@@ -86987,9 +86987,7 @@ END_VAR</Single>
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* test *)
-(* enable test *)
-T := TIME_TO_REAL(TimeConst) / 1000.0;
+            <Single Name="TextBlobForSerialisation" Type="string">T := TIME_TO_REAL(TimeConst) / 1000.0;
 
 IF (T + CycleTimeS) &gt; 0.0 THEN
     Alpha := CycleTimeS / (T + CycleTimeS);
@@ -87341,8 +87339,7 @@ END_VAR</Single>
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* modif *)
-// Détection du comportement (Accélération vs Décélération)
+            <Single Name="TextBlobForSerialisation" Type="string">// Détection du comportement (Accélération vs Décélération)
 IF (Target &gt; 0.0 AND Target &gt; Current) OR (Target &lt; 0.0 AND Target &lt; Current) THEN
     StepX := AccelRate * CycleTimeS; // S'éloigne du zéro
 ELSE
@@ -88466,8 +88463,7 @@ END_VAR</Single>
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* testvar *)
-// 1. ACQUISITION DU TEMPS SYSTÈME
+            <Single Name="TextBlobForSerialisation" Type="string">// 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
 
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE

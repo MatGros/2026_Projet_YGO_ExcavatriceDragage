@@ -46,7 +46,7 @@ excavatrice-dragage/
 │   ├── PRG_JOY1__*.xml
 │   └── _archive_plcopen/    (anciens fichiers)
 │
-├── PROJ_Full_ImportExport/   # 📦 Projet CODESYS (export complet)
+├── PRJ_CODESYS/PROJ_Full_ImportExport/   # 📦 Projet CODESYS (export complet)
 │   └── Device.export         (source de vérité)
 │
 ├── tools/                    # 🛠️ Utilitaires
@@ -68,7 +68,7 @@ excavatrice-dragage/
 Pour modifier du code en dehors de CODESYS :
 
 ```bash
-# 1. Exporter depuis CODESYS → PROJ_Full_ImportExport/Device.export
+# 1. Exporter depuis CODESYS → PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
 # 2. Extraire tous les POUs
 extract.bat --yes

@@ -37,7 +37,7 @@ import subprocess
 import codesys_common as cc
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_TARGET = PROJECT_ROOT / "PROJ_Full_ImportExport" / "Device.export"
+DEFAULT_TARGET = PROJECT_ROOT / "PRJ_CODESYS" / "PROJ_Full_ImportExport" / "Device.export"
 DEFAULT_SOURCE = PROJECT_ROOT / "CODE"
 
 
