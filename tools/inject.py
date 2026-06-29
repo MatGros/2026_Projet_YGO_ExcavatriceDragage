@@ -32,6 +32,7 @@ import shutil
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
+import subprocess
 
 import codesys_common as cc
 
@@ -195,6 +196,23 @@ def main(argv=None):
     print("\nReinjection terminee : {} POU mis a jour dans {}.".format(len(chosen), target.name))
     print("Backup : {}".format(backup.name))
     print("OK. Vous pouvez reimporter Device.export dans CODESYS.")
+
+    # Proposition de clean
+    print("\n" + "=" * 60)
+    try:
+        ans = input("Faire un nettoyage (clean) pour preparer le prochain cycle ? [o]ui / [n]on : ").strip().lower()
+    except EOFError:
+        ans = ""
+    if ans in ("o", "oui", "y", "yes"):
+        print("\nLancement du clean...")
+        clean_script = Path(__file__).parent / "clean.py"
+        try:
+            result = subprocess.call([sys.executable, str(clean_script)])
+            return result
+        except Exception as e:
+            print("ERREUR lors du clean : {}".format(e))
+            print("(vous pouvez le lancer manuellement : python tools/clean.py)")
+            return 0
     return 0
 
 
