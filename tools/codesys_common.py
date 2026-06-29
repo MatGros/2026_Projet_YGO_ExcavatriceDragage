@@ -115,3 +115,33 @@ def safe_filename(name, guid):
     """Nom de fichier d'extraction : <Name>__<Guid>.xml (Name nettoye)."""
     clean = re.sub(r'[^0-9A-Za-z_\-]', '_', name)
     return "{}__{}.xml".format(clean, guid)
+
+
+class QuitRequested(Exception):
+    """Leve quand l'utilisateur choisit [q]uitter dans une invite."""
+
+
+def confirm_each(label, state):
+    """
+    Invite interactive par element avec memoire 'tout'.
+    `state` est un dict mutable ; state['all']=True apres un choix [t]out.
+    Retourne True (faire) / False (ignorer). Leve QuitRequested sur [q].
+    En mode non interactif (EOF), repond False par defaut.
+    """
+    if state.get("all"):
+        return True
+    while True:
+        try:
+            ans = input("    {} ? [o]ui / [n]on / [t]out / [q]uitter : ".format(label)).strip().lower()
+        except EOFError:
+            return False
+        if ans in ("o", "oui", "y", "yes"):
+            return True
+        if ans in ("n", "non", "no", ""):
+            return False
+        if ans in ("t", "tout", "a", "all"):
+            state["all"] = True
+            return True
+        if ans in ("q", "quit", "quitter"):
+            raise QuitRequested()
+        print("    Reponse non reconnue.")

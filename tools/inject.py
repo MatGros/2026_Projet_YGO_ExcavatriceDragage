@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-inject.py — Reinjecte les fragments POU modifies (dossier import/) dans
-PRJ/Device.export, en les retrouvant par leur GUID unique.
+inject.py — Reinjecte dans PRJ/Device.export les POU du dossier CODE/, retrouves
+par leur GUID unique.
+
+Detection automatique : un POU dont le fichier CODE/ est IDENTIQUE au bloc deja
+present dans Device.export est marque "inchange" et ignore (rien a faire). Seuls
+les POU reellement modifies sont proposes a la reinjection.
+
+Pour chaque POU modifie : invite [o]ui / [n]on / [t]out / [q]uitter
+(--yes reinjecte tout sans demander).
 
 Securites :
-  - chaque fragment doit etre un XML bien forme ;
-  - son GUID doit exister (et etre unique) dans Device.export ;
-  - le LineInfoPersistence doit correspondre au GUID (anti-corruption) ;
-  - pour un POU Ladder/FBD, le corps graphique (NetworkList) ne doit pas avoir
-    change (sinon avertissement) ;
+  - fragment XML bien forme ; GUID present et unique dans la cible ;
+  - LineInfoPersistence coherent avec le GUID (avertissement sinon) ;
+  - corps Ladder/FBD inchange (avertissement sinon) ;
   - backup horodate .bak avant ecriture ;
-  - confirmation interactive [o/N] ;
-  - re-verification XML du fichier complet apres ecriture (rollback sinon).
+  - re-validation XML du fichier complet avant ecriture (abandon sinon).
 
 Usage :
-    python tools/inject.py                 # depuis ../import/ vers PRJ/Device.export
-    python tools/inject.py --yes           # sans confirmation interactive
-    python tools/inject.py --imports X --target Y
+    python tools/inject.py             # depuis CODE/ vers PRJ/Device.export
+    python tools/inject.py --yes       # reinjecte tout sans confirmation
+    python tools/inject.py --source X --target Y
 """
 from __future__ import print_function
 
@@ -33,173 +37,165 @@ import codesys_common as cc
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_TARGET = PROJECT_ROOT / "PRJ" / "Device.export"
-DEFAULT_IMPORTS = PROJECT_ROOT / "import"
+DEFAULT_SOURCE = PROJECT_ROOT / "CODE"
 
 
 def fragment_info(frag_text):
-    """
-    Valide qu'un fragment est un XML bien forme et retourne (guid, name).
-    Leve ValueError sinon.
-    """
+    """Valide le fragment (XML bien forme) et retourne (guid, name)."""
     try:
         ET.fromstring(frag_text)
     except ET.ParseError as e:
         raise ValueError("XML mal forme : {}".format(e))
-
     guid_m = cc.GUID_RE.search(frag_text)
     name_m = cc.NAME_RE.search(frag_text)
     if not guid_m or not name_m:
-        raise ValueError("Guid ou Name introuvable dans le fragment.")
+        raise ValueError("Guid ou Name introuvable.")
     return guid_m.group(1).strip(), name_m.group(1).strip()
 
 
 def check_lineinfo(frag_text, guid):
-    """Avertit si un LineInfoPersistence ne reference pas le bon GUID."""
     problems = []
     for m in cc.re.finditer(
             r'<Single\s+Name="LineInfoPersistence"\s+Type="string">([^<]*)</Single>',
             frag_text):
-        val = m.group(1)
-        if guid not in val:
-            problems.append(val)
+        if guid not in m.group(1):
+            problems.append(m.group(1))
     return problems
 
 
+def _extract_impl(block):
+    m = cc.re.search(r'<Single\s+Name="Implementation"\b', block)
+    if not m:
+        return None
+    return block[m.start():cc.find_entry_end(block, m.start())]
+
+
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Reinjecte les FB/PRG modifies dans Device.export.")
+    parser = argparse.ArgumentParser(description="Reinjecte les FB/PRG de CODE/ dans Device.export.")
     parser.add_argument("--target", default=str(DEFAULT_TARGET),
                         help="Device.export cible (defaut: PRJ/Device.export)")
-    parser.add_argument("--imports", default=str(DEFAULT_IMPORTS),
-                        help="Dossier des fragments a reinjecter (defaut: import/)")
+    parser.add_argument("--source", default=str(DEFAULT_SOURCE),
+                        help="Dossier des POU (defaut: CODE/)")
     parser.add_argument("--yes", action="store_true",
-                        help="Ne pas demander de confirmation (mode non interactif)")
+                        help="Reinjecte tout sans confirmation")
     args = parser.parse_args(argv)
 
     target = Path(args.target)
-    imports = Path(args.imports)
+    source = Path(args.source)
 
     if not target.is_file():
         print("ERREUR: cible introuvable : {}".format(target))
         return 1
-    if not imports.is_dir():
-        print("ERREUR: dossier import introuvable : {}".format(imports))
+    if not source.is_dir():
+        print("ERREUR: dossier source introuvable : {}".format(source))
         return 1
 
-    frag_files = sorted(imports.glob("*.xml"))
+    # Fichiers a la racine de CODE/ seulement (sous-dossiers type _archive ignores)
+    frag_files = sorted(p for p in source.glob("*.xml") if p.is_file())
     if not frag_files:
-        print("Rien a faire : aucun .xml dans {}.".format(imports))
+        print("Rien a faire : aucun .xml dans {}.".format(source))
         return 0
 
     text = target.read_text(encoding="utf-8")
-
-    # Index des POU existants par GUID
     existing = {}
     for pou in cc.iter_pou_entries(text):
         existing.setdefault(pou["guid"], []).append(pou)
 
-    planned = []   # (frag_path, name, guid, old_pou, new_block, delta)
-    errors = []
+    candidates = []   # POU modifies, valides : (path, name, guid, old_pou, new_block, delta)
+    n_same = n_err = 0
 
-    print("\nAnalyse des fragments de {} ...\n".format(imports))
+    print("\nAnalyse de {} ...\n".format(source))
     for fp in frag_files:
-        frag_text = fp.read_text(encoding="utf-8")
+        try:
+            frag_text = fp.read_text(encoding="utf-8")
+        except (PermissionError, OSError) as e:
+            n_err += 1
+            print("  VERROUILLE {:<41} {} (fermez-le)".format(fp.name, e))
+            continue
         try:
             guid, name = fragment_info(frag_text)
         except ValueError as e:
-            errors.append("{} : {}".format(fp.name, e))
-            print("  REFUSE  {:<40} {}".format(fp.name, e))
+            n_err += 1
+            print("  REFUSE   {:<42} {}".format(fp.name, e))
             continue
 
         matches = existing.get(guid, [])
-        if len(matches) == 0:
-            msg = "GUID {} absent de la cible".format(guid)
-            errors.append("{} : {}".format(fp.name, msg))
-            print("  REFUSE  {:<40} {}".format(fp.name, msg))
-            continue
-        if len(matches) > 1:
-            msg = "GUID {} non unique dans la cible ({} occurrences)".format(guid, len(matches))
-            errors.append("{} : {}".format(fp.name, msg))
-            print("  REFUSE  {:<40} {}".format(fp.name, msg))
+        if len(matches) != 1:
+            n_err += 1
+            why = "GUID absent de la cible" if not matches else \
+                  "GUID non unique ({} occurrences)".format(len(matches))
+            print("  REFUSE   {:<42} {}".format(fp.name, why))
             continue
 
         old_pou = matches[0]
-
-        # Garde-fou LineInfoPersistence
-        li_problems = check_lineinfo(frag_text, guid)
-        if li_problems:
-            print("  ATTENTION {:<38} LineInfoPersistence ne reference pas le GUID : {}".format(
-                fp.name, li_problems))
-
-        # Garde-fou Ladder : NetworkList ne doit pas avoir change
-        if cc.is_ladder(old_pou["block"]):
-            old_impl = _extract_impl(old_pou["block"])
-            new_impl = _extract_impl(frag_text)
-            if old_impl is not None and old_impl != new_impl:
-                print("  ATTENTION {:<38} corps Ladder/FBD modifie (deconseille).".format(fp.name))
-
         new_block = frag_text
-        # On normalise : pas de newline final parasite hors balise
         if new_block.endswith("\n") and not old_pou["block"].endswith("\n"):
             new_block = new_block.rstrip("\n")
 
+        if new_block == old_pou["block"]:
+            n_same += 1
+            print("  inchange {:<42} {}".format(fp.name, name))
+            continue
+
+        # Avertissements non bloquants
+        for bad in check_lineinfo(frag_text, guid):
+            print("  ATTENTION {:<41} LineInfoPersistence ne reference pas le GUID : {}".format(
+                fp.name, bad))
+        if cc.is_ladder(old_pou["block"]):
+            if _extract_impl(old_pou["block"]) != _extract_impl(frag_text):
+                print("  ATTENTION {:<41} corps Ladder/FBD modifie (deconseille).".format(fp.name))
+
         delta = len(new_block) - len(old_pou["block"])
-        planned.append((fp, name, guid, old_pou, new_block, delta))
-        print("  OK      {:<40} {:<22} (delta {:+d} car.)".format(fp.name, name, delta))
+        candidates.append((fp, name, guid, old_pou, new_block, delta))
+        print("  MODIFIE  {:<42} {:<22} (delta {:+d} car.)".format(fp.name, name, delta))
 
-    if not planned:
-        print("\nAucun fragment valide a reinjecter.")
-        return 1 if errors else 0
+    print("\n{} inchange(s), {} modifie(s), {} refuse(s).".format(n_same, len(candidates), n_err))
+    if not candidates:
+        print("Aucun POU a reinjecter.")
+        return 1 if n_err else 0
 
-    print("\n{} POU a reinjecter :".format(len(planned)))
-    for _, name, guid, _, _, delta in planned:
-        print("   - {:<22} {}  (delta {:+d})".format(name, guid, delta))
-    if errors:
-        print("\n{} fragment(s) refuse(s) (ignore(s)).".format(len(errors)))
+    # Confirmation par POU avec memoire 'tout'
+    print("\nConfirmation de la reinjection :")
+    state = {"all": args.yes}
+    chosen = []
+    try:
+        for cand in candidates:
+            fp, name, guid, _, _, delta = cand
+            if cc.confirm_each("Reinjecter {} ({:+d})".format(name, delta), state):
+                chosen.append(cand)
+            else:
+                print("    -> ignore : {}".format(name))
+    except cc.QuitRequested:
+        print("\nInterrompu. Aucun changement.")
+        return 1
 
-    if not args.yes:
-        try:
-            ans = input("\nReinjecter ces POU dans {} ? [o/N] ".format(target.name)).strip().lower()
-        except EOFError:
-            ans = ""
-        if ans not in ("o", "oui", "y", "yes"):
-            print("Annule. Aucun changement.")
-            return 0
+    if not chosen:
+        print("\nAucun POU selectionne. Aucun changement.")
+        return 0
 
-    # Backup horodate
+    # Backup
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup = target.with_suffix(target.suffix + ".{}.bak".format(stamp))
     shutil.copy2(target, backup)
     print("\nBackup cree : {}".format(backup.name))
 
-    # Remplacement par offsets decroissants (pour ne pas decaler les suivants)
-    planned_by_pos = sorted(planned, key=lambda t: t[3]["start"], reverse=True)
+    # Remplacement par offsets decroissants
     new_text = text
-    for _, name, guid, old_pou, new_block, _ in planned_by_pos:
+    for _, name, guid, old_pou, new_block, _ in sorted(
+            chosen, key=lambda t: t[3]["start"], reverse=True):
         new_text = new_text[:old_pou["start"]] + new_block + new_text[old_pou["end"]:]
 
-    # Verification XML du fichier complet AVANT d'ecrire
     try:
         ET.fromstring(new_text)
     except ET.ParseError as e:
-        print("ERREUR: le resultat ne serait pas un XML valide ({}).".format(e))
-        print("Aucune ecriture effectuee. Backup conserve : {}".format(backup.name))
+        print("ERREUR: resultat XML invalide ({}). Aucune ecriture. Backup conserve.".format(e))
         return 1
 
     target.write_text(new_text, encoding="utf-8")
-
-    print("\nReinjection terminee : {} POU mis a jour dans {}.".format(len(planned), target.name))
+    print("\nReinjection terminee : {} POU mis a jour dans {}.".format(len(chosen), target.name))
     print("Backup : {}".format(backup.name))
     print("OK. Vous pouvez reimporter Device.export dans CODESYS.")
     return 0
-
-
-def _extract_impl(block):
-    """Retourne le sous-bloc <Single Name="Implementation" ...>...</Single> ou None."""
-    m = cc.re.search(r'<Single\s+Name="Implementation"\b', block)
-    if not m:
-        return None
-    end = cc.find_entry_end(block, m.start())
-    return block[m.start():end]
 
 
 if __name__ == "__main__":

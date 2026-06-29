@@ -5,9 +5,27 @@
       "Bash(python extract.py --clean)",
       "Bash(python -c ' *)",
       "Bash(rm -rf scratch_test PRJ/*.bak import/*.xml)",
+      "Bash(python extract.py --yes)",
+      "Bash(python inject.py --yes)",
+      "Bash(git status*)",
+      "Bash(git log *)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git commit*)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git merge*)",
+      "Bash(git rebase*)",
+      "Bash(git fetch*)",
+      "Bash(git tag*)",
+      "Bash(git stash*)",
+      "Bash(git checkout *)"
+    ],
+    "ask": [
+      "Bash(git reset *)",
+      "Bash(git push --force*)",
+      "Bash(git clean *)"
     ]
   }
 }
