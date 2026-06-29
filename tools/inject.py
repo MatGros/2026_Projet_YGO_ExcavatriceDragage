@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-inject.py — Reinjecte dans PRJ/Device.export les POU du dossier CODE/, retrouves
+inject.py — Reinjecte dans PROJ_Full_ImportExport/Device.export les POU du dossier CODE/, retrouves
 par leur GUID unique.
 
 Detection automatique : un POU dont le fichier CODE/ est IDENTIQUE au bloc deja
@@ -19,7 +19,7 @@ Securites :
   - re-validation XML du fichier complet avant ecriture (abandon sinon).
 
 Usage :
-    python tools/inject.py             # depuis CODE/ vers PRJ/Device.export
+    python tools/inject.py             # depuis CODE/ vers PROJ_Full_ImportExport/Device.export
     python tools/inject.py --yes       # reinjecte tout sans confirmation
     python tools/inject.py --source X --target Y
 """
@@ -36,7 +36,7 @@ from pathlib import Path
 import codesys_common as cc
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_TARGET = PROJECT_ROOT / "PRJ" / "Device.export"
+DEFAULT_TARGET = PROJECT_ROOT / "PROJ_Full_ImportExport" / "Device.export"
 DEFAULT_SOURCE = PROJECT_ROOT / "CODE"
 
 
@@ -73,7 +73,7 @@ def _extract_impl(block):
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Reinjecte les FB/PRG de CODE/ dans Device.export.")
     parser.add_argument("--target", default=str(DEFAULT_TARGET),
-                        help="Device.export cible (defaut: PRJ/Device.export)")
+                        help="Device.export cible (defaut: PROJ_Full_ImportExport/Device.export)")
     parser.add_argument("--source", default=str(DEFAULT_SOURCE),
                         help="Dossier des POU (defaut: CODE/)")
     parser.add_argument("--yes", action="store_true",

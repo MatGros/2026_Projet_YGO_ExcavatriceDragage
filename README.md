@@ -44,7 +44,7 @@ excavatrice-dragage/
 ├── CODE/                     # 🔧 Code source XML CODESYS
 │   └── FB_Filter_PT1__*.xml
 │
-├── PRJ/                      # 📦 Projet CODESYS
+├── PROJ_Full_ImportExport/   # 📦 Projet CODESYS (export complet)
 │   └── Device.export         (source de vérité)
 │
 ├── tools/                    # 🛠️ Utilitaires
@@ -66,7 +66,7 @@ excavatrice-dragage/
 Pour modifier du code en dehors de CODESYS :
 
 ```bash
-# 1. Exporter depuis CODESYS → PRJ/Device.export
+# 1. Exporter depuis CODESYS → PROJ_Full_ImportExport/Device.export
 
 # 2. Extraire tous les POUs
 python tools/extract.py --clean

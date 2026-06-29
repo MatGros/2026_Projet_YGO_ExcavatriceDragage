@@ -6,7 +6,7 @@ Function Blocks et Programmes hors de CODESYS, puis les réinjecter.
 ## Arborescence
 
 ```
-PRJ/Device.export      <- export depuis CODESYS (source de vérité)
+PROJ_Full_ImportExport/Device.export      <- export depuis CODESYS (source de vérité)
 tools/extract.py       <- extrait chaque POU en .xml individuel
 tools/inject.py        <- réinjecte les POU modifiés par GUID
 tools/codesys_common.py<- fonctions partagées
@@ -16,7 +16,7 @@ import/                <- fragments modifiés à réinjecter (copier depuis extr
 
 ## Workflow
 
-1. **Exporter** depuis CODESYS → `PRJ/Device.export`.
+1. **Exporter** depuis CODESYS → `PROJ_Full_ImportExport/Device.export`.
 2. **Extraire** :
    ```
    python tools/extract.py --clean
