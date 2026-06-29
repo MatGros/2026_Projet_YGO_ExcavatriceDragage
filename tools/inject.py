@@ -174,11 +174,10 @@ def main(argv=None):
         print("\nAucun POU selectionne. Aucun changement.")
         return 0
 
-    # Backup
+    # Backup horodate (sera supprime apres succes)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup = target.with_suffix(target.suffix + ".{}.bak".format(stamp))
     shutil.copy2(target, backup)
-    print("\nBackup cree : {}".format(backup.name))
 
     # Remplacement par offsets decroissants
     new_text = text
@@ -194,8 +193,13 @@ def main(argv=None):
 
     target.write_text(new_text, encoding="utf-8")
     print("\nReinjection terminee : {} POU mis a jour dans {}.".format(len(chosen), target.name))
-    print("Backup : {}".format(backup.name))
     print("OK. Vous pouvez reimporter Device.export dans CODESYS.")
+
+    # Supprimer le backup (horodate, accumule inutilement ; archive avec clean si besoin)
+    try:
+        backup.unlink()
+    except Exception:
+        pass
 
     # Proposition de clean
     print("\n" + "=" * 60)
