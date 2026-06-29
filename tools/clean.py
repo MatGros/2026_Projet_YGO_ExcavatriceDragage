@@ -19,7 +19,7 @@ from datetime import datetime
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CODE = PROJECT_ROOT / "CODE"
-DEFAULT_PROJ = PROJECT_ROOT / "PROJ_Full_ImportExport"
+DEFAULT_PROJ = PROJECT_ROOT / "PRJ_CODESYS" / "PROJ_Full_ImportExport"
 DEFAULT_ARCHIVE_ROOT = PROJECT_ROOT / "ARCHIVES"
 
 

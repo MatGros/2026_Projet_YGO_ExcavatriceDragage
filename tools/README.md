@@ -10,7 +10,7 @@ Wrapper `.bat` à la racine pour lancement facile : `extract.bat`, `inject.bat`,
 ## Arborescence
 
 ```
-PROJ_Full_ImportExport/Device.export      ← source de vérité (réexport CODESYS)
+PRJ_CODESYS/PROJ_Full_ImportExport/Device.export      ← source de vérité (réexport CODESYS)
 CODE/                                      ← fragments POUs (extract/inject)
   ├── FB_Filter_PT1__<GUID>.xml
   ├── PRG_JOY1__<GUID>.xml
@@ -32,7 +32,7 @@ ARCHIVES/                  ← historique des cycles
 
 ## Workflow Édition (cycle unique)
 
-1. **Exporter** depuis CODESYS → `PROJ_Full_ImportExport/Device.export`.
+1. **Exporter** depuis CODESYS → `PRJ_CODESYS/PROJ_Full_ImportExport/Device.export`.
 
 2. **Extraire** vers CODE/ :
    ```
