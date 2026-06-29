@@ -2,6 +2,14 @@
 PRJ/*.bak
 *.bak
 
+# CODESYS temporary files
+*.~u
+*.~d
+
 # Python
 __pycache__/
 *.pyc
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/skills/
