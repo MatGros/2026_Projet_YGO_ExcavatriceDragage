@@ -107,32 +107,39 @@ Tous les docs dans **`DOC/`** :
 
 ---
 
-## 🔒 **AVANT TOUTE MODIFICATION CODE/ — OBLIGATION**
+## 🔒 **GUARDRAILS OBLIGATOIRES — AVANT TOUTE MODIF CODE/**
 
-**L'IA doit TOUJOURS faire ceci** avant de générer du code CODESYS :
+**Si l'utilisateur demande modification CODE/, FB_, PRG_, ou "codesys" :**
 
-1. **Lire guardrails** → `.claude/guardrails-codesys.md`
-2. **Charger docs pertinentes** → NAMING_CONVENTION, AF_Partie3, etc.
-3. **Vérifier la spec** → Complète ou signaler manques
-4. **Auditer conformité** → Nommage, interface, sécurité
-5. **Tracer checklist** → Avant génération
-6. **Refuser non-conforme** → Ne JAMAIS approximer
+1. ✅ **Charger automatiquement** `.claude/guardrails-codesys.md`
+2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun.md
+3. ✅ **Vérifier spec complète** → Sinon demander clarifications
+4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
+5. ✅ **Tracer checklist** avant génération
+6. ✅ **Refuser code non-conforme** → Ne JAMAIS approximer
 
-### ⚡ **SKILL Locale : /codesys-code**
+**Cas d'arrêt (refuse génération) :**
+- Nommage ambigu ou non-PascalCase
+- Interface FB incomplète
+- Reset pas sur front
+- SafeStop dépendant de Enable
+- Redémarrage auto après défaut
+- Spec manquante/incomplète
 
-Invoquer avant chaque modification :
+---
+
+### 📖 **Accès rapide à la SKILL**
+
+Les guardrails sont aussi dans [`.claude/skills/codesys-code.md`](.claude/skills/codesys-code.md)
+
+Demande simplement (les guardrails chargent auto) :
 ```
-/codesys-code [fichier | nom_FB | description]
+Modifier FB_Joystick pour [description]
+Créer nouveau FB_ pour [description]
+Ajouter [feature] au CODE/
 ```
 
-**Guardrails auto-appliqués** (voir [.claude/guardrails-codesys.md](.claude/guardrails-codesys.md)) :
-- ✓ Audit strict nommage PascalCase
-- ✓ Validation interface FB (Enable, SafeStop, ErrorId, etc.)
-- ✓ Détection logique Reset & SafeStop
-- ✓ Signale doutes / specs manquantes **AVANT génération**
-- ✗ Refuse code non-conforme
-
-**L'IA doit** lire docs pertinentes + tracer checklist d'audit.
+L'IA charge automatiquement + valide avant génération.
 
 ---
 
