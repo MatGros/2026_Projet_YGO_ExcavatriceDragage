@@ -107,6 +107,35 @@ Tous les docs dans **`DOC/`** :
 
 ---
 
+## 🔒 **AVANT TOUTE MODIFICATION CODE/ — OBLIGATION**
+
+**L'IA doit TOUJOURS faire ceci** avant de générer du code CODESYS :
+
+1. **Lire guardrails** → `.claude/guardrails-codesys.md`
+2. **Charger docs pertinentes** → NAMING_CONVENTION, AF_Partie3, etc.
+3. **Vérifier la spec** → Complète ou signaler manques
+4. **Auditer conformité** → Nommage, interface, sécurité
+5. **Tracer checklist** → Avant génération
+6. **Refuser non-conforme** → Ne JAMAIS approximer
+
+### ⚡ **SKILL Locale : /codesys-code**
+
+Invoquer avant chaque modification :
+```
+/codesys-code [fichier | nom_FB | description]
+```
+
+**Guardrails auto-appliqués** (voir [.claude/guardrails-codesys.md](.claude/guardrails-codesys.md)) :
+- ✓ Audit strict nommage PascalCase
+- ✓ Validation interface FB (Enable, SafeStop, ErrorId, etc.)
+- ✓ Détection logique Reset & SafeStop
+- ✓ Signale doutes / specs manquantes **AVANT génération**
+- ✗ Refuse code non-conforme
+
+**L'IA doit** lire docs pertinentes + tracer checklist d'audit.
+
+---
+
 ## ✅ **Checklist Avant de Coder**
 
 - [ ] Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)
@@ -115,6 +144,16 @@ Tous les docs dans **`DOC/`** :
 - [ ] `ErrorId` = bitfield ? Reset = front obligatoire ?
 - [ ] `SafeStop` prioritaire sur Enable ?
 
+### Avant de demander modification code (Workflow complet)
+
+1. **Extraire** : `python tools/extract.py --clean`
+2. **Invoquer guardrails** : `/codesys-code [fichier]`
+3. **L'IA valide** : audit nommage, interface, sécurité
+4. **Si doute** : signale + demande clarification
+5. **Sinon** : génère code + checklist
+6. **Réinjecter** : `python tools/inject.py`
+7. **Réimporter dans CODESYS** (manuel)
+
 ---
 
-**État du projet :** Main branch clean, documentation complète, outils d'édition prêts. 🚀
+**État du projet :** Main branch clean, documentation complète, outils d'édition + guardrails actifs. 🚀

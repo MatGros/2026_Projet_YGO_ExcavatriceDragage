@@ -27,7 +27,10 @@
       "Bash(python tools/inject.py --yes)",
       "Bash(python tools/clean.py --dry-run)",
       "Bash(python tools/clean.py)",
-      "Bash(rm -f PROJ_Full_ImportExport/*.bak)"
+      "Bash(rm -f PROJ_Full_ImportExport/*.bak)",
+      "Bash(python tools/check-codesys-code.py *)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
     ],
     "ask": [
       "Bash(git reset *)",
