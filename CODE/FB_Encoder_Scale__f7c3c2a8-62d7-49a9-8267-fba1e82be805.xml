@@ -1,0 +1,96 @@
+<Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">f7c3c2a8-62d7-49a9-8267-fba1e82be805</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Encoder_Scale</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639182692963612328</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">// 1. Mode Teach : Calcul automatique du coefficient de mise à l'échelle (a)
+IF EnableTeach AND RealDistMeters &gt; 0.001 THEN
+    DeltaPulses := UDINT_TO_REAL(EndTeachPos) - UDINT_TO_REAL(StartTeachPos);
+    IF ABS(DeltaPulses) &gt; 0.0 THEN
+        // Calcul du ratio : impulsions par mètre
+        PulsePerMeter := ABS(DeltaPulses) / RealDistMeters;
+    END_IF
+END_IF
+
+// 2. Application de la formule affine y = ax + b
+// Sécurité : évite la division par zéro si le ratio n'est pas configuré
+IF PulsePerMeter &gt; 0.001 THEN
+    PositionMeters := (UDINT_TO_REAL(CurrentRawPos) / PulsePerMeter) + OffsetValueB;
+ELSE
+    PositionMeters := 0.0;
+END_IF</Single>
+            <Single Name="LineInfoPersistence" Type="string">f7c3c2a8-62d7-49a9-8267-fba1e82be805_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Encoder_Scale
+VAR_INPUT
+    CurrentRawPos : UDINT;        // Valeur brute synchrone (%ID2)
+    OffsetValueB  : REAL;         // Le "b" de l'équation (décalage en mètres)
+    
+    (* Mode Teach / Calibration assistée *)
+    EnableTeach   : BOOL;         // Active le mode calibration
+    StartTeachPos : UDINT;        // Capture de la position brute au point A
+    EndTeachPos   : UDINT;        // Capture de la position brute au point B
+    RealDistMeters: REAL;         // Distance réelle mesurée au mètre ruban entre A et B
+END_VAR
+VAR_IN_OUT
+    PulsePerMeter : REAL;         // Le "a" de l'équation (Pulsations / mètre)
+END_VAR
+VAR_OUTPUT
+    PositionMeters: REAL;         // La sortie finale f(x) = ax + b
+END_VAR
+VAR
+    DeltaPulses   : REAL;
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">f7c3c2a8-62d7-49a9-8267-fba1e82be805_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">43</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CODEUR</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
