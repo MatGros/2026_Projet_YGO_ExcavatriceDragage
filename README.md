@@ -41,20 +41,22 @@ excavatrice-dragage/
 │   ├── AF_Partie2_Architecture_Programme_v2.1.md
 │   └── AF_Partie3_Template_FB_Commun.md
 │
-├── CODE/                     # 🔧 Code source XML CODESYS
-│   └── FB_Filter_PT1__*.xml
+├── CODE/                     # 🔧 Fragments POUs CODESYS (extract/inject)
+│   ├── FB_Filter_PT1__*.xml
+│   ├── PRG_JOY1__*.xml
+│   └── _archive_plcopen/    (anciens fichiers)
 │
 ├── PROJ_Full_ImportExport/   # 📦 Projet CODESYS (export complet)
 │   └── Device.export         (source de vérité)
 │
 ├── tools/                    # 🛠️ Utilitaires
-│   ├── extract.py           (extrait POUs → XML)
-│   ├── inject.py            (réinjecte POUs modifiés)
+│   ├── extract.py           (extrait POUs → CODE/)
+│   ├── inject.py            (réinjecte POUs modifiés de CODE/)
 │   ├── codesys_common.py    (fonctions partagées)
 │   └── README.md            (mode d'emploi)
 │
-├── extraction/              # 📄 Sortie extract.py (1 POU = 1 XML)
-├── import/                  # ✏️ POUs à réinjecter (avant inject.py)
+├── extract.bat              # 💻 Raccourci Windows (→ tools/extract.py)
+├── inject.bat               # 💻 Raccourci Windows (→ tools/inject.py)
 │
 └── README.md               # 👈 Vous êtes ici
 ```
@@ -69,13 +71,15 @@ Pour modifier du code en dehors de CODESYS :
 # 1. Exporter depuis CODESYS → PROJ_Full_ImportExport/Device.export
 
 # 2. Extraire tous les POUs
-python tools/extract.py --clean
+extract.bat --yes
+# ou : python tools/extract.py --yes
 
-# 3. Copier le(s) POU à modifier
-#    extraction/ → import/ et éditer dans VS Code
+# 3. Éditer les fichiers XML dans CODE/ (via VS Code)
+#    → modifier la déclaration VAR et/ou le corps ST
 
 # 4. Réinjecter les changements
-python tools/inject.py
+inject.bat
+# ou : python tools/inject.py
 
 # 5. Réimporter Device.export dans CODESYS
 ```
