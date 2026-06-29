@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-extract.py — Extrait chaque POU (FB / PRG) de PRJ/Device.export dans un fichier
+extract.py — Extrait chaque POU (FB / PRG) de PROJ_Full_ImportExport/Device.export dans un fichier
 .xml individuel sous CODE/ (dossier unique, versionne avec git).
 
 Chaque fichier contient le bloc XML complet de l'entree, VERBATIM (octets
@@ -27,14 +27,14 @@ from pathlib import Path
 import codesys_common as cc
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SOURCE = PROJECT_ROOT / "PRJ" / "Device.export"
+DEFAULT_SOURCE = PROJECT_ROOT / "PROJ_Full_ImportExport" / "Device.export"
 DEFAULT_OUT = PROJECT_ROOT / "CODE"
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Extrait les FB/PRG de Device.export vers CODE/.")
     parser.add_argument("--source", default=str(DEFAULT_SOURCE),
-                        help="Chemin du Device.export (defaut: PRJ/Device.export)")
+                        help="Chemin du Device.export (defaut: PROJ_Full_ImportExport/Device.export)")
     parser.add_argument("--out", default=str(DEFAULT_OUT),
                         help="Dossier de sortie (defaut: CODE/)")
     parser.add_argument("--yes", action="store_true",

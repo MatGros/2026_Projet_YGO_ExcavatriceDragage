@@ -20,7 +20,9 @@
       "Bash(git fetch*)",
       "Bash(git tag*)",
       "Bash(git stash*)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(rm -f extract.py inject.py)",
+      "Bash(extract.bat --yes)"
     ],
     "ask": [
       "Bash(git reset *)",
