@@ -41,7 +41,8 @@
       "Bash(git mv *)",
       "Bash(mkdir -p tools/archive)",
       "Bash(git status *)",
-      "Bash(python3 tools/inject.py --yes)"
+      "Bash(python3 tools/inject.py --yes)",
+      "Bash(awk '{print $5, $9}')"
     ],
     "ask": [
       "Bash(git reset *)",
