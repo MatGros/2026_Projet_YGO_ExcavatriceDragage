@@ -39,19 +39,35 @@ Tâches, arborescence CODESYS, flux données.
 
 ## 🛠️ **Workflow Édition**
 
+### **Modifier FBs existants**
 ```bash
-# Extraire POUs pour édition externe
-python tools/extract.py --clean
+# 1. Extraire POUs pour édition
+python tools/extract.py --yes --commit
 
-# Copier extraction/ → import/ et éditer dans VS Code
+# 2. Éditer CODE/*.xml directement dans VS Code
 
-# Réinjecter (guarded par GUID, backup auto)
-python tools/inject.py
+# 3. Réinjecter (guarded par GUID, backup auto)
+python tools/inject.py --yes
 
-# Réimporter Device.export dans CODESYS
+# 4. Réimporter Device.export dans CODESYS
+```
+
+### **Créer nouveaux FBs (simplifié)**
+```bash
+# 1. Écrire un fichier ST brut (pas d'XML)
+#    ex: CODE/FB_MonFB.st
+
+# 2. Convertir ST → XML CODESYS (génère GUID auto)
+python tools/st2xml.py CODE/FB_MonFB.st
+
+# 3. Réinjecter les nouveaux FBs
+python tools/inject.py --yes
+
+# 4. Réimporter Device.export dans CODESYS
 ```
 
 👉 Voir [tools/README.md](tools/README.md) pour options complètes.
+👉 Voir [.claude/guardrails-codesys.md](.claude/guardrails-codesys.md) pour détails sur st2xml.py.
 
 ---
 

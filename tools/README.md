@@ -1,8 +1,9 @@
-# Outils extract / inject / clean — Device.export CODESYS
+# Outils extract / inject / clean / st2xml — Device.export CODESYS
 
-Trois scripts Python (stdlib uniquement, aucune dépendance) :
+Quatre scripts Python (stdlib uniquement, aucune dépendance) :
 - **extract** : exporte chaque FB/PRG de Device.export vers CODE/
 - **inject** : réinjecte les FB/PRG modifiés dans Device.export
+- **st2xml** : convertit fichiers ST bruts → XML CODESYS (NOUVEAU ✨)
 - **clean** : archive CODE/ + Device.export, prépare slate clean pour réexport CODESYS
 
 Wrapper `.bat` à la racine pour lancement facile : `extract.bat`, `inject.bat`, `clean.bat`
@@ -29,6 +30,48 @@ ARCHIVES/                  ← historique des cycles
   │   └── Device.export.backup
   └── 20260701_120000/ …
 ```
+
+## Workflow Édition — SIMPLIFIÉE (st2xml) ✨
+
+### Créer de nouveaux FBs (ST brut → XML automatique)
+
+```bash
+# 1. Écrire un FB simple en ST
+cat > CODE/FB_MyNewFB.st << 'EOF'
+FUNCTION_BLOCK FB_MyNewFB
+VAR_INPUT
+    Enable : BOOL;
+    Reset  : BOOL;
+END_VAR
+VAR_OUTPUT
+    Ready  : BOOL;
+    Error  : BOOL;
+END_VAR
+// Implémentation
+IF NOT Enable THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+Ready := TRUE;
+END_FUNCTION_BLOCK
+EOF
+
+# 2. Convertir en XML (génère GUID auto, place dans CODE/)
+python tools/st2xml.py CODE/FB_MyNewFB.st
+# → Crée : CODE/FB_MyNewFB__<UUID>.xml
+
+# 3. Injecter dans Device.export
+python tools/inject.py --yes
+
+# 4. Réimporter dans CODESYS et compiler
+```
+
+**Avantages** :
+- ✅ Écrire en ST pur (lisible, versionnable)
+- ✅ Conversion automatique → XML CODESYS
+- ✅ GUID généré (pas de collision)
+- ✅ Deterministe + stable dans le temps
+- ✅ Prêt pour `inject.py` directement
 
 ## Workflow Édition (cycle unique)
 

@@ -16,7 +16,76 @@
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string"></Single>
+            <Single Name="TextBlobForSerialisation" Type="string">// 🛑 1. GATE : SafeStop logiciel par défaut
+IF NOT Enable THEN
+    Ready := FALSE;
+    State := E_DiagState.DISABLED;
+    Joystick.State := E_DiagState.DISABLED;
+    Joystick.Online := FALSE;
+    Joystick.Operational := FALSE;
+    Joystick.Error := FALSE;
+    Joystick.ErrorId := 16#0000;
+    Error := FALSE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+
+// 🔑 2. RESET FRONT — efface défauts dont cause disparue
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    IF (CanOnline AND CanOperational) THEN
+        Joystick.ErrorId := 16#0000;
+        StateAtError := E_DiagState.DISABLED;
+    END_IF;
+END_IF;
+
+// 🔍 3. DIAGNOSTIC JOYSTICK
+// Bit 0 : Perte communication CAN
+IF NOT CanOnline THEN
+    Joystick.ErrorId := 16#0001;  // Perte liaison CAN joystick
+    Joystick.Online := FALSE;
+ELSE
+    Joystick.Online := TRUE;
+    IF ResetEdge.Q THEN
+        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFE;
+    END_IF;
+END_IF;
+
+// Bit 1 : Mode non-opérationnel
+IF NOT CanOperational THEN
+    Joystick.ErrorId := Joystick.ErrorId OR 16#0002;  // Joystick pas opérationnel
+    Joystick.Operational := FALSE;
+ELSE
+    Joystick.Operational := TRUE;
+    IF ResetEdge.Q THEN
+        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFD;
+    END_IF;
+END_IF;
+
+// 🚦 4. STATE MACHINE
+IF Joystick.ErrorId &lt;&gt; 0 THEN
+    Joystick.State := E_DiagState.ERROR;
+    IF StateAtError = E_DiagState.DISABLED THEN
+        StateAtError := State;  // Fige la phase du défaut
+    END_IF;
+ELSIF NOT (Joystick.Online AND Joystick.Operational) THEN
+    Joystick.State := E_DiagState.INIT;
+ELSE
+    Joystick.State := E_DiagState.READY;
+END_IF;
+
+State := Joystick.State;
+
+// 📤 5. SORTIES GLOBALES
+Joystick.Error := (Joystick.ErrorId &lt;&gt; 0);
+Error := Joystick.Error;
+ErrorId := Joystick.ErrorId;
+
+// Busy, Done non utilisés mais présents pour conformité
+Busy := FALSE;
+Done := FALSE;</Single>
             <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Impl_LineIds</Single>
           </Single>
         </Single>
@@ -24,10 +93,23 @@
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK DiagCanOpen
 VAR_INPUT
+    Enable          : BOOL;        // Active la surveillance CAN
+    Reset           : BOOL;        // Front acquittement défauts
+    CanOnline       : BOOL;        // Trame joystick reçue (TRUE = OK)
+    CanOperational  : BOOL;        // Joystick en mode opérationnel (TRUE = OK)
 END_VAR
 VAR_OUTPUT
+    Ready           : BOOL;        // Logique active
+    Busy            : BOOL;        // Non utilisé (pour conformité interface)
+    Done            : BOOL;        // Non utilisé
+    Error           : BOOL;        // Présence anomalie
+    ErrorId         : WORD;        // Code défaut
+    State           : E_DiagState; // Phase courante
+    StateAtError    : E_DiagState; // Snapshot figé
+    Joystick        : ST_DeviceDiag;  // État détaillé joystick
 END_VAR
 VAR
+    ResetEdge       : R_TRIG;      // Détecteur front Reset
 END_VAR
 </Single>
             <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Decl_LineIds</Single>
