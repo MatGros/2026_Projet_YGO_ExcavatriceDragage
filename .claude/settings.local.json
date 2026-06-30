@@ -42,7 +42,8 @@
       "Bash(mkdir -p tools/archive)",
       "Bash(git status *)",
       "Bash(python3 tools/inject.py --yes)",
-      "Bash(awk '{print $5, $9}')"
+      "Bash(awk '{print $5, $9}')",
+      "Bash(git check-ignore *)"
     ],
     "ask": [
       "Bash(git reset *)",
