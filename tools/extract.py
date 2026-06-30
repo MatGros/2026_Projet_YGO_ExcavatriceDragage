@@ -13,8 +13,9 @@ Comportement quand un fichier existe deja dans CODE/ :
                               (sauf --yes qui ecrase tout sans demander).
 
 Usage :
-    python tools/extract.py            # extrait/maj vers CODE/
-    python tools/extract.py --yes      # ecrase tout sans confirmation
+    python tools/extract.py                    # extrait/maj vers CODE/
+    python tools/extract.py --yes              # ecrase tout sans confirmation
+    python tools/extract.py --yes --commit     # extraction + commit (point de depart propre)
     python tools/extract.py --out X --source Y
 """
 from __future__ import print_function
@@ -39,6 +40,8 @@ def main(argv=None):
                         help="Dossier de sortie (defaut: CODE/)")
     parser.add_argument("--yes", action="store_true",
                         help="Ecrase tous les fichiers existants sans demander")
+    parser.add_argument("--commit", action="store_true",
+                        help="Commit git apres extraction (capture point de depart propre)")
     args = parser.parse_args(argv)
 
     source = Path(args.source)
@@ -117,6 +120,19 @@ def main(argv=None):
     print("  nouveaux : {} | mis a jour : {} | inchanges : {} | ignores : {} | verrouilles : {}".format(
         n_new, n_upd, n_same, n_skip, n_lock))
     print("OK." if n_lock == 0 else "TERMINE avec {} fichier(s) verrouille(s) (non ecrits).".format(n_lock))
+
+    if args.commit and n_lock == 0:
+        import subprocess
+        try:
+            subprocess.run(["git", "add", str(out)], cwd=str(PROJECT_ROOT), check=True,
+                          capture_output=True)
+            subprocess.run(["git", "commit", "-m",
+                           "Extract CODE before modifications ({} new, {} upd)".format(n_new, n_upd)],
+                          cwd=str(PROJECT_ROOT), check=True, capture_output=True)
+            print("\n✓ Commit git: capture point de depart propre")
+        except subprocess.CalledProcessError as e:
+            print("\n! Commit git echoue (peut-etre rien a committer)")
+
     return 0 if n_lock == 0 else 2
 
 

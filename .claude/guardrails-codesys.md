@@ -25,6 +25,13 @@
 - [ ] Sémantique > typage (le nom doit parler du rôle)
 - [ ] 1 FB = 1 responsabilité
 
+### 5. **Modifications Incrémentales** ⭐ (Par défaut)
+- [ ] 1 idée = fragmenter en étapes testables
+- [ ] **MAIS** : si pas pertinent → proposer alternative à utilisateur
+- [ ] Si utilisateur approuve monolithe → ok, procéder
+- [ ] Sinon → revenir à approche incrémentale
+- [ ] I/O directs (pas de ST_* sauf demandé)
+
 ---
 
 ## ✅ AVANT CHAQUE MODIFICATION
@@ -84,6 +91,11 @@ CODE
 SÉCURITÉ
   [ ] SafeStop indépendant ?
   [ ] Défaut → arrêt, puis reset manuel ?
+
+MODIFICATIONS INCRÉMENTALES
+  [ ] Par défaut fragmenté en étapes ?
+  [ ] Si monolithe proposé : utilisateur approuvé ?
+  [ ] Pas de refactor caché non-approuvé ?
 ```
 
 ---
@@ -99,19 +111,28 @@ SÉCURITÉ
 
 ---
 
-## 🚀 À faire AVANT de demander modification
+## 🚀 Workflow Standard
 
-```bash
-# Extrait CODE depuis CODESYS
-python tools/extract.py --clean
-
-# Édite dans VS Code
-# → Passe CODE/ à l'IA avec checklist
-# → L'IA valide + applique guardrails
-# → L'IA génère ou SIGNALE les doutes
-
-# Réinjecte (GUID-protected, backup auto)
-python tools/inject.py
-
-# Réimporte Device.export dans CODESYS (manuel)
 ```
+1. Extraire + commit :  python tools/extract.py --yes --commit
+   └─ Capture point de départ propre → git diff futur montrera vrais changements
+
+2. Demander modif :     "Modifier FB_X pour [idée]"
+
+3. Claude propose :     Fragmenté PAR DÉFAUT (ou signale si monolithe mieux)
+
+4. Utilisateur :        Approuve fragmenté OU dit "fais monolithe"
+
+5. Générer + tester :   Chaque étape, code est validé
+
+6. Réinjecter :         python tools/inject.py
+
+7. Voir changements :   git diff CODE/ → montrer fichiers modifiés
+
+8. Réimporter CODESYS : (manuel)
+```
+
+**Clés** : 
+- Commit après extraction = départ propre
+- Incrémental prioritaire, flexible si justifié
+- git diff révèle changements réels

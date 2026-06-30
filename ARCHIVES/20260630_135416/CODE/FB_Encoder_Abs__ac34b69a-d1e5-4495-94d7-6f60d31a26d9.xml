@@ -1,0 +1,208 @@
+<Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">ac34b69a-d1e5-4495-94d7-6f60d31a26d9</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Encoder_Abs</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639184142177507171</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">// ==========================================================================
+// 1. GESTION DE L'ENABLE GÉNÉRAL &amp; SÉCURITÉ DE REPLI
+// ==========================================================================
+IF NOT Enable THEN
+    // Mise en sécurité et réinitialisation des commandes matérielles
+    Out_PresetCmd       := 16#0000;
+    Out_PresetValue     := 0;
+    
+    // On force l'arrêt d'urgence par sécurité si le bloc est désactivé
+    EmergencyStop       := TRUE; 
+    
+    // On fige/remet à zéro les mesures pour l'IHM
+    ActualSpeedFiltered := 0.0;
+    // Note: On peut choisir de conserver la dernière position connue ou mettre 0.0 selon le besoin process
+    
+    LastHomingTrigger   := HomingTrigger;
+    RETURN; // Sortie immédiate du bloc, le reste du code n'est pas exécuté
+END_IF
+
+// ==========================================================================
+// 2. EXÉCUTION DU TRAITEMENT STANDARD (SI ENABLE = TRUE)
+// ==========================================================================
+
+// Calcul du temps de cycle
+GetCycleTime();
+
+// Traitement du sens de rotation mécanique
+IF InvertDirection THEN
+    LocalRawPos := 16#FFFFFFFF - In_PosValue; 
+ELSE
+    LocalRawPos := In_PosValue;
+END_IF
+
+// LOGIQUE DU HOMING / PRESET (Niveau de l'eau)
+IF HomingTrigger AND NOT LastHomingTrigger THEN
+    Out_PresetValue := REAL_TO_UDINT(WaterLevelOffset * Config_PulsePerMeter);
+    Out_PresetCmd   := 16#0001; 
+ELSE
+    Out_PresetCmd   := 16#0000;
+END_IF
+LastHomingTrigger := HomingTrigger;
+
+// DIAGNOSTIC ALARMES
+EncoderError := (In_Alarms &lt;&gt; 0);
+
+// PIPELINE MISE À L'ÉCHELLE (ax + b)
+ScaleStage(
+    CurrentRawPos  := LocalRawPos,
+    OffsetValueB   := 0.0, 
+    EnableTeach    := TeachActive,
+    StartTeachPos  := TeachStartRaw,
+    EndTeachPos    := TeachEndRaw,
+    RealDistMeters := TeachRealDistance,
+    PulsePerMeter  := Config_PulsePerMeter
+);
+ActualPositionM := ScaleStage.PositionMeters;
+
+// PIPELINE SÉCURITÉ &amp; VITESSE
+SafetyStage(
+    RawSpeed      := In_SpdValue,
+    MaxSpeedLimit := MaxSpeedThreshold,
+    CycleTimeS    := GetCycleTime.CycleTimeS
+);
+ActualSpeedFiltered := SafetyStage.FilteredSpeed;
+
+// L'arrêt d'urgence tombe si survitesse ou si le codeur remonte un défaut matériel
+EmergencyStop       := SafetyStage.OverspeedTrip OR EncoderError;
+// 3. LOGIQUE DU HOMING / PRESET (Niveau de l'eau)
+// Quand on valide le Homing, on prépare les mots RxPDO pour le codeur EtherCAT
+IF HomingTrigger AND NOT LastHomingTrigger THEN
+    // On convertit la position "Niveau de l'eau" en points codeur pour flasher le hard
+    Out_PresetValue := REAL_TO_UDINT(WaterLevelOffset * Config_PulsePerMeter);
+    Out_PresetCmd   := 16#0001; // Code d'écriture du Preset (dépend de la doc du codeur)
+ELSE
+    Out_PresetCmd   := 16#0000;
+END_IF
+LastHomingTrigger := HomingTrigger;
+
+// 4. DIAGNOSTIC ALARMES (Simplifié pour l'exemple)
+EncoderError := (In_Alarms &lt;&gt; 0);
+
+// 5. PIPELINE MISE À L'ÉCHELLE (ax + b)
+ScaleStage(
+    CurrentRawPos  := LocalRawPos,
+    OffsetValueB   := 0.0, // Géré par le Homing matériel du codeur
+    EnableTeach    := TeachActive,
+    StartTeachPos  := TeachStartRaw,
+    EndTeachPos    := TeachEndRaw,
+    RealDistMeters := TeachRealDistance,
+    PulsePerMeter  := Config_PulsePerMeter // Variable In_Out persistante
+);
+ActualPositionM := ScaleStage.PositionMeters;
+
+// 6. PIPELINE SÉCURITÉ &amp; VITESSE
+SafetyStage(
+    RawSpeed      := In_SpdValue,
+    MaxSpeedLimit := MaxSpeedThreshold,
+    CycleTimeS    := GetCycleTime.CycleTimeS
+);
+ActualSpeedFiltered := SafetyStage.FilteredSpeed;
+EmergencyStop       := SafetyStage.OverspeedTrip OR EncoderError; // Si alarme = Arret treuil</Single>
+            <Single Name="LineInfoPersistence" Type="string">ac34b69a-d1e5-4495-94d7-6f60d31a26d9_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Encoder_Abs
+VAR_INPUT
+    Enable              : BOOL;   // &lt;-- Autorisation générale de marche du bloc (Ex: Sécu OK et EtherCAT Opérationnel)
+    
+    (* Hardware Inputs (Liaison directe avec l'image E/S EtherCAT) *)
+    In_Alarms           : UINT;   // %IW2
+    In_Warnings         : UINT;   // %IW3
+    In_PosValue         : UDINT;  // %ID2
+    In_SpdValue         : INT;    // %IW6
+    
+    (* Configuration et Calibration *)
+    HomingTrigger       : BOOL;   // Flanc pour lancer le recalage au niveau de l'eau
+    WaterLevelOffset    : REAL;   // Valeur en mètres correspondant au niveau de l'eau
+    
+    InvertDirection     : BOOL;   // Inversion du sens de déroulement mécanique
+    MaxSpeedThreshold   : INT := 5000;
+    
+    (* Configuration Teach *)
+    TeachActive         : BOOL;
+    TeachStartRaw       : UDINT;
+    TeachEndRaw         : UDINT;
+    TeachRealDistance   : REAL;
+END_VAR
+VAR_OUTPUT
+    (* Hardware Outputs (Liaison vers le RxPDO) *)
+    Out_PresetCmd       : UINT;   // %QW2 (Commande de déclenchement du preset)
+    Out_PresetValue     : UDINT;  // %QD2 (La valeur physique chargée dans le codeur)
+    
+    (* Business Outputs *)
+    ActualPositionM     : REAL;   // Position finale en mètres
+    ActualSpeedFiltered : REAL;   // Vitesse filtrée
+    EncoderError        : BOOL;   // Erreur com ou hardware codeur
+    EmergencyStop       : BOOL;   // Demande de freinage immédiat (Survitesse)
+END_VAR
+VAR_IN_OUT
+    Config_PulsePerMeter : REAL;  // RETAIN ou persistant dans l'IHM
+END_VAR
+VAR
+    (* Composants POO internes *)
+    GetCycleTime        : FB_CycleTime;
+    ScaleStage          : FB_Encoder_Scale;
+    SafetyStage         : FB_Encoder_Safety;
+    
+    (* Variables internes *)
+    LocalRawPos         : UDINT;
+    LastHomingTrigger   : BOOL;
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">ac34b69a-d1e5-4495-94d7-6f60d31a26d9_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">209</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CODEUR</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
