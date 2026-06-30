@@ -24,6 +24,7 @@
       "Bash(rm -f extract.py inject.py)",
       "Bash(extract.bat --yes)",
       "Bash(python tools/extract.py --yes)",
+      "Bash(python tools/extract.py --yes --commit)",
       "Bash(python tools/inject.py --yes)",
       "Bash(python tools/clean.py --dry-run)",
       "Bash(python tools/clean.py)",
@@ -32,7 +33,9 @@
       "Skill(update-config)",
       "Skill(update-config:*)",
       "Bash(python tools/extract.py --clean)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(python *)",
+      "Bash(git commit -m ' *)"
     ],
     "ask": [
       "Bash(git reset *)",
