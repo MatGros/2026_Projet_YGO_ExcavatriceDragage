@@ -12,7 +12,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 - Booléens entrée = verbe (`Enable`, `Start`), sortie = état (`Ready`, `Done`)
 - Suffixes unité si besoin : `_M` (mètres), `_Pct` (%), `_Ms` (ms)
 
-### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie3_Template_FB_Commun.md)** ← Contrat FB
+### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md)** ← Contrat FB
 Chaque Function Block doit respecter :
 - Interface : `Enable`, `Reset`, `SafeStop`, `SafetyOk`, `Mode` (entrées)
 - Sorties : `Ready`, `Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError`
@@ -20,7 +20,7 @@ Chaque Function Block doit respecter :
 - **Reset = front obligatoire** : cause disparue + appui reset pour effacer
 - Jamais autoriser le redémarrage automatique après défaut
 
-### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.1.md)** ← Pour comprendre
+### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.3.md)** ← Pour comprendre
 Tâches, arborescence CODESYS, flux données.
 
 ---
@@ -99,9 +99,9 @@ Application (PLC_PRG)
 
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
-- [AF_Partie1_Analyse_Fonctionnelle.md](DOC/AF_Partie1_Analyse_Fonctionnelle.md) — Équipements & fonctions
-- [AF_Partie2_Architecture_Programme_v2.1.md](DOC/AF_Partie2_Architecture_Programme_v2.1.md) — Architecture détaillée
-- [AF_Partie3_Template_FB_Commun.md](DOC/AF_Partie3_Template_FB_Commun.md) — Contrat FB & sécurité
+- [AF_Partie1_Analyse_Fonctionnelle_v1.1.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md) — Équipements & fonctions
+- [AF_Partie2_Architecture_Programme_v2.3.md](DOC/AF_Partie2_Architecture_Programme_v2.3.md) — Architecture détaillée
+- [AF_Partie3_Template_FB_Commun_v1.1.md](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) — Contrat FB & sécurité
 
 ---
 
@@ -110,7 +110,7 @@ Tous les docs dans **`DOC/`** :
 **Si l'utilisateur demande modification CODE/, FB_, PRG_, ou "codesys" :**
 
 1. ✅ **Charger automatiquement** la skill `.claude/skills/codesys-workflow.md`
-2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun.md
+2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun_v1.1.md
 3. ✅ **Vérifier spec complète** → Sinon demander clarifications
 4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
 5. ✅ **Tracer checklist** avant génération
@@ -144,7 +144,7 @@ L'IA charge les règles DOC + valide avant de générer.
 ## ✅ **Checklist Avant de Coder**
 
 - [ ] Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)
-- [ ] Lire [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun.md) si nouveau FB
+- [ ] Lire [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) si nouveau FB
 - [ ] Vérifier que le nom suit : **PascalCase, sémantique, sans hongrois**
 - [ ] `ErrorId` = bitfield ? Reset = front obligatoire ?
 - [ ] `SafeStop` prioritaire sur Enable ?

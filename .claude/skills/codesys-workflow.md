@@ -21,9 +21,11 @@ Spec incomplète ou ambiguë → **STOP + demander clarification.** Jamais d'app
 
 Lire et appliquer **systématiquement** :
 - `DOC/NAMING_CONVENTION.md` → PascalCase, préfixes, pas de hongrois
-- `DOC/AF_Partie3_Template_FB_Commun.md` → contrat FB (Enable/Reset/SafeStop/Ready/Error…)
-- `DOC/AF_Partie2_Architecture_Programme_v2.2.md` → architecture, tâches, flux
-- `DOC/AF_Partie1_Analyse_Fonctionnelle.md` → équipements & fonctions
+- `DOC/AF_Partie3_Template_FB_Commun_v1.1.md` → contrat FB (Enable/Reset/SafeStop/Ready/Error…) + réutilisation libs
+- `DOC/AF_Partie2_Architecture_Programme_v2.3.md` → architecture, tâches, flux
+- `DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md` → équipements & fonctions
+
+⚠️ Toujours utiliser la **version la plus récente** (suffixe `_vX.X` le plus élevé). Anciennes versions dans `DOC/Archives/`.
 
 ✋ Si une règle DOC contredit la demande → signaler avant de coder.
 
