@@ -70,7 +70,11 @@ Après validation du plan :
 3. **Note d'application CODESYS 3.5 détaillée** : où coller, quel POU, quelles déclarations, ordre des étapes — car l'utilisateur applique **tout à la main**.
 
 📁 **Sortie obligatoire dans `DOC/`** : le code ST généré **et** la note d'application sont écrits comme fichier(s) dans `DOC/` (jamais ailleurs).
-Nom versionné, ex. `DOC/FB_Joystick_v1.md`. Un fichier peut contenir code ST + note d'application ensemble.
+
+📐 **Format livrable = suite de la série AF, orienté métier** :
+`AF_PartieN_Fonction_<Metier>_vX.Y.md` (ex. `AF_Partie4_Fonction_Joystick_v1.0.md`, `AF_Partie5_Fonction_Winch_v1.0.md`).
+Structure attendue : rôle métier → pipeline/blocs → interface → sécurité → mapping E/S → **implémentation ST commentée** → note d'application CODESYS 3.5 → REX.
+Un fichier = une fonction métier (code ST + note d'application ensemble). Versionner `vX.Y`, anciens dans `DOC/Archives/`.
 
 Style commentaires :
 ```
