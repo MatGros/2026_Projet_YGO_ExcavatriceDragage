@@ -30,7 +30,9 @@
       "Bash(rm -f PROJ_Full_ImportExport/*.bak)",
       "Bash(python tools/check-codesys-code.py *)",
       "Skill(update-config)",
-      "Skill(update-config:*)"
+      "Skill(update-config:*)",
+      "Bash(python tools/extract.py --clean)",
+      "Bash(git rm *)"
     ],
     "ask": [
       "Bash(git reset *)",
