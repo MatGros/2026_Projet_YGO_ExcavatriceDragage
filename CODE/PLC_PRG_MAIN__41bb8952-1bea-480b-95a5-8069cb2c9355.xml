@@ -92,8 +92,8 @@ InstanceJoystick(
 VAR
     InstanceSafety      : FB_Safety;
     InstanceJoystick    : FB_Joystick;
-    InstanceDiagCan     : DiagCanOpen;           // Diagnostic CAN/Joystick
-    InstanceDiagEthercat : diagETHERCAT;        // Diagnostic EtherCAT (3 devices)
+    InstanceDiagCan     : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
+    InstanceDiagEthercat : FB_DiagEthercat;    // Diagnostic EtherCAT (3 devices)
 
 	LocalEmergencyStopTOR  : BOOL := TRUE;
 	LocalEthercatOk        : BOOL := FALSE;      // Résumé diagnostic EtherCAT
