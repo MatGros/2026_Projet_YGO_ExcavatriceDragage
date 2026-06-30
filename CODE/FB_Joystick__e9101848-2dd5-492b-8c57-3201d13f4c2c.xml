@@ -1,0 +1,186 @@
+<Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">e9101848-2dd5-492b-8c57-3201d13f4c2c</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Joystick</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639183899232232146</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">// 🛑 1. GATE (Sécurités et coupures prioritaires)
+IF NOT Enable OR SafeStop OR NOT CanOnline OR NOT CanOperational THEN
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    AxisCmdX.Enable := FALSE; AxisCmdX.Start := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0; AxisCmdX.SafetyOk := FALSE;
+    AxisCmdY.Enable := FALSE; AxisCmdY.Start := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0; AxisCmdY.SafetyOk := FALSE;
+    Button := FALSE;
+    NeutralXAct := NeutralXMem;
+    NeutralYAct := NeutralYMem;
+    RETURN;
+END_IF;
+
+Ready := TRUE; Busy := TRUE;
+
+// 🔑 2. RESET DÉFAUT
+IF Reset AND Error THEN
+    Error := FALSE; ErrorId := 16#0000;
+END_IF;
+
+// 📥 3. ACQUISITION TIMING &amp; BOUTON
+CycleTimeCalc();
+Button := RawButton;
+
+// 🎯 4. CALIBRATION DYNAMIQUE (Zone RETAIN)
+IF Calibrate AND NOT LastCalibrate THEN
+    IF RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000 THEN
+        NeutralXMem := RawX;
+        NeutralYMem := RawY;
+    ELSE
+        Error := TRUE; ErrorId := 16#0003;
+    END_IF;
+END_IF;
+LastCalibrate := Calibrate;
+
+// 🕹️ 5. PIPELINE TRAITEMENT — AXE X
+ScaleX(RawIn := RawX, Neutral := NeutralXMem, Deadband := Deadband);
+
+IF InvertX THEN
+    FilterX(ValueIn := -ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+ELSE
+    FilterX(ValueIn := ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+END_IF;
+
+RampX(Target := FilterX.ValueOut, AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+
+// Mapping Sortie Standardisée Axe X
+AxisCmdX.Enable := TRUE;
+AxisCmdX.SpeedRef := ABS(RampX.Current);
+AxisCmdX.Start := (AxisCmdX.SpeedRef &gt; 0.1);
+AxisCmdX.SafetyOk := SafetyOk;
+
+IF RampX.Current &gt; 0.1 THEN     AxisCmdX.Direction := 1;
+ELSIF RampX.Current &lt; -0.1 THEN AxisCmdX.Direction := -1;
+ELSE AxisCmdX.Direction := 0;   AxisCmdX.SpeedRef := 0.0;
+END_IF;
+
+// 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
+ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
+
+IF InvertY THEN
+    FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+ELSE
+    FilterY(ValueIn := ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+END_IF;
+
+RampY(Target := FilterY.ValueOut, AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+
+// Mapping Sortie Standardisée Axe Y
+AxisCmdY.Enable := TRUE;
+AxisCmdY.SpeedRef := ABS(RampY.Current);
+AxisCmdY.Start := (AxisCmdY.SpeedRef &gt; 0.1);
+AxisCmdY.SafetyOk := SafetyOk;
+
+IF RampY.Current &gt; 0.1 THEN     AxisCmdY.Direction := 1;
+ELSIF RampY.Current &lt; -0.1 THEN AxisCmdY.Direction := -1;
+ELSE AxisCmdY.Direction := 0;   AxisCmdY.SpeedRef := 0.0;
+END_IF;
+
+// 📤 7. VALIDATION DES SORTIES ÉTAT
+NeutralXAct := NeutralXMem;
+NeutralYAct := NeutralYMem;
+Done := NOT Error;</Single>
+            <Single Name="LineInfoPersistence" Type="string">e9101848-2dd5-492b-8c57-3201d13f4c2c_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Joystick
+VAR_INPUT
+    Enable          : BOOL;       // Active la logique
+    Reset           : BOOL;       // Acquittement défaut
+    SafeStop        : BOOL;       // Arrêt sûr forcé
+    SafetyOk        : BOOL;       // Conditions globales OK
+    CanOnline       : BOOL;       // État présence nœud CAN
+    CanOperational  : BOOL;       // Mode esclave CANopen actif
+    RawX            : INT;        // Valeur brute axe X
+    RawY            : INT;        // Valeur brute axe Y
+    RawButton       : BOOL;       // État brut bouton
+    Calibrate       : BOOL;       // Demande de recalage neutre
+    InvertX         : BOOL := FALSE;
+    InvertY         : BOOL := FALSE;
+    Deadband        : REAL := 5.0;
+    FilterTime      : TIME := TIME#100ms;
+    AccelRate       : REAL := 50.0;
+    DecelRate       : REAL := 150.0;
+END_VAR
+VAR_OUTPUT
+    Ready           : BOOL;       // Prêt à commuter
+    Busy            : BOOL;       // Traitement en cours
+    Done            : BOOL;       // Données valides dispo
+    Error           : BOOL;       // Présence anomalie
+    ErrorId         : WORD;       // Code d'erreur
+    AxisCmdX        : ST_AxisCmd; // Sortie normalisée X
+    AxisCmdY        : ST_AxisCmd; // Sortie normalisée Y
+    Button          : BOOL;       // Bouton filtré
+    NeutralXAct     : INT;        // Point neutre X actuel pour IHM/Test
+    NeutralYAct     : INT;        // Point neutre Y actuel pour IHM/Test
+END_VAR
+VAR RETAIN
+    NeutralXMem     : INT := 5000; // Mémoire persistante X
+    NeutralYMem     : INT := 5000; // Mémoire persistante Y
+END_VAR
+VAR
+    CycleTimeCalc   : FB_CycleTime;
+    ScaleX          : FB_AxisScale;
+    ScaleY          : FB_AxisScale;
+    FilterX         : FB_Filter_PT1;
+    FilterY         : FB_Filter_PT1;
+    RampX           : FB_Ramp;
+    RampY           : FB_Ramp;
+    LastCalibrate   : BOOL;
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">e9101848-2dd5-492b-8c57-3201d13f4c2c_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">1073</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">JOYSTICK</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
