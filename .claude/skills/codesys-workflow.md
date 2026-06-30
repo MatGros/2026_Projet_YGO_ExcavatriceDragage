@@ -69,12 +69,22 @@ Après validation du plan :
    - Commentaire sur chaque section logique
 3. **Note d'application CODESYS 3.5 détaillée** : où coller, quel POU, quelles déclarations, ordre des étapes — car l'utilisateur applique **tout à la main**.
 
-📁 **Sortie obligatoire dans `DOC/`** : le code ST généré **et** la note d'application sont écrits comme fichier(s) dans `DOC/` (jamais ailleurs).
+📁 **Double sortie obligatoire** :
 
-📐 **Format livrable = suite de la série AF, orienté métier** :
-`AF_PartieN_Fonction_<Metier>_vX.Y.md` (ex. `AF_Partie4_Fonction_Joystick_v1.0.md`, `AF_Partie5_Fonction_Winch_v1.0.md`).
-Structure attendue : rôle métier → pipeline/blocs → interface → sécurité → mapping E/S → **implémentation ST commentée** → note d'application CODESYS 3.5 → REX.
-Un fichier = une fonction métier (code ST + note d'application ensemble). Versionner `vX.Y`, anciens dans `DOC/Archives/`.
+1. 📂 **Code ST à copier → dossier `CODE/`** (jamais ailleurs).
+   - Tout code que l'utilisateur doit copier/créer dans CODESYS est écrit comme **fichier `.st` brut** dans `CODE/`.
+   - Nom = nom du POU, ex. `CODE/PRG_JOY1.st`, `CODE/FB_Winch.st`.
+   - C'est ce fichier que l'utilisateur copie-colle dans CODESYS.
+
+2. 📄 **Doc métier + note d'application → dossier `DOC/`** (série AF).
+   - `AF_PartieN_Fonction_<Metier>_vX.Y.md` (ex. `AF_Partie4_Fonction_Joystick_v1.0.md`, `AF_Partie5_Fonction_Winch_v1.0.md`).
+   - Structure : rôle métier → pipeline/blocs → interface → sécurité → mapping E/S → **référence au(x) fichier(s) `CODE/*.st`** → note d'application CODESYS 3.5 → REX.
+   - Versionner `vX.Y`, anciens dans `DOC/Archives/`.
+
+🧭 **Règle anti-doublon (STRICTE)** : le **corps/implémentation** ST n'existe **qu'une seule fois**, dans `CODE/*.st`.
+- ✅ `DOC/` PEUT contenir : l'**interface IN/OUT** (tableaux des entrées/sorties, types, rôles), le mapping E/S, le pipeline.
+- ❌ `DOC/` ne recopie **JAMAIS** le **corps** du POU (logique, appels, calculs) — il **référence** `CODE/xxx.st`.
+`CODE/` = source unique exécutable à copier ; `DOC/` = métier + interface IN/OUT + mode d'emploi qui pointe vers `CODE/`.
 
 Style commentaires :
 ```
@@ -111,6 +121,6 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 - [ ] Architecture + devices compris
 - [ ] Existant analysé (variables/PRG/FB)
 - [ ] Plan groupé par concept **validé**
-- [ ] Code ST commenté FR + emoji **écrit dans `DOC/` (fichier versionné)**
-- [ ] Note d'application manuelle CODESYS 3.5 **dans `DOC/`**
+- [ ] Code ST à copier commenté FR + emoji **écrit dans `CODE/*.st`**
+- [ ] Doc métier + note d'application CODESYS 3.5 **dans `DOC/AF_PartieN_Fonction_*`**
 - [ ] REX + specs versionnées `vX.X`
