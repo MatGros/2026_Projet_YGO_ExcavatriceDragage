@@ -29,6 +29,8 @@ Lire et appliquer **systématiquement** :
 
 ✋ Si une règle DOC contredit la demande → signaler avant de coder.
 
+🚫 **`DOC/Archives/` = versions PÉRIMÉES** : ne jamais lire ni prendre en compte ce dossier (gitignoré). Toujours la version active (suffixe `_vX.Y` le plus élevé à la racine de `DOC/`).
+
 ---
 
 ## 🔍 Étape 1 — Comprendre l'architecture
