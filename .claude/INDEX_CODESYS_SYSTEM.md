@@ -23,7 +23,7 @@
 |---------|---------|
 | **[CLAUDE.md](../CLAUDE.md)** | Instructions projet + guardrails obligatoires |
 | **[QUICK_START_CODESYS.md](QUICK_START_CODESYS.md)** | Workflow rapide (2 min) |
-| **[guardrails-codesys.md](guardrails-codesys.md)** | Règles strictes + checklist complète |
+| **[guardrails-codesys.md](guardrails-codesys.md)** | ⭐ Règles strictes + modifications incrémentales |
 | **[codesys-code-skill.md](codesys-code-skill.md)** | Documentation SKILL détaillée |
 | **[SKILL-CODESYS-CODE.md](SKILL-CODESYS-CODE.md)** | Vue d'ensemble architecture |
 | **[README-SKILL-CODESYS.md](README-SKILL-CODESYS.md)** | Guide complet utilisateur |

@@ -4,9 +4,9 @@
 
 | Tâche | Priorité | Cadence | Contenu & Rôle |
 | --- | --- | --- | --- |
-| ⚡ **EtherCatTask** | Haute (0) | Rapide (Bus) | Lecture synchrone codeurs, communication variateur, blocs `diagETHERCAT`. |
-| 🔌 **CanTask** | Moyenne (1) | Moyenne (10ms) | Lecture trames PDO du joystick Hall, blocs `diagCAN`. |
-| 🧠 **MainTask** | Standard (10) | Cyclique (20ms) | Logique métier complète, exécution du cycle, arbitrages des modes, `FB_Safety`. |
+| ⚡ **EtherCatTask** | Haute (0) | Rapide (Bus) | **PRG_EthercatMonitor** : appelle 3×`FB_DiagEthercat` (M1, M2, Variateur) → écrit dans `GVL_BusHealth`. |
+| 🔌 **CanTask** | Moyenne (1) | Moyenne (10ms) | **PRG_CanMonitor** : appelle `FB_DiagCanOpen` (bus + joystick) → écrit dans `GVL_BusHealth`. |
+| 🧠 **MainTask** | Standard (10) | Cyclique (20ms) | Logique métier : `FB_Safety`, `InstanceJoystick`, `FB_Winch`, `FB_Encoder_Abs` (lisent `GVL_BusHealth`), séquençage cycle. |
 
 🧭 **Règle d'or** : Couche basse rafraîchit (Bus) → Couche haute consomme (`MainTask`).
 
@@ -21,21 +21,28 @@ Application (PLC_PRG)
 │   └── FB_Brake             (Gestion de la logique levage & temporisation frein)
 ├── 📁 _TYPES (Structures & énumérations globales)
 │   ├── 📄 ST_AxisCmd        (Structure de consigne générique)
+│   ├── 📄 ST_BusHealth      (État santé CAN + EtherCAT par équipement)
 │   ├── 📄 ST_WinchIO        (Structure d'état/commande Treuil)
 │   ├── 📄 ST_TransIO        (Structure d'état/commande Translation)
 │   ├── 📄 ST_EncoderData    (Structure de données traitées codeur)
 │   ├── 📄 E_Mode            (Énumération des modes de marche)
+│   ├── 📄 E_DegradationLevel (FULL / LEVEL1 / LEVEL2 / MAINTENANCE)
 │   └── 📄 E_CycleStep       (Énumération des étapes du séquenceur)
+├── 📁 _DIAG (Diagnostics bus communication)
+│   ├── GVL_BusHealth        (Santé CAN + EtherCAT partagée, mise à jour par tâches basses)
+│   ├── FB_DiagCanOpen       (Moniteur CANopen bus + nœud Joystick)
+│   └── FB_DiagEthercat      (Moniteur esclave EtherCAT unique)
 ├── 📁 JOYSTICK (Traitement commande opérateur)
-│   ├── FB_JoystickCAN       (Traitement complet de l'axe physique)
-│   └── PRG_JOY1             (Programme d'acquisition sur CanTask)
+│   ├── FB_Joystick          (Traitement complet joystick : filtre, rampe, calibration)
+│   └── PRG_CanMonitor       (Exécuté par CanTask : appelle FB_DiagCanOpen)
 ├── 📁 WINCH (Gestion de la plongée/extraction)
 │   ├── FB_Winch             (Directeur de treuil individuel)
 │   └── FB_SpeedStep         (Décodeur de paliers de vitesse pour contacteurs)
 ├── 📁 ENCODER (Traitement de la position câble)
-│   ├── FB_EncoderRead       (Lecture physique brute EtherCAT)
-│   ├── FB_EncoderScale      (Mise à l'échelle en mètres via LIN_TRAFO)
-│   └── FB_EncoderHoming     (Mise à zéro et gestion offset plan d'eau)
+│   ├── FB_Encoder_Abs       (Lecture + validation EtherCAT, latch défauts)
+│   ├── FB_Encoder_Scale     (Mise à l'échelle en mètres via LIN_TRAFO)
+│   ├── FB_Encoder_Safety    (Vérifications cohérence position / limites)
+│   └── PRG_EthercatMonitor  (Exécuté par EthercatTask : appelle 3×FB_DiagEthercat pour M1/M2/Variateur)
 ├── 📁 TRANSLATION (Gestion déplacement pont)
 │   └── FB_Translation       (Régulation vitesse/position sur variateur)
 ├── 📁 BUCKET (Gestion cinématique godet)
@@ -139,10 +146,17 @@ Application (PLC_PRG)
 
 ### 📈 Flux Montant (Mesures et Signaux)
 
-1. Le **Joystick physique** transmet ses positions brutes sur la `CanTask` au bloc `FB_JoystickCAN`.
-2. Les **Codeurs tambours** renvoient les points de rotation sur l' `EtherCatTask` vers `FB_EncoderScale`.
-3. `FB_EncoderScale` calcule le déroulé en mètres (`CablePosM`) et le distribue instantanément à `FB_Winch` (pour les arrêts de position) et à `FB_Safety` (pour le contrôle de la cote légale).
-4. Les **Capteurs TOR de position** (fond touché, maintenance, fdc) alimentent directement `FB_Safety` et le séquenceur `FB_Cycle`.
+**Tâche basse : Diagnostics bus (rafraîchit `GVL_BusHealth`)**
+1. **CanTask** → `PRG_CanMonitor` appelle `FB_DiagCanOpen` (lit bus CANopen + nœud Joystick)
+   - Outputs : `CanHealthy`, `JoystickAvailable` → `GVL_BusHealth`
+2. **EthercatTask** → `PRG_EthercatMonitor` appelle 3×`FB_DiagEthercat` (M1, M2, Variateur)
+   - Outputs : `EncoderM1Available`, `EncoderM2Available`, `VariateurAvailable` → `GVL_BusHealth`
+
+**Tâche haute : Logique métier (consomme `GVL_BusHealth`)**
+3. Le **Joystick physique** transmet ses positions brutes (CanTask) → `FB_Joystick` (MainTask) lit `GVL_BusHealth.JoystickAvailable`.
+4. Les **Codeurs tambours** renvoient les points (EthercatTask) → `FB_Encoder_Abs` (MainTask) lit `GVL_BusHealth.EncoderM1/M2Available` et décide son propre `E_DegradationLevel`.
+5. `FB_EncoderScale` calcule le déroulé en mètres et le distribue à `FB_Winch` + `FB_Safety`.
+6. Les **Capteurs TOR** alimentent directement `FB_Safety` et `FB_Cycle`.
 
 ### 📉 Flux Descendant (Ordres et Procédés)
 
@@ -153,9 +167,21 @@ Application (PLC_PRG)
 
 ### 🛡️ Flux Transverse de Sécurité (Priorité Absolue)
 
-1. Dès qu'un défaut de cohérence, une valeur absurde ou un dépassement de la limite légale est détecté par `FB_Safety`, la variable **`SafeStop` passe à `TRUE**`.
-2. Ce bit `SafeStop` est propagé immédiatement à l'entrée de tous les blocs opérationnels (`FB_Winch`, `FB_Translation`, `FB_Cycle`).
-3. L'interaction est immédiate : coupure instantanée de toutes les sorties relais de vitesse/direction et collage instantané des freins à manque de courant.
+**Inputs granulaires vers FB_Safety**
+- `FB_Safety` reçoit via `GVL_BusHealth` :
+  - `CanHealthy` (CANopen bus + Joystick opérationnels?)
+  - `EncoderM1Available`, `EncoderM2Available`, `VariateurAvailable` (quels équipements sont disponibles?)
+  - `JoystickAvailable` (opérateur peut-il commander?)
+
+**Adaptation locale de chaque FB**
+- `FB_Safety` décide son propre `E_DegradationLevel` (FULL / LEVEL1 / LEVEL2 / MAINTENANCE) selon les inputs reçus.
+- `FB_Winch` décide son propre niveau (ex: bloqué si M1 down, semi-opérationnel si M2 down).
+- `FB_Encoder_Abs` décide son propre niveau (ex: bloqué si EtherCAT down, nominal sinon).
+
+**Arrêt sûr**
+1. Dès qu'un défaut critique est détecté par `FB_Safety`, le variable **`SafeStop` passe à `TRUE`**.
+2. Ce bit `SafeStop` est propagé à l'entrée de tous les blocs opérationnels (`FB_Winch`, `FB_Translation`, `FB_Cycle`, `FB_Joystick`).
+3. L'interaction est immédiate : coupure instantanée de toutes les sorties relais et collage des freins.
 
 ---
 

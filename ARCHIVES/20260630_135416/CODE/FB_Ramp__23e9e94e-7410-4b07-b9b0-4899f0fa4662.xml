@@ -1,0 +1,88 @@
+<Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">23e9e94e-7410-4b07-b9b0-4899f0fa4662</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Ramp</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639184142178079449</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">// Détection du comportement (Accélération vs Décélération)
+IF (Target &gt; 0.0 AND Target &gt; Current) OR (Target &lt; 0.0 AND Target &lt; Current) THEN
+    StepX := AccelRate * CycleTimeS; // S'éloigne du zéro
+ELSE
+    StepX := DecelRate * CycleTimeS; // Retourne vers le zéro
+END_IF;
+
+// Application de la rampe
+IF Current &lt; Target THEN
+    Current := Current + StepX;
+    IF Current &gt; Target THEN Current := Target; END_IF;
+ELSIF Current &gt; Target THEN
+    Current := Current - StepX;
+    IF Current &lt; Target THEN Current := Target; END_IF;
+END_IF;</Single>
+            <Single Name="LineInfoPersistence" Type="string">23e9e94e-7410-4b07-b9b0-4899f0fa4662_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Ramp
+VAR_INPUT
+    Target      : REAL;       // Cible visée
+    AccelRate   : REAL;       // Taux d'accélération (%/s)
+    DecelRate   : REAL;       // Taux de décélération (%/s)
+    CycleTimeS  : REAL;       // Temps de cycle réel en secondes
+END_VAR
+VAR_OUTPUT
+    Current     : REAL;       // Valeur courante amortie
+END_VAR
+VAR
+    StepX       : REAL;
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">23e9e94e-7410-4b07-b9b0-4899f0fa4662_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">103</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">JOYSTICK</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>

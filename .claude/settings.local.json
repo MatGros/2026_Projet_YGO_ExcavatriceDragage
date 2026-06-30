@@ -35,7 +35,12 @@
       "Bash(python tools/extract.py --clean)",
       "Bash(git rm *)",
       "Bash(python *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(python \"c:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/tools/clean.py\")",
+      "Bash(python \"c:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/tools/clean.py\" --dry-run)",
+      "Bash(git mv *)",
+      "Bash(mkdir -p tools/archive)",
+      "Bash(git status *)"
     ],
     "ask": [
       "Bash(git reset *)",
