@@ -28,7 +28,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242307254</Single>
+        <Single Name="Timestamp" Type="long">639184353128851768</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4105</Single>
@@ -3085,7 +3085,7 @@
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">40b404f9-e5dc-42c6-907f-c89f4a517386</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid" />
-        <Single Name="Timestamp" Type="long">639183899231907757</Single>
+        <Single Name="Timestamp" Type="long">639184353125338000</Single>
       </Single>
       <Single Name="Object" Type="{40b404f9-e5dc-42c6-907f-c89f4a517386}" Method="IArchivable" />
       <Single Name="ParentSVNodeGuid" Type="System.Guid">f0e17164-47ba-4298-8cfc-9720cc96205b</Single>
@@ -3114,7 +3114,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">e9159722-55bc-49e5-8034-fbd278ef718f</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899240836759</Single>
+        <Single Name="Timestamp" Type="long">639184353128931296</Single>
       </Single>
       <Single Name="Object" Type="{e9159722-55bc-49e5-8034-fbd278ef718f}" Method="IArchivable">
         <Single Name="VisibleInterfaceName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
@@ -3545,7 +3545,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40030</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">1d6bf06b-d5cc-51c1-a10c-4a0381b7549f</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">aa0d12f8-334f-5a38-ad3d-c78698f50c4c</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -3632,7 +3632,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40031</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">d1bb039f-a14b-5511-9dfe-829f90e06177</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">cd2c3400-0590-5a09-88e8-0ffa45bb842c</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -3719,7 +3719,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40032</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">13fafa9e-9474-5edc-a062-bda87773f565</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">27b9936d-d0ed-56d2-a1b1-20b22dd4e08b</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -3806,7 +3806,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40033</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">3703c262-4f23-59b8-b35b-da7ea8354584</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">33752385-8c35-542c-a7ab-4ad5933ae296</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -3893,7 +3893,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40034</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">d10a8b55-e188-5301-a19c-22e5e5287c8b</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">c67cd0bf-085c-5869-8000-8d42e1aef199</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -3980,7 +3980,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40035</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">a0bf1deb-28de-52c2-8700-d159abd58307</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">b1077386-1bb7-5df1-a303-17a97a8d48b0</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -4067,7 +4067,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40036</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">8edb8f80-8375-5797-9bf4-96f1af2007e5</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">f260266f-4bca-51f9-b299-97913e0933b7</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -4154,7 +4154,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40037</Single>
                 <Single Name="TypeName" Type="string">InterrputType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">7dca9e6f-dc1f-5352-9933-d8984e9d5ba7</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">5baf056c-dc34-5108-bb2d-93f605f6621e</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Write</Single>
@@ -4241,7 +4241,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40050</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">1b51bd58-a8e8-518d-81c0-fdd1bd34238c</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">bb03566a-7669-53e9-8667-3055c624be30</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -4398,7 +4398,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40051</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">44d49d4a-323b-5445-aab3-357f6174e0dc</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">63affe74-b8ab-5609-9aa8-ddc9cbc2892a</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -4555,7 +4555,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40052</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">093f5792-7946-56d1-a474-fd56647dc54f</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">8db3f2f1-9bf0-5fdd-9acd-9f1ccf018fd3</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -4712,7 +4712,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40053</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">08c46693-bbac-59c2-823a-22f4935532c5</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">b37ac6af-36f7-50a7-87a7-2313f4fdb564</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -4869,7 +4869,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40054</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">34126022-57de-53c2-aa06-2660fc8cdd7d</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">0eef7e8e-135f-57ee-b77b-879978ec9e1e</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -5026,7 +5026,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40055</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">9708ec19-fdcc-5673-b435-6ec79255cd53</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">15062446-f493-54aa-a859-2af6803a0840</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -5183,7 +5183,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40056</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">1a1a4416-9d8d-5207-ad8d-9b336e2246af</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">558291f8-9fac-5680-a40f-a4da36af11f0</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -5340,7 +5340,7 @@
                 </Single>
                 <Single Name="Identifier" Type="string">40057</Single>
                 <Single Name="TypeName" Type="string">OutputModeType</Single>
-                <Single Name="LmEnumTypeGuid" Type="System.Guid">404e174f-d83d-5ead-bf7d-56e9ac5d64d7</Single>
+                <Single Name="LmEnumTypeGuid" Type="System.Guid">a35ffef0-f745-5c90-9988-841106858fb3</Single>
                 <Single Name="BaseType" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                   <Null Name="FilterFlags" />
                   <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
@@ -5478,7 +5478,7 @@
               <Single Name="IndexInDevDesc" Type="long">29</Single>
             </Single>
           </List2>
-          <Single Name="LmGuid" Type="System.Guid">4533b3f4-02ee-5230-b9a4-179fa8c0f221</Single>
+          <Single Name="LmGuid" Type="System.Guid">80d9a5da-9920-56c2-aafd-851ffbe96354</Single>
           <List2 Name="Sections">
             <Single Type="{33f58abf-62ae-4277-a80b-74c57ea00c50}" Method="IArchivable">
               <Single Name="Name" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
@@ -5652,7 +5652,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241532363</Single>
+        <Single Name="Timestamp" Type="long">639184353128591767</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4224</Single>
@@ -7515,7 +7515,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242026741</Single>
+        <Single Name="Timestamp" Type="long">639184353127975581</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4182</Single>
@@ -8606,7 +8606,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242167248</Single>
+        <Single Name="Timestamp" Type="long">639184353127580328</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4152</Single>
@@ -9644,7 +9644,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">e9159722-55bc-49e5-8034-fbd278ef718f</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242307254</Single>
+        <Single Name="Timestamp" Type="long">639184353127455794</Single>
       </Single>
       <Single Name="Object" Type="{e9159722-55bc-49e5-8034-fbd278ef718f}" Method="IArchivable">
         <Single Name="VisibleInterfaceName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
@@ -9667,7 +9667,7 @@
         </Single>
         <Single Name="HostParameterSet" Type="{abc12bfe-e34e-4b2c-a058-42c6e7e03a13}" Method="IArchivable">
           <List2 Name="Params" />
-          <Single Name="LmGuid" Type="System.Guid">691611e8-517e-5595-b52a-a1b239190c5e</Single>
+          <Single Name="LmGuid" Type="System.Guid">5023c5cf-f305-59ea-b32b-da108579809a</Single>
           <Null Name="Sections" />
           <Single Name="AlwaysMapping" Type="bool">False</Single>
           <Null Name="EditorName" />
@@ -9761,7 +9761,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">639b491f-5557-464c-af91-1471bac9f549</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899231917744</Single>
+        <Single Name="Timestamp" Type="long">639184353125397996</Single>
       </Single>
       <Single Name="Object" Type="{639b491f-5557-464c-af91-1471bac9f549}" Method="IArchivable">
         <Single Name="DynamicMemory" Type="int">-1</Single>
@@ -9822,7 +9822,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899240836759</Single>
+        <Single Name="Timestamp" Type="long">639184353128941879</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4141</Single>
@@ -10602,7 +10602,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899240997184</Single>
+        <Single Name="Timestamp" Type="long">639184353128208937</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">5775</Single>
@@ -21188,10 +21188,10 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899246999544</Single>
+        <Single Name="Timestamp" Type="long">639184353129781743</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-        <Single Name="UniqueIdGenerator" Type="string">5311</Single>
+        <Single Name="UniqueIdGenerator" Type="string">5315</Single>
         <Null Name="TypeList" />
         <Single Name="NeedsBusCycle" Type="bool">False</Single>
         <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -21683,8 +21683,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5308</Single>
-                      <Single Name="EditorPositionId" Type="long">5309</Single>
+                      <Single Name="PositionId" Type="long">5312</Single>
+                      <Single Name="EditorPositionId" Type="long">5313</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_InputOffsets</Single>
                       </Single>
@@ -21702,8 +21702,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5310</Single>
-                      <Single Name="EditorPositionId" Type="long">5311</Single>
+                      <Single Name="PositionId" Type="long">5314</Single>
+                      <Single Name="EditorPositionId" Type="long">5315</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_OutputOffsets</Single>
                       </Single>
@@ -30736,10 +30736,10 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899246773988</Single>
+        <Single Name="Timestamp" Type="long">639184353129683514</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-        <Single Name="UniqueIdGenerator" Type="string">5015</Single>
+        <Single Name="UniqueIdGenerator" Type="string">5019</Single>
         <Null Name="TypeList" />
         <Single Name="NeedsBusCycle" Type="bool">False</Single>
         <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -31231,8 +31231,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5012</Single>
-                      <Single Name="EditorPositionId" Type="long">5013</Single>
+                      <Single Name="PositionId" Type="long">5016</Single>
+                      <Single Name="EditorPositionId" Type="long">5017</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_InputOffsets</Single>
                       </Single>
@@ -31250,8 +31250,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5014</Single>
-                      <Single Name="EditorPositionId" Type="long">5015</Single>
+                      <Single Name="PositionId" Type="long">5018</Single>
+                      <Single Name="EditorPositionId" Type="long">5019</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_OutputOffsets</Single>
                       </Single>
@@ -40285,7 +40285,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241866468</Single>
+        <Single Name="Timestamp" Type="long">639184353127820617</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4262</Single>
@@ -41624,7 +41624,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241911984</Single>
+        <Single Name="Timestamp" Type="long">639184353127885123</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4154</Single>
@@ -42208,7 +42208,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241981701</Single>
+        <Single Name="Timestamp" Type="long">639184353127935572</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4222</Single>
@@ -43234,7 +43234,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242026741</Single>
+        <Single Name="Timestamp" Type="long">639184353127998531</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4159</Single>
@@ -44259,7 +44259,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242277293</Single>
+        <Single Name="Timestamp" Type="long">639184353127640606</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4190</Single>
@@ -45600,6 +45600,44 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">dbed5258-b652-4961-bc40-775659712c76</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">E_DiagState</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639184356623103987</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">TYPE E_DiagState :
+(
+    DISABLED := 0,
+    INIT := 1,
+    READY := 2,
+    MONITORING := 3,
+    ERROR := 4
+)
+END_TYPE</Single>
+            <Single Name="LineInfoPersistence" Type="string">dbed5258-b652-4961-bc40-775659712c76_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">29</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">0792e1c4-921e-41a7-b3f3-a7a6c6c06975</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">ST_AxisCmd</Single>
@@ -45608,7 +45646,7 @@
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232010498</Single>
+        <Single Name="Timestamp" Type="long">639184353126938973</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -45626,6 +45664,45 @@ END_TYPE</Single>
           </Single>
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">18</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">b13c09af-c8e6-46b1-8318-d42b48923509</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_DeviceDiag</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639184353750999297</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">TYPE ST_DeviceDiag :
+STRUCT
+    Online         : BOOL;
+    Operational    : BOOL;
+    Error          : BOOL;
+    ErrorId        : WORD;
+    State          : E_DiagState;
+    StateAtError   : E_DiagState;
+END_STRUCT
+END_TYPE</Single>
+            <Single Name="LineInfoPersistence" Type="string">b13c09af-c8e6-46b1-8318-d42b48923509_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">14</Single>
       </Single>
       <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
       <Array Name="Path" Type="string">
@@ -45664,7 +45741,7 @@ END_TYPE</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232035592</Single>
+        <Single Name="Timestamp" Type="long">639184353125498039</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -45706,7 +45783,7 @@ END_TYPE</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232137734</Single>
+        <Single Name="Timestamp" Type="long">639184353125891205</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -45748,7 +45825,7 @@ END_TYPE</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232252402</Single>
+        <Single Name="Timestamp" Type="long">639184353126854992</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -45790,7 +45867,7 @@ END_TYPE</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232524026</Single>
+        <Single Name="Timestamp" Type="long">639184353127028991</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -45814,7 +45891,7 @@ END_TYPE</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232353001</Single>
+        <Single Name="Timestamp" Type="long">639184353125761190</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -45849,7 +45926,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899231988984</Single>
+        <Single Name="Timestamp" Type="long">639184353125801198</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -45911,7 +45988,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232025537</Single>
+        <Single Name="Timestamp" Type="long">639184353125841196</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -45948,7 +46025,7 @@ END_VAR</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">adb5cb65-8e1d-4a00-b70a-375ea27582f3</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232705422</Single>
+        <Single Name="Timestamp" Type="long">639184353126675006</Single>
       </Single>
       <Single Name="Object" Type="{adb5cb65-8e1d-4a00-b70a-375ea27582f3}" Method="IArchivable">
         <List2 Name="ParameterTable" />
@@ -46399,10 +46476,10 @@ END_VAR</Single>
           </Entry>
           <Entry>
             <Key>
-              <Single Type="string">System_VisuElemCamDisplayer</Single>
+              <Single Type="string">ElementCollections</Single>
             </Key>
             <Value>
-              <Single Type="string">VisuElemCamDisplayer, 4.2.0.0 (System)</Single>
+              <Single Type="string">Element Collections, 3.5.17.0 (3S - Smart Software Solutions GmbH)</Single>
             </Value>
           </Entry>
           <Entry>
@@ -46439,10 +46516,10 @@ END_VAR</Single>
           </Entry>
           <Entry>
             <Key>
-              <Single Type="string">VH600_Lib</Single>
+              <Single Type="string">System_VisuElemBase</Single>
             </Key>
             <Value>
-              <Single Type="string">VH600_Lib, 1.0.0.0 (Veichi)</Single>
+              <Single Type="string">VisuElemBase, 4.3.0.0 (System)</Single>
             </Value>
           </Entry>
           <Entry>
@@ -46455,10 +46532,10 @@ END_VAR</Single>
           </Entry>
           <Entry>
             <Key>
-              <Single Type="string">Standard64</Single>
+              <Single Type="string">FloatingPointUtils</Single>
             </Key>
             <Value>
-              <Single Type="string">Standard64, 3.5.17.0 (System)</Single>
+              <Single Type="string">FloatingPointUtils, 3.5.17.0 (System)</Single>
             </Value>
           </Entry>
           <Entry>
@@ -46479,10 +46556,10 @@ END_VAR</Single>
           </Entry>
           <Entry>
             <Key>
-              <Single Type="string">FloatingPointUtils</Single>
+              <Single Type="string">System_VisuElemCamDisplayer</Single>
             </Key>
             <Value>
-              <Single Type="string">FloatingPointUtils, 3.5.17.0 (System)</Single>
+              <Single Type="string">VisuElemCamDisplayer, 4.2.0.0 (System)</Single>
             </Value>
           </Entry>
           <Entry>
@@ -46551,10 +46628,10 @@ END_VAR</Single>
           </Entry>
           <Entry>
             <Key>
-              <Single Type="string">ElementCollections</Single>
+              <Single Type="string">Standard64</Single>
             </Key>
             <Value>
-              <Single Type="string">Element Collections, 3.5.17.0 (3S - Smart Software Solutions GmbH)</Single>
+              <Single Type="string">Standard64, 3.5.17.0 (System)</Single>
             </Value>
           </Entry>
           <Entry>
@@ -46575,10 +46652,10 @@ END_VAR</Single>
           </Entry>
           <Entry>
             <Key>
-              <Single Type="string">System_VisuElemBase</Single>
+              <Single Type="string">VH600_Lib</Single>
             </Key>
             <Value>
-              <Single Type="string">VisuElemBase, 4.3.0.0 (System)</Single>
+              <Single Type="string">VH600_Lib, 1.0.0.0 (Veichi)</Single>
             </Value>
           </Entry>
           <Entry>
@@ -46602,228 +46679,6 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">2b4ef824-ef6d-4538-9653-5fe1b189498c</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">BusAggregator</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639183899231968634</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string"></Single>
-            <Single Name="LineInfoPersistence" Type="string">2b4ef824-ef6d-4538-9653-5fe1b189498c_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK BusAggregator
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
-VAR
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">2b4ef824-ef6d-4538-9653-5fe1b189498c_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">9</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">2f6867ac-7a6a-46ff-b874-0cb8099fff11</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_DiagCanOpen</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639183899231978969</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 🛑 1. GATE : SafeStop logiciel par défaut
-IF NOT Enable THEN
-    Ready := FALSE;
-    State := E_DiagState.DISABLED;
-    Joystick.State := E_DiagState.DISABLED;
-    Joystick.Online := FALSE;
-    Joystick.Operational := FALSE;
-    Joystick.Error := FALSE;
-    Joystick.ErrorId := 16#0000;
-    Error := FALSE;
-    ErrorId := 16#0000;
-    RETURN;
-END_IF;
-
-Ready := TRUE;
-
-// 🔑 2. RESET FRONT — efface défauts dont cause disparue
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    IF (CanOnline AND CanOperational) THEN
-        Joystick.ErrorId := 16#0000;
-        StateAtError := E_DiagState.DISABLED;
-    END_IF;
-END_IF;
-
-// 🔍 3. DIAGNOSTIC JOYSTICK
-// Bit 0 : Perte communication CAN
-IF NOT CanOnline THEN
-    Joystick.ErrorId := 16#0001;  // Perte liaison CAN joystick
-    Joystick.Online := FALSE;
-ELSE
-    Joystick.Online := TRUE;
-    IF ResetEdge.Q THEN
-        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFE;
-    END_IF;
-END_IF;
-
-// Bit 1 : Mode non-opérationnel
-IF NOT CanOperational THEN
-    Joystick.ErrorId := Joystick.ErrorId OR 16#0002;  // Joystick pas opérationnel
-    Joystick.Operational := FALSE;
-ELSE
-    Joystick.Operational := TRUE;
-    IF ResetEdge.Q THEN
-        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFD;
-    END_IF;
-END_IF;
-
-// 🚦 4. STATE MACHINE
-IF Joystick.ErrorId &lt;&gt; 0 THEN
-    Joystick.State := E_DiagState.ERROR;
-    IF StateAtError = E_DiagState.DISABLED THEN
-        StateAtError := State;  // Fige la phase du défaut
-    END_IF;
-ELSIF NOT (Joystick.Online AND Joystick.Operational) THEN
-    Joystick.State := E_DiagState.INIT;
-ELSE
-    Joystick.State := E_DiagState.READY;
-END_IF;
-
-State := Joystick.State;
-
-// 📤 5. SORTIES GLOBALES
-Joystick.Error := (Joystick.ErrorId &lt;&gt; 0);
-Error := Joystick.Error;
-ErrorId := Joystick.ErrorId;
-
-// Busy, Done non utilisés mais présents pour conformité
-Busy := FALSE;
-Done := FALSE;</Single>
-            <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_DiagCanOpen
-VAR_INPUT
-    Enable          : BOOL;        // Active la surveillance CAN
-    Reset           : BOOL;        // Front acquittement défauts
-    CanOnline       : BOOL;        // Trame joystick reçue (TRUE = OK)
-    CanOperational  : BOOL;        // Joystick en mode opérationnel (TRUE = OK)
-END_VAR
-VAR_OUTPUT
-    Ready           : BOOL;        // Logique active
-    Busy            : BOOL;        // Non utilisé (pour conformité interface)
-    Done            : BOOL;        // Non utilisé
-    Error           : BOOL;        // Présence anomalie
-    ErrorId         : WORD;        // Code défaut
-    State           : E_DiagState; // Phase courante
-    StateAtError    : E_DiagState; // Snapshot figé
-    Joystick        : ST_DeviceDiag;  // État détaillé joystick
-END_VAR
-VAR
-    ResetEdge       : R_TRIG;      // Détecteur front Reset
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">9</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">434f83d9-99f2-4175-ac83-d43a4660b11e</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">PRG_BusMonitor</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639183899231947748</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string"></Single>
-            <Single Name="LineInfoPersistence" Type="string">434f83d9-99f2-4175-ac83-d43a4660b11e_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">PROGRAM PRG_BusMonitor
-VAR
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">434f83d9-99f2-4175-ac83-d43a4660b11e_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">5</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">5f0d22a7-a43e-4993-b595-48f80c08c3ad</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">PROGRAMME_IP</Single>
@@ -46833,7 +46688,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232312988</Single>
+        <Single Name="Timestamp" Type="long">639184353126765011</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -47163,7 +47018,7 @@ END_VAR
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">21d4fe94-4123-4e23-9091-ead220afbd1f</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232322990</Single>
+        <Single Name="Timestamp" Type="long">639184353126988992</Single>
       </Single>
       <Single Name="Object" Type="{21d4fe94-4123-4e23-9091-ead220afbd1f}" Method="IArchivable">
         <Single Name="GVLGuid" Type="System.Guid">f6a0f90b-8fbf-4c39-ac25-17160d5a75c1</Single>
@@ -47226,7 +47081,7 @@ END_VAR
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">ae1de277-a207-4a28-9efb-456c06bd52f3</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232402998</Single>
+        <Single Name="Timestamp" Type="long">639184353127275252</Single>
       </Single>
       <Single Name="Object" Type="{ae1de277-a207-4a28-9efb-456c06bd52f3}" Method="IArchivable">
         <List Name="TaskConfigurationList" Type="{75fc8bb3-c744-4e99-b6eb-bb2796e19500}" />
@@ -47284,7 +47139,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232343002</Single>
+        <Single Name="Timestamp" Type="long">639184353126804984</Single>
       </Single>
       <Single Name="Object" Type="{261bd6e6-249c-4232-bb6f-84c2fbeef430}" Method="IArchivable">
         <Null Name="persvarlist" />
@@ -47340,7 +47195,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">085766fd-043e-4545-8e8d-d651d56d5d3b</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241312357</Single>
+        <Single Name="Timestamp" Type="long">639184353128491770</Single>
       </Single>
       <Single Name="Object" Type="{085766fd-043e-4545-8e8d-d651d56d5d3b}" Method="IArchivable">
         <Single Name="Device" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
@@ -60301,7 +60156,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">e666d3b8-b36c-47b7-9743-2eb12fa30294</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241382363</Single>
+        <Single Name="Timestamp" Type="long">639184353128551786</Single>
       </Single>
       <Single Name="Object" Type="{e666d3b8-b36c-47b7-9743-2eb12fa30294}" Method="IArchivable">
         <Null Name="Device" />
@@ -60437,7 +60292,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">085766fd-043e-4545-8e8d-d651d56d5d3b</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241652367</Single>
+        <Single Name="Timestamp" Type="long">639184353128781786</Single>
       </Single>
       <Single Name="Object" Type="{085766fd-043e-4545-8e8d-d651d56d5d3b}" Method="IArchivable">
         <Single Name="Device" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
@@ -73324,7 +73179,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">e666d3b8-b36c-47b7-9743-2eb12fa30294</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899241763150</Single>
+        <Single Name="Timestamp" Type="long">639184353128841767</Single>
       </Single>
       <Single Name="Object" Type="{e666d3b8-b36c-47b7-9743-2eb12fa30294}" Method="IArchivable">
         <Null Name="Device" />
@@ -73483,7 +73338,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899242277293</Single>
+        <Single Name="Timestamp" Type="long">639184353127680598</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">28055</Single>
@@ -86264,7 +86119,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232115578</Single>
+        <Single Name="Timestamp" Type="long">639184353125548005</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -86472,7 +86327,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232095590</Single>
+        <Single Name="Timestamp" Type="long">639184353125588005</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -86556,7 +86411,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232125594</Single>
+        <Single Name="Timestamp" Type="long">639184353125638006</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -86652,7 +86507,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232075595</Single>
+        <Single Name="Timestamp" Type="long">639184353125687995</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87174,7 +87029,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232168641</Single>
+        <Single Name="Timestamp" Type="long">639184353125944176</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87265,7 +87120,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232242399</Single>
+        <Single Name="Timestamp" Type="long">639184353126002273</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87346,7 +87201,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232232146</Single>
+        <Single Name="Timestamp" Type="long">639184353126054039</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87532,7 +87387,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232191819</Single>
+        <Single Name="Timestamp" Type="long">639184353126131608</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87617,7 +87472,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232212159</Single>
+        <Single Name="Timestamp" Type="long">639184353126180999</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87705,7 +87560,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232158204</Single>
+        <Single Name="Timestamp" Type="long">639184353126235000</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -88421,7 +88276,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232272406</Single>
+        <Single Name="Timestamp" Type="long">639184353126904999</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -88501,9 +88356,9 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">77594c8b-d37e-4460-a0f5-f5314a888c10</Single>
+        <Single Name="Guid" Type="System.Guid">bfa36efc-1649-4f1a-bf63-1c8e695b9290</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">diagCAN</Single>
+        <Single Name="Name" Type="string">FB_CycleTime</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
           <Entry>
             <Key>
@@ -88530,65 +88385,208 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232574179</Single>
+        <Single Name="Timestamp" Type="long">639184353127118994</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 1. Get CAN bus logic status
-BusState := CANopen_Manager.GetBusState(
-    xDiagnosisInfoAvailable =&gt; BusDiagAvailable, 
-    eError =&gt; BusError
-);
+            <Single Name="TextBlobForSerialisation" Type="string">// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
 
-// 2. Get Joystick node status
-DeviceState := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState(
-    xDiagnosisInfoAvailable =&gt; DevDiagAvailable, 
-    eError =&gt; DeviceError
-);
-
-// 3. Evaluate if device is physically connected/found
-IF DeviceState &lt;&gt; DEVICE_STATE.NOT_FOUND THEN
-    IsOnline := TRUE;
-ELSE
-    IsOnline := FALSE;
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent; // ◄ Fixé ici pour éviter un calcul faussé au cycle 2
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
 END_IF;
 
-// 4. Evaluate if device is actively Operational (NMT Operational / Running)
-IF DeviceState = DEVICE_STATE.RUNNING THEN
-    IsOperational := TRUE;
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+
+// 4. CONVERSION ET CHARGE DE SECOURS
+IF DeltaTimeMs &gt; 0 THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
-    IsOperational := FALSE; 
-    // (If FALSE, it might be stopped, pre-operational, or disconnected)
-END_IF;</Single>
-            <Single Name="LineInfoPersistence" Type="string">77594c8b-d37e-4460-a0f5-f5314a888c10_Impl_LineIds</Single>
+    CycleTimeS := DefaultValueS;
+END_IF;
+
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;</Single>
+            <Single Name="LineInfoPersistence" Type="string">bfa36efc-1649-4f1a-bf63-1c8e695b9290_Impl_LineIds</Single>
           </Single>
         </Single>
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">PROGRAM diagCAN
+            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_CycleTime
+VAR_INPUT
+    DefaultValueS : REAL := 0.004; // Valeur de secours (Ex: MainTask = 20ms -&gt; 0.020)
+END_VAR
+VAR_OUTPUT
+    CycleTimeS    : REAL;          // Temps écoulé réel (Secondes)
+END_VAR
 VAR
-    // Bus &amp; Device states
-    BusState         : BUS_STATE;
-    DeviceState      : DEVICE_STATE;
-    
-    // Internal function execution errors (0 = NO_ERROR)
-    BusError         : INT;
-    DeviceError      : INT;
-    
-    // Diagnosis status flags
-    BusDiagAvailable : BOOL;
-    DevDiagAvailable : BOOL;
-    
-    // Status flags
-    IsOnline         : BOOL; // Device is physically present on the bus
-    IsOperational    : BOOL; // Device is running and actively processing I/O (PDO)
+    TimeCurrent   : TIME;          // Temps système actuel
+    TimeLast      : TIME;          // Empreinte du cycle précédent
+    DeltaTimeMs   : UDINT;         // Écart brut calculé
+    InitDone      : BOOL;          // Drapeau d'initialisation
 END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">77594c8b-d37e-4460-a0f5-f5314a888c10_Decl_LineIds</Single>
+            <Single Name="LineInfoPersistence" Type="string">bfa36efc-1649-4f1a-bf63-1c8e695b9290_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">314</Single>
+        <Single Name="UniqueIdGenerator" Type="string">77</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">SYSTEM</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">2f6867ac-7a6a-46ff-b874-0cb8099fff11</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_DiagCanOpen</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639184353272267030</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">// 🛑 1. GATE : SafeStop logiciel par défaut
+IF NOT Enable THEN
+    Ready := FALSE;
+    State := E_DiagState.DISABLED;
+    Joystick.State := E_DiagState.DISABLED;
+    Joystick.Online := FALSE;
+    Joystick.Operational := FALSE;
+    Joystick.Error := FALSE;
+    Joystick.ErrorId := 16#0000;
+    Error := FALSE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+
+// 🔑 2. RESET FRONT — efface défauts dont cause disparue
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    IF (CanOnline AND CanOperational) THEN
+        Joystick.ErrorId := 16#0000;
+        StateAtError := E_DiagState.DISABLED;
+    END_IF;
+END_IF;
+
+// 🔍 3. DIAGNOSTIC JOYSTICK
+// Bit 0 : Perte communication CAN
+IF NOT CanOnline THEN
+    Joystick.ErrorId := 16#0001;  // Perte liaison CAN joystick
+    Joystick.Online := FALSE;
+ELSE
+    Joystick.Online := TRUE;
+    IF ResetEdge.Q THEN
+        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFE;
+    END_IF;
+END_IF;
+
+// Bit 1 : Mode non-opérationnel
+IF NOT CanOperational THEN
+    Joystick.ErrorId := Joystick.ErrorId OR 16#0002;  // Joystick pas opérationnel
+    Joystick.Operational := FALSE;
+ELSE
+    Joystick.Operational := TRUE;
+    IF ResetEdge.Q THEN
+        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFD;
+    END_IF;
+END_IF;
+
+// 🚦 4. STATE MACHINE
+IF Joystick.ErrorId &lt;&gt; 0 THEN
+    Joystick.State := E_DiagState.ERROR;
+    IF StateAtError = E_DiagState.DISABLED THEN
+        StateAtError := State;  // Fige la phase du défaut
+    END_IF;
+ELSIF NOT (Joystick.Online AND Joystick.Operational) THEN
+    Joystick.State := E_DiagState.INIT;
+ELSE
+    Joystick.State := E_DiagState.READY;
+END_IF;
+
+State := Joystick.State;
+
+// 📤 5. SORTIES GLOBALES
+Joystick.Error := (Joystick.ErrorId &lt;&gt; 0);
+Error := Joystick.Error;
+ErrorId := Joystick.ErrorId;
+
+// Busy, Done non utilisés mais présents pour conformité
+Busy := FALSE;
+Done := FALSE;</Single>
+            <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_DiagCanOpen
+VAR_INPUT
+    Enable          : BOOL;        // Active la surveillance CAN
+    Reset           : BOOL;        // Front acquittement défauts
+    CanOnline       : BOOL;        // Trame joystick reçue (TRUE = OK)
+    CanOperational  : BOOL;        // Joystick en mode opérationnel (TRUE = OK)
+END_VAR
+VAR_OUTPUT
+    Ready           : BOOL;        // Logique active
+    Busy            : BOOL;        // Non utilisé (pour conformité interface)
+    Done            : BOOL;        // Non utilisé
+    Error           : BOOL;        // Présence anomalie
+    ErrorId         : WORD;        // Code défaut
+    State           : E_DiagState; // Phase courante
+    StateAtError    : E_DiagState; // Snapshot figé
+    Joystick        : ST_DeviceDiag;  // État détaillé joystick
+END_VAR
+VAR
+    ResetEdge       : R_TRIG;      // Détecteur front Reset
+END_VAR
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">71</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -88634,7 +88632,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232544180</Single>
+        <Single Name="Timestamp" Type="long">639184353127175216</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -88847,102 +88845,6 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">bfa36efc-1649-4f1a-bf63-1c8e695b9290</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_CycleTime</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639183899232564174</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 1. ACQUISITION DU TEMPS SYSTÈME
-TimeCurrent := TIME();
-
-// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
-IF NOT InitDone THEN
-    TimeLast := TimeCurrent; // ◄ Fixé ici pour éviter un calcul faussé au cycle 2
-    InitDone := TRUE;
-    CycleTimeS := DefaultValueS;
-    RETURN;
-END_IF;
-
-// 3. CALCUL DU DELTA EN MILLISECONDES
-DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
-
-// 4. CONVERSION ET CHARGE DE SECOURS
-IF DeltaTimeMs &gt; 0 THEN
-    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
-ELSE
-    CycleTimeS := DefaultValueS;
-END_IF;
-
-// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
-TimeLast := TimeCurrent;</Single>
-            <Single Name="LineInfoPersistence" Type="string">bfa36efc-1649-4f1a-bf63-1c8e695b9290_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_CycleTime
-VAR_INPUT
-    DefaultValueS : REAL := 0.004; // Valeur de secours (Ex: MainTask = 20ms -&gt; 0.020)
-END_VAR
-VAR_OUTPUT
-    CycleTimeS    : REAL;          // Temps écoulé réel (Secondes)
-END_VAR
-VAR
-    TimeCurrent   : TIME;          // Temps système actuel
-    TimeLast      : TIME;          // Empreinte du cycle précédent
-    DeltaTimeMs   : UDINT;         // Écart brut calculé
-    InitDone      : BOOL;          // Drapeau d'initialisation
-END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">bfa36efc-1649-4f1a-bf63-1c8e695b9290_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">77</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">SYSTEM</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">41bb8952-1bea-480b-95a5-8069cb2c9355</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">PLC_PRG_MAIN</Single>
@@ -88972,7 +88874,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639183899232634187</Single>
+        <Single Name="Timestamp" Type="long">639184353127235198</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -89068,7 +88970,7 @@ END_VAR
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">98a2708a-9b18-4f31-82ed-a1465b24fa2d</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232412994</Single>
+        <Single Name="Timestamp" Type="long">639184355957760975</Single>
       </Single>
       <Single Name="Object" Type="{98a2708a-9b18-4f31-82ed-a1465b24fa2d}" Method="IArchivable">
         <Single Name="AllowEmpty" Type="bool">False</Single>
@@ -89096,10 +88998,6 @@ END_VAR
         <Single Name="TaskGuid" Type="System.Guid">28355fd2-9e2f-475f-93f7-2172a0a2b5f6</Single>
         <Single Name="EventPOUGuid" Type="System.Guid">3249f8a4-7f62-44f0-8bff-4363c387cdf0</Single>
         <List Name="PouList" Type="{33f568bb-4a2c-48cb-a762-34cca3066d03}">
-          <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
-            <Single Name="Name" Type="string">diagCAN</Single>
-            <Single Name="Comment" Type="string"></Single>
-          </Single>
           <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
             <Single Name="Name" Type="string">PRG_JOY1</Single>
             <Single Name="Comment" Type="string"></Single>
@@ -89130,7 +89028,7 @@ END_VAR
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">98a2708a-9b18-4f31-82ed-a1465b24fa2d</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232442985</Single>
+        <Single Name="Timestamp" Type="long">639184355935140030</Single>
       </Single>
       <Single Name="Object" Type="{98a2708a-9b18-4f31-82ed-a1465b24fa2d}" Method="IArchivable">
         <Single Name="AllowEmpty" Type="bool">True</Single>
@@ -89159,10 +89057,6 @@ END_VAR
         <Single Name="EventPOUGuid" Type="System.Guid">26257e6c-83d6-4f7d-bfd1-aa75c4d73b08</Single>
         <List Name="PouList" Type="{33f568bb-4a2c-48cb-a762-34cca3066d03}">
           <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
-            <Single Name="Name" Type="string">diagETHERCAT</Single>
-            <Single Name="Comment" Type="string"></Single>
-          </Single>
-          <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
             <Single Name="Name" Type="string">PRG_COD1</Single>
             <Single Name="Comment" Type="string"></Single>
           </Single>
@@ -89170,7 +89064,7 @@ END_VAR
         <Single Name="Implicit" Type="bool">False</Single>
         <Single Name="WithinSPSTimeSlicing" Type="bool">True</Single>
         <Single Name="Core" Type="int">-1</Single>
-        <Single Name="Core2" Type="int">-1</Single>
+        <Single Name="Core2" Type="int">-2</Single>
         <Single Name="TaskGroup" Type="string">IEC-Tasks</Single>
         <Single Name="SynchTask" Type="string"></Single>
       </Single>
@@ -89192,7 +89086,7 @@ END_VAR
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">98a2708a-9b18-4f31-82ed-a1465b24fa2d</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639183899232472996</Single>
+        <Single Name="Timestamp" Type="long">639184353127395238</Single>
       </Single>
       <Single Name="Object" Type="{98a2708a-9b18-4f31-82ed-a1465b24fa2d}" Method="IArchivable">
         <Single Name="AllowEmpty" Type="bool">False</Single>
@@ -89247,151 +89141,5 @@ END_VAR
     </Single>
   </List2>
   <Single Name="ProfileName" Type="string">CODESYS V3.5 SP19 Patch 1</Single>
-</Single>  <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">2d05189f-7902-4f7a-8657-cc8d50f9a835</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">Types_Diagnostic</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">134272883813017792</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 📋 Types pour diagnostic bus (CAN + EtherCAT)
-// Réutilisables pour tout device avec Online/Operational/Error
-
-TYPE E_DiagState :
-(
-    DISABLED := 0,      // Enable faux, neutralisé
-    INIT := 1,          // Démarrage / scan initial
-    READY := 2,         // Prêt, surveille
-    MONITORING := 3,    // En surveillance active
-    ERROR := 4          // Défaut présent
-)
-END_TYPE
-
-// Device state: Online, Operational, Error, code défaut, phase courante, snapshot défaut
-TYPE ST_DeviceDiag :
-STRUCT
-    Online         : BOOL;         // Device présent sur le bus
-    Operational    : BOOL;         // Device actif, échange données
-    Error          : BOOL;         // Défaut détecté (= ErrorId &lt;&gt; 0)
-    ErrorId        : WORD;         // Bitfield défauts (16 codes max)
-    State          : E_DiagState;  // Phase courante (DISABLED, READY, MONITORING, ERROR)
-    StateAtError   : E_DiagState;  // Snapshot figé au moment du défaut
-END_STRUCT
-END_TYPE</Single>
-            <Single Name="LineInfoPersistence" Type="string">2d05189f-7902-4f7a-8657-cc8d50f9a835_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK Types_Diagnostic
- Types_Diagnostic
-VAR
-END_VAR
-END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">2d05189f-7902-4f7a-8657-cc8d50f9a835_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">10</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">_TYPES</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-<Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">c8f3a2b1-5e7d-4c9a-b5d2-f1a3e6c8d9b2</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">E_DiagState</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639183899232400000</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">TYPE E_DiagState :
-(
-    DISABLED := 0,      (* Enable faux, neutralise *)
-    INIT := 1,          (* Demarrage / scan initial *)
-    READY := 2,         (* Pret, surveille *)
-    MONITORING := 3,    (* En surveillance active *)
-    ERROR := 4          (* Defaut present *)
-)
-END_TYPE</Single>
-            <Single Name="LineInfoPersistence" Type="string">c8f3a2b1-5e7d-4c9a-b5d2-f1a3e6c8d9b2_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">10</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-<Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">d9f4b3c2-6f8e-5d0b-c6e3-a2b4f7d0e1c3</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">ST_DeviceDiag</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639183899232410000</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">TYPE ST_DeviceDiag :
-STRUCT
-    Online         : BOOL;         (* Device present sur le bus *)
-    Operational    : BOOL;         (* Device actif, echange donnees *)
-    Error          : BOOL;         (* Defaut detecte (= ErrorId &lt;&gt; 0) *)
-    ErrorId        : WORD;         (* Bitfield defauts (16 codes max) *)
-    State          : E_DiagState;  (* Phase courante *)
-    StateAtError   : E_DiagState;  (* Snapshot fige au moment du defaut *)
-END_STRUCT
-END_TYPE</Single>
-            <Single Name="LineInfoPersistence" Type="string">d9f4b3c2-6f8e-5d0b-c6e3-a2b4f7d0e1c3_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">11</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-</StructuredView>
+</Single>  </StructuredView>
 </ExportFile>
