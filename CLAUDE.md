@@ -39,35 +39,9 @@ Tâches, arborescence CODESYS, flux données.
 
 ## 🛠️ **Workflow Édition**
 
-### **Modifier FBs existants**
-```bash
-# 1. Extraire POUs pour édition
-python tools/extract.py --yes --commit
+*Nouvelle procédure en cours de mise en place...*
 
-# 2. Éditer CODE/*.xml directement dans VS Code
-
-# 3. Réinjecter (guarded par GUID, backup auto)
-python tools/inject.py --yes
-
-# 4. Réimporter Device.export dans CODESYS
-```
-
-### **Créer nouveaux FBs (simplifié)**
-```bash
-# 1. Écrire un fichier ST brut (pas d'XML)
-#    ex: CODE/FB_MonFB.st
-
-# 2. Convertir ST → XML CODESYS (génère GUID auto)
-python tools/st2xml.py CODE/FB_MonFB.st
-
-# 3. Réinjecter les nouveaux FBs
-python tools/inject.py --yes
-
-# 4. Réimporter Device.export dans CODESYS
-```
-
-👉 Voir [tools/README.md](tools/README.md) pour options complètes.
-👉 Voir [.claude/guardrails-codesys.md](.claude/guardrails-codesys.md) pour détails sur st2xml.py.
+👉 Voir [.claude/guardrails-codesys.md](.claude/guardrails-codesys.md) pour les guardrails.
 
 ---
 
@@ -144,18 +118,18 @@ Tous les docs dans **`DOC/`** :
 
 ---
 
-### 📖 **Accès rapide à la SKILL**
+### 📖 **Guardrails Obligatoires**
 
-Les guardrails sont aussi dans [`.claude/skills/codesys-code.md`](.claude/skills/codesys-code.md)
+Les guardrails sont définis dans [`.claude/guardrails-codesys.md`](.claude/guardrails-codesys.md).
 
-Demande simplement (les guardrails chargent auto) :
+Demande simplement :
 ```
 Modifier FB_Joystick pour [description]
 Créer nouveau FB_ pour [description]
 Ajouter [feature] au CODE/
 ```
 
-L'IA charge automatiquement + valide avant génération.
+L'IA valide automatiquement avant génération.
 
 ---
 
@@ -167,16 +141,15 @@ L'IA charge automatiquement + valide avant génération.
 - [ ] `ErrorId` = bitfield ? Reset = front obligatoire ?
 - [ ] `SafeStop` prioritaire sur Enable ?
 
-### Avant de demander modification code (Workflow complet)
+### Avant de demander modification code
 
-1. **Extraire** : `python tools/extract.py --clean`
-2. **Invoquer guardrails** : `/codesys-code [fichier]`
-3. **L'IA valide** : audit nommage, interface, sécurité
+1. **Décrire** : spec complète du besoin
+2. **L'IA charge guardrails** : audit nommage, interface, sécurité
+3. **L'IA valide** : conform spec
 4. **Si doute** : signale + demande clarification
 5. **Sinon** : génère code + checklist
-6. **Réinjecter** : `python tools/inject.py`
-7. **Réimporter dans CODESYS** (manuel)
+6. **Réimporter dans CODESYS** (manuel)
 
 ---
 
-**État du projet :** Main branch clean, documentation complète, outils d'édition + guardrails actifs. 🚀
+**État du projet :** Main branch clean, documentation complète, guardrails actifs. Nouvelle procédure en cours. 🚀
