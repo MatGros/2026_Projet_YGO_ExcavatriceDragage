@@ -136,3 +136,43 @@ MODIFICATIONS INCRÉMENTALES
 - Commit après extraction = départ propre
 - Incrémental prioritaire, flexible si justifié
 - git diff révèle changements réels
+
+---
+
+## 📝 Création de NOUVEAUX FBs / POUs
+
+**Option 1 : Modifier XML existant** (POUs vides ou à refactoriser)
+```bash
+1. extract.py --yes               # Extrait tous les FBs (y c. vides)
+2. Éditer CODE/DiagCanOpen__GUID.xml  # Modifier le contenu
+3. inject.py --yes                # Réinjecte
+```
+
+**Option 2 : Créer ST brut + conversion auto** ✨ NOUVEAU
+```bash
+1. Écrire CODE/FB_MonFB.st        # ST simple (pas d'XML)
+2. python tools/st2xml.py CODE/FB_MonFB.st  # Convertir → XML + GUID unique
+   └─ Génère : CODE/FB_MonFB__<UUID>.xml (prêt pour inject.py)
+3. inject.py --yes                # Réinjecte le nouveau POU
+```
+
+**st2xml.py : Features**
+- ✅ Parse FUNCTION_BLOCK / PROGRAM
+- ✅ Extrait interface (VAR_INPUT/OUTPUT/VAR)
+- ✅ Extrait implémentation
+- ✅ Génère GUID UUID unique
+- ✅ Crée wrapper XML CODESYS complet
+- ✅ Valide XML avant écriture
+- ✅ Sort dans CODE/ prêt pour inject.py
+
+**Exemple**
+```bash
+# Un seul fichier
+python tools/st2xml.py CODE/FB_DiagCanOpen.st
+
+# Plusieurs fichiers (glob)
+python tools/st2xml.py "CODE/FB_*.st"
+
+# Afficher le XML généré (debug)
+python tools/st2xml.py CODE/FB_MonFB.st --template
+```
