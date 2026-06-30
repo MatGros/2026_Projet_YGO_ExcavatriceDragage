@@ -218,13 +218,13 @@ def main(argv=None):
         print("Aucun fichier .st trouvé dans : {}".format(args.files))
         return 1
 
-    print("Conversion ST → XML CODESYS")
+    print("Conversion ST -> XML CODESYS")
     print("=" * 60)
 
     success_count = 0
     for st_file in st_files:
         if not st_file.is_file():
-            print("⚠ Ignoré (pas un fichier) : {}".format(st_file))
+            print("[WARN] Ignore (not a file) : {}".format(st_file))
             continue
 
         try:
@@ -239,13 +239,13 @@ def main(argv=None):
                 print("\n[TEMPLATE] {}".format(pou_name))
                 print(xml_str[:500] + "...")
             else:
-                # Écrire le fichier XML
+                # Ecrire le fichier XML
                 output_file = write_xml_file(xml_str, pou_name, pou_guid, output_dir)
-                print("✓ {} → {}".format(st_file.name, output_file.name))
+                print("[OK] {} -> {}".format(st_file.name, output_file.name))
                 success_count += 1
 
         except Exception as e:
-            print("✗ ERREUR {} : {}".format(st_file.name, str(e)))
+            print("[ERREUR] {} : {}".format(st_file.name, str(e)))
             return 1
 
     print("=" * 60)
