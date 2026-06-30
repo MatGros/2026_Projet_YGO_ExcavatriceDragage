@@ -39,9 +39,17 @@ Tâches, arborescence CODESYS, flux données.
 
 ## 🛠️ **Workflow Édition**
 
-*Nouvelle procédure en cours de mise en place...*
+Toute modif passe par la skill **[`codesys-workflow`](.claude/skills/codesys-workflow.md)** (chargement auto) :
 
-👉 Voir [.claude/guardrails-codesys.md](.claude/guardrails-codesys.md) pour les guardrails.
+0. 📚 Lire règles `DOC/` + STOP si spec incomplète
+1. 🔍 Comprendre architecture + devices (`Device.export`)
+2. 🔬 Analyser variables / PRG / FB existants
+3. 🧩 Plan **groupé par concept** → validation user
+4. 💻 Code ST commenté FR + emoji + **note d'application manuelle**
+5. 🔁 REX → maj specs `DOC/` versionnées `vX.X`
+6. 🔄 Nouvel export user → rebouclage
+
+⚠️ L'utilisateur applique **tout manuellement** dans CODESYS 3.5 (copie du ST).
 
 ---
 
@@ -101,7 +109,7 @@ Tous les docs dans **`DOC/`** :
 
 **Si l'utilisateur demande modification CODE/, FB_, PRG_, ou "codesys" :**
 
-1. ✅ **Charger automatiquement** `.claude/guardrails-codesys.md`
+1. ✅ **Charger automatiquement** la skill `.claude/skills/codesys-workflow.md`
 2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun.md
 3. ✅ **Vérifier spec complète** → Sinon demander clarifications
 4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
@@ -118,18 +126,18 @@ Tous les docs dans **`DOC/`** :
 
 ---
 
-### 📖 **Guardrails Obligatoires**
+### 📖 **Skill Obligatoire**
 
-Les guardrails sont définis dans [`.claude/guardrails-codesys.md`](.claude/guardrails-codesys.md).
+Workflow défini dans [`.claude/skills/codesys-workflow.md`](.claude/skills/codesys-workflow.md) (chargement auto).
 
 Demande simplement :
 ```
 Modifier FB_Joystick pour [description]
 Créer nouveau FB_ pour [description]
-Ajouter [feature] au CODE/
+Analyser [partie] du programme automate
 ```
 
-L'IA valide automatiquement avant génération.
+L'IA charge les règles DOC + valide avant de générer.
 
 ---
 
