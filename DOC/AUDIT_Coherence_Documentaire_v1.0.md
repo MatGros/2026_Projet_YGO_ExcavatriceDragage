@@ -7,6 +7,8 @@
 > **Objectif de conception rappelé** : POO **partielle par composition**, **sans méthode ni property**.
 >
 > 📅 Établi le 2026-07-01. Décisions intégrées suite à arbitrage utilisateur (voir §2).
+> 🔄 Révision : ajout **D12/D13** (interface FB standard, modèle d'arrêt `Start`/`Stop`/`SafeStop`,
+> abandon de la formule `Enable := ordre AND NOT SafeStop` de la 1ʳᵉ passe).
 
 ---
 
@@ -26,10 +28,10 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 
 | # | Sujet | Décision de référence |
 |---|-------|-----------------------|
-| D1 | **`SafeStop`** | **Conservé** comme **sortie** des blocs safety (`FB_Safety` / safety métier). C'est une **information** : il **ne force pas les sorties à 0**, il **met la machine en arrêt sûr** (rampe). ❌ N'est **pas** une entrée-commande propagée par FB. |
-| D2 | **`CoupeEnable`** | **N'existe pas** comme variable. L'arrêt sûr = **désactivation de l'`Enable`** (`/Enable`). Règle : `Enable := (ordre) AND NOT SafeStop`. **Tout le vocabulaire `CoupeEnable` doit disparaître des specs.** |
+| D1 | **`SafeStop`** | **Conservé** comme **sortie** des blocs safety (`FB_Safety` / safety métier), **consommée en entrée** par les FB de mouvement. Il **ne force pas les sorties à 0** : il déclenche un **arrêt sur rampe rapide** (voir D12), le FB **restant `Enable`**. |
+| D2 | **`CoupeEnable`** | **N'existe pas** comme variable. **Tout le vocabulaire `CoupeEnable` doit disparaître des specs.** ⚠️ Correction : `Enable := (ordre) AND NOT SafeStop` (formulé en v1.0) est **abandonné** — `SafeStop` ne retire **pas** l'`Enable` (voir D12). |
 | D3 | **AU (arrêt d'urgence)** | AU physique (coup-de-poing / câble « position haute extrême ») coupe la **puissance** via gros contacteur. **Seul l'AU coupe brutalement.** Automate **jamais coupé** (surveillance permanente). Une **info automate « machine en AU »** existe → alimente `SafetyOk`. |
-| D4 | **Arrêt sûr (hors AU)** | Pas de coupure sèche : arrêt des **relais vitesse + sens Av/AR** sur une **rampe plus rapide que l'accélération**, puis collage frein. |
+| D4 | **Arrêt sûr (hors AU)** | Pas de coupure sèche : arrêt des **relais vitesse + sens Av/AR** sur une **rampe plus rapide que l'accélération**, puis collage frein. Déclenché par `SafeStop` (voir D12). |
 | D5 | **Limite légale** | **Hors safety.** C'est un **arrêt géré par `FB_Modes`**, pas par `FB_Safety`. |
 | D6 | **Synchro treuils / godet** | Pendant la **phase godet**, **pas de mouvement M1** → `FB_WinchSync` **inutile** (aucun conflit). À documenter comme **suspension explicite** de la surveillance synchro en phase godet. |
 | D7 | **Cadencement joystick** | Communication CAN **20 ms** ; **code de traitement dans MainTask 10 ms**. |
@@ -37,6 +39,8 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 | D9 | **`ErrorId`** | **`WORD`** partout (set de bits). |
 | D10 | **Filtre PT1** | Nom standard unique : **`FB_FilterPT1`** (sans underscore). |
 | D11 | **Blocs joystick** | `FB_CycleTime` = base de temps pour filtrage ; `FB_Joystick` **obligatoire**, appelé dans le **POU main**. |
+| D12 | **Interface FB & modèle d'arrêt** | **Tous les FB** ont l'interface standard de base, dont **`Enable`**. `Enable = FALSE` = **FB désactivé = coupure de toutes ses sorties** (neutralisation dure). Pour les **FB de mouvement** : entrée **`Start`/`Stop`** → `Start` actif = **rampe d'accélération**, `Start` inactif = **rampe de décélération normale** ; **`SafeStop`** (entrée, issue du bloc safety) = **rampe de décélération rapide** (FB reste `Enable`). |
+| D13 | **Guardrail « arrêt sûr » (CLAUDE.md)** | Le guardrail « arrêt sûr = retrait de l'`Enable` » est **remplacé** : arrêt sûr = **`SafeStop` → rampe rapide** (Enable maintenu) ; `Enable` off = **coupure des sorties** (neutralisation, cas distinct). |
 
 ---
 
@@ -72,7 +76,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie2_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
 | m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie4_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
 | m6 | `README.md` (structure `CODE/`, workflow) | Décrit `CODE/*.xml` + `extract/inject` round-trip, alors que `CODE/` contient un `.st` et la skill impose la **copie manuelle `.st`** | ❓ Ouvert (Q3) : quel workflow fait foi ? |
-| m7 | `AF_Partie3` (« **tout** FB respecte le contrat ») vs `AF_Partie6` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ❓ Ouvert (Q4) : exempter explicitement les briques ? |
+| m7 | `AF_Partie3` (« **tout** FB respecte le contrat ») vs `AF_Partie6` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12** : tous les FB portent l'interface **standard de base** (dont `Enable`). Reste à confirmer le périmètre exact des briques réduites (Q4bis). |
 | m8 | `AF_Partie2` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ❓ Ouvert (Q5) : réordonner Watchdog **avant** Safety. |
 | m9 | `NAMING_CONVENTION.md` (ex. `E_Error`) vs `AF_Partie3` §3 | Exemple d'enum `E_Error` alors que design = bitfield **sans mnémonique** | 🛠️ Harmoniser l'exemple. |
 | m10 | `AF_Partie1` §Initialisation | « preset codeurs à une valeur **positive** » puis « **Affichage 0 m** » au plan d'eau — logique correcte mais **non expliquée** (risque de lecture contradictoire) | 🛠️ Ajouter une phrase d'explication (offset brut vs échelle 0). |
@@ -93,8 +97,13 @@ impose une révision coordonnée (à faire lors d'une mise à jour de specs, hor
 - `AF_Partie6` : §2 (note feedback), §5.
 - `CLAUDE.md`, `README.md`, skill : nombreuses occurrences.
 
-➡️ **Motif de remplacement** : `CoupeEnable` → formulation « **retrait de l'`Enable`** piloté
-par `SafeStop` » ; règle canonique `Enable := (ordre) AND NOT SafeStop`.
+➡️ **Motif de remplacement** (révisé par D12/D13) : supprimer `CoupeEnable` **sans** le
+remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documenter :
+- **Arrêt sûr** = `SafeStop` (entrée des FB de mouvement, issue du bloc safety) → **rampe rapide**, `Enable` maintenu.
+- **Neutralisation** = `Enable = FALSE` → **coupure des sorties** du FB (état `DISABLED`).
+
+⚠️ Le guardrail `CLAUDE.md` « arrêt sûr = retrait de l'`Enable` » et la formule
+`Enable := (ordre) AND NOT FB_Safety.CoupeEnable` sont **à réécrire** en conséquence.
 `PowerCutOff` (coupure puissance amont sur contacteur collé) **reste inchangé**.
 
 ---
@@ -103,13 +112,16 @@ par `SafeStop` » ; règle canonique `Enable := (ordre) AND NOT SafeStop`.
 
 | Q | Question | Enjeu |
 |---|----------|-------|
-| Q1 | **Granularité de `SafeStop`** : une info **globale unique**, ou **plusieurs sorties** (par bloc safety métier / par axe M1, M2, M3) ? | Détermine le câblage `Enable := ordre AND NOT SafeStop` (global vs par axe). |
-| Q2 | **Relation `SafeStop` (sortie) ↔ `SafetyOk` (entrée FB)** : complémentaires ou redondants ? Formule de `SafetyOk` (ex. `SafetyOk := (AU réarmé) AND (conditions OK)`), et faut-il **garder `SafetyOk`** ou `SafeStop` suffit-il ? | Corrige B2 (`EStopOk`) et fige l'interface P3 §1. |
+| Q1 | **Granularité de `SafeStop`** : une info **globale unique**, ou **plusieurs sorties** (par bloc safety métier / par axe M1, M2, M3) ? | Détermine le câblage vers les FB de mouvement (global vs par axe). |
+| Q2 | **Relation `SafeStop` (sortie) ↔ `SafetyOk` (entrée FB)** : complémentaires ou redondants ? Formule de `SafetyOk` (ex. `SafetyOk := (AU réarmé) AND (conditions OK)`), et faut-il **garder `SafetyOk`** ? | Corrige B2 (`EStopOk`) et fige l'interface P3 §1. |
 | Q3 | **Workflow `CODE/`** : round-trip **XML** (`extract/inject`, README) **ou** copie manuelle **`.st`** (skill/`CLAUDE.md`) — lequel fait foi ? | Deux workflows contradictoires cohabitent (m6). |
-| Q4 | **Contrat FB (P3)** : confirmer que les **briques E/S** (`FB_Input_Digital`, `FB_Output_Relay`) et **diag** (`FB_Diag*`) sont **exemptées** du template complet (interface réduite) ? | Lève l'ambiguïté « tout FB respecte le contrat » (m7). |
+| Q4bis | **Périmètre de l'interface réduite** : confirmer que **briques E/S** (`FB_Input_Digital`, `FB_Output_Relay`) et **diag** (`FB_Diag*`) portent une interface **réduite** (pas de `Start`/`Mode`/`State`/`StateAtError`), le `Start`/`SafeStop` (D12) ne concernant que les **FB de mouvement** ? | Précise D12 (m7). |
 | Q5 | **Ordre d'appel** : déplacer `FB_Watchdog()` **avant** `FB_Safety()` (pour alimenter la sécurité le même cycle) ? | Évite 1 cycle (10 ms) de retard (m8). |
 | Q6 | **Séquence `INIT`** (`AF_Partie4` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. |
 | Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. |
+| Q8 | **Précédence `Enable` / `SafeStop` / `Start`** : sur défaut process → **`SafeStop`** (rampe rapide, `Enable` maintenu), `Enable` off réservé à la neutralisation « déjà à l'arrêt / mode non sélectionné » ? Confirmer la hiérarchie. | Câblage sûr des FB de mouvement (D12). |
+| Q9 | **Passage à une étape sans mouvement** (`AF_Partie4` §0) : se fait par **`Start := FALSE`** (décélération normale), **pas** par retrait d'`Enable` — à confirmer/réécrire ? | Aligne P4 sur D12. |
+| Q10 | **Périmètre `Start`/`Stop`** : quels FB en ont besoin — `FB_Winch`, `FB_Translation` (et `FB_Bucket` via M2 ?) ; le `FB_Cycle` pilote-t-il `Start` ou l'`Enable` ? | Interface des FB de mouvement (D12). |
 
 ---
 
