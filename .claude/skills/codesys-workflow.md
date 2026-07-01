@@ -21,7 +21,7 @@ Spec incomplète ou ambiguë → **STOP + demander clarification.** Jamais d'app
 
 Lire et appliquer **systématiquement** :
 - `DOC/NAMING_CONVENTION.md` → PascalCase, préfixes, pas de hongrois
-- `DOC/AF_Partie3_Template_FB_Commun_v1.1.md` → contrat FB (Enable/Reset/SafeStop/Ready/Error…) + réutilisation libs
+- `DOC/AF_Partie3_Template_FB_Commun_v1.1.md` → contrat FB (Enable/Reset/SafetyOk/Mode/Ready/Error… ; arrêt sûr = retrait Enable via CoupeEnable) + réutilisation libs
 - `DOC/AF_Partie2_Architecture_Programme_v2.3.md` → architecture, tâches, flux
 - `DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md` → équipements & fonctions
 
@@ -93,9 +93,9 @@ Style commentaires :
 (* ═══════════════════════════════════════════════
    🎮 FB_Joystick — Acquisition + traitement Hall
    ───────────────────────────────────────────────
-   📥 Enable    : autorisation traitement
+   📥 Enable    : autorisation traitement (retiré par CoupeEnable en cas de défaut)
    📤 Ready     : valeurs valides disponibles
-   🛡️ SafeStop  : arrêt sûr prioritaire
+   🛡️ SafetyOk  : conditions globales OK (AU réarmé) ; arrêt sûr = retrait Enable
    ═══════════════════════════════════════════════ *)
 ```
 
