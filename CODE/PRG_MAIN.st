@@ -38,10 +38,16 @@ VAR
     instWinchM1 : FB_Winch;
 
     // 🪜 Table paliers M1 — RETAIN, réglable sans recompiler (Partie1 §Paliers)
-    // ⚠️ Valeurs par défaut indicatives : À AJUSTER selon le câblage réel des
-    //    4 contacteurs de vitesse M1 (masques) et les seuils souhaités (%).
+    // ⚠️ Valeurs par défaut indicatives (cumulatives P1→P5) : À AJUSTER un par un
+    //    selon le câblage réel des 4 contacteurs de vitesse M1 pendant la mise
+    //    en service (chaque P<palier>R<relais> est modifiable en direct dans la
+    //    vue instance CODESYS), et les seuils souhaités (%).
     M1_SpeedStepTable : ST_SpeedStepTable := (
-        StepMask := [2#0001, 2#0011, 2#0111, 2#1111, 2#1111],
+        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
+        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
+        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
+        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
+        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
 
@@ -106,7 +112,7 @@ FB_Joystick_0(
 
     // 🔌 --- État du bus CANopen (joystick) ---
     BusCanOpenOP    := instDiagCanOpen.busCanOpen,        // 📡 nœud CAN présent
-    joystickOP      := instDiagCanOpen.Joystick,          // 📡 esclave en mode opérationnel
+    JoystickOP      := instDiagCanOpen.Joystick,          // 📡 esclave en mode opérationnel
 
     // 📥 --- Entrées brutes joystick ---
     RawX            := JoyXRaw_ANA1,            // 🕹️ axe X brut (0..10000)
@@ -145,10 +151,9 @@ instSafetyWinch(
    🪝 4. TREUIL M1 — FB_Winch (test chaîne Joystick→Relais, Maint N1)
    ───────────────────────────────────────────────────────────────
    Axe Y du joystick pilote Plongée/Extraction (M1 seul pour ce lot).
-   📤 Sorties à câbler en I/O Mapping (voir note d'application) :
-      M1_RelayFwd, M1_RelayRev, M1_Contactor1..4, M1_BrakeCmd
-   📥 Entrées à câbler en I/O Mapping (retours contacteurs physiques) :
-      M1_ContactorFeedbackFwd, M1_ContactorFeedbackRev, M1_BrakeFeedback
+   🧪 Ce lot : M1_* déclarées dans GVL_Winch_M1_Stub.st (STUB logiciel,
+      pas de matériel branché). Quand le matériel sera prêt : SUPPRIMER
+      ce GVL et saisir les mêmes noms en I/O Mapping (voir DOC §7 Étape 9bis).
    ═══════════════════════════════════════════════════════════════ *)
 
 instWinchM1(
@@ -161,12 +166,12 @@ instWinchM1(
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := M1_SpeedStepTable,
-    ContactorFeedbackFwd    := M1_ContactorFeedbackFwd,      // 🔌 À créer en I/O Mapping (entrée)
-    ContactorFeedbackRev    := M1_ContactorFeedbackRev,      // 🔌 À créer en I/O Mapping (entrée)
-    BrakeFeedback           := M1_BrakeFeedback              // 🔌 À créer en I/O Mapping (entrée)
+    ContactorFeedbackFwd    := M1_ContactorFeedbackFwd,      // 🧪 STUB GVL_Winch_M1_Stub (§ ci-dessus)
+    ContactorFeedbackRev    := M1_ContactorFeedbackRev,      // 🧪 STUB GVL_Winch_M1_Stub
+    BrakeFeedback           := M1_BrakeFeedback              // 🧪 STUB GVL_Winch_M1_Stub
 );
 
-// 📤 Sorties treuil M1 → variables à mapper en I/O Mapping (sorties physiques)
+// 📤 Sorties treuil M1 → variables STUB (GVL_Winch_M1_Stub), à remplacer par I/O Mapping réel
 M1_RelayFwd  := instWinchM1.RelayFwd;
 M1_RelayRev  := instWinchM1.RelayRev;
 M1_Contactor1 := instWinchM1.Contactor1;
@@ -174,3 +179,11 @@ M1_Contactor2 := instWinchM1.Contactor2;
 M1_Contactor3 := instWinchM1.Contactor3;
 M1_Contactor4 := instWinchM1.Contactor4;
 M1_BrakeCmd  := instWinchM1.BrakeCmd;
+
+// 🧪 SIMULATION (stub sans matériel réel, GVL_Winch_M1_Stub) — retours contacteurs
+// miroir des commandes (contacteur "idéal", 1 cycle de retard). Évite des faux
+// défauts StuckOpen/StuckClosed tant qu'aucun retour réel n'est câblé.
+// 🔴 À SUPPRIMER dès que le matériel réel sera câblé (voir DOC §7 Étape 9bis)
+M1_ContactorFeedbackFwd := M1_RelayFwd;
+M1_ContactorFeedbackRev := M1_RelayRev;
+M1_BrakeFeedback        := M1_BrakeCmd;
