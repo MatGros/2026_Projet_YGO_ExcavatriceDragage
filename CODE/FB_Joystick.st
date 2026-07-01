@@ -12,6 +12,13 @@
          info de contexte est désormais consommée directement par le FB
          de mouvement (FB_Winch), pas portée par la consigne d'axe.
       3. `Start` → `StartStop` (suit le renommage du champ ST_AxisCmd).
+   ⚠️ CORRECTIFS (revue de code 2026-07-01) :
+      4. Reset était sur NIVEAU (`Reset AND Error`), sans front ni vérif
+         que la cause (calib hors plage) avait disparu — corrigé en
+         front (`R_TRIG`) + cause vérifiée (Partie3 §5).
+      5. `ErrorId := 16#0003` levait à tort 2 bits pour une seule cause
+         (calibration) — corrigé en 1 seul bit (`16#0001`, Partie3 §3).
+      6. `joystickOP` renommé `JoystickOP` (PascalCase, NAMING_CONVENTION.md).
    🔴 NON traité ici (hors périmètre, connu — voir Partie8 §6bis) :
       l'entrée `SafeStop` ci-dessous reste présente sur ce FB alors que
       Partie8 v1.1 §3 l'interdit (FB_Joystick n'est pas un FB de
@@ -28,7 +35,7 @@ VAR_INPUT
     SafeStop        : BOOL;       // ⚠️ Vestige non conforme (Partie8 §6bis) — conservé tel quel, hors périmètre de ce lot
     EmergencyStopOk : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
     BusCanOpenOP    : ST_DeviceDiag;       // État présence nœud CAN
-    joystickOP	    : ST_DeviceDiag;       // Mode esclave CANopen actif
+    JoystickOP      : ST_DeviceDiag;       // Mode esclave CANopen actif
     RawX            : INT;        // Valeur brute axe X
     RawY            : INT;        // Valeur brute axe Y
     RawButton       : BOOL;       // État brut bouton
@@ -65,12 +72,13 @@ VAR
     RampX           : FB_Ramp;
     RampY           : FB_Ramp;
     LastCalibrate   : BOOL;
+    ResetEdge       : R_TRIG;   // 🔧 AJOUT (revue de code 2026-07-01) — Reset doit être un front, pas un niveau
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
-IF NOT Enable OR SafeStop OR NOT EmergencyStopOk OR NOT BusCanOpenOP.Operational OR NOT joystickOP.Operational THEN
+IF NOT Enable OR SafeStop OR NOT EmergencyStopOk OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0;
@@ -82,9 +90,14 @@ END_IF;
 
 Ready := TRUE; Busy := TRUE;
 
-// 🔑 2. RESET DÉFAUT
-IF Reset AND Error THEN
-    Error := FALSE; ErrorId := 16#0000;
+// 🔑 2. RESET DÉFAUT (front uniquement + cause disparue, Partie3 §5)
+// ⚠️ CORRECTIF (revue de code 2026-07-01) : l'ancienne version effaçait le défaut sur simple
+// niveau `Reset AND Error`, sans front ET sans vérifier que la cause (calib hors plage) avait
+// disparu — un Reset maintenu (bouton IHM bloqué) effaçait le défaut en boucle même si RawX/Y
+// restaient hors plage. Non conforme au guardrail Reset (CLAUDE.md, Partie3 §5).
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q AND (RawX >= 2000 AND RawX <= 8000 AND RawY >= 2000 AND RawY <= 8000) THEN
+    ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
 // 📥 3. ACQUISITION TIMING & BOUTON
@@ -97,9 +110,12 @@ IF Calibrate AND NOT LastCalibrate THEN
         NeutralXMem := RawX;
         NeutralYMem := RawY;
     ELSE
-        Error := TRUE; ErrorId := 16#0003;
+        // 🔧 CORRECTIF N7 (revue de code) : un seul bit pour une seule cause (Partie3 §3),
+        // l'ancienne valeur 16#0003 levait à tort les bits 0 ET 1 pour un même défaut.
+        ErrorId := ErrorId OR 16#0001;
     END_IF;
 END_IF;
+Error := (ErrorId <> 16#0000);
 LastCalibrate := Calibrate;
 
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X

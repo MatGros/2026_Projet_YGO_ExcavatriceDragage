@@ -8,9 +8,15 @@
    📤 Sorties physiques : RelayFwd/RelayRev (contacteurs de sens),
       Contactor1..4 (contacteurs de vitesse), BrakeCmd (bobine frein) —
       à câbler manuellement sur les canaux Q réels (I/O Mapping CODESYS).
-   🔒 Interlock changement de sens : jamais Fwd et Rev simultanément ;
-      le sens ne change QUE lorsque la vitesse rampée est confirmée à
-      zéro (évite le court-circuit contacteurs sens croisés).
+   🔒 Interlock changement de sens : jamais Fwd et Rev simultanément.
+      ⚠️ CORRECTIF (retour terrain 2026-07-01) : neutre↔un sens = immédiat ;
+      seule une inversion DIRECTE Fwd↔Rev exige la vitesse confirmée nulle
+      (l'ancienne version exigeait l'arrêt confirmé même pour le tout
+      premier engagement, ce qui bloquait `CommandedDirection` à 0 en
+      permanence — voir §3bis dans le corps ST pour le détail).
+   ⚠️ ÉVOLUTION (retour terrain 2026-07-01) : `Contactor1..4` sont désormais
+      lus directement dans `FB_SpeedStep` (table `P<palier>R<relais>`),
+      plus de masque `BYTE` intermédiaire ni de bit-extraction ici.
    🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
       uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
@@ -53,11 +59,10 @@ VAR_OUTPUT
     StateAtError        : E_State;
     RelayFwd            : BOOL;        // 🔌 Contacteur sens avant (montée) — à mapper en I/O Mapping
     RelayRev            : BOOL;        // 🔌 Contacteur sens arrière (descente) — à mapper en I/O Mapping
-    Contactor1          : BOOL;        // 🔌 Contacteur vitesse 1 (bit0 du masque)
-    Contactor2          : BOOL;        // 🔌 Contacteur vitesse 2 (bit1 du masque)
-    Contactor3          : BOOL;        // 🔌 Contacteur vitesse 3 (bit2 du masque)
-    Contactor4          : BOOL;        // 🔌 Contacteur vitesse 4 (bit3 du masque)
-    SpeedStepMask       : BYTE;        // Masque brut (IHM/diag)
+    Contactor1          : BOOL;        // 🔌 Contacteur vitesse 1 pour le palier courant (Table.P<n>R1)
+    Contactor2          : BOOL;        // 🔌 Contacteur vitesse 2 pour le palier courant (Table.P<n>R2)
+    Contactor3          : BOOL;        // 🔌 Contacteur vitesse 3 pour le palier courant (Table.P<n>R3)
+    Contactor4          : BOOL;        // 🔌 Contacteur vitesse 4 pour le palier courant (Table.P<n>R4)
     StepNumber          : INT;         // Palier courant (IHM, 0..5)
     BrakeCmd            : BOOL;        // 🔌 Commande bobine frein — TRUE = relâché
     FwdContactorCheck   : ST_ContactorCheck;   // Diag contacteur sens avant (IHM/FB_Safety_Winch)
@@ -86,7 +91,6 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 
     SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
-    SpeedStepMask := SpeedStep.StepMask;
     StepNumber := SpeedStep.StepNumber;
 
     Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
@@ -121,11 +125,38 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
-// 🔒 3bis. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev, sens figé tant que non arrêté
-IF ABS(SpeedRamp.Current) < 0.1 THEN
-    DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
-    IF DirectionChangeDelay.Q THEN
+// 🔒 3bis. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés
+// ⚠️ CORRECTIF 1 (retour terrain 2026-07-01) : l'ancienne version exigeait 200 ms à vitesse
+// confirmée nulle AVANT de figer CommandedDirection, y compris pour le tout premier
+// engagement (neutre → un sens) — or la rampe quitte le seuil de 0.1 % en ~2 ms dès qu'une
+// consigne existe (AccelRate 50 %/s), donc la fenêtre se refermait avant que le délai de
+// 200 ms n'ait pu s'écouler : CommandedDirection restait bloqué à 0 en permanence (aucun
+// RelayFwd/RelayRev jamais activé, alors que les paliers de vitesse évoluaient normalement).
+// ⚠️ CORRECTIF 2 (revue de code 2026-07-01) : le correctif 1 traitait "un sens → neutre"
+// comme immédiat au même titre que "neutre → un sens" — or RelayFwd/RelayRev suivent
+// CommandedDirection, alors que Contactor1..4 suit SpeedRamp.Current (rampe interne
+// indépendante) : un arrêt demandé (Direction:=0) coupait le contacteur de sens
+// INSTANTANÉMENT, alors que le palier de vitesse et le frein (MovementRequested) restaient
+// actifs pendant encore toute la durée de la rampe de décélération — perte de couple moteur
+// non contrôlée, frein encore ouvert. Non conforme Partie3 §9 ("SafeStop ne coupe pas les
+// sorties : elles restent actives le temps de la décélération").
+// Correction définitive : SEUL neutre → un sens (engagement initial) est immédiat (rien à
+// interrompre). "un sens → neutre" (arrêt) ET une inversion directe Fwd↔Rev exigent tous
+// les deux la vitesse rampée confirmée nulle avant de lâcher/changer CommandedDirection.
+IF Direction <> CommandedDirection THEN
+    IF CommandedDirection = 0 AND Direction <> 0 THEN
+        // Engagement initial neutre → un sens : immédiat (rien à inverser brutalement)
         CommandedDirection := Direction;
+        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    ELSIF ABS(SpeedRamp.Current) < 0.1 THEN
+        // Arrêt (un sens → neutre) ou inversion directe Fwd↔Rev : vitesse confirmée nulle requise
+        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
+        IF DirectionChangeDelay.Q THEN
+            CommandedDirection := Direction;
+            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        END_IF;
+    ELSE
+        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
     END_IF;
 ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
@@ -134,12 +165,11 @@ END_IF;
 // 🪜 4. PALIER DE VITESSE (composé, table propre à ce treuil)
 SpeedStep(Enable := (ABS(SpeedRamp.Current) > 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
-SpeedStepMask := SpeedStep.StepMask;
 StepNumber := SpeedStep.StepNumber;
-Contactor1 := SpeedStepMask.0;
-Contactor2 := SpeedStepMask.1;
-Contactor3 := SpeedStepMask.2;
-Contactor4 := SpeedStepMask.3;
+Contactor1 := SpeedStep.Contactor1;
+Contactor2 := SpeedStep.Contactor2;
+Contactor3 := SpeedStep.Contactor3;
+Contactor4 := SpeedStep.Contactor4;
 
 // ➡️⬅️ 5. CONTACTEURS DE SENS
 RelayFwd := (CommandedDirection = 1) AND (StepNumber > 0);
@@ -210,3 +240,17 @@ END_IF;
 
 Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
 Done := FALSE;   // Pas de notion de "terminé" ponctuel sans FB_Cycle — présent pour conformité
+
+// 🛡️ 10. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7 : "sorties coupées si Error / NOT Enable")
+// ⚠️ AJOUT (revue de code 2026-07-01) : un contacteur de sens incohérent (collé/absent) ou un
+// défaut frein ne neutralisait auparavant QUE le diagnostic (ErrorId), sans couper les sorties
+// physiques — le treuil restait commandé normalement malgré un défaut détecté. Coupure directe
+// (pas de rampe) : on ne peut plus se fier au contacteur suspect pour un arrêt maîtrisé, comme
+// pour l'AU physique (Partie2 §6 — coupure brutale, frein collé brutalement, cas distinct du
+// SafeStop process qui reste géré en douceur ci-dessus).
+IF Error THEN
+    RelayFwd := FALSE;
+    RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE;   // Frein collé — position sûre par défaut
+END_IF;

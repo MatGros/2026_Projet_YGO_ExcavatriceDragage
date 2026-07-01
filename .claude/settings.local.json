@@ -50,7 +50,10 @@
       "WebSearch",
       "WebFetch(domain:content.helpme-codesys.com)",
       "WebFetch(domain:product-help.schneider-electric.com)",
-      "WebFetch(domain:product-help.se.com)"
+      "WebFetch(domain:product-help.se.com)",
+      "Bash(grep -n \"9 \\\\`BOOL\\\\`\\\\|9 BOOL\" DOC/AF_Partie9_Fonction_Winch_v1.0.md)",
+      "Bash(grep -rn \"joystickOP\\\\b\" CODE/)",
+      "Bash(grep -rln \"StepMask\\\\b\\\\|SpeedStepMask\\\\b\" CODE/ DOC/AF_Partie9_Fonction_Winch_v1.0.md)"
     ],
     "ask": [
       "Bash(git reset *)",
