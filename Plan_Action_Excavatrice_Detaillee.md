@@ -56,18 +56,18 @@
 
 ## 🔒 PHASE 4 : COORDINATION & SÉCURITÉ
 
-- [ ] Implémenter `FB_Safety` (superviseur défauts)
+- [ ] Implémenter `FB_Safety_<Metier>` (un bloc par domaine — treuils, translation, godet…)
   - [ ] Cohérence capteurs
   - [ ] Détection valeurs absurdes
-  - [ ] Vérification limite légale de dragage
-  - [ ] Levée `SafeStop` en cas défaut
+  - [ ] Levée `SafeStop` (propre au métier) en cas défaut
 
-- [ ] Implémenter `FB_Watchdog` (surveillance tâches & bus)
+- [ ] Configurer la surveillance périodicité des tâches (fonction système CODESYS, seuil 200 ms — pas de `FB_Watchdog` applicatif)
 
 - [ ] Implémenter `FB_Modes` (arbitrage sources commande)
   - [ ] Mode Manuel (joystick direct)
   - [ ] Mode Maint N1 & N2
-  - [ ] Mode Auto (cycle)
+  - [ ] Mode Semi-auto (cycle)
+  - [ ] Vérification limite légale de dragage (interdiction normale, gérée ici — pas dans `FB_Safety_*`)
 
 - [ ] Implémenter `FB_Cycle` (séquenceur semi-auto)
   - [ ] État Descente
@@ -89,7 +89,7 @@
 - [ ] Test `FB_EncoderHoming` (calibration)
 
 ### Intégration
-- [ ] Test `FB_Safety` + `FB_Watchdog` (arrêts sûrs)
+- [ ] Test `FB_Safety_<Metier>` (arrêts sûrs, `SafeStop` par métier)
 - [ ] Test `FB_Modes` (basculement modes)
 - [ ] Test `FB_Cycle` complet (toutes les étapes)
 
@@ -126,4 +126,4 @@
 
 ---
 
-**Dernière mise à jour** : 2026-06-30
+**Dernière mise à jour** : 2026-07-01

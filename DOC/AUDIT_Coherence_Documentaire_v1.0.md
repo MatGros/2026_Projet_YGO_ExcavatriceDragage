@@ -153,9 +153,40 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 
 ---
 
-## 📚 Documents audités
+## 📚 Documents audités (état initial)
 
 `DOC/NAMING_CONVENTION.md` · `DOC/AF_Partie1_..._v1.1` · `DOC/AF_Partie2_..._v2.4` ·
 `DOC/AF_Partie3_..._v1.1` · `DOC/AF_Partie4_..._v1.0` · `DOC/AF_Partie5_..._v1.0` ·
 `DOC/AF_Partie6_..._v1.0` · `DOC/AF_Partie8_..._v1.0` · `CLAUDE.md` · `README.md` ·
 `.claude/skills/codesys-workflow.md` · `CODE/PRG_JOY1.st` · `Plan_Action_Excavatrice_Detaillee.md`.
+
+---
+
+## 🚀 7. Implémentation des décisions (2026-07-01)
+
+Toutes les décisions **D1→D21** (D22 = TBD assumé) ont été répercutées dans les specs. Les
+anciennes versions ont été déplacées vers `DOC/Archives/` (gitignoré, non versionné) conformément
+à la règle de versionnement stricte de la skill `codesys-workflow`.
+
+| Fichier | Ancienne version | Nouvelle version | Changements clés |
+|---------|-------------------|-------------------|-------------------|
+| `DOC/NAMING_CONVENTION.md` | (sans version) | édité en place | `SafeStop` reclassé sortie safety métier, `StartStop` ajouté, `EmergencyStopOk` ajouté, `ErrorId` en `WORD`, exemple `E_Error` retiré |
+| `AF_Partie1_Analyse_Fonctionnelle` | v1.1 | **v1.2** | Suppression `CoupeEnable`, flux `SafeStop`/`StartStop`, explication init codeurs (m10) |
+| `AF_Partie2_Architecture_Programme` | v2.4 | **v2.5** | Suppression `CoupeEnable` et `FB_Watchdog` ; modèle `SafeStop` (par métier) / `StartStop` ; `EmergencyStopOk` ; interlock godet/synchro documenté ; composition pipeline joystick précisée (m3) |
+| `AF_Partie3_Template_FB_Commun` | v1.1 | **v1.2** | Nouveau §1bis (profils d'interface FB standard / mouvement / briques réduites) ; `EmergencyStopOk` ; précédence `Enable`>`SafeStop`>`StartStop` ; §7/§9 réécrits |
+| `AF_Partie4_Cycle_Sequenceur` | v1.0 | **v1.1** | §0 réécrit (`StartStop:=FALSE`, pas retrait Enable) ; nouveau §3bis (suspension `FB_WinchSync` en phase godet, M3) ; `ERROR_HOLD` déclenché par `SafeStop` |
+| `AF_Partie5_Modes_Maintenance` | v1.0 | **v1.1** | Pseudo-code §2 corrigé (limite légale hors `FB_Safety`, M1) ; §4/§5 réécrits (`SafeStop` par métier, watchdog système) |
+| `AF_Partie6_IO_Conditioning` | v1.0 | **v1.1** | §5 corrigé (pas de coupure sèche de sortie relais, M2) ; terminologie `PRG_IO` retirée (M5) |
+| `AF_Partie8_Fonction_Joystick` | v1.0 | **v1.1** | `SafeStop` retiré de l'interface (B1) ; `EStopOk`/`SafetyOk` → `EmergencyStopOk` (B2) ; lien mort corrigé (m5) ; `FB_FilterPT1` (m2) ; nouveau §6bis (écarts avec `CODE/PRG_JOY1.st` actuel) |
+| `CLAUDE.md` | — | édité en place | Guardrails, arborescence, liens de version, cas d'arrêt mis à jour |
+| `README.md` | — | édité en place | Workflow XML `extract/inject` remplacé par export/copie manuelle (D19, m6) ; liens de version |
+| `.claude/skills/codesys-workflow.md` | — | édité en place | Référence v2.3→v2.5 corrigée (m4) ; exemple `SafeStop`/`EmergencyStopOk` mis à jour |
+| `Plan_Action_Excavatrice_Detaillee.md` | — | édité en place | `FB_Safety_<Metier>`, limite légale déplacée sous `FB_Modes`, `FB_Watchdog` retiré, « Auto » → « Semi-auto » (m11) |
+
+### ⚠️ Hors périmètre (non modifié)
+- **`CODE/PRG_JOY1.st`** : non touché — reste **hors périmètre** d'un audit documentaire (le code
+  CODESYS s'édite via le workflow `codesys-workflow` avec validation utilisateur explicite). Les
+  écarts entre ce fichier et la Partie 8 v1.1 sont listés dans `AF_Partie8_..._v1.1.md` §6bis
+  (câblage `SafeStop`/`SafetyOk` à corriger, nom `PRG_JOY1` à faire évoluer).
+- **Q6/Q7/Q11** (séquence `INIT` fine, priorités tâches, source exacte de `EmergencyStopOk`) :
+  restent **TBD**, non spécifiées dans cette passe.
