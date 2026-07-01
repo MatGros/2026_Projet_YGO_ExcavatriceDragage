@@ -1,7 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.2)
 
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
+> **v1.2** — Suite audit documentaire : suppression `CoupeEnable` (n'a jamais existé comme
+> variable), modèle d'arrêt `SafeStop`/`StartStop` (voir Partie 3 v1.2), `SafeStop` **par métier**
+> (pas de signal global), clarification séquence d'initialisation codeurs.
 > **v1.1** — Mapping physique M1/M2/M3, paliers vitesse à masque 4 bits, sécurité électrique (automate jamais coupé).
 
 ---
@@ -40,14 +43,13 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 
 ---
 
-## 🪜 Paliers de vitesse (nouveau principe — masque 4 bits)
+## 🪜 Paliers de vitesse (masque 4 bits)
 
 Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit en **5 paliers**.
 
-- ❌ **Ancien** : palier N ⇒ N contacteurs (cumul figé : 1, 2, 3, 4).
-- ✅ **Nouveau** : chaque palier porte un **masque de 4 bits** ⇒ on choisit **librement** quels contacteurs sont actifs (`bit0..bit3`).
+- Chaque palier porte un **masque de 4 bits** ⇒ on choisit **librement** quels contacteurs sont actifs (`bit0..bit3`).
 - 🎛️ **Table indépendante par treuil** (M1 et M2 ont chacun leurs 5 masques).
-- 🧭 L'ordre d'actionnement n'est plus implicite : il est **explicitement défini dans la table** de masques.
+- 🧭 L'ordre d'actionnement n'est pas implicite : il est **explicitement défini dans la table** de masques.
 
 > Décodage assuré par `FB_SpeedStep` (voir Partie 2).
 
@@ -60,7 +62,7 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 - ↔️ **Translation** → amène le pont sur la bonne position.
 - 🪣 **Godet** → ouvre/ferme via désynchro des treuils.
 - 🔄 **Cycle** → enchaîne les étapes en semi-auto.
-- 🎚️ **Modes** → Manuel / Maint N1 / N2 / Auto + autorisations.
+- 🎚️ **Modes** → Manuel / Maint N1 / N2 / Semi-auto + autorisations.
 
 ---
 
@@ -80,33 +82,39 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 ## 🔗 Interactions (flux de données)
 
 ```
-Joystick ──consigne %──► Cycle/Modes ──ordre──► Treuil + Translation
+Joystick ──consigne %──► Cycle/Modes ──StartStop──► Treuil + Translation
 Codeur ──position m──► Treuil ──limite──► ralentit/arrête
 Treuil ──pilote──► Frein + Contacteurs
-Safety ──CoupeEnable──► PLC_PRG_MAIN retire les Enable ──► objets en repli sûr
+Safety métier (par domaine) ──SafeStop──► FB de mouvement concerné ──► rampe décélération RAPIDE (Enable maintenu)
 Safety ──PowerCutOff──► contacteur général amont (si collage détecté)
 ```
 
-🧭 **Tout passe par Modes + Safety avant d'agir.** L'arrêt sûr logiciel = **retrait de l'`Enable`**
-(`CoupeEnable`), pas un `SafeStop` propagé. Voir Partie 2 v2.4 §6 et Partie 3 §7.
+🧭 **Tout passe par Modes + Safety avant d'agir.** L'arrêt sûr logiciel = **`SafeStop`** (sortie
+d'un bloc safety **métier**, une par domaine) reçu en entrée par le(s) FB de mouvement concerné(s)
+→ **rampe de décélération rapide**, le FB restant `Enable`. `Enable = FALSE` reste un mécanisme
+**distinct** : neutralisation complète (coupure des sorties du FB). Voir Partie 2 v2.5 §6 et
+Partie 3 v1.2 §1/§7.
 
 ---
 
 ## 🛡️ Sécurité (priorité absolue)
 - Cohérence capteurs, valeurs absurdes, conditions de marche.
 - 🪝 Frein = séquence stricte intégrant les temps physiques (relâche après établissement moteur, colle après décélération — voir Partie 4 §Frein).
-- 🔴 Tout défaut process → `FB_Safety` lève `CoupeEnable` → retrait des `Enable` → arrêt **sûr propre** (contacteurs off, freins collés). Voir Partie 2 v2.4 §6.
+- 🔴 Tout défaut process détecté par un bloc safety métier → il lève **son** `SafeStop` → le(s) FB de mouvement concerné(s) passent en **rampe de décélération rapide** (`Enable` maintenu), puis freins collés. Voir Partie 2 v2.5 §6.
 
 > 🚫 **Limite légale ≠ sécurité** : l'interdiction de draguer sous une cote imposée est une
 > **interdiction normale** (réglementaire), appliquée par **`FB_Modes`** en semi-auto/descente,
-> **pas** par `FB_Safety`. Signalisation seule en maintenance. Voir Partie 6 §3.
+> **pas** par un bloc safety. Signalisation seule en maintenance. Voir Partie 6 §3.
 
 ### 🔌 Sécurité électrique — automate jamais coupé
 L'automate **reste alimenté en permanence** (pas de coupure électrique générale du contrôleur).
-Conséquence : la mise en sécurité ne peut pas compter sur l'extinction de l'API. Il faut une **chaîne de coupure puissance pilotée + surveillée** :
+Seul l'**arrêt d'urgence physique** (bouton coup-de-poing ou câble mécanique de position haute
+extrême) **coupe brutalement la puissance** via un gros contacteur ; l'automate continue de
+surveiller en permanence (il dispose d'une **info « machine en AU »**, voir Partie 3 §1
+`EmergencyStopOk`). Conséquence pour le logiciel :
 - Chaque contacteur de puissance possède un **retour d'état** (contact auxiliaire) lu en entrée.
-- `FB_Safety` compare en permanence **commande vs retour**.
-- Si l'API commande l'ouverture (arrêt moteur) mais que le contacteur **reste collé** (retour incohérent) → `FB_Safety` lève une **sortie de coupure puissance** dédiée qui **coupe électriquement** la puissance en amont.
+- Le bloc safety concerné compare en permanence **commande vs retour**.
+- Si l'API commande l'ouverture (arrêt moteur) mais que le contacteur **reste collé** (retour incohérent) → une **sortie de coupure puissance** dédiée (`PowerCutOff`) **coupe électriquement** la puissance en amont.
 
 ---
 
@@ -127,5 +135,17 @@ Conséquence : la mise en sécurité ne peut pas compter sur l'extinction de l'A
 ## 🧭 Initialisation (référencement codeurs)
 1. Descente 2 treuils synchro, godet ouvert.
 2. 🌊 Toucher l'eau = **plan 0**.
-3. Mode maintenance → preset codeurs à une **valeur positive**.
-4. Affichage 0 m ; ⬆️ enroulé = +m, ⬇️ sous l'eau = −m.
+3. Mode maintenance → preset codeurs à une **valeur positive** (offset brut choisi assez grand
+   pour que la position mesurée ne devienne jamais négative en usage normal — c'est une valeur
+   **interne** au codeur, pas ce qui est affiché).
+4. Affichage 0 m à ce plan de référence (l'échelle **affichée** est recalée à 0, indépendamment
+   de l'offset brut du point 3) ; ⬆️ enroulé = +m, ⬇️ sous l'eau = −m.
+
+---
+
+## 📚 Documents liés
+- **Partie 2 v2.5** — Architecture (orchestration, flux `SafeStop`/`StartStop`, `PowerCutOff`).
+- **Partie 3 v1.2** — Contrat FB : interface (`Enable/Reset/EmergencyStopOk/Mode`), `StartStop`, `SafeStop`.
+- **Partie 4** — Cycle & séquenceur.
+- **Partie 5** — Modes & maintenance : limite légale (`FB_Modes`).
+- **Partie 6** — Conditionnement E/S.

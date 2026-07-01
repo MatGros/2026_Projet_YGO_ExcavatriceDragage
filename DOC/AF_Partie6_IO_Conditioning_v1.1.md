@@ -1,10 +1,16 @@
-# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties
+# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.1)
 
+> **Version 1.1** — Suite audit documentaire : §5 corrigé — il n'y a **pas de coupure sèche**
+> de la sortie relais sur défaut. Le passage en **rampe** (normale via `StartStop`, rapide via
+> `SafeStop`) se résout **à l'intérieur** du FB de mouvement (`FB_Winch`/`FB_Translation`) ; par le
+> temps où `Output[i]` est appelé, la commande transmise est déjà la commande **rampée** correcte.
+> Terminologie `PRG_IO` retirée (1 seul POU `PLC_PRG_MAIN`, pas de sous-`PRG_*` — voir Partie 2 §0).
+>
 > **Version 1.0** — Briques génériques de conditionnement E/S : `FB_Input_Digital` et
 > `FB_Output_Relay`, déclaration en **tableaux d'instances**, contrôle de feedback et
 > récupération du diagnostic automate / cartes E/S.
 >
-> 🔗 Dépend de : Partie 2 v2.4 (`PRG_IO`), Partie 3 (v1.1) (contrat FB).
+> 🔗 Dépend de : Partie 2 v2.5 (architecture), Partie 3 v1.2 (contrat FB, §1bis interface réduite).
 
 ---
 
@@ -19,6 +25,10 @@ qui centralisent le traitement bas niveau et remontent un **diagnostic**.
 
 > ⚠️ Liste **non exhaustive** : ces FB sont des canevas extensibles (d'autres options
 > pourront être ajoutées : tempo retard, mémorisation, etc.).
+>
+> 🧭 **Interface réduite** (Partie 3 v1.2 §1bis) : ces briques n'ont **pas** l'interface standard
+> complète (`Enable`/`StartStop`/`Mode`/`State`/`StateAtError`) — elles ont **leurs propres types
+> de données**, dédiés à leur rôle de conditionnement bas niveau.
 
 ---
 
@@ -60,11 +70,16 @@ Commander un actionneur (relais/contacteur) et **vérifier son retour d'état** 
 renvoie souvent une entrée de retour. En hébergeant le **contrôle de rétroaction** dans la
 sortie, on récupère **directement un défaut de commande** (contacteur collé, ouvert, absent).
 
+> 🧭 Ce FB est un **relais de commande bas niveau** : il transmet fidèlement `Command` (après
+> inversion/blink) et **ne décide pas** d'un arrêt de mouvement. La logique de rampe
+> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Translation`, qui pilote
+> `Command` déjà « rampé » (paliers de vitesse levés progressivement, sens coupé en dernier).
+
 ### Interface (proposition)
 ```codesys
 FUNCTION_BLOCK FB_Output_Relay
 VAR_INPUT
-    Command      : BOOL;    (* Ordre logique *)
+    Command      : BOOL;    (* Ordre logique, déjà résolu par le FB métier appelant *)
     InvertLogic  : BOOL;    (* TRUE = NC *)
     FeedbackRaw  : BOOL;    (* Retour d'état actionneur (optionnel) *)
     UseFeedback  : BOOL;    (* Activer le contrôle de rétroaction *)
@@ -92,8 +107,8 @@ END_VAR
 ```
 
 > 🧷 Le contrôle de feedback est essentiel pour le scénario « contacteur de puissance collé »
-> (voir Partie 2 §6 / Partie 5 §4) : la détection peut conduire à `CoupeEnable`, voire au
-> déclenchement de l'AU via `PowerCutOff`.
+> (voir Partie 2 §6 / Partie 5 §4) : la détection alimente le bloc safety métier concerné
+> (`SafeStop`), voire déclenche l'AU via `PowerCutOff`.
 
 ---
 
@@ -147,7 +162,7 @@ carte absente/défaut, court-circuit/surcharge selon matériel) peuvent être **
 injectées dans `ChannelOk` de chaque voie. Elles servent à :
 - **valider le fonctionnement** d'une voie avant d'exploiter sa valeur ;
 - remonter un **défaut E/S** distinct d'un défaut process ;
-- contribuer, si critique, à `FB_Safety` (→ `CoupeEnable`).
+- contribuer, si critique, au bloc safety métier concerné (→ `SafeStop`).
 
 > 🔎 La disponibilité exacte de ces diagnostics dépend du matériel (références cartes /
 > coupleur). Mapping précis **à définir** à la configuration matérielle.
@@ -157,19 +172,23 @@ injectées dans `ChannelOk` de chaque voie. Elles servent à :
 ## 🧭 5. Place dans l'architecture
 
 ```
-PRG_MAIN
- ├─ PRG_IO (in)  : Input[1..n]()   → valeurs conditionnées consommées par FB_Cycle, FB_Safety…
- ├─ ... (métier) ...
- └─ PRG_IO (out) : Output[1..m]()  ← reçoit Command = (ordre métier) AND NOT FB_Safety.CoupeEnable
+PLC_PRG_MAIN (1 seul POU, séquentiel — voir Partie 2 §0/§9)
+ ├─ [IO IN]  Input[1..n]()   → valeurs conditionnées consommées par FB_Cycle, FB_Safety_<Metier>…
+ ├─ ... (sécurité, modes, métier — chaque FB de mouvement résout SON StartStop/SafeStop en interne) ...
+ └─ [IO OUT] Output[1..m]()  ← reçoit Command = sortie déjà rampée du FB métier appelant
+                                (le FB de mouvement a déjà géré StartStop/SafeStop en amont)
 ```
 
-🧷 L'application de `CoupeEnable` se fait **avant** `PRG_IO (out)` : les sorties retombent dans
-l'état sûr dès qu'un défaut est actif (voir Partie 2 §4–5).
+🧷 Il n'y a **pas** de coupure globale des sorties relais sur `SafeStop` : c'est le FB de
+mouvement qui, en interne, applique sa rampe (rapide sur `SafeStop`, normale sur
+`StartStop:=FALSE`) et produit progressivement les `Command` corrects (paliers de vitesse
+levés dans l'ordre, sens coupé en dernier). Le seul cas de coupure **immédiate** au niveau des
+sorties est la **neutralisation** (`Enable=FALSE` du FB métier) ou l'**AU physique** (coupure
+matérielle du contacteur général, indépendante du programme).
 
 ---
 
 ## 📚 Documents liés
-- **Partie 2 v2.4** — Architecture (`PRG_IO`, `CoupeEnable`).
-- **Partie 3 (v1.1)** — Contrat FB (interface, ErrorId).
+- **Partie 2 v2.5** — Architecture (`SafeStop`/`StartStop`, PLC_PRG_MAIN).
+- **Partie 3 v1.2** — Contrat FB (interface, §1bis interface réduite briques E/S).
 - **Partie 4 / 5** — Cycle, modes & défauts.
-</content>
