@@ -140,10 +140,14 @@ descente sans surveillance visuelle des fins de câble physiques).
 2. Ouvrir **Library Manager** (double-clic dans l'arbre projet).
 3. Vérifier que **`Util`** apparaît dans la liste. Si absent : bouton **Add library...** →
    rechercher `Util` → sélectionner → **OK**.
-   *(Sans ça, `HYSTERESIS` dans `FB_SpeedStep` risque de ne pas compiler. Si le Rebuild à
-   l'étape 10 signale `HYSTERESIS` introuvable alors que `Util` est bien ajoutée, chercher le
-   bloc dans la bibliothèque **`Standard`** à la place — l'implémentation exacte selon laquelle
-   il est catalogué peut varier d'une distribution CODESYS à l'autre.)*
+   *(Sans ça, `HYSTERESIS` dans `FB_SpeedStep` ne compilera pas.)*
+
+> 🔧 **Correctif 2026-07-01** : la 1ère version de `FB_SpeedStep.st` supposait une interface
+> `HYSTERESIS(XIN1, XIN2, EPSILON → Q)` qui n'existe pas dans `Util` 3.5.19.0. L'interface réelle
+> (confirmée par la doc officielle CODESYS) est `HYSTERESIS(IN, HIGH, LOW : INT → OUT : BOOL)`
+> — `OUT` passe à `TRUE` quand `IN < LOW`, à `FALSE` quand `IN > HIGH`, maintien entre les deux.
+> `CODE/FB_SpeedStep.st` a été corrigé en conséquence (conversion `SpeedRefPct` REAL → INT via
+> `REAL_TO_INT`). **Recoller ce fichier si tu avais déjà créé `FB_SpeedStep` avec la 1ère version.**
 
 ### Étape 1 — Créer les types fondamentaux (`_TYPES` ou racine `Application`)
 Clic droit sur **Application** (ou un sous-dossier `_TYPES` si tu préfères en créer un :
@@ -217,7 +221,7 @@ Idem étape 4, mais :
 3. Volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du même fichier.
 4. **Enregistrer**.
 
-### Étape 9 — I/O Mapping (câblage physique réel)
+### Étape 9 — I/O Mapping (câblage physique réel) — **si le matériel est déjà branché**
 Onglet **I/O Mapping** du device concerné (carte de sortie relais pour les commandes,
 carte d'entrée TOR pour les retours) :
 
@@ -233,6 +237,23 @@ carte d'entrée TOR pour les retours) :
 
 *(Même principe que `JoyXRaw_ANA1`/`JoyYRaw_ANA2` déjà utilisés : taper le nom directement
 dans la colonne Variable du canal correspondant — CODESYS crée la variable globale associée.)*
+
+### Étape 9bis — GVL stub logiciel (câblage PAS ENCORE branché — choix retenu 2026-07-01)
+Tant que le matériel de test (relais/retours M1) n'est pas branché, créer une GVL temporaire
+plutôt que l'I/O Mapping :
+1. Clic droit sur **Application** → **Add Object → Global Variable List (GVL)...**
+2. **Name** : `GVL_Winch_M1_Stub` → **Add**
+3. Coller le contenu de [`CODE/GVL_Winch_M1_Stub.st`](../CODE/GVL_Winch_M1_Stub.st) (9 `BOOL`,
+   aucun relais réel piloté).
+4. `PRG_MAIN.st` (déjà à jour dans `CODE/`) mire les retours contacteurs sur les commandes
+   (`M1_ContactorFeedbackFwd := M1_RelayFwd`, etc.) pour simuler un contacteur idéal et éviter
+   de faux défauts `StuckOpen` — bloc marqué `🧪 SIMULATION` dans le fichier, à supprimer en
+   même temps que le GVL quand le matériel réel arrivera.
+5. **Rebuild** doit passer sans erreur (hors avertissement `CAN` déjà présent, non lié à ce lot).
+
+🔴 **Migration vers le matériel réel plus tard** : supprimer `GVL_Winch_M1_Stub` **et** le bloc
+`🧪 SIMULATION` de `PRG_MAIN`, puis faire l'Étape 9 (I/O Mapping) avec les mêmes noms de
+variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
 
 ### Étape 10 — Compiler et vérifier
 1. Menu **Build → Rebuild all** (ou **F11**).

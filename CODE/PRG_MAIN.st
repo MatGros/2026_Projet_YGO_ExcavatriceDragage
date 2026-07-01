@@ -145,10 +145,9 @@ instSafetyWinch(
    🪝 4. TREUIL M1 — FB_Winch (test chaîne Joystick→Relais, Maint N1)
    ───────────────────────────────────────────────────────────────
    Axe Y du joystick pilote Plongée/Extraction (M1 seul pour ce lot).
-   📤 Sorties à câbler en I/O Mapping (voir note d'application) :
-      M1_RelayFwd, M1_RelayRev, M1_Contactor1..4, M1_BrakeCmd
-   📥 Entrées à câbler en I/O Mapping (retours contacteurs physiques) :
-      M1_ContactorFeedbackFwd, M1_ContactorFeedbackRev, M1_BrakeFeedback
+   🧪 Ce lot : M1_* déclarées dans GVL_Winch_M1_Stub.st (STUB logiciel,
+      pas de matériel branché). Quand le matériel sera prêt : SUPPRIMER
+      ce GVL et saisir les mêmes noms en I/O Mapping (voir DOC §7 Étape 9bis).
    ═══════════════════════════════════════════════════════════════ *)
 
 instWinchM1(
@@ -161,12 +160,12 @@ instWinchM1(
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := M1_SpeedStepTable,
-    ContactorFeedbackFwd    := M1_ContactorFeedbackFwd,      // 🔌 À créer en I/O Mapping (entrée)
-    ContactorFeedbackRev    := M1_ContactorFeedbackRev,      // 🔌 À créer en I/O Mapping (entrée)
-    BrakeFeedback           := M1_BrakeFeedback              // 🔌 À créer en I/O Mapping (entrée)
+    ContactorFeedbackFwd    := M1_ContactorFeedbackFwd,      // 🧪 STUB GVL_Winch_M1_Stub (§ ci-dessus)
+    ContactorFeedbackRev    := M1_ContactorFeedbackRev,      // 🧪 STUB GVL_Winch_M1_Stub
+    BrakeFeedback           := M1_BrakeFeedback              // 🧪 STUB GVL_Winch_M1_Stub
 );
 
-// 📤 Sorties treuil M1 → variables à mapper en I/O Mapping (sorties physiques)
+// 📤 Sorties treuil M1 → variables STUB (GVL_Winch_M1_Stub), à remplacer par I/O Mapping réel
 M1_RelayFwd  := instWinchM1.RelayFwd;
 M1_RelayRev  := instWinchM1.RelayRev;
 M1_Contactor1 := instWinchM1.Contactor1;
@@ -174,3 +173,11 @@ M1_Contactor2 := instWinchM1.Contactor2;
 M1_Contactor3 := instWinchM1.Contactor3;
 M1_Contactor4 := instWinchM1.Contactor4;
 M1_BrakeCmd  := instWinchM1.BrakeCmd;
+
+// 🧪 SIMULATION (stub sans matériel réel, GVL_Winch_M1_Stub) — retours contacteurs
+// miroir des commandes (contacteur "idéal", 1 cycle de retard). Évite des faux
+// défauts StuckOpen/StuckClosed tant qu'aucun retour réel n'est câblé.
+// 🔴 À SUPPRIMER dès que le matériel réel sera câblé (voir DOC §7 Étape 9bis)
+M1_ContactorFeedbackFwd := M1_RelayFwd;
+M1_ContactorFeedbackRev := M1_RelayRev;
+M1_BrakeFeedback        := M1_BrakeCmd;
