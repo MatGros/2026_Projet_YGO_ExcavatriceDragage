@@ -38,10 +38,16 @@ VAR
     instWinchM1 : FB_Winch;
 
     // 🪜 Table paliers M1 — RETAIN, réglable sans recompiler (Partie1 §Paliers)
-    // ⚠️ Valeurs par défaut indicatives : À AJUSTER selon le câblage réel des
-    //    4 contacteurs de vitesse M1 (masques) et les seuils souhaités (%).
+    // ⚠️ Valeurs par défaut indicatives (cumulatives P1→P5) : À AJUSTER un par un
+    //    selon le câblage réel des 4 contacteurs de vitesse M1 pendant la mise
+    //    en service (chaque P<palier>R<relais> est modifiable en direct dans la
+    //    vue instance CODESYS), et les seuils souhaités (%).
     M1_SpeedStepTable : ST_SpeedStepTable := (
-        StepMask := [2#0001, 2#0011, 2#0111, 2#1111, 2#1111],
+        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
+        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
+        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
+        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
+        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
 
@@ -106,7 +112,7 @@ FB_Joystick_0(
 
     // 🔌 --- État du bus CANopen (joystick) ---
     BusCanOpenOP    := instDiagCanOpen.busCanOpen,        // 📡 nœud CAN présent
-    joystickOP      := instDiagCanOpen.Joystick,          // 📡 esclave en mode opérationnel
+    JoystickOP      := instDiagCanOpen.Joystick,          // 📡 esclave en mode opérationnel
 
     // 📥 --- Entrées brutes joystick ---
     RawX            := JoyXRaw_ANA1,            // 🕹️ axe X brut (0..10000)

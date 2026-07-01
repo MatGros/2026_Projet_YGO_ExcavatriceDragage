@@ -23,7 +23,9 @@ VAR_GLOBAL
     M1_Contactor3            : BOOL;   // 🔌 Sortie — contacteur vitesse 3 M1 (STUB)
     M1_Contactor4            : BOOL;   // 🔌 Sortie — contacteur vitesse 4 M1 (STUB)
     M1_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M1 (STUB)
-    M1_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M1 (STUB, toujours FALSE)
-    M1_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M1 (STUB, toujours FALSE)
-    M1_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M1 (STUB, toujours FALSE)
+    // 🔧 CORRECTIF (revue de code) : PAS "toujours FALSE" — PRG_MAIN.st (bloc 🧪 SIMULATION)
+    // mire activement ces 3 retours sur les commandes ci-dessus à chaque scan (contacteur idéal).
+    M1_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M1 (STUB, miroir de M1_RelayFwd)
+    M1_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M1 (STUB, miroir de M1_RelayRev)
+    M1_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M1 (STUB, miroir de M1_BrakeCmd)
 END_VAR
