@@ -44,7 +44,9 @@
       "Bash(python3 tools/inject.py --yes)",
       "Bash(awk '{print $5, $9}')",
       "Bash(git check-ignore *)",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(ls CODE/)",
+      "Bash(find CODE -maxdepth 1 -type f)"
     ],
     "ask": [
       "Bash(git reset *)",
