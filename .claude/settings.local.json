@@ -43,7 +43,8 @@
       "Bash(git status *)",
       "Bash(python3 tools/inject.py --yes)",
       "Bash(awk '{print $5, $9}')",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(echo \"exit: $?\")"
     ],
     "ask": [
       "Bash(git reset *)",
