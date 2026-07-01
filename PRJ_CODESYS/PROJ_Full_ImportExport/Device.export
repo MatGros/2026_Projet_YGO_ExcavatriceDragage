@@ -85787,7 +85787,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639184353125548005</Single>
+        <Single Name="Timestamp" Type="long">639185083135775402</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -85889,6 +85889,9 @@ ActualPositionM := ScaleStage.PositionMeters;
 // 6. PIPELINE SÉCURITÉ &amp; VITESSE
 SafetyStage(
     RawSpeed      := In_SpdValue,
+
+
+
     MaxSpeedLimit := MaxSpeedThreshold,
     CycleTimeS    := GetCycleTime.CycleTimeS
 );
@@ -85949,7 +85952,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">ac34b69a-d1e5-4495-94d7-6f60d31a26d9_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">209</Single>
+        <Single Name="UniqueIdGenerator" Type="string">212</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -86175,7 +86178,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639184353125687995</Single>
+        <Single Name="Timestamp" Type="long">639185083104342462</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -86641,6 +86644,13 @@ END_VAR</Single>
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">PROGRAM PRG_COD1
+
+
+
+
+
+
+
 VAR
 	instFB_Encoder_Abs_0: FB_Encoder_Abs;
 	ratio : REAL;
@@ -86651,7 +86661,7 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">8722f719-e014-444f-a333-9da87151fed0_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">52</Single>
+        <Single Name="UniqueIdGenerator" Type="string">59</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -86824,131 +86834,6 @@ END_VAR</Single>
           </Single>
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">116</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">JOYSTICK</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">4c63f8b4-fae2-4434-8179-3af1dee50378</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_JOY1</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184782338592777</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">
-(* ═══════════════════════════════════════════════════════════════
-   🕹️ PRG_JOY1 — Appel du traitement joystick (version ST)
-   ───────────────────────────────────────────────────────────────
-   Remplace l'ancien réseau CFC. Câble les E/S physiques sur le FB,
-   qui réalise en interne : calibration ➜ filtrage ➜ rampe ➜ % .
-   📤 Résultat exploitable : FB_Joystick_0.AxisCmdX / .AxisCmdY
-   📄 Doc métier : DOC/AF_Partie4_Fonction_Joystick_v1.0.md
-   ═══════════════════════════════════════════════════════════════ *)
-
-FB_Joystick_0(
-    // 🟢 --- Autorisations &amp; sécurité ---
-    Enable          := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par autorisation réelle
-    SafetyOk        := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par conditions sécurité OK
-    SafeStop        := GVL_DEBUG.DBG_False,     // ⚠️ DEBUG : remplacer par SafeStop global (FB_Safety)
-    Reset           := FALSE,                   // ⚠️ À câbler : front acquittement défaut IHM
-
-    // 🔌 --- État du bus CANopen (joystick) ---
-    BusCanOpenOP       := DiagCanOpen,        // 📡 nœud CAN présent
-    joystickOP  := DiagCanOpenJoystick,   // 📡 esclave en mode opérationnel
-
-    // 📥 --- Entrées brutes joystick ---
-    RawX            := JoyXRaw_ANA1,            // 🕹️ axe X brut (0..10000)
-    RawY            := JoyYRaw_ANA2,            // 🕹️ axe Y brut (0..10000)
-    RawButton       := JoyBtnRaw,               // 🔘 bouton brut
-
-    // 🎯 --- Calibration ---
-    Calibrate       := FALSE,                   // ⚠️ À câbler : bouton recalage neutre (front)
-
-    // 🎛️ --- Paramètres de traitement (valeurs par défaut conservées) ---
-    InvertX         := FALSE,                   // ↔️ inversion sens axe X si besoin
-    InvertY         := FALSE,                   // ↕️ inversion sens axe Y si besoin
-    Deadband        := 5.0,                     // 🛑 zone morte ±5 %
-    FilterTime      := TIME#100ms,              // 〰️ constante de temps filtre PT1
-    AccelRate       := 50.0,                    // 📈 accélération 50 %/s
-    DecelRate       := 150.0                    // 📉 décélération 150 %/s (retour zéro plus rapide)
-);
-
-(* 📤 SORTIES DISPONIBLES (lecture seule, à consommer en aval) :
-   ───────────────────────────────────────────────────────────────
-   FB_Joystick_0.AxisCmdX.SpeedRef    : REAL  // 🚀 vitesse X 0..100 %
-   FB_Joystick_0.AxisCmdX.Direction   : INT   // ➡️ -1 / 0 / +1
-   FB_Joystick_0.AxisCmdY.SpeedRef    : REAL  // 🚀 vitesse Y 0..100 %
-   FB_Joystick_0.AxisCmdY.Direction   : INT   // ⬆️ -1 / 0 / +1
-   FB_Joystick_0.Button               : BOOL  // 🔘 bouton filtré
-   FB_Joystick_0.NeutralXAct/.NeutralYAct : INT  // 🎯 neutres calibrés (IHM)
-   FB_Joystick_0.Ready/.Busy/.Done    : BOOL  // 🚦 état FB
-   FB_Joystick_0.Error/.ErrorId       : BOOL/WORD // 🧾 défaut (ErrorId 16#0003 = calib hors plage)
-   ─────────────────────────────────────────────────────────────── *)
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">4c63f8b4-fae2-4434-8179-3af1dee50378_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK PUBLIC FB_JOY1
-VAR_INPUT
-    DiagCanOpen          : ST_DeviceDiag; // Phase courante
-    DiagCanOpenJoystick        : ST_DeviceDiag;  // État détaillé joystick
-END_VAR
-VAR_OUTPUT
-END_VAR
-VAR_IN_OUT
-
-END_VAR
-VAR
-	// 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
-    FB_Joystick_0 : FB_Joystick;	
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">4c63f8b4-fae2-4434-8179-3af1dee50378_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">110</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -87558,7 +87443,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639184778165845026</Single>
+        <Single Name="Timestamp" Type="long">639185082068838803</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87631,6 +87516,8 @@ Joystick.Error := (Joystick.ErrorId &lt;&gt; 0);
 Error := Joystick.Error;
 ErrorId := Joystick.ErrorId;
 
+busCanOpen.Operational := CanOnline;
+
 // Busy, Done non utilisés mais présents pour conformité
 Busy := FALSE;
 Done := FALSE;</Single>
@@ -87664,7 +87551,7 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">2f6867ac-7a6a-46ff-b874-0cb8099fff11_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">72</Single>
+        <Single Name="UniqueIdGenerator" Type="string">74</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -87908,199 +87795,6 @@ END_VAR</Single>
           </Single>
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">450</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">SYSTEM</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">76d5face-1542-4109-8fd7-ec20ed53a503</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_MAIN_MACHINE</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184783019116207</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// PROGRAM PLC_PRG_MAIN
-
-// 0. DIAGNOSTIC CAN (Joystick)
-// TODO: Wire CanOnline/CanOperational from CAN task
-instDiagCanOpen(
-    Enable := TRUE,
-    Reset := FALSE,
-    CanOnline := TRUE,         // TBD: from CAN task
-    CanOperational := TRUE     // TBD: from CAN task
-);
-
-// 0. DIAGNOSTIC ETHERCAT (Variateur, EncoderM1, EncoderM2)
-// TODO: Wire WcState/SlaveState from EtherCAT task
-instDiagEthercat(
-    Enable := TRUE,
-    Reset := FALSE,
-    VariateurWcState := FALSE,         // TBD: from EtherCAT master
-    VariateurSlaveState := 8,          // TBD: from EtherCAT master
-    EncoderM1WcState := FALSE,         // TBD: from EtherCAT master
-    EncoderM1SlaveState := 8,          // TBD: from EtherCAT master
-    EncoderM2WcState := FALSE,         // TBD: from EtherCAT master
-    EncoderM2SlaveState := 8           // TBD: from EtherCAT master
-);
-
-// Update local status
-LocalEthercatOk := instDiagEthercat.Variateur.Operational AND instDiagEthercat.EncoderM1.Operational AND instDiagEthercat.EncoderM2.Operational;
-
-// 1. ÉVALUATION DE LA SÉCURITÉ TRANSVERSE
-instSafety(
-    Enable := TRUE,
-    EStopArmed := LocalEmergencyStopTOR,
-    CanOnline := instDiagCanOpen.Joystick.Online,
-    CanOperational := instDiagCanOpen.Joystick.Operational,
-    EthercatOk := LocalEthercatOk
-);
-
-// 2. ACQUISITION DU GESTE OPÉRATEUR SÉCURISÉ
-instFB_JOY1(
-	DiagCanOpen:= instDiagCanOpen.busCanOpen,
-	DiagCanOpenJoystick:= instDiagCanOpen.Joystick);
-
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">76d5face-1542-4109-8fd7-ec20ed53a503_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK PUBLIC FB_MAIN_MACHINE
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
-
-VAR_IN_OUT
-END_VAR
-
-VAR
-    instSafety      : FB_Safety;
-    instDiagCanOpen    : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
-    instDiagEthercat : FB_DiagEthercat;    // Diagnostic EtherCAT (3 devices)
-
-	LocalEmergencyStopTOR  : BOOL := TRUE;
-	LocalEthercatOk        : BOOL := FALSE;      // Résumé diagnostic EtherCAT
-	
-	// 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
-    instFB_JOY1 : FB_JOY1;
-	
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">76d5face-1542-4109-8fd7-ec20ed53a503_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">99</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">SYSTEM</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">4869778c-4148-4dc6-85ea-b3629514c64e</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">POU</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184753810495810</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string"></Single>
-            <Single Name="LineInfoPersistence" Type="string">4869778c-4148-4dc6-85ea-b3629514c64e_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK PUBLIC POU
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
-VAR
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">4869778c-4148-4dc6-85ea-b3629514c64e_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">9</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -88500,29 +88194,130 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639184751535963406</Single>
+        <Single Name="Timestamp" Type="long">639185079737624199</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
-instFB_MAIN_MACHINE();</Single>
+// PROGRAM PLC_PRG_MAIN
+
+// 0. DIAGNOSTIC CAN (Joystick)
+// TODO: Wire CanOnline/CanOperational from CAN task
+instDiagCanOpen(
+    Enable := TRUE,
+    Reset := FALSE,
+    CanOnline := TRUE,         // TBD: from CAN task
+    CanOperational := TRUE     // TBD: from CAN task
+);
+
+// 0. DIAGNOSTIC ETHERCAT (Variateur, EncoderM1, EncoderM2)
+// TODO: Wire WcState/SlaveState from EtherCAT task
+instDiagEthercat(
+    Enable := TRUE,
+    Reset := FALSE,
+    VariateurWcState := FALSE,         // TBD: from EtherCAT master
+    VariateurSlaveState := 8,          // TBD: from EtherCAT master
+    EncoderM1WcState := FALSE,         // TBD: from EtherCAT master
+    EncoderM1SlaveState := 8,          // TBD: from EtherCAT master
+    EncoderM2WcState := FALSE,         // TBD: from EtherCAT master
+    EncoderM2SlaveState := 8           // TBD: from EtherCAT master
+);
+
+// Update local status
+LocalEthercatOk := instDiagEthercat.Variateur.Operational AND instDiagEthercat.EncoderM1.Operational AND instDiagEthercat.EncoderM2.Operational;
+
+// 1. ÉVALUATION DE LA SÉCURITÉ TRANSVERSE
+instSafety(
+    Enable := TRUE,
+    EStopArmed := LocalEmergencyStopTOR,
+    CanOnline := instDiagCanOpen.Joystick.Online,
+    CanOperational := instDiagCanOpen.Joystick.Operational,
+    EthercatOk := LocalEthercatOk
+);
+
+// 2. ACQUISITION DU GESTE OPÉRATEUR SÉCURISÉ
+
+(* ═══════════════════════════════════════════════════════════════
+   🕹️ PRG_JOY1 — Appel du traitement joystick (version ST)
+   ───────────────────────────────────────────────────────────────
+   Remplace l'ancien réseau CFC. Câble les E/S physiques sur le FB,
+   qui réalise en interne : calibration ➜ filtrage ➜ rampe ➜ % .
+   📤 Résultat exploitable : FB_Joystick_0.AxisCmdX / .AxisCmdY
+   📄 Doc métier : DOC/AF_Partie4_Fonction_Joystick_v1.0.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+FB_Joystick_0(
+    // 🟢 --- Autorisations &amp; sécurité ---
+    Enable          := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par autorisation réelle
+    SafetyOk        := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par conditions sécurité OK
+    SafeStop        := GVL_DEBUG.DBG_False,     // ⚠️ DEBUG : remplacer par SafeStop global (FB_Safety)
+    Reset           := FALSE,                   // ⚠️ À câbler : front acquittement défaut IHM
+
+    // 🔌 --- État du bus CANopen (joystick) ---
+    BusCanOpenOP       := instDiagCanOpen.busCanOpen,        // 📡 nœud CAN présent
+    joystickOP  := instDiagCanOpen.Joystick,   // 📡 esclave en mode opérationnel
+
+    // 📥 --- Entrées brutes joystick ---
+    RawX            := JoyXRaw_ANA1,            // 🕹️ axe X brut (0..10000)
+    RawY            := JoyYRaw_ANA2,            // 🕹️ axe Y brut (0..10000)
+    RawButton       := JoyBtnRaw,               // 🔘 bouton brut
+
+    // 🎯 --- Calibration ---
+    Calibrate       := FALSE,                   // ⚠️ À câbler : bouton recalage neutre (front)
+
+    // 🎛️ --- Paramètres de traitement (valeurs par défaut conservées) ---
+    InvertX         := FALSE,                   // ↔️ inversion sens axe X si besoin
+    InvertY         := FALSE,                   // ↕️ inversion sens axe Y si besoin
+    Deadband        := 5.0,                     // 🛑 zone morte ±5 %
+    FilterTime      := TIME#100ms,              // 〰️ constante de temps filtre PT1
+    AccelRate       := 50.0,                    // 📈 accélération 50 %/s
+    DecelRate       := 150.0                    // 📉 décélération 150 %/s (retour zéro plus rapide)
+);
+
+(* 📤 SORTIES DISPONIBLES (lecture seule, à consommer en aval) :
+   ───────────────────────────────────────────────────────────────
+   FB_Joystick_0.AxisCmdX.SpeedRef    : REAL  // 🚀 vitesse X 0..100 %
+   FB_Joystick_0.AxisCmdX.Direction   : INT   // ➡️ -1 / 0 / +1
+   FB_Joystick_0.AxisCmdY.SpeedRef    : REAL  // 🚀 vitesse Y 0..100 %
+   FB_Joystick_0.AxisCmdY.Direction   : INT   // ⬆️ -1 / 0 / +1
+   FB_Joystick_0.Button               : BOOL  // 🔘 bouton filtré
+   FB_Joystick_0.NeutralXAct/.NeutralYAct : INT  // 🎯 neutres calibrés (IHM)
+   FB_Joystick_0.Ready/.Busy/.Done    : BOOL  // 🚦 état FB
+   FB_Joystick_0.Error/.ErrorId       : BOOL/WORD // 🧾 défaut (ErrorId 16#0003 = calib hors plage)
+   ─────────────────────────────────────────────────────────────── *)
+
+</Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Impl_LineIds</Single>
           </Single>
         </Single>
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">PROGRAM PRG_MAIN
-VAR
-	
-instFB_MAIN_MACHINE : FB_MAIN_MACHINE;
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
 
+VAR_IN_OUT
+END_VAR
+
+VAR
+    instSafety      : FB_Safety;
+    instDiagCanOpen    : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
+    instDiagEthercat : FB_DiagEthercat;    // Diagnostic EtherCAT (3 devices)
+
+	LocalEmergencyStopTOR  : BOOL := TRUE;
+	LocalEthercatOk        : BOOL := FALSE;      // Résumé diagnostic EtherCAT
+	
+	// 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
+    FB_Joystick_0 : FB_Joystick;	
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">270</Single>
+        <Single Name="UniqueIdGenerator" Type="string">433</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
