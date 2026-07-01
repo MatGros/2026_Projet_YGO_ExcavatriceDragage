@@ -1,4 +1,7 @@
-# 📋 Analyse Fonctionnelle — Partie 4 : Fonction Joystick (v1.0)
+# 📋 Analyse Fonctionnelle — Partie 8 : Fonction Joystick (v1.0)
+
+> 🔢 Renumérotée **Partie 4 → Partie 8** : les docs de **fonctions métier par FB** sont numérotées **8+**
+> (les Parties 4–6 sont réservées aux specs transverses Cycle/Modes/E-S).
 
 > **Fonction métier** : acquisition et conditionnement de la commande opérateur (joystick Hall → CANopen).
 > **Livrable associé** : `PRG_JOY1` en ST (appel de l'instance `FB_Joystick`).
