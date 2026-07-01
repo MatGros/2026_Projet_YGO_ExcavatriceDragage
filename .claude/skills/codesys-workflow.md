@@ -21,9 +21,9 @@ Spec incomplète ou ambiguë → **STOP + demander clarification.** Jamais d'app
 
 Lire et appliquer **systématiquement** :
 - `DOC/NAMING_CONVENTION.md` → PascalCase, préfixes, pas de hongrois
-- `DOC/AF_Partie3_Template_FB_Commun_v1.1.md` → contrat FB (Enable/Reset/SafetyOk/Mode/Ready/Error… ; arrêt sûr = retrait Enable via CoupeEnable) + réutilisation libs
-- `DOC/AF_Partie2_Architecture_Programme_v2.3.md` → architecture, tâches, flux
-- `DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md` → équipements & fonctions
+- `DOC/AF_Partie3_Template_FB_Commun_v1.2.md` → contrat FB (Enable/Reset/EmergencyStopOk/Mode/Ready/Error… ; profils d'interface §1bis : FB standard vs FB de mouvement `StartStop`/`SafeStop` vs briques réduites ; précédence Enable > SafeStop > StartStop) + réutilisation libs
+- `DOC/AF_Partie2_Architecture_Programme_v2.5.md` → architecture, tâches, flux
+- `DOC/AF_Partie1_Analyse_Fonctionnelle_v1.2.md` → équipements & fonctions
 
 ⚠️ Toujours utiliser la **version la plus récente** (suffixe `_vX.X` le plus élevé). Anciennes versions dans `DOC/Archives/`.
 
@@ -79,7 +79,7 @@ Après validation du plan :
    - C'est ce fichier que l'utilisateur copie-colle dans CODESYS.
 
 2. 📄 **Doc métier + note d'application → dossier `DOC/`** (série AF).
-   - `AF_PartieN_Fonction_<Metier>_vX.Y.md` (ex. `AF_Partie4_Fonction_Joystick_v1.0.md`, `AF_Partie5_Fonction_Winch_v1.0.md`).
+   - `AF_PartieN_Fonction_<Metier>_vX.Y.md`, **N ≥ 8** (ex. `AF_Partie8_Fonction_Joystick_v1.1.md`, `AF_Partie9_Fonction_Winch_v1.0.md`).
    - Structure : rôle métier → pipeline/blocs → interface → sécurité → mapping E/S → **référence au(x) fichier(s) `CODE/*.st`** → note d'application CODESYS 3.5 → REX.
    - Versionner `vX.Y`, anciens dans `DOC/Archives/`.
 
@@ -93,9 +93,11 @@ Style commentaires :
 (* ═══════════════════════════════════════════════
    🎮 FB_Joystick — Acquisition + traitement Hall
    ───────────────────────────────────────────────
-   📥 Enable    : autorisation traitement (retiré par CoupeEnable en cas de défaut)
-   📤 Ready     : valeurs valides disponibles
-   🛡️ SafetyOk  : conditions globales OK (AU réarmé) ; arrêt sûr = retrait Enable
+   📥 Enable          : autorisation traitement ; FALSE = neutralisation (sorties coupées)
+   📤 Ready            : valeurs valides disponibles
+   🛡️ EmergencyStopOk  : conditions globales OK (chaîne AU réarmée)
+   ⚠️ FB de mouvement uniquement (pas FB_Joystick) : StartStop (rampe normale),
+      SafeStop en entrée (sortie du bloc safety métier concerné → rampe rapide, Enable maintenu)
    ═══════════════════════════════════════════════ *)
 ```
 

@@ -12,7 +12,7 @@
 | Préfixe | Usage | Exemple |
 |---------|-------|---------|
 | `ST_` | Struct de données | `ST_AxisCmd`, `ST_WinchIO` |
-| `E_` | Enum / énumération | `E_Mode`, `E_Error` |
+| `E_` | Enum / énumération | `E_Mode`, `E_State`, `E_CycleStep` |
 | `FB_` | Function Block | `FB_Joystick`, `FB_Treuil` |
  
 ---
@@ -31,9 +31,28 @@ En = enable           Rdy = ready                  Err = error / ErrorId
  
 ### Entrées de commande
 ```
-Enable, Start, Stop, Reset
-SafeStop, SafetyOk
+Enable, Reset
+StartStop            → BOOL : TRUE = rampe accélération, FALSE = rampe décélération normale
+                        (FB de mouvement uniquement — Winch, Translation)
 ```
+
+### Entrées sécurité / contexte
+```
+SafeStop             → BOOL : sortie d'un bloc safety MÉTIER, consommée en entrée
+                        par les FB de mouvement de son domaine (1 SafeStop par métier,
+                        pas de signal global unique). TRUE = rampe décélération RAPIDE.
+                        Enable reste actif pendant SafeStop (≠ neutralisation).
+EmergencyStopOk       → BOOL : chaîne de sécurité AU (arrêt d'urgence) réarmée / OK,
+                        ou retour contacteur de puissance (source à définir par métier).
+                        Anciennement nommé SafetyOk — renommé pour éviter l'ambiguïté
+                        avec SafeStop.
+Mode                  → E_Mode courant (autorisations)
+```
+
+> 🧭 **Hiérarchie de précédence** (du plus fort au plus faible) : `Enable` > `SafeStop` > `StartStop`.
+> - `Enable = FALSE` → FB désactivé, **toutes les sorties coupées** (neutralisation dure).
+> - `SafeStop = TRUE` (Enable actif) → **rampe de décélération rapide** (défaut process).
+> - `StartStop = FALSE` (Enable actif, pas de SafeStop) → **rampe de décélération normale** (arrêt demandé).
  
 ### Consignes (références)
 ```
@@ -51,7 +70,7 @@ DrumPos           → position tambour codeur
 ### Sorties d'état / feedback
 ```
 Ready, Done, Busy, Moving
-Error, ErrorId    → code erreur numérique
+Error, ErrorId    → ErrorId = bitfield WORD (bit n = défaut n), Error = miroir (ErrorId <> 0)
 ```
  
 ### Sorties physiques / actionneurs
@@ -64,13 +83,14 @@ SoftStartRampActive          → gestion rampe soft-start
 ### Booléens : convention d'état
 **Entrées** → verbe d'action :
 ```
-Start, Stop, Reset, Enable
+Reset, Enable, StartStop
 ```
  
 **Sorties** → état/propriété :
 ```
 Ready, Busy, Done, Error
 IsOverload, HasFault
+SafeStop            → sortie d'un bloc safety métier (état, pas une commande)
 ```
  
 ---
@@ -93,7 +113,7 @@ WinchA, WinchB             → les deux treuils
 Translation                → axe transversal
 Bucket                     → godet
 Joystick                   → manette
-Watchdog, Sync, Safety     → fonctions critiques
+Sync, Safety               → fonctions critiques
 ```
  
 ---
@@ -104,10 +124,10 @@ Watchdog, Sync, Safety     → fonctions critiques
 TYPE ST_AxisCmd :
 STRUCT
     Enable      : BOOL;       (* Autorisation *)
-    Start       : BOOL;       (* Lancer action *)
+    StartStop   : BOOL;       (* TRUE = rampe accel, FALSE = rampe decel normale *)
     SpeedRef    : REAL;       (* Consigne vitesse 0..100% *)
     Direction   : INT;        (* -1=Rev, 0=Neutre, +1=Fwd *)
-    SafetyOk    : BOOL;       (* Coherence capteurs OK *)
+    EmergencyStopOk : BOOL;   (* Chaine AU réarmée / contacteur puissance OK *)
 END_STRUCT
 END_TYPE
  
@@ -117,7 +137,8 @@ STRUCT
     Ready       : BOOL;
     Done        : BOOL;
     Error       : BOOL;
-    ErrorId     : INT;
+    ErrorId     : WORD;       (* bitfield : bit n = défaut n, pas un code numérique *)
+    SafeStop    : BOOL;       (* sortie safety métier consommée par ce treuil *)
     CablePosAct : REAL;       (* m *)
     SpeedAct    : REAL;       (* % *)
     RelayFwd    : BOOL;
@@ -131,7 +152,7 @@ END_TYPE
 ## En Ladder : lisibilité flux
 ```
 [FB_Joystick]     →  (.Done)  →  [FB_Treuil.Enable]
-     ↓ SpeedRef        + Start     ↓ SpeedRef
+     ↓ SpeedRef        + StartStop ↓ SpeedRef
 [FB_Encodeur]     ←  (.CablePosAct)
 ```
 → Chaînes d'instance, flux d'info immédiatement visible pour maintenance. ✅

@@ -12,24 +12,25 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 - Booléens entrée = verbe (`Enable`, `Start`), sortie = état (`Ready`, `Done`)
 - Suffixes unité si besoin : `_M` (mètres), `_Pct` (%), `_Ms` (ms)
 
-### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md)** ← Contrat FB
-Chaque Function Block doit respecter :
-- Interface : `Enable`, `Reset`, `SafetyOk`, `Mode` (entrées) — **pas de `SafeStop` propagé** (v2.4)
+### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.2.md)** ← Contrat FB
+Chaque Function Block **métier** doit respecter :
+- Interface : `Enable`, `Reset`, `EmergencyStopOk`, `Mode` (entrées) — **FB de mouvement en plus** : `StartStop` (accel/decel normale) + `SafeStop` (decel rapide, sortie du bloc safety métier concerné)
 - Sorties : `Ready`, `Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError`
 - `ErrorId` = bitfield (max 16 défauts)
 - **Reset = front obligatoire** : cause disparue + appui reset pour effacer
 - Jamais autoriser le redémarrage automatique après défaut
-- **Arrêt sûr = retrait de l'`Enable`** : `PLC_PRG_MAIN` fait `Enable := (ordre) AND NOT FB_Safety.CoupeEnable`
+- **Précédence `Enable` > `SafeStop` > `StartStop`** : `Enable=FALSE` → neutralisation (sorties coupées) ; `SafeStop=TRUE` → rampe rapide (`Enable` maintenu) ; `StartStop=FALSE` → rampe normale. **`CoupeEnable` n'existe pas** (jamais une variable — vocabulaire abandonné).
 
-### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.4.md)** ← Pour comprendre
-Tâches, arborescence CODESYS, flux données. **v2.4 = référence** (paradigme `CoupeEnable`,
-pas de `GVL_BusHealth`/`E_DegradationLevel` ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff`).
+### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.5.md)** ← Pour comprendre
+Tâches, arborescence CODESYS, flux données. **v2.5 = référence** (modèle `SafeStop`/`StartStop`,
+`SafeStop` **par métier** — pas de signal global ; pas de `GVL_BusHealth`/`E_DegradationLevel`/
+`FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff`).
 
 ### 4. **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
-- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.0.md)** — Modes & maintenance (N1/N2, AU/`CoupeEnable`/`PowerCutOff`, limite légale).
-- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.0.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
-- **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.0.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
+- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
+- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
+- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
+- **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.1.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
 
@@ -39,8 +40,8 @@ pas de `GVL_BusHealth`/`E_DegradationLevel` ; conserve mapping M1/M2/M3, SpeedSt
 |-------|----------|
 | Sémantique > Typage | Le type se lit en déclaration, le nom parle du **rôle** |
 | Reset = front | Évite réarmement accidentel, garantit conscient du défaut |
-| Arrêt sûr = retrait `Enable` | `FB_Safety.CoupeEnable` retire les `Enable` ; pas de `SafeStop` propagé |
-| AU physique + `PowerCutOff` | Chaîne matérielle indépendante ; `PowerCutOff` coupe la puissance amont si contacteur collé |
+| `Enable` > `SafeStop` > `StartStop` | `Enable=FALSE` = neutralisation ; `SafeStop` (par métier) = rampe rapide, `Enable` maintenu ; `StartStop=FALSE` = rampe normale |
+| AU physique + `PowerCutOff` | Chaîne matérielle indépendante ; **seul l'AU coupe brutalement** ; `PowerCutOff` coupe la puissance amont si contacteur collé |
 | 1 FB = 1 responsabilité | Composition > héritage, clair et maintenable |
 
 ---
@@ -68,14 +69,16 @@ PLC_PRG_MAIN (MainTask 10 ms — orchestration séquentielle : diag PUIS métier
 ├── _COMMON      (FB_FilterPT1, FB_Brake, FB_Input_Digital, FB_Output_Relay)
 ├── _TYPES       (ST_*, ST_SpeedStepTable, ST_ContactorCheck, ST_LimitLegal, E_Mode/State/CycleStep)
 ├── _DIAG        (FB_DiagCanOpen, FB_DiagEthercat ×3 — appelés dans PLC_PRG_MAIN, pas de GVL)
-├── JOYSTICK     (FB_Joystick)
-├── WINCH        (FB_Winch M1/M2, FB_SpeedStep masque 4 bits, FB_WinchSync)
+├── JOYSTICK     (FB_Joystick — compose FB_AxisScale/FB_FilterPT1/FB_Ramp/FB_CycleTime en interne)
+├── WINCH        (FB_Winch M1/M2 — StartStop/SafeStop, FB_SpeedStep masque 4 bits, FB_WinchSync)
 ├── ENCODER      (FB_Encoder_Abs COD1/COD2 → Scale → Safety)
-├── TRANSLATION  (FB_Translation — variateur AC600 / M3)
+├── TRANSLATION  (FB_Translation — variateur AC600 / M3 — StartStop/SafeStop)
 ├── BUCKET       (FB_Bucket)
-├── SAFETY       (FB_Safety → CoupeEnable + PowerCutOff, FB_Watchdog)
-└── SEQUENCE     (FB_Modes, FB_Cycle)
+├── SAFETY       (FB_Safety_<Metier> → SafeStop propre au métier + PowerCutOff)
+└── SEQUENCE     (FB_Modes — dont limite légale, FB_Cycle)
 ```
+👉 **Pas de `FB_Watchdog`** : périodicité des tâches surveillée par la fonction système CODESYS
+(config tâche, seuil 200 ms), pas un FB applicatif.
 👉 Mapping : **M1**=treuil1+COD1, **M2**=treuil2+COD2, **M3**=translation AC600. Pas de `GVL_BusHealth` :
 chaque FB lit directement la sortie du FB producteur (appel séquentiel).
 
@@ -89,8 +92,10 @@ chaque FB lit directement la sortie du FB producteur (appel séquentiel).
 | **CanTask** | à définir | **20 ms** | Joystick Hall |
 | **MainTask** | à définir | **10 ms** | `PLC_PRG_MAIN` : diag bus **puis** logique métier, cycle |
 
-👉 Tâches bus rafraîchissent l'image process → `PLC_PRG_MAIN` consomme.
-⏲️ Watchdog : seuil **200 ms** toutes tâches. Priorités **à définir** en config CODESYS.
+👉 Tâches bus rafraîchissent l'image process → `PLC_PRG_MAIN` consomme. Traitement `FB_Joystick`
+dans `MainTask` (10 ms), même si l'acquisition CAN est à 20 ms.
+⏲️ Surveillance périodicité tâches : **fonction système CODESYS**, seuil **200 ms** (pas de FB
+dédié). Priorités **à définir** en config CODESYS (TBD).
 
 ---
 
@@ -108,13 +113,14 @@ chaque FB lit directement la sortie du FB producteur (appel séquentiel).
 
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
-- [AF_Partie1_Analyse_Fonctionnelle_v1.1.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md) — Équipements & fonctions
-- [AF_Partie2_Architecture_Programme_v2.4.md](DOC/AF_Partie2_Architecture_Programme_v2.4.md) — Architecture détaillée (**v2.4**)
-- [AF_Partie3_Template_FB_Commun_v1.1.md](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) — Contrat FB & sécurité
-- [AF_Partie4_Cycle_Sequenceur_v1.0.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md) — Cycle, synchro, frein, godet, rampes
-- [AF_Partie5_Modes_Maintenance_v1.0.md](DOC/AF_Partie5_Modes_Maintenance_v1.0.md) — Modes, maintenance N1/N2, AU, limite légale
-- [AF_Partie6_IO_Conditioning_v1.0.md](DOC/AF_Partie6_IO_Conditioning_v1.0.md) — Conditionnement E/S
-- [AF_Partie8_Fonction_Joystick_v1.0.md](DOC/AF_Partie8_Fonction_Joystick_v1.0.md) — Fonction métier Joystick (8+ = métier par FB)
+- [AF_Partie1_Analyse_Fonctionnelle_v1.2.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.2.md) — Équipements & fonctions
+- [AF_Partie2_Architecture_Programme_v2.5.md](DOC/AF_Partie2_Architecture_Programme_v2.5.md) — Architecture détaillée (**v2.5**)
+- [AF_Partie3_Template_FB_Commun_v1.2.md](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) — Contrat FB & sécurité
+- [AF_Partie4_Cycle_Sequenceur_v1.1.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md) — Cycle, synchro, frein, godet, rampes
+- [AF_Partie5_Modes_Maintenance_v1.1.md](DOC/AF_Partie5_Modes_Maintenance_v1.1.md) — Modes, maintenance N1/N2, AU, limite légale
+- [AF_Partie6_IO_Conditioning_v1.1.md](DOC/AF_Partie6_IO_Conditioning_v1.1.md) — Conditionnement E/S
+- [AF_Partie8_Fonction_Joystick_v1.1.md](DOC/AF_Partie8_Fonction_Joystick_v1.1.md) — Fonction métier Joystick (8+ = métier par FB)
+- [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 
 ### 📐 Plan de numérotation
 - **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…).
@@ -126,7 +132,7 @@ Tous les docs dans **`DOC/`** :
 **Si l'utilisateur demande modification CODE/, FB_, PRG_, ou "codesys" :**
 
 1. ✅ **Charger automatiquement** la skill `.claude/skills/codesys-workflow.md`
-2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun_v1.1.md
+2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun_v1.2.md
 3. ✅ **Vérifier spec complète** → Sinon demander clarifications
 4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
 5. ✅ **Tracer checklist** avant génération
@@ -134,9 +140,11 @@ Tous les docs dans **`DOC/`** :
 
 **Cas d'arrêt (refuse génération) :**
 - Nommage ambigu ou non-PascalCase
-- Interface FB incomplète
+- Interface FB incomplète (voir profils Partie 3 §1bis : FB standard vs FB de mouvement vs briques réduites)
 - Reset pas sur front
-- `SafeStop` réintroduit comme entrée FB (paradigme abandonné → arrêt sûr = retrait `Enable`/`CoupeEnable`)
+- `SafeStop`/`StartStop` ajoutés à un FB qui n'est **pas** un FB de mouvement (ex. `FB_Joystick`, briques E/S/diag) — voir Partie 3 §1bis
+- `CoupeEnable` réintroduit (vocabulaire abandonné — n'a jamais été une variable, voir Partie 2 §0)
+- `FB_Watchdog` réintroduit comme FB applicatif (surveillance = fonction système CODESYS)
 - Redémarrage auto après défaut
 - Spec manquante/incomplète
 
@@ -160,10 +168,10 @@ L'IA charge les règles DOC + valide avant de générer.
 ## ✅ **Checklist Avant de Coder**
 
 - [ ] Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)
-- [ ] Lire [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) si nouveau FB
+- [ ] Lire [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) si nouveau FB
 - [ ] Vérifier que le nom suit : **PascalCase, sémantique, sans hongrois**
 - [ ] `ErrorId` = bitfield ? Reset = front obligatoire ?
-- [ ] Arrêt sûr = retrait `Enable` via `CoupeEnable` (pas de `SafeStop` propagé) ?
+- [ ] Précédence `Enable` > `SafeStop` > `StartStop` respectée ? `StartStop`/`SafeStop` uniquement si FB de mouvement ?
 
 ### Avant de demander modification code
 
