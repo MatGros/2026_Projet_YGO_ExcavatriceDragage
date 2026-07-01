@@ -7,8 +7,9 @@
 > **Objectif de conception rappelé** : POO **partielle par composition**, **sans méthode ni property**.
 >
 > 📅 Établi le 2026-07-01. Décisions intégrées suite à arbitrage utilisateur (voir §2).
-> 🔄 Révision : ajout **D12/D13** (interface FB standard, modèle d'arrêt `Start`/`Stop`/`SafeStop`,
-> abandon de la formule `Enable := ordre AND NOT SafeStop` de la 1ʳᵉ passe).
+> 🔄 Révision : ajout **D12→D16** (interface FB standard, variable **`StartStop`**, modèle d'arrêt
+> `StartStop`/`SafeStop`, précédence `Enable`>`SafeStop`>`StartStop`, source `FB_Cycle`+IHM ;
+> abandon de la formule `Enable := ordre AND NOT SafeStop` de la 1ʳᵉ passe). Q8/Q9/Q10 résolues.
 
 ---
 
@@ -39,8 +40,11 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 | D9 | **`ErrorId`** | **`WORD`** partout (set de bits). |
 | D10 | **Filtre PT1** | Nom standard unique : **`FB_FilterPT1`** (sans underscore). |
 | D11 | **Blocs joystick** | `FB_CycleTime` = base de temps pour filtrage ; `FB_Joystick` **obligatoire**, appelé dans le **POU main**. |
-| D12 | **Interface FB & modèle d'arrêt** | **Tous les FB** ont l'interface standard de base, dont **`Enable`**. `Enable = FALSE` = **FB désactivé = coupure de toutes ses sorties** (neutralisation dure). Pour les **FB de mouvement** : entrée **`Start`/`Stop`** → `Start` actif = **rampe d'accélération**, `Start` inactif = **rampe de décélération normale** ; **`SafeStop`** (entrée, issue du bloc safety) = **rampe de décélération rapide** (FB reste `Enable`). |
+| D12 | **Interface FB & modèle d'arrêt** | **Tous les FB** ont l'interface standard de base, dont **`Enable`**. `Enable = FALSE` = **FB désactivé = coupure de toutes ses sorties** (neutralisation dure). Pour les **FB de mouvement** : entrée **`StartStop`** (BOOL) → `TRUE` = **rampe d'accélération** vers consigne, `FALSE` = **rampe de décélération normale** (arrêt) ; **`SafeStop`** (entrée, issue du bloc safety) = **rampe de décélération rapide** (FB reste `Enable`). |
 | D13 | **Guardrail « arrêt sûr » (CLAUDE.md)** | Le guardrail « arrêt sûr = retrait de l'`Enable` » est **remplacé** : arrêt sûr = **`SafeStop` → rampe rapide** (Enable maintenu) ; `Enable` off = **coupure des sorties** (neutralisation, cas distinct). |
+| D14 | **Précédence (Q8)** | Hiérarchie confirmée **`Enable` > `SafeStop` > `StartStop`**. Défaut process → **`SafeStop`** (rampe rapide, `Enable` maintenu). `Enable = FALSE` réservé à la **neutralisation** (déjà à l'arrêt / mode non sélectionné). |
+| D15 | **Arrêt = `StartStop := FALSE` (Q9)** | L'arrêt d'un mouvement se fait par **`StartStop := FALSE`** (décélération normale), **pas** par retrait d'`Enable`. ⚠️ `AF_Partie4` §0 (« passage à une étape sans mouvement = retrait `Enable` → rampe ») est **à réécrire**. |
+| D16 | **Source de `StartStop` (Q10)** | `StartStop` est commandé par **`FB_Cycle`** (semi-auto) et par les **commandes IHM** (manuel/maintenance), via la **source légitime arbitrée par `FB_Modes`**. |
 
 ---
 
@@ -65,6 +69,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | M3 | `AF_Partie4` §3 vs §6 | `FB_WinchSync` (`ΔPos>SyncStop`→arrêt) vs désynchro **volontaire** M2 pour le godet → risque de faux défaut synchro | ✅ **D6** : phase godet = pas de mouvement M1 → **sync suspendue**. Documenter l'interlock. |
 | M4 | `AF_Partie2` §2/§9 vs `AF_Partie8` §7 | Traitement joystick en `CanTask` (20 ms) **ou** `MainTask` (10 ms) ? Ambigu | ✅ **D7** : comm 20 ms, **traitement 10 ms** (MainTask). |
 | M5 | `AF_Partie2` §0 vs `AF_Partie5` §1, `AF_Partie6` §5, `AF_Partie8` | Terminologie flottante : `PLC_PRG_MAIN` unique vs `PRG_MODES`/`PRG_IO`/`PRG_JOY1` séparés | ✅ **D8** : **1 POU main**, plus de `PRG_*`. Nettoyer le vocabulaire. |
+| M6 | `AF_Partie4` §0 | « passage à une étape sans mouvement = retrait `Enable` → arrêt sur rampe » | ✅ **D15** : arrêt = **`StartStop := FALSE`** (décélération normale), pas retrait d'`Enable`. Réécrire §0. |
 
 ### 🟡 Sévérité MINEURE
 
@@ -119,9 +124,8 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 | Q5 | **Ordre d'appel** : déplacer `FB_Watchdog()` **avant** `FB_Safety()` (pour alimenter la sécurité le même cycle) ? | Évite 1 cycle (10 ms) de retard (m8). |
 | Q6 | **Séquence `INIT`** (`AF_Partie4` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. |
 | Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. |
-| Q8 | **Précédence `Enable` / `SafeStop` / `Start`** : sur défaut process → **`SafeStop`** (rampe rapide, `Enable` maintenu), `Enable` off réservé à la neutralisation « déjà à l'arrêt / mode non sélectionné » ? Confirmer la hiérarchie. | Câblage sûr des FB de mouvement (D12). |
-| Q9 | **Passage à une étape sans mouvement** (`AF_Partie4` §0) : se fait par **`Start := FALSE`** (décélération normale), **pas** par retrait d'`Enable` — à confirmer/réécrire ? | Aligne P4 sur D12. |
-| Q10 | **Périmètre `Start`/`Stop`** : quels FB en ont besoin — `FB_Winch`, `FB_Translation` (et `FB_Bucket` via M2 ?) ; le `FB_Cycle` pilote-t-il `Start` ou l'`Enable` ? | Interface des FB de mouvement (D12). |
+
+> ✅ **Q8, Q9, Q10 résolues** → actées en **D14, D15, D16** (§2).
 
 ---
 
