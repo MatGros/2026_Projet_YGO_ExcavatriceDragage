@@ -14,14 +14,22 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md)** ← Contrat FB
 Chaque Function Block doit respecter :
-- Interface : `Enable`, `Reset`, `SafeStop`, `SafetyOk`, `Mode` (entrées)
+- Interface : `Enable`, `Reset`, `SafetyOk`, `Mode` (entrées) — **pas de `SafeStop` propagé** (v2.4)
 - Sorties : `Ready`, `Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError`
 - `ErrorId` = bitfield (max 16 défauts)
 - **Reset = front obligatoire** : cause disparue + appui reset pour effacer
 - Jamais autoriser le redémarrage automatique après défaut
+- **Arrêt sûr = retrait de l'`Enable`** : `PLC_PRG_MAIN` fait `Enable := (ordre) AND NOT FB_Safety.CoupeEnable`
 
-### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.3.md)** ← Pour comprendre
-Tâches, arborescence CODESYS, flux données.
+### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.4.md)** ← Pour comprendre
+Tâches, arborescence CODESYS, flux données. **v2.4 = référence** (paradigme `CoupeEnable`,
+pas de `GVL_BusHealth`/`E_DegradationLevel` ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff`).
+
+### 4. **Specs détaillées**
+- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
+- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.0.md)** — Modes & maintenance (N1/N2, AU/`CoupeEnable`/`PowerCutOff`, limite légale).
+- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.0.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
+- **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.0.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
 
@@ -31,8 +39,8 @@ Tâches, arborescence CODESYS, flux données.
 |-------|----------|
 | Sémantique > Typage | Le type se lit en déclaration, le nom parle du **rôle** |
 | Reset = front | Évite réarmement accidentel, garantit conscient du défaut |
-| SafeStop prioritaire | Arrêt sûr indépendant, pas bloqué par une autre erreur |
-| AU physique | Bouton dur, réarmement manuel et séparé de l'acquittement IHM |
+| Arrêt sûr = retrait `Enable` | `FB_Safety.CoupeEnable` retire les `Enable` ; pas de `SafeStop` propagé |
+| AU physique + `PowerCutOff` | Chaîne matérielle indépendante ; `PowerCutOff` coupe la puissance amont si contacteur collé |
 | 1 FB = 1 responsabilité | Composition > héritage, clair et maintenable |
 
 ---
@@ -56,17 +64,20 @@ Toute modif passe par la skill **[`codesys-workflow`](.claude/skills/codesys-wor
 ## 🏗️ **Arborescence CODESYS**
 
 ```
-Application (PLC_PRG)
-├── _COMMON        (FB_FilterPT1, FB_Brake)
-├── _TYPES         (Structures, Enums)
-├── JOYSTICK       (Acquisition + traitement)
-├── WINCH          (2 treuils × FB_Winch)
-├── ENCODER        (Codeurs tambour)
-├── TRANSLATION    (Moteur variateur)
-├── BUCKET         (Cinématique godet)
-├── SAFETY         (Superviseur défauts)
-└── SEQUENCE       (Modes + Cycle)
+PLC_PRG_MAIN (MainTask 10 ms — orchestration séquentielle : diag PUIS métier)
+├── _COMMON      (FB_FilterPT1, FB_Brake, FB_Input_Digital, FB_Output_Relay)
+├── _TYPES       (ST_*, ST_SpeedStepTable, ST_ContactorCheck, ST_LimitLegal, E_Mode/State/CycleStep)
+├── _DIAG        (FB_DiagCanOpen, FB_DiagEthercat ×3 — appelés dans PLC_PRG_MAIN, pas de GVL)
+├── JOYSTICK     (FB_Joystick)
+├── WINCH        (FB_Winch M1/M2, FB_SpeedStep masque 4 bits, FB_WinchSync)
+├── ENCODER      (FB_Encoder_Abs COD1/COD2 → Scale → Safety)
+├── TRANSLATION  (FB_Translation — variateur AC600 / M3)
+├── BUCKET       (FB_Bucket)
+├── SAFETY       (FB_Safety → CoupeEnable + PowerCutOff, FB_Watchdog)
+└── SEQUENCE     (FB_Modes, FB_Cycle)
 ```
+👉 Mapping : **M1**=treuil1+COD1, **M2**=treuil2+COD2, **M3**=translation AC600. Pas de `GVL_BusHealth` :
+chaque FB lit directement la sortie du FB producteur (appel séquentiel).
 
 ---
 
@@ -74,24 +85,22 @@ Application (PLC_PRG)
 
 | Tâche | Priorité | Cadence | Contenu |
 |-------|----------|---------|---------|
-| **EtherCatTask** | 0 (haute) | Bus | Codeurs, variateur |
-| **CanTask** | 1 | 10 ms | Joystick Hall |
-| **MainTask** | 10 | 20 ms | Logique métier, cycle |
+| **EtherCatTask** | à définir | **4 ms** | Codeurs M1/M2 (COD1/COD2), variateur AC600 (M3) |
+| **CanTask** | à définir | **20 ms** | Joystick Hall |
+| **MainTask** | à définir | **10 ms** | `PLC_PRG_MAIN` : diag bus **puis** logique métier, cycle |
 
-👉 Couche basse rafraîchit (bus) → MainTask consomme.
+👉 Tâches bus rafraîchissent l'image process → `PLC_PRG_MAIN` consomme.
+⏲️ Watchdog : seuil **200 ms** toutes tâches. Priorités **à définir** en config CODESYS.
 
 ---
 
-## 🔄 **Cycle de Dragage**
+## 🔄 **Cycle de Dragage** (`E_CycleStep` — détail Partie 4)
 
-1. ⬇️ Descente godet ouvert
-2. 🌊 Capteur fond touché
-3. 🔧 Synchro 2 treuils
-4. ⬆️ Remontée à vitesse variable
-5. ⏱️ Égouttage temporisé
-6. ↔️ Translation vers vidange
-7. ⬇️ Ouverture godet (désynchro treuils)
-8. 🔁 Retour position travail
+`INIT` → `WORK_POS_SELECT` → `DESCENDING_OPEN` → `BOTTOM_TOUCH_WAIT` → `SYNCHRO_ADJUST`
+→ `CTRL_ASCENDING` → `ASCENDING_LOADED` → `DRAINING_PAUSE` → `TRANSLATION_MOVE`
+→ `DESCENDING_OPEN_DUMP` → `RETURN_WORK_POS` → `READY` (reboucle). `ERROR_HOLD` sur défaut.
+
+👉 Pseudo-Grafcet : chaque étape = une mémoire. Tout mouvement validé au joystick (homme-mort).
 
 ---
 
@@ -100,8 +109,15 @@ Application (PLC_PRG)
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
 - [AF_Partie1_Analyse_Fonctionnelle_v1.1.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md) — Équipements & fonctions
-- [AF_Partie2_Architecture_Programme_v2.3.md](DOC/AF_Partie2_Architecture_Programme_v2.3.md) — Architecture détaillée
+- [AF_Partie2_Architecture_Programme_v2.4.md](DOC/AF_Partie2_Architecture_Programme_v2.4.md) — Architecture détaillée (**v2.4**)
 - [AF_Partie3_Template_FB_Commun_v1.1.md](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) — Contrat FB & sécurité
+- [AF_Partie4_Cycle_Sequenceur_v1.0.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md) — Cycle, synchro, frein, godet, rampes
+- [AF_Partie5_Modes_Maintenance_v1.0.md](DOC/AF_Partie5_Modes_Maintenance_v1.0.md) — Modes, maintenance N1/N2, AU, limite légale
+- [AF_Partie6_IO_Conditioning_v1.0.md](DOC/AF_Partie6_IO_Conditioning_v1.0.md) — Conditionnement E/S
+- [AF_Partie8_Fonction_Joystick_v1.0.md](DOC/AF_Partie8_Fonction_Joystick_v1.0.md) — Fonction métier Joystick (8+ = métier par FB)
+
+### 📐 Plan de numérotation
+- **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…).
 
 ---
 
@@ -120,7 +136,7 @@ Tous les docs dans **`DOC/`** :
 - Nommage ambigu ou non-PascalCase
 - Interface FB incomplète
 - Reset pas sur front
-- SafeStop dépendant de Enable
+- `SafeStop` réintroduit comme entrée FB (paradigme abandonné → arrêt sûr = retrait `Enable`/`CoupeEnable`)
 - Redémarrage auto après défaut
 - Spec manquante/incomplète
 
@@ -147,7 +163,7 @@ L'IA charge les règles DOC + valide avant de générer.
 - [ ] Lire [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) si nouveau FB
 - [ ] Vérifier que le nom suit : **PascalCase, sémantique, sans hongrois**
 - [ ] `ErrorId` = bitfield ? Reset = front obligatoire ?
-- [ ] `SafeStop` prioritaire sur Enable ?
+- [ ] Arrêt sûr = retrait `Enable` via `CoupeEnable` (pas de `SafeStop` propagé) ?
 
 ### Avant de demander modification code
 

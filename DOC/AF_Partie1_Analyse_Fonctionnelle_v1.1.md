@@ -83,19 +83,23 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 Joystick ──consigne %──► Cycle/Modes ──ordre──► Treuil + Translation
 Codeur ──position m──► Treuil ──limite──► ralentit/arrête
 Treuil ──pilote──► Frein + Contacteurs
-Safety ──SafeStop──► TOUS les objets
-Safety ──coupure puissance──► contacteur général (si collage détecté)
+Safety ──CoupeEnable──► PLC_PRG_MAIN retire les Enable ──► objets en repli sûr
+Safety ──PowerCutOff──► contacteur général amont (si collage détecté)
 ```
 
-🧭 **Tout passe par Modes + Safety avant d'agir.**
+🧭 **Tout passe par Modes + Safety avant d'agir.** L'arrêt sûr logiciel = **retrait de l'`Enable`**
+(`CoupeEnable`), pas un `SafeStop` propagé. Voir Partie 2 v2.4 §6 et Partie 3 §7.
 
 ---
 
 ## 🛡️ Sécurité (priorité absolue)
 - Cohérence capteurs, valeurs absurdes, conditions de marche.
-- 🪝 Frein = séquence stricte (relâche après moteur, colle avant arrêt).
-- 🚫 **Limite légale** : interdiction de draguer sous une cote imposée.
-- 🔴 Tout défaut → arrêt **sûr** (contacteurs off, freins collés).
+- 🪝 Frein = séquence stricte intégrant les temps physiques (relâche après établissement moteur, colle après décélération — voir Partie 4 §Frein).
+- 🔴 Tout défaut process → `FB_Safety` lève `CoupeEnable` → retrait des `Enable` → arrêt **sûr propre** (contacteurs off, freins collés). Voir Partie 2 v2.4 §6.
+
+> 🚫 **Limite légale ≠ sécurité** : l'interdiction de draguer sous une cote imposée est une
+> **interdiction normale** (réglementaire), appliquée par **`FB_Modes`** en semi-auto/descente,
+> **pas** par `FB_Safety`. Signalisation seule en maintenance. Voir Partie 6 §3.
 
 ### 🔌 Sécurité électrique — automate jamais coupé
 L'automate **reste alimenté en permanence** (pas de coupure électrique générale du contrôleur).

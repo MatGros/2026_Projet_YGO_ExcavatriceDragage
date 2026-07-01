@@ -15,19 +15,26 @@ Tous les documents sont dans le dossier **`DOC/`** :
 - Booléens : entrée = verbe (`Start`), sortie = état (`Ready`)
 - Exemples complets pour structures et instances
 
-### 2️⃣ **[Analyse Fonctionnelle — Partie 1](DOC/AF_Partie1_Analyse_Fonctionnelle.md)**
+### 2️⃣ **[Analyse Fonctionnelle — Partie 1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md)**
 Le projet en bref : équipements pilotés, fonctions principales, interactions.
 
-### 3️⃣ **[Analyse Fonctionnelle — Partie 2](DOC/AF_Partie2_Architecture_Programme_v2.1.md)**
-Architecture détaillée : cadencement des tâches (EtherCAT/CAN/Main), arborescence CODESYS complète, flux de données.
+### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.4)](DOC/AF_Partie2_Architecture_Programme_v2.4.md)**
+Architecture détaillée : cadencement (EtherCAT 4 / CANopen 20 / Main 10 ms), orchestration
+séquentielle `PLC_PRG_MAIN`, mapping M1/M2/M3, paradigme `CoupeEnable`, `PowerCutOff`.
 
-### 4️⃣ **[Analyse Fonctionnelle — Partie 3](DOC/AF_Partie3_Template_FB_Commun.md)**
+### 4️⃣ **[Analyse Fonctionnelle — Partie 3 (v1.1)](DOC/AF_Partie3_Template_FB_Commun_v1.1.md)**
 Contrat standard que **tout FB respecte** :
-- Interface VAR_INPUT/OUTPUT unifiée
+- Interface VAR_INPUT/OUTPUT unifiée (`Enable`/`Reset`/`SafetyOk`/`Mode`)
 - Machine d'état `E_State`
 - Gestion `ErrorId` (bitfield)
 - Logique Reset (front obligatoire, cause doit disparaître)
-- Arrêt d'urgence & SafeStop
+- Arrêt sûr = retrait `Enable` (`CoupeEnable`) ; AU matériel + `PowerCutOff`
+
+### 5️⃣ **Specs détaillées**
+- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
+- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.0.md)** — Modes & maintenance (N1/N2, AU/`CoupeEnable`/`PowerCutOff`, limite légale).
+- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.0.md)** — Conditionnement E/S.
+- **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.0.md)** — Fonction métier Joystick (docs métier par FB en 8+).
 
 ---
 
@@ -37,9 +44,13 @@ Contrat standard que **tout FB respecte** :
 excavatrice-dragage/
 ├── DOC/                      # 📖 Documentation (ICI COMMENCE)
 │   ├── NAMING_CONVENTION.md
-│   ├── AF_Partie1_Analyse_Fonctionnelle.md
-│   ├── AF_Partie2_Architecture_Programme_v2.1.md
-│   └── AF_Partie3_Template_FB_Commun.md
+│   ├── AF_Partie1_Analyse_Fonctionnelle_v1.1.md
+│   ├── AF_Partie2_Architecture_Programme_v2.4.md   (référence)
+│   ├── AF_Partie3_Template_FB_Commun_v1.1.md
+│   ├── AF_Partie4_Cycle_Sequenceur_v1.0.md
+│   ├── AF_Partie5_Modes_Maintenance_v1.0.md
+│   ├── AF_Partie6_IO_Conditioning_v1.0.md
+│   └── AF_Partie8_Fonction_Joystick_v1.0.md
 │
 ├── CODE/                     # 🔧 Fragments POUs CODESYS (extract/inject)
 │   ├── FB_Filter_PT1__*.xml
@@ -94,19 +105,20 @@ inject.bat
 | Concept | Important |
 |---------|-----------|
 | **Nommage** | Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) d'abord — aucun hongrois, PascalCase strict |
-| **Tâches** | 3 niveaux : EtherCAT (haute) → CAN (10ms) → Main (20ms) |
-| **FB Standard** | Tous les FB respectent le contrat [Partie 3](DOC/AF_Partie3_Template_FB_Commun.md) |
-| **Sécurité** | SafeStop prioritaire, Reset = front obligatoire, AU physique indépendant |
-| **Cycle** | Semi-auto : descente → synchro → remontée → vidage → retour |
+| **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; watchdog 200 ms |
+| **FB Standard** | Tous les FB respectent le contrat [Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) |
+| **Sécurité** | Arrêt sûr = retrait `Enable` (`CoupeEnable`) ; AU matériel + `PowerCutOff` ; Reset = front |
+| **Cycle** | Semi-auto : `E_CycleStep` ([Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md)) |
 
 ---
 
 ## 🚀 **Commencer**
 
 1. **Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)** ← commence ici
-2. Consulter [AF_Partie1](DOC/AF_Partie1_Analyse_Fonctionnelle.md) pour le contexte métier
-3. Étudier [AF_Partie2](DOC/AF_Partie2_Architecture_Programme_v2.1.md) pour l'architecture
-4. Comprendre [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun.md) avant de coder un FB
+2. Consulter [AF_Partie1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.1.md) pour le contexte métier
+3. Étudier [AF_Partie2 (v2.4)](DOC/AF_Partie2_Architecture_Programme_v2.4.md) pour l'architecture
+4. Comprendre [AF_Partie3 (v1.1)](DOC/AF_Partie3_Template_FB_Commun_v1.1.md) avant de coder un FB
+5. Approfondir [Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.0.md) / [5](DOC/AF_Partie5_Modes_Maintenance_v1.0.md) / [6](DOC/AF_Partie6_IO_Conditioning_v1.0.md)
 
 ---
 
