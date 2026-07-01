@@ -24,7 +24,7 @@ voir §5 Sécurité pour ce que cela implique concrètement).
 ## ⚙️ 2. Chaîne de traitement (pipeline)
 
 ```
-FB_Joystick.AxisCmdY ──► FB_Winch(M1) ──┬─► FB_SpeedStep ──► masque 4 bits (Contactor1..4)
+FB_Joystick.AxisCmdY ──► FB_Winch(M1) ──┬─► FB_SpeedStep ──► Contactor1..4 (table P<palier>R<relais>)
                                         ├─► RelayFwd / RelayRev (interlock changement de sens)
                                         └─► FB_Brake ──► BrakeCmd (séquence temporisée)
 
@@ -33,7 +33,7 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 
 | Bloc | Rôle métier |
 |------|-------------|
-| `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en masque 4 bits, via table `ST_SpeedStepTable` propre à M1, sélection par `HYSTERESIS` (lib Util, anti-battement) |
+| `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
 | `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN (codeur **TBD**, non câblé ce lot) |
 | `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens |
@@ -57,7 +57,7 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 | `SafeStop` | BOOL | Sortie `FB_Safety_Winch` : `TRUE` = rampe décélération **rapide** |
 | `Direction` | INT | -1/0/+1 |
 | `SpeedRefPct` | REAL | Consigne 0..100 % |
-| `SpeedStepTable` | `ST_SpeedStepTable` | Table des 5 paliers **propre à M1** |
+| `SpeedStepTable` | `ST_SpeedStepTable` | Table des 5 paliers **propre à M1** (20 `BOOL` `P<palier>R<relais>` + seuils) |
 | `ContactorFeedbackFwd/Rev` | BOOL | Retours contacteurs de sens |
 | `BrakeFeedback` | BOOL | Retour contacteur bobine frein |
 
@@ -65,7 +65,7 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 | Sortie | Type | Rôle |
 |--------|------|------|
 | `RelayFwd` / `RelayRev` | BOOL | Contacteurs de sens (jamais simultanés — interlock) |
-| `Contactor1..4` | BOOL | Contacteurs de vitesse (masque 4 bits décomposé) |
+| `Contactor1..4` | BOOL | Contacteurs de vitesse du palier courant (lus dans `Table.P<palier>R<relais>`) |
 | `BrakeCmd` | BOOL | Commande bobine frein (`TRUE` = relâché) |
 | `Ready/Busy/Done/Error/ErrorId/State/StateAtError` | — | État standard (Partie3 §1) |
 | `FwdContactorCheck/RevContactorCheck/BrakeContactorCheck` | `ST_ContactorCheck` | Diagnostic détaillé (IHM) |
@@ -79,11 +79,32 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 - **Précédence stricte** `Enable > SafeStop > StartStop` (arbitrage rampe interne à `FB_Winch`,
   indépendant de la rampe déjà appliquée par `FB_Joystick` sur la consigne).
 - **Interlock changement de sens** : `RelayFwd`/`RelayRev` ne sont jamais actifs simultanément ;
-  le sens ne bascule que lorsque la vitesse rampée est confirmée à zéro (`DirectionInterlockDelay`).
+  **seul l'engagement initial** neutre→un sens est immédiat — un arrêt (un sens→neutre) **et**
+  une inversion directe Fwd↔Rev exigent tous les deux la vitesse rampée confirmée nulle
+  (`DirectionInterlockDelay`), pour que le contacteur de sens reste actif tout le temps de la
+  décélération réelle (cohérent avec le palier et le frein).
 - **Frein** : séquence temporisée stricte (Partie4 §4) — jamais de relâche avant fermeture
   contacteur + magnétisation, jamais de collage avant décélération.
 - **Double vérification contacteurs** (sens + frein) via `ST_ContactorCheck` : incohérence
   commande/retour au-delà d'un timeout → `ErrorId`.
+- **Sortie sûre sur défaut** (`FB_Winch`/`FB_Brake`) : `Error` force `RelayFwd`/`RelayRev`/
+  `Contactor1..4`/`BrakeCmd` à leur état sûr (coupure directe, frein collé), conforme Partie3
+  §9 étape 7 — un contacteur incohérent ne doit plus jamais rester commandé normalement.
+
+> 🔧 **Correctifs retour terrain + revue de code 2026-07-01** (2 itérations) :
+> 1. La 1ère version de l'interlock exigeait la vitesse confirmée nulle (200 ms) **avant même
+>    le tout premier engagement** (neutre → un sens) — or la rampe interne quitte le seuil de
+>    repos en ~2 ms dès qu'une consigne existe (`AccelRate` 50 %/s), donc `CommandedDirection`
+>    restait bloqué à 0 en permanence : les paliers de vitesse évoluaient (`Contactor1..4`),
+>    mais aucun `RelayFwd`/`RelayRev` ne s'activait jamais (symptôme observé : "les relais
+>    vitesse évoluent mais pas de commande de sens").
+> 2. Le correctif 1 traitait ensuite "un sens → neutre" comme immédiat lui aussi — or
+>    `Contactor1..4` suit une rampe indépendante (`SpeedRamp.Current`) : un arrêt demandé
+>    coupait le contacteur de sens **avant** la fin de la décélération réelle, frein encore
+>    ouvert (non conforme Partie3 §9). Corrigé dans `CODE/FB_Winch.st` §3bis (revue de code
+>    indépendante) : seul l'engagement initial est immédiat, arrêt et inversion directe
+>    exigent tous les deux la vitesse confirmée nulle.
+> 3. Ajout de la sortie sûre sur `Error` (ci-dessus), absente des deux versions précédentes.
 
 ### ⚠️ Ce que « pas de codeur » signifie concrètement pour ce lot
 
@@ -106,7 +127,7 @@ descente sans surveillance visuelle des fins de câble physiques).
 |------------------|------|------|
 | `M1_RelayFwd` | Sortie | Contacteur sens avant (montée) M1 |
 | `M1_RelayRev` | Sortie | Contacteur sens arrière (descente) M1 |
-| `M1_Contactor1..4` | Sortie | Contacteurs de vitesse M1 (paliers) |
+| `M1_Contactor1..4` | Sortie | Contacteurs de vitesse M1 (palier courant, table `P<palier>R<relais>`) |
 | `M1_BrakeCmd` | Sortie | Bobine frein M1 (`TRUE` = relâché) |
 | `M1_ContactorFeedbackFwd/Rev` | Entrée | Retours contacteurs de sens M1 |
 | `M1_BrakeFeedback` | Entrée | Retour contacteur bobine frein M1 |
@@ -140,10 +161,14 @@ descente sans surveillance visuelle des fins de câble physiques).
 2. Ouvrir **Library Manager** (double-clic dans l'arbre projet).
 3. Vérifier que **`Util`** apparaît dans la liste. Si absent : bouton **Add library...** →
    rechercher `Util` → sélectionner → **OK**.
-   *(Sans ça, `HYSTERESIS` dans `FB_SpeedStep` risque de ne pas compiler. Si le Rebuild à
-   l'étape 10 signale `HYSTERESIS` introuvable alors que `Util` est bien ajoutée, chercher le
-   bloc dans la bibliothèque **`Standard`** à la place — l'implémentation exacte selon laquelle
-   il est catalogué peut varier d'une distribution CODESYS à l'autre.)*
+   *(Sans ça, `HYSTERESIS` dans `FB_SpeedStep` ne compilera pas.)*
+
+> 🔧 **Correctif 2026-07-01** : la 1ère version de `FB_SpeedStep.st` supposait une interface
+> `HYSTERESIS(XIN1, XIN2, EPSILON → Q)` qui n'existe pas dans `Util` 3.5.19.0. L'interface réelle
+> (confirmée par la doc officielle CODESYS) est `HYSTERESIS(IN, HIGH, LOW : INT → OUT : BOOL)`
+> — `OUT` passe à `TRUE` quand `IN < LOW`, à `FALSE` quand `IN > HIGH`, maintien entre les deux.
+> `CODE/FB_SpeedStep.st` a été corrigé en conséquence (conversion `SpeedRefPct` REAL → INT via
+> `REAL_TO_INT`). **Recoller ce fichier si tu avais déjà créé `FB_SpeedStep` avec la 1ère version.**
 
 ### Étape 1 — Créer les types fondamentaux (`_TYPES` ou racine `Application`)
 Clic droit sur **Application** (ou un sous-dossier `_TYPES` si tu préfères en créer un :
@@ -163,6 +188,14 @@ Pour **`ST_SpeedStepTable`** et **`ST_ContactorCheck`** :
 2. Champ **Name** : `ST_SpeedStepTable` (puis `ST_ContactorCheck`)
 3. Champ **Type** : sélectionner **`Structure`**
 4. **Add**, puis coller le contenu du fichier `CODE/` correspondant (remplace tout).
+
+> 🔧 **Évolution retour terrain 2026-07-01** : `ST_SpeedStepTable` n'utilise plus un masque
+> `BYTE` packé par palier, mais **20 `BOOL` nommés individuellement** `P1R1`..`P5R4`
+> (`P`=Palier, `R`=Relais de vitesse 1..4) — chacun réglable **un par un**, en direct dans la
+> vue instance CODESYS pendant la mise en service, sans manipuler de valeur binaire packée.
+> Si tu avais déjà créé `ST_SpeedStepTable`/`FB_SpeedStep`/`FB_Winch` avec la 1ère version
+> (masque `BYTE`), **recoller les 3 fichiers** (`ST_SpeedStepTable.st`, `FB_SpeedStep.st`,
+> `FB_Winch.st`) et le `M1_SpeedStepTable` de `PRG_MAIN.st`.
 
 ### Étape 2 — Mettre à jour `ST_AxisCmd`
 1. Double-clic sur `ST_AxisCmd` existant (racine `Application`, à côté de `ST_DeviceDiag`).
@@ -217,7 +250,7 @@ Idem étape 4, mais :
 3. Volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du même fichier.
 4. **Enregistrer**.
 
-### Étape 9 — I/O Mapping (câblage physique réel)
+### Étape 9 — I/O Mapping (câblage physique réel) — **si le matériel est déjà branché**
 Onglet **I/O Mapping** du device concerné (carte de sortie relais pour les commandes,
 carte d'entrée TOR pour les retours) :
 
@@ -234,6 +267,23 @@ carte d'entrée TOR pour les retours) :
 *(Même principe que `JoyXRaw_ANA1`/`JoyYRaw_ANA2` déjà utilisés : taper le nom directement
 dans la colonne Variable du canal correspondant — CODESYS crée la variable globale associée.)*
 
+### Étape 9bis — GVL stub logiciel (câblage PAS ENCORE branché — choix retenu 2026-07-01)
+Tant que le matériel de test (relais/retours M1) n'est pas branché, créer une GVL temporaire
+plutôt que l'I/O Mapping :
+1. Clic droit sur **Application** → **Add Object → Global Variable List (GVL)...**
+2. **Name** : `GVL_Winch_M1_Stub` → **Add**
+3. Coller le contenu de [`CODE/GVL_Winch_M1_Stub.st`](../CODE/GVL_Winch_M1_Stub.st) (10 `BOOL`,
+   aucun relais réel piloté).
+4. `PRG_MAIN.st` (déjà à jour dans `CODE/`) mire les retours contacteurs sur les commandes
+   (`M1_ContactorFeedbackFwd := M1_RelayFwd`, etc.) pour simuler un contacteur idéal et éviter
+   de faux défauts `StuckOpen` — bloc marqué `🧪 SIMULATION` dans le fichier, à supprimer en
+   même temps que le GVL quand le matériel réel arrivera.
+5. **Rebuild** doit passer sans erreur (hors avertissement `CAN` déjà présent, non lié à ce lot).
+
+🔴 **Migration vers le matériel réel plus tard** : supprimer `GVL_Winch_M1_Stub` **et** le bloc
+`🧪 SIMULATION` de `PRG_MAIN`, puis faire l'Étape 9 (I/O Mapping) avec les mêmes noms de
+variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
+
 ### Étape 10 — Compiler et vérifier
 1. Menu **Build → Rebuild all** (ou **F11**).
 2. Corriger les éventuelles erreurs de référence résiduelles (noms de variables I/O Mapping
@@ -247,18 +297,27 @@ dans la colonne Variable du canal correspondant — CODESYS crée la variable gl
 | `EmergencyStopOk := GVL_DEBUG.DBG_True` (Joystick/Safety/Winch) | Chaîne AU réarmée réelle |
 | `Reset := FALSE` (Joystick/Safety/Winch) | Front acquittement IHM |
 | `Mode := E_Mode.MAINT_N1` (Safety/Winch) | Sortie réelle `FB_Modes` |
-| Table `M1_SpeedStepTable` (valeurs par défaut) | Masques/seuils réels validés à la mise en service |
+| Table `M1_SpeedStepTable` (valeurs par défaut cumulatives) | `P<palier>R<relais>` + seuils réels validés à la mise en service |
 
 ---
 
 ## 🔁 8. Retour d'expérience (à compléter après test)
 
+- [x] Sens (Fwd/Rev) — bug interlock corrigé 2026-07-01 (neutre→un sens bloqué à tort) : à revalider en marche réelle
+- [x] Revue de code indépendante 2026-07-01 : 2 critiques + 1 majeur corrigés (interlock arrêt
+      prématuré, `Reset` non-front sur `FB_Joystick`, sortie sûre sur `Error` manquante) — à
+      revalider en marche réelle malgré tout (défauts précédemment "dormants" en banc de test).
 - [ ] Sens (Fwd/Rev) cohérent avec le joystick axe Y (haut = plongée ou extraction ? à vérifier au 1er essai)
 - [ ] Paliers de vitesse progressifs et stables (pas de battement au changement de palier)
+- [ ] Chaque `P<palier>R<relais>` de `M1_SpeedStepTable` réglé un par un selon le câblage réel des 4 contacteurs M1
 - [ ] Frein : relâche bien après le délai (pas d'à-coup), collage bien après arrêt (pas de grincement)
-- [ ] Interlock changement de sens : impossible de commuter Fwd/Rev en mouvement
-- [ ] Relâcher le joystick → rampe de décélération normale → arrêt → frein collé
-- [ ] Table `M1_SpeedStepTable` : masques/seuils définitifs à figer une fois validés
+- [ ] Interlock changement de sens : impossible de commuter Fwd/Rev en mouvement ; arrêt ET inversion directe bien bloqués hors vitesse confirmée nulle
+- [ ] Relâcher le joystick → rampe de décélération normale → contacteur de sens reste actif jusqu'à l'arrêt réel → frein collé
+- [ ] Défaut simulé (débrancher un retour contacteur) → sorties coupées immédiatement (sortie sûre sur `Error`)
+- [ ] Seuils `StepThreshold_Pct` définitifs à figer une fois validés
+- [ ] **Avant de câbler le CAN réel ou le bouton Reset IHM** : re-tester spécifiquement la
+      perte joystick/CAN (`SafeStop`) et un Reset maintenu, actuellement inatteignables en
+      banc d'essai (`CanOnline`/`CanOperational` figés `TRUE`, `Reset` figé `FALSE`)
 - [ ] Si validé → dupliquer pour M2 (nouvelle instance `FB_Winch`, nouvelle table), puis
       réintégrer `FB_WinchSync`/`FB_Encoder_Safety` une fois le codeur fiabilisé
 

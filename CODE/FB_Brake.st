@@ -110,3 +110,10 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+
+// 🛡️ 6. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7 — ajout revue de code 2026-07-01)
+// Incohérence commande/retour détectée : on ne peut plus se fier à la séquence temporisée
+// normale (le contacteur suspect biaiserait la logique) → position sûre par défaut (collé).
+IF Error THEN
+    BrakeCmd := FALSE;
+END_IF;
