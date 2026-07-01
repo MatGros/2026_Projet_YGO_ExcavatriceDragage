@@ -4,6 +4,8 @@
 > Interface + machine d'état + gestion défauts/reset/AU.
 > Pas de code interne — règles et structure.
 > **v1.1** — Ajout règle de réutilisation des librairies CODESYS + note sécurité électrique (`FB_Safety`).
+> **Alignement v2.4** — Paradigme `CoupeEnable` : l'arrêt sûr passe par le **retrait de l'`Enable`**,
+> `SafeStop` n'est plus une entrée propagée (voir §1 et §7). POO par **composition** (pas de méthode/propriété).
 
 ---
 
@@ -50,10 +52,15 @@ Avant d'écrire la moindre logique « brique » (scaling, rampe, filtre, hystér
 **🛡️ VAR_INPUT — Sécurité / contexte**
 | Nom | Type | Rôle |
 |-----|------|------|
-| `SafeStop` | BOOL | Arrêt sûr forcé (actif = stop) |
-| `SafetyOk` | BOOL | Conditions globales OK |
-| `EStopOk` | BOOL | AU réarmé, machine mouvante |
+| `SafetyOk` | BOOL | Conditions globales OK (inclut **AU réarmé**). Faux → le FB se neutralise. |
 | `Mode` | `E_Mode` | Mode courant (autorisations) |
+
+> 🧭 **Alignement v2.4 (paradigme `CoupeEnable`)** : **plus de `SafeStop` propagé** en entrée de
+> chaque FB. L'arrêt sûr logiciel est obtenu en **retirant l'`Enable`** : `FB_Safety` lève
+> `CoupeEnable`, et `PLC_PRG_MAIN` applique `Enable := (ordre) AND NOT CoupeEnable`. `SafetyOk`
+> porte l'info « AU réarmé + conditions OK ». L'ancienne entrée `EStopOk` est absorbée par
+> `SafetyOk`. La **coupure puissance** sur contacteur collé (`PowerCutOff`, §7) reste une chaîne
+> matérielle distincte.
 
 **📤 VAR_OUTPUT — État**
 | Nom | Type | Rôle |
@@ -74,7 +81,7 @@ Avant d'écrire la moindre logique « brique » (scaling, rampe, filtre, hystér
 ## 🚦 2. E_State — ENUM exclusif (phases SEULES)
 
 ⚠️ Valeurs ordinales, **pas** des bits → toujours **1 seul état** à la fois.
-`Error` et `SafeStop` sont **orthogonaux** : ils se superposent sans polluer la phase.
+`Error` et l'arrêt par perte d'`Enable` (`CoupeEnable`) sont **orthogonaux** à la phase : ils se superposent sans la polluer.
 
 | Val | État | Sens |
 |-----|------|------|
@@ -152,19 +159,22 @@ Redémarrage   → exige un NOUVEL ordre explicite (Cycle ou opérateur)
 
 | Élément | Nature | Action |
 |---------|--------|--------|
-| 🔴 Bouton AU | Physique câblé | Coupe tout (contacteurs, freins collent) |
+| 🔴 Bouton AU + câble « montée excessive » | Physique câblé | Coupe le contacteur de puissance (moteurs OFF, freins collent) |
 | 🔧 Réarmement AU | Bouton **physique** | Réautorise le mouvement |
-| ✅ `EStopOk` | Info | =1 **quand réarmé + contacteurs collés** |
+| 🧨 `PowerCutOff` | Cmd PLC → relais | Coupure puissance amont si contacteur collé (voir 7bis) |
+| 🟧 `CoupeEnable` | Variable interne `FB_Safety` | Sur défaut process : retire les `Enable` → arrêt sûr propre |
+| ✅ `SafetyOk` | Info (entrée FB) | =1 **quand AU réarmé + conditions globales OK** |
 
 🧭 Règles strictes :
 - 🔌 Réarmement AU = **physique**, pas IHM.
 - 🚫 Réarmer l'AU **n'efface pas** les alarmes (2 actions distinctes).
-- 🔗 `EStopOk` alimente `SafetyOk` / `SafeStop` des FB.
+- 🔗 L'arrêt logiciel passe par le **retrait de l'`Enable`** (`CoupeEnable`), pas par un `SafeStop` propagé.
 
 ```
-AU enfoncé         → EStopOk = 0 → SafeStop actif → sorties sûres
-AU réarmé physique → EStopOk = 1 → mouvement réautorisé
-Alarmes            → toujours présentes → acquittement IHM séparé requis
+AU enfoncé         → contacteur puissance coupé → sorties sûres (matériel)
+AU réarmé physique → SafetyOk = 1 → mouvement réautorisable
+Défaut process     → FB_Safety.CoupeEnable = 1 → Enable retirés → arrêt sûr
+Alarmes            → toujours présentes → acquittement IHM séparé (reset front)
 ```
 
 ---
@@ -195,16 +205,16 @@ Hmi : ST_<Objet>Hmi   // lecture (mesures, état, ErrorId, StateAtError)
 ## 🧱 9. Squelette d'exécution (phases, pas de code)
 
 ```
-1. 🛡️ GATE     → NOT Enable / SafeStop(EStop) → sorties sûres + RETURN
+1. 🛡️ GATE     → NOT Enable (inclut CoupeEnable) / NOT SafetyOk → sorties sûres + RETURN
 2. 📥 ACQUIRE  → copies locales + range check entrées
 3. 🚦 STATE    → avance la phase (DISABLED…DONE)
 4. ⚙️ CORE     → briques métier composées (réutiliser libs §0, si autorisé)
 5. 🧾 ERROR    → set bits ErrorId + fige StateAtError
 6. 🔑 RESET    → R_TRIG + efface bits dont cause disparue
-7. 📤 OUTPUT   → mappe sorties + force sûr si Error/SafeStop
+7. 📤 OUTPUT   → mappe sorties + force sûr si Error / NOT Enable
 8. 🖥️ HMI      → Error, ErrorId, State, StateAtError → écran
 ```
 
 📌 Ordre **imposé** : sécurité d'abord, IHM en dernier.
-📌 Sortie sûre (étape 7) **prioritaire** sur la phase : `State` peut dire BUSY, sorties coupées si `Error`/`SafeStop`.
+📌 Sortie sûre (étape 7) **prioritaire** sur la phase : `State` peut dire BUSY, sorties coupées si `Error` / perte `Enable`.
 📌 Copies locales = **intégrité** (jamais agir sur la donnée brute volatile).
