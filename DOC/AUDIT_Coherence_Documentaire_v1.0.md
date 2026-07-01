@@ -7,9 +7,9 @@
 > **Objectif de conception rappelé** : POO **partielle par composition**, **sans méthode ni property**.
 >
 > 📅 Établi le 2026-07-01. Décisions intégrées suite à arbitrage utilisateur (voir §2).
-> 🔄 Révision : ajout **D12→D16** (interface FB standard, variable **`StartStop`**, modèle d'arrêt
-> `StartStop`/`SafeStop`, précédence `Enable`>`SafeStop`>`StartStop`, source `FB_Cycle`+IHM ;
-> abandon de la formule `Enable := ordre AND NOT SafeStop` de la 1ʳᵉ passe). Q8/Q9/Q10 résolues.
+> 🔄 Révision : ajout **D12→D22** (interface FB, variable **`StartStop`**, modèle d'arrêt, précédence ;
+> **`SafeStop` par métier**, **`SafetyOk`→`EmergencyStopOk`**, **suppression `FB_Watchdog`** et du
+> **workflow XML `extract/inject`**). Q1→Q5 et Q8→Q10 résolues ; restent Q6/Q7 (TBD) + Q11.
 
 ---
 
@@ -45,6 +45,12 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 | D14 | **Précédence (Q8)** | Hiérarchie confirmée **`Enable` > `SafeStop` > `StartStop`**. Défaut process → **`SafeStop`** (rampe rapide, `Enable` maintenu). `Enable = FALSE` réservé à la **neutralisation** (déjà à l'arrêt / mode non sélectionné). |
 | D15 | **Arrêt = `StartStop := FALSE` (Q9)** | L'arrêt d'un mouvement se fait par **`StartStop := FALSE`** (décélération normale), **pas** par retrait d'`Enable`. ⚠️ `AF_Partie4` §0 (« passage à une étape sans mouvement = retrait `Enable` → rampe ») est **à réécrire**. |
 | D16 | **Source de `StartStop` (Q10)** | `StartStop` est commandé par **`FB_Cycle`** (semi-auto) et par les **commandes IHM** (manuel/maintenance), via la **source légitime arbitrée par `FB_Modes`**. |
+| D17 | **Granularité `SafeStop` (Q1)** | **1 `SafeStop` par métier** (chaque bloc safety métier surveille des choses différentes → sa propre sortie `SafeStop`, consommée par le/les FB de mouvement de son domaine). Pas de `SafeStop` global unique. |
+| D18 | **`SafetyOk` → `EmergencyStopOk` (Q2)** | L'entrée standard `SafetyOk` est **renommée `EmergencyStopOk`** : information de la **chaîne de sécurité AU** **ou** du **contacteur de puissance** (**source à définir**). Résout le `EStopOk` fautif de la Partie 8 (B2). |
+| D19 | **Workflow `CODE/` (Q3)** | **Plus de script `extract`/`inject`.** L'utilisateur **exporte manuellement** depuis CODESYS → `Device.export` (analyse du projet complet), puis **colle manuellement** le code **ST** et exécute des **procédures manuelles** de mise à jour. `CODE/` = fichiers **`.st`**. → `README.md` (workflow XML round-trip) **à corriger** (m6). |
+| D20 | **Interface réduite briques (Q4bis)** | Les briques **E/S** (`FB_Input_Digital`, `FB_Output_Relay`) et **diag** (`FB_Diag*`) **n'ont pas** de `StartStop` : elles ont **leurs propres types de données** (interface dédiée). Confirme l'exemption au template complet. |
+| D21 | **`FB_Watchdog` supprimé (Q5)** | `FB_Watchdog` est **retiré** : le chien de garde est déjà assuré par la **fonction système** (task watchdog CODESYS). Le seuil 200 ms = **configuration tâche**, pas un FB. → nettoyer P2 (arborescence §3, §2, §4, §7, §9), P5 §5, `CLAUDE.md`. |
+| D22 | **`INIT` & priorités tâches (Q6/Q7)** | **TBD** — reportés (séquence `INIT` fine, priorités EtherCAT/CAN/Main). |
 
 ---
 
@@ -57,7 +63,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | Réf | Localisation | Constat | Statut |
 |-----|--------------|---------|--------|
 | B1 | `AF_Partie8` §3/§4/§5/§7 ; `CODE/PRG_JOY1.st:20` | `SafeStop` traité comme **entrée-commande qui force les sorties à 0** | ✅ Recadré par **D1** : `SafeStop` = **sortie** safety (info arrêt sûr), pas une entrée qui zérote. Le FB Joystick réagit via **retrait d'`Enable`**. |
-| B2 | `AF_Partie8` §7 | `SafetyOk := NOT SafeStop AND EStopOk` → réintroduit **`EStopOk`** (censé absorbé par `SafetyOk`, P3 §1) | ❓ Ouvert (Q2) : formule exacte de `SafetyOk` à figer selon relation `SafeStop`/`SafetyOk`. |
+| B2 | `AF_Partie8` §7 | `SafetyOk := NOT SafeStop AND EStopOk` → réintroduit **`EStopOk`** (censé absorbé par `SafetyOk`, P3 §1) | ✅ **D18** : `SafetyOk` **renommé `EmergencyStopOk`** (chaîne AU / contacteur puissance, source à définir). `EStopOk` disparaît. |
 | B3 | `NAMING_CONVENTION.md:35` | `SafeStop` listé en « entrée de commande » | 🛠️ À reclasser : `SafeStop` = **sortie** safety (D1), pas entrée de commande. |
 
 ### 🟠 Sévérité MAJEURE
@@ -80,9 +86,9 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | m3 | `AF_Partie8` §2/§7 vs `AF_Partie2` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
 | m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie2_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
 | m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie4_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
-| m6 | `README.md` (structure `CODE/`, workflow) | Décrit `CODE/*.xml` + `extract/inject` round-trip, alors que `CODE/` contient un `.st` et la skill impose la **copie manuelle `.st`** | ❓ Ouvert (Q3) : quel workflow fait foi ? |
-| m7 | `AF_Partie3` (« **tout** FB respecte le contrat ») vs `AF_Partie6` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12** : tous les FB portent l'interface **standard de base** (dont `Enable`). Reste à confirmer le périmètre exact des briques réduites (Q4bis). |
-| m8 | `AF_Partie2` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ❓ Ouvert (Q5) : réordonner Watchdog **avant** Safety. |
+| m6 | `README.md` (structure `CODE/`, workflow) | Décrit `CODE/*.xml` + `extract/inject` round-trip, alors que `CODE/` contient un `.st` et la skill impose la **copie manuelle `.st`** | ✅ **D19** : workflow XML **supprimé** ; export manuel `Device.export` + copie ST manuelle. Corriger README (structure `CODE/`, section « Workflow Édition », `extract.bat`/`inject.bat`, `tools/`). |
+| m7 | `AF_Partie3` (« **tout** FB respecte le contrat ») vs `AF_Partie6` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12 + D20** : FB de mouvement = interface standard + `StartStop` ; briques E/S & diag = **types de données propres** (pas de `StartStop`). |
+| m8 | `AF_Partie2` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ✅ **Sans objet (D21)** : `FB_Watchdog` supprimé (fonction système). Retirer toutes ses références. |
 | m9 | `NAMING_CONVENTION.md` (ex. `E_Error`) vs `AF_Partie3` §3 | Exemple d'enum `E_Error` alors que design = bitfield **sans mnémonique** | 🛠️ Harmoniser l'exemple. |
 | m10 | `AF_Partie1` §Initialisation | « preset codeurs à une valeur **positive** » puis « **Affichage 0 m** » au plan d'eau — logique correcte mais **non expliquée** (risque de lecture contradictoire) | 🛠️ Ajouter une phrase d'explication (offset brut vs échelle 0). |
 | m11 | `Plan_Action` / `CLAUDE.md` (« Auto ») vs `AF_Partie5` (`SEMI_AUTO`) | Vocabulaire « Auto » vs « semi-auto » | 🛠️ Harmoniser (« semi-auto »). |
@@ -111,21 +117,26 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 `Enable := (ordre) AND NOT FB_Safety.CoupeEnable` sont **à réécrire** en conséquence.
 `PowerCutOff` (coupure puissance amont sur contacteur collé) **reste inchangé**.
 
+### Autres révisions transverses actées
+- **`SafetyOk` → `EmergencyStopOk`** (D18) : entrée standard renommée dans P3 §1, et partout
+  (P8, `CODE/PRG_JOY1.st`, `NAMING_CONVENTION.md`, `CLAUDE.md`, README).
+- **Suppression `FB_Watchdog`** (D21) : retirer de P2 (arborescence §3, tableau §2, §4, §7, §9),
+  P5 §5 et `CLAUDE.md` ; le watchdog 200 ms devient une **config tâche système**.
+- **`SafeStop` par métier** (D17) : P1/P2/P3/P5 doivent parler de **plusieurs** `SafeStop`
+  (un par bloc safety métier), pas d'un signal unique.
+- **Workflow `CODE/`** (D19) : réécrire `README.md` (plus de `.xml`, `extract/inject`, `tools/`).
+
 ---
 
 ## ❓ 5. Questions en suspens (à instruire)
 
 | Q | Question | Enjeu |
 |---|----------|-------|
-| Q1 | **Granularité de `SafeStop`** : une info **globale unique**, ou **plusieurs sorties** (par bloc safety métier / par axe M1, M2, M3) ? | Détermine le câblage vers les FB de mouvement (global vs par axe). |
-| Q2 | **Relation `SafeStop` (sortie) ↔ `SafetyOk` (entrée FB)** : complémentaires ou redondants ? Formule de `SafetyOk` (ex. `SafetyOk := (AU réarmé) AND (conditions OK)`), et faut-il **garder `SafetyOk`** ? | Corrige B2 (`EStopOk`) et fige l'interface P3 §1. |
-| Q3 | **Workflow `CODE/`** : round-trip **XML** (`extract/inject`, README) **ou** copie manuelle **`.st`** (skill/`CLAUDE.md`) — lequel fait foi ? | Deux workflows contradictoires cohabitent (m6). |
-| Q4bis | **Périmètre de l'interface réduite** : confirmer que **briques E/S** (`FB_Input_Digital`, `FB_Output_Relay`) et **diag** (`FB_Diag*`) portent une interface **réduite** (pas de `Start`/`Mode`/`State`/`StateAtError`), le `Start`/`SafeStop` (D12) ne concernant que les **FB de mouvement** ? | Précise D12 (m7). |
-| Q5 | **Ordre d'appel** : déplacer `FB_Watchdog()` **avant** `FB_Safety()` (pour alimenter la sécurité le même cycle) ? | Évite 1 cycle (10 ms) de retard (m8). |
-| Q6 | **Séquence `INIT`** (`AF_Partie4` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. |
-| Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. |
+| Q6 | **Séquence `INIT`** (`AF_Partie4` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. **→ TBD (D22).** |
+| Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. **→ TBD (D22).** |
+| Q11 | **Source de `EmergencyStopOk`** : chaîne de sécurité AU **ou** retour du **contacteur de puissance** ? (marquée « à définir » en D18) | Fige l'origine de l'info sécurité consommée par les FB. |
 
-> ✅ **Q8, Q9, Q10 résolues** → actées en **D14, D15, D16** (§2).
+> ✅ **Q1→Q5, Q8→Q10 résolues** → actées en **D14…D21** (§2). Ne restent ouvertes que **Q6/Q7** (TBD) et **Q11** (source `EmergencyStopOk`, à définir).
 
 ---
 
