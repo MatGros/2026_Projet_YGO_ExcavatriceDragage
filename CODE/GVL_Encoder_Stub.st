@@ -27,8 +27,11 @@ VAR_GLOBAL
     M1_ConfirmCoherence_IHM  : BOOL;   // 🖥️ À mapper bouton IHM dédié COD1
     M2_ConfirmCoherence_IHM  : BOOL;   // 🖥️ À mapper bouton IHM dédié COD2
 
-    // 🎯 Home — bouton UNIQUE partagé M1+M2 (référencement simultané, Partie10 §1)
-    StubHomeButton_IHM       : BOOL;   // 🖥️ À mapper bouton IHM — déplacé depuis PRG_MAIN (2026-07-03)
+    // 🎯 Mode homing — 2026-07-03 : sélecteur pour exploitation vs maintenance
+    HomingMode_IHM           : INT := 3;   // 🖥️ 1=M1seul, 2=M2seul, 3=Both(normal exploitation)
+
+    // 🎯 Home — bouton UNIQUE (action selon HomingMode_IHM)
+    StubHomeButton_IHM       : BOOL;   // 🖥️ À mapper bouton IHM — commande Home M1/M2/Both selon mode
 END_VAR
 
 VAR_GLOBAL RETAIN
