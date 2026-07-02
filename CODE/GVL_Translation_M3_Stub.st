@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 GVL_Chariot_M3_Stub — Variables LOGICIELLES temporaires M3
+   🧪 GVL_Translation_M3_Stub — Variables LOGICIELLES temporaires M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.2.md §7
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md §7
    ⚠️ TEMPORAIRE — aucun relais/capteur réel piloté. Même principe que
       `GVL_Winch_M1_Stub.st`/`GVL_Winch_M2_Stub.st` : à supprimer dès
       que le matériel M3 (relais sens/PV-GV/frein + retours + capteur
@@ -13,7 +13,7 @@
       un "pas de défaut" arbitraire comme s'il était réel).
    ═══════════════════════════════════════════════════════════════ *)
 
-// === DECLARATION (à coller dans la partie déclaration du GVL GVL_Chariot_M3_Stub) ===
+// === DECLARATION (à coller dans la partie déclaration du GVL GVL_Translation_M3_Stub) ===
 
 VAR_GLOBAL
     M3_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M3 (STUB, DEGRADED_IO)

@@ -1,8 +1,5 @@
 # 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.3)
 
-> 🔧 **2026-07-02** — Terminologie : godet → grappin (correction utilisateur).
-> 🔧 **2026-07-02** — Terminologie : Translation → Chariot (liste I/O réelle reçue de l'utilisateur, terminologie officielle du matériel) — voir Partie 11 v1.2.
-
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
 > **v1.3** — Retour terrain 2026-07-02 : le câble mécanique de position haute extrême a été
@@ -19,7 +16,7 @@
 
 ## 🎯 Le projet en bref
 Machine de **dragage en carrière noyée**.
-Un grappin descend sous l'eau, mord le fond, remonte plein, se déplace, vide.
+Un godet descend sous l'eau, mord le fond, remonte plein, se déplace, vide.
 Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 
 ---
@@ -30,7 +27,7 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 |-----|--------|-----------|-----|--------|
 | 🪝 Treuil 1 | **M1** | Moteur treuil levage 1 | — | **COD1** (codeur absolu tambour M1, EtherCAT) |
 | 🪝 Treuil 2 | **M2** | Moteur treuil levage 2 | — | **COD2** (codeur absolu tambour M2, EtherCAT) |
-| ↔️ Chariot | **M3** | Variateur **AC600** axe transversal | EtherCAT | — (consigne vitesse %) |
+| ↔️ Translation | **M3** | Variateur **AC600** axe transversal | EtherCAT | — (consigne vitesse %) |
 
 🧭 **Règle de lecture** : `COD1` ⇒ codeur du treuil **M1**, `COD2` ⇒ codeur du treuil **M2**, `AC600` ⇒ variateur de l'axe transversal **M3**.
 
@@ -43,8 +40,8 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 | 🪝 Plongée/Extraction | 2 treuils identiques (M1, M2) | 2 contacteurs sens + **2×4 contacteurs vitesse** (5 paliers, masque 4 bits/palier) |
 | 🧲 Position câble | 2 codeurs absolus tambour (COD1→M1, COD2→M2) | EtherCAT → déroulé en **mètres** |
 | 🛑 Maintien charge | 2 freins manque-courant | Logique levage (frein colle au repos) |
-| ↔️ Chariot | 1 moteur sur variateur AC600 (M3) | EtherCAT, commande **vitesse %** |
-| 🪣 Grappin | (= désynchro des 2 treuils) | Pas de moteur propre |
+| ↔️ Translation | 1 moteur sur variateur AC600 (M3) | EtherCAT, commande **vitesse %** |
+| 🪣 Godet | (= désynchro des 2 treuils) | Pas de moteur propre |
 | 🕹️ Commande | Joystick Hall → CANopen | 2 axes + bouton |
 | 📡 Capteurs | Fond touché, fdc haut/bas, positions travail/vidange/maintenance | TOR + position |
 | 🔌 Retour contacteurs | Contact auxiliaire par contacteur de puissance | TOR → surveillance collage |
@@ -67,8 +64,8 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 
 - 🕹️ **Joystick** → traduit le geste opérateur en consigne.
 - 🪝 **Treuil** ×2 → cœur métier : direction, vitesse, frein, position, limites.
-- ↔️ **Chariot** → amène le pont sur la bonne position.
-- 🪣 **Grappin** → ouvre/ferme via désynchro des treuils.
+- ↔️ **Translation** → amène le pont sur la bonne position.
+- 🪣 **Godet** → ouvre/ferme via désynchro des treuils.
 - 🔄 **Cycle** → enchaîne les étapes en semi-auto.
 - 🎚️ **Modes** → Manuel / Maint N1 / N2 / Semi-auto + autorisations.
 
@@ -90,7 +87,7 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 ## 🔗 Interactions (flux de données)
 
 ```
-Joystick ──consigne %──► Cycle/Modes ──StartStop──► Treuil + Chariot
+Joystick ──consigne %──► Cycle/Modes ──StartStop──► Treuil + Translation
 Codeur ──position m──► Treuil ──limite──► ralentit/arrête
 Treuil ──pilote──► Frein + Contacteurs
 Safety métier (par domaine) ──SafeStop──► FB de mouvement concerné ──► rampe décélération RAPIDE (Enable maintenu)
@@ -136,12 +133,12 @@ Conséquence pour le logiciel :
 
 ## 🔄 Cycle type (semi-auto)
 
-1. ⬇️ Descente grappin ouvert → 🌊 capteur **fond touché**.
+1. ⬇️ Descente godet ouvert → 🌊 capteur **fond touché**.
 2. 🔧 Synchro 2 treuils + recalage (petite vitesse).
-3. ⬆️ Accélération → remontée grappin plein.
+3. ⬆️ Accélération → remontée godet plein.
 4. ⏱️ Temps d'égouttage en haut.
-5. ↔️ Chariot vers zone de vidange.
-6. ⬇️ Descente + 🪣 ouverture grappin (désynchro).
+5. ↔️ Translation vers zone de vidange.
+6. ⬇️ Descente + 🪣 ouverture godet (désynchro).
 7. 🔁 Retour position travail.
 
 ⚠️ Cycle = **indicatif**, pas figé.
@@ -149,7 +146,7 @@ Conséquence pour le logiciel :
 ---
 
 ## 🧭 Initialisation (référencement codeurs)
-1. Descente 2 treuils synchro, grappin ouvert.
+1. Descente 2 treuils synchro, godet ouvert.
 2. 🌊 Toucher l'eau = **plan 0**.
 3. Mode maintenance → preset codeurs à une **valeur positive** (offset brut choisi assez grand
    pour que la position mesurée ne devienne jamais négative en usage normal — c'est une valeur

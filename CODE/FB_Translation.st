@@ -1,10 +1,10 @@
 (* ═══════════════════════════════════════════════════════════════
-   ↔️ FB_Chariot — Directeur de l'axe transversal M3 (variateur AC600)
+   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.2.md
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
-   🔀 CommMode (E_ChariotCommMode) — sélection MANUELLE, verrouillée
+   🔀 CommMode (E_TranslationCommMode) — sélection MANUELLE, verrouillée
       pendant un mouvement (CommModeLocked, correctif v1.1 F5 — voir §2bis) :
         - ETHERCAT    : mot de commande/état + consigne fréquence (proportionnelle)
         - DEGRADED_IO : RelayFwd/RelayRev + RelaySpeedGv (2 paliers PV/GV),
@@ -53,17 +53,17 @@
           application (pas un simple report du contrat FB standard).
    ═══════════════════════════════════════════════════════════════ *)
 
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Chariot) ===
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Translation) ===
 
-FUNCTION_BLOCK PUBLIC FB_Chariot
+FUNCTION_BLOCK PUBLIC FB_Translation
 VAR_INPUT
     Enable                      : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
     Reset                       : BOOL;        // Acquittement défaut (front)
     EmergencyStopOk             : BOOL;        // Chaîne AU réarmée + conditions globales OK
     Mode                        : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
     StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
-    SafeStop                    : BOOL;        // Sortie FB_Safety_Chariot : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    CommMode                    : E_ChariotCommMode; // Sélection MANUELLE (maintenance) — verrouillée pendant un mouvement, voir §2bis
+    SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
+    CommMode                    : E_TranslationCommMode; // Sélection MANUELLE (maintenance) — verrouillée pendant un mouvement, voir §2bis
     Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdX.Direction) — source d'autorité du sens (interlock §5)
     SpeedRefPct                 : REAL;        // 🔧 2026-07-02 : AxisCmdX.SpeedRef est désormais SIGNÉ (-100..+100 %) —
                                                  // seule la MAGNITUDE est utilisée ici (ABS() en §4 et §5bis), Direction
@@ -80,7 +80,7 @@ VAR_INPUT
     DriveFaultFeedback           : BOOL;       // Retour TOR défaut variateur, SI câblé sur une sortie relais dédiée du variateur (sinon laisser à FALSE côté appelant — ne pas stubber un "pas de défaut" arbitraire)
 
     // 🔌 Frein (indépendant du mode — circuit propre, comme le treuil)
-    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein chariot
+    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
 
     // Réglages rampe (RETAIN) — pilotent une vitesse PHYSIQUE réelle en ETHERCAT uniquement (correctif v1.1 F7)
     RampAccelRate                : REAL := 20.0;    // %/s — accélération
@@ -152,7 +152,7 @@ VAR
     DirectionAtArrival     : INT;          // §9bis — sens verrouillé au moment de l'arrivée
     ArrivalLock             : BOOL;        // §9bis — TRUE tant que le capteur cible bloque le sens d'arrivée
     MovementRequested      : BOOL;         // Commun aux 2 modes — pilote FB_Brake
-    CommModeLocked          : E_ChariotCommMode; // 🆕 v1.1 (F5) — CommMode figé pendant un mouvement (Busy)
+    CommModeLocked          : E_TranslationCommMode; // 🆕 v1.1 (F5) — CommMode figé pendant un mouvement (Busy)
     DegradedMoveAuthorized  : BOOL;        // 🆕 v1.1 (F1) — DEGRADED_IO : autorisation IMMÉDIATE du relais (StartStop/SafeStop/ArrivalLock, sans rampe)
     DegradedStopSettleTon   : TON;         // 🆕 v1.1 (F1) — confirmation d'arrêt physique DEGRADED_IO (remplace SpeedRamp pour l'interlock)
     IsStoppedConfirmed      : BOOL;        // 🆕 v1.1 — "vitesse confirmée nulle" par mode : rampe (ETHERCAT) ou temporisation (DEGRADED_IO)
@@ -211,7 +211,7 @@ END_IF;
 
 // ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE — ETHERCAT uniquement (Partie4 §5)
 // DEGRADED_IO : pas d'automatisme, le choix PV/GV reste manuel (joystick) — voir §5bis
-IF CommModeLocked = E_ChariotCommMode.ETHERCAT THEN
+IF CommModeLocked = E_TranslationCommMode.ETHERCAT THEN
     ApproachTimer(IN := (StartStop AND NOT SafeStop), PT := ApproachTime);
     IF ApproachTimer.Q THEN
         RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
@@ -243,7 +243,7 @@ SpeedRamp(Target := RampTargetPct,
 // encore la valeur du cycle précédent à ce stade — pas encore recalculés, voir §5bis), PAS sur
 // la rampe logicielle SpeedRamp (sans lien physique en DEGRADED_IO, cf. correctif F1 en tête de fichier).
 DegradedStopSettleTon(IN := NOT (RelayFwd OR RelayRev), PT := DegradedStopSettleTime);
-IsStoppedConfirmed := SEL(CommModeLocked = E_ChariotCommMode.DEGRADED_IO,
+IsStoppedConfirmed := SEL(CommModeLocked = E_TranslationCommMode.DEGRADED_IO,
                           (ABS(SpeedRamp.Current) < 0.1),   // ETHERCAT : rampe = consigne réelle
                           DegradedStopSettleTon.Q);          // DEGRADED_IO : délai physique réel
 
@@ -268,12 +268,12 @@ END_IF;
 // 🆕 v1.1 (F1) — Autorisation de mouvement DEGRADED_IO : IMMÉDIATE, découplée de la rampe logicielle
 DegradedMoveAuthorized := StartStop AND NOT SafeStop AND NOT ArrivalLock;
 
-MovementRequested := SEL(CommModeLocked = E_ChariotCommMode.DEGRADED_IO,
+MovementRequested := SEL(CommModeLocked = E_TranslationCommMode.DEGRADED_IO,
                           (CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1),  // ETHERCAT : lié à la rampe réelle (pilote le frein en douceur)
                           (CommandedDirection <> 0) AND DegradedMoveAuthorized);          // DEGRADED_IO : immédiat
 
 // 🔀 5bis. SORTIE PHYSIQUE SELON CommModeLocked
-IF CommModeLocked = E_ChariotCommMode.ETHERCAT THEN
+IF CommModeLocked = E_TranslationCommMode.ETHERCAT THEN
     RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
 
     // 🔴 TBD — mise à l'échelle %→Hz : calcul linéaire explicite (LIN_TRAFO NON vérifié, voir tête de fichier)

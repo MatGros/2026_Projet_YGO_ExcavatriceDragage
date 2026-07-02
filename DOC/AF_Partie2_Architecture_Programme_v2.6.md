@@ -1,8 +1,5 @@
 # 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.6)
 
-> 🔧 **2026-07-02** — Terminologie : godet → grappin, `FB_Bucket` → `FB_Grappin`, `ST_BucketConfig`/`ST_BucketState` → `ST_GrappinConfig`/`ST_GrappinState` (correction utilisateur).
-> 🔧 **2026-07-02** — Terminologie : Translation → Chariot, `FB_Translation` → `FB_Chariot` (liste I/O réelle reçue de l'utilisateur, terminologie officielle du matériel) — voir Partie 11 v1.2.
-
 > **Version 2.6** — Retour terrain 2026-07-02 (§6) : le câble mécanique « montée excessive » est
 > **retiré de la chaîne AU matérielle** — seul le bouton coup-de-poing reste un AU purement
 > câblé. Le capteur de position haute est désormais lu par l'automate, qui déclenche
@@ -17,7 +14,7 @@
 > - **`SafetyOk` renommé `EmergencyStopOk`** (chaîne AU / retour contacteur puissance).
 > - **`FB_Watchdog` supprimé** : la surveillance de périodicité des tâches est une **fonction
 >   système CODESYS** (configuration tâche), pas un FB applicatif.
-> - Interlock **`FB_WinchSync` suspendu** explicitement pendant la phase grappin (pas de mouvement M1).
+> - Interlock **`FB_WinchSync` suspendu** explicitement pendant la phase godet (pas de mouvement M1).
 >
 > 🗂️ Historique : v2.3 (deux variantes) → v2.4 réconciliée → **v2.5** (présent audit, retrait
 > définitif de `CoupeEnable`/`FB_Watchdog`, modèle `SafeStop`/`StartStop`). Versions périmées
@@ -33,7 +30,7 @@
 | 2 | **Pas de `GVL_BusHealth`** | Chaque FB lit **directement** la sortie du FB producteur (appel séquentiel même cycle) |
 | 3 | **Pas de `E_DegradationLevel`** | Dégradation = `FB_Modes` + interlocks `Enable`/`Ready` par FB |
 | 4 | **Modèle d'arrêt à 3 niveaux** : `Enable` > `SafeStop` > `StartStop` | `Enable=FALSE` → FB neutralisé (sorties coupées) ; `SafeStop=TRUE` (émis par le bloc safety **du métier concerné**) → rampe décélération **rapide**, `Enable` maintenu ; `StartStop=FALSE` → rampe décélération **normale** (arrêt demandé). Voir §6. |
-| 5 | **`SafeStop` = 1 par bloc safety métier**, pas de signal global | Chaque domaine (treuils, chariot, grappin…) a son diagnostic propre |
+| 5 | **`SafeStop` = 1 par bloc safety métier**, pas de signal global | Chaque domaine (treuils, translation, godet…) a son diagnostic propre |
 | 6 | **AU = chaîne matérielle indépendante** ; **`PowerCutOff`** = coupure puissance amont si contacteur collé | Voir §6. Automate **jamais coupé** ; `EmergencyStopOk` informe l'état AU. |
 | 7 | **`FB_SpeedStep` en masque 4 bits**, table par treuil (`ST_SpeedStepTable`) | Paliers librement définis, données ≠ code |
 | 8 | Conditionnement E/S mutualisé (`FB_Input_Digital` / `FB_Output_Relay`) | Interface **réduite** (types de données propres, pas de `StartStop`) — voir Partie 6 |
@@ -51,7 +48,7 @@ Ici tout est séquentiel dans `PLC_PRG_MAIN` → échange par entrées/sorties d
 |--------|----------|---------------------|-----|
 | **M1** | `FB_Winch` (M1) + `FB_Encoder_Abs` **COD1** | Treuil levage 1 + codeur absolu tambour 1 | EtherCAT |
 | **M2** | `FB_Winch` (M2) + `FB_Encoder_Abs` **COD2** | Treuil levage 2 + codeur absolu tambour 2 | EtherCAT |
-| **M3** | `FB_Chariot` | Variateur **AC600** axe transversal | EtherCAT |
+| **M3** | `FB_Translation` | Variateur **AC600** axe transversal | EtherCAT |
 
 🧭 `COD1`=codeur **M1**, `COD2`=codeur **M2**, `AC600`=variateur **M3**. Toute instance/variable respecte cette correspondance.
 
@@ -91,13 +88,13 @@ Application (PLC_PRG → PLC_PRG_MAIN sur MainTask 10 ms — orchestration séqu
 ├── 📁 _TYPES (Structures & énumérations globales)
 │   ├── ST_AxisCmd           (Consigne générique Enable/StartStop/Sens/SpeedRef)
 │   ├── ST_WinchIO           (État/commande treuil)
-│   ├── ST_TransIO           (État/commande chariot)
+│   ├── ST_TransIO           (État/commande translation)
 │   ├── ST_EncoderData       (Données traitées codeur)
 │   ├── ST_SpeedStepTable    (5 masques 4 bits — table de paliers d'UN treuil)
 │   ├── ST_ContactorCheck    (Commande + retour + diag collage d'un contacteur)
 │   ├── ST_LimitLegal        (Cote min dragage — voir Partie 5)
-│   ├── ST_GrappinConfig     (Offsets désynchro M2 — RETAIN)
-│   ├── ST_GrappinState      (État grappin mémorisé — RETAIN)
+│   ├── ST_BucketConfig      (Offsets désynchro M2 — RETAIN)
+│   ├── ST_BucketState       (État godet mémorisé — RETAIN)
 │   ├── E_Mode               (Manuel / Maint_N1 / Maint_N2 / SemiAuto)
 │   ├── E_State              (DISABLED / INIT / READY / BUSY / DONE / STOPPING)
 │   └── E_CycleStep          (Étapes du séquenceur — voir Partie 4)
@@ -109,15 +106,15 @@ Application (PLC_PRG → PLC_PRG_MAIN sur MainTask 10 ms — orchestration séqu
 ├── 📁 WINCH (Treuils — granularité unitaire)
 │   ├── FB_Winch             (Directeur treuil individuel — M1, M2 ; pilotable seul)
 │   ├── FB_SpeedStep         (Décodeur paliers → masque 4 bits, table par treuil)
-│   └── FB_WinchSync         (Surveillance + régulation écart M1↔M2 — actif hors phase grappin)
+│   └── FB_WinchSync         (Surveillance + régulation écart M1↔M2 — actif hors phase godet)
 ├── 📁 ENCODER (Chaîne de mesure position câble)
 │   ├── FB_Encoder_Abs       (Lecture + validation EtherCAT, latch défauts — COD1/COD2)
 │   ├── FB_Encoder_Scale     (Points → mètres via LIN_TRAFO, 2 déc.)
 │   └── FB_Encoder_Safety    (Cohérence position / limites)
-├── 📁 CHARIOT
-│   └── FB_Chariot       (Variateur AC600 — M3, approche temporisée + arrêt capteur)
-├── 📁 GRAPPIN
-│   └── FB_Grappin           (Désynchro M2 ouvert/fermé, mémoire RETAIN + vérif boot)
+├── 📁 TRANSLATION
+│   └── FB_Translation       (Variateur AC600 — M3, approche temporisée + arrêt capteur)
+├── 📁 BUCKET
+│   └── FB_Bucket            (Désynchro M2 ouvert/fermé, mémoire RETAIN + vérif boot)
 ├── 📁 SAFETY (Surveillance transverse — un bloc safety par métier)
 │   └── FB_Safety_<Metier>   (Défauts du domaine → SafeStop propre au métier ; sécurité électrique → PowerCutOff)
 └── 📁 SEQUENCE
@@ -144,7 +141,7 @@ Application (PLC_PRG → PLC_PRG_MAIN sur MainTask 10 ms — orchestration séqu
 
 ### 📁 Diagnostics communication
 * **`FB_DiagCanOpen`** — État bus CANopen + nœud joystick. Sorties (`CanHealthy`, `JoystickAvailable`) lues **directement** par `FB_Joystick`, blocs safety.
-* **`FB_DiagEthercat`** (×3 : COD1/M1, COD2/M2, AC600/M3) — État esclave (WcState, SlaveState). Sorties lues directement par `FB_Encoder_Abs`, `FB_Chariot`, blocs safety.
+* **`FB_DiagEthercat`** (×3 : COD1/M1, COD2/M2, AC600/M3) — État esclave (WcState, SlaveState). Sorties lues directement par `FB_Encoder_Abs`, `FB_Translation`, blocs safety.
 
 ### 📁 Conditionnement E/S (Partie 6)
 * **`FB_Input_Digital`** — Inversion NO/NC, filtrage anti-rebond, diag. Déclaré en **tableau**. Interface réduite (types propres, pas `StartStop`/`Mode`).
@@ -171,16 +168,16 @@ Application (PLC_PRG → PLC_PRG_MAIN sur MainTask 10 ms — orchestration séqu
 ### 📁 Treuils
 * **`FB_Winch`** (M1, M2) — Directeur d'un treuil **individuel** : sens, commande des contacteurs de paliers via `FB_SpeedStep` (masque 4 bits), séquence frein via `FB_Brake`. Entrées `StartStop` (rampe accel/decel normale) et `SafeStop` (rampe decel rapide, propre au métier treuil). Pilotable **unitairement** (maintenance N1/N2, y compris sans codeur ni joystick selon droits). ⚠️ Treuils **sans variateur** : la vitesse résulte des contacteurs de paliers ; pas de mesure de courant (disjoncteurs seuls) → l'effort se **déduit** de Δposition/Δvitesse.
 * **`FB_SpeedStep`** 🪜 — Convertit une consigne en **masque 4 bits** (4 contacteurs) selon le **palier courant** : 5 paliers, chaque palier = masque librement défini (plus de cumul implicite), **table propre à chaque treuil** (`ST_SpeedStepTable`), sélection du palier via `HYSTERESIS`. Sortie : 4 booléens (ou `BYTE` masque) + n° de palier. L'ordre des contacteurs est **donnée** (table), pas codé en dur.
-* **`FB_WinchSync`** — Mesure `ΔPos = |PosM1 − PosM2|` (+ dérive vitesse) et régule l'axe rapide (ralentissement par paliers/rampe) **quand les deux treuils sont censés bouger ensemble**. ⚠️ **Suspendue pendant la phase grappin** (`SYNCHRO_ADJUST`, `DESCENDING_OPEN_DUMP`) : la désynchronisation y est **volontaire** (pas de mouvement M1), donc pas de conflit ni de faux défaut synchro. Voir Partie 4 §Synchro/§Grappin.
+* **`FB_WinchSync`** — Mesure `ΔPos = |PosM1 − PosM2|` (+ dérive vitesse) et régule l'axe rapide (ralentissement par paliers/rampe) **quand les deux treuils sont censés bouger ensemble**. ⚠️ **Suspendue pendant la phase godet** (`SYNCHRO_ADJUST`, `DESCENDING_OPEN_DUMP`) : la désynchronisation y est **volontaire** (pas de mouvement M1), donc pas de conflit ni de faux défaut synchro. Voir Partie 4 §Synchro/§Godet.
 
-### 📁 Chariot
-* **`FB_Chariot`** (M3) — Pilote le variateur **AC600** (mot cmd/état ; vitesse estimée + consigne fréquence disponibles, **pas** la mesure de courant). Entrées `StartStop`/`SafeStop` comme `FB_Winch`. Approche temporisée puis ralentissement et **arrêt sur capteur** (travail 1/2, vidage). Voir Partie 4 §Chariot.
+### 📁 Translation
+* **`FB_Translation`** (M3) — Pilote le variateur **AC600** (mot cmd/état ; vitesse estimée + consigne fréquence disponibles, **pas** la mesure de courant). Entrées `StartStop`/`SafeStop` comme `FB_Winch`. Approche temporisée puis ralentissement et **arrêt sur capteur** (travail 1/2, vidage). Voir Partie 4 §Translation.
 
-### 📁 Grappin
-* **`FB_Grappin`** — État **ouvert/fermé** via positions codeurs + **mémoire RETAIN**. Contrôle de cohérence au boot (état mémorisé vs position réelle > seuil → état **non sûr** → maintenance + vitesse réduite). Ouverture/fermeture = désynchro M2 (offsets `ST_GrappinConfig`, réglables Maint N2).
+### 📁 Godet
+* **`FB_Bucket`** — État **ouvert/fermé** via positions codeurs + **mémoire RETAIN**. Contrôle de cohérence au boot (état mémorisé vs position réelle > seuil → état **non sûr** → maintenance + vitesse réduite). Ouverture/fermeture = désynchro M2 (offsets `ST_BucketConfig`, réglables Maint N2).
 
 ### 📁 Séquenceur
-* **`FB_Cycle`** — Machine d'état `E_CycleStep` (pseudo-Grafcet). Émet `Enable`/`StartStop`/Sens/SpeedRef vers treuils & chariot ; passage à une étape **sans mouvement** = `StartStop := FALSE` → arrêt sur rampe de décélération **normale** (`Enable` reste actif). Voir Partie 4.
+* **`FB_Cycle`** — Machine d'état `E_CycleStep` (pseudo-Grafcet). Émet `Enable`/`StartStop`/Sens/SpeedRef vers treuils & translation ; passage à une étape **sans mouvement** = `StartStop := FALSE` → arrêt sur rampe de décélération **normale** (`Enable` reste actif). Voir Partie 4.
 
 ---
 
@@ -189,7 +186,7 @@ Application (PLC_PRG → PLC_PRG_MAIN sur MainTask 10 ms — orchestration séqu
 ### 📈 Flux montant (mesures)
 ```
 EtherCAT 4ms : Codeurs COD1/COD2 ──► FB_Encoder_Abs ──► FB_Encoder_Scale ──► (mètres)
-                Variateur AC600 ──► mot d'état ──► FB_Chariot
+                Variateur AC600 ──► mot d'état ──► FB_Translation
 CANopen 20ms : Joystick Hall ──► (image process) ──► FB_Joystick (traité en MainTask 10ms) ──► consigne relative
 TOR + retours contacteurs (Partie 6) ──► FB_Safety_<Metier>, FB_Cycle
 FB_Diag* ──► (CanHealthy, JoystickAvailable, EncoderM1/M2Available, VariateurAvailable) lus DIRECTEMENT
@@ -200,9 +197,9 @@ Chaque consommateur lit la **sortie du FB producteur** (appel séquentiel), pas 
 ```
 FB_Modes (source légitime selon mode) ──► ST_AxisCmd (Enable, StartStop, SpeedRef, Direction)
    ├─► FB_Winch M1/M2 ──► FB_SpeedStep (masque 4 bits) ──► contacteurs ; FB_Brake ──► frein
-   ├─► FB_WinchSync (corrige les consignes M1/M2 si dérive — hors phase grappin)
-   ├─► FB_Chariot ──► variateur AC600
-   └─► FB_Grappin (phase grappin : désynchro M2 ; FB_WinchSync suspendue durant cette phase)
+   ├─► FB_WinchSync (corrige les consignes M1/M2 si dérive — hors phase godet)
+   ├─► FB_Translation ──► variateur AC600
+   └─► FB_Bucket (phase godet : désynchro M2 ; FB_WinchSync suspendue durant cette phase)
 ```
 
 ### 🛡️ Flux sécurité (priorité absolue)
@@ -220,7 +217,7 @@ FB_Safety_<Metier> contacteur collé ──► PowerCutOff := TRUE ──► cou
 | CANopen / joystick down | `CanHealthy=0`, `JoystickAvailable=0` | Commande manuelle interdite, cycle en HOLD sûr (Ready=0) |
 | Codeur M1 down | `EncoderM1Available=0` | Treuil M1 bloqué (Ready=0), M2 dégradé, auto interdit |
 | Codeur M2 down | `EncoderM2Available=0` | Treuil M2 bloqué, M1 dégradé, auto interdit |
-| Variateur M3 down | `VariateurAvailable=0` | Chariot interdite, treuils nominaux possibles |
+| Variateur M3 down | `VariateurAvailable=0` | Translation interdite, treuils nominaux possibles |
 | Contacteur collé | retour ≠ commande (`ST_ContactorCheck`) | `FB_Safety_<Metier>.PowerCutOff` → coupure puissance immédiate |
 
 ---
@@ -247,7 +244,7 @@ n'efface pas les alarmes (acquittement IHM séparé, reset front — voir Partie
 [0. DIAG]   ─► [1. IO IN]  ─► [2. SÉCURITÉ]           ─► [3. MODES] ─► [4. MÉTIER]        ─► [5. IO OUT]
  FB_DiagCan     FB_Input      FB_Safety_<Metier>×N       FB_Modes       FB_Winch M1/M2        FB_Output
  FB_DiagEcat×3  (TOR cond.)   (SafeStop par domaine,      (source+droits FB_SpeedStep/WinchSync (relais+feedback)
-                retours contact PowerCutOff)                             +limite légale)FB_Chariot/Grappin
+                retours contact PowerCutOff)                             +limite légale)FB_Translation/Bucket
                                                                                           FB_Cycle
 ```
 
@@ -316,9 +313,9 @@ MainTask (10ms)
      ├─ FB_Modes()    → source + droits + overrides + limite légale
      ├─ FB_Joystick()                              // traitement (calibration/filtre/rampe) ici, 10 ms
      ├─ FB_Encoder_Abs(COD1) → Scale → Safety ; FB_Encoder_Abs(COD2) → Scale → Safety
-     ├─ FB_Winch(M1) / FB_Winch(M2)  → FB_SpeedStep (masque 4 bits) + FB_Brake ; FB_WinchSync() (hors phase grappin)
-     ├─ FB_Chariot(M3)
-     ├─ FB_Grappin()
+     ├─ FB_Winch(M1) / FB_Winch(M2)  → FB_SpeedStep (masque 4 bits) + FB_Brake ; FB_WinchSync() (hors phase godet)
+     ├─ FB_Translation(M3)
+     ├─ FB_Bucket()
      ├─ FB_Cycle()                                // machine d'état E_CycleStep
      └─ [IO OUT] Output[1..m]()                    // relais vitesse/sens pilotés par StartStop/SafeStop de chaque FB ; PowerCutOff
 ```
@@ -328,6 +325,6 @@ MainTask (10ms)
 ## 📚 Documents liés
 - **Partie 1** — Présentation & équipements.
 - **Partie 3** — Contrat FB commun : interface (`Enable/Reset/EmergencyStopOk/Mode`, `StartStop`), état, ErrorId, reset, AU/PowerCutOff.
-- **Partie 4** — Cycle & séquenceur : `E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes.
+- **Partie 4** — Cycle & séquenceur : `E_CycleStep`, INIT, synchro, frein, translation, godet, rampes.
 - **Partie 5** — Modes & maintenance : Manuel/N1/N2/SemiAuto, AU/`SafeStop`/`PowerCutOff`, limite légale (`FB_Modes`).
 - **Partie 6** — Conditionnement E/S : `FB_Input_Digital`, `FB_Output_Relay`, `ST_ContactorCheck`.

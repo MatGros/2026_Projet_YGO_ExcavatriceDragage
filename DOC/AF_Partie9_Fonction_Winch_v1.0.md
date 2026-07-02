@@ -4,7 +4,7 @@
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.6.md), [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md), [P8 Joystick v1.1](AF_Partie8_Fonction_Joystick_v1.1.md).
+> 🔗 Dépend de : [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.6.md), [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md), [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §3bis/§4, [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md), [P8 Joystick v1.1](AF_Partie8_Fonction_Joystick_v1.1.md).
 
 ---
 
@@ -434,7 +434,7 @@ Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explici
 ### Dépendance bloquante (toujours valable pour la synchro)
 `FB_WinchSync` (Partie2 §4, Partie4 §3) régule l'écart `ΔPos = |PosM1 − PosM2|` à partir des
 positions codeur validées. L'acquisition + mise à l'échelle (`FB_Encoder_Abs`→`FB_Encoder_Scale`)
-sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md` §9), mais
+sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md` §9), mais
 `HomingRefRaw` reste une valeur RETAIN modifiable **manuellement** (pas de vrai homing tant que
 `FB_Encoder_Homing` n'est pas codé) — construire une synchro sur cette base serait prématuré.
 **M1 et M2 bougent donc ensemble sans aucune régulation d'écart pour l'instant** : à surveiller
