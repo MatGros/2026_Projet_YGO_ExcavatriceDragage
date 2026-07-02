@@ -15,10 +15,10 @@ Tous les documents sont dans le dossier **`DOC/`** :
 - Booléens : entrée = verbe (`Start`), sortie = état (`Ready`)
 - Exemples complets pour structures et instances
 
-### 2️⃣ **[Analyse Fonctionnelle — Partie 1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.2.md)**
+### 2️⃣ **[Analyse Fonctionnelle — Partie 1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md)**
 Le projet en bref : équipements pilotés, fonctions principales, interactions.
 
-### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.5)](DOC/AF_Partie2_Architecture_Programme_v2.5.md)**
+### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.6)](DOC/AF_Partie2_Architecture_Programme_v2.6.md)**
 Architecture détaillée : cadencement (EtherCAT 4 / CANopen 20 / Main 10 ms), orchestration
 séquentielle `PLC_PRG_MAIN`, mapping M1/M2/M3, modèle d'arrêt `SafeStop`/`StartStop`, `PowerCutOff`.
 
@@ -46,8 +46,8 @@ Contrat standard que **tout FB métier respecte** :
 excavatrice-dragage/
 ├── DOC/                      # 📖 Documentation (ICI COMMENCE)
 │   ├── NAMING_CONVENTION.md
-│   ├── AF_Partie1_Analyse_Fonctionnelle_v1.2.md
-│   ├── AF_Partie2_Architecture_Programme_v2.5.md   (référence)
+│   ├── AF_Partie1_Analyse_Fonctionnelle_v1.3.md
+│   ├── AF_Partie2_Architecture_Programme_v2.6.md   (référence)
 │   ├── AF_Partie3_Template_FB_Commun_v1.2.md
 │   ├── AF_Partie4_Cycle_Sequenceur_v1.1.md
 │   ├── AF_Partie5_Modes_Maintenance_v1.1.md
@@ -103,8 +103,8 @@ pas de round-trip XML) : tout se fait **manuellement** dans CODESYS.
 ## 🚀 **Commencer**
 
 1. **Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)** ← commence ici
-2. Consulter [AF_Partie1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.2.md) pour le contexte métier
-3. Étudier [AF_Partie2 (v2.5)](DOC/AF_Partie2_Architecture_Programme_v2.5.md) pour l'architecture
+2. Consulter [AF_Partie1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md) pour le contexte métier
+3. Étudier [AF_Partie2 (v2.6)](DOC/AF_Partie2_Architecture_Programme_v2.6.md) pour l'architecture
 4. Comprendre [AF_Partie3 (v1.2)](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) avant de coder un FB
 5. Approfondir [Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md) / [5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md) / [6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)
 6. Consulter [l'audit de cohérence](DOC/AUDIT_Coherence_Documentaire_v1.0.md) pour l'historique des décisions de conception

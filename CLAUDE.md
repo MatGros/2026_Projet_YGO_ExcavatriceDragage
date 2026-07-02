@@ -21,10 +21,12 @@ Chaque Function Block **métier** doit respecter :
 - Jamais autoriser le redémarrage automatique après défaut
 - **Précédence `Enable` > `SafeStop` > `StartStop`** : `Enable=FALSE` → neutralisation (sorties coupées) ; `SafeStop=TRUE` → rampe rapide (`Enable` maintenu) ; `StartStop=FALSE` → rampe normale. **`CoupeEnable` n'existe pas** (jamais une variable — vocabulaire abandonné).
 
-### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.5.md)** ← Pour comprendre
-Tâches, arborescence CODESYS, flux données. **v2.5 = référence** (modèle `SafeStop`/`StartStop`,
+### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.6.md)** ← Pour comprendre
+Tâches, arborescence CODESYS, flux données. **v2.6 = référence** (modèle `SafeStop`/`StartStop`,
 `SafeStop` **par métier** — pas de signal global ; pas de `GVL_BusHealth`/`E_DegradationLevel`/
-`FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff`).
+`FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff` ;
+câble mécanique de position haute retiré de la chaîne AU matérielle, géré par l'automate via
+`PowerCutOff` — voir Partie1 v1.3 §Sécurité électrique).
 
 ### 4. **Specs détaillées**
 - **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
@@ -113,8 +115,8 @@ dédié). Priorités **à définir** en config CODESYS (TBD).
 
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
-- [AF_Partie1_Analyse_Fonctionnelle_v1.2.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.2.md) — Équipements & fonctions
-- [AF_Partie2_Architecture_Programme_v2.5.md](DOC/AF_Partie2_Architecture_Programme_v2.5.md) — Architecture détaillée (**v2.5**)
+- [AF_Partie1_Analyse_Fonctionnelle_v1.3.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md) — Équipements & fonctions
+- [AF_Partie2_Architecture_Programme_v2.6.md](DOC/AF_Partie2_Architecture_Programme_v2.6.md) — Architecture détaillée (**v2.6**)
 - [AF_Partie3_Template_FB_Commun_v1.2.md](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) — Contrat FB & sécurité
 - [AF_Partie4_Cycle_Sequenceur_v1.1.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md) — Cycle, synchro, frein, godet, rampes
 - [AF_Partie5_Modes_Maintenance_v1.1.md](DOC/AF_Partie5_Modes_Maintenance_v1.1.md) — Modes, maintenance N1/N2, AU, limite légale

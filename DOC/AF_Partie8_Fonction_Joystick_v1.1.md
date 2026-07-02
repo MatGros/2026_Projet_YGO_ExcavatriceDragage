@@ -13,7 +13,7 @@
 
 > **Fonction métier** : acquisition et conditionnement de la commande opérateur (joystick Hall → CANopen).
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P1 équipements](AF_Partie1_Analyse_Fonctionnelle_v1.2.md), [P3 contrat FB](AF_Partie3_Template_FB_Commun_v1.2.md).
+> 🔗 Dépend de : [P1 équipements](AF_Partie1_Analyse_Fonctionnelle_v1.3.md), [P3 contrat FB](AF_Partie3_Template_FB_Commun_v1.2.md).
 
 ---
 

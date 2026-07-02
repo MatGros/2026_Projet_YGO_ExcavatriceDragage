@@ -4,7 +4,7 @@
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.5.md), [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md), [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §3bis/§4, [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md), [P8 Joystick v1.1](AF_Partie8_Fonction_Joystick_v1.1.md).
+> 🔗 Dépend de : [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.6.md), [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md), [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §3bis/§4, [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md), [P8 Joystick v1.1](AF_Partie8_Fonction_Joystick_v1.1.md).
 
 ---
 
@@ -399,12 +399,14 @@ variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
 
 ---
 
-## 🧭 9. Extension planifiée — Treuil M2 + sélection opérateur (réflexions actées, PAS implémenté)
+## 🧭 9. Extension — Treuil M2 + sélection opérateur (partiellement implémenté)
 
-> ⚪ **Statut : réflexions consignées, aucun code écrit.** Prochaine étape actée avec
-> l'utilisateur (2026-07-02) : prioriser les **objets métier codeur M1/M2** (Partie10, encore un
-> pur document de conception à ce jour) **avant** de revenir finaliser ce lot M2, car la synchro
-> réelle (`FB_WinchSync`) dépend d'un `ΔPos` codeur fiable (Partie4 §3).
+> 🟡 **Statut mis à jour 2026-07-02** : `instWinchM2`/`instSafetyWinchM2` sont créés et **actifs**
+> dans `PRG_MAIN` (voir `CODE/PRG_MAIN.st`), consigne **dupliquée** sur l'axe Y du joystick (même
+> source que M1) — **sans** `E_WinchSelect`/sélecteur IHM, **sans** bit « Prise de main IHM »,
+> **sans** `FB_WinchSync` réel. Les décisions ci-dessous (sélecteur, arbitrage IHM, synchro
+> conditionnelle par mode) restent **non codées** — seule l'intégration brute de M2 (dupliqué) a
+> été avancée, à la demande explicite de l'utilisateur, en parallèle du lot Codeur.
 
 ### Besoin
 Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explicite :
@@ -429,19 +431,20 @@ Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explici
 4. **Périmètre** : **Maintenance N1 et N2 uniquement** pour ce lot (pas Manuel, pas Semi-auto —
    `FB_Cycle` gérera les deux treuils à sa manière plus tard).
 
-### Dépendance bloquante
+### Dépendance bloquante (toujours valable pour la synchro)
 `FB_WinchSync` (Partie2 §4, Partie4 §3) régule l'écart `ΔPos = |PosM1 − PosM2|` à partir des
-positions codeur validées (`FB_Encoder_Abs` → `FB_Encoder_Scale`). Partie10 (`FB_Encoder_Homing`
-et le pipeline codeur M1/M2) est encore **un document de conception, aucun code produit** — voir
-`DOC/AF_Partie10_Fonction_Encoder_Homing_v1.1.md` §9 (checklist entièrement décochée, confirmé
-par revue de code 2026-07-02). Construire une synchro M1/M2 sans codeur fiable reviendrait à
-câbler un stub qui masquerait un vrai défaut de dérive — **refusé par principe** (cohérent avec
-le choix déjà fait pour `FB_Safety_Winch` §TBD codeur, voir §4 ci-dessus).
+positions codeur validées. L'acquisition + mise à l'échelle (`FB_Encoder_Abs`→`FB_Encoder_Scale`)
+sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md` §9), mais
+`HomingRefRaw` reste une valeur RETAIN modifiable **manuellement** (pas de vrai homing tant que
+`FB_Encoder_Homing` n'est pas codé) — construire une synchro sur cette base serait prématuré.
+**M1 et M2 bougent donc ensemble sans aucune régulation d'écart pour l'instant** : à surveiller
+visuellement pendant tout essai avec les deux treuils actifs.
 
-### Prochaine étape
-Implémenter Partie10 (objets métier codeur M1/M2 : `FB_Encoder_Homing`, pipeline
-lecture/validation/mise à l'échelle) **avant** de revenir coder : le sélecteur treuil IHM,
-le bit « Prise de main IHM », la 2ᵉ instance `FB_Winch` (M2), et `FB_WinchSync`.
+### Ce qui reste à faire
+- Sélecteur treuil IHM (M1 / M2 / Les deux), bit « Prise de main IHM », `E_WinchSelect`
+- `FB_WinchSync` réel (dépend d'un homing fiable, donc de `FB_Encoder_Homing`)
+- Synchro conditionnelle par mode (imposée N1, activable N2, active SemiAuto) — décisions déjà
+  actées ci-dessus, juste pas codées
 
 ---
 

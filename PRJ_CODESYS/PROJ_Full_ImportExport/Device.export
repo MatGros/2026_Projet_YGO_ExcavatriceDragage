@@ -21189,10 +21189,10 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639185440280852210</Single>
+        <Single Name="Timestamp" Type="long">639186134728230298</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-        <Single Name="UniqueIdGenerator" Type="string">5323</Single>
+        <Single Name="UniqueIdGenerator" Type="string">5427</Single>
         <Null Name="TypeList" />
         <Single Name="NeedsBusCycle" Type="bool">False</Single>
         <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -21684,8 +21684,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5320</Single>
-                      <Single Name="EditorPositionId" Type="long">5321</Single>
+                      <Single Name="PositionId" Type="long">5424</Single>
+                      <Single Name="EditorPositionId" Type="long">5425</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_InputOffsets</Single>
                       </Single>
@@ -21703,8 +21703,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5322</Single>
-                      <Single Name="EditorPositionId" Type="long">5323</Single>
+                      <Single Name="PositionId" Type="long">5426</Single>
+                      <Single Name="EditorPositionId" Type="long">5427</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_OutputOffsets</Single>
                       </Single>
@@ -30737,10 +30737,10 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639184353129683514</Single>
+        <Single Name="Timestamp" Type="long">639186135030298821</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-        <Single Name="UniqueIdGenerator" Type="string">5019</Single>
+        <Single Name="UniqueIdGenerator" Type="string">5135</Single>
         <Null Name="TypeList" />
         <Single Name="NeedsBusCycle" Type="bool">False</Single>
         <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -31232,8 +31232,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5016</Single>
-                      <Single Name="EditorPositionId" Type="long">5017</Single>
+                      <Single Name="PositionId" Type="long">5132</Single>
+                      <Single Name="EditorPositionId" Type="long">5133</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_InputOffsets</Single>
                       </Single>
@@ -31251,8 +31251,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5018</Single>
-                      <Single Name="EditorPositionId" Type="long">5019</Single>
+                      <Single Name="PositionId" Type="long">5134</Single>
+                      <Single Name="EditorPositionId" Type="long">5135</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_OutputOffsets</Single>
                       </Single>
@@ -46463,398 +46463,6 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">7bb3ad0b-7bb0-411d-bc2c-d204b776c348</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">DUT</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185113101729552</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">{attribute 'qualified_only'}
-{attribute 'strict'}
-TYPE DUT :
-(
-	enum_member := 0
-);
-END_TYPE
-
-
-
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">7bb3ad0b-7bb0-411d-bc2c-d204b776c348_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">11</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">dbed5258-b652-4961-bc40-775659712c76</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">E_DiagState</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184772544652501</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">TYPE E_DiagState :
-(
-    DISABLED := 0,
-    READY := 1,
-    INIT := 2,
-    MONITORING := 3,
-    ERROR := 4
-);
-END_TYPE</Single>
-            <Single Name="LineInfoPersistence" Type="string">dbed5258-b652-4961-bc40-775659712c76_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">41</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">89aee626-a70b-4c0d-8ed0-baefd12ba9bd</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">E_Mode</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185113281664086</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🎚️ E_Mode — Modes de marche de la machine
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.1.md §1
-   🧩 Fondation manquante requise par le contrat FB (Partie3 §1) :
-      tout FB métier expose une entrée Mode : E_Mode.
-   ═══════════════════════════════════════════════════════════════ *)
-
-TYPE E_Mode :
-(
-    MANUEL      := 0,   (* Pilotage joystick direct, sécurités actives *)
-    MAINT_N1    := 1,   (* Manuel "encadré" : ~cycle avec interdictions, sécurité correcte *)
-    MAINT_N2    := 2,   (* Droits étendus, mot de passe, override de sécurités *)
-    SEMI_AUTO   := 3    (* Séquenceur FB_Cycle (semi-automatique) *)
-);
-END_TYPE
-
-
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">89aee626-a70b-4c0d-8ed0-baefd12ba9bd_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">37</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">0f108f5b-28f2-4742-82d2-c0230be46066</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">E_State</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185113341666439</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🚦 E_State — Phase opérationnelle d'un FB métier (valeurs EXCLUSIVES)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §2
-   ⚠️ Un seul état à la fois. Error / SafeStop / perte Enable sont
-      ORTHOGONAUX à la phase (voir ErrorId, ne polluent pas State).
-   🧩 Fondation manquante requise par le contrat FB (Partie3 §1).
-   ═══════════════════════════════════════════════════════════════ *)
-
-TYPE E_State :
-(
-    DISABLED := 0,   (* Enable faux, neutralisé *)
-    INIT     := 1,   (* Démarrage / vérifs *)
-    READY    := 2,   (* Prêt, attend ordre *)
-    BUSY     := 3,   (* Action en cours *)
-    DONE     := 4,   (* Action terminée *)
-    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
-);
-END_TYPE
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">0f108f5b-28f2-4742-82d2-c0230be46066_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">26</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">0792e1c4-921e-41a7-b3f3-a7a6c6c06975</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">ST_AxisCmd</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185109418664471</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🕹️ ST_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.5.md §8
-   ⚠️ MISE EN CONFORMITÉ (remplace la version actuelle du projet) :
-      - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
-        TRUE = rampe accélération, FALSE = rampe décélération normale)
-      - Champ `SafetyOk` RETIRÉ : ce n'est pas une commande d'axe, c'est
-        une info de contexte (`EmergencyStopOk`) consommée directement
-        par le FB de mouvement (FB_Winch/FB_Translation), pas portée
-        par la consigne d'axe elle-même.
-   🧭 4 champs exactement, conforme Partie2 v2.5 §8.
-   ═══════════════════════════════════════════════════════════════ *)
-
-TYPE ST_AxisCmd :
-STRUCT
-    Enable      : BOOL;   // Autorisation FB (FALSE = neutralisation, sorties coupées)
-    StartStop   : BOOL;   // TRUE = rampe accélération, FALSE = rampe décélération normale
-    SpeedRef    : REAL;   // Consigne vitesse 0..100 %
-    Direction   : INT;    // -1 = Rev, 0 = Neutre, +1 = Fwd
-END_STRUCT
-END_TYPE
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">0792e1c4-921e-41a7-b3f3-a7a6c6c06975_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">40</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">b917c37d-44df-46a0-871a-29de2d249295</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">ST_ContactorCheck</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185112341944020</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.5.md §8,
-                   DOC/AF_Partie3_Template_FB_Commun_v1.2.md §7bis
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════ *)
-
-TYPE ST_ContactorCheck :
-STRUCT
-    Command     : BOOL;   // Ordre envoyé au contacteur (TRUE = fermé/actif)
-    Feedback    : BOOL;   // Retour d'état câblé (TRUE = effectivement fermé)
-    StuckClosed : BOOL;   // Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff
-    StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
-END_STRUCT
-END_TYPE</Single>
-            <Single Name="LineInfoPersistence" Type="string">b917c37d-44df-46a0-871a-29de2d249295_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">23</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">b13c09af-c8e6-46b1-8318-d42b48923509</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">ST_DeviceDiag</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184353750999297</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">TYPE ST_DeviceDiag :
-STRUCT
-    Online         : BOOL;
-    Operational    : BOOL;
-    Error          : BOOL;
-    ErrorId        : WORD;
-    State          : E_DiagState;
-    StateAtError   : E_DiagState;
-END_STRUCT
-END_TYPE</Single>
-            <Single Name="LineInfoPersistence" Type="string">b13c09af-c8e6-46b1-8318-d42b48923509_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">14</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">6ab0f9d5-b3b5-404f-8e07-4b31c192a40e</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">ST_SpeedStepTable</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185462863377534</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
-   🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
-   ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
-      packé de la 1ère version) : chaque contacteur de vitesse de
-      chaque palier est un BOOL nommé individuellement
-      `P&lt;palier&gt;R&lt;relais&gt;` (ex. `P1R1`, `P3R2`) — paramétrable un par
-      un pendant la mise en service (visible/modifiable directement
-      dans la vue instance CODESYS), sans manipuler un masque binaire
-      packé. `P` = Palier, `R` = Relais (contacteur de vitesse 1..4).
-   L'ordre d'actionnement n'est pas implicite : il est défini ICI,
-   dans les données, pas codé en dur dans la logique (FB_SpeedStep).
-   ═══════════════════════════════════════════════════════════════ *)
-
-TYPE ST_SpeedStepTable :
-STRUCT
-    // Palier 1 (vitesse la plus faible)
-    P1R1 : BOOL;
-    P1R2 : BOOL;
-    P1R3 : BOOL;
-    P1R4 : BOOL;
-    // Palier 2
-    P2R1 : BOOL;
-    P2R2 : BOOL;
-    P2R3 : BOOL;
-    P2R4 : BOOL;
-    // Palier 3
-    P3R1 : BOOL;
-    P3R2 : BOOL;
-    P3R3 : BOOL;
-    P3R4 : BOOL;
-    // Palier 4
-    P4R1 : BOOL;
-    P4R2 : BOOL;
-    P4R3 : BOOL;
-    P4R4 : BOOL;
-    // Palier 5 (vitesse la plus élevée)
-    P5R1 : BOOL;
-    P5R2 : BOOL;
-    P5R3 : BOOL;
-    P5R4 : BOOL;
-    // Seuils de changement de palier (%), utilisés par paires successives (HYSTERESIS)
-    // Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1→2..4→5)
-    StepThreshold_Pct : ARRAY[1..5] OF REAL;
-END_STRUCT
-END_TYPE
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">6ab0f9d5-b3b5-404f-8e07-4b31c192a40e_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">71</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">CODEUR</Single>
@@ -47065,6 +46673,48 @@ END_TYPE
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">d0f31ba0-ba05-435b-b91d-dc9eba7e617f</Single>
+        <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
+        <Single Name="Name" Type="string">_COMMON</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
+        <Null Name="EmbeddedTypeGuids" />
+        <Single Name="Timestamp" Type="long">639186049165183718</Single>
+      </Single>
+      <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
+        <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">b44e3955-af6a-4793-a9ad-8af51466bf03</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">GVL</Single>
@@ -47247,6 +46897,63 @@ VAR_GLOBAL
 END_VAR
 </Single>
             <Single Name="LineInfoPersistence" Type="string">4a81cdc3-8440-48f3-9349-0d47f66492c9_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Null Name="NetVarProperties" />
+        <Single Name="ParameterList" Type="bool">False</Single>
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">ad38fd16-fdb0-4c5f-a775-32fc62434952</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">GVL_Winch_M2_Stub</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
+        <Single Name="TypeGuid" Type="System.Guid">ffbfa93a-b94d-45fc-a329-229860183b1d</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186056684040690</Single>
+      </Single>
+      <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🧪 GVL_Winch_M2_Stub — Variables LOGICIELLES temporaires M2
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md §7 Étape 9bis
+   ⚠️ TEMPORAIRE — aucun relais réel piloté. Même principe que
+      `GVL_Winch_M1_Stub.st` : à supprimer dès que le matériel M2
+      (relais sens/vitesse/frein + retours) sera câblé en I/O Mapping
+      avec ces MÊMES noms de variables (les deux mécanismes ne
+      peuvent pas coexister — conflit de nom).
+   ═══════════════════════════════════════════════════════════════ *)
+
+// === DECLARATION (à coller dans la partie déclaration du GVL GVL_Winch_M2_Stub) ===
+
+VAR_GLOBAL
+    M2_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M2 (STUB)
+    M2_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M2 (STUB)
+    M2_Contactor1            : BOOL;   // 🔌 Sortie — contacteur vitesse 1 M2 (STUB)
+    M2_Contactor2            : BOOL;   // 🔌 Sortie — contacteur vitesse 2 M2 (STUB)
+    M2_Contactor3            : BOOL;   // 🔌 Sortie — contacteur vitesse 3 M2 (STUB)
+    M2_Contactor4            : BOOL;   // 🔌 Sortie — contacteur vitesse 4 M2 (STUB)
+    M2_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M2 (STUB)
+    M2_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M2 (STUB, toujours FALSE)
+    M2_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M2 (STUB, toujours FALSE)
+    M2_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M2 (STUB, toujours FALSE)
+END_VAR
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">ad38fd16-fdb0-4c5f-a775-32fc62434952_Decl_LineIds</Single>
           </Single>
         </Single>
         <Null Name="NetVarProperties" />
@@ -52043,7 +51750,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">085766fd-043e-4545-8e8d-d651d56d5d3b</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639185440280443832</Single>
+        <Single Name="Timestamp" Type="long">639186134727987317</Single>
       </Single>
       <Single Name="Object" Type="{085766fd-043e-4545-8e8d-d651d56d5d3b}" Method="IArchivable">
         <Single Name="Device" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
@@ -65132,7 +64839,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">085766fd-043e-4545-8e8d-d651d56d5d3b</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639184353128781786</Single>
+        <Single Name="Timestamp" Type="long">639186135030039220</Single>
       </Single>
       <Single Name="Object" Type="{085766fd-043e-4545-8e8d-d651d56d5d3b}" Method="IArchivable">
         <Single Name="Device" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
@@ -65639,6 +65346,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">4813</Single>
                         <Single Name="EditorPositionId" Type="long">4814</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_PresettTrigCmd</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Preset Trigger Command</Single>
                         </Single>
@@ -66077,6 +65794,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">4847</Single>
                         <Single Name="EditorPositionId" Type="long">4848</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_CodeSeqTrigCmd</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Code Sequence Trigger Command</Single>
                         </Single>
@@ -66931,6 +66658,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">4881</Single>
                         <Single Name="EditorPositionId" Type="long">4882</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_PresetValue</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Preset Value</Single>
                         </Single>
@@ -67383,6 +67120,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">4951</Single>
                         <Single Name="EditorPositionId" Type="long">4952</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_Alarms</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Alarms</Single>
                         </Single>
@@ -67821,6 +67568,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">4985</Single>
                         <Single Name="EditorPositionId" Type="long">4986</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_Warnings</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Warnings</Single>
                         </Single>
@@ -68682,7 +68439,7 @@ END_VAR</Single>
                             <List2 Name="Mappings">
                               <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                 <Single Name="CreateVariable" Type="bool">True</Single>
-                                <Single Name="Variable" Type="string">VALEUR_CODEUR_2</Single>
+                                <Single Name="Variable" Type="string">COD2_PosValue</Single>
                               </Single>
                             </List2>
                           </Single>
@@ -69125,6 +68882,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">5085</Single>
                         <Single Name="EditorPositionId" Type="long">5086</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_SpdValue</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Speed value channel 1</Single>
                         </Single>
@@ -69563,6 +69330,16 @@ END_VAR</Single>
                         </Single>
                         <Single Name="PositionId" Type="long">5119</Single>
                         <Single Name="EditorPositionId" Type="long">5120</Single>
+                        <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                          <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                            <List2 Name="Mappings">
+                              <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                <Single Name="CreateVariable" Type="bool">True</Single>
+                                <Single Name="Variable" Type="string">COD2_AccValue</Single>
+                              </Single>
+                            </List2>
+                          </Single>
+                        </Single>
                         <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Acceleration value channel 1</Single>
                         </Single>
@@ -90930,6 +90707,77 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">ca500197-54ce-48f4-a1e7-d2dc28a40393</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_EncoderCalib</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057083795198</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.1.md §9
+   🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
+   ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
+      modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
+      `FB_Encoder_Homing` (qui l'écrit normalement, §5) n'est pas codé —
+      même principe que le stub GVL du lot Winch.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_EncoderCalib :
+STRUCT
+    HomingRefRaw                  : UDINT;   // Valeur brute figée au dernier homing réussi
+    LastKnownRawPos                : UDINT;   // Dernier point brut valide connu (§3.7, continu)
+    RestartCoherenceTolerancePts    : UDINT := 1000;  // Tolérance redémarrage (~12% PointsPerRev 8192)
+    Homed                          : BOOL;    // TRUE dès qu'un référencement a réussi
+    HomingSuspect                  : BOOL;    // TRUE si incohérence détectée au redémarrage (§3.7)
+END_STRUCT
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">ca500197-54ce-48f4-a1e7-d2dc28a40393_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">25</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CODEUR</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">ac34b69a-d1e5-4495-94d7-6f60d31a26d9</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">FB_Encoder_Abs</Single>
@@ -90959,256 +90807,186 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639185083135775402</Single>
+        <Single Name="Timestamp" Type="long">639186059806033489</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// ==========================================================================
-// 1. GESTION DE L'ENABLE GÉNÉRAL &amp; SÉCURITÉ DE REPLI
-// ==========================================================================
-IF NOT Enable THEN
-    // Mise en sécurité et réinitialisation des commandes matérielles
-    Out_PresetCmd       := 16#0000;
-    Out_PresetValue     := 0;
-    
-    // On force l'arrêt d'urgence par sécurité si le bloc est désactivé
-    EmergencyStop       := TRUE; 
-    
-    // On fige/remet à zéro les mesures pour l'IHM
-    ActualSpeedFiltered := 0.0;
-    // Note: On peut choisir de conserver la dernière position connue ou mettre 0.0 selon le besoin process
-    
-    LastHomingTrigger   := HomingTrigger;
-    RETURN; // Sortie immédiate du bloc, le reste du code n'est pas exécuté
-END_IF
+            <Single Name="TextBlobForSerialisation" Type="string">
 
-// ==========================================================================
-// 2. EXÉCUTION DU TRAITEMENT STANDARD (SI ENABLE = TRUE)
-// ==========================================================================
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
-// Calcul du temps de cycle
-GetCycleTime();
+// 🛑 1. GATE
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    EncoderAvailable := FALSE;
+    State := E_State.DISABLED;
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
+    PresetSeqStep := 0;
+    PresetTimer(IN := FALSE, PT := PresetTimeout);
+    RETURN;
+END_IF;
 
-// Traitement du sens de rotation mécanique
-IF InvertDirection THEN
-    LocalRawPos := 16#FFFFFFFF - In_PosValue; 
-ELSE
-    LocalRawPos := In_PosValue;
-END_IF
+Ready := TRUE;
+State := E_State.READY;
 
-// LOGIQUE DU HOMING / PRESET (Niveau de l'eau)
-IF HomingTrigger AND NOT LastHomingTrigger THEN
-    Out_PresetValue := REAL_TO_UDINT(WaterLevelOffset * Config_PulsePerMeter);
-    Out_PresetCmd   := 16#0001; 
-ELSE
-    Out_PresetCmd   := 16#0000;
-END_IF
-LastHomingTrigger := HomingTrigger;
+// 🔑 2. RESET FRONT
+ResetEdge(CLK := Reset);
 
-// DIAGNOSTIC ALARMES
-EncoderError := (In_Alarms &lt;&gt; 0);
+// 🔍 3. DIAGNOSTIC BUS / ALARME
+IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+EncoderAvailable := (ErrorId AND 16#0001) = 0;
 
-// PIPELINE MISE À L'ÉCHELLE (ax + b)
-ScaleStage(
-    CurrentRawPos  := LocalRawPos,
-    OffsetValueB   := 0.0, 
-    EnableTeach    := TeachActive,
-    StartTeachPos  := TeachStartRaw,
-    EndTeachPos    := TeachEndRaw,
-    RealDistMeters := TeachRealDistance,
-    PulsePerMeter  := Config_PulsePerMeter
-);
-ActualPositionM := ScaleStage.PositionMeters;
+// 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
+// Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
+// global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
+IF EncoderAvailable THEN
+    IF InvertDirection THEN
+        RawPos := 16#FFFFFFFF - RawPosIn;
+    ELSE
+        RawPos := RawPosIn;
+    END_IF;
+    AngleRaw := UDINT_TO_UINT(RawPos MOD PointsPerRev);
+    TurnCount := RawPos / PointsPerRev;
+END_IF;
 
-// PIPELINE SÉCURITÉ &amp; VITESSE
-SafetyStage(
-    RawSpeed      := In_SpdValue,
-    MaxSpeedLimit := MaxSpeedThreshold,
-    CycleTimeS    := GetCycleTime.CycleTimeS
-);
-ActualSpeedFiltered := SafetyStage.FilteredSpeed;
+// 🔧 5. SÉQUENCE PRESET (écriture bus) — ⚠️ bits/timing PLACEHOLDER, voir en-tête
+PresetReqEdge(CLK := PresetRequest);
+PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
+CASE PresetSeqStep OF
+    0: // IDLE
+        PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000;
+        IF PresetReqEdge.Q AND EncoderAvailable THEN
+            PresetValueOut := PresetValue;
+            PresetSeqStep := 1;
+            PresetTimer(IN := TRUE, PT := PresetTimeout);
+        END_IF;
+    1: // Pulse déverrouillage (code sequence)
+        CodeSeqTriggerCmd := 16#4000;   // ⚠️ placeholder — bit exact à confirmer fiche technique
+        PresetSeqStep := 2;
+    2: // Pulse déclenchement preset
+        CodeSeqTriggerCmd := 16#0000;
+        PresetTriggerCmd := 16#4000;    // ⚠️ placeholder — bit exact à confirmer fiche technique
+        PresetSeqStep := 3;
+    3: // Attente confirmation (relecture RawPos vs PresetValueOut)
+        PresetTriggerCmd := 16#0000;
+        RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
+        IF ABS(RawDiff) &lt;= UDINT_TO_DINT(PresetTolerancePts) THEN
+            PresetAck := TRUE;
+            PresetSeqStep := 0;
+            PresetTimer(IN := FALSE, PT := PresetTimeout);
+        ELSIF PresetTimer.Q THEN
+            PresetNak := TRUE;
+            ErrorId := ErrorId OR 16#0002;
+            PresetSeqStep := 0;
+            PresetTimer(IN := FALSE, PT := PresetTimeout);
+        END_IF;
+END_CASE;
+IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
 
-// L'arrêt d'urgence tombe si survitesse ou si le codeur remonte un défaut matériel
-EmergencyStop       := SafetyStage.OverspeedTrip OR EncoderError;
-// 3. LOGIQUE DU HOMING / PRESET (Niveau de l'eau)
-// Quand on valide le Homing, on prépare les mots RxPDO pour le codeur EtherCAT
-IF HomingTrigger AND NOT LastHomingTrigger THEN
-    // On convertit la position "Niveau de l'eau" en points codeur pour flasher le hard
-    Out_PresetValue := REAL_TO_UDINT(WaterLevelOffset * Config_PulsePerMeter);
-    Out_PresetCmd   := 16#0001; // Code d'écriture du Preset (dépend de la doc du codeur)
-ELSE
-    Out_PresetCmd   := 16#0000;
-END_IF
-LastHomingTrigger := HomingTrigger;
+// 🧾 6. ERROR / STATEATERROR
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
 
-// 4. DIAGNOSTIC ALARMES (Simplifié pour l'exemple)
-EncoderError := (In_Alarms &lt;&gt; 0);
-
-// 5. PIPELINE MISE À L'ÉCHELLE (ax + b)
-ScaleStage(
-    CurrentRawPos  := LocalRawPos,
-    OffsetValueB   := 0.0, // Géré par le Homing matériel du codeur
-    EnableTeach    := TeachActive,
-    StartTeachPos  := TeachStartRaw,
-    EndTeachPos    := TeachEndRaw,
-    RealDistMeters := TeachRealDistance,
-    PulsePerMeter  := Config_PulsePerMeter // Variable In_Out persistante
-);
-ActualPositionM := ScaleStage.PositionMeters;
-
-// 6. PIPELINE SÉCURITÉ &amp; VITESSE
-SafetyStage(
-    RawSpeed      := In_SpdValue,
-
-
-
-    MaxSpeedLimit := MaxSpeedThreshold,
-    CycleTimeS    := GetCycleTime.CycleTimeS
-);
-ActualSpeedFiltered := SafetyStage.FilteredSpeed;
-EmergencyStop       := SafetyStage.OverspeedTrip OR EncoderError; // Si alarme = Arret treuil</Single>
+Busy := (PresetSeqStep &lt;&gt; 0);
+Done := PresetAck;
+</Single>
             <Single Name="LineInfoPersistence" Type="string">ac34b69a-d1e5-4495-94d7-6f60d31a26d9_Impl_LineIds</Single>
           </Single>
         </Single>
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Encoder_Abs
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.1.md §3/§6
+   ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
+      CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
+      instantané par simple offset) + un mode `Teach` auto-calibré —
+      **incompatibles** avec le design Partie10 (preset SDO avec
+      accusé, formule `CableM_PerRev` fixe). Retirés : `HomingTrigger`,
+      `WaterLevelOffset`, `TeachActive/StartRaw/EndRaw/RealDistance`.
+   🧩 1 FB = 1 responsabilité : accès bus EtherCAT + séquence d'écriture
+      preset. N'orchestre PAS le homing lui-même (ça sera le rôle de
+      `FB_Encoder_Homing`, pas codé ce lot) — `PresetRequest`/`PresetValue`
+      sont pilotés en dur (`FALSE`/`0`) dans `PRG_MAIN` pour l'instant.
+   🧊 Principe « geler sur doute » (§6) : `RawPos`/`AngleRaw`/`TurnCount`
+      ne sont PAS mis à jour si `EncoderAvailable = FALSE` — ils
+      conservent leur dernière valeur plausible.
+   ⚠️ SÉQUENCE PRESET (§5) : les bits exacts de `PresetTriggerCmd`/
+      `CodeSeqTriggerCmd` (canaux RxPDO réels `COD1_PresettTrigCmd`/
+      `COD1_CodeSeqTrigCmd`, déjà présents dans la config matérielle)
+      sont un PLACEHOLDER conservateur (pulse séquentiel) — la fiche
+      technique COD1/COD2 doit confirmer le protocole exact avant tout
+      essai réel de preset (doc §6, note explicite). Ne pas se fier à
+      ce placeholder pour un vrai homing tant que non vérifié.
+   🔴 PERTE DE FONCTION SIGNALÉE : l'ancienne version composait
+      `FB_Encoder_Safety` en interne (survitesse via `In_SpdValue`).
+      Ce n'est PAS repris ici (Partie10 ne le demande pas, hors
+      périmètre du document) — `FB_Encoder_Safety` (overspeed) devient
+      orphelin tant qu'un lot dédié ne décide pas de son sort (fusion
+      avec le "saut incohérent" Partie10 §3.5, ou reprise telle quelle).
+   ═══════════════════════════════════════════════════════════════ *)
+
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===
+
+FUNCTION_BLOCK PUBLIC FB_Encoder_Abs
 VAR_INPUT
-    Enable              : BOOL;   // &lt;-- Autorisation générale de marche du bloc (Ex: Sécu OK et EtherCAT Opérationnel)
-    
-    (* Hardware Inputs (Liaison directe avec l'image E/S EtherCAT) *)
-    In_Alarms           : UINT;   // %IW2
-    In_Warnings         : UINT;   // %IW3
-    In_PosValue         : UDINT;  // %ID2
-    In_SpdValue         : INT;    // %IW6
-    
-    (* Configuration et Calibration *)
-    HomingTrigger       : BOOL;   // Flanc pour lancer le recalage au niveau de l'eau
-    WaterLevelOffset    : REAL;   // Valeur en mètres correspondant au niveau de l'eau
-    
-    InvertDirection     : BOOL;   // Inversion du sens de déroulement mécanique
-    MaxSpeedThreshold   : INT := 5000;
-    
-    (* Configuration Teach *)
-    TeachActive         : BOOL;
-    TeachStartRaw       : UDINT;
-    TeachEndRaw         : UDINT;
-    TeachRealDistance   : REAL;
+    Enable              : BOOL;        // Standard
+    Reset               : BOOL;        // Acquittement défaut (front)
+    EmergencyStopOk     : BOOL;        // Standard
+    Mode                : E_Mode;      // Standard (contexte, pas encore exploité ce lot)
+    RawPosIn            : UDINT;       // Brut EtherCAT (ex. COD1_PosValue, %ID)
+    AlarmsIn            : UINT;        // Brut EtherCAT (ex. COD1_Alarms)
+    WarningsIn          : UINT;        // Brut EtherCAT (ex. COD1_Warnings) — informatif seulement
+    SlaveOperational    : BOOL;        // FB_DiagEthercat — esclave EtherCAT opérationnel
+    InvertDirection     : BOOL := FALSE;
+    PointsPerRev        : UDINT := 8192;  // Résolution codeur confirmée (Partie10 §3.3)
+    PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing (stub FALSE ce lot)
+    PresetValue         : UDINT;       // Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)
+    PresetTimeout       : TIME := T#2s;
+    PresetTolerancePts  : UDINT := 10; // Tolérance relecture post-preset
 END_VAR
 VAR_OUTPUT
-    (* Hardware Outputs (Liaison vers le RxPDO) *)
-    Out_PresetCmd       : UINT;   // %QW2 (Commande de déclenchement du preset)
-    Out_PresetValue     : UDINT;  // %QD2 (La valeur physique chargée dans le codeur)
-    
-    (* Business Outputs *)
-    ActualPositionM     : REAL;   // Position finale en mètres
-    ActualSpeedFiltered : REAL;   // Vitesse filtrée
-    EncoderError        : BOOL;   // Erreur com ou hardware codeur
-    EmergencyStop       : BOOL;   // Demande de freinage immédiat (Survitesse)
-END_VAR
-VAR_IN_OUT
-    Config_PulsePerMeter : REAL;  // RETAIN ou persistant dans l'IHM
+    Ready               : BOOL;
+    Busy                : BOOL;
+    Done                : BOOL;
+    Error               : BOOL;
+    ErrorId             : WORD;        // bit0 : alarme/bus codeur ; bit1 : preset refusé/timeout
+    State               : E_State;
+    StateAtError        : E_State;
+    RawPos              : UDINT;       // Position brute — GELÉE si EncoderAvailable=FALSE
+    EncoderAvailable    : BOOL;
+    AngleRaw            : UINT;        // Informatif maintenance : RawPos MOD PointsPerRev
+    TurnCount           : UDINT;       // Informatif maintenance : RawPos / PointsPerRev
+    PresetAck           : BOOL;        // Pulse 1 cycle — écriture confirmée
+    PresetNak           : BOOL;        // Pulse 1 cycle — écriture refusée/timeout
+    PresetTriggerCmd    : WORD;        // → à câbler sur COD_PresettTrigCmd (RxPDO)
+    CodeSeqTriggerCmd   : WORD;        // → à câbler sur COD_CodeSeqTrigCmd (RxPDO)
+    PresetValueOut      : UDINT;       // → à câbler sur COD_PresetValue (RxPDO)
 END_VAR
 VAR
-    (* Composants POO internes *)
-    GetCycleTime        : FB_CycleTime;
-    ScaleStage          : FB_Encoder_Scale;
-    SafetyStage         : FB_Encoder_Safety;
-    
-    (* Variables internes *)
-    LocalRawPos         : UDINT;
-    LastHomingTrigger   : BOOL;
+    ResetEdge           : R_TRIG;
+    ErrorEdge           : R_TRIG;
+    PresetReqEdge       : R_TRIG;
+    PresetTimer         : TON;
+    PresetSeqStep       : INT;         // 0=IDLE, 1=pulse CodeSeq, 2=pulse Trig, 3=attente confirmation
+    RawDiff             : DINT;
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">ac34b69a-d1e5-4495-94d7-6f60d31a26d9_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">212</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">CODEUR</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">04b798f6-14ef-4194-a8bf-4a7a0caac245</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_Encoder_Safety</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184353125588005</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 1. Filtrage de la vitesse brute pour éviter les déclenchements intempestifs sur pic de com
-Filter(ValueIn := INT_TO_REAL(RawSpeed), TimeConst := SpeedFilterTime, CycleTimeS := CycleTimeS);
-FilteredSpeed := Filter.ValueOut;
-
-// 2. Surveillance du seuil critique (survitesse positive ou négative)
-IF ABS(FilteredSpeed) &gt;= INT_TO_REAL(MaxSpeedLimit) THEN
-    OverspeedTrip := TRUE; // Interlock / Trip à verrouiller dans votre sécurité machine
-ELSE
-    OverspeedTrip := FALSE;
-END_IF</Single>
-            <Single Name="LineInfoPersistence" Type="string">04b798f6-14ef-4194-a8bf-4a7a0caac245_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Encoder_Safety
-VAR_INPUT
-    RawSpeed        : INT;  // Vitesse brute du bus (%IW6)
-    MaxSpeedLimit   : INT;  // Seuil critique de survitesse (en pts de vitesse)
-    SpeedFilterTime : TIME := T#100ms;
-    CycleTimeS      : REAL;
-END_VAR
-VAR_OUTPUT
-    OverspeedTrip   : BOOL; // Ordre d'arrêt d'urgence / Freinage d'urgence
-    FilteredSpeed   : REAL; // Vitesse lissée pour monitoring IHM
-END_VAR
-VAR
-    Filter          : FB_Filter_PT1; // Réutilisation du filtre POO
-END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">04b798f6-14ef-4194-a8bf-4a7a0caac245_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">31</Single>
+        <Single Name="UniqueIdGenerator" Type="string">451</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -91254,586 +91032,68 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639184353125638006</Single>
+        <Single Name="Timestamp" Type="long">639186060196269608</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 1. Mode Teach : Calcul automatique du coefficient de mise à l'échelle (a)
-IF EnableTeach AND RealDistMeters &gt; 0.001 THEN
-    DeltaPulses := UDINT_TO_REAL(EndTeachPos) - UDINT_TO_REAL(StartTeachPos);
-    IF ABS(DeltaPulses) &gt; 0.0 THEN
-        // Calcul du ratio : impulsions par mètre
-        PulsePerMeter := ABS(DeltaPulses) / RealDistMeters;
-    END_IF
-END_IF
+            <Single Name="TextBlobForSerialisation" Type="string">
 
-// 2. Application de la formule affine y = ax + b
-// Sécurité : évite la division par zéro si le ratio n'est pas configuré
-IF PulsePerMeter &gt; 0.001 THEN
-    PositionMeters := (UDINT_TO_REAL(CurrentRawPos) / PulsePerMeter) + OffsetValueB;
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Scale) ===
+
+// 🧮 Écart signé sûr : conversion DINT AVANT soustraction (§3.1) — jamais l'inverse
+RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(HomingRefRaw);
+
+// 📏 Formule fixe points → mètres (Partie10 §2)
+IF PointsPerRev &gt; 0 THEN
+    CablePosM := DINT_TO_REAL(RawDiff) * (CableM_PerRev / UDINT_TO_REAL(PointsPerRev));
 ELSE
-    PositionMeters := 0.0;
-END_IF</Single>
+    CablePosM := 0.0;   // Garde division par zéro (PointsPerRev mal configuré)
+END_IF;
+</Single>
             <Single Name="LineInfoPersistence" Type="string">f7c3c2a8-62d7-49a9-8267-fba1e82be805_Impl_LineIds</Single>
           </Single>
         </Single>
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_Encoder_Scale
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.1.md §2/§3.1
+   ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
+      `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
+      — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
+      `EndTeachPos`/`RealDistMeters`) : `CableM_PerRev` est un paramètre
+      RETAIN fixe (site), pas recalculé dynamiquement (Partie10 §2).
+   🧮 Arithmétique signée sûre (§3.1) : conversion en DINT AVANT la
+      soustraction (jamais soustraire deux UDINT directement — un
+      résultat négatif reboucle silencieusement vers ~2³²).
+   🧩 Brique de calcul pure — pas de gel/bornage ici : `RawPos` en
+      entrée est déjà gelé par `FB_Encoder_Abs` (§6) ; le bornage
+      physique absolu [-99;+99] m est la responsabilité de
+      `FB_Encoder_Safety` (§3.6, pas dans ce lot), pas de celle-ci.
+   ═══════════════════════════════════════════════════════════════ *)
+
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===
+
+FUNCTION_BLOCK PUBLIC FB_Encoder_Scale
 VAR_INPUT
-    CurrentRawPos : UDINT;        // Valeur brute synchrone (%ID2)
-    OffsetValueB  : REAL;         // Le "b" de l'équation (décalage en mètres)
-    
-    (* Mode Teach / Calibration assistée *)
-    EnableTeach   : BOOL;         // Active le mode calibration
-    StartTeachPos : UDINT;        // Capture de la position brute au point A
-    EndTeachPos   : UDINT;        // Capture de la position brute au point B
-    RealDistMeters: REAL;         // Distance réelle mesurée au mètre ruban entre A et B
-END_VAR
-VAR_IN_OUT
-    PulsePerMeter : REAL;         // Le "a" de l'équation (Pulsations / mètre)
+    RawPos          : UDINT;       // Position brute (sortie FB_Encoder_Abs, déjà gelée sur doute)
+    HomingRefRaw    : UDINT;       // Référence brute figée au dernier homing (ST_EncoderCalib)
+    CableM_PerRev   : REAL := 1.5; // Câble déroulé par tour (paramètre RETAIN, réglable site)
+    PointsPerRev    : UDINT := 8192; // Résolution codeur confirmée (Partie10 §3.3)
 END_VAR
 VAR_OUTPUT
-    PositionMeters: REAL;         // La sortie finale f(x) = ax + b
+    CablePosM       : REAL;        // Position câble en mètres, signée (+ enroulé, − sous l'eau)
 END_VAR
 VAR
-    DeltaPulses   : REAL;
+    RawDiff         : DINT;        // Écart signé RawPos - HomingRefRaw (§3.1)
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">f7c3c2a8-62d7-49a9-8267-fba1e82be805_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">43</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">CODEUR</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">8722f719-e014-444f-a333-9da87151fed0</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">PRG_COD1</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639185083104342462</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{25e509de-33d4-4447-93f8-c9e4ea381c8b}" Method="IArchivable">
-          <Single Name="NetworkListComment" Type="string"></Single>
-          <Single Name="DefaultViewMode" Type="string">Ld</Single>
-          <List2 Name="NetworkList">
-            <Single Type="{d9a99d73-b633-47db-b876-a752acb25871}" Method="IArchivable">
-              <Single Name="ILActive" Type="bool">False</Single>
-              <Single Name="FBDValid" Type="bool">False</Single>
-              <Single Name="ILValid" Type="bool">False</Single>
-              <List2 Name="ILLines" />
-              <Single Name="Comment" Type="string"></Single>
-              <Single Name="Title" Type="string"></Single>
-              <Single Name="Label" Type="string"></Single>
-              <Single Name="OutCommented" Type="bool">False</Single>
-              <List2 Name="NetworkItems">
-                <Single Type="{acfc6f68-8e3a-4af5-bf81-3dd512095a46}" Method="IArchivable">
-                  <Single Name="BoxType" Type="string">FB_Encoder_Abs</Single>
-                  <Single Name="Instance" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                    <Single Name="Operand" Type="string">instFB_Encoder_Abs_0</Single>
-                    <Single Name="Type" Type="string">FB_Encoder_Abs</Single>
-                    <Single Name="Comment" Type="string"></Single>
-                    <Single Name="SymbolComment" Type="string"></Single>
-                    <Single Name="Address" Type="string"></Single>
-                    <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                      <Single Name="Flags" Type="int">0</Single>
-                      <Single Name="Fixed" Type="bool">False</Single>
-                      <Single Name="Extensible" Type="bool">False</Single>
-                    </Single>
-                    <Single Name="LValue" Type="bool">False</Single>
-                    <Single Name="Boolean" Type="bool">False</Single>
-                    <Single Name="IsInstance" Type="bool">True</Single>
-                    <Single Name="Id" Type="long">47</Single>
-                  </Single>
-                  <Single Name="OutputItems" Type="{f40d3e09-c02c-4522-a88c-dac23558cfc4}" Method="IArchivable">
-                    <List2 Name="OutputItems">
-                      <Null />
-                      <Single Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">UDINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">True</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">8</Single>
-                      </Single>
-                      <Single Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">UINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">True</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">9</Single>
-                      </Single>
-                      <Single Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">REAL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">True</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">10</Single>
-                      </Single>
-                      <Single Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">BOOL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">True</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">11</Single>
-                      </Single>
-                      <Single Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">BOOL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">True</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">12</Single>
-                      </Single>
-                    </List2>
-                  </Single>
-                  <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                    <Single Name="Flags" Type="int">0</Single>
-                    <Single Name="Fixed" Type="bool">True</Single>
-                    <Single Name="Extensible" Type="bool">False</Single>
-                  </Single>
-                  <Null Name="InputFlags" />
-                  <List2 Name="InputItems">
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">BOOL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">True</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">50</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">49</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">UINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">14</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">13</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">UINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">16</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">15</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string">COD1_PosValue</Single>
-                        <Single Name="Type" Type="string">UDINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">18</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">17</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string">COD1_SpdValue</Single>
-                        <Single Name="Type" Type="string">INT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">20</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">19</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">BOOL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">True</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">22</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">21</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">REAL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">24</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">23</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string">0</Single>
-                        <Single Name="Type" Type="string">INT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">True</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">26</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">25</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">INT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">28</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">27</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">BOOL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">True</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">30</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">29</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">UDINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">32</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">31</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">UDINT</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">34</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">33</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string"></Single>
-                        <Single Name="Type" Type="string">REAL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">36</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">35</Single>
-                    </Single>
-                    <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                      <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                        <Single Name="Operand" Type="string">ratio</Single>
-                        <Single Name="Type" Type="string">REAL</Single>
-                        <Single Name="Comment" Type="string"></Single>
-                        <Single Name="SymbolComment" Type="string"></Single>
-                        <Single Name="Address" Type="string"></Single>
-                        <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                          <Single Name="Flags" Type="int">0</Single>
-                          <Single Name="Fixed" Type="bool">False</Single>
-                          <Single Name="Extensible" Type="bool">False</Single>
-                        </Single>
-                        <Single Name="LValue" Type="bool">False</Single>
-                        <Single Name="Boolean" Type="bool">False</Single>
-                        <Single Name="IsInstance" Type="bool">False</Single>
-                        <Single Name="Id" Type="long">38</Single>
-                      </Single>
-                      <Single Name="Id" Type="long">37</Single>
-                    </Single>
-                  </List2>
-                  <Single Name="InputParam" Type="{71496971-9e0c-4677-a832-b9583b571130}" Method="IArchivable">
-                    <List2 Name="Names">
-                      <Single Type="string">Enable</Single>
-                      <Single Type="string">In_Alarms</Single>
-                      <Single Type="string">In_Warnings</Single>
-                      <Single Type="string">In_PosValue</Single>
-                      <Single Type="string">In_SpdValue</Single>
-                      <Single Type="string">HomingTrigger</Single>
-                      <Single Type="string">WaterLevelOffset</Single>
-                      <Single Type="string">InvertDirection</Single>
-                      <Single Type="string">MaxSpeedThreshold</Single>
-                      <Single Type="string">TeachActive</Single>
-                      <Single Type="string">TeachStartRaw</Single>
-                      <Single Type="string">TeachEndRaw</Single>
-                      <Single Type="string">TeachRealDistance</Single>
-                      <Single Type="string">Config_PulsePerMeter</Single>
-                    </List2>
-                    <List2 Name="Types">
-                      <Single Type="string">BOOL</Single>
-                      <Single Type="string">UINT</Single>
-                      <Single Type="string">UINT</Single>
-                      <Single Type="string">UDINT</Single>
-                      <Single Type="string">INT</Single>
-                      <Single Type="string">BOOL</Single>
-                      <Single Type="string">REAL</Single>
-                      <Single Type="string">BOOL</Single>
-                      <Single Type="string">INT</Single>
-                      <Single Type="string">BOOL</Single>
-                      <Single Type="string">UDINT</Single>
-                      <Single Type="string">UDINT</Single>
-                      <Single Type="string">REAL</Single>
-                      <Single Type="string">REAL[REF]</Single>
-                    </List2>
-                  </Single>
-                  <Single Name="OutputParam" Type="{71496971-9e0c-4677-a832-b9583b571130}" Method="IArchivable">
-                    <List2 Name="Names">
-                      <Single Type="string">Out_PresetCmd</Single>
-                      <Single Type="string">Out_PresetValue</Single>
-                      <Single Type="string">ActualPositionM</Single>
-                      <Single Type="string">ActualSpeedFiltered</Single>
-                      <Single Type="string">EncoderError</Single>
-                      <Single Type="string">EmergencyStop</Single>
-                    </List2>
-                    <List2 Name="Types">
-                      <Single Type="string">UINT</Single>
-                      <Single Type="string">UDINT</Single>
-                      <Single Type="string">REAL</Single>
-                      <Single Type="string">REAL</Single>
-                      <Single Type="string">BOOL</Single>
-                      <Single Type="string">BOOL</Single>
-                    </List2>
-                  </Single>
-                  <Single Name="CallType" Type="{bffb3c53-f105-4e85-aba2-e30df579d75f}">FunctionBlock</Single>
-                  <Single Name="EN" Type="bool">False</Single>
-                  <Single Name="ENO" Type="bool">False</Single>
-                  <Null Name="STSnippet" />
-                  <Single Name="ContainsExtensibleInputs" Type="bool">False</Single>
-                  <Single Name="ProvidesSTSnippet" Type="bool">False</Single>
-                  <Single Name="Id" Type="long">48</Single>
-                </Single>
-              </List2>
-              <List2 Name="Connectors" />
-              <Single Name="Id" Type="long">5</Single>
-            </Single>
-          </List2>
-          <Single Name="BranchCounter" Type="int">0</Single>
-          <Single Name="ValidIds" Type="bool">True</Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">PROGRAM PRG_COD1
-
-
-
-
-
-
-
-VAR
-	instFB_Encoder_Abs_0: FB_Encoder_Abs;
-	ratio : REAL;
-	
-	
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">8722f719-e014-444f-a333-9da87151fed0_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">59</Single>
+        <Single Name="UniqueIdGenerator" Type="string">120</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -92249,91 +91509,6 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">25c33d52-f7f4-4115-918f-26c5d0aad649</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_MultiStage_Relay</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639184353126131608</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">// 1. On prend la valeur absolue (Valable en marche avant comme arrière)
-AbsCmd := ABS(Cmd_Pct);
-
-// 2. Logique cumulative (Cascade)
-Q1 := (AbsCmd &gt;= Stage1);
-Q2 := (AbsCmd &gt;= Stage2);
-Q3 := (AbsCmd &gt;= Stage3);
-Q4 := (AbsCmd &gt;= Stage4);</Single>
-            <Single Name="LineInfoPersistence" Type="string">25c33d52-f7f4-4115-918f-26c5d0aad649_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">FUNCTION_BLOCK FB_MultiStage_Relay
-VAR_INPUT
-    Cmd_Pct   : REAL; // Consigne finale de l'axe (ex: Y_Pct_Ramped, entre -100.0 et 100.0)
-    Stage1    : REAL; // Seuil d'activation Vitesse 1 (ex: 15.0)
-    Stage2    : REAL; // Seuil d'activation Vitesse 2 (ex: 40.0)
-    Stage3    : REAL; // Seuil d'activation Vitesse 3 (ex: 70.0)
-    Stage4    : REAL; // Seuil d'activation Vitesse 4 (ex: 90.0)
-END_VAR
-VAR_OUTPUT
-    Q1        : BOOL; // Sortie physique Relais Vitesse 1
-    Q2        : BOOL; // Sortie physique Relais Vitesse 2
-    Q3        : BOOL; // Sortie physique Relais Vitesse 3
-    Q4        : BOOL; // Sortie physique Relais Vitesse 4
-END_VAR
-VAR
-    AbsCmd    : REAL; // Variable de travail interne (Valeur absolue)
-END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">25c33d52-f7f4-4115-918f-26c5d0aad649_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">39</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">5db58524-f94e-4197-aa12-fb0fb7a35340</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">JOYSTICK</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">23e9e94e-7410-4b07-b9b0-4899f0fa4662</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">FB_Ramp</Single>
@@ -92566,6 +91741,263 @@ END_VAR</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
         <Single Type="string">SAFETY</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">dbed5258-b652-4961-bc40-775659712c76</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">E_DiagState</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057390093140</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">TYPE E_DiagState :
+(
+    DISABLED := 0,
+    READY := 1,
+    INIT := 2,
+    MONITORING := 3,
+    ERROR := 4
+);
+END_TYPE</Single>
+            <Single Name="LineInfoPersistence" Type="string">dbed5258-b652-4961-bc40-775659712c76_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">41</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">SYSTEM</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">89aee626-a70b-4c0d-8ed0-baefd12ba9bd</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">E_Mode</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186115119054283</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🎚️ E_Mode — Modes de marche de la machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.1.md §1
+   🧩 Fondation manquante requise par le contrat FB (Partie3 §1) :
+      tout FB métier expose une entrée Mode : E_Mode.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE E_Mode :
+(
+    MANUEL      := 0,   (* Pilotage joystick direct, sécurités actives *)
+    MAINT_N1    := 1,   (* Manuel "encadré" : ~cycle avec interdictions, sécurité correcte *)
+    MAINT_N2    := 2,   (* Droits étendus, mot de passe, override de sécurités *)
+    SEMI_AUTO   := 3    (* Séquenceur FB_Cycle (semi-automatique) *)
+);
+END_TYPE
+
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">89aee626-a70b-4c0d-8ed0-baefd12ba9bd_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">37</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">SYSTEM</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">0f108f5b-28f2-4742-82d2-c0230be46066</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">E_State</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057321485700</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🚦 E_State — Phase opérationnelle d'un FB métier (valeurs EXCLUSIVES)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §2
+   ⚠️ Un seul état à la fois. Error / SafeStop / perte Enable sont
+      ORTHOGONAUX à la phase (voir ErrorId, ne polluent pas State).
+   🧩 Fondation manquante requise par le contrat FB (Partie3 §1).
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE E_State :
+(
+    DISABLED := 0,   (* Enable faux, neutralisé *)
+    INIT     := 1,   (* Démarrage / vérifs *)
+    READY    := 2,   (* Prêt, attend ordre *)
+    BUSY     := 3,   (* Action en cours *)
+    DONE     := 4,   (* Action terminée *)
+    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+);
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">0f108f5b-28f2-4742-82d2-c0230be46066_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">26</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">SYSTEM</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">b13c09af-c8e6-46b1-8318-d42b48923509</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_DeviceDiag</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057282073904</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">TYPE ST_DeviceDiag :
+STRUCT
+    Online         : BOOL;
+    Operational    : BOOL;
+    Error          : BOOL;
+    ErrorId        : WORD;
+    State          : E_DiagState;
+    StateAtError   : E_DiagState;
+END_STRUCT
+END_TYPE</Single>
+            <Single Name="LineInfoPersistence" Type="string">b13c09af-c8e6-46b1-8318-d42b48923509_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">14</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">SYSTEM</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -93448,14 +92880,13 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186031655910726</Single>
+        <Single Name="Timestamp" Type="long">639186133702288447</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
-
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
 
 // 0. DIAGNOSTIC CAN (Joystick)
@@ -93525,35 +92956,111 @@ FB_Joystick_0(
     // 🎛️ --- Paramètres de traitement (valeurs par défaut conservées) ---
     InvertX         := FALSE,
     InvertY         := FALSE,
-    Deadband        := 10.0,
+    Deadband        := 5.0,
     FilterTime      := TIME#100ms,
     AccelRate       := 50.0,
     DecelRate       := 150.0
 );
 
 (* ═══════════════════════════════════════════════════════════════
-   🔌 3. SÉCURITÉ MÉTIER TREUIL — FB_Safety_Winch
+   🧲 3. CODEUR — Acquisition + mise à l'échelle (M1 = COD1, M2 = COD2)
    ───────────────────────────────────────────────────────────────
-   Périmètre de ce lot : perte joystick/CAN uniquement (codeur TBD,
-   voir CODE/FB_Safety_Winch.st). SafeStop consommé par instWinchM1.
+   ⚠️ Canaux COD1_* déjà câblés en I/O Mapping (matériel existant).
+   🔴 Canaux COD2_* : PAS ENCORE mappés en I/O Mapping (à faire, même
+      principe que COD1, avant tout essai réel de l'acquisition M2).
+   🔴 PresetRequest/PresetValue figés (FB_Encoder_Homing pas codé ce
+      lot) : aucun homing possible pour l'instant, RawPos "brut" tel
+      que le codeur le rend depuis sa dernière mise sous tension.
    ═══════════════════════════════════════════════════════════════ *)
 
-instSafetyWinch(
+instEncoderAbsM1(
+    Enable              := TRUE,
+    Reset               := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk     := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
+    RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
+    AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
+    WarningsIn          := COD1_Warnings,                   // 📡 I/O Mapping déjà existant
+    SlaveOperational    := instDiagEthercat.EncoderM1.Operational,
+    InvertDirection     := FALSE,
+    PresetRequest       := FALSE,                           // 🔴 TBD FB_Encoder_Homing (pas ce lot)
+    PresetValue         := 0                                // 🔴 TBD FB_Encoder_Homing (pas ce lot)
+);
+// 📤 Sorties preset → RxPDO réels (I/O Mapping déjà existant, canaux COD1)
+COD1_PresettTrigCmd := instEncoderAbsM1.PresetTriggerCmd;
+COD1_CodeSeqTrigCmd := instEncoderAbsM1.CodeSeqTriggerCmd;
+COD1_PresetValue    := instEncoderAbsM1.PresetValueOut;
+
+instEncoderScaleM1(
+    RawPos          := instEncoderAbsM1.RawPos,
+    HomingRefRaw    := M1_EncoderCalib.HomingRefRaw,        // RETAIN, réglable manuellement (§ ci-dessus)
+    CableM_PerRev   := 1.5,
+    PointsPerRev    := 8192
+);
+
+instEncoderAbsM2(
+    Enable              := TRUE,
+    Reset               := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk     := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
+    RawPosIn            := COD2_PosValue,                   // 🔴 À créer en I/O Mapping (comme COD1_PosValue)
+    AlarmsIn            := COD2_Alarms,                     // 🔴 À créer en I/O Mapping
+    WarningsIn          := COD2_Warnings,                   // 🔴 À créer en I/O Mapping
+    SlaveOperational    := instDiagEthercat.EncoderM2.Operational,
+    InvertDirection     := FALSE,
+    PresetRequest       := FALSE,                           // 🔴 TBD FB_Encoder_Homing (pas ce lot)
+    PresetValue         := 0                                // 🔴 TBD FB_Encoder_Homing (pas ce lot)
+);
+// 📤 Sorties preset → RxPDO réels (🔴 À créer en I/O Mapping, comme COD1_PresettTrigCmd etc.)
+COD1_PresettTrigCmd := instEncoderAbsM2.PresetTriggerCmd;
+COD2_CodeSeqTrigCmd := instEncoderAbsM2.CodeSeqTriggerCmd;
+COD2_PresetValue    := instEncoderAbsM2.PresetValueOut;
+
+instEncoderScaleM2(
+    RawPos          := instEncoderAbsM2.RawPos,
+    HomingRefRaw    := M2_EncoderCalib.HomingRefRaw,        // RETAIN, réglable manuellement (§ ci-dessus)
+    CableM_PerRev   := 1.5,
+    PointsPerRev    := 8192
+);
+
+(* ═══════════════════════════════════════════════════════════════
+   🔌 4. SÉCURITÉ MÉTIER TREUIL — FB_Safety_Winch (1 instance par treuil)
+   ───────────────────────────────────────────────────────────────
+   Périmètre : perte joystick/CAN (partagée) + perte codeur DE CE
+   TREUIL (câblé, lot Codeur). SafeStop consommé par le FB_Winch du
+   MÊME treuil (Partie10 §7 : split M1/M2 par composition, 2 instances).
+   ═══════════════════════════════════════════════════════════════ *)
+
+instSafetyWinchM1(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick, à sécuriser ensemble
     Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
-    JoystickOperational := instDiagCanOpen.Joystick.Operational
+    JoystickOperational := instDiagCanOpen.Joystick.Operational,
+    EncoderAvailable    := instEncoderAbsM1.EncoderAvailable
+);
+
+instSafetyWinchM2(
+    Enable              := TRUE,
+    Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick, à sécuriser ensemble
+    Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    JoystickOnline      := instDiagCanOpen.Joystick.Online,
+    JoystickOperational := instDiagCanOpen.Joystick.Operational,
+    EncoderAvailable    := instEncoderAbsM2.EncoderAvailable
 );
 
 (* ═══════════════════════════════════════════════════════════════
-   🪝 4. TREUIL M1 — FB_Winch (test chaîne Joystick→Relais, Maint N1)
+   🪝 5. TREUILS M1 + M2 — FB_Winch (Maint N1, consigne dupliquée axe Y)
    ───────────────────────────────────────────────────────────────
-   Axe Y du joystick pilote Plongée/Extraction (M1 seul pour ce lot).
-   🧪 Ce lot : M1_* déclarées dans GVL_Winch_M1_Stub.st (STUB logiciel,
-      pas de matériel branché). Quand le matériel sera prêt : SUPPRIMER
-      ce GVL et saisir les mêmes noms en I/O Mapping (voir DOC §7 Étape 9bis).
+   ⚠️ M2 dupliqué sur le MÊME axe Y que M1 (choix acté 2026-07-02) :
+      les deux treuils reçoivent la même consigne, SANS FB_WinchSync
+      réel (le codeur sert à la mesure/sécurité de ce lot, pas encore
+      à une régulation d'écart M1/M2 — voir DOC/AF_Partie9 §9).
+   🧪 M1_*/M2_* déclarées dans GVL_Winch_M1_Stub.st/GVL_Winch_M2_Stub.st
+      (STUB logiciel). Quand le matériel sera prêt : SUPPRIMER le GVL
+      concerné et saisir les mêmes noms en I/O Mapping (DOC §7 Étape 9bis).
    ═══════════════════════════════════════════════════════════════ *)
 
 instWinchM1(
@@ -93562,7 +93069,7 @@ instWinchM1(
     EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
     Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
-    SafeStop                := instSafetyWinch.SafeStop,
+    SafeStop                := instSafetyWinchM1.SafeStop,
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := M1_SpeedStepTable,
@@ -93587,6 +93094,35 @@ M1_BrakeCmd  := instWinchM1.BrakeCmd;
 M1_ContactorFeedbackFwd := M1_RelayFwd;
 M1_ContactorFeedbackRev := M1_RelayRev;
 M1_BrakeFeedback        := M1_BrakeCmd;
+
+instWinchM2(
+    Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que M1 — à remplacer par FB_Modes
+    Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
+    SafeStop                := instSafetyWinchM2.SafeStop,
+    Direction               := FB_Joystick_0.AxisCmdY.Direction,   // ⚠️ Même consigne que M1
+    SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,    // ⚠️ Même consigne que M1
+    SpeedStepTable          := M2_SpeedStepTable,
+    ContactorFeedbackFwd    := M2_ContactorFeedbackFwd,      // 🧪 STUB GVL_Winch_M2_Stub
+    ContactorFeedbackRev    := M2_ContactorFeedbackRev,      // 🧪 STUB GVL_Winch_M2_Stub
+    BrakeFeedback           := M2_BrakeFeedback              // 🧪 STUB GVL_Winch_M2_Stub
+);
+
+// 📤 Sorties treuil M2 → variables STUB (GVL_Winch_M2_Stub), à remplacer par I/O Mapping réel
+M2_RelayFwd  := instWinchM2.RelayFwd;
+M2_RelayRev  := instWinchM2.RelayRev;
+M2_Contactor1 := instWinchM2.Contactor1;
+M2_Contactor2 := instWinchM2.Contactor2;
+M2_Contactor3 := instWinchM2.Contactor3;
+M2_Contactor4 := instWinchM2.Contactor4;
+M2_BrakeCmd  := instWinchM2.BrakeCmd;
+
+// 🧪 SIMULATION (stub sans matériel réel, GVL_Winch_M2_Stub) — voir note M1 ci-dessus
+M2_ContactorFeedbackFwd := M2_RelayFwd;
+M2_ContactorFeedbackRev := M2_RelayRev;
+M2_BrakeFeedback        := M2_BrakeCmd;
 </Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Impl_LineIds</Single>
           </Single>
@@ -93596,12 +93132,16 @@ M1_BrakeFeedback        := M1_BrakeCmd;
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🧠 PRG_MAIN — Orchestration séquentielle (diag → sécurité → métier)
    ───────────────────────────────────────────────────────────────
-   📄 Contient désormais la chaîne : Joystick (axe Y) → FB_Safety_Winch
-      → FB_Winch (M1) → relais sens/vitesse/frein.
-   ⚠️ Stubs debug conservés à l'identique pour Joystick (GVL_DEBUG) —
-      NON étendus à Winch : Enable/Mode de FB_Winch sont câblés sur un
-      stub Maintenance N1 dédié, clairement marqué, en l'absence de
-      FB_Modes (à venir).
+   📄 Contient : Joystick (axe Y) → FB_Safety_Winch(M1/M2) → FB_Winch
+      (M1 + M2, consigne dupliquée sur le même axe) → relais, et le
+      pipeline codeur M1/M2 (FB_Encoder_Abs → FB_Encoder_Scale).
+   ⚠️ M2 ACTIF DÈS CE LOT (choix acté 2026-07-02) : dupliqué sur l'axe Y
+      comme M1, SANS sélecteur ni FB_WinchSync réel (codeur pas encore
+      exploité pour une synchro — voir DOC/AF_Partie9 §9).
+   🔴 `PRG_COD1` (legacy, orphelin, jamais appelé dans aucune tâche) :
+      À SUPPRIMER MANUELLEMENT dans CODESYS (clic droit → Delete) — sa
+      logique est remplacée par les instances ci-dessous, câblées
+      directement ici (principe 1 seul POU, Partie2 §0).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU PRG_MAIN) ===
@@ -93626,11 +93166,25 @@ VAR
     // 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
     FB_Joystick_0 : FB_Joystick;
 
-    // 🔌 SAFETY — bloc safety métier du domaine treuil (SafeStop propre au métier)
-    instSafetyWinch : FB_Safety_Winch;
+    // 🧲 CODEUR — acquisition + mise à l'échelle, 1 instance de chaque par treuil
+    instEncoderAbsM1   : FB_Encoder_Abs;
+    instEncoderScaleM1 : FB_Encoder_Scale;
+    instEncoderAbsM2   : FB_Encoder_Abs;
+    instEncoderScaleM2 : FB_Encoder_Scale;
 
-    // 🪝 WINCH — treuil M1 (test chaîne joystick→relais, Maintenance N1, sans codeur)
+    // 🧲 Calibration/référence codeur — RETAIN, modifiable manuellement tant que
+    // FB_Encoder_Homing (qui l'écrit normalement) n'est pas codé (Partie10 §9)
+    M1_EncoderCalib : ST_EncoderCalib;
+    M2_EncoderCalib : ST_EncoderCalib;
+
+    // 🔌 SAFETY — bloc safety métier du domaine treuil, 1 instance par treuil
+    // (même TYPE FB_Safety_Winch, 2 instances — Partie10 §7)
+    instSafetyWinchM1 : FB_Safety_Winch;
+    instSafetyWinchM2 : FB_Safety_Winch;
+
+    // 🪝 WINCH — M1 et M2 (consigne dupliquée sur l'axe Y, Maintenance N1, choix 2026-07-02)
     instWinchM1 : FB_Winch;
+    instWinchM2 : FB_Winch;
 
     // 🪜 Table paliers M1 — RETAIN, réglable sans recompiler (Partie1 §Paliers)
     // ⚠️ Valeurs par défaut indicatives (cumulatives P1→P5) : À AJUSTER un par un
@@ -93643,24 +93197,29 @@ VAR
         P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
         P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
         P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
-		
-	    //P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := TRUE,
-        //P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := TRUE,
-        //P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := TRUE,
-        //P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := FALSE,  P4R4 := FALSE,
-        //P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := FALSE,
-		
+        StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
+    );
+
+    // 🪜 Table paliers M2 — RETAIN, INDÉPENDANTE de M1 (Partie1 §Paliers : "table
+    // indépendante par treuil"), mêmes valeurs par défaut indicatives à ajuster.
+    M2_SpeedStepTable : ST_SpeedStepTable := (
+        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
+        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
+        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
+        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
+        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
 
     // 🎚️ Stub Maintenance N1 pour ce lot (pas de FB_Modes) — à remplacer dès que
     // FB_Modes existera (source légitime Enable/Mode par bloc métier)
     StubWinchEnableN1 : BOOL := TRUE;
-END_VAR</Single>
+END_VAR
+</Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">1144</Single>
+        <Single Name="UniqueIdGenerator" Type="string">2027</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -93671,6 +93230,247 @@ END_VAR</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
         <Single Type="string">SYSTEM</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">0792e1c4-921e-41a7-b3f3-a7a6c6c06975</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_AxisCmd</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057242365646</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🕹️ ST_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.5.md §8
+   ⚠️ MISE EN CONFORMITÉ (remplace la version actuelle du projet) :
+      - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
+        TRUE = rampe accélération, FALSE = rampe décélération normale)
+      - Champ `SafetyOk` RETIRÉ : ce n'est pas une commande d'axe, c'est
+        une info de contexte (`EmergencyStopOk`) consommée directement
+        par le FB de mouvement (FB_Winch/FB_Translation), pas portée
+        par la consigne d'axe elle-même.
+   🧭 4 champs exactement, conforme Partie2 v2.5 §8.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_AxisCmd :
+STRUCT
+    Enable      : BOOL;   // Autorisation FB (FALSE = neutralisation, sorties coupées)
+    StartStop   : BOOL;   // TRUE = rampe accélération, FALSE = rampe décélération normale
+    SpeedRef    : REAL;   // Consigne vitesse 0..100 %
+    Direction   : INT;    // -1 = Rev, 0 = Neutre, +1 = Fwd
+END_STRUCT
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">0792e1c4-921e-41a7-b3f3-a7a6c6c06975_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">40</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">TREUIL</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">b917c37d-44df-46a0-871a-29de2d249295</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_ContactorCheck</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057187993555</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.5.md §8,
+                   DOC/AF_Partie3_Template_FB_Commun_v1.2.md §7bis
+   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
+   détecter un collage / une absence de fermeture d'un contacteur de
+   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
+   appelant).
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_ContactorCheck :
+STRUCT
+    Command     : BOOL;   // Ordre envoyé au contacteur (TRUE = fermé/actif)
+    Feedback    : BOOL;   // Retour d'état câblé (TRUE = effectivement fermé)
+    StuckClosed : BOOL;   // Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff
+    StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
+END_STRUCT
+END_TYPE</Single>
+            <Single Name="LineInfoPersistence" Type="string">b917c37d-44df-46a0-871a-29de2d249295_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">23</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">TREUIL</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">6ab0f9d5-b3b5-404f-8e07-4b31c192a40e</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_SpeedStepTable</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186057117483322</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
+   ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
+      packé de la 1ère version) : chaque contacteur de vitesse de
+      chaque palier est un BOOL nommé individuellement
+      `P&lt;palier&gt;R&lt;relais&gt;` (ex. `P1R1`, `P3R2`) — paramétrable un par
+      un pendant la mise en service (visible/modifiable directement
+      dans la vue instance CODESYS), sans manipuler un masque binaire
+      packé. `P` = Palier, `R` = Relais (contacteur de vitesse 1..4).
+   L'ordre d'actionnement n'est pas implicite : il est défini ICI,
+   dans les données, pas codé en dur dans la logique (FB_SpeedStep).
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_SpeedStepTable :
+STRUCT
+    // Palier 1 (vitesse la plus faible)
+    P1R1 : BOOL;
+    P1R2 : BOOL;
+    P1R3 : BOOL;
+    P1R4 : BOOL;
+    // Palier 2
+    P2R1 : BOOL;
+    P2R2 : BOOL;
+    P2R3 : BOOL;
+    P2R4 : BOOL;
+    // Palier 3
+    P3R1 : BOOL;
+    P3R2 : BOOL;
+    P3R3 : BOOL;
+    P3R4 : BOOL;
+    // Palier 4
+    P4R1 : BOOL;
+    P4R2 : BOOL;
+    P4R3 : BOOL;
+    P4R4 : BOOL;
+    // Palier 5 (vitesse la plus élevée)
+    P5R1 : BOOL;
+    P5R2 : BOOL;
+    P5R3 : BOOL;
+    P5R4 : BOOL;
+    // Seuils de changement de palier (%), utilisés par paires successives (HYSTERESIS)
+    // Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1→2..4→5)
+    StepThreshold_Pct : ARRAY[1..5] OF REAL;
+END_STRUCT
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">6ab0f9d5-b3b5-404f-8e07-4b31c192a40e_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">71</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">TREUIL</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -93887,7 +93687,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639185517940202676</Single>
+        <Single Name="Timestamp" Type="long">639186057762553816</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -93919,10 +93719,12 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🔴 TBD (codeur non finalisé) : bit1 réservé perte codeur/EtherCAT M1 — NON câblé dans ce lot.
-// Ne jamais mettre un stub qui masquerait un vrai défaut : laisser le bit à 0 tant que la
-// surveillance codeur n'est pas fiabilisée revient à accepter ce risque en Maintenance N1
-// (cohérent avec le choix de test réduit validé avec l'utilisateur).
+// 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
+IF NOT EncoderAvailable THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -93946,20 +93748,25 @@ Done := FALSE;
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1/M2)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md,
+                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.1.md §7
                    (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
-   📤 Sortie maîtresse SafeStop_Winch : consommée en entrée par TOUT
-      FB de mouvement du domaine treuil (FB_Winch M1, M2 plus tard).
-   ⚠️ PÉRIMÈTRE MINIMAL DE CE LOT (créé pour tester la chaîne
-      Joystick→Winch→Relais en Maintenance N1, sans dépendance codeur) :
+   📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
+      DU MÊME TREUIL (instSafetyWinchM1→instWinchM1, idem M2).
+   ⚠️ ÉVOLUTION (lot Codeur, 2026-07-02) : `FB_Safety_Winch` reste UN
+      SEUL type FB — le "split M1/M2" acté en Partie10 §7 s'obtient par
+      DEUX INSTANCES (`instSafetyWinchM1`/`instSafetyWinchM2`), chacune
+      câblée sur l'`EncoderAvailable` de SON treuil (pas deux FB
+      distincts — composition, pas duplication de code).
       - ✅ Détecte la perte joystick/CAN (sans commande valide, un
         treuil ne doit pas pouvoir bouger).
-      - 🔴 TBD (codeur non finalisé, PAS simulé) : perte codeur M1/M2,
-        perte bus EtherCAT du treuil concerné. Zones clairement
-        marquées ci-dessous — à câbler quand FB_Encoder_Abs/Safety et
-        FB_DiagEthercat seront fiabilisés pour ce domaine.
+      - ✅ Détecte la perte codeur DE CE TREUIL (`EncoderAvailable`,
+        sortie `FB_Encoder_Abs` — désormais câblée, ErrorId bit1).
+      - 🔴 TBD (non simulé) : perte bus EtherCAT spécifique (au-delà de
+        ce que `EncoderAvailable` reflète déjà, si besoin d'un signal
+        distinct plus tard).
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
         ST_ContactorCheck de puissance câblé — FB_Output_Relay
         transverse hors périmètre de ce lot, voir Partie6).
@@ -93993,15 +93800,14 @@ VAR_INPUT
     Mode                : E_Mode;      // Mode courant (autorisations)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
-    // 🔴 TBD (codeur non finalisé) : ajouter ici EncoderM1Available / EncoderM1EtherCatOk
-    //     quand FB_Encoder_Abs/Safety M1 seront fiabilisés — ne PAS stubber en dur.
+    EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine treuil sans commande valide)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
@@ -94014,7 +93820,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">1c48691e-7eeb-425a-a642-75da80a33af5_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">330</Single>
+        <Single Name="UniqueIdGenerator" Type="string">518</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>

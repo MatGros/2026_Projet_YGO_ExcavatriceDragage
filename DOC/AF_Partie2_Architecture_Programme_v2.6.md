@@ -1,5 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.5)
+# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.6)
 
+> **Version 2.6** — Retour terrain 2026-07-02 (§6) : le câble mécanique « montée excessive » est
+> **retiré de la chaîne AU matérielle** — seul le bouton coup-de-poing reste un AU purement
+> câblé. Le capteur de position haute est désormais lu par l'automate, qui déclenche
+> `PowerCutOff` si activé hors mode référencement (2ᵉ cause de `PowerCutOff`, en plus du
+> contacteur collé) — voir aussi Partie 1 v1.3 et Partie 10.
+>
 > **Version 2.5** — Suite audit documentaire (voir `DOC/AUDIT_Coherence_Documentaire_v1.0.md`) :
 > - **`CoupeEnable` supprimé** : cette variable n'a **jamais existé**, c'était une façon imprécise
 >   de décrire le mécanisme d'arrêt. Remplacé par le couple **`SafeStop`/`StartStop`** (voir §0, §6).
@@ -220,8 +226,8 @@ FB_Safety_<Metier> contacteur collé ──► PowerCutOff := TRUE ──► cou
 
 | Couche | Élément | Nature | Action |
 |--------|---------|--------|--------|
-| Matérielle | Bouton coup-de-poing **ou** câble mécanique « montée excessive » | Câblé | Coupe le **contacteur de puissance** → moteurs OFF + freins collés **brutalement**. Automate/CC **non coupés**, continue de surveiller. |
-| Matérielle ⟵ Logiciel | Sortie **`PowerCutOff`** (= `AuTrigger`) | Cmd PLC → relais coupure | Si un **contacteur de puissance reste collé**, ouvre le **contacteur général amont** (organe distinct du contacteur collé). Seul moyen d'arrêter un treuil parti sans commande. |
+| Matérielle | Bouton coup-de-poing (opérateur) | Câblé | Coupe le **contacteur de puissance** → moteurs OFF + freins collés **brutalement**. Automate/CC **non coupés**, continue de surveiller. **Seul** AU purement matériel restant (2026-07-02). |
+| Matérielle ⟵ Logiciel | Sortie **`PowerCutOff`** (= `AuTrigger`) | Cmd PLC → relais coupure | 2 causes possibles : (1) un **contacteur de puissance reste collé** (historique) ; (2) **capteur de position haute treuil activé hors mode référencement** (2026-07-02 — ancien câble mécanique « montée excessive », désormais lu par l'automate, voir Partie 1 §Sécurité électrique / Partie 10). Les deux ouvrent le **contacteur général amont**. |
 | Logicielle | **`SafeStop`** (sortie d'un bloc safety **métier**, une par domaine) | Variable interne, propre au métier | Sur défaut process de son domaine : le(s) FB de mouvement concerné(s) passent en **rampe de décélération rapide** (**Enable maintenu**). **≠ AU** : c'est le **seul** mécanisme non-brutal ; **seul l'AU coupe brutalement** la puissance. |
 | Logicielle | `EmergencyStopOk` (entrée FB, anciennement `SafetyOk`) | Info | Reflète « AU réarmé + conditions globales OK » — alimentée par la chaîne de sécurité AU ou le retour du contacteur de puissance (source exacte à définir par métier). |
 

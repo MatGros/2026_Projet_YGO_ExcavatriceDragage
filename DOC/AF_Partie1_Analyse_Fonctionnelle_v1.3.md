@@ -1,7 +1,12 @@
-# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.3)
 
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
+> **v1.3** — Retour terrain 2026-07-02 : le câble mécanique de position haute extrême a été
+> **retiré de la chaîne AU matérielle** — c'est désormais l'automate qui gère la coupure via
+> `PowerCutOff` à partir d'un capteur TOR lu en entrée (voir §Sécurité électrique). Seuls les
+> boutons coup-de-poing opérateur restent un AU **purement matériel**. Ce capteur sert aussi de
+> référence répétable pour le homing (voir Partie 10).
 > **v1.2** — Suite audit documentaire : suppression `CoupeEnable` (n'a jamais existé comme
 > variable), modèle d'arrêt `SafeStop`/`StartStop` (voir Partie 3 v1.2), `SafeStop` **par métier**
 > (pas de signal global), clarification séquence d'initialisation codeurs.
@@ -108,10 +113,18 @@ Partie 3 v1.2 §1/§7.
 
 ### 🔌 Sécurité électrique — automate jamais coupé
 L'automate **reste alimenté en permanence** (pas de coupure électrique générale du contrôleur).
-Seul l'**arrêt d'urgence physique** (bouton coup-de-poing ou câble mécanique de position haute
-extrême) **coupe brutalement la puissance** via un gros contacteur ; l'automate continue de
-surveiller en permanence (il dispose d'une **info « machine en AU »**, voir Partie 3 §1
-`EmergencyStopOk`). Conséquence pour le logiciel :
+
+⚠️ **Correctif 2026-07-02** : seul le **bouton coup-de-poing opérateur** est câblé en AU **purement
+matériel** — il coupe brutalement la puissance via un gros contacteur, indépendamment de
+l'automate, qui continue de surveiller (info « machine en AU », voir Partie 3 §1
+`EmergencyStopOk`). Le **câble mécanique de position haute extrême a été retiré de cette chaîne
+matérielle** : c'est désormais un **capteur TOR lu par l'automate**, qui sert (1) de référence
+répétable pour le homing (Partie 10) et (2) déclenche `PowerCutOff` (coupure de puissance pilotée
+logiciel, même mécanisme que le cas « contacteur collé », voir Partie 2 §6) si activé **en dehors
+d'un mode référencement explicite** — l'automate porte donc la responsabilité de cette protection
+anti-survitesse/anti-débordement en position haute, ce n'est plus un trip matériel direct.
+
+Conséquence pour le logiciel :
 - Chaque contacteur de puissance possède un **retour d'état** (contact auxiliaire) lu en entrée.
 - Le bloc safety concerné compare en permanence **commande vs retour**.
 - Si l'API commande l'ouverture (arrêt moteur) mais que le contacteur **reste collé** (retour incohérent) → une **sortie de coupure puissance** dédiée (`PowerCutOff`) **coupe électriquement** la puissance en amont.
