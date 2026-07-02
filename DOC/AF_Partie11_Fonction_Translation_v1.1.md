@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.0)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.1)
 
 > **Fonction métier** : chaîne de commande Joystick (axe X) → `FB_Translation` → variateur AC600
 > (axe M3), avec **deux modes de communication** sélectionnables manuellement : `ETHERCAT`
@@ -8,13 +8,31 @@
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
 > 🔴 **Document de réflexion / squelette** : la partie `ETHERCAT` porte des inconnues protocolaires
 > (layout exact des mots commande/état AC600) volontairement **non comblées par approximation**
-> (règle projet : ne jamais deviner). La partie `DEGRADED_IO` est en revanche complète et
-> applicable dès que le bornier réel est confirmé.
+> (règle projet : ne jamais deviner). La partie `DEGRADED_IO` est fonctionnellement complète
+> (corrigée v1.1) mais reste conditionnée à la confirmation du bornier réel et du paramétrage
+> AC600 (§4bis) avant tout essai machine en charge.
 > 🔗 Dépend de : [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.5.md), [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md) §1bis, [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §5, [P9 Winch v1.0](AF_Partie9_Fonction_Winch_v1.0.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`).
 >
 > ℹ️ **Numérotation** : la branche `claude/encoder-homing-winch-control-h6ef89` (non fusionnée
 > dans `main` à la rédaction) occupe déjà `AF_Partie10_Fonction_Encoder_Homing_v1.1.md` — ce
 > document prend donc le numéro **11** pour éviter toute collision au moment du merge.
+>
+> **v1.1** — Correctifs suite revue automatisme/mise en service 2026-07-02 (périmètre strictement
+> limité à `FB_Translation`/`FB_Safety_Translation`/`E_TranslationCommMode`, aucun autre bloc du
+> projet touché) :
+> - 🔴 **[F1, bloquant, corrigé]** En `DEGRADED_IO`, la coupure des relais de sens sur arrivée
+>   capteur (§9bis) dépendait de la rampe **logicielle** `SpeedRamp.Current`, sans lien avec la
+>   vitesse physique réelle en tout-ou-rien (PV/GV) → jusqu'à ~2,5 s de roulage à pleine vitesse
+>   après passage sur le capteur. Corrigé : coupure **immédiate**, découplée de la rampe
+>   (`DegradedMoveAuthorized`, voir `CODE/FB_Translation.st`).
+> - 🟠 **[F5, corrigé]** `CommMode` est désormais **verrouillé** (`CommModeLocked`) tant qu'un
+>   mouvement est en cours — un changement de mode pendant `Busy=TRUE` n'est plus pris en compte.
+> - 🟠 **[F7, clarifié]** Les paramètres de rampe ne pilotent une vitesse physique réelle qu'en
+>   `ETHERCAT`. Nouveau paramètre `DegradedStopSettleTime` (délai physique réel) remplace la rampe
+>   comme confirmation d'arrêt pour l'interlock de sens en `DEGRADED_IO`.
+> - 🟠 **[F2, F3, F4, F6]** Ajout §4bis (paramétrage AC600 à vérifier avant essai), avertissement
+>   double commande EtherCAT/relais (§4bis), note de portée sur Partie2 §5 (§4), checklist
+>   "avant premier essai" (§7).
 
 ---
 
@@ -103,14 +121,19 @@ si câblé — 🔴 TBD tant que le bit exact du mot d'état `ETHERCAT` n'est pa
 ## 🛡️ 4. Sécurité
 
 - **Précédence stricte** `Enable > SafeStop > StartStop`, identique aux autres FB de mouvement.
-- **Interlock changement de sens** (`DEGRADED_IO`) : même principe que `FB_Winch` — engagement
-  initial neutre→un sens immédiat, arrêt et inversion directe exigent la vitesse rampée
-  confirmée nulle.
+- **Interlock changement de sens** : même principe que `FB_Winch` — engagement initial
+  neutre→un sens immédiat, arrêt et inversion directe exigent une confirmation d'arrêt
+  (`IsStoppedConfirmed`, 🆕 v1.1) dont la source diffère par mode : rampe logicielle confirmée
+  nulle en `ETHERCAT` (consigne réellement proportionnelle), **délai physique réel
+  `DegradedStopSettleTime`** en `DEGRADED_IO` (la rampe logicielle n'y a aucun lien avec la
+  vitesse réelle, cf. correctif F1/F7).
 - **Arrêt exact sur capteur** (§9bis du code, 🆕 **comportement proposé, à valider avec
-  l'utilisateur** — absent de toute doc existante) : la rampe est verrouillée à 0 tant que
-  `PositionSensorTarget` (débounced) reste actif **et** que le sens commandé est le même que
-  celui qui a mené à l'arrivée — permet de repartir immédiatement en sens inverse sans bloquer
-  totalement l'axe sur la position atteinte.
+  l'utilisateur** — absent de toute doc existante) : le mouvement est verrouillé (`ArrivalLock`)
+  tant que `PositionSensorTarget` (débounced) reste actif **et** que le sens commandé est le même
+  que celui qui a mené à l'arrivée — permet de repartir immédiatement en sens inverse sans
+  bloquer totalement l'axe sur la position atteinte. **Coupure immédiate des relais en
+  `DEGRADED_IO`** depuis le correctif v1.1 (F1) — avant correction, la coupure réelle pouvait être
+  retardée de plusieurs secondes.
 - **Ralentissement auto à l'approche** (`ETHERCAT` uniquement, Partie4 §5) : après `ApproachTime`
   écoulé depuis le début du mouvement, la consigne est plafonnée à `ApproachSpeedPct`. **Non
   reproductible en `DEGRADED_IO`** (pas de consigne variable programmable) — le choix PV/GV y
@@ -128,6 +151,38 @@ si câblé — 🔴 TBD tant que le bit exact du mot d'état `ETHERCAT` n'est pa
 | Interface `LIN_TRAFO` (Util) | Non vérifiée ici — le projet a déjà eu une mauvaise supposition d'interface sur `HYSTERESIS` (correctif `FB_SpeedStep` 2026-07-01). En attendant, mise à l'échelle %→Hz par calcul linéaire explicite dans `FB_Translation.st`, à remplacer par `LIN_TRAFO` si son interface réelle est vérifiée |
 | Bornier TOR réel `DEGRADED_IO` | Nombre exact d'entrées présélection vitesse dispo sur l'AC600, câblage physique — à valider à la mise en service (comme `ST_SpeedStepTable` pour le treuil) |
 | `VariateurAvailable` (`FB_DiagEthercat` AC600/M3) | Diag EtherCAT non finalisé — `FB_Safety_Translation` ne le surveille pas encore (bit réservé, non stubé), comme le codeur pour `FB_Safety_Winch` |
+
+> 🧭 **Note de portée vs Partie2 §5** : la table "Dégradation par domaine" de
+> [Partie2 §5](AF_Partie2_Architecture_Programme_v2.5.md) indique « Variateur M3 down →
+> Translation interdite ». Cette règle s'entend **hors activation volontaire de
+> `CommMode := DEGRADED_IO`** — Partie2 n'a pas encore été mise à jour pour référencer ce mode
+> (mise à jour transverse à faire lors d'une prochaine revue de cohérence documentaire, hors
+> périmètre de ce lot qui ne touche que les fichiers Translation).
+
+---
+
+## ⚡ 4bis. Paramétrage AC600 & câblage — à vérifier AVANT tout essai réel
+
+🔴 **Cette section liste QUOI vérifier, pas les valeurs exactes** (numéros de paramètres/menu
+propres au modèle AC600 exact installé — non disponibles à la rédaction, à relever sur la doc
+constructeur ou l'étiquette du variateur).
+
+| Vérification | Pourquoi | Type |
+|---------------|----------|------|
+| Fréquence PV (petite vitesse) réglée sur le variateur | Vitesse physique réelle en `DEGRADED_IO` quand `RelaySpeedGv = FALSE` — le PLC ne fait que sélectionner, pas moduler | Paramètre variateur |
+| Fréquence GV (grande vitesse) réglée sur le variateur | Idem quand `RelaySpeedGv = TRUE` | Paramètre variateur |
+| Rampes accel/decel **internes** au variateur | Déterminent la décélération physique réelle après coupure du relais de sens — c'est cette valeur, pas `RampDecelNormalRate`/`RampDecelFastRate` (paramètres PLC, sans effet physique en `DEGRADED_IO`), qui doit inspirer le réglage de `DegradedStopSettleTime` | Paramètre variateur |
+| **Source de commande** (Terminal/bornier vs Communication/fieldbus) | 🔴 **Critique** : le câblage relais est prévu **en parallèle** du bus EtherCAT (§1). Tant que ce paramètre n'est pas verrouillé sur *Terminal* pendant `CommMode = DEGRADED_IO`, une reprise intermittente du bus EtherCAT peut produire un comportement imprévisible (le PLC écrit `DriveControlWord := 0`/`DriveFreqRefHz := 0.0` sur l'image EtherCAT en `DEGRADED_IO`, mais l'interprétation de ce "0" par le variateur dépend entièrement de ce paramètre) | Paramètre variateur — **à figer avant tout essai** |
+| Sectionnement/isolement physique du bus EtherCAT (si possible) | Alternative plus sûre que le seul verrouillage logiciel du paramètre source de commande, tant que ce dernier n'est pas confirmé | Câblage |
+
+**Procédure de réglage progressif recommandée pour le premier essai** (valeurs par défaut
+`FB_Translation.st` volontairement prudentes mais non validées terrain) :
+1. Régler PV à une fréquence **très basse** sur le variateur (mouvement à peine perceptible).
+2. Tester `RelayFwd` seul (axe **non chargé**, machine à l'arrêt) → valider le sens physique
+   correspond bien à l'attendu joystick (sinon inverser le câblage moteur, pas la logique PLC).
+3. Remonter PV progressivement jusqu'à une valeur d'exploitation confortable.
+4. Régler GV en dernier, seulement une fois PV validée et le comportement d'arrêt sur capteur
+   (§9bis) vérifié à vitesse PV.
 
 ---
 
@@ -195,17 +250,36 @@ opérationnel pendant que l'EtherCAT est en panne. Étapes (une fois validées) 
    IHM/sélecteur maintenance), `DriveStatusWord := 0`, `DriveActualFreqHz := 0.0` (stubs neutres).
 5. I/O Mapping : relais sens + PV/GV + retours (Mapping §5) sur les canaux physiques réels.
 6. **Rebuild** — 0 erreur avant tout téléchargement automate.
+7. **Paramétrage AC600 + verrouillage source de commande** (§4bis) — avant toute mise sous tension
+   avec le PLC actif.
+
+### ✅ Avant le premier essai réel (mouvement machine)
+
+À faire **dans cet ordre**, avant tout essai en charge :
+1. Vérifier §4bis entièrement réglé (PV très basse, source de commande verrouillée Terminal).
+2. **Essai à vide** (axe débrayé si possible, ou machine non chargée) : valider `RelayFwd`/`RelayRev`
+   séparément, sens physique conforme au joystick.
+3. Valider l'interlock de sens : tenter une inversion directe Fwd→Rev en mouvement → doit être
+   bloquée jusqu'à `DegradedStopSettleTime` écoulé après coupure relais.
+4. Valider la double vérification contacteurs (`FwdContactorCheck`/`RevContactorCheck`) :
+   débrancher volontairement un retour contacteur → `ErrorId` doit se lever, sorties coupées.
+5. Valider l'arrêt sur capteur (§9bis) à vitesse **PV uniquement**, machine non chargée, avant
+   tout essai à vitesse GV ou en charge.
+6. Seulement après ces 5 points validés : essai en charge, montée progressive PV→GV.
 
 ---
 
 ## 🔁 8. Retour d'expérience (à compléter après test)
 
-- [ ] Sens (Fwd/Rev) cohérent avec le joystick axe X (à vérifier au 1er essai)
+- [ ] Sens (Fwd/Rev) cohérent avec le joystick axe X (à vérifier au 1er essai, à vide — §7)
 - [ ] Sélection PV/GV : seuils `DegradedGvThresholdHighPct`/`LowPct` à régler selon ressenti opérateur
-- [ ] Arrêt sur capteur cible : comportement §9bis (verrouillage sens identique, déverrouillage sur inversion) à valider en conditions réelles — **signaler si le comportement attendu diffère**
+- [ ] Arrêt sur capteur cible : comportement §9bis (verrouillage sens identique, déverrouillage sur inversion) — coupure relais **immédiate** depuis correctif v1.1 (F1), à confirmer en conditions réelles que `DegradedStopSettleTime` est suffisant compte tenu de la décélération physique réelle du variateur (§4bis)
+- [ ] `DegradedStopSettleTime` : régler selon le temps d'arrêt physique réel observé (rampe interne AC600, §4bis) — valeur par défaut (1s) non validée terrain
 - [ ] Frein translation : mêmes réglages temporisés que le treuil, ou délais différents à ajuster (`BrakeDelay*`) ?
+- [ ] Vérifier qu'un changement de `CommMode` pendant un mouvement est bien ignoré (`CommModeLocked`, correctif v1.1 F5)
 - [ ] Une fois l'EtherCAT AC600 fiabilisé : lever les TBD §4 (protocole variateur), passer des tests en `CommMode := ETHERCAT`
 - [ ] `FB_Safety_Translation` : n'est validée que pour perte joystick/CAN ce lot — revoir avant mise en service définitive
+- [ ] Paramètre "source de commande" AC600 (§4bis) confirmé verrouillé sur Terminal pendant `DEGRADED_IO` — vérifier qu'une reprise EtherCAT intermittente ne perturbe pas la commande relais
 
 ---
 

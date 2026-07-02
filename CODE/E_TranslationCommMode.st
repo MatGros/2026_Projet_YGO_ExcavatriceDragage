@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🔀 E_TranslationCommMode — Mode de communication FB_Translation
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md
    🧭 Sélection MANUELLE (maintenance), jamais de bascule automatique
       pendant un mouvement — voir Partie11 §1.
    ═══════════════════════════════════════════════════════════════ *)

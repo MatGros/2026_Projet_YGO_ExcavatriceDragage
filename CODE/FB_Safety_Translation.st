@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Translation — Bloc safety MÉTIER du domaine Translation (M3)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md
                    (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
