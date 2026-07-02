@@ -1,5 +1,7 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.2)
 
+> **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Grappin
+> (`OverrideGrappin`, `FB_Grappin`), Translation→Chariot — préfixe I/O physique M3 inchangé.
 > **Version 1.1** — Suite audit documentaire : correction du pseudo-code d'override (§2) qui
 > plaçait à tort la limite légale dans `FB_Safety` (elle est **exclusivement** gérée par
 > `FB_Modes`, §3) ; `CoupeEnable` retiré (jamais une variable) au profit de `SafeStop`/`StartStop` ;
@@ -49,14 +51,14 @@ ponctuelles**, mais en conservant **un niveau de sécurité correct**.
 | Caractéristique | État |
 |-----------------|------|
 | Commande | Joystick, treuils **pilotables unitairement** (M1, M2 séparés) |
-| Contrôle synchro (`FB_WinchSync`) | ✅ Actif (sauf phase godet — suspension automatique, Partie 4 §3bis) |
-| Contrôle godet (`FB_Bucket`) | ✅ Actif |
+| Contrôle synchro (`FB_WinchSync`) | ✅ Actif (sauf phase grappin — suspension automatique, Partie 4 §3bis) |
+| Contrôle grappin (`FB_Grappin`) | ✅ Actif |
 | Codeurs / freins / capteurs | ✅ Actifs (sécurités maintenues) |
 | Limite légale profondeur | ⚠️ Non bloquante, **signalisation** IHM |
 | Authentification | Aucune (un sélecteur de choix pourra élargir vers N2 à la marche) |
 
 Usages : positionnement init après démarrage, tests moteurs/freins en conditions sûres,
-remise en ordre légère (ex. godet à recaler en vitesse réduite).
+remise en ordre légère (ex. grappin à recaler en vitesse réduite).
 
 ### 🔴 Maintenance Niveau 2 (`MAINT_N2`)
 Mode à **mot de passe** plus dur, **droits augmentés**, avec la possibilité de **désactiver
@@ -68,7 +70,7 @@ de l'opérateur (mot de passe + droits).
 | Authentification | 🔑 Mot de passe + droits |
 | Commande | Joystick, treuils **indépendants** |
 | Override synchro | ⛔→ désactivable (ex. codeur mort) |
-| Override contrôle godet | ⛔→ désactivable |
+| Override contrôle grappin | ⛔→ désactivable |
 | Override limite légale | ⛔→ désactivable (signalisation maintenue) |
 | Pilotage sans codeur | ✅ possible |
 | Pilotage sans/forçant frein | ✅ possible selon droits |
@@ -84,15 +86,15 @@ freins, déplacements **malgré** défauts ou incohérences, récupération apr�
 ```
 IF Mode = MAINT_N2 AND PasswordOk THEN
     OverrideSync   := UserSelectIHM;   // case à cocher opérateur
-    OverrideBucket := UserSelectIHM;
+    OverrideGrappin := UserSelectIHM;
     OverrideLimit  := UserSelectIHM;
     // application aux blocs concernés :
     FB_WinchSync.Enable       := NOT OverrideSync;
-    FB_Bucket.ControlEnable   := NOT OverrideBucket;
+    FB_Grappin.ControlEnable   := NOT OverrideGrappin;
     LimitLegal.Enabled        := NOT OverrideLimit;   // interne à FB_Modes (PAS FB_Safety, voir §3)
     MsgIHM := "MAINT N2 active";
 ELSE
-    OverrideSync := FALSE; OverrideBucket := FALSE; OverrideLimit := FALSE;  // tout actif
+    OverrideSync := FALSE; OverrideGrappin := FALSE; OverrideLimit := FALSE;  // tout actif
 END_IF
 ```
 
@@ -170,7 +172,7 @@ conditions globales OK ».
 ### Récupération (exemple : codeur M1 mort)
 ```
 - L'axe treuil M1 est SIGNALÉ en défaut ; ses commandes seront compliquées/inopérantes.
-- Le treuil M2 reste fonctionnel (ex. ouvrir/fermer godet possible via M2).
+- Le treuil M2 reste fonctionnel (ex. ouvrir/fermer grappin possible via M2).
 - Meilleure pratique : passer en MAINT_N2 :
     → choisir de remonter SYNCHRONE mais SANS contrôle de synchronisme
       (codeurs morts → override OverrideSync) ;
@@ -207,5 +209,5 @@ Règle de conception : **prévoir, en sortie de chaque FB, de l'information pens
 ## 📚 Documents liés
 - **Partie 2 v2.5** — Architecture (`FB_Modes`, `SafeStop`/`StartStop`, AU).
 - **Partie 3 v1.2** — Contrat FB (`Mode`, `EmergencyStopOk`, `SafeStop`, reset).
-- **Partie 4** — Cycle (étapes, synchro, godet, rampes).
+- **Partie 4** — Cycle (étapes, synchro, grappin, rampes).
 - **Partie 6** — Conditionnement E/S.

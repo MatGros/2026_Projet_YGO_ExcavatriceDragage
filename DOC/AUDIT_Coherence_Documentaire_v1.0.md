@@ -190,3 +190,35 @@ anciennes versions ont été déplacées vers `DOC/Archives/` (gitignoré, non v
   (câblage `SafeStop`/`SafetyOk` à corriger, nom `PRG_JOY1` à faire évoluer).
 - **Q6/Q7/Q11** (séquence `INIT` fine, priorités tâches, source exacte de `EmergencyStopOk`) :
   restent **TBD**, non spécifiées dans cette passe.
+
+---
+
+## 🚀 8. Décisions terminologiques + sécurité treuil (2026-07-02, session nouvel export I/O réel)
+
+**Contexte** : nouvel export `Device.export` reçu (I/O Mapping réel pour la majorité des signaux
+M1/M2 winch + capteur position haute commun + nouveaux signaux thermique/mou de câble). En
+parallèle, l'utilisateur a tranché deux renommages métier en attente depuis le retour arrière
+partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D23 | **Godet→Grappin** | Terme métier définitif : **Grappin** (ouverture/fermeture, prévention gravats). `Bucket`/`Godet` retirés du vocabulaire des specs. `FB_Grappin`, `ST_GrappinConfig`/`ST_GrappinState` (aspirationnels, non codés). |
+| D24 | **Translation→Chariot** | Terme métier définitif : **Chariot** (axe transversal M3, objet métier qui se déplace) — conserve **Plongée/Extraction** pour les treuils (inchangé). `FB_Chariot`, `FB_Safety_Chariot`, `E_ChariotCommMode`, `GVL_Chariot_M3_Stub`, `ST_ChariotIO`. Préfixe I/O physique **M3 inchangé** (mapping matériel), `E_CycleStep.TRANSLATION_MOVE` renommé **`CHARIOT_MOVE`**. |
+| D25 | **I/O réel M1/M2 winch** | `RelayFwd/Rev`, `SpeedContactor_1..4` (renommé, ex `Contactor1..4`), `BrakeCmd`, `ContactorFeedbackFwd/Rev` désormais câblés en I/O Mapping réel → stubs `GVL_Winch_M1/M2_Stub` réduits à `BrakeFeedback` seul (dernier signal non câblé). |
+| D26 | **Capteur position haute réel** | `M1_M2_TopPositionSensor` (I/O réel, commun M1+M2) — résout la clarification terminologique laissée ouverte en Partie10 v1.3. `GVL_Homing_Stub` **supprimé**. |
+| D27 | **Mou de câble → `ForbidDescent`** | Nouveau signal `M1_M2_SlackCableSwitch` (I/O réel, commun). Ne peut **pas** être porté par `SafeStop` (arrête les 2 sens) : nouvelle sortie dédiée `FB_Safety_Winch.ForbidDescent`, masque **uniquement** `RelayRev` (descente) — `RelayFwd` (montée) reste libre pour vérification câblage. Défaut visible IHM (`ErrorId` bit3), reset front standard. Pattern **spécifique à ce cas**, pas une généralisation du contrat Partie3. |
+| D28 | **Thermique moteur → `SafeStop`** | `M1/M2_ThermalFeedback` (I/O réel, par treuil) → nouveau bit `ErrorId` (bit2) dans `FB_Safety_Winch`, participe à `SafeStop` (arrêt total classique, protection moteur). |
+| D29 | **Capteurs position Chariot** | 4 capteurs réels (`PosiFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`) câblés, mais sélection de cible normale différée à `FB_Cycle` (non codé). Sélecteur **STUB maintenance** (`StubChariotPositionSelect_IHM`) ajouté pour tester chaque capteur individuellement dès ce lot. |
+| D30 | **Nouveaux équipements (convoyeur, grille, casque, hydraulique)** | **Hors périmètre explicite** de ce lot (décision utilisateur : "pour l'instant, il n'y a rien à faire") — non traités, ni en code ni en doc. |
+
+### Fichiers impactés (2026-07-02)
+- **CODE/** : `FB_Chariot.st` (ex-`FB_Translation`), `FB_Safety_Chariot.st`, `E_ChariotCommMode.st`,
+  `GVL_Chariot_M3_Stub.st` (renommés + M3_BrakeCmd retiré, sélecteur position ajouté),
+  `FB_Safety_Winch.st`/`FB_Winch.st` (ThermalFeedback/SlackCableDetected/ForbidDescent),
+  `GVL_Winch_M1/M2_Stub.st` (réduits à BrakeFeedback), `GVL_Homing_Stub.st` (supprimé),
+  `PRG_MAIN.st` (câblage complet), + mentions croisées (`FB_Brake`, `FB_Encoder_*`,
+  `FB_Joystick`, `FB_Input_Digital`, `FB_Output_Relay`, `ST_AxisCmd`, `ST_EncoderCalib`).
+- **DOC/** : Partie1 v1.3→**v1.4**, Partie2 v2.6→**v2.7**, Partie3 v1.2→**v1.3**,
+  Partie4 v1.1→**v1.2**, Partie5 v1.1→**v1.2**, Partie6 v1.1→**v1.2**, Partie8 v1.1→**v1.2**,
+  Partie9 v1.0→**v1.1**, Partie10 v1.3→**v1.4**, Partie11 (renommé) v1.1→**v1.2**,
+  `NAMING_CONVENTION.md`/`CLAUDE.md` édités en place. Anciennes versions → `DOC/Archives/`.

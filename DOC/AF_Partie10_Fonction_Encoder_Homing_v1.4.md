@@ -1,13 +1,23 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.4)
 
+> **v1.4** — Nouvel export `Device.export` (2026-07-02) : le capteur de position haute est
+> désormais câblé en **I/O Mapping réel**, sous le nom **`M1_M2_TopPositionSensor`** — cela
+> répond à la clarification terminologique laissée ouverte en v1.3 (« nom neutre, terminologie
+> exacte en cours de clarification »). `CODE/GVL_Homing_Stub.st` est **supprimé** (conflit de nom
+> avec la variable réelle sinon) ; le port d'entrée `FB_Encoder_Homing.TopPositionSensor`
+> **reste nommé ainsi** côté FB (seule la variable globale qui l'alimente dans `PRG_MAIN.st`
+> change de nom). Renommage métier Translation→Chariot répercuté dans les renvois croisés
+> (`FB_Chariot`, préfixe I/O physique M3 inchangé).
+>
 > **v1.3** — Retour terrain 2026-07-02 (correction implémentation) :
 > - 🔧 **`TopPositionSensor` : UN SEUL capteur physique, COMMUN aux 2 treuils** — pas un par
 >   treuil. Les 2 câbles (M1/M2) hissent ensemble le même ensemble mécanique qui vient toucher ce
 >   capteur unique. L'implémentation précédente (`CODE/`) avait divergé : 2 variables séparées
 >   (`M1_TopPositionSensor`/`M2_TopPositionSensor`, une par GVL stub Winch) et le commentaire
 >   d'entrée `FB_Encoder_Homing.TopPositionSensor` disait à tort « CE TREUIL ». Corrigé :
->   `CODE/GVL_Homing_Stub.st` (nouveau, variable unique `TopPositionSensor` — nom **neutre**,
->   sans préfixe métier, terminologie exacte de l'ensemble mécanique en cours de clarification),
+>   `CODE/GVL_Homing_Stub.st` (nouveau à l'époque, variable unique `TopPositionSensor` — nom
+>   **neutre**, sans préfixe métier, terminologie exacte de l'ensemble mécanique en cours de
+>   clarification — voir note v1.4 ci-dessus, clarification arrivée),
 >   câblée IDENTIQUEMENT sur `instHomingM1` ET `instHomingM2` dans `PRG_MAIN.st`. Voir §5/§7bis/§9
 >   mis à jour ci-dessous. `TopSensorPositionM` (paramètre de calibration, distinct du capteur
 >   lui-même) reste réglable indépendamment par treuil (asymétrie mécanique possible même avec un
@@ -41,7 +51,7 @@
 > - 🔢 Résolution codeur **confirmée** (8192 pts/tour × 4096 tours, plage totale 33 554 432 pts) —
 >   n'est plus un exemple hypothétique (§3.3). Cible de homing nominal = **centre exact** de la
 >   plage (16 777 216 pts = 0.00 m) : marge symétrique maximale, aucun risque de rebouclage.
-> - 🎯 **Deux flux de homing distincts** : nominal (les 2 treuils ensemble, godet ouvert, cible
+> - 🎯 **Deux flux de homing distincts** : nominal (les 2 treuils ensemble, grappin ouvert, cible
 >   fixe 0.00 m, `MAINT_N1` suffit) vs unitaire maintenance (1 treuil seul, cible **paramétrable**,
 >   `MAINT_N2` requis) — voir §5.
 > - 🖥️ **Confirmation déportée à l'IHM** : `Home` devient une entrée BOOL unique (front) — mot de
@@ -58,9 +68,9 @@
 >   (12 ms) — perte de quelques trames jugée sans risque temporel, évite les fausses alarmes.
 > - 🧩 **`FB_Safety_Winch` scindé en 2 instances indépendantes** (`WinchM1`/`WinchM2`) — lève
 >   l'ambiguïté relevée en revue (§7).
-> - 📝 Note hors périmètre : variateur **AC600 (M3, translation)** — sur perte de communication,
+> - 📝 Note hors périmètre : variateur **AC600 (M3, chariot)** — sur perte de communication,
 >   comportement pressenti **roue libre sans rampe** (proche d'un STO) ≠ comportement treuil
->   (contacteurs/frein). À traiter dans un futur document dédié `FB_Translation`/Partie2 (§9).
+>   (contacteurs/frein). À traiter dans un futur document dédié `FB_Chariot`/Partie2 (§9).
 >
 > **v1.0** — Version initiale (cinématique câble/tambour, analyse anti-débordement générique,
 > sélection treuil indépendante, `FB_Encoder_Homing`).
@@ -73,11 +83,11 @@
 > (`FB_Encoder_Abs`/`FB_Encoder_Scale`/`ST_EncoderCalib`), homing (`FB_Encoder_Homing`) et
 > sélection treuil (`E_WinchSelect`) restent conception seule (voir §9 pour le détail exact).
 > 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.2](AF_Partie1_Analyse_Fonctionnelle_v1.3.md) §Initialisation,
-> [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.6.md) (dossier `ENCODER`),
-> [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md) §1bis (profils FB),
-> [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §Initialisation/§3 Synchro,
-> [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.0](AF_Partie9_Fonction_Winch_v1.0.md) (`FB_Winch` unitaire M1/M2).
+> [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md) (dossier `ENCODER`),
+> [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (profils FB),
+> [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
+> [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
+> [P9 Fonction Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
@@ -302,7 +312,7 @@ END_TYPE
 
 🧭 **Portée du principe** : la même logique de sélection/neutralisation croisée (et le même
 verrou de transition de mode) s'applique par construction à d'autres actionneurs pilotables en
-maintenance (godet, translation) — hors périmètre détaillé de ce document, mais `FB_Modes` doit
+maintenance (grappin, chariot) — hors périmètre détaillé de ce document, mais `FB_Modes` doit
 généraliser cet interlock, pas le réserver aux seuls treuils.
 
 ---
@@ -324,8 +334,8 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `Mode` | `E_Mode` | `MAINT_N1` autorise le flux **nominal** (cible `TopSensorPositionM`) ; `MAINT_N2` requis pour le flux **unitaire** (cible `HomingTargetM` libre) |
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
-| `TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis). Câblé IDENTIQUEMENT sur les 2 instances (`CODE/GVL_Homing_Stub.st`). Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
-| `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis) |
+| `M1_M2_TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis), désormais **I/O Mapping réel** (`GVL_Homing_Stub` supprimé). Câblé IDENTIQUEMENT sur les 2 instances. Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
+| `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `M1_M2_TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis) |
 | `HomingTargetM` | REAL | Cible de position à imposer **en flux unitaire uniquement** (`MAINT_N2`), bornée **[-99.00 ; +99.00]** m (§3.6) — remplace l'ancien usage "flux nominal verrouillé à 0.00" (le flux nominal utilise désormais `TopSensorPositionM`, pas ce champ) |
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
 | `RawPos` | `UDINT` | Valeur brute codeur courante (sortie `FB_Encoder_Abs`) |
@@ -374,7 +384,7 @@ READY    → (front ConfirmCoherence, Mode IN MAINT_N1/N2) → HomingSuspect:=FA
 ### 📋 Procédure opérateur
 
 **Flux nominal** (routine, `MAINT_N1`, cycle d'INIT) — ✅ **réglé 2026-07-02** :
-1. Monter les 2 treuils synchronisés jusqu'au capteur de position haute (`TopPositionSensor`
+1. Monter les 2 treuils synchronisés jusqu'au capteur de position haute (`M1_M2_TopPositionSensor`
    actif sur les deux treuils).
 2. Relâcher le joystick — arrêt confirmé (contacteurs + frein, ErrorId bit2 à 0).
 3. Appuyer le bouton IHM unique « Réf/Homing COD1+COD2 » → `Home` sur **les deux instances**
@@ -508,7 +518,7 @@ s'arrêter avant** d'atteindre le capteur de position haute — celui-ci reste u
 
 🔴 **Non conçu en détail** : nécessite une **limite haute « normale »**, plus basse que
 `TopSensorPositionM`, avec une zone de ralentissement progressif (principe similaire à
-l'approche temporisée de `FB_Translation`, Partie4 §5) — probablement un paramètre RETAIN
+l'approche temporisée de `FB_Chariot`, Partie4 §5) — probablement un paramètre RETAIN
 supplémentaire (ex. `NormalTopLimitM`, à définir) consommé par `FB_Winch`/`FB_Cycle` en aval de
 `CablePosM`. À concevoir dans le même lot que `FB_Encoder_Homing`/`FB_Encoder_Safety` — pas
 avant, et pas improvisé ici sans validation explicite du mécanisme de ralentissement souhaité
@@ -528,7 +538,7 @@ Partie1 §Sécurité électrique, mais la logique de coupure elle-même doit êt
 `FB_Encoder_Homing`, pas une simple variable IHM non vérifiée).
 
 🔴 **Non implémenté** : nécessite `FB_Encoder_Homing` (pour poser `EnModeReferencement` de façon
-fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `TopPositionSensor` +
+fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `M1_M2_TopPositionSensor` +
 `InReferencingMode`, nouvelle logique `PowerCutOff`) — à faire dans le même lot que
 `FB_Encoder_Homing` (§9), pas avant.
 
@@ -553,7 +563,7 @@ fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `TopPo
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie9_Fonction_Winch_v1.0.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie9_Fonction_Winch_v1.1.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`
@@ -583,7 +593,7 @@ fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `TopPo
       point encore inconnu de la séquence preset (`PresettTrigCmd`/`PresetValue` confirmés)
 - [x] Flux homing nominal réglé (§1/§7bis, 2026-07-02) : capteur haut = déclencheur unique,
       `TopSensorPositionM` ≈ 12.50 m paramétrable, toucher d'eau = contrôle visuel de calibration
-- [ ] Coder l'extension `FB_Safety_Winch` (§7bis) : `TopPositionSensor`, `InReferencingMode` →
+- [ ] Coder l'extension `FB_Safety_Winch` (§7bis) : `M1_M2_TopPositionSensor`, `InReferencingMode` →
       `PowerCutOff` — dépend de `FB_Encoder_Homing` (fournit `InReferencingMode` de façon fiable)
 - [ ] Concevoir + coder la limite haute « normale » (ralentissement avant position extrême, §7bis)
       — mécanisme non défini (paliers existants réutilisables ou rampe dédiée ? à trancher)
@@ -596,10 +606,10 @@ bougent ensemble sans régulation d'écart. Canaux `COD2_*` (I/O Mapping) **mapp
 (miroir de `COD1_*`, voir §9bis point 9).
 
 **Hors périmètre — à traiter séparément** :
-- [ ] Variateur **AC600 (M3, translation)** : comportement pressenti sur perte de communication =
+- [ ] Variateur **AC600 (M3, chariot)** : comportement pressenti sur perte de communication =
       **roue libre sans rampe** (proche d'un STO), différent du comportement treuil
       (contacteurs+frein, rampe rapide `SafeStop`). À valider et documenter dans une future mise à
-      jour de `AF_Partie2`/un document dédié `FB_Translation` — pas traité ici (hors sujet codeur
+      jour de `AF_Partie2`/un document dédié `FB_Chariot` — pas traité ici (hors sujet codeur
       treuil).
 
 ---
@@ -642,33 +652,33 @@ cas (même principe que `GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub`, Partie9 §7 Ét
 11. **Rebuild** : erreurs attendues avant l'étape 9 (I/O Mapping COD2) — normal, à corriger dans
     l'ordre indiqué.
 
-### 9quater. Note d'application — `FB_Encoder_Homing` (lot Homing, 2026-07-02)
+### 9quater. Note d'application — `FB_Encoder_Homing` (lot Homing, 2026-07-02, mis à jour v1.4)
 
-Référence code : `CODE/FB_Encoder_Homing.st` (nouveau), `CODE/PRG_MAIN.st`,
-`CODE/GVL_Homing_Stub.st` (nouveau, capteur unique commun M1+M2) — tous à recopier.
+Référence code : `CODE/FB_Encoder_Homing.st`, `CODE/PRG_MAIN.st` — `M1_M2_TopPositionSensor`
+est désormais **I/O Mapping réel** (plus de GVL à créer pour ce signal).
 
-1. **`FB_Encoder_Homing`** : POU **nouveau**, dossier `ENCODER` (comme `FB_Encoder_Abs`/`Scale`).
+1. **`FB_Encoder_Homing`** : POU dossier `ENCODER` (comme `FB_Encoder_Abs`/`Scale`).
    `Add Object → POU...` → Name = `FB_Encoder_Homing`, Type = `Function block`, Language =
    `Structured Text (ST)` → coller déclaration + implémentation.
-2. **`GVL_Homing_Stub`** : nouveau GVL, variable **unique** `TopPositionSensor` (toujours
-   `FALSE` par défaut) — 🔧 correctif 2026-07-02 : PAS un stub par treuil (voir en-tête de
-   document), câblée identiquement sur `instHomingM1` ET `instHomingM2`.
-3. **`PRG_MAIN`** : remplacer déclaration + implémentation en entier (nouvelles instances
-   `instHomingM1`/`instHomingM2`, nouveau `VAR RETAIN` — **note** : `M1_EncoderCalib`/
-   `M2_EncoderCalib` ont disparu, remplacés par l'état interne de `FB_Encoder_Homing`).
+2. **🔴 `GVL_Homing_Stub` : SUPPRIMER** (clic droit → Delete dans l'arbre projet, s'il avait été
+   créé v1.3) — `M1_M2_TopPositionSensor` est désormais une variable réelle créée par l'I/O
+   Mapping (conflit de nom sinon). Vérifier dans l'onglet I/O Mapping du canal physique
+   concerné que la colonne **Variable** contient bien `M1_M2_TopPositionSensor`.
+3. **`PRG_MAIN`** : remplacer déclaration + implémentation en entier (câblage
+   `TopPositionSensor := M1_M2_TopPositionSensor` sur `instHomingM1` ET `instHomingM2`).
 4. **Rebuild.**
 
-### 🧪 Procédure de test (COD1/COD2 réels, capteurs position haute encore en stub)
+### 🧪 Procédure de test (COD1/COD2 réels, capteur position haute désormais réel)
 
-Le stub `TopPositionSensor` reste `FALSE` par défaut (sécurité : jamais de simulation active par
-défaut sur un signal safety-relevant) — pour tester la séquence complète, **forcer** les valeurs
-en ligne (CODESYS : clic droit sur la variable dans la vue instance → *Write*/*Force*) :
+`M1_M2_TopPositionSensor` étant câblé en I/O Mapping réel, la séquence se teste **physiquement**
+(actionner le capteur) plutôt que par forçage logiciel :
 
 ```
 1. Vérifier ArretConfirme : joystick au neutre (M1_RelayFwd/Rev = FALSE, M1_BrakeCmd = FALSE
    → collé), sinon Home sera rejeté (ErrorId bit2).
-2. Forcer TopPositionSensor := TRUE (simule "position haute atteinte" — capteur UNIQUE,
-   un seul forçage suffit pour les 2 instances M1/M2, voir en-tête de document).
+2. Actionner physiquement le capteur position haute (ou forcer M1_M2_TopPositionSensor := TRUE
+   en vue instance CODESYS si le matériel n'est pas encore accessible) — capteur UNIQUE, un seul
+   forçage/actionnement suffit pour les 2 instances M1/M2.
 3. Basculer StubHomeButton_IHM : FALSE → TRUE → FALSE (simule l'appui bouton IHM, front).
 4. Observer instHomingM1 : Busy doit passer TRUE brièvement, puis Done pulse à TRUE,
    Homed := TRUE, ErrorId reste à 0.
@@ -677,10 +687,10 @@ en ligne (CODESYS : clic droit sur la variable dans la vue instance → *Write*/
    sur instEncoderAbsM1.RawPos une fois PresetAck reçu (dépend du COD1 réel — si le codeur COD1
    n'accepte pas encore le preset réellement, PresetNak/timeout est attendu tant que
    CodeSeqTrigCmd n'est pas confirmé, voir points bloquants ci-dessous).
-6. Répéter pour M2 (mêmes stubs, préfixe M2_) — le même bouton IHM déclenche les deux.
+6. Répéter pour M2 (même capteur commun) — le même bouton IHM déclenche les deux.
 ```
 
-⚠️ Sans câblage réel de `TopPositionSensor` (ou son stub forcé), `Home` sera **systématiquement
+⚠️ Sans le capteur `M1_M2_TopPositionSensor` actif (ou forcé), `Home` sera **systématiquement
 rejeté** (`ErrorId` bit4) — c'est le comportement voulu, pas une erreur.
 
 ### 🔒 Points bloquants avant tout essai réel (pas des bugs, des TODO explicites)
@@ -699,7 +709,7 @@ rejeté** (`ErrorId` bit4) — c'est le comportement voulu, pas une erreur.
 ## 🔁 10. Retour d'expérience (à compléter après implémentation + test)
 
 - [ ] `HomingRefTargetNominal` = 16 777 216 pts confirmé conforme à la fiche technique définitive ?
-- [ ] Flux nominal (2 treuils, `MAINT_N1`) : `Home` refusé sans `TopPositionSensor` confirmé sur
+- [ ] Flux nominal (2 treuils, `MAINT_N1`) : `Home` refusé sans `M1_M2_TopPositionSensor` confirmé sur
       les deux, `CablePosM` ≈ `TopSensorPositionM` après homing, sur les deux treuils simultanément ?
 - [ ] Calibration `TopSensorPositionM` (§7bis) : après homing haut, `CablePosM` ≈ 0.00 m au
       contact visuel réel de l'eau ? Sinon, ajustement du paramètre suffisant pour converger ?
@@ -720,9 +730,9 @@ rejeté** (`ErrorId` bit4) — c'est le comportement voulu, pas une erreur.
 
 ## 📚 Documents liés
 - **Partie 1 v1.2** — §Initialisation (référencement codeurs, description d'origine).
-- **Partie 2 v2.5** — Architecture (dossier `ENCODER`, à faire évoluer v2.6 après implémentation).
-- **Partie 3 v1.2** — Contrat FB §1bis (profils : ce FB n'est **pas** un FB de mouvement) et §6
+- **Partie 2 v2.7** — Architecture (dossier `ENCODER`, à faire évoluer v2.6 après implémentation).
+- **Partie 3 v1.3** — Contrat FB §1bis (profils : ce FB n'est **pas** un FB de mouvement) et §6
   (« acquitter ≠ redémarrer », appliqué ici à la confiance dans la référence, §3.7/§7).
-- **Partie 4 v1.1** — Cycle & synchro (`FB_WinchSync`, suspension pendant phases sans mouvement commun).
-- **Partie 5 v1.1** — Modes & maintenance (droits `MAINT_N1`/`MAINT_N2`, usages homing/maintenance lourde).
-- **Partie 9 v1.0** — Fonction Winch (`FB_Winch` pilotable unitairement, base du pilotage indépendant).
+- **Partie 4 v1.2** — Cycle & synchro (`FB_WinchSync`, suspension pendant phases sans mouvement commun).
+- **Partie 5 v1.2** — Modes & maintenance (droits `MAINT_N1`/`MAINT_N2`, usages homing/maintenance lourde).
+- **Partie 9 v1.1** — Fonction Winch (`FB_Winch` pilotable unitairement, base du pilotage indépendant).

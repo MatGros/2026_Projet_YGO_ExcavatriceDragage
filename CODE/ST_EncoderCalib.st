@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md §9
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.4.md §9
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
       modifiable MANUELLEMENT (RETAIN, valeur de test) tant que

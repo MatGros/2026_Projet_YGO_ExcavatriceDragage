@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1/M2)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md,
-                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md §7
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md,
+                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.4.md §7
                    (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
@@ -23,6 +23,22 @@
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
         ST_ContactorCheck de puissance câblé — FB_Output_Relay
         transverse hors périmètre de ce lot, voir Partie6).
+   🆕 AJOUT (2026-07-02, retour terrain — nouvel export Device.export avec
+      I/O réel `M1_ThermalFeedback`/`M2_ThermalFeedback` et
+      `M1_M2_SlackCableSwitch`, demande utilisateur) — Partie9 §4ter :
+      - ✅ `ThermalFeedback` (par instance, retour thermique CE moteur) :
+        défaut → bit2 ErrorId → `SafeStop` (arrêt total, protection moteur,
+        comme les autres défauts du domaine).
+      - ✅ `SlackCableDetected` (COMMUN aux 2 treuils, même capteur — même
+        principe que `M1_M2_TopPositionSensor`, câblé IDENTIQUEMENT sur
+        les 2 instances) : mou de câble détecté (descente non arrêtée à
+        temps) → bit3 ErrorId (visible IHM, reset front requis dès que la
+        cause disparaît) → sortie **`ForbidDescent`** DÉDIÉE, DISTINCTE de
+        `SafeStop` — bloque UNIQUEMENT la descente (`FB_Winch.RelayRev`),
+        la remontée (`RelayFwd`) reste libre pour permettre à l'opérateur
+        d'aller vérifier le câblage. Nouveau pattern (pas un simple
+        `SafeStop`, qui aurait arrêté les 2 sens) — voir Partie9 §4ter
+        pour la justification complète.
    🔴 TBD — SURVEILLANCE DE COHÉRENCE MOUVEMENT (retour terrain 2026-07-02,
       idée capturée, NON conçue en détail, NON implémentée — détail complet
       dans DOC/AF_Partie9 §4bis). 4 cas DISTINCTS (1 bit ErrorId chacun,
@@ -54,16 +70,19 @@ VAR_INPUT
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
+    ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
+    SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun)
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
+    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2 uniquement
+    ForbidDescent       : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la descente (bit3, mou de câble) — Enable/RelayFwd (montée) non affectés
     PowerCutOff         : BOOL;        // 🧨 Sortie maîtresse : coupure puissance amont (FALSE, TBD ce lot)
 END_VAR
 VAR
@@ -77,6 +96,7 @@ END_VAR
 IF NOT Enable OR NOT EmergencyStopOk THEN
     Ready := FALSE;
     SafeStop := TRUE;              // Fail-safe : tant que la surveillance n'est pas garantie, on arrête
+    ForbidDescent := TRUE;         // Fail-safe : cohérent avec SafeStop (descente a fortiori interdite)
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -102,14 +122,37 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
 
+// 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
+IF ThermalFeedback THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
+
+// 🔍 3quater. MOU DE CÂBLE (câblé — I/O réel 2026-07-02, commun M1/M2) — bit3, N'ARRÊTE PAS
+// la remontée : voir §4ter Partie9 (ForbidDescent dédié, distinct de SafeStop ci-dessous).
+IF SlackCableDetected THEN
+    ErrorId := ErrorId OR 16#0008;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFF7;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId <> 16#0000);
+Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-SafeStop := Error;          // 🟧 Tout défaut du domaine → rampe décélération rapide (Enable maintenu)
+// 🟧 SafeStop : UNIQUEMENT bits 0 (joystick)/1 (codeur)/2 (thermique) — arrêt total des 2 sens.
+// Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
+// (ForbidDescent ci-dessous), pas bloquer une remontée nécessaire pour aller vérifier le câble.
+SafeStop := (ErrorId AND 16#0007) <> 16#0000;
+
+// 🆕 ForbidDescent : reflète UNIQUEMENT le bit3 (mou de câble) — consommé par FB_Winch pour
+// masquer RelayRev (descente) seul, RelayFwd (montée) reste piloté normalement.
+ForbidDescent := (ErrorId AND 16#0008) <> 16#0000;
+
 PowerCutOff := FALSE;       // 🧨 TBD — pas de ST_ContactorCheck de puissance câblé dans ce lot
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)

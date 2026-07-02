@@ -1,10 +1,17 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.0)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.1)
 
 > **Fonction métier** : chaîne de commande Joystick (axe Y, Plongée/Extraction) → `FB_Winch` →
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.6.md), [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md), [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §3bis/§4, [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md), [P8 Joystick v1.1](AF_Partie8_Fonction_Joystick_v1.1.md).
+> 🔗 Dépend de : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
+>
+> 🔧 **v1.1 (2026-07-02)** — Nouvel export `Device.export` avec I/O réel : `M1/M2_RelayFwd/Rev`,
+> `M1/M2_SpeedContactor_1..4` (renommé, ex `Contactor1..4`), `M1/M2_BrakeCmd`,
+> `M1/M2_ContactorFeedbackFwd/Rev`, `M1_M2_TopPositionSensor` sont désormais câblés en I/O
+> Mapping réel (seul `M1/M2_BrakeFeedback` reste stub). AJOUT §4ter : `ThermalFeedback` (par
+> treuil) et `SlackCableDetected`/`M1_M2_SlackCableSwitch` (commun, mou de câble) dans
+> `FB_Safety_Winch`, avec la nouvelle sortie dédiée `ForbidDescent` (distincte de `SafeStop`).
 
 ---
 
@@ -25,18 +32,19 @@ voir §5 Sécurité pour ce que cela implique concrètement).
 
 ```
 FB_Joystick.AxisCmdY ──► FB_Winch(M1) ──┬─► FB_SpeedStep ──► Contactor1..4 (table P<palier>R<relais>)
-                                        ├─► RelayFwd / RelayRev (interlock changement de sens)
+                                        ├─► RelayFwd / RelayRev (interlock changement de sens + ForbidDescent)
                                         └─► FB_Brake ──► BrakeCmd (séquence temporisée)
 
-FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
+FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — arrêt total (joystick/codeur/thermique)
+                ──► ForbidDescent   ──► (entrée) FB_Winch(M1) — masque UNIQUEMENT RelayRev (mou de câble)
 ```
 
 | Bloc | Rôle métier |
 |------|-------------|
 | `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
-| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN (codeur **TBD**, non câblé ce lot) |
-| `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens |
+| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, ou surchauffe moteur ; lève `ForbidDescent` (dédié) sur mou de câble — voir §4ter |
+| `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev` sur `ForbidDescent` |
 
 > ♻️ **Réutilisation** (Partie3 §0) : `HYSTERESIS` (lib Util) pour les paliers, `FB_Ramp` +
 > `FB_CycleTime` (déjà utilisés par `FB_Joystick`) pour la rampe interne — aucune brique
@@ -44,7 +52,9 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 
 ---
 
-## 🔌 3. Interface `FB_Winch` (FB de mouvement, Partie3 §1bis)
+## 🔌 3. Interface
+
+### `FB_Winch` (FB de mouvement, Partie3 §1bis)
 
 **📥 Entrées**
 | Entrée | Type | Rôle |
@@ -54,23 +64,44 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 | `EmergencyStopOk` | BOOL | Chaîne AU réarmée + conditions globales OK |
 | `Mode` | `E_Mode` | Contexte (droits arbitrés en amont, `FB_Modes` à venir) |
 | `StartStop` | BOOL | `TRUE` = rampe accélération, `FALSE` = rampe décélération normale |
-| `SafeStop` | BOOL | Sortie `FB_Safety_Winch` : `TRUE` = rampe décélération **rapide** |
+| `SafeStop` | BOOL | Sortie `FB_Safety_Winch` : `TRUE` = rampe décélération **rapide** (arrêt total) |
+| `ForbidDescent` 🆕 | BOOL | Sortie dédiée `FB_Safety_Winch` (mou de câble) : masque **uniquement** `RelayRev` |
 | `Direction` | INT | -1/0/+1 |
 | `SpeedRefPct` | REAL | Consigne 0..100 % |
 | `SpeedStepTable` | `ST_SpeedStepTable` | Table des 5 paliers **propre à M1** (20 `BOOL` `P<palier>R<relais>` + seuils) |
-| `ContactorFeedbackFwd/Rev` | BOOL | Retours contacteurs de sens |
-| `BrakeFeedback` | BOOL | Retour contacteur bobine frein |
+| `ContactorFeedbackFwd/Rev` | BOOL | Retours contacteurs de sens (I/O réel) |
+| `BrakeFeedback` | BOOL | Retour contacteur bobine frein (stub, non câblé) |
 
 **📤 Sorties clés**
 | Sortie | Type | Rôle |
 |--------|------|------|
-| `RelayFwd` / `RelayRev` | BOOL | Contacteurs de sens (jamais simultanés — interlock) |
+| `RelayFwd` / `RelayRev` | BOOL | Contacteurs de sens (jamais simultanés — interlock ; `RelayRev` forcé `FALSE` si `ForbidDescent`) |
 | `Contactor1..4` | BOOL | Contacteurs de vitesse du palier courant (lus dans `Table.P<palier>R<relais>`) |
 | `BrakeCmd` | BOOL | Commande bobine frein (`TRUE` = relâché) |
 | `Ready/Busy/Done/Error/ErrorId/State/StateAtError` | — | État standard (Partie3 §1) |
 | `FwdContactorCheck/RevContactorCheck/BrakeContactorCheck` | `ST_ContactorCheck` | Diagnostic détaillé (IHM) |
 
 `ErrorId` : bit0 = défaut frein, bit1 = contacteur sens Fwd incohérent, bit2 = contacteur sens Rev incohérent.
+
+### `FB_Safety_Winch` (1 instance par treuil, Partie3 §1/§7bis)
+
+**📥 Entrées**
+| Entrée | Type | Rôle |
+|--------|------|------|
+| `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Partie3 §1) |
+| `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.Joystick` |
+| `EncoderAvailable` | BOOL | Sortie `FB_Encoder_Abs` **de ce treuil** |
+| `ThermalFeedback` 🆕 | BOOL | Retour TOR thermique **de ce moteur** (`M1/M2_ThermalFeedback`, I/O réel) |
+| `SlackCableDetected` 🆕 | BOOL | Détecteur mou de câble **commun** aux 2 treuils (`M1_M2_SlackCableSwitch`, I/O réel — même valeur sur les 2 instances) |
+
+**📤 Sorties**
+| Sortie | Type | Rôle |
+|--------|------|------|
+| `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
+| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 🆕 : surchauffe moteur ; bit3 🆕 : mou de câble |
+| `SafeStop` | BOOL | `(ErrorId AND 16#0007) <> 0` — **uniquement** bits 0/1/2 → arrêt total (Enable maintenu) |
+| `ForbidDescent` 🆕 | BOOL | `(ErrorId AND 16#0008) <> 0` — **uniquement** bit3 → interdit la descente seule |
+| `PowerCutOff` | BOOL | `FALSE` (TBD ce lot) |
 
 ---
 
@@ -94,6 +125,45 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 - **Sortie sûre sur défaut** (`FB_Winch`/`FB_Brake`) : `Error` force `RelayFwd`/`RelayRev`/
   `Contactor1..4`/`BrakeCmd` à leur état sûr (coupure directe, frein collé), conforme Partie3
   §9 étape 7 — un contacteur incohérent ne doit plus jamais rester commandé normalement.
+
+### 🆕 4ter. Surchauffe moteur + mou de câble (2026-07-02, I/O réel)
+
+Le nouvel export `Device.export` câble deux nouveaux retours safety-critiques :
+
+**Surchauffe moteur (`M1/M2_ThermalFeedback`, par treuil)** — traitement classique : nouveau
+bit `ErrorId` (bit2) dans `FB_Safety_Winch`, participe au calcul de `SafeStop` **au même titre**
+que la perte joystick/codeur → arrêt total des 2 sens, `Enable` maintenu (rampe rapide). Reset
+front standard (Partie3 §5) dès que le retour repasse à `FALSE`.
+
+**Mou de câble (`M1_M2_SlackCableSwitch`, commun aux 2 treuils)** — traitement **différent**,
+demandé explicitement par l'utilisateur :
+
+> Scénario terrain : en descente, si le grappin touche le fond sans que l'arrêt soit
+> correctement détecté, le mouvement continue et du mou de câble apparaît en haut (câble qui se
+> détend). Il faut **interdire la descente** (empêcher d'aggraver le mou), **signaler un défaut
+> visible à l'IHM** (l'opérateur doit avoir vu la cause avant de pouvoir continuer), mais
+> **autoriser la remontée** (nécessaire pour aller vérifier/re-tendre le câble — un `SafeStop`
+> classique, qui bloque les 2 sens, empêcherait cette vérification).
+
+Ce comportement **ne peut pas** être porté par `SafeStop` (qui arrête systématiquement les 2
+sens) : nouveau bit `ErrorId` (bit3) et nouvelle sortie dédiée **`ForbidDescent`**, calculée
+**indépendamment** de `SafeStop` :
+
+```
+ErrorId.bit3 := SlackCableDetected (cause) — cumulatif, reset front standard (cause disparue + appui)
+SafeStop      := (ErrorId AND 16#0007) <> 0   // bits 0/1/2 SEULEMENT — bit3 exclu
+ForbidDescent := (ErrorId AND 16#0008) <> 0   // bit3 SEULEMENT
+
+FB_Winch : RelayRev forcé FALSE si ForbidDescent (RelayFwd non affecté)
+```
+
+`Error` reste le miroir de **tout** `ErrorId` (Partie3 §4, y compris bit3) : le défaut est donc
+bien visible à l'IHM même s'il ne déclenche pas `SafeStop` — l'opérateur voit l'alarme, doit
+l'acquitter (front `Reset`, une fois la cause disparue) comme tout autre défaut du domaine.
+
+> 🧭 Ce pattern (sortie de blocage directionnelle, distincte de `SafeStop`) est **spécifique** à
+> ce cas d'usage — pas une généralisation du contrat Partie3, qui reste `Enable > SafeStop >
+> StartStop`. À documenter au cas par cas si un autre métier a un besoin similaire.
 
 > 🔧 **Correctifs retour terrain + revue de code 2026-07-01** (2 itérations) :
 > 1. La 1ère version de l'interlock exigeait la vitesse confirmée nulle (200 ms) **avant même
@@ -179,16 +249,19 @@ descente sans surveillance visuelle des fins de câble physiques).
 
 ---
 
-## 🗺️ 5. Mapping E/S (à créer en I/O Mapping CODESYS, voir §7)
+## 🗺️ 5. Mapping E/S
 
-| Variable (code) | Sens | Rôle |
-|------------------|------|------|
-| `M1_RelayFwd` | Sortie | Contacteur sens avant (montée) M1 |
-| `M1_RelayRev` | Sortie | Contacteur sens arrière (descente) M1 |
-| `M1_Contactor1..4` | Sortie | Contacteurs de vitesse M1 (palier courant, table `P<palier>R<relais>`) |
-| `M1_BrakeCmd` | Sortie | Bobine frein M1 (`TRUE` = relâché) |
-| `M1_ContactorFeedbackFwd/Rev` | Entrée | Retours contacteurs de sens M1 |
-| `M1_BrakeFeedback` | Entrée | Retour contacteur bobine frein M1 |
+| Variable (code) | Sens | Statut | Rôle |
+|------------------|------|--------|------|
+| `M1/M2_RelayFwd` | Sortie | 📡 I/O réel | Contacteur sens avant (montée) |
+| `M1/M2_RelayRev` | Sortie | 📡 I/O réel | Contacteur sens arrière (descente) |
+| `M1/M2_SpeedContactor_1..4` | Sortie | 📡 I/O réel | Contacteurs de vitesse (palier courant, table `P<palier>R<relais>`) — 🔧 renommé (ex `Contactor1..4`) |
+| `M1/M2_BrakeCmd` | Sortie | 📡 I/O réel | Bobine frein (`TRUE` = relâché) |
+| `M1/M2_ContactorFeedbackFwd/Rev` | Entrée | 📡 I/O réel | Retours contacteurs de sens |
+| `M1/M2_BrakeFeedback` | Entrée | 🧪 STUB | Retour contacteur bobine frein — seul signal encore non câblé |
+| `M1_M2_TopPositionSensor` 🆕 | Entrée | 📡 I/O réel | Capteur position haute, **commun** M1+M2 (remplace `GVL_Homing_Stub`, supprimé) |
+| `M1/M2_ThermalFeedback` 🆕 | Entrée | 📡 I/O réel | Retour thermique **de ce moteur** → `FB_Safety_Winch.ThermalFeedback` |
+| `M1_M2_SlackCableSwitch` 🆕 | Entrée | 📡 I/O réel | Détecteur mou de câble, **commun** M1+M2 → `FB_Safety_Winch.SlackCableDetected` (même valeur sur les 2 instances) |
 
 ---
 
@@ -201,9 +274,10 @@ descente sans surveillance visuelle des fins de câble physiques).
 - [`CODE/FB_Joystick.st`](../CODE/FB_Joystick.st) — **mise à jour** (suit `ST_AxisCmd`, renomme `SafetyOk`→`EmergencyStopOk`, l'ajoute au GATE)
 - [`CODE/FB_Ramp.st`](../CODE/FB_Ramp.st) — **mise à jour** (POU déjà existant, correctif bug accel/décel lors d'une inversion rapide — voir §4)
 - [`CODE/FB_SpeedStep.st`](../CODE/FB_SpeedStep.st), [`CODE/FB_Brake.st`](../CODE/FB_Brake.st) — nouvelles briques composées
-- [`CODE/FB_Safety_Winch.st`](../CODE/FB_Safety_Winch.st) — nouveau bloc safety métier
-- [`CODE/FB_Winch.st`](../CODE/FB_Winch.st) — nouveau FB de mouvement
-- [`CODE/PRG_MAIN.st`](../CODE/PRG_MAIN.st) — **mise à jour** (câblage complet)
+- [`CODE/FB_Safety_Winch.st`](../CODE/FB_Safety_Winch.st) — **mise à jour v1.1** (`ThermalFeedback`, `SlackCableDetected`, `ForbidDescent` — voir §4ter)
+- [`CODE/FB_Winch.st`](../CODE/FB_Winch.st) — **mise à jour v1.1** (`ForbidDescent` en entrée, masque `RelayRev`)
+- [`CODE/GVL_Winch_M1_Stub.st`](../CODE/GVL_Winch_M1_Stub.st) / [`CODE/GVL_Winch_M2_Stub.st`](../CODE/GVL_Winch_M2_Stub.st) — **réduits v1.1** (`BrakeFeedback` seul, reste réel)
+- [`CODE/PRG_MAIN.st`](../CODE/PRG_MAIN.st) — **mise à jour** (câblage I/O réel + nouvelles entrées safety)
 
 *(Pas de recopie du corps ici — voir les fichiers `CODE/` pour le ST complet, règle anti-doublon.)*
 
@@ -213,6 +287,9 @@ descente sans surveillance visuelle des fins de câble physiques).
 
 > ⚠️ **Ordre impératif** (dépendances entre objets) : suivre les étapes dans l'ordre ci-dessous.
 > Chaque étape indique précisément quoi cocher/sélectionner dans les fenêtres CODESYS.
+> 🆕 **v1.1** : les étapes 0 à 8 sont **inchangées** si déjà appliquées (v1.0). Seules les
+> étapes **6bis** (mise à jour `FB_Safety_Winch`), **7bis** (mise à jour `FB_Winch`) et **9**
+> (I/O Mapping, désormais en grande partie déjà fait côté device) sont nouvelles/à revoir.
 
 ### Étape 0 — Vérifier la bibliothèque Util (pour `HYSTERESIS`)
 1. Menu **Outils → Library Repository** (ou **Bibliothèques** dans l'arbre projet, nœud
@@ -220,136 +297,60 @@ descente sans surveillance visuelle des fins de câble physiques).
 2. Ouvrir **Library Manager** (double-clic dans l'arbre projet).
 3. Vérifier que **`Util`** apparaît dans la liste. Si absent : bouton **Add library...** →
    rechercher `Util` → sélectionner → **OK**.
-   *(Sans ça, `HYSTERESIS` dans `FB_SpeedStep` ne compilera pas.)*
 
-> 🔧 **Correctif 2026-07-01** : la 1ère version de `FB_SpeedStep.st` supposait une interface
-> `HYSTERESIS(XIN1, XIN2, EPSILON → Q)` qui n'existe pas dans `Util` 3.5.19.0. L'interface réelle
-> (confirmée par la doc officielle CODESYS) est `HYSTERESIS(IN, HIGH, LOW : INT → OUT : BOOL)`
-> — `OUT` passe à `TRUE` quand `IN < LOW`, à `FALSE` quand `IN > HIGH`, maintien entre les deux.
-> `CODE/FB_SpeedStep.st` a été corrigé en conséquence (conversion `SpeedRefPct` REAL → INT via
-> `REAL_TO_INT`). **Recoller ce fichier si tu avais déjà créé `FB_SpeedStep` avec la 1ère version.**
+### Étape 1 à 8 — Voir Partie9 v1.0 (archivée, `DOC/Archives/`) — inchangées
 
-### Étape 1 — Créer les types fondamentaux (`_TYPES` ou racine `Application`)
-Clic droit sur **Application** (ou un sous-dossier `_TYPES` si tu préfères en créer un :
-clic droit → **Add Object → Folder...** → Name = `_TYPES` → **Add**) :
+### Étape 6bis 🆕 — Mettre à jour `FB_Safety_Winch`
+1. Double-clic sur `FB_Safety_Winch` (dossier `SAFETY`, déjà créé si Étape 6 v1.0 faite).
+2. Volet déclaration : effacer tout, coller la section **DECLARATION** de
+   `CODE/FB_Safety_Winch.st` (v1.1 — ajoute `ThermalFeedback`/`SlackCableDetected` en entrée,
+   `ForbidDescent` en sortie).
+3. Volet implémentation : effacer tout, coller la section **IMPLEMENTATION**.
+4. **Enregistrer**. Répéter pour **les 2 instances** (`instSafetyWinchM1`/`instSafetyWinchM2`
+   partagent le même TYPE — rien à dupliquer côté POU, juste le câblage dans `PRG_MAIN`).
 
-Pour **`E_Mode`** et **`E_State`** :
-1. Clic droit → **Add Object → DUT...**
-2. Champ **Name** : `E_Mode` (puis répéter pour `E_State`)
-3. Champ **Type** (menu déroulant) : sélectionner **`Enumeration`**
-4. Bouton **Add**
-5. Dans l'éditeur qui s'ouvre, **effacer tout le contenu généré** et coller le contenu de
-   `CODE/E_Mode.st` (resp. `CODE/E_State.st`) — un seul bloc `TYPE ... END_TYPE`, pas de
-   séparation déclaration/implémentation pour un DUT.
-
-Pour **`ST_SpeedStepTable`** et **`ST_ContactorCheck`** :
-1. Clic droit → **Add Object → DUT...**
-2. Champ **Name** : `ST_SpeedStepTable` (puis `ST_ContactorCheck`)
-3. Champ **Type** : sélectionner **`Structure`**
-4. **Add**, puis coller le contenu du fichier `CODE/` correspondant (remplace tout).
-
-> 🔧 **Évolution retour terrain 2026-07-01** : `ST_SpeedStepTable` n'utilise plus un masque
-> `BYTE` packé par palier, mais **20 `BOOL` nommés individuellement** `P1R1`..`P5R4`
-> (`P`=Palier, `R`=Relais de vitesse 1..4) — chacun réglable **un par un**, en direct dans la
-> vue instance CODESYS pendant la mise en service, sans manipuler de valeur binaire packée.
-> Si tu avais déjà créé `ST_SpeedStepTable`/`FB_SpeedStep`/`FB_Winch` avec la 1ère version
-> (masque `BYTE`), **recoller les 3 fichiers** (`ST_SpeedStepTable.st`, `FB_SpeedStep.st`,
-> `FB_Winch.st`) et le `M1_SpeedStepTable` de `PRG_MAIN.st`.
-
-### Étape 2 — Mettre à jour `ST_AxisCmd`
-1. Double-clic sur `ST_AxisCmd` existant (racine `Application`, à côté de `ST_DeviceDiag`).
-2. Sélectionner tout le contenu, remplacer par le contenu de `CODE/ST_AxisCmd.st`.
-3. **Enregistrer** (Ctrl+S). Ne pas compiler tout de suite (des erreurs de référence sur
-   `FB_Joystick` sont attendues tant que l'étape 3 n'est pas faite — normal).
-
-### Étape 3 — Mettre à jour `FB_Joystick`
-1. Double-clic sur `FB_Joystick` (dossier `JOYSTICK`).
-2. Le POU a **deux volets** : le volet **déclaration** (haut, VAR_INPUT/OUTPUT/VAR) et le
-   volet **implémentation** (bas, code ST).
-3. Dans le volet déclaration : effacer tout, coller la section **DECLARATION** de
-   `CODE/FB_Joystick.st`.
-4. Dans le volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du
-   même fichier.
-5. **Enregistrer**.
-
-### Étape 3bis — Mettre à jour `FB_Ramp` (correctif bug accel/décel, existe déjà dans le projet)
-1. Double-clic sur `FB_Ramp` (dossier `JOYSTICK` — POU **déjà existant**, pas à créer).
-2. Volet déclaration : effacer tout, coller la section **DECLARATION** de `CODE/FB_Ramp.st`.
-3. Volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du même fichier.
-4. **Enregistrer**. Aucun autre fichier à toucher : ce correctif ne change le comportement que
-   pour `RampX`/`RampY` (dans `FB_Joystick`) — `SpeedRamp` (dans `FB_Winch`) n'est pas affecté
-   (cible toujours `>= 0`, voir analyse d'impact §4).
-
-### Étape 4 — Créer `FB_SpeedStep`
-1. Clic droit sur le dossier **WINCH** (le créer d'abord si absent : clic droit sur
-   `Application` → **Add Object → Folder...** → Name = `WINCH` → **Add**).
-2. Clic droit sur `WINCH` → **Add Object → POU...**
-3. Champ **Name** : `FB_SpeedStep`
-4. Champ **Type** (radio) : sélectionner **`Function block`**
-5. Champ **Implementation language** (radio) : sélectionner **`Structured Text (ST)`**
-6. Laisser **Extends** et **Implements** vides (pas d'héritage — composition, règle projet)
-7. **Add**
-8. Coller la section **DECLARATION** de `CODE/FB_SpeedStep.st` dans le volet déclaration,
-   la section **IMPLEMENTATION** dans le volet implémentation. **Enregistrer**.
-
-### Étape 5 — Créer `FB_Brake`
-Idem étape 4, mais :
-- Dossier cible : **`_COMMON`** (le créer si absent, comme à l'étape 4 pour `WINCH`) —
-  `FB_Brake` est une brique réutilisable (Partie2 §3), pas spécifique à un seul treuil.
-- **Name** : `FB_Brake`, **Type** : `Function block`, **Language** : `Structured Text (ST)`.
-- Coller `CODE/FB_Brake.st` (déclaration + implémentation).
-
-### Étape 6 — Créer `FB_Safety_Winch`
-- Dossier cible : **`SAFETY`** (existe déjà — contient `FB_Safety`).
-- **Add Object → POU...** → **Name** : `FB_Safety_Winch`, **Type** : `Function block`,
-  **Language** : `Structured Text (ST)`.
-- Coller `CODE/FB_Safety_Winch.st`.
-
-### Étape 7 — Créer `FB_Winch`
-- Dossier cible : **`WINCH`**.
-- **Add Object → POU...** → **Name** : `FB_Winch`, **Type** : `Function block`,
-  **Language** : `Structured Text (ST)`.
-- Coller `CODE/FB_Winch.st`.
-
-### Étape 8 — Mettre à jour `PRG_MAIN`
-1. Double-clic sur `PRG_MAIN` (dossier `SYSTEM`, ou racine selon ton arborescence actuelle).
-2. Volet déclaration : effacer tout, coller la section **DECLARATION** de `CODE/PRG_MAIN.st`.
-3. Volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du même fichier.
+### Étape 7bis 🆕 — Mettre à jour `FB_Winch`
+1. Double-clic sur `FB_Winch` (dossier `WINCH`).
+2. Volet déclaration : coller la section **DECLARATION** de `CODE/FB_Winch.st` (v1.1 — ajoute
+   `ForbidDescent` en entrée).
+3. Volet implémentation : coller la section **IMPLEMENTATION** (§5bis nouveau : masque
+   `RelayRev` si `ForbidDescent`).
 4. **Enregistrer**.
 
-### Étape 9 — I/O Mapping (câblage physique réel) — **si le matériel est déjà branché**
-Onglet **I/O Mapping** du device concerné (carte de sortie relais pour les commandes,
-carte d'entrée TOR pour les retours) :
+### Étape 8bis 🆕 — Mettre à jour `PRG_MAIN`
+1. Double-clic sur `PRG_MAIN`.
+2. Recoller **DECLARATION** puis **IMPLEMENTATION** de `CODE/PRG_MAIN.st` (câblage complet :
+   I/O réel M1/M2, `ThermalFeedback`/`SlackCableDetected`/`ForbidDescent`, renommage Chariot).
+3. **Enregistrer**.
 
-| Canal physique | Colonne **Variable** à saisir |
+### Étape 9 — I/O Mapping — **déjà fait pour la majorité des canaux (nouvel export)**
+D'après le dernier export `Device.export`, les canaux suivants sont **déjà mappés** (rien à
+refaire, juste vérifier la présence dans l'arbre projet, onglet I/O Mapping) :
+
+| Canal physique | Variable (déjà mappée) |
+|-----------------|-------------------------|
+| Sortie contacteur sens avant/arrière M1/M2 | `M1_RelayFwd`/`M1_RelayRev`, `M2_RelayFwd`/`M2_RelayRev` |
+| Sortie contacteur vitesse 1..4 M1/M2 | `M1_SpeedContactor_1..4`, `M2_SpeedContactor_1..4` |
+| Sortie bobine frein M1/M2 | `M1_BrakeCmd`, `M2_BrakeCmd` |
+| Entrée retour contacteur sens avant/arrière M1/M2 | `M1_ContactorFeedbackFwd/Rev`, `M2_ContactorFeedbackFwd/Rev` |
+| Entrée capteur position haute (commun) | `M1_M2_TopPositionSensor` |
+| Entrée thermique moteur M1/M2 | `M1_ThermalFeedback`, `M2_ThermalFeedback` |
+| Entrée mou de câble (commun) | `M1_M2_SlackCableSwitch` |
+
+Seul reste **non câblé** (stub logiciel, `GVL_Winch_M1/M2_Stub`) :
+
+| Canal physique | Colonne **Variable** à saisir (quand le matériel sera prêt) |
 |-----------------|-------------------------------|
-| Sortie contacteur sens avant M1 | `M1_RelayFwd` |
-| Sortie contacteur sens arrière M1 | `M1_RelayRev` |
-| Sortie contacteur vitesse 1..4 M1 | `M1_Contactor1`, `M1_Contactor2`, `M1_Contactor3`, `M1_Contactor4` |
-| Sortie bobine frein M1 | `M1_BrakeCmd` |
-| Entrée retour contacteur sens avant M1 | `M1_ContactorFeedbackFwd` |
-| Entrée retour contacteur sens arrière M1 | `M1_ContactorFeedbackRev` |
-| Entrée retour contacteur frein M1 | `M1_BrakeFeedback` |
+| Entrée retour contacteur frein M1/M2 | `M1_BrakeFeedback`, `M2_BrakeFeedback` |
 
-*(Même principe que `JoyXRaw_ANA1`/`JoyYRaw_ANA2` déjà utilisés : taper le nom directement
-dans la colonne Variable du canal correspondant — CODESYS crée la variable globale associée.)*
+### Étape 9bis — GVL stub logiciel — **réduit v1.1**
+`GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub` ne contiennent plus qu'une seule variable chacun
+(`M1/M2_BrakeFeedback`) — tout le reste est désormais réel. Si le GVL existe encore avec
+l'ancien contenu (v1.0, 10 `BOOL`), **recoller entièrement** le fichier `CODE/GVL_Winch_M1(M2)_Stub.st`
+(v1.1) : les variables déjà réelles seraient sinon en conflit de nom avec l'I/O Mapping.
 
-### Étape 9bis — GVL stub logiciel (câblage PAS ENCORE branché — choix retenu 2026-07-01)
-Tant que le matériel de test (relais/retours M1) n'est pas branché, créer une GVL temporaire
-plutôt que l'I/O Mapping :
-1. Clic droit sur **Application** → **Add Object → Global Variable List (GVL)...**
-2. **Name** : `GVL_Winch_M1_Stub` → **Add**
-3. Coller le contenu de [`CODE/GVL_Winch_M1_Stub.st`](../CODE/GVL_Winch_M1_Stub.st) (10 `BOOL`,
-   aucun relais réel piloté).
-4. `PRG_MAIN.st` (déjà à jour dans `CODE/`) mire les retours contacteurs sur les commandes
-   (`M1_ContactorFeedbackFwd := M1_RelayFwd`, etc.) pour simuler un contacteur idéal et éviter
-   de faux défauts `StuckOpen` — bloc marqué `🧪 SIMULATION` dans le fichier, à supprimer en
-   même temps que le GVL quand le matériel réel arrivera.
-5. **Rebuild** doit passer sans erreur (hors avertissement `CAN` déjà présent, non lié à ce lot).
-
-🔴 **Migration vers le matériel réel plus tard** : supprimer `GVL_Winch_M1_Stub` **et** le bloc
-`🧪 SIMULATION` de `PRG_MAIN`, puis faire l'Étape 9 (I/O Mapping) avec les mêmes noms de
-variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
+🔴 **`GVL_Homing_Stub` (capteur position haute)** : à **supprimer entièrement** (clic droit →
+Delete dans l'arbre projet) — `M1_M2_TopPositionSensor` est désormais réel.
 
 ### Étape 10 — Compiler et vérifier
 1. Menu **Build → Rebuild all** (ou **F11**).
@@ -396,6 +397,13 @@ variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
       sur l'armoire M1) : **vérifier le schéma électrique réel de l'armoire M1** avant tout essai
       avec charge/vitesse réelle. Si absent, ajouter un état intermédiaire (2 relais à `FALSE`
       pendant quelques dizaines de ms) dans `FB_Winch` §3bis/§5 avant d'engager le nouveau sens.
+- [ ] 🆕 **v1.1** — Forcer `M1_ThermalFeedback`/`M2_ThermalFeedback` → vérifier `SafeStop` (arrêt
+      total des 2 sens), puis relâcher + Reset front → mouvement réautorisé.
+- [ ] 🆕 **v1.1** — Forcer `M1_M2_SlackCableSwitch` pendant une descente → vérifier `RelayRev`
+      coupé **immédiatement**, `RelayFwd` (montée) **toujours disponible**, `Error`/`ErrorId`
+      bit3 visible IHM. Relâcher + Reset front → descente réautorisée.
+- [ ] 🆕 **v1.1** — Vérifier qu'un défaut thermique **et** un mou de câble simultanés cumulent
+      bien `SafeStop=TRUE` **et** `ForbidDescent=TRUE` (les deux bits actifs, pas d'écrasement).
 
 ---
 
@@ -434,7 +442,7 @@ Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explici
 ### Dépendance bloquante (toujours valable pour la synchro)
 `FB_WinchSync` (Partie2 §4, Partie4 §3) régule l'écart `ΔPos = |PosM1 − PosM2|` à partir des
 positions codeur validées. L'acquisition + mise à l'échelle (`FB_Encoder_Abs`→`FB_Encoder_Scale`)
-sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md` §9), mais
+sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.4.md` §9), mais
 `HomingRefRaw` reste une valeur RETAIN modifiable **manuellement** (pas de vrai homing tant que
 `FB_Encoder_Homing` n'est pas codé) — construire une synchro sur cette base serait prématuré.
 **M1 et M2 bougent donc ensemble sans aucune régulation d'écart pour l'instant** : à surveiller
@@ -449,9 +457,9 @@ visuellement pendant tout essai avec les deux treuils actifs.
 ---
 
 ## 📚 Documents liés
-- **Partie 2 v2.5** — Architecture (`FB_Winch`, `FB_SpeedStep`, mapping M1/M2).
-- **Partie 3 v1.2** — Contrat FB (`StartStop`/`SafeStop`, ErrorId, reset).
-- **Partie 4 v1.1** — Cycle (§3 Synchro, §4 Frein — règles reprises ici pour `FB_Brake`).
-- **Partie 5 v1.1** — Modes & maintenance (droits Maintenance N1).
-- **Partie 8 v1.1** — Fonction Joystick (source de `AxisCmdY`, corrections `ST_AxisCmd` liées).
-- **Partie 10 v1.1** — Encoder Homing (dépendance bloquante §9 ci-dessus, pas encore codée).
+- **Partie 2 v2.7** — Architecture (`FB_Winch`, `FB_SpeedStep`, mapping M1/M2).
+- **Partie 3 v1.3** — Contrat FB (`StartStop`/`SafeStop`, ErrorId, reset).
+- **Partie 4 v1.2** — Cycle (§3 Synchro, §4 Frein — règles reprises ici pour `FB_Brake`).
+- **Partie 5 v1.2** — Modes & maintenance (droits Maintenance N1).
+- **Partie 8 v1.2** — Fonction Joystick (source de `AxisCmdY`, corrections `ST_AxisCmd` liées).
+- **Partie 10 v1.4** — Encoder Homing (dépendance bloquante §9 ci-dessus, pas encore codée).

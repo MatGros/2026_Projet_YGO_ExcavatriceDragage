@@ -1,15 +1,17 @@
-# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.2)
 
+> **v1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Translation→Chariot
+> dans les exemples (préfixe I/O physique M3 inchangé).
 > 📌 **État d'implémentation (2026-07-02)** : `FB_Input_Digital.st`/`FB_Output_Relay.st` **codés**
 > (conformes à la proposition d'interface ci-dessous, non modifiée). **Non encore intégrés** :
-> ni composés dans `FB_Winch`/`FB_Translation` (remplaceraient leur double-vérification actuelle
+> ni composés dans `FB_Winch`/`FB_Chariot` (remplaceraient leur double-vérification actuelle
 > écrite à la main), ni appelés via un `FB_IO` générique en tableaux (§3) — choix d'architecture
-> **en attente de décision utilisateur**. `M1_*`/`M2_*`/`M3_*` (Winch/Translation) restent des
+> **en attente de décision utilisateur**. `M1_*`/`M2_*`/`M3_*` (Winch/Chariot) restent des
 > variables nommées individuelles (stubs GVL), pas encore migrées vers ces briques.
 >
 > **Version 1.1** — Suite audit documentaire : §5 corrigé — il n'y a **pas de coupure sèche**
 > de la sortie relais sur défaut. Le passage en **rampe** (normale via `StartStop`, rapide via
-> `SafeStop`) se résout **à l'intérieur** du FB de mouvement (`FB_Winch`/`FB_Translation`) ; par le
+> `SafeStop`) se résout **à l'intérieur** du FB de mouvement (`FB_Winch`/`FB_Chariot`) ; par le
 > temps où `Output[i]` est appelé, la commande transmise est déjà la commande **rampée** correcte.
 > Terminologie `PRG_IO` retirée (1 seul POU `PLC_PRG_MAIN`, pas de sous-`PRG_*` — voir Partie 2 §0).
 >
@@ -79,7 +81,7 @@ sortie, on récupère **directement un défaut de commande** (contacteur collé,
 
 > 🧭 Ce FB est un **relais de commande bas niveau** : il transmet fidèlement `Command` (après
 > inversion/blink) et **ne décide pas** d'un arrêt de mouvement. La logique de rampe
-> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Translation`, qui pilote
+> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Chariot`, qui pilote
 > `Command` déjà « rampé » (paliers de vitesse levés progressivement, sens coupé en dernier).
 
 ### Interface (proposition)

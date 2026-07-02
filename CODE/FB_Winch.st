@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1/M2 — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -28,6 +28,12 @@
    🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
       uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
+   🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
+      entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
+      `SafeStop`) — masque UNIQUEMENT `RelayRev` (descente), `RelayFwd`
+      (montée) reste piloté normalement. Permet à l'opérateur de remonter
+      pour vérifier le câblage sans être bloqué par un `SafeStop` classique
+      qui aurait arrêté les 2 sens. Voir DOC/AF_Partie9 §4ter.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Winch) ===
@@ -40,6 +46,7 @@ VAR_INPUT
     Mode                    : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
     StartStop               : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                : BOOL;        // Sortie FB_Safety_Winch : TRUE = rampe décélération RAPIDE (Enable maintenu)
+    ForbidDescent           : BOOL;        // 🆕 Sortie dédiée FB_Safety_Winch (mou de câble) : TRUE = masque UNIQUEMENT RelayRev (descente), RelayFwd (montée) non affecté
     Direction               : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdY.Direction) — source d'autorité du sens (interlock §3bis)
     SpeedRefPct             : REAL;        // 🔧 2026-07-02 : AxisCmdY.SpeedRef est désormais SIGNÉ (-100..+100 %) —
                                             // seule la MAGNITUDE est utilisée ici (ABS() en §3), Direction ci-dessus
@@ -203,6 +210,13 @@ Contactor4 := SpeedStep.Contactor4;
 // ➡️⬅️ 5. CONTACTEURS DE SENS
 RelayFwd := (CommandedDirection = 1) AND (StepNumber > 0);
 RelayRev := (CommandedDirection = -1) AND (StepNumber > 0);
+
+// 🔒 5bis. MOU DE CÂBLE — 🆕 2026-07-02 : ForbidDescent masque UNIQUEMENT la descente (RelayRev).
+// La montée (RelayFwd) reste disponible pour permettre d'aller vérifier le câblage — ce n'est
+// PAS un SafeStop (qui aurait arrêté les 2 sens), voir DOC/AF_Partie9 §4ter.
+IF ForbidDescent THEN
+    RelayRev := FALSE;
+END_IF;
 
 // 🛑 6. FREIN (composé) — ne relâche qu'après la séquence temporisée interne
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev),
