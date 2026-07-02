@@ -1,5 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.5)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.6)
 
+> **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
+> contacteur puissance/AU, résout AUDIT Q11 pour le pipeline codeur — §7). `Reset` des FB
+> codeur/homing câblé (`M1/M2_Reset_IHM`, n'était câblé nulle part avant). Nouveau
+> `CODE/GVL_Encoder_Stub.st` : centralise Reset/ConfirmCoherence/Home/TopSensorPositionM
+> (déplacés depuis `PRG_MAIN`) — voir §8.
+>
 > **v1.5** — Retour terrain 2026-07-03 : `InvertDirection` **retiré** de `FB_Encoder_Abs` — le
 > sens de comptage codeur se règle côté device (objet CoE `6000h`, Startup Parameter CODESYS),
 > pas par calcul PLC (l'ancien calcul était de toute façon buggé, plage `UDINT` au lieu de la
@@ -497,6 +503,13 @@ CoE, lui, agit directement sur la mesure native, sans hypothèse de plage côté
   `FB_Encoder_Homing` — la robustesse de la non-écriture **côté bus** (`FB_Encoder_Abs`, en cas de
   coupure pendant la fenêtre SDO elle-même) reste un point d'implémentation à vérifier fiche
   technique/tests (comportement du firmware codeur sur SDO abort en cours d'écriture).
+- ✅ **`EmergencyStopOk` réel (2026-07-03)** — résout **AUDIT Q11** (source de `EmergencyStopOk`,
+  laissée ouverte depuis l'audit 2026-07-01) **pour le pipeline codeur** : c'est le **retour
+  contacteur de puissance géré par l'arrêt d'urgence** (I/O Mapping réel, description device :
+  "Retour état contacteur de puissance géré par arrêt d'urgence"), câblé directement sur
+  `instEncoderAbsM1/M2` et `instHomingM1/M2`. ⚠️ **Portée limitée à ce lot** : Joystick,
+  `FB_Safety_Winch`, `FB_Winch`, `FB_Safety_Chariot`, `FB_Chariot` restent sur le stub
+  `GVL_DEBUG.DBG_True` — même câblage réel à reprendre pour ces FB dans un prochain lot.
 
 ### 7bis. Capteur de position haute — double rôle (2026-07-02, ⚠️ conception, pas codé)
 
@@ -584,6 +597,13 @@ fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `M1_M2
 | Voyant doute (IHM) | `HomingSuspectM1_Lamp` / `HomingSuspectM2_Lamp` | ← `HomingSuspect` |
 | Affichage position | `CablePosM1_Display` / `CablePosM2_Display` | ← `FB_Encoder_Scale`, format `xx.xx` m signé |
 | Affichage maintenance (angle/tours) | `AngleRawM1_Display` / `TurnCountM1_Display` (+ M2) | ← `FB_Encoder_Abs`, informatif seulement |
+
+> ✅ **Implémenté (2026-07-03)**, `CODE/GVL_Encoder_Stub.st` — noms réels différents des
+> exemples ci-dessus (écrits avant codage) : `M1/M2_Reset_IHM` (acquittement, remplace le
+> `Reset := FALSE` figé qui empêchait tout acquittement), `M1/M2_ConfirmCoherence_IHM`,
+> `StubHomeButton_IHM` (partagé M1+M2, inchangé), `M1/M2_TopSensorPositionM` (RETAIN, déplacé
+> depuis `PRG_MAIN` pour visibilité). Tout regroupé dans **un seul GVL** dédié au pipeline
+> codeur — reste TBD/non codé : `WinchSelect_IHM`, `HomingTargetM_IHM`, voyants/affichages IHM.
 
 ---
 

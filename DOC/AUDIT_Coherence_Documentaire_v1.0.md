@@ -134,9 +134,10 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 |---|----------|-------|
 | Q6 | **Séquence `INIT`** (`AF_Partie4` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. **→ TBD (D22).** |
 | Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. **→ TBD (D22).** |
-| Q11 | **Source de `EmergencyStopOk`** : chaîne de sécurité AU **ou** retour du **contacteur de puissance** ? (marquée « à définir » en D18) | Fige l'origine de l'info sécurité consommée par les FB. |
+| Q11 | **Source de `EmergencyStopOk`** : chaîne de sécurité AU **ou** retour du **contacteur de puissance** ? (marquée « à définir » en D18) | ✅ **Résolue (2026-07-03), partiellement** : I/O réel confirmé = **retour contacteur de puissance géré par l'arrêt d'urgence** (les deux à la fois, en fait — pas un "ou"). Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` (D31). ⚠️ Reste `GVL_DEBUG.DBG_True` sur Joystick/Safety_Winch/Winch/Safety_Chariot/Chariot — même variable réelle à reprendre, pas encore fait sur ces FB. |
 
-> ✅ **Q1→Q5, Q8→Q10 résolues** → actées en **D14…D21** (§2). Ne restent ouvertes que **Q6/Q7** (TBD) et **Q11** (source `EmergencyStopOk`, à définir).
+> ✅ **Q1→Q5, Q8→Q10 résolues** → actées en **D14…D21** (§2). **Q11 résolue partiellement**
+> (2026-07-03, D31 — pipeline codeur seulement). Ne reste ouvert que **Q6/Q7** (TBD).
 
 ---
 
@@ -222,3 +223,21 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
   Partie4 v1.1→**v1.2**, Partie5 v1.1→**v1.2**, Partie6 v1.1→**v1.2**, Partie8 v1.1→**v1.2**,
   Partie9 v1.0→**v1.1**, Partie10 v1.3→**v1.4**, Partie11 (renommé) v1.1→**v1.2**,
   `NAMING_CONVENTION.md`/`CLAUDE.md` édités en place. Anciennes versions → `DOC/Archives/`.
+
+---
+
+## 🚀 9. Correctifs pipeline codeur (2026-07-03, retours mise en service)
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D31 | **Sens de comptage codeur** | `InvertDirection` (calcul PLC) **retiré** de `FB_Encoder_Abs` — était buggé (inversait sur la plage `UDINT` 32 bits au lieu de la plage réelle 25 bits du codeur, `PointsPerRev × MultiTurnRevsMax`). Confirmé terrain : objet CoE **`6000h`** (bit0 : `4`→`5`) inverse le sens **côté codeur** (Kübler F58x8), réglé en **Startup Parameter CODESYS** (init automate, pas un paramètre PLC). |
+| D32 | **`EmergencyStopOk` réel (Q11, partiel)** | I/O réel confirmé = retour contacteur de puissance géré par l'AU. Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` **uniquement ce lot** — Joystick/Safety_Winch/Winch/Safety_Chariot/Chariot restent sur `GVL_DEBUG.DBG_True` (même câblage à reprendre, prochain lot). |
+| D33 | **`Reset` codeur/homing câblé + `GVL_Encoder_Stub`** | `Reset` des FB codeur/homing (`FALSE` figé jusqu'ici — alarmes jamais acquittables) câblé sur `M1/M2_Reset_IHM` (un bouton par codeur, acquitte `instEncoderAbsMx` + `instHomingMx`). Nouveau `CODE/GVL_Encoder_Stub.st` : centralise Reset/`ConfirmCoherence`/`Home`/`TopSensorPositionM` (déplacés depuis `PRG_MAIN`) — un seul endroit à consulter pour le mapping IHM et les paramètres de homing (mètres). |
+
+### Fichiers impactés (2026-07-03)
+- **CODE/** : `FB_Encoder_Abs.st` (`InvertDirection` retiré), `GVL_Encoder_Stub.st` (nouveau),
+  `PRG_MAIN.st` (câblage `Reset`/`EmergencyStopOk` réel sur les 4 instances codeur/homing,
+  déclarations `StubHomeButton_IHM`/`M1_M2_TopSensorPositionM` déplacées), + refs croisées
+  (`FB_Encoder_Homing/Scale`, `FB_Safety_Winch`, `ST_EncoderCalib`).
+- **DOC/** : Partie10 v1.4→**v1.5**→**v1.6** (2 lots), Partie9 (ref croisée v1.6),
+  `CLAUDE.md` (ref croisée v1.6), AUDIT Q11 partiellement résolue.

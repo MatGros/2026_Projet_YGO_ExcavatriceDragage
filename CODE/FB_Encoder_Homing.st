@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur, flux NOMINAL uniquement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.5.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE DE CE LOT : flux **nominal** uniquement (capteur haut +
       bouton IHM, référencement à `TopSensorPositionM`, 1 instance par
       treuil, câblées sur le MÊME bouton IHM côté PRG_MAIN). Le flux
