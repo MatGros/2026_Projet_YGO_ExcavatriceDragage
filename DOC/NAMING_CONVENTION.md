@@ -33,7 +33,7 @@ En = enable           Rdy = ready                  Err = error / ErrorId
 ```
 Enable, Reset
 StartStop            → BOOL : TRUE = rampe accélération, FALSE = rampe décélération normale
-                        (FB de mouvement uniquement — Winch, Chariot)
+                        (FB de mouvement uniquement — Winch, Translation)
 ```
 
 ### Entrées sécurité / contexte
@@ -110,8 +110,8 @@ DrumRevs          → rotations tambour
 Rôle métier clair, court :
 ```
 WinchA, WinchB             → les deux treuils
-Chariot                → axe transversal
-Grappin                    → grappin
+Translation                → axe transversal
+Bucket                     → godet
 Joystick                   → manette
 Sync, Safety               → fonctions critiques
 ```

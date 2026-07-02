@@ -34,7 +34,7 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 | D3 | **AU (arrêt d'urgence)** | AU physique (coup-de-poing / câble « position haute extrême ») coupe la **puissance** via gros contacteur. **Seul l'AU coupe brutalement.** Automate **jamais coupé** (surveillance permanente). Une **info automate « machine en AU »** existe → alimente `SafetyOk`. |
 | D4 | **Arrêt sûr (hors AU)** | Pas de coupure sèche : arrêt des **relais vitesse + sens Av/AR** sur une **rampe plus rapide que l'accélération**, puis collage frein. Déclenché par `SafeStop` (voir D12). |
 | D5 | **Limite légale** | **Hors safety.** C'est un **arrêt géré par `FB_Modes`**, pas par `FB_Safety`. |
-| D6 | **Synchro treuils / grappin** | Pendant la **phase grappin**, **pas de mouvement M1** → `FB_WinchSync` **inutile** (aucun conflit). À documenter comme **suspension explicite** de la surveillance synchro en phase grappin. |
+| D6 | **Synchro treuils / godet** | Pendant la **phase godet**, **pas de mouvement M1** → `FB_WinchSync` **inutile** (aucun conflit). À documenter comme **suspension explicite** de la surveillance synchro en phase godet. |
 | D7 | **Cadencement joystick** | Communication CAN **20 ms** ; **code de traitement dans MainTask 10 ms**. |
 | D8 | **Architecture POU** | **1 seul POU `main`** exécute les FB **séquentiellement**. **Plus de `PRG_*`** séparés (`PRG_MODES`, `PRG_IO`, `PRG_JOY1` à retirer du vocabulaire des specs). |
 | D9 | **`ErrorId`** | **`WORD`** partout (set de bits). |
@@ -72,7 +72,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 |-----|--------------|---------|--------|
 | M1 | `AF_Partie5` §2 vs §3 | Le pseudo-code override met la limite légale dans `FB_Safety.CheckLimitLegal`, alors que §3 dit « **pas `FB_Safety`**, c'est `FB_Modes` » | ✅ **D5** : limite légale = `FB_Modes`. Corriger le pseudo-code §2. |
 | M2 | `AF_Partie6` §5 (`:163`) vs `AF_Partie4` §7 / `AF_Partie5` §5 | `Command := ordre AND NOT CoupeEnable` sur la sortie relais = **coupure sèche**, contredit la « rampe non destructive » | ✅ **D2+D4** : pas de `CoupeEnable` ; arrêt = **rampe sur relais vitesse/sens**, pas coupure de sortie. Reformuler §5. |
-| M3 | `AF_Partie4` §3 vs §6 | `FB_WinchSync` (`ΔPos>SyncStop`→arrêt) vs désynchro **volontaire** M2 pour le grappin → risque de faux défaut synchro | ✅ **D6** : phase grappin = pas de mouvement M1 → **sync suspendue**. Documenter l'interlock. |
+| M3 | `AF_Partie4` §3 vs §6 | `FB_WinchSync` (`ΔPos>SyncStop`→arrêt) vs désynchro **volontaire** M2 pour le godet → risque de faux défaut synchro | ✅ **D6** : phase godet = pas de mouvement M1 → **sync suspendue**. Documenter l'interlock. |
 | M4 | `AF_Partie2` §2/§9 vs `AF_Partie8` §7 | Traitement joystick en `CanTask` (20 ms) **ou** `MainTask` (10 ms) ? Ambigu | ✅ **D7** : comm 20 ms, **traitement 10 ms** (MainTask). |
 | M5 | `AF_Partie2` §0 vs `AF_Partie5` §1, `AF_Partie6` §5, `AF_Partie8` | Terminologie flottante : `PLC_PRG_MAIN` unique vs `PRG_MODES`/`PRG_IO`/`PRG_JOY1` séparés | ✅ **D8** : **1 POU main**, plus de `PRG_*`. Nettoyer le vocabulaire. |
 | M6 | `AF_Partie4` §0 | « passage à une étape sans mouvement = retrait `Enable` → arrêt sur rampe » | ✅ **D15** : arrêt = **`StartStop := FALSE`** (décélération normale), pas retrait d'`Enable`. Réécrire §0. |
@@ -172,9 +172,9 @@ anciennes versions ont été déplacées vers `DOC/Archives/` (gitignoré, non v
 |---------|-------------------|-------------------|-------------------|
 | `DOC/NAMING_CONVENTION.md` | (sans version) | édité en place | `SafeStop` reclassé sortie safety métier, `StartStop` ajouté, `EmergencyStopOk` ajouté, `ErrorId` en `WORD`, exemple `E_Error` retiré |
 | `AF_Partie1_Analyse_Fonctionnelle` | v1.1 | **v1.2** | Suppression `CoupeEnable`, flux `SafeStop`/`StartStop`, explication init codeurs (m10) |
-| `AF_Partie2_Architecture_Programme` | v2.4 | **v2.5** | Suppression `CoupeEnable` et `FB_Watchdog` ; modèle `SafeStop` (par métier) / `StartStop` ; `EmergencyStopOk` ; interlock grappin/synchro documenté ; composition pipeline joystick précisée (m3) |
+| `AF_Partie2_Architecture_Programme` | v2.4 | **v2.5** | Suppression `CoupeEnable` et `FB_Watchdog` ; modèle `SafeStop` (par métier) / `StartStop` ; `EmergencyStopOk` ; interlock godet/synchro documenté ; composition pipeline joystick précisée (m3) |
 | `AF_Partie3_Template_FB_Commun` | v1.1 | **v1.2** | Nouveau §1bis (profils d'interface FB standard / mouvement / briques réduites) ; `EmergencyStopOk` ; précédence `Enable`>`SafeStop`>`StartStop` ; §7/§9 réécrits |
-| `AF_Partie4_Cycle_Sequenceur` | v1.0 | **v1.1** | §0 réécrit (`StartStop:=FALSE`, pas retrait Enable) ; nouveau §3bis (suspension `FB_WinchSync` en phase grappin, M3) ; `ERROR_HOLD` déclenché par `SafeStop` |
+| `AF_Partie4_Cycle_Sequenceur` | v1.0 | **v1.1** | §0 réécrit (`StartStop:=FALSE`, pas retrait Enable) ; nouveau §3bis (suspension `FB_WinchSync` en phase godet, M3) ; `ERROR_HOLD` déclenché par `SafeStop` |
 | `AF_Partie5_Modes_Maintenance` | v1.0 | **v1.1** | Pseudo-code §2 corrigé (limite légale hors `FB_Safety`, M1) ; §4/§5 réécrits (`SafeStop` par métier, watchdog système) |
 | `AF_Partie6_IO_Conditioning` | v1.0 | **v1.1** | §5 corrigé (pas de coupure sèche de sortie relais, M2) ; terminologie `PRG_IO` retirée (M5) |
 | `AF_Partie8_Fonction_Joystick` | v1.0 | **v1.1** | `SafeStop` retiré de l'interface (B1) ; `EStopOk`/`SafetyOk` → `EmergencyStopOk` (B2) ; lien mort corrigé (m5) ; `FB_FilterPT1` (m2) ; nouveau §6bis (écarts avec `CODE/PRG_JOY1.st` actuel) |

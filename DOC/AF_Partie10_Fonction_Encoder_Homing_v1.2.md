@@ -1,25 +1,5 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.2)
 
-> 🔧 **2026-07-02** — Terminologie : godet → grappin (correction utilisateur). Corrige au passage
-> une incohérence doc/code : cette version référençait encore `GodetTopPositionSensor` alors que
-> `CODE/GVL_Homing_Stub.st` porte déjà `GrappinTopPositionSensor` — les deux noms désignent la
-> même variable unique décrite ci-dessous (§7bis) ; c'est le nom du doc qui a divergé, pas le code.
-> 🔧 **2026-07-02** — Terminologie : Translation → Chariot (liste I/O réelle reçue de l'utilisateur,
-> terminologie officielle du matériel) — voir Partie 11 v1.2.
-
-> **v1.3** — Retour terrain 2026-07-02 (correction implémentation) :
-> - 🔧 **`TopPositionSensor` : UN SEUL capteur physique, COMMUN aux 2 treuils** — pas un par
->   treuil. C'est le **grappin** qui, en montant (tracté par les 2 câbles synchronisés), vient
->   toucher ce capteur unique. Le §1 ci-dessous décrivait déjà correctement un « capteur de
->   position haute unique et répétable », mais l'implémentation (`CODE/`) avait divergé : 2
->   variables séparées (`M1_TopPositionSensor`/`M2_TopPositionSensor`, une par GVL stub Winch) et
->   le commentaire d'entrée `FB_Encoder_Homing.TopPositionSensor` disaient à tort « CE TREUIL ».
->   Corrigé : `CODE/GVL_Homing_Stub.st` (nouveau, variable unique `GrappinTopPositionSensor`),
->   câblée IDENTIQUEMENT sur `instHomingM1` ET `instHomingM2` dans `PRG_MAIN.st`. Voir §5/§7bis/§9
->   mis à jour ci-dessous. `TopSensorPositionM` (paramètre de calibration, distinct du capteur
->   lui-même) reste réglable indépendamment par treuil (asymétrie mécanique possible même avec un
->   capteur de déclenchement commun) — **inchangé**.
->
 > **v1.2** — Retour terrain 2026-07-02 (câblage réel) :
 > - 🔴➜🤖 **Capteur position haute retiré de la chaîne AU matérielle** : ce n'est plus le câble
 >   mécanique qui coupe directement la puissance (voir Partie1 v1.3/Partie2 v2.6 §6) — c'est
@@ -48,7 +28,7 @@
 > - 🔢 Résolution codeur **confirmée** (8192 pts/tour × 4096 tours, plage totale 33 554 432 pts) —
 >   n'est plus un exemple hypothétique (§3.3). Cible de homing nominal = **centre exact** de la
 >   plage (16 777 216 pts = 0.00 m) : marge symétrique maximale, aucun risque de rebouclage.
-> - 🎯 **Deux flux de homing distincts** : nominal (les 2 treuils ensemble, grappin ouvert, cible
+> - 🎯 **Deux flux de homing distincts** : nominal (les 2 treuils ensemble, godet ouvert, cible
 >   fixe 0.00 m, `MAINT_N1` suffit) vs unitaire maintenance (1 treuil seul, cible **paramétrable**,
 >   `MAINT_N2` requis) — voir §5.
 > - 🖥️ **Confirmation déportée à l'IHM** : `Home` devient une entrée BOOL unique (front) — mot de
@@ -65,9 +45,9 @@
 >   (12 ms) — perte de quelques trames jugée sans risque temporel, évite les fausses alarmes.
 > - 🧩 **`FB_Safety_Winch` scindé en 2 instances indépendantes** (`WinchM1`/`WinchM2`) — lève
 >   l'ambiguïté relevée en revue (§7).
-> - 📝 Note hors périmètre : variateur **AC600 (M3, chariot)** — sur perte de communication,
+> - 📝 Note hors périmètre : variateur **AC600 (M3, translation)** — sur perte de communication,
 >   comportement pressenti **roue libre sans rampe** (proche d'un STO) ≠ comportement treuil
->   (contacteurs/frein). À traiter dans un futur document dédié `FB_Chariot`/Partie2 (§9).
+>   (contacteurs/frein). À traiter dans un futur document dédié `FB_Translation`/Partie2 (§9).
 >
 > **v1.0** — Version initiale (cinématique câble/tambour, analyse anti-débordement générique,
 > sélection treuil indépendante, `FB_Encoder_Homing`).
@@ -82,7 +62,7 @@
 > 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.2](AF_Partie1_Analyse_Fonctionnelle_v1.3.md) §Initialisation,
 > [P2 Architecture v2.5](AF_Partie2_Architecture_Programme_v2.6.md) (dossier `ENCODER`),
 > [P3 Contrat FB v1.2](AF_Partie3_Template_FB_Commun_v1.2.md) §1bis (profils FB),
-> [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
+> [P4 Cycle v1.1](AF_Partie4_Cycle_Sequenceur_v1.1.md) §Initialisation/§3 Synchro,
 > [P5 Modes v1.1](AF_Partie5_Modes_Maintenance_v1.1.md) §2 (`MAINT_N1`/`MAINT_N2`),
 > [P9 Fonction Winch v1.0](AF_Partie9_Fonction_Winch_v1.0.md) (`FB_Winch` unitaire M1/M2).
 
@@ -309,7 +289,7 @@ END_TYPE
 
 🧭 **Portée du principe** : la même logique de sélection/neutralisation croisée (et le même
 verrou de transition de mode) s'applique par construction à d'autres actionneurs pilotables en
-maintenance (grappin, chariot) — hors périmètre détaillé de ce document, mais `FB_Modes` doit
+maintenance (godet, translation) — hors périmètre détaillé de ce document, mais `FB_Modes` doit
 généraliser cet interlock, pas le réserver aux seuls treuils.
 
 ---
@@ -331,7 +311,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `Mode` | `E_Mode` | `MAINT_N1` autorise le flux **nominal** (cible `TopSensorPositionM`) ; `MAINT_N2` requis pour le flux **unitaire** (cible `HomingTargetM` libre) |
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
-| `TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (le grappin le touche en montant — PAS un capteur par treuil, §7bis). Câblé IDENTIQUEMENT sur les 2 instances (`CODE/GVL_Homing_Stub.st`). Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
+| `TopPositionSensor` | BOOL | ✅ **2026-07-02** — État du capteur de position haute **de ce treuil** (unique et répétable, §7bis). Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
 | `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis) |
 | `HomingTargetM` | REAL | Cible de position à imposer **en flux unitaire uniquement** (`MAINT_N2`), bornée **[-99.00 ; +99.00]** m (§3.6) — remplace l'ancien usage "flux nominal verrouillé à 0.00" (le flux nominal utilise désormais `TopSensorPositionM`, pas ce champ) |
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
@@ -515,7 +495,7 @@ s'arrêter avant** d'atteindre le capteur de position haute — celui-ci reste u
 
 🔴 **Non conçu en détail** : nécessite une **limite haute « normale »**, plus basse que
 `TopSensorPositionM`, avec une zone de ralentissement progressif (principe similaire à
-l'approche temporisée de `FB_Chariot`, Partie4 §5) — probablement un paramètre RETAIN
+l'approche temporisée de `FB_Translation`, Partie4 §5) — probablement un paramètre RETAIN
 supplémentaire (ex. `NormalTopLimitM`, à définir) consommé par `FB_Winch`/`FB_Cycle` en aval de
 `CablePosM`. À concevoir dans le même lot que `FB_Encoder_Homing`/`FB_Encoder_Safety` — pas
 avant, et pas improvisé ici sans validation explicite du mécanisme de ralentissement souhaité
@@ -603,10 +583,10 @@ bougent ensemble sans régulation d'écart. Canaux `COD2_*` (I/O Mapping) **mapp
 (miroir de `COD1_*`, voir §9bis point 9).
 
 **Hors périmètre — à traiter séparément** :
-- [ ] Variateur **AC600 (M3, chariot)** : comportement pressenti sur perte de communication =
+- [ ] Variateur **AC600 (M3, translation)** : comportement pressenti sur perte de communication =
       **roue libre sans rampe** (proche d'un STO), différent du comportement treuil
       (contacteurs+frein, rampe rapide `SafeStop`). À valider et documenter dans une future mise à
-      jour de `AF_Partie2`/un document dédié `FB_Chariot` — pas traité ici (hors sujet codeur
+      jour de `AF_Partie2`/un document dédié `FB_Translation` — pas traité ici (hors sujet codeur
       treuil).
 
 ---
@@ -652,14 +632,13 @@ cas (même principe que `GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub`, Partie9 §7 Ét
 ### 9quater. Note d'application — `FB_Encoder_Homing` (lot Homing, 2026-07-02)
 
 Référence code : `CODE/FB_Encoder_Homing.st` (nouveau), `CODE/PRG_MAIN.st`,
-`CODE/GVL_Homing_Stub.st` (nouveau, capteur unique commun M1+M2) — tous à recopier.
+`CODE/GVL_Winch_M1_Stub.st`/`GVL_Winch_M2_Stub.st` (mis à jour) — tous à recopier.
 
 1. **`FB_Encoder_Homing`** : POU **nouveau**, dossier `ENCODER` (comme `FB_Encoder_Abs`/`Scale`).
    `Add Object → POU...` → Name = `FB_Encoder_Homing`, Type = `Function block`, Language =
    `Structured Text (ST)` → coller déclaration + implémentation.
-2. **`GVL_Homing_Stub`** : nouveau GVL, variable **unique** `GrappinTopPositionSensor` (toujours
-   `FALSE` par défaut) — 🔧 correctif 2026-07-02 : PAS un stub par treuil (voir en-tête de
-   document), câblée identiquement sur `instHomingM1` ET `instHomingM2`.
+2. **`GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub`** : remplacer ENTIÈREMENT (ajout `M1_TopPositionSensor`/
+   `M2_TopPositionSensor`, toujours `FALSE` par défaut).
 3. **`PRG_MAIN`** : remplacer déclaration + implémentation en entier (nouvelles instances
    `instHomingM1`/`instHomingM2`, nouveau `VAR RETAIN` — **note** : `M1_EncoderCalib`/
    `M2_EncoderCalib` ont disparu, remplacés par l'état interne de `FB_Encoder_Homing`).
@@ -674,8 +653,7 @@ en ligne (CODESYS : clic droit sur la variable dans la vue instance → *Write*/
 ```
 1. Vérifier ArretConfirme : joystick au neutre (M1_RelayFwd/Rev = FALSE, M1_BrakeCmd = FALSE
    → collé), sinon Home sera rejeté (ErrorId bit2).
-2. Forcer GrappinTopPositionSensor := TRUE (simule "grappin en position haute" — capteur UNIQUE,
-   un seul forçage suffit pour les 2 instances M1/M2, voir en-tête de document).
+2. Forcer M1_TopPositionSensor := TRUE (simule "treuil physiquement en haut").
 3. Basculer StubHomeButton_IHM : FALSE → TRUE → FALSE (simule l'appui bouton IHM, front).
 4. Observer instHomingM1 : Busy doit passer TRUE brièvement, puis Done pulse à TRUE,
    Homed := TRUE, ErrorId reste à 0.
