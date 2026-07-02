@@ -64,8 +64,10 @@ VAR_INPUT
     StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
     CommMode                    : E_TranslationCommMode; // Sélection MANUELLE (maintenance) — verrouillée pendant un mouvement, voir §2bis
-    Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdX.Direction)
-    SpeedRefPct                 : REAL;        // Consigne 0..100 % (ETHERCAT: proportionnel ; DEGRADED_IO: sélecteur PV/GV via HYSTERESIS)
+    Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdX.Direction) — source d'autorité du sens (interlock §5)
+    SpeedRefPct                 : REAL;        // 🔧 2026-07-02 : AxisCmdX.SpeedRef est désormais SIGNÉ (-100..+100 %) —
+                                                 // seule la MAGNITUDE est utilisée ici (ABS() en §4 et §5bis), Direction
+                                                 // ci-dessus reste la source d'autorité du sens/interlock (inchangé)
     PositionSensorTarget        : BOOL;        // Capteur position cible courante (sélection de la cible = hors périmètre, en amont — IHM/FB_Cycle)
 
     // 🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
@@ -204,7 +206,7 @@ TargetReached := CaptorDebounceTon.Q;
 // ⚙️ 4. CORE — arbitrage rampe : Enable > SafeStop > StartStop
 RampTargetPct := 0.0;
 IF NOT SafeStop AND StartStop THEN
-    RampTargetPct := SpeedRefPct;
+    RampTargetPct := ABS(SpeedRefPct);  // 🔧 2026-07-02 : SpeedRefPct peut arriver signé (AxisCmdX.SpeedRef) — ABS() ici
 END_IF;
 
 // ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE — ETHERCAT uniquement (Partie4 §5)
@@ -287,7 +289,10 @@ ELSE // DEGRADED_IO
 
     // 🪜 Sélection PV/GV par HYSTERESIS (lib Util, Partie3 §0) — anti-battement, PAS de FB_SpeedStep
     // (table 5 paliers disproportionnée pour un choix à 2 états)
-    SpeedRefInt := REAL_TO_INT(SpeedRefPct);
+    // 🔧 2026-07-02 : ABS() — SpeedRefPct signé, les seuils Threshold sont des seuils de MAGNITUDE
+    // (60%/40%) ; sans ABS() une consigne négative (sens arrière) ne dépasserait jamais HIGH et
+    // resterait bloquée en PV quelle que soit la vitesse réelle demandée en marche arrière.
+    SpeedRefInt := REAL_TO_INT(ABS(SpeedRefPct));
     HystGv(IN := SpeedRefInt, HIGH := REAL_TO_INT(DegradedGvThresholdHighPct), LOW := REAL_TO_INT(DegradedGvThresholdLowPct));
     RelaySpeedGv := NOT HystGv.OUT;   // Convention FB_SpeedStep : OUT=TRUE en régime bas → NOT OUT = seuil haut franchi (GV)
 

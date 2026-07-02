@@ -25,9 +25,15 @@ VAR_GLOBAL
     M1_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M1 (STUB)
     // 🔧 CORRECTIF (revue de code) : PAS "toujours FALSE" — PRG_MAIN.st (bloc 🧪 SIMULATION)
     // mire activement ces 3 retours sur les commandes ci-dessus à chaque scan (contacteur idéal).
+    // ⚠️ INUTILE de forcer ces 3 variables manuellement pour un essai (ex. homing) : le miroir
+    // PRG_MAIN les réécrit CHAQUE cycle depuis M1_RelayFwd/Rev/M1_BrakeCmd — un forçage serait
+    // écrasé au cycle suivant. Elles se stabilisent SEULES en environ 500 ms (DelayMotorDecel)
+    // dès que le joystick reste au neutre (aucun mouvement commandé).
     M1_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M1 (STUB, miroir de M1_RelayFwd)
     M1_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M1 (STUB, miroir de M1_RelayRev)
-    M1_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M1 (STUB, miroir de M1_BrakeCmd)
+    // 🔧 Polarité frein à manque de courant (confirmée FB_Brake.st §BrakeCmd / FB_Encoder_Homing.st
+    // §ArretConfirme) : TRUE = relâché (bobine alimentée) ; FALSE = collé/serré (arrêt sûr tenu).
+    M1_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M1 (STUB, miroir de M1_BrakeCmd — TRUE=relâché/FALSE=collé)
 
     // 🎯 AJOUT 2026-07-02 (lot Homing) — capteur position haute M1 (physique, PAS de miroir
     // automatique : reste FALSE tant que non forcé manuellement dans la vue instance CODESYS).

@@ -1,5 +1,12 @@
 # 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.1)
 
+> 📌 **État d'implémentation (2026-07-02)** : `FB_Input_Digital.st`/`FB_Output_Relay.st` **codés**
+> (conformes à la proposition d'interface ci-dessous, non modifiée). **Non encore intégrés** :
+> ni composés dans `FB_Winch`/`FB_Translation` (remplaceraient leur double-vérification actuelle
+> écrite à la main), ni appelés via un `FB_IO` générique en tableaux (§3) — choix d'architecture
+> **en attente de décision utilisateur**. `M1_*`/`M2_*`/`M3_*` (Winch/Translation) restent des
+> variables nommées individuelles (stubs GVL), pas encore migrées vers ces briques.
+>
 > **Version 1.1** — Suite audit documentaire : §5 corrigé — il n'y a **pas de coupure sèche**
 > de la sortie relais sur défaut. Le passage en **rampe** (normale via `StartStop`, rapide via
 > `SafeStop`) se résout **à l'intérieur** du FB de mouvement (`FB_Winch`/`FB_Translation`) ; par le

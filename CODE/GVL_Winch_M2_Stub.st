@@ -21,9 +21,15 @@ VAR_GLOBAL
     M2_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M2 (STUB)
     // 🔧 Mirés activement par PRG_MAIN.st (bloc 🧪 SIMULATION) sur les commandes ci-dessus
     // (contacteur "idéal"), pas "toujours FALSE" — même principe que GVL_Winch_M1_Stub.
+    // ⚠️ INUTILE de forcer ces 3 variables manuellement pour un essai (ex. homing) : le miroir
+    // PRG_MAIN les réécrit CHAQUE cycle depuis M2_RelayFwd/Rev/M2_BrakeCmd — un forçage serait
+    // écrasé au cycle suivant. Elles se stabilisent SEULES en environ 500 ms (DelayMotorDecel)
+    // dès que le joystick reste au neutre (aucun mouvement commandé).
     M2_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M2 (STUB, miroir de M2_RelayFwd)
     M2_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M2 (STUB, miroir de M2_RelayRev)
-    M2_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M2 (STUB, miroir de M2_BrakeCmd)
+    // 🔧 Polarité frein à manque de courant (confirmée FB_Brake.st §BrakeCmd / FB_Encoder_Homing.st
+    // §ArretConfirme) : TRUE = relâché (bobine alimentée) ; FALSE = collé/serré (arrêt sûr tenu).
+    M2_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M2 (STUB, miroir de M2_BrakeCmd — TRUE=relâché/FALSE=collé)
 
     // 🎯 AJOUT 2026-07-02 (lot Homing) — capteur position haute M2 (physique, PAS de miroir
     // automatique : reste FALSE tant que non forcé manuellement dans la vue instance CODESYS).
