@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
-   🔀 CommMode (E_TranslationCommMode) — sélection MANUELLE, jamais de
-      bascule automatique en cours de mouvement (Partie11 §1) :
+   🔀 CommMode (E_TranslationCommMode) — sélection MANUELLE, verrouillée
+      pendant un mouvement (CommModeLocked, correctif v1.1 F5 — voir §2bis) :
         - ETHERCAT    : mot de commande/état + consigne fréquence (proportionnelle)
         - DEGRADED_IO : RelayFwd/RelayRev + RelaySpeedGv (2 paliers PV/GV),
                         vitesse et rampes réglées LOCALEMENT sur le variateur
@@ -15,8 +15,30 @@
    🧱 Réutilisation lib Util (Partie3 §0) : HYSTERESIS pour la sélection
       PV/GV en DEGRADED_IO (préféré à FB_SpeedStep — table 5 paliers/4
       relais disproportionnée pour un choix à 2 états, voir Partie11 §3).
-   🔴 SQUELETTE — sections marquées TBD à compléter/vérifier avant tout
-      collage en CODESYS (Ne JAMAIS approximer, Partie3 §0/CLAUDE.md) :
+
+   🔧 CORRECTIFS retour terrain — revue automatisme/mise en service 2026-07-02
+      (Partie11 passe v1.0 → v1.1, voir doc pour le détail complet) :
+      1. [F1 — BLOQUANT corrigé] En DEGRADED_IO, RelayFwd/RelayRev restaient
+         commandés tant que la rampe LOGICIELLE SpeedRamp.Current ne repassait
+         pas sous 0.1 % — or cette rampe n'a AUCUN lien avec la vitesse physique
+         réelle en DEGRADED_IO (vitesse en tout-ou-rien PV/GV, fixée sur le
+         variateur). Résultat : jusqu'à ~2,5 s de roulage à pleine vitesse
+         PV/GV après passage sur le capteur cible (risque de choc en bout de
+         course). Corrigé : nouvelle variable DegradedMoveAuthorized, calculée
+         directement depuis StartStop/SafeStop/ArrivalLock (immédiate, aucune
+         dépendance à la rampe) — voir §4quater et §5bis.
+      2. [F5 — corrigé] Ajout d'une garde logicielle CommModeLocked (§2bis) :
+         le changement de CommMode n'est plus pris en compte tant qu'un
+         mouvement est en cours (Busy de l'état précédent), en complément de
+         la consigne procédurale (bascule manuelle hors mouvement).
+      3. [F7 — clarifié] Les paramètres de rampe (RampAccelRate/RampDecelNormalRate/
+         RampDecelFastRate) ne pilotent une vitesse physique réelle qu'en
+         ETHERCAT. En DEGRADED_IO ils ne servent plus qu'à SpeedRamp pour
+         l'affichage State/StateAtError — le nouveau DegradedStopSettleTime
+         remplace la rampe comme confirmation d'arrêt physique pour l'interlock
+         de sens (§5, IsStoppedConfirmed).
+   🔴 SQUELETTE — sections encore marquées TBD, volontairement non comblées
+      (Ne JAMAIS approximer, Partie3 §0/CLAUDE.md) :
         - Layout exact des bits DriveControlWord/DriveStatusWord AC600
           (non disponible à la rédaction — voir doc constructeur variateur).
         - Interface exacte LIN_TRAFO (Util) : NON vérifiée ici. Le
@@ -41,7 +63,7 @@ VAR_INPUT
     Mode                        : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
     StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    CommMode                    : E_TranslationCommMode; // Sélection MANUELLE (maintenance) — voir §1 doc
+    CommMode                    : E_TranslationCommMode; // Sélection MANUELLE (maintenance) — verrouillée pendant un mouvement, voir §2bis
     Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdX.Direction)
     SpeedRefPct                 : REAL;        // Consigne 0..100 % (ETHERCAT: proportionnel ; DEGRADED_IO: sélecteur PV/GV via HYSTERESIS)
     PositionSensorTarget        : BOOL;        // Capteur position cible courante (sélection de la cible = hors périmètre, en amont — IHM/FB_Cycle)
@@ -58,7 +80,7 @@ VAR_INPUT
     // 🔌 Frein (indépendant du mode — circuit propre, comme le treuil)
     BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
 
-    // Réglages rampe (RETAIN)
+    // Réglages rampe (RETAIN) — pilotent une vitesse PHYSIQUE réelle en ETHERCAT uniquement (correctif v1.1 F7)
     RampAccelRate                : REAL := 20.0;    // %/s — accélération
     RampDecelNormalRate          : REAL := 40.0;    // %/s — décélération normale (StartStop=FALSE)
     RampDecelFastRate            : REAL := 100.0;   // %/s — décélération RAPIDE (SafeStop=TRUE)
@@ -73,6 +95,7 @@ VAR_INPUT
     DegradedGvThresholdHighPct   : REAL := 60.0;    // Seuil bascule PV→GV (HYSTERESIS HIGH)
     DegradedGvThresholdLowPct    : REAL := 40.0;    // Seuil bascule GV→PV (HYSTERESIS LOW)
     ContactorFeedbackTimeout     : TIME := T#500ms; // Timeout cohérence commande/retour contacteurs de sens (DEGRADED_IO)
+    DegradedStopSettleTime       : TIME := T#1s;    // 🆕 v1.1 (F1) — délai physique estimé d'arrêt réel après coupure relais (à régler selon la décélération interne réelle configurée sur le variateur en PV/GV) ; remplace SpeedRamp comme confirmation d'arrêt pour l'interlock de sens en DEGRADED_IO
 
     // Réglages communs
     CaptorDebounce                : TIME := T#100ms; // Filtrage capteur de position cible
@@ -91,11 +114,11 @@ VAR_OUTPUT
     StateAtError        : E_State;
     TargetReached        : BOOL;       // Capteur position cible confirmé (debounce) — voir §9bis
 
-    // 🔌 Sorties ETHERCAT — à mapper sur l'image de sortie EtherCAT du variateur (SI CommMode=ETHERCAT, sinon inertes)
+    // 🔌 Sorties ETHERCAT — à mapper sur l'image de sortie EtherCAT du variateur (SI CommModeLocked=ETHERCAT, sinon inertes)
     DriveControlWord     : WORD;       // 🔴 TBD — mot de commande AC600, layout non câblé (voir tête de fichier)
     DriveFreqRefHz        : REAL;      // Consigne fréquence écrite au variateur
 
-    // 🔌 Sorties DEGRADED_IO — à mapper en I/O Mapping CODESYS (SI CommMode=DEGRADED_IO, sinon forcées FALSE)
+    // 🔌 Sorties DEGRADED_IO — à mapper en I/O Mapping CODESYS (SI CommModeLocked=DEGRADED_IO, sinon forcées FALSE)
     RelayFwd              : BOOL;      // 🔌 Contacteur sens avant
     RelayRev               : BOOL;     // 🔌 Contacteur sens arrière
     RelaySpeedGv           : BOOL;     // 🔌 FALSE = PV (défaut), TRUE = GV — câblé sur entrée présélection vitesse AC600
@@ -111,7 +134,7 @@ END_VAR
 VAR
     Brake                : FB_Brake;       // 🧩 Composé — séquence frein (réutilisé tel quel, Partie11 §3)
     CycleTimeCalc        : FB_CycleTime;
-    SpeedRamp             : FB_Ramp;       // Rampe interne (arbitrage SafeStop/StartStop)
+    SpeedRamp             : FB_Ramp;       // Rampe interne — vitesse physique réelle en ETHERCAT ; affichage State uniquement en DEGRADED_IO (v1.1)
     ResetEdge            : R_TRIG;
     ErrorEdge            : R_TRIG;
     DirectionChangeDelay : TON;            // Interlock changement de sens (identique principe FB_Winch)
@@ -125,7 +148,12 @@ VAR
     SpeedRefInt            : INT;          // Consigne convertie en INT (interface HYSTERESIS)
     ArrivalEdge            : R_TRIG;       // §9bis — détecte l'arrivée sur capteur cible
     DirectionAtArrival     : INT;          // §9bis — sens verrouillé au moment de l'arrivée
+    ArrivalLock             : BOOL;        // §9bis — TRUE tant que le capteur cible bloque le sens d'arrivée
     MovementRequested      : BOOL;         // Commun aux 2 modes — pilote FB_Brake
+    CommModeLocked          : E_TranslationCommMode; // 🆕 v1.1 (F5) — CommMode figé pendant un mouvement (Busy)
+    DegradedMoveAuthorized  : BOOL;        // 🆕 v1.1 (F1) — DEGRADED_IO : autorisation IMMÉDIATE du relais (StartStop/SafeStop/ArrivalLock, sans rampe)
+    DegradedStopSettleTon   : TON;         // 🆕 v1.1 (F1) — confirmation d'arrêt physique DEGRADED_IO (remplace SpeedRamp pour l'interlock)
+    IsStoppedConfirmed      : BOOL;        // 🆕 v1.1 — "vitesse confirmée nulle" par mode : rampe (ETHERCAT) ou temporisation (DEGRADED_IO)
 END_VAR
 
 // === IMPLEMENTATION (SQUELETTE — corps à compléter/vérifier avant collage, voir TBD en tête de fichier) ===
@@ -146,6 +174,11 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     ApproachTimer(IN := FALSE, PT := ApproachTime);
     SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+    ArrivalLock := FALSE;
+    DegradedMoveAuthorized := FALSE;
+    DegradedStopSettleTon(IN := FALSE, PT := DegradedStopSettleTime);
+    CommModeLocked := CommMode;   // Neutralisé = libre de choisir le mode (pas de mouvement en cours)
+
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     RETURN;
@@ -156,6 +189,13 @@ CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms (valeur de secours 
 
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
+
+// 🔒 2bis. GARDE CommMode — 🆕 v1.1 (F5) : pas de changement de mode de communication en cours
+// de mouvement. Utilise Busy du cycle PRÉCÉDENT (pas encore recalculé ce cycle, §9) : tant que
+// l'axe était en mouvement au dernier scan, CommMode externe est ignoré.
+IF NOT Busy THEN
+    CommModeLocked := CommMode;
+END_IF;
 
 // 📡 3. CAPTEUR POSITION CIBLE (debounce commun aux 2 modes)
 CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
@@ -169,7 +209,7 @@ END_IF;
 
 // ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE — ETHERCAT uniquement (Partie4 §5)
 // DEGRADED_IO : pas d'automatisme, le choix PV/GV reste manuel (joystick) — voir §5bis
-IF CommMode = E_TranslationCommMode.ETHERCAT THEN
+IF CommModeLocked = E_TranslationCommMode.ETHERCAT THEN
     ApproachTimer(IN := (StartStop AND NOT SafeStop), PT := ApproachTime);
     IF ApproachTimer.Q THEN
         RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
@@ -179,15 +219,16 @@ ELSE
 END_IF;
 
 // 🎯 4ter. ARRÊT EXACT SUR CAPTEUR — §9bis (commun aux 2 modes, comportement PROPOSÉ à valider)
-// Verrouille la rampe à 0 tant que le capteur cible reste actif ET que le sens commandé est
+// Verrouille (ArrivalLock) tant que le capteur cible reste actif ET que le sens commandé est
 // le MÊME que celui qui a mené à l'arrivée (permet de repartir immédiatement en sens inverse,
 // contrairement à un blocage total qui empêcherait de quitter la position).
 ArrivalEdge(CLK := TargetReached);
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
-IF TargetReached AND (Direction = DirectionAtArrival) AND (DirectionAtArrival <> 0) THEN
-    RampTargetPct := 0.0;
+ArrivalLock := TargetReached AND (Direction = DirectionAtArrival) AND (DirectionAtArrival <> 0);
+IF ArrivalLock THEN
+    RampTargetPct := 0.0;   // Pertinent en ETHERCAT (consigne proportionnelle) ; sans effet direct en DEGRADED_IO, voir §5bis/DegradedMoveAuthorized
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,
@@ -195,12 +236,21 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+// ⏱️ 4quater. CONFIRMATION D'ARRÊT PHYSIQUE — 🆕 v1.1 (F1)
+// DEGRADED_IO : basée sur un délai RÉEL depuis la coupure du relais (RelayFwd/RelayRev tiennent
+// encore la valeur du cycle précédent à ce stade — pas encore recalculés, voir §5bis), PAS sur
+// la rampe logicielle SpeedRamp (sans lien physique en DEGRADED_IO, cf. correctif F1 en tête de fichier).
+DegradedStopSettleTon(IN := NOT (RelayFwd OR RelayRev), PT := DegradedStopSettleTime);
+IsStoppedConfirmed := SEL(CommModeLocked = E_TranslationCommMode.DEGRADED_IO,
+                          (ABS(SpeedRamp.Current) < 0.1),   // ETHERCAT : rampe = consigne réelle
+                          DegradedStopSettleTon.Q);          // DEGRADED_IO : délai physique réel
+
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (même principe que FB_Winch §3bis)
 IF Direction <> CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction <> 0 THEN
         CommandedDirection := Direction;
         DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    ELSIF ABS(SpeedRamp.Current) < 0.1 THEN
+    ELSIF IsStoppedConfirmed THEN
         DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
         IF DirectionChangeDelay.Q THEN
             CommandedDirection := Direction;
@@ -213,10 +263,15 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-MovementRequested := (CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1);
+// 🆕 v1.1 (F1) — Autorisation de mouvement DEGRADED_IO : IMMÉDIATE, découplée de la rampe logicielle
+DegradedMoveAuthorized := StartStop AND NOT SafeStop AND NOT ArrivalLock;
 
-// 🔀 5bis. SORTIE PHYSIQUE SELON CommMode
-IF CommMode = E_TranslationCommMode.ETHERCAT THEN
+MovementRequested := SEL(CommModeLocked = E_TranslationCommMode.DEGRADED_IO,
+                          (CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1),  // ETHERCAT : lié à la rampe réelle (pilote le frein en douceur)
+                          (CommandedDirection <> 0) AND DegradedMoveAuthorized);          // DEGRADED_IO : immédiat
+
+// 🔀 5bis. SORTIE PHYSIQUE SELON CommModeLocked
+IF CommModeLocked = E_TranslationCommMode.ETHERCAT THEN
     RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
 
     // 🔴 TBD — mise à l'échelle %→Hz : calcul linéaire explicite (LIN_TRAFO NON vérifié, voir tête de fichier)
@@ -232,12 +287,14 @@ ELSE // DEGRADED_IO
 
     // 🪜 Sélection PV/GV par HYSTERESIS (lib Util, Partie3 §0) — anti-battement, PAS de FB_SpeedStep
     // (table 5 paliers disproportionnée pour un choix à 2 états)
-    SpeedRefInt := REAL_TO_INT(ABS(SpeedRamp.Current));
+    SpeedRefInt := REAL_TO_INT(SpeedRefPct);
     HystGv(IN := SpeedRefInt, HIGH := REAL_TO_INT(DegradedGvThresholdHighPct), LOW := REAL_TO_INT(DegradedGvThresholdLowPct));
     RelaySpeedGv := NOT HystGv.OUT;   // Convention FB_SpeedStep : OUT=TRUE en régime bas → NOT OUT = seuil haut franchi (GV)
 
-    RelayFwd := (CommandedDirection = 1) AND MovementRequested;
-    RelayRev := (CommandedDirection = -1) AND MovementRequested;
+    // 🆕 v1.1 (F1) — coupure IMMÉDIATE sur DegradedMoveAuthorized=FALSE (StartStop=FALSE, SafeStop,
+    // ou ArrivalLock) : ne dépend plus du temps de décroissance de la rampe logicielle.
+    RelayFwd := (CommandedDirection = 1) AND DegradedMoveAuthorized;
+    RelayRev := (CommandedDirection = -1) AND DegradedMoveAuthorized;
 END_IF;
 
 // 🛑 6. FREIN (composé, réutilisé tel quel) — indépendant du mode
@@ -305,6 +362,9 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🚦 9. STATE MACHINE (phase — orthogonale à Error, Partie3 §2)
+// ⚠️ En DEGRADED_IO, cet indicateur reste basé sur SpeedRamp.Current (valeur logicielle sans lien
+// physique direct, cf. F7) : usage diagnostic/IHM uniquement, PAS utilisé pour une décision de
+// sécurité (celles-ci utilisent DegradedMoveAuthorized/IsStoppedConfirmed, calculés séparément).
 IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) > 0.1 THEN
     State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) > 0.1 THEN
@@ -313,7 +373,8 @@ ELSE
     State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
+Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING) OR RelayFwd OR RelayRev;
+
 Done := FALSE;   // Pas de notion de "terminé" ponctuel sans FB_Cycle — présent pour conformité
 
 // 🛡️ 10. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7)
