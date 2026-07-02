@@ -1,5 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.4)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.5)
 
+> **v1.5** — Retour terrain 2026-07-03 : `InvertDirection` **retiré** de `FB_Encoder_Abs` — le
+> sens de comptage codeur se règle côté device (objet CoE `6000h`, Startup Parameter CODESYS),
+> pas par calcul PLC (l'ancien calcul était de toute façon buggé, plage `UDINT` au lieu de la
+> plage réelle du codeur). Voir §6bis.
+>
 > **v1.4** — Nouvel export `Device.export` (2026-07-02) : le capteur de position haute est
 > désormais câblé en **I/O Mapping réel**, sous le nom **`M1_M2_TopPositionSensor`** — cela
 > répond à la clarification terminologique laissée ouverte en v1.3 (« nom neutre, terminologie
@@ -435,6 +440,28 @@ d'imposer un ordonnancement strict entre blocs pour ce cas.
 > ⚠️ Objet CoE exact (index/subindex du preset) dépendant du modèle COD1/COD2 — à confirmer fiche
 > technique. Ne **jamais réimplémenter** un recalage manuel si le codeur fournit une fonction
 > preset native (Partie3 §0, réutilisation).
+
+### 6bis. Sens de comptage — objet CoE `6000h`, PAS un calcul PLC (2026-07-03, confirmé terrain)
+
+🔧 **Correctif** : `FB_Encoder_Abs` portait une entrée `InvertDirection` qui recalculait
+`RawPos := 16#FFFFFFFF − RawPosIn` — **buggé** (inversait sur toute la plage `UDINT` 32 bits au
+lieu des 25 bits réels du codeur, `PointsPerRev × MultiTurnRevsMax`, §3.3), et de toute façon
+**au mauvais endroit**.
+
+✅ **Confirmé terrain** : le codeur Kübler F58x8 (F5868/88 MT, `F58x8_ECAT.xml`) inverse son sens
+de comptage via l'objet CoE **`6000h`** — valeur `4` (défaut) → `5` (bit0 à 1) inverse le
+comptage **côté codeur**. C'est un **Startup Parameter CODESYS** (onglet correspondant du device
+dans l'arbre projet, appliqué à chaque démarrage du bus EtherCAT), **pas** une variable PLC :
+
+- Réglé **une fois à la mise en service**, pas modifié en exploitation courante.
+- `RawPosIn` arrive déjà dans le bon sens → `FB_Encoder_Abs` n'a **plus besoin** de calculer
+  quoi que ce soit (`RawPos := RawPosIn` directement, §3.1).
+- `InvertDirection` **retiré** de l'interface `FB_Encoder_Abs` (allégement — plus de paramètre
+  ni de branche logicielle pour un problème résolu en amont, côté configuration device).
+
+🧭 **Pourquoi côté codeur plutôt que PLC** : le calcul logiciel dépendait d'une hypothèse sur la
+plage réelle du codeur (facile à mal borner, comme démontré par le bug ci-dessus) — le réglage
+CoE, lui, agit directement sur la mesure native, sans hypothèse de plage côté application.
 
 ---
 

@@ -215,7 +215,6 @@ instEncoderAbsM1(
     AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
     WarningsIn          := COD1_Warnings,                   // 📡 I/O Mapping déjà existant
     SlaveOperational    := instDiagEthercat.EncoderM1.Operational,
-    InvertDirection     := FALSE,
     PresetRequest       := instHomingM1.PresetRequest,      // ✅ 2026-07-02 (1 cycle de retard, voir en-tête)
     PresetValue         := instHomingM1.PresetValue         // ✅ 2026-07-02
 );
@@ -262,7 +261,6 @@ instEncoderAbsM2(
     AlarmsIn            := COD2_Alarms,                     // 📡 I/O Mapping (mappé 2026-07-02)
     WarningsIn          := COD2_Warnings,                   // 📡 I/O Mapping (mappé 2026-07-02)
     SlaveOperational    := instDiagEthercat.EncoderM2.Operational,
-    InvertDirection     := FALSE,
     PresetRequest       := instHomingM2.PresetRequest,      // ✅ 2026-07-02 (1 cycle de retard, voir en-tête)
     PresetValue         := instHomingM2.PresetValue         // ✅ 2026-07-02
 );
