@@ -24,6 +24,29 @@
       Partie8 v1.1 §3 l'interdit (FB_Joystick n'est pas un FB de
       mouvement). Câblage stub GVL_DEBUG.DBG_False inchangé. À traiter
       dans une prochaine itération dédiée SAFETY/JOYSTICK.
+   🆕 AJOUT (2026-07-02, demande utilisateur — maintenance) : `SpeedXPct`/
+      `DirectionX`/`SpeedYPct`/`DirectionY` en sortie DIRECTE (miroir des
+      champs déjà présents dans `AxisCmdX/Y`), pour lecture immédiate en
+      vue instance CODESYS sans devoir déplier la structure `ST_AxisCmd`.
+      `ST_AxisCmd` reste inchangé et reste la sortie consommée par
+      `FB_Winch`/`FB_Translation` (Partie2 §8) — purement additif, pas
+      de nouvelle logique métier.
+   🆕 AJOUT (2026-07-02, demande utilisateur) :
+      1. `Deadband` par défaut 5.0 → 10.0 (% autour du neutre).
+      2. `AxisCmdX/Y.SpeedRef` (et ses miroirs `SpeedXPct`/`SpeedYPct`) sont
+         désormais SIGNÉS (-100..+100 %, le signe porte le sens) au lieu de
+         toujours positifs — affichage plus simple pour l'IHM/maintenance
+         (une seule valeur lisible au lieu de 2 champs à recouper). Le champ
+         `Direction` (-1/0/+1) est CONSERVÉ tel quel en plus (redondant mais
+         explicite) — rien ne change dans son calcul.
+      ⚠️ IMPACT AVAL : `FB_Winch`/`FB_Translation` consomment `SpeedRefPct`
+      en supposant une magnitude non signée (0..100) pour leur rampe interne
+      — ils ont été adaptés en conséquence (voir CODE/FB_Winch.st §3 et
+      CODE/FB_Translation.st §4/§5bis, `ABS(SpeedRefPct)` ajouté à la
+      frontière d'entrée). Le sens réellement appliqué au treuil/translation
+      reste piloté par `Direction` (interlock déjà validé terrain, inchangé)
+      — la magnitude signée n'est PAS (encore) utilisée comme source de
+      sens côté treuil, uniquement affichée pour la maintenance.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Joystick) ===
@@ -42,7 +65,7 @@ VAR_INPUT
     Calibrate       : BOOL;       // Demande de recalage neutre
     InvertX         : BOOL := FALSE;
     InvertY         : BOOL := FALSE;
-    Deadband        : REAL := 5.0;
+    Deadband        : REAL := 10.0;  // 🔧 2026-07-02 (demande utilisateur) : 5.0 → 10.0 %
     FilterTime      : TIME := TIME#100ms;
     AccelRate       : REAL := 50.0;
     DecelRate       : REAL := 150.0;
@@ -58,6 +81,12 @@ VAR_OUTPUT
     Button          : BOOL;       // Bouton filtré
     NeutralXAct     : INT;        // Point neutre X actuel pour IHM/Test
     NeutralYAct     : INT;        // Point neutre Y actuel pour IHM/Test
+    // 🆕 Miroirs directs (maintenance) — mêmes valeurs que AxisCmdX/Y.SpeedRef/.Direction,
+    // exposés à plat pour lecture immédiate en vue instance CODESYS (pas de dépliage struct).
+    SpeedXPct       : REAL;       // Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef
+    DirectionX      : INT;        // Sens axe X (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdX.Direction
+    SpeedYPct       : REAL;       // Consigne vitesse axe Y en % SIGNÉE (-100..+100), miroir AxisCmdY.SpeedRef
+    DirectionY      : INT;        // Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction
 END_VAR
 VAR RETAIN
     NeutralXMem     : INT := 5000; // Mémoire persistante X
@@ -82,6 +111,8 @@ IF NOT Enable OR SafeStop OR NOT EmergencyStopOk OR NOT BusCanOpenOP.Operational
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0;
+    SpeedXPct := 0.0; DirectionX := 0;
+    SpeedYPct := 0.0; DirectionY := 0;
     Button := FALSE;
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
@@ -130,14 +161,22 @@ END_IF;
 RampX(Target := FilterX.ValueOut, AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
 
 // Mapping Sortie Standardisée Axe X
+// 🔧 2026-07-02 : SpeedRef désormais SIGNÉ (plus de ABS) — le signe porte le sens, cohérent
+// avec Direction ci-dessous (même seuil 0.1, même variable RampX.Current). StartStop reste
+// calculé sur la MAGNITUDE (indépendant du signe) : sinon un mouvement négatif (< -0.1) serait
+// à tort interprété comme "pas de mouvement" (StartStop=FALSE) par le test `> 0.1` direct.
 AxisCmdX.Enable := TRUE;
-AxisCmdX.SpeedRef := ABS(RampX.Current);
-AxisCmdX.StartStop := (AxisCmdX.SpeedRef > 0.1);
+AxisCmdX.SpeedRef := RampX.Current;
+AxisCmdX.StartStop := (ABS(RampX.Current) > 0.1);
 
 IF RampX.Current > 0.1 THEN     AxisCmdX.Direction := 1;
 ELSIF RampX.Current < -0.1 THEN AxisCmdX.Direction := -1;
 ELSE AxisCmdX.Direction := 0;   AxisCmdX.SpeedRef := 0.0;
 END_IF;
+
+// 🆕 Miroirs maintenance (voir en-tête) — mêmes valeurs, à plat
+SpeedXPct := AxisCmdX.SpeedRef;
+DirectionX := AxisCmdX.Direction;
 
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
@@ -151,14 +190,19 @@ END_IF;
 RampY(Target := FilterY.ValueOut, AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
 
 // Mapping Sortie Standardisée Axe Y
+// 🔧 2026-07-02 : voir note axe X ci-dessus (même principe, SpeedRef signé + StartStop sur magnitude)
 AxisCmdY.Enable := TRUE;
-AxisCmdY.SpeedRef := ABS(RampY.Current);
-AxisCmdY.StartStop := (AxisCmdY.SpeedRef > 0.1);
+AxisCmdY.SpeedRef := RampY.Current;
+AxisCmdY.StartStop := (ABS(RampY.Current) > 0.1);
 
 IF RampY.Current > 0.1 THEN     AxisCmdY.Direction := 1;
 ELSIF RampY.Current < -0.1 THEN AxisCmdY.Direction := -1;
 ELSE AxisCmdY.Direction := 0;   AxisCmdY.SpeedRef := 0.0;
 END_IF;
+
+// 🆕 Miroirs maintenance (voir en-tête) — mêmes valeurs, à plat
+SpeedYPct := AxisCmdY.SpeedRef;
+DirectionY := AxisCmdY.Direction;
 
 // 📤 7. VALIDATION DES SORTIES ÉTAT
 NeutralXAct := NeutralXMem;

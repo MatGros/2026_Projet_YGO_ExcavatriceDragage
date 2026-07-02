@@ -71,12 +71,16 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 **📤 Sorties clés**
 | Sortie | Type | Rôle |
 |--------|------|------|
-| `AxisCmdX` / `AxisCmdY` | `ST_AxisCmd` | Consigne normalisée (SpeedRef %, Direction) |
+| `AxisCmdX` / `AxisCmdY` | `ST_AxisCmd` | Consigne normalisée. 🔧 (2026-07-02) `SpeedRef` désormais SIGNÉ (-100..+100 %, signe = sens) — consommée par `FB_Winch`/`FB_Translation`, qui extraient la magnitude via `ABS()` |
+| `SpeedXPct` / `SpeedYPct` | REAL | 🆕 (2026-07-02) Miroir direct de `AxisCmdX/Y.SpeedRef` (%) — lecture maintenance sans dépliage struct |
+| `DirectionX` / `DirectionY` | INT | 🆕 (2026-07-02) Miroir direct de `AxisCmdX/Y.Direction` (-1/0/+1) — lecture maintenance sans dépliage struct |
 | `Button` | BOOL | Bouton filtré |
 | `NeutralXAct` / `NeutralYAct` | INT | Neutres calibrés (IHM) |
 | `Ready`/`Busy`/`Done`/`Error`/`ErrorId` | — | État FB (`ErrorId 16#0003` = calib hors plage) |
 
 🎯 Neutre mémorisé en **`VAR RETAIN`** (persiste à la coupure). Plage de calibration valide : 2000..8000.
+
+🔧 **2026-07-02 (demande utilisateur)** : `Deadband` par défaut passé de 5.0 à **10.0 %**.
 
 ---
 

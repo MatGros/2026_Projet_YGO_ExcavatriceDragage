@@ -40,8 +40,10 @@ VAR_INPUT
     Mode                    : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
     StartStop               : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                : BOOL;        // Sortie FB_Safety_Winch : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    Direction               : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdY.Direction)
-    SpeedRefPct             : REAL;        // Consigne 0..100 % (ex. AxisCmdY.SpeedRef)
+    Direction               : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdY.Direction) — source d'autorité du sens (interlock §3bis)
+    SpeedRefPct             : REAL;        // 🔧 2026-07-02 : AxisCmdY.SpeedRef est désormais SIGNÉ (-100..+100 %) —
+                                            // seule la MAGNITUDE est utilisée ici (ABS() en §3), Direction ci-dessus
+                                            // reste la source d'autorité du sens/interlock (inchangé, non re-testé)
     SpeedStepTable          : ST_SpeedStepTable;  // Table des 5 paliers PROPRE À CE TREUIL
     ContactorFeedbackFwd    : BOOL;        // Retour d'état câblé contacteur sens avant
     ContactorFeedbackRev    : BOOL;        // Retour d'état câblé contacteur sens arrière
@@ -137,7 +139,9 @@ DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirect
 
 RampTargetPct := 0.0;
 IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
-    RampTargetPct := SpeedRefPct;
+    RampTargetPct := ABS(SpeedRefPct);  // 🔧 2026-07-02 : SpeedRefPct peut arriver signé (AxisCmdY.SpeedRef) —
+                                          // ABS() ici préserve l'invariant "SpeedRamp cible toujours >= 0" documenté
+                                          // dans FB_Ramp.st (jamais concerné par le correctif traversée de zéro)
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,

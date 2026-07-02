@@ -271,6 +271,17 @@ opérationnel pendant que l'EtherCAT est en panne. Étapes (une fois validées) 
 
 ## 🔁 8. Retour d'expérience (à compléter après test)
 
+- [x] **Intégré dans `PRG_MAIN` (2026-07-02, revue par une 2ᵉ IA/session)** : `instSafetyTranslationM3`
+      + `instTranslationM3`, `CommMode` figé `DEGRADED_IO`, câblé sur `FB_Joystick_0.AxisCmdX`.
+      Stubs `GVL_Translation_M3_Stub` (relais/retours/capteur cible), même principe que
+      `GVL_Winch_M1_Stub`/`M2_Stub`.
+- [ ] **Finding revue (2026-07-02)** : en mode `ETHERCAT`, `IsStoppedConfirmed` repose sur
+      `ABS(SpeedRamp.Current) < 0.1` (rampe logicielle) — même classe de bug que celui corrigé
+      dans `FB_Winch` (inversion joystick plus rapide que la décélération = fenêtre jamais
+      atteinte, cf. `FB_Winch.st` §3/`DirectionChangePending`). **Non bloquant aujourd'hui**
+      (`ETHERCAT` reste TBD/non câblé), mais **à corriger avant d'activer ce mode** — appliquer
+      le même correctif que `FB_Winch` (forcer la cible de rampe à 0.0 dès qu'un changement de
+      sens est en attente, indépendamment du signal joystick).
 - [ ] Sens (Fwd/Rev) cohérent avec le joystick axe X (à vérifier au 1er essai, à vide — §7)
 - [ ] Sélection PV/GV : seuils `DegradedGvThresholdHighPct`/`LowPct` à régler selon ressenti opérateur
 - [ ] Arrêt sur capteur cible : comportement §9bis (verrouillage sens identique, déverrouillage sur inversion) — coupure relais **immédiate** depuis correctif v1.1 (F1), à confirmer en conditions réelles que `DegradedStopSettleTime` est suffisant compte tenu de la décélération physique réelle du variateur (§4bis)

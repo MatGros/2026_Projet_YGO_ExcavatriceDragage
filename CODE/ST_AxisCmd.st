@@ -10,13 +10,20 @@
         par le FB de mouvement (FB_Winch/FB_Translation), pas portée
         par la consigne d'axe elle-même.
    🧭 4 champs exactement, conforme Partie2 v2.5 §8.
+   🔧 2026-07-02 (demande utilisateur) : `SpeedRef` devient SIGNÉ (-100..+100 %,
+      le signe porte le sens) au lieu de toujours positif — affichage simplifié
+      IHM/maintenance. `Direction` reste inchangé (conservé, redondant mais
+      explicite). Émis par `FB_Joystick` (CODE/FB_Joystick.st) ; `FB_Winch`/
+      `FB_Translation` extraient la magnitude via `ABS(SpeedRefPct)` à leur
+      frontière d'entrée et continuent d'utiliser `Direction` comme source
+      d'autorité du sens (interlock inchangé).
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_AxisCmd :
 STRUCT
     Enable      : BOOL;   // Autorisation FB (FALSE = neutralisation, sorties coupées)
     StartStop   : BOOL;   // TRUE = rampe accélération, FALSE = rampe décélération normale
-    SpeedRef    : REAL;   // Consigne vitesse 0..100 %
+    SpeedRef    : REAL;   // Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)
     Direction   : INT;    // -1 = Rev, 0 = Neutre, +1 = Fwd
 END_STRUCT
 END_TYPE

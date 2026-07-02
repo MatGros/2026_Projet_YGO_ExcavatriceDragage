@@ -2,9 +2,11 @@
    🧠 PRG_MAIN — Orchestration séquentielle (diag → sécurité → métier)
    ───────────────────────────────────────────────────────────────
    📄 Contient : Joystick (axe Y) → FB_Safety_Winch(M1/M2) → FB_Winch
-      (M1 + M2, consigne dupliquée sur le même axe) → relais, et le
+      (M1 + M2, consigne dupliquée sur le même axe) → relais, le
       pipeline codeur M1/M2 (FB_Encoder_Abs → FB_Encoder_Scale →
-      FB_Encoder_Homing, flux nominal).
+      FB_Encoder_Homing, flux nominal), et Joystick (axe X) →
+      FB_Safety_Translation → FB_Translation (M3, mode DEGRADED_IO
+      figé — intégré 2026-07-02, Partie11).
    ⚠️ M2 ACTIF DÈS CE LOT (choix acté 2026-07-02) : dupliqué sur l'axe Y
       comme M1, SANS sélecteur ni FB_WinchSync réel (codeur pas encore
       exploité pour une synchro — voir DOC/AF_Partie9 §9).
@@ -57,6 +59,10 @@ VAR
     // 🪝 WINCH — M1 et M2 (consigne dupliquée sur l'axe Y, Maintenance N1, choix 2026-07-02)
     instWinchM1 : FB_Winch;
     instWinchM2 : FB_Winch;
+
+    // ↔️ TRANSLATION — M3, axe X joystick (intégré 2026-07-02, mode DEGRADED_IO figé — Partie11 §7)
+    instSafetyTranslationM3 : FB_Safety_Translation;
+    instTranslationM3       : FB_Translation;
 
     // 🎚️ Stub Maintenance N1 pour ce lot (pas de FB_Modes) — à remplacer dès que
     // FB_Modes existera (source légitime Enable/Mode par bloc métier)
@@ -168,10 +174,10 @@ FB_Joystick_0(
     // 🎯 --- Calibration ---
     Calibrate       := FALSE,                   // ⚠️ À câbler : bouton recalage neutre (front)
 
-    // 🎛️ --- Paramètres de traitement (valeurs par défaut conservées) ---
+    // 🎛️ --- Paramètres de traitement ---
     InvertX         := FALSE,
     InvertY         := FALSE,
-    Deadband        := 5.0,
+    Deadband        := 10.0,                    // 🔧 2026-07-02 (demande utilisateur) : 5.0 → 10.0 %
     FilterTime      := TIME#100ms,
     AccelRate       := 50.0,
     DecelRate       := 150.0
@@ -380,3 +386,54 @@ M2_BrakeCmd  := instWinchM2.BrakeCmd;
 M2_ContactorFeedbackFwd := M2_RelayFwd;
 M2_ContactorFeedbackRev := M2_RelayRev;
 M2_BrakeFeedback        := M2_BrakeCmd;
+
+(* ═══════════════════════════════════════════════════════════════
+   ↔️ 6. TRANSLATION M3 — FB_Translation (axe X, mode DEGRADED_IO figé)
+   ───────────────────────────────────────────────────────────────
+   Intégré 2026-07-02 (Partie11 §7, recommandation "option 1") : mode
+   ETHERCAT non câblé (TBD protocole AC600, voir Partie11 §4) — CommMode
+   figé DEGRADED_IO (relais sens + PV/GV), stubs neutres sur les entrées
+   ETHERCAT (jamais utilisées tant que CommMode ne bascule pas).
+   🧪 M3_* déclarées dans GVL_Translation_M3_Stub.st (STUB logiciel).
+   ⚠️ AVANT tout essai réel : Partie11 §4bis (paramétrage AC600,
+   verrouillage source de commande Terminal) impératif.
+   ═══════════════════════════════════════════════════════════════ *)
+
+instSafetyTranslationM3(
+    Enable              := TRUE,
+    Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    JoystickOnline      := instDiagCanOpen.Joystick.Online,
+    JoystickOperational := instDiagCanOpen.Joystick.Operational
+);
+
+instTranslationM3(
+    Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que Winch — à remplacer par FB_Modes
+    Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    StartStop               := FB_Joystick_0.AxisCmdX.StartStop,
+    SafeStop                := instSafetyTranslationM3.SafeStop,
+    CommMode                := E_TranslationCommMode.DEGRADED_IO,  // ⚠️ Figé (EtherCAT AC600 TBD, Partie11 §4/§7)
+    Direction               := FB_Joystick_0.AxisCmdX.Direction,
+    SpeedRefPct             := FB_Joystick_0.AxisCmdX.SpeedRef,
+    PositionSensorTarget    := M3_PositionSensorTarget,      // 🧪 STUB GVL_Translation_M3_Stub
+    DriveStatusWord         := 0,                            // 🔴 TBD ETHERCAT (Partie11 §4) — inerte en DEGRADED_IO
+    DriveActualFreqHz       := 0.0,                          // 🔴 TBD ETHERCAT — inerte en DEGRADED_IO
+    ContactorFeedbackFwd    := M3_ContactorFeedbackFwd,      // 🧪 STUB GVL_Translation_M3_Stub
+    ContactorFeedbackRev    := M3_ContactorFeedbackRev,      // 🧪 STUB GVL_Translation_M3_Stub
+    DriveFaultFeedback      := M3_DriveFaultFeedback,        // 🧪 STUB GVL_Translation_M3_Stub (toujours FALSE, non câblé)
+    BrakeFeedback           := M3_BrakeFeedback              // 🧪 STUB GVL_Translation_M3_Stub
+);
+
+// 📤 Sorties translation M3 → variables STUB (GVL_Translation_M3_Stub), à remplacer par I/O Mapping réel
+M3_RelayFwd     := instTranslationM3.RelayFwd;
+M3_RelayRev     := instTranslationM3.RelayRev;
+M3_RelaySpeedGv := instTranslationM3.RelaySpeedGv;
+M3_BrakeCmd     := instTranslationM3.BrakeCmd;
+
+// 🧪 SIMULATION (stub sans matériel réel, GVL_Translation_M3_Stub) — voir note Winch M1 ci-dessus
+M3_ContactorFeedbackFwd := M3_RelayFwd;
+M3_ContactorFeedbackRev := M3_RelayRev;
+M3_BrakeFeedback        := M3_BrakeCmd;
