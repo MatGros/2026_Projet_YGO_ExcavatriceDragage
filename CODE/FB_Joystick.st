@@ -29,7 +29,7 @@
       champs déjà présents dans `AxisCmdX/Y`), pour lecture immédiate en
       vue instance CODESYS sans devoir déplier la structure `ST_AxisCmd`.
       `ST_AxisCmd` reste inchangé et reste la sortie consommée par
-      `FB_Winch`/`FB_Translation` (Partie2 §8) — purement additif, pas
+      `FB_Winch`/`FB_Chariot` (Partie2 §8) — purement additif, pas
       de nouvelle logique métier.
    🆕 AJOUT (2026-07-02, demande utilisateur) :
       1. `Deadband` par défaut 5.0 → 10.0 (% autour du neutre).
@@ -39,11 +39,11 @@
          (une seule valeur lisible au lieu de 2 champs à recouper). Le champ
          `Direction` (-1/0/+1) est CONSERVÉ tel quel en plus (redondant mais
          explicite) — rien ne change dans son calcul.
-      ⚠️ IMPACT AVAL : `FB_Winch`/`FB_Translation` consomment `SpeedRefPct`
+      ⚠️ IMPACT AVAL : `FB_Winch`/`FB_Chariot` consomment `SpeedRefPct`
       en supposant une magnitude non signée (0..100) pour leur rampe interne
       — ils ont été adaptés en conséquence (voir CODE/FB_Winch.st §3 et
-      CODE/FB_Translation.st §4/§5bis, `ABS(SpeedRefPct)` ajouté à la
-      frontière d'entrée). Le sens réellement appliqué au treuil/translation
+      CODE/FB_Chariot.st §4/§5bis, `ABS(SpeedRefPct)` ajouté à la
+      frontière d'entrée). Le sens réellement appliqué au treuil/chariot
       reste piloté par `Direction` (interlock déjà validé terrain, inchangé)
       — la magnitude signée n'est PAS (encore) utilisée comme source de
       sens côté treuil, uniquement affichée pour la maintenance.

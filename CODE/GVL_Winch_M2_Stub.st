@@ -31,9 +31,8 @@ VAR_GLOBAL
     // §ArretConfirme) : TRUE = relâché (bobine alimentée) ; FALSE = collé/serré (arrêt sûr tenu).
     M2_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M2 (STUB, miroir de M2_BrakeCmd — TRUE=relâché/FALSE=collé)
 
-    // 🎯 AJOUT 2026-07-02 (lot Homing) — capteur position haute M2 (physique, PAS de miroir
-    // automatique : reste FALSE tant que non forcé manuellement dans la vue instance CODESYS).
-    // ⚠️ Homing volontairement IMPOSSIBLE tant que ce stub reste FALSE (sécurité : ne jamais
-    // simuler un signal safety-relevant comme actif par défaut).
-    M2_TopPositionSensor     : BOOL;   // 🔌 Entrée — capteur position haute M2 (STUB, toujours FALSE)
+    // 🔴 CORRECTIF (2026-07-02, retour terrain) : le capteur de position haute a été RETIRÉ
+    // d'ici — il n'y a qu'UN SEUL capteur physique, COMMUN aux 2 treuils (le grappin le touche
+    // en montant), pas un par treuil. Voir désormais CODE/GVL_Homing_Stub.st
+    // (`GrappinTopPositionSensor`), câblé identiquement sur instHomingM1 ET instHomingM2.
 END_VAR

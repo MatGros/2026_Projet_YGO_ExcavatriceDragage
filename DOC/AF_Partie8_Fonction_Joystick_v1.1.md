@@ -10,6 +10,7 @@
 >
 > 🔢 Renumérotée **Partie 4 → Partie 8** : les docs de **fonctions métier par FB** sont numérotées **8+**
 > (les Parties 4–6 sont réservées aux specs transverses Cycle/Modes/E-S).
+> 🔧 **2026-07-02** — Terminologie : Translation → Chariot, `FB_Translation` → `FB_Chariot` (liste I/O réelle reçue de l'utilisateur, terminologie officielle du matériel) — voir Partie 11 v1.2.
 
 > **Fonction métier** : acquisition et conditionnement de la commande opérateur (joystick Hall → CANopen).
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
@@ -19,7 +20,7 @@
 
 ## 🎯 1. Rôle métier
 
-Traduire le **geste opérateur** (2 axes + bouton) en une **consigne normalisée en %** exploitable par les treuils et la translation.
+Traduire le **geste opérateur** (2 axes + bouton) en une **consigne normalisée en %** exploitable par les treuils et le chariot.
 
 - 🕹️ 2 axes analogiques bruts (0..10000 pts) via nœud **CANopen**.
 - 🔘 1 bouton.
@@ -71,7 +72,7 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 **📤 Sorties clés**
 | Sortie | Type | Rôle |
 |--------|------|------|
-| `AxisCmdX` / `AxisCmdY` | `ST_AxisCmd` | Consigne normalisée. 🔧 (2026-07-02) `SpeedRef` désormais SIGNÉ (-100..+100 %, signe = sens) — consommée par `FB_Winch`/`FB_Translation`, qui extraient la magnitude via `ABS()` |
+| `AxisCmdX` / `AxisCmdY` | `ST_AxisCmd` | Consigne normalisée. 🔧 (2026-07-02) `SpeedRef` désormais SIGNÉ (-100..+100 %, signe = sens) — consommée par `FB_Winch`/`FB_Chariot`, qui extraient la magnitude via `ABS()` |
 | `SpeedXPct` / `SpeedYPct` | REAL | 🆕 (2026-07-02) Miroir direct de `AxisCmdX/Y.SpeedRef` (%) — lecture maintenance sans dépliage struct |
 | `DirectionX` / `DirectionY` | INT | 🆕 (2026-07-02) Miroir direct de `AxisCmdX/Y.Direction` (-1/0/+1) — lecture maintenance sans dépliage struct |
 | `Button` | BOOL | Bouton filtré |

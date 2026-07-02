@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur, flux NOMINAL uniquement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE DE CE LOT : flux **nominal** uniquement (capteur haut +
       bouton IHM, référencement à `TopSensorPositionM`, 1 instance par
       treuil, câblées sur le MÊME bouton IHM côté PRG_MAIN). Le flux
@@ -39,7 +39,9 @@ VAR_INPUT
     Mode                 : E_Mode;      // MAINT_N1 requis pour le flux nominal
     Home                 : BOOL;        // Demande de référencement (front, bouton IHM UNIQUE)
     ConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
-    TopPositionSensor    : BOOL;        // Capteur position haute CE TREUIL (confirmation physique)
+    TopPositionSensor    : BOOL;        // 🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils
+                                         // (le grappin le touche en montant) — câblé IDENTIQUEMENT sur les
+                                         // instances M1 ET M2 (PAS un capteur par treuil), voir PRG_MAIN.st
     TopSensorPositionM   : REAL := 12.5;  // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
     ContactorFeedbackFwd : BOOL;        // Retour contacteur sens avant CE TREUIL — arrêt confirmé
     ContactorFeedbackRev : BOOL;        // Retour contacteur sens arrière CE TREUIL — arrêt confirmé
