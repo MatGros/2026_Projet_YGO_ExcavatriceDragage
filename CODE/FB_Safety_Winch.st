@@ -18,6 +18,24 @@
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
         ST_ContactorCheck de puissance câblé — FB_Output_Relay
         transverse hors périmètre de ce lot, voir Partie6).
+   🔴 TBD — SURVEILLANCE DE COHÉRENCE MOUVEMENT (retour terrain 2026-07-02,
+      idée capturée, NON conçue en détail, NON implémentée — détail complet
+      dans DOC/AF_Partie9 §4bis). 4 cas DISTINCTS (1 bit ErrorId chacun,
+      pas un bit générique) :
+      - Cas A — Sens opposé : sens joystick BRUT (avant traitement) ≠ sens
+        réel constaté (contacteur et/ou signe vitesse codeur), persistant.
+        → câblage inversé / contacteur collé mauvais sens / codeur mal orienté.
+      - Cas B — Mouvement non commandé (roue libre) : codeur bouge alors
+        qu'AUCUN contacteur de sens n'est engagé. → charge qui tombe, frein
+        qui ne tient pas. GRAVITÉ TRÈS ÉLEVÉE, priorité dès codeur dispo.
+      - Cas C — Absence de mouvement malgré commande : sens+palier+frein
+        relâché confirmés, mais codeur immobile après délai. → blocage
+        mécanique / accouplement rompu / défaut invisible à ST_ContactorCheck.
+      - Cas D — Fenêtre de tolérance (règle transverse, pas un défaut) :
+        ne jamais déclencher pendant le temps normal de rampe+interlock.
+      Sources manquantes aujourd'hui : sens joystick brut (RawX/RawY non
+      remontés ici), vitesse/signe codeur (Partie10), RelayFwd/RelayRev/
+      BrakeCmd de FB_Winch (existent en sortie, pas encore câblés ici).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
