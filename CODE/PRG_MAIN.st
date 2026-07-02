@@ -217,7 +217,7 @@ instEncoderScaleM1(
     PointsPerRev    := 8192
 );
 
-(* 🎯 Homing M1 (flux nominal) — bouton IHM (stub) + capteur position haute (stub GVL M1) *)
+(* 🎯 Homing M1 (flux nominal) — bouton IHM (stub) + capteur position haute (stub GVL_Homing_Stub, commun M1+M2) *)
 instHomingM1(
     Enable               := TRUE,
     Reset                := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
@@ -225,7 +225,7 @@ instHomingM1(
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     Home                 := StubHomeButton_IHM,              // ⚠️ Stub bouton IHM — piloté aussi sur M2 (même bouton)
     ConfirmCoherence     := FALSE,                           // ⚠️ À câbler : bouton IHM dédié
-    TopPositionSensor    := M1_TopPositionSensor,            // 🧪 STUB GVL_Winch_M1_Stub — à câbler en I/O Mapping réel
+    TopPositionSensor    := TopPositionSensor,               // 🧪 STUB GVL_Homing_Stub — commun M1+M2 (retour terrain 2026-07-02, 1 seul capteur physique)
     TopSensorPositionM   := M1_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
     ContactorFeedbackFwd := M1_ContactorFeedbackFwd,         // 🧪 STUB GVL_Winch_M1_Stub
     ContactorFeedbackRev := M1_ContactorFeedbackRev,         // 🧪 STUB GVL_Winch_M1_Stub
@@ -272,7 +272,7 @@ instHomingM2(
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     Home                 := StubHomeButton_IHM,              // ⚠️ Même bouton stub que M1 (référencement simultané)
     ConfirmCoherence     := FALSE,                           // ⚠️ À câbler : bouton IHM dédié
-    TopPositionSensor    := M2_TopPositionSensor,            // 🧪 STUB GVL_Winch_M2_Stub — à câbler en I/O Mapping réel
+    TopPositionSensor    := TopPositionSensor,               // 🧪 STUB GVL_Homing_Stub — commun M1+M2 (retour terrain 2026-07-02, 1 seul capteur physique)
     TopSensorPositionM   := M2_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
     ContactorFeedbackFwd := M2_ContactorFeedbackFwd,         // 🧪 STUB GVL_Winch_M2_Stub
     ContactorFeedbackRev := M2_ContactorFeedbackRev,         // 🧪 STUB GVL_Winch_M2_Stub

@@ -434,7 +434,7 @@ Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explici
 ### Dépendance bloquante (toujours valable pour la synchro)
 `FB_WinchSync` (Partie2 §4, Partie4 §3) régule l'écart `ΔPos = |PosM1 − PosM2|` à partir des
 positions codeur validées. L'acquisition + mise à l'échelle (`FB_Encoder_Abs`→`FB_Encoder_Scale`)
-sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md` §9), mais
+sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md` §9), mais
 `HomingRefRaw` reste une valeur RETAIN modifiable **manuellement** (pas de vrai homing tant que
 `FB_Encoder_Homing` n'est pas codé) — construire une synchro sur cette base serait prématuré.
 **M1 et M2 bougent donc ensemble sans aucune régulation d'écart pour l'instant** : à surveiller

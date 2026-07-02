@@ -1,5 +1,18 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.3)
 
+> **v1.3** — Retour terrain 2026-07-02 (correction implémentation) :
+> - 🔧 **`TopPositionSensor` : UN SEUL capteur physique, COMMUN aux 2 treuils** — pas un par
+>   treuil. Les 2 câbles (M1/M2) hissent ensemble le même ensemble mécanique qui vient toucher ce
+>   capteur unique. L'implémentation précédente (`CODE/`) avait divergé : 2 variables séparées
+>   (`M1_TopPositionSensor`/`M2_TopPositionSensor`, une par GVL stub Winch) et le commentaire
+>   d'entrée `FB_Encoder_Homing.TopPositionSensor` disait à tort « CE TREUIL ». Corrigé :
+>   `CODE/GVL_Homing_Stub.st` (nouveau, variable unique `TopPositionSensor` — nom **neutre**,
+>   sans préfixe métier, terminologie exacte de l'ensemble mécanique en cours de clarification),
+>   câblée IDENTIQUEMENT sur `instHomingM1` ET `instHomingM2` dans `PRG_MAIN.st`. Voir §5/§7bis/§9
+>   mis à jour ci-dessous. `TopSensorPositionM` (paramètre de calibration, distinct du capteur
+>   lui-même) reste réglable indépendamment par treuil (asymétrie mécanique possible même avec un
+>   capteur de déclenchement commun) — **inchangé**.
+>
 > **v1.2** — Retour terrain 2026-07-02 (câblage réel) :
 > - 🔴➜🤖 **Capteur position haute retiré de la chaîne AU matérielle** : ce n'est plus le câble
 >   mécanique qui coupe directement la puissance (voir Partie1 v1.3/Partie2 v2.6 §6) — c'est
@@ -311,7 +324,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `Mode` | `E_Mode` | `MAINT_N1` autorise le flux **nominal** (cible `TopSensorPositionM`) ; `MAINT_N2` requis pour le flux **unitaire** (cible `HomingTargetM` libre) |
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
-| `TopPositionSensor` | BOOL | ✅ **2026-07-02** — État du capteur de position haute **de ce treuil** (unique et répétable, §7bis). Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
+| `TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis). Câblé IDENTIQUEMENT sur les 2 instances (`CODE/GVL_Homing_Stub.st`). Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
 | `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis) |
 | `HomingTargetM` | REAL | Cible de position à imposer **en flux unitaire uniquement** (`MAINT_N2`), bornée **[-99.00 ; +99.00]** m (§3.6) — remplace l'ancien usage "flux nominal verrouillé à 0.00" (le flux nominal utilise désormais `TopSensorPositionM`, pas ce champ) |
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
@@ -632,13 +645,14 @@ cas (même principe que `GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub`, Partie9 §7 Ét
 ### 9quater. Note d'application — `FB_Encoder_Homing` (lot Homing, 2026-07-02)
 
 Référence code : `CODE/FB_Encoder_Homing.st` (nouveau), `CODE/PRG_MAIN.st`,
-`CODE/GVL_Winch_M1_Stub.st`/`GVL_Winch_M2_Stub.st` (mis à jour) — tous à recopier.
+`CODE/GVL_Homing_Stub.st` (nouveau, capteur unique commun M1+M2) — tous à recopier.
 
 1. **`FB_Encoder_Homing`** : POU **nouveau**, dossier `ENCODER` (comme `FB_Encoder_Abs`/`Scale`).
    `Add Object → POU...` → Name = `FB_Encoder_Homing`, Type = `Function block`, Language =
    `Structured Text (ST)` → coller déclaration + implémentation.
-2. **`GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub`** : remplacer ENTIÈREMENT (ajout `M1_TopPositionSensor`/
-   `M2_TopPositionSensor`, toujours `FALSE` par défaut).
+2. **`GVL_Homing_Stub`** : nouveau GVL, variable **unique** `TopPositionSensor` (toujours
+   `FALSE` par défaut) — 🔧 correctif 2026-07-02 : PAS un stub par treuil (voir en-tête de
+   document), câblée identiquement sur `instHomingM1` ET `instHomingM2`.
 3. **`PRG_MAIN`** : remplacer déclaration + implémentation en entier (nouvelles instances
    `instHomingM1`/`instHomingM2`, nouveau `VAR RETAIN` — **note** : `M1_EncoderCalib`/
    `M2_EncoderCalib` ont disparu, remplacés par l'état interne de `FB_Encoder_Homing`).
@@ -653,7 +667,8 @@ en ligne (CODESYS : clic droit sur la variable dans la vue instance → *Write*/
 ```
 1. Vérifier ArretConfirme : joystick au neutre (M1_RelayFwd/Rev = FALSE, M1_BrakeCmd = FALSE
    → collé), sinon Home sera rejeté (ErrorId bit2).
-2. Forcer M1_TopPositionSensor := TRUE (simule "treuil physiquement en haut").
+2. Forcer TopPositionSensor := TRUE (simule "position haute atteinte" — capteur UNIQUE,
+   un seul forçage suffit pour les 2 instances M1/M2, voir en-tête de document).
 3. Basculer StubHomeButton_IHM : FALSE → TRUE → FALSE (simule l'appui bouton IHM, front).
 4. Observer instHomingM1 : Busy doit passer TRUE brièvement, puis Done pulse à TRUE,
    Homed := TRUE, ErrorId reste à 0.
