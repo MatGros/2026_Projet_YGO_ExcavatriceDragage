@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md §2/§3.1
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.4.md §2/§3.1
    ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
       `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
       — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/

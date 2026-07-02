@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.3.md §3/§6
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.4.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
