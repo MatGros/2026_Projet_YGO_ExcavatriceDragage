@@ -21,6 +21,20 @@
       4. Nouveau : sélecteur STUB maintenance pour les 4 capteurs
          position réels du chariot (Fosse1/Fosse2/Maintenance/Trémie),
          en attendant FB_Cycle — voir GVL_Chariot_M3_Stub.
+   🔧 CORRECTIF (2026-07-03, retour terrain) :
+      1. `EmergencyStopOk` est désormais un **I/O réel** (retour contacteur
+         puissance géré par l'AU, résout Partie3/AUDIT Q11) — remplace le
+         stub `GVL_DEBUG.DBG_True` sur les FB codeur/homing (Abs/Homing
+         M1/M2 uniquement ce lot — Joystick/Safety/Winch/Chariot restent
+         en stub, à traiter dans un prochain lot).
+      2. `Reset` des FB codeur/homing câblé sur `GVL_Encoder_Stub`
+         (`M1/M2_Reset_IHM`, un bouton par codeur, acquitte Abs+Homing) —
+         n'était câblé nulle part avant (`FALSE` figé = alarmes jamais
+         acquittables).
+      3. Nouveau `CODE/GVL_Encoder_Stub.st` : centralise tout ce qui doit
+         être mappé IHM/réglé pour le pipeline codeur (Reset,
+         ConfirmCoherence, Home, TopSensorPositionM) — déplacé depuis
+         PRG_MAIN (`StubHomeButton_IHM`, `M1/M2_TopSensorPositionM`).
    ⚠️ M2 ACTIF DÈS CE LOT (choix acté 2026-07-02) : dupliqué sur l'axe Y
       comme M1, SANS sélecteur ni FB_WinchSync réel (codeur pas encore
       exploité pour une synchro — voir DOC/AF_Partie9 §9).
@@ -81,11 +95,6 @@ VAR
     // 🎚️ Stub Maintenance N1 pour ce lot (pas de FB_Modes) — à remplacer dès que
     // FB_Modes existera (source légitime Enable/Mode par bloc métier)
     StubWinchEnableN1 : BOOL := TRUE;
-
-    // 🎯 Stub bouton IHM homing (2026-07-02) — à remplacer par un vrai bouton IHM.
-    // Un seul bouton pilote Home sur les 2 instances (flux nominal, Partie10 §1) :
-    // bascule TRUE puis FALSE dans la vue instance CODESYS pour simuler l'appui (front).
-    StubHomeButton_IHM : BOOL := FALSE;
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -116,10 +125,6 @@ VAR RETAIN
         P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
-
-    // 🎯 Cible de homing nominal — paramétrable par treuil (Partie10 §7bis, valeur indicative)
-    M1_TopSensorPositionM : REAL := 12.5;
-    M2_TopSensorPositionM : REAL := 12.5;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
@@ -208,8 +213,8 @@ FB_Joystick_0(
 
 instEncoderAbsM1(
     Enable              := TRUE,
-    Reset               := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset               := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1
+    EmergencyStopOk     := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
     AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
@@ -233,11 +238,11 @@ instEncoderScaleM1(
 (* 🎯 Homing M1 (flux nominal) — bouton IHM (stub) + capteur position haute (stub GVL_Homing_Stub, commun M1+M2) *)
 instHomingM1(
     Enable               := TRUE,
-    Reset                := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk      := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset                := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1 (même bouton que instEncoderAbsM1)
+    EmergencyStopOk      := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
-    Home                 := StubHomeButton_IHM,              // ⚠️ Stub bouton IHM — piloté aussi sur M2 (même bouton)
-    ConfirmCoherence     := FALSE,                           // ⚠️ À câbler : bouton IHM dédié
+    Home                 := StubHomeButton_IHM,              // 🖥️ GVL_Encoder_Stub — piloté aussi sur M2 (même bouton)
+    ConfirmCoherence     := M1_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
     TopPositionSensor    := M1_M2_TopPositionSensor,         // 📡 I/O Mapping RÉEL — commun M1+M2 (remplace le stub GVL_Homing_Stub, supprimé 2026-07-02)
     TopSensorPositionM   := M1_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
     ContactorFeedbackFwd := M1_ContactorFeedbackFwd,         // 📡 I/O Mapping RÉEL (2026-07-02)
@@ -254,8 +259,8 @@ instHomingM1(
 
 instEncoderAbsM2(
     Enable              := TRUE,
-    Reset               := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset               := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2
+    EmergencyStopOk     := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     RawPosIn            := COD2_PosValue,                   // 📡 I/O Mapping (mappé 2026-07-02)
     AlarmsIn            := COD2_Alarms,                     // 📡 I/O Mapping (mappé 2026-07-02)
@@ -279,11 +284,11 @@ instEncoderScaleM2(
 (* 🎯 Homing M2 (flux nominal) — MÊME bouton IHM que M1 (référencement simultané, Partie10 §1) *)
 instHomingM2(
     Enable               := TRUE,
-    Reset                := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk      := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset                := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2 (même bouton que instEncoderAbsM2)
+    EmergencyStopOk      := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
-    Home                 := StubHomeButton_IHM,              // ⚠️ Même bouton stub que M1 (référencement simultané)
-    ConfirmCoherence     := FALSE,                           // ⚠️ À câbler : bouton IHM dédié
+    Home                 := StubHomeButton_IHM,              // 🖥️ GVL_Encoder_Stub — même bouton que M1 (référencement simultané)
+    ConfirmCoherence     := M2_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
     TopPositionSensor    := M1_M2_TopPositionSensor,         // 📡 I/O Mapping RÉEL — commun M1+M2 (remplace le stub GVL_Homing_Stub, supprimé 2026-07-02)
     TopSensorPositionM   := M2_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
     ContactorFeedbackFwd := M2_ContactorFeedbackFwd,         // 📡 I/O Mapping RÉEL (2026-07-02)
