@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.4.md §3/§6
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.5.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
@@ -27,6 +27,15 @@
       périmètre du document) — `FB_Encoder_Safety` (overspeed) devient
       orphelin tant qu'un lot dédié ne décide pas de son sort (fusion
       avec le "saut incohérent" Partie10 §3.5, ou reprise telle quelle).
+   🔧 CORRECTIF (2026-07-03, retour terrain) : `InvertDirection` **retiré**.
+      Confirmé terrain : l'objet CoE `6000h` (bit0 : 4→5) inverse le sens
+      de comptage **côté codeur** (F58x8 Kübler), configuré en **Startup
+      Parameter** CODESYS (init automate) — pas un paramètre PLC. L'ancien
+      calcul logiciel (`16#FFFFFFFF - RawPosIn`) était de toute façon
+      **buggé** : il inversait sur toute la plage `UDINT` (32 bits) au
+      lieu de la plage réelle du codeur (25 bits, `PointsPerRev ×
+      MultiTurnRevsMax`), produisant des positions incohérentes après
+      homing. Voir Partie10 §3bis.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===
@@ -41,7 +50,6 @@ VAR_INPUT
     AlarmsIn            : UINT;        // Brut EtherCAT (ex. COD1_Alarms)
     WarningsIn          : UINT;        // Brut EtherCAT (ex. COD1_Warnings) — informatif seulement
     SlaveOperational    : BOOL;        // FB_DiagEthercat — esclave EtherCAT opérationnel
-    InvertDirection     : BOOL := FALSE;
     PointsPerRev        : UDINT := 8192;  // Résolution codeur confirmée (Partie10 §3.3)
     PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing (stub FALSE ce lot)
     PresetValue         : UDINT;       // Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)
@@ -106,11 +114,8 @@ EncoderAvailable := (ErrorId AND 16#0001) = 0;
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
 IF EncoderAvailable THEN
-    IF InvertDirection THEN
-        RawPos := 16#FFFFFFFF - RawPosIn;
-    ELSE
-        RawPos := RawPosIn;
-    END_IF;
+    RawPos := RawPosIn;   // 🔧 2026-07-03 : sens de comptage géré côté codeur (CoE 6000h bit0,
+                          // startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
     AngleRaw := UDINT_TO_UINT(RawPos MOD PointsPerRev);
     TurnCount := RawPos / PointsPerRev;
 END_IF;
