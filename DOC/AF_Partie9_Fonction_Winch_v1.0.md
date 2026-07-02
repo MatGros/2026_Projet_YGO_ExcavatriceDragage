@@ -83,6 +83,10 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
   une inversion directe Fwd↔Rev exigent tous les deux la vitesse rampée confirmée nulle
   (`DirectionInterlockDelay`), pour que le contacteur de sens reste actif tout le temps de la
   décélération réelle (cohérent avec le palier et le frein).
+- **Arrêt forcé et déterministe pendant un changement de sens en attente** : dès que
+  `Direction ≠ CommandedDirection` (hors 1er engagement), la cible de rampe est **forcée à 0**
+  — indépendamment de ce que redemande le joystick entre-temps — pour garantir un arrêt réel,
+  même en cas d'inversion plus rapide que le temps de décélération.
 - **Frein** : séquence temporisée stricte (Partie4 §4) — jamais de relâche avant fermeture
   contacteur + magnétisation, jamais de collage avant décélération.
 - **Double vérification contacteurs** (sens + frein) via `ST_ContactorCheck` : incohérence
@@ -105,6 +109,60 @@ FB_Safety_Winch ──► SafeStop ──► (entrée) FB_Winch(M1)
 >    indépendante) : seul l'engagement initial est immédiat, arrêt et inversion directe
 >    exigent tous les deux la vitesse confirmée nulle.
 > 3. Ajout de la sortie sûre sur `Error` (ci-dessus), absente des deux versions précédentes.
+> 4. **(2026-07-02)** Les correctifs 1/2 supposaient que `ABS(SpeedRamp.Current)` finirait par
+>    croiser le seuil 0,1 % naturellement en suivant la magnitude joystick — faux en cas
+>    d'inversion **plus rapide que le temps de décélération réel** : la magnitude peut sauter
+>    par-dessus la fenêtre de détection (deux rampes en cascade, pas discrets) sans jamais y
+>    entrer, laissant le treuil tourner indéfiniment dans l'ancien sens tant que l'opérateur ne
+>    laisse pas le joystick se stabiliser. Corrigé dans `CODE/FB_Winch.st` §3 : la cible de
+>    rampe est désormais **forcée à 0.0** dès qu'un changement de sens est en attente
+>    (`DirectionChangePending`), garantissant un arrêt réel et déterministe, indépendant du
+>    signal joystick.
+
+> 🔧 **Correctif `FB_Ramp` (retour terrain 2026-07-02)** : lors d'une inversion **rapide** du
+> joystick, `FB_Ramp` (utilisé par `RampX`/`RampY` dans `FB_Joystick`) sélectionnait à tort le
+> taux d'**accélération** (lent) au lieu de **décélération** (rapide) pour la portion du trajet
+> qui revient vers zéro — la comparaison se faisait sur le signe brut de `Target`/`Current`, pas
+> sur le côté de zéro où se trouve `Current`. Conséquence en cascade : `AxisCmdY.Direction`
+> restait "collé" sur l'ancien sens ~3× plus longtemps que nécessaire lors d'un flick rapide, ce
+> qui retardait d'autant l'interlock de sens de `FB_Winch` (symptôme : "les contacteurs Fwd/Rev
+> restent bloqués sur l'ancien sens" après une inversion rapide). Corrigé dans `CODE/FB_Ramp.st`
+> (nouveau fichier — `FB_Ramp` existait déjà dans le projet mais n'était pas encore extrait dans
+> `CODE/`). **Analyse d'impact avant correctif** : `FB_Ramp` n'est instancié que 3 fois au total
+> (`RampX`/`RampY` dans `FB_Joystick`, cible signée → concernées ; `SpeedRamp` dans `FB_Winch`,
+> cible toujours `>= 0` → **jamais** concernée, comportement inchangé pour `FB_Winch`).
+
+### 🔴 TBD — Surveillance de cohérence mouvement (2026-07-02, PAS implémentée)
+
+> ⚠️ Statut : **idée capturée, non conçue en détail, non implémentée.** Nécessite le codeur
+> fiabilisé (Partie 10) pour au moins 3 des 4 cas ci-dessous. Ne pas commencer l'implémentation
+> sans repasser par le workflow complet (spec → plan → validation) le moment venu.
+
+Piste de sécurité identifiée pendant les tests : au-delà du contrôle **commande vs retour d'un
+même contacteur** déjà fait par `ST_ContactorCheck` (Partie3 §7bis, existant dans `FB_Winch`),
+il manque un contrôle de cohérence de plus haut niveau entre **l'intention opérateur**,
+**ce que la machine commande**, et **ce qu'elle fait réellement**. Ce sont 3 signaux distincts
+qui devraient normalement toujours converger (à un délai de rampe/interlock près), et 4 cas de
+divergence à couvrir séparément — ce ne sont pas des variantes d'un même défaut, chacun a une
+cause probable et une gravité différentes :
+
+| Cas | Divergence observée | Cause probable | Gravité |
+|-----|----------------------|-----------------|---------|
+| **A — Sens opposé** | Sens joystick **brut** (avant deadband/filtre/rampe, donc l'intention quasi instantanée) ≠ sens réellement constaté (contacteur engagé et/ou signe vitesse codeur), de façon **persistante** | Câblage de sens inversé, contacteur collé dans le mauvais sens, codeur mal orienté (signe inversé à la config) | Élevée — la machine bouge à l'opposé de la demande opérateur |
+| **B — Mouvement non commandé (roue libre)** | Le codeur indique un déplacement significatif alors qu'**aucun** contacteur de sens n'est engagé (`RelayFwd`/`RelayRev` = FALSE tous les deux) | Charge qui tombe (frein qui ne tient pas malgré `BrakeCmd=FALSE`), roue libre mécanique | **Très élevée** — mouvement incontrôlé, à détecter en priorité dès que le codeur est dispo |
+| **C — Absence de mouvement malgré commande** | Sens + palier commandés, frein relâché **confirmé** (`BrakeCmd=TRUE` et `BrakeContactorCheck` cohérent), mais le codeur ne montre **aucune** évolution de position après un délai raisonnable | Blocage mécanique, accouplement/câble rompu, contacteur de puissance qui ne répond pas malgré un retour TOR correct (défaut invisible à `ST_ContactorCheck`, qui ne voit que la bobine de commande, pas l'arbre moteur) | Élevée — aucune action physique alors que tout semble commandé correctement |
+| **D — Fenêtre de tolérance** | *(pas un cas de défaut, une règle transverse aux 3 ci-dessus)* Ne jamais déclencher pendant le temps normal de rampe + interlock (~0,5 à 1 s selon les taux réglés, voir §4) | — | — évite les faux positifs à chaque changement de sens/palier normal |
+
+**Sources de données nécessaires** (aucune encore remontée jusqu'à `FB_Safety_Winch`) :
+- Sens joystick **brut** (avant traitement) — actuellement `FB_Safety_Winch` ne voit que
+  `Joystick.Online`/`Operational`, pas `RawX`/`RawY` ni un signe brut dérivé.
+- Signe + magnitude de la vitesse codeur (Cas A, B, C) — dépend de Partie 10 (homing/fiabilisation).
+- `RelayFwd`/`RelayRev`/`BrakeCmd` de `FB_Winch` (Cas B, C) — déjà disponibles en sortie de
+  `FB_Winch`, juste pas encore câblés vers `FB_Safety_Winch`.
+
+Chaque cas incohérent → un bit `ErrorId` **distinct** dans `FB_Safety_Winch` (1 bit = 1 cause,
+Partie3 §3), pas un bit générique "incohérence". Note miroir (condensée) laissée dans
+`CODE/FB_Safety_Winch.st` (en-tête).
 
 ### ⚠️ Ce que « pas de codeur » signifie concrètement pour ce lot
 
@@ -141,6 +199,7 @@ descente sans surveillance visuelle des fins de câble physiques).
 - [`CODE/ST_SpeedStepTable.st`](../CODE/ST_SpeedStepTable.st), [`CODE/ST_ContactorCheck.st`](../CODE/ST_ContactorCheck.st)
 - [`CODE/ST_AxisCmd.st`](../CODE/ST_AxisCmd.st) — **mise à jour** (renommage `Start`→`StartStop`, retrait `SafetyOk`)
 - [`CODE/FB_Joystick.st`](../CODE/FB_Joystick.st) — **mise à jour** (suit `ST_AxisCmd`, renomme `SafetyOk`→`EmergencyStopOk`, l'ajoute au GATE)
+- [`CODE/FB_Ramp.st`](../CODE/FB_Ramp.st) — **mise à jour** (POU déjà existant, correctif bug accel/décel lors d'une inversion rapide — voir §4)
 - [`CODE/FB_SpeedStep.st`](../CODE/FB_SpeedStep.st), [`CODE/FB_Brake.st`](../CODE/FB_Brake.st) — nouvelles briques composées
 - [`CODE/FB_Safety_Winch.st`](../CODE/FB_Safety_Winch.st) — nouveau bloc safety métier
 - [`CODE/FB_Winch.st`](../CODE/FB_Winch.st) — nouveau FB de mouvement
@@ -212,6 +271,14 @@ Pour **`ST_SpeedStepTable`** et **`ST_ContactorCheck`** :
 4. Dans le volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du
    même fichier.
 5. **Enregistrer**.
+
+### Étape 3bis — Mettre à jour `FB_Ramp` (correctif bug accel/décel, existe déjà dans le projet)
+1. Double-clic sur `FB_Ramp` (dossier `JOYSTICK` — POU **déjà existant**, pas à créer).
+2. Volet déclaration : effacer tout, coller la section **DECLARATION** de `CODE/FB_Ramp.st`.
+3. Volet implémentation : effacer tout, coller la section **IMPLEMENTATION** du même fichier.
+4. **Enregistrer**. Aucun autre fichier à toucher : ce correctif ne change le comportement que
+   pour `RampX`/`RampY` (dans `FB_Joystick`) — `SpeedRamp` (dans `FB_Winch`) n'est pas affecté
+   (cible toujours `>= 0`, voir analyse d'impact §4).
 
 ### Étape 4 — Créer `FB_SpeedStep`
 1. Clic droit sur le dossier **WINCH** (le créer d'abord si absent : clic droit sur
@@ -312,6 +379,8 @@ variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
 - [ ] Chaque `P<palier>R<relais>` de `M1_SpeedStepTable` réglé un par un selon le câblage réel des 4 contacteurs M1
 - [ ] Frein : relâche bien après le délai (pas d'à-coup), collage bien après arrêt (pas de grincement)
 - [ ] Interlock changement de sens : impossible de commuter Fwd/Rev en mouvement ; arrêt ET inversion directe bien bloqués hors vitesse confirmée nulle
+- [ ] Inversion **rapide** du joystick (flick) : `Direction`/`RelayFwd`/`RelayRev` basculent en ~0,5 s (temps de décel normal), plus ~3 s comme avant le correctif `FB_Ramp`
+- [ ] Inversion **plus rapide que la rampe de décélération** (répétée/sans jamais tenir le stick immobile) : le treuil doit quand même ralentir puis s'arrêter avant de rebasculer — vérifier `instWinchM1.StepNumber` qui redescend bien vers 0 pendant ce temps (correctif `DirectionChangePending` 2026-07-02)
 - [ ] Relâcher le joystick → rampe de décélération normale → contacteur de sens reste actif jusqu'à l'arrêt réel → frein collé
 - [ ] Défaut simulé (débrancher un retour contacteur) → sorties coupées immédiatement (sortie sûre sur `Error`)
 - [ ] Seuils `StepThreshold_Pct` définitifs à figer une fois validés
@@ -320,6 +389,59 @@ variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
       banc d'essai (`CanOnline`/`CanOperational` figés `TRUE`, `Reset` figé `FALSE`)
 - [ ] Si validé → dupliquer pour M2 (nouvelle instance `FB_Winch`, nouvelle table), puis
       réintégrer `FB_WinchSync`/`FB_Encoder_Safety` une fois le codeur fiabilisé
+- [ ] **Revue indépendante 2026-07-02** : lors d'une inversion **directe** de sens (Fwd↔Rev sans
+      repasser par neutre), `RelayFwd`/`RelayRev` basculent dans le **même cycle** (10 ms) — pas
+      de temps mort logiciel explicite entre l'ouverture d'un contacteur de sens et la fermeture
+      de l'autre. Non corrigé (incertain si un verrouillage électromécanique matériel existe déjà
+      sur l'armoire M1) : **vérifier le schéma électrique réel de l'armoire M1** avant tout essai
+      avec charge/vitesse réelle. Si absent, ajouter un état intermédiaire (2 relais à `FALSE`
+      pendant quelques dizaines de ms) dans `FB_Winch` §3bis/§5 avant d'engager le nouveau sens.
+
+---
+
+## 🧭 9. Extension planifiée — Treuil M2 + sélection opérateur (réflexions actées, PAS implémenté)
+
+> ⚪ **Statut : réflexions consignées, aucun code écrit.** Prochaine étape actée avec
+> l'utilisateur (2026-07-02) : prioriser les **objets métier codeur M1/M2** (Partie10, encore un
+> pur document de conception à ce jour) **avant** de revenir finaliser ce lot M2, car la synchro
+> réelle (`FB_WinchSync`) dépend d'un `ΔPos` codeur fiable (Partie4 §3).
+
+### Besoin
+Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explicite :
+- **Quel(s) treuil(s)** : M1 seul, M2 seul, ou les deux.
+- **Quelle source de commande** : Joystick **ou** IHM — **jamais les deux en même temps**.
+
+### Décisions actées (session 2026-07-02)
+1. **Sélection treuil** : sélecteur **IHM dédié** (M1 / M2 / Les deux), indépendant du mode de
+   marche — l'opérateur choisit à tout moment.
+2. **Arbitrage Joystick ↔ IHM** : bit **« Prise de main IHM »**. Tant qu'il est actif, l'IHM est
+   la source légitime et le joystick est ignoré (même logique d'arbitrage de source que
+   `FB_Modes` Manuel/SemiAuto, Partie5 §1, mais appliquée ici à Joystick vs IHM).
+3. **Synchro M1/M2 selon mode** (si « Les deux » sélectionné) :
+   - **Semi-auto** : synchro **active par défaut** (hors périmètre immédiat — `FB_Cycle` n'existe
+     pas encore).
+   - **Maintenance N1** : synchro **imposée**, non désactivable (cohérent avec Partie5 §2 —
+     sécurité maintenue en N1).
+   - **Maintenance N2** : synchro **activable/désactivable par sélecteur** (override assumé,
+     cohérent avec Partie5 §2 — droits étendus N2).
+   - Sinon (un seul treuil sélectionné) : pas de notion de synchro, consigne simple sur le
+     treuil choisi (comme M1 aujourd'hui).
+4. **Périmètre** : **Maintenance N1 et N2 uniquement** pour ce lot (pas Manuel, pas Semi-auto —
+   `FB_Cycle` gérera les deux treuils à sa manière plus tard).
+
+### Dépendance bloquante
+`FB_WinchSync` (Partie2 §4, Partie4 §3) régule l'écart `ΔPos = |PosM1 − PosM2|` à partir des
+positions codeur validées (`FB_Encoder_Abs` → `FB_Encoder_Scale`). Partie10 (`FB_Encoder_Homing`
+et le pipeline codeur M1/M2) est encore **un document de conception, aucun code produit** — voir
+`DOC/AF_Partie10_Fonction_Encoder_Homing_v1.1.md` §9 (checklist entièrement décochée, confirmé
+par revue de code 2026-07-02). Construire une synchro M1/M2 sans codeur fiable reviendrait à
+câbler un stub qui masquerait un vrai défaut de dérive — **refusé par principe** (cohérent avec
+le choix déjà fait pour `FB_Safety_Winch` §TBD codeur, voir §4 ci-dessus).
+
+### Prochaine étape
+Implémenter Partie10 (objets métier codeur M1/M2 : `FB_Encoder_Homing`, pipeline
+lecture/validation/mise à l'échelle) **avant** de revenir coder : le sélecteur treuil IHM,
+le bit « Prise de main IHM », la 2ᵉ instance `FB_Winch` (M2), et `FB_WinchSync`.
 
 ---
 
@@ -329,3 +451,4 @@ variables — les deux mécanismes ne peuvent pas coexister (conflit de nom).
 - **Partie 4 v1.1** — Cycle (§3 Synchro, §4 Frein — règles reprises ici pour `FB_Brake`).
 - **Partie 5 v1.1** — Modes & maintenance (droits Maintenance N1).
 - **Partie 8 v1.1** — Fonction Joystick (source de `AxisCmdY`, corrections `ST_AxisCmd` liées).
+- **Partie 10 v1.1** — Encoder Homing (dépendance bloquante §9 ci-dessus, pas encore codée).

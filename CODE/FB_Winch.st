@@ -17,6 +17,14 @@
    ⚠️ ÉVOLUTION (retour terrain 2026-07-01) : `Contactor1..4` sont désormais
       lus directement dans `FB_SpeedStep` (table `P<palier>R<relais>`),
       plus de masque `BYTE` intermédiaire ni de bit-extraction ici.
+   ⚠️ CORRECTIF (retour terrain 2026-07-02) : une inversion de sens PLUS
+      RAPIDE que le temps de décélération réel pouvait bloquer
+      indéfiniment `CommandedDirection` (le treuil ne s'arrêtait jamais,
+      continuait dans l'ancien sens) — la cible de rampe suivait la
+      magnitude joystick en continu, sans garantie de croiser le seuil
+      d'arrêt. Corrigé : `DirectionChangePending` FORCE désormais la
+      cible à 0.0 dès qu'un changement de sens est en attente, de façon
+      déterministe et indépendante du joystick (voir §3 dans le corps ST).
    🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
       uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
@@ -81,6 +89,7 @@ VAR
     TonFwdFeedback      : TON;
     TonRevFeedback      : TON;
     RampTargetPct       : REAL;
+    DirectionChangePending : BOOL;  // 🔧 AJOUT (retour terrain 2026-07-02) — voir §3
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Winch) ===
@@ -115,8 +124,19 @@ CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms (valeur de secours 
 ResetEdge(CLK := Reset);
 
 // ⚙️ 3. CORE — arbitrage rampe : Enable > SafeStop > StartStop
+// 🔧 CORRECTIF (retour terrain 2026-07-02) : un changement de sens en attente FORCE la cible
+// de rampe à 0.0, INDÉPENDAMMENT de ce que redemande le joystick entre-temps. Avant ce
+// correctif, la cible suivait en continu SpeedRefPct (magnitude joystick) ; lors d'une
+// inversion plus rapide que le temps de décélération réel, rien ne garantissait que cette
+// magnitude "croise" un instant sous le seuil 0,1 % (deux rampes en cascade avancent par pas
+// discrets, la magnitude peut sauter par-dessus la fenêtre sans jamais y entrer) — le treuil
+// ne s'arrêtait jamais tant que l'opérateur ne laissait pas le joystick se stabiliser au
+// neutre. Désormais : dès qu'un sens différent est demandé (hors 1er engagement depuis
+// neutre), on force l'arrêt réel et déterministe avant d'envisager quoi que ce soit d'autre.
+DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
+
 RampTargetPct := 0.0;
-IF NOT SafeStop AND StartStop THEN
+IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := SpeedRefPct;
 END_IF;
 
@@ -140,6 +160,11 @@ SpeedRamp(Target := RampTargetPct,
 // actifs pendant encore toute la durée de la rampe de décélération — perte de couple moteur
 // non contrôlée, frein encore ouvert. Non conforme Partie3 §9 ("SafeStop ne coupe pas les
 // sorties : elles restent actives le temps de la décélération").
+// ⚠️ CORRECTIF 3 (retour terrain 2026-07-02) : les correctifs 1/2 supposaient que
+// ABS(SpeedRamp.Current) finirait par croiser le seuil 0,1 % naturellement — faux en cas
+// d'inversion plus rapide que le temps de décélération réel (voir §3, DirectionChangePending
+// force maintenant la cible à 0 de façon déterministe, donc ce test ci-dessous devient
+// fiable dans tous les cas, y compris les inversions rapides/répétées).
 // Correction définitive : SEUL neutre → un sens (engagement initial) est immédiat (rien à
 // interrompre). "un sens → neutre" (arrêt) ET une inversion directe Fwd↔Rev exigent tous
 // les deux la vitesse rampée confirmée nulle avant de lâcher/changer CommandedDirection.
@@ -230,8 +255,10 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🚦 9. STATE MACHINE (phase — orthogonale à Error, Partie3 §2)
-IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) > 0.1 THEN
-    State := E_State.STOPPING;      // Décélération en cours (arrêt demandé ou défaut process)
+// 🔧 AJOUT DirectionChangePending (2026-07-02) : décélération forcée par un changement de
+// sens en attente = aussi un STOPPING pour l'IHM (cohérent avec le §3 ci-dessus).
+IF (NOT StartStop OR SafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) > 0.1 THEN
+    State := E_State.STOPPING;      // Décélération en cours (arrêt demandé, défaut process, ou changement de sens en attente)
 ELSIF ABS(SpeedRamp.Current) > 0.1 THEN
     State := E_State.BUSY;          // Mouvement en cours
 ELSE
