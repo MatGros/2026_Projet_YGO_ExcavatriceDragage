@@ -7,14 +7,14 @@
         TRUE = rampe accélération, FALSE = rampe décélération normale)
       - Champ `SafetyOk` RETIRÉ : ce n'est pas une commande d'axe, c'est
         une info de contexte (`EmergencyStopOk`) consommée directement
-        par le FB de mouvement (FB_Winch/FB_Translation), pas portée
+        par le FB de mouvement (FB_Winch/FB_Chariot), pas portée
         par la consigne d'axe elle-même.
    🧭 4 champs exactement, conforme Partie2 v2.5 §8.
    🔧 2026-07-02 (demande utilisateur) : `SpeedRef` devient SIGNÉ (-100..+100 %,
       le signe porte le sens) au lieu de toujours positif — affichage simplifié
       IHM/maintenance. `Direction` reste inchangé (conservé, redondant mais
       explicite). Émis par `FB_Joystick` (CODE/FB_Joystick.st) ; `FB_Winch`/
-      `FB_Translation` extraient la magnitude via `ABS(SpeedRefPct)` à leur
+      `FB_Chariot` extraient la magnitude via `ABS(SpeedRefPct)` à leur
       frontière d'entrée et continuent d'utiliser `Direction` comme source
       d'autorité du sens (interlock inchangé).
    ═══════════════════════════════════════════════════════════════ *)

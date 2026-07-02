@@ -7,7 +7,7 @@
       de conditionnement bas niveau, à instancier en tableau (§3) ou
       composée directement dans un FB métier.
    🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
+   🔴 INTÉGRATION dans Winch/Chariot/etc. : PAS encore décidée (choix
       d'architecture en attente — composition interne vs FB_IO générique
       séparé). Ce fichier ne fait QUE créer la brique elle-même.
    ═══════════════════════════════════════════════════════════════ *)

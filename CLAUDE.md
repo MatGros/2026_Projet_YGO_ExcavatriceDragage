@@ -29,7 +29,7 @@ câble mécanique de position haute retiré de la chaîne AU matérielle, géré
 `PowerCutOff` — voir Partie1 v1.3 §Sécurité électrique).
 
 ### 4. **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
+- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
 - **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
 - **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
 - **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.1.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
@@ -74,14 +74,14 @@ PLC_PRG_MAIN (MainTask 10 ms — orchestration séquentielle : diag PUIS métier
 ├── JOYSTICK     (FB_Joystick — compose FB_AxisScale/FB_FilterPT1/FB_Ramp/FB_CycleTime en interne)
 ├── WINCH        (FB_Winch M1/M2 — StartStop/SafeStop, FB_SpeedStep masque 4 bits, FB_WinchSync)
 ├── ENCODER      (FB_Encoder_Abs COD1/COD2 → Scale → Safety)
-├── TRANSLATION  (FB_Translation — variateur AC600 / M3 — StartStop/SafeStop)
-├── BUCKET       (FB_Bucket)
+├── CHARIOT      (FB_Chariot — variateur AC600 / M3 — StartStop/SafeStop)
+├── GRAPPIN      (FB_Grappin)
 ├── SAFETY       (FB_Safety_<Metier> → SafeStop propre au métier + PowerCutOff)
 └── SEQUENCE     (FB_Modes — dont limite légale, FB_Cycle)
 ```
 👉 **Pas de `FB_Watchdog`** : périodicité des tâches surveillée par la fonction système CODESYS
 (config tâche, seuil 200 ms), pas un FB applicatif.
-👉 Mapping : **M1**=treuil1+COD1, **M2**=treuil2+COD2, **M3**=translation AC600. Pas de `GVL_BusHealth` :
+👉 Mapping : **M1**=treuil1+COD1, **M2**=treuil2+COD2, **M3**=chariot AC600. Pas de `GVL_BusHealth` :
 chaque FB lit directement la sortie du FB producteur (appel séquentiel).
 
 ---
@@ -118,7 +118,7 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie1_Analyse_Fonctionnelle_v1.3.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md) — Équipements & fonctions
 - [AF_Partie2_Architecture_Programme_v2.6.md](DOC/AF_Partie2_Architecture_Programme_v2.6.md) — Architecture détaillée (**v2.6**)
 - [AF_Partie3_Template_FB_Commun_v1.2.md](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) — Contrat FB & sécurité
-- [AF_Partie4_Cycle_Sequenceur_v1.1.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md) — Cycle, synchro, frein, godet, rampes
+- [AF_Partie4_Cycle_Sequenceur_v1.2.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md) — Cycle, synchro, frein, grappin, rampes
 - [AF_Partie5_Modes_Maintenance_v1.1.md](DOC/AF_Partie5_Modes_Maintenance_v1.1.md) — Modes, maintenance N1/N2, AU, limite légale
 - [AF_Partie6_IO_Conditioning_v1.1.md](DOC/AF_Partie6_IO_Conditioning_v1.1.md) — Conditionnement E/S
 - [AF_Partie8_Fonction_Joystick_v1.1.md](DOC/AF_Partie8_Fonction_Joystick_v1.1.md) — Fonction métier Joystick (8+ = métier par FB)

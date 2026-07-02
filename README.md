@@ -1,6 +1,6 @@
 # Excavatrice de Dragage — Automate CODESYS 3.5
 
-**Système de dragage en carrière noyée** — Pilotage d'un godet sous-marin avec 2 treuils, translation et sécurité intégrée.
+**Système de dragage en carrière noyée** — Pilotage d'un grappin sous-marin avec 2 treuils, chariot et sécurité intégrée.
 
 ---
 
@@ -32,7 +32,7 @@ Contrat standard que **tout FB métier respecte** :
 - Précédence `Enable` > `SafeStop` > `StartStop` ; AU matériel (seul arrêt brutal) + `PowerCutOff`
 
 ### 5️⃣ **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
+- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
 - **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
 - **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)** — Conditionnement E/S.
 - **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.1.md)** — Fonction métier Joystick (docs métier par FB en 8+).
@@ -49,7 +49,7 @@ excavatrice-dragage/
 │   ├── AF_Partie1_Analyse_Fonctionnelle_v1.3.md
 │   ├── AF_Partie2_Architecture_Programme_v2.6.md   (référence)
 │   ├── AF_Partie3_Template_FB_Commun_v1.2.md
-│   ├── AF_Partie4_Cycle_Sequenceur_v1.1.md
+│   ├── AF_Partie4_Cycle_Sequenceur_v1.2.md
 │   ├── AF_Partie5_Modes_Maintenance_v1.1.md
 │   ├── AF_Partie6_IO_Conditioning_v1.1.md
 │   ├── AF_Partie8_Fonction_Joystick_v1.1.md
@@ -96,7 +96,7 @@ pas de round-trip XML) : tout se fait **manuellement** dans CODESYS.
 | **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; surveillance périodicité = fonction système CODESYS (200 ms) |
 | **FB Standard** | Tous les FB métier respectent le contrat [Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) (profils selon catégorie, §1bis) |
 | **Sécurité** | `Enable` > `SafeStop` (par métier, rampe rapide) > `StartStop` (rampe normale) ; AU matériel = seul arrêt brutal + `PowerCutOff` ; Reset = front |
-| **Cycle** | Semi-auto : `E_CycleStep` ([Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md)) |
+| **Cycle** | Semi-auto : `E_CycleStep` ([Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)) |
 
 ---
 
@@ -106,7 +106,7 @@ pas de round-trip XML) : tout se fait **manuellement** dans CODESYS.
 2. Consulter [AF_Partie1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md) pour le contexte métier
 3. Étudier [AF_Partie2 (v2.6)](DOC/AF_Partie2_Architecture_Programme_v2.6.md) pour l'architecture
 4. Comprendre [AF_Partie3 (v1.2)](DOC/AF_Partie3_Template_FB_Commun_v1.2.md) avant de coder un FB
-5. Approfondir [Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md) / [5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md) / [6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)
+5. Approfondir [Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md) / [5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md) / [6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)
 6. Consulter [l'audit de cohérence](DOC/AUDIT_Coherence_Documentaire_v1.0.md) pour l'historique des décisions de conception
 
 ---

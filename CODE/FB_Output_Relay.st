@@ -7,10 +7,10 @@
       appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
    🔁 Rôle : inversion NO/NC, option blink 1Hz, double vérification
       commande/retour (contacteur collé/absent), diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
+   🔴 INTÉGRATION dans Winch/Chariot/etc. : PAS encore décidée (choix
       d'architecture en attente — composition interne, remplacerait la
       logique actuelle TonFwdFeedback/ST_ContactorCheck manuelle dans
-      FB_Winch/FB_Translation — vs FB_IO générique séparé). Ce fichier
+      FB_Winch/FB_Chariot — vs FB_IO générique séparé). Ce fichier
       ne fait QUE créer la brique elle-même.
    ═══════════════════════════════════════════════════════════════ *)
 

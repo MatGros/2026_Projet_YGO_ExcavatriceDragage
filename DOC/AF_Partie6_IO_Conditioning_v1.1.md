@@ -2,16 +2,17 @@
 
 > 📌 **État d'implémentation (2026-07-02)** : `FB_Input_Digital.st`/`FB_Output_Relay.st` **codés**
 > (conformes à la proposition d'interface ci-dessous, non modifiée). **Non encore intégrés** :
-> ni composés dans `FB_Winch`/`FB_Translation` (remplaceraient leur double-vérification actuelle
+> ni composés dans `FB_Winch`/`FB_Chariot` (remplaceraient leur double-vérification actuelle
 > écrite à la main), ni appelés via un `FB_IO` générique en tableaux (§3) — choix d'architecture
-> **en attente de décision utilisateur**. `M1_*`/`M2_*`/`M3_*` (Winch/Translation) restent des
+> **en attente de décision utilisateur**. `M1_*`/`M2_*`/`M3_*` (Winch/Chariot) restent des
 > variables nommées individuelles (stubs GVL), pas encore migrées vers ces briques.
 >
 > **Version 1.1** — Suite audit documentaire : §5 corrigé — il n'y a **pas de coupure sèche**
 > de la sortie relais sur défaut. Le passage en **rampe** (normale via `StartStop`, rapide via
-> `SafeStop`) se résout **à l'intérieur** du FB de mouvement (`FB_Winch`/`FB_Translation`) ; par le
+> `SafeStop`) se résout **à l'intérieur** du FB de mouvement (`FB_Winch`/`FB_Chariot`) ; par le
 > temps où `Output[i]` est appelé, la commande transmise est déjà la commande **rampée** correcte.
 > Terminologie `PRG_IO` retirée (1 seul POU `PLC_PRG_MAIN`, pas de sous-`PRG_*` — voir Partie 2 §0).
+> 🔧 **2026-07-02** — Terminologie : Translation → Chariot, `FB_Translation` → `FB_Chariot` (liste I/O réelle reçue de l'utilisateur, terminologie officielle du matériel) — voir Partie 11 v1.2.
 >
 > **Version 1.0** — Briques génériques de conditionnement E/S : `FB_Input_Digital` et
 > `FB_Output_Relay`, déclaration en **tableaux d'instances**, contrôle de feedback et
@@ -79,7 +80,7 @@ sortie, on récupère **directement un défaut de commande** (contacteur collé,
 
 > 🧭 Ce FB est un **relais de commande bas niveau** : il transmet fidèlement `Command` (après
 > inversion/blink) et **ne décide pas** d'un arrêt de mouvement. La logique de rampe
-> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Translation`, qui pilote
+> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Chariot`, qui pilote
 > `Command` déjà « rampé » (paliers de vitesse levés progressivement, sens coupé en dernier).
 
 ### Interface (proposition)
