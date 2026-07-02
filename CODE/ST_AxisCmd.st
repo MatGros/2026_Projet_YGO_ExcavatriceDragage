@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🕹️ ST_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.5.md §8
+   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.6.md §8
    ⚠️ MISE EN CONFORMITÉ (remplace la version actuelle du projet) :
       - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
         TRUE = rampe accélération, FALSE = rampe décélération normale)

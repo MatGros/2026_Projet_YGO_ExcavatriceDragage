@@ -22,8 +22,8 @@ Spec incomplète ou ambiguë → **STOP + demander clarification.** Jamais d'app
 Lire et appliquer **systématiquement** :
 - `DOC/NAMING_CONVENTION.md` → PascalCase, préfixes, pas de hongrois
 - `DOC/AF_Partie3_Template_FB_Commun_v1.2.md` → contrat FB (Enable/Reset/EmergencyStopOk/Mode/Ready/Error… ; profils d'interface §1bis : FB standard vs FB de mouvement `StartStop`/`SafeStop` vs briques réduites ; précédence Enable > SafeStop > StartStop) + réutilisation libs
-- `DOC/AF_Partie2_Architecture_Programme_v2.5.md` → architecture, tâches, flux
-- `DOC/AF_Partie1_Analyse_Fonctionnelle_v1.2.md` → équipements & fonctions
+- `DOC/AF_Partie2_Architecture_Programme_v2.6.md` → architecture, tâches, flux
+- `DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md` → équipements & fonctions
 
 ⚠️ Toujours utiliser la **version la plus récente** (suffixe `_vX.X` le plus élevé). Anciennes versions dans `DOC/Archives/`.
 

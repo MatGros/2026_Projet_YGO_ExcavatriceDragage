@@ -28,4 +28,10 @@ VAR_GLOBAL
     M1_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M1 (STUB, miroir de M1_RelayFwd)
     M1_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M1 (STUB, miroir de M1_RelayRev)
     M1_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M1 (STUB, miroir de M1_BrakeCmd)
+
+    // 🎯 AJOUT 2026-07-02 (lot Homing) — capteur position haute M1 (physique, PAS de miroir
+    // automatique : reste FALSE tant que non forcé manuellement dans la vue instance CODESYS).
+    // ⚠️ Homing volontairement IMPOSSIBLE tant que ce stub reste FALSE (sécurité : ne jamais
+    // simuler un signal safety-relevant comme actif par défaut).
+    M1_TopPositionSensor     : BOOL;   // 🔌 Entrée — capteur position haute M1 (STUB, toujours FALSE)
 END_VAR

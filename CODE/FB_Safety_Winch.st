@@ -1,20 +1,25 @@
 (* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1/M2)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md,
+                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md §7
                    (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
-   📤 Sortie maîtresse SafeStop_Winch : consommée en entrée par TOUT
-      FB de mouvement du domaine treuil (FB_Winch M1, M2 plus tard).
-   ⚠️ PÉRIMÈTRE MINIMAL DE CE LOT (créé pour tester la chaîne
-      Joystick→Winch→Relais en Maintenance N1, sans dépendance codeur) :
+   📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
+      DU MÊME TREUIL (instSafetyWinchM1→instWinchM1, idem M2).
+   ⚠️ ÉVOLUTION (lot Codeur, 2026-07-02) : `FB_Safety_Winch` reste UN
+      SEUL type FB — le "split M1/M2" acté en Partie10 §7 s'obtient par
+      DEUX INSTANCES (`instSafetyWinchM1`/`instSafetyWinchM2`), chacune
+      câblée sur l'`EncoderAvailable` de SON treuil (pas deux FB
+      distincts — composition, pas duplication de code).
       - ✅ Détecte la perte joystick/CAN (sans commande valide, un
         treuil ne doit pas pouvoir bouger).
-      - 🔴 TBD (codeur non finalisé, PAS simulé) : perte codeur M1/M2,
-        perte bus EtherCAT du treuil concerné. Zones clairement
-        marquées ci-dessous — à câbler quand FB_Encoder_Abs/Safety et
-        FB_DiagEthercat seront fiabilisés pour ce domaine.
+      - ✅ Détecte la perte codeur DE CE TREUIL (`EncoderAvailable`,
+        sortie `FB_Encoder_Abs` — désormais câblée, ErrorId bit1).
+      - 🔴 TBD (non simulé) : perte bus EtherCAT spécifique (au-delà de
+        ce que `EncoderAvailable` reflète déjà, si besoin d'un signal
+        distinct plus tard).
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
         ST_ContactorCheck de puissance câblé — FB_Output_Relay
         transverse hors périmètre de ce lot, voir Partie6).
@@ -48,15 +53,14 @@ VAR_INPUT
     Mode                : E_Mode;      // Mode courant (autorisations)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
-    // 🔴 TBD (codeur non finalisé) : ajouter ici EncoderM1Available / EncoderM1EtherCatOk
-    //     quand FB_Encoder_Abs/Safety M1 seront fiabilisés — ne PAS stubber en dur.
+    EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine treuil sans commande valide)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
@@ -91,10 +95,12 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🔴 TBD (codeur non finalisé) : bit1 réservé perte codeur/EtherCAT M1 — NON câblé dans ce lot.
-// Ne jamais mettre un stub qui masquerait un vrai défaut : laisser le bit à 0 tant que la
-// surveillance codeur n'est pas fiabilisée revient à accepter ce risque en Maintenance N1
-// (cohérent avec le choix de test réduit validé avec l'utilisateur).
+// 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
+IF NOT EncoderAvailable THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);
