@@ -9,6 +9,10 @@ VAR_GLOBAL RETAIN
     WinchM2 : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Auxiliaire M2 *)
     Grappin : ST_GrappinHMI;(* 🪣 Variables d'échange IHM Mécanisme Grappin *)
     Sync    : ST_SyncHMI;   (* ⚖️ Variables d'échange IHM Surveillance de synchro *)
+    Joystick : ST_JoystickHMI; (* 🕹️ Variables d'échange IHM Joystick *)
+    Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
+    Chariot : ST_ChariotHMI;(* ↔️ Variables d'échange IHM Chariot M3 *)
+    Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
 END_VAR
 
 (* ═══════════════════════════════════════════════════════════════

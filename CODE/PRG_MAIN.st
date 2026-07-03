@@ -173,7 +173,13 @@ GVL_Encoder_Stub.M1_Reset_IHM                   := GVL_IHM.WinchM1.CmdReset;
 GVL_Encoder_Stub.M2_Reset_IHM                   := GVL_IHM.WinchM2.CmdReset;
 GVL_Encoder_Stub.M1_ConfirmCoherence_IHM         := GVL_IHM.WinchM1.ConfirmCoherence;
 GVL_Encoder_Stub.M2_ConfirmCoherence_IHM         := GVL_IHM.WinchM2.ConfirmCoherence;
-GVL_Machine_Stub.MachineReset_IHM               := GVL_IHM.WinchM1.CmdReset OR GVL_IHM.WinchM2.CmdReset OR GVL_IHM.Grappin.CmdReset;
+
+// 🎛️ Acquisition des commandes issues de l'IHM (Joystick, Modes, Chariot)
+GVL_Modes_Stub.ModeRequest_IHM                  := GVL_IHM.Modes.ModeRequest;
+GVL_Modes_Stub.PasswordOk_IHM                   := GVL_IHM.Modes.PasswordOk;
+MachineReset_IHM                                := GVL_IHM.Modes.MachineReset OR GVL_IHM.WinchM1.CmdReset OR GVL_IHM.WinchM2.CmdReset OR GVL_IHM.Grappin.CmdReset;
+StubChariotPositionSelect_IHM                   := GVL_IHM.Chariot.SelectedTargetNum;
+FB_Joystick_0.Calibrate                         := GVL_IHM.Joystick.Calibrate;
 
 // Gestion de la commande Home et du mode homing selon les boutons tactiles
 IF GVL_IHM.WinchM1.CmdHome AND GVL_IHM.WinchM2.CmdHome THEN
@@ -297,7 +303,7 @@ FB_Joystick_0(
     RawButton       := JoyBtnRaw,               // 🔘 bouton brut
 
     // 🎯 --- Calibration ---
-    Calibrate       := FALSE,                   // ⚠️ À câbler : bouton recalage neutre (front)
+    Calibrate       := GVL_IHM.Joystick.Calibrate,                   // 🎯 Bouton recalage neutre IHM (front)
 
     // 🎛️ --- Paramètres de traitement ---
     InvertX         := FALSE,
@@ -700,7 +706,7 @@ instChariotM3(
     ContactorFeedbackFwd    := M3_ContactorFeedbackFwd,      // 🧪 STUB GVL_Chariot_M3_Stub
     ContactorFeedbackRev    := M3_ContactorFeedbackRev,      // 🧪 STUB GVL_Chariot_M3_Stub
     DriveFaultFeedback      := M3_DriveFaultFeedback,        // 🧪 STUB GVL_Chariot_M3_Stub (toujours FALSE, non câblé)
-    BrakeFeedback           := GVL_IN.M3BrakeFeedback
+    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, GVL_IN.M3BrakeFeedback, instChariotM3.BrakeCmd)
 );
 
 // 📤 Sorties chariot M3 STUB (GVL_Chariot_M3_Stub, pas de matériel réel — pas conditionnées,
@@ -755,12 +761,13 @@ WinchSyncToleranceM                         := GVL_IHM.Sync.SyncToleranceM;
 GrappinConfig                               := GVL_IHM.Grappin.Config;
 
 // --- 3. GESTION DES BYPASSES BANC DE TEST (DEUX VOIES) ---
-GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST  := GVL_IHM.WinchM1.BypassContactorFeedback OR GVL_IHM.WinchM2.BypassContactorFeedback;
+GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST  := GVL_IHM.WinchM1.BypassContactorFeedback OR GVL_IHM.WinchM2.BypassContactorFeedback OR GVL_IHM.Chariot.BypassContactorFeedback;
 GVL_DEBUG.DBG_SlackCableSwitch_TEST         := GVL_IHM.WinchM1.BypassSlackCable OR GVL_IHM.WinchM2.BypassSlackCable;
 GVL_DEBUG.DBG_TopPositionSensorBypass_TEST   := GVL_IHM.WinchM1.BypassTopPositionSensor OR GVL_IHM.WinchM2.BypassTopPositionSensor;
 
 GVL_IHM.WinchM1.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
 GVL_IHM.WinchM2.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
+GVL_IHM.Chariot.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
 GVL_IHM.WinchM1.BypassSlackCable            := GVL_DEBUG.DBG_SlackCableSwitch_TEST;
 GVL_IHM.WinchM2.BypassSlackCable            := GVL_DEBUG.DBG_SlackCableSwitch_TEST;
 GVL_IHM.WinchM1.BypassTopPositionSensor     := GVL_DEBUG.DBG_TopPositionSensorBypass_TEST;
@@ -789,6 +796,12 @@ GVL_IHM.WinchM1.ForbidDescentActive         := instSafetyWinchM1.ForbidDescent;
 GVL_IHM.WinchM1.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM1.ThermalFault                := GVL_IN.M1ThermalFeedback;
 GVL_IHM.WinchM1.EncoderFault                := NOT instEncoderAbsM1.EncoderAvailable OR instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.WinchM1.Encoder.RawPos              := instEncoderAbsM1.RawPos;
+GVL_IHM.WinchM1.Encoder.Alarms              := instEncoderAbsM1.AlarmsIn;
+GVL_IHM.WinchM1.Encoder.Warnings            := instEncoderAbsM1.WarningsIn;
+GVL_IHM.WinchM1.Encoder.SlaveOperational    := instEncoderAbsM1.SlaveOperational;
+GVL_IHM.WinchM1.Encoder.PresetTriggerCmd    := instEncoderAbsM1.PresetTriggerCmd;
+GVL_IHM.WinchM1.Encoder.PresetValueOut      := instEncoderAbsM1.PresetValueOut;
 GVL_IHM.WinchM1.FwdContactorCheck           := instWinchM1.FwdContactorCheck;
 GVL_IHM.WinchM1.RevContactorCheck           := instWinchM1.RevContactorCheck;
 GVL_IHM.WinchM1.BrakeContactorCheck         := instWinchM1.BrakeContactorCheck;
@@ -816,6 +829,12 @@ GVL_IHM.WinchM2.ForbidDescentActive         := instSafetyWinchM2.ForbidDescent;
 GVL_IHM.WinchM2.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM2.ThermalFault                := GVL_IN.M2ThermalFeedback;
 GVL_IHM.WinchM2.EncoderFault                := NOT instEncoderAbsM2.EncoderAvailable OR instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.WinchM2.Encoder.RawPos              := instEncoderAbsM2.RawPos;
+GVL_IHM.WinchM2.Encoder.Alarms              := instEncoderAbsM2.AlarmsIn;
+GVL_IHM.WinchM2.Encoder.Warnings            := instEncoderAbsM2.WarningsIn;
+GVL_IHM.WinchM2.Encoder.SlaveOperational    := instEncoderAbsM2.SlaveOperational;
+GVL_IHM.WinchM2.Encoder.PresetTriggerCmd    := instEncoderAbsM2.PresetTriggerCmd;
+GVL_IHM.WinchM2.Encoder.PresetValueOut      := instEncoderAbsM2.PresetValueOut;
 GVL_IHM.WinchM2.FwdContactorCheck           := instWinchM2.FwdContactorCheck;
 GVL_IHM.WinchM2.RevContactorCheck           := instWinchM2.RevContactorCheck;
 GVL_IHM.WinchM2.BrakeContactorCheck         := instWinchM2.BrakeContactorCheck;
@@ -841,6 +860,47 @@ GVL_IHM.Sync.Ready                          := instWinchSync.Ready;
 GVL_IHM.Sync.Error                          := instWinchSync.Error;
 GVL_IHM.Sync.ErrorId                        := instWinchSync.ErrorId;
 GVL_IHM.Sync.State                          := instWinchSync.State;
+
+// --- 8. COPIE DES STATUTS CHARIOT M3 VERS GVL_IHM ---
+GVL_IHM.Chariot.FBState                     := instChariotM3.State;
+GVL_IHM.Chariot.Ready                       := instChariotM3.Ready;
+GVL_IHM.Chariot.Busy                        := instChariotM3.Busy;
+GVL_IHM.Chariot.Done                        := instChariotM3.Done;
+GVL_IHM.Chariot.Error                       := instChariotM3.Error;
+GVL_IHM.Chariot.ErrorId                     := instChariotM3.ErrorId;
+GVL_IHM.Chariot.RelayFwd                    := instChariotM3.RelayFwd;
+GVL_IHM.Chariot.RelayRev                    := instChariotM3.RelayRev;
+GVL_IHM.Chariot.RelaySpeedGv                := instChariotM3.RelaySpeedGv;
+GVL_IHM.Chariot.BrakeCmd                    := instChariotM3.BrakeCmd;
+GVL_IHM.Chariot.BrakeFeedback               := GVL_IN.M3BrakeFeedback;
+GVL_IHM.Chariot.PositionSensorTarget        := M3_PositionSensorTarget;
+GVL_IHM.Chariot.DriveStatusWord             := instChariotM3.DriveStatusWord;
+GVL_IHM.Chariot.DriveActualFreqHz           := instChariotM3.DriveActualFreqHz;
+
+// --- 9. COPIE DES STATUTS DU JOYSTICK VERS GVL_IHM ---
+GVL_IHM.Joystick.RawX                       := JoyXRaw_ANA1;
+GVL_IHM.Joystick.RawY                       := JoyYRaw_ANA2;
+GVL_IHM.Joystick.RawButton                  := JoyBtnRaw;
+GVL_IHM.Joystick.CmdX                       := FB_Joystick_0.AxisCmdX;
+GVL_IHM.Joystick.CmdY                       := FB_Joystick_0.AxisCmdY;
+GVL_IHM.Joystick.Online                     := instDiagCanOpen.Joystick.Online;
+GVL_IHM.Joystick.Operational                 := instDiagCanOpen.Joystick.Operational;
+
+// --- 10. COPIE DES STATUTS MODES DE MARCHE VERS GVL_IHM ---
+GVL_IHM.Modes.CurrentMode                   := instModes.Mode;
+GVL_IHM.Modes.EmergencyStopOk               := GVL_IN.EmergencyStopOk;
+
+// --- 11. COPIE DES STATUTS DIAGNOSTICS RÉSEAU VERS GVL_IHM ---
+GVL_IHM.Network.BusCanOpen                  := instDiagCanOpen.busCanOpen;
+GVL_IHM.Network.Joystick                    := instDiagCanOpen.Joystick;
+GVL_IHM.Network.CanError                    := instDiagCanOpen.Error;
+GVL_IHM.Network.CanErrorId                  := instDiagCanOpen.ErrorId;
+GVL_IHM.Network.BusEthercat                 := instDiagEthercat.BusEthercat;
+GVL_IHM.Network.EncoderM1                   := instDiagEthercat.EncoderM1;
+GVL_IHM.Network.EncoderM2                   := instDiagEthercat.EncoderM2;
+GVL_IHM.Network.VariateurM3                 := instDiagEthercat.Variateur;
+GVL_IHM.Network.EcatError                   := instDiagEthercat.Error;
+GVL_IHM.Network.EcatErrorId                 := instDiagEthercat.ErrorId;
 
 (* ═══════════════════════════════════════════════════════════════
    📤 7. GVL_OUTPUTS + FB_OUTPUTSMACHINE — conditionnement SORTIES réelles (tard)
