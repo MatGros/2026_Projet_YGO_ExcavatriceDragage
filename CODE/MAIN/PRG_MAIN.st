@@ -117,6 +117,8 @@ VAR
     // 🛠️ Variables de simulation pour banc de test (mouvement simulé des treuils)
     SimulatedM1Raw          : UDINT := 1000000;
     SimulatedM2Raw          : UDINT := 1000000;
+    M1_RawPosToUse          : UDINT;
+    M2_RawPosToUse          : UDINT;
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -353,9 +355,13 @@ IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
         END_IF;
     END_IF;
 
-    // Écriture des positions simulées dans les variables physiques pour instEncoderAbsM1/M2
-    COD1_PosValue := SimulatedM1Raw;
-    COD2_PosValue := SimulatedM2Raw;
+    // Utilisation des positions simulées
+    M1_RawPosToUse := SimulatedM1Raw;
+    M2_RawPosToUse := SimulatedM2Raw;
+ELSE
+    // Utilisation des valeurs réelles
+    M1_RawPosToUse := COD1_PosValue;
+    M2_RawPosToUse := COD2_PosValue;
 END_IF;
 
 instEncoderAbsM1(
@@ -365,7 +371,7 @@ instEncoderAbsM1(
     EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
-    RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
+    RawPosIn            := M1_RawPosToUse,                  // 📡 Sélecteur simulation/physique (banc de test)
     AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
     WarningsIn          := COD1_Warnings,                   // 📡 I/O Mapping déjà existant
     SlaveOperational    := instDiagEthercat.EncoderM1.Operational,
@@ -415,7 +421,7 @@ instEncoderAbsM2(
     EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
-    RawPosIn            := COD2_PosValue,                   // 📡 I/O Mapping (mappé 2026-07-02)
+    RawPosIn            := M2_RawPosToUse,                  // 📡 Sélecteur simulation/physique (banc de test)
     AlarmsIn            := COD2_Alarms,                     // 📡 I/O Mapping (mappé 2026-07-02)
     WarningsIn          := COD2_Warnings,                   // 📡 I/O Mapping (mappé 2026-07-02)
     SlaveOperational    := instDiagEthercat.EncoderM2.Operational,
