@@ -39,6 +39,7 @@ STRUCT
     SlackCableDetected      : BOOL;             (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* 🔥 Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)
+    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
     FwdContactorCheck       : ST_ContactorCheck; (* 🔌 Coherence contacteur montée *)

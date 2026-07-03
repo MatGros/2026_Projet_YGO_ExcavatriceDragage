@@ -131,6 +131,103 @@ END_STRUCT
 END_TYPE
 ```
 
+### D. Joystick / Organe de Commande (`ST_JoystickHMI`)
+Regroupe les informations de commande et d'état du joystick CANopen.
+
+```pascal
+TYPE ST_JoystickHMI :
+STRUCT
+    RawX        : INT;        (* 🕹️ Axe X brut du joystick (0..10000) *)
+    RawY        : INT;        (* 🕹️ Axe Y brut du joystick (0..10000) *)
+    RawButton   : BOOL;       (* 🔘 Bouton homme-mort brut *)
+    CmdX        : ST_AxisCmd; (* ⚙️ Consigne d'axe X normalisée *)
+    CmdY        : ST_AxisCmd; (* ⚙️ Consigne d'axe Y normalisée *)
+    Online      : BOOL;       (* 📡 Liaison CAN joystick active *)
+    Operational : BOOL;       (* 🟢 Joystick opérationnel *)
+    Calibrate   : BOOL;       (* 🎯 Demande de recalage au neutre *)
+END_STRUCT
+END_TYPE
+```
+
+### E. Modes de Marche (`ST_ModesHMI`)
+Permet de piloter et de surveiller l'état des modes de marche de la machine.
+
+```pascal
+TYPE ST_ModesHMI :
+STRUCT
+    CurrentMode     : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
+    ModeRequest     : E_Mode; (* 🖥️ Demande de changement de mode de marche *)
+    PasswordOk      : BOOL;   (* 🔑 Authentification pour le mode maintenance N2 *)
+    EmergencyStopOk : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
+    MachineReset    : BOOL;   (* 🔁 Commande d'acquittement général de la machine *)
+END_STRUCT
+END_TYPE
+```
+
+### F. Diagnostics Codeurs Absolus (`ST_EncoderHMI`)
+Contient les informations d'état et les commandes spécifiques aux codeurs absolus Kübler.
+
+```pascal
+TYPE ST_EncoderHMI :
+STRUCT
+    RawPos           : UDINT; (* 📊 Position brute lue sur le bus *)
+    Alarms           : UINT;  (* ⚠️ Code d'alarme brut du codeur *)
+    Warnings         : UINT;  (* 🟧 Code d'avertissement brut du codeur *)
+    SlaveOperational : BOOL;  (* 📡 Esclave EtherCAT opérationnel *)
+    PresetTriggerCmd : WORD;  (* 🎯 Commande de preset active *)
+    PresetValueOut   : UDINT; (* 📐 Valeur de preset envoyée au codeur *)
+END_STRUCT
+END_TYPE
+```
+
+### G. Chariot M3 (`ST_ChariotHMI`)
+Regroupe les informations de commande, d'état et de diagnostic de l'axe transversal de la machine (M3).
+
+```pascal
+TYPE ST_ChariotHMI :
+STRUCT
+    FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Chariot) *)
+    Ready                   : BOOL;    (* 🟢 Chariot prêt à fonctionner *)
+    Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
+    Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
+    Error                   : BOOL;    (* 🔴 Chariot en défaut *)
+    ErrorId                 : WORD;    (* ❌ Code du défaut actif *)
+    RelayFwd                : BOOL;    (* 🔌 Relais direction avant activé *)
+    RelayRev                : BOOL;    (* 🔌 Relais direction arrière activé *)
+    RelaySpeedGv            : BOOL;    (* 🔌 Relais grande vitesse (GV) activé *)
+    BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein *)
+    BrakeFeedback           : BOOL;    (* 🔌 Retour physique de l'état du frein *)
+    PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
+    SelectedTargetNum       : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
+    DriveStatusWord         : WORD;    (* 📡 Mot d'état du variateur (EtherCAT) *)
+    DriveActualFreqHz       : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
+    BypassContactorFeedback : BOOL;    (* 🔌 Activation du bypass des retours contacteurs *)
+    BypassBrakeFeedback     : BOOL;    (* 🔓 Activation du bypass du retour frein *)
+END_STRUCT
+END_TYPE
+```
+
+### H. Diagnostics Réseau (`ST_NetworkDiagHMI`)
+Regroupe les états de diagnostics des bus de communication CANopen et EtherCAT.
+
+```pascal
+TYPE ST_NetworkDiagHMI :
+STRUCT
+    BusCanOpen          : ST_DeviceDiag;  (* 📡 Diagnostics bus CANopen *)
+    Joystick            : ST_DeviceDiag;  (* 🕹️ Diagnostics esclave Joystick *)
+    CanError            : BOOL;           (* ⚠️ Anomalie CANopen *)
+    CanErrorId          : WORD;           (* ❌ Code anomalie CANopen *)
+    
+    BusEthercat         : ST_DeviceDiag;  (* 📡 Diagnostics bus EtherCAT *)
+    EncoderM1           : ST_DeviceDiag;  (* 🧲 Diagnostics esclave COD1 *)
+    EncoderM2           : ST_DeviceDiag;  (* 🧲 Diagnostics esclave COD2 *)
+    VariateurM3         : ST_DeviceDiag;  (* ↔️ Diagnostics esclave AC600 *)
+    EcatError           : BOOL;           (* ⚠️ Anomalie EtherCAT *)
+    EcatErrorId         : WORD;           (* ❌ Code anomalie EtherCAT *)
+END_STRUCT
+END_TYPE
+```
+
 ---
 
 ## 🎛️ 3. Déclaration GVL (`GVL_IHM.st`)
@@ -141,6 +238,10 @@ VAR_GLOBAL RETAIN
     WinchM2 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Auxiliaire M2 *)
     Grappin : ST_GrappinHMI;(* Variables d'échange IHM Mécanisme Grappin *)
     Sync    : ST_SyncHMI;   (* Variables d'échange IHM Surveillance de synchro *)
+    Joystick : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
+    Modes   : ST_ModesHMI;  (* Variables d'échange IHM Modes de marche *)
+    Chariot : ST_ChariotHMI;(* Variables d'échange IHM Chariot M3 *)
+    Network : ST_NetworkDiagHMI;(* Variables d'échange IHM Diagnostics réseau *)
 END_VAR
 ```
 
@@ -165,7 +266,7 @@ Le mapping bidirectionnel est divisé en deux parties dans `PRG_MAIN.st` :
 ## 🔌 5. Note d'application CODESYS 3.5
 
 1. **Création des types de données** :
-   Dans le dossier `_TYPES` du projet CODESYS, ajouter les trois fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_GrappinHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_GrappinHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st).
+   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_GrappinHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_GrappinHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_EncoderHMI.st), [ST_ChariotHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ChariotHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_NetworkDiagHMI.st).
 
 2. **Déclaration de la GVL** :
    Créer une GVL nommée `GVL_IHM` et y copier le contenu de [GVL_IHM.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/GVL_IHM.st). S'assurer de la cocher en **Retain** si requis par votre configuration automate (la directive `VAR_GLOBAL RETAIN` assure la persistance des données au niveau du compilateur).
