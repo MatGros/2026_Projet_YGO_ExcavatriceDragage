@@ -69,8 +69,8 @@ VAR_OUTPUT
     HomingSuspect        : BOOL;        // RETAIN interne, miroir Calib.HomingSuspect
     HomingRefRaw         : UDINT;       // RETAIN interne, miroir Calib.HomingRefRaw → FB_Encoder_Scale
 END_VAR
-VAR RETAIN
-    Calib                : ST_EncoderCalib;   // État persistant (Homed/HomingRefRaw/LastKnownRawPos...)
+VAR_IN_OUT
+    Calib                : ST_EncoderCalib;   // Référence vers l'état persistant global (survit aux téléchargements)
 END_VAR
 VAR
     ResetEdge            : R_TRIG;
