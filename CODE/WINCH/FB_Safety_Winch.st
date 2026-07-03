@@ -76,7 +76,7 @@ VAR_INPUT
     TopPositionSensor   : BOOL;        // 🆕 Capteur de position haute commun (M1_M2_TopPositionSensor, I/O réel)
     InReferencingMode   : BOOL;        // 🆕 Indique si le treuil est en cours de homing (référencement)
     CablePosM           : REAL;        // 🆕 Position actuelle du câble en mètres (scaled)
-    CableLimitDescentM  : REAL;        // 🆕 Profondeur max / longueur de câble autorisée en mètres (positive)
+    CableLimitDescentM  : REAL;        // 🆕 Limite basse physique de descente en mètres (négative)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -161,9 +161,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
-// Sécurité active tout le temps. Si la longueur de câble dépasse la limite max (CablePosM <= -CableLimitDescentM),
+// Sécurité active tout le temps. Si la position de câble descend sous la limite basse physique (CablePosM <= CableLimitDescentM),
 // alors on interdit uniquement la descente.
-IF (CableLimitDescentM > 0.0) AND (CablePosM <= -CableLimitDescentM) THEN
+IF (CableLimitDescentM < 0.0) AND (CablePosM <= CableLimitDescentM) THEN
     ErrorId := ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;

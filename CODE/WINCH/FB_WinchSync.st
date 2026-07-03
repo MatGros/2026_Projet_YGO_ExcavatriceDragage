@@ -34,13 +34,27 @@ VAR_INPUT
     OverrideSync    : BOOL;        // Sortie FB_Modes (actionnable UNIQUEMENT MAINT_N2)
     SyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
     ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: grappin fermé/ouvert)
+    
+    // 🆕 Signaux de commande réels des treuils (pour contrôle de cohérence)
+    RelayFwdM1      : BOOL;
+    RelayFwdM2      : BOOL;
+    RelayRevM1      : BOOL;
+    RelayRevM2      : BOOL;
+    Contactor1_M1   : BOOL;
+    Contactor1_M2   : BOOL;
+    Contactor2_M1   : BOOL;
+    Contactor2_M2   : BOOL;
+    Contactor3_M1   : BOOL;
+    Contactor3_M2   : BOOL;
+    Contactor4_M1   : BOOL;
+    Contactor4_M2   : BOOL;
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;
     Busy            : BOOL;
     Done            : BOOL;
     Error           : BOOL;
-    ErrorId         : WORD;        // bit0 : écart hors tolérance (SyncActive uniquement)
+    ErrorId         : WORD;        // bit0 : écart hors tolérance (SyncActive uniquement) ; bit1 : incohérence de commande (sens/paliers différents)
     State           : E_State;
     StateAtError    : E_State;
     DeltaPosM       : REAL;        // |CablePosM1 - CablePosM2|, 0.0 si pas les 2 homés
@@ -50,6 +64,8 @@ END_VAR
 VAR
     ResetEdge       : R_TRIG;
     ErrorEdge       : R_TRIG;
+    MismatchActive  : BOOL;        // 🆕 Indique une discordance active de commande
+    MismatchTimer   : TON;         // 🆕 Filtre temporel pour éviter les faux déclenchements transitoires
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
@@ -61,6 +77,8 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     DeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE;
+    Error := FALSE;
+    ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -92,6 +110,26 @@ IF SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > SyncToleranceM) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+// 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
+// Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
+// Filtre de 500ms pour tolérer les transitions et rampes.
+MismatchActive := SyncActive AND (
+    (RelayFwdM1 <> RelayFwdM2) OR
+    (RelayRevM1 <> RelayRevM2) OR
+    (Contactor1_M1 <> Contactor1_M2) OR
+    (Contactor2_M1 <> Contactor2_M2) OR
+    (Contactor3_M1 <> Contactor3_M2) OR
+    (Contactor4_M1 <> Contactor4_M2)
+);
+
+MismatchTimer(IN := MismatchActive, PT := T#500ms);
+
+IF MismatchTimer.Q THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFD;
 END_IF;
 
 // 📤 6. SORTIES ÉTAT

@@ -64,15 +64,13 @@ VAR_GLOBAL PERSISTENT RETAIN
     WinchM2RampDecelFast_Pct    : REAL := 400.0; // 💾 Décélération SafeStop M2 (%/s) — CRITIQUE
 
     // 📐 PARAMÈTRES DE LIMITES DE DESCENTE ET DE RALENTISSEMENT SUR BORDURE (Nouveau 2026-07-03)
-    WinchM1CableLimitDescent_M  : REAL := 20.0;  // 💾 Profondeur max / longueur de câble autorisée M1 (m)
-    WinchM1SlowdownDistance_M   : REAL := 1.0;   // 💾 Distance de ralentissement M1 (m)
-    WinchM1SlowSpeedPct         : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement M1 (%)
-    WinchM2CableLimitDescent_M  : REAL := 20.0;  // 💾 Profondeur max / longueur de câble autorisée M2 (m)
-    WinchM2SlowdownDistance_M   : REAL := 1.0;   // 💾 Distance de ralentissement M2 (m)
-    WinchM2SlowSpeedPct         : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement M2 (%)
+    CableLimitDescent_M         : REAL := -20.0; // 💾 Limite basse physique de descente commune (m, négatif)
+    WinchSlowdownDistance_M     : REAL := 1.0;   // 💾 Distance de ralentissement commune (m)
+    WinchSlowSpeedPct           : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement commune (%)
 
     // 📏 LIMITE LÉGALE DE DRAGAGE (Nouveau 2026-07-03)
-    LimitLegal                  : ST_LimitLegal; // 💾 Configuration de la limite légale de profondeur
+    LimitLegalDepthMinAllowed   : REAL := -15.0; // 💾 Cote min de dragage autorisée (m, négatif)
+    LimitLegalEnabled           : BOOL := TRUE;  // 💾 Activation de la limite légale
 
     // ═══════════════════════════════════════════════════════════
     // ⚖️ SYNCHRONISATION — Tolérance d'écart M1/M2
