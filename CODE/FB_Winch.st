@@ -34,6 +34,14 @@
       (montée) reste piloté normalement. Permet à l'opérateur de remonter
       pour vérifier le câblage sans être bloqué par un `SafeStop` classique
       qui aurait arrêté les 2 sens. Voir DOC/AF_Partie9 §4ter.
+   🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
+      nouveau paramètre `MaxStepDescente` (défaut 2). En descente
+      (`CommandedDirection = -1`), le palier atteignable par `FB_SpeedStep` est
+      plafonné à cette valeur MÊME à consigne joystick 100% — la charge est
+      entraînante en descente (image de couple, pas besoin d'aller vite). En
+      montée, les 5 paliers normaux restent inchangés (`MaxStepNumber := 5`).
+      Ne change PAS la logique de décodage (voir FB_SpeedStep.st), juste le
+      plafond fourni selon le sens.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
@@ -48,6 +56,7 @@ VAR_INPUT
     Direction               : INT;
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
+    MaxStepDescente         : INT := 2;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse
     ContactorFeedbackFwd    : BOOL;
     ContactorFeedbackRev    : BOOL;
     BrakeFeedback           : BOOL;
@@ -149,8 +158,11 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
+// 🆕 Plafond palier descente (couple, pas vitesse) : 5 = inchangé en montée/neutre,
+// MaxStepDescente uniquement si CommandedDirection = -1 (Rev)
 SpeedStep(Enable := (ABS(SpeedRamp.Current) > 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
-          Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
+          Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
+          MaxStepNumber := SEL(CommandedDirection = -1, 5, MaxStepDescente));
 StepNumber := SpeedStep.StepNumber;
 Contactor1 := SpeedStep.Contactor1;
 Contactor2 := SpeedStep.Contactor2;

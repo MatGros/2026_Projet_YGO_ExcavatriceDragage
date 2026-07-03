@@ -1,5 +1,12 @@
 # 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.1)
 
+> 📌 **État d'implémentation (2026-07-03quater, AUDIT D40)** : `FB_WinchSync` **codé (squelette)**
+> — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
+> `SafeStop`), `SyncActive` selon Mode (imposé N1, activable/désactivable N2 via `OverrideSync`
+> de `FB_Modes`). **Pas de correction/régulation active** — `FB_Winch` n'a aucune entrée de
+> correction de vitesse aujourd'hui, hors périmètre de ce lot (§9 "reste à faire"). Sélecteur
+> treuil IHM (M1/M2/Les deux) et bit « Prise de main IHM » : toujours **non codés**.
+>
 > **Fonction métier** : chaîne de commande Joystick (axe Y, Plongée/Extraction) → `FB_Winch` →
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
@@ -385,6 +392,10 @@ Delete dans l'arbre projet) — `M1_M2_TopPositionSensor` est désormais réel.
 - [ ] Relâcher le joystick → rampe de décélération normale → contacteur de sens reste actif jusqu'à l'arrêt réel → frein collé
 - [ ] Défaut simulé (débrancher un retour contacteur) → sorties coupées immédiatement (sortie sûre sur `Error`)
 - [ ] Seuils `StepThreshold_Pct` définitifs à figer une fois validés
+- [ ] 🆕 **2026-07-03quinquies** — `MaxStepDescente` (défaut 2, `FB_Winch`/`FB_SpeedStep`) : en
+      descente, vérifier qu'à 100% joystick le palier ne dépasse JAMAIS `MaxStepDescente` (charge
+      entraînante, limitation couple pas vitesse) ; en montée, vérifier que les 5 paliers normaux
+      sont inchangés. Valeur `2` indicative, à ajuster selon comportement réel du câble/charge.
 - [ ] **Avant de câbler le CAN réel ou le bouton Reset IHM** : re-tester spécifiquement la
       perte joystick/CAN (`SafeStop`) et un Reset maintenu, actuellement inatteignables en
       banc d'essai (`CanOnline`/`CanOperational` figés `TRUE`, `Reset` figé `FALSE`)

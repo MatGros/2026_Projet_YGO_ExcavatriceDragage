@@ -21305,10 +21305,10 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639186134728230298</Single>
+        <Single Name="Timestamp" Type="long">639186348768882500</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-        <Single Name="UniqueIdGenerator" Type="string">5427</Single>
+        <Single Name="UniqueIdGenerator" Type="string">5443</Single>
         <Null Name="TypeList" />
         <Single Name="NeedsBusCycle" Type="bool">False</Single>
         <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -21800,8 +21800,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5424</Single>
-                      <Single Name="EditorPositionId" Type="long">5425</Single>
+                      <Single Name="PositionId" Type="long">5438</Single>
+                      <Single Name="EditorPositionId" Type="long">5439</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_InputOffsets</Single>
                       </Single>
@@ -21819,8 +21819,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5426</Single>
-                      <Single Name="EditorPositionId" Type="long">5427</Single>
+                      <Single Name="PositionId" Type="long">5440</Single>
+                      <Single Name="EditorPositionId" Type="long">5441</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_OutputOffsets</Single>
                       </Single>
@@ -23665,8 +23665,8 @@
                     <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">4580</Single>
-                      <Single Name="EditorPositionId" Type="long">4581</Single>
+                      <Single Name="PositionId" Type="long">5442</Single>
+                      <Single Name="EditorPositionId" Type="long">5443</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">Number of SDO</Single>
                       </Single>
@@ -41869,7 +41869,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639186289831953912</Single>
+        <Single Name="Timestamp" Type="long">639186353616446283</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4154</Single>
@@ -42031,6 +42031,19 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4137</Single>
                             <Single Name="EditorPositionId" Type="long">4138</Single>
+                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                                <List2 Name="Mappings">
+                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                    <Single Name="CreateVariable" Type="bool">True</Single>
+                                    <Single Name="Variable" Type="string">EmergencyStopOk</Single>
+                                  </Single>
+                                </List2>
+                              </Single>
+                            </Single>
+                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
+                              <Single Name="Default" Type="string">Retour etat contacteur de puissance géré par arrêt d'urgence</Single>
+                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit0</Single>
@@ -46801,6 +46814,48 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+        <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
+        <Single Name="Name" Type="string">CHARIOT</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
+        <Null Name="EmbeddedTypeGuids" />
+        <Single Name="Timestamp" Type="long">639186364142601753</Single>
+      </Single>
+      <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
+        <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">CODEUR</Single>
@@ -46954,48 +47009,6 @@
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
         <Single Name="Timestamp" Type="long">639184353127028991</Single>
-      </Single>
-      <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
-        <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-        <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
-        <Single Name="Name" Type="string">TRANSLATION</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
-        <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639186240194723934</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47938,11 +47951,11 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">085766fd-043e-4545-8e8d-d651d56d5d3b</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639186134727987317</Single>
+        <Single Name="Timestamp" Type="long">639186348768622492</Single>
       </Single>
       <Single Name="Object" Type="{085766fd-043e-4545-8e8d-d651d56d5d3b}" Method="IArchivable">
         <Single Name="Device" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-          <Single Name="UniqueIdGenerator" Type="string">5160</Single>
+          <Single Name="UniqueIdGenerator" Type="string">5166</Single>
           <Null Name="TypeList" />
           <Single Name="NeedsBusCycle" Type="bool">False</Single>
           <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -52579,8 +52592,8 @@ END_VAR</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                         <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                        <Single Name="PositionId" Type="long">5159</Single>
-                        <Single Name="EditorPositionId" Type="long">5160</Single>
+                        <Single Name="PositionId" Type="long">5165</Single>
+                        <Single Name="EditorPositionId" Type="long">5166</Single>
                         <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                           <Single Name="Default" Type="string">Number of SDO</Single>
                         </Single>
@@ -86895,6 +86908,757 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">76850fab-1917-4cc9-8359-cd30b43ef48c</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">E_ChariotCommMode</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186364896506775</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_ChariotCommMode :
+(
+    ETHERCAT    := 0,   (* Nominal : mot commande/état + consigne fréquence via EtherCAT (AC600) *)
+    DEGRADED_IO := 1    (* Dégradé : relais de sens + présélection vitesse PV/GV (TOR), vitesse/rampes réglées sur le variateur en local *)
+);
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">76850fab-1917-4cc9-8359-cd30b43ef48c_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">18</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CHARIOT</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">74971587-0a2d-4aeb-a628-2984ee284fbf</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">GVL_Chariot_M3_Stub</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">ffbfa93a-b94d-45fc-a329-229860183b1d</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186400702273163</Single>
+      </Single>
+      <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🧪 GVL_Chariot_M3_Stub — Variables STUB M3
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.2.md §7
+   🔧 CORRECTIF (2026-07-03) : réintégration de M3_RelayFwd/Rev/SpeedGv,
+      M3_ContactorFeedbackFwd/Rev, M3_DriveFaultFeedback,
+      M3_PositionSensorTarget — retirés par erreur le 2026-07-03
+      (câblage I/O réel pas encore fait, PRG_MAIN.st en dépend toujours
+      → 31 erreurs de compilation). Seul `M3_BrakeCmd` est réel (I/O
+      Mapping Device.export, 2026-07-02) — il ne revient PAS ici.
+   ═══════════════════════════════════════════════════════════════ *)
+
+VAR_GLOBAL
+    StubChariotPositionSelect_IHM : INT := 0;   // 🖥️ Sélecteur test maintenance (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)
+
+    M3_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M3 (STUB, DEGRADED_IO)
+    M3_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M3 (STUB, DEGRADED_IO)
+    M3_RelaySpeedGv          : BOOL;   // 🔌 Sortie — présélection GV M3 (STUB, DEGRADED_IO)
+
+    // 🔧 Mirés activement par PRG_MAIN.st (bloc 🧪 SIMULATION) sur les commandes ci-dessus (contacteur "idéal")
+    M3_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M3 (STUB, miroir de M3_RelayFwd)
+    M3_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M3 (STUB, miroir de M3_RelayRev)
+    M3_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M3 (STUB, miroir de M3_BrakeCmd réel)
+
+    // 🎯 Capteur position cible (PAS de miroir automatique — forcer manuellement en instance CODESYS, Partie11 §9bis)
+    M3_PositionSensorTarget  : BOOL;   // 🔌 Entrée — capteur position cible M3 (STUB, arbitré par sélecteur ci-dessus)
+
+    // 🔴 Retour défaut variateur — PAS de miroir, reste FALSE tant que non câblé
+    M3_DriveFaultFeedback    : BOOL;   // 🔌 Entrée — défaut variateur TOR M3 (STUB, toujours FALSE)
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">74971587-0a2d-4aeb-a628-2984ee284fbf_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Null Name="NetVarProperties" />
+        <Single Name="ParameterList" Type="bool">False</Single>
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CHARIOT</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">650eae5d-5591-4580-9c15-34d6b3342724</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Chariot</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186364896694071</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">
+
+// === IMPLEMENTATION (SQUELETTE — corps à compléter/vérifier avant collage, voir TBD en tête de fichier) ===
+
+// 🛑 1. GATE (Enable / EmergencyStopOk) — neutralisation totale, sorties sûres
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
+    DriveControlWord := 0; DriveFreqRefHz := 0.0;
+
+    Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
+          DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
+          DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
+    BrakeCmd := Brake.BrakeCmd;
+    BrakeContactorCheck := Brake.ContactorCheck;
+
+    CommandedDirection := 0;
+    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    ApproachTimer(IN := FALSE, PT := ApproachTime);
+    SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+
+    ArrivalLock := FALSE;
+    DegradedMoveAuthorized := FALSE;
+    DegradedStopSettleTon(IN := FALSE, PT := DegradedStopSettleTime);
+    CommModeLocked := CommMode;   // Neutralisé = libre de choisir le mode (pas de mouvement en cours)
+
+    State := E_State.DISABLED;
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms (valeur de secours si delta temps invalide)
+
+// 🔑 2. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🔒 2bis. GARDE CommMode — 🆕 v1.1 (F5) : pas de changement de mode de communication en cours
+// de mouvement. Utilise Busy du cycle PRÉCÉDENT (pas encore recalculé ce cycle, §9) : tant que
+// l'axe était en mouvement au dernier scan, CommMode externe est ignoré.
+IF NOT Busy THEN
+    CommModeLocked := CommMode;
+END_IF;
+
+// 📡 3. CAPTEUR POSITION CIBLE (debounce commun aux 2 modes)
+CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
+TargetReached := CaptorDebounceTon.Q;
+
+// ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
+RampTargetPct := 0.0;
+IF NOT SafeStop AND StartStop THEN
+    RampTargetPct := ABS(SpeedRefPct);  // 🔧 2026-07-02 : SpeedRefPct peut arriver signé (AxisCmdX.SpeedRef) — ABS() ici
+END_IF;
+
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE — ETHERCAT uniquement (Partie4 §5)
+// DEGRADED_IO : pas d'automatisme, le choix PV/GV reste manuel (joystick) — voir §5bis
+IF CommModeLocked = E_ChariotCommMode.ETHERCAT THEN
+    ApproachTimer(IN := (StartStop AND NOT SafeStop), PT := ApproachTime);
+    IF ApproachTimer.Q THEN
+        RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
+    END_IF;
+ELSE
+    ApproachTimer(IN := FALSE, PT := ApproachTime);
+END_IF;
+
+// 🎯 4ter. ARRÊT EXACT SUR CAPTEUR — §9bis (commun aux 2 modes, comportement PROPOSÉ à valider)
+// Verrouille (ArrivalLock) tant que le capteur cible reste actif ET que le sens commandé est
+// le MÊME que celui qui a mené à l'arrivée (permet de repartir immédiatement en sens inverse,
+// contrairement à un blocage total qui empêcherait de quitter la position).
+ArrivalEdge(CLK := TargetReached);
+IF ArrivalEdge.Q THEN
+    DirectionAtArrival := CommandedDirection;
+END_IF;
+ArrivalLock := TargetReached AND (Direction = DirectionAtArrival) AND (DirectionAtArrival &lt;&gt; 0);
+IF ArrivalLock THEN
+    RampTargetPct := 0.0;   // Pertinent en ETHERCAT (consigne proportionnelle) ; sans effet direct en DEGRADED_IO, voir §5bis/DegradedMoveAuthorized
+END_IF;
+
+SpeedRamp(Target := RampTargetPct,
+          AccelRate := RampAccelRate,
+          DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
+          CycleTimeS := CycleTimeCalc.CycleTimeS);
+
+// ⏱️ 4quater. CONFIRMATION D'ARRÊT PHYSIQUE — 🆕 v1.1 (F1)
+// DEGRADED_IO : basée sur un délai RÉEL depuis la coupure du relais (RelayFwd/RelayRev tiennent
+// encore la valeur du cycle précédent à ce stade — pas encore recalculés, voir §5bis), PAS sur
+// la rampe logicielle SpeedRamp (sans lien physique en DEGRADED_IO, cf. correctif F1 en tête de fichier).
+DegradedStopSettleTon(IN := NOT (RelayFwd OR RelayRev), PT := DegradedStopSettleTime);
+IsStoppedConfirmed := SEL(CommModeLocked = E_ChariotCommMode.DEGRADED_IO,
+                          (ABS(SpeedRamp.Current) &lt; 0.1),   // ETHERCAT : rampe = consigne réelle
+                          DegradedStopSettleTon.Q);          // DEGRADED_IO : délai physique réel
+
+// 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (même principe que FB_Winch §3bis)
+IF Direction &lt;&gt; CommandedDirection THEN
+    IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
+        CommandedDirection := Direction;
+        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    ELSIF IsStoppedConfirmed THEN
+        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
+        IF DirectionChangeDelay.Q THEN
+            CommandedDirection := Direction;
+            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        END_IF;
+    ELSE
+        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    END_IF;
+ELSE
+    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+END_IF;
+
+// 🆕 v1.1 (F1) — Autorisation de mouvement DEGRADED_IO : IMMÉDIATE, découplée de la rampe logicielle
+DegradedMoveAuthorized := StartStop AND NOT SafeStop AND NOT ArrivalLock;
+
+MovementRequested := SEL(CommModeLocked = E_ChariotCommMode.DEGRADED_IO,
+                          (CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1),  // ETHERCAT : lié à la rampe réelle (pilote le frein en douceur)
+                          (CommandedDirection &lt;&gt; 0) AND DegradedMoveAuthorized);          // DEGRADED_IO : immédiat
+
+// 🔀 5bis. SORTIE PHYSIQUE SELON CommModeLocked
+IF CommModeLocked = E_ChariotCommMode.ETHERCAT THEN
+    RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
+
+    // 🔴 TBD — mise à l'échelle %→Hz : calcul linéaire explicite (LIN_TRAFO NON vérifié, voir tête de fichier)
+    DriveFreqRefHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
+    // 🔴 TBD — DriveControlWord : layout de bits non disponible à la rédaction (Run/Stop/Enable/Reset
+    // variateur selon protocole AC600 — À CONFIRMER avant tout collage, ne pas déduire de bits ici).
+    DriveControlWord := 0;
+
+    HystGv(IN := 0, HIGH := 0, LOW := 0);   // Inerte en ETHERCAT — instance maintenue pour cohérence cyclique
+ELSE // DEGRADED_IO
+    DriveFreqRefHz := 0.0;
+    DriveControlWord := 0;
+
+    // 🪜 Sélection PV/GV par HYSTERESIS (lib Util, Partie3 §0) — anti-battement, PAS de FB_SpeedStep
+    // (table 5 paliers disproportionnée pour un choix à 2 états)
+    // 🔧 2026-07-02 : ABS() — SpeedRefPct signé, les seuils Threshold sont des seuils de MAGNITUDE
+    // (60%/40%) ; sans ABS() une consigne négative (sens arrière) ne dépasserait jamais HIGH et
+    // resterait bloquée en PV quelle que soit la vitesse réelle demandée en marche arrière.
+    SpeedRefInt := REAL_TO_INT(ABS(SpeedRefPct));
+    HystGv(IN := SpeedRefInt, HIGH := REAL_TO_INT(DegradedGvThresholdHighPct), LOW := REAL_TO_INT(DegradedGvThresholdLowPct));
+    RelaySpeedGv := NOT HystGv.OUT;   // Convention FB_SpeedStep : OUT=TRUE en régime bas → NOT OUT = seuil haut franchi (GV)
+
+    // 🆕 v1.1 (F1) — coupure IMMÉDIATE sur DegradedMoveAuthorized=FALSE (StartStop=FALSE, SafeStop,
+    // ou ArrivalLock) : ne dépend plus du temps de décroissance de la rampe logicielle.
+    RelayFwd := (CommandedDirection = 1) AND DegradedMoveAuthorized;
+    RelayRev := (CommandedDirection = -1) AND DegradedMoveAuthorized;
+END_IF;
+
+// 🛑 6. FREIN (composé, réutilisé tel quel) — indépendant du mode
+Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
+      ContactorFeedback := BrakeFeedback,
+      DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
+      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
+BrakeCmd := Brake.BrakeCmd;
+BrakeContactorCheck := Brake.ContactorCheck;
+
+// 🔍 7. DOUBLE VÉRIFICATION CONTACTEURS DE SENS — pertinent en DEGRADED_IO uniquement
+// (en ETHERCAT, RelayFwd/RelayRev restent FALSE ci-dessus, donc pas de fausse incohérence
+// tant que les retours câblés lisent bien FALSE au repos)
+FwdContactorCheck.Command := RelayFwd;
+FwdContactorCheck.Feedback := ContactorFeedbackFwd;
+TonFwdFeedback(IN := (RelayFwd &lt;&gt; ContactorFeedbackFwd), PT := ContactorFeedbackTimeout);
+IF TonFwdFeedback.Q THEN
+    FwdContactorCheck.StuckClosed := (NOT RelayFwd AND ContactorFeedbackFwd);
+    FwdContactorCheck.StuckOpen   := (RelayFwd AND NOT ContactorFeedbackFwd);
+ELSIF ResetEdge.Q THEN
+    FwdContactorCheck.StuckClosed := FALSE; FwdContactorCheck.StuckOpen := FALSE;
+END_IF;
+
+RevContactorCheck.Command := RelayRev;
+RevContactorCheck.Feedback := ContactorFeedbackRev;
+TonRevFeedback(IN := (RelayRev &lt;&gt; ContactorFeedbackRev), PT := ContactorFeedbackTimeout);
+IF TonRevFeedback.Q THEN
+    RevContactorCheck.StuckClosed := (NOT RelayRev AND ContactorFeedbackRev);
+    RevContactorCheck.StuckOpen   := (RelayRev AND NOT ContactorFeedbackRev);
+ELSIF ResetEdge.Q THEN
+    RevContactorCheck.StuckClosed := FALSE; RevContactorCheck.StuckOpen := FALSE;
+END_IF;
+
+// 🧾 8. ERRORID (bitfield, cumul — effacé bit à bit si cause disparue + reset front)
+IF Brake.Error THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
+
+IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
+
+// 🔴 TBD — bit3 défaut variateur : uniquement basé sur DriveFaultFeedback TOR SI câblé (ne
+// jamais stubber ce bit si le retour n'existe pas encore — cf. principe codeur TBD FB_Safety_Winch)
+IF DriveFaultFeedback THEN
+    ErrorId := ErrorId OR 16#0008;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFF7;
+END_IF;
+
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+// 🚦 9. STATE MACHINE (phase — orthogonale à Error, Partie3 §2)
+// ⚠️ En DEGRADED_IO, cet indicateur reste basé sur SpeedRamp.Current (valeur logicielle sans lien
+// physique direct, cf. F7) : usage diagnostic/IHM uniquement, PAS utilisé pour une décision de
+// sécurité (celles-ci utilisent DegradedMoveAuthorized/IsStoppedConfirmed, calculés séparément).
+IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
+    State := E_State.STOPPING;
+ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
+    State := E_State.BUSY;
+ELSE
+    State := E_State.READY;
+END_IF;
+
+Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING) OR RelayFwd OR RelayRev;
+
+Done := FALSE;   // Pas de notion de "terminé" ponctuel sans FB_Cycle — présent pour conformité
+
+// 🛡️ 10. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7)
+IF Error THEN
+    RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
+    DriveControlWord := 0; DriveFreqRefHz := 0.0;
+    BrakeCmd := FALSE;
+END_IF;
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">650eae5d-5591-4580-9c15-34d6b3342724_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md
+   🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
+      plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
+   🔀 CommMode (E_TranslationCommMode) — sélection MANUELLE, verrouillée
+      pendant un mouvement (CommModeLocked, correctif v1.1 F5 — voir §2bis) :
+        - ETHERCAT    : mot de commande/état + consigne fréquence (proportionnelle)
+        - DEGRADED_IO : RelayFwd/RelayRev + RelaySpeedGv (2 paliers PV/GV),
+                        vitesse et rampes réglées LOCALEMENT sur le variateur
+   🧩 Compose FB_Brake (réutilisé TEL QUEL depuis _COMMON, nouvelle instance
+      + nouveaux réglages RETAIN propres à M3 — pas de FB_Brake spécifique,
+      voir Partie11 §3).
+   🧱 Réutilisation lib Util (Partie3 §0) : HYSTERESIS pour la sélection
+      PV/GV en DEGRADED_IO (préféré à FB_SpeedStep — table 5 paliers/4
+      relais disproportionnée pour un choix à 2 états, voir Partie11 §3).
+
+   🔧 CORRECTIFS retour terrain — revue automatisme/mise en service 2026-07-02
+      (Partie11 passe v1.0 → v1.1, voir doc pour le détail complet) :
+      1. [F1 — BLOQUANT corrigé] En DEGRADED_IO, RelayFwd/RelayRev restaient
+         commandés tant que la rampe LOGICIELLE SpeedRamp.Current ne repassait
+         pas sous 0.1 % — or cette rampe n'a AUCUN lien avec la vitesse physique
+         réelle en DEGRADED_IO (vitesse en tout-ou-rien PV/GV, fixée sur le
+         variateur). Résultat : jusqu'à ~2,5 s de roulage à pleine vitesse
+         PV/GV après passage sur le capteur cible (risque de choc en bout de
+         course). Corrigé : nouvelle variable DegradedMoveAuthorized, calculée
+         directement depuis StartStop/SafeStop/ArrivalLock (immédiate, aucune
+         dépendance à la rampe) — voir §4quater et §5bis.
+      2. [F5 — corrigé] Ajout d'une garde logicielle CommModeLocked (§2bis) :
+         le changement de CommMode n'est plus pris en compte tant qu'un
+         mouvement est en cours (Busy de l'état précédent), en complément de
+         la consigne procédurale (bascule manuelle hors mouvement).
+      3. [F7 — clarifié] Les paramètres de rampe (RampAccelRate/RampDecelNormalRate/
+         RampDecelFastRate) ne pilotent une vitesse physique réelle qu'en
+         ETHERCAT. En DEGRADED_IO ils ne servent plus qu'à SpeedRamp pour
+         l'affichage State/StateAtError — le nouveau DegradedStopSettleTime
+         remplace la rampe comme confirmation d'arrêt physique pour l'interlock
+         de sens (§5, IsStoppedConfirmed).
+   🔴 SQUELETTE — sections encore marquées TBD, volontairement non comblées
+      (Ne JAMAIS approximer, Partie3 §0/CLAUDE.md) :
+        - Layout exact des bits DriveControlWord/DriveStatusWord AC600
+          (non disponible à la rédaction — voir doc constructeur variateur).
+        - Interface exacte LIN_TRAFO (Util) : NON vérifiée ici. Le
+          projet a déjà eu une mauvaise supposition d'interface sur
+          HYSTERESIS (correctif FB_SpeedStep 2026-07-01) — pour ne pas
+          répéter l'erreur, la mise à l'échelle %→Hz ci-dessous est un
+          calcul linéaire explicite en attendant confirmation ; à
+          remplacer par LIN_TRAFO si son interface réelle est vérifiée.
+        - Comportement "arrêt exact sur capteur, même direction verrouillée
+          jusqu'à inversion joystick" (§9bis) : logique PROPOSÉE, absente
+          de toute doc existante — à valider avec l'utilisateur avant
+          application (pas un simple report du contrat FB standard).
+   ═══════════════════════════════════════════════════════════════ *)
+
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Translation) ===
+
+FUNCTION_BLOCK PUBLIC FB_Chariot
+VAR_INPUT
+    Enable                      : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
+    Reset                       : BOOL;        // Acquittement défaut (front)
+    EmergencyStopOk             : BOOL;        // Chaîne AU réarmée + conditions globales OK
+    Mode                        : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
+    StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
+    SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
+    CommMode                    : E_ChariotCommMode; // Sélection MANUELLE (maintenance) — verrouillée pendant un mouvement, voir §2bis
+    Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdX.Direction) — source d'autorité du sens (interlock §5)
+    SpeedRefPct                 : REAL;        // 🔧 2026-07-02 : AxisCmdX.SpeedRef est désormais SIGNÉ (-100..+100 %) —
+                                                 // seule la MAGNITUDE est utilisée ici (ABS() en §4 et §5bis), Direction
+                                                 // ci-dessus reste la source d'autorité du sens/interlock (inchangé)
+    PositionSensorTarget        : BOOL;        // Capteur position cible courante (sélection de la cible = hors périmètre, en amont — IHM/FB_Cycle)
+
+    // 🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
+    DriveStatusWord              : WORD;       // 🔴 TBD bit layout exact — mot d'état AC600 lu depuis l'image d'entrée EtherCAT
+    DriveActualFreqHz            : REAL;       // Fréquence réelle mesurée (retour variateur) — pas de mesure de courant (Partie4 §5)
+
+    // 🔌 Spécifique DEGRADED_IO (retours câblés TOR)
+    ContactorFeedbackFwd         : BOOL;       // Retour d'état câblé contacteur sens avant
+    ContactorFeedbackRev         : BOOL;       // Retour d'état câblé contacteur sens arrière
+    DriveFaultFeedback           : BOOL;       // Retour TOR défaut variateur, SI câblé sur une sortie relais dédiée du variateur (sinon laisser à FALSE côté appelant — ne pas stubber un "pas de défaut" arbitraire)
+
+    // 🔌 Frein (indépendant du mode — circuit propre, comme le treuil)
+    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
+
+    // Réglages rampe (RETAIN) — pilotent une vitesse PHYSIQUE réelle en ETHERCAT uniquement (correctif v1.1 F7)
+    RampAccelRate                : REAL := 20.0;    // %/s — accélération
+    RampDecelNormalRate          : REAL := 40.0;    // %/s — décélération normale (StartStop=FALSE)
+    RampDecelFastRate            : REAL := 100.0;   // %/s — décélération RAPIDE (SafeStop=TRUE)
+    DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt (interlock, identique principe FB_Winch)
+
+    // Réglages ETHERCAT uniquement (RETAIN)
+    ApproachTime                 : TIME := T#5s;    // Temps estimé avant déclenchement du ralentissement auto (Partie4 §5)
+    ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (PV) une fois ApproachTime écoulé
+    DriveFreqScaleMaxHz          : REAL := 50.0;    // Échelle 0..100 % → 0..DriveFreqScaleMaxHz Hz (calcul linéaire, voir 🔴 TBD LIN_TRAFO en tête de fichier)
+
+    // Réglages DEGRADED_IO uniquement (RETAIN)
+    DegradedGvThresholdHighPct   : REAL := 60.0;    // Seuil bascule PV→GV (HYSTERESIS HIGH)
+    DegradedGvThresholdLowPct    : REAL := 40.0;    // Seuil bascule GV→PV (HYSTERESIS LOW)
+    ContactorFeedbackTimeout     : TIME := T#500ms; // Timeout cohérence commande/retour contacteurs de sens (DEGRADED_IO)
+    DegradedStopSettleTime       : TIME := T#1s;    // 🆕 v1.1 (F1) — délai physique estimé d'arrêt réel après coupure relais (à régler selon la décélération interne réelle configurée sur le variateur en PV/GV) ; remplace SpeedRamp comme confirmation d'arrêt pour l'interlock de sens en DEGRADED_IO
+
+    // Réglages communs
+    CaptorDebounce                : TIME := T#100ms; // Filtrage capteur de position cible
+    BrakeDelayContactClose        : TIME := T#100ms; // Voir FB_Brake
+    BrakeDelayMagnetise           : TIME := T#300ms; // Voir FB_Brake
+    BrakeDelayMotorDecel          : TIME := T#500ms; // Voir FB_Brake
+    BrakeFeedbackTimeout          : TIME := T#1s;    // Voir FB_Brake
+END_VAR
+VAR_OUTPUT
+    Ready               : BOOL;
+    Busy                : BOOL;
+    Done                : BOOL;
+    Error               : BOOL;
+    ErrorId             : WORD;        // bit0: Brake.Error ; bit1: contacteur sens Fwd (DEGRADED_IO) ; bit2: contacteur sens Rev (DEGRADED_IO) ; bit3: défaut variateur (DriveFaultFeedback, si câblé)
+    State               : E_State;
+    StateAtError        : E_State;
+    TargetReached        : BOOL;       // Capteur position cible confirmé (debounce) — voir §9bis
+
+    // 🔌 Sorties ETHERCAT — à mapper sur l'image de sortie EtherCAT du variateur (SI CommModeLocked=ETHERCAT, sinon inertes)
+    DriveControlWord     : WORD;       // 🔴 TBD — mot de commande AC600, layout non câblé (voir tête de fichier)
+    DriveFreqRefHz        : REAL;      // Consigne fréquence écrite au variateur
+
+    // 🔌 Sorties DEGRADED_IO — à mapper en I/O Mapping CODESYS (SI CommModeLocked=DEGRADED_IO, sinon forcées FALSE)
+    RelayFwd              : BOOL;      // 🔌 Contacteur sens avant
+    RelayRev               : BOOL;     // 🔌 Contacteur sens arrière
+    RelaySpeedGv           : BOOL;     // 🔌 FALSE = PV (défaut), TRUE = GV — câblé sur entrée présélection vitesse AC600
+
+    // 🔌 Frein (indépendant du mode)
+    BrakeCmd                : BOOL;    // Commande bobine frein — TRUE = relâché
+
+    // Diag
+    FwdContactorCheck    : ST_ContactorCheck;  // Diag contacteur sens avant (pertinent en DEGRADED_IO)
+    RevContactorCheck    : ST_ContactorCheck;  // Diag contacteur sens arrière (pertinent en DEGRADED_IO)
+    BrakeContactorCheck  : ST_ContactorCheck;  // Diag contacteur frein (miroir de FB_Brake)
+END_VAR
+VAR
+    Brake                : FB_Brake;       // 🧩 Composé — séquence frein (réutilisé tel quel, Partie11 §3)
+    CycleTimeCalc        : FB_CycleTime;
+    SpeedRamp             : FB_Ramp;       // Rampe interne — vitesse physique réelle en ETHERCAT ; affichage State uniquement en DEGRADED_IO (v1.1)
+    ResetEdge            : R_TRIG;
+    ErrorEdge            : R_TRIG;
+    DirectionChangeDelay : TON;            // Interlock changement de sens (identique principe FB_Winch)
+    CommandedDirection   : INT;            // Sens réellement appliqué (figé pendant le mouvement)
+    TonFwdFeedback       : TON;
+    TonRevFeedback       : TON;
+    RampTargetPct        : REAL;
+    ApproachTimer         : TON;           // ETHERCAT uniquement — déclenche le ralentissement auto
+    CaptorDebounceTon     : TON;
+    HystGv                : HYSTERESIS;    // 🧱 Lib Util — sélection PV/GV (DEGRADED_IO)
+    SpeedRefInt            : INT;          // Consigne convertie en INT (interface HYSTERESIS)
+    ArrivalEdge            : R_TRIG;       // §9bis — détecte l'arrivée sur capteur cible
+    DirectionAtArrival     : INT;          // §9bis — sens verrouillé au moment de l'arrivée
+    ArrivalLock             : BOOL;        // §9bis — TRUE tant que le capteur cible bloque le sens d'arrivée
+    MovementRequested      : BOOL;         // Commun aux 2 modes — pilote FB_Brake
+    CommModeLocked          : E_ChariotCommMode; // 🆕 v1.1 (F5) — CommMode figé pendant un mouvement (Busy)
+    DegradedMoveAuthorized  : BOOL;        // 🆕 v1.1 (F1) — DEGRADED_IO : autorisation IMMÉDIATE du relais (StartStop/SafeStop/ArrivalLock, sans rampe)
+    DegradedStopSettleTon   : TON;         // 🆕 v1.1 (F1) — confirmation d'arrêt physique DEGRADED_IO (remplace SpeedRamp pour l'interlock)
+    IsStoppedConfirmed      : BOOL;        // 🆕 v1.1 — "vitesse confirmée nulle" par mode : rampe (ETHERCAT) ou temporisation (DEGRADED_IO)
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">650eae5d-5591-4580-9c15-34d6b3342724_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">715</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CHARIOT</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">aa6ebeb4-94ee-4410-be47-6e2c220eb221</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Safety_Chariot</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186367063185322</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Chariot) ===
+
+// 🛑 1. GATE — sécurité par défaut : pas de surveillance active = arrêt forcé du domaine
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    Ready := FALSE;
+    SafeStop := TRUE;              // Fail-safe : tant que la surveillance n'est pas garantie, on arrête
+    PowerCutOff := FALSE;
+    State := E_State.DISABLED;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+State := E_State.READY;
+
+// 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
+ResetEdge(CLK := Reset);
+
+// 🔍 3. DIAGNOSTIC DU DOMAINE CHARIOT
+IF NOT JoystickOnline OR NOT JoystickOperational THEN
+    ErrorId := ErrorId OR 16#0001;       // Perte joystick/CAN : pas de commande opérateur valide
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+// 🔴 TBD (EtherCAT AC600 non finalisé) : bit1 réservé perte EtherCAT variateur — NON câblé
+// dans ce lot. Ne jamais mettre un stub qui masquerait un vrai défaut : laisser le bit à 0
+// tant que la surveillance EtherCAT n'est pas fiabilisée revient à accepter ce risque, comme
+// pour le codeur treuil (FB_Safety_Winch) — décision à revalider avec l'utilisateur avant
+// mise en service réelle en mode ETHERCAT.
+
+// 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+SafeStop := Error;          // 🟧 Tout défaut du domaine → rampe décélération rapide (Enable maintenu)
+PowerCutOff := FALSE;       // 🧨 TBD — pas de ST_ContactorCheck de puissance câblé dans ce lot
+
+Busy := FALSE;
+Done := FALSE;
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">aa6ebeb4-94ee-4410-be47-6e2c220eb221_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🔌 FB_Safety_Chariot — Bloc safety MÉTIER du domaine Chariot (M3)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.2.md
+                   (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
+   🔧 2026-07-02 : renommage métier Translation→Chariot (demande utilisateur).
+      Préfixe I/O physique M3 inchangé (mapping matériel).
+   🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
+      un FB métier à part entière (pas une brique réduite).
+   📤 Sortie maîtresse SafeStop_Chariot : consommée en entrée par
+      FB_Chariot (M3).
+   ⚠️ PÉRIMÈTRE MINIMAL DE CE LOT (même logique que FB_Safety_Winch,
+      Partie9 §2 — premier lot testable) :
+      - ✅ Détecte la perte joystick/CAN (sans commande valide, le
+        chariot ne doit pas pouvoir bouger).
+      - 🔴 TBD (non câblé, PAS simulé) : perte EtherCAT variateur AC600
+        (VariateurAvailable de FB_DiagEthercat, non finalisé), défaut
+        variateur détaillé (au-delà du simple DriveFaultFeedback TOR
+        déjà géré dans FB_Chariot lui-même, bit3 ErrorId). Zone
+        clairement marquée ci-dessous — à câbler quand FB_DiagEthercat
+        AC600/M3 sera fiabilisé.
+      - `PowerCutOff` : FALSE pour ce lot (pas encore de
+        ST_ContactorCheck de puissance câblé — comme FB_Safety_Winch).
+   ═══════════════════════════════════════════════════════════════ *)
+
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Chariot) ===
+
+FUNCTION_BLOCK PUBLIC FB_Safety_Chariot
+VAR_INPUT
+    Enable              : BOOL;        // Active la surveillance
+    Reset               : BOOL;        // Front acquittement défauts
+    EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
+    Mode                : E_Mode;      // Mode courant (autorisations)
+    JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
+    JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
+    // 🔴 TBD (EtherCAT AC600 non finalisé) : ajouter ici VariateurAvailable
+    //     (FB_DiagEthercat AC600/M3) quand ce diag sera fiabilisé — ne PAS stubber en dur.
+END_VAR
+VAR_OUTPUT
+    Ready               : BOOL;
+    Busy                : BOOL;
+    Done                : BOOL;
+    Error               : BOOL;
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine chariot sans commande valide)
+    State               : E_State;
+    StateAtError        : E_State;
+    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
+    PowerCutOff         : BOOL;        // 🧨 Sortie maîtresse : coupure puissance amont (FALSE, TBD ce lot)
+END_VAR
+VAR
+    ResetEdge           : R_TRIG;
+    ErrorEdge           : R_TRIG;
+END_VAR</Single>
+            <Single Name="LineInfoPersistence" Type="string">aa6ebeb4-94ee-4410-be47-6e2c220eb221_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">157</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CHARIOT</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">ca500197-54ce-48f4-a1e7-d2dc28a40393</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">ST_EncoderCalib</Single>
@@ -86966,6 +87730,102 @@ END_TYPE
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">36695a2f-b087-4010-9536-2a42896e5ceb</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">GVL_Encoder_Stub</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">ffbfa93a-b94d-45fc-a329-229860183b1d</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186393140996535</Single>
+      </Single>
+      <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🧲 GVL_Encoder_Stub — Variables IHM/paramètres codeurs COD1 (M1) + COD2 (M2)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §5/§7bis
+   🎯 Regroupe TOUT ce qui doit être mappé IHM ou réglé pour le pipeline
+      codeur/homing (un seul endroit à consulter en mise en service) :
+      - Boutons IHM (front) : Reset (acquittement), ConfirmCoherence,
+        Home (partagé M1+M2 — référencement simultané, Partie10 §1).
+      - Paramètre RETAIN : TopSensorPositionM (cible homing nominal, m).
+   ⚠️ `M1_Reset_IHM`/`M2_Reset_IHM` acquittent LES DEUX FB de ce codeur
+      (`instEncoderAbsMx` + `instHomingMx`) — même principe que le
+      "bouton général" décrit en Partie3 §5, mais scindé par codeur
+      pour ce lot (plus simple à tester en mise en service). À
+      généraliser en bouton machine unique quand `FB_Modes`/IHM existera.
+   🔴 TOUJOURS STUB (pas de vrai bouton IHM câblé) : basculer TRUE puis
+      FALSE dans la vue instance CODESYS pour simuler un appui (front).
+   ═══════════════════════════════════════════════════════════════ *)
+
+// === DECLARATION (à coller dans la partie déclaration du GVL GVL_Encoder_Stub) ===
+
+VAR_GLOBAL
+    // 🔑 Reset — acquittement défauts instEncoderAbsMx + instHomingMx (front)
+    M1_Reset_IHM             : BOOL;   // 🖥️ À mapper bouton IHM — acquitte COD1 (Abs + Homing)
+    M2_Reset_IHM             : BOOL;   // 🖥️ À mapper bouton IHM — acquitte COD2 (Abs + Homing)
+
+    // 🔓 ConfirmCoherence — lève le doute redémarrage (Partie10 §3.7, front)
+    M1_ConfirmCoherence_IHM  : BOOL;   // 🖥️ À mapper bouton IHM dédié COD1
+    M2_ConfirmCoherence_IHM  : BOOL;   // 🖥️ À mapper bouton IHM dédié COD2
+
+    // 🎯 Mode homing — 2026-07-03 : sélecteur pour exploitation vs maintenance
+    HomingMode_IHM           : INT := 3;   // 🖥️ 1=M1seul, 2=M2seul, 3=Both(normal exploitation)
+
+    // 🎯 Home — bouton UNIQUE (action selon HomingMode_IHM)
+    StubHomeButton_IHM       : BOOL;   // 🖥️ À mapper bouton IHM — commande Home M1/M2/Both selon mode
+END_VAR
+
+VAR_GLOBAL RETAIN
+    // 🎯 Cible de homing nominal — paramétrable PAR TREUIL (Partie10 §7bis).
+    // 🖥️ IHM : valeur en MÈTRES au-dessus du niveau d'eau, ajustée via la procédure
+    // de calibration (Partie10 §7bis) — c'est LE paramètre qui rend le homing utilisable.
+    M1_TopSensorPositionM    : REAL := 12.5;
+    M2_TopSensorPositionM    : REAL := 12.5;
+END_VAR
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">36695a2f-b087-4010-9536-2a42896e5ceb_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Null Name="NetVarProperties" />
+        <Single Name="ParameterList" Type="bool">False</Single>
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CODEUR</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">ac34b69a-d1e5-4495-94d7-6f60d31a26d9</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">FB_Encoder_Abs</Single>
@@ -86995,7 +87855,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186138650302094</Single>
+        <Single Name="Timestamp" Type="long">639186362820845378</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87034,11 +87894,8 @@ EncoderAvailable := (ErrorId AND 16#0001) = 0;
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
 IF EncoderAvailable THEN
-    IF InvertDirection THEN
-        RawPos := 16#FFFFFFFF - RawPosIn;
-    ELSE
-        RawPos := RawPosIn;
-    END_IF;
+    RawPos := RawPosIn;   // 🔧 2026-07-03 : sens de comptage géré côté codeur (CoE 6000h bit0,
+                          // startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
     AngleRaw := UDINT_TO_UINT(RawPos MOD PointsPerRev);
     TurnCount := RawPos / PointsPerRev;
 END_IF;
@@ -87098,7 +87955,7 @@ Done := PresetAck;
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md §3/§6
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
@@ -87124,6 +87981,15 @@ Done := PresetAck;
       périmètre du document) — `FB_Encoder_Safety` (overspeed) devient
       orphelin tant qu'un lot dédié ne décide pas de son sort (fusion
       avec le "saut incohérent" Partie10 §3.5, ou reprise telle quelle).
+   🔧 CORRECTIF (2026-07-03, retour terrain) : `InvertDirection` **retiré**.
+      Confirmé terrain : l'objet CoE `6000h` (bit0 : 4→5) inverse le sens
+      de comptage **côté codeur** (F58x8 Kübler), configuré en **Startup
+      Parameter** CODESYS (init automate) — pas un paramètre PLC. L'ancien
+      calcul logiciel (`16#FFFFFFFF - RawPosIn`) était de toute façon
+      **buggé** : il inversait sur toute la plage `UDINT` (32 bits) au
+      lieu de la plage réelle du codeur (25 bits, `PointsPerRev ×
+      MultiTurnRevsMax`), produisant des positions incohérentes après
+      homing. Voir Partie10 §3bis.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===
@@ -87138,7 +88004,6 @@ VAR_INPUT
     AlarmsIn            : UINT;        // Brut EtherCAT (ex. COD1_Alarms)
     WarningsIn          : UINT;        // Brut EtherCAT (ex. COD1_Warnings) — informatif seulement
     SlaveOperational    : BOOL;        // FB_DiagEthercat — esclave EtherCAT opérationnel
-    InvertDirection     : BOOL := FALSE;
     PointsPerRev        : UDINT := 8192;  // Résolution codeur confirmée (Partie10 §3.3)
     PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing (stub FALSE ce lot)
     PresetValue         : UDINT;       // Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)
@@ -87174,7 +88039,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">ac34b69a-d1e5-4495-94d7-6f60d31a26d9_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">689</Single>
+        <Single Name="UniqueIdGenerator" Type="string">940</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -87220,14 +88085,13 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186139243439489</Single>
+        <Single Name="Timestamp" Type="long">639186377198186819</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
-
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
@@ -87345,7 +88209,7 @@ HomingRefRaw := Calib.HomingRefRaw;
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur, flux NOMINAL uniquement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE DE CE LOT : flux **nominal** uniquement (capteur haut +
       bouton IHM, référencement à `TopSensorPositionM`, 1 instance par
       treuil, câblées sur le MÊME bouton IHM côté PRG_MAIN). Le flux
@@ -87383,7 +88247,10 @@ VAR_INPUT
     Mode                 : E_Mode;      // MAINT_N1 requis pour le flux nominal
     Home                 : BOOL;        // Demande de référencement (front, bouton IHM UNIQUE)
     ConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
-    TopPositionSensor    : BOOL;        // Capteur position haute CE TREUIL (confirmation physique)
+    TopPositionSensor    : BOOL;        // 🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils
+                                         // (les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
+                                         // IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
+                                         // voir PRG_MAIN.st
     TopSensorPositionM   : REAL := 12.5;  // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
     ContactorFeedbackFwd : BOOL;        // Retour contacteur sens avant CE TREUIL — arrêt confirmé
     ContactorFeedbackRev : BOOL;        // Retour contacteur sens arrière CE TREUIL — arrêt confirmé
@@ -87423,11 +88290,12 @@ VAR
     PresetValueCalc      : UDINT;       // = HomingRefTargetNominal (constant tant que PointsPerRev/MultiTurnRevsMax fixes)
     TargetPoints         : DINT;        // Écart signé TopSensorPositionM → points, figé pendant la séquence
     RawDiffRestart       : DINT;        // Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)
-END_VAR</Single>
+END_VAR
+</Single>
             <Single Name="LineInfoPersistence" Type="string">eb8b0254-cd0f-4e92-b481-14ca81915b75_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">281</Single>
+        <Single Name="UniqueIdGenerator" Type="string">915</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -87473,7 +88341,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186139402835887</Single>
+        <Single Name="Timestamp" Type="long">639186363330955596</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87534,7 +88402,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">f7c3c2a8-62d7-49a9-8267-fba1e82be805_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">197</Single>
+        <Single Name="UniqueIdGenerator" Type="string">242</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -89823,7 +90691,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186335154853344</Single>
+        <Single Name="Timestamp" Type="long">639186401082710449</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -89897,15 +90765,14 @@ FB_Joystick_0(
     // 🎯 --- Calibration ---
     Calibrate       := FALSE,                   // ⚠️ À câbler : bouton recalage neutre (front)
 
-    // 🎛️ --- Paramètres de traitement (valeurs par défaut conservées) ---
+    // 🎛️ --- Paramètres de traitement ---
     InvertX         := FALSE,
     InvertY         := FALSE,
-    Deadband        := 5.0,
+    Deadband        := 10.0,                    // 🔧 2026-07-02 (demande utilisateur) : 5.0 → 10.0 %
     FilterTime      := TIME#100ms,
     AccelRate       := 50.0,
     DecelRate       := 150.0
 );
-
 
 (* ═══════════════════════════════════════════════════════════════
    🧲 3. CODEUR — Acquisition + mise à l'échelle + homing (M1=COD1, M2=COD2)
@@ -89918,14 +90785,13 @@ FB_Joystick_0(
 
 instEncoderAbsM1(
     Enable              := TRUE,
-    Reset               := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset               := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1
+    EmergencyStopOk     := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
     AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
     WarningsIn          := COD1_Warnings,                   // 📡 I/O Mapping déjà existant
     SlaveOperational    := instDiagEthercat.EncoderM1.Operational,
-    InvertDirection     := TRUE,
     PresetRequest       := instHomingM1.PresetRequest,      // ✅ 2026-07-02 (1 cycle de retard, voir en-tête)
     PresetValue         := instHomingM1.PresetValue         // ✅ 2026-07-02
 );
@@ -89941,19 +90807,19 @@ instEncoderScaleM1(
     PointsPerRev    := 8192
 );
 
-(* 🎯 Homing M1 (flux nominal) — bouton IHM (stub) + capteur position haute (stub GVL M1) *)
+(* 🎯 Homing M1 (flux nominal) — bouton IHM (stub) + capteur position haute (stub GVL_Homing_Stub, commun M1+M2) *)
 instHomingM1(
     Enable               := TRUE,
-    Reset                := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk      := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset                := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1 (même bouton que instEncoderAbsM1)
+    EmergencyStopOk      := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
-    Home                 := StubHomeButton_IHM,              // ⚠️ Stub bouton IHM — piloté aussi sur M2 (même bouton)
-    ConfirmCoherence     := FALSE,                           // ⚠️ À câbler : bouton IHM dédié
-    TopPositionSensor    := M1_TopPositionSensor,            // 🧪 STUB GVL_Winch_M1_Stub — à câbler en I/O Mapping réel
+    Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 1) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
+    ConfirmCoherence     := M1_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
+    TopPositionSensor    := M1_M2_TopPositionSensor,         // 📡 I/O Mapping RÉEL — commun M1+M2 (remplace le stub GVL_Homing_Stub, supprimé 2026-07-02)
     TopSensorPositionM   := M1_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
-    ContactorFeedbackFwd := GVL_Winch_M1_Stub.M1_ContactorFeedbackFwd,         // 🧪 STUB GVL_Winch_M1_Stub
-    ContactorFeedbackRev := GVL_Winch_M1_Stub.M1_ContactorFeedbackRev,         // 🧪 STUB GVL_Winch_M1_Stub
-    BrakeFeedback        := M1_BrakeFeedback,                // 🧪 STUB GVL_Winch_M1_Stub
+    ContactorFeedbackFwd := M1_ContactorFeedbackFwd,         // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackRev := M1_ContactorFeedbackRev,         // 📡 I/O Mapping RÉEL (2026-07-02)
+    BrakeFeedback        := M1_BrakeFeedback,                // 🧪 STUB GVL_Winch_M1_Stub (seul signal encore non câblé)
     RawPos               := instEncoderAbsM1.RawPos,
     EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
     PresetAck            := instEncoderAbsM1.PresetAck,
@@ -89965,14 +90831,13 @@ instHomingM1(
 
 instEncoderAbsM2(
     Enable              := TRUE,
-    Reset               := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset               := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2
+    EmergencyStopOk     := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     RawPosIn            := COD2_PosValue,                   // 📡 I/O Mapping (mappé 2026-07-02)
     AlarmsIn            := COD2_Alarms,                     // 📡 I/O Mapping (mappé 2026-07-02)
     WarningsIn          := COD2_Warnings,                   // 📡 I/O Mapping (mappé 2026-07-02)
     SlaveOperational    := instDiagEthercat.EncoderM2.Operational,
-    InvertDirection     := FALSE,
     PresetRequest       := instHomingM2.PresetRequest,      // ✅ 2026-07-02 (1 cycle de retard, voir en-tête)
     PresetValue         := instHomingM2.PresetValue         // ✅ 2026-07-02
 );
@@ -89991,16 +90856,16 @@ instEncoderScaleM2(
 (* 🎯 Homing M2 (flux nominal) — MÊME bouton IHM que M1 (référencement simultané, Partie10 §1) *)
 instHomingM2(
     Enable               := TRUE,
-    Reset                := FALSE,                          // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk      := GVL_DEBUG.DBG_True,              // ⚠️ DEBUG : même stub que Joystick/Safety
+    Reset                := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2 (même bouton que instEncoderAbsM2)
+    EmergencyStopOk      := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
-    Home                 := StubHomeButton_IHM,              // ⚠️ Même bouton stub que M1 (référencement simultané)
-    ConfirmCoherence     := FALSE,                           // ⚠️ À câbler : bouton IHM dédié
-    TopPositionSensor    := M2_TopPositionSensor,            // 🧪 STUB GVL_Winch_M2_Stub — à câbler en I/O Mapping réel
+    Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 2) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
+    ConfirmCoherence     := M2_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
+    TopPositionSensor    := M1_M2_TopPositionSensor,         // 📡 I/O Mapping RÉEL — commun M1+M2 (remplace le stub GVL_Homing_Stub, supprimé 2026-07-02)
     TopSensorPositionM   := M2_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
-    ContactorFeedbackFwd := GVL_Winch_M2_Stub.M2_ContactorFeedbackFwd,         // 🧪 STUB GVL_Winch_M2_Stub
-    ContactorFeedbackRev := GVL_Winch_M2_Stub.M2_ContactorFeedbackRev,         // 🧪 STUB GVL_Winch_M2_Stub
-    BrakeFeedback        := M2_BrakeFeedback,                // 🧪 STUB GVL_Winch_M2_Stub
+    ContactorFeedbackFwd := M2_ContactorFeedbackFwd,         // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackRev := M2_ContactorFeedbackRev,         // 📡 I/O Mapping RÉEL (2026-07-02)
+    BrakeFeedback        := M2_BrakeFeedback,                // 🧪 STUB GVL_Winch_M2_Stub (seul signal encore non câblé)
     RawPos               := instEncoderAbsM2.RawPos,
     EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,
     PresetAck            := instEncoderAbsM2.PresetAck,
@@ -90025,7 +90890,9 @@ instSafetyWinchM1(
     Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
-    EncoderAvailable    := instEncoderAbsM1.EncoderAvailable
+    EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
+    ThermalFeedback     := M1_ThermalFeedback,        // 📡 I/O Mapping RÉEL (2026-07-02)
+    SlackCableDetected  := M1_M2_SlackCableSwitch     // 📡 I/O Mapping RÉEL — commun M1/M2 (même valeur câblée sur instSafetyWinchM2)
 );
 
 instSafetyWinchM2(
@@ -90035,7 +90902,9 @@ instSafetyWinchM2(
     Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
-    EncoderAvailable    := instEncoderAbsM2.EncoderAvailable
+    EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
+    ThermalFeedback     := M2_ThermalFeedback,        // 📡 I/O Mapping RÉEL (2026-07-02)
+    SlackCableDetected  := M1_M2_SlackCableSwitch     // 📡 I/O Mapping RÉEL — commun M1/M2 (même valeur câblée sur instSafetyWinchM1)
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -90057,30 +90926,29 @@ instWinchM1(
     Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
     SafeStop                := instSafetyWinchM1.SafeStop,
+    ForbidDescent           := instSafetyWinchM1.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := M1_SpeedStepTable,
-    ContactorFeedbackFwd    := GVL_Winch_M1_Stub.M1_ContactorFeedbackFwd,      // 🧪 STUB GVL_Winch_M1_Stub (§ ci-dessus)
-    ContactorFeedbackRev    := GVL_Winch_M1_Stub.M1_ContactorFeedbackRev,      // 🧪 STUB GVL_Winch_M1_Stub
-    BrakeFeedback           := M1_BrakeFeedback              // 🧪 STUB GVL_Winch_M1_Stub
+    ContactorFeedbackFwd    := M1_ContactorFeedbackFwd,      // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackRev    := M1_ContactorFeedbackRev,      // 📡 I/O Mapping RÉEL (2026-07-02)
+    BrakeFeedback           := M1_BrakeFeedback              // 🧪 STUB GVL_Winch_M1_Stub (seul signal encore non câblé)
 );
 
-// 📤 Sorties treuil M1 → variables STUB (GVL_Winch_M1_Stub), à remplacer par I/O Mapping réel
-GVL_Winch_M1_Stub.M1_RelayFwd  := instWinchM1.RelayFwd;
-GVL_Winch_M1_Stub.M1_RelayRev  := instWinchM1.RelayRev;
-M1_Contactor1 := instWinchM1.Contactor1;
-M1_Contactor2 := instWinchM1.Contactor2;
-M1_Contactor3 := instWinchM1.Contactor3;
-M1_Contactor4 := instWinchM1.Contactor4;
-GVL_Winch_M1_Stub.M1_BrakeCmd  := instWinchM1.BrakeCmd;
+// 📤 Sorties treuil M1 → I/O Mapping RÉEL (2026-07-02, RelayFwd/Rev/BrakeCmd/SpeedContactor_1..4)
+M1_RelayFwd         := instWinchM1.RelayFwd;
+M1_RelayRev         := instWinchM1.RelayRev;
+M1_SpeedContactor_1 := instWinchM1.Contactor1;
+M1_SpeedContactor_2 := instWinchM1.Contactor2;
+M1_SpeedContactor_3 := instWinchM1.Contactor3;
+M1_SpeedContactor_4 := instWinchM1.Contactor4;
+M1_BrakeCmd         := instWinchM1.BrakeCmd;
 
-// 🧪 SIMULATION (stub sans matériel réel, GVL_Winch_M1_Stub) — retours contacteurs
-// miroir des commandes (contacteur "idéal", 1 cycle de retard). Évite des faux
-// défauts StuckOpen/StuckClosed tant qu'aucun retour réel n'est câblé.
-// 🔴 À SUPPRIMER dès que le matériel réel sera câblé (voir DOC §7 Étape 9bis)
-GVL_Winch_M1_Stub.M1_ContactorFeedbackFwd := GVL_Winch_M1_Stub.M1_RelayFwd;
-GVL_Winch_M1_Stub.M1_ContactorFeedbackRev := GVL_Winch_M1_Stub.M1_RelayRev;
-M1_BrakeFeedback        := GVL_Winch_M1_Stub.M1_BrakeCmd;
+// 🧪 SIMULATION (stub GVL_Winch_M1_Stub) — SEUL le retour frein reste non câblé côté device :
+// miroir de la commande (contacteur "idéal", 1 cycle de retard). RelayFwd/Rev/ContactorFeedback
+// sont désormais des retours RÉELS câblés en I/O Mapping (plus de miroir logiciel — écrire dans
+// une variable d'entrée réelle serait écrasé par le bus à chaque cycle, donc supprimé).
+M1_BrakeFeedback := M1_BrakeCmd;
 
 instWinchM2(
     Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que M1 — à remplacer par FB_Modes
@@ -90089,27 +90957,93 @@ instWinchM2(
     Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
     SafeStop                := instSafetyWinchM2.SafeStop,
+    ForbidDescent           := instSafetyWinchM2.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
     Direction               := FB_Joystick_0.AxisCmdY.Direction,   // ⚠️ Même consigne que M1
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,    // ⚠️ Même consigne que M1
     SpeedStepTable          := M2_SpeedStepTable,
-    ContactorFeedbackFwd    := GVL_Winch_M2_Stub.M2_ContactorFeedbackFwd,      // 🧪 STUB GVL_Winch_M2_Stub
-    ContactorFeedbackRev    := GVL_Winch_M2_Stub.M2_ContactorFeedbackRev,      // 🧪 STUB GVL_Winch_M2_Stub
-    BrakeFeedback           := M2_BrakeFeedback              // 🧪 STUB GVL_Winch_M2_Stub
+    ContactorFeedbackFwd    := M2_ContactorFeedbackFwd,      // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackRev    := M2_ContactorFeedbackRev,      // 📡 I/O Mapping RÉEL (2026-07-02)
+    BrakeFeedback           := M2_BrakeFeedback              // 🧪 STUB GVL_Winch_M2_Stub (seul signal encore non câblé)
 );
 
-// 📤 Sorties treuil M2 → variables STUB (GVL_Winch_M2_Stub), à remplacer par I/O Mapping réel
-GVL_Winch_M2_Stub.M2_RelayFwd  := instWinchM2.RelayFwd;
-GVL_Winch_M2_Stub.M2_RelayRev  := instWinchM2.RelayRev;
-M2_Contactor1 := instWinchM2.Contactor1;
-M2_Contactor2 := instWinchM2.Contactor2;
-M2_Contactor3 := instWinchM2.Contactor3;
-M2_Contactor4 := instWinchM2.Contactor4;
-GVL_Winch_M2_Stub.M2_BrakeCmd  := instWinchM2.BrakeCmd;
+// 📤 Sorties treuil M2 → I/O Mapping RÉEL (2026-07-02, RelayFwd/Rev/BrakeCmd/SpeedContactor_1..4)
+M2_RelayFwd         := instWinchM2.RelayFwd;
+M2_RelayRev         := instWinchM2.RelayRev;
+M2_SpeedContactor_1 := instWinchM2.Contactor1;
+M2_SpeedContactor_2 := instWinchM2.Contactor2;
+M2_SpeedContactor_3 := instWinchM2.Contactor3;
+M2_SpeedContactor_4 := instWinchM2.Contactor4;
+M2_BrakeCmd         := instWinchM2.BrakeCmd;
 
-// 🧪 SIMULATION (stub sans matériel réel, GVL_Winch_M2_Stub) — voir note M1 ci-dessus
-GVL_Winch_M2_Stub.M2_ContactorFeedbackFwd := GVL_Winch_M2_Stub.M2_RelayFwd;
-GVL_Winch_M2_Stub.M2_ContactorFeedbackRev := GVL_Winch_M2_Stub.M2_RelayRev;
-M2_BrakeFeedback        := GVL_Winch_M2_Stub.M2_BrakeCmd;
+// 🧪 SIMULATION (stub GVL_Winch_M2_Stub) — voir note M1 ci-dessus (seul le retour frein reste stub)
+M2_BrakeFeedback := M2_BrakeCmd;
+
+(* ═══════════════════════════════════════════════════════════════
+   ↔️ 6. CHARIOT M3 — FB_Chariot (axe X, mode DEGRADED_IO figé)
+   ───────────────────────────────────────────────────────────────
+   Intégré 2026-07-02 (Partie11 §7, recommandation "option 1") : mode
+   ETHERCAT non câblé (TBD protocole AC600, voir Partie11 §4) — CommMode
+   figé DEGRADED_IO (relais sens + PV/GV), stubs neutres sur les entrées
+   ETHERCAT (jamais utilisées tant que CommMode ne bascule pas).
+   🔧 2026-07-02 : renommage métier Translation→Chariot (préfixe I/O
+   physique M3 inchangé). `M3_BrakeCmd` désormais câblé en I/O Mapping
+   RÉEL (retiré de GVL_Chariot_M3_Stub, reste sinon STUB logiciel).
+   ⚠️ AVANT tout essai réel : Partie11 §4bis (paramétrage AC600,
+   verrouillage source de commande Terminal) impératif.
+   ═══════════════════════════════════════════════════════════════ *)
+
+instSafetyChariotM3(
+    Enable              := TRUE,
+    Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    JoystickOnline      := instDiagCanOpen.Joystick.Online,
+    JoystickOperational := instDiagCanOpen.Joystick.Operational
+);
+
+// 🎯 SÉLECTEUR STUB MAINTENANCE (2026-07-02, demande utilisateur) — arbitre M3_PositionSensorTarget
+// parmi les 4 capteurs position RÉELS du chariot, en attendant FB_Cycle (pas encore codé, qui
+// fera cette sélection en exploitation normale — Partie11 §9bis). PosFosse1/PosFosse2/
+// PosMaintenance/PosTremie : noms exacts I/O Mapping (Device.export).
+CASE StubChariotPositionSelect_IHM OF
+    1: M3_PositionSensorTarget := PosFosse1;
+    2: M3_PositionSensorTarget := PosFosse2;
+    3: M3_PositionSensorTarget := PosMaintenance;
+    4: M3_PositionSensorTarget := PosTremie;
+ELSE
+    M3_PositionSensorTarget := FALSE;   // 0 ou valeur hors plage = aucun capteur sélectionné
+END_CASE;
+
+instChariotM3(
+    Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que Winch — à remplacer par FB_Modes
+    Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
+    Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    StartStop               := FB_Joystick_0.AxisCmdX.StartStop,
+    SafeStop                := instSafetyChariotM3.SafeStop,
+    CommMode                := E_ChariotCommMode.DEGRADED_IO,  // ⚠️ Figé (EtherCAT AC600 TBD, Partie11 §4/§7)
+    Direction               := FB_Joystick_0.AxisCmdX.Direction,
+    SpeedRefPct             := FB_Joystick_0.AxisCmdX.SpeedRef,
+    PositionSensorTarget    := M3_PositionSensorTarget,      // 🎯 Arbitré par le sélecteur STUB ci-dessus
+    DriveStatusWord         := 0,                            // 🔴 TBD ETHERCAT (Partie11 §4) — inerte en DEGRADED_IO
+    DriveActualFreqHz       := 0.0,                          // 🔴 TBD ETHERCAT — inerte en DEGRADED_IO
+    ContactorFeedbackFwd    := M3_ContactorFeedbackFwd,      // 🧪 STUB GVL_Chariot_M3_Stub
+    ContactorFeedbackRev    := M3_ContactorFeedbackRev,      // 🧪 STUB GVL_Chariot_M3_Stub
+    DriveFaultFeedback      := M3_DriveFaultFeedback,        // 🧪 STUB GVL_Chariot_M3_Stub (toujours FALSE, non câblé)
+    BrakeFeedback           := M3_BrakeFeedback              // 🧪 STUB GVL_Chariot_M3_Stub
+);
+
+// 📤 Sorties chariot M3 → RelayFwd/Rev/RelaySpeedGv (STUB GVL_Chariot_M3_Stub), BrakeCmd (I/O réel)
+M3_RelayFwd     := instChariotM3.RelayFwd;
+M3_RelayRev     := instChariotM3.RelayRev;
+M3_RelaySpeedGv := instChariotM3.RelaySpeedGv;
+M3_BrakeCmd     := instChariotM3.BrakeCmd;
+
+// 🧪 SIMULATION (stub GVL_Chariot_M3_Stub) — voir note Winch M1 ci-dessus. BrakeCmd étant
+// désormais réel, seul le miroir BrakeFeedback reste légitime (retour frein encore non câblé).
+M3_ContactorFeedbackFwd := M3_RelayFwd;
+M3_ContactorFeedbackRev := M3_RelayRev;
+M3_BrakeFeedback        := M3_BrakeCmd;
 </Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Impl_LineIds</Single>
           </Single>
@@ -90120,9 +91054,39 @@ M2_BrakeFeedback        := GVL_Winch_M2_Stub.M2_BrakeCmd;
    🧠 PRG_MAIN — Orchestration séquentielle (diag → sécurité → métier)
    ───────────────────────────────────────────────────────────────
    📄 Contient : Joystick (axe Y) → FB_Safety_Winch(M1/M2) → FB_Winch
-      (M1 + M2, consigne dupliquée sur le même axe) → relais, et le
+      (M1 + M2, consigne dupliquée sur le même axe) → relais, le
       pipeline codeur M1/M2 (FB_Encoder_Abs → FB_Encoder_Scale →
-      FB_Encoder_Homing, flux nominal).
+      FB_Encoder_Homing, flux nominal), et Joystick (axe X) →
+      FB_Safety_Chariot → FB_Chariot (M3, mode DEGRADED_IO
+      figé — intégré 2026-07-02, Partie11).
+   🔧 CORRECTIF (2026-07-02, nouvel export Device.export — I/O réel) :
+      1. Renommage métier Translation→Chariot (demande utilisateur),
+         préfixe I/O physique M3 inchangé.
+      2. RelayFwd/Rev, Contactor1..4 (→SpeedContactor_1..4), BrakeCmd,
+         ContactorFeedbackFwd/Rev M1/M2 sont désormais câblés en I/O
+         Mapping RÉEL (GVL_Winch_M1/M2_Stub réduits à BrakeFeedback
+         seul). Capteur position haute réel : `M1_M2_TopPositionSensor`
+         (remplace le stub `GVL_Homing_Stub`, supprimé).
+      3. Nouveau : `M1_M2_SlackCableSwitch` (mou de câble, commun M1/M2)
+         → `FB_Safety_Winch.ForbidDescent` (interdit UNIQUEMENT la
+         descente) ; `M1/M2_ThermalFeedback` → `SafeStop` (arrêt total).
+      4. Nouveau : sélecteur STUB maintenance pour les 4 capteurs
+         position réels du chariot (Fosse1/Fosse2/Maintenance/Trémie),
+         en attendant FB_Cycle — voir GVL_Chariot_M3_Stub.
+   🔧 CORRECTIF (2026-07-03, retour terrain) :
+      1. `EmergencyStopOk` est désormais un **I/O réel** (retour contacteur
+         puissance géré par l'AU, résout Partie3/AUDIT Q11) — remplace le
+         stub `GVL_DEBUG.DBG_True` sur les FB codeur/homing (Abs/Homing
+         M1/M2 uniquement ce lot — Joystick/Safety/Winch/Chariot restent
+         en stub, à traiter dans un prochain lot).
+      2. `Reset` des FB codeur/homing câblé sur `GVL_Encoder_Stub`
+         (`M1/M2_Reset_IHM`, un bouton par codeur, acquitte Abs+Homing) —
+         n'était câblé nulle part avant (`FALSE` figé = alarmes jamais
+         acquittables).
+      3. Nouveau `CODE/GVL_Encoder_Stub.st` : centralise tout ce qui doit
+         être mappé IHM/réglé pour le pipeline codeur (Reset,
+         ConfirmCoherence, Home, TopSensorPositionM) — déplacé depuis
+         PRG_MAIN (`StubHomeButton_IHM`, `M1/M2_TopSensorPositionM`).
    ⚠️ M2 ACTIF DÈS CE LOT (choix acté 2026-07-02) : dupliqué sur l'axe Y
       comme M1, SANS sélecteur ni FB_WinchSync réel (codeur pas encore
       exploité pour une synchro — voir DOC/AF_Partie9 §9).
@@ -90176,14 +91140,13 @@ VAR
     instWinchM1 : FB_Winch;
     instWinchM2 : FB_Winch;
 
+    // ↔️ CHARIOT — M3, axe X joystick (intégré 2026-07-02, mode DEGRADED_IO figé — Partie11 §7)
+    instSafetyChariotM3 : FB_Safety_Chariot;
+    instChariotM3       : FB_Chariot;
+
     // 🎚️ Stub Maintenance N1 pour ce lot (pas de FB_Modes) — à remplacer dès que
     // FB_Modes existera (source légitime Enable/Mode par bloc métier)
     StubWinchEnableN1 : BOOL := TRUE;
-
-    // 🎯 Stub bouton IHM homing (2026-07-02) — à remplacer par un vrai bouton IHM.
-    // Un seul bouton pilote Home sur les 2 instances (flux nominal, Partie10 §1) :
-    // bascule TRUE puis FALSE dans la vue instance CODESYS pour simuler l'appui (front).
-    StubHomeButton_IHM : BOOL := FALSE;
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -90214,15 +91177,11 @@ VAR RETAIN
         P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
-
-    // 🎯 Cible de homing nominal — paramétrable par treuil (Partie10 §7bis, valeur indicative)
-    M1_TopSensorPositionM : REAL := 12.5;
-    M2_TopSensorPositionM : REAL := 12.5;
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">5076</Single>
+        <Single Name="UniqueIdGenerator" Type="string">7480</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -90268,7 +91227,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186228767370439</Single>
+        <Single Name="Timestamp" Type="long">639186366412457022</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -90373,109 +91332,7 @@ END_VAR</Single>
         </Single>
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🧠 PRG_MAIN — Orchestration séquentielle (diag → sécurité → métier)
-   ───────────────────────────────────────────────────────────────
-   📄 Contient : Joystick (axe Y) → FB_Safety_Winch(M1/M2) → FB_Winch
-      (M1 + M2, consigne dupliquée sur le même axe) → relais, et le
-      pipeline codeur M1/M2 (FB_Encoder_Abs → FB_Encoder_Scale →
-      FB_Encoder_Homing, flux nominal).
-   ⚠️ M2 ACTIF DÈS CE LOT (choix acté 2026-07-02) : dupliqué sur l'axe Y
-      comme M1, SANS sélecteur ni FB_WinchSync réel (codeur pas encore
-      exploité pour une synchro — voir DOC/AF_Partie9 §9).
-   🎯 HOMING (2026-07-02) : ordre d'appel PAR TREUIL = Abs → Scale →
-      Homing. `PresetRequest`/`PresetValue` (Homing → Abs) et
-      `HomingRefRaw` (Homing → Scale) sont donc consommés avec **1 cycle
-      de retard** (10 ms) — standard et sans conséquence (dépendance
-      croisée assumée, cf. Partie10 §9bis).
-   🔴 `PRG_COD1` (legacy, orphelin, jamais appelé dans aucune tâche) :
-      À SUPPRIMER MANUELLEMENT dans CODESYS (clic droit → Delete) — sa
-      logique est remplacée par les instances ci-dessous, câblées
-      directement ici (principe 1 seul POU, Partie2 §0).
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU PRG_MAIN) ===
-
-PROGRAM PRG_MAIN_LD
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
-
-VAR_IN_OUT
-END_VAR
-
-VAR
-    instSafety       : FB_Safety;
-    instDiagCanOpen  : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
-    instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
-
-    LocalEmergencyStopTOR  : BOOL := TRUE;
-    LocalEthercatOk        : BOOL := FALSE;  // Résumé diagnostic EtherCAT
-
-    // 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
-    FB_Joystick_0 : FB_Joystick;
-
-    // 🧲 CODEUR — acquisition + mise à l'échelle + homing (flux nominal), 1 instance par treuil
-    instEncoderAbsM1   : FB_Encoder_Abs;
-    instEncoderScaleM1 : FB_Encoder_Scale;
-    instHomingM1       : FB_Encoder_Homing;   // ✅ 2026-07-02 — possède Calib (RETAIN) en interne
-    instEncoderAbsM2   : FB_Encoder_Abs;
-    instEncoderScaleM2 : FB_Encoder_Scale;
-    instHomingM2       : FB_Encoder_Homing;
-
-    // 🔌 SAFETY — bloc safety métier du domaine treuil, 1 instance par treuil
-    // (même TYPE FB_Safety_Winch, 2 instances — Partie10 §7)
-    instSafetyWinchM1 : FB_Safety_Winch;
-    instSafetyWinchM2 : FB_Safety_Winch;
-
-    // 🪝 WINCH — M1 et M2 (consigne dupliquée sur l'axe Y, Maintenance N1, choix 2026-07-02)
-    instWinchM1 : FB_Winch;
-    instWinchM2 : FB_Winch;
-
-    // 🎚️ Stub Maintenance N1 pour ce lot (pas de FB_Modes) — à remplacer dès que
-    // FB_Modes existera (source légitime Enable/Mode par bloc métier)
-    StubWinchEnableN1 : BOOL := TRUE;
-
-    // 🎯 Stub bouton IHM homing (2026-07-02) — à remplacer par un vrai bouton IHM.
-    // Un seul bouton pilote Home sur les 2 instances (flux nominal, Partie10 §1) :
-    // bascule TRUE puis FALSE dans la vue instance CODESYS pour simuler l'appui (front).
-    StubHomeButton_IHM : BOOL := FALSE;
-END_VAR
-
-// ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
-// commentaire "RETAIN" — ne persistaient PAS réellement entre coupures/téléchargements.
-// Corrigé : bloc VAR RETAIN dédié, comme le nécessitent aussi les paramètres de homing.
-VAR RETAIN
-    // 🪜 Table paliers M1 — réglable sans recompiler (Partie1 §Paliers)
-    // ⚠️ Valeurs par défaut indicatives (cumulatives P1→P5) : À AJUSTER un par un
-    //    selon le câblage réel des 4 contacteurs de vitesse M1 pendant la mise
-    //    en service (chaque P&lt;palier&gt;R&lt;relais&gt; est modifiable en direct dans la
-    //    vue instance CODESYS), et les seuils souhaités (%).
-    M1_SpeedStepTable : ST_SpeedStepTable := (
-        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
-        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
-        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
-        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
-        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
-        StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
-    );
-
-    // 🪜 Table paliers M2 — INDÉPENDANTE de M1 (Partie1 §Paliers : "table
-    // indépendante par treuil"), mêmes valeurs par défaut indicatives à ajuster.
-    M2_SpeedStepTable : ST_SpeedStepTable := (
-        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
-        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
-        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
-        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
-        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
-        StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
-    );
-
-    // 🎯 Cible de homing nominal — paramétrable par treuil (Partie10 §7bis, valeur indicative)
-    M1_TopSensorPositionM : REAL := 12.5;
-    M2_TopSensorPositionM : REAL := 12.5;
-END_VAR</Single>
+            <Single Name="TextBlobForSerialisation" Type="string"></Single>
             <Single Name="LineInfoPersistence" Type="string">5f5764cb-af5b-4ef6-8a43-7a9e2e1fb523_Decl_LineIds</Single>
           </Single>
         </Single>
@@ -90490,606 +91347,6 @@ END_VAR</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
         <Single Type="string">SYSTEM</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">76850fab-1917-4cc9-8359-cd30b43ef48c</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">E_TranslationCommMode</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639186241450867783</Single>
-      </Single>
-      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">{attribute 'qualified_only'}
-{attribute 'strict'}
-TYPE E_TranslationCommMode :
-(
-    ETHERCAT    := 0,   (* Nominal : mot commande/état + consigne fréquence via EtherCAT (AC600) *)
-    DEGRADED_IO := 1    (* Dégradé : relais de sens + présélection vitesse PV/GV (TOR), vitesse/rampes réglées sur le variateur en local *)
-);
-END_TYPE
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">76850fab-1917-4cc9-8359-cd30b43ef48c_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">10</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">TRANSLATION</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">74971587-0a2d-4aeb-a628-2984ee284fbf</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">GVL_Translation_M3_Stub</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">ffbfa93a-b94d-45fc-a329-229860183b1d</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639186240750801490</Single>
-      </Single>
-      <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🧪 GVL_Translation_M3_Stub — Variables LOGICIELLES temporaires M3
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md §7
-   ⚠️ TEMPORAIRE — aucun relais/capteur réel piloté. Même principe que
-      `GVL_Winch_M1_Stub.st`/`GVL_Winch_M2_Stub.st` : à supprimer dès
-      que le matériel M3 (relais sens/PV-GV/frein + retours + capteur
-      position cible) sera câblé en I/O Mapping avec ces MÊMES noms
-      (les deux mécanismes ne peuvent pas coexister — conflit de nom).
-   🔴 M3_DriveFaultFeedback : laissé à FALSE (STUB) — NE PAS interpréter
-      comme "pas de défaut variateur confirmé", c'est juste l'absence
-      de retour câblé pour l'instant (Partie11 §3, ne jamais stubber
-      un "pas de défaut" arbitraire comme s'il était réel).
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du GVL GVL_Translation_M3_Stub) ===
-
-VAR_GLOBAL
-    M3_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M3 (STUB, DEGRADED_IO)
-    M3_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M3 (STUB, DEGRADED_IO)
-    M3_RelaySpeedGv          : BOOL;   // 🔌 Sortie — présélection GV M3 (STUB, DEGRADED_IO)
-    M3_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M3 (STUB)
-
-    // 🔧 Mirés activement par PRG_MAIN.st (bloc 🧪 SIMULATION) sur les commandes ci-dessus
-    // (contacteur "idéal"), même principe que GVL_Winch_M1_Stub/M2_Stub.
-    M3_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M3 (STUB, miroir de M3_RelayFwd)
-    M3_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M3 (STUB, miroir de M3_RelayRev)
-    M3_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M3 (STUB, miroir de M3_BrakeCmd)
-
-    // 🎯 Capteur position cible (PAS de miroir automatique — physique, forcer manuellement
-    // dans la vue instance CODESYS pour tester l'arrêt sur capteur, Partie11 §9bis).
-    M3_PositionSensorTarget  : BOOL;   // 🔌 Entrée — capteur position cible M3 (STUB, toujours FALSE)
-
-    // 🔴 Retour défaut variateur — PAS de miroir, reste FALSE tant que non câblé (voir en-tête)
-    M3_DriveFaultFeedback    : BOOL;   // 🔌 Entrée — défaut variateur TOR M3 (STUB, toujours FALSE)
-END_VAR
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">74971587-0a2d-4aeb-a628-2984ee284fbf_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Null Name="NetVarProperties" />
-        <Single Name="ParameterList" Type="bool">False</Single>
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">TRANSLATION</Single>
-      </Array>
-      <Single Name="Index" Type="int">-1</Single>
-    </Single>
-    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
-      <Single Name="IsRoot" Type="bool">False</Single>
-      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">650eae5d-5591-4580-9c15-34d6b3342724</Single>
-        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">FB_Translation</Single>
-        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
-          <Entry>
-            <Key>
-              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
-            </Key>
-            <Value>
-              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
-                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
-                  <Entry>
-                    <Key>
-                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
-                    </Key>
-                    <Value>
-                      <Single Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-                    </Value>
-                  </Entry>
-                </Dictionary>
-              </Single>
-            </Value>
-          </Entry>
-        </Dictionary>
-        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
-        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
-          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
-          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
-        </Array>
-        <Single Name="Timestamp" Type="long">639186240550718441</Single>
-      </Single>
-      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
-        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
-        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">
-
-// === IMPLEMENTATION (SQUELETTE — corps à compléter/vérifier avant collage, voir TBD en tête de fichier) ===
-
-// 🛑 1. GATE (Enable / EmergencyStopOk) — neutralisation totale, sorties sûres
-IF NOT Enable OR NOT EmergencyStopOk THEN
-    RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
-    DriveControlWord := 0; DriveFreqRefHz := 0.0;
-
-    Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
-          DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-          DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
-    BrakeCmd := Brake.BrakeCmd;
-    BrakeContactorCheck := Brake.ContactorCheck;
-
-    CommandedDirection := 0;
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    ApproachTimer(IN := FALSE, PT := ApproachTime);
-    SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
-
-    ArrivalLock := FALSE;
-    DegradedMoveAuthorized := FALSE;
-    DegradedStopSettleTon(IN := FALSE, PT := DegradedStopSettleTime);
-    CommModeLocked := CommMode;   // Neutralisé = libre de choisir le mode (pas de mouvement en cours)
-
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    RETURN;
-END_IF;
-
-Ready := TRUE;
-CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms (valeur de secours si delta temps invalide)
-
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-
-// 🔒 2bis. GARDE CommMode — 🆕 v1.1 (F5) : pas de changement de mode de communication en cours
-// de mouvement. Utilise Busy du cycle PRÉCÉDENT (pas encore recalculé ce cycle, §9) : tant que
-// l'axe était en mouvement au dernier scan, CommMode externe est ignoré.
-IF NOT Busy THEN
-    CommModeLocked := CommMode;
-END_IF;
-
-// 📡 3. CAPTEUR POSITION CIBLE (debounce commun aux 2 modes)
-CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
-TargetReached := CaptorDebounceTon.Q;
-
-// ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
-RampTargetPct := 0.0;
-IF NOT SafeStop AND StartStop THEN
-    RampTargetPct := ABS(SpeedRefPct);  // 🔧 2026-07-02 : SpeedRefPct peut arriver signé (AxisCmdX.SpeedRef) — ABS() ici
-END_IF;
-
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE — ETHERCAT uniquement (Partie4 §5)
-// DEGRADED_IO : pas d'automatisme, le choix PV/GV reste manuel (joystick) — voir §5bis
-IF CommModeLocked = E_TranslationCommMode.ETHERCAT THEN
-    ApproachTimer(IN := (StartStop AND NOT SafeStop), PT := ApproachTime);
-    IF ApproachTimer.Q THEN
-        RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
-    END_IF;
-ELSE
-    ApproachTimer(IN := FALSE, PT := ApproachTime);
-END_IF;
-
-// 🎯 4ter. ARRÊT EXACT SUR CAPTEUR — §9bis (commun aux 2 modes, comportement PROPOSÉ à valider)
-// Verrouille (ArrivalLock) tant que le capteur cible reste actif ET que le sens commandé est
-// le MÊME que celui qui a mené à l'arrivée (permet de repartir immédiatement en sens inverse,
-// contrairement à un blocage total qui empêcherait de quitter la position).
-ArrivalEdge(CLK := TargetReached);
-IF ArrivalEdge.Q THEN
-    DirectionAtArrival := CommandedDirection;
-END_IF;
-ArrivalLock := TargetReached AND (Direction = DirectionAtArrival) AND (DirectionAtArrival &lt;&gt; 0);
-IF ArrivalLock THEN
-    RampTargetPct := 0.0;   // Pertinent en ETHERCAT (consigne proportionnelle) ; sans effet direct en DEGRADED_IO, voir §5bis/DegradedMoveAuthorized
-END_IF;
-
-SpeedRamp(Target := RampTargetPct,
-          AccelRate := RampAccelRate,
-          DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
-          CycleTimeS := CycleTimeCalc.CycleTimeS);
-
-// ⏱️ 4quater. CONFIRMATION D'ARRÊT PHYSIQUE — 🆕 v1.1 (F1)
-// DEGRADED_IO : basée sur un délai RÉEL depuis la coupure du relais (RelayFwd/RelayRev tiennent
-// encore la valeur du cycle précédent à ce stade — pas encore recalculés, voir §5bis), PAS sur
-// la rampe logicielle SpeedRamp (sans lien physique en DEGRADED_IO, cf. correctif F1 en tête de fichier).
-DegradedStopSettleTon(IN := NOT (RelayFwd OR RelayRev), PT := DegradedStopSettleTime);
-IsStoppedConfirmed := SEL(CommModeLocked = E_TranslationCommMode.DEGRADED_IO,
-                          (ABS(SpeedRamp.Current) &lt; 0.1),   // ETHERCAT : rampe = consigne réelle
-                          DegradedStopSettleTon.Q);          // DEGRADED_IO : délai physique réel
-
-// 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (même principe que FB_Winch §3bis)
-IF Direction &lt;&gt; CommandedDirection THEN
-    IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
-        CommandedDirection := Direction;
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    ELSIF IsStoppedConfirmed THEN
-        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
-        IF DirectionChangeDelay.Q THEN
-            CommandedDirection := Direction;
-            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-        END_IF;
-    ELSE
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    END_IF;
-ELSE
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-END_IF;
-
-// 🆕 v1.1 (F1) — Autorisation de mouvement DEGRADED_IO : IMMÉDIATE, découplée de la rampe logicielle
-DegradedMoveAuthorized := StartStop AND NOT SafeStop AND NOT ArrivalLock;
-
-MovementRequested := SEL(CommModeLocked = E_TranslationCommMode.DEGRADED_IO,
-                          (CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1),  // ETHERCAT : lié à la rampe réelle (pilote le frein en douceur)
-                          (CommandedDirection &lt;&gt; 0) AND DegradedMoveAuthorized);          // DEGRADED_IO : immédiat
-
-// 🔀 5bis. SORTIE PHYSIQUE SELON CommModeLocked
-IF CommModeLocked = E_TranslationCommMode.ETHERCAT THEN
-    RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
-
-    // 🔴 TBD — mise à l'échelle %→Hz : calcul linéaire explicite (LIN_TRAFO NON vérifié, voir tête de fichier)
-    DriveFreqRefHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
-    // 🔴 TBD — DriveControlWord : layout de bits non disponible à la rédaction (Run/Stop/Enable/Reset
-    // variateur selon protocole AC600 — À CONFIRMER avant tout collage, ne pas déduire de bits ici).
-    DriveControlWord := 0;
-
-    HystGv(IN := 0, HIGH := 0, LOW := 0);   // Inerte en ETHERCAT — instance maintenue pour cohérence cyclique
-ELSE // DEGRADED_IO
-    DriveFreqRefHz := 0.0;
-    DriveControlWord := 0;
-
-    // 🪜 Sélection PV/GV par HYSTERESIS (lib Util, Partie3 §0) — anti-battement, PAS de FB_SpeedStep
-    // (table 5 paliers disproportionnée pour un choix à 2 états)
-    // 🔧 2026-07-02 : ABS() — SpeedRefPct signé, les seuils Threshold sont des seuils de MAGNITUDE
-    // (60%/40%) ; sans ABS() une consigne négative (sens arrière) ne dépasserait jamais HIGH et
-    // resterait bloquée en PV quelle que soit la vitesse réelle demandée en marche arrière.
-    SpeedRefInt := REAL_TO_INT(ABS(SpeedRefPct));
-    HystGv(IN := SpeedRefInt, HIGH := REAL_TO_INT(DegradedGvThresholdHighPct), LOW := REAL_TO_INT(DegradedGvThresholdLowPct));
-    RelaySpeedGv := NOT HystGv.OUT;   // Convention FB_SpeedStep : OUT=TRUE en régime bas → NOT OUT = seuil haut franchi (GV)
-
-    // 🆕 v1.1 (F1) — coupure IMMÉDIATE sur DegradedMoveAuthorized=FALSE (StartStop=FALSE, SafeStop,
-    // ou ArrivalLock) : ne dépend plus du temps de décroissance de la rampe logicielle.
-    RelayFwd := (CommandedDirection = 1) AND DegradedMoveAuthorized;
-    RelayRev := (CommandedDirection = -1) AND DegradedMoveAuthorized;
-END_IF;
-
-// 🛑 6. FREIN (composé, réutilisé tel quel) — indépendant du mode
-Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
-      ContactorFeedback := BrakeFeedback,
-      DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
-BrakeCmd := Brake.BrakeCmd;
-BrakeContactorCheck := Brake.ContactorCheck;
-
-// 🔍 7. DOUBLE VÉRIFICATION CONTACTEURS DE SENS — pertinent en DEGRADED_IO uniquement
-// (en ETHERCAT, RelayFwd/RelayRev restent FALSE ci-dessus, donc pas de fausse incohérence
-// tant que les retours câblés lisent bien FALSE au repos)
-FwdContactorCheck.Command := RelayFwd;
-FwdContactorCheck.Feedback := ContactorFeedbackFwd;
-TonFwdFeedback(IN := (RelayFwd &lt;&gt; ContactorFeedbackFwd), PT := ContactorFeedbackTimeout);
-IF TonFwdFeedback.Q THEN
-    FwdContactorCheck.StuckClosed := (NOT RelayFwd AND ContactorFeedbackFwd);
-    FwdContactorCheck.StuckOpen   := (RelayFwd AND NOT ContactorFeedbackFwd);
-ELSIF ResetEdge.Q THEN
-    FwdContactorCheck.StuckClosed := FALSE; FwdContactorCheck.StuckOpen := FALSE;
-END_IF;
-
-RevContactorCheck.Command := RelayRev;
-RevContactorCheck.Feedback := ContactorFeedbackRev;
-TonRevFeedback(IN := (RelayRev &lt;&gt; ContactorFeedbackRev), PT := ContactorFeedbackTimeout);
-IF TonRevFeedback.Q THEN
-    RevContactorCheck.StuckClosed := (NOT RelayRev AND ContactorFeedbackRev);
-    RevContactorCheck.StuckOpen   := (RelayRev AND NOT ContactorFeedbackRev);
-ELSIF ResetEdge.Q THEN
-    RevContactorCheck.StuckClosed := FALSE; RevContactorCheck.StuckOpen := FALSE;
-END_IF;
-
-// 🧾 8. ERRORID (bitfield, cumul — effacé bit à bit si cause disparue + reset front)
-IF Brake.Error THEN
-    ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
-END_IF;
-
-IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
-
-IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
-END_IF;
-
-// 🔴 TBD — bit3 défaut variateur : uniquement basé sur DriveFaultFeedback TOR SI câblé (ne
-// jamais stubber ce bit si le retour n'existe pas encore — cf. principe codeur TBD FB_Safety_Winch)
-IF DriveFaultFeedback THEN
-    ErrorId := ErrorId OR 16#0008;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFF7;
-END_IF;
-
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
-IF ErrorEdge.Q THEN
-    StateAtError := State;
-END_IF;
-
-// 🚦 9. STATE MACHINE (phase — orthogonale à Error, Partie3 §2)
-// ⚠️ En DEGRADED_IO, cet indicateur reste basé sur SpeedRamp.Current (valeur logicielle sans lien
-// physique direct, cf. F7) : usage diagnostic/IHM uniquement, PAS utilisé pour une décision de
-// sécurité (celles-ci utilisent DegradedMoveAuthorized/IsStoppedConfirmed, calculés séparément).
-IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.STOPPING;
-ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.BUSY;
-ELSE
-    State := E_State.READY;
-END_IF;
-
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING) OR RelayFwd OR RelayRev;
-
-Done := FALSE;   // Pas de notion de "terminé" ponctuel sans FB_Cycle — présent pour conformité
-
-// 🛡️ 10. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7)
-IF Error THEN
-    RelayFwd := FALSE; RelayRev := FALSE; RelaySpeedGv := FALSE;
-    DriveControlWord := 0; DriveFreqRefHz := 0.0;
-    BrakeCmd := FALSE;
-END_IF;
-</Single>
-            <Single Name="LineInfoPersistence" Type="string">650eae5d-5591-4580-9c15-34d6b3342724_Impl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
-          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.1.md
-   🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
-      plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
-   🔀 CommMode (E_TranslationCommMode) — sélection MANUELLE, verrouillée
-      pendant un mouvement (CommModeLocked, correctif v1.1 F5 — voir §2bis) :
-        - ETHERCAT    : mot de commande/état + consigne fréquence (proportionnelle)
-        - DEGRADED_IO : RelayFwd/RelayRev + RelaySpeedGv (2 paliers PV/GV),
-                        vitesse et rampes réglées LOCALEMENT sur le variateur
-   🧩 Compose FB_Brake (réutilisé TEL QUEL depuis _COMMON, nouvelle instance
-      + nouveaux réglages RETAIN propres à M3 — pas de FB_Brake spécifique,
-      voir Partie11 §3).
-   🧱 Réutilisation lib Util (Partie3 §0) : HYSTERESIS pour la sélection
-      PV/GV en DEGRADED_IO (préféré à FB_SpeedStep — table 5 paliers/4
-      relais disproportionnée pour un choix à 2 états, voir Partie11 §3).
-
-   🔧 CORRECTIFS retour terrain — revue automatisme/mise en service 2026-07-02
-      (Partie11 passe v1.0 → v1.1, voir doc pour le détail complet) :
-      1. [F1 — BLOQUANT corrigé] En DEGRADED_IO, RelayFwd/RelayRev restaient
-         commandés tant que la rampe LOGICIELLE SpeedRamp.Current ne repassait
-         pas sous 0.1 % — or cette rampe n'a AUCUN lien avec la vitesse physique
-         réelle en DEGRADED_IO (vitesse en tout-ou-rien PV/GV, fixée sur le
-         variateur). Résultat : jusqu'à ~2,5 s de roulage à pleine vitesse
-         PV/GV après passage sur le capteur cible (risque de choc en bout de
-         course). Corrigé : nouvelle variable DegradedMoveAuthorized, calculée
-         directement depuis StartStop/SafeStop/ArrivalLock (immédiate, aucune
-         dépendance à la rampe) — voir §4quater et §5bis.
-      2. [F5 — corrigé] Ajout d'une garde logicielle CommModeLocked (§2bis) :
-         le changement de CommMode n'est plus pris en compte tant qu'un
-         mouvement est en cours (Busy de l'état précédent), en complément de
-         la consigne procédurale (bascule manuelle hors mouvement).
-      3. [F7 — clarifié] Les paramètres de rampe (RampAccelRate/RampDecelNormalRate/
-         RampDecelFastRate) ne pilotent une vitesse physique réelle qu'en
-         ETHERCAT. En DEGRADED_IO ils ne servent plus qu'à SpeedRamp pour
-         l'affichage State/StateAtError — le nouveau DegradedStopSettleTime
-         remplace la rampe comme confirmation d'arrêt physique pour l'interlock
-         de sens (§5, IsStoppedConfirmed).
-   🔴 SQUELETTE — sections encore marquées TBD, volontairement non comblées
-      (Ne JAMAIS approximer, Partie3 §0/CLAUDE.md) :
-        - Layout exact des bits DriveControlWord/DriveStatusWord AC600
-          (non disponible à la rédaction — voir doc constructeur variateur).
-        - Interface exacte LIN_TRAFO (Util) : NON vérifiée ici. Le
-          projet a déjà eu une mauvaise supposition d'interface sur
-          HYSTERESIS (correctif FB_SpeedStep 2026-07-01) — pour ne pas
-          répéter l'erreur, la mise à l'échelle %→Hz ci-dessous est un
-          calcul linéaire explicite en attendant confirmation ; à
-          remplacer par LIN_TRAFO si son interface réelle est vérifiée.
-        - Comportement "arrêt exact sur capteur, même direction verrouillée
-          jusqu'à inversion joystick" (§9bis) : logique PROPOSÉE, absente
-          de toute doc existante — à valider avec l'utilisateur avant
-          application (pas un simple report du contrat FB standard).
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Translation) ===
-
-FUNCTION_BLOCK PUBLIC FB_Translation
-VAR_INPUT
-    Enable                      : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
-    Reset                       : BOOL;        // Acquittement défaut (front)
-    EmergencyStopOk             : BOOL;        // Chaîne AU réarmée + conditions globales OK
-    Mode                        : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
-    StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
-    SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    CommMode                    : E_TranslationCommMode; // Sélection MANUELLE (maintenance) — verrouillée pendant un mouvement, voir §2bis
-    Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdX.Direction) — source d'autorité du sens (interlock §5)
-    SpeedRefPct                 : REAL;        // 🔧 2026-07-02 : AxisCmdX.SpeedRef est désormais SIGNÉ (-100..+100 %) —
-                                                 // seule la MAGNITUDE est utilisée ici (ABS() en §4 et §5bis), Direction
-                                                 // ci-dessus reste la source d'autorité du sens/interlock (inchangé)
-    PositionSensorTarget        : BOOL;        // Capteur position cible courante (sélection de la cible = hors périmètre, en amont — IHM/FB_Cycle)
-
-    // 🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
-    DriveStatusWord              : WORD;       // 🔴 TBD bit layout exact — mot d'état AC600 lu depuis l'image d'entrée EtherCAT
-    DriveActualFreqHz            : REAL;       // Fréquence réelle mesurée (retour variateur) — pas de mesure de courant (Partie4 §5)
-
-    // 🔌 Spécifique DEGRADED_IO (retours câblés TOR)
-    ContactorFeedbackFwd         : BOOL;       // Retour d'état câblé contacteur sens avant
-    ContactorFeedbackRev         : BOOL;       // Retour d'état câblé contacteur sens arrière
-    DriveFaultFeedback           : BOOL;       // Retour TOR défaut variateur, SI câblé sur une sortie relais dédiée du variateur (sinon laisser à FALSE côté appelant — ne pas stubber un "pas de défaut" arbitraire)
-
-    // 🔌 Frein (indépendant du mode — circuit propre, comme le treuil)
-    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
-
-    // Réglages rampe (RETAIN) — pilotent une vitesse PHYSIQUE réelle en ETHERCAT uniquement (correctif v1.1 F7)
-    RampAccelRate                : REAL := 20.0;    // %/s — accélération
-    RampDecelNormalRate          : REAL := 40.0;    // %/s — décélération normale (StartStop=FALSE)
-    RampDecelFastRate            : REAL := 100.0;   // %/s — décélération RAPIDE (SafeStop=TRUE)
-    DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt (interlock, identique principe FB_Winch)
-
-    // Réglages ETHERCAT uniquement (RETAIN)
-    ApproachTime                 : TIME := T#5s;    // Temps estimé avant déclenchement du ralentissement auto (Partie4 §5)
-    ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (PV) une fois ApproachTime écoulé
-    DriveFreqScaleMaxHz          : REAL := 50.0;    // Échelle 0..100 % → 0..DriveFreqScaleMaxHz Hz (calcul linéaire, voir 🔴 TBD LIN_TRAFO en tête de fichier)
-
-    // Réglages DEGRADED_IO uniquement (RETAIN)
-    DegradedGvThresholdHighPct   : REAL := 60.0;    // Seuil bascule PV→GV (HYSTERESIS HIGH)
-    DegradedGvThresholdLowPct    : REAL := 40.0;    // Seuil bascule GV→PV (HYSTERESIS LOW)
-    ContactorFeedbackTimeout     : TIME := T#500ms; // Timeout cohérence commande/retour contacteurs de sens (DEGRADED_IO)
-    DegradedStopSettleTime       : TIME := T#1s;    // 🆕 v1.1 (F1) — délai physique estimé d'arrêt réel après coupure relais (à régler selon la décélération interne réelle configurée sur le variateur en PV/GV) ; remplace SpeedRamp comme confirmation d'arrêt pour l'interlock de sens en DEGRADED_IO
-
-    // Réglages communs
-    CaptorDebounce                : TIME := T#100ms; // Filtrage capteur de position cible
-    BrakeDelayContactClose        : TIME := T#100ms; // Voir FB_Brake
-    BrakeDelayMagnetise           : TIME := T#300ms; // Voir FB_Brake
-    BrakeDelayMotorDecel          : TIME := T#500ms; // Voir FB_Brake
-    BrakeFeedbackTimeout          : TIME := T#1s;    // Voir FB_Brake
-END_VAR
-VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: Brake.Error ; bit1: contacteur sens Fwd (DEGRADED_IO) ; bit2: contacteur sens Rev (DEGRADED_IO) ; bit3: défaut variateur (DriveFaultFeedback, si câblé)
-    State               : E_State;
-    StateAtError        : E_State;
-    TargetReached        : BOOL;       // Capteur position cible confirmé (debounce) — voir §9bis
-
-    // 🔌 Sorties ETHERCAT — à mapper sur l'image de sortie EtherCAT du variateur (SI CommModeLocked=ETHERCAT, sinon inertes)
-    DriveControlWord     : WORD;       // 🔴 TBD — mot de commande AC600, layout non câblé (voir tête de fichier)
-    DriveFreqRefHz        : REAL;      // Consigne fréquence écrite au variateur
-
-    // 🔌 Sorties DEGRADED_IO — à mapper en I/O Mapping CODESYS (SI CommModeLocked=DEGRADED_IO, sinon forcées FALSE)
-    RelayFwd              : BOOL;      // 🔌 Contacteur sens avant
-    RelayRev               : BOOL;     // 🔌 Contacteur sens arrière
-    RelaySpeedGv           : BOOL;     // 🔌 FALSE = PV (défaut), TRUE = GV — câblé sur entrée présélection vitesse AC600
-
-    // 🔌 Frein (indépendant du mode)
-    BrakeCmd                : BOOL;    // Commande bobine frein — TRUE = relâché
-
-    // Diag
-    FwdContactorCheck    : ST_ContactorCheck;  // Diag contacteur sens avant (pertinent en DEGRADED_IO)
-    RevContactorCheck    : ST_ContactorCheck;  // Diag contacteur sens arrière (pertinent en DEGRADED_IO)
-    BrakeContactorCheck  : ST_ContactorCheck;  // Diag contacteur frein (miroir de FB_Brake)
-END_VAR
-VAR
-    Brake                : FB_Brake;       // 🧩 Composé — séquence frein (réutilisé tel quel, Partie11 §3)
-    CycleTimeCalc        : FB_CycleTime;
-    SpeedRamp             : FB_Ramp;       // Rampe interne — vitesse physique réelle en ETHERCAT ; affichage State uniquement en DEGRADED_IO (v1.1)
-    ResetEdge            : R_TRIG;
-    ErrorEdge            : R_TRIG;
-    DirectionChangeDelay : TON;            // Interlock changement de sens (identique principe FB_Winch)
-    CommandedDirection   : INT;            // Sens réellement appliqué (figé pendant le mouvement)
-    TonFwdFeedback       : TON;
-    TonRevFeedback       : TON;
-    RampTargetPct        : REAL;
-    ApproachTimer         : TON;           // ETHERCAT uniquement — déclenche le ralentissement auto
-    CaptorDebounceTon     : TON;
-    HystGv                : HYSTERESIS;    // 🧱 Lib Util — sélection PV/GV (DEGRADED_IO)
-    SpeedRefInt            : INT;          // Consigne convertie en INT (interface HYSTERESIS)
-    ArrivalEdge            : R_TRIG;       // §9bis — détecte l'arrivée sur capteur cible
-    DirectionAtArrival     : INT;          // §9bis — sens verrouillé au moment de l'arrivée
-    ArrivalLock             : BOOL;        // §9bis — TRUE tant que le capteur cible bloque le sens d'arrivée
-    MovementRequested      : BOOL;         // Commun aux 2 modes — pilote FB_Brake
-    CommModeLocked          : E_TranslationCommMode; // 🆕 v1.1 (F5) — CommMode figé pendant un mouvement (Busy)
-    DegradedMoveAuthorized  : BOOL;        // 🆕 v1.1 (F1) — DEGRADED_IO : autorisation IMMÉDIATE du relais (StartStop/SafeStop/ArrivalLock, sans rampe)
-    DegradedStopSettleTon   : TON;         // 🆕 v1.1 (F1) — confirmation d'arrêt physique DEGRADED_IO (remplace SpeedRamp pour l'interlock)
-    IsStoppedConfirmed      : BOOL;        // 🆕 v1.1 — "vitesse confirmée nulle" par mode : rampe (ETHERCAT) ou temporisation (DEGRADED_IO)
-END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">650eae5d-5591-4580-9c15-34d6b3342724_Decl_LineIds</Single>
-          </Single>
-        </Single>
-        <Single Name="UniqueIdGenerator" Type="string">557</Single>
-        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
-        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
-        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
-      </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">b480d4f5-defb-44b5-ac23-a19779fb0da4</Single>
-      <Array Name="Path" Type="string">
-        <Single Type="string">Device</Single>
-        <Single Type="string">Logique API</Single>
-        <Single Type="string">Application</Single>
-        <Single Type="string">TRANSLATION</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -91373,7 +91630,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186291470787650</Single>
+        <Single Name="Timestamp" Type="long">639186380908668464</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -91381,45 +91638,28 @@ END_TYPE
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Winch_M1_Stub — Variables LOGICIELLES temporaires M1
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md §7 Étape 9bis
-   ⚠️ TEMPORAIRE — aucun relais réel piloté. Créé uniquement pour
-      compiler/tester la logique FB_Winch(M1) sans matériel branché
-      (pas encore de carte de sortie/entrée disponible pour ce lot).
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md §7 Étape 9bis
+   🔴 CORRECTIF (2026-07-02, nouvel export Device.export) : RelayFwd/Rev,
+      Contactor1..4 (renommés `M1_SpeedContactor_1..4` côté device),
+      BrakeCmd, ContactorFeedbackFwd/Rev sont désormais câblés en I/O
+      Mapping RÉEL — RETIRÉS d'ici (conflit de nom sinon, les 2
+      déclarations NE PEUVENT PAS coexister). Seul `M1_BrakeFeedback`
+      reste non câblé côté device pour ce lot.
+   ⚠️ TEMPORAIRE — `M1_BrakeFeedback` reste piloté par le miroir logiciel
+      dans PRG_MAIN.st (bloc 🧪 SIMULATION) tant que le retour frein réel
+      n'est pas câblé.
    🔴 QUAND LE MATÉRIEL SERA PRÊT : SUPPRIMER ce GVL entièrement, puis
-      saisir les MÊMES noms directement dans la colonne "Variable" de
-      l'onglet I/O Mapping des canaux physiques concernés (comme
-      JoyXRaw_ANA1/JoyYRaw_ANA2/JoyBtnRaw) — CODESYS créera alors les
-      variables globales réelles à cet endroit. Les DEUX déclarations
-      (ce GVL + I/O Mapping) NE PEUVENT PAS coexister (conflit de nom).
+      saisir le MÊME nom directement dans la colonne "Variable" de
+      l'onglet I/O Mapping du canal physique concerné — CODESYS créera
+      alors la variable globale réelle à cet endroit.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du GVL GVL_Winch_M1_Stub) ===
 
 VAR_GLOBAL
-    M1_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M1 (STUB)
-    M1_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M1 (STUB)
-    M1_Contactor1            : BOOL;   // 🔌 Sortie — contacteur vitesse 1 M1 (STUB)
-    M1_Contactor2            : BOOL;   // 🔌 Sortie — contacteur vitesse 2 M1 (STUB)
-    M1_Contactor3            : BOOL;   // 🔌 Sortie — contacteur vitesse 3 M1 (STUB)
-    M1_Contactor4            : BOOL;   // 🔌 Sortie — contacteur vitesse 4 M1 (STUB)
-    M1_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M1 (STUB)
-    // 🔧 CORRECTIF (revue de code) : PAS "toujours FALSE" — PRG_MAIN.st (bloc 🧪 SIMULATION)
-    // mire activement ces 3 retours sur les commandes ci-dessus à chaque scan (contacteur idéal).
-    // ⚠️ INUTILE de forcer ces 3 variables manuellement pour un essai (ex. homing) : le miroir
-    // PRG_MAIN les réécrit CHAQUE cycle depuis M1_RelayFwd/Rev/M1_BrakeCmd — un forçage serait
-    // écrasé au cycle suivant. Elles se stabilisent SEULES en environ 500 ms (DelayMotorDecel)
-    // dès que le joystick reste au neutre (aucun mouvement commandé).
-    M1_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M1 (STUB, miroir de M1_RelayFwd)
-    M1_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M1 (STUB, miroir de M1_RelayRev)
     // 🔧 Polarité frein à manque de courant (confirmée FB_Brake.st §BrakeCmd / FB_Encoder_Homing.st
     // §ArretConfirme) : TRUE = relâché (bobine alimentée) ; FALSE = collé/serré (arrêt sûr tenu).
     M1_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M1 (STUB, miroir de M1_BrakeCmd — TRUE=relâché/FALSE=collé)
-
-    // 🎯 AJOUT 2026-07-02 (lot Homing) — capteur position haute M1 (physique, PAS de miroir
-    // automatique : reste FALSE tant que non forcé manuellement dans la vue instance CODESYS).
-    // ⚠️ Homing volontairement IMPOSSIBLE tant que ce stub reste FALSE (sécurité : ne jamais
-    // simuler un signal safety-relevant comme actif par défaut).
-    M1_TopPositionSensor     : BOOL;   // 🔌 Entrée — capteur position haute M1 (STUB, toujours FALSE)
 END_VAR
 </Single>
             <Single Name="LineInfoPersistence" Type="string">4a81cdc3-8440-48f3-9349-0d47f66492c9_Decl_LineIds</Single>
@@ -91469,7 +91709,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186297292705867</Single>
+        <Single Name="Timestamp" Type="long">639186381038687332</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -91477,41 +91717,29 @@ END_VAR
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Winch_M2_Stub — Variables LOGICIELLES temporaires M2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md §7 Étape 9bis
-   ⚠️ TEMPORAIRE — aucun relais réel piloté. Même principe que
-      `GVL_Winch_M1_Stub.st` : à supprimer dès que le matériel M2
-      (relais sens/vitesse/frein + retours) sera câblé en I/O Mapping
-      avec ces MÊMES noms de variables (les deux mécanismes ne
-      peuvent pas coexister — conflit de nom).
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md §7 Étape 9bis
+   🔴 CORRECTIF (2026-07-02, nouvel export Device.export) : RelayFwd/Rev,
+      Contactor1..4 (renommés `M2_SpeedContactor_1..4` côté device),
+      BrakeCmd, ContactorFeedbackFwd/Rev sont désormais câblés en I/O
+      Mapping RÉEL — RETIRÉS d'ici (conflit de nom sinon, les 2
+      déclarations NE PEUVENT PAS coexister). Seul `M2_BrakeFeedback`
+      reste non câblé côté device pour ce lot. Même principe que
+      `GVL_Winch_M1_Stub.st`.
+   ⚠️ TEMPORAIRE — `M2_BrakeFeedback` reste piloté par le miroir logiciel
+      dans PRG_MAIN.st (bloc 🧪 SIMULATION) tant que le retour frein réel
+      n'est pas câblé.
+   🔴 QUAND LE MATÉRIEL SERA PRÊT : SUPPRIMER ce GVL entièrement, puis
+      saisir le MÊME nom directement dans la colonne "Variable" de
+      l'onglet I/O Mapping du canal physique concerné — CODESYS créera
+      alors la variable globale réelle à cet endroit.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du GVL GVL_Winch_M2_Stub) ===
 
 VAR_GLOBAL
-    M2_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M2 (STUB)
-    M2_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M2 (STUB)
-    M2_Contactor1            : BOOL;   // 🔌 Sortie — contacteur vitesse 1 M2 (STUB)
-    M2_Contactor2            : BOOL;   // 🔌 Sortie — contacteur vitesse 2 M2 (STUB)
-    M2_Contactor3            : BOOL;   // 🔌 Sortie — contacteur vitesse 3 M2 (STUB)
-    M2_Contactor4            : BOOL;   // 🔌 Sortie — contacteur vitesse 4 M2 (STUB)
-    M2_BrakeCmd              : BOOL;   // 🔌 Sortie — bobine frein M2 (STUB)
-    // 🔧 Mirés activement par PRG_MAIN.st (bloc 🧪 SIMULATION) sur les commandes ci-dessus
-    // (contacteur "idéal"), pas "toujours FALSE" — même principe que GVL_Winch_M1_Stub.
-    // ⚠️ INUTILE de forcer ces 3 variables manuellement pour un essai (ex. homing) : le miroir
-    // PRG_MAIN les réécrit CHAQUE cycle depuis M2_RelayFwd/Rev/M2_BrakeCmd — un forçage serait
-    // écrasé au cycle suivant. Elles se stabilisent SEULES en environ 500 ms (DelayMotorDecel)
-    // dès que le joystick reste au neutre (aucun mouvement commandé).
-    M2_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M2 (STUB, miroir de M2_RelayFwd)
-    M2_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M2 (STUB, miroir de M2_RelayRev)
     // 🔧 Polarité frein à manque de courant (confirmée FB_Brake.st §BrakeCmd / FB_Encoder_Homing.st
     // §ArretConfirme) : TRUE = relâché (bobine alimentée) ; FALSE = collé/serré (arrêt sûr tenu).
     M2_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M2 (STUB, miroir de M2_BrakeCmd — TRUE=relâché/FALSE=collé)
-
-    // 🎯 AJOUT 2026-07-02 (lot Homing) — capteur position haute M2 (physique, PAS de miroir
-    // automatique : reste FALSE tant que non forcé manuellement dans la vue instance CODESYS).
-    // ⚠️ Homing volontairement IMPOSSIBLE tant que ce stub reste FALSE (sécurité : ne jamais
-    // simuler un signal safety-relevant comme actif par défaut).
-    M2_TopPositionSensor     : BOOL;   // 🔌 Entrée — capteur position haute M2 (STUB, toujours FALSE)
 END_VAR
 </Single>
             <Single Name="LineInfoPersistence" Type="string">ad38fd16-fdb0-4c5f-a775-32fc62434952_Decl_LineIds</Single>
@@ -91562,7 +91790,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186139671263987</Single>
+        <Single Name="Timestamp" Type="long">639186386518812810</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -91576,6 +91804,7 @@ END_VAR
 IF NOT Enable OR NOT EmergencyStopOk THEN
     Ready := FALSE;
     SafeStop := TRUE;              // Fail-safe : tant que la surveillance n'est pas garantie, on arrête
+    ForbidDescent := TRUE;         // Fail-safe : cohérent avec SafeStop (descente a fortiori interdite)
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -91601,14 +91830,37 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
 
+// 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
+IF ThermalFeedback THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
+
+// 🔍 3quater. MOU DE CÂBLE (câblé — I/O réel 2026-07-02, commun M1/M2) — bit3, N'ARRÊTE PAS
+// la remontée : voir §4ter Partie9 (ForbidDescent dédié, distinct de SafeStop ci-dessous).
+IF SlackCableDetected THEN
+    ErrorId := ErrorId OR 16#0008;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFF7;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId &lt;&gt; 16#0000);
+Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-SafeStop := Error;          // 🟧 Tout défaut du domaine → rampe décélération rapide (Enable maintenu)
+// 🟧 SafeStop : UNIQUEMENT bits 0 (joystick)/1 (codeur)/2 (thermique) — arrêt total des 2 sens.
+// Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
+// (ForbidDescent ci-dessous), pas bloquer une remontée nécessaire pour aller vérifier le câble.
+SafeStop := (ErrorId AND 16#0007) &lt;&gt; 16#0000;
+
+// 🆕 ForbidDescent : reflète UNIQUEMENT le bit3 (mou de câble) — consommé par FB_Winch pour
+// masquer RelayRev (descente) seul, RelayFwd (montée) reste piloté normalement.
+ForbidDescent := (ErrorId AND 16#0008) &lt;&gt; 16#0000;
+
 PowerCutOff := FALSE;       // 🧨 TBD — pas de ST_ContactorCheck de puissance câblé dans ce lot
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)
@@ -91623,8 +91875,8 @@ Done := FALSE;
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1/M2)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md,
-                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.2.md §7
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md,
+                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §7
                    (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
@@ -91645,6 +91897,22 @@ Done := FALSE;
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
         ST_ContactorCheck de puissance câblé — FB_Output_Relay
         transverse hors périmètre de ce lot, voir Partie6).
+   🆕 AJOUT (2026-07-02, retour terrain — nouvel export Device.export avec
+      I/O réel `M1_ThermalFeedback`/`M2_ThermalFeedback` et
+      `M1_M2_SlackCableSwitch`, demande utilisateur) — Partie9 §4ter :
+      - ✅ `ThermalFeedback` (par instance, retour thermique CE moteur) :
+        défaut → bit2 ErrorId → `SafeStop` (arrêt total, protection moteur,
+        comme les autres défauts du domaine).
+      - ✅ `SlackCableDetected` (COMMUN aux 2 treuils, même capteur — même
+        principe que `M1_M2_TopPositionSensor`, câblé IDENTIQUEMENT sur
+        les 2 instances) : mou de câble détecté (descente non arrêtée à
+        temps) → bit3 ErrorId (visible IHM, reset front requis dès que la
+        cause disparaît) → sortie **`ForbidDescent`** DÉDIÉE, DISTINCTE de
+        `SafeStop` — bloque UNIQUEMENT la descente (`FB_Winch.RelayRev`),
+        la remontée (`RelayFwd`) reste libre pour permettre à l'opérateur
+        d'aller vérifier le câblage. Nouveau pattern (pas un simple
+        `SafeStop`, qui aurait arrêté les 2 sens) — voir Partie9 §4ter
+        pour la justification complète.
    🔴 TBD — SURVEILLANCE DE COHÉRENCE MOUVEMENT (retour terrain 2026-07-02,
       idée capturée, NON conçue en détail, NON implémentée — détail complet
       dans DOC/AF_Partie9 §4bis). 4 cas DISTINCTS (1 bit ErrorId chacun,
@@ -91676,16 +91944,19 @@ VAR_INPUT
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
+    ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
+    SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun)
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
+    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2 uniquement
+    ForbidDescent       : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la descente (bit3, mou de câble) — Enable/RelayFwd (montée) non affectés
     PowerCutOff         : BOOL;        // 🧨 Sortie maîtresse : coupure puissance amont (FALSE, TBD ce lot)
 END_VAR
 VAR
@@ -91695,7 +91966,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">1c48691e-7eeb-425a-a642-75da80a33af5_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">706</Single>
+        <Single Name="UniqueIdGenerator" Type="string">1788</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -91886,7 +92157,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186240010750716</Single>
+        <Single Name="Timestamp" Type="long">639186400912291554</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -91894,54 +92165,34 @@ END_VAR</Single>
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Winch) ===
-
-// 🛑 1. GATE (Enable / EmergencyStopOk) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT EmergencyStopOk THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-
     SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
     StepNumber := SpeedStep.StepNumber;
-
     Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
     BrakeCmd := Brake.BrakeCmd;
     BrakeContactorCheck := Brake.ContactorCheck;
-
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
     SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
-
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
-CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms (valeur de secours si delta temps invalide)
+CycleTimeCalc(DefaultValueS := 0.010);
 
-// 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
-// ⚙️ 3. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
-// 🔧 CORRECTIF (retour terrain 2026-07-02) : un changement de sens en attente FORCE la cible
-// de rampe à 0.0, INDÉPENDAMMENT de ce que redemande le joystick entre-temps. Avant ce
-// correctif, la cible suivait en continu SpeedRefPct (magnitude joystick) ; lors d'une
-// inversion plus rapide que le temps de décélération réel, rien ne garantissait que cette
-// magnitude "croise" un instant sous le seuil 0,1 % (deux rampes en cascade avancent par pas
-// discrets, la magnitude peut sauter par-dessus la fenêtre sans jamais y entrer) — le treuil
-// ne s'arrêtait jamais tant que l'opérateur ne laissait pas le joystick se stabiliser au
-// neutre. Désormais : dès qu'un sens différent est demandé (hors 1er engagement depuis
-// neutre), on force l'arrêt réel et déterministe avant d'envisager quoi que ce soit d'autre.
 DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
 
 RampTargetPct := 0.0;
 IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
-    RampTargetPct := ABS(SpeedRefPct);  // 🔧 2026-07-02 : SpeedRefPct peut arriver signé (AxisCmdY.SpeedRef) —
-                                          // ABS() ici préserve l'invariant "SpeedRamp cible toujours &gt;= 0" documenté
-                                          // dans FB_Ramp.st (jamais concerné par le correctif traversée de zéro)
+    RampTargetPct := ABS(SpeedRefPct);
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,
@@ -91949,36 +92200,11 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
-// 🔒 3bis. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés
-// ⚠️ CORRECTIF 1 (retour terrain 2026-07-01) : l'ancienne version exigeait 200 ms à vitesse
-// confirmée nulle AVANT de figer CommandedDirection, y compris pour le tout premier
-// engagement (neutre → un sens) — or la rampe quitte le seuil de 0.1 % en ~2 ms dès qu'une
-// consigne existe (AccelRate 50 %/s), donc la fenêtre se refermait avant que le délai de
-// 200 ms n'ait pu s'écouler : CommandedDirection restait bloqué à 0 en permanence (aucun
-// RelayFwd/RelayRev jamais activé, alors que les paliers de vitesse évoluaient normalement).
-// ⚠️ CORRECTIF 2 (revue de code 2026-07-01) : le correctif 1 traitait "un sens → neutre"
-// comme immédiat au même titre que "neutre → un sens" — or RelayFwd/RelayRev suivent
-// CommandedDirection, alors que Contactor1..4 suit SpeedRamp.Current (rampe interne
-// indépendante) : un arrêt demandé (Direction:=0) coupait le contacteur de sens
-// INSTANTANÉMENT, alors que le palier de vitesse et le frein (MovementRequested) restaient
-// actifs pendant encore toute la durée de la rampe de décélération — perte de couple moteur
-// non contrôlée, frein encore ouvert. Non conforme Partie3 §9 ("SafeStop ne coupe pas les
-// sorties : elles restent actives le temps de la décélération").
-// ⚠️ CORRECTIF 3 (retour terrain 2026-07-02) : les correctifs 1/2 supposaient que
-// ABS(SpeedRamp.Current) finirait par croiser le seuil 0,1 % naturellement — faux en cas
-// d'inversion plus rapide que le temps de décélération réel (voir §3, DirectionChangePending
-// force maintenant la cible à 0 de façon déterministe, donc ce test ci-dessous devient
-// fiable dans tous les cas, y compris les inversions rapides/répétées).
-// Correction définitive : SEUL neutre → un sens (engagement initial) est immédiat (rien à
-// interrompre). "un sens → neutre" (arrêt) ET une inversion directe Fwd↔Rev exigent tous
-// les deux la vitesse rampée confirmée nulle avant de lâcher/changer CommandedDirection.
 IF Direction &lt;&gt; CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
-        // Engagement initial neutre → un sens : immédiat (rien à inverser brutalement)
         CommandedDirection := Direction;
         DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
     ELSIF ABS(SpeedRamp.Current) &lt; 0.1 THEN
-        // Arrêt (un sens → neutre) ou inversion directe Fwd↔Rev : vitesse confirmée nulle requise
         DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
         IF DirectionChangeDelay.Q THEN
             CommandedDirection := Direction;
@@ -91991,7 +92217,6 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-// 🪜 4. PALIER DE VITESSE (composé, table propre à ce treuil)
 SpeedStep(Enable := (ABS(SpeedRamp.Current) &gt; 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
 StepNumber := SpeedStep.StepNumber;
@@ -92000,11 +92225,13 @@ Contactor2 := SpeedStep.Contactor2;
 Contactor3 := SpeedStep.Contactor3;
 Contactor4 := SpeedStep.Contactor4;
 
-// ➡️⬅️ 5. CONTACTEURS DE SENS
 RelayFwd := (CommandedDirection = 1) AND (StepNumber &gt; 0);
 RelayRev := (CommandedDirection = -1) AND (StepNumber &gt; 0);
 
-// 🛑 6. FREIN (composé) — ne relâche qu'après la séquence temporisée interne
+IF ForbidDescent THEN
+    RelayRev := FALSE;
+END_IF;
+
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev),
       ContactorFeedback := BrakeFeedback,
       DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
@@ -92012,7 +92239,6 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev
 BrakeCmd := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
 
-// 🔍 7. DOUBLE VÉRIFICATION CONTACTEURS DE SENS (ST_ContactorCheck)
 FwdContactorCheck.Command := RelayFwd;
 FwdContactorCheck.Feedback := ContactorFeedbackFwd;
 TonFwdFeedback(IN := (RelayFwd &lt;&gt; ContactorFeedbackFwd), PT := ContactorFeedbackTimeout);
@@ -92033,7 +92259,6 @@ ELSIF ResetEdge.Q THEN
     RevContactorCheck.StuckClosed := FALSE; RevContactorCheck.StuckOpen := FALSE;
 END_IF;
 
-// 🧾 8. ERRORID (bitfield, cumul — effacé bit à bit si cause disparue + reset front)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
@@ -92058,32 +92283,22 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🚦 9. STATE MACHINE (phase — orthogonale à Error, Partie3 §2)
-// 🔧 AJOUT DirectionChangePending (2026-07-02) : décélération forcée par un changement de
-// sens en attente = aussi un STOPPING pour l'IHM (cohérent avec le §3 ci-dessus).
 IF (NOT StartStop OR SafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.STOPPING;      // Décélération en cours (arrêt demandé, défaut process, ou changement de sens en attente)
+    State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.BUSY;          // Mouvement en cours
+    State := E_State.BUSY;
 ELSE
-    State := E_State.READY;         // À l'arrêt, prêt
+    State := E_State.READY;
 END_IF;
 
 Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
-Done := FALSE;   // Pas de notion de "terminé" ponctuel sans FB_Cycle — présent pour conformité
+Done := FALSE;
 
-// 🛡️ 10. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7 : "sorties coupées si Error / NOT Enable")
-// ⚠️ AJOUT (revue de code 2026-07-01) : un contacteur de sens incohérent (collé/absent) ou un
-// défaut frein ne neutralisait auparavant QUE le diagnostic (ErrorId), sans couper les sorties
-// physiques — le treuil restait commandé normalement malgré un défaut détecté. Coupure directe
-// (pas de rampe) : on ne peut plus se fier au contacteur suspect pour un arrêt maîtrisé, comme
-// pour l'AU physique (Partie2 §6 — coupure brutale, frein collé brutalement, cas distinct du
-// SafeStop process qui reste géré en douceur ci-dessus).
 IF Error THEN
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-    BrakeCmd := FALSE;   // Frein collé — position sûre par défaut
+    BrakeCmd := FALSE;
 END_IF;
 </Single>
             <Single Name="LineInfoPersistence" Type="string">fe1e6af7-da18-4559-8d7e-415a962a53ee_Impl_LineIds</Single>
@@ -92094,7 +92309,7 @@ END_IF;
             <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1/M2 — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -92121,75 +92336,78 @@ END_IF;
    🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
       uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
+   🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
+      entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
+      `SafeStop`) — masque UNIQUEMENT `RelayRev` (descente), `RelayFwd`
+      (montée) reste piloté normalement. Permet à l'opérateur de remonter
+      pour vérifier le câblage sans être bloqué par un `SafeStop` classique
+      qui aurait arrêté les 2 sens. Voir DOC/AF_Partie9 §4ter.
    ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Winch) ===
 
 FUNCTION_BLOCK PUBLIC FB_Winch
 VAR_INPUT
-    Enable                  : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
-    Reset                   : BOOL;        // Acquittement défaut (front)
-    EmergencyStopOk         : BOOL;        // Chaîne AU réarmée + conditions globales OK
-    Mode                    : E_Mode;      // Mode courant (contexte — droits arbitrés en amont par l'appelant)
-    StartStop               : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
-    SafeStop                : BOOL;        // Sortie FB_Safety_Winch : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    Direction               : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (ex. AxisCmdY.Direction) — source d'autorité du sens (interlock §3bis)
-    SpeedRefPct             : REAL;        // 🔧 2026-07-02 : AxisCmdY.SpeedRef est désormais SIGNÉ (-100..+100 %) —
-                                            // seule la MAGNITUDE est utilisée ici (ABS() en §3), Direction ci-dessus
-                                            // reste la source d'autorité du sens/interlock (inchangé, non re-testé)
-    SpeedStepTable          : ST_SpeedStepTable;  // Table des 5 paliers PROPRE À CE TREUIL
-    ContactorFeedbackFwd    : BOOL;        // Retour d'état câblé contacteur sens avant
-    ContactorFeedbackRev    : BOOL;        // Retour d'état câblé contacteur sens arrière
-    BrakeFeedback           : BOOL;        // Retour d'état câblé bobine frein
-    RampAccelRate           : REAL := 50.0;    // %/s — accélération
-    RampDecelNormalRate     : REAL := 150.0;   // %/s — décélération normale (StartStop=FALSE)
-    RampDecelFastRate       : REAL := 400.0;   // %/s — décélération RAPIDE (SafeStop=TRUE, "plus rapide que l'accel")
-    SpeedStepHystMargin     : REAL := 2.0;     // % — marge anti-battement changement de palier
-    DirectionInterlockDelay : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt
-    ContactorFeedbackTimeout: TIME := T#500ms; // Timeout cohérence commande/retour contacteurs de sens
-    BrakeDelayContactClose  : TIME := T#100ms; // Voir FB_Brake
-    BrakeDelayMagnetise     : TIME := T#300ms; // Voir FB_Brake
-    BrakeDelayMotorDecel    : TIME := T#500ms; // Voir FB_Brake
-    BrakeFeedbackTimeout    : TIME := T#1s;    // Voir FB_Brake
+    Enable                  : BOOL;
+    Reset                   : BOOL;
+    EmergencyStopOk         : BOOL;
+    Mode                    : E_Mode;
+    StartStop               : BOOL;
+    SafeStop                : BOOL;
+    ForbidDescent           : BOOL;
+    Direction               : INT;
+    SpeedRefPct             : REAL;
+    SpeedStepTable          : ST_SpeedStepTable;
+    ContactorFeedbackFwd    : BOOL;
+    ContactorFeedbackRev    : BOOL;
+    BrakeFeedback           : BOOL;
+    RampAccelRate           : REAL := 50.0;
+    RampDecelNormalRate     : REAL := 150.0;
+    RampDecelFastRate       : REAL := 400.0;
+    SpeedStepHystMargin     : REAL := 2.0;
+    DirectionInterlockDelay : TIME := T#200ms;
+    ContactorFeedbackTimeout: TIME := T#500ms;
+    BrakeDelayContactClose  : TIME := T#100ms;
+    BrakeDelayMagnetise     : TIME := T#300ms;
+    BrakeDelayMotorDecel    : TIME := T#500ms;
+    BrakeFeedbackTimeout    : TIME := T#1s;
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0: Brake.Error ; bit1: contacteur sens Fwd ; bit2: contacteur sens Rev
+    ErrorId             : WORD;
     State               : E_State;
     StateAtError        : E_State;
-    RelayFwd            : BOOL;        // 🔌 Contacteur sens avant (montée) — à mapper en I/O Mapping
-    RelayRev            : BOOL;        // 🔌 Contacteur sens arrière (descente) — à mapper en I/O Mapping
-    Contactor1          : BOOL;        // 🔌 Contacteur vitesse 1 pour le palier courant (Table.P&lt;n&gt;R1)
-    Contactor2          : BOOL;        // 🔌 Contacteur vitesse 2 pour le palier courant (Table.P&lt;n&gt;R2)
-    Contactor3          : BOOL;        // 🔌 Contacteur vitesse 3 pour le palier courant (Table.P&lt;n&gt;R3)
-    Contactor4          : BOOL;        // 🔌 Contacteur vitesse 4 pour le palier courant (Table.P&lt;n&gt;R4)
-    StepNumber          : INT;         // Palier courant (IHM, 0..5)
-    BrakeCmd            : BOOL;        // 🔌 Commande bobine frein — TRUE = relâché
-    FwdContactorCheck   : ST_ContactorCheck;   // Diag contacteur sens avant (IHM/FB_Safety_Winch)
-    RevContactorCheck   : ST_ContactorCheck;   // Diag contacteur sens arrière
-    BrakeContactorCheck : ST_ContactorCheck;   // Diag contacteur frein (miroir de FB_Brake)
+    RelayFwd            : BOOL;
+    RelayRev            : BOOL;
+    Contactor1          : BOOL;
+    Contactor2          : BOOL;
+    Contactor3          : BOOL;
+    Contactor4          : BOOL;
+    StepNumber          : INT;
+    BrakeCmd            : BOOL;
+    FwdContactorCheck   : ST_ContactorCheck;
+    RevContactorCheck   : ST_ContactorCheck;
+    BrakeContactorCheck : ST_ContactorCheck;
 END_VAR
 VAR
-    SpeedStep           : FB_SpeedStep;    // 🧩 Composé — décodage palier
-    Brake               : FB_Brake;        // 🧩 Composé — séquence frein
-    CycleTimeCalc       : FB_CycleTime;    // Base de temps pour la rampe interne
-    SpeedRamp           : FB_Ramp;         // Rampe interne (arbitrage SafeStop/StartStop)
+    SpeedStep           : FB_SpeedStep;
+    Brake               : FB_Brake;
+    CycleTimeCalc       : FB_CycleTime;
+    SpeedRamp           : FB_Ramp;
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
-    DirectionChangeDelay: TON;             // Interlock changement de sens
-    CommandedDirection  : INT;             // Sens réellement appliqué (figé pendant le mouvement)
+    DirectionChangeDelay: TON;
+    CommandedDirection  : INT;
     TonFwdFeedback      : TON;
     TonRevFeedback      : TON;
     RampTargetPct       : REAL;
-    DirectionChangePending : BOOL;  // 🔧 AJOUT (retour terrain 2026-07-02) — voir §3
+    DirectionChangePending : BOOL;
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">fe1e6af7-da18-4559-8d7e-415a962a53ee_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">1394</Single>
+        <Single Name="UniqueIdGenerator" Type="string">2056</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
