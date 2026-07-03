@@ -79,7 +79,7 @@ GVL_IN.M1ContactorFeedbackFwd := instM1ContactorFwd.State;
 instM1ContactorRev(InputRaw := M1_ContactorFeedbackRev_DI, FilterTime := T#20MS);
 GVL_IN.M1ContactorFeedbackRev := instM1ContactorRev.State;
 
-instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR GVL_DEBUG.DBG_ThermalBypass_TEST, FilterTime := T#20MS);
+instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, FilterTime := T#20MS);
 GVL_IN.M1ThermalFeedback := instM1Thermal.State;
 
 // 🆕 Retour frein M1 RÉEL (était miroir logiciel GVL_Winch_M1_Stub)
@@ -93,7 +93,7 @@ GVL_IN.M2ContactorFeedbackFwd := instM2ContactorFwd.State;
 instM2ContactorRev(InputRaw := M2_ContactorFeedbackRev_DI, FilterTime := T#20MS);
 GVL_IN.M2ContactorFeedbackRev := instM2ContactorRev.State;
 
-instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR GVL_DEBUG.DBG_ThermalBypass_TEST, FilterTime := T#20MS);
+instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, FilterTime := T#20MS);
 GVL_IN.M2ThermalFeedback := instM2Thermal.State;
 
 // 🆕 Retour frein M2 RÉEL (était miroir logiciel GVL_Winch_M2_Stub)
