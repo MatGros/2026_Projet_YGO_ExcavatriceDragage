@@ -113,6 +113,10 @@ VAR
     M2_Direction_Active     : INT;              // Consigne Direction arbitrée pour M2
     M2_SpeedRef_Active      : REAL;             // Consigne SpeedRef arbitrée pour M2
     M2_SpeedStepTableActive : ST_SpeedStepTable; // Table de paliers active de M2
+
+    // 🛠️ Variables de simulation pour banc de test (mouvement simulé des treuils)
+    SimulatedM1Raw          : UDINT := 1000000;
+    SimulatedM2Raw          : UDINT := 1000000;
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -312,6 +316,41 @@ FB_Joystick_0(
    🎯 Ordre d'appel PAR TREUIL : Abs → Scale → Homing (voir en-tête
       fichier — dépendance croisée Abs↔Homing assumée à 1 cycle près).
    ═══════════════════════════════════════════════════════════════ *)
+
+// 🛠️ --- SIMULATION SUR BANC DE TEST (Winches M1/M2) ---
+// Actif uniquement si GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST est TRUE.
+// Permet de simuler le mouvement des treuils et le homing sans matériel connecté.
+IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    // Treuil M1
+    IF COD1_PresettTrigCmd = 2 THEN
+        SimulatedM1Raw := COD1_PresetValue; // Simule le recalage matériel lors de la commande de preset (homing)
+    ELSIF GVL_OUT.M1RelayFwd THEN
+        SimulatedM1Raw := SimulatedM1Raw + REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1);
+    ELSIF GVL_OUT.M1RelayRev THEN
+        IF SimulatedM1Raw >= REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1) THEN
+            SimulatedM1Raw := SimulatedM1Raw - REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1);
+        ELSE
+            SimulatedM1Raw := 0;
+        END_IF;
+    END_IF;
+
+    // Treuil M2
+    IF COD2_PresettTrigCmd = 2 THEN
+        SimulatedM2Raw := COD2_PresetValue; // Simule le recalage matériel lors de la commande de preset (homing)
+    ELSIF GVL_OUT.M2RelayFwd THEN
+        SimulatedM2Raw := SimulatedM2Raw + REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1);
+    ELSIF GVL_OUT.M2RelayRev THEN
+        IF SimulatedM2Raw >= REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1) THEN
+            SimulatedM2Raw := SimulatedM2Raw - REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1);
+        ELSE
+            SimulatedM2Raw := 0;
+        END_IF;
+    END_IF;
+
+    // Écriture des positions simulées dans les variables physiques pour instEncoderAbsM1/M2
+    COD1_PosValue := SimulatedM1Raw;
+    COD2_PosValue := SimulatedM2Raw;
+END_IF;
 
 instEncoderAbsM1(
     Enable              := TRUE,
