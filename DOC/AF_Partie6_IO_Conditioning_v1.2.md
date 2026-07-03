@@ -2,12 +2,17 @@
 
 > **v1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Translation→Chariot
 > dans les exemples (préfixe I/O physique M3 inchangé).
-> 📌 **État d'implémentation (2026-07-02)** : `FB_Input_Digital.st`/`FB_Output_Relay.st` **codés**
-> (conformes à la proposition d'interface ci-dessous, non modifiée). **Non encore intégrés** :
-> ni composés dans `FB_Winch`/`FB_Chariot` (remplaceraient leur double-vérification actuelle
-> écrite à la main), ni appelés via un `FB_IO` générique en tableaux (§3) — choix d'architecture
-> **en attente de décision utilisateur**. `M1_*`/`M2_*`/`M3_*` (Winch/Chariot) restent des
-> variables nommées individuelles (stubs GVL), pas encore migrées vers ces briques.
+> 📌 **État d'implémentation (2026-07-03ter, AUDIT D36/D37)** : `FB_Input_Digital.st`/
+> `FB_Output_Relay.st` **codés et intégrés** via un FB composite unique **`FB_IO_Machine`**
+> (`CODE/FB_IO_Machine.st`), **1 seule instance** (`instIoMachine`) dans `PRG_MAIN`, appelée
+> 2×/cycle (entrées tôt, sorties tard — voir en-tête du fichier). Couvre TOUT le conditionnement
+> I/O réel connu à ce jour : `EmergencyStopOk` (commun), mou de câble + capteur position haute
+> (commun M1/M2), Winch M1 (3 entrées + 7 sorties), Winch M2 (idem), Chariot M3 (4 capteurs
+> position + `BrakeCmd`, seuls signaux réels — `RelayFwd/Rev/RelaySpeedGv` restent STUB logiciel,
+> pas de matériel réel). Anti-rebond fixe `T#20MS` + `InvertLogic` par voie (bascule NO/NC en
+> mise en service sans câblage). **Reste non intégré** : composition DANS `FB_Winch`/`FB_Chariot`
+> eux-mêmes (remplacerait leur double-vérification contacteur écrite à la main — choix
+> d'architecture toujours en attente, `UseFeedback` reste `FALSE` partout dans `FB_IO_Machine`).
 >
 > **Version 1.1** — Suite audit documentaire : §5 corrigé — il n'y a **pas de coupure sèche**
 > de la sortie relais sur défaut. Le passage en **rampe** (normale via `StartStop`, rapide via

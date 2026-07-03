@@ -2,7 +2,7 @@
 
 > **v1.2** — Renommage métier Translation→Chariot (demande utilisateur — l'axe transversal est
 > un objet métier, "le chariot qui se déplace"), préfixe I/O physique M3 inchangé. AJOUT §5bis :
-> capteurs position réels du chariot (`PosiFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`,
+> capteurs position réels du chariot (`PosFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`,
 > I/O Mapping réel) + sélecteur STUB maintenance (`StubChariotPositionSelect_IHM`,
 > `GVL_Chariot_M3_Stub`) en attendant `FB_Cycle` pour la sélection de cible normale.
 
@@ -227,7 +227,7 @@ permettant un arrêt précis sur chacun sans attendre `FB_Cycle` (pas encore cod
 
 | Variable (I/O réel) | Rôle |
 |----------------------|------|
-| `PosiFosse1` | Position fosse 1 |
+| `PosFosse1` | Position fosse 1 |
 | `PosFosse2` | Position fosse 2 |
 | `PosMaintenance` | Position maintenance |
 | `PosTremie` | Position trémie |
@@ -334,7 +334,7 @@ opérationnel pendant que l'EtherCAT est en panne. Étapes (une fois validées) 
 - [ ] `FB_Safety_Chariot` : n'est validée que pour perte joystick/CAN ce lot — revoir avant mise en service définitive
 - [ ] Paramètre "source de commande" AC600 (§4bis) confirmé verrouillé sur Terminal pendant `DEGRADED_IO` — vérifier qu'une reprise EtherCAT intermittente ne perturbe pas la commande relais
 - [ ] 🆕 **v1.2** — Vérifier `M3_BrakeCmd` (désormais I/O réel) : commande cohérente avec `MovementRequested`, pas de régression suite au retrait du miroir logiciel.
-- [ ] 🆕 **v1.2** — Tester le sélecteur STUB position (§5bis) : chaque valeur 1..4 de `StubChariotPositionSelect_IHM` active bien le bon capteur (`PosiFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`) sur `M3_PositionSensorTarget`, 0 = aucun (comportement neutre, pas d'arrêt sur capteur).
+- [ ] 🆕 **v1.2** — Tester le sélecteur STUB position (§5bis) : chaque valeur 1..4 de `StubChariotPositionSelect_IHM` active bien le bon capteur (`PosFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`) sur `M3_PositionSensorTarget`, 0 = aucun (comportement neutre, pas d'arrêt sur capteur).
 
 ---
 

@@ -241,3 +241,35 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
   (`FB_Encoder_Homing/Scale`, `FB_Safety_Winch`, `ST_EncoderCalib`).
 - **DOC/** : Partie10 v1.4→**v1.5**→**v1.6** (2 lots), Partie9 (ref croisée v1.6),
   `CLAUDE.md` (ref croisée v1.6), AUDIT Q11 partiellement résolue.
+
+---
+
+## 🚀 10. `EmergencyStopOk` généralisé via `FB_Input_Digital` (2026-07-03bis)
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D34 | **`EmergencyStopOk` réel généralisé (Q11 close)** | Le câblage direct de l'I/O réel `EmergencyStopOk` (D32) est étendu à **tous** les FB métier (Joystick/Safety_Winch M1+M2/Winch M1+M2/Safety_Chariot/Chariot), en plus d'Encoder/Homing. `GVL_DEBUG.DBG_True` **disparaît** de `PRG_MAIN` pour ce signal. |
+| D35 | **Intégration `FB_Input_Digital` (Partie6 §0, "en attente")** | Choix tranché **pour `EmergencyStopOk` uniquement** (pas pour tous les I/O) : une instance `instEmergencyStopOk` conditionne le raw I/O (anti-rebond `T#20MS` + `InvertLogic` pour bascule NO/NC en mise en service sans retoucher le câblage) → sortie `EmergencyStopOkCond`, seule variable distribuée aux FB métier. Motivation utilisateur : pouvoir **forcer/inverser facilement** en mise en service sans toucher les GVL. `ChannelOk` laissé au défaut `TRUE` (pas de diagnostic voie/carte disponible ce lot). |
+
+> ✅ **Q11 entièrement résolue** (D32 + D34/D35).
+
+### Fichiers impactés (2026-07-03bis)
+- **CODE/** : `PRG_MAIN.st` (`instEmergencyStopOk : FB_Input_Digital`, `EmergencyStopOkCond`,
+  remplace `EmergencyStopOk`/`GVL_DEBUG.DBG_True` sur les 11 câblages FB métier).
+- **DOC/** : `AF_Partie6_IO_Conditioning` (état d'implémentation — `FB_Input_Digital` intégré pour
+  `EmergencyStopOk`), AUDIT Q11 close.
+
+---
+
+## 🚀 11. Généralisation finale — `FB_IO_Machine` (2026-07-03ter)
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D36 | **Consolidation en 1 seul FB `FB_IO_Machine` (revient sur D35 "uniquement EmergencyStopOk")** | Après tests successifs (par métier `FB_IO_Winch`/`FB_IO_Chariot`, ou par sens In/Out séparé), choix final utilisateur : **un seul FB, une seule instance** (`instIoMachine`) couvrant TOUT le conditionnement I/O réel de la machine (Commun + Winch M1 + Winch M2 + Chariot M3, entrées ET sorties). Interface volontairement longue (~28 voies) mais **tout au même endroit**, classé par section métier commentée — priorité choisie : lisibilité/maintenabilité (1 seul fichier à ouvrir) plutôt que modularité par FB. `instSafety`/`LocalEmergencyStopTOR` (résidu mort, sorties jamais consommées) retirés de `PRG_MAIN` à cette occasion. |
+| D37 | **Appel 2×/cycle d'une même instance (pattern retenu)** | `instIoMachine` est appelée deux fois dans `PRG_MAIN` : 1er appel tout en haut (entrées réelles → `*Cond`, consommées par Homing/Safety_Winch/Winch/Safety_Chariot/Chariot), 2e appel tout en bas (commandes `*Cmd` des FB métier, disponibles seulement à ce point → `*Out` vers I/O Mapping réel). Sans risque sur les timers anti-rebond internes (écart de temps ≈0 entre les 2 appels du même scan). Chariot M3 : seuls les signaux réellement câblés (`PosFosse1/2/Maintenance/Tremie`, `M3_BrakeCmd`) sont conditionnés — `M3_RelayFwd/Rev/RelaySpeedGv` restent STUB logiciel (pas de matériel réel). |
+
+### Fichiers impactés (2026-07-03ter)
+- **CODE/** : `FB_IO_Machine.st` (nouveau, remplace `FB_IO_Winch.st`/`FB_IO_Winch_In.st`/
+  `FB_IO_Winch_Out.st` supprimés en cours de route), `PRG_MAIN.st` (1 seule instance
+  `instIoMachine`, 2 appels ; `instSafety`/`LocalEmergencyStopTOR`/`LocalEthercatOk` retirés).
+- **DOC/** : `AF_Partie6_IO_Conditioning` (état d'implémentation mis à jour), AUDIT (ce §11).

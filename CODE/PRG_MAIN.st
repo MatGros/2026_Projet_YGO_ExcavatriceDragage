@@ -23,10 +23,8 @@
          en attendant FB_Cycle — voir GVL_Chariot_M3_Stub.
    🔧 CORRECTIF (2026-07-03, retour terrain) :
       1. `EmergencyStopOk` est désormais un **I/O réel** (retour contacteur
-         puissance géré par l'AU, résout Partie3/AUDIT Q11) — remplace le
-         stub `GVL_DEBUG.DBG_True` sur les FB codeur/homing (Abs/Homing
-         M1/M2 uniquement ce lot — Joystick/Safety/Winch/Chariot restent
-         en stub, à traiter dans un prochain lot).
+         puissance géré par l'AU, résout Partie3/AUDIT Q11) — câblé d'abord
+         sur les FB codeur/homing (Abs/Homing M1/M2) ce lot-ci.
       2. `Reset` des FB codeur/homing câblé sur `GVL_Encoder_Stub`
          (`M1/M2_Reset_IHM`, un bouton par codeur, acquitte Abs+Homing) —
          n'était câblé nulle part avant (`FALSE` figé = alarmes jamais
@@ -35,6 +33,16 @@
          être mappé IHM/réglé pour le pipeline codeur (Reset,
          ConfirmCoherence, Home, TopSensorPositionM) — déplacé depuis
          PRG_MAIN (`StubHomeButton_IHM`, `M1/M2_TopSensorPositionM`).
+   🔧 CORRECTIF (2026-07-03bis, AUDIT D34/D35 — Q11 close) :
+      `EmergencyStopOk` généralisé à TOUS les FB métier (Joystick/Safety_Winch/
+      Winch/Safety_Chariot/Chariot), plus de `GVL_DEBUG.DBG_True` pour ce
+      signal. Passe par `instIoMachine : FB_IO_Machine` (§1 ci-dessous) →
+      `EmergencyStopOkCond`, seule variable câblée partout — permet de
+      forcer/inverser (`InvertLogic`) en mise en service sans toucher au câblage.
+   🔧 CORRECTIF (2026-07-03ter, Plan FB_IO final) : TOUT le conditionnement I/O réel
+      de la machine (Commun/Winch M1/Winch M2/Chariot M3, entrées+sorties) regroupé
+      dans UNE SEULE FB `FB_IO_Machine`, 1 SEULE instance `instIoMachine`, appelée
+      2× par cycle (entrées tôt, sorties tard) — voir en-tête `FB_IO_Machine.st`.
    ⚠️ M2 ACTIF DÈS CE LOT (choix acté 2026-07-02) : dupliqué sur l'axe Y
       comme M1, SANS sélecteur ni FB_WinchSync réel (codeur pas encore
       exploité pour une synchro — voir DOC/AF_Partie9 §9).
@@ -47,6 +55,10 @@
       À SUPPRIMER MANUELLEMENT dans CODESYS (clic droit → Delete) — sa
       logique est remplacée par les instances ci-dessous, câblées
       directement ici (principe 1 seul POU, Partie2 §0).
+   🔴 CORRECTIF (2026-07-03bis) : `instSafety` (FB_Safety) retiré de PRG_MAIN — sorties
+      (SafetyOk/SafeStop) jamais consommées, `LocalEmergencyStopTOR` était un stub jamais
+      câblé. `FB_Safety` devient orphelin dans CODESYS (comme PRG_COD1) — à supprimer
+      manuellement si aucun usage futur n'est prévu.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU PRG_MAIN) ===
@@ -61,12 +73,29 @@ VAR_IN_OUT
 END_VAR
 
 VAR
-    instSafety       : FB_Safety;
     instDiagCanOpen  : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
     instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
 
-    LocalEmergencyStopTOR  : BOOL := TRUE;
-    LocalEthercatOk        : BOOL := FALSE;  // Résumé diagnostic EtherCAT
+    // 🧰 FB_IO_MACHINE — conditionnement I/O réel de TOUTE la machine, 1 SEULE instance
+    // (Commun/Winch M1/Winch M2/Chariot M3, entrées+sorties). Voir en-tête FB_IO_Machine.st :
+    // APPELÉE 2× PAR CYCLE (1er appel entrées, plus bas avant Joystick/Homing/Safety/Winch/
+    // Chariot ; 2e appel sorties, tout en bas après FB_Winch M1/M2 ET FB_Chariot).
+    instIoMachine : FB_IO_Machine;
+
+    // 📤 Sorties conditionnées (entrées) consommées par Homing/Safety_Winch/Winch/Chariot
+    EmergencyStopOkCond         : BOOL;
+    M1_M2_SlackCableSwitchCond  : BOOL;
+    M1_M2_TopPositionSensorCond : BOOL;
+    M1_ContactorFeedbackFwdCond : BOOL;
+    M1_ContactorFeedbackRevCond : BOOL;
+    M1_ThermalFeedbackCond      : BOOL;
+    M2_ContactorFeedbackFwdCond : BOOL;
+    M2_ContactorFeedbackRevCond : BOOL;
+    M2_ThermalFeedbackCond      : BOOL;
+    ChariotPosFosse1Cond        : BOOL;
+    ChariotPosFosse2Cond        : BOOL;
+    ChariotPosMaintenanceCond   : BOOL;
+    ChariotPosTremieCond        : BOOL;
 
     // 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
     FB_Joystick_0 : FB_Joystick;
@@ -151,17 +180,44 @@ instDiagEthercat(
     EncoderM2SlaveState := 8           // TBD: from EtherCAT master
 );
 
-// Update local status
-LocalEthercatOk := instDiagEthercat.Variateur.Operational AND instDiagEthercat.EncoderM1.Operational AND instDiagEthercat.EncoderM2.Operational;
+(* ═══════════════════════════════════════════════════════════════
+   🧰 1. FB_IO_MACHINE — conditionnement I/O réel, 1er appel/2 (ENTRÉES)
+   ───────────────────────────────────────────────────────────────
+   TOUT le conditionnement d'entrées réelles de la machine (Commun + Winch M1 + Winch M2
+   + Chariot M3) en UN SEUL appel, AVANT tout FB métier — clôt Q11/D32 (AUDIT) et
+   généralise le principe (anti-rebond + `InvertLogic` forçable en mise en service sans
+   toucher au câblage). 2e appel (sorties) plus bas, après FB_Winch/FB_Chariot — voir
+   en-tête FB_IO_Machine.st.
+   ═══════════════════════════════════════════════════════════════ *)
 
-// 1. ÉVALUATION DE LA SÉCURITÉ TRANSVERSE (existante, inchangée)
-instSafety(
-    Enable := TRUE,
-    EStopArmed := LocalEmergencyStopTOR,
-    CanOnline := instDiagCanOpen.Joystick.Online,
-    CanOperational := instDiagCanOpen.Joystick.Operational,
-    EthercatOk := LocalEthercatOk
+instIoMachine(
+    EmergencyStopOkRaw        := EmergencyStopOk OR GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST,  // 📡 I/O Mapping réel ⚠️ OR bypass TEST banc (GVL_DEBUG) — TOUJOURS FALSE avant essai réel
+    SlackCableSwitchRaw       := M1_M2_SlackCableSwitch,    // 📡 I/O Mapping réel
+    TopPositionSensorRaw      := M1_M2_TopPositionSensor OR GVL_DEBUG.DBG_TopPositionSensorBypass_TEST,  // 📡 I/O Mapping réel ⚠️ OR bypass TEST banc (GVL_DEBUG) — TOUJOURS FALSE avant essai réel
+    M1ContactorFeedbackFwdRaw := M1_ContactorFeedbackFwd,   // 📡 I/O Mapping réel
+    M1ContactorFeedbackRevRaw := M1_ContactorFeedbackRev,   // 📡 I/O Mapping réel
+    M1ThermalFeedbackRaw      := M1_ThermalFeedback,        // 📡 I/O Mapping réel
+    M2ContactorFeedbackFwdRaw := M2_ContactorFeedbackFwd,   // 📡 I/O Mapping réel
+    M2ContactorFeedbackRevRaw := M2_ContactorFeedbackRev,   // 📡 I/O Mapping réel
+    M2ThermalFeedbackRaw      := M2_ThermalFeedback,        // 📡 I/O Mapping réel
+    ChariotPosFosse1Raw       := PosFosse1,                 // 📡 I/O Mapping réel
+    ChariotPosFosse2Raw       := PosFosse2,                 // 📡 I/O Mapping réel
+    ChariotPosMaintenanceRaw  := PosMaintenance,             // 📡 I/O Mapping réel
+    ChariotPosTremieRaw       := PosTremie                  // 📡 I/O Mapping réel
 );
+EmergencyStopOkCond         := instIoMachine.EmergencyStopOkCond;
+M1_M2_SlackCableSwitchCond  := instIoMachine.SlackCableSwitchCond;
+M1_M2_TopPositionSensorCond := instIoMachine.TopPositionSensorCond;
+M1_ContactorFeedbackFwdCond := instIoMachine.M1ContactorFeedbackFwdCond;
+M1_ContactorFeedbackRevCond := instIoMachine.M1ContactorFeedbackRevCond;
+M1_ThermalFeedbackCond      := instIoMachine.M1ThermalFeedbackCond;
+M2_ContactorFeedbackFwdCond := instIoMachine.M2ContactorFeedbackFwdCond;
+M2_ContactorFeedbackRevCond := instIoMachine.M2ContactorFeedbackRevCond;
+M2_ThermalFeedbackCond      := instIoMachine.M2ThermalFeedbackCond;
+ChariotPosFosse1Cond        := instIoMachine.ChariotPosFosse1Cond;
+ChariotPosFosse2Cond        := instIoMachine.ChariotPosFosse2Cond;
+ChariotPosMaintenanceCond   := instIoMachine.ChariotPosMaintenanceCond;
+ChariotPosTremieCond        := instIoMachine.ChariotPosTremieCond;
 
 // 2. ACQUISITION DU GESTE OPÉRATEUR SÉCURISÉ
 
@@ -177,7 +233,7 @@ instSafety(
 FB_Joystick_0(
     // 🟢 --- Autorisations & sécurité ---
     Enable          := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par autorisation réelle
-    EmergencyStopOk := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par conditions sécurité OK (renommé, était SafetyOk)
+    EmergencyStopOk := EmergencyStopOkCond,      // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     SafeStop        := GVL_DEBUG.DBG_False,     // ⚠️ DEBUG : vestige non conforme (Partie8 §6bis), hors périmètre de ce lot
     Reset           := FALSE,                   // ⚠️ À câbler : front acquittement défaut IHM
 
@@ -214,7 +270,7 @@ FB_Joystick_0(
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1
-    EmergencyStopOk     := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
+    EmergencyStopOk     := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
     AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
@@ -239,14 +295,14 @@ instEncoderScaleM1(
 instHomingM1(
     Enable               := TRUE,
     Reset                := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1 (même bouton que instEncoderAbsM1)
-    EmergencyStopOk      := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
+    EmergencyStopOk      := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
-    Home                 := StubHomeButton_IHM,              // 🖥️ GVL_Encoder_Stub — piloté aussi sur M2 (même bouton)
+    Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 1) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
     ConfirmCoherence     := M1_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
-    TopPositionSensor    := M1_M2_TopPositionSensor,         // 📡 I/O Mapping RÉEL — commun M1+M2 (remplace le stub GVL_Homing_Stub, supprimé 2026-07-02)
+    TopPositionSensor    := M1_M2_TopPositionSensorCond,     // 📡 Conditionné FB_IO_Machine
     TopSensorPositionM   := M1_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
-    ContactorFeedbackFwd := M1_ContactorFeedbackFwd,         // 📡 I/O Mapping RÉEL (2026-07-02)
-    ContactorFeedbackRev := M1_ContactorFeedbackRev,         // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackFwd := M1_ContactorFeedbackFwdCond,     // 📡 Conditionné FB_IO_Machine
+    ContactorFeedbackRev := M1_ContactorFeedbackRevCond,     // 📡 Conditionné FB_IO_Machine
     BrakeFeedback        := M1_BrakeFeedback,                // 🧪 STUB GVL_Winch_M1_Stub (seul signal encore non câblé)
     RawPos               := instEncoderAbsM1.RawPos,
     EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
@@ -260,7 +316,7 @@ instHomingM1(
 instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2
-    EmergencyStopOk     := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
+    EmergencyStopOk     := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
     RawPosIn            := COD2_PosValue,                   // 📡 I/O Mapping (mappé 2026-07-02)
     AlarmsIn            := COD2_Alarms,                     // 📡 I/O Mapping (mappé 2026-07-02)
@@ -285,14 +341,14 @@ instEncoderScaleM2(
 instHomingM2(
     Enable               := TRUE,
     Reset                := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2 (même bouton que instEncoderAbsM2)
-    EmergencyStopOk      := EmergencyStopOk,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
+    EmergencyStopOk      := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
     Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
-    Home                 := StubHomeButton_IHM,              // 🖥️ GVL_Encoder_Stub — même bouton que M1 (référencement simultané)
+    Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 2) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
     ConfirmCoherence     := M2_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
-    TopPositionSensor    := M1_M2_TopPositionSensor,         // 📡 I/O Mapping RÉEL — commun M1+M2 (remplace le stub GVL_Homing_Stub, supprimé 2026-07-02)
+    TopPositionSensor    := M1_M2_TopPositionSensorCond,     // 📡 Conditionné FB_IO_Machine
     TopSensorPositionM   := M2_TopSensorPositionM,           // RETAIN, réglable (§ calibration Partie10 §7bis)
-    ContactorFeedbackFwd := M2_ContactorFeedbackFwd,         // 📡 I/O Mapping RÉEL (2026-07-02)
-    ContactorFeedbackRev := M2_ContactorFeedbackRev,         // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackFwd := M2_ContactorFeedbackFwdCond,     // 📡 Conditionné FB_IO_Machine
+    ContactorFeedbackRev := M2_ContactorFeedbackRevCond,     // 📡 Conditionné FB_IO_Machine
     BrakeFeedback        := M2_BrakeFeedback,                // 🧪 STUB GVL_Winch_M2_Stub (seul signal encore non câblé)
     RawPos               := instEncoderAbsM2.RawPos,
     EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,
@@ -314,25 +370,25 @@ instHomingM2(
 instSafetyWinchM1(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick, à sécuriser ensemble
+    EmergencyStopOk     := EmergencyStopOkCond,        // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
-    ThermalFeedback     := M1_ThermalFeedback,        // 📡 I/O Mapping RÉEL (2026-07-02)
-    SlackCableDetected  := M1_M2_SlackCableSwitch     // 📡 I/O Mapping RÉEL — commun M1/M2 (même valeur câblée sur instSafetyWinchM2)
+    ThermalFeedback     := M1_ThermalFeedbackCond,    // 📡 Conditionné FB_IO_Machine
+    SlackCableDetected  := M1_M2_SlackCableSwitchCond // 📡 Conditionné FB_IO_Machine
 );
 
 instSafetyWinchM2(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick, à sécuriser ensemble
+    EmergencyStopOk     := EmergencyStopOkCond,        // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
-    ThermalFeedback     := M2_ThermalFeedback,        // 📡 I/O Mapping RÉEL (2026-07-02)
-    SlackCableDetected  := M1_M2_SlackCableSwitch     // 📡 I/O Mapping RÉEL — commun M1/M2 (même valeur câblée sur instSafetyWinchM1)
+    ThermalFeedback     := M2_ThermalFeedbackCond,    // 📡 Conditionné FB_IO_Machine
+    SlackCableDetected  := M1_M2_SlackCableSwitchCond // 📡 Conditionné FB_IO_Machine
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -350,7 +406,7 @@ instSafetyWinchM2(
 instWinchM1(
     Enable                  := StubWinchEnableN1,           // ⚠️ Stub Maint N1 — à remplacer par FB_Modes
     Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
+    EmergencyStopOk         := EmergencyStopOkCond,           // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
     SafeStop                := instSafetyWinchM1.SafeStop,
@@ -358,30 +414,15 @@ instWinchM1(
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := M1_SpeedStepTable,
-    ContactorFeedbackFwd    := M1_ContactorFeedbackFwd,      // 📡 I/O Mapping RÉEL (2026-07-02)
-    ContactorFeedbackRev    := M1_ContactorFeedbackRev,      // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackFwd    := M1_ContactorFeedbackFwdCond,  // 📡 Conditionné FB_IO_Machine
+    ContactorFeedbackRev    := M1_ContactorFeedbackRevCond,  // 📡 Conditionné FB_IO_Machine
     BrakeFeedback           := M1_BrakeFeedback              // 🧪 STUB GVL_Winch_M1_Stub (seul signal encore non câblé)
 );
-
-// 📤 Sorties treuil M1 → I/O Mapping RÉEL (2026-07-02, RelayFwd/Rev/BrakeCmd/SpeedContactor_1..4)
-M1_RelayFwd         := instWinchM1.RelayFwd;
-M1_RelayRev         := instWinchM1.RelayRev;
-M1_SpeedContactor_1 := instWinchM1.Contactor1;
-M1_SpeedContactor_2 := instWinchM1.Contactor2;
-M1_SpeedContactor_3 := instWinchM1.Contactor3;
-M1_SpeedContactor_4 := instWinchM1.Contactor4;
-M1_BrakeCmd         := instWinchM1.BrakeCmd;
-
-// 🧪 SIMULATION (stub GVL_Winch_M1_Stub) — SEUL le retour frein reste non câblé côté device :
-// miroir de la commande (contacteur "idéal", 1 cycle de retard). RelayFwd/Rev/ContactorFeedback
-// sont désormais des retours RÉELS câblés en I/O Mapping (plus de miroir logiciel — écrire dans
-// une variable d'entrée réelle serait écrasé par le bus à chaque cycle, donc supprimé).
-M1_BrakeFeedback := M1_BrakeCmd;
 
 instWinchM2(
     Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que M1 — à remplacer par FB_Modes
     Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
+    EmergencyStopOk         := EmergencyStopOkCond,           // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
     SafeStop                := instSafetyWinchM2.SafeStop,
@@ -389,22 +430,10 @@ instWinchM2(
     Direction               := FB_Joystick_0.AxisCmdY.Direction,   // ⚠️ Même consigne que M1
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,    // ⚠️ Même consigne que M1
     SpeedStepTable          := M2_SpeedStepTable,
-    ContactorFeedbackFwd    := M2_ContactorFeedbackFwd,      // 📡 I/O Mapping RÉEL (2026-07-02)
-    ContactorFeedbackRev    := M2_ContactorFeedbackRev,      // 📡 I/O Mapping RÉEL (2026-07-02)
+    ContactorFeedbackFwd    := M2_ContactorFeedbackFwdCond,  // 📡 Conditionné FB_IO_Machine
+    ContactorFeedbackRev    := M2_ContactorFeedbackRevCond,  // 📡 Conditionné FB_IO_Machine
     BrakeFeedback           := M2_BrakeFeedback              // 🧪 STUB GVL_Winch_M2_Stub (seul signal encore non câblé)
 );
-
-// 📤 Sorties treuil M2 → I/O Mapping RÉEL (2026-07-02, RelayFwd/Rev/BrakeCmd/SpeedContactor_1..4)
-M2_RelayFwd         := instWinchM2.RelayFwd;
-M2_RelayRev         := instWinchM2.RelayRev;
-M2_SpeedContactor_1 := instWinchM2.Contactor1;
-M2_SpeedContactor_2 := instWinchM2.Contactor2;
-M2_SpeedContactor_3 := instWinchM2.Contactor3;
-M2_SpeedContactor_4 := instWinchM2.Contactor4;
-M2_BrakeCmd         := instWinchM2.BrakeCmd;
-
-// 🧪 SIMULATION (stub GVL_Winch_M2_Stub) — voir note M1 ci-dessus (seul le retour frein reste stub)
-M2_BrakeFeedback := M2_BrakeCmd;
 
 (* ═══════════════════════════════════════════════════════════════
    ↔️ 6. CHARIOT M3 — FB_Chariot (axe X, mode DEGRADED_IO figé)
@@ -423,7 +452,7 @@ M2_BrakeFeedback := M2_BrakeCmd;
 instSafetyChariotM3(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk     := GVL_DEBUG.DBG_True,        // ⚠️ DEBUG : même stub que Joystick/Safety
+    EmergencyStopOk     := EmergencyStopOkCond,        // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational
@@ -431,13 +460,13 @@ instSafetyChariotM3(
 
 // 🎯 SÉLECTEUR STUB MAINTENANCE (2026-07-02, demande utilisateur) — arbitre M3_PositionSensorTarget
 // parmi les 4 capteurs position RÉELS du chariot, en attendant FB_Cycle (pas encore codé, qui
-// fera cette sélection en exploitation normale — Partie11 §9bis). PosiFosse1/PosFosse2/
+// fera cette sélection en exploitation normale — Partie11 §9bis). PosFosse1/PosFosse2/
 // PosMaintenance/PosTremie : noms exacts I/O Mapping (Device.export).
 CASE StubChariotPositionSelect_IHM OF
-    1: M3_PositionSensorTarget := PosiFosse1;
-    2: M3_PositionSensorTarget := PosFosse2;
-    3: M3_PositionSensorTarget := PosMaintenance;
-    4: M3_PositionSensorTarget := PosTremie;
+    1: M3_PositionSensorTarget := ChariotPosFosse1Cond;       // 📡 Conditionné FB_IO_Machine
+    2: M3_PositionSensorTarget := ChariotPosFosse2Cond;       // 📡 Conditionné FB_IO_Machine
+    3: M3_PositionSensorTarget := ChariotPosMaintenanceCond;  // 📡 Conditionné FB_IO_Machine
+    4: M3_PositionSensorTarget := ChariotPosTremieCond;       // 📡 Conditionné FB_IO_Machine
 ELSE
     M3_PositionSensorTarget := FALSE;   // 0 ou valeur hors plage = aucun capteur sélectionné
 END_CASE;
@@ -445,7 +474,7 @@ END_CASE;
 instChariotM3(
     Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que Winch — à remplacer par FB_Modes
     Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
-    EmergencyStopOk         := GVL_DEBUG.DBG_True,           // ⚠️ DEBUG : même stub que Joystick/Safety
+    EmergencyStopOk         := EmergencyStopOkCond,           // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
     Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
     StartStop               := FB_Joystick_0.AxisCmdX.StartStop,
     SafeStop                := instSafetyChariotM3.SafeStop,
@@ -461,14 +490,72 @@ instChariotM3(
     BrakeFeedback           := M3_BrakeFeedback              // 🧪 STUB GVL_Chariot_M3_Stub
 );
 
-// 📤 Sorties chariot M3 → RelayFwd/Rev/RelaySpeedGv (STUB GVL_Chariot_M3_Stub), BrakeCmd (I/O réel)
+// 📤 Sorties chariot M3 STUB (GVL_Chariot_M3_Stub, pas de matériel réel — pas conditionnées,
+// voir en-tête FB_IO_Machine.st) : RelayFwd/Rev/RelaySpeedGv
 M3_RelayFwd     := instChariotM3.RelayFwd;
 M3_RelayRev     := instChariotM3.RelayRev;
 M3_RelaySpeedGv := instChariotM3.RelaySpeedGv;
-M3_BrakeCmd     := instChariotM3.BrakeCmd;
 
-// 🧪 SIMULATION (stub GVL_Chariot_M3_Stub) — voir note Winch M1 ci-dessus. BrakeCmd étant
-// désormais réel, seul le miroir BrakeFeedback reste légitime (retour frein encore non câblé).
+// 🧪 SIMULATION (stub GVL_Chariot_M3_Stub) — voir note Winch M1 ci-dessus.
 M3_ContactorFeedbackFwd := M3_RelayFwd;
 M3_ContactorFeedbackRev := M3_RelayRev;
-M3_BrakeFeedback        := M3_BrakeCmd;
+
+(* ═══════════════════════════════════════════════════════════════
+   🧰 7. FB_IO_MACHINE — conditionnement I/O réel, 2e appel/2 (SORTIES)
+   ───────────────────────────────────────────────────────────────
+   TOUTES les sorties réelles de la machine (Winch M1 + Winch M2 + Chariot M3 BrakeCmd)
+   en UN SEUL appel, APRÈS tous les FB métier (Command dispo seulement ici). Les
+   entrées (*Raw/Invert*) sont omises : mêmes valeurs que le 1er appel, déjà traitées
+   (voir en-tête FB_IO_Machine.st — instance retient ses VAR_INPUT entre les 2 appels).
+   ═══════════════════════════════════════════════════════════════ *)
+
+instIoMachine(
+    M1RelayFwdCmd        := instWinchM1.RelayFwd,
+    M1RelayRevCmd        := instWinchM1.RelayRev,
+    M1SpeedContactor1Cmd := instWinchM1.Contactor1,
+    M1SpeedContactor2Cmd := instWinchM1.Contactor2,
+    M1SpeedContactor3Cmd := instWinchM1.Contactor3,
+    M1SpeedContactor4Cmd := instWinchM1.Contactor4,
+    M1BrakeCmdCmd        := instWinchM1.BrakeCmd,
+    M2RelayFwdCmd        := instWinchM2.RelayFwd,
+    M2RelayRevCmd        := instWinchM2.RelayRev,
+    M2SpeedContactor1Cmd := instWinchM2.Contactor1,
+    M2SpeedContactor2Cmd := instWinchM2.Contactor2,
+    M2SpeedContactor3Cmd := instWinchM2.Contactor3,
+    M2SpeedContactor4Cmd := instWinchM2.Contactor4,
+    M2BrakeCmdCmd        := instWinchM2.BrakeCmd,
+    ChariotBrakeCmdCmd   := instChariotM3.BrakeCmd
+);
+
+// 📤 Sorties treuil M1 → I/O Mapping RÉEL
+M1_RelayFwd         := instIoMachine.M1RelayFwdOut;
+M1_RelayRev         := instIoMachine.M1RelayRevOut;
+M1_SpeedContactor_1 := instIoMachine.M1SpeedContactor1Out;
+M1_SpeedContactor_2 := instIoMachine.M1SpeedContactor2Out;
+M1_SpeedContactor_3 := instIoMachine.M1SpeedContactor3Out;
+M1_SpeedContactor_4 := instIoMachine.M1SpeedContactor4Out;
+M1_BrakeCmd         := instIoMachine.M1BrakeCmdOut;
+
+// 🧪 SIMULATION (stub GVL_Winch_M1_Stub) — SEUL le retour frein reste non câblé côté device :
+// miroir de la commande (contacteur "idéal"). RelayFwd/Rev/ContactorFeedback sont désormais
+// des retours RÉELS câblés en I/O Mapping (plus de miroir logiciel).
+M1_BrakeFeedback := M1_BrakeCmd;
+
+// 📤 Sorties treuil M2 → I/O Mapping RÉEL
+M2_RelayFwd         := instIoMachine.M2RelayFwdOut;
+M2_RelayRev         := instIoMachine.M2RelayRevOut;
+M2_SpeedContactor_1 := instIoMachine.M2SpeedContactor1Out;
+M2_SpeedContactor_2 := instIoMachine.M2SpeedContactor2Out;
+M2_SpeedContactor_3 := instIoMachine.M2SpeedContactor3Out;
+M2_SpeedContactor_4 := instIoMachine.M2SpeedContactor4Out;
+M2_BrakeCmd         := instIoMachine.M2BrakeCmdOut;
+
+// 🧪 SIMULATION (stub GVL_Winch_M2_Stub) — voir note M1 ci-dessus (seul le retour frein reste stub)
+M2_BrakeFeedback := M2_BrakeCmd;
+
+// 📤 Sortie chariot M3 → I/O Mapping RÉEL (seul BrakeCmd est réel, voir en-tête FB_IO_Machine.st)
+M3_BrakeCmd := instIoMachine.ChariotBrakeCmdOut;
+
+// 🧪 SIMULATION (stub GVL_Chariot_M3_Stub) — BrakeCmd étant réel, seul le miroir BrakeFeedback
+// reste légitime (retour frein encore non câblé).
+M3_BrakeFeedback := M3_BrakeCmd;
