@@ -837,6 +837,10 @@ IF GVL_IHM.LimitLegalDepthMinAllowed = 0.0 THEN
     GVL_IHM.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
 END_IF;
 
+IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
+    GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+END_IF;
+
 // --- 2. PROPAGATION DES PARAMÈTRES IHM → GVL_PERSISTENT (sauvegarde des réglages opérateur)
 GVL_PERSISTENT.HomingTargetM1_M          := GVL_IHM.WinchM1.TopSensorPositionM;
 GVL_PERSISTENT.HomingTargetM2_M          := GVL_IHM.WinchM2.TopSensorPositionM;

@@ -6,7 +6,7 @@
 TYPE ST_ModesHMI :
 STRUCT
     CurrentMode     : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
-    ModeRequest     : E_Mode; (* 🖥️ Demande de changement de mode de marche *)
+    ModeRequest     : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode de marche *)
     PasswordOk      : BOOL;   (* 🔑 Authentification pour le mode maintenance N2 *)
     EmergencyStopOk : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
     MachineReset    : BOOL;   (* 🔁 Commande d'acquittement général de la machine *)
