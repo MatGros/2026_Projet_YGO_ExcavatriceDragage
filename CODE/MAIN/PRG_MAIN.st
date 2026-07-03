@@ -119,6 +119,7 @@ VAR
     SimulatedM2Raw          : UDINT := 1000000;
     M1_RawPosToUse          : UDINT;
     M2_RawPosToUse          : UDINT;
+    InitDone                : BOOL;             // 🧪 Initialisation unique au boot (simulation)
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -166,6 +167,15 @@ VAR RETAIN
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
+
+// 🧪 LOGIQUE D'INITIALISATION AU BOOT SUR BANC (Simulation)
+IF NOT InitDone THEN
+    InitDone := TRUE;
+    IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.PasswordOk := TRUE;
+    END_IF;
+END_IF;
 
 // 🖥️ 1. ACQUISITION DES COMMANDES IHM (Lot A, 2026-07-03)
 GrappinCmdOpen_IHM                              := GVL_IHM.Grappin.CmdOpen;
