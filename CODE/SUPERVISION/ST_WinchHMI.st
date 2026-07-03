@@ -36,6 +36,7 @@ STRUCT
     Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
     SafeStopActive          : BOOL;             (* 🟧 Arrêt rapide activé par la sécurité *)
     ForbidDescentActive     : BOOL;             (* 🚯 Descente interdite (détecteur mou de câble) *)
+    ForbidAscentActive      : BOOL;             (* 🚯 Montée interdite (fin de course haut) *)
     SlackCableDetected      : BOOL;             (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* 🔥 Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)

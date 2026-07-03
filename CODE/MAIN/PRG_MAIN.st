@@ -134,6 +134,20 @@ IF NOT InitDone THEN
     IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
         GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
         GVL_IHM.Modes.PasswordOk := TRUE;
+        
+        // 💾 Initialisation des positions simulées à partir de la calibration persistante (si référencée)
+        // Permet d'éviter le problème de valeur absurde (-3800m) après un redémarrage à chaud (Hot Restart)
+        IF GVL_PERSISTENT.CalibM1.Homed THEN
+            SimulatedM1Raw := GVL_PERSISTENT.CalibM1.HomingRefRaw + REAL_TO_UDINT(GVL_PERSISTENT.HomingTargetM1_M * 4096.0);
+        ELSE
+            SimulatedM1Raw := 1000000;
+        END_IF;
+        
+        IF GVL_PERSISTENT.CalibM2.Homed THEN
+            SimulatedM2Raw := GVL_PERSISTENT.CalibM2.HomingRefRaw + REAL_TO_UDINT(GVL_PERSISTENT.HomingTargetM2_M * 4096.0);
+        ELSE
+            SimulatedM2Raw := 1000000;
+        END_IF;
     END_IF;
 END_IF;
 
@@ -327,11 +341,21 @@ IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
         END_IF;
     END_IF;
 
-    // Utilisation des positions simulées
-    M1_RawPosToUse := SimulatedM1Raw;
-    M2_RawPosToUse := SimulatedM2Raw;
+    // Utilisation des positions simulées uniquement si le codeur physique n'est PAS opérationnel
+    // (permet de tester le vrai codeur sur table même avec le bypass contacteurs actif).
+    IF NOT instDiagEthercat.EncoderM1.Operational THEN
+        M1_RawPosToUse := SimulatedM1Raw;
+    ELSE
+        M1_RawPosToUse := COD1_PosValue;
+    END_IF;
+
+    IF NOT instDiagEthercat.EncoderM2.Operational THEN
+        M2_RawPosToUse := SimulatedM2Raw;
+    ELSE
+        M2_RawPosToUse := COD2_PosValue;
+    END_IF;
 ELSE
-    // Utilisation des valeurs réelles
+    // Utilisation inconditionnelle des valeurs réelles
     M1_RawPosToUse := COD1_PosValue;
     M2_RawPosToUse := COD2_PosValue;
 END_IF;
@@ -346,7 +370,7 @@ instEncoderAbsM1(
     RawPosIn            := M1_RawPosToUse,                  // 📡 Sélecteur simulation/physique (banc de test)
     AlarmsIn            := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_Alarms, 0), // 📡 Bypass alarmes sur banc
     WarningsIn          := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_Warnings, 0), // 📡 Bypass warnings sur banc
-    SlaveOperational    := instDiagEthercat.EncoderM1.Operational,
+    SlaveOperational    := instDiagEthercat.EncoderM1.Operational OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
     PresetRequest       := instHomingM1.PresetRequest,      // ✅ 2026-07-02 (1 cycle de retard, voir en-tête)
     PresetValue         := instHomingM1.PresetValue         // ✅ 2026-07-02
 );
@@ -397,7 +421,7 @@ instEncoderAbsM2(
     RawPosIn            := M2_RawPosToUse,                  // 📡 Sélecteur simulation/physique (banc de test)
     AlarmsIn            := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_Alarms, 0), // 📡 Bypass alarmes sur banc
     WarningsIn          := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_Warnings, 0), // 📡 Bypass warnings sur banc
-    SlaveOperational    := instDiagEthercat.EncoderM2.Operational,
+    SlaveOperational    := instDiagEthercat.EncoderM2.Operational OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
     PresetRequest       := instHomingM2.PresetRequest,      // ✅ 2026-07-02 (1 cycle de retard, voir en-tête)
     PresetValue         := instHomingM2.PresetValue         // ✅ 2026-07-02
 );
@@ -515,7 +539,9 @@ instSafetyWinchM1(
     EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
     ThermalFeedback     := NOT GVL_IN.M1ThermalFeedback,
     SlackCableDetected  := NOT GVL_IN.SlackCableSwitch,
-    PhaseRotationOk     := GVL_IN.PhaseRotationOk
+    PhaseRotationOk     := GVL_IN.PhaseRotationOk,
+    TopPositionSensor   := GVL_IN.TopPositionSensor,
+    InReferencingMode   := instHomingM1.Busy
 );
 
 instSafetyWinchM2(
@@ -530,7 +556,9 @@ instSafetyWinchM2(
     EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
     ThermalFeedback     := NOT GVL_IN.M2ThermalFeedback,
     SlackCableDetected  := NOT GVL_IN.SlackCableSwitch,
-    PhaseRotationOk     := GVL_IN.PhaseRotationOk
+    PhaseRotationOk     := GVL_IN.PhaseRotationOk,
+    TopPositionSensor   := GVL_IN.TopPositionSensor,
+    InReferencingMode   := instHomingM2.Busy
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -595,6 +623,7 @@ instWinchM1(
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy, // Bloqué pendant le mouvement grappin
     SafeStop                := instSafetyWinchM1.SafeStop,
     ForbidDescent           := instSafetyWinchM1.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
+    ForbidAscent            := instSafetyWinchM1.ForbidAscent,   // 🆕 Fin de course haut — masque UNIQUEMENT RelayFwd
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
@@ -617,6 +646,7 @@ instWinchM2(
     StartStop               := M2_StartStop_Active,           // Arbitré grappin
     SafeStop                := instSafetyWinchM2.SafeStop,
     ForbidDescent           := instSafetyWinchM2.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
+    ForbidAscent            := instSafetyWinchM2.ForbidAscent,   // 🆕 Fin de course haut — masque UNIQUEMENT RelayFwd
     Direction               := M2_Direction_Active,           // Arbitré grappin
     SpeedRefPct             := M2_SpeedRef_Active,            // Arbitré grappin
     SpeedStepTable          := M2_SpeedStepTableActive,       // Arbitrée grappin (sans contacteurs si vitesse lente forcée)
@@ -782,6 +812,7 @@ GVL_IHM.WinchM1.BrakeCmd                    := instWinchM1.BrakeCmd;
 GVL_IHM.WinchM1.Homed                       := instHomingM1.Homed;
 GVL_IHM.WinchM1.SafeStopActive              := instSafetyWinchM1.SafeStop;
 GVL_IHM.WinchM1.ForbidDescentActive         := instSafetyWinchM1.ForbidDescent;
+GVL_IHM.WinchM1.ForbidAscentActive          := instSafetyWinchM1.ForbidAscent;
 GVL_IHM.WinchM1.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM1.ThermalFault                := GVL_IN.M1ThermalFeedback;
 GVL_IHM.WinchM1.EncoderFault                := NOT instEncoderAbsM1.EncoderAvailable OR instEncoderSafetyM1.EncoderIncoherent;
@@ -815,6 +846,7 @@ GVL_IHM.WinchM2.BrakeCmd                    := instWinchM2.BrakeCmd;
 GVL_IHM.WinchM2.Homed                       := instHomingM2.Homed;
 GVL_IHM.WinchM2.SafeStopActive              := instSafetyWinchM2.SafeStop;
 GVL_IHM.WinchM2.ForbidDescentActive         := instSafetyWinchM2.ForbidDescent;
+GVL_IHM.WinchM2.ForbidAscentActive          := instSafetyWinchM2.ForbidAscent;
 GVL_IHM.WinchM2.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM2.ThermalFault                := GVL_IN.M2ThermalFeedback;
 GVL_IHM.WinchM2.EncoderFault                := NOT instEncoderAbsM2.EncoderAvailable OR instEncoderSafetyM2.EncoderIncoherent;
