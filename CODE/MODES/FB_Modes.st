@@ -49,10 +49,10 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Modes) ===
 
-// 🛑 1. GATE — repli sur le mode le plus contraint/surveillé (MAINT_N1), jamais SEMI_AUTO/MANUEL
-// par défaut si la surveillance elle-même n'est pas garantie
+// 🛑 1. GATE — repli sur le mode de sécurité de veille (AUCUN) si désactivé
+// ou si l'arrêt d'urgence est déclenché.
 IF NOT Enable OR NOT EmergencyStopOk THEN
-    Mode := E_Mode.MAINT_N1;
+    Mode := E_Mode.AUCUN;
     OverrideSync := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
