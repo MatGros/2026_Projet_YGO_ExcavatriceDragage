@@ -30,10 +30,11 @@
       uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
    🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
       entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
-      `SafeStop`) — masque UNIQUEMENT `RelayRev` (descente), `RelayFwd`
-      (montée) reste piloté normalement. Permet à l'opérateur de remonter
-      pour vérifier le câblage sans être bloqué par un `SafeStop` classique
-      qui aurait arrêté les 2 sens. Voir DOC/AF_Partie9 §4ter.
+      `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
+      `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
+      déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
+      en train de remonter — voir DOC/AF_Partie9 §4ter pour le contexte
+      d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `MaxStepDescente` (défaut 2). En descente
       (`CommandedDirection = -1`), le palier atteignable par `FB_SpeedStep` est
@@ -42,6 +43,13 @@
       montée, les 5 paliers normaux restent inchangés (`MaxStepNumber := 5`).
       Ne change PAS la logique de décodage (voir FB_SpeedStep.st), juste le
       plafond fourni selon le sens.
+   🔧 CORRECTIF (2026-07-03vicies, demande utilisateur, AUDIT D72) : `ForbidDescent`
+      (mou de câble) intègre désormais une VRAIE décélération rapide (comme `SafeStop`)
+      via `EffectiveSafeStop`, au lieu d'un simple masquage brut de `RelayRev`. INHIBÉ
+      quand `CommandedDirection = 1` (montée/enroulement en cours) : l'opérateur peut
+      librement remonter pour reprendre le mou, sans déclencher de décélération. Le
+      masquage `RelayRev := FALSE` sur `ForbidDescent` reste EN PLUS, inconditionnel
+      (filet de sécurité direct, indépendant de la rampe).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
@@ -104,6 +112,7 @@ VAR
     TonRevFeedback      : TON;
     RampTargetPct       : REAL;
     DirectionChangePending : BOOL;
+    EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
 END_VAR
 
 IF NOT Enable OR NOT EmergencyStopOk THEN
@@ -131,14 +140,19 @@ ResetEdge(CLK := Reset);
 
 DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
 
+// 🆕 Mou de câble (ForbidDescent) intégré à une VRAIE décélération rapide, comme SafeStop —
+// INHIBÉ si CommandedDirection = 1 (montée/enroulement en cours) : l'opérateur remonte
+// librement pour reprendre le mou, sans déclencher de décélération (AUDIT D72).
+EffectiveSafeStop := SafeStop OR (ForbidDescent AND (CommandedDirection <> 1));
+
 RampTargetPct := 0.0;
-IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
+IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,
           AccelRate := RampAccelRate,
-          DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
+          DecelRate := SEL(EffectiveSafeStop, RampDecelNormalRate, RampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
 IF Direction <> CommandedDirection THEN
@@ -209,16 +223,23 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
+// 🔴 BYPASS TEST BANC (2026-07-03vicies, demande utilisateur) — sans contacteurs réels câblés/
+// cohérents en essai, StuckClosed/StuckOpen se déclenche à tort et bloque RelayFwd/RelayRev
+// (voir Error plus bas). TOUJOURS FALSE en exploitation réelle.
+IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0002;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFD;
+    END_IF;
 
-IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0004;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFB;
+    END_IF;
+ELSE
+    ErrorId := ErrorId AND 16#FFF9;   // Bypass actif : efface/maintient à 0 les bits 1/2
 END_IF;
 
 Error := (ErrorId <> 16#0000);
@@ -227,7 +248,7 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-IF (NOT StartStop OR SafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) > 0.1 THEN
+IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) > 0.1 THEN
     State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) > 0.1 THEN
     State := E_State.BUSY;

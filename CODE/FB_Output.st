@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
-   📤 FB_Output_Relay — Sortie relais + feedback (brique réduite)
+   📤 FB_Output — Sortie relais + feedback (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie6_IO_Conditioning_v1.1.md §2
+   📄 Doc métier : DOC/AF_Partie6_IO_Conditioning_v1.2.md §2
    🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
       transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
       appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
@@ -14,9 +14,9 @@
       ne fait QUE créer la brique elle-même.
    ═══════════════════════════════════════════════════════════════ *)
 
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Output_Relay) ===
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Output) ===
 
-FUNCTION_BLOCK PUBLIC FB_Output_Relay
+FUNCTION_BLOCK PUBLIC FB_Output
 VAR_INPUT
     Command         : BOOL;         // Ordre logique, déjà résolu/rampé par le FB métier appelant
     InvertLogic     : BOOL;         // TRUE = NC
@@ -27,7 +27,7 @@ VAR_INPUT
     ChannelOk       : BOOL := TRUE;    // Diag voie/carte sortie OK — TRUE par défaut si pas de diag dispo
 END_VAR
 VAR_OUTPUT
-    OutputCmd       : BOOL;         // Vers la carte de sortie
+    State       : BOOL;         // Vers la carte de sortie
     FeedbackOk      : BOOL;         // Retour cohérent avec la commande
     Error           : BOOL;
     ErrorId         : WORD;         // bit0 : feedback incohérent ; bit1 : voie/carte HS
@@ -38,18 +38,18 @@ VAR
     FeedbackTon     : TON;
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Output_Relay) ===
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Output) ===
 
 // 1. Inversion NO/NC
-OutputCmd := Command XOR InvertLogic;
+State := Command XOR InvertLogic;
 
 // 2. Option blink 1 Hz (diagnostic/visualisation) — modulation à 500ms ON/500ms OFF
-IF Blink1Hz AND OutputCmd THEN
+IF Blink1Hz AND State THEN
     BlinkTimer(IN := NOT BlinkTimer.Q, PT := T#500ms);
     IF BlinkTimer.Q THEN
         BlinkState := NOT BlinkState;
     END_IF;
-    OutputCmd := BlinkState;
+    State := BlinkState;
 ELSE
     BlinkTimer(IN := FALSE, PT := T#500ms);
     BlinkState := FALSE;
@@ -57,7 +57,7 @@ END_IF;
 
 // 3. Double vérification commande/retour (contacteur collé/ne colle pas)
 IF UseFeedback THEN
-    FeedbackTon(IN := (OutputCmd <> FeedbackRaw), PT := FeedbackTimeout);
+    FeedbackTon(IN := (State <> FeedbackRaw), PT := FeedbackTimeout);
     IF FeedbackTon.Q THEN
         ErrorId := ErrorId OR 16#0001;
         FeedbackOk := FALSE;

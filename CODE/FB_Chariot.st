@@ -343,16 +343,23 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
+// 🔴 BYPASS TEST BANC (2026-07-03vicies, demande utilisateur, même correctif que FB_Winch) —
+// sans contacteurs réels câblés/cohérents en essai, StuckClosed/StuckOpen bloque à tort
+// RelayFwd/RelayRev. TOUJOURS FALSE en exploitation réelle.
+IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0002;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFD;
+    END_IF;
 
-IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0004;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFB;
+    END_IF;
+ELSE
+    ErrorId := ErrorId AND 16#FFF9;   // Bypass actif : efface/maintient à 0 les bits 1/2
 END_IF;
 
 // 🔴 TBD — bit3 défaut variateur : uniquement basé sur DriveFaultFeedback TOR SI câblé (ne
