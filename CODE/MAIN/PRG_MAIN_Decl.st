@@ -372,8 +372,8 @@ instEncoderAbsM1(
     Mode                := instModes.Mode,
 
     RawPosIn            := M1_RawPosToUse,                  // ðŸ“¡ SÃ©lecteur simulation/physique (banc de test)
-    AlarmsIn            := COD1_Alarms,                     // ðŸ“¡ I/O Mapping dÃ©jÃ  existant
-    WarningsIn          := COD1_Warnings,                   // ðŸ“¡ I/O Mapping dÃ©jÃ  existant
+    AlarmsIn            := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_Alarms, 0), // ðŸ“¡ Bypass alarmes sur banc
+    WarningsIn          := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_Warnings, 0), // ðŸ“¡ Bypass warnings sur banc
     SlaveOperational    := instDiagEthercat.EncoderM1.Operational,
     PresetRequest       := instHomingM1.PresetRequest,      // âœ… 2026-07-02 (1 cycle de retard, voir en-tÃªte)
     PresetValue         := instHomingM1.PresetValue         // âœ… 2026-07-02
@@ -422,8 +422,8 @@ instEncoderAbsM2(
     Mode                := instModes.Mode,
 
     RawPosIn            := M2_RawPosToUse,                  // ðŸ“¡ SÃ©lecteur simulation/physique (banc de test)
-    AlarmsIn            := COD2_Alarms,                     // ðŸ“¡ I/O Mapping (mappÃ© 2026-07-02)
-    WarningsIn          := COD2_Warnings,                   // ðŸ“¡ I/O Mapping (mappÃ© 2026-07-02)
+    AlarmsIn            := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_Alarms, 0), // ðŸ“¡ Bypass alarmes sur banc
+    WarningsIn          := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_Warnings, 0), // ðŸ“¡ Bypass warnings sur banc
     SlaveOperational    := instDiagEthercat.EncoderM2.Operational,
     PresetRequest       := instHomingM2.PresetRequest,      // âœ… 2026-07-02 (1 cycle de retard, voir en-tÃªte)
     PresetValue         := instHomingM2.PresetValue         // âœ… 2026-07-02
