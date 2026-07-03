@@ -11,7 +11,7 @@ STRUCT
     RampAccelRate           : REAL := 50.0;     (* 📈 Rampe d'accélération (%/s) *)
     RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     RampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
-    CableLimitDescentM      : REAL := 20.0;     (* 📐 Profondeur max / longueur de câble autorisée (m) *)
+    CableLimitDescentM      : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
     SlowdownDistanceM       : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
     SlowSpeedPct            : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
 
@@ -38,11 +38,12 @@ STRUCT
     (* 🛡️ Sécurités & Diagnostics *)
     Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
     SafeStopActive          : BOOL;             (* 🟧 Arrêt rapide activé par la sécurité *)
-    ForbidDescentActive     : BOOL;             (* 🚯 Descente interdite (détecteur mou de câble) *)
+    ForbidDescentActive     : BOOL;             (* 🚯 Descente interdite (détecteur mou de câble / limites) *)
     ForbidAscentActive      : BOOL;             (* 🚯 Montée interdite (fin de course haut) *)
     SlackCableDetected      : BOOL;             (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* 🔥 Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)
+    CableLimitDescentReached: BOOL;             (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)

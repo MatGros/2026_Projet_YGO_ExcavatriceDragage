@@ -522,7 +522,21 @@ instWinchSync(
     HomedM2         := instHomingM2.Homed,
     OverrideSync    := instModes.OverrideSync,
     SyncToleranceM  := GVL_PERSISTENT.WinchSyncTolerance_M,
-    ActiveOffsetM   := instGrappin.ActiveOffsetM
+    ActiveOffsetM   := instGrappin.ActiveOffsetM,
+    
+    // Command mapping for command coherence check
+    RelayFwdM1      := instWinchM1.RelayFwd,
+    RelayFwdM2      := instWinchM2.RelayFwd,
+    RelayRevM1      := instWinchM1.RelayRev,
+    RelayRevM2      := instWinchM2.RelayRev,
+    Contactor1_M1   := instWinchM1.Contactor1,
+    Contactor1_M2   := instWinchM2.Contactor1,
+    Contactor2_M1   := instWinchM1.Contactor2,
+    Contactor2_M2   := instWinchM2.Contactor2,
+    Contactor3_M1   := instWinchM1.Contactor3,
+    Contactor3_M2   := instWinchM2.Contactor3,
+    Contactor4_M1   := instWinchM1.Contactor4,
+    Contactor4_M2   := instWinchM2.Contactor4
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -549,7 +563,7 @@ instSafetyWinchM1(
     TopPositionSensor   := GVL_IN.TopPositionSensor,
     InReferencingMode   := instHomingM1.Busy,
     CablePosM           := instEncoderScaleM1.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.WinchM1CableLimitDescent_M
+    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M
 );
 
 instSafetyWinchM2(
@@ -568,7 +582,7 @@ instSafetyWinchM2(
     TopPositionSensor   := GVL_IN.TopPositionSensor,
     InReferencingMode   := instHomingM2.Busy,
     CablePosM           := instEncoderScaleM2.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.WinchM2CableLimitDescent_M
+    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -625,28 +639,28 @@ END_IF;
 
 // --- CALCUL DES LIMITES BASSES ACTIVES ET DU BLOCAGE DE DESCENTE ---
 // 1. Limite basse active M1 (le maximum entre la longueur de câble max et la limite légale en SEMI_AUTO)
-BottomLimitM1_Active := -GVL_PERSISTENT.WinchM1CableLimitDescent_M;
-IF (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegal.Enabled THEN
-    BottomLimitM1_Active := MAX(BottomLimitM1_Active, GVL_PERSISTENT.LimitLegal.DepthMinAllowed);
+BottomLimitM1_Active := GVL_PERSISTENT.CableLimitDescent_M;
+IF (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
+    BottomLimitM1_Active := MAX(BottomLimitM1_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
 // 2. Limite basse active M2
-BottomLimitM2_Active := -GVL_PERSISTENT.WinchM2CableLimitDescent_M;
-IF (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegal.Enabled THEN
-    BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegal.DepthMinAllowed);
+BottomLimitM2_Active := GVL_PERSISTENT.CableLimitDescent_M;
+IF (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
+    BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
 // 3. ForbidDescent M1 : Défaut safety (mou de câble / max câble) OR Limite légale en SEMI_AUTO
 ForbidDescentM1_Active := instSafetyWinchM1.ForbidDescent
                           OR ((instModes.Mode = E_Mode.SEMI_AUTO)
-                              AND GVL_PERSISTENT.LimitLegal.Enabled
-                              AND (instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegal.DepthMinAllowed));
+                              AND GVL_PERSISTENT.LimitLegalEnabled
+                              AND (instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 // 4. ForbidDescent M2
 ForbidDescentM2_Active := instSafetyWinchM2.ForbidDescent
                           OR ((instModes.Mode = E_Mode.SEMI_AUTO)
-                              AND GVL_PERSISTENT.LimitLegal.Enabled
-                              AND (instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegal.DepthMinAllowed));
+                              AND GVL_PERSISTENT.LimitLegalEnabled
+                              AND (instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 
 instWinchM1(
@@ -657,7 +671,7 @@ instWinchM1(
     Mode                    := instModes.Mode,
 
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy, // Bloqué pendant le mouvement grappin
-    SafeStop                := instSafetyWinchM1.SafeStop,
+    SafeStop                := instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
     ForbidDescent           := ForbidDescentM1_Active,           // 🆕 Mou de câble / longueur max / limite légale
     ForbidAscent            := instSafetyWinchM1.ForbidAscent,   // 🆕 Fin de course haut
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
@@ -674,8 +688,8 @@ instWinchM1(
     CablePosM               := instEncoderScaleM1.CablePosM,
     TopLimitM               := GVL_PERSISTENT.HomingTargetM1_M,
     BottomLimitM            := BottomLimitM1_Active,
-    SlowdownDistanceM       := GVL_PERSISTENT.WinchM1SlowdownDistance_M,
-    SlowSpeedPct            := GVL_PERSISTENT.WinchM1SlowSpeedPct
+    SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
+    SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct
 );
 
 instWinchM2(
@@ -686,7 +700,7 @@ instWinchM2(
     Mode                    := instModes.Mode,
 
     StartStop               := M2_StartStop_Active,           // Arbitré grappin
-    SafeStop                := instSafetyWinchM2.SafeStop,
+    SafeStop                := instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
     ForbidDescent           := ForbidDescentM2_Active,           // 🆕 Mou de câble / longueur max / limite légale
     ForbidAscent            := instSafetyWinchM2.ForbidAscent,   // 🆕 Fin de course haut
     Direction               := M2_Direction_Active,           // Arbitré grappin
@@ -703,8 +717,8 @@ instWinchM2(
     CablePosM               := instEncoderScaleM2.CablePosM,
     TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M,
     BottomLimitM            := BottomLimitM2_Active,
-    SlowdownDistanceM       := GVL_PERSISTENT.WinchM2SlowdownDistance_M,
-    SlowSpeedPct            := GVL_PERSISTENT.WinchM2SlowSpeedPct
+    SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
+    SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -793,9 +807,9 @@ IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM1.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
     GVL_IHM.WinchM1.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
     GVL_IHM.WinchM1.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
-    GVL_IHM.WinchM1.CableLimitDescentM  := GVL_PERSISTENT.WinchM1CableLimitDescent_M;
-    GVL_IHM.WinchM1.SlowdownDistanceM   := GVL_PERSISTENT.WinchM1SlowdownDistance_M;
-    GVL_IHM.WinchM1.SlowSpeedPct        := GVL_PERSISTENT.WinchM1SlowSpeedPct;
+    GVL_IHM.WinchM1.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M;
+    GVL_IHM.WinchM1.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
+    GVL_IHM.WinchM1.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
 
 IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
@@ -804,9 +818,9 @@ IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM2.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
     GVL_IHM.WinchM2.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
     GVL_IHM.WinchM2.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
-    GVL_IHM.WinchM2.CableLimitDescentM  := GVL_PERSISTENT.WinchM2CableLimitDescent_M;
-    GVL_IHM.WinchM2.SlowdownDistanceM   := GVL_PERSISTENT.WinchM2SlowdownDistance_M;
-    GVL_IHM.WinchM2.SlowSpeedPct        := GVL_PERSISTENT.WinchM2SlowSpeedPct;
+    GVL_IHM.WinchM2.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M;
+    GVL_IHM.WinchM2.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
+    GVL_IHM.WinchM2.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
 
 IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
@@ -818,8 +832,9 @@ IF GVL_IHM.Grappin.Config.OffsetOpenM = 0.0 AND GVL_IHM.Grappin.Config.OffsetClo
     GVL_IHM.Grappin.TimeoutDuration := T#30s;
 END_IF;
 
-IF GVL_IHM.LimitLegal.DepthMinAllowed = 0.0 THEN
-    GVL_IHM.LimitLegal := GVL_PERSISTENT.LimitLegal;
+IF GVL_IHM.LimitLegalDepthMinAllowed = 0.0 THEN
+    GVL_IHM.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
+    GVL_IHM.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
 END_IF;
 
 // --- 2. PROPAGATION DES PARAMÈTRES IHM → GVL_PERSISTENT (sauvegarde des réglages opérateur)
@@ -835,13 +850,36 @@ GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.WinchM2.RampDecelNormalRate
 GVL_PERSISTENT.WinchM2RampDecelFast_Pct  := GVL_IHM.WinchM2.RampDecelFastRate;
 GVL_PERSISTENT.WinchSyncTolerance_M      := GVL_IHM.Sync.SyncToleranceM;
 GVL_PERSISTENT.GrappinConfig             := GVL_IHM.Grappin.Config;
-GVL_PERSISTENT.WinchM1CableLimitDescent_M := GVL_IHM.WinchM1.CableLimitDescentM;
-GVL_PERSISTENT.WinchM1SlowdownDistance_M  := GVL_IHM.WinchM1.SlowdownDistanceM;
-GVL_PERSISTENT.WinchM1SlowSpeedPct        := GVL_IHM.WinchM1.SlowSpeedPct;
-GVL_PERSISTENT.WinchM2CableLimitDescent_M := GVL_IHM.WinchM2.CableLimitDescentM;
-GVL_PERSISTENT.WinchM2SlowdownDistance_M  := GVL_IHM.WinchM2.SlowdownDistanceM;
-GVL_PERSISTENT.WinchM2SlowSpeedPct        := GVL_IHM.WinchM2.SlowSpeedPct;
-GVL_PERSISTENT.LimitLegal                 := GVL_IHM.LimitLegal;
+// Propagation synchrone bidirectionnelle de la limite de câble
+IF GVL_IHM.WinchM1.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
+    GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM1.CableLimitDescentM;
+ELSIF GVL_IHM.WinchM2.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
+    GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM2.CableLimitDescentM;
+END_IF;
+GVL_IHM.WinchM1.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescent_M;
+GVL_IHM.WinchM2.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescent_M;
+
+// Propagation synchrone bidirectionnelle de la distance de ralentissement
+IF GVL_IHM.WinchM1.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
+    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM1.SlowdownDistanceM;
+ELSIF GVL_IHM.WinchM2.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
+    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM2.SlowdownDistanceM;
+END_IF;
+GVL_IHM.WinchM1.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
+GVL_IHM.WinchM2.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
+
+// Propagation synchrone bidirectionnelle de la vitesse de ralentissement
+IF GVL_IHM.WinchM1.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
+    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.WinchM1.SlowSpeedPct;
+ELSIF GVL_IHM.WinchM2.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
+    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.WinchM2.SlowSpeedPct;
+END_IF;
+GVL_IHM.WinchM1.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
+GVL_IHM.WinchM2.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
+GVL_PERSISTENT.LimitLegalDepthMinAllowed  := GVL_IHM.LimitLegalDepthMinAllowed;
+GVL_PERSISTENT.LimitLegalEnabled          := GVL_IHM.LimitLegalEnabled;
+GVL_IHM.LimitLegalReached                 := (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled AND ((instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed) OR (instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+GVL_IHM.TopPositionSensorActive           := GVL_IN.TopPositionSensor;
 GVL_Encoder_Stub.M1_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M;
 GVL_Encoder_Stub.M2_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M;
 
@@ -876,11 +914,12 @@ GVL_IHM.WinchM1.Contactor4                  := instWinchM1.Contactor4;
 GVL_IHM.WinchM1.BrakeCmd                    := instWinchM1.BrakeCmd;
 GVL_IHM.WinchM1.Homed                       := instHomingM1.Homed;
 GVL_IHM.WinchM1.SafeStopActive              := instSafetyWinchM1.SafeStop;
-GVL_IHM.WinchM1.ForbidDescentActive         := instSafetyWinchM1.ForbidDescent;
+GVL_IHM.WinchM1.ForbidDescentActive         := ForbidDescentM1_Active;
 GVL_IHM.WinchM1.ForbidAscentActive          := instSafetyWinchM1.ForbidAscent;
 GVL_IHM.WinchM1.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM1.ThermalFault                := GVL_IN.M1ThermalFeedback;
 GVL_IHM.WinchM1.EncoderFault                := NOT instEncoderAbsM1.EncoderAvailable OR instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.WinchM1.CableLimitDescentReached    := (instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
 GVL_IHM.WinchM1.Encoder.RawPos              := instEncoderAbsM1.RawPos;
 GVL_IHM.WinchM1.Encoder.Alarms              := instEncoderAbsM1.AlarmsIn;
 GVL_IHM.WinchM1.Encoder.Warnings            := instEncoderAbsM1.WarningsIn;
@@ -910,11 +949,12 @@ GVL_IHM.WinchM2.Contactor4                  := instWinchM2.Contactor4;
 GVL_IHM.WinchM2.BrakeCmd                    := instWinchM2.BrakeCmd;
 GVL_IHM.WinchM2.Homed                       := instHomingM2.Homed;
 GVL_IHM.WinchM2.SafeStopActive              := instSafetyWinchM2.SafeStop;
-GVL_IHM.WinchM2.ForbidDescentActive         := instSafetyWinchM2.ForbidDescent;
+GVL_IHM.WinchM2.ForbidDescentActive         := ForbidDescentM2_Active;
 GVL_IHM.WinchM2.ForbidAscentActive          := instSafetyWinchM2.ForbidAscent;
 GVL_IHM.WinchM2.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM2.ThermalFault                := GVL_IN.M2ThermalFeedback;
 GVL_IHM.WinchM2.EncoderFault                := NOT instEncoderAbsM2.EncoderAvailable OR instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.WinchM2.CableLimitDescentReached    := (instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
 GVL_IHM.WinchM2.Encoder.RawPos              := instEncoderAbsM2.RawPos;
 GVL_IHM.WinchM2.Encoder.Alarms              := instEncoderAbsM2.AlarmsIn;
 GVL_IHM.WinchM2.Encoder.Warnings            := instEncoderAbsM2.WarningsIn;

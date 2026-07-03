@@ -1,9 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.2)
 
-> 📌 **État d'implémentation (2026-07-03quater, AUDIT D40)** : `FB_WinchSync` **codé (squelette)**
+> 📌 **État d'implémentation (2026-07-03, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
-> `SafeStop`), `SyncActive` selon Mode (imposé N1, activable/désactivable N2 via `OverrideSync`
-> de `FB_Modes`). **Pas de correction/régulation active** — `FB_Winch` n'a aucune entrée de
+> `SafeStop` pour l'écart de position), `SyncActive` selon Mode (imposé N1, activable/désactivable N2 via `OverrideSync`
+> de `FB_Modes`).
+> **Contrôle de cohérence de commande intégré** : `ErrorId` bit 1 (16#0002) entraîne un `SafeStop` des deux treuils.
+> **Pas de correction/régulation active** de l'écart — `FB_Winch` n'a aucune entrée de
 > correction de vitesse aujourd'hui, hors périmètre de ce lot (§9 "reste à faire"). Sélecteur
 > treuil IHM (M1/M2/Les deux) et bit « Prise de main IHM » : toujours **non codés**.
 >
@@ -13,6 +15,7 @@
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
 > 🔗 Dépend de : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
 >
+> 🔧 **v1.2 (2026-07-03)** — Audit de sécurité et intégration du contrôle de cohérence des commandes (SafeStop sur bit 1 de `ErrorId`, bypass automatique sur Grappin actif et override MAINT_N2, avec effacement automatique des erreurs).
 > 🔧 **v1.1 (2026-07-02)** — Nouvel export `Device.export` avec I/O réel : `M1/M2_RelayFwd/Rev`,
 > `M1/M2_SpeedContactor_1..4` (renommé, ex `Contactor1..4`), `M1/M2_BrakeCmd`,
 > `M1/M2_ContactorFeedbackFwd/Rev`, `M1_M2_TopPositionSensor` sont désormais câblés en I/O
@@ -208,6 +211,27 @@ l'acquitter (front `Reset`, une fois la cause disparue) comme tout autre défaut
 > `CODE/`). **Analyse d'impact avant correctif** : `FB_Ramp` n'est instancié que 3 fois au total
 > (`RampX`/`RampY` dans `FB_Joystick`, cible signée → concernées ; `SpeedRamp` dans `FB_Winch`,
 > cible toujours `>= 0` → **jamais** concernée, comportement inchangé pour `FB_Winch`).
+### 🆕 4quater. Contrôle de cohérence des commandes (2026-07-03)
+
+Afin d'éviter tout dommage mécanique majeur (déchirement du câble, torsion de l'arbre) ou une chute de charge en cas de comportement divergent des deux treuils M1 et M2, un contrôle de cohérence des commandes est intégré dans `FB_WinchSync` :
+
+- **Principe de détection** :
+  Le bloc compare en temps réel les consignes de mouvement envoyées aux contacteurs physiques des deux moteurs :
+  - Sens de marche : `RelayFwdM1` vs `RelayFwdM2` et `RelayRevM1` vs `RelayRevM2`.
+  - Paliers de vitesse engagés : `Contactor1..4_M1` vs `Contactor1..4_M2`.
+  Si une discordance est détectée alors que la surveillance de synchronisation est active (`SyncActive = TRUE`), un filtre temporel anti-rebond de **500 ms** (`MismatchTimer`) est lancé pour éviter les déclenchements intempestifs durant les phases transitoires (rampes de vitesse ou commutations).
+  
+- **Traitement du défaut** :
+  - **Bit de défaut** : `ErrorId` bit 1 (16#0002) dans `FB_WinchSync`.
+  - **Action de sécurité** : Ce défaut étant critique, il entraîne un **`SafeStop`** immédiat (décélération rapide et serrage des freins) sur les deux treuils M1 et M2 par le câblage suivant dans `PRG_MAIN` :
+    `SafeStop := instSafetyWinchM1/M2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)`.
+  - *Remarque sur l'écart de position (bit 0)* : L'écart hors tolérance de position (`ErrorId` bit 0, 16#0001) reste quant à lui un simple avertissement IHM (`SyncWarn = Error` pour affichage) et ne doit pas couper le mouvement (`SafeStop` non activé par ce bit).
+
+- **Conditions d'activation et de Bypass** :
+  - **MAINT_N1 / MANUEL / SEMI_AUTO** : La surveillance est active par défaut (`SyncActive = TRUE`).
+  - **MAINT_N2 (Override Sync)** : L'opérateur peut désactiver temporairement la surveillance en cochant `OverrideSync` à l'IHM, ce qui désactive le bloc `FB_WinchSync` (`Enable := FALSE`) et efface immédiatement son défaut.
+  - **Mouvement Grappin** : Lorsque le grappin est en mouvement (`Grappin.Busy = TRUE`), le treuil M2 fonctionne de manière indépendante pour ouvrir/fermer le grappin. Le contrôle de cohérence des commandes est alors automatiquement désactivé en forçant `FB_WinchSync.Enable := FALSE` dans `PRG_MAIN`.
+  - **Effacement automatique sur désactivation** : Lorsque `Enable` passe à `FALSE`, le bloc `FB_WinchSync` remet à zéro ses sorties `Error` (à `FALSE`) et `ErrorId` (à `16#0000`) afin de ne pas verrouiller le système en `SafeStop` pendant un bypass ou l'utilisation du grappin.
 
 ### 🔴 TBD — Surveillance de cohérence mouvement (2026-07-02, PAS implémentée)
 
