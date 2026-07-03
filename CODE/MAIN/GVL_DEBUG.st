@@ -51,6 +51,4 @@ VAR_GLOBAL
 	DBG_CtrlPhaseRotation_Bypass_TEST : BOOL := TRUE; // TRUE = force CtrlPhaseRotation_DI à TRUE (test banc sans le vrai contrôle de rotation câblé)
 	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (capteur mou de câble forcé OK)
 	DBG_SlackCableSwitch_TEST : BOOL := TRUE; // TRUE = force M1_M2_SlackCableSwitch_DI à TRUE (pas de défaut mou de câble)
-	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (thermique moteur forcé OK)
-	DBG_ThermalBypass_TEST : BOOL := TRUE; // TRUE = force thermiques M1/M2 à TRUE (pas de surchauffe)
 END_VAR
