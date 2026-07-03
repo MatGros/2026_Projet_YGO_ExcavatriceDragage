@@ -152,7 +152,7 @@ END_IF
 
 | Couche | Mécanisme | Effet |
 |--------|-----------|-------|
-| Matérielle | Bouton coup-de-poing **ou** câble mécanique « montée excessive » | Coupe le **contacteur de puissance** → moteurs OFF **brutalement** + freins collés. Automate/CC restent alimentés, continuent de surveiller. |
+| Matérielle | Bouton coup-de-poing (opérateur) | Coupe le **contacteur de puissance** → moteurs OFF **brutalement** + freins collés. Automate/CC restent alimentés, continuent de surveiller. |
 | Logiciel → Matériel | Sortie automate **`PowerCutOff`** | Déclenche la coupure AU si un **contacteur de puissance reste collé** (treuil incontrôlable). |
 | Logicielle | **`SafeStop`** (sortie d'un bloc safety **métier**, une par domaine) | Met le(s) FB de mouvement du domaine en **rampe de décélération rapide** sur défaut (`Enable` maintenu), pour que l'opérateur traite le problème. Ce **n'est pas** l'AU : **seul l'AU coupe brutalement**. |
 

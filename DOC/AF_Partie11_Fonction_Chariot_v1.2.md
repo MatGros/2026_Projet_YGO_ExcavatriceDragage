@@ -106,7 +106,7 @@ FB_Safety_Chariot ──► SafeStop ──► (entrée) FB_Chariot(M3)
 | Entrée | Type | Rôle |
 |--------|------|------|
 | `ContactorFeedbackFwd` / `Rev` | BOOL | Retours d'état câblés contacteurs de sens |
-| `DriveFaultFeedback` | BOOL | Retour TOR défaut variateur, **si câblé** sur une sortie relais dédiée (sinon `FALSE` côté appelant — ne jamais stubber un "pas de défaut" arbitraire) |
+| `DriveFaultOk` | BOOL | Retour TOR état sain variateur, câblage NF (`TRUE` = sain/normal, `FALSE` = défaut/ouvert ou fil coupé) |
 
 **📤 Sorties clés**
 | Sortie | Type | Rôle |
@@ -119,8 +119,8 @@ FB_Safety_Chariot ──► SafeStop ──► (entrée) FB_Chariot(M3)
 | `FwdContactorCheck` / `RevContactorCheck` / `BrakeContactorCheck` | `ST_ContactorCheck` | Diagnostic détaillé (IHM) |
 
 `ErrorId` : bit0 = défaut frein, bit1 = contacteur sens Fwd incohérent (`DEGRADED_IO`), bit2 =
-contacteur sens Rev incohérent (`DEGRADED_IO`), bit3 = défaut variateur (`DriveFaultFeedback`,
-si câblé — 🔴 TBD tant que le bit exact du mot d'état `ETHERCAT` n'est pas confirmé).
+contacteur sens Rev incohérent (`DEGRADED_IO`), bit3 = défaut variateur (`DriveFaultOk` ou 
+variateur non disponible, actif sur `FALSE`/`0`).
 
 ---
 
@@ -209,7 +209,7 @@ constructeur ou l'étiquette du variateur).
 | `M3_RelayRev` | Sortie | Contacteur sens arrière M3 |
 | `M3_RelaySpeedGv` | Sortie | Sélection vitesse (câblé sur entrée présélection AC600) |
 | `M3_ContactorFeedbackFwd` / `Rev` | Entrée | Retours contacteurs de sens M3 |
-| `M3_DriveFaultFeedback` | Entrée | Retour TOR défaut variateur, si câblé |
+| `M3_DriveFaultOk` | Entrée | Retour TOR état sain variateur, câblage NF (`TRUE` = OK/sain, `FALSE` = défaut/ouvert ou fil coupé) |
 
 **Communs**
 | Variable (code) | Sens | Statut | Rôle |

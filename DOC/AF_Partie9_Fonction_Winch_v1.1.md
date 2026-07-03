@@ -144,7 +144,7 @@ Le nouvel export `Device.export` câble deux nouveaux retours safety-critiques :
 bit `ErrorId` (bit2) dans `FB_Safety_Winch`, participe au calcul de `SafeStop` **au même titre**
 que la perte joystick/codeur → arrêt total des 2 sens, `Enable` maintenu (rampe rapide).
 * **Câblage physique** : Contacts Normally Closed (NC), donc sains à `1` (TRUE) et en défaut/ouvert à `0` (FALSE).
-* **Reset** : Front standard (Partie3 §5) dès que le retour physique repasse à `TRUE` (sain). L'automate utilise l'inversion `NOT GVL_IN.M1_M2ThermalFeedback` pour la logique de défaut.
+* **Reset** : Front standard (Partie3 §5) dès que le retour physique repasse à `TRUE` (sain). L'automate utilise l'inversion `NOT GVL_IN.M1ThermalFeedback` (pour M1) ou `NOT GVL_IN.M2ThermalFeedback` (pour M2) pour la logique de défaut.
 
 **Mou de câble (`M1_M2_SlackCableSwitch`, commun aux 2 treuils)** — traitement **différent**,
 demandé explicitement par l'utilisateur :
