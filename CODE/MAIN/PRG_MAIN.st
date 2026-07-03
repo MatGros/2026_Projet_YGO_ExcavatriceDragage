@@ -209,26 +209,22 @@ END_IF;
 instDiagCanOpen(
     Enable := TRUE,
     Reset := MachineReset_IHM,
-    CanOnline := TRUE,         // 🔴 TODO CONFIRMER propriété device CAN (voir en-tête section)
-    CanOperational := TRUE     // 🔴 TODO CONFIRMER propriété device CAN (voir en-tête section)
+    CanOnline := (CANbus.GetBusState() = 1) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, // 1 = ACTIVE (ou bypass test banc)
+    CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.wState = 8) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST // 8 = OPERATIONAL (ou bypass test banc)
 );
 
-// 🔴 TODO CONFIRMER (2026-07-03octies) : `EnableDiagnosis=False` sur COD1_CODEUR/COD2_CODEUR/
-// AC600_ECAT_Drive dans le projet CODESYS actuel (vérifié dans Device.export) — `.xError`/
-// `.wState` PAS garantis fiables tant que le diagnostic device n'est pas activé. Littéraux
-// TODO conservés (comportement inchangé, SANS RISQUE) en attendant : voir note d'application
-// DOC/AUDIT_Coherence_Documentaire_v1.0.md §16 pour la procédure d'activation CODESYS +
-// remplacer VariateurWcState/SlaveState, EncoderM1/M2WcState/SlaveState par les VRAIS canaux
-// de diagnostic une fois activés et leurs noms confirmés dans l'assistant de saisie.
+// 🔴 NOTE (2026-07-04) : Les propriétés .xError et .wState exigent que l'option « Enable Diagnosis »
+// soit cochée sur chaque device EtherCAT dans CODESYS. En cas d'essai sur table sans matériel,
+// le bypass DBG_ContactorFeedbackBypass_TEST force les retours à l'état sain (FALSE / 8).
 instDiagEthercat(
     Enable := TRUE,
     Reset := MachineReset_IHM,          // 🔑 Bouton général machine
-    VariateurWcState := FALSE,          // 🔴 TODO: activer Diagnosis sur AC600_ECAT_Drive (AUDIT §16)
-    VariateurSlaveState := 8,           // 🔴 TODO: idem
-    EncoderM1WcState := FALSE,          // 🔴 TODO: activer Diagnosis sur COD1_CODEUR (AUDIT §16)
-    EncoderM1SlaveState := 8,           // 🔴 TODO: idem
-    EncoderM2WcState := FALSE,          // 🔴 TODO: activer Diagnosis sur COD2_CODEUR (AUDIT §16)
-    EncoderM2SlaveState := 8            // 🔴 TODO: idem
+    VariateurWcState := AC600_ECAT_Drive.xError AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    VariateurSlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, AC600_ECAT_Drive.wState, 8),
+    EncoderM1WcState := COD1_CODEUR.xError AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM1SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_CODEUR.wState, 8),
+    EncoderM2WcState := COD2_CODEUR.xError AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM2SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_CODEUR.wState, 8)
 );
 
 (* ═══════════════════════════════════════════════════════════════
