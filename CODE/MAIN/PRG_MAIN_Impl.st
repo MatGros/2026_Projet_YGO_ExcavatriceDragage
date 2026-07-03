@@ -76,21 +76,21 @@ instDiagCanOpen(
     Enable := TRUE,
     Reset := MachineReset_IHM,
     CanOnline := (CANbus.GetBusState() = 1) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, // 1 = ACTIVE (ou bypass test banc)
-    CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.wState = 8) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST // 8 = OPERATIONAL (ou bypass test banc)
+    CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST
 );
 
-// 🔴 NOTE (2026-07-04) : Les propriétés .xError et .wState exigent que l'option « Enable Diagnosis »
-// soit cochée sur chaque device EtherCAT dans CODESYS. En cas d'essai sur table sans matériel,
-// le bypass DBG_ContactorFeedbackBypass_TEST force les retours à l'état sain (FALSE / 8).
+// 🔴 NOTE (2026-07-04) : Les esclaves EtherCAT et CANopen implémentent l'interface IDevice.
+// Nous interrogeons donc leur état de fonctionnement réel via la méthode standard .GetDeviceState()
+// (DEVICE_STATE.RUNNING = état sain / actif).
 instDiagEthercat(
     Enable := TRUE,
     Reset := MachineReset_IHM,          // 🔑 Bouton général machine
-    VariateurWcState := AC600_ECAT_Drive.xError AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
-    VariateurSlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, AC600_ECAT_Drive.wState, 8),
-    EncoderM1WcState := COD1_CODEUR.xError AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
-    EncoderM1SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_CODEUR.wState, 8),
-    EncoderM2WcState := COD2_CODEUR.xError AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
-    EncoderM2SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_CODEUR.wState, 8)
+    VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    VariateurSlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
+    EncoderM1WcState := (COD1_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM1SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
+    EncoderM2WcState := (COD2_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM2SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
 );
 
 (* ═══════════════════════════════════════════════════════════════
