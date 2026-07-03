@@ -75,13 +75,15 @@ VAR_INPUT
     PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
     TopPositionSensor   : BOOL;        // 🆕 Capteur de position haute commun (M1_M2_TopPositionSensor, I/O réel)
     InReferencingMode   : BOOL;        // 🆕 Indique si le treuil est en cours de homing (référencement)
+    CablePosM           : REAL;        // 🆕 Position actuelle du câble en mètres (scaled)
+    CableLimitDescentM  : REAL;        // 🆕 Profondeur max / longueur de câble autorisée en mètres (positive)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun) ; bit5 : fin de course haut atteint (anti-débordement)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun) ; bit5 : fin de course haut atteint ; bit6 : longueur max câble atteinte (déroulement)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2/4 uniquement
@@ -158,6 +160,15 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFDF;
 END_IF;
 
+// 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
+// Sécurité active tout le temps. Si la longueur de câble dépasse la limite max (CablePosM <= -CableLimitDescentM),
+// alors on interdit uniquement la descente.
+IF (CableLimitDescentM > 0.0) AND (CablePosM <= -CableLimitDescentM) THEN
+    ErrorId := ErrorId OR 16#0040;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFBF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -166,12 +177,12 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🟧 SafeStop : bits 0 (joystick)/1 (codeur)/2 (thermique)/4 (rotation phase) — arrêt total des
-// 2 sens. Le mou de câble (bit3) et le fin de course haut (bit5) sont EXCLUS : ils n'interdisent
-// qu'un seul sens de marche (voir ForbidDescent/ForbidAscent ci-dessous).
+// 2 sens. Le mou de câble (bit3), le fin de course haut (bit5) et la longueur max câble (bit6)
+// sont EXCLUS : ils n'interdisent qu'un seul sens de marche (voir ForbidDescent/ForbidAscent).
 SafeStop := (ErrorId AND 16#0017) <> 16#0000;
 
-// 🆕 ForbidDescent : reflète le bit3 (mou de câble) — interdit la descente.
-ForbidDescent := (ErrorId AND 16#0008) <> 16#0000;
+// 🆕 ForbidDescent : reflète le bit3 (mou de câble) OU le bit6 (longueur max de câble) — interdit la descente.
+ForbidDescent := (ErrorId AND 16#0048) <> 16#0000;
 
 // 🆕 ForbidAscent : reflète le bit5 (fin de course haut) — interdit la montée.
 ForbidAscent := (ErrorId AND 16#0020) <> 16#0000;

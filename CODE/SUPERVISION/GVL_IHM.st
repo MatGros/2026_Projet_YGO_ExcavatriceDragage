@@ -13,6 +13,7 @@ VAR_GLOBAL RETAIN
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
     Chariot : ST_ChariotHMI;(* ↔️ Variables d'échange IHM Chariot M3 *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
+    LimitLegal : ST_LimitLegal; (* 📏 Limite légale de dragage (configurable IHM) *)
 END_VAR
 
 (* ═══════════════════════════════════════════════════════════════

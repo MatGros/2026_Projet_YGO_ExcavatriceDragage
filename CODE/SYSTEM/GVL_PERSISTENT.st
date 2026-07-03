@@ -63,6 +63,17 @@ VAR_GLOBAL PERSISTENT RETAIN
     WinchM2RampDecelNormal_Pct  : REAL := 150.0; // 💾 Décélération normale M2 (%/s)
     WinchM2RampDecelFast_Pct    : REAL := 400.0; // 💾 Décélération SafeStop M2 (%/s) — CRITIQUE
 
+    // 📐 PARAMÈTRES DE LIMITES DE DESCENTE ET DE RALENTISSEMENT SUR BORDURE (Nouveau 2026-07-03)
+    WinchM1CableLimitDescent_M  : REAL := 20.0;  // 💾 Profondeur max / longueur de câble autorisée M1 (m)
+    WinchM1SlowdownDistance_M   : REAL := 1.0;   // 💾 Distance de ralentissement M1 (m)
+    WinchM1SlowSpeedPct         : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement M1 (%)
+    WinchM2CableLimitDescent_M  : REAL := 20.0;  // 💾 Profondeur max / longueur de câble autorisée M2 (m)
+    WinchM2SlowdownDistance_M   : REAL := 1.0;   // 💾 Distance de ralentissement M2 (m)
+    WinchM2SlowSpeedPct         : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement M2 (%)
+
+    // 📏 LIMITE LÉGALE DE DRAGAGE (Nouveau 2026-07-03)
+    LimitLegal                  : ST_LimitLegal; // 💾 Configuration de la limite légale de profondeur
+
     // ═══════════════════════════════════════════════════════════
     // ⚖️ SYNCHRONISATION — Tolérance d'écart M1/M2
     // ═══════════════════════════════════════════════════════════

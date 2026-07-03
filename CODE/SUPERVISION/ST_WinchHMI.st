@@ -11,6 +11,9 @@ STRUCT
     RampAccelRate           : REAL := 50.0;     (* 📈 Rampe d'accélération (%/s) *)
     RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     RampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
+    CableLimitDescentM      : REAL := 20.0;     (* 📐 Profondeur max / longueur de câble autorisée (m) *)
+    SlowdownDistanceM       : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
+    SlowSpeedPct            : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
 
     (* 🚦 États & Mesures (Lecture seule) *)
     PositionM               : REAL;             (* 📊 Position actuelle du câble (mètres) *)
