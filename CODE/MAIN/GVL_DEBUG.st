@@ -39,16 +39,16 @@ VAR_GLOBAL
 	DBG_ForceNeutral : INT := 5000; //(Pour simuler le retour au centre).
 	DBG_ForceMax : INT := 10000; //(Pour simuler une consigne à fond).
 
-	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (chaîne AU câblée)
-	DBG_EmergencyStopOkBypass_TEST : BOOL := FALSE; // TRUE = force EmergencyStopOk réel à TRUE (test banc sans AU câblé)
-	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (capteur position haute câblé)
+	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (à remettre à FALSE en exploitation réelle)
+	DBG_EmergencyStopOkBypass_TEST : BOOL := TRUE; // TRUE = force EmergencyStopOk réel à TRUE (test banc sans AU câblé)
+	// 🔴 BYPASS TEST BANC — INITIALISÉ À FALSE (actionné ponctuellement pour le homing)
 	DBG_TopPositionSensorBypass_TEST : BOOL := FALSE; // TRUE = force M1_M2_TopPositionSensor à TRUE (test banc, re-homing sans actionner le capteur)
-	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (homme-mort actif)
-	DBG_DeadmanBypass_TEST : BOOL := FALSE; // TRUE = force DeadmanArmed à TRUE en permanence (bouton non nécessaire, essais joystick)
-	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (contacteurs réels câblés/cohérents)
-	DBG_ContactorFeedbackBypass_TEST : BOOL := FALSE; // TRUE = désactive StuckClosed/StuckOpen (FB_Winch/FB_Chariot), pas de blocage RelayFwd/RelayRev sans retour contacteur réel
-	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (contrôle rotation phase câblé)
-	DBG_CtrlPhaseRotation_Bypass_TEST : BOOL := FALSE; // TRUE = force CtrlPhaseRotation_DI à TRUE (test banc sans le vrai contrôle de rotation câblé)
-	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (capteur mou de câble câblé)
-	DBG_SlackCableSwitch_TEST : BOOL := FALSE; // TRUE = force M1_M2_SlackCableSwitch_DI à TRUE (test banc sans le vrai capteur mou de câble câblé)
+	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (homme-mort forcé)
+	DBG_DeadmanBypass_TEST : BOOL := TRUE; // TRUE = force DeadmanArmed à TRUE en permanence (bouton non nécessaire, essais joystick)
+	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (retours contacteurs shuntés)
+	DBG_ContactorFeedbackBypass_TEST : BOOL := TRUE; // TRUE = désactive StuckClosed/StuckOpen (FB_Winch/FB_Chariot), pas de blocage sans retour réel
+	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (contrôle rotation phase forcé)
+	DBG_CtrlPhaseRotation_Bypass_TEST : BOOL := TRUE; // TRUE = force CtrlPhaseRotation_DI à TRUE (test banc sans le vrai contrôle de rotation câblé)
+	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (capteur mou de câble forcé OK)
+	DBG_SlackCableSwitch_TEST : BOOL := TRUE; // TRUE = force M1_M2_SlackCableSwitch_DI à TRUE (pas de défaut mou de câble)
 END_VAR
