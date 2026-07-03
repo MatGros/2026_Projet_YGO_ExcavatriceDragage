@@ -8,6 +8,9 @@
       (câblage I/O réel pas encore fait, PRG_MAIN.st en dépend toujours
       → 31 erreurs de compilation). Seul `M3_BrakeCmd` est réel (I/O
       Mapping Device.export, 2026-07-02) — il ne revient PAS ici.
+   🔧 CORRECTIF (2026-07-03quattuordecies) : `M3_BrakeFeedback` RETIRÉ — retour
+      frein M3 désormais réel (`M3_BrakeContactorFeedback_DI`, conditionné dans
+      `FB_InputsMachine`), plus de miroir logiciel nécessaire.
    ═══════════════════════════════════════════════════════════════ *)
 
 VAR_GLOBAL
@@ -20,7 +23,6 @@ VAR_GLOBAL
     // 🔧 Mirés activement par PRG_MAIN.st (bloc 🧪 SIMULATION) sur les commandes ci-dessus (contacteur "idéal")
     M3_ContactorFeedbackFwd  : BOOL;   // 🔌 Entrée — retour contacteur sens avant M3 (STUB, miroir de M3_RelayFwd)
     M3_ContactorFeedbackRev  : BOOL;   // 🔌 Entrée — retour contacteur sens arrière M3 (STUB, miroir de M3_RelayRev)
-    M3_BrakeFeedback         : BOOL;   // 🔌 Entrée — retour contacteur frein M3 (STUB, miroir de M3_BrakeCmd réel)
 
     // 🎯 Capteur position cible (PAS de miroir automatique — forcer manuellement en instance CODESYS, Partie11 §9bis)
     M3_PositionSensorTarget  : BOOL;   // 🔌 Entrée — capteur position cible M3 (STUB, arbitré par sélecteur ci-dessus)

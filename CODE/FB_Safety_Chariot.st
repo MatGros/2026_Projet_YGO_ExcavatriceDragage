@@ -33,6 +33,7 @@ VAR_INPUT
     Mode                : E_Mode;      // Mode courant (autorisations)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
+    PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
     // 🔴 TBD (EtherCAT AC600 non finalisé) : ajouter ici VariateurAvailable
     //     (FB_DiagEthercat AC600/M3) quand ce diag sera fiabilisé — ne PAS stubber en dur.
 END_VAR
@@ -41,7 +42,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine chariot sans commande valide)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine chariot sans commande valide) ; bit2 : mauvaise rotation de phase (commun, bit1 réservé EtherCAT variateur)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
@@ -81,6 +82,13 @@ END_IF;
 // tant que la surveillance EtherCAT n'est pas fiabilisée revient à accepter ce risque, comme
 // pour le codeur treuil (FB_Safety_Winch) — décision à revalider avec l'utilisateur avant
 // mise en service réelle en mode ETHERCAT.
+
+// 🔍 3bis. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2/M3, 2026-07-03octodecies) — bit2
+IF NOT PhaseRotationOk THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);

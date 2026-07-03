@@ -21,7 +21,7 @@
         ce que `EncoderAvailable` reflète déjà, si besoin d'un signal
         distinct plus tard).
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
-        ST_ContactorCheck de puissance câblé — FB_Output_Relay
+        ST_ContactorCheck de puissance câblé — FB_Output
         transverse hors périmètre de ce lot, voir Partie6).
    🆕 AJOUT (2026-07-02, retour terrain — nouvel export Device.export avec
       I/O réel `M1_ThermalFeedback`/`M2_ThermalFeedback` et
@@ -72,13 +72,14 @@ VAR_INPUT
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
     SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
+    PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2 uniquement
@@ -137,6 +138,14 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
+// 🔍 3quinquies. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2, 2026-07-03octodecies) —
+// bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
+IF NOT PhaseRotationOk THEN
+    ErrorId := ErrorId OR 16#0010;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFEF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -144,10 +153,10 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🟧 SafeStop : UNIQUEMENT bits 0 (joystick)/1 (codeur)/2 (thermique) — arrêt total des 2 sens.
-// Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
+// 🟧 SafeStop : bits 0 (joystick)/1 (codeur)/2 (thermique)/4 (rotation phase) — arrêt total des
+// 2 sens. Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
 // (ForbidDescent ci-dessous), pas bloquer une remontée nécessaire pour aller vérifier le câble.
-SafeStop := (ErrorId AND 16#0007) <> 16#0000;
+SafeStop := (ErrorId AND 16#0017) <> 16#0000;
 
 // 🆕 ForbidDescent : reflète UNIQUEMENT le bit3 (mou de câble) — consommé par FB_Winch pour
 // masquer RelayRev (descente) seul, RelayFwd (montée) reste piloté normalement.

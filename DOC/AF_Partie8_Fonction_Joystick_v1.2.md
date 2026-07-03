@@ -1,5 +1,21 @@
 # 📋 Analyse Fonctionnelle — Partie 8 : Fonction Joystick (v1.2)
 
+> 📌 **État d'implémentation (2026-07-03septdecies, AUDIT D69)** : `SafeStop` enfin RETIRÉ du
+> code (`CODE/FB_Joystick.st`) — la spec v1.1 le demandait depuis longtemps, mais le vestige
+> (entrée `SafeStop` câblée sur un stub `GVL_DEBUG.DBG_False`, agissant comme un second `Enable`
+> dans le GATE) n'avait jamais été nettoyé côté implémentation. Fermé : plus de `SafeStop` ni en
+> `VAR_INPUT` ni dans le GATE, `PRG_MAIN.st` ne câble plus rien dessus.
+>
+> 📌 **État d'implémentation (2026-07-03duodecies, AUDIT D49/D51/D54-D57)** : bouton homme-mort
+> anti-calage câblé (`CODE/FB_Joystick.st`). `RawButton` était acquis (`Button`) mais sans effet —
+> désormais : le geste doit être ARMÉ par un appui bouton pendant que le manche est AU NEUTRE.
+> Une fois armé et en mouvement, le bouton doit être MAINTENU ou RÉAPPUYÉ (les deux comptent)
+> au moins une fois toutes les `DeadmanRearmTimeout` (**10 s**, ajusté suite retour terrain —
+> était 3 s), sinon désarmement automatique (décélération normale). Le retour au neutre désarme
+> aussi, mais SEULEMENT si le neutre est TENU `NeutralHoldTime` (500 ms) — une simple traversée
+> rapide en inversion de sens (Fwd↔Rev) ne désarme pas. `DeadmanArmed` exposé en sortie. Défend
+> contre le calage AVANT et APRÈS armement, sans pénaliser les inversions de sens fréquentes.
+>
 > **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Translation→Chariot
 > dans les renvois croisés (préfixe I/O physique M3 inchangé).
 > **Version 1.1** — Suite audit documentaire : `SafeStop` **retiré** de l'interface `FB_Joystick`
@@ -131,10 +147,10 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 
 ### 6bis. Écarts connus entre ce document (v1.1) et le code actuel
 
-⚠️ Le présent audit documentaire **ne modifie pas** `CODE/PRG_JOY1.st`. Écarts à traiter lors
-d'une prochaine itération de code (via le workflow `codesys-workflow`) :
-1. Retirer le câblage `SafeStop := GVL_DEBUG.DBG_False` (entrée supprimée du contrat, §3/§5).
-2. Renommer `SafetyOk` → `EmergencyStopOk` dans l'appel `FB_Joystick_0(...)`.
+⚠️ Écarts historiques (1 et 2 ci-dessous FERMÉS le 2026-07-03septdecies, AUDIT D69 —
+`CODE/FB_Joystick.st`/`PRG_MAIN.st` à jour ; 3 et 4 restent ouverts) :
+1. ✅ **FERMÉ** : câblage `SafeStop := GVL_DEBUG.DBG_False` retiré (entrée supprimée du contrat).
+2. ✅ **FERMÉ** : `EmergencyStopOk` (déjà renommé, câblé sur I/O réel via `GVL_IN`).
 3. Le nom de programme `PRG_JOY1` est un **vestige** de l'ancienne architecture multi-`PRG_*`
    (Partie 2 abandonne ce découpage — 1 seul POU `PLC_PRG_MAIN`, appels séquentiels). À terme,
    l'appel de `FB_Joystick` devrait être **inline dans `PLC_PRG_MAIN`**, pas dans un sous-programme
@@ -174,5 +190,5 @@ d'une prochaine itération de code (via le workflow `codesys-workflow`) :
 - [ ] Calibration OK (front `Calibrate`, neutre 2000..8000) ?
 - [ ] Sortie % cohérente (deadband 5 %, rampes douces) ?
 - [ ] CAN coupé → sorties à 0 (gate OK) ?
-- [ ] Suppression effective de `SafeStop` et renommage `EmergencyStopOk` dans `CODE/PRG_JOY1.st` (§6bis) ?
+- [x] Suppression effective de `SafeStop` et renommage `EmergencyStopOk` — fait 2026-07-03septdecies (§6bis).
 - [ ] Si validé → figer le mapping sécurité définitif dans `AF_Partie2_v2.x` + clôturer cette v1.1.

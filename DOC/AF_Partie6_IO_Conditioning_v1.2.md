@@ -1,18 +1,34 @@
 # 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.2)
 
+> 📌 **État d'implémentation (2026-07-03quindecies, AUDIT D63-D65)** : `FB_Input_Digital`/
+> `FB_Output_Relay` renommés **`FB_Input`**/**`FB_Output`** (demande utilisateur — pas que des
+> relais côté sortie). `FB_Output.OutputCmd` renommé **`State`** (cohérence avec
+> `FB_Input.State`). `FB_InputsMachine` n'a plus de `VAR_OUTPUT` : il écrit directement
+> **`GVL_IN.Xxx`** (noms courts, sans suffixe). `FB_OutputsMachine` n'a plus ni
+> `VAR_INPUT` ni `VAR_OUTPUT` : il lit **`GVL_OUT.Xxx`** (écrit par `PRG_MAIN` par
+> simples affectations juste après `FB_Winch`/`FB_Chariot`) et écrit directement les I/O
+> réels. Les deux FB composites s'appellent désormais **sans aucun paramètre**
+> (`instInputsMachine()`, `instOutputsMachine()`). Écart assumé à Partie2 §0 pour ces 2 GVL —
+> choix pragmatique de lisibilité en LD (accès par tag global, pas d'instance à déplier).
+> 🔧 **Renommage des GVL** (2026-07-03quindecies) : `GVL_Inputs`→**`GVL_IN`**,
+> `GVL_Outputs`→**`GVL_OUT`** (demande utilisateur, noms courts).
+>
 > **v1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Translation→Chariot
 > dans les exemples (préfixe I/O physique M3 inchangé).
-> 📌 **État d'implémentation (2026-07-03ter, AUDIT D36/D37)** : `FB_Input_Digital.st`/
-> `FB_Output_Relay.st` **codés et intégrés** via un FB composite unique **`FB_IO_Machine`**
-> (`CODE/FB_IO_Machine.st`), **1 seule instance** (`instIoMachine`) dans `PRG_MAIN`, appelée
-> 2×/cycle (entrées tôt, sorties tard — voir en-tête du fichier). Couvre TOUT le conditionnement
-> I/O réel connu à ce jour : `EmergencyStopOk` (commun), mou de câble + capteur position haute
-> (commun M1/M2), Winch M1 (3 entrées + 7 sorties), Winch M2 (idem), Chariot M3 (4 capteurs
-> position + `BrakeCmd`, seuls signaux réels — `RelayFwd/Rev/RelaySpeedGv` restent STUB logiciel,
-> pas de matériel réel). Anti-rebond fixe `T#20MS` + `InvertLogic` par voie (bascule NO/NC en
-> mise en service sans câblage). **Reste non intégré** : composition DANS `FB_Winch`/`FB_Chariot`
-> eux-mêmes (remplacerait leur double-vérification contacteur écrite à la main — choix
-> d'architecture toujours en attente, `UseFeedback` reste `FALSE` partout dans `FB_IO_Machine`).
+> 📌 **État d'implémentation (2026-07-03undecies, AUDIT D36/D37/D52/D53)** : `FB_Input.st`/
+> `FB_Output.st` **codés et intégrés**, scindés en 2 FB composites **`FB_InputsMachine`**
+> (entrées) / **`FB_OutputsMachine`** (sorties) — remplacent l'ancien `FB_IO_Machine` (double
+> appel). Chacun **1 seule instance**, appelée **une seule fois** dans `PRG_MAIN` (entrées tôt,
+> sorties tard). `FB_Input.OutputClean` renommé **`State`** (demande utilisateur).
+> `FB_InputsMachine` référence désormais DIRECTEMENT les I/O réels en interne (plus de
+> `*Raw`/`Invert*` câblés depuis `PRG_MAIN`) — devient un FB spécifique machine, pas une brique
+> générique réutilisable ailleurs ; `InvertLogic`/`ChannelOk` de chaque sous-instance se forcent
+> directement en vue CODESYS. Couvre TOUT le conditionnement I/O réel connu à ce jour :
+> `EmergencyStopOk` (commun), mou de câble + capteur position haute (commun M1/M2), Winch M1
+> (3 entrées + 7 sorties), Winch M2 (idem), Chariot M3 (4 capteurs position + `BrakeCmd`, seuls
+> signaux réels — `RelayFwd/Rev/RelaySpeedGv` restent STUB logiciel). **Reste non intégré** :
+> composition DANS `FB_Winch`/`FB_Chariot` eux-mêmes (choix d'architecture toujours en attente,
+> `UseFeedback` reste `FALSE` partout). Prévu pour être implémenté en **LD** par l'utilisateur.
 >
 > **Version 1.1** — Suite audit documentaire : §5 corrigé — il n'y a **pas de coupure sèche**
 > de la sortie relais sur défaut. Le passage en **rampe** (normale via `StartStop`, rapide via
@@ -20,8 +36,8 @@
 > temps où `Output[i]` est appelé, la commande transmise est déjà la commande **rampée** correcte.
 > Terminologie `PRG_IO` retirée (1 seul POU `PLC_PRG_MAIN`, pas de sous-`PRG_*` — voir Partie 2 §0).
 >
-> **Version 1.0** — Briques génériques de conditionnement E/S : `FB_Input_Digital` et
-> `FB_Output_Relay`, déclaration en **tableaux d'instances**, contrôle de feedback et
+> **Version 1.0** — Briques génériques de conditionnement E/S : `FB_Input` et
+> `FB_Output`, déclaration en **tableaux d'instances**, contrôle de feedback et
 > récupération du diagnostic automate / cartes E/S.
 >
 > 🔗 Dépend de : Partie 2 v2.5 (architecture), Partie 3 v1.2 (contrat FB, §1bis interface réduite).
@@ -46,7 +62,7 @@ qui centralisent le traitement bas niveau et remontent un **diagnostic**.
 
 ---
 
-## 📥 1. `FB_Input_Digital` — Entrée TOR conditionnée
+## 📥 1. `FB_Input` — Entrée TOR conditionnée
 
 ### Rôle
 Conditionner une entrée tout-ou-rien : inversion NO/NC, filtrage anti-rebond (tempo de
@@ -54,7 +70,7 @@ filtrage par entrée), diagnostic.
 
 ### Interface (proposition)
 ```codesys
-FUNCTION_BLOCK FB_Input_Digital
+FUNCTION_BLOCK FB_Input
 VAR_INPUT
     InputRaw    : BOOL;     (* Signal brut carte d'entrée *)
     InvertLogic : BOOL;     (* TRUE = NC (logique inversée) *)
@@ -62,7 +78,7 @@ VAR_INPUT
     ChannelOk   : BOOL;     (* Diag voie/carte OK (voir §4) *)
 END_VAR
 VAR_OUTPUT
-    OutputClean : BOOL;     (* Signal conditionné, prêt à l'emploi *)
+    State : BOOL;     (* Signal conditionné, prêt à l'emploi *)
     Error       : BOOL;     (* Voie en défaut (ChannelOk faux) *)
     ErrorId     : WORD;     (* bit0 : voie/carte HS *)
 END_VAR
@@ -71,13 +87,13 @@ END_VAR
 ### Comportement
 ```
 1. value := InputRaw XOR InvertLogic        (* inversion NO/NC *)
-2. filtrage anti-rebond sur FilterTime → OutputClean
-3. si ChannelOk = FALSE → Error, ErrorId.0, OutputClean forcé état sûr
+2. filtrage anti-rebond sur FilterTime → State
+3. si ChannelOk = FALSE → Error, ErrorId.0, State forcé état sûr
 ```
 
 ---
 
-## 📤 2. `FB_Output_Relay` — Sortie relais + feedback
+## 📤 2. `FB_Output` — Sortie relais + feedback
 
 ### Rôle
 Commander un actionneur (relais/contacteur) et **vérifier son retour d'état** : un actionneur
@@ -91,7 +107,7 @@ sortie, on récupère **directement un défaut de commande** (contacteur collé,
 
 ### Interface (proposition)
 ```codesys
-FUNCTION_BLOCK FB_Output_Relay
+FUNCTION_BLOCK FB_Output
 VAR_INPUT
     Command      : BOOL;    (* Ordre logique, déjà résolu par le FB métier appelant *)
     InvertLogic  : BOOL;    (* TRUE = NC *)
@@ -102,7 +118,7 @@ VAR_INPUT
     ChannelOk    : BOOL;    (* Diag voie/carte sortie OK *)
 END_VAR
 VAR_OUTPUT
-    OutputCmd    : BOOL;    (* Vers la carte de sortie *)
+    State    : BOOL;    (* Vers la carte de sortie *)
     FeedbackOk   : BOOL;    (* Retour cohérent avec la commande *)
     Error        : BOOL;
     ErrorId      : WORD;    (* bit0: feedback incohérent ; bit1: voie/carte HS *)
@@ -113,7 +129,7 @@ END_VAR
 ```
 1. cmd := Command XOR InvertLogic
 2. si Blink1Hz : moduler cmd à 1 Hz (diagnostic/visualisation)
-3. OutputCmd := cmd
+3. State := cmd
 4. si UseFeedback :
      comparer FeedbackRaw vs cmd ; au-delà de FeedbackTimeout incohérent
         → ErrorId.0 (contacteur collé / ne colle pas), FeedbackOk := FALSE
@@ -133,7 +149,7 @@ Pour 8, 16… voies, instancier en **tableau** et configurer en boucle.
 ### Entrées
 ```codesys
 VAR
-    Input  : ARRAY[1..16] OF FB_Input_Digital;
+    Input  : ARRAY[1..16] OF FB_Input;
 END_VAR
 
 (* Configuration (une fois, ex. à l'init) *)
@@ -150,7 +166,7 @@ END_FOR
 ### Sorties
 ```codesys
 VAR
-    Output : ARRAY[1..16] OF FB_Output_Relay;
+    Output : ARRAY[1..16] OF FB_Output;
 END_VAR
 
 Output[1].InvertLogic := FALSE;  Output[1].UseFeedback := TRUE;   (* Relais M1 Fwd *)
@@ -160,7 +176,7 @@ Output[1].FeedbackTimeout := T#500MS;
 FOR i := 1 TO 16 DO
     Output[i](Command := CmdRelais[i], FeedbackRaw := DI_Retour[i],
               ChannelOk := DiagCarteDO[i]);
-    DO[i] := Output[i].OutputCmd;
+    DO[i] := Output[i].State;
 END_FOR
 ```
 
