@@ -136,8 +136,9 @@ ArretConfirme := (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev) AND (
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
-    IF Mode <> E_Mode.MAINT_N1 THEN
-        ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé pour le flux nominal
+    // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
+    IF (Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2) THEN
+        ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
     ELSIF NOT EncoderAvailable THEN
         ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
     ELSIF NOT ArretConfirme THEN
