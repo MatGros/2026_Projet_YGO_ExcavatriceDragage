@@ -61,6 +61,7 @@ VAR_INPUT
     StartStop               : BOOL;
     SafeStop                : BOOL;
     ForbidDescent           : BOOL;
+    ForbidAscent            : BOOL;
     Direction               : INT;
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
@@ -140,10 +141,13 @@ ResetEdge(CLK := Reset);
 
 DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
 
-// 🆕 Mou de câble (ForbidDescent) intégré à une VRAIE décélération rapide, comme SafeStop —
-// INHIBÉ si CommandedDirection = 1 (montée/enroulement en cours) : l'opérateur remonte
-// librement pour reprendre le mou, sans déclencher de décélération (AUDIT D72).
-EffectiveSafeStop := SafeStop OR (ForbidDescent AND (CommandedDirection <> 1));
+// 🆕 Mou de câble (ForbidDescent) et Fin de course haut (ForbidAscent) intégrés à une VRAIE
+// décélération rapide (comme SafeStop) :
+// - ForbidDescent est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
+// - ForbidAscent est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
+EffectiveSafeStop := SafeStop 
+                     OR (ForbidDescent AND (CommandedDirection <> 1))
+                     OR (ForbidAscent AND (CommandedDirection <> -1));
 
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
@@ -188,6 +192,10 @@ RelayRev := (CommandedDirection = -1) AND (StepNumber > 0);
 
 IF ForbidDescent THEN
     RelayRev := FALSE;
+END_IF;
+
+IF ForbidAscent THEN
+    RelayFwd := FALSE;
 END_IF;
 
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev),

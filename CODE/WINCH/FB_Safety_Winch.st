@@ -73,17 +73,20 @@ VAR_INPUT
     ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
     SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
     PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
+    TopPositionSensor   : BOOL;        // 🆕 Capteur de position haute commun (M1_M2_TopPositionSensor, I/O réel)
+    InReferencingMode   : BOOL;        // 🆕 Indique si le treuil est en cours de homing (référencement)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun) ; bit5 : fin de course haut atteint (anti-débordement)
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2 uniquement
-    ForbidDescent       : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la descente (bit3, mou de câble) — Enable/RelayFwd (montée) non affectés
+    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2/4 uniquement
+    ForbidDescent       : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la descente (bit3, mou de câble)
+    ForbidAscent        : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la montée (bit5, fin de course haut)
     PowerCutOff         : BOOL;        // 🧨 Sortie maîtresse : coupure puissance amont (FALSE, TBD ce lot)
 END_VAR
 VAR
@@ -146,6 +149,15 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFEF;
 END_IF;
 
+// 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
+// Si le capteur physique de position haute est actif ET qu'on n'est pas en phase de référencement (homing),
+// alors on lève le défaut pour interdire uniquement la montée.
+IF TopPositionSensor AND NOT InReferencingMode THEN
+    ErrorId := ErrorId OR 16#0020;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFDF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -154,13 +166,15 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🟧 SafeStop : bits 0 (joystick)/1 (codeur)/2 (thermique)/4 (rotation phase) — arrêt total des
-// 2 sens. Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
-// (ForbidDescent ci-dessous), pas bloquer une remontée nécessaire pour aller vérifier le câble.
+// 2 sens. Le mou de câble (bit3) et le fin de course haut (bit5) sont EXCLUS : ils n'interdisent
+// qu'un seul sens de marche (voir ForbidDescent/ForbidAscent ci-dessous).
 SafeStop := (ErrorId AND 16#0017) <> 16#0000;
 
-// 🆕 ForbidDescent : reflète UNIQUEMENT le bit3 (mou de câble) — consommé par FB_Winch pour
-// masquer RelayRev (descente) seul, RelayFwd (montée) reste piloté normalement.
+// 🆕 ForbidDescent : reflète le bit3 (mou de câble) — interdit la descente.
 ForbidDescent := (ErrorId AND 16#0008) <> 16#0000;
+
+// 🆕 ForbidAscent : reflète le bit5 (fin de course haut) — interdit la montée.
+ForbidAscent := (ErrorId AND 16#0020) <> 16#0000;
 
 PowerCutOff := FALSE;       // 🧨 TBD — pas de ST_ContactorCheck de puissance câblé dans ce lot
 
