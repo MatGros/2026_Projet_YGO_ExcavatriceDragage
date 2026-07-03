@@ -104,6 +104,15 @@ VAR
     // 🎚️ Stub Maintenance N1 pour ce lot (Enable, PAS le Mode — voir instModes ci-dessus)
     // — à remplacer par une vraie arbitrage FB_Modes quand FB_Cycle existera
     StubMachineEnableN1 : BOOL := TRUE;
+
+    // 🪣 GRAPPIN
+    instGrappin             : FB_Grappin;
+    GrappinCmdOpen_IHM      : BOOL;             // 🖥️ Commande d'ouverture IHM (bouton)
+    GrappinCmdClose_IHM     : BOOL;             // 🖥️ Commande de fermeture IHM (bouton)
+    M2_StartStop_Active     : BOOL;             // Consigne StartStop arbitrée pour M2
+    M2_Direction_Active     : INT;              // Consigne Direction arbitrée pour M2
+    M2_SpeedRef_Active      : REAL;             // Consigne SpeedRef arbitrée pour M2
+    M2_SpeedStepTableActive : ST_SpeedStepTable; // Table de paliers active de M2
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -138,6 +147,16 @@ VAR RETAIN
     // ⚖️ Tolérance écart M1/M2 (FB_WinchSync) — réglable sans recompiler, ajuster selon jeu
     // mécanique réel observé sur site (Partie9 §9).
     WinchSyncToleranceM : REAL := 0.10;
+
+    // 🪣 Configuration persistante du grappin
+    GrappinConfig : ST_GrappinConfig := (
+        OffsetOpenM := 0.0,
+        OffsetCloseM := -1.5,
+        CoherenceLimitM := 0.05
+    );
+
+    // 🪣 État persistant mémorisé du grappin
+    GrappinState : ST_GrappinState;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
@@ -413,7 +432,7 @@ EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;   // 📤
    ═══════════════════════════════════════════════════════════════ *)
 
 instWinchSync(
-    Enable          := NOT instModes.OverrideSync,
+    Enable          := NOT instModes.OverrideSync AND NOT instGrappin.Busy,
     Reset           := MachineReset_IHM,
 
     EmergencyStopOk := GVL_IN.EmergencyStopOk,
@@ -423,7 +442,8 @@ instWinchSync(
     HomedM1         := instHomingM1.Homed,
     HomedM2         := instHomingM2.Homed,
     OverrideSync    := instModes.OverrideSync,
-    SyncToleranceM  := WinchSyncToleranceM
+    SyncToleranceM  := WinchSyncToleranceM,
+    ActiveOffsetM   := instGrappin.ActiveOffsetM
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -476,6 +496,45 @@ instSafetyWinchM2(
       désormais réel, câblé en I/O Mapping (`_DI`/`_DQ`/`_RQ`, voir §0 et §7bis).
    ═══════════════════════════════════════════════════════════════ *)
 
+// 🪣 Appel du bloc Grappin (entre l'acquisition codeurs/joystick et les winches)
+instGrappin(
+    Enable              := TRUE,
+    Reset               := MachineReset_IHM,
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
+    Mode                := instModes.Mode,
+    CmdOpen_IHM         := GrappinCmdOpen_IHM,
+    CmdClose_IHM        := GrappinCmdClose_IHM,
+    JoystickY_StartStop := FB_Joystick_0.AxisCmdY.StartStop,
+    JoystickY_Direction := FB_Joystick_0.AxisCmdY.Direction,
+    CablePosM1          := instEncoderScaleM1.CablePosM,
+    CablePosM2          := instEncoderScaleM2.CablePosM,
+    Config              := GrappinConfig,
+    GrappinState        := GrappinState
+);
+
+// Arbitrage des consignes de M2 (Grappin vs Mouvement Synchrone)
+IF instGrappin.Busy THEN
+    M2_StartStop_Active := instGrappin.M2_StartStop;
+    M2_Direction_Active := instGrappin.M2_Direction;
+    M2_SpeedRef_Active  := 15.0; // Vitesse lente grappin
+ELSE
+    M2_StartStop_Active := FB_Joystick_0.AxisCmdY.StartStop;
+    M2_Direction_Active := FB_Joystick_0.AxisCmdY.Direction;
+    M2_SpeedRef_Active  := FB_Joystick_0.AxisCmdY.SpeedRef;
+END_IF;
+
+// Construction de la table de paliers active de M2 (force tous les contacteurs à FALSE si ForceSlowSpeed)
+IF instGrappin.M2_ForceSlowSpeed THEN
+    M2_SpeedStepTableActive.P1R1 := FALSE; M2_SpeedStepTableActive.P1R2 := FALSE; M2_SpeedStepTableActive.P1R3 := FALSE; M2_SpeedStepTableActive.P1R4 := FALSE;
+    M2_SpeedStepTableActive.P2R1 := FALSE; M2_SpeedStepTableActive.P2R2 := FALSE; M2_SpeedStepTableActive.P2R3 := FALSE; M2_SpeedStepTableActive.P2R4 := FALSE;
+    M2_SpeedStepTableActive.P3R1 := FALSE; M2_SpeedStepTableActive.P3R2 := FALSE; M2_SpeedStepTableActive.P3R3 := FALSE; M2_SpeedStepTableActive.P3R4 := FALSE;
+    M2_SpeedStepTableActive.P4R1 := FALSE; M2_SpeedStepTableActive.P4R2 := FALSE; M2_SpeedStepTableActive.P4R3 := FALSE; M2_SpeedStepTableActive.P4R4 := FALSE;
+    M2_SpeedStepTableActive.P5R1 := FALSE; M2_SpeedStepTableActive.P5R2 := FALSE; M2_SpeedStepTableActive.P5R3 := FALSE; M2_SpeedStepTableActive.P5R4 := FALSE;
+    M2_SpeedStepTableActive.StepThreshold_Pct := M2_SpeedStepTable.StepThreshold_Pct;
+ELSE
+    M2_SpeedStepTableActive := M2_SpeedStepTable;
+END_IF;
+
 instWinchM1(
     Enable                  := StubMachineEnableN1,           // ⚠️ Stub Maint N1 — à remplacer par FB_Modes
     Reset                   := MachineReset_IHM,
@@ -483,7 +542,7 @@ instWinchM1(
     EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
-    StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
+    StartStop               := FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy, // Bloqué pendant le mouvement grappin
     SafeStop                := instSafetyWinchM1.SafeStop,
     ForbidDescent           := instSafetyWinchM1.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
@@ -501,12 +560,12 @@ instWinchM2(
     EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
-    StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
+    StartStop               := M2_StartStop_Active,           // Arbitré grappin
     SafeStop                := instSafetyWinchM2.SafeStop,
     ForbidDescent           := instSafetyWinchM2.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
-    Direction               := FB_Joystick_0.AxisCmdY.Direction,   // ⚠️ Même consigne que M1
-    SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,    // ⚠️ Même consigne que M1
-    SpeedStepTable          := M2_SpeedStepTable,
+    Direction               := M2_Direction_Active,           // Arbitré grappin
+    SpeedRefPct             := M2_SpeedRef_Active,            // Arbitré grappin
+    SpeedStepTable          := M2_SpeedStepTableActive,       // Arbitrée grappin (sans contacteurs si vitesse lente forcée)
     ContactorFeedbackFwd    := GVL_IN.M2ContactorFeedbackFwd,
     ContactorFeedbackRev    := GVL_IN.M2ContactorFeedbackRev,
     BrakeFeedback           := GVL_IN.M2BrakeFeedback
