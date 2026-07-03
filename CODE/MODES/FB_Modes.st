@@ -49,10 +49,10 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Modes) ===
 
-// 🛑 1. GATE — repli sur le mode de sécurité de veille (AUCUN) si désactivé
+// 🛑 1. GATE — repli sur le mode de sécurité de veille (DISABLE) si désactivé
 // ou si l'arrêt d'urgence est déclenché.
 IF NOT Enable OR NOT EmergencyStopOk THEN
-    Mode := E_Mode.AUCUN;
+    Mode := E_Mode.DISABLE;
     OverrideSync := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;

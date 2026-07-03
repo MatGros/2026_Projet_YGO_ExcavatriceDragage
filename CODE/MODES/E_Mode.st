@@ -3,12 +3,12 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.2.md §1
    ⚙️ Alignement terrain (2026-07-03) :
-      - 0 = AUCUN (sécurité/veille)
+      - 0 = DISABLE (sécurité/veille)
       - MAINT_N1 / MAINT_N2 = Pilotage MANUEL à 2 niveaux
    ═══════════════════════════════════════════════════════════════ *)
 TYPE E_Mode :
 ENUM
-    AUCUN       := 0,   (* Aucun mode sélectionné / Veille de sécurité (sorties bloquées) *)
+    DISABLE     := 0,   (* Mode Désactivé / Veille de sécurité (sorties bloquées) *)
     MAINT_N1    := 1,   (* Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives *)
     MAINT_N2    := 2,   (* Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés) *)
     SEMI_AUTO   := 3    (* Mode Semi-Automatique (séquenceur automatique) *)
