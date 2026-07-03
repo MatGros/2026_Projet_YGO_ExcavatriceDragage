@@ -68,9 +68,9 @@ VAR_OUTPUT
     DirectionY      : INT;        // Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction
     DeadmanArmed    : BOOL;       // 🆕 Geste armé (bouton appuyé au neutre) — IHM/diagnostic
 END_VAR
-VAR RETAIN
-    NeutralXMem     : INT := 5000; // Mémoire persistante X
-    NeutralYMem     : INT := 5000; // Mémoire persistante Y
+VAR_IN_OUT
+    NeutralXMem     : INT; // Point neutre X persistant global
+    NeutralYMem     : INT; // Point neutre Y persistant global
 END_VAR
 VAR
     CycleTimeCalc   : FB_CycleTime;

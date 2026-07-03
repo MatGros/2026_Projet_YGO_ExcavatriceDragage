@@ -122,49 +122,9 @@ VAR
     InitDone                : BOOL;             // 🧪 Initialisation unique au boot (simulation)
 END_VAR
 
-// ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
-// commentaire "RETAIN" — ne persistaient PAS réellement entre coupures/téléchargements.
-// Corrigé : bloc VAR RETAIN dédié, comme le nécessitent aussi les paramètres de homing.
-VAR RETAIN
-    // 🪜 Table paliers M1 — réglable sans recompiler (Partie1 §Paliers)
-    // ⚠️ Valeurs par défaut indicatives (cumulatives P1→P5) : À AJUSTER un par un
-    //    selon le câblage réel des 4 contacteurs de vitesse M1 pendant la mise
-    //    en service (chaque P<palier>R<relais> est modifiable en direct dans la
-    //    vue instance CODESYS), et les seuils souhaités (%).
-    M1_SpeedStepTable : ST_SpeedStepTable := (
-        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
-        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
-        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
-        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
-        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
-        StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
-    );
-
-    // 🪜 Table paliers M2 — INDÉPENDANTE de M1 (Partie1 §Paliers : "table
-    // indépendante par treuil"), mêmes valeurs par défaut indicatives à ajuster.
-    M2_SpeedStepTable : ST_SpeedStepTable := (
-        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
-        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
-        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
-        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
-        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
-        StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
-    );
-
-    // ⚖️ Tolérance écart M1/M2 (FB_WinchSync) — réglable sans recompiler, ajuster selon jeu
-    // mécanique réel observé sur site (Partie9 §9).
-    WinchSyncToleranceM : REAL := 0.10;
-
-    // 🪣 Configuration persistante du grappin
-    GrappinConfig : ST_GrappinConfig := (
-        OffsetOpenM := 0.0,
-        OffsetCloseM := -1.5,
-        CoherenceLimitM := 0.05
-    );
-
-    // 🪣 État persistant mémorisé du grappin
-    GrappinState : ST_GrappinState;
-END_VAR
+// 💾 Bloc VAR RETAIN SUPPRIMÉ (2026-07-03) : toutes les variables de calibration
+// et réglage de mise en service sont désormais dans GVL_PERSISTENT (survivent aux
+// téléchargements de programme). Voir CODE/SYSTEM/GVL_PERSISTENT.st.
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
 
@@ -303,6 +263,8 @@ FB_Joystick_0(
     Enable          := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par autorisation réelle
     EmergencyStopOk := GVL_IN.EmergencyStopOk,
     Reset           := MachineReset_IHM,
+    NeutralXMem     := GVL_PERSISTENT.JoystickNeutralX, // 🕹️ Point neutre X persistant global
+    NeutralYMem     := GVL_PERSISTENT.JoystickNeutralY, // 🕹️ Point neutre Y persistant global
 
 
     // 🔌 --- État du bus CANopen (joystick) ---
@@ -403,6 +365,7 @@ instEncoderScaleM1(
 (* 🎯 Homing M1 (flux nominal) — bouton IHM (stub) + capteur position haute (stub GVL_Homing_Stub, commun M1+M2) *)
 instHomingM1(
     Enable               := TRUE,
+    Calib                := GVL_PERSISTENT.CalibM1,          // 🧲 Données persistantes (survit aux téléchargements)
     Reset                := (M1_Reset_IHM OR MachineReset_IHM),
 
     EmergencyStopOk      := GVL_IN.EmergencyStopOk,
@@ -453,6 +416,7 @@ instEncoderScaleM2(
 (* 🎯 Homing M2 (flux nominal) — MÊME bouton IHM que M1 (référencement simultané, Partie10 §1) *)
 instHomingM2(
     Enable               := TRUE,
+    Calib                := GVL_PERSISTENT.CalibM2,          // 🧲 Données persistantes (survit aux téléchargements)
     Reset                := (M2_Reset_IHM OR MachineReset_IHM),
 
     EmergencyStopOk      := GVL_IN.EmergencyStopOk,
@@ -527,7 +491,7 @@ instWinchSync(
     HomedM1         := instHomingM1.Homed,
     HomedM2         := instHomingM2.Homed,
     OverrideSync    := instModes.OverrideSync,
-    SyncToleranceM  := WinchSyncToleranceM,
+    SyncToleranceM  := GVL_PERSISTENT.WinchSyncTolerance_M,
     ActiveOffsetM   := instGrappin.ActiveOffsetM
 );
 
@@ -593,9 +557,9 @@ instGrappin(
     JoystickY_Direction := FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := instEncoderScaleM1.CablePosM,
     CablePosM2          := instEncoderScaleM2.CablePosM,
-    Config              := GrappinConfig,
+    Config              := GVL_PERSISTENT.GrappinConfig,
     TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,  // 🆕 Configurable depuis IHM
-    GrappinState        := GrappinState
+    GrappinState        := GVL_PERSISTENT.GrappinState
 );
 
 // Arbitrage des consignes de M2 (Grappin vs Mouvement Synchrone)
@@ -616,9 +580,9 @@ IF instGrappin.M2_ForceSlowSpeed THEN
     M2_SpeedStepTableActive.P3R1 := FALSE; M2_SpeedStepTableActive.P3R2 := FALSE; M2_SpeedStepTableActive.P3R3 := FALSE; M2_SpeedStepTableActive.P3R4 := FALSE;
     M2_SpeedStepTableActive.P4R1 := FALSE; M2_SpeedStepTableActive.P4R2 := FALSE; M2_SpeedStepTableActive.P4R3 := FALSE; M2_SpeedStepTableActive.P4R4 := FALSE;
     M2_SpeedStepTableActive.P5R1 := FALSE; M2_SpeedStepTableActive.P5R2 := FALSE; M2_SpeedStepTableActive.P5R3 := FALSE; M2_SpeedStepTableActive.P5R4 := FALSE;
-    M2_SpeedStepTableActive.StepThreshold_Pct := M2_SpeedStepTable.StepThreshold_Pct;
+    M2_SpeedStepTableActive.StepThreshold_Pct := GVL_PERSISTENT.WinchM2SpeedStepTable.StepThreshold_Pct;
 ELSE
-    M2_SpeedStepTableActive := M2_SpeedStepTable;
+    M2_SpeedStepTableActive := GVL_PERSISTENT.WinchM2SpeedStepTable;
 END_IF;
 
 instWinchM1(
@@ -633,14 +597,14 @@ instWinchM1(
     ForbidDescent           := instSafetyWinchM1.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
-    SpeedStepTable          := M1_SpeedStepTable,
-    MaxStepDescente         := GVL_IHM.WinchM1.MaxStepDescente,    // 🆕 Configurable depuis IHM
+    SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
+    MaxStepDescente         := GVL_PERSISTENT.WinchM1MaxStepDescente,    // 💾 Persistant
     ContactorFeedbackFwd    := GVL_IN.M1ContactorFeedbackFwd,
     ContactorFeedbackRev    := GVL_IN.M1ContactorFeedbackRev,
     BrakeFeedback           := GVL_IN.M1BrakeFeedback,
-    RampAccelRate           := GVL_IHM.WinchM1.RampAccelRate,      // 🆕 Configurable depuis IHM
-    RampDecelNormalRate     := GVL_IHM.WinchM1.RampDecelNormalRate, // 🆕 Configurable depuis IHM
-    RampDecelFastRate       := GVL_IHM.WinchM1.RampDecelFastRate   // 🆕 Configurable depuis IHM
+    RampAccelRate           := GVL_PERSISTENT.WinchM1RampAccelRate_Pct,      // 💾 Persistant
+    RampDecelNormalRate     := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct, // 💾 Persistant
+    RampDecelFastRate       := GVL_PERSISTENT.WinchM1RampDecelFast_Pct   // 💾 Persistant — CRITIQUE
 );
 
 instWinchM2(
@@ -656,13 +620,13 @@ instWinchM2(
     Direction               := M2_Direction_Active,           // Arbitré grappin
     SpeedRefPct             := M2_SpeedRef_Active,            // Arbitré grappin
     SpeedStepTable          := M2_SpeedStepTableActive,       // Arbitrée grappin (sans contacteurs si vitesse lente forcée)
-    MaxStepDescente         := GVL_IHM.WinchM2.MaxStepDescente,    // 🆕 Configurable depuis IHM
+    MaxStepDescente         := GVL_PERSISTENT.WinchM2MaxStepDescente,    // 💾 Persistant
     ContactorFeedbackFwd    := GVL_IN.M2ContactorFeedbackFwd,
     ContactorFeedbackRev    := GVL_IN.M2ContactorFeedbackRev,
     BrakeFeedback           := GVL_IN.M2BrakeFeedback,
-    RampAccelRate           := GVL_IHM.WinchM2.RampAccelRate,      // 🆕 Configurable depuis IHM
-    RampDecelNormalRate     := GVL_IHM.WinchM2.RampDecelNormalRate, // 🆕 Configurable depuis IHM
-    RampDecelFastRate       := GVL_IHM.WinchM2.RampDecelFastRate   // 🆕 Configurable depuis IHM
+    RampAccelRate           := GVL_PERSISTENT.WinchM2RampAccelRate_Pct,      // 💾 Persistant
+    RampDecelNormalRate     := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct, // 💾 Persistant
+    RampDecelFastRate       := GVL_PERSISTENT.WinchM2RampDecelFast_Pct   // 💾 Persistant — CRITIQUE
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -742,39 +706,49 @@ M3_ContactorFeedbackRev := M3_RelayRev;
    et des états/diagnostics vers GVL_IHM pour affichage écran.
    ═══════════════════════════════════════════════════════════════ *)
 
-// --- 1. INITIALISATION DES CONFIGURATIONS DEPUIS LES VALEURS PAR DÉFAUT (SI VIDE) ---
+// --- 1. INITIALISATION IHM DEPUIS GVL_PERSISTENT (si valeur IHM encore à zéro au boot)
+// Les paramètres IHM sont affichés depuis GVL_PERSISTENT, ré-écrits à chaque cycle
+// vers GVL_PERSISTENT pour sauvegarder les réglages opérateur.
 IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.WinchM1.TopSensorPositionM  := 12.5;
-    GVL_IHM.WinchM1.MaxStepDescente     := 2;
-    GVL_IHM.WinchM1.RampAccelRate       := 50.0;
-    GVL_IHM.WinchM1.RampDecelNormalRate := 150.0;
-    GVL_IHM.WinchM1.RampDecelFastRate   := 400.0;
+    GVL_IHM.WinchM1.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM1_M;
+    GVL_IHM.WinchM1.MaxStepDescente     := GVL_PERSISTENT.WinchM1MaxStepDescente;
+    GVL_IHM.WinchM1.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
+    GVL_IHM.WinchM1.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
+    GVL_IHM.WinchM1.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
 END_IF;
 
 IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.WinchM2.TopSensorPositionM  := 12.5;
-    GVL_IHM.WinchM2.MaxStepDescente     := 2;
-    GVL_IHM.WinchM2.RampAccelRate       := 50.0;
-    GVL_IHM.WinchM2.RampDecelNormalRate := 150.0;
-    GVL_IHM.WinchM2.RampDecelFastRate   := 400.0;
+    GVL_IHM.WinchM2.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM2_M;
+    GVL_IHM.WinchM2.MaxStepDescente     := GVL_PERSISTENT.WinchM2MaxStepDescente;
+    GVL_IHM.WinchM2.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
+    GVL_IHM.WinchM2.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
+    GVL_IHM.WinchM2.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
 END_IF;
 
 IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
-    GVL_IHM.Sync.SyncToleranceM         := 0.10;
+    GVL_IHM.Sync.SyncToleranceM         := GVL_PERSISTENT.WinchSyncTolerance_M;
 END_IF;
 
 IF GVL_IHM.Grappin.Config.OffsetOpenM = 0.0 AND GVL_IHM.Grappin.Config.OffsetCloseM = 0.0 THEN
-    GVL_IHM.Grappin.Config.OffsetOpenM     := 0.0;
-    GVL_IHM.Grappin.Config.OffsetCloseM    := -1.5;
-    GVL_IHM.Grappin.Config.CoherenceLimitM := 0.05;
-    GVL_IHM.Grappin.TimeoutDuration        := T#30s;
+    GVL_IHM.Grappin.Config := GVL_PERSISTENT.GrappinConfig;
+    GVL_IHM.Grappin.TimeoutDuration := T#30s;
 END_IF;
 
-// --- 2. PROPAGATION DES PARAMÈTRES ET CONFIGURATIONS DEPUIS L'IHM ---
-GVL_Encoder_Stub.M1_TopSensorPositionM      := GVL_IHM.WinchM1.TopSensorPositionM;
-GVL_Encoder_Stub.M2_TopSensorPositionM      := GVL_IHM.WinchM2.TopSensorPositionM;
-WinchSyncToleranceM                         := GVL_IHM.Sync.SyncToleranceM;
-GrappinConfig                               := GVL_IHM.Grappin.Config;
+// --- 2. PROPAGATION DES PARAMÈTRES IHM → GVL_PERSISTENT (sauvegarde des réglages opérateur)
+GVL_PERSISTENT.HomingTargetM1_M          := GVL_IHM.WinchM1.TopSensorPositionM;
+GVL_PERSISTENT.HomingTargetM2_M          := GVL_IHM.WinchM2.TopSensorPositionM;
+GVL_PERSISTENT.WinchM1MaxStepDescente    := GVL_IHM.WinchM1.MaxStepDescente;
+GVL_PERSISTENT.WinchM2MaxStepDescente    := GVL_IHM.WinchM2.MaxStepDescente;
+GVL_PERSISTENT.WinchM1RampAccelRate_Pct  := GVL_IHM.WinchM1.RampAccelRate;
+GVL_PERSISTENT.WinchM1RampDecelNormal_Pct := GVL_IHM.WinchM1.RampDecelNormalRate;
+GVL_PERSISTENT.WinchM1RampDecelFast_Pct  := GVL_IHM.WinchM1.RampDecelFastRate;
+GVL_PERSISTENT.WinchM2RampAccelRate_Pct  := GVL_IHM.WinchM2.RampAccelRate;
+GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.WinchM2.RampDecelNormalRate;
+GVL_PERSISTENT.WinchM2RampDecelFast_Pct  := GVL_IHM.WinchM2.RampDecelFastRate;
+GVL_PERSISTENT.WinchSyncTolerance_M      := GVL_IHM.Sync.SyncToleranceM;
+GVL_PERSISTENT.GrappinConfig             := GVL_IHM.Grappin.Config;
+GVL_Encoder_Stub.M1_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M;
+GVL_Encoder_Stub.M2_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M;
 
 // --- 3. GESTION DES BYPASSES BANC DE TEST (DEUX VOIES) ---
 GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST  := GVL_IHM.WinchM1.BypassContactorFeedback OR GVL_IHM.WinchM2.BypassContactorFeedback OR GVL_IHM.Chariot.BypassContactorFeedback;
@@ -866,7 +840,7 @@ GVL_IHM.Grappin.Busy                        := instGrappin.Busy;
 GVL_IHM.Grappin.Done                        := instGrappin.Done;
 GVL_IHM.Grappin.Error                       := instGrappin.Error;
 GVL_IHM.Grappin.ErrorId                     := instGrappin.ErrorId;
-GVL_IHM.Grappin.State                       := GrappinState;
+GVL_IHM.Grappin.State                       := GVL_PERSISTENT.GrappinState;
 
 // --- 7. COPIE DES STATUTS SYNCHRO VERS GVL_IHM ---
 GVL_IHM.Sync.DeltaPosM                      := instWinchSync.DeltaPosM;
