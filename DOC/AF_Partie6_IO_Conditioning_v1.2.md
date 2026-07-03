@@ -91,6 +91,13 @@ END_VAR
 3. si ChannelOk = FALSE → Error, ErrorId.0, State forcé état sûr
 ```
 
+> 🔒 **Polarité** : un signal de sécurité (`EmergencyStopOk`, mou de câble, rotation de phase…)
+> est câblé fail-safe — `TRUE`=OK, `FALSE`=défaut — et doit toujours être initialisé à `TRUE`
+> tant que le vrai capteur n'est pas câblé. Un capteur d'information classique (position atteinte…)
+> suit la logique inverse (`FALSE`=repos, `TRUE`=déclenché), sans besoin d'initialisation
+> particulière. Détail complet + 2 bugs réels rencontrés sur ce projet :
+> `DOC/NAMING_CONVENTION.md` §"Polarité des booléens I/O".
+
 ---
 
 ## 📤 2. `FB_Output` — Sortie relais + feedback

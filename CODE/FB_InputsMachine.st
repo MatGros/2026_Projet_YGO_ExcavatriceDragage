@@ -55,7 +55,10 @@ END_VAR
 instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST, FilterTime := T#20MS);
 GVL_IN.EmergencyStopOk := instEmergencyStopOk.State;
 
-instSlackCableSwitch(InputRaw := M1_M2_SlackCableSwitch_DI, FilterTime := T#20MS);
+// ⚠️ Bypass TEST banc (GVL_DEBUG, créé par l'utilisateur) — TOUJOURS FALSE avant essai réel
+// avec le vrai capteur mou de câble câblé. Câblage sécurité : TRUE=OK (pas de mou) — le
+// bypass force donc l'état OK, cohérent avec les autres bypass (OR sur le signal brut).
+instSlackCableSwitch(InputRaw := M1_M2_SlackCableSwitch_DI OR GVL_DEBUG.DBG_SlackCableSwitch_TEST, FilterTime := T#20MS);
 GVL_IN.SlackCableSwitch := instSlackCableSwitch.State;
 
 // ⚠️ Bypass TEST banc (GVL_DEBUG) — TOUJOURS FALSE avant essai réel avec le capteur câblé
@@ -63,9 +66,10 @@ instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR GVL_DEBUG.DBG_To
 GVL_IN.TopPositionSensor := instTopPositionSensor.State;
 
 // 🆕 Contrôle rotation phases électriques (2026-07-03sexdecies) — TRUE = rotation correcte.
-// Combiné en AND avec EmergencyStopOk partout (PRG_MAIN) : mauvaise rotation = danger
-// machine entière (sens moteur inversé), même traitement que la chaîne AU (D34/D35).
-instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI, FilterTime := T#20MS);
+// Câblé dans FB_Safety_Winch/FB_Safety_Chariot (D71), pas directement sur EmergencyStopOk.
+// ⚠️ Bypass TEST banc (GVL_DEBUG, créé par l'utilisateur) — TOUJOURS FALSE avant essai réel
+// avec le vrai contrôle de rotation câblé.
+instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR GVL_DEBUG.DBG_CtrlPhaseRotation_Bypass_TEST, FilterTime := T#20MS);
 GVL_IN.PhaseRotationOk := instCtrlPhaseRotation.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────

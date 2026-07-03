@@ -53,7 +53,46 @@ Mode                  → E_Mode courant (autorisations)
 > - `Enable = FALSE` → FB désactivé, **toutes les sorties coupées** (neutralisation dure).
 > - `SafeStop = TRUE` (Enable actif) → **rampe de décélération rapide** (défaut process).
 > - `StartStop = FALSE` (Enable actif, pas de SafeStop) → **rampe de décélération normale** (arrêt demandé).
- 
+
+### 🔒 Polarité des booléens I/O : sécurité vs information vs commande
+
+Trois familles, ne pas les confondre — c'est précisément ce qui a coûté une session de débogage
+complète sur ce projet (voir incident ci-dessous).
+
+| Famille | Convention | Exemples | Pourquoi |
+|---|---|---|---|
+| **Capteur de sécurité** (entrée brute, suffixe `Ok`, fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `EmergencyStopOk`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
+| **Information / état classique** (entrée brute) | `FALSE` = repos ; `TRUE` = capteur atteint/déclenché | `ChariotPosFosse1/Fosse2/Maintenance/Tremie` | Logique directe : "je suis arrivé à la position" = `TRUE`. Pas d'enjeu fail-safe. |
+| **Sortie de COMMANDE d'un bloc Safety** (calculée, PAS un capteur) | `TRUE` = **déclenche** l'action | `SafeStop` (déclenche décél. rapide), `ForbidDescent` (déclenche l'interdiction), `PowerCutOff` (déclenche la coupure) | Nom = un verbe d'action, pas un état de capteur — c'est l'inverse de la famille "sécurité" ci-dessus, volontairement. |
+
+⚠️ **Confusion réelle vécue sur ce projet** (retour terrain, session mise en service) :
+l'utilisateur a **forcé manuellement `instWinchM1.SafeStop` à `TRUE`**, en pensant — par analogie
+avec la famille "capteur de sécurité" — qu'un "organe de sécurité" devait être en permanence à `1`.
+Résultat : `SafeStop` (sortie de COMMANDE, pas un capteur) forcé à `TRUE` = décélération rapide
+imposée en permanence, mouvement totalement bloqué, alors que `FB_Safety_Winch` calculait
+correctement `FALSE` (aucun défaut). Diagnostic long car le câblage était irréprochable — seul un
+Force expliquait la divergence entre la sortie calculée et l'entrée reçue.
+**Règle** : ne JAMAIS forcer manuellement une sortie de COMMANDE (`SafeStop`, `ForbidDescent`,
+`PowerCutOff`) — elle est TOUJOURS calculée par son bloc Safety. Si un test banc nécessite de
+neutraliser une condition, forcer/bypasser l'entrée CAPTEUR en amont (ex. `GVL_IN.PhaseRotationOk`,
+ou un `GVL_DEBUG.DBG_*Bypass_TEST` dédié), jamais la sortie de commande elle-même.
+
+⚠️ **Deux bugs de câblage réels sur ce projet** (voir `AUDIT_Coherence_Documentaire_v1.0.md` §27
+D72a et §29 D74), famille "capteur de sécurité" :
+- `GVL_IN.SlackCableSwitch` câblé **sans inversion** alors que le contact est NF (`TRUE`=pas de mou)
+  → jamais détecté un vrai mou de câble. Corrigé : `SlackCableDetected := NOT GVL_IN.SlackCableSwitch`.
+- `GVL_IN.PhaseRotationOk` déclaré **sans valeur initiale** → un `BOOL` non initialisé démarre à
+  `FALSE` (IEC 61131-3) = "défaut" par défaut → `SafeStop` bloqué en permanence tant que le vrai
+  capteur n'est pas câblé, sans aucun vrai défaut.
+
+**Règle à appliquer systématiquement** (famille "capteur de sécurité" UNIQUEMENT — ne s'applique
+PAS aux sorties de commande, qui ne s'initialisent pas, elles se calculent) : toute variable de la
+famille "sécurité" (suffixe `Ok`, ou toute entrée capteur consommée par un `FB_Safety_<Metier>`)
+doit être **initialisée explicitement à `TRUE`** dans sa déclaration (`VAR_GLOBAL`/`VAR_INPUT`),
+jamais laissée à la valeur par défaut du langage — sinon un capteur "pas encore câblé" se lit
+comme "défaut détecté". La famille "information classique" n'a pas ce besoin : son repos naturel
+(`FALSE`) est déjà la bonne valeur par défaut.
+
 ### Consignes (références)
 ```
 SpeedRef          → consigne de vitesse

@@ -18,9 +18,17 @@
       — sans contacteurs réels câblés/cohérents en essai (`FB_Winch`/`FB_Chariot`), le contrôle
       StuckClosed/StuckOpen (commande/retour incohérente > `ContactorFeedbackTimeout`) se
       déclenche à tort et bloque `RelayFwd`/`RelayRev`. ⚠️ TOUJOURS FALSE en exploitation réelle.
-      Pour le thermique/mou de câble/rotation phase (simples variables `GVL_IN`), pas besoin de
-      flag dédié : **Force** directement la variable dans CODESYS (le Force prend le dessus sur
-      l'écriture cyclique du programme, contrairement à un simple Write).
+      Pour le thermique/mou de câble (simples variables `GVL_IN`), pas besoin de flag dédié :
+      **Force** directement la variable dans CODESYS (le Force prend le dessus sur l'écriture
+      cyclique du programme, contrairement à un simple Write).
+   🔧 AJOUT (2026-07-03unvicies, créé par l'utilisateur) : `DBG_CtrlPhaseRotation_Bypass_TEST` —
+      bypass dédié pour `CtrlPhaseRotation_DI`, OR'é sur le signal brut dans `FB_InputsMachine`
+      (même principe que `DBG_EmergencyStopOkBypass_TEST`/`DBG_TopPositionSensorBypass_TEST`).
+      ⚠️ TOUJOURS FALSE en exploitation réelle avec le vrai contrôle de rotation câblé.
+   🔧 AJOUT (2026-07-03duovicies, créé par l'utilisateur) : `DBG_SlackCableSwitch_TEST` — même
+      principe pour `M1_M2_SlackCableSwitch_DI`. Câblage sécurité (TRUE=OK, pas de mou) : le
+      bypass force donc l'état OK. ⚠️ TOUJOURS FALSE en exploitation réelle avec le vrai
+      capteur mou de câble câblé.
    ═══════════════════════════════════════════════════════════════ *)
 
 {attribute 'qualified_only'}
@@ -39,4 +47,8 @@ VAR_GLOBAL
 	DBG_DeadmanBypass_TEST : BOOL := FALSE; // TRUE = force DeadmanArmed à TRUE en permanence (bouton non nécessaire, essais joystick)
 	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (contacteurs réels câblés/cohérents)
 	DBG_ContactorFeedbackBypass_TEST : BOOL := FALSE; // TRUE = désactive StuckClosed/StuckOpen (FB_Winch/FB_Chariot), pas de blocage RelayFwd/RelayRev sans retour contacteur réel
+	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (contrôle rotation phase câblé)
+	DBG_CtrlPhaseRotation_Bypass_TEST : BOOL := FALSE; // TRUE = force CtrlPhaseRotation_DI à TRUE (test banc sans le vrai contrôle de rotation câblé)
+	// 🔴 BYPASS TEST BANC — TOUJOURS FALSE en exploitation réelle (capteur mou de câble câblé)
+	DBG_SlackCableSwitch_TEST : BOOL := FALSE; // TRUE = force M1_M2_SlackCableSwitch_DI à TRUE (test banc sans le vrai capteur mou de câble câblé)
 END_VAR
