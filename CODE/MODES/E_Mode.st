@@ -1,16 +1,16 @@
 (* ═══════════════════════════════════════════════════════════════
    🎚️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.1.md §1
-   🧩 Fondation manquante requise par le contrat FB (Partie3 §1) :
-      tout FB métier expose une entrée Mode : E_Mode.
+   📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.2.md §1
+   ⚙️ Alignement terrain (2026-07-03) :
+      - 0 = AUCUN (sécurité/veille)
+      - MAINT_N1 / MAINT_N2 = Pilotage MANUEL à 2 niveaux
    ═══════════════════════════════════════════════════════════════ *)
-
 TYPE E_Mode :
 ENUM
-    MANUEL      := 0,   (* Pilotage joystick direct, sécurités actives *)
-    MAINT_N1    := 1,   (* Manuel "encadré" : ~cycle avec interdictions, sécurité correcte *)
-    MAINT_N2    := 2,   (* Droits étendus, mot de passe, override de sécurités *)
-    SEMI_AUTO   := 3    (* Séquenceur FB_Cycle (semi-automatique) *)
+    AUCUN       := 0,   (* Aucun mode sélectionné / Veille de sécurité (sorties bloquées) *)
+    MAINT_N1    := 1,   (* Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives *)
+    MAINT_N2    := 2,   (* Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés) *)
+    SEMI_AUTO   := 3    (* Mode Semi-Automatique (séquenceur automatique) *)
 END_ENUM
 END_TYPE
