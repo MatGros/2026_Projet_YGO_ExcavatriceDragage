@@ -142,8 +142,9 @@ Le nouvel export `Device.export` câble deux nouveaux retours safety-critiques :
 
 **Surchauffe moteur (`M1/M2_ThermalFeedback`, par treuil)** — traitement classique : nouveau
 bit `ErrorId` (bit2) dans `FB_Safety_Winch`, participe au calcul de `SafeStop` **au même titre**
-que la perte joystick/codeur → arrêt total des 2 sens, `Enable` maintenu (rampe rapide). Reset
-front standard (Partie3 §5) dès que le retour repasse à `FALSE`.
+que la perte joystick/codeur → arrêt total des 2 sens, `Enable` maintenu (rampe rapide).
+* **Câblage physique** : Contacts Normally Closed (NC), donc sains à `1` (TRUE) et en défaut/ouvert à `0` (FALSE).
+* **Reset** : Front standard (Partie3 §5) dès que le retour physique repasse à `TRUE` (sain). L'automate utilise l'inversion `NOT GVL_IN.M1_M2ThermalFeedback` pour la logique de défaut.
 
 **Mou de câble (`M1_M2_SlackCableSwitch`, commun aux 2 treuils)** — traitement **différent**,
 demandé explicitement par l'utilisateur :
