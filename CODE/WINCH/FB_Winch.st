@@ -79,6 +79,12 @@ VAR_INPUT
     BrakeDelayMagnetise     : TIME := T#300ms;
     BrakeDelayMotorDecel    : TIME := T#500ms;
     BrakeFeedbackTimeout    : TIME := T#1s;
+    Homed                   : BOOL;             // 🆕 État de référencement du treuil
+    CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
+    TopLimitM               : REAL := 12.5;     // 🆕 Position limite haute active (cible homing, m)
+    BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
+    SlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
+    SlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -152,6 +158,20 @@ EffectiveSafeStop := SafeStop
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
+    
+    // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé)
+    // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
+    IF Homed THEN
+        // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
+        IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM >= (TopLimitM - SlowdownDistanceM)) THEN
+            RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
+        END_IF;
+        
+        // En descente (engagement ou mouvement actif), ralentit à l'approche de la limite basse
+        IF ((CommandedDirection = -1) OR (Direction = -1)) AND (CablePosM <= (BottomLimitM + SlowdownDistanceM)) THEN
+            RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
+        END_IF;
+    END_IF;
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,

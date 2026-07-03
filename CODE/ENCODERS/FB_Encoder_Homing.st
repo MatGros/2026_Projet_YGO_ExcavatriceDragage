@@ -143,8 +143,8 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
         ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
     ELSIF NOT ArretConfirme THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
-    ELSIF NOT TopPositionSensor THEN
-        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé
+    ELSIF (Mode <> E_Mode.MAINT_N2) AND NOT TopPositionSensor THEN
+        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé (requis uniquement en MAINT_N1)
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)

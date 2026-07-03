@@ -120,6 +120,12 @@ VAR
     M1_RawPosToUse          : UDINT;
     M2_RawPosToUse          : UDINT;
     InitDone                : BOOL;             // 🧪 Initialisation unique au boot (simulation)
+    
+    // 📐 Limites basses actives et blocages de descente calculés (légal + longueur câble)
+    BottomLimitM1_Active    : REAL;
+    BottomLimitM2_Active    : REAL;
+    ForbidDescentM1_Active  : BOOL;
+    ForbidDescentM2_Active  : BOOL;
 END_VAR
 
 // 💾 Bloc VAR RETAIN SUPPRIMÉ (2026-07-03) : toutes les variables de calibration
