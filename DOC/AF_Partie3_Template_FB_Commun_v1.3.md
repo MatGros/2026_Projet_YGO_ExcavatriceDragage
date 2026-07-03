@@ -192,7 +192,7 @@ Redémarrage   → exige un NOUVEL ordre explicite (StartStop, Cycle ou opérate
 
 | Élément | Nature | Action |
 |---------|--------|--------|
-| 🔴 Bouton AU + câble « montée excessive » | Physique câblé | Coupe le contacteur de puissance (moteurs OFF **brutalement**, freins collent) |
+| 🔴 Bouton AU | Physique câblé | Coupe le contacteur de puissance (moteurs OFF **brutalement**, freins collent) |
 | 🔧 Réarmement AU | Bouton **physique** | Réautorise le mouvement |
 | 🧨 `PowerCutOff` | Cmd PLC → relais | Coupure puissance amont si contacteur collé (voir §7bis) |
 | 🟧 `SafeStop` | Sortie d'un bloc safety **métier** (1 par domaine) | Sur défaut process de ce domaine : rampe de décélération **rapide**, `Enable` maintenu — **≠ AU**, seul mécanisme non-brutal |

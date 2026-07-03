@@ -354,7 +354,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `Mode` | `E_Mode` | `MAINT_N1` autorise le flux **nominal** (cible `TopSensorPositionM`) ; `MAINT_N2` requis pour le flux **unitaire** (cible `HomingTargetM` libre) |
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
-| `M1_M2_TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis), désormais **I/O Mapping réel** (`GVL_Homing_Stub` supprimé). Câblé IDENTIQUEMENT sur les 2 instances. Flux nominal : `Home` n'est accepté que si `TopPositionSensor = TRUE` (confirmation physique, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
+| `M1_M2_TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis), désormais **I/O Mapping réel** (`GVL_Homing_Stub` supprimé). Câblé IDENTIQUEMENT sur les 2 instances. Flux nominal : `Home` n'est accepté que si `TopPositionSensor = FALSE` (contact ouvert, position haute atteinte — logique fail-safe NC, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
 | `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `M1_M2_TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis) |
 | `HomingTargetM` | REAL | Cible de position à imposer **en flux unitaire uniquement** (`MAINT_N2`), bornée **[-99.00 ; +99.00]** m (§3.6) — remplace l'ancien usage "flux nominal verrouillé à 0.00" (le flux nominal utilise désormais `TopSensorPositionM`, pas ce champ) |
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
@@ -380,7 +380,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | 1 | `WinchSelect` ne correspond pas à ce treuil (flux unitaire) |
 | 2 | Arrêt non confirmé (contacteurs sens actifs ou frein non collé) |
 | 3 | `EncoderAvailable = FALSE` |
-| 4 | `HomingTargetM` hors bornage `[-99.00 ; +99.00]` m (flux unitaire) ; ou flux nominal demandé sans `TopPositionSensor = TRUE` (confirmation physique manquante) |
+| 4 | `HomingTargetM` hors bornage `[-99.00 ; +99.00]` m (flux unitaire) ; ou flux nominal demandé sans `TopPositionSensor = FALSE` (confirmation physique de position haute atteinte manquante) |
 | 5 | Écriture preset refusée par le bus (`PresetAck` jamais reçu, timeout) |
 | 6 | Relecture post-preset incohérente (`RawPos ≠ PresetValue` au-delà d'une tolérance) |
 | 7 | Position hors bornage absolu pendant fonctionnement (§3.6, remontée depuis `FB_Encoder_Safety`) |
@@ -408,7 +408,7 @@ READY    → (front ConfirmCoherence, Mode IN MAINT_N1/N2) → HomingSuspect:=FA
    actif sur les deux treuils).
 2. Relâcher le joystick — arrêt confirmé (contacteurs + frein, ErrorId bit2 à 0).
 3. Appuyer le bouton IHM unique « Réf/Homing COD1+COD2 » → `Home` sur **les deux instances**
-   simultanément ; accepté seulement si `TopPositionSensor = TRUE` sur les deux (ErrorId bit4
+   simultanément ; accepté seulement si `TopPositionSensor = FALSE` sur les deux (contact ouvert, position haute atteinte — ErrorId bit4
    sinon) ; cible = `TopSensorPositionM` (paramétrable, ≈ 12.50 m). Confirmation mot de
    passe/message gérée par l'IHM en amont si le niveau l'exige.
 4. `Done` sur les deux instances → affichage `CablePosM` ≈ `TopSensorPositionM` sur M1 **et** M2.
@@ -574,8 +574,8 @@ avant, et pas improvisé ici sans validation explicite du mécanisme de ralentis
 (paliers vitesse existants réutilisables, ou rampe dédiée ?).
 
 ```
-SI CapteurPositionHaute = TRUE ET NOT EnModeReferencement(CeTreuil) ALORS
-    → PowerCutOff := TRUE   (FB_Safety_WinchM1/M2, selon le treuil concerné)
+SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
+    → PowerCutOff := TRUE   (FB_Safety_WinchM1/M2, selon le treuil concerné — logique fail-safe NC, contact ouvert / fil coupé = danger)
 SINON (en mode référencement actif sur ce treuil)
     → capteur consommé par FB_Encoder_Homing comme référence, PAS de PowerCutOff
 ```

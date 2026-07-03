@@ -61,7 +61,7 @@ complète sur ce projet (voir incident ci-dessous).
 
 | Famille | Convention | Exemples | Pourquoi |
 |---|---|---|---|
-| **Capteur de sécurité** (entrée brute, suffixe `Ok`, fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `EmergencyStopOk`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
+| **Capteur de sécurité** (entrée brute, suffixe `Ok` ou assimilé fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `EmergencyStopOk`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk`, `GVL_IN.TopPositionSensor` (sain si non atteint), `GVL_IN.DriveFaultOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
 | **Information / état classique** (entrée brute) | `FALSE` = repos ; `TRUE` = capteur atteint/déclenché | `ChariotPosFosse1/Fosse2/Maintenance/Tremie` | Logique directe : "je suis arrivé à la position" = `TRUE`. Pas d'enjeu fail-safe. |
 | **Sortie de COMMANDE d'un bloc Safety** (calculée, PAS un capteur) | `TRUE` = **déclenche** l'action | `SafeStop` (déclenche décél. rapide), `ForbidDescent` (déclenche l'interdiction), `PowerCutOff` (déclenche la coupure) | Nom = un verbe d'action, pas un état de capteur — c'est l'inverse de la famille "sécurité" ci-dessus, volontairement. |
 
