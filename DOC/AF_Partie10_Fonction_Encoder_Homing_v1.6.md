@@ -1,5 +1,14 @@
 # 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.6)
 
+> 📌 **État d'implémentation (2026-07-03quater, AUDIT D39)** : `FB_Encoder_Safety` **revive**
+> (§3.6/§3.7 uniquement) — `CODE/FB_Encoder_Safety.st`, 1 instance par treuil. Répond à
+> l'incident terrain `CablePosM≈4096m` (RETAIN `Calib` remis à 0 après refactor structurel du
+> programme). Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7, déjà calculé
+> par `FB_Encoder_Homing`, jamais consommé avant ce lot) → `EncoderIncoherent`, consommé
+> **uniquement par `FB_Modes`** (refuse `SEMI_AUTO`) — PAS de `SafeStop`, pour ne pas empêcher
+> de bouger les treuils en maintenance afin de re-référencer. §3.5 (saut en exploitation,
+> calcul sur cycles EtherCAT 4ms) **reste non codé**, lot dédié à part.
+>
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
 > contacteur puissance/AU, résout AUDIT Q11 pour le pipeline codeur — §7). `Reset` des FB
 > codeur/homing câblé (`M1/M2_Reset_IHM`, n'était câblé nulle part avant). Nouveau

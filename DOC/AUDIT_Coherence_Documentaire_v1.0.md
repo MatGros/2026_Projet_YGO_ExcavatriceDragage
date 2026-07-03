@@ -273,3 +273,41 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
   `FB_IO_Winch_Out.st` supprimés en cours de route), `PRG_MAIN.st` (1 seule instance
   `instIoMachine`, 2 appels ; `instSafety`/`LocalEmergencyStopTOR`/`LocalEthercatOk` retirés).
 - **DOC/** : `AF_Partie6_IO_Conditioning` (état d'implémentation mis à jour), AUDIT (ce §11).
+
+---
+
+## 🚀 12. `FB_Modes` (MVP) + `FB_Encoder_Safety` + `FB_WinchSync` — squelettes de liaisons (2026-07-03quater)
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D38 | **`FB_Modes` MVP — diffusion du mode uniquement** | Nouveau `FB_Modes` (+ `GVL_Modes_Stub.ModeRequest_IHM` forceable) remplace les **10 `E_Mode.MAINT_N1` codés en dur** dans `PRG_MAIN` (liste confirmée par audit indépendant). Garde-fous : refuse `SEMI_AUTO` si `EncoderFaultPresent` (agrégat `FB_Encoder_Safety` M1/M2, 1 cycle de retard) ; refuse `MAINT_N2` sans `PasswordOk` (stub). Sort `OverrideSync` pour `FB_WinchSync`. **Hors périmètre** : `OverrideGrappin`/limite légale — pas de consommateur (`FB_Grappin`/`FB_Cycle` inexistants), pas de dead code ajouté sans raison. |
+| D39 | **`FB_Encoder_Safety` revive — bornage ±99m + relais `HomingSuspect`** | Répond à l'incident `CablePosM≈4096m` (RETAIN `Calib` remis à 0 après refactor structurel). Périmètre limité à Partie10 §3.6 (bornage) + relais §3.7 (`HomingSuspect`, déjà calculé par `FB_Encoder_Homing`, jamais consommé avant ce lot). §3.5 (saut en exploitation, calcul 4ms EtherCAT) **reporté**, lot dédié. `EncoderIncoherent` alimente **`FB_Modes` uniquement** (pas `FB_Safety_Winch`/`SafeStop`) — décision explicite utilisateur : un défaut codeur doit bloquer `SEMI_AUTO`, PAS empêcher de bouger les treuils en MAINT_N1/N2 pour re-référencer. |
+| D40 | **`FB_WinchSync` — squelette de surveillance, pas de correction** | Nouveau FB (1 instance), calcule `DeltaPosM`/`SyncWarn` (Partie9 §9 : imposé N1, activable/désactivable N2 via `OverrideSync`, actif par défaut MANUEL/SEMI_AUTO faute de `FB_Cycle`). `SyncWarn` = **avertissement IHM uniquement** (Partie5 §6), pas de `SafeStop` : aucune entrée de correction n'existe sur `FB_Winch` aujourd'hui, rien à piloter automatiquement. Squelette de liaisons volontaire (« même si pas complet à l'intérieur »), pas de logique de régulation inventée. |
+| D41 | **`StubWinchEnableN1` → `StubMachineEnableN1`** | Renommage (signalé par audit indépendant) : la variable est utilisée par `FB_Winch` **et** `FB_Chariot`, le nom `Winch` était trompeur. |
+
+### Fichiers impactés (2026-07-03quater)
+- **CODE/** : `GVL_Modes_Stub.st` (nouveau), `FB_Modes.st` (nouveau), `FB_Encoder_Safety.st`
+  (nouveau, revive), `FB_WinchSync.st` (nouveau), `PRG_MAIN.st` (`instModes`/`instEncoderSafetyM1/2`/
+  `instWinchSync`, remplacement des 10 `E_Mode.MAINT_N1`, `WinchSyncToleranceM` RETAIN,
+  renommage `StubMachineEnableN1`).
+- **DOC/** : `AF_Partie5_Modes_Maintenance` (état d'implémentation `FB_Modes` MVP),
+  `AF_Partie9_Fonction_Winch` (§9 `FB_WinchSync` squelette), `AF_Partie10...` (§3.6/§3.7
+  `FB_Encoder_Safety` revive), AUDIT (ce §12).
+- **Audit indépendant** : un agent spécialisé automatisme a cartographié tous les flux
+  inter-FB de `PRG_MAIN` avant ce lot — confirme la liste des 10 `E_Mode.MAINT_N1`, signale
+  `StubWinchEnableN1` mal nommé, `FB_Joystick` avec `SafeStop` non conforme Partie3 §1bis
+  (dette déjà connue, non traitée ce lot), `CablePosM`/`Homed`/`HomingSuspect` jamais
+  consommés avant ce lot (désormais consommés par `FB_Encoder_Safety`/`FB_WinchSync`).
+
+---
+
+## 🚀 13. Limitation couple en descente — `MaxStepDescente` (2026-07-03quinquies)
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D42 | **Plafond palier direction-dépendant** | Nouvelle spec terrain : en descente (charge entraînante, image de couple plutôt que vitesse), le palier atteignable ne doit JAMAIS dépasser un plafond (`MaxStepDescente`, défaut 2) même à consigne joystick 100%. Choix d'implémentation (validé utilisateur, vs re-mapping du 0-100%) : **plafond fixe**, pas de rescale de la courbe — `FB_SpeedStep` gagne une entrée `MaxStepNumber` (défaut 5, pas de régression montée), `FB_Winch` fournit `MaxStepDescente` uniquement quand `CommandedDirection=-1`. Logique de décodage centralisée dans `FB_SpeedStep` (pas de duplication de la lecture table dans `FB_Winch`). |
+
+### Fichiers impactés (2026-07-03quinquies)
+- **CODE/** : `FB_SpeedStep.st` (`MaxStepNumber`, plafond post-hystérésis), `FB_Winch.st`
+  (`MaxStepDescente` + câblage direction-dépendant sur l'appel `SpeedStep`).
+- **DOC/** : `AF_Partie9_Fonction_Winch` (REX §8), AUDIT (ce §13).

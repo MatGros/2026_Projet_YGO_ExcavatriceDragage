@@ -100,6 +100,13 @@ VAR
     // 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
     FB_Joystick_0 : FB_Joystick;
 
+    // 🎚️ FB_MODES — arbitrage du mode machine, 1 SEULE instance (remplace E_Mode.MAINT_N1 codé
+    // en dur partout). Voir en-tête FB_Modes.st.
+    instModes : FB_Modes;
+    EncoderFaultPresentM1 : BOOL;   // 📤 instEncoderSafetyM1.EncoderIncoherent (calculé plus bas, 1 cycle de retard)
+    EncoderFaultPresentM2 : BOOL;   // 📤 instEncoderSafetyM2.EncoderIncoherent (calculé plus bas, 1 cycle de retard)
+    EncoderFaultPresent   : BOOL;   // 📤 OR des deux — entrée instModes (1 cycle de retard, cf en-tête FB_Modes.st)
+
     // 🧲 CODEUR — acquisition + mise à l'échelle + homing (flux nominal), 1 instance par treuil
     instEncoderAbsM1   : FB_Encoder_Abs;
     instEncoderScaleM1 : FB_Encoder_Scale;
@@ -108,10 +115,19 @@ VAR
     instEncoderScaleM2 : FB_Encoder_Scale;
     instHomingM2       : FB_Encoder_Homing;
 
+    // 🛡️ FB_ENCODER_SAFETY — bornage ±99m + relais HomingSuspect, 1 instance par treuil (répond
+    // à l'incident CablePosM≈4096m). Voir en-tête FB_Encoder_Safety.st.
+    instEncoderSafetyM1 : FB_Encoder_Safety;
+    instEncoderSafetyM2 : FB_Encoder_Safety;
+
     // 🔌 SAFETY — bloc safety métier du domaine treuil, 1 instance par treuil
     // (même TYPE FB_Safety_Winch, 2 instances — Partie10 §7)
     instSafetyWinchM1 : FB_Safety_Winch;
     instSafetyWinchM2 : FB_Safety_Winch;
+
+    // ⚖️ FB_WINCHSYNC — surveillance écart M1/M2, 1 SEULE instance (squelette de liaisons,
+    // pas de correction — voir en-tête FB_WinchSync.st et Partie9 §9).
+    instWinchSync : FB_WinchSync;
 
     // 🪝 WINCH — M1 et M2 (consigne dupliquée sur l'axe Y, Maintenance N1, choix 2026-07-02)
     instWinchM1 : FB_Winch;
@@ -121,9 +137,9 @@ VAR
     instSafetyChariotM3 : FB_Safety_Chariot;
     instChariotM3       : FB_Chariot;
 
-    // 🎚️ Stub Maintenance N1 pour ce lot (pas de FB_Modes) — à remplacer dès que
-    // FB_Modes existera (source légitime Enable/Mode par bloc métier)
-    StubWinchEnableN1 : BOOL := TRUE;
+    // 🎚️ Stub Maintenance N1 pour ce lot (Enable, PAS le Mode — voir instModes ci-dessus)
+    // — à remplacer par une vraie arbitrage FB_Modes quand FB_Cycle existera
+    StubMachineEnableN1 : BOOL := TRUE;
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -154,6 +170,10 @@ VAR RETAIN
         P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
+
+    // ⚖️ Tolérance écart M1/M2 (FB_WinchSync) — réglable sans recompiler, ajuster selon jeu
+    // mécanique réel observé sur site (Partie9 §9).
+    WinchSyncToleranceM : REAL := 0.10;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
@@ -219,6 +239,25 @@ ChariotPosFosse2Cond        := instIoMachine.ChariotPosFosse2Cond;
 ChariotPosMaintenanceCond   := instIoMachine.ChariotPosMaintenanceCond;
 ChariotPosTremieCond        := instIoMachine.ChariotPosTremieCond;
 
+(* ═══════════════════════════════════════════════════════════════
+   🎚️ 1bis2. FB_MODES — arbitrage du mode machine (remplace E_Mode.MAINT_N1 codé en dur)
+   ───────────────────────────────────────────────────────────────
+   `EncoderFaultPresent` utilisé ici est celui calculé à LA FIN du cycle PRÉCÉDENT
+   (par instEncoderSafetyM1/M2, appelés plus bas — dépendent de CablePosM/Homing qui
+   ne sont pas encore connus à ce point du cycle). 1 cycle de retard assumé, même
+   principe que HomingRefRaw (Partie10 §9bis) — voir en-tête FB_Modes.st.
+   ═══════════════════════════════════════════════════════════════ *)
+
+instModes(
+    Enable              := TRUE,
+    Reset               := FALSE,                              // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk     := EmergencyStopOkCond,
+    ModeRequest         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur forceable
+    PasswordOk          := GVL_Modes_Stub.PasswordOk_IHM,       // 🖥️ Stub authentification MAINT_N2
+    OverrideSyncRequest := GVL_Modes_Stub.OverrideSyncRequest_IHM,
+    EncoderFaultPresent := EncoderFaultPresent                  // 1 cycle de retard (voir ci-dessus)
+);
+
 // 2. ACQUISITION DU GESTE OPÉRATEUR SÉCURISÉ
 
 (* ═══════════════════════════════════════════════════════════════
@@ -271,7 +310,8 @@ instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1
     EmergencyStopOk     := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
-    Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
+    Mode                := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
     AlarmsIn            := COD1_Alarms,                     // 📡 I/O Mapping déjà existant
     WarningsIn          := COD1_Warnings,                   // 📡 I/O Mapping déjà existant
@@ -296,7 +336,8 @@ instHomingM1(
     Enable               := TRUE,
     Reset                := M1_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD1 (même bouton que instEncoderAbsM1)
     EmergencyStopOk      := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
-    Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
+    Mode                 := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 1) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
     ConfirmCoherence     := M1_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
     TopPositionSensor    := M1_M2_TopPositionSensorCond,     // 📡 Conditionné FB_IO_Machine
@@ -317,7 +358,8 @@ instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2
     EmergencyStopOk     := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
-    Mode                := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
+    Mode                := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     RawPosIn            := COD2_PosValue,                   // 📡 I/O Mapping (mappé 2026-07-02)
     AlarmsIn            := COD2_Alarms,                     // 📡 I/O Mapping (mappé 2026-07-02)
     WarningsIn          := COD2_Warnings,                   // 📡 I/O Mapping (mappé 2026-07-02)
@@ -342,7 +384,8 @@ instHomingM2(
     Enable               := TRUE,
     Reset                := M2_Reset_IHM,                    // 🖥️ GVL_Encoder_Stub — acquittement COD2 (même bouton que instEncoderAbsM2)
     EmergencyStopOk      := EmergencyStopOkCond,                 // 📡 I/O Mapping RÉEL (2026-07-03) — retour contacteur puissance/AU
-    Mode                 := E_Mode.MAINT_N1,                 // ⚠️ Stub — à remplacer par FB_Modes
+    Mode                 := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 2) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
     ConfirmCoherence     := M2_ConfirmCoherence_IHM,          // 🖥️ GVL_Encoder_Stub
     TopPositionSensor    := M1_M2_TopPositionSensorCond,     // 📡 Conditionné FB_IO_Machine
@@ -360,6 +403,59 @@ instHomingM2(
 );
 
 (* ═══════════════════════════════════════════════════════════════
+   🛡️ 3bis. FB_ENCODER_SAFETY — bornage ±99m + relais HomingSuspect (1 par treuil)
+   ───────────────────────────────────────────────────────────────
+   Répond à l'incident CablePosM≈4096m (RETAIN Calib remis à 0 après refactor).
+   EncoderFaultPresent (OR M1/M2) alimente instModes AU CYCLE SUIVANT (voir §1bis2).
+   ═══════════════════════════════════════════════════════════════ *)
+
+instEncoderSafetyM1(
+    Enable          := TRUE,
+    Reset           := M1_Reset_IHM,                 // 🖥️ GVL_Encoder_Stub — même bouton que Abs/Homing M1
+    EmergencyStopOk := EmergencyStopOkCond,
+    Mode            := instModes.Mode,
+    CablePosM       := instEncoderScaleM1.CablePosM,
+    HomingSuspect   := instHomingM1.HomingSuspect,
+    PositionMinM    := -99.0,
+    PositionMaxM    := 99.0
+);
+EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
+
+instEncoderSafetyM2(
+    Enable          := TRUE,
+    Reset           := M2_Reset_IHM,                 // 🖥️ GVL_Encoder_Stub — même bouton que Abs/Homing M2
+    EmergencyStopOk := EmergencyStopOkCond,
+    Mode            := instModes.Mode,
+    CablePosM       := instEncoderScaleM2.CablePosM,
+    HomingSuspect   := instHomingM2.HomingSuspect,
+    PositionMinM    := -99.0,
+    PositionMaxM    := 99.0
+);
+EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
+
+EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;   // 📤 Consommé par instModes AU CYCLE SUIVANT
+
+(* ═══════════════════════════════════════════════════════════════
+   ⚖️ 3ter. FB_WINCHSYNC — surveillance écart M1/M2 (squelette, PAS de correction)
+   ───────────────────────────────────────────────────────────────
+   Enable := NOT OverrideSync (Partie5 §2 "Logique d'override" — actionnable
+   UNIQUEMENT en MAINT_N2 via GVL_Modes_Stub.OverrideSyncRequest_IHM).
+   ═══════════════════════════════════════════════════════════════ *)
+
+instWinchSync(
+    Enable          := NOT instModes.OverrideSync,
+    Reset           := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
+    EmergencyStopOk := EmergencyStopOkCond,
+    Mode            := instModes.Mode,
+    CablePosM1      := instEncoderScaleM1.CablePosM,
+    CablePosM2      := instEncoderScaleM2.CablePosM,
+    HomedM1         := instHomingM1.Homed,
+    HomedM2         := instHomingM2.Homed,
+    OverrideSync    := instModes.OverrideSync,
+    SyncToleranceM  := WinchSyncToleranceM
+);
+
+(* ═══════════════════════════════════════════════════════════════
    🔌 4. SÉCURITÉ MÉTIER TREUIL — FB_Safety_Winch (1 instance par treuil)
    ───────────────────────────────────────────────────────────────
    Périmètre : perte joystick/CAN (partagée) + perte codeur DE CE
@@ -371,7 +467,8 @@ instSafetyWinchM1(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk     := EmergencyStopOkCond,        // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
-    Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    Mode                := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
@@ -383,7 +480,8 @@ instSafetyWinchM2(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk     := EmergencyStopOkCond,        // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
-    Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    Mode                := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
@@ -404,10 +502,11 @@ instSafetyWinchM2(
    ═══════════════════════════════════════════════════════════════ *)
 
 instWinchM1(
-    Enable                  := StubWinchEnableN1,           // ⚠️ Stub Maint N1 — à remplacer par FB_Modes
+    Enable                  := StubMachineEnableN1,           // ⚠️ Stub Maint N1 — à remplacer par FB_Modes
     Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk         := EmergencyStopOkCond,           // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
-    Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    Mode                    := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
     SafeStop                := instSafetyWinchM1.SafeStop,
     ForbidDescent           := instSafetyWinchM1.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
@@ -420,10 +519,11 @@ instWinchM1(
 );
 
 instWinchM2(
-    Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que M1 — à remplacer par FB_Modes
+    Enable                  := StubMachineEnableN1,           // ⚠️ Même stub Maint N1 que M1 — à remplacer par FB_Modes
     Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk         := EmergencyStopOkCond,           // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
-    Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    Mode                    := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
     SafeStop                := instSafetyWinchM2.SafeStop,
     ForbidDescent           := instSafetyWinchM2.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
@@ -453,7 +553,8 @@ instSafetyChariotM3(
     Enable              := TRUE,
     Reset               := FALSE,                    // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk     := EmergencyStopOkCond,        // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
-    Mode                := E_Mode.MAINT_N1,           // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    Mode                := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational
 );
@@ -472,10 +573,11 @@ ELSE
 END_CASE;
 
 instChariotM3(
-    Enable                  := StubWinchEnableN1,           // ⚠️ Même stub Maint N1 que Winch — à remplacer par FB_Modes
+    Enable                  := StubMachineEnableN1,           // ⚠️ Même stub Maint N1 que Winch — à remplacer par FB_Modes
     Reset                   := FALSE,                        // ⚠️ À câbler : front acquittement défaut IHM
     EmergencyStopOk         := EmergencyStopOkCond,           // 🛑 Conditionné FB_Input_Digital (D32/Q11 close)
-    Mode                    := E_Mode.MAINT_N1,              // ⚠️ Stub Maintenance N1 — à remplacer par FB_Modes
+    Mode                    := instModes.Mode,  // 🎚️ Arbitré FB_Modes (était E_Mode.MAINT_N1 codé en dur)
+
     StartStop               := FB_Joystick_0.AxisCmdX.StartStop,
     SafeStop                := instSafetyChariotM3.SafeStop,
     CommMode                := E_ChariotCommMode.DEGRADED_IO,  // ⚠️ Figé (EtherCAT AC600 TBD, Partie11 §4/§7)

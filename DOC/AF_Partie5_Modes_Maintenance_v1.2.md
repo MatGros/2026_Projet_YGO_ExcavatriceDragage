@@ -1,5 +1,12 @@
 # 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.2)
 
+> 📌 **État d'implémentation (2026-07-03quater, AUDIT D38)** : `FB_Modes` **codé (MVP)** —
+> `CODE/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
+> codés en dur dans `PRG_MAIN`), refuse `SEMI_AUTO` si défaut codeur (`FB_Encoder_Safety`),
+> refuse `MAINT_N2` sans mot de passe (stub), sort `OverrideSync` (→ `FB_WinchSync`). **Reste
+> non codé** : `OverrideGrappin`, limite légale `ST_LimitLegal` (§3) — pas de consommateur
+> tant que `FB_Cycle`/`FB_Grappin` n'existent pas.
+>
 > **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Grappin
 > (`OverrideGrappin`, `FB_Grappin`), Translation→Chariot — préfixe I/O physique M3 inchangé.
 > **Version 1.1** — Suite audit documentaire : correction du pseudo-code d'override (§2) qui

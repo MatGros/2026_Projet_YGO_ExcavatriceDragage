@@ -21,16 +21,22 @@
    ⚠️ Brique réduite (Partie3 §1bis) : pas d'Enable/Reset/Error au sens
       "FB métier" — c'est un décodeur pur, composé À L'INTÉRIEUR de
       FB_Winch, qui porte lui la sécurité/le contrat complet.
+   🆕 AJOUT (2026-07-03quinquies, spec descente/couple) : `MaxStepNumber` plafonne
+      le palier atteignable (défaut 5 = comportement inchangé). Sert à `FB_Winch`
+      pour limiter la vitesse en descente (charge entraînante, pas besoin d'aller
+      vite) SANS changer la logique de décodage elle-même — juste un plafond
+      appliqué APRÈS la sélection par hystérésis, avant la lecture de la table.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_SpeedStep) ===
 
 FUNCTION_BLOCK PUBLIC FB_SpeedStep
 VAR_INPUT
-    Enable      : BOOL;               // Piloté par FB_Winch : FALSE = treuil à l'arrêt (palier 0)
-    SpeedRefPct : REAL;                // Consigne vitesse 0..100 % (déjà rampée par FB_Winch)
-    Table       : ST_SpeedStepTable;   // Table des 5 paliers (contacteurs + seuils), propre à CE treuil
-    HystMargin  : REAL := 2.0;         // Marge anti-battement (%) autour de chaque seuil
+    Enable        : BOOL;               // Piloté par FB_Winch : FALSE = treuil à l'arrêt (palier 0)
+    SpeedRefPct   : REAL;                // Consigne vitesse 0..100 % (déjà rampée par FB_Winch)
+    Table         : ST_SpeedStepTable;   // Table des 5 paliers (contacteurs + seuils), propre à CE treuil
+    HystMargin    : REAL := 2.0;         // Marge anti-battement (%) autour de chaque seuil
+    MaxStepNumber : INT := 5;            // 🆕 Plafond palier atteignable (1..5) — 5 = pas de restriction
 END_VAR
 VAR_OUTPUT
     Contactor1  : BOOL;   // Contacteur de vitesse 1 pour le palier courant
@@ -72,6 +78,13 @@ IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;
 IF NOT Hyst2.OUT THEN StepNumber := 3; END_IF;
 IF NOT Hyst3.OUT THEN StepNumber := 4; END_IF;
 IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
+
+// 🆕 2bis. PLAFOND (2026-07-03quinquies) — appliqué APRÈS la sélection hystérésis,
+// AVANT la lecture table : le 0..100% de la consigne peut réclamer le palier 5,
+// mais ne dépassera jamais MaxStepNumber (ex. limitation couple en descente, voir FB_Winch)
+IF StepNumber > MaxStepNumber THEN
+    StepNumber := MaxStepNumber;
+END_IF;
 
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
 CASE StepNumber OF
