@@ -161,6 +161,30 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
 
+// 🖥️ 1. ACQUISITION DES COMMANDES IHM (Lot A, 2026-07-03)
+GrappinCmdOpen_IHM                              := GVL_IHM.Grappin.CmdOpen;
+GrappinCmdClose_IHM                             := GVL_IHM.Grappin.CmdClose;
+GVL_Modes_Stub.OverrideSyncRequest_IHM          := GVL_IHM.Sync.OverrideSync;
+GVL_Encoder_Stub.M1_Reset_IHM                   := GVL_IHM.WinchM1.CmdReset;
+GVL_Encoder_Stub.M2_Reset_IHM                   := GVL_IHM.WinchM2.CmdReset;
+GVL_Encoder_Stub.M1_ConfirmCoherence_IHM         := GVL_IHM.WinchM1.ConfirmCoherence;
+GVL_Encoder_Stub.M2_ConfirmCoherence_IHM         := GVL_IHM.WinchM2.ConfirmCoherence;
+GVL_Machine_Stub.MachineReset_IHM               := GVL_IHM.WinchM1.CmdReset OR GVL_IHM.WinchM2.CmdReset OR GVL_IHM.Grappin.CmdReset;
+
+// Gestion de la commande Home et du mode homing selon les boutons tactiles
+IF GVL_IHM.WinchM1.CmdHome AND GVL_IHM.WinchM2.CmdHome THEN
+    GVL_Encoder_Stub.HomingMode_IHM := 3;
+    GVL_Encoder_Stub.StubHomeButton_IHM := TRUE;
+ELSIF GVL_IHM.WinchM1.CmdHome THEN
+    GVL_Encoder_Stub.HomingMode_IHM := 1;
+    GVL_Encoder_Stub.StubHomeButton_IHM := TRUE;
+ELSIF GVL_IHM.WinchM2.CmdHome THEN
+    GVL_Encoder_Stub.HomingMode_IHM := 2;
+    GVL_Encoder_Stub.StubHomeButton_IHM := TRUE;
+ELSE
+    GVL_Encoder_Stub.StubHomeButton_IHM := FALSE;
+END_IF;
+
 (* ═══════════════════════════════════════════════════════════════
    📡 0. DIAGNOSTICS BUS RÉELS (Lot A mise en service, 2026-07-03sexies)
    ───────────────────────────────────────────────────────────────
@@ -509,6 +533,7 @@ instGrappin(
     CablePosM1          := instEncoderScaleM1.CablePosM,
     CablePosM2          := instEncoderScaleM2.CablePosM,
     Config              := GrappinConfig,
+    TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,  // 🆕 Configurable depuis IHM
     GrappinState        := GrappinState
 );
 
@@ -548,9 +573,13 @@ instWinchM1(
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
     SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,
     SpeedStepTable          := M1_SpeedStepTable,
+    MaxStepDescente         := GVL_IHM.WinchM1.MaxStepDescente,    // 🆕 Configurable depuis IHM
     ContactorFeedbackFwd    := GVL_IN.M1ContactorFeedbackFwd,
     ContactorFeedbackRev    := GVL_IN.M1ContactorFeedbackRev,
-    BrakeFeedback           := GVL_IN.M1BrakeFeedback
+    BrakeFeedback           := GVL_IN.M1BrakeFeedback,
+    RampAccelRate           := GVL_IHM.WinchM1.RampAccelRate,      // 🆕 Configurable depuis IHM
+    RampDecelNormalRate     := GVL_IHM.WinchM1.RampDecelNormalRate, // 🆕 Configurable depuis IHM
+    RampDecelFastRate       := GVL_IHM.WinchM1.RampDecelFastRate   // 🆕 Configurable depuis IHM
 );
 
 instWinchM2(
@@ -566,9 +595,13 @@ instWinchM2(
     Direction               := M2_Direction_Active,           // Arbitré grappin
     SpeedRefPct             := M2_SpeedRef_Active,            // Arbitré grappin
     SpeedStepTable          := M2_SpeedStepTableActive,       // Arbitrée grappin (sans contacteurs si vitesse lente forcée)
+    MaxStepDescente         := GVL_IHM.WinchM2.MaxStepDescente,    // 🆕 Configurable depuis IHM
     ContactorFeedbackFwd    := GVL_IN.M2ContactorFeedbackFwd,
     ContactorFeedbackRev    := GVL_IN.M2ContactorFeedbackRev,
-    BrakeFeedback           := GVL_IN.M2BrakeFeedback
+    BrakeFeedback           := GVL_IN.M2BrakeFeedback,
+    RampAccelRate           := GVL_IHM.WinchM2.RampAccelRate,      // 🆕 Configurable depuis IHM
+    RampDecelNormalRate     := GVL_IHM.WinchM2.RampDecelNormalRate, // 🆕 Configurable depuis IHM
+    RampDecelFastRate       := GVL_IHM.WinchM2.RampDecelFastRate   // 🆕 Configurable depuis IHM
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -640,6 +673,135 @@ M3_RelaySpeedGv := instChariotM3.RelaySpeedGv;
 // 🧪 SIMULATION (stub GVL_Chariot_M3_Stub) — voir note Winch M1 ci-dessus.
 M3_ContactorFeedbackFwd := M3_RelayFwd;
 M3_ContactorFeedbackRev := M3_RelayRev;
+
+(* ═══════════════════════════════════════════════════════════════
+   🖥️ MAPPING IHM ↔ PROCESSUS
+   ───────────────────────────────────────────────────────────────
+   Ce bloc assure la copie bidirectionnelle des consignes/paramètres
+   et des états/diagnostics vers GVL_IHM pour affichage écran.
+   ═══════════════════════════════════════════════════════════════ *)
+
+// --- 1. INITIALISATION DES CONFIGURATIONS DEPUIS LES VALEURS PAR DÉFAUT (SI VIDE) ---
+IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
+    GVL_IHM.WinchM1.TopSensorPositionM  := 12.5;
+    GVL_IHM.WinchM1.MaxStepDescente     := 2;
+    GVL_IHM.WinchM1.RampAccelRate       := 50.0;
+    GVL_IHM.WinchM1.RampDecelNormalRate := 150.0;
+    GVL_IHM.WinchM1.RampDecelFastRate   := 400.0;
+END_IF;
+
+IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
+    GVL_IHM.WinchM2.TopSensorPositionM  := 12.5;
+    GVL_IHM.WinchM2.MaxStepDescente     := 2;
+    GVL_IHM.WinchM2.RampAccelRate       := 50.0;
+    GVL_IHM.WinchM2.RampDecelNormalRate := 150.0;
+    GVL_IHM.WinchM2.RampDecelFastRate   := 400.0;
+END_IF;
+
+IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
+    GVL_IHM.Sync.SyncToleranceM         := 0.10;
+END_IF;
+
+IF GVL_IHM.Grappin.Config.OffsetOpenM = 0.0 AND GVL_IHM.Grappin.Config.OffsetCloseM = 0.0 THEN
+    GVL_IHM.Grappin.Config.OffsetOpenM     := 0.0;
+    GVL_IHM.Grappin.Config.OffsetCloseM    := -1.5;
+    GVL_IHM.Grappin.Config.CoherenceLimitM := 0.05;
+    GVL_IHM.Grappin.TimeoutDuration        := T#30s;
+END_IF;
+
+// --- 2. PROPAGATION DES PARAMÈTRES ET CONFIGURATIONS DEPUIS L'IHM ---
+GVL_Encoder_Stub.M1_TopSensorPositionM      := GVL_IHM.WinchM1.TopSensorPositionM;
+GVL_Encoder_Stub.M2_TopSensorPositionM      := GVL_IHM.WinchM2.TopSensorPositionM;
+WinchSyncToleranceM                         := GVL_IHM.Sync.SyncToleranceM;
+GrappinConfig                               := GVL_IHM.Grappin.Config;
+
+// --- 3. GESTION DES BYPASSES BANC DE TEST (DEUX VOIES) ---
+GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST  := GVL_IHM.WinchM1.BypassContactorFeedback OR GVL_IHM.WinchM2.BypassContactorFeedback;
+GVL_DEBUG.DBG_SlackCableSwitch_TEST         := GVL_IHM.WinchM1.BypassSlackCable OR GVL_IHM.WinchM2.BypassSlackCable;
+GVL_DEBUG.DBG_TopPositionSensorBypass_TEST   := GVL_IHM.WinchM1.BypassTopPositionSensor OR GVL_IHM.WinchM2.BypassTopPositionSensor;
+
+GVL_IHM.WinchM1.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
+GVL_IHM.WinchM2.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
+GVL_IHM.WinchM1.BypassSlackCable            := GVL_DEBUG.DBG_SlackCableSwitch_TEST;
+GVL_IHM.WinchM2.BypassSlackCable            := GVL_DEBUG.DBG_SlackCableSwitch_TEST;
+GVL_IHM.WinchM1.BypassTopPositionSensor     := GVL_DEBUG.DBG_TopPositionSensorBypass_TEST;
+GVL_IHM.WinchM2.BypassTopPositionSensor     := GVL_DEBUG.DBG_TopPositionSensorBypass_TEST;
+
+// --- 4. COPIE DES STATUTS TREUIL M1 VERS GVL_IHM ---
+GVL_IHM.WinchM1.PositionM                   := instEncoderScaleM1.CablePosM;
+GVL_IHM.WinchM1.SpeedRefPct                 := instWinchM1.SpeedRamp.Current;
+GVL_IHM.WinchM1.StepNumber                  := instWinchM1.StepNumber;
+GVL_IHM.WinchM1.FBState                     := instWinchM1.State;
+GVL_IHM.WinchM1.Ready                       := instWinchM1.Ready;
+GVL_IHM.WinchM1.Busy                        := instWinchM1.Busy;
+GVL_IHM.WinchM1.Done                        := instWinchM1.Done;
+GVL_IHM.WinchM1.Error                       := instWinchM1.Error;
+GVL_IHM.WinchM1.ErrorId                     := instWinchM1.ErrorId;
+GVL_IHM.WinchM1.RelayFwd                    := instWinchM1.RelayFwd;
+GVL_IHM.WinchM1.RelayRev                    := instWinchM1.RelayRev;
+GVL_IHM.WinchM1.Contactor1                  := instWinchM1.Contactor1;
+GVL_IHM.WinchM1.Contactor2                  := instWinchM1.Contactor2;
+GVL_IHM.WinchM1.Contactor3                  := instWinchM1.Contactor3;
+GVL_IHM.WinchM1.Contactor4                  := instWinchM1.Contactor4;
+GVL_IHM.WinchM1.BrakeCmd                    := instWinchM1.BrakeCmd;
+GVL_IHM.WinchM1.Homed                       := instHomingM1.Homed;
+GVL_IHM.WinchM1.SafeStopActive              := instSafetyWinchM1.SafeStop;
+GVL_IHM.WinchM1.ForbidDescentActive         := instSafetyWinchM1.ForbidDescent;
+GVL_IHM.WinchM1.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
+GVL_IHM.WinchM1.ThermalFault                := GVL_IN.M1ThermalFeedback;
+GVL_IHM.WinchM1.EncoderFault                := NOT instEncoderAbsM1.EncoderAvailable OR instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.WinchM1.FwdContactorCheck           := instWinchM1.FwdContactorCheck;
+GVL_IHM.WinchM1.RevContactorCheck           := instWinchM1.RevContactorCheck;
+GVL_IHM.WinchM1.BrakeContactorCheck         := instWinchM1.BrakeContactorCheck;
+
+// --- 5. COPIE DES STATUTS TREUIL M2 VERS GVL_IHM ---
+GVL_IHM.WinchM2.PositionM                   := instEncoderScaleM2.CablePosM;
+GVL_IHM.WinchM2.SpeedRefPct                 := instWinchM2.SpeedRamp.Current;
+GVL_IHM.WinchM2.StepNumber                  := instWinchM2.StepNumber;
+GVL_IHM.WinchM2.FBState                     := instWinchM2.State;
+GVL_IHM.WinchM2.Ready                       := instWinchM2.Ready;
+GVL_IHM.WinchM2.Busy                        := instWinchM2.Busy;
+GVL_IHM.WinchM2.Done                        := instWinchM2.Done;
+GVL_IHM.WinchM2.Error                       := instWinchM2.Error;
+GVL_IHM.WinchM2.ErrorId                     := instWinchM2.ErrorId;
+GVL_IHM.WinchM2.RelayFwd                    := instWinchM2.RelayFwd;
+GVL_IHM.WinchM2.RelayRev                    := instWinchM2.RelayRev;
+GVL_IHM.WinchM2.Contactor1                  := instWinchM2.Contactor1;
+GVL_IHM.WinchM2.Contactor2                  := instWinchM2.Contactor2;
+GVL_IHM.WinchM2.Contactor3                  := instWinchM2.Contactor3;
+GVL_IHM.WinchM2.Contactor4                  := instWinchM2.Contactor4;
+GVL_IHM.WinchM2.BrakeCmd                    := instWinchM2.BrakeCmd;
+GVL_IHM.WinchM2.Homed                       := instHomingM2.Homed;
+GVL_IHM.WinchM2.SafeStopActive              := instSafetyWinchM2.SafeStop;
+GVL_IHM.WinchM2.ForbidDescentActive         := instSafetyWinchM2.ForbidDescent;
+GVL_IHM.WinchM2.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
+GVL_IHM.WinchM2.ThermalFault                := GVL_IN.M2ThermalFeedback;
+GVL_IHM.WinchM2.EncoderFault                := NOT instEncoderAbsM2.EncoderAvailable OR instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.WinchM2.FwdContactorCheck           := instWinchM2.FwdContactorCheck;
+GVL_IHM.WinchM2.RevContactorCheck           := instWinchM2.RevContactorCheck;
+GVL_IHM.WinchM2.BrakeContactorCheck         := instWinchM2.BrakeContactorCheck;
+
+// --- 6. COPIE DES STATUTS GRAPPIN VERS GVL_IHM ---
+GVL_IHM.Grappin.FBState                     := instGrappin.State;
+GVL_IHM.Grappin.ActiveOffsetM               := instGrappin.ActiveOffsetM;
+GVL_IHM.Grappin.M2StartStop                 := instGrappin.M2_StartStop;
+GVL_IHM.Grappin.M2Direction                 := instGrappin.M2_Direction;
+GVL_IHM.Grappin.M2ForceSlowSpeed            := instGrappin.M2_ForceSlowSpeed;
+GVL_IHM.Grappin.Ready                       := instGrappin.Ready;
+GVL_IHM.Grappin.Busy                        := instGrappin.Busy;
+GVL_IHM.Grappin.Done                        := instGrappin.Done;
+GVL_IHM.Grappin.Error                       := instGrappin.Error;
+GVL_IHM.Grappin.ErrorId                     := instGrappin.ErrorId;
+GVL_IHM.Grappin.State                       := GrappinState;
+
+// --- 7. COPIE DES STATUTS SYNCHRO VERS GVL_IHM ---
+GVL_IHM.Sync.DeltaPosM                      := instWinchSync.DeltaPosM;
+GVL_IHM.Sync.SyncActive                     := instWinchSync.SyncActive;
+GVL_IHM.Sync.SyncWarn                       := instWinchSync.SyncWarn;
+GVL_IHM.Sync.Ready                          := instWinchSync.Ready;
+GVL_IHM.Sync.Error                          := instWinchSync.Error;
+GVL_IHM.Sync.ErrorId                        := instWinchSync.ErrorId;
+GVL_IHM.Sync.State                          := instWinchSync.State;
 
 (* ═══════════════════════════════════════════════════════════════
    📤 7. GVL_OUTPUTS + FB_OUTPUTSMACHINE — conditionnement SORTIES réelles (tard)
