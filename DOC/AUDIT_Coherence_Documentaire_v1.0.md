@@ -731,3 +731,31 @@ de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
 ### Fichiers impactés (2026-07-03duovicies, partie 2)
 - **DOC/** : `NAMING_CONVENTION.md` (3ᵉ famille + avertissement forçage), AUDIT (ce §31).
 - **CODE/** : aucun — le bug n'était pas dans le code, uniquement un Force runtime côté utilisateur.
+
+---
+
+## 🚀 32. Prise en compte du bypass contacteur dans le retour frein FB_Brake (2026-07-03trivicies)
+
+**Contexte** : Sur banc de test, bien que `DBG_ContactorFeedbackBypass_TEST` soit à TRUE pour contourner les contrôles contacteurs de direction dans `FB_Winch`, `FB_Brake` n'intégrait pas ce bypass. Faute de retour frein physique, `FB_Brake` levait un défaut (ErrorId=1) après 1.4s, verrouillant les sorties relais.
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D78 | **Bypass diagnostic frein dans `FB_Brake`** | `FB_Brake.st` intègre désormais la vérification de `GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST` dans son diagnostic de retour. Si actif, le défaut de retour de frein (bit 0) est forcé à 0 et les erreurs de collage/non-collage sont effacées, évitant le verrouillage des sorties treuil/chariot sur banc. |
+
+### Fichiers impactés (2026-07-03trivicies)
+- **CODE/** : `FB_Brake.st` (intégration du bypass dans l'étape 4).
+- **DOC/** : `AUDIT_Coherence_Documentaire_v1.0.md` (ce §32).
+
+---
+
+## 🚀 33. Revue de cohérence et correctifs de la fonction Grappin (2026-07-03quadravicies)
+
+**Contexte** : Suite à un audit approfondi de la fonction Grappin, deux points d'amélioration ont été identifiés et résolus : (1) Une faille de sécurité dans `FB_Grappin` permettait d'acquitter le défaut d'incohérence mécanique de démarrage sans recalage réel, et (2) Plusieurs variables de configuration et d'état contenaient des tirets du bas, enfreignant `NAMING_CONVENTION.md`.
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D79 | **Sécurisation du Reset Grappin, PascalCase & Correction de Compilation** | 1. Suppression du forçage de `GrappinState.StateIncoherent` à FALSE dans le bloc Reset de `FB_Grappin.st` (le recalage reste obligatoire). <br> 2. Suppression de tous les tirets du bas dans les variables de `ST_GrappinConfig.st` et `ST_GrappinState.st` pour respecter strictement la convention de nommage. <br> 3. Passage de `GrappinState` en `VAR_IN_OUT` pour résoudre l'erreur CODESYS C0037 (écriture sur variable de sortie non autorisée). |
+
+### Fichiers impactés (2026-07-03quadravicies)
+- **CODE/** : `FB_Grappin.st`, `ST_GrappinConfig.st`, `ST_GrappinState.st`, `PRG_MAIN.st`.
+- **DOC/** : `AF_Partie12_Fonction_Grappin_v1.0.md` (mise à jour des interfaces documentées), `AUDIT_Coherence_Documentaire_v1.0.md` (ce §33).

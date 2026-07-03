@@ -47155,7 +47155,7 @@
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
-        <Single Name="Name" Type="string">TREUIL</Single>
+        <Single Name="Name" Type="string">TREUIL_GRAPPIN</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
           <Entry>
             <Key>
@@ -47179,7 +47179,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639185109007296371</Single>
+        <Single Name="Timestamp" Type="long">639186891904488306</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -96489,6 +96489,70 @@ END_TYPE</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">a6dd12d7-3376-4e14-88fc-f40ecc746ee0</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_GrappinConfig</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186892382446173</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   ⚙️ ST_GrappinConfig — Configuration des offsets du grappin
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.0.md §4.A
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_GrappinConfig :
+STRUCT
+    OffsetOpenM     : REAL;    (* Écart M1/M2 en mètres grappin ouvert *)
+    OffsetCloseM    : REAL;    (* Écart M1/M2 en mètres grappin fermé *)
+    CoherenceLimitM : REAL;    (* Seuil de détection d'incohérence au boot *)
+END_STRUCT
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">a6dd12d7-3376-4e14-88fc-f40ecc746ee0_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">18</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d8c0b031-3e65-4beb-8d26-f8feb928fd4d</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">SYSTEM</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">b44e3955-af6a-4793-a9ad-8af51466bf03</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">GVL</Single>
@@ -97591,7 +97655,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186813200470691</Single>
+        <Single Name="Timestamp" Type="long">639186892091334455</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -97872,7 +97936,7 @@ EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;   // 📤
    ═══════════════════════════════════════════════════════════════ *)
 
 instWinchSync(
-    Enable          := NOT instModes.OverrideSync,
+    Enable          := NOT instModes.OverrideSync AND NOT instGrappin.Busy,
     Reset           := MachineReset_IHM,
 
     EmergencyStopOk := GVL_IN.EmergencyStopOk,
@@ -97882,7 +97946,8 @@ instWinchSync(
     HomedM1         := instHomingM1.Homed,
     HomedM2         := instHomingM2.Homed,
     OverrideSync    := instModes.OverrideSync,
-    SyncToleranceM  := WinchSyncToleranceM
+    SyncToleranceM  := WinchSyncToleranceM,
+    ActiveOffsetM   := instGrappin.ActiveOffsetM
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -97903,8 +97968,8 @@ instSafetyWinchM1(
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
-    ThermalFeedback     := GVL_IN.M1ThermalFeedback,
-    SlackCableDetected  := GVL_IN.SlackCableSwitch,
+    ThermalFeedback     := NOT GVL_IN.M1ThermalFeedback,
+    SlackCableDetected  := NOT GVL_IN.SlackCableSwitch,
     PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );
 
@@ -97918,8 +97983,8 @@ instSafetyWinchM2(
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
-    ThermalFeedback     := GVL_IN.M2ThermalFeedback,
-    SlackCableDetected  := GVL_IN.SlackCableSwitch,
+    ThermalFeedback     := NOT GVL_IN.M2ThermalFeedback,
+    SlackCableDetected  := NOT GVL_IN.SlackCableSwitch,
     PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );
 
@@ -97935,6 +98000,50 @@ instSafetyWinchM2(
       désormais réel, câblé en I/O Mapping (`_DI`/`_DQ`/`_RQ`, voir §0 et §7bis).
    ═══════════════════════════════════════════════════════════════ *)
 
+// 🪣 Restauration de l'état persistant dans l'instance
+instGrappin.GrappinState := GrappinState;
+
+// 🪣 Appel du bloc Grappin (entre l'acquisition codeurs/joystick et les winches)
+instGrappin(
+    Enable              := TRUE,
+    Reset               := MachineReset_IHM,
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
+    Mode                := instModes.Mode,
+    CmdOpen_IHM         := GrappinCmdOpen_IHM,
+    CmdClose_IHM        := GrappinCmdClose_IHM,
+    JoystickY_StartStop := FB_Joystick_0.AxisCmdY.StartStop,
+    JoystickY_Direction := FB_Joystick_0.AxisCmdY.Direction,
+    CablePosM1          := instEncoderScaleM1.CablePosM,
+    CablePosM2          := instEncoderScaleM2.CablePosM,
+    Config              := GrappinConfig
+);
+
+// 🪣 Sauvegarde de l'état persistant
+GrappinState := instGrappin.GrappinState;
+
+// Arbitrage des consignes de M2 (Grappin vs Mouvement Synchrone)
+IF instGrappin.Busy THEN
+    M2_StartStop_Active := instGrappin.M2_StartStop;
+    M2_Direction_Active := instGrappin.M2_Direction;
+    M2_SpeedRef_Active  := 15.0; // Vitesse lente grappin
+ELSE
+    M2_StartStop_Active := FB_Joystick_0.AxisCmdY.StartStop;
+    M2_Direction_Active := FB_Joystick_0.AxisCmdY.Direction;
+    M2_SpeedRef_Active  := FB_Joystick_0.AxisCmdY.SpeedRef;
+END_IF;
+
+// Construction de la table de paliers active de M2 (force tous les contacteurs à FALSE si ForceSlowSpeed)
+IF instGrappin.M2_ForceSlowSpeed THEN
+    M2_SpeedStepTableActive.P1R1 := FALSE; M2_SpeedStepTableActive.P1R2 := FALSE; M2_SpeedStepTableActive.P1R3 := FALSE; M2_SpeedStepTableActive.P1R4 := FALSE;
+    M2_SpeedStepTableActive.P2R1 := FALSE; M2_SpeedStepTableActive.P2R2 := FALSE; M2_SpeedStepTableActive.P2R3 := FALSE; M2_SpeedStepTableActive.P2R4 := FALSE;
+    M2_SpeedStepTableActive.P3R1 := FALSE; M2_SpeedStepTableActive.P3R2 := FALSE; M2_SpeedStepTableActive.P3R3 := FALSE; M2_SpeedStepTableActive.P3R4 := FALSE;
+    M2_SpeedStepTableActive.P4R1 := FALSE; M2_SpeedStepTableActive.P4R2 := FALSE; M2_SpeedStepTableActive.P4R3 := FALSE; M2_SpeedStepTableActive.P4R4 := FALSE;
+    M2_SpeedStepTableActive.P5R1 := FALSE; M2_SpeedStepTableActive.P5R2 := FALSE; M2_SpeedStepTableActive.P5R3 := FALSE; M2_SpeedStepTableActive.P5R4 := FALSE;
+    M2_SpeedStepTableActive.StepThreshold_Pct := M2_SpeedStepTable.StepThreshold_Pct;
+ELSE
+    M2_SpeedStepTableActive := M2_SpeedStepTable;
+END_IF;
+
 instWinchM1(
     Enable                  := StubMachineEnableN1,           // ⚠️ Stub Maint N1 — à remplacer par FB_Modes
     Reset                   := MachineReset_IHM,
@@ -97942,7 +98051,7 @@ instWinchM1(
     EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
-    StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
+    StartStop               := FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy, // Bloqué pendant le mouvement grappin
     SafeStop                := instSafetyWinchM1.SafeStop,
     ForbidDescent           := instSafetyWinchM1.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
@@ -97960,12 +98069,12 @@ instWinchM2(
     EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
-    StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
+    StartStop               := M2_StartStop_Active,           // Arbitré grappin
     SafeStop                := instSafetyWinchM2.SafeStop,
     ForbidDescent           := instSafetyWinchM2.ForbidDescent,  // 🆕 Mou de câble — masque UNIQUEMENT RelayRev
-    Direction               := FB_Joystick_0.AxisCmdY.Direction,   // ⚠️ Même consigne que M1
-    SpeedRefPct             := FB_Joystick_0.AxisCmdY.SpeedRef,    // ⚠️ Même consigne que M1
-    SpeedStepTable          := M2_SpeedStepTable,
+    Direction               := M2_Direction_Active,           // Arbitré grappin
+    SpeedRefPct             := M2_SpeedRef_Active,            // Arbitré grappin
+    SpeedStepTable          := M2_SpeedStepTableActive,       // Arbitrée grappin (sans contacteurs si vitesse lente forcée)
     ContactorFeedbackFwd    := GVL_IN.M2ContactorFeedbackFwd,
     ContactorFeedbackRev    := GVL_IN.M2ContactorFeedbackRev,
     BrakeFeedback           := GVL_IN.M2BrakeFeedback
@@ -98117,7 +98226,13 @@ PowerCutOff_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
       `FB_Safety_Chariot` (pas directement sur `EmergencyStopOk`, cf D71 — cohérent avec
       le principe « safety centralise les capteurs, le métier consomme SafeStop »). Nom/
       polarité (TRUE=OK) ASSUMÉS sans confirmation utilisateur — à vérifier.
-   📚 Historique complet des décisions (D1-D71, dont renommage I/O `_DI`/`_DQ`/
+   🔧 CORRECTIF (2026-07-03unvicies, retour terrain, AUDIT D74 — SUPERSEDÉ D75) : blocage
+      `SafeStop` diagnostiqué en direct (`GVL_IN.PhaseRotationOk` jamais écrit tant que
+      `CtrlPhaseRotation_DI` n'existe pas côté device → démarrait `FALSE`, défaut IEC 61131-3).
+      Fix final retenu : `GVL_DEBUG.DBG_CtrlPhaseRotation_Bypass_TEST` (créé par l'utilisateur,
+      OR'é sur le signal brut dans `FB_InputsMachine`, même pattern qu'`EmergencyStopOk`/
+      `TopPositionSensor`) — pas d'init `:= TRUE` sur `GVL_IN.PhaseRotationOk` (retirée, D75).
+   📚 Historique complet des décisions (D1-D75, dont renommage I/O `_DI`/`_DQ`/
       `_RQ`, retours frein réels, `GVL_IN`/`GVL_OUT`) :
       DOC/AUDIT_Coherence_Documentaire_v1.0.md
    ═══════════════════════════════════════════════════════════════ *)
@@ -98187,6 +98302,15 @@ VAR
     // 🎚️ Stub Maintenance N1 pour ce lot (Enable, PAS le Mode — voir instModes ci-dessus)
     // — à remplacer par une vraie arbitrage FB_Modes quand FB_Cycle existera
     StubMachineEnableN1 : BOOL := TRUE;
+
+    // 🪣 GRAPPIN
+    instGrappin             : FB_Grappin;
+    GrappinCmdOpen_IHM      : BOOL;             // 🖥️ Commande d'ouverture IHM (bouton)
+    GrappinCmdClose_IHM     : BOOL;             // 🖥️ Commande de fermeture IHM (bouton)
+    M2_StartStop_Active     : BOOL;             // Consigne StartStop arbitrée pour M2
+    M2_Direction_Active     : INT;              // Consigne Direction arbitrée pour M2
+    M2_SpeedRef_Active      : REAL;             // Consigne SpeedRef arbitrée pour M2
+    M2_SpeedStepTableActive : ST_SpeedStepTable; // Table de paliers active de M2
 END_VAR
 
 // ⚠️ CORRECTIF (2026-07-02) : les tables paliers étaient déclarées en VAR simple malgré le
@@ -98221,11 +98345,21 @@ VAR RETAIN
     // ⚖️ Tolérance écart M1/M2 (FB_WinchSync) — réglable sans recompiler, ajuster selon jeu
     // mécanique réel observé sur site (Partie9 §9).
     WinchSyncToleranceM : REAL := 0.10;
+
+    // 🪣 Configuration persistante du grappin
+    GrappinConfig : ST_GrappinConfig := (
+        OffsetOpenM := 0.0,
+        OffsetCloseM := -1.5,
+        CoherenceLimitM := 0.05
+    );
+
+    // 🪣 État persistant mémorisé du grappin
+    GrappinState : ST_GrappinState;
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">16333</Single>
+        <Single Name="UniqueIdGenerator" Type="string">17180</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -98470,7 +98604,7 @@ END_TYPE
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -98540,7 +98674,73 @@ END_TYPE
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">b77ff04e-60b2-448d-9cee-07e9506dd2cf</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">ST_GrappinState</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">2db5746d-d284-4425-9f7f-2663a34b0ebc</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186892631965108</Single>
+      </Single>
+      <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_GrappinState — État mémorisé et diagnostic du grappin
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.0.md §4.B
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_GrappinState :
+STRUCT
+    IsOpen          : BOOL;    (* TRUE = Grappin ouvert mémorisé *)
+    IsClosed        : BOOL;    (* TRUE = Grappin fermé mémorisé *)
+    LastPosM2Open   : REAL;    (* Dernière position M2 mémorisée ouvert *)
+    LastPosM2Close  : REAL;    (* Dernière position M2 mémorisée fermé *)
+    StateIncoherent : BOOL;    (* État non sûr (divergence boot/réel) *)
+END_STRUCT
+END_TYPE
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">b77ff04e-60b2-448d-9cee-07e9506dd2cf_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">20</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -98639,7 +98839,7 @@ END_TYPE
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -98718,7 +98918,7 @@ END_VAR
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -98798,7 +98998,316 @@ END_VAR
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">59da5cf6-55f4-401f-9438-8dcb10363fb1</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Grappin</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639186891719279942</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">
+
+// 🛑 1. GATE DE SÉCURITÉ
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
+    M2_StartStop := FALSE;
+    M2_Direction := 0;
+    M2_ForceSlowSpeed := FALSE;
+    State := E_State.DISABLED;
+    // Les requêtes internes sont réinitialisées
+    CloseReq := FALSE;
+    OpenReq := FALSE;
+    RETURN;
+END_IF;
+
+// 🟢 ÉTAT INITIAL READY SI DISABLED PRÉCÉDEMMENT
+IF State = E_State.DISABLED THEN
+    State := E_State.READY;
+END_IF;
+
+// 🔑 2. GESTION DU RESET (FRONT MONTANT)
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
+END_IF;
+
+// 📏 3. DÉTECTION D'INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
+IF FirstCycle THEN
+    FirstCycle := FALSE;
+    IF Config.CoherenceLimitM &gt; 0.01 THEN
+        IF GrappinState.IsOpen AND NOT GrappinState.IsClosed THEN
+            IF ABS(CablePosM2 - GrappinState.LastPosM2Open) &gt; Config.CoherenceLimitM THEN
+                GrappinState.StateIncoherent := TRUE;
+            END_IF;
+        ELSIF GrappinState.IsClosed AND NOT GrappinState.IsOpen THEN
+            IF ABS(CablePosM2 - GrappinState.LastPosM2Close) &gt; Config.CoherenceLimitM THEN
+                GrappinState.StateIncoherent := TRUE;
+            END_IF;
+        ELSE
+            // Si l'état n'a jamais été initialisé (les deux FALSE/TRUE), on signale une incohérence
+            GrappinState.StateIncoherent := TRUE;
+        END_IF;
+    ELSE
+        // Limite non configurée ou invalide, par précaution on force l'incohérence
+        GrappinState.StateIncoherent := TRUE;
+    END_IF;
+END_IF;
+
+// Met à jour le bit1 d'erreur si incohérence détectée
+IF GrappinState.StateIncoherent THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSE
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
+
+// 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
+// On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
+MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
+IF ABS(CablePosM1 - CablePosM2) &gt; MaxAllowedOffset THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
+
+// ⏲️ 5. SURVEILLANCE TIMEOUT MOUVEMENT (bit 0)
+// Déclenche si le mouvement actif (M2_StartStop = TRUE) dure plus longtemps que le timeout
+TonTimeout(IN := (State = E_State.BUSY AND M2_StartStop), PT := TimeoutDuration);
+IF TonTimeout.Q THEN
+    ErrorId := ErrorId OR 16#0001;
+END_IF;
+
+// ❌ Évaluation des erreurs graves (Timeout ou Limites dépassées)
+SevereError := (ErrorId AND 16#0005) &lt;&gt; 16#0000;
+
+IF SevereError THEN
+    M2_StartStop := FALSE;
+    M2_Direction := 0;
+    M2_ForceSlowSpeed := FALSE;
+    CloseReq := FALSE;
+    OpenReq := FALSE;
+    // On repasse en READY et attend un Reset
+    State := E_State.READY;
+END_IF;
+
+// 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
+CASE State OF
+    E_State.READY:
+        Ready := TRUE;
+        Busy := FALSE;
+        Done := FALSE;
+        M2_StartStop := FALSE;
+        M2_Direction := 0;
+        M2_ForceSlowSpeed := FALSE;
+
+        // Mémorisation des requêtes IHM (l'une annule l'autre)
+        IF CmdClose_IHM AND NOT SevereError THEN
+            CloseReq := TRUE;
+            OpenReq := FALSE;
+        ELSIF CmdOpen_IHM AND NOT SevereError THEN
+            OpenReq := TRUE;
+            CloseReq := FALSE;
+        END_IF;
+
+        // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
+        IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
+            State := E_State.BUSY;
+        ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
+            State := E_State.BUSY;
+        END_IF;
+
+    E_State.BUSY:
+        Ready := TRUE;
+        Busy := TRUE;
+        Done := FALSE;
+        M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
+
+        // Interlock Homme-mort joystick
+        IF NOT JoystickY_StartStop THEN
+            // Si relâchement du joystick, arrêt temporaire du mouvement
+            M2_StartStop := FALSE;
+            M2_Direction := 0;
+        ELSIF CloseReq AND (JoystickY_Direction = -1) THEN
+            // Fermeture en cours : M2 descend
+            M2_StartStop := TRUE;
+            M2_Direction := -1;
+        ELSIF OpenReq AND (JoystickY_Direction = 1) THEN
+            // Ouverture en cours : M2 monte
+            M2_StartStop := TRUE;
+            M2_Direction := 1;
+        ELSE
+            // Joystick poussé dans la mauvaise direction pour la requête active : arrêt
+            M2_StartStop := FALSE;
+            M2_Direction := 0;
+        END_IF;
+
+        // Condition d'arrêt automatique de la fermeture
+        IF CloseReq THEN
+            // Cible atteinte : M2 est descendu assez bas (CablePosM2 décroissant)
+            IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetCloseM) THEN
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+                
+                // Mémorisation de l'état physique fermé
+                GrappinState.IsOpen := FALSE;
+                GrappinState.IsClosed := TRUE;
+                GrappinState.LastPosM2Close := CablePosM2;
+                GrappinState.StateIncoherent := FALSE; // recalage réussi
+                
+                CloseReq := FALSE;
+                State := E_State.DONE;
+            END_IF;
+        END_IF;
+
+        // Condition d'arrêt automatique de l'ouverture
+        IF OpenReq THEN
+            // Cible atteinte : M2 est remonté assez haut (CablePosM2 croissant)
+            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetOpenM) THEN
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+                
+                // Mémorisation de l'état physique ouvert
+                GrappinState.IsOpen := TRUE;
+                GrappinState.IsClosed := FALSE;
+                GrappinState.LastPosM2Open := CablePosM2;
+                GrappinState.StateIncoherent := FALSE; // recalage réussi
+                
+                OpenReq := FALSE;
+                State := E_State.DONE;
+            END_IF;
+        END_IF;
+
+    E_State.DONE:
+        Ready := TRUE;
+        Busy := FALSE;
+        Done := TRUE;
+        M2_StartStop := FALSE;
+        M2_Direction := 0;
+        M2_ForceSlowSpeed := FALSE;
+
+        // Attente du relâchement de la validation joystick pour repasser à READY
+        IF NOT JoystickY_StartStop THEN
+            State := E_State.READY;
+        END_IF;
+END_CASE;
+
+// 📤 7. GESTION DES SORTIES D'ÉTAT GLOBALES
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+// Détermination de l'offset actif pour le synchronisme de FB_WinchSync
+IF GrappinState.IsClosed THEN
+    ActiveOffsetM := Config.OffsetCloseM;
+ELSE
+    // Par défaut ou si ouvert, on applique l'offset ouvert
+    ActiveOffsetM := Config.OffsetOpenM;
+END_IF;
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">59da5cf6-55f4-401f-9438-8dcb10363fb1_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">FB_Grappin(* ═══════════════════════════════════════════════════════════════
+   🪣 FB_Grappin — Commande d'ouverture/fermeture du grappin
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.0.md
+   🔌 Conforme au contrat FB standard (Partie3 §1bis).
+   ═══════════════════════════════════════════════════════════════ *)
+
+FUNCTION_BLOCK PUBLIC FB_Grappin
+VAR_INPUT
+    Enable              : BOOL;             // Activation générale
+    Reset               : BOOL;             // Acquittement défauts (front)
+    EmergencyStopOk     : BOOL;             // Condition d'arrêt d'urgence
+    Mode                : E_Mode;           // Mode de marche machine
+    CmdOpen_IHM         : BOOL;             // Demande d'ouverture depuis l'IHM
+    CmdClose_IHM        : BOOL;             // Demande de fermeture depuis l'IHM
+    JoystickY_StartStop : BOOL;             // Homme-mort joystick (AxisCmdY.StartStop)
+    JoystickY_Direction : INT;              // Sens joystick (AxisCmdY.Direction : 1=montée, -1=descente)
+    CablePosM1          : REAL;             // Position réelle câble treuil M1 (mètres)
+    CablePosM2          : REAL;             // Position réelle câble treuil M2 (mètres)
+    Config              : ST_GrappinConfig; // Configuration (RETAIN site)
+    TimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
+END_VAR
+VAR_OUTPUT
+    Ready               : BOOL;             // FB prêt à fonctionner
+    Busy                : BOOL;             // Mouvement en cours
+    Done                : BOOL;             // Mouvement terminé avec succès
+    Error               : BOOL;             // Présence d'un défaut
+    ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées
+    State               : E_State;          // État opérationnel du FB
+    StateAtError        : E_State;          // État lors de l'apparition de l'erreur
+    GrappinState        : ST_GrappinState;  // État physique du grappin mémorisé (RETAIN)
+    ActiveOffsetM       : REAL;             // Décalage cible à injecter dans FB_WinchSync
+    M2_StartStop        : BOOL;             // Sortie consigne StartStop vers Winch M2
+    M2_Direction        : INT;              // Sortie consigne Direction vers Winch M2
+    M2_ForceSlowSpeed   : BOOL;             // TRUE = Bloque les contacteurs de vitesse de M2
+END_VAR
+VAR
+    FirstCycle          : BOOL := TRUE;     // Drapeau de premier cycle API
+    ResetEdge           : R_TRIG;           // Détecteur de front montant Reset
+    ErrorEdge           : R_TRIG;           // Détecteur de front montant Error
+    TonTimeout          : TON;              // Temporisateur de timeout de mouvement
+    CloseReq            : BOOL;             // Demande de fermeture mémorisée
+    OpenReq             : BOOL;             // Demande d'ouverture mémorisée
+    SevereError         : BOOL;             // Erreur grave nécessitant l'arrêt
+    MaxAllowedOffset    : REAL;             // Offset max calculé dynamiquement
+END_VAR
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">59da5cf6-55f4-401f-9438-8dcb10363fb1_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">300</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">519e2aee-b852-42a4-9971-4f126e899014</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -99029,7 +99538,7 @@ END_VAR</Single>
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -99187,7 +99696,7 @@ END_VAR</Single>
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -99223,7 +99732,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186807178927362</Single>
+        <Single Name="Timestamp" Type="long">639186828878907952</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -99506,7 +100015,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">fe1e6af7-da18-4559-8d7e-415a962a53ee_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">2769</Single>
+        <Single Name="UniqueIdGenerator" Type="string">3427</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -99516,7 +100025,7 @@ END_VAR</Single>
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -99552,13 +100061,14 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186737685938719</Single>
+        <Single Name="Timestamp" Type="long">639186891601184978</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
+
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
 // 🛑 1. GATE
@@ -99589,7 +100099,7 @@ END_CASE;
 
 // 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
 IF HomedM1 AND HomedM2 THEN
-    DeltaPosM := ABS(CablePosM1 - CablePosM2);
+    DeltaPosM := ABS(CablePosM1 - CablePosM2 + ActiveOffsetM);
 ELSE
     DeltaPosM := 0.0;
 END_IF;
@@ -99652,6 +100162,7 @@ VAR_INPUT
     HomedM2         : BOOL;        // Sortie FB_Encoder_Homing M2
     OverrideSync    : BOOL;        // Sortie FB_Modes (actionnable UNIQUEMENT MAINT_N2)
     SyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
+    ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: grappin fermé/ouvert)
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;
@@ -99668,12 +100179,11 @@ END_VAR
 VAR
     ResetEdge       : R_TRIG;
     ErrorEdge       : R_TRIG;
-END_VAR
-</Single>
+END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">b5ca6c83-94ac-4d81-b268-1bb24a0ea30e_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">166</Single>
+        <Single Name="UniqueIdGenerator" Type="string">324</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -99683,7 +100193,7 @@ END_VAR
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
         <Single Type="string">Application</Single>
-        <Single Type="string">TREUIL</Single>
+        <Single Type="string">TREUIL_GRAPPIN</Single>
       </Array>
       <Single Name="Index" Type="int">-1</Single>
     </Single>
@@ -99719,13 +100229,14 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186254755479462</Single>
+        <Single Name="Timestamp" Type="long">639186893042413554</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
+
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Brake) ===
 
 // 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
@@ -99774,14 +100285,20 @@ ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
 TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
-IF TonFeedback.Q THEN
-    ContactorCheck.StuckClosed := (NOT BrakeCmd AND ContactorFeedback);  // commandé collé mais retour "relâché"
-    ContactorCheck.StuckOpen   := (BrakeCmd AND NOT ContactorFeedback);  // commandé relâché mais retour "collé"
-    ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
+IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    IF TonFeedback.Q THEN
+        ContactorCheck.StuckClosed := (NOT BrakeCmd AND ContactorFeedback);  // commandé collé mais retour "relâché"
+        ContactorCheck.StuckOpen   := (BrakeCmd AND NOT ContactorFeedback);  // commandé relâché mais retour "collé"
+        ErrorId := ErrorId OR 16#0001;
+    ELSIF ResetEdge.Q THEN
+        ContactorCheck.StuckClosed := FALSE;
+        ContactorCheck.StuckOpen   := FALSE;
+        ErrorId := ErrorId AND 16#FFFE;
+    END_IF;
+ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
-    ErrorId := ErrorId AND 16#FFFE;
+    ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
 END_IF;
 
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
@@ -99807,7 +100324,7 @@ END_IF;
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
-                   (règles issues de DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md §4)
+                   (règles issues de DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
    📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
@@ -99849,12 +100366,11 @@ VAR
     TonMagnetise        : TON;           // Temporisation avant relâche
     TonDecel            : TON;           // Temporisation avant collage
     TonFeedback         : TON;           // Timeout cohérence commande/retour
-END_VAR
-</Single>
+END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">8e670160-d9b2-410f-8ef1-b7c38fc86279_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">496</Single>
+        <Single Name="UniqueIdGenerator" Type="string">1161</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>

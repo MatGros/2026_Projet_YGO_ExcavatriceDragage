@@ -94,14 +94,20 @@ ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
 TonFeedback(IN := (BrakeCmd <> ContactorFeedback), PT := FeedbackTimeout);
-IF TonFeedback.Q THEN
-    ContactorCheck.StuckClosed := (NOT BrakeCmd AND ContactorFeedback);  // commandé collé mais retour "relâché"
-    ContactorCheck.StuckOpen   := (BrakeCmd AND NOT ContactorFeedback);  // commandé relâché mais retour "collé"
-    ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
+IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    IF TonFeedback.Q THEN
+        ContactorCheck.StuckClosed := (NOT BrakeCmd AND ContactorFeedback);  // commandé collé mais retour "relâché"
+        ContactorCheck.StuckOpen   := (BrakeCmd AND NOT ContactorFeedback);  // commandé relâché mais retour "collé"
+        ErrorId := ErrorId OR 16#0001;
+    ELSIF ResetEdge.Q THEN
+        ContactorCheck.StuckClosed := FALSE;
+        ContactorCheck.StuckOpen   := FALSE;
+        ErrorId := ErrorId AND 16#FFFE;
+    END_IF;
+ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
-    ErrorId := ErrorId AND 16#FFFE;
+    ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
 END_IF;
 
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)

@@ -33,6 +33,7 @@ VAR_INPUT
     HomedM2         : BOOL;        // Sortie FB_Encoder_Homing M2
     OverrideSync    : BOOL;        // Sortie FB_Modes (actionnable UNIQUEMENT MAINT_N2)
     SyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
+    ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: grappin fermé/ouvert)
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;
@@ -81,7 +82,7 @@ END_CASE;
 
 // 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
 IF HomedM1 AND HomedM2 THEN
-    DeltaPosM := ABS(CablePosM1 - CablePosM2);
+    DeltaPosM := ABS(CablePosM1 - CablePosM2 + ActiveOffsetM);
 ELSE
     DeltaPosM := 0.0;
 END_IF;
