@@ -750,11 +750,10 @@ GVL_PERSISTENT.GrappinConfig             := GVL_IHM.Grappin.Config;
 GVL_Encoder_Stub.M1_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M;
 GVL_Encoder_Stub.M2_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M;
 
-// --- 3. GESTION DES BYPASSES BANC DE TEST (DEUX VOIES) ---
-GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST  := GVL_IHM.WinchM1.BypassContactorFeedback OR GVL_IHM.WinchM2.BypassContactorFeedback OR GVL_IHM.Chariot.BypassContactorFeedback;
-GVL_DEBUG.DBG_SlackCableSwitch_TEST         := GVL_IHM.WinchM1.BypassSlackCable OR GVL_IHM.WinchM2.BypassSlackCable;
-GVL_DEBUG.DBG_TopPositionSensorBypass_TEST   := GVL_IHM.WinchM1.BypassTopPositionSensor OR GVL_IHM.WinchM2.BypassTopPositionSensor;
-
+// --- 3. GESTION DES BYPASSES BANC DE TEST ---
+// ⚠️ SENS UNIQUE : GVL_DEBUG est le MAÎTRE (valeurs := TRUE au boot depuis GVL_DEBUG.st).
+// GVL_IHM.Bypass* sont des MIROIRS pour affichage IHM uniquement.
+// Ne PAS écrire GVL_DEBUG depuis GVL_IHM (écraserait l'initialisation := TRUE).
 GVL_IHM.WinchM1.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
 GVL_IHM.WinchM2.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
 GVL_IHM.Chariot.BypassContactorFeedback     := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
