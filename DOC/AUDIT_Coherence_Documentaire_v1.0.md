@@ -648,4 +648,86 @@ suffit (le Force prend le dessus sur l'écriture cyclique du programme).
 - **CODE/** : `GVL_DEBUG.st` (`DBG_ContactorFeedbackBypass_TEST`), `FB_Winch.st`/`FB_Chariot.st`
   (bypass appliqué autour des blocs StuckClosed/StuckOpen).
 - **DOC/** : AUDIT (ce §28).
-- **DOC/** : AUDIT (ce §26).
+
+---
+
+## 🚀 29. `GVL_IN.PhaseRotationOk` initialisé à TRUE — SafeStop bloqué à tort (2026-07-03unvicies)
+
+Diagnostic en direct avec l'utilisateur (`instWinchM1.SafeStop=TRUE`, `ForbidDescent=FALSE`,
+rampe/relais totalement bloqués malgré `StartStop`/`SpeedRefPct` corrects) : `FB_Safety_Winch`
+bit4 (`PhaseRotationOk`) levé en permanence, car `GVL_IN.PhaseRotationOk` n'a jamais été
+initialisé — un `BOOL` non initialisé démarre à `FALSE` (IEC 61131-3), et tant que
+`CtrlPhaseRotation_DI` n'existe pas en I/O Mapping, `FB_InputsMachine` n'écrit jamais cette
+variable. Résultat : `SafeStop` bloqué à `TRUE` en permanence sur M1/M2/Chariot sans aucun vrai
+défaut. Principe rappelé par l'utilisateur : **toute information de sécurité doit démarrer à
+l'état OK/nominal tant qu'elle n'est pas réellement câblée** (même logique que la polarité
+`SlackCableSwitch`, D72a).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D74 | **`GVL_IN.PhaseRotationOk : BOOL := TRUE`** | Initialisation ajoutée dans `GVL_IN.st`. Si `instCtrlPhaseRotation` (FB_InputsMachine) n'est pas encore appliqué/câblé chez l'utilisateur, la variable reste à `TRUE` (OK) au lieu de `FALSE` (défaut) — ne bloque plus `SafeStop`. Dès que le vrai DI sera câblé et que `FB_InputsMachine` écrira réellement cette variable chaque cycle, l'init n'a plus d'effet (écrasée par la vraie valeur). |
+
+⚠️ Nuance importante : cette init ne protège que le cas « variable jamais écrite ». Si
+`CtrlPhaseRotation_DI` existe déjà et que `FB_InputsMachine` l'écrit réellement, une vraie
+mauvaise rotation de phase désarmera bien `SafeStop` normalement (l'init ne masque pas un vrai
+défaut, seulement l'absence de câblage).
+
+### Fichiers impactés (2026-07-03unvicies)
+- **CODE/** : `GVL_IN.st` (init `PhaseRotationOk := TRUE`), `PRG_MAIN.st` (note header).
+- **DOC/** : AUDIT (ce §29).
+
+---
+
+## 🚀 30. Bypass dédiés `PhaseRotationOk`/`SlackCableSwitch` créés par l'utilisateur (2026-07-03duovicies)
+
+L'utilisateur avait déjà créé lui-même 2 bypass dans son `GVL_DEBUG` réel avant même que je
+propose l'init `:= TRUE` (D74) : `DBG_CtrlPhaseRotation_Bypass_TEST` et
+`DBG_SlackCableSwitch_TEST`. Préférence exprimée : garder le pattern OR-bypass uniforme
+(`EmergencyStopOk`/`TopPositionSensor`/`CtrlPhaseRotation`/`SlackCableSwitch`, tous OR'és sur le
+signal brut dans `FB_InputsMachine`) plutôt qu'une init `:= TRUE` isolée sur une seule variable.
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D75 | **`GVL_IN.PhaseRotationOk := TRUE` retiré** | D74 annulé/superседé. Retour à `PhaseRotationOk : BOOL;` simple (pas d'init), cohérent avec `EmergencyStopOk`/`TopPositionSensor` (aucun des deux n'a d'init `GVL_IN` non plus). |
+| D76 | **2 bypass utilisateur intégrés au code de référence** | `GVL_DEBUG.DBG_CtrlPhaseRotation_Bypass_TEST` et `DBG_SlackCableSwitch_TEST` ajoutés à `GVL_DEBUG.st`, câblés en OR sur le signal brut dans `FB_InputsMachine.st` (`CtrlPhaseRotation_DI OR ...`, `M1_M2_SlackCableSwitch_DI OR ...`) — même pattern que les bypass existants. |
+
+⚠️ **Note observée** (pas une action requise, juste un rappel) : dans le `GVL_DEBUG` réel de
+l'utilisateur au moment de cet échange, **tous les bypass sont à `TRUE`** (banc de test complet :
+homme-mort, contrôle contacteur, mou de câble, rotation de phase, AU, capteur position haute) —
+cohérent avec une phase d'essai sans aucun capteur/contacteur réel câblé. Rappel déjà documenté
+partout : TOUS remettre à `FALSE` avant tout essai avec un risque réel (charge, mouvement motorisé).
+
+### Fichiers impactés (2026-07-03duovicies)
+- **CODE/** : `GVL_IN.st` (retrait init), `GVL_DEBUG.st` (2 nouveaux bypass), `FB_InputsMachine.st`
+  (câblage OR sur `SlackCableSwitch`/`CtrlPhaseRotation`), `PRG_MAIN.st` (note header).
+- **DOC/** : AUDIT (ce §30).
+
+---
+
+## 🚀 31. Incident diagnostic — `instWinchM1.SafeStop` forcé manuellement à TRUE (2026-07-03duovicies)
+
+Séance de mise en service en direct : mouvement M1 totalement bloqué (`RampTargetPct`/
+`SpeedRamp.Current` restaient à 0 malgré `StartStop`/`SpeedRefPct` corrects). Diagnostic pas à pas
+(`EffectiveSafeStop`→`SafeStop`→`ForbidDescent`→câblage `PRG_MAIN.st` vérifié ligne par ligne,
+identique à la référence) a fini par révéler la cause : `instSafetyWinchM1.SafeStop` calculait bien
+`FALSE` (`ErrorId=0`, aucun défaut), mais **l'utilisateur avait lui-même forcé manuellement
+`instWinchM1.SafeStop` à `TRUE`** dans CODESYS, croyant — par analogie avec la convention
+"capteur de sécurité = TRUE=OK" établie plus tôt dans la session (D72a/D74/§27/§29) — qu'un
+"organe de sécurité" devait rester à `1` en permanence.
+
+**Cause racine de la confusion** : `SafeStop` n'est PAS un capteur de sécurité (convention
+TRUE=OK) mais une **sortie de commande calculée** par `FB_Safety_Winch` — convention inverse,
+`TRUE` = déclenche activement la décélération rapide. Les deux familles ont des polarités
+opposées et portent toutes les deux le mot "sécurité" dans leur contexte, d'où la confusion.
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D77 | **Convention à 3 familles documentée** | `NAMING_CONVENTION.md` §"Polarité des booléens I/O" étendue : capteur sécurité (TRUE=OK) / information classique (FALSE=repos) / **sortie de commande Safety** (TRUE=déclenche — `SafeStop`/`ForbidDescent`/`PowerCutOff`), avec règle explicite : ne jamais forcer manuellement une sortie de commande, seulement bypasser l'entrée capteur en amont. |
+
+**Résolution** : Force retiré par l'utilisateur sur `instWinchM1.SafeStop`, raccordement normal
+rétabli (`SafeStop := instSafetyWinchM1.SafeStop`, déjà correct dans le code — aucune modification
+de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
+
+### Fichiers impactés (2026-07-03duovicies, partie 2)
+- **DOC/** : `NAMING_CONVENTION.md` (3ᵉ famille + avertissement forçage), AUDIT (ce §31).
+- **CODE/** : aucun — le bug n'était pas dans le code, uniquement un Force runtime côté utilisateur.

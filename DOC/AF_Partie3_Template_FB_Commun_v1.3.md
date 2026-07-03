@@ -62,6 +62,12 @@ Avant d'écrire la moindre logique « brique » (scaling, rampe, filtre, hystér
 > 🧭 **Renommage v1.2** : `SafetyOk` devient **`EmergencyStopOk`**, pour éviter toute confusion
 > avec `SafeStop` (§1bis). `EStopOk` (ancien nom transitoire vu dans certains docs métier) est
 > définitivement absorbé par `EmergencyStopOk`.
+>
+> 🔒 **Polarité fail-safe** : `EmergencyStopOk` et tout signal de sécurité du même type
+> (mou de câble, rotation de phase…) valent `TRUE`=OK, `FALSE`=défaut — et doivent être
+> **initialisés à `TRUE`** tant que leur capteur réel n'est pas câblé (sinon une variable
+> jamais écrite lit `FALSE` par défaut = "défaut" en permanence). Détail + précédents réels
+> (bugs D72a/D74) : `DOC/NAMING_CONVENTION.md` §"Polarité des booléens I/O".
 
 **📤 VAR_OUTPUT — État**
 | Nom | Type | Rôle |

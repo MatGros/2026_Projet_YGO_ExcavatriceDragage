@@ -22,7 +22,11 @@ VAR_GLOBAL
     EmergencyStopOk      : BOOL;
     SlackCableSwitch     : BOOL;
     TopPositionSensor    : BOOL;
-    PhaseRotationOk      : BOOL;   // 🆕 Contrôle rotation phases élec. — TRUE = correcte
+    PhaseRotationOk      : BOOL;   // 🆕 Contrôle rotation phases élec. — TRUE = correcte.
+    // 🔧 RETIRÉ (2026-07-03duovicies, demande utilisateur) : init `:= TRUE` retirée — l'utilisateur
+    // a créé son propre bypass dédié `GVL_DEBUG.DBG_CtrlPhaseRotation_Bypass_TEST` (OR'é sur le
+    // signal brut dans FB_InputsMachine), cohérent avec le pattern EmergencyStopOk/
+    // TopPositionSensor (aucun des deux n'a d'init GVL_IN non plus). Voir AUDIT D75.
 
     // 🪝 WINCH M1
     M1ContactorFeedbackFwd : BOOL;

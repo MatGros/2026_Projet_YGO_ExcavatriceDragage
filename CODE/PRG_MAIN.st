@@ -28,7 +28,13 @@
       `FB_Safety_Chariot` (pas directement sur `EmergencyStopOk`, cf D71 — cohérent avec
       le principe « safety centralise les capteurs, le métier consomme SafeStop »). Nom/
       polarité (TRUE=OK) ASSUMÉS sans confirmation utilisateur — à vérifier.
-   📚 Historique complet des décisions (D1-D71, dont renommage I/O `_DI`/`_DQ`/
+   🔧 CORRECTIF (2026-07-03unvicies, retour terrain, AUDIT D74 — SUPERSEDÉ D75) : blocage
+      `SafeStop` diagnostiqué en direct (`GVL_IN.PhaseRotationOk` jamais écrit tant que
+      `CtrlPhaseRotation_DI` n'existe pas côté device → démarrait `FALSE`, défaut IEC 61131-3).
+      Fix final retenu : `GVL_DEBUG.DBG_CtrlPhaseRotation_Bypass_TEST` (créé par l'utilisateur,
+      OR'é sur le signal brut dans `FB_InputsMachine`, même pattern qu'`EmergencyStopOk`/
+      `TopPositionSensor`) — pas d'init `:= TRUE` sur `GVL_IN.PhaseRotationOk` (retirée, D75).
+   📚 Historique complet des décisions (D1-D75, dont renommage I/O `_DI`/`_DQ`/
       `_RQ`, retours frein réels, `GVL_IN`/`GVL_OUT`) :
       DOC/AUDIT_Coherence_Documentaire_v1.0.md
    ═══════════════════════════════════════════════════════════════ *)
@@ -438,7 +444,7 @@ instSafetyWinchM1(
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
-    ThermalFeedback     := GVL_IN.M1ThermalFeedback,
+    ThermalFeedback     := NOT GVL_IN.M1ThermalFeedback,
     SlackCableDetected  := NOT GVL_IN.SlackCableSwitch,
     PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );
@@ -453,7 +459,7 @@ instSafetyWinchM2(
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
-    ThermalFeedback     := GVL_IN.M2ThermalFeedback,
+    ThermalFeedback     := NOT GVL_IN.M2ThermalFeedback,
     SlackCableDetected  := NOT GVL_IN.SlackCableSwitch,
     PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );

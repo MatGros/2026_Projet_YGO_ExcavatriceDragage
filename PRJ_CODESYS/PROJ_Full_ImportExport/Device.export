@@ -87659,7 +87659,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186367063185322</Single>
+        <Single Name="Timestamp" Type="long">639186779676361506</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -87696,6 +87696,13 @@ END_IF;
 // tant que la surveillance EtherCAT n'est pas fiabilisée revient à accepter ce risque, comme
 // pour le codeur treuil (FB_Safety_Winch) — décision à revalider avec l'utilisateur avant
 // mise en service réelle en mode ETHERCAT.
+
+// 🔍 3bis. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2/M3, 2026-07-03octodecies) — bit2
+IF NOT PhaseRotationOk THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -87750,6 +87757,7 @@ VAR_INPUT
     Mode                : E_Mode;      // Mode courant (autorisations)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
+    PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
     // 🔴 TBD (EtherCAT AC600 non finalisé) : ajouter ici VariateurAvailable
     //     (FB_DiagEthercat AC600/M3) quand ce diag sera fiabilisé — ne PAS stubber en dur.
 END_VAR
@@ -87758,7 +87766,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine chariot sans commande valide)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine chariot sans commande valide) ; bit2 : mauvaise rotation de phase (commun, bit1 réservé EtherCAT variateur)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
@@ -87771,7 +87779,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">aa6ebeb4-94ee-4410-be47-6e2c220eb221_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">157</Single>
+        <Single Name="UniqueIdGenerator" Type="string">314</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -88736,7 +88744,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186731992844628</Single>
+        <Single Name="Timestamp" Type="long">639186797257896924</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -88765,7 +88773,12 @@ VAR_GLOBAL
     EmergencyStopOk      : BOOL;
     SlackCableSwitch     : BOOL;
     TopPositionSensor    : BOOL;
-    PhaseRotationOk      : BOOL;   // 🆕 Contrôle rotation phases élec. — TRUE = correcte
+    PhaseRotationOk      : BOOL := TRUE;   // 🆕 Contrôle rotation phases élec. — TRUE = correcte.
+    // ⚠️ Init à TRUE (2026-07-03unvicies, demande utilisateur) : tant que CtrlPhaseRotation_DI
+    // n'existe pas en I/O Mapping, FB_InputsMachine n'écrit jamais cette variable — un BOOL
+    // non initialisé démarre à FALSE (= défaut), ce qui bloquait SafeStop en permanence
+    // (FB_Safety_Winch/Chariot) sans aucun vrai défaut. Principe général : toute information
+    // de sécurité doit démarrer à l'état OK/nominal tant qu'elle n'est pas réellement câblée.
 
     // 🪝 WINCH M1
     M1ContactorFeedbackFwd : BOOL;
@@ -89122,7 +89135,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">25e509de-33d4-4447-93f8-c9e4ea381c8b</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186733403051384</Single>
+        <Single Name="Timestamp" Type="long">639186773686518247</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -90672,24 +90685,50 @@ END_VAR
                     </Single>
                     <Null Name="InputFlags" />
                     <List2 Name="InputItems">
-                      <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                        <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                          <Single Name="Operand" Type="string">M1_BrakeFeedback_DI</Single>
-                          <Single Name="Type" Type="string">BOOL</Single>
-                          <Single Name="Comment" Type="string"></Single>
-                          <Single Name="SymbolComment" Type="string"></Single>
-                          <Single Name="Address" Type="string"></Single>
-                          <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                            <Single Name="Flags" Type="int">0</Single>
-                            <Single Name="Fixed" Type="bool">False</Single>
-                            <Single Name="Extensible" Type="bool">False</Single>
+                      <Single Type="{827b9ec2-2032-40da-9f4e-7670ca2d55a8}" Method="IArchivable">
+                        <List2 Name="Trees">
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">M1_BrakeFeedback_DI</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">False</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">698</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">697</Single>
                           </Single>
-                          <Single Name="LValue" Type="bool">False</Single>
-                          <Single Name="Boolean" Type="bool">True</Single>
-                          <Single Name="IsInstance" Type="bool">False</Single>
-                          <Single Name="Id" Type="long">698</Single>
-                        </Single>
-                        <Single Name="Id" Type="long">697</Single>
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">True</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">978</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">977</Single>
+                          </Single>
+                        </List2>
+                        <Null Name="Input" />
+                        <Single Name="Mode" Type="{3b9474d0-c98b-4935-8ce5-65f06808350d}">BoxShortCircuit</Single>
+                        <Single Name="Id" Type="long">979</Single>
                       </Single>
                       <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
                         <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
@@ -90887,24 +90926,50 @@ END_VAR
                     </Single>
                     <Null Name="InputFlags" />
                     <List2 Name="InputItems">
-                      <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                        <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                          <Single Name="Operand" Type="string">M1_ThermalFeedback_DI</Single>
-                          <Single Name="Type" Type="string">BOOL</Single>
-                          <Single Name="Comment" Type="string"></Single>
-                          <Single Name="SymbolComment" Type="string"></Single>
-                          <Single Name="Address" Type="string"></Single>
-                          <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                            <Single Name="Flags" Type="int">0</Single>
-                            <Single Name="Fixed" Type="bool">False</Single>
-                            <Single Name="Extensible" Type="bool">False</Single>
+                      <Single Type="{827b9ec2-2032-40da-9f4e-7670ca2d55a8}" Method="IArchivable">
+                        <List2 Name="Trees">
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">M1_ThermalFeedback_DI</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">False</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">606</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">605</Single>
                           </Single>
-                          <Single Name="LValue" Type="bool">False</Single>
-                          <Single Name="Boolean" Type="bool">True</Single>
-                          <Single Name="IsInstance" Type="bool">False</Single>
-                          <Single Name="Id" Type="long">606</Single>
-                        </Single>
-                        <Single Name="Id" Type="long">605</Single>
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">True</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">981</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">980</Single>
+                          </Single>
+                        </List2>
+                        <Null Name="Input" />
+                        <Single Name="Mode" Type="{3b9474d0-c98b-4935-8ce5-65f06808350d}">BoxShortCircuit</Single>
+                        <Single Name="Id" Type="long">982</Single>
                       </Single>
                       <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
                         <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
@@ -91545,24 +91610,50 @@ END_VAR
                     </Single>
                     <Null Name="InputFlags" />
                     <List2 Name="InputItems">
-                      <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                        <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                          <Single Name="Operand" Type="string">M2_ThermalFeedback_DI</Single>
-                          <Single Name="Type" Type="string">BOOL</Single>
-                          <Single Name="Comment" Type="string"></Single>
-                          <Single Name="SymbolComment" Type="string"></Single>
-                          <Single Name="Address" Type="string"></Single>
-                          <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                            <Single Name="Flags" Type="int">0</Single>
-                            <Single Name="Fixed" Type="bool">False</Single>
-                            <Single Name="Extensible" Type="bool">False</Single>
+                      <Single Type="{827b9ec2-2032-40da-9f4e-7670ca2d55a8}" Method="IArchivable">
+                        <List2 Name="Trees">
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">M2_ThermalFeedback_DI</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">False</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">648</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">647</Single>
                           </Single>
-                          <Single Name="LValue" Type="bool">False</Single>
-                          <Single Name="Boolean" Type="bool">True</Single>
-                          <Single Name="IsInstance" Type="bool">False</Single>
-                          <Single Name="Id" Type="long">648</Single>
-                        </Single>
-                        <Single Name="Id" Type="long">647</Single>
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">True</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">994</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">993</Single>
+                          </Single>
+                        </List2>
+                        <Null Name="Input" />
+                        <Single Name="Mode" Type="{3b9474d0-c98b-4935-8ce5-65f06808350d}">BoxShortCircuit</Single>
+                        <Single Name="Id" Type="long">995</Single>
                       </Single>
                       <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
                         <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
@@ -91760,24 +91851,50 @@ END_VAR
                     </Single>
                     <Null Name="InputFlags" />
                     <List2 Name="InputItems">
-                      <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                        <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                          <Single Name="Operand" Type="string">M2_BrakeFeedback_DI</Single>
-                          <Single Name="Type" Type="string">BOOL</Single>
-                          <Single Name="Comment" Type="string"></Single>
-                          <Single Name="SymbolComment" Type="string"></Single>
-                          <Single Name="Address" Type="string"></Single>
-                          <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                            <Single Name="Flags" Type="int">0</Single>
-                            <Single Name="Fixed" Type="bool">False</Single>
-                            <Single Name="Extensible" Type="bool">False</Single>
+                      <Single Type="{827b9ec2-2032-40da-9f4e-7670ca2d55a8}" Method="IArchivable">
+                        <List2 Name="Trees">
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">M2_BrakeFeedback_DI</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">False</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">732</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">731</Single>
                           </Single>
-                          <Single Name="LValue" Type="bool">False</Single>
-                          <Single Name="Boolean" Type="bool">True</Single>
-                          <Single Name="IsInstance" Type="bool">False</Single>
-                          <Single Name="Id" Type="long">732</Single>
-                        </Single>
-                        <Single Name="Id" Type="long">731</Single>
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">True</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">997</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">996</Single>
+                          </Single>
+                        </List2>
+                        <Null Name="Input" />
+                        <Single Name="Mode" Type="{3b9474d0-c98b-4935-8ce5-65f06808350d}">BoxShortCircuit</Single>
+                        <Single Name="Id" Type="long">998</Single>
                       </Single>
                       <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
                         <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
@@ -92848,24 +92965,50 @@ END_VAR
                     </Single>
                     <Null Name="InputFlags" />
                     <List2 Name="InputItems">
-                      <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
-                        <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
-                          <Single Name="Operand" Type="string">M3_BrakeFeedback_DI</Single>
-                          <Single Name="Type" Type="string">BOOL</Single>
-                          <Single Name="Comment" Type="string"></Single>
-                          <Single Name="SymbolComment" Type="string"></Single>
-                          <Single Name="Address" Type="string"></Single>
-                          <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
-                            <Single Name="Flags" Type="int">0</Single>
-                            <Single Name="Fixed" Type="bool">False</Single>
-                            <Single Name="Extensible" Type="bool">False</Single>
+                      <Single Type="{827b9ec2-2032-40da-9f4e-7670ca2d55a8}" Method="IArchivable">
+                        <List2 Name="Trees">
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">M3_BrakeFeedback_DI</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">False</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">747</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">746</Single>
                           </Single>
-                          <Single Name="LValue" Type="bool">False</Single>
-                          <Single Name="Boolean" Type="bool">True</Single>
-                          <Single Name="IsInstance" Type="bool">False</Single>
-                          <Single Name="Id" Type="long">747</Single>
-                        </Single>
-                        <Single Name="Id" Type="long">746</Single>
+                          <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
+                            <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
+                              <Single Name="Operand" Type="string">GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST</Single>
+                              <Single Name="Type" Type="string">BOOL</Single>
+                              <Single Name="Comment" Type="string"></Single>
+                              <Single Name="SymbolComment" Type="string"></Single>
+                              <Single Name="Address" Type="string"></Single>
+                              <Single Name="Flags" Type="{668066f2-6069-46b3-8962-8db8d13d7db2}" Method="IArchivable">
+                                <Single Name="Flags" Type="int">0</Single>
+                                <Single Name="Fixed" Type="bool">True</Single>
+                                <Single Name="Extensible" Type="bool">False</Single>
+                              </Single>
+                              <Single Name="LValue" Type="bool">False</Single>
+                              <Single Name="Boolean" Type="bool">True</Single>
+                              <Single Name="IsInstance" Type="bool">False</Single>
+                              <Single Name="Id" Type="long">1000</Single>
+                            </Single>
+                            <Single Name="Id" Type="long">999</Single>
+                          </Single>
+                        </List2>
+                        <Null Name="Input" />
+                        <Single Name="Mode" Type="{3b9474d0-c98b-4935-8ce5-65f06808350d}">BoxShortCircuit</Single>
+                        <Single Name="Id" Type="long">1001</Single>
                       </Single>
                       <Single Type="{9de7f100-1b87-424c-a62e-45b0cfc85ed2}" Method="IArchivable">
                         <Single Name="Operand" Type="{c9b2f165-48a2-4a45-8326-3952d8a3d708}" Method="IArchivable">
@@ -93101,7 +93244,7 @@ GVL_IN.M3BrakeFeedback := instM3BrakeFeedback.State; *)</Single>
             <Single Name="LineInfoPersistence" Type="string">5121a7b9-4d1f-4aa9-b088-b4c84cbcf42e_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">976</Single>
+        <Single Name="UniqueIdGenerator" Type="string">1001</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -97448,13 +97591,14 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186754139647003</Single>
+        <Single Name="Timestamp" Type="long">639186813200470691</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
         <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">
+
 // === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
 
 (* ═══════════════════════════════════════════════════════════════
@@ -97530,7 +97674,7 @@ instModes(
     Enable              := TRUE,
     Reset               := MachineReset_IHM,
 
-    EmergencyStopOk     := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     ModeRequest         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur forceable
     PasswordOk          := GVL_Modes_Stub.PasswordOk_IHM,       // 🖥️ Stub authentification MAINT_N2
     OverrideSyncRequest := GVL_Modes_Stub.OverrideSyncRequest_IHM,
@@ -97551,7 +97695,7 @@ instModes(
 FB_Joystick_0(
     // 🟢 --- Autorisations &amp; sécurité ---
     Enable          := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par autorisation réelle
-    EmergencyStopOk := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk := GVL_IN.EmergencyStopOk,
     Reset           := MachineReset_IHM,
 
 
@@ -97589,7 +97733,7 @@ instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := (M1_Reset_IHM OR MachineReset_IHM),
 
-    EmergencyStopOk     := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
     RawPosIn            := COD1_PosValue,                   // 📡 I/O Mapping déjà existant
@@ -97616,7 +97760,7 @@ instHomingM1(
     Enable               := TRUE,
     Reset                := (M1_Reset_IHM OR MachineReset_IHM),
 
-    EmergencyStopOk      := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk      := GVL_IN.EmergencyStopOk,
     Mode                 := instModes.Mode,
 
     Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 1) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
@@ -97639,7 +97783,7 @@ instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := (M2_Reset_IHM OR MachineReset_IHM),
 
-    EmergencyStopOk     := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
     RawPosIn            := COD2_PosValue,                   // 📡 I/O Mapping (mappé 2026-07-02)
@@ -97666,7 +97810,7 @@ instHomingM2(
     Enable               := TRUE,
     Reset                := (M2_Reset_IHM OR MachineReset_IHM),
 
-    EmergencyStopOk      := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk      := GVL_IN.EmergencyStopOk,
     Mode                 := instModes.Mode,
 
     Home                 := (StubHomeButton_IHM AND ((HomingMode_IHM = 2) OR (HomingMode_IHM = 3))),  // 🖥️ GVL_Encoder_Stub — mode homing (1=M1seul, 2=M2seul, 3=Both)
@@ -97696,7 +97840,7 @@ instEncoderSafetyM1(
     Enable          := TRUE,
     Reset           := (M1_Reset_IHM OR MachineReset_IHM),
 
-    EmergencyStopOk := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk := GVL_IN.EmergencyStopOk,
     Mode            := instModes.Mode,
     CablePosM       := instEncoderScaleM1.CablePosM,
     HomingSuspect   := instHomingM1.HomingSuspect,
@@ -97709,7 +97853,7 @@ instEncoderSafetyM2(
     Enable          := TRUE,
     Reset           := (M2_Reset_IHM OR MachineReset_IHM),
 
-    EmergencyStopOk := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk := GVL_IN.EmergencyStopOk,
     Mode            := instModes.Mode,
     CablePosM       := instEncoderScaleM2.CablePosM,
     HomingSuspect   := instHomingM2.HomingSuspect,
@@ -97731,7 +97875,7 @@ instWinchSync(
     Enable          := NOT instModes.OverrideSync,
     Reset           := MachineReset_IHM,
 
-    EmergencyStopOk := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk := GVL_IN.EmergencyStopOk,
     Mode            := instModes.Mode,
     CablePosM1      := instEncoderScaleM1.CablePosM,
     CablePosM2      := instEncoderScaleM2.CablePosM,
@@ -97753,28 +97897,30 @@ instSafetyWinchM1(
     Enable              := TRUE,
     Reset               := MachineReset_IHM,
 
-    EmergencyStopOk     := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM1.EncoderAvailable,
     ThermalFeedback     := GVL_IN.M1ThermalFeedback,
-    SlackCableDetected  := GVL_IN.SlackCableSwitch
+    SlackCableDetected  := GVL_IN.SlackCableSwitch,
+    PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );
 
 instSafetyWinchM2(
     Enable              := TRUE,
     Reset               := MachineReset_IHM,
 
-    EmergencyStopOk     := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
     EncoderAvailable    := instEncoderAbsM2.EncoderAvailable,
     ThermalFeedback     := GVL_IN.M2ThermalFeedback,
-    SlackCableDetected  := GVL_IN.SlackCableSwitch
+    SlackCableDetected  := GVL_IN.SlackCableSwitch,
+    PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -97793,7 +97939,7 @@ instWinchM1(
     Enable                  := StubMachineEnableN1,           // ⚠️ Stub Maint N1 — à remplacer par FB_Modes
     Reset                   := MachineReset_IHM,
 
-    EmergencyStopOk         := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,
@@ -97811,7 +97957,7 @@ instWinchM2(
     Enable                  := StubMachineEnableN1,           // ⚠️ Même stub Maint N1 que M1 — à remplacer par FB_Modes
     Reset                   := MachineReset_IHM,
 
-    EmergencyStopOk         := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop,   // ⚠️ Même consigne que M1 (dupliquée, pas de sélecteur)
@@ -97843,11 +97989,12 @@ instSafetyChariotM3(
     Enable              := TRUE,
     Reset               := MachineReset_IHM,
 
-    EmergencyStopOk     := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
 
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
-    JoystickOperational := instDiagCanOpen.Joystick.Operational
+    JoystickOperational := instDiagCanOpen.Joystick.Operational,
+    PhaseRotationOk     := GVL_IN.PhaseRotationOk
 );
 
 // 🎯 SÉLECTEUR STUB MAINTENANCE (2026-07-02, demande utilisateur) — arbitre M3_PositionSensorTarget
@@ -97867,7 +98014,7 @@ instChariotM3(
     Enable                  := StubMachineEnableN1,           // ⚠️ Même stub Maint N1 que Winch — à remplacer par FB_Modes
     Reset                   := MachineReset_IHM,
 
-    EmergencyStopOk         := (GVL_IN.EmergencyStopOk AND GVL_IN.PhaseRotationOk),
+    EmergencyStopOk         := GVL_IN.EmergencyStopOk,
     Mode                    := instModes.Mode,
 
     StartStop               := FB_Joystick_0.AxisCmdX.StartStop,
@@ -97965,10 +98112,12 @@ PowerCutOff_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
       version stack) ; (3) CAN joystick en littéraux TRUE (§0 — homme-mort
       aveugle à la perte de liaison).
    🔴 NE COMPILE PAS TANT QUE `CtrlPhaseRotation_DI` N'EXISTE PAS EN I/O MAPPING
-      (2026-07-03sexdecies, AUDIT D67/D68) : créer ce DI dans CODESYS AVANT de coller
-      ce fichier. Nom/polarité/portée (généralisée à tous les métiers, TRUE=OK)
-      ASSUMÉS sans confirmation utilisateur — à vérifier/ajuster (AUDIT §23).
-   📚 Historique complet des décisions (D1-D68, dont renommage I/O `_DI`/`_DQ`/
+      (2026-07-03sexdecies/novodecies, AUDIT D67/D71) : créer ce DI dans CODESYS AVANT de
+      coller ce fichier. `GVL_IN.PhaseRotationOk` câblé dans `FB_Safety_Winch`(M1/M2)/
+      `FB_Safety_Chariot` (pas directement sur `EmergencyStopOk`, cf D71 — cohérent avec
+      le principe « safety centralise les capteurs, le métier consomme SafeStop »). Nom/
+      polarité (TRUE=OK) ASSUMÉS sans confirmation utilisateur — à vérifier.
+   📚 Historique complet des décisions (D1-D71, dont renommage I/O `_DI`/`_DQ`/
       `_RQ`, retours frein réels, `GVL_IN`/`GVL_OUT`) :
       DOC/AUDIT_Coherence_Documentaire_v1.0.md
    ═══════════════════════════════════════════════════════════════ *)
@@ -98072,12 +98221,11 @@ VAR RETAIN
     // ⚖️ Tolérance écart M1/M2 (FB_WinchSync) — réglable sans recompiler, ajuster selon jeu
     // mécanique réel observé sur site (Partie9 §9).
     WinchSyncToleranceM : REAL := 0.10;
-END_VAR
-</Single>
+END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">14828</Single>
+        <Single Name="UniqueIdGenerator" Type="string">16333</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -98686,7 +98834,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186386518812810</Single>
+        <Single Name="Timestamp" Type="long">639186816130944369</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -98727,7 +98875,7 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
-IF ThermalFeedback THEN
+IF NOT  ThermalFeedback THEN
     ErrorId := ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
@@ -98735,10 +98883,18 @@ END_IF;
 
 // 🔍 3quater. MOU DE CÂBLE (câblé — I/O réel 2026-07-02, commun M1/M2) — bit3, N'ARRÊTE PAS
 // la remontée : voir §4ter Partie9 (ForbidDescent dédié, distinct de SafeStop ci-dessous).
-IF SlackCableDetected THEN
+IF NOT  SlackCableDetected THEN
     ErrorId := ErrorId OR 16#0008;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFF7;
+END_IF;
+
+// 🔍 3quinquies. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2, 2026-07-03octodecies) —
+// bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
+IF NOT PhaseRotationOk THEN
+    ErrorId := ErrorId OR 16#0010;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFEF;
 END_IF;
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
@@ -98748,10 +98904,10 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🟧 SafeStop : UNIQUEMENT bits 0 (joystick)/1 (codeur)/2 (thermique) — arrêt total des 2 sens.
-// Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
+// 🟧 SafeStop : bits 0 (joystick)/1 (codeur)/2 (thermique)/4 (rotation phase) — arrêt total des
+// 2 sens. Le mou de câble (bit3) est EXCLU volontairement : il ne doit interdire QUE la descente
 // (ForbidDescent ci-dessous), pas bloquer une remontée nécessaire pour aller vérifier le câble.
-SafeStop := (ErrorId AND 16#0007) &lt;&gt; 16#0000;
+SafeStop := (ErrorId AND 16#0017) &lt;&gt; 16#0000;
 
 // 🆕 ForbidDescent : reflète UNIQUEMENT le bit3 (mou de câble) — consommé par FB_Winch pour
 // masquer RelayRev (descente) seul, RelayFwd (montée) reste piloté normalement.
@@ -98791,7 +98947,7 @@ Done := FALSE;
         ce que `EncoderAvailable` reflète déjà, si besoin d'un signal
         distinct plus tard).
       - `PowerCutOff` : FALSE pour ce lot (pas encore de
-        ST_ContactorCheck de puissance câblé — FB_Output_Relay
+        ST_ContactorCheck de puissance câblé — FB_Output
         transverse hors périmètre de ce lot, voir Partie6).
    🆕 AJOUT (2026-07-02, retour terrain — nouvel export Device.export avec
       I/O réel `M1_ThermalFeedback`/`M2_ThermalFeedback` et
@@ -98842,13 +98998,14 @@ VAR_INPUT
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
     SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
+    PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun)
+    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2 uniquement
@@ -98862,7 +99019,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">1c48691e-7eeb-425a-a642-75da80a33af5_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">1788</Single>
+        <Single Name="UniqueIdGenerator" Type="string">2048</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -98908,7 +99065,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639185461752927233</Single>
+        <Single Name="Timestamp" Type="long">639186792277905319</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -98941,6 +99098,13 @@ IF NOT Hyst1.OUT THEN StepNumber := 2; END_IF;
 IF NOT Hyst2.OUT THEN StepNumber := 3; END_IF;
 IF NOT Hyst3.OUT THEN StepNumber := 4; END_IF;
 IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
+
+// 🆕 2bis. PLAFOND (2026-07-03quinquies) — appliqué APRÈS la sélection hystérésis,
+// AVANT la lecture table : le 0..100% de la consigne peut réclamer le palier 5,
+// mais ne dépassera jamais MaxStepNumber (ex. limitation couple en descente, voir FB_Winch)
+IF StepNumber &gt; MaxStepNumber THEN
+    StepNumber := MaxStepNumber;
+END_IF;
 
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
 CASE StepNumber OF
@@ -98979,16 +99143,22 @@ END_CASE;
    ⚠️ Brique réduite (Partie3 §1bis) : pas d'Enable/Reset/Error au sens
       "FB métier" — c'est un décodeur pur, composé À L'INTÉRIEUR de
       FB_Winch, qui porte lui la sécurité/le contrat complet.
+   🆕 AJOUT (2026-07-03quinquies, spec descente/couple) : `MaxStepNumber` plafonne
+      le palier atteignable (défaut 5 = comportement inchangé). Sert à `FB_Winch`
+      pour limiter la vitesse en descente (charge entraînante, pas besoin d'aller
+      vite) SANS changer la logique de décodage elle-même — juste un plafond
+      appliqué APRÈS la sélection par hystérésis, avant la lecture de la table.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_SpeedStep) ===
 
 FUNCTION_BLOCK PUBLIC FB_SpeedStep
 VAR_INPUT
-    Enable      : BOOL;               // Piloté par FB_Winch : FALSE = treuil à l'arrêt (palier 0)
-    SpeedRefPct : REAL;                // Consigne vitesse 0..100 % (déjà rampée par FB_Winch)
-    Table       : ST_SpeedStepTable;   // Table des 5 paliers (contacteurs + seuils), propre à CE treuil
-    HystMargin  : REAL := 2.0;         // Marge anti-battement (%) autour de chaque seuil
+    Enable        : BOOL;               // Piloté par FB_Winch : FALSE = treuil à l'arrêt (palier 0)
+    SpeedRefPct   : REAL;                // Consigne vitesse 0..100 % (déjà rampée par FB_Winch)
+    Table         : ST_SpeedStepTable;   // Table des 5 paliers (contacteurs + seuils), propre à CE treuil
+    HystMargin    : REAL := 2.0;         // Marge anti-battement (%) autour de chaque seuil
+    MaxStepNumber : INT := 5;            // 🆕 Plafond palier atteignable (1..5) — 5 = pas de restriction
 END_VAR
 VAR_OUTPUT
     Contactor1  : BOOL;   // Contacteur de vitesse 1 pour le palier courant
@@ -99007,7 +99177,7 @@ END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">a1abed58-84fa-4b5a-a868-d4943b31b4df_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">529</Single>
+        <Single Name="UniqueIdGenerator" Type="string">678</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -99053,7 +99223,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186424776301056</Single>
+        <Single Name="Timestamp" Type="long">639186807178927362</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -99086,14 +99256,19 @@ ResetEdge(CLK := Reset);
 
 DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
 
+// 🆕 Mou de câble (ForbidDescent) intégré à une VRAIE décélération rapide, comme SafeStop —
+// INHIBÉ si CommandedDirection = 1 (montée/enroulement en cours) : l'opérateur remonte
+// librement pour reprendre le mou, sans déclencher de décélération (AUDIT D72).
+EffectiveSafeStop := SafeStop OR (ForbidDescent AND (CommandedDirection &lt;&gt; 1));
+
 RampTargetPct := 0.0;
-IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
+IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,
           AccelRate := RampAccelRate,
-          DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
+          DecelRate := SEL(EffectiveSafeStop, RampDecelNormalRate, RampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
 IF Direction &lt;&gt; CommandedDirection THEN
@@ -99113,8 +99288,11 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
+// 🆕 Plafond palier descente (couple, pas vitesse) : 5 = inchangé en montée/neutre,
+// MaxStepDescente uniquement si CommandedDirection = -1 (Rev)
 SpeedStep(Enable := (ABS(SpeedRamp.Current) &gt; 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
-          Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
+          Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
+          MaxStepNumber := SEL(CommandedDirection = -1, 5, MaxStepDescente));
 StepNumber := SpeedStep.StepNumber;
 Contactor1 := SpeedStep.Contactor1;
 Contactor2 := SpeedStep.Contactor2;
@@ -99161,16 +99339,23 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
+// 🔴 BYPASS TEST BANC (2026-07-03vicies, demande utilisateur) — sans contacteurs réels câblés/
+// cohérents en essai, StuckClosed/StuckOpen se déclenche à tort et bloque RelayFwd/RelayRev
+// (voir Error plus bas). TOUJOURS FALSE en exploitation réelle.
+IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0002;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFD;
+    END_IF;
 
-IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
-    ErrorId := ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0004;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFB;
+    END_IF;
+ELSE
+    ErrorId := ErrorId AND 16#FFF9;   // Bypass actif : efface/maintient à 0 les bits 1/2
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -99179,7 +99364,7 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-IF (NOT StartStop OR SafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
+IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
     State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
     State := E_State.BUSY;
@@ -99234,10 +99419,26 @@ END_IF;
       uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
    🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
       entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
-      `SafeStop`) — masque UNIQUEMENT `RelayRev` (descente), `RelayFwd`
-      (montée) reste piloté normalement. Permet à l'opérateur de remonter
-      pour vérifier le câblage sans être bloqué par un `SafeStop` classique
-      qui aurait arrêté les 2 sens. Voir DOC/AF_Partie9 §4ter.
+      `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
+      `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
+      déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
+      en train de remonter — voir DOC/AF_Partie9 §4ter pour le contexte
+      d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
+   🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
+      nouveau paramètre `MaxStepDescente` (défaut 2). En descente
+      (`CommandedDirection = -1`), le palier atteignable par `FB_SpeedStep` est
+      plafonné à cette valeur MÊME à consigne joystick 100% — la charge est
+      entraînante en descente (image de couple, pas besoin d'aller vite). En
+      montée, les 5 paliers normaux restent inchangés (`MaxStepNumber := 5`).
+      Ne change PAS la logique de décodage (voir FB_SpeedStep.st), juste le
+      plafond fourni selon le sens.
+   🔧 CORRECTIF (2026-07-03vicies, demande utilisateur, AUDIT D72) : `ForbidDescent`
+      (mou de câble) intègre désormais une VRAIE décélération rapide (comme `SafeStop`)
+      via `EffectiveSafeStop`, au lieu d'un simple masquage brut de `RelayRev`. INHIBÉ
+      quand `CommandedDirection = 1` (montée/enroulement en cours) : l'opérateur peut
+      librement remonter pour reprendre le mou, sans déclencher de décélération. Le
+      masquage `RelayRev := FALSE` sur `ForbidDescent` reste EN PLUS, inconditionnel
+      (filet de sécurité direct, indépendant de la rampe).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
@@ -99252,6 +99453,7 @@ VAR_INPUT
     Direction               : INT;
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
+    MaxStepDescente         : INT := 2;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse
     ContactorFeedbackFwd    : BOOL;
     ContactorFeedbackRev    : BOOL;
     BrakeFeedback           : BOOL;
@@ -99299,11 +99501,12 @@ VAR
     TonRevFeedback      : TON;
     RampTargetPct       : REAL;
     DirectionChangePending : BOOL;
+    EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">fe1e6af7-da18-4559-8d7e-415a962a53ee_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">2387</Single>
+        <Single Name="UniqueIdGenerator" Type="string">2769</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
