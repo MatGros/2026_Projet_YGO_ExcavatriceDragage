@@ -1,0 +1,534 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T21:56:51.2672708" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T08:07:16.6985335">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Grappin" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Activation générale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Acquittement défauts (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Condition d'arrêt d'urgence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Mode de marche machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdOpen_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande d'ouverture depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdClose_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande de fermeture depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickY_StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Homme-mort joystick (AxisCmdY.StartStop)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickY_Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sens joystick (AxisCmdY.Direction : 1=montée, -1=descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Position réelle câble treuil M1 (mètres)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Position réelle câble treuil M2 (mètres)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_GrappinConfig" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Configuration (RETAIN site)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#30s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Timeout de mouvement configurable</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> FB prêt à fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Mouvement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Mouvement terminé avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Présence d'un défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> État opérationnel du FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> État lors de l'apparition de l'erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveOffsetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Décalage cible à injecter dans FB_WinchSync</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sortie consigne StartStop vers Winch M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Sortie consigne Direction vers Winch M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ForceSlowSpeed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = Bloque les contacteurs de vitesse de M2</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="GrappinState">
+              <type>
+                <derived name="ST_GrappinState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> État physique du grappin mémorisé (RETAIN)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="FirstCycle">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Drapeau de premier cycle API</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Détecteur de front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Détecteur de front montant Error</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTimeout">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Temporisateur de timeout de mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CloseReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande de fermeture mémorisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OpenReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande d'ouverture mémorisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SevereError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Erreur grave nécessitant l'arrêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxAllowedOffset">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Offset max calculé dynamiquement</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   🪣 FB_Grappin — Commande d'ouverture/fermeture du grappin
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.0.md
+   🔌 Conforme au contrat FB standard (Partie3 §1bis).
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 🛑 1. GATE DE SÉCURITÉ
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
+    M2_StartStop := FALSE;
+    M2_Direction := 0;
+    M2_ForceSlowSpeed := FALSE;
+    State := E_State.DISABLED;
+    // Les requêtes internes sont réinitialisées
+    CloseReq := FALSE;
+    OpenReq := FALSE;
+    RETURN;
+END_IF;
+
+// 🟢 ÉTAT INITIAL READY SI DISABLED PRÉCÉDEMMENT
+IF State = E_State.DISABLED THEN
+    State := E_State.READY;
+END_IF;
+
+// 🔑 2. GESTION DU RESET (FRONT MONTANT)
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
+END_IF;
+
+// 📏 3. DÉTECTION D'INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
+IF FirstCycle THEN
+    FirstCycle := FALSE;
+    IF Config.CoherenceLimitM &gt; 0.01 THEN
+        IF GrappinState.IsOpen AND NOT GrappinState.IsClosed THEN
+            IF ABS(CablePosM2 - GrappinState.LastPosM2Open) &gt; Config.CoherenceLimitM THEN
+                GrappinState.StateIncoherent := TRUE;
+            END_IF;
+        ELSIF GrappinState.IsClosed AND NOT GrappinState.IsOpen THEN
+            IF ABS(CablePosM2 - GrappinState.LastPosM2Close) &gt; Config.CoherenceLimitM THEN
+                GrappinState.StateIncoherent := TRUE;
+            END_IF;
+        ELSE
+            // Si l'état n'a jamais été initialisé (les deux FALSE/TRUE), on signale une incohérence
+            GrappinState.StateIncoherent := TRUE;
+        END_IF;
+    ELSE
+        // Limite non configurée ou invalide, par précaution on force l'incohérence
+        GrappinState.StateIncoherent := TRUE;
+    END_IF;
+END_IF;
+
+// Met à jour le bit1 d'erreur si incohérence détectée
+IF GrappinState.StateIncoherent THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSE
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
+
+// 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
+// On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
+MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
+IF ABS(CablePosM1 - CablePosM2) &gt; MaxAllowedOffset THEN
+    ErrorId := ErrorId OR 16#0004;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
+
+// ⏲️ 5. SURVEILLANCE TIMEOUT MOUVEMENT (bit 0)
+// Déclenche si le mouvement actif (M2_StartStop = TRUE) dure plus longtemps que le timeout
+TonTimeout(IN := (State = E_State.BUSY AND M2_StartStop), PT := TimeoutDuration);
+IF TonTimeout.Q THEN
+    ErrorId := ErrorId OR 16#0001;
+END_IF;
+
+// ❌ Évaluation des erreurs graves (Timeout ou Limites dépassées)
+SevereError := (ErrorId AND 16#0005) &lt;&gt; 16#0000;
+
+IF SevereError THEN
+    M2_StartStop := FALSE;
+    M2_Direction := 0;
+    M2_ForceSlowSpeed := FALSE;
+    CloseReq := FALSE;
+    OpenReq := FALSE;
+    // On repasse en READY et attend un Reset
+    State := E_State.READY;
+END_IF;
+
+// 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
+CASE State OF
+    E_State.READY:
+        Ready := TRUE;
+        Busy := FALSE;
+        Done := FALSE;
+        M2_StartStop := FALSE;
+        M2_Direction := 0;
+        M2_ForceSlowSpeed := FALSE;
+
+        // Mémorisation des requêtes IHM (l'une annule l'autre)
+        IF CmdClose_IHM AND NOT SevereError THEN
+            CloseReq := TRUE;
+            OpenReq := FALSE;
+        ELSIF CmdOpen_IHM AND NOT SevereError THEN
+            OpenReq := TRUE;
+            CloseReq := FALSE;
+        END_IF;
+
+        // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
+        IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
+            State := E_State.BUSY;
+        ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
+            State := E_State.BUSY;
+        END_IF;
+
+    E_State.BUSY:
+        Ready := TRUE;
+        Busy := TRUE;
+        Done := FALSE;
+        M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
+
+        // Interlock Homme-mort joystick
+        IF NOT JoystickY_StartStop THEN
+            // Si relâchement du joystick, arrêt temporaire du mouvement
+            M2_StartStop := FALSE;
+            M2_Direction := 0;
+        ELSIF CloseReq AND (JoystickY_Direction = -1) THEN
+            // Fermeture en cours : M2 descend
+            M2_StartStop := TRUE;
+            M2_Direction := -1;
+        ELSIF OpenReq AND (JoystickY_Direction = 1) THEN
+            // Ouverture en cours : M2 monte
+            M2_StartStop := TRUE;
+            M2_Direction := 1;
+        ELSE
+            // Joystick poussé dans la mauvaise direction pour la requête active : arrêt
+            M2_StartStop := FALSE;
+            M2_Direction := 0;
+        END_IF;
+
+        // Condition d'arrêt automatique de la fermeture
+        IF CloseReq THEN
+            // Cible atteinte : M2 est descendu assez bas (CablePosM2 décroissant)
+            IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetCloseM) THEN
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+                
+                // Mémorisation de l'état physique fermé
+                GrappinState.IsOpen := FALSE;
+                GrappinState.IsClosed := TRUE;
+                GrappinState.LastPosM2Close := CablePosM2;
+                GrappinState.StateIncoherent := FALSE; // recalage réussi
+                
+                CloseReq := FALSE;
+                State := E_State.DONE;
+            END_IF;
+        END_IF;
+
+        // Condition d'arrêt automatique de l'ouverture
+        IF OpenReq THEN
+            // Cible atteinte : M2 est remonté assez haut (CablePosM2 croissant)
+            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetOpenM) THEN
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+                
+                // Mémorisation de l'état physique ouvert
+                GrappinState.IsOpen := TRUE;
+                GrappinState.IsClosed := FALSE;
+                GrappinState.LastPosM2Open := CablePosM2;
+                GrappinState.StateIncoherent := FALSE; // recalage réussi
+                
+                OpenReq := FALSE;
+                State := E_State.DONE;
+            END_IF;
+        END_IF;
+
+    E_State.DONE:
+        Ready := TRUE;
+        Busy := FALSE;
+        Done := TRUE;
+        M2_StartStop := FALSE;
+        M2_Direction := 0;
+        M2_ForceSlowSpeed := FALSE;
+
+        // Attente du relâchement de la validation joystick pour repasser à READY
+        IF NOT JoystickY_StartStop THEN
+            State := E_State.READY;
+        END_IF;
+END_CASE;
+
+// 📤 7. GESTION DES SORTIES D'ÉTAT GLOBALES
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+// Détermination de l'offset actif pour le synchronisme de FB_WinchSync
+IF GrappinState.IsClosed THEN
+    ActiveOffsetM := Config.OffsetCloseM;
+ELSE
+    // Par défaut ou si ouvert, on applique l'offset ouvert
+    ActiveOffsetM := Config.OffsetOpenM;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>59da5cf6-55f4-401f-9438-8dcb10363fb1</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="GRAPPIN">
+          <Object Name="FB_Grappin" ObjectId="59da5cf6-55f4-401f-9438-8dcb10363fb1" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
