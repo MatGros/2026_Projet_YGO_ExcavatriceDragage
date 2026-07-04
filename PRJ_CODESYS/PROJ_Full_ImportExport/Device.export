@@ -46943,6 +46943,48 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">2684d018-3180-4ef7-8831-0f7cdc2b3a07</Single>
+        <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
+        <Single Name="Name" Type="string">CYCLE</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
+        <Null Name="EmbeddedTypeGuids" />
+        <Single Name="Timestamp" Type="long">639187210345967586</Single>
+      </Single>
+      <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
+        <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">31ec211b-bd08-4fe0-8608-7ae927897eb0</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">ENCODERS</Single>
@@ -100347,6 +100389,193 @@ END_VAR</Single>
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
+        <Single Name="Guid" Type="System.Guid">578b3bfb-1ae8-48e4-bcd9-49a549303503</Single>
+        <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
+        <Single Name="Name" Type="string">FB_Cycle</Single>
+        <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
+          <Entry>
+            <Key>
+              <Single Type="System.Guid">829a18f2-c514-4f6e-9634-1df173429203</Single>
+            </Key>
+            <Value>
+              <Single Type="{829a18f2-c514-4f6e-9634-1df173429203}" Method="IArchivable">
+                <Dictionary Type="{fa2ee218-a39b-4b6d-b249-49dbddbd168a}" Name="ParentObjects">
+                  <Entry>
+                    <Key>
+                      <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
+                    </Key>
+                    <Value>
+                      <Single Type="System.Guid">2684d018-3180-4ef7-8831-0f7cdc2b3a07</Single>
+                    </Value>
+                  </Entry>
+                </Dictionary>
+              </Single>
+            </Value>
+          </Entry>
+        </Dictionary>
+        <Single Name="TypeGuid" Type="System.Guid">6f9dac99-8de1-4efc-8465-68ac443b7d08</Single>
+        <Array Name="EmbeddedTypeGuids" Type="System.Guid">
+          <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
+          <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
+        </Array>
+        <Single Name="Timestamp" Type="long">639187213744862093</Single>
+      </Single>
+      <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
+        <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
+        <Single Name="Implementation" Type="{3b83b776-fb25-43b8-99f2-3c507c9143fc}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">
+
+// === IMPLEMENTATION ===
+
+// 🛑 1. GATE — Repli sécurisé
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    CmdWinchM1_StartStop := FALSE;
+    CmdWinchM1_Direction := 0;
+    CmdWinchM1_SpeedPct  := 0.0;
+    
+    CmdWinchM2_StartStop := FALSE;
+    CmdWinchM2_Direction := 0;
+    CmdWinchM2_SpeedPct  := 0.0;
+    
+    CmdChariotM3_Start   := FALSE;
+    
+    State := 0;
+    CycleStep := 0;
+    CycleStateStr := "DÉSACTIVÉ / ARRET";
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+ResetEdge(CLK := Reset);
+StartEdge(CLK := StartCycle);
+
+// 🔁 2. LOGIQUE DU SÉQUENCEUR (Grafcet / Machine d'état)
+CASE State OF
+    0:  // IDLE / ATTENTE
+        CycleStep := 0;
+        CycleStateStr := "ATTENTE DÉMARRAGE";
+        Busy := FALSE;
+        Done := FALSE;
+        
+        IF StartEdge.Q THEN
+            State := 10; // Lancement vers la première étape
+        END_IF;
+        
+    10: // DESCENTE DU GRAPPIN OUVERT
+        CycleStep := 10;
+        CycleStateStr := "DESCENTE GRAPPIN OUVERT";
+        Busy := TRUE;
+        
+        // Squelette de commande :
+        // CmdWinchM1_StartStop := TRUE; CmdWinchM1_Direction := -1; CmdWinchM1_SpeedPct := 50.0;
+        // CmdWinchM2_StartStop := TRUE; CmdWinchM2_Direction := -1; CmdWinchM2_SpeedPct := 50.0;
+        
+        // Condition de transition à définir (ex: position atteinte)
+        
+    20: // FERMETURE DU GODET (DÉBUT EXCAVATION)
+        CycleStep := 20;
+        CycleStateStr := "FERMETURE GODET / EXCAVATION";
+        
+        // Condition de transition
+        
+    30: // REMONTÉE DU GODET FERMÉ
+        CycleStep := 30;
+        CycleStateStr := "REMONTÉE DU GODET";
+        
+        // Condition de transition
+        
+    40: // DÉPLACEMENT CHARIOT &amp; VIDANGE
+        CycleStep := 40;
+        CycleStateStr := "VIDANGE DU GODET";
+        
+        // Condition de transition
+        
+END_CASE;
+
+IF AbortCycle THEN
+    State := 0;
+END_IF;
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">578b3bfb-1ae8-48e4-bcd9-49a549303503_Impl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
+          <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
+            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
+   🔄 FB_Cycle — Machine d'état séquentielle (Grafcet de dragage)
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à piloter les cycles automatiques et semi-automatiques
+      de l'Excavatrice (descente, dragage/godet, remontée, déversement).
+   ═══════════════════════════════════════════════════════════════ *)
+
+FUNCTION_BLOCK FB_Cycle
+VAR_INPUT
+    Enable              : BOOL;         // Standard
+    Reset               : BOOL;         // Acquittement défaut (front)
+    EmergencyStopOk     : BOOL;         // Standard
+    
+    // Commandes opérateur
+    StartCycle          : BOOL;         // Demande de lancement du cycle
+    PauseCycle          : BOOL;         // Demande de mise en pause du cycle
+    AbortCycle          : BOOL;         // Demande d'arrêt d'urgence/abandon cycle
+    
+    // Paramètres cycle (provenance GVL_PERSISTENT / GVL_IHM)
+    TargetDepthM        : REAL;         // Profondeur de dragage cible (négative)
+    TargetOffsetM       : REAL;         // Décalage grappin cible pour fermeture
+END_VAR
+VAR_OUTPUT
+    Ready               : BOOL;
+    Busy                : BOOL;
+    Done                : BOOL;
+    Error               : BOOL;
+    ErrorId             : WORD;
+    
+    // Commandes vers les actionneurs
+    CmdWinchM1_StartStop : BOOL;
+    CmdWinchM1_Direction : INT;
+    CmdWinchM1_SpeedPct  : REAL;
+    
+    CmdWinchM2_StartStop : BOOL;
+    CmdWinchM2_Direction : INT;
+    CmdWinchM2_SpeedPct  : REAL;
+    
+    CmdChariotM3_Start   : BOOL;
+    CmdChariotM3_Target  : INT;
+    
+    // État du cycle pour l'IHM
+    CycleStep           : INT;          // Numéro de l'étape active
+    CycleStateStr       : STRING(80);   // Description textuelle de l'état
+END_VAR
+VAR
+    ResetEdge           : R_TRIG;
+    StartEdge           : R_TRIG;
+    
+    // Machine d'état
+    State               : INT := 0;     // 0 = Idle, 10 = Descente, 20 = Fermeture, 30 = Remontée, 40 = Vidange
+END_VAR
+</Single>
+            <Single Name="LineInfoPersistence" Type="string">578b3bfb-1ae8-48e4-bcd9-49a549303503_Decl_LineIds</Single>
+          </Single>
+        </Single>
+        <Single Name="UniqueIdGenerator" Type="string">184</Single>
+        <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
+        <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
+        <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
+      </Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">2684d018-3180-4ef7-8831-0f7cdc2b3a07</Single>
+      <Array Name="Path" Type="string">
+        <Single Type="string">Device</Single>
+        <Single Type="string">Logique API</Single>
+        <Single Type="string">Application</Single>
+        <Single Type="string">CYCLE</Single>
+      </Array>
+      <Single Name="Index" Type="int">-1</Single>
+    </Single>
+    <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
+      <Single Name="IsRoot" Type="bool">False</Single>
+      <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">ca500197-54ce-48f4-a1e7-d2dc28a40393</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">ST_EncoderCalib</Single>
@@ -101736,7 +101965,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186797257896924</Single>
+        <Single Name="Timestamp" Type="long">639187225943294586</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -101765,12 +101994,11 @@ VAR_GLOBAL
     EmergencyStopOk      : BOOL;
     SlackCableSwitch     : BOOL;
     TopPositionSensor    : BOOL;
-    PhaseRotationOk      : BOOL := TRUE;   // 🆕 Contrôle rotation phases élec. — TRUE = correcte.
-    // ⚠️ Init à TRUE (2026-07-03unvicies, demande utilisateur) : tant que CtrlPhaseRotation_DI
-    // n'existe pas en I/O Mapping, FB_InputsMachine n'écrit jamais cette variable — un BOOL
-    // non initialisé démarre à FALSE (= défaut), ce qui bloquait SafeStop en permanence
-    // (FB_Safety_Winch/Chariot) sans aucun vrai défaut. Principe général : toute information
-    // de sécurité doit démarrer à l'état OK/nominal tant qu'elle n'est pas réellement câblée.
+    PhaseRotationOk      : BOOL;   // 🆕 Contrôle rotation phases élec. — TRUE = correcte.
+    // 🔧 RETIRÉ (2026-07-03duovicies, demande utilisateur) : init `:= TRUE` retirée — l'utilisateur
+    // a créé son propre bypass dédié `GVL_DEBUG.DBG_CtrlPhaseRotation_Bypass_TEST` (OR'é sur le
+    // signal brut dans FB_InputsMachine), cohérent avec le pattern EmergencyStopOk/
+    // TopPositionSensor (aucun des deux n'a d'init GVL_IN non plus). Voir AUDIT D75.
 
     // 🪝 WINCH M1
     M1ContactorFeedbackFwd : BOOL;
@@ -111222,7 +111450,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639187198189493182</Single>
+        <Single Name="Timestamp" Type="long">639187224902513567</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -111271,7 +111499,7 @@ VAR_GLOBAL
 	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (à remettre à FALSE en exploitation réelle)
 	DBG_EmergencyStopOkBypass_TEST : BOOL := TRUE; // TRUE = force EmergencyStopOk réel à TRUE (test banc sans AU câblé)
 	// 🔴 BYPASS TEST BANC — INITIALISÉ À FALSE (actionné ponctuellement pour le homing)
-	DBG_TopPositionSensorBypass_TEST : BOOL := FALSE; // TRUE = force M1_M2_TopPositionSensor à TRUE (test banc, re-homing sans actionner le capteur)
+	DBG_TopPositionSensorBypass_TEST : BOOL := TRUE; // TRUE = force M1_M2_TopPositionSensor à TRUE (test banc, re-homing sans actionner le capteur)
 	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (homme-mort forcé)
 	DBG_DeadmanBypass_TEST : BOOL := TRUE; // TRUE = force DeadmanArmed à TRUE en permanence (bouton non nécessaire, essais joystick)
 	// 🔴 BYPASS TEST BANC — INITIALISÉ À TRUE POUR ESSAIS SUR BANC (retours contacteurs shuntés)
@@ -111332,7 +111560,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639187208020729617</Single>
+        <Single Name="Timestamp" Type="long">639187219711999207</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -111415,26 +111643,22 @@ END_IF;
 instDiagCanOpen(
     Enable := TRUE,
     Reset := MachineReset_IHM,
-    CanOnline := TRUE,         // 🔴 TODO CONFIRMER propriété device CAN (voir en-tête section)
-    CanOperational := TRUE     // 🔴 TODO CONFIRMER propriété device CAN (voir en-tête section)
+    CanOnline := (CANbus.GetBusState() = 1) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, // 1 = ACTIVE (ou bypass test banc)
+    CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST
 );
 
-// 🔴 TODO CONFIRMER (2026-07-03octies) : `EnableDiagnosis=False` sur COD1_CODEUR/COD2_CODEUR/
-// AC600_ECAT_Drive dans le projet CODESYS actuel (vérifié dans Device.export) — `.xError`/
-// `.wState` PAS garantis fiables tant que le diagnostic device n'est pas activé. Littéraux
-// TODO conservés (comportement inchangé, SANS RISQUE) en attendant : voir note d'application
-// DOC/AUDIT_Coherence_Documentaire_v1.0.md §16 pour la procédure d'activation CODESYS +
-// remplacer VariateurWcState/SlaveState, EncoderM1/M2WcState/SlaveState par les VRAIS canaux
-// de diagnostic une fois activés et leurs noms confirmés dans l'assistant de saisie.
+// 🔴 NOTE (2026-07-04) : Les esclaves EtherCAT et CANopen implémentent l'interface IDevice.
+// Nous interrogeons donc leur état de fonctionnement réel via la méthode standard .GetDeviceState()
+// (DEVICE_STATE.RUNNING = état sain / actif).
 instDiagEthercat(
     Enable := TRUE,
     Reset := MachineReset_IHM,          // 🔑 Bouton général machine
-    VariateurWcState := FALSE,          // 🔴 TODO: activer Diagnosis sur AC600_ECAT_Drive (AUDIT §16)
-    VariateurSlaveState := 8,           // 🔴 TODO: idem
-    EncoderM1WcState := FALSE,          // 🔴 TODO: activer Diagnosis sur COD1_CODEUR (AUDIT §16)
-    EncoderM1SlaveState := 8,           // 🔴 TODO: idem
-    EncoderM2WcState := FALSE,          // 🔴 TODO: activer Diagnosis sur COD2_CODEUR (AUDIT §16)
-    EncoderM2SlaveState := 8            // 🔴 TODO: idem
+    VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() &lt;&gt; DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    VariateurSlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
+    EncoderM1WcState := (COD1_CODEUR.GetDeviceState() &lt;&gt; DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM1SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
+    EncoderM2WcState := (COD2_CODEUR.GetDeviceState() &lt;&gt; DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM2SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
 );
 
 (* ═══════════════════════════════════════════════════════════════
@@ -112422,7 +112646,7 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">41bb8952-1bea-480b-95a5-8069cb2c9355_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">41147</Single>
+        <Single Name="UniqueIdGenerator" Type="string">43020</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -112775,7 +112999,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186936056943628</Single>
+        <Single Name="Timestamp" Type="long">639187214781450622</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -115765,7 +115989,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639187187528236017</Single>
+        <Single Name="Timestamp" Type="long">639187211230622149</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -115925,7 +116149,7 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">b5ca6c83-94ac-4d81-b268-1bb24a0ea30e_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">468</Single>
+        <Single Name="UniqueIdGenerator" Type="string">681</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
@@ -116111,7 +116335,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639186893042413554</Single>
+        <Single Name="Timestamp" Type="long">639187223822511733</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -116226,9 +116450,9 @@ VAR_INPUT
     Reset               : BOOL;                     // Acquittement défaut (front)
     MovementRequested   : BOOL;                      // TRUE = FB_Winch demande un mouvement (sens+palier actifs)
     ContactorFeedback   : BOOL;                      // Retour d'état câblé de la bobine/contacteur frein
-    DelayContactClose   : TIME := T#100ms;            // Temps de fermeture contacteur de puissance
-    DelayMagnetise      : TIME := T#300ms;            // Délai magnétisation moteur avant ouverture frein
-    DelayMotorDecel     : TIME := T#500ms;            // Délai décélération/ouverture contacteur avant collage frein
+    DelayContactClose   : TIME := T#50MS;            // Temps de fermeture contacteur de puissance
+    DelayMagnetise      : TIME := T#100MS;            // Délai magnétisation moteur avant ouverture frein
+    DelayMotorDecel     : TIME := T#200ms;            // Délai décélération/ouverture contacteur avant collage frein
     FeedbackTimeout     : TIME := T#1s;               // Délai max cohérence commande/retour frein
 END_VAR
 VAR_OUTPUT

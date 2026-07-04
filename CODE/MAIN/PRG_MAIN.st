@@ -879,7 +879,7 @@ GVL_IHM.WinchM2.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 GVL_PERSISTENT.LimitLegalDepthMinAllowed  := GVL_IHM.LimitLegalDepthMinAllowed;
 GVL_PERSISTENT.LimitLegalEnabled          := GVL_IHM.LimitLegalEnabled;
 GVL_IHM.LimitLegalReached                 := (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled AND ((instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed) OR (instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
-GVL_IHM.TopPositionSensorActive           := GVL_IN.TopPositionSensor;
+GVL_IHM.TopPositionSensorActive           := NOT GVL_IN.TopPositionSensor;   // 🔧 CORRIGÉ 2026-07-04 : TRUE=sain/non atteint côté GVL_IN, "Active" doit être l'inverse
 GVL_Encoder_Stub.M1_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M;
 GVL_Encoder_Stub.M2_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M;
 
