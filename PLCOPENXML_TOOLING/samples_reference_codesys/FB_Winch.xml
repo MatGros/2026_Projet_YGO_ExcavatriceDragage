@@ -1,0 +1,667 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T07:56:09.9828169" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T07:53:26.301727">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Winch" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SafeStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ForbidDescent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ForbidAscent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+            </variable>
+            <variable name="MaxStepDescente">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorFeedbackFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ContactorFeedbackRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RampAccelRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+            </variable>
+            <variable name="RampDecelNormalRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="150" />
+              </initialValue>
+            </variable>
+            <variable name="RampDecelFastRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+            </variable>
+            <variable name="SpeedStepHystMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="DirectionInterlockDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+            </variable>
+            <variable name="ContactorFeedbackTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeDelayContactClose">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeDelayMagnetise">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#300ms" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeDelayMotorDecel">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+            </variable>
+            <variable name="BrakeFeedbackTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 État de référencement du treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 Position actuelle du câble en mètres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="12.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 Position limite haute active (cible homing, m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 Position limite basse active (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 Distance d'approche avant limite pour ralentir (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Contactor1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Contactor2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Contactor3">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Contactor4">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FwdContactorCheck">
+              <type>
+                <derived name="ST_ContactorCheck" />
+              </type>
+            </variable>
+            <variable name="RevContactorCheck">
+              <type>
+                <derived name="ST_ContactorCheck" />
+              </type>
+            </variable>
+            <variable name="BrakeContactorCheck">
+              <type>
+                <derived name="ST_ContactorCheck" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="SpeedStep">
+              <type>
+                <derived name="FB_SpeedStep" />
+              </type>
+            </variable>
+            <variable name="Brake">
+              <type>
+                <derived name="FB_Brake" />
+              </type>
+            </variable>
+            <variable name="CycleTimeCalc">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+            </variable>
+            <variable name="SpeedRamp">
+              <type>
+                <derived name="FB_Ramp" />
+              </type>
+            </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="DirectionChangeDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="CommandedDirection">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="TonFwdFeedback">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonRevFeedback">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="RampTargetPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="DirectionChangePending">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectiveSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   🪝 FB_Winch — Directeur d'un treuil individuel (M1/M2 — instance par treuil)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md
+   🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
+      plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
+   🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
+   📤 Sorties physiques : RelayFwd/RelayRev (contacteurs de sens),
+      Contactor1..4 (contacteurs de vitesse), BrakeCmd (bobine frein) —
+      à câbler manuellement sur les canaux Q réels (I/O Mapping CODESYS).
+   🔒 Interlock changement de sens : jamais Fwd et Rev simultanément.
+      ⚠️ CORRECTIF (retour terrain 2026-07-01) : neutre↔un sens = immédiat ;
+      seule une inversion DIRECTE Fwd↔Rev exige la vitesse confirmée nulle
+      (l'ancienne version exigeait l'arrêt confirmé même pour le tout
+      premier engagement, ce qui bloquait `CommandedDirection` à 0 en
+      permanence — voir §3bis dans le corps ST pour le détail).
+   ⚠️ ÉVOLUTION (retour terrain 2026-07-01) : `Contactor1..4` sont désormais
+      lus directement dans `FB_SpeedStep` (table `P&lt;palier&gt;R&lt;relais&gt;`),
+      plus de masque `BYTE` intermédiaire ni de bit-extraction ici.
+   ⚠️ CORRECTIF (retour terrain 2026-07-02) : une inversion de sens PLUS
+      RAPIDE que le temps de décélération réel pouvait bloquer
+      indéfiniment `CommandedDirection` (le treuil ne s'arrêtait jamais,
+      continuait dans l'ancien sens) — la cible de rampe suivait la
+      magnitude joystick en continu, sans garantie de croiser le seuil
+      d'arrêt. Corrigé : `DirectionChangePending` FORCE désormais la
+      cible à 0.0 dès qu'un changement de sens est en attente, de façon
+      déterministe et indépendante du joystick (voir §3 dans le corps ST).
+   🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
+      codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
+      uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
+   🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
+      entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
+      `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
+      `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
+      déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
+      en train de remonter — voir DOC/AF_Partie9 §4ter pour le contexte
+      d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
+   🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
+      nouveau paramètre `MaxStepDescente` (défaut 2). En descente
+      (`CommandedDirection = -1`), le palier atteignable par `FB_SpeedStep` est
+      plafonné à cette valeur MÊME à consigne joystick 100% — la charge est
+      entraînante en descente (image de couple, pas besoin d'aller vite). En
+      montée, les 5 paliers normaux restent inchangés (`MaxStepNumber := 5`).
+      Ne change PAS la logique de décodage (voir FB_SpeedStep.st), juste le
+      plafond fourni selon le sens.
+   🔧 CORRECTIF (2026-07-03vicies, demande utilisateur, AUDIT D72) : `ForbidDescent`
+      (mou de câble) intègre désormais une VRAIE décélération rapide (comme `SafeStop`)
+      via `EffectiveSafeStop`, au lieu d'un simple masquage brut de `RelayRev`. INHIBÉ
+      quand `CommandedDirection = 1` (montée/enroulement en cours) : l'opérateur peut
+      librement remonter pour reprendre le mou, sans déclencher de décélération. Le
+      masquage `RelayRev := FALSE` sur `ForbidDescent` reste EN PLUS, inconditionnel
+      (filet de sécurité direct, indépendant de la rampe).
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
+    StepNumber := SpeedStep.StepNumber;
+    Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
+          DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
+          DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
+    BrakeCmd := Brake.BrakeCmd;
+    BrakeContactorCheck := Brake.ContactorCheck;
+    CommandedDirection := 0;
+    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    State := E_State.DISABLED;
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+CycleTimeCalc(DefaultValueS := 0.010);
+
+ResetEdge(CLK := Reset);
+
+DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
+
+// 🆕 Mou de câble (ForbidDescent) et Fin de course haut (ForbidAscent) intégrés à une VRAIE
+// décélération rapide (comme SafeStop) :
+// - ForbidDescent est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
+// - ForbidAscent est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
+EffectiveSafeStop := SafeStop 
+                     OR (ForbidDescent AND (CommandedDirection &lt;&gt; 1))
+                     OR (ForbidAscent AND (CommandedDirection &lt;&gt; -1));
+
+RampTargetPct := 0.0;
+IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
+    RampTargetPct := ABS(SpeedRefPct);
+    
+    // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé)
+    // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
+    IF Homed THEN
+        // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
+        IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM &gt;= (TopLimitM - SlowdownDistanceM)) THEN
+            RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
+        END_IF;
+        
+        // En descente (engagement ou mouvement actif), ralentit à l'approche de la limite basse
+        IF ((CommandedDirection = -1) OR (Direction = -1)) AND (CablePosM &lt;= (BottomLimitM + SlowdownDistanceM)) THEN
+            RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
+        END_IF;
+    END_IF;
+END_IF;
+
+SpeedRamp(Target := RampTargetPct,
+          AccelRate := RampAccelRate,
+          DecelRate := SEL(EffectiveSafeStop, RampDecelNormalRate, RampDecelFastRate),
+          CycleTimeS := CycleTimeCalc.CycleTimeS);
+
+IF Direction &lt;&gt; CommandedDirection THEN
+    IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
+        CommandedDirection := Direction;
+        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    ELSIF ABS(SpeedRamp.Current) &lt; 0.1 THEN
+        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
+        IF DirectionChangeDelay.Q THEN
+            CommandedDirection := Direction;
+            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        END_IF;
+    ELSE
+        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    END_IF;
+ELSE
+    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+END_IF;
+
+// 🆕 Plafond palier descente (couple, pas vitesse) : 5 = inchangé en montée/neutre,
+// MaxStepDescente uniquement si CommandedDirection = -1 (Rev)
+SpeedStep(Enable := (ABS(SpeedRamp.Current) &gt; 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
+          Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
+          MaxStepNumber := SEL(CommandedDirection = -1, 5, MaxStepDescente));
+StepNumber := SpeedStep.StepNumber;
+Contactor1 := SpeedStep.Contactor1;
+Contactor2 := SpeedStep.Contactor2;
+Contactor3 := SpeedStep.Contactor3;
+Contactor4 := SpeedStep.Contactor4;
+
+RelayFwd := (CommandedDirection = 1) AND (StepNumber &gt; 0);
+RelayRev := (CommandedDirection = -1) AND (StepNumber &gt; 0);
+
+IF ForbidDescent THEN
+    RelayRev := FALSE;
+END_IF;
+
+IF ForbidAscent THEN
+    RelayFwd := FALSE;
+END_IF;
+
+Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev),
+      ContactorFeedback := BrakeFeedback,
+      DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
+      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
+BrakeCmd := Brake.BrakeCmd;
+BrakeContactorCheck := Brake.ContactorCheck;
+
+FwdContactorCheck.Command := RelayFwd;
+FwdContactorCheck.Feedback := ContactorFeedbackFwd;
+TonFwdFeedback(IN := (RelayFwd &lt;&gt; ContactorFeedbackFwd), PT := ContactorFeedbackTimeout);
+IF TonFwdFeedback.Q THEN
+    FwdContactorCheck.StuckClosed := (NOT RelayFwd AND ContactorFeedbackFwd);
+    FwdContactorCheck.StuckOpen   := (RelayFwd AND NOT ContactorFeedbackFwd);
+ELSIF ResetEdge.Q THEN
+    FwdContactorCheck.StuckClosed := FALSE; FwdContactorCheck.StuckOpen := FALSE;
+END_IF;
+
+RevContactorCheck.Command := RelayRev;
+RevContactorCheck.Feedback := ContactorFeedbackRev;
+TonRevFeedback(IN := (RelayRev &lt;&gt; ContactorFeedbackRev), PT := ContactorFeedbackTimeout);
+IF TonRevFeedback.Q THEN
+    RevContactorCheck.StuckClosed := (NOT RelayRev AND ContactorFeedbackRev);
+    RevContactorCheck.StuckOpen   := (RelayRev AND NOT ContactorFeedbackRev);
+ELSIF ResetEdge.Q THEN
+    RevContactorCheck.StuckClosed := FALSE; RevContactorCheck.StuckOpen := FALSE;
+END_IF;
+
+IF Brake.Error THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+// 🔴 BYPASS TEST BANC (2026-07-03vicies, demande utilisateur) — sans contacteurs réels câblés/
+// cohérents en essai, StuckClosed/StuckOpen se déclenche à tort et bloque RelayFwd/RelayRev
+// (voir Error plus bas). TOUJOURS FALSE en exploitation réelle.
+IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+    IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0002;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFD;
+    END_IF;
+
+    IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
+        ErrorId := ErrorId OR 16#0004;
+    ELSIF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFB;
+    END_IF;
+ELSE
+    ErrorId := ErrorId AND 16#FFF9;   // Bypass actif : efface/maintient à 0 les bits 1/2
+END_IF;
+
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
+    State := E_State.STOPPING;
+ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
+    State := E_State.BUSY;
+ELSE
+    State := E_State.READY;
+END_IF;
+
+Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
+Done := FALSE;
+
+IF Error THEN
+    RelayFwd := FALSE;
+    RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fe1e6af7-da18-4559-8d7e-415a962a53ee</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="WINCH">
+          <Object Name="FB_Winch" ObjectId="fe1e6af7-da18-4559-8d7e-415a962a53ee" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

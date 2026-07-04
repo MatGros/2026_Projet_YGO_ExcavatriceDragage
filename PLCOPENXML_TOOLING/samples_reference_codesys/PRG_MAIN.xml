@@ -1,4 +1,335 @@
-(* ═══════════════════════════════════════════════════════════════
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T07:58:50.8947168" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T07:53:26.301727">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_MAIN" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="instDiagCanOpen">
+              <type>
+                <derived name="FB_DiagCanOpen" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Diagnostic CAN/Joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instDiagEthercat">
+              <type>
+                <derived name="FB_DiagEthercat" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Diagnostic EtherCAT (3 devices)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instInputsMachine">
+              <type>
+                <derived name="FB_InputsMachine" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🧰 FB_INPUTSMACHINE/FB_OUTPUTSMACHINE — conditionnement I/O réel de toute la machine
+ (2026-07-03nonies, scinde l'ancien FB_IO_Machine — 1 instance chacun, APPELÉE UNE
+ SEULE FOIS : entrées tôt (avant Homing/Safety/Winch/Chariot), sorties tard (après
+ FB_Winch/FB_Chariot). Voir en-têtes FB_InputsMachine.st/FB_OutputsMachine.st.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instOutputsMachine">
+              <type>
+                <derived name="FB_OutputsMachine" />
+              </type>
+            </variable>
+            <variable name="FB_Joystick_0">
+              <type>
+                <derived name="FB_Joystick" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instModes">
+              <type>
+                <derived name="FB_Modes" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🎚️ FB_MODES — arbitrage du mode machine, 1 SEULE instance (remplace E_Mode.MAINT_N1 codé
+ en dur partout). Voir en-tête FB_Modes.st.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultPresentM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📤 instEncoderSafetyM1.EncoderIncoherent (calculé plus bas, 1 cycle de retard)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultPresentM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📤 instEncoderSafetyM2.EncoderIncoherent (calculé plus bas, 1 cycle de retard)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultPresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📤 OR des deux — entrée instModes (1 cycle de retard, cf en-tête FB_Modes.st)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderAbsM1">
+              <type>
+                <derived name="FB_Encoder_Abs" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🧲 CODEUR — acquisition + mise à l'échelle + homing (flux nominal), 1 instance par treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderScaleM1">
+              <type>
+                <derived name="FB_Encoder_Scale" />
+              </type>
+            </variable>
+            <variable name="instHomingM1">
+              <type>
+                <derived name="FB_Encoder_Homing" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ✅ 2026-07-02 — possède Calib (RETAIN) en interne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderAbsM2">
+              <type>
+                <derived name="FB_Encoder_Abs" />
+              </type>
+            </variable>
+            <variable name="instEncoderScaleM2">
+              <type>
+                <derived name="FB_Encoder_Scale" />
+              </type>
+            </variable>
+            <variable name="instHomingM2">
+              <type>
+                <derived name="FB_Encoder_Homing" />
+              </type>
+            </variable>
+            <variable name="instEncoderSafetyM1">
+              <type>
+                <derived name="FB_Encoder_Safety" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🛡️ FB_ENCODER_SAFETY — bornage ±99m + relais HomingSuspect, 1 instance par treuil (répond
+ à l'incident CablePosM≈4096m). Voir en-tête FB_Encoder_Safety.st.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderSafetyM2">
+              <type>
+                <derived name="FB_Encoder_Safety" />
+              </type>
+            </variable>
+            <variable name="instSafetyWinchM1">
+              <type>
+                <derived name="FB_Safety_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 SAFETY — bloc safety métier du domaine treuil, 1 instance par treuil
+ (même TYPE FB_Safety_Winch, 2 instances — Partie10 §7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instSafetyWinchM2">
+              <type>
+                <derived name="FB_Safety_Winch" />
+              </type>
+            </variable>
+            <variable name="instWinchSync">
+              <type>
+                <derived name="FB_WinchSync" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ⚖️ FB_WINCHSYNC — surveillance écart M1/M2, 1 SEULE instance (squelette de liaisons,
+ pas de correction — voir en-tête FB_WinchSync.st et Partie9 §9).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchM1">
+              <type>
+                <derived name="FB_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🪝 WINCH — M1 et M2 (consigne dupliquée sur l'axe Y, Maintenance N1, choix 2026-07-02)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchM2">
+              <type>
+                <derived name="FB_Winch" />
+              </type>
+            </variable>
+            <variable name="instSafetyChariotM3">
+              <type>
+                <derived name="FB_Safety_Chariot" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ↔️ CHARIOT — M3, axe X joystick (intégré 2026-07-02, mode DEGRADED_IO figé — Partie11 §7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instChariotM3">
+              <type>
+                <derived name="FB_Chariot" />
+              </type>
+            </variable>
+            <variable name="StubMachineEnableN1">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🎚️ Stub Maintenance N1 pour ce lot (Enable, PAS le Mode — voir instModes ci-dessus)
+ — à remplacer par une vraie arbitrage FB_Modes quand FB_Cycle existera</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instGrappin">
+              <type>
+                <derived name="FB_Grappin" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🪣 GRAPPIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GrappinCmdOpen_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🖥️ Commande d'ouverture IHM (bouton)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="GrappinCmdClose_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🖥️ Commande de fermeture IHM (bouton)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_StartStop_Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Consigne StartStop arbitrée pour M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_Direction_Active">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Consigne Direction arbitrée pour M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SpeedRef_Active">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Consigne SpeedRef arbitrée pour M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SpeedStepTableActive">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Table de paliers active de M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimulatedM1Raw">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🛠️ Variables de simulation pour banc de test (mouvement simulé des treuils)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimulatedM2Raw">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000000" />
+              </initialValue>
+            </variable>
+            <variable name="M1_RawPosToUse">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M2_RawPosToUse">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="InitDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🧪 Initialisation unique au boot (simulation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM1_Active">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📐 Limites basses actives et blocages de descente calculés (légal + longueur câble)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM2_Active">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="ForbidDescentM1_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ForbidDescentM2_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
    🧠 PRG_MAIN — Orchestration séquentielle (diag → sécurité → métier)
    ───────────────────────────────────────────────────────────────
    📄 Contient : Joystick (axe Y) → FB_Safety_Winch (M1/M2) → FB_Winch (M1+M2,
@@ -37,102 +368,13 @@
    📚 Historique complet des décisions (D1-D75, dont renommage I/O `_DI`/`_DQ`/
       `_RQ`, retours frein réels, `GVL_IN`/`GVL_OUT`) :
       DOC/AUDIT_Coherence_Documentaire_v1.0.md
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU PRG_MAIN) ===
-
-PROGRAM PRG_MAIN
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
-
-VAR_IN_OUT
-END_VAR
-
-VAR
-    instDiagCanOpen  : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
-    instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
-
-    // 🧰 FB_INPUTSMACHINE/FB_OUTPUTSMACHINE — conditionnement I/O réel de toute la machine
-    // (2026-07-03nonies, scinde l'ancien FB_IO_Machine — 1 instance chacun, APPELÉE UNE
-    // SEULE FOIS : entrées tôt (avant Homing/Safety/Winch/Chariot), sorties tard (après
-    // FB_Winch/FB_Chariot). Voir en-têtes FB_InputsMachine.st/FB_OutputsMachine.st.
-    instInputsMachine  : FB_InputsMachine;
-    instOutputsMachine : FB_OutputsMachine;
-
-    // 🕹️ Instance unique du traitement joystick (pipeline calib/filtre/rampe)
-    FB_Joystick_0 : FB_Joystick;
-
-    // 🎚️ FB_MODES — arbitrage du mode machine, 1 SEULE instance (remplace E_Mode.MAINT_N1 codé
-    // en dur partout). Voir en-tête FB_Modes.st.
-    instModes : FB_Modes;
-    EncoderFaultPresentM1 : BOOL;   // 📤 instEncoderSafetyM1.EncoderIncoherent (calculé plus bas, 1 cycle de retard)
-    EncoderFaultPresentM2 : BOOL;   // 📤 instEncoderSafetyM2.EncoderIncoherent (calculé plus bas, 1 cycle de retard)
-    EncoderFaultPresent   : BOOL;   // 📤 OR des deux — entrée instModes (1 cycle de retard, cf en-tête FB_Modes.st)
-
-    // 🧲 CODEUR — acquisition + mise à l'échelle + homing (flux nominal), 1 instance par treuil
-    instEncoderAbsM1   : FB_Encoder_Abs;
-    instEncoderScaleM1 : FB_Encoder_Scale;
-    instHomingM1       : FB_Encoder_Homing;   // ✅ 2026-07-02 — possède Calib (RETAIN) en interne
-    instEncoderAbsM2   : FB_Encoder_Abs;
-    instEncoderScaleM2 : FB_Encoder_Scale;
-    instHomingM2       : FB_Encoder_Homing;
-
-    // 🛡️ FB_ENCODER_SAFETY — bornage ±99m + relais HomingSuspect, 1 instance par treuil (répond
-    // à l'incident CablePosM≈4096m). Voir en-tête FB_Encoder_Safety.st.
-    instEncoderSafetyM1 : FB_Encoder_Safety;
-    instEncoderSafetyM2 : FB_Encoder_Safety;
-
-    // 🔌 SAFETY — bloc safety métier du domaine treuil, 1 instance par treuil
-    // (même TYPE FB_Safety_Winch, 2 instances — Partie10 §7)
-    instSafetyWinchM1 : FB_Safety_Winch;
-    instSafetyWinchM2 : FB_Safety_Winch;
-
-    // ⚖️ FB_WINCHSYNC — surveillance écart M1/M2, 1 SEULE instance (squelette de liaisons,
-    // pas de correction — voir en-tête FB_WinchSync.st et Partie9 §9).
-    instWinchSync : FB_WinchSync;
-
-    // 🪝 WINCH — M1 et M2 (consigne dupliquée sur l'axe Y, Maintenance N1, choix 2026-07-02)
-    instWinchM1 : FB_Winch;
-    instWinchM2 : FB_Winch;
-
-    // ↔️ CHARIOT — M3, axe X joystick (intégré 2026-07-02, mode DEGRADED_IO figé — Partie11 §7)
-    instSafetyChariotM3 : FB_Safety_Chariot;
-    instChariotM3       : FB_Chariot;
-
-    // 🎚️ Stub Maintenance N1 pour ce lot (Enable, PAS le Mode — voir instModes ci-dessus)
-    // — à remplacer par une vraie arbitrage FB_Modes quand FB_Cycle existera
-    StubMachineEnableN1 : BOOL := TRUE;
-
-    // 🪣 GRAPPIN
-    instGrappin             : FB_Grappin;
-    GrappinCmdOpen_IHM      : BOOL;             // 🖥️ Commande d'ouverture IHM (bouton)
-    GrappinCmdClose_IHM     : BOOL;             // 🖥️ Commande de fermeture IHM (bouton)
-    M2_StartStop_Active     : BOOL;             // Consigne StartStop arbitrée pour M2
-    M2_Direction_Active     : INT;              // Consigne Direction arbitrée pour M2
-    M2_SpeedRef_Active      : REAL;             // Consigne SpeedRef arbitrée pour M2
-    M2_SpeedStepTableActive : ST_SpeedStepTable; // Table de paliers active de M2
-
-    // 🛠️ Variables de simulation pour banc de test (mouvement simulé des treuils)
-    SimulatedM1Raw          : UDINT := 1000000;
-    SimulatedM2Raw          : UDINT := 1000000;
-    M1_RawPosToUse          : UDINT;
-    M2_RawPosToUse          : UDINT;
-    InitDone                : BOOL;             // 🧪 Initialisation unique au boot (simulation)
-    
-    // 📐 Limites basses actives et blocages de descente calculés (légal + longueur câble)
-    BottomLimitM1_Active    : REAL;
-    BottomLimitM2_Active    : REAL;
-    ForbidDescentM1_Active  : BOOL;
-    ForbidDescentM2_Active  : BOOL;
-END_VAR
-
-// 💾 Bloc VAR RETAIN SUPPRIMÉ (2026-07-03) : toutes les variables de calibration
-// et réglage de mise en service sont désormais dans GVL_PERSISTENT (survivent aux
-// téléchargements de programme). Voir CODE/SYSTEM/GVL_PERSISTENT.st.
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
+   ═══════════════════════════════════════════════════════════════ 
+ === DECLARATION (à coller dans la partie déclaration du POU PRG_MAIN) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">// === IMPLEMENTATION (à coller dans le corps ST du POU PRG_MAIN) ===
 
 // 🧪 LOGIQUE D'INITIALISATION AU BOOT SUR BANC (Simulation)
 IF NOT InitDone THEN
@@ -219,11 +461,11 @@ instDiagCanOpen(
 instDiagEthercat(
     Enable := TRUE,
     Reset := MachineReset_IHM,          // 🔑 Bouton général machine
-    VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() &lt;&gt; DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
     VariateurSlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
-    EncoderM1WcState := (COD1_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM1WcState := (COD1_CODEUR.GetDeviceState() &lt;&gt; DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
     EncoderM1SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
-    EncoderM2WcState := (COD2_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    EncoderM2WcState := (COD2_CODEUR.GetDeviceState() &lt;&gt; DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
     EncoderM2SlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
 );
 
@@ -275,7 +517,7 @@ instModes(
    ═══════════════════════════════════════════════════════════════ *)
 
 FB_Joystick_0(
-    // 🟢 --- Autorisations & sécurité ---
+    // 🟢 --- Autorisations &amp; sécurité ---
     Enable          := GVL_DEBUG.DBG_True,      // ⚠️ DEBUG : remplacer par autorisation réelle
     EmergencyStopOk := GVL_IN.EmergencyStopOk,
     Reset           := MachineReset_IHM,
@@ -323,7 +565,7 @@ IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
     ELSIF GVL_OUT.M1RelayFwd THEN
         SimulatedM1Raw := SimulatedM1Raw + REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1);
     ELSIF GVL_OUT.M1RelayRev THEN
-        IF SimulatedM1Raw >= REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1) THEN
+        IF SimulatedM1Raw &gt;= REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1) THEN
             SimulatedM1Raw := SimulatedM1Raw - REAL_TO_UDINT(instWinchM1.SpeedRamp.Current * 0.1);
         ELSE
             SimulatedM1Raw := 0;
@@ -336,7 +578,7 @@ IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
     ELSIF GVL_OUT.M2RelayFwd THEN
         SimulatedM2Raw := SimulatedM2Raw + REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1);
     ELSIF GVL_OUT.M2RelayRev THEN
-        IF SimulatedM2Raw >= REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1) THEN
+        IF SimulatedM2Raw &gt;= REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1) THEN
             SimulatedM2Raw := SimulatedM2Raw - REAL_TO_UDINT(instWinchM2.SpeedRamp.Current * 0.1);
         ELSE
             SimulatedM2Raw := 0;
@@ -652,13 +894,13 @@ END_IF;
 ForbidDescentM1_Active := instSafetyWinchM1.ForbidDescent
                           OR ((instModes.Mode = E_Mode.SEMI_AUTO)
                               AND GVL_PERSISTENT.LimitLegalEnabled
-                              AND (instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                              AND (instEncoderScaleM1.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 // 4. ForbidDescent M2
 ForbidDescentM2_Active := instSafetyWinchM2.ForbidDescent
                           OR ((instModes.Mode = E_Mode.SEMI_AUTO)
                               AND GVL_PERSISTENT.LimitLegalEnabled
-                              AND (instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                              AND (instEncoderScaleM2.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 
 instWinchM1(
@@ -669,7 +911,7 @@ instWinchM1(
     Mode                    := instModes.Mode,
 
     StartStop               := FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy, // Bloqué pendant le mouvement grappin
-    SafeStop                := instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
+    SafeStop                := instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000),
     ForbidDescent           := ForbidDescentM1_Active,           // 🆕 Mou de câble / longueur max / limite légale
     ForbidAscent            := instSafetyWinchM1.ForbidAscent,   // 🆕 Fin de course haut
     Direction               := FB_Joystick_0.AxisCmdY.Direction,
@@ -698,7 +940,7 @@ instWinchM2(
     Mode                    := instModes.Mode,
 
     StartStop               := M2_StartStop_Active,           // Arbitré grappin
-    SafeStop                := instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
+    SafeStop                := instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000),
     ForbidDescent           := ForbidDescentM2_Active,           // 🆕 Mou de câble / longueur max / limite légale
     ForbidAscent            := instSafetyWinchM2.ForbidAscent,   // 🆕 Fin de course haut
     Direction               := M2_Direction_Active,           // Arbitré grappin
@@ -853,34 +1095,34 @@ GVL_PERSISTENT.WinchM2RampDecelFast_Pct  := GVL_IHM.WinchM2.RampDecelFastRate;
 GVL_PERSISTENT.WinchSyncTolerance_M      := GVL_IHM.Sync.SyncToleranceM;
 GVL_PERSISTENT.GrappinConfig             := GVL_IHM.Grappin.Config;
 // Propagation synchrone bidirectionnelle de la limite de câble
-IF GVL_IHM.WinchM1.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
+IF GVL_IHM.WinchM1.CableLimitDescentM &lt;&gt; GVL_PERSISTENT.CableLimitDescent_M THEN
     GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM1.CableLimitDescentM;
-ELSIF GVL_IHM.WinchM2.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
+ELSIF GVL_IHM.WinchM2.CableLimitDescentM &lt;&gt; GVL_PERSISTENT.CableLimitDescent_M THEN
     GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM2.CableLimitDescentM;
 END_IF;
 GVL_IHM.WinchM1.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescent_M;
 GVL_IHM.WinchM2.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescent_M;
 
 // Propagation synchrone bidirectionnelle de la distance de ralentissement
-IF GVL_IHM.WinchM1.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
+IF GVL_IHM.WinchM1.SlowdownDistanceM &lt;&gt; GVL_PERSISTENT.WinchSlowdownDistance_M THEN
     GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM1.SlowdownDistanceM;
-ELSIF GVL_IHM.WinchM2.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
+ELSIF GVL_IHM.WinchM2.SlowdownDistanceM &lt;&gt; GVL_PERSISTENT.WinchSlowdownDistance_M THEN
     GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM2.SlowdownDistanceM;
 END_IF;
 GVL_IHM.WinchM1.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
 GVL_IHM.WinchM2.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
 
 // Propagation synchrone bidirectionnelle de la vitesse de ralentissement
-IF GVL_IHM.WinchM1.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
+IF GVL_IHM.WinchM1.SlowSpeedPct &lt;&gt; GVL_PERSISTENT.WinchSlowSpeedPct THEN
     GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.WinchM1.SlowSpeedPct;
-ELSIF GVL_IHM.WinchM2.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
+ELSIF GVL_IHM.WinchM2.SlowSpeedPct &lt;&gt; GVL_PERSISTENT.WinchSlowSpeedPct THEN
     GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.WinchM2.SlowSpeedPct;
 END_IF;
 GVL_IHM.WinchM1.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 GVL_IHM.WinchM2.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 GVL_PERSISTENT.LimitLegalDepthMinAllowed  := GVL_IHM.LimitLegalDepthMinAllowed;
 GVL_PERSISTENT.LimitLegalEnabled          := GVL_IHM.LimitLegalEnabled;
-GVL_IHM.LimitLegalReached                 := (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled AND ((instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed) OR (instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+GVL_IHM.LimitLegalReached                 := (instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled AND ((instEncoderScaleM1.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed) OR (instEncoderScaleM2.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 GVL_IHM.TopPositionSensorActive           := NOT GVL_IN.TopPositionSensor;   // 🔧 CORRIGÉ 2026-07-04 : TRUE=sain/non atteint côté GVL_IN, "Active" doit être l'inverse
 GVL_Encoder_Stub.M1_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M;
 GVL_Encoder_Stub.M2_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M;
@@ -921,7 +1163,7 @@ GVL_IHM.WinchM1.ForbidAscentActive          := instSafetyWinchM1.ForbidAscent;
 GVL_IHM.WinchM1.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM1.ThermalFault                := NOT GVL_IN.M1ThermalFeedback;
 GVL_IHM.WinchM1.EncoderFault                := NOT instEncoderAbsM1.EncoderAvailable OR instEncoderSafetyM1.EncoderIncoherent;
-GVL_IHM.WinchM1.CableLimitDescentReached    := (instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
+GVL_IHM.WinchM1.CableLimitDescentReached    := (instSafetyWinchM1.ErrorId AND 16#0040) &lt;&gt; 16#0000;
 GVL_IHM.WinchM1.Encoder.RawPos              := instEncoderAbsM1.RawPos;
 GVL_IHM.WinchM1.Encoder.Alarms              := instEncoderAbsM1.AlarmsIn;
 GVL_IHM.WinchM1.Encoder.Warnings            := instEncoderAbsM1.WarningsIn;
@@ -956,7 +1198,7 @@ GVL_IHM.WinchM2.ForbidAscentActive          := instSafetyWinchM2.ForbidAscent;
 GVL_IHM.WinchM2.SlackCableDetected          := NOT GVL_IN.SlackCableSwitch;
 GVL_IHM.WinchM2.ThermalFault                := NOT GVL_IN.M2ThermalFeedback;
 GVL_IHM.WinchM2.EncoderFault                := NOT instEncoderAbsM2.EncoderAvailable OR instEncoderSafetyM2.EncoderIncoherent;
-GVL_IHM.WinchM2.CableLimitDescentReached    := (instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
+GVL_IHM.WinchM2.CableLimitDescentReached    := (instSafetyWinchM2.ErrorId AND 16#0040) &lt;&gt; 16#0000;
 GVL_IHM.WinchM2.Encoder.RawPos              := instEncoderAbsM2.RawPos;
 GVL_IHM.WinchM2.Encoder.Alarms              := instEncoderAbsM2.AlarmsIn;
 GVL_IHM.WinchM2.Encoder.Warnings            := instEncoderAbsM2.WarningsIn;
@@ -1071,3 +1313,27 @@ PowerCutOff_A_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutO
                     OR instSafetyChariotM3.PowerCutOff;
 PowerCutOff_B_RQ := PowerCutOff_A_RQ;  // 🧨 Canal B = même signal — redondance matérielle par 2 cartes distinctes
 
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>41bb8952-1bea-480b-95a5-8069cb2c9355</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="MAIN">
+          <Object Name="PRG_MAIN" ObjectId="41bb8952-1bea-480b-95a5-8069cb2c9355" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
