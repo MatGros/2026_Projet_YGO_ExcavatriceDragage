@@ -1059,14 +1059,15 @@ GVL_OUT.ChariotBrakeCmd   := instChariotM3.BrakeCmd;
 instOutputsMachine();
 
 (* ═══════════════════════════════════════════════════════════════
-   🧨 8. POWERCUTOFF — agrégat coupure puissance amont (Lot A, 2026-07-03sexies)
+   🧨 8. POWERCUTOFF — Coupure puissance amont REDONDANTE (2026-07-04)
    ───────────────────────────────────────────────────────────────
-   OR des sorties PowerCutOff des blocs safety métier (Partie2 §6 : coupure puissance
-   amont si contacteur collé). Aujourd'hui les 3 sorties sont TOUJOURS FALSE (pas de
-   ST_ContactorCheck de puissance câblé dans les FB safety — TBD assumé).
-   🔧 CORRECTIF (2026-07-03quindecies) : relais réel câblé en I/O Mapping
-   (`PowerCutOff_RQ`) — remplace le stub `GVL_Machine_Stub.PowerCutOffCmd`, retiré.
+   Deux relais (A et B) commandés SIMULTANÉMENT par le même signal.
+   Contacts câblés EN SÉRIE côté puissance : si un relais colle (contact soudé),
+   l'autre assure quand même la coupure. Diversité matérielle : 2 cartes I/O différentes.
+   Aujourd'hui PowerCutOff = FALSE sur tous les FB Safety (TBD — logique à définir).
    ═══════════════════════════════════════════════════════════════ *)
 
-PowerCutOff_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
-                  OR instSafetyChariotM3.PowerCutOff;
+PowerCutOff_A_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
+                    OR instSafetyChariotM3.PowerCutOff;
+PowerCutOff_B_RQ := PowerCutOff_A_RQ;  // 🧨 Canal B = même signal — redondance matérielle par 2 cartes distinctes
+
