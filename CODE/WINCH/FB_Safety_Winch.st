@@ -67,29 +67,30 @@ VAR_INPUT
     Reset               : BOOL;        // Front acquittement défauts
     EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
     Mode                : E_Mode;      // Mode courant (autorisations)
+    OverrideSync        : BOOL;        // 🆕 OverrideSync actif (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (procédure récupération manuelle)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
-    ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
-    SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
-    PhaseRotationOk     : BOOL;        // 🆕 GVL_IN.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
-    TopPositionSensor   : BOOL;        // 🆕 Capteur de position haute commun (M1_M2_TopPositionSensor, I/O réel)
-    InReferencingMode   : BOOL;        // 🆕 Indique si le treuil est en cours de homing (référencement)
-    CablePosM           : REAL;        // 🆕 Position actuelle du câble en mètres (scaled)
-    CableLimitDescentM  : REAL;        // 🆕 Limite basse physique de descente en mètres (négative)
+    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT GVL_IN.M1/M2ThermalFeedback)
+    SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si OverrideSync
+    PhaseRotationOk     : BOOL;        // GVL_IN.PhaseRotationOk (commun) — TRUE = rotation phases correcte
+    TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
+    InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
+    CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
+    CableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN ; bit1 : perte codeur de ce treuil ; bit2 : surchauffe moteur ; bit3 : mou de câble (commun) ; bit4 : mauvaise rotation de phase (commun) ; bit5 : fin de course haut atteint ; bit6 : longueur max câble atteinte (déroulement)
+    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe ; bit3:mou câble M2 (SafeStop ou ForbidAscent si OverrideSync) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu) — bits 0/1/2/4 uniquement
-    ForbidDescent       : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la descente (bit3, mou de câble)
-    ForbidAscent        : BOOL;        // 🆕 Sortie dédiée : interdit UNIQUEMENT la montée (bit5, fin de course haut)
-    PowerCutOff         : BOOL;        // 🧨 Sortie maîtresse : coupure puissance amont (FALSE, TBD ce lot)
+    SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4 (mou câble inclus SAUF si OverrideSync)
+    ForbidDescent       : BOOL;        // ⬇️ Interdit descente uniquement — bit6 (limite basse câble)
+    ForbidAscent        : BOOL;        // ⬆️ Interdit montée uniquement — bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble)
+    PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont (FALSE, TBD ce lot)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -135,11 +136,12 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
 END_IF;
 
-// 🔍 3quater. MOU DE CÂBLE (câblé — I/O réel 2026-07-02, commun M1/M2) — bit3, N'ARRÊTE PAS
-// la remontée : voir §4ter Partie9 (ForbidDescent dédié, distinct de SafeStop ci-dessous).
+// 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
+// Mode NORMAL (OverrideSync=FALSE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
+// Mode RÉCUPÉRATION (OverrideSync=TRUE) → ForbidAscent uniquement (montée interdite, descente OK)
 IF SlackCableDetected THEN
     ErrorId := ErrorId OR 16#0008;
-ELSIF ResetEdge.Q THEN
+ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
@@ -180,16 +182,20 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🟧 SafeStop : bits 0 (joystick)/1 (codeur)/2 (thermique)/4 (rotation phase) — arrêt total des
-// 2 sens. Le mou de câble (bit3), le fin de course haut (bit5) et la longueur max câble (bit6)
-// sont EXCLUS : ils n'interdisent qu'un seul sens de marche (voir ForbidDescent/ForbidAscent).
-SafeStop := (ErrorId AND 16#0017) <> 16#0000;
+// 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique, MOU CÂBLE, phases)
+// ⚠️ bit3 (mou câble) est EXCLU du SafeStop si OverrideSync=TRUE (procédure récupération manuelle)
+IF OverrideSync THEN
+    SafeStop := (ErrorId AND 16#0017) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+ELSE
+    SafeStop := (ErrorId AND 16#001F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+END_IF;
 
-// 🆕 ForbidDescent : reflète le bit3 (mou de câble) OU le bit6 (longueur max de câble) — interdit la descente.
-ForbidDescent := (ErrorId AND 16#0048) <> 16#0000;
+// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble). Le mou câble → SafeStop (pas ForbidDescent)
+ForbidDescent := (ErrorId AND 16#0040) <> 16#0000;
 
-// 🆕 ForbidAscent : reflète le bit5 (fin de course haut) — interdit la montée.
-ForbidAscent := (ErrorId AND 16#0020) <> 16#0000;
+// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble : montée interdite même en récup)
+ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
+             OR ((ErrorId AND 16#0008) <> 16#0000 AND OverrideSync);
 
 PowerCutOff := FALSE;       // 🧨 TBD — pas de ST_ContactorCheck de puissance câblé dans ce lot
 
