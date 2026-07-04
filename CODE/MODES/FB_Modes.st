@@ -40,7 +40,7 @@ VAR_OUTPUT
     State               : E_State;
     StateAtError        : E_State;
     Mode                : E_Mode;      // 🎯 Mode ARBITRÉ — diffusé à TOUS les FB métier (remplace E_Mode.MAINT_N1 codé en dur)
-    OverrideSync        : BOOL;        // → FB_WinchSync.Enable := NOT OverrideSync (actif UNIQUEMENT si Mode=MAINT_N2)
+    OverrideSync        : BOOL;        // → Actif si Mode=MAINT_N1 OU MAINT_N2 AND OverrideSyncRequest (Décision D_OVERRIDESYNC 2026-07-04)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -89,8 +89,10 @@ ELSE
     Mode := ModeRequest;
 END_IF;
 
-// 📤 5. OVERRIDE SYNC — actionnable UNIQUEMENT en MAINT_N2 (Partie5 §2)
-OverrideSync := (Mode = E_Mode.MAINT_N2) AND OverrideSyncRequest;
+// 📤 5. OVERRIDE SYNC — actionnable en MAINT_N1 OU MAINT_N2 (Décision D_OVERRIDESYNC 2026-07-04)
+// Anciennement restreint à MAINT_N2 uniquement, mais l'opérateur peut avoir besoin de la
+// procédure de récupération mou câble dès MAINT_N1.
+OverrideSync := (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) AND OverrideSyncRequest;
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);

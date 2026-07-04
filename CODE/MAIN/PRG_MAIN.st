@@ -549,6 +549,7 @@ instSafetyWinchM1(
 
     EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
+    OverrideSync        := instModes.OverrideSync,   // 🆕 Procédure récupération mou câble
 
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,
@@ -568,6 +569,7 @@ instSafetyWinchM2(
 
     EmergencyStopOk     := GVL_IN.EmergencyStopOk,
     Mode                := instModes.Mode,
+    OverrideSync        := instModes.OverrideSync,   // 🆕 Même OverrideSync que M1 (procédure récupération)
 
     JoystickOnline      := instDiagCanOpen.Joystick.Online,
     JoystickOperational := instDiagCanOpen.Joystick.Operational,

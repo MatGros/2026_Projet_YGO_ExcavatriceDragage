@@ -759,3 +759,25 @@ de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
 ### Fichiers impactés (2026-07-03quadravicies)
 - **CODE/** : `FB_Grappin.st`, `ST_GrappinConfig.st`, `ST_GrappinState.st`, `PRG_MAIN.st`.
 - **DOC/** : `AF_Partie12_Fonction_Grappin_v1.0.md` (mise à jour des interfaces documentées), `AUDIT_Coherence_Documentaire_v1.0.md` (ce §33).
+
+---
+
+## 🚀 34. Révision comportement mou de câble + OverrideSync étendu (2026-07-04)
+
+**Contexte** : Retour utilisateur après analyse terrain — le scénario physique du mou de câble
+est différent de celui documenté en v1.1 (D27). Le capteur `M1_M2_SlackCableSwitch` est
+**physiquement localisé sur le tambour M2 uniquement** (grappin). Le mou se forme lors d'une
+**remontée** (grappin se ferme mal, câble continue de s'enrouler sans tension), et non en
+descente comme supposé initialement. Par ailleurs, le rôle d'`OverrideSync` est clarifié et
+étendu : il est applicable à la fois en MAINT_N1 et MAINT_N2 (pas restreint à N2).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D80 | **D_SLACK_1 — Comportement mou de câble revu (SafeStop total en mode normal)** | En mode **NORMAL / SEMI_AUTO / MAINT_N1 sans OverrideSync** : un mou de câble déclenche un **SafeStop M1 ET M2** (arrêt total des 2 sens, rampe rapide) + **alarme IHM acquittable** — ce n'est plus un simple `ForbidDescent` (D27). En mode **MAINT avec OverrideSync activé** : le SafeStop câble est **levé** ; `ForbidAscent` (montée interdite sur M1 ET M2) remplace le blocage directionnel ; la descente reste autorisée pour rattraper le câble sur le tambour. L'opérateur pilote M1 et M2 indépendamment. Le capteur est physiquement sur le tambour M2 uniquement. |
+| D81 | **D_SLACK_2 — Procédure de récupération grappin bloqué** | En SEMI_AUTO : mou de câble → SafeStop → cycle **suspendu en mémoire** (non réinitialisé). L'opérateur doit passer en MAINT_N1 ou MAINT_N2. La réouverture du grappin est **manuelle** depuis l'IHM (`CmdOpen` sur `FB_Grappin`). Séquence de récupération typique : (a) MAINT_N2 + OverrideSync, (b) redescendre M2 pour rattraper câble, (c) redescendre M1 si grappin vraiment bloqué, (d) ouvrir grappin (CmdOpen IHM), (e) remonter en position connue, (f) désactiver OverrideSync, (g) acquitter alarme (Reset IHM), (h) reprendre cycle. L'opérateur a la possibilité d'utiliser d'autres axes (chariot) — ce choix fait perdre la mémoire du cycle. |
+| D82 | **D_SLACK_3 — Acquittement manuel des alarmes mou de câble** | Les défauts mou de câble (bit3 `ErrorId`) sont exposés comme **alarmes sur l'IHM**. Acquittement **Manuel obligatoire** : pas de reset automatique, même si la cause disparaît. Condition : `GVL_IN.SlackCableSwitch = TRUE` (sain) **ET** appui Reset front montant. Pattern standard Partie3 §5 (front Reset + cause disparue) — identique aux autres défauts du domaine treuil. |
+| D83 | **D_OVERRIDESYNC — Rôle élargi d'OverrideSync** | `OverrideSync` = désactive **toute** synchronisation ET tout contrôle de synchronisation. Applicable en **MAINT_N1 ET MAINT_N2** (pas restreint à N2 comme documenté initialement en §2 de Partie5 v1.2). Permet de piloter M1 et M2 **indépendamment sans contrôle d'écart de position**. **Lève également le SafeStop dû au mou de câble** (procédure de récupération manuelle autorisée). Corrige le pseudo-code de §2 Partie5 qui conditionne `OverrideSync` à `Mode = MAINT_N2` uniquement. |
+
+### Fichiers impactés (2026-07-04)
+- **DOC/** : `AF_Partie9_Fonction_Winch` (v1.2→**v1.3** — §4ter entièrement réécrit : SafeStop total en mode normal, ForbidAscent en MAINT+OverrideSync, procédure récupération D_SLACK_2, acquittement D_SLACK_3), `AF_Partie5_Modes_Maintenance` (v1.2 — §2 et §6 OverrideSync étendu MAINT_N1+N2, D_OVERRIDESYNC), AUDIT (ce §34).
+- **CODE/** (à faire) : `FB_Safety_Winch.st` (logique SafeStop conditionnée par `OverrideSync` / nouveau `ForbidAscent`), `FB_Winch.st` (masquage `RelayFwd` sur `ForbidAscent`).

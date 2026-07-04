@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.3)
 
 > 📌 **État d'implémentation (2026-07-03, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
@@ -15,6 +15,7 @@
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
 > 🔗 Dépend de : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
 >
+> 🔧 **v1.3 (2026-07-04)** — Révision §4ter : comportement mou de câble revu (D_SLACK_1 : SafeStop M1+M2 en mode normal, ForbidAscent en MAINT+OverrideSync), procédure de récupération grappin bloqué (D_SLACK_2), acquittement manuel alarme IHM (D_SLACK_3), clarification capteur physiquement sur M2 uniquement, OverrideSync applicable MAINT_N1 et MAINT_N2 (D_OVERRIDESYNC).
 > 🔧 **v1.2 (2026-07-03)** — Audit de sécurité et intégration du contrôle de cohérence des commandes (SafeStop sur bit 1 de `ErrorId`, bypass automatique sur Grappin actif et override MAINT_N2, avec effacement automatique des erreurs).
 > 🔧 **v1.1 (2026-07-02)** — Nouvel export `Device.export` avec I/O réel : `M1/M2_RelayFwd/Rev`,
 > `M1/M2_SpeedContactor_1..4` (renommé, ex `Contactor1..4`), `M1/M2_BrakeCmd`,
@@ -42,19 +43,20 @@ voir §5 Sécurité pour ce que cela implique concrètement).
 
 ```
 FB_Joystick.AxisCmdY ──► FB_Winch(M1) ──┬─► FB_SpeedStep ──► Contactor1..4 (table P<palier>R<relais>)
-                                        ├─► RelayFwd / RelayRev (interlock changement de sens + ForbidDescent)
+                                        ├─► RelayFwd / RelayRev (interlock changement de sens + ForbidDescent + ForbidAscent)
                                         └─► FB_Brake ──► BrakeCmd (séquence temporisée)
 
-FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — arrêt total (joystick/codeur/thermique)
-                ──► ForbidDescent   ──► (entrée) FB_Winch(M1) — masque UNIQUEMENT RelayRev (mou de câble)
+FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — arrêt total (joystick/codeur/thermique/mou câble normal)
+                ──► ForbidDescent   ──► (entrée) FB_Winch — masque UNIQUEMENT RelayRev (mou câble, MAINT+OverrideSync)
+                ──► ForbidAscent    ──► (entrée) FB_Winch — masque UNIQUEMENT RelayFwd  (mou câble, MAINT+OverrideSync)
 ```
 
 | Bloc | Rôle métier |
 |------|-------------|
 | `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
-| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, ou surchauffe moteur ; lève `ForbidDescent` (dédié) sur mou de câble — voir §4ter |
-| `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev` sur `ForbidDescent` |
+| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, ou mou de câble (mode normal) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+OverrideSync — voir §4ter |
+| `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev`/`RelayFwd` sur `ForbidDescent`/`ForbidAscent` |
 
 > ♻️ **Réutilisation** (Partie3 §0) : `HYSTERESIS` (lib Util) pour les paliers, `FB_Ramp` +
 > `FB_CycleTime` (déjà utilisés par `FB_Joystick`) pour la rampe interne — aucune brique
@@ -108,9 +110,10 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | Sortie | Type | Rôle |
 |--------|------|------|
 | `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
-| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 🆕 : surchauffe moteur ; bit3 🆕 : mou de câble |
-| `SafeStop` | BOOL | `(ErrorId AND 16#0007) <> 0` — **uniquement** bits 0/1/2 → arrêt total (Enable maintenu) |
-| `ForbidDescent` 🆕 | BOOL | `(ErrorId AND 16#0008) <> 0` — **uniquement** bit3 → interdit la descente seule |
+| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 🆕 : surchauffe moteur ; bit3 🆕 : mou de câble ; bit4 : rotation de phase |
+| `SafeStop` | BOOL | `(ErrorId AND 16#0017) <> 0` — bits 0/1/2/4 + **bit3 en mode NORMAL/SEMI_AUTO/MAINT sans OverrideSync** → arrêt total (Enable maintenu) |
+| `ForbidDescent` 🆕 | BOOL | bit3, **uniquement en MAINT+OverrideSync** → interdit la descente (aggrave le mou) ; inhibe le SafeStop câble |
+| `ForbidAscent` 🆕 | BOOL | bit3, **uniquement en MAINT+OverrideSync** → interdit la montée sur M1 ET M2 (aggrave le mou) |
 | `PowerCutOff` | BOOL | `FALSE` (TBD ce lot) |
 
 ---
@@ -136,7 +139,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
   `Contactor1..4`/`BrakeCmd` à leur état sûr (coupure directe, frein collé), conforme Partie3
   §9 étape 7 — un contacteur incohérent ne doit plus jamais rester commandé normalement.
 
-### 🆕 4ter. Surchauffe moteur + mou de câble (2026-07-02, I/O réel)
+### 🆕 4ter. Surchauffe moteur + mou de câble — **RÉVISÉ v1.3** (D_SLACK_1/D_SLACK_2/D_SLACK_3)
 
 Le nouvel export `Device.export` câble deux nouveaux retours safety-critiques :
 
@@ -146,35 +149,92 @@ que la perte joystick/codeur → arrêt total des 2 sens, `Enable` maintenu (ram
 * **Câblage physique** : Contacts Normally Closed (NC), donc sains à `1` (TRUE) et en défaut/ouvert à `0` (FALSE).
 * **Reset** : Front standard (Partie3 §5) dès que le retour physique repasse à `TRUE` (sain). L'automate utilise l'inversion `NOT GVL_IN.M1ThermalFeedback` (pour M1) ou `NOT GVL_IN.M2ThermalFeedback` (pour M2) pour la logique de défaut.
 
-**Mou de câble (`M1_M2_SlackCableSwitch`, commun aux 2 treuils)** — traitement **différent**,
-demandé explicitement par l'utilisateur :
+#### 🔴 Mou de câble — comportement revu (D_SLACK_1, 2026-07-04)
 
-> Scénario terrain : en descente, si le grappin touche le fond sans que l'arrêt soit
-> correctement détecté, le mouvement continue et du mou de câble apparaît en haut (câble qui se
-> détend). Il faut **interdire la descente** (empêcher d'aggraver le mou), **signaler un défaut
-> visible à l'IHM** (l'opérateur doit avoir vu la cause avant de pouvoir continuer), mais
-> **autoriser la remontée** (nécessaire pour aller vérifier/re-tendre le câble — un `SafeStop`
-> classique, qui bloque les 2 sens, empêcherait cette vérification).
+**Emplacement physique du capteur** : `M1_M2_SlackCableSwitch` est câblé **uniquement sur le
+tambour du treuil M2** (grappin). Le même signal est distribué aux deux instances
+`FB_Safety_Winch` par convention de nommage, mais la cause physique est exclusivement côté M2.
 
-Ce comportement **ne peut pas** être porté par `SafeStop` (qui arrête systématiquement les 2
-sens) : nouveau bit `ErrorId` (bit3) et nouvelle sortie dédiée **`ForbidDescent`**, calculée
-**indépendamment** de `SafeStop` :
+**Scénario terrain (revu)** : lors d'une remontée, si le grappin se ferme mal (pince un câblot,
+objet), il peut se bloquer partiellement — le tambour M2 continue d'enrouler alors que le câble
+ne monte pas vraiment → du mou se forme sur le tambour M2. Ce scénario survient **en montée**
+(contrairement au scénario descente documenté v1.1).
+
+**Comportement selon le mode** :
+
+| Mode | OverrideSync | Comportement mou de câble (`SlackCableDetected = TRUE`) |
+|------|-------------|----------------------------------------------------------|
+| NORMAL / SEMI_AUTO / MAINT_N1 | N/A | **SafeStop M1 + M2** — rampe rapide, arrêt total des 2 sens + **alarme IHM acquittable** (pattern Partie3 §5) |
+| MAINT_N1 ou MAINT_N2 | ✅ OverrideSync activé | SafeStop câble **levé** — `ForbidAscent` (montée interdite M1 ET M2) + descente autorisée (pour rattraper le câble) |
 
 ```
-ErrorId.bit3 := SlackCableDetected (cause) — cumulatif, reset front standard (cause disparue + appui)
-SafeStop      := (ErrorId AND 16#0007) <> 0   // bits 0/1/2 SEULEMENT — bit3 exclu
-ForbidDescent := (ErrorId AND 16#0008) <> 0   // bit3 SEULEMENT
+// Mode NORMAL/SEMI_AUTO/MAINT sans OverrideSync :
+ErrorId.bit3  := SlackCableDetected
+SafeStop      := (ErrorId AND 16#0017) <> 0    // bits 0/1/2/3/4 → arrêt total
+ForbidDescent := FALSE                          // inutile, SafeStop bloque tout
+ForbidAscent  := FALSE                          // inutile, SafeStop bloque tout
 
-FB_Winch : RelayRev forcé FALSE si ForbidDescent (RelayFwd non affecté)
+// Mode MAINT avec OverrideSync activé :
+ErrorId.bit3  := SlackCableDetected
+SafeStop      := (ErrorId AND 16#0016) <> 0    // bits 0/1/2/4 SEULEMENT — bit3 exclu
+ForbidDescent := FALSE                          // descente autorisée pour rattraper le câble
+ForbidAscent  := (ErrorId AND 16#0008) <> 0    // bit3 → montée interdite M1 ET M2
+
+// Dans FB_Winch (appliqué sur les 2 instances M1 et M2) :
+RelayFwd forcé FALSE si ForbidAscent   // bloque la montée
+RelayRev forcé FALSE si ForbidDescent  // bloque la descente (+ EffectiveSafeStop si SafeStop)
 ```
 
-`Error` reste le miroir de **tout** `ErrorId` (Partie3 §4, y compris bit3) : le défaut est donc
-bien visible à l'IHM même s'il ne déclenche pas `SafeStop` — l'opérateur voit l'alarme, doit
-l'acquitter (front `Reset`, une fois la cause disparue) comme tout autre défaut du domaine.
+`Error` reste le miroir de **tout** `ErrorId` (Partie3 §4, y compris bit3) : le défaut est
+visible à l'IHM comme **alarme acquittable** — voir §4ter-D_SLACK_3 ci-dessous.
 
-> 🧭 Ce pattern (sortie de blocage directionnelle, distincte de `SafeStop`) est **spécifique** à
-> ce cas d'usage — pas une généralisation du contrat Partie3, qui reste `Enable > SafeStop >
-> StartStop`. À documenter au cas par cas si un autre métier a un besoin similaire.
+> 🧭 La logique direction-dépendante (`ForbidAscent`/`ForbidDescent`) est appliquée côté
+> `FB_Winch` (seul FB qui connaît `CommandedDirection`), pas côté `FB_Safety_Winch`
+> (qui ne doit pas connaître le sens de mouvement) — cohérent avec le pattern établi en D72b.
+
+#### 🔧 Procédure de récupération — grappin bloqué (D_SLACK_2, 2026-07-04)
+
+Quand un mou de câble survient en SEMI_AUTO :
+- Le `SafeStop` se déclenche sur M1 et M2 → le cycle SEMI_AUTO se **suspend** (reste en mémoire,
+  non réinitialisé) ;
+- L'opérateur **doit** quitter vers MAINT_N1 ou MAINT_N2 pour intervenir ;
+- La réouverture du grappin est **MANUELLE depuis l'IHM** (bouton `CmdOpen` sur `FB_Grappin`) ;
+- L'opérateur a deux options :
+  1. Utiliser d'autres axes (chariot…) → quitte le mode de récupération → **perd la mémoire du cycle** ;
+  2. Acquitter l'alarme seule (`Reset` IHM) → le cycle peut reprendre là où il s'est arrêté.
+
+**Séquence typique de récupération** :
+
+```
+a. Passer en MAINT_N2 + activer OverrideSync (IHM)
+b. Redescendre M2 (tambour) pour rattraper le câble sur le tambour
+c. Si grappin vraiment bloqué mécaniquement : redescendre M1 aussi (dégagement)
+d. Ouvrir manuellement le grappin (bouton CmdOpen IHM → FB_Grappin)
+e. Remonter en position connue (M1 + M2 indépendants sous OverrideSync)
+f. Désactiver OverrideSync → revenir en MAINT_N1
+g. Acquitter l'alarme mou de câble via IHM (Reset front + cause disparue)
+h. Valider la reprise du cycle SEMI_AUTO si souhaité
+```
+
+> ⚠️ En mode MAINT_N2 + OverrideSync : l'opérateur pilote M1 et M2 **indépendamment**, sans
+> contrôle d'écart de position ni synchronisation. `ForbidAscent` empêche toute montée tant que
+> `SlackCableDetected = TRUE` (le mou n'est pas rattrapé). La descente reste libre pour
+> enrouler le câble correctement sur le tambour.
+
+#### 🔔 Acquittement des alarmes mou de câble (D_SLACK_3, 2026-07-04)
+
+- Les défauts mou de câble (bit3 `ErrorId`) sont exposés comme **alarmes sur l'IHM** via la
+  sortie `Error` du FB (Partie3 §4) ;
+- Acquittement **Manuel obligatoire** : l'opérateur doit explicitement appuyer sur le bouton
+  Reset de l'IHM ;
+- **Condition d'acquittement** : cause réelle disparue (`GVL_IN.SlackCableSwitch = TRUE` à
+  nouveau) **ET** appui Reset (front montant) ;
+- Pattern standard **Partie3 §5** (front Reset + cause disparue) — identique à tous les autres
+  défauts du domaine treuil.
+
+> ⚠️ **Pas de reset automatique** : même si le câble se rattrape physiquement (capteur revenu
+> à TRUE), l'opérateur doit valider explicitement que la situation est correcte avant que le
+> mouvement ne reprenne. Un `SafeStop` résiduel ne s'efface jamais seul.
 
 > 🔧 **Correctifs retour terrain + revue de code 2026-07-01** (2 itérations) :
 > 1. La 1ère version de l'interlock exigeait la vitesse confirmée nulle (200 ms) **avant même
