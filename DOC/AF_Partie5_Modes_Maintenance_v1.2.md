@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.3)
 
 > 📌 **État d'implémentation (2026-07-03quater, AUDIT D38)** : `FB_Modes` **codé (MVP)** —
 > `CODE/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
@@ -7,6 +7,7 @@
 > non codé** : `OverrideGrappin`, limite légale `ST_LimitLegal` (§3) — pas de consommateur
 > tant que `FB_Cycle`/`FB_Grappin` n'existent pas.
 >
+> **Version 1.3 (2026-07-04)** — D_OVERRIDESYNC : `OverrideSync` étendu à MAINT_N1 (pas restreint à N2) ; lève également le SafeStop mou de câble ; ajout §6bis détaillant le rôle complet de `OverrideSync`.
 > **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Grappin
 > (`OverrideGrappin`, `FB_Grappin`), Translation→Chariot — préfixe I/O physique M3 inchangé.
 > **Version 1.1** — Suite audit documentaire : correction du pseudo-code d'override (§2) qui
@@ -59,6 +60,7 @@ ponctuelles**, mais en conservant **un niveau de sécurité correct**.
 |-----------------|------|
 | Commande | Joystick, treuils **pilotables unitairement** (M1, M2 séparés) |
 | Contrôle synchro (`FB_WinchSync`) | ✅ Actif (sauf phase grappin — suspension automatique, Partie 4 §3bis) |
+| **Override synchro (`OverrideSync`)** | ✅ **Disponible en MAINT_N1** (voir §6bis — OverrideSync lève aussi le SafeStop mou de câble) |
 | Contrôle grappin (`FB_Grappin`) | ✅ Actif |
 | Codeurs / freins / capteurs | ✅ Actifs (sécurités maintenues) |
 | Limite légale profondeur | ⚠️ Non bloquante, **signalisation** IHM |
@@ -91,16 +93,23 @@ freins, déplacements **malgré** défauts ou incohérences, récupération apr�
 
 ### Logique d'override (`FB_Modes`)
 ```
+// OverrideSync est disponible en MAINT_N1 ET MAINT_N2 (D_OVERRIDESYNC, D83)
+IF (Mode = MAINT_N1 OR (Mode = MAINT_N2 AND PasswordOk)) THEN
+    OverrideSync   := UserSelectIHM;   // case à cocher opérateur (MAINT_N1 ou N2)
+END_IF
 IF Mode = MAINT_N2 AND PasswordOk THEN
-    OverrideSync   := UserSelectIHM;   // case à cocher opérateur
     OverrideGrappin := UserSelectIHM;
     OverrideLimit  := UserSelectIHM;
-    // application aux blocs concernés :
-    FB_WinchSync.Enable       := NOT OverrideSync;
-    FB_Grappin.ControlEnable   := NOT OverrideGrappin;
-    LimitLegal.Enabled        := NOT OverrideLimit;   // interne à FB_Modes (PAS FB_Safety, voir §3)
     MsgIHM := "MAINT N2 active";
-ELSE
+END_IF
+
+// Application aux blocs concernés :
+FB_WinchSync.Enable       := NOT OverrideSync;  // désactive TOUTE synchronisation
+// Si OverrideSync actif : FB_Safety_Winch désactive le SafeStop mâble et active ForbidAscent
+FB_Grappin.ControlEnable   := NOT OverrideGrappin;
+LimitLegal.Enabled        := NOT OverrideLimit;  // interne à FB_Modes (PAS FB_Safety, voir §3)
+
+IF NOT (Mode = MAINT_N1 OR Mode = MAINT_N2) THEN
     OverrideSync := FALSE; OverrideGrappin := FALSE; OverrideLimit := FALSE;  // tout actif
 END_IF
 ```
@@ -108,6 +117,10 @@ END_IF
 > ⚠️ **Correction v1.1** : la limite légale n'est **jamais** portée par un bloc safety
 > (`FB_Safety_<Metier>`) — c'est une interdiction **normale**, gérée en interne à `FB_Modes`
 > (voir §3). L'ancienne formulation `FB_Safety.CheckLimitLegal` était une erreur de conception.
+
+> 🔧 **Correction v1.3 (D_OVERRIDESYNC, D83)** : `OverrideSync` est désormais accessible
+> **dès MAINT_N1** (pas seulement N2). Le pseudo-code précédent conditionnait `OverrideSync`
+> à `Mode = MAINT_N2 AND PasswordOk` — corrigé ci-dessus.
 
 ---
 
@@ -210,6 +223,29 @@ Règle de conception : **prévoir, en sortie de chaque FB, de l'information pens
   que l'intégrateur **mappe** manuellement (DFD entrée pour les paramètres, sortie pour l'affichage).
 - Une **GVL d'échange IHM** *pourra* être créée à cette fin (à définir) — c'est le seul usage
   de GVL envisagé, l'état interne machine restant porté par les E/S des FB.
+
+---
+
+## 🔒 6bis. Rôle complet de `OverrideSync` (D_OVERRIDESYNC, D83, 2026-07-04)
+
+`OverrideSync` est un **override de sécurité étendu** (case à cocher IHM, conditionné par
+l'activation d'un niveau de Maintenance) qui réunit **trois effets simultanés** :
+
+| Effet | Détail |
+|-------|--------|
+| **Désactive la synchronisation** | `FB_WinchSync.Enable := FALSE` — plus de calcul `DeltaPosM`/`SyncWarn`, surveillance d'écart suspendue |
+| **Désactive le contrôle de cohérence des commandes** | `FB_WinchSync` étant `Enable=FALSE`, le SafeStop de cohérence de commande (bit1 `ErrorId WinchSync`) est également inhibé et effacé |
+| **Lève le SafeStop mou de câble** | `FB_Safety_Winch` : si `OverrideSync=TRUE`, le bit3 n'alimente plus `SafeStop` mais active `ForbidAscent` (montée interdite M1+M2) et laisse la descente libre (pour rattraper le câble) — voir Partie9 §4ter et D_SLACK_1 |
+
+**Disponibilité** : `OverrideSync` est accessible **dès MAINT_N1** (sans mot de passe) et bien
+sûr en MAINT_N2. Les autres overrides (`OverrideGrappin`, `OverrideLimit`) restent
+**exclusifs à MAINT_N2** (droits étendus, mot de passe requis).
+
+> ⚠️ **Rappel sécurité** : avec `OverrideSync` actif, l'opérateur pilote M1 et M2 **sans
+> aucun contrôle d'écart de position**. Il est responsable de la cohérence du mouvement.
+> `ForbidAscent` reste actif tant que `SlackCableDetected = TRUE` : on ne peut pas
+> aggraver le mou en remontant, mais la cause doit être réglée avant de reprendre un
+> mouvement synchrone normal.
 
 ---
 

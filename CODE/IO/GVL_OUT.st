@@ -32,4 +32,13 @@ VAR_GLOBAL
     // ── ↔️ CHARIOT M3 (sens/vitesse via variateur EtherCAT, TOR=frein uniquement) ────────
     ChariotBrakeCmd   : BOOL;  // 🔓 Frein M3 ⚠️INVERSÉ : TRUE=desserré/mouvement | FALSE=SERRÉ sécurité ✅
 
+    // ── 🧨 COUPURE PUISSANCE AMONT — Redondance 2 relais en série ────────────────────────
+    // Les 2 relais sont commandés SIMULTANÉMENT par le même signal logique (PowerCutOff_RQ).
+    // Leurs contacts sont câblés EN SÉRIE : si l'un colle (soudure), l'autre coupe quand même.
+    // Placés sur 2 cartes I/O DIFFÉRENTES pour diversité matérielle (panne carte n'empêche pas la coupure).
+    // ⚠️ Logique NC côté puissance : TRUE=relais excité/contact ouvert=CIRCUIT COUPÉ 🔴
+    //                                FALSE=relais retombé/contact fermé=puissance OK ✅
+    PowerCutOff_A_RQ  : BOOL;  // 🧨 Relais coupure puissance CANAL A (carte 1) : TRUE=coupure active | FALSE=puissance OK ✅
+    PowerCutOff_B_RQ  : BOOL;  // 🧨 Relais coupure puissance CANAL B (carte 2) : TRUE=coupure active | FALSE=puissance OK ✅
+
 END_VAR
