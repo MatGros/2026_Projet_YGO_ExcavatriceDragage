@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T21:59:10.3691833" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T21:58:56.1360916">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_CycleStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="INIT" value="0" />
+              <value name="WORK_POS_SELECT" value="1" />
+              <value name="DESCENDING_OPEN" value="2" />
+              <value name="BOTTOM_TOUCH_WAIT" value="3" />
+              <value name="SYNCHRO_ADJUST" value="4" />
+              <value name="CTRL_ASCENDING" value="5" />
+              <value name="ASCENDING_LOADED" value="6" />
+              <value name="DRAINING_PAUSE" value="7" />
+              <value name="CHARIOT_MOVE" value="8" />
+              <value name="DESCENDING_OPEN_DUMP" value="9" />
+              <value name="RETURN_WORK_POS" value="10" />
+              <value name="READY" value="11" />
+              <value name="ERROR_HOLD" value="12" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Vérifs cohérence états + sécurités, mise en position init </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WORK_POS_SELECT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Choix opérateur pos travail 1/2 + déplacement validé joystick </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DESCENDING_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Plongée grappin déjà ouvert, M1+M2 synchro </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTTOM_TOUCH_WAIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Attente info BOOL capteur "fond touché" </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SYNCHRO_ADJUST</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Désynchro M2 petite vitesse (offset X) → fermeture grappin </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CTRL_ASCENDING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Remontée lente de contrôle (vérification fermeture) </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ASCENDING_LOADED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Remontée pleine vitesse charge </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DRAINING_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Égouttage temporisé (durée RETAIN) </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CHARIOT_MOVE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Déplacement chariot M3 vers trémie </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DESCENDING_OPEN_DUMP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Descente de vidage + ouverture grappin </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RETURN_WORK_POS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Retour position travail (remontée synchro) </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Cycle terminé, prêt à reboucler </xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> Arrêt sûr figé sur défaut (SafeStop) </xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3bb859e5-9f8b-4b3f-8833-0105afce794b</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="CYCLE">
+          <Object Name="E_CycleStep" ObjectId="3bb859e5-9f8b-4b3f-8833-0105afce794b" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

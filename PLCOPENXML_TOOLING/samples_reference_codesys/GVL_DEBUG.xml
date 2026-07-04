@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T22:00:05.2942817" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T21:58:56.1360916">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_DEBUG">
+        <variable name="DBG_True">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">(Remplace les TRUE codéS en dur).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_False">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">(Remplace les FALSE codéS en dur).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_Blink_1Hz">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> (Horloge générée par un clignoteur pour simuler un capteur).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_ForceNeutral">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5000" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">(Pour simuler le retour au centre).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_ForceMax">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="10000" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">(Pour simuler une consigne à fond).</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_EmergencyStopOkBypass_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = force EmergencyStopOk réel à TRUE (test banc sans AU câblé)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_TopPositionSensorBypass_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = force M1_M2_TopPositionSensor à TRUE (test banc, re-homing sans actionner le capteur)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_DeadmanBypass_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = force DeadmanArmed à TRUE en permanence (bouton non nécessaire, essais joystick)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_ContactorFeedbackBypass_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = désactive StuckClosed/StuckOpen (FB_Winch/FB_Chariot), pas de blocage sans retour réel</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_CtrlPhaseRotation_Bypass_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = force CtrlPhaseRotation_DI à TRUE (test banc sans le vrai contrôle de rotation câblé)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_SlackCableSwitch_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = force M1_M2_SlackCableSwitch_DI à TRUE (pas de défaut mou de câble)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="DBG_ThermalBypass_TEST">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> TRUE = force thermiques M1/M2 à TRUE (pas de surchauffe)</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6b2cf07b-52d3-451b-98bd-7ceff2a18054</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   🐞 GVL_DEBUG — Variables de simulation/bypass génériques (existant, non versionné jusqu'ici)
+   ───────────────────────────────────────────────────────────────
+   🔧 AJOUT (2026-07-03quater) : `DBG_EmergencyStopOkBypass_TEST` — bypass banc de test pour
+      `EmergencyStopOk` (voir PRG_MAIN.st §1, instIoMachine). ⚠️ TOUJOURS FALSE en exploitation
+      réelle — à remettre à FALSE (ou retirer le OR dans PRG_MAIN) avant tout essai réel avec
+      la chaîne AU effectivement câblée. Suivi comme point bloquant (AUDIT).
+   🔧 AJOUT (2026-07-03quinquies) : `DBG_TopPositionSensorBypass_TEST` — même principe pour
+      `M1_M2_TopPositionSensor` (capteur position haute réel, commun M1/M2) : permet de
+      re-déclencher un `Home` sur banc sans devoir actionner physiquement le capteur à
+      chaque fois. ⚠️ TOUJOURS FALSE en exploitation réelle.
+   🔧 AJOUT (2026-07-03octodecies, demande utilisateur) : `DBG_DeadmanBypass_TEST` — homme-mort
+      `FB_Joystick` en investigation (comportement jugé gênant en essai), pas le temps de
+      déboguer dans l'immédiat. Force l'armement en permanence (bouton plus nécessaire pour
+      bouger le joystick). ⚠️ TOUJOURS FALSE en exploitation réelle — à restreindre par Mode
+      (ex. MAINT_N1 seul) dès que l'arbitrage voulu par IHM sera précisé (AUDIT D70).
+   🔧 AJOUT (2026-07-03vicies, demande utilisateur, AUDIT D73) : `DBG_ContactorFeedbackBypass_TEST`
+      — sans contacteurs réels câblés/cohérents en essai (`FB_Winch`/`FB_Chariot`), le contrôle
+      StuckClosed/StuckOpen (commande/retour incohérente &gt; `ContactorFeedbackTimeout`) se
+      déclenche à tort et bloque `RelayFwd`/`RelayRev`. ⚠️ TOUJOURS FALSE en exploitation réelle.
+      Pour le thermique/mou de câble (simples variables `GVL_IN`), pas besoin de flag dédié :
+      **Force** directement la variable dans CODESYS (le Force prend le dessus sur l'écriture
+      cyclique du programme, contrairement à un simple Write).
+   🔧 AJOUT (2026-07-03unvicies, créé par l'utilisateur) : `DBG_CtrlPhaseRotation_Bypass_TEST` —
+      bypass dédié pour `CtrlPhaseRotation_DI`, OR'é sur le signal brut dans `FB_InputsMachine`
+      (même principe que `DBG_EmergencyStopOkBypass_TEST`/`DBG_TopPositionSensorBypass_TEST`).
+      ⚠️ TOUJOURS FALSE en exploitation réelle avec le vrai contrôle de rotation câblé.
+   🔧 AJOUT (2026-07-03duovicies, créé par l'utilisateur) : `DBG_SlackCableSwitch_TEST` — même
+      principe pour `M1_M2_SlackCableSwitch_DI`. Câblage sécurité (TRUE=OK, pas de mou) : le
+      bypass force donc l'état OK. ⚠️ TOUJOURS FALSE en exploitation réelle avec le vrai
+      capteur mou de câble câblé.
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="MAIN">
+          <Object Name="GVL_DEBUG" ObjectId="6b2cf07b-52d3-451b-98bd-7ceff2a18054" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

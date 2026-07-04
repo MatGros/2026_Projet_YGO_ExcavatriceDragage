@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T00:00:00.0000000" />
+  <contentHeader name="POC_ImportTest.xml" modificationDateTime="2026-07-04T00:00:00.0000000">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">POC_ImportTest</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_POC_ImportTest">
+        <baseType>
+          <struct>
+            <variable name="Counter">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> POC — compteur incrémenté à chaque appel avec Enable=TRUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Label">
+              <type>
+                <string length="20" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> POC — libellé texte, écrit par le FB de test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> POC — passe à TRUE après le premier appel réussi</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ad121d0-f078-4915-a2d5-93ede69fb13e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   🧪 ST_POC_ImportTest — Objet JETABLE, uniquement pour tester le mécanisme
+   d'import PLCopenXML (GUID neuf, nom neuf, sans lien avec le programme réel).
+   À supprimer du projet CODESYS après le test. Voir README.md du dossier
+   test_import_poc/ pour le protocole d'observation.
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_POC_ImportTest" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> POC — active l'incrémentation du compteur</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> POC — TRUE tant qu'Enable est actif</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Data">
+              <type>
+                <derived name="ST_POC_ImportTest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> POC — structure de test lue/écrite par ce FB (VAR_IN_OUT)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   🧪 FB_POC_ImportTest — Objet JETABLE, uniquement pour tester le mécanisme
+   d'import PLCopenXML (GUID neuf, nom neuf, sans lien avec le programme réel).
+   Ne pas appeler depuis un vrai programme métier. À supprimer du projet
+   CODESYS après le test. Voir README.md du dossier test_import_poc/.
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+// 🧪 POC — logique volontairement minimale, sert juste à exercer le mécanisme d'import.
+IF Enable THEN
+    Data.Counter := Data.Counter + 1;
+    Data.Label := 'POC_TEST';
+    Data.Ready := TRUE;
+    Done := TRUE;
+ELSE
+    Done := FALSE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>4afc4450-3037-4e62-8586-070b5c55100e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="_POC_IMPORT_TEST">
+          <Object Name="ST_POC_ImportTest" ObjectId="9ad121d0-f078-4915-a2d5-93ede69fb13e" />
+          <Object Name="FB_POC_ImportTest" ObjectId="4afc4450-3037-4e62-8586-070b5c55100e" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

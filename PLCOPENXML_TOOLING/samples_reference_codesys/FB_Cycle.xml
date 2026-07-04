@@ -1,0 +1,311 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T21:57:27.0396602" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T08:07:16.6985335">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Cycle" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Standard</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Acquittement défaut (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Standard</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartCycle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande de lancement du cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PauseCycle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande de mise en pause du cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbortCycle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Demande d'arrêt d'urgence/abandon cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetDepthM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Profondeur de dragage cible (négative)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetOffsetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Décalage grappin cible pour fermeture</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="CmdWinchM1_StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Commandes vers les actionneurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdWinchM1_Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CmdWinchM1_SpeedPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CmdWinchM2_StartStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CmdWinchM2_Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CmdWinchM2_SpeedPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="CmdChariotM3_Start">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CmdChariotM3_Target">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Numéro de l'étape active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStateStr">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> Description textuelle de l'état</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="StartEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 0 = Idle, 10 = Descente, 20 = Fermeture, 30 = Remontée, 40 = Vidange</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   🔄 FB_Cycle — Machine d'état séquentielle (Grafcet de dragage)
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à piloter les cycles automatiques et semi-automatiques
+      de l'Excavatrice (descente, dragage/godet, remontée, déversement).
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🛑 1. GATE — Repli sécurisé
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    CmdWinchM1_StartStop := FALSE;
+    CmdWinchM1_Direction := 0;
+    CmdWinchM1_SpeedPct  := 0.0;
+    
+    CmdWinchM2_StartStop := FALSE;
+    CmdWinchM2_Direction := 0;
+    CmdWinchM2_SpeedPct  := 0.0;
+    
+    CmdChariotM3_Start   := FALSE;
+    
+    State := 0;
+    CycleStep := 0;
+    CycleStateStr := "DÉSACTIVÉ / ARRET";
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+ResetEdge(CLK := Reset);
+StartEdge(CLK := StartCycle);
+
+// 🔁 2. LOGIQUE DU SÉQUENCEUR (Grafcet / Machine d'état)
+CASE State OF
+    0:  // IDLE / ATTENTE
+        CycleStep := 0;
+        CycleStateStr := "ATTENTE DÉMARRAGE";
+        Busy := FALSE;
+        Done := FALSE;
+        
+        IF StartEdge.Q THEN
+            State := 10; // Lancement vers la première étape
+        END_IF;
+        
+    10: // DESCENTE DU GRAPPIN OUVERT
+        CycleStep := 10;
+        CycleStateStr := "DESCENTE GRAPPIN OUVERT";
+        Busy := TRUE;
+        
+        // Squelette de commande :
+        // CmdWinchM1_StartStop := TRUE; CmdWinchM1_Direction := -1; CmdWinchM1_SpeedPct := 50.0;
+        // CmdWinchM2_StartStop := TRUE; CmdWinchM2_Direction := -1; CmdWinchM2_SpeedPct := 50.0;
+        
+        // Condition de transition à définir (ex: position atteinte)
+        
+    20: // FERMETURE DU GODET (DÉBUT EXCAVATION)
+        CycleStep := 20;
+        CycleStateStr := "FERMETURE GODET / EXCAVATION";
+        
+        // Condition de transition
+        
+    30: // REMONTÉE DU GODET FERMÉ
+        CycleStep := 30;
+        CycleStateStr := "REMONTÉE DU GODET";
+        
+        // Condition de transition
+        
+    40: // DÉPLACEMENT CHARIOT &amp; VIDANGE
+        CycleStep := 40;
+        CycleStateStr := "VIDANGE DU GODET";
+        
+        // Condition de transition
+        
+END_CASE;
+
+IF AbortCycle THEN
+    State := 0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>578b3bfb-1ae8-48e4-bcd9-49a549303503</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="CYCLE">
+          <Object Name="FB_Cycle" ObjectId="578b3bfb-1ae8-48e4-bcd9-49a549303503" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
