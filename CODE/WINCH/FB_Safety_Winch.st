@@ -71,9 +71,9 @@ VAR_INPUT
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
-    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT GVL_IN.M1/M2ThermalFeedback)
+    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_0_Inputs.M1/M2ThermalFeedback)
     SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si OverrideSync
-    PhaseRotationOk     : BOOL;        // GVL_IN.PhaseRotationOk (commun) — TRUE = rotation phases correcte
+    PhaseRotationOk     : BOOL;        // PRG_0_Inputs.PhaseRotationOk (commun) — TRUE = rotation phases correcte
     TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)

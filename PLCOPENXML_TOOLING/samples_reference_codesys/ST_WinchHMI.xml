@@ -1,0 +1,419 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T07:57:21.9323215" />
+  <contentHeader name="Programme MGS_v0.3.10_Simulation.project" modificationDateTime="2026-07-04T07:53:26.301727">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Programme MGS_v0.3.10_Simulation</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_WinchHMI">
+        <baseType>
+          <struct>
+            <variable name="TopSensorPositionM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="12.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📐 Position cible du capteur haut (m) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDescente">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🛑 Limitation palier vitesse en descente (1..5) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="RampAccelRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📈 Rampe d'accélération (%/s) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="RampDecelNormalRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="150" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📉 Rampe de décélération normale (%/s) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="RampDecelFastRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ⚡ Rampe de décélération rapide / SafeStop (%/s) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitDescentM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📐 Limite basse physique de descente (m, négatif) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📏 Distance avant limite pour enclencher le ralentissement (m) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📉 Vitesse de consigne lente dans la zone de ralentissement (%) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📊 Position actuelle du câble (mètres) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📈 Consigne de vitesse finale après rampe (%) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔢 Palier de vitesse actif (0..5) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="FBState">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🤖 État de l'automate interne (FB_Winch) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🟢 Treuil prêt à fonctionner </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ⚙️ Mouvement en cours </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ✅ Action terminée </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔴 Treuil en défaut </xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ❌ Code bitfield du défaut treuil </xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🛗 Relais Montée activé </xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🛗 Relais Descente activé </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Contacteur vitesse palier 1 </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Contacteur vitesse palier 2 </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Contacteur vitesse palier 3 </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Contacteur vitesse palier 4 </xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔓 Commande frein (TRUE = desserré / libre) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🎯 Prise d'origine (Homing) validée </xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🟧 Arrêt rapide activé par la sécurité </xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForbidDescentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🚯 Descente interdite (détecteur mou de câble / limites) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForbidAscentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🚯 Montée interdite (fin de course haut) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlackCableDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ⚠️ Mou de câble physiquement détecté </xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThermalFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔥 Défaut surchauffe thermique moteur </xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Perte de liaison ou incohérence codeur </xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitDescentReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ⚠️ Longueur max de câble atteinte (limite basse physique) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="Encoder">
+              <type>
+                <derived name="ST_EncoderHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🧲 Données d'échange et diagnostic du codeur </xhtml>
+              </documentation>
+            </variable>
+            <variable name="FwdContactorCheck">
+              <type>
+                <derived name="ST_ContactorCheck" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Coherence contacteur montée </xhtml>
+              </documentation>
+            </variable>
+            <variable name="RevContactorCheck">
+              <type>
+                <derived name="ST_ContactorCheck" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Coherence contacteur descente </xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeContactorCheck">
+              <type>
+                <derived name="ST_ContactorCheck" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Coherence retour frein </xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔑 Acquittement défauts spécifique treuil </xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdHome">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🎯 Lancement de la prise d'origine </xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmCoherence">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔓 Confirmation de cohérence au démarrage </xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassContactorFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 🔌 Bypass retours contacteurs (banc de test) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassSlackCable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> ⚠️ Bypass capteur mou de câble (banc de test) </xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassTopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> 📐 Bypass capteur position haute (banc de test) </xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>818e37d8-0c03-4540-a2bb-61a33833a34f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml"> ═══════════════════════════════════════════════════════════════
+   ⚙️ ST_WinchHMI — Données d'échange IHM pour un treuil (M1/M2)
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l'affichage des bargraphes, LEDs, mesures et réglages.
+   ═══════════════════════════════════════════════════════════════ </xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SUPERVISION">
+          <Object Name="ST_WinchHMI" ObjectId="818e37d8-0c03-4540-a2bb-61a33833a34f" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
