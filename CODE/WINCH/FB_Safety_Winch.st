@@ -152,9 +152,13 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
-// Si le capteur physique de position haute est actif ET qu'on n'est pas en phase de référencement (homing),
-// alors on lève le défaut pour interdire uniquement la montée.
-IF TopPositionSensor AND NOT InReferencingMode THEN
+// ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
+// position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
+// (TopPositionSensor=FALSE) ET qu'on n'est pas en phase de référencement (homing), alors on lève
+// le défaut pour interdire uniquement la montée. 🔧 CORRIGÉ 2026-07-04 : polarité inversée
+// (testait TopPositionSensor au lieu de NOT TopPositionSensor), bloquait la montée en permanence
+// en fonctionnement normal au lieu de la bloquer au fin de course haut.
+IF NOT TopPositionSensor AND NOT InReferencingMode THEN
     ErrorId := ErrorId OR 16#0020;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFDF;

@@ -143,7 +143,10 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
         ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
     ELSIF NOT ArretConfirme THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
-    ELSIF (Mode <> E_Mode.MAINT_N2) AND NOT TopPositionSensor THEN
+    ELSIF (Mode <> E_Mode.MAINT_N2) AND TopPositionSensor THEN
+        // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
+        // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
+        // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
         ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé (requis uniquement en MAINT_N1)
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
