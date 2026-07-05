@@ -98,7 +98,8 @@ END_IF;
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev),
       ContactorFeedback := BrakeFeedback,
       DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
+      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
+      BypassContactorCheck := BypassContactorCheck);
 BrakeCmd := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
 
@@ -128,10 +129,10 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🔴 BYPASS TEST BANC (2026-07-03vicies, demande utilisateur) — sans contacteurs réels câblés/
-// cohérents en essai, StuckClosed/StuckOpen se déclenche à tort et bloque RelayFwd/RelayRev
-// (voir Error plus bas). TOUJOURS FALSE en exploitation réelle.
-IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+// 🧪 Simulation (GVL_Simulation.ContactorFeedbackMx_IsReal, passé par l'appelant via
+// BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed/
+// StuckOpen se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
+IF NOT BypassContactorCheck THEN
     IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
         ErrorId := ErrorId OR 16#0002;
     ELSIF ResetEdge.Q THEN
