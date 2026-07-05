@@ -112,7 +112,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
 
     State                := E_CycleStep.INIT;
     CycleStep            := E_CycleStep.INIT;
-    CycleStateStr        := "ARRÊT : SÉCURITÉ ABSENTE OU AUTO DÉSACTIVÉ";
+    CycleStateStr        := 'ARRÊT : SÉCURITÉ ABSENTE OU AUTO DÉSACTIVÉ';
     Ready                := FALSE;
     Busy                 := FALSE;
     Done                 := FALSE;
@@ -147,7 +147,7 @@ CASE State OF
 
     E_CycleStep.INIT: // 🔄 ÉTAPE 0 : Initialisation et vérifications
         CycleStep := E_CycleStep.INIT;
-        CycleStateStr := "VÉRIFICATION COHÉRENCE SYSTÈME";
+        CycleStateStr := 'VÉRIFICATION COHÉRENCE SYSTÈME';
         
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
@@ -164,7 +164,7 @@ CASE State OF
 
     E_CycleStep.WORK_POS_SELECT: // 📍 ÉTAPE 1 : Sélection position travail
         CycleStep := E_CycleStep.WORK_POS_SELECT;
-        CycleStateStr := "SÉLECTION POSITION TRAVAIL (FOSSE 1 / 2)";
+        CycleStateStr := 'SÉLECTION POSITION TRAVAIL (FOSSE 1 / 2)';
         Busy := TRUE;
 
         // Choix cible
@@ -183,7 +183,7 @@ CASE State OF
 
     E_CycleStep.DESCENDING_OPEN: // ⬇️ ÉTAPE 2 : Plongée grappin ouvert
         CycleStep := E_CycleStep.DESCENDING_OPEN;
-        CycleStateStr := "PLONGÉE GRAPPIN OUVERT";
+        CycleStateStr := 'PLONGÉE GRAPPIN OUVERT';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
         CmdWinchM1_StartStop := TRUE;
@@ -204,7 +204,7 @@ CASE State OF
 
     E_CycleStep.BOTTOM_TOUCH_WAIT: // ⏳ ÉTAPE 3 : Temporisation contact fond
         CycleStep := E_CycleStep.BOTTOM_TOUCH_WAIT;
-        CycleStateStr := "ATTENTE DÉPOSE FOND";
+        CycleStateStr := 'ATTENTE DÉPOSE FOND';
 
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
@@ -214,7 +214,7 @@ CASE State OF
 
     E_CycleStep.SYNCHRO_ADJUST: // 🪣 ÉTAPE 4 : Fermeture du grappin (Excavation)
         CycleStep := E_CycleStep.SYNCHRO_ADJUST;
-        CycleStateStr := "FERMETURE DU GODET / EXCAVATION";
+        CycleStateStr := 'FERMETURE DU GODET / EXCAVATION';
 
         CmdWinchM1_StartStop := FALSE; // M1 reste immobile
         
@@ -229,7 +229,7 @@ CASE State OF
 
     E_CycleStep.CTRL_ASCENDING: // ⬆️ ÉTAPE 5 : Remontée lente de contrôle
         CycleStep := E_CycleStep.CTRL_ASCENDING;
-        CycleStateStr := "REMONTÉE LENTE DE CONTRÔLE";
+        CycleStateStr := 'REMONTÉE LENTE DE CONTRÔLE';
 
         // M1 et M2 montent lentement en synchro
         CmdWinchM1_StartStop := TRUE;
@@ -247,7 +247,7 @@ CASE State OF
 
     E_CycleStep.ASCENDING_LOADED: // 🚀 ÉTAPE 6 : Remontée pleine vitesse
         CycleStep := E_CycleStep.ASCENDING_LOADED;
-        CycleStateStr := "REMONTÉE EN CHARGE";
+        CycleStateStr := 'REMONTÉE EN CHARGE';
 
         CmdWinchM1_StartStop := TRUE;
         CmdWinchM1_Direction := 1;
@@ -266,7 +266,7 @@ CASE State OF
 
     E_CycleStep.DRAINING_PAUSE: // 💧 ÉTAPE 7 : Égouttage temporisé
         CycleStep := E_CycleStep.DRAINING_PAUSE;
-        CycleStateStr := "ÉGOUTTAGE DU GODET EN COURS";
+        CycleStateStr := 'ÉGOUTTAGE DU GODET EN COURS';
 
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
@@ -279,7 +279,7 @@ CASE State OF
 
     E_CycleStep.CHARIOT_MOVE: // ↔️ ÉTAPE 8 : Déplacement vers trémie
         CycleStep := E_CycleStep.CHARIOT_MOVE;
-        CycleStateStr := "DÉPLACEMENT VERS TRÉMIE DE VIDANGE";
+        CycleStateStr := 'DÉPLACEMENT VERS TRÉMIE DE VIDANGE';
 
         CmdChariotM3_Target := 4; // Trémie
         CmdChariotM3_Start := TRUE;
@@ -292,7 +292,7 @@ CASE State OF
 
     E_CycleStep.DESCENDING_OPEN_DUMP: // 🗑️ ÉTAPE 9 : Ouverture grappin (Vidange)
         CycleStep := E_CycleStep.DESCENDING_OPEN_DUMP;
-        CycleStateStr := "VIDANGE / OUVERTURE DU GODET";
+        CycleStateStr := 'VIDANGE / OUVERTURE DU GODET';
 
         // Déclenchement ouverture grappin
         CmdGrappin_Open := TRUE;
@@ -305,7 +305,7 @@ CASE State OF
 
     E_CycleStep.RETURN_WORK_POS: // 🔙 ÉTAPE 10 : Retour fosse de travail
         CycleStep := E_CycleStep.RETURN_WORK_POS;
-        CycleStateStr := "RETOUR VERS FOSSE DE TRAVAIL";
+        CycleStateStr := 'RETOUR VERS FOSSE DE TRAVAIL';
 
         CmdChariotM3_Target := SelectedWorkTarget;
         CmdChariotM3_Start := TRUE;
@@ -319,7 +319,7 @@ CASE State OF
 
     E_CycleStep.READY: // 🏁 ÉTAPE 11 : Prêt / Cycle terminé
         CycleStep := E_CycleStep.READY;
-        CycleStateStr := "CYCLE AUTOMATIQUE COMPLÉTÉ - PRÊT";
+        CycleStateStr := 'CYCLE AUTOMATIQUE COMPLÉTÉ - PRÊT';
         
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
@@ -335,7 +335,7 @@ CASE State OF
 
     E_CycleStep.ERROR_HOLD: // 🛑 ÉTAPE 12 : Maintien sur arrêt / pause
         CycleStep := E_CycleStep.ERROR_HOLD;
-        CycleStateStr := "CYCLE SUSPENDU (PAUSE OU ARRÊT DE SÉCURITÉ)";
+        CycleStateStr := 'CYCLE SUSPENDU (PAUSE OU ARRÊT DE SÉCURITÉ)';
 
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;

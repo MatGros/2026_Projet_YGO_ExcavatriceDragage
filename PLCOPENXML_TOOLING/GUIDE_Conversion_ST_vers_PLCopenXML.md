@@ -9,9 +9,13 @@
 > `FB_Winch.xml` / `FB_Grappin.xml` / `FB_Cycle.xml` (FUNCTION_BLOCK), `PRG_MAIN.xml` (PROGRAM),
 > `E_DiagState.xml` / `E_CycleStep.xml` (ENUM), `ST_WinchHMI.xml` / `ST_SpeedStepTable.xml` (STRUCT),
 > `GVL_IHM.xml` / `GVL_PERSISTENT.xml` / `GVL_DEBUG.xml` (GVL, retain / retain+persistent / non-retain).
-> Quelques points de **comportement à l'import** restent `🟡 TBD` (voir §7 — dépendance de
-> type manquante, création auto du dossier cible, ré-import du même objet) : un POC de test
-> est prêt dans `test_import_poc/` pour les vérifier directement dans CODESYS.
+> **Import testé en conditions réelles** (§7) : le POC `test_import_poc/` a été importé (et
+> réimporté) dans le vrai projet CODESYS. Confirmé : sélection d'objets individuelle à l'import
+> (cases à cocher, pas de tout-ou-rien) ; le dossier cible du `ProjectStructure` se crée
+> **relativement au nœud sélectionné dans l'arbre projet** au moment de l'import (pas un chemin
+> absolu) ; **le ré-import d'un objet déjà présent ne propose PAS la boîte Replace/Rename/Skip
+> documentée officiellement — CODESYS duplique silencieusement en `_1`/`_2`...** (voir §7).
+> Reste `🟡 TBD` : dépendance de type manquante entre plusieurs objets.
 
 ---
 
@@ -25,11 +29,12 @@ propriétaire `Device.export` par GUID, pas du vrai PLCopenXML).
 
 Trois choses confirmées par la doc officielle CODESYS (menus `Project → Import…` /
 `Project → Export…`, sous-commande PLCopenXML) :
-- L'import PLCopenXML matche les objets **par nom**, pas par GUID. En cas de conflit de nom,
-  la boîte de dialogue d'import propose exactement 3 choix (termes officiels) :
-  - **Replace** : l'objet existant du projet est écrasé par l'objet importé.
-  - **Rename** : le nouvel objet est importé avec un nom modifié (`_<n>` ajouté en suffixe).
-  - **Skip** : l'objet n'est pas importé.
+- L'import PLCopenXML matche les objets **par nom**, pas par GUID. La doc officielle décrit une
+  boîte de dialogue à 3 choix en cas de conflit de nom (Replace/Rename/Skip) — **⚠️ non
+  reproduit lors du test réel de ce projet** : réimporter un objet déjà présent ne l'a **pas**
+  proposé, CODESYS a dupliqué silencieusement en `_1` sans rien demander (voir §7, POC
+  `test_import_poc/`). À considérer comme le comportement réel par défaut tant que le cas où la
+  boîte à 3 choix apparaît réellement n'est pas identifié.
 - `Project → Export PLCopenXML` ouvre une boîte de dialogue qui **liste tous les objets de
   l'arbre du device exportables** en PLCopenXML — l'utilisateur coche un sous-ensemble précis.
   La doc officielle ne précise pas si les dépendances (types utilisés) sont cochées
@@ -404,9 +409,11 @@ CODESYS/3S-Software placée directement dans le **`<addData>` de niveau `<projec
 - **Pas d'export de bibliothèque** via PLCopenXML.
 - **Pas de garantie de fidélité à 100 %** (formulation officielle CODESYS) — toujours
   comparer visuellement le résultat après import avant de faire confiance à un lot généré.
-- Import = conflit résolu **par nom**, 3 choix officiels **Replace / Rename / Skip** (voir §0)
-  : pas besoin de faire correspondre un `ObjectId` existant pour mettre à jour un objet déjà
-  présent — un GUID neuf convient même pour remplacer un objet existant du même nom.
+- Import = matching **par nom**, pas besoin de faire correspondre un `ObjectId` existant. En
+  revanche, réimporter un nom déjà présent **ne l'écrase pas en place** : CODESYS a dupliqué
+  silencieusement en `_1` lors du test réel (voir §7) — la boîte Replace/Rename/Skip décrite
+  officiellement n'est pas apparue. Pour mettre à jour un objet existant, supprimer l'ancien
+  avant de réimporter plutôt que de compter sur un remplacement automatique.
 - Le placement dans l'arbre (`<ProjectStructure><Folder Name="...">`) est piloté par le nom
   de dossier choisi dans le fichier généré — reproduire le nom du sous-dossier `CODE/` d'origine.
 
@@ -421,24 +428,79 @@ supposé. Un seul import = une seule transaction CODESYS, donc pas de risque d'o
 
 ---
 
-## 7. Ce qui reste à vérifier (🟡 TBD)
+## 7. Comportements observés à l'import réel (POC `test_import_poc/`)
 
-Le schéma lui-même est maintenant couvert (FB/PROGRAM, STRUCT, ENUM, GVL retain/persistent/
-simple, `VAR_IN_OUT`, `STRING(n)`, `ARRAY[..] OF`). Il reste des points **comportementaux**
-(pas des points de syntaxe) qui ne se vérifient pas en lisant un export, mais en testant un
-import — voir le POC `PLCOPENXML_TOOLING/test_import_poc/` conçu pour ça :
+Test effectué : import de `POC_ImportTest.xml` (2 objets neufs, GUID neufs, dossier
+`_POC_IMPORT_TEST` inexistant) dans le projet réel, puis **export complet du projet** en
+`Device.export` (format natif) pour vérifier ligne à ligne où et comment CODESYS a rangé les
+objets importés.
+
+### ✅ Confirmé : sélection d'objets à l'import, pas un tout-ou-rien
+
+Comme pour l'export (§0), la boîte de dialogue d'import PLCopenXML permet de **cocher/décocher
+individuellement** les objets contenus dans le fichier avant de valider — l'utilisateur n'est
+pas obligé d'importer tout ce que contient le `.xml`. Utile pour un générateur qui produirait
+un fichier "large" (plusieurs objets liés, cf. bonne pratique §6) : rien n'empêche de
+n'en importer qu'une partie ponctuellement.
+
+### ✅ Confirmé : le placement dépend de la sélection dans l'arbre au moment de l'import, pas uniquement du XML
+
+La boîte de dialogue d'import PLCopenXML liste les objets du fichier avec des **cases à
+cocher** (sélection individuelle, cf. point précédent). L'emplacement où atterrit le contenu
+importé dépend de **l'endroit sélectionné avec la souris dans l'arborescence du projet** au
+moment de lancer la commande — CODESYS crée/peuple un sous-dossier (nommé d'après
+`<ProjectStructure><Folder Name="...">` du XML) **sous ce nœud sélectionné**, pas à un
+emplacement absolu fixe déterminé uniquement par le fichier.
+
+Dans le test POC, l'objet a atterri sous `Application › _IMPORT › _POC_IMPORT_TEST` simplement
+parce que le nœud `_IMPORT` du projet était sélectionné dans l'arbre à ce moment-là — ce n'est
+pas un dossier tampon auto-généré par CODESYS, ni un comportement caché : c'est le nœud choisi
+par l'utilisateur qui sert de parent.
+
+👉 **Conséquence pour le futur générateur** : le nom de dossier dans `ProjectStructure` (`WINCH`,
+`GRAPPIN`, etc.) crée bien un sous-dossier de ce nom, mais **relativement au nœud sélectionné
+dans l'arbre CODESYS avant de lancer l'import** — pas un chemin absolu depuis la racine de
+l'Application. Pour reproduire l'organisation `CODE/` (dossiers à plat sous `Application`),
+il faut **sélectionner le nœud `Application`** (ou le device racine de la logique) avant de
+lancer `Project → Import PLCopenXML`, pas n'importe quel sous-dossier.
+
+### ⚠️ Confirmé : le ré-import du même fichier ne déclenche PAS la boîte Replace/Rename/Skip
+
+Test effectué : réimporter `POC_ImportTest.xml` tel quel (même noms, mêmes `ObjectId`
+inchangés) alors que `ST_POC_ImportTest`/`FB_POC_ImportTest` existaient déjà dans le projet.
+**Résultat observé** : import réussi, **sans aucune erreur ni boîte de dialogue de conflit** —
+CODESYS a renommé automatiquement le nouvel objet en `ST_POC_ImportTest_1`, en incrémentant le
+suffixe tout seul, silencieusement.
+
+👉 Ceci **contredit la description officielle** citée en §0 (boîte à 3 choix Replace / Rename /
+Skip) — au moins pour ce flux d'import précis (sélection dans l'arbre + `Project → Import`) :
+en pratique, un nom déjà présent est **automatiquement dupliqué en `_1`/`_2`/...** sans qu'on
+soit interrogé. **Conséquence importante pour le générateur** : réimporter un objet pour le
+"mettre à jour" ne l'écrase donc pas en place — il faut soit supprimer manuellement l'ancien
+objet avant de réimporter, soit s'attendre à des doublons `_1`, `_2`... à nettoyer à la main.
+La boîte Replace/Rename/Skip documentée officiellement n'a pas été vue lors de ce test — peut-
+être réservée à un autre point d'entrée (ex. import depuis un écran de gestion de bibliothèque,
+ou un conflit de type différent) : à garder en tête, pas encore expliqué.
+
+### ✅ Confirmé : un `ProjectStructure` avec plusieurs `<Folder>` s'importe correctement
+
+Testé en conditions réelles : le générateur (`PLCOPENXML_TOOLING/generator/`, voir son propre
+README) produit, avec l'option `--bundle`, un seul fichier XML regroupant plusieurs objets
+répartis sur plusieurs dossiers d'origine (`<ProjectStructure>` avec un `<Folder Name="...">`
+par dossier `CODE/` distinct, chacun listant ses objets). Import réel du bundle complet de
+`CODE/` (61 objets, 15 dossiers) dans CODESYS : **chaque objet est arrivé dans le bon dossier**,
+CODESYS a bien recréé/peuplé les 15 dossiers séparément à partir d'un seul fichier — pas de
+mélange, pas de dossier unique fourre-tout. Ceci répond au point qui restait ouvert plus haut
+(fermeture de dépendances embarquée) : un objet + ses dépendances de dossiers différents dans
+un même fichier s'importe sans problème, chacun à sa bonne place.
+
+### 🟡 Reste à vérifier
 
 | Point | Pourquoi c'est encore incertain |
 |---|---|
-| Comportement exact à l'import d'un `dataType` référencé par un FB mais absent du fichier (ex. importer `FB_Winch.xml` seul alors que `ST_SpeedStepTable`/`E_State` ne sont pas inclus) | Pas testé ; probablement un échec d'import ou une résolution différée — **à tester avant de généraliser un générateur qui n'exporterait qu'un seul objet à la fois sans ses dépendances**. En attendant, voir la bonne pratique de regroupement en §6. |
-| Le dossier `<Folder Name="...">` ciblé par `ProjectStructure` est-il créé automatiquement s'il n'existe pas encore dans l'arbre du projet, ou l'import échoue/range-t-il ailleurs ? | Non documenté officiellement. **Testable directement avec le POC `test_import_poc/`** (dossier `_POC_IMPORT_TEST` volontairement inexistant dans le vrai projet). |
-| Comportement d'un ré-import du même fichier (même nom d'objet, même `ObjectId` inchangé) : le choix Replace/Rename/Skip est-il re-proposé à l'identique, ou CODESYS détecte-t-il "rien n'a changé" ? | Non documenté officiellement. **Testable avec le POC `test_import_poc/`** (réimporter deux fois de suite). |
+| Comportement exact à l'import d'un `dataType` référencé par un FB mais absent **du fichier lui-même** (aucune dépendance embarquée du tout, ni dans le même fichier ni déjà présente dans le projet cible) | Non testé isolément — le générateur inclut désormais les dépendances par défaut (`--bundle`/fermeture transitive), donc ce cas ne se présente plus en usage normal. Resterait pertinent uniquement en usage `--no-deps` explicite. |
 | `VAR_GLOBAL CONSTANT` | Non observé dans un échantillon — seule la contrainte documentée officiellement (§6, incompatibilité avec `VAR_GLOBAL` simple dans la même liste) est connue. Faible priorité (peu utilisé dans `CODE/`). |
 | `VAR_TEMP` | Non observé — par analogie avec `inOutVars`, `<tempVars>` attendu mais pas vérifié. Faible priorité (rarement utilisé dans le style de code du projet). |
-
-Pour le point prioritaire (import avec dépendance manquante), il n'y a pas besoin d'un nouvel
-export : c'est un **test direct dans CODESYS** (importer `FB_Winch.xml` seul dans un projet/
-dossier qui n'a pas encore `ST_SpeedStepTable`/`E_State`, observer le résultat).
 
 ---
 

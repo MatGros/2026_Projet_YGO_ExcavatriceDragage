@@ -73,29 +73,29 @@ instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR GVL_DEBUG.DBG_CtrlPhas
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
-instM1ContactorFwd(InputRaw := M1_ContactorFeedbackFwd_DI, FilterTime := T#20MS);
+instM1ContactorFwd(InputRaw := M1_FeedbackFwd_DI, FilterTime := T#20MS);
 M1ContactorFeedbackFwd := instM1ContactorFwd.State;
 
-instM1ContactorRev(InputRaw := M1_ContactorFeedbackRev_DI, FilterTime := T#20MS);
+instM1ContactorRev(InputRaw := M1_FeedbackRev_DI, FilterTime := T#20MS);
 M1ContactorFeedbackRev := instM1ContactorRev.State;
 
 instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
 
-instM1BrakeFeedback(InputRaw := M1_BrakeContactorFeedback_DI, FilterTime := T#20MS);
+instM1BrakeFeedback(InputRaw := M1_BrakeFeedback_DI, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
-instM2ContactorFwd(InputRaw := M2_ContactorFeedbackFwd_DI, FilterTime := T#20MS);
+instM2ContactorFwd(InputRaw := M2_FeedbackFwd_DI, FilterTime := T#20MS);
 M2ContactorFeedbackFwd := instM2ContactorFwd.State;
 
-instM2ContactorRev(InputRaw := M2_ContactorFeedbackRev_DI, FilterTime := T#20MS);
+instM2ContactorRev(InputRaw := M2_FeedbackRev_DI, FilterTime := T#20MS);
 M2ContactorFeedbackRev := instM2ContactorRev.State;
 
 instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;
 
-instM2BrakeFeedback(InputRaw := M2_BrakeContactorFeedback_DI, FilterTime := T#20MS);
+instM2BrakeFeedback(InputRaw := M2_BrakeFeedback_DI, FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── CHARIOT M3 ────────────────────────────────────────────────────────
@@ -111,5 +111,5 @@ ChariotPosMaintenance := instChariotPosMaintenance.State;
 instChariotPosTremie(InputRaw := PosTremie_DI, FilterTime := T#20MS);
 ChariotPosTremie := instChariotPosTremie.State;
 
-instM3BrakeFeedback(InputRaw := M3_BrakeContactorFeedback_DI, FilterTime := T#20MS);
+instM3BrakeFeedback(InputRaw := M3_BrakeFeedback_DI, FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
