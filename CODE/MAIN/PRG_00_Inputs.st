@@ -1,12 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   📥 PRG_0_Inputs — Acquisition et conditionnement des ENTRÉES (PROGRAMME)
+   📥 PRG_00_Inputs — Acquisition et conditionnement des ENTRÉES (PROGRAMME)
    ───────────────────────────────────────────────────────────────
    📄 Doc : DOC/AF_Partie6_IO_Conditioning_v1.2.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_0_Inputs
+PROGRAM PRG_00_Inputs
 VAR_OUTPUT
     // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
     EmergencyStopOk      : BOOL;   // 🚨 Chaîne AU : TRUE=fermée/armée ✅ | FALSE=AU appuyé ou fil coupé 🔴
@@ -57,7 +57,7 @@ VAR
     instM3BrakeFeedback       : FB_Input;
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_0_Inputs) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
 
 // 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
 instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST, FilterTime := T#20MS);

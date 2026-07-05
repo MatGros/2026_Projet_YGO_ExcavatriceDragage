@@ -72,7 +72,7 @@ VAR_INPUT
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // 🆕 Retour TOR thermique CE moteur (M1_ThermalFeedback/M2_ThermalFeedback, I/O réel) — TRUE = surchauffe
     SlackCableDetected  : BOOL;        // 🆕 Détecteur mou de câble COMMUN aux 2 treuils (M1_M2_SlackCableSwitch, I/O réel) — même valeur câblée sur les 2 instances
-    PhaseRotationOk     : BOOL;        // 🆕 PRG_0_Inputs.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
+    PhaseRotationOk     : BOOL;        // 🆕 PRG_00_Inputs.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
     TopPositionSensor   : BOOL;        // 🆕 Capteur de position haute commun (M1_M2_TopPositionSensor, I/O réel)
     InReferencingMode   : BOOL;        // 🆕 Indique si le treuil est en cours de homing (référencement)
     CablePosM           : REAL;        // 🆕 Position actuelle du câble en mètres (scaled)

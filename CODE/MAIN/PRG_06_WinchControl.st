@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   🪝 PRG_6_WinchControl — Commande des Treuils M1/M2, Synchro et Grappin
+   🪝 PRG_06_WinchControl — Commande des Treuils M1/M2, Synchro et Grappin
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
-   ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_5_Cycle).
+   ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_6_WinchControl
+PROGRAM PRG_06_WinchControl
 VAR
     // Stubs
     StubMachineEnableN1 : BOOL := TRUE;
@@ -34,17 +34,17 @@ VAR
     ForbidDescentM2_Active  : BOOL;
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_6_WinchControl) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
-IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
-    M1_StartStop_Active := PRG_5_Cycle.instCycle.CmdWinchM1_StartStop;
-    M1_Direction_Active := PRG_5_Cycle.instCycle.CmdWinchM1_Direction;
-    M1_SpeedRef_Active  := PRG_5_Cycle.instCycle.CmdWinchM1_SpeedPct;
+IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+    M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop;
+    M1_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM1_Direction;
+    M1_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
 ELSE
-    M1_StartStop_Active := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy;
-    M1_Direction_Active := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-    M1_SpeedRef_Active  := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+    M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy;
+    M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
+    M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
 END_IF;
 
 // ── 2. ARBITRAGE DES CONSIGNES M2 (Grappin vs Cycle Automatique vs Joystick) ──
@@ -53,28 +53,28 @@ IF instGrappin.Busy THEN
     M2_Direction_Active := instGrappin.M2_Direction;
     M2_SpeedRef_Active  := 15.0; // Vitesse lente forcée pour fermeture grappin
 ELSE
-    IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
-        M2_StartStop_Active := PRG_5_Cycle.instCycle.CmdWinchM2_StartStop;
-        M2_Direction_Active := PRG_5_Cycle.instCycle.CmdWinchM2_Direction;
-        M2_SpeedRef_Active  := PRG_5_Cycle.instCycle.CmdWinchM2_SpeedPct;
+    IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+        M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop;
+        M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
+        M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
     ELSE
-        M2_StartStop_Active := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
-        M2_Direction_Active := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-        M2_SpeedRef_Active  := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+        M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+        M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
+        M2_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
     END_IF;
 END_IF;
 
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
-    Enable          := NOT PRG_4_Modes.instModes.OverrideSync AND NOT instGrappin.Busy,
-    Reset           := PRG_9_Supervision.MachineReset_IHM,
-    EmergencyStopOk := PRG_0_Inputs.EmergencyStopOk,
-    Mode            := PRG_4_Modes.instModes.Mode,
-    CablePosM1      := PRG_2_Encoders.instEncoderScaleM1.CablePosM,
-    CablePosM2      := PRG_2_Encoders.instEncoderScaleM2.CablePosM,
-    HomedM1         := PRG_2_Encoders.instHomingM1.Homed,
-    HomedM2         := PRG_2_Encoders.instHomingM2.Homed,
-    OverrideSync    := PRG_4_Modes.instModes.OverrideSync,
+    Enable          := NOT PRG_04_Modes.instModes.OverrideSync AND NOT instGrappin.Busy,
+    Reset           := PRG_09_Supervision.MachineReset_IHM,
+    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    Mode            := PRG_04_Modes.instModes.Mode,
+    CablePosM1      := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
+    CablePosM2      := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
+    HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
+    OverrideSync    := PRG_04_Modes.instModes.OverrideSync,
     SyncToleranceM  := GVL_PERSISTENT.WinchSyncTolerance_M,
     ActiveOffsetM   := instGrappin.ActiveOffsetM,
     
@@ -95,15 +95,15 @@ instWinchSync(
 // ── 4. COMMANDE DU GRAPPIN (Séquence lente) ─────────────────────────────
 instGrappin(
     Enable              := TRUE,
-    Reset               := PRG_9_Supervision.MachineReset_IHM,
-    EmergencyStopOk     := PRG_0_Inputs.EmergencyStopOk,
-    Mode                := PRG_4_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.Grappin.CmdOpen OR PRG_5_Cycle.instCycle.CmdGrappin_Open,
-    CmdClose_IHM        := GVL_IHM.Grappin.CmdClose OR PRG_5_Cycle.instCycle.CmdGrappin_Close,
-    JoystickY_StartStop := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
-    JoystickY_Direction := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
-    CablePosM1          := PRG_2_Encoders.instEncoderScaleM1.CablePosM,
-    CablePosM2          := PRG_2_Encoders.instEncoderScaleM2.CablePosM,
+    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    Mode                := PRG_04_Modes.instModes.Mode,
+    CmdOpen_IHM         := GVL_IHM.Grappin.CmdOpen OR PRG_05_Cycle.instCycle.CmdGrappin_Open,
+    CmdClose_IHM        := GVL_IHM.Grappin.CmdClose OR PRG_05_Cycle.instCycle.CmdGrappin_Close,
+    JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
+    JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
+    CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
+    CablePosM2          := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     Config              := GVL_PERSISTENT.GrappinConfig,
     TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,
     GrappinState        := GVL_PERSISTENT.GrappinState
@@ -124,47 +124,47 @@ END_IF;
 
 // ── 5. CALCUL DES LIMITES BASSES ACTIVES ET DU BLOCAGE DE DESCENTE ──────
 BottomLimitM1_Active := GVL_PERSISTENT.CableLimitDescent_M;
-IF (PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
+IF (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM1_Active := MAX(BottomLimitM1_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
 BottomLimitM2_Active := GVL_PERSISTENT.CableLimitDescent_M;
-IF (PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
+IF (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
-ForbidDescentM1_Active := PRG_3_Safety.instSafetyWinchM1.ForbidDescent
-                          OR ((PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO)
+ForbidDescentM1_Active := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
+                          OR ((PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO)
                               AND GVL_PERSISTENT.LimitLegalEnabled
-                              AND (PRG_2_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
-ForbidDescentM2_Active := PRG_3_Safety.instSafetyWinchM2.ForbidDescent
-                          OR ((PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO)
+ForbidDescentM2_Active := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
+                          OR ((PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO)
                               AND GVL_PERSISTENT.LimitLegalEnabled
-                              AND (PRG_2_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
     Enable                  := StubMachineEnableN1,
-    Reset                   := PRG_9_Supervision.MachineReset_IHM,
-    EmergencyStopOk         := PRG_0_Inputs.EmergencyStopOk,
-    Mode                    := PRG_4_Modes.instModes.Mode,
+    Reset                   := PRG_09_Supervision.MachineReset_IHM,
+    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M1_StartStop_Active,
-    SafeStop                := PRG_3_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
+    SafeStop                := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
     ForbidDescent           := ForbidDescentM1_Active,
-    ForbidAscent            := PRG_3_Safety.instSafetyWinchM1.ForbidAscent,
+    ForbidAscent            := PRG_03_Safety.instSafetyWinchM1.ForbidAscent,
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
     MaxStepDescente         := GVL_PERSISTENT.WinchM1MaxStepDescente,
-    ContactorFeedbackFwd    := PRG_0_Inputs.M1ContactorFeedbackFwd,
-    ContactorFeedbackRev    := PRG_0_Inputs.M1ContactorFeedbackRev,
-    BrakeFeedback           := PRG_0_Inputs.M1BrakeFeedback,
+    ContactorFeedbackFwd    := PRG_00_Inputs.M1ContactorFeedbackFwd,
+    ContactorFeedbackRev    := PRG_00_Inputs.M1ContactorFeedbackRev,
+    BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
     RampAccelRate           := GVL_PERSISTENT.WinchM1RampAccelRate_Pct,
     RampDecelNormalRate     := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct,
     RampDecelFastRate       := GVL_PERSISTENT.WinchM1RampDecelFast_Pct,
-    Homed                   := PRG_2_Encoders.instHomingM1.Homed,
-    CablePosM               := PRG_2_Encoders.instEncoderScaleM1.CablePosM,
+    Homed                   := PRG_02_Encoders.instHomingM1.Homed,
+    CablePosM               := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     TopLimitM               := GVL_PERSISTENT.HomingTargetM1_M,
     BottomLimitM            := BottomLimitM1_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
@@ -174,25 +174,25 @@ instWinchM1(
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
 instWinchM2(
     Enable                  := StubMachineEnableN1,
-    Reset                   := PRG_9_Supervision.MachineReset_IHM,
-    EmergencyStopOk         := PRG_0_Inputs.EmergencyStopOk,
-    Mode                    := PRG_4_Modes.instModes.Mode,
+    Reset                   := PRG_09_Supervision.MachineReset_IHM,
+    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M2_StartStop_Active,
-    SafeStop                := PRG_3_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
+    SafeStop                := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
     ForbidDescent           := ForbidDescentM2_Active,
-    ForbidAscent            := PRG_3_Safety.instSafetyWinchM2.ForbidAscent,
+    ForbidAscent            := PRG_03_Safety.instSafetyWinchM2.ForbidAscent,
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
     MaxStepDescente         := GVL_PERSISTENT.WinchM2MaxStepDescente,
-    ContactorFeedbackFwd    := PRG_0_Inputs.M2ContactorFeedbackFwd,
-    ContactorFeedbackRev    := PRG_0_Inputs.M2ContactorFeedbackRev,
-    BrakeFeedback           := PRG_0_Inputs.M2BrakeFeedback,
+    ContactorFeedbackFwd    := PRG_00_Inputs.M2ContactorFeedbackFwd,
+    ContactorFeedbackRev    := PRG_00_Inputs.M2ContactorFeedbackRev,
+    BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
     RampAccelRate           := GVL_PERSISTENT.WinchM2RampAccelRate_Pct,
     RampDecelNormalRate     := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct,
     RampDecelFastRate       := GVL_PERSISTENT.WinchM2RampDecelFast_Pct,
-    Homed                   := PRG_2_Encoders.instHomingM2.Homed,
-    CablePosM               := PRG_2_Encoders.instEncoderScaleM2.CablePosM,
+    Homed                   := PRG_02_Encoders.instHomingM2.Homed,
+    CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M,
     BottomLimitM            := BottomLimitM2_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,

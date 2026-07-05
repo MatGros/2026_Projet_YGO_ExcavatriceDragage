@@ -1,22 +1,22 @@
 (* ═══════════════════════════════════════════════════════════════
-   📡 PRG_1_Diagnostics — États bus de terrain et Joystick (PROGRAMME)
+   📡 PRG_01_Diagnostics — États bus de terrain et Joystick (PROGRAMME)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1.
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_1_Diagnostics
+PROGRAM PRG_01_Diagnostics
 VAR
     instDiagCanOpen  : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
     instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
     FB_Joystick_0    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_1_Diagnostics) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_01_Diagnostics) ===
 
 // 1. Diagnostics CANopen
 instDiagCanOpen(
     Enable := TRUE,
-    Reset := PRG_9_Supervision.MachineReset_IHM,
+    Reset := PRG_09_Supervision.MachineReset_IHM,
     CanOnline := (CANbus.GetBusState() = 1) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, // 1 = ACTIVE (ou bypass test banc)
     CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST
 );
@@ -24,7 +24,7 @@ instDiagCanOpen(
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
 instDiagEthercat(
     Enable := TRUE,
-    Reset := PRG_9_Supervision.MachineReset_IHM,          // 🔑 Bouton général machine
+    Reset := PRG_09_Supervision.MachineReset_IHM,          // 🔑 Bouton général machine
     VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
     VariateurSlaveState := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
     EncoderM1WcState := (COD1_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
@@ -36,8 +36,8 @@ instDiagEthercat(
 // 3. Acquisition Joystick
 FB_Joystick_0(
     Enable          := GVL_DEBUG.DBG_True,
-    EmergencyStopOk := PRG_0_Inputs.EmergencyStopOk,
-    Reset           := PRG_9_Supervision.MachineReset_IHM,
+    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    Reset           := PRG_09_Supervision.MachineReset_IHM,
     NeutralXMem     := GVL_PERSISTENT.JoystickNeutralX,
     NeutralYMem     := GVL_PERSISTENT.JoystickNeutralY,
     BusCanOpenOP    := instDiagCanOpen.busCanOpen,

@@ -330,6 +330,7 @@ def build_project_xml(
     include_deps: bool = True,
     project_name: str = "Generated",
     timestamp_override: str | None = None,
+    exclude_gvl_persistent: bool = False,
 ) -> ET.Element:
     roots = [root_names] if isinstance(root_names, str) else list(root_names)
     if not roots:
@@ -395,7 +396,7 @@ def build_project_xml(
             # ⚠️ GVL_PERSISTENT est exclu du bundle : ses variables PERSISTENT RETAIN
             # sont gérées directement par CODESYS et ne doivent pas être importées
             # via PLCopenXML (risque de doublon / écrasement des valeurs persistantes).
-            if obj.name == "GVL_PERSISTENT":
+            if exclude_gvl_persistent and obj.name == "GVL_PERSISTENT":
                 diagnostics.info(
                     "GVL_PERSISTENT exclu du bundle (variables PERSISTENT RETAIN, géré par CODESYS)",
                     obj.name,

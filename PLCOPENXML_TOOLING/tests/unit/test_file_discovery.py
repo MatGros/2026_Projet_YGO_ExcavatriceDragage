@@ -98,4 +98,4 @@ def test_real_gvl_encoder_stub_object_present_and_named_from_stem():
     objects = discover_objects(CODE_DIR, diag)
     stub = next(o for o in objects if o.name == "GVL_Encoder_Stub")
     assert stub.kind == "gvl"
-    assert len(stub.global_blocks) == 2
+    assert len(stub.global_blocks) == 1

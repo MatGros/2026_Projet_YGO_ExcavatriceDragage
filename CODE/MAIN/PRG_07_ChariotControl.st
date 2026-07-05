@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   ↔️ PRG_7_ChariotControl — Pilotage de la Translation Chariot M3
+   ↔️ PRG_07_ChariotControl — Pilotage de la Translation Chariot M3
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 7.
-   ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_5_Cycle).
+   ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_7_ChariotControl
+PROGRAM PRG_07_ChariotControl
 VAR
     instChariotM3           : FB_Chariot;
     
@@ -19,13 +19,13 @@ VAR
     SelectedTargetNum       : INT;
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_7_ChariotControl) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_07_ChariotControl) ===
 
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
-IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
-    SelectedTargetNum    := PRG_5_Cycle.instCycle.CmdChariotM3_Target;
-    M3_StartStop_Active  := PRG_5_Cycle.instCycle.CmdChariotM3_Start;
+    SelectedTargetNum    := PRG_05_Cycle.instCycle.CmdChariotM3_Target;
+    M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdChariotM3_Start;
     M3_SpeedRef_Active   := 40.0; // Vitesse de translation automatique nominale (40%)
     
     // Détermination automatique du sens de marche selon la cible :
@@ -39,29 +39,29 @@ IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 ELSE
     // Mode Manuel/Maintenance : Consignes issues du Joystick et sélecteur HMI
     SelectedTargetNum    := StubChariotPositionSelect_IHM;
-    M3_StartStop_Active  := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
-    M3_Direction_Active  := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
-    M3_SpeedRef_Active   := PRG_1_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+    M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
+    M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
+    M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
 END_IF;
 
 // Câblage du capteur de butée de la cible sélectionnée
 CASE SelectedTargetNum OF
-    1: M3_PositionSensorTarget := PRG_0_Inputs.ChariotPosFosse1;
-    2: M3_PositionSensorTarget := PRG_0_Inputs.ChariotPosFosse2;
-    3: M3_PositionSensorTarget := PRG_0_Inputs.ChariotPosMaintenance;
-    4: M3_PositionSensorTarget := PRG_0_Inputs.ChariotPosTremie;
+    1: M3_PositionSensorTarget := PRG_00_Inputs.ChariotPosFosse1;
+    2: M3_PositionSensorTarget := PRG_00_Inputs.ChariotPosFosse2;
+    3: M3_PositionSensorTarget := PRG_00_Inputs.ChariotPosMaintenance;
+    4: M3_PositionSensorTarget := PRG_00_Inputs.ChariotPosTremie;
 ELSE
     M3_PositionSensorTarget := FALSE;   // Aucun capteur visé
 END_CASE;
 
 // ── 2. EXÉCUTION DU PILOTAGE DU CHARIOT M3 ──────────────────────────────
 instChariotM3(
-    Enable                  := PRG_6_WinchControl.StubMachineEnableN1,
-    Reset                   := PRG_9_Supervision.MachineReset_IHM,
-    EmergencyStopOk         := PRG_0_Inputs.EmergencyStopOk,
-    Mode                    := PRG_4_Modes.instModes.Mode,
+    Enable                  := PRG_06_WinchControl.StubMachineEnableN1,
+    Reset                   := PRG_09_Supervision.MachineReset_IHM,
+    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M3_StartStop_Active,
-    SafeStop                := PRG_3_Safety.instSafetyChariotM3.SafeStop,
+    SafeStop                := PRG_03_Safety.instSafetyChariotM3.SafeStop,
     CommMode                := E_ChariotCommMode.DEGRADED_IO,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
@@ -71,7 +71,7 @@ instChariotM3(
     ContactorFeedbackFwd    := M3_ContactorFeedbackFwd,
     ContactorFeedbackRev    := M3_ContactorFeedbackRev,
     DriveFaultFeedback      := M3_DriveFaultFeedback,
-    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_0_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd)
+    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd)
 );
 
 // ── 3. RECOPIE VERS LES VARIABLES GLOBALES DE SIMULATION / STUBS ─────────

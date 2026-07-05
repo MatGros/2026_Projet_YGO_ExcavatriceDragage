@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   ⚡ PRG_8_AuxiliaryControl — Gestion des Auxiliaires (Hydraulique, Crible...)
+   ⚡ PRG_08_AuxiliaryControl — Gestion des Auxiliaires (Hydraulique, Crible...)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 8.
    ✅ Regroupe toutes les commandes et logiques hors-axes.
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_8_AuxiliaryControl
+PROGRAM PRG_08_AuxiliaryControl
 VAR
     // 🌡️ Groupe Hydraulique
     HydraulicPumpRunCmd   : BOOL;   // Commande démarrage centrale hydraulique
@@ -20,7 +20,7 @@ VAR
     HelmetCloseCmd        : BOOL;   // Commande fermeture casque
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_8_AuxiliaryControl) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
 // --- STUBS LOGIQUES TEMPORAIRES (comportement passif / neutre) ---
 HydraulicPumpRunCmd := FALSE;
