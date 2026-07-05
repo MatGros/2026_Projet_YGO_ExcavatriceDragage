@@ -323,7 +323,7 @@ def _build_globalvars_data(
 
 
 def build_project_xml(
-    root_name: str,
+    root_names: str | list[str],
     objects_by_name: dict[str, SourceObject],
     diagnostics: DiagnosticCollector,
     *,
@@ -331,14 +331,17 @@ def build_project_xml(
     project_name: str = "Generated",
     timestamp_override: str | None = None,
 ) -> ET.Element:
-    root_obj = objects_by_name.get(root_name)
-    if root_obj is None:
-        raise KeyError(f"unknown root object: {root_name!r}")
+    roots = [root_names] if isinstance(root_names, str) else list(root_names)
+    if not roots:
+        raise ValueError("build_project_xml requires at least one root object name")
+    missing = [r for r in roots if r not in objects_by_name]
+    if missing:
+        raise KeyError(f"unknown root object(s): {missing!r}")
 
-    names = resolve_dependencies([root_name], objects_by_name, diagnostics) if include_deps else [root_name]
+    names = resolve_dependencies(roots, objects_by_name, diagnostics) if include_deps else roots
     objs = [objects_by_name[n] for n in names if n in objects_by_name]
 
-    timestamp = timestamp_override or _format_timestamp(root_obj.mtime)
+    timestamp = timestamp_override or _format_timestamp(objects_by_name[roots[0]].mtime)
 
     project = ET.Element("project")
     project.set("xmlns", PLCOPEN_NS)
@@ -389,6 +392,15 @@ def build_project_xml(
         elif obj.kind == "enum":
             data_types_el.append(_build_enum_datatype(obj, guid, diagnostics))
         elif obj.kind == "gvl":
+            # ⚠️ GVL_PERSISTENT est exclu du bundle : ses variables PERSISTENT RETAIN
+            # sont gérées directement par CODESYS et ne doivent pas être importées
+            # via PLCopenXML (risque de doublon / écrasement des valeurs persistantes).
+            if obj.name == "GVL_PERSISTENT":
+                diagnostics.info(
+                    "GVL_PERSISTENT exclu du bundle (variables PERSISTENT RETAIN, géré par CODESYS)",
+                    obj.name,
+                )
+                continue
             for block in obj.global_blocks:
                 top_adddata.append(_build_globalvars_data(obj, block, guid, objects_by_name, diagnostics))
 

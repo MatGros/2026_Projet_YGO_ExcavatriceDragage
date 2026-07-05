@@ -37,7 +37,7 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_6_WinchControl) ===
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
-IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO OR PRG_4_Modes.instModes.Mode = E_Mode.AUTO THEN
+IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     M1_StartStop_Active := PRG_5_Cycle.instCycle.CmdWinchM1_StartStop;
     M1_Direction_Active := PRG_5_Cycle.instCycle.CmdWinchM1_Direction;
     M1_SpeedRef_Active  := PRG_5_Cycle.instCycle.CmdWinchM1_SpeedPct;
@@ -53,7 +53,7 @@ IF instGrappin.Busy THEN
     M2_Direction_Active := instGrappin.M2_Direction;
     M2_SpeedRef_Active  := 15.0; // Vitesse lente forcée pour fermeture grappin
 ELSE
-    IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO OR PRG_4_Modes.instModes.Mode = E_Mode.AUTO THEN
+    IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
         M2_StartStop_Active := PRG_5_Cycle.instCycle.CmdWinchM2_StartStop;
         M2_Direction_Active := PRG_5_Cycle.instCycle.CmdWinchM2_Direction;
         M2_SpeedRef_Active  := PRG_5_Cycle.instCycle.CmdWinchM2_SpeedPct;

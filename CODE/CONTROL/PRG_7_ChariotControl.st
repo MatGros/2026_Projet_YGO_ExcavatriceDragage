@@ -22,7 +22,7 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_7_ChariotControl) ===
 
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
-IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO OR PRG_4_Modes.instModes.Mode = E_Mode.AUTO THEN
+IF PRG_4_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
     SelectedTargetNum    := PRG_5_Cycle.instCycle.CmdChariotM3_Target;
     M3_StartStop_Active  := PRG_5_Cycle.instCycle.CmdChariotM3_Start;

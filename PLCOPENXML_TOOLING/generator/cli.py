@@ -39,6 +39,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Do not embed each object's transitive type-dependency closure in the generated file",
     )
     parser.add_argument(
+        "--bundle",
+        metavar="FILENAME",
+        default=None,
+        help=(
+            "Write every requested object (plus their combined dependency closure) into a "
+            "single FILENAME.xml under --out-dir instead of one file per object"
+        ),
+    )
+    parser.add_argument(
         "--timestamp",
         default=None,
         help="Override creationDateTime/modificationDateTime (default: derived from each object's .st mtime)",
@@ -62,22 +71,43 @@ def main(argv: list[str] | None = None) -> int:
     targets = args.objects if args.objects else sorted(objects_by_name)
 
     generated = 0
-    for name in targets:
-        obj = objects_by_name.get(name)
-        if obj is None:
-            diagnostics.error(f"unknown object requested: {name!r}", name)
-            continue
-        root = build_project_xml(
-            name,
-            objects_by_name,
-            diagnostics,
-            include_deps=not args.no_deps,
-            project_name=args.project_name,
-            timestamp_override=args.timestamp,
-        )
-        out_path = args.out_dir / obj.folder / f"{name}.xml"
-        write_file(root, out_path)
-        generated += 1
+    if args.bundle:
+        known_targets = []
+        for name in targets:
+            if name in objects_by_name:
+                known_targets.append(name)
+            else:
+                diagnostics.error(f"unknown object requested: {name!r}", name)
+        if known_targets:
+            root = build_project_xml(
+                known_targets,
+                objects_by_name,
+                diagnostics,
+                include_deps=not args.no_deps,
+                project_name=args.project_name,
+                timestamp_override=args.timestamp,
+            )
+            bundle_name = args.bundle[:-4] if args.bundle.lower().endswith(".xml") else args.bundle
+            out_path = args.out_dir / f"{bundle_name}.xml"
+            write_file(root, out_path)
+            generated = len(known_targets)
+    else:
+        for name in targets:
+            obj = objects_by_name.get(name)
+            if obj is None:
+                diagnostics.error(f"unknown object requested: {name!r}", name)
+                continue
+            root = build_project_xml(
+                name,
+                objects_by_name,
+                diagnostics,
+                include_deps=not args.no_deps,
+                project_name=args.project_name,
+                timestamp_override=args.timestamp,
+            )
+            out_path = args.out_dir / obj.folder / f"{name}.xml"
+            write_file(root, out_path)
+            generated += 1
 
     for diagnostic in diagnostics:
         stream = sys.stdout if diagnostic.severity is Severity.INFO else sys.stderr

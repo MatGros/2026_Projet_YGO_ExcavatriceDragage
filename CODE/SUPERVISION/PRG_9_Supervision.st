@@ -36,8 +36,8 @@ ELSE
     GVL_Encoder_Stub.StubHomeButton_IHM := FALSE;
 END_IF;
 
-// Transmission de la demande de recalage Joystick
-PRG_1_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.Joystick.Calibrate;
+// ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.Joystick.Calibrate dans PRG_1_Diagnostics (ligne 48)
+// PRG_1_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.Joystick.Calibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
@@ -128,8 +128,6 @@ GVL_IHM.LimitLegalReached                := (PRG_4_Modes.instModes.Mode = E_Mode
                                                  OR (PRG_2_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 GVL_IHM.TopPositionSensorActive          := NOT PRG_0_Inputs.TopPositionSensor;
-GVL_Encoder_Stub.M1_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M;
-GVL_Encoder_Stub.M2_TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M;
 
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM ──────────────────────────────────

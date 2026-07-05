@@ -33,11 +33,3 @@ VAR_GLOBAL
     // 🎯 Home — bouton UNIQUE (action selon HomingMode_IHM)
     StubHomeButton_IHM       : BOOL;   // 🖥️ À mapper bouton IHM — commande Home M1/M2/Both selon mode
 END_VAR
-
-VAR_GLOBAL RETAIN
-    // 🎯 Cible de homing nominal — paramétrable PAR TREUIL (Partie10 §7bis).
-    // 🖥️ IHM : valeur en MÈTRES au-dessus du niveau d'eau, ajustée via la procédure
-    // de calibration (Partie10 §7bis) — c'est LE paramètre qui rend le homing utilisable.
-    M1_TopSensorPositionM    : REAL := 12.5;
-    M2_TopSensorPositionM    : REAL := 12.5;
-END_VAR

@@ -20,6 +20,20 @@ lien avec quoi que ce soit de connu de CODESYS :
 - `ST_POC_ImportTest` → `9ad121d0-f078-4915-a2d5-93ede69fb13e`
 - `FB_POC_ImportTest` → `4afc4450-3037-4e62-8586-070b5c55100e`
 
+## ✅ Résultats déjà observés (import réel effectué)
+
+- **Import sélectif confirmé** : la boîte de dialogue d'import liste les objets du fichier avec
+  des cases à cocher — on peut n'en importer qu'une partie, pas obligé de tout prendre.
+- **Placement confirmé** : le dossier `<ProjectStructure><Folder Name="...">` du XML se crée
+  **relativement au nœud sélectionné dans l'arbre du projet** au moment de lancer l'import (pas
+  un chemin absolu depuis la racine). Résultat observé la 1ère fois : les objets ont atterri
+  sous `_IMPORT` parce que ce nœud était sélectionné dans l'arbre à ce moment-là. **Pour
+  reproduire l'organisation à plat de `CODE/` (dossiers directement sous `Application`, comme
+  `WINCH`), sélectionner le nœud `Application` avant de lancer l'import.**
+- GUID totalement inconnu (`uuid4` frais) : import accepté sans erreur ni avertissement.
+
+## Encore à observer
+
 ## Pourquoi ce test
 
 Le guide (§7 "Ce qui reste à vérifier") liste plusieurs points de **comportement** non
@@ -28,22 +42,16 @@ fichier sert à ça.
 
 ## Ce qu'il faut observer précisément lors de l'import
 
-Dans CODESYS : `Project → Import…` (PLCopenXML), sélectionner `POC_ImportTest.xml`.
+Dans CODESYS : sélectionner le nœud `Application` dans l'arbre, puis `Project → Import…`
+(PLCopenXML), sélectionner `POC_ImportTest.xml`.
 
-1. **GUID totalement inconnu, nom neuf** : CODESYS accepte-t-il silencieusement l'import, ou
-   affiche-t-il un avertissement/erreur au sujet de l'`ObjectId` non reconnu ? (D'après la doc
-   officielle le matching se fait par nom, donc un GUID inconnu ne devrait rien changer — à
-   confirmer.)
-2. **Placement dans l'arbre** : le dossier `_POC_IMPORT_TEST` est-il créé automatiquement à la
-   racine du device/application, ou faut-il qu'il existe déjà ? Si CODESYS ne peut pas le
-   créer, où range-t-il les 2 objets à la place ?
-3. **Message affiché** : y a-t-il un résumé/rapport d'import (objets créés, avertissements) ?
+1. **Message affiché** : y a-t-il un résumé/rapport d'import (objets créés, avertissements) ?
    Le noter tel quel.
-4. **Ré-import du même fichier, à l'identique** : importer `POC_ImportTest.xml` une seconde
+2. **Ré-import du même fichier, à l'identique** : importer `POC_ImportTest.xml` une seconde
    fois (GUID inchangé, noms déjà présents). CODESYS propose-t-il de nouveau les 3 choix
    **Replace / Rename / Skip** documentés officiellement ? Le comportement est-il le même pour
    la STRUCT et pour le FB ?
-5. Bonus si testé : ré-importer après avoir modifié `Counter` ou le commentaire dans le
+3. Bonus si testé : ré-importer après avoir modifié `Counter` ou le commentaire dans le
    fichier XML (toujours même nom/GUID) et choisir **Replace** — vérifier que le contenu est
    bien remplacé sans laisser de résidu de l'ancienne version.
 
