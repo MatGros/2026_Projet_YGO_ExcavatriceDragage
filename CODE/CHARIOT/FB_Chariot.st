@@ -81,6 +81,8 @@ VAR_INPUT
     ContactorFeedbackFwd         : BOOL;       // Retour d'état câblé contacteur sens avant
     ContactorFeedbackRev         : BOOL;       // Retour d'état câblé contacteur sens arrière
     DriveFaultFeedback           : BOOL;       // Retour TOR défaut variateur, SI câblé sur une sortie relais dédiée du variateur (sinon laisser à FALSE côté appelant — ne pas stubber un "pas de défaut" arbitraire)
+    BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen (M3 simulé,
+                                                // voir GVL_Simulation.ContactorFeedbackM3_IsReal — TOUJOURS FALSE réel)
 
     // 🔌 Frein (indépendant du mode — circuit propre, comme le treuil)
     BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein chariot
@@ -309,7 +311,8 @@ END_IF;
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
       DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
+      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
+      BypassContactorCheck := BypassContactorCheck);
 BrakeCmd := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
 
@@ -343,10 +346,10 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🔴 BYPASS TEST BANC (2026-07-03vicies, demande utilisateur, même correctif que FB_Winch) —
-// sans contacteurs réels câblés/cohérents en essai, StuckClosed/StuckOpen bloque à tort
-// RelayFwd/RelayRev. TOUJOURS FALSE en exploitation réelle.
-IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+// 🧪 Simulation (GVL_Simulation.ContactorFeedbackM3_IsReal, passé par l'appelant via
+// BypassContactorCheck, même principe que FB_Winch) — sans contacteurs réels câblés/
+// cohérents en essai, StuckClosed/StuckOpen bloque à tort RelayFwd/RelayRev.
+IF NOT BypassContactorCheck THEN
     IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
         ErrorId := ErrorId OR 16#0002;
     ELSIF ResetEdge.Q THEN

@@ -69,6 +69,8 @@ VAR_INPUT
     ContactorFeedbackFwd    : BOOL;
     ContactorFeedbackRev    : BOOL;
     BrakeFeedback           : BOOL;
+    BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,
+                                       // voir GVL_Simulation.ContactorFeedbackMx_IsReal — TOUJOURS FALSE réel)
     RampAccelRate           : REAL := 50.0;
     RampDecelNormalRate     : REAL := 150.0;
     RampDecelFastRate       : REAL := 400.0;

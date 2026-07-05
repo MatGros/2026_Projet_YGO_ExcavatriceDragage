@@ -130,14 +130,14 @@ GVL_IHM.LimitLegalReached                := (PRG_04_Modes.instModes.Mode = E_Mod
 GVL_IHM.TopPositionSensorActive          := NOT PRG_00_Inputs.TopPositionSensor;
 
 
-// ── 4. BYPASS DE SIMULATION POUR L'IHM ──────────────────────────────────
-GVL_IHM.WinchM1.BypassContactorFeedback := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
-GVL_IHM.WinchM2.BypassContactorFeedback := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
-GVL_IHM.Chariot.BypassContactorFeedback := GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST;
-GVL_IHM.WinchM1.BypassSlackCable        := GVL_DEBUG.DBG_SlackCableSwitch_TEST;
-GVL_IHM.WinchM2.BypassSlackCable        := GVL_DEBUG.DBG_SlackCableSwitch_TEST;
-GVL_IHM.WinchM1.BypassTopPositionSensor := GVL_DEBUG.DBG_TopPositionSensorBypass_TEST;
-GVL_IHM.WinchM2.BypassTopPositionSensor := GVL_DEBUG.DBG_TopPositionSensorBypass_TEST;
+// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir AF_Partie13) ──────
+GVL_IHM.WinchM1.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
+GVL_IHM.WinchM2.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal;
+GVL_IHM.Chariot.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
+GVL_IHM.WinchM1.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
+GVL_IHM.WinchM2.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
+GVL_IHM.WinchM1.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
+GVL_IHM.WinchM2.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────

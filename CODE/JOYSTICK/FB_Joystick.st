@@ -16,10 +16,12 @@
         rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
         désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
       Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔴 BYPASS TEST BANC (2026-07-03octodecies, AUDIT D70) : `GVL_DEBUG.DBG_DeadmanBypass_TEST`
-      force `DeadmanArmed` en permanence (comportement en investigation, pas encore déboguable
-      dans l'immédiat). ⚠️ TOUJOURS FALSE en exploitation réelle — à restreindre par Mode
-      (ex. MAINT_N1 seul) dès que l'arbitrage IHM sera précisé.
+   🔧 RETRAIT BYPASS (AF_Partie13, migration simulation) : l'ancien bypass
+      `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
+      supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
+      CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/
+      `RawButton` simulés en amont (dans `PRG_01_Diagnostics.st`) : l'opérateur doit
+      toujours réellement "appuyer" (forcer `RawButton` en instance) pour armer.
    🆕 `SpeedXPct`/`DirectionX`/`SpeedYPct`/`DirectionY` : miroirs directs de `AxisCmdX/Y`
       (lecture instance CODESYS sans déplier `ST_AxisCmd`). `SpeedRef` est SIGNÉ
       (-100..+100%, signe = sens) ; `Direction` (-1/0/+1) reste la source de vérité pour
@@ -179,16 +181,6 @@ DeadmanTimer(IN := DeadmanArmed AND NOT ((ScaleX.OutPct = 0.0) AND (ScaleY.OutPc
              PT := DeadmanRearmTimeout);
 IF DeadmanTimer.Q THEN
     DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)
-END_IF;
-
-// 🔴 BYPASS TEST BANC (2026-07-03octodecies, demande utilisateur) — TOUJOURS FALSE en
-// exploitation réelle. Homme-mort en investigation (comportement jugé gênant en essai) ;
-// pas le temps de déboguer dans l'immédiat. Force l'armement en permanence : bouton plus
-// nécessaire pour bouger le joystick. À restreindre par Mode (ex. MAINT_N1 seul) dès que
-// l'arbitrage voulu par IHM sera précisé — pour l'instant, un seul flag global, comme les
-// autres bypass (DBG_EmergencyStopOkBypass_TEST/DBG_TopPositionSensorBypass_TEST).
-IF GVL_DEBUG.DBG_DeadmanBypass_TEST THEN
-    DeadmanArmed := TRUE;
 END_IF;
 
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
