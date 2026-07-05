@@ -8,7 +8,9 @@
 PROGRAM PRG_07_ChariotControl
 VAR
     instChariotM3           : FB_Chariot;
-    
+    instSimMirrorM3Fwd      : FB_Sim_DigitalMirror; // 🧪 Lot 5 — retour contacteur M3 réaliste (temporisé)
+    instSimMirrorM3Rev      : FB_Sim_DigitalMirror;
+
     // Commandes arbitrées après sélection Manuel/Auto
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
@@ -71,7 +73,8 @@ instChariotM3(
     ContactorFeedbackFwd    := M3_ContactorFeedbackFwd,
     ContactorFeedbackRev    := M3_ContactorFeedbackRev,
     DriveFaultFeedback      := M3_DriveFaultFeedback,
-    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd)
+    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd),
+    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
 );
 
 // ── 3. RECOPIE VERS LES VARIABLES GLOBALES DE SIMULATION / STUBS ─────────
@@ -79,5 +82,19 @@ M3_RelayFwd     := instChariotM3.RelayFwd;
 M3_RelayRev     := instChariotM3.RelayRev;
 M3_RelaySpeedGv := instChariotM3.RelaySpeedGv;
 
-M3_ContactorFeedbackFwd := M3_RelayFwd;
-M3_ContactorFeedbackRev := M3_RelayRev;
+// 🧪 Retour contacteur M3 (Lot 5, non prioritaire) : miroir temporisé réaliste
+// (FB_Sim_DigitalMirror) au lieu de l'ancien miroir instantané inconditionnel.
+// Délai nettement sous ContactorFeedbackTimeout (500ms, GVL_PERSISTENT côté FB_Chariot)
+// pour ne pas déclencher StuckClosed/StuckOpen à tort pendant le délai simulé.
+instSimMirrorM3Fwd(
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal,
+    Command     := M3_RelayFwd,
+    MirrorDelay := T#150ms
+);
+instSimMirrorM3Rev(
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal,
+    Command     := M3_RelayRev,
+    MirrorDelay := T#150ms
+);
+M3_ContactorFeedbackFwd := instSimMirrorM3Fwd.Feedback;
+M3_ContactorFeedbackRev := instSimMirrorM3Rev.Feedback;

@@ -26,6 +26,9 @@ VAR_INPUT
     DelayMagnetise      : TIME := T#300ms;            // Délai magnétisation moteur avant ouverture frein
     DelayMotorDecel     : TIME := T#500ms;            // Délai décélération/ouverture contacteur avant collage frein
     FeedbackTimeout     : TIME := T#1s;               // Délai max cohérence commande/retour frein
+    BypassContactorCheck: BOOL;                       // 🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,
+                                                       // voir GVL_Simulation.ContactorFeedbackMx_IsReal, passé
+                                                       // par l'appelant FB_Winch/FB_Chariot — TOUJOURS FALSE réel)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -94,7 +97,7 @@ ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
 TonFeedback(IN := (BrakeCmd <> ContactorFeedback), PT := FeedbackTimeout);
-IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
+IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
         ContactorCheck.StuckClosed := (NOT BrakeCmd AND ContactorFeedback);  // commandé collé mais retour "relâché"
         ContactorCheck.StuckOpen   := (BrakeCmd AND NOT ContactorFeedback);  // commandé relâché mais retour "collé"

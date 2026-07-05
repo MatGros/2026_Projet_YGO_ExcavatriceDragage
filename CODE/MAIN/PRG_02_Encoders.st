@@ -12,9 +12,9 @@ VAR_OUTPUT
     EncoderFaultPresentM2 : BOOL;
 END_VAR
 VAR
-    // Simulation banc de test
-    SimulatedM1Raw        : UDINT := 1000000;
-    SimulatedM2Raw        : UDINT := 1000000;
+    // 🧪 Simulation banc de test (Lot 2 — voir CODE/SIMULATION/FB_Sim_Encoder.st)
+    instSimEncoderM1      : FB_Sim_Encoder;
+    instSimEncoderM2      : FB_Sim_Encoder;
     M1_RawPosToUse        : UDINT;
     M2_RawPosToUse        : UDINT;
 
@@ -31,48 +31,34 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
-// 1. SIMULATION SUR BANC DE TEST (si DBG_ContactorFeedbackBypass_TEST = TRUE)
-IF GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN
-    // Treuil M1
-    IF COD1_PresettTrigCmd = 2 THEN
-        SimulatedM1Raw := COD1_PresetValue;
-    ELSIF PRG_10_Outputs.M1RelayFwd THEN
-        SimulatedM1Raw := SimulatedM1Raw + REAL_TO_UDINT(PRG_06_WinchControl.instWinchM1.SpeedRamp.Current * 0.1);
-    ELSIF PRG_10_Outputs.M1RelayRev THEN
-        IF SimulatedM1Raw >= REAL_TO_UDINT(PRG_06_WinchControl.instWinchM1.SpeedRamp.Current * 0.1) THEN
-            SimulatedM1Raw := SimulatedM1Raw - REAL_TO_UDINT(PRG_06_WinchControl.instWinchM1.SpeedRamp.Current * 0.1);
-        ELSE
-            SimulatedM1Raw := 0;
-        END_IF;
-    END_IF;
+// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
+instSimEncoderM1(
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
+    RelayFwd    := PRG_10_Outputs.M1RelayFwd,
+    RelayRev    := PRG_10_Outputs.M1RelayRev,
+    SpeedRefPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current,
+    PresetCmd   := (COD1_PresettTrigCmd = 2),
+    PresetValue := COD1_PresetValue
+);
+instSimEncoderM2(
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
+    RelayFwd    := PRG_10_Outputs.M2RelayFwd,
+    RelayRev    := PRG_10_Outputs.M2RelayRev,
+    SpeedRefPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current,
+    PresetCmd   := (COD2_PresettTrigCmd = 2),
+    PresetValue := COD2_PresetValue
+);
 
-    // Treuil M2
-    IF COD2_PresettTrigCmd = 2 THEN
-        SimulatedM2Raw := COD2_PresetValue;
-    ELSIF PRG_10_Outputs.M2RelayFwd THEN
-        SimulatedM2Raw := SimulatedM2Raw + REAL_TO_UDINT(PRG_06_WinchControl.instWinchM2.SpeedRamp.Current * 0.1);
-    ELSIF PRG_10_Outputs.M2RelayRev THEN
-        IF SimulatedM2Raw >= REAL_TO_UDINT(PRG_06_WinchControl.instWinchM2.SpeedRamp.Current * 0.1) THEN
-            SimulatedM2Raw := SimulatedM2Raw - REAL_TO_UDINT(PRG_06_WinchControl.instWinchM2.SpeedRamp.Current * 0.1);
-        ELSE
-            SimulatedM2Raw := 0;
-        END_IF;
-    END_IF;
-
-    // Aiguillage
-    IF NOT PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational THEN
-        M1_RawPosToUse := SimulatedM1Raw;
-    ELSE
-        M1_RawPosToUse := COD1_PosValue;
-    END_IF;
-
-    IF NOT PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational THEN
-        M2_RawPosToUse := SimulatedM2Raw;
-    ELSE
-        M2_RawPosToUse := COD2_PosValue;
-    END_IF;
+// Aiguillage (par device — suit l'état Operational réel, lui-même piloté par EncoderM1/M2_IsReal)
+IF NOT PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational THEN
+    M1_RawPosToUse := instSimEncoderM1.RawPosOut;
 ELSE
     M1_RawPosToUse := COD1_PosValue;
+END_IF;
+
+IF NOT PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational THEN
+    M2_RawPosToUse := instSimEncoderM2.RawPosOut;
+ELSE
     M2_RawPosToUse := COD2_PosValue;
 END_IF;
 
@@ -83,9 +69,9 @@ instEncoderAbsM1(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
-    AlarmsIn            := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_Alarms, 0),
-    WarningsIn          := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD1_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
+    WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational OR instSimEncoderM1.Enable,
     PresetRequest       := instHomingM1.PresetRequest,
     PresetValue         := instHomingM1.PresetValue
 );
@@ -129,9 +115,9 @@ instEncoderAbsM2(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
-    AlarmsIn            := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_Alarms, 0),
-    WarningsIn          := SEL(GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST, COD2_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational OR GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST,
+    AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
+    WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational OR instSimEncoderM2.Enable,
     PresetRequest       := instHomingM2.PresetRequest,
     PresetValue         := instHomingM2.PresetValue
 );
