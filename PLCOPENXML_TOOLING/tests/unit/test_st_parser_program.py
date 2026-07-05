@@ -1,0 +1,30 @@
+from generator.diagnostics import DiagnosticCollector
+from generator.st_parser import parse_file
+
+from conftest import CODE_DIR
+
+
+def test_synthetic_program():
+    source = "PROGRAM PRG_Demo\nVAR_OUTPUT\n    Y : BOOL;\nEND_VAR\nY := TRUE;\n"
+    diag = DiagnosticCollector()
+    obj = parse_file(source, folder="IO", stem="PRG_Demo", mtime=1.0, source_label="PRG_Demo.st", diagnostics=diag)
+    assert obj.kind == "program"
+    assert obj.name == "PRG_Demo"
+    assert obj.is_public is False
+    assert obj.body_text.strip() == "Y := TRUE;"
+    assert not diag.has_errors()
+
+
+def test_real_prg_0_inputs_parses_end_to_end():
+    path = CODE_DIR / "IO" / "PRG_0_Inputs.st"
+    source = path.read_text(encoding="utf-8")
+    diag = DiagnosticCollector()
+    obj = parse_file(
+        source, folder="IO", stem="PRG_0_Inputs", mtime=1.0, source_label="PRG_0_Inputs.st", diagnostics=diag
+    )
+    assert obj is not None
+    assert obj.kind == "program"
+    assert obj.name == "PRG_0_Inputs"
+    names = [v.name for v in obj.output_vars]
+    assert "EmergencyStopOk" in names
+    assert not diag.has_errors()

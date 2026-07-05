@@ -15,3 +15,8 @@ __pycache__/
 
 # Documentation archivée — versions périmées, NE PAS prendre en compte pour le projet
 DOC/Archives/
+
+# PLCopenXML generator: build output, regenerated from CODE/ via
+# PLCOPENXML_TOOLING/generator/cli.py, not versioned.
+PLCOPENXML_TOOLING/generated/
+.pytest_cache/
