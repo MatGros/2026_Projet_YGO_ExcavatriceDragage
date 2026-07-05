@@ -103,6 +103,38 @@ Style commentaires :
 
 ---
 
+## 📦 Étape 4bis — Génération du bundle PLCopenXML (Optionnelle)
+
+À la fin de l'écriture du code (Étape 4) et avant que l'utilisateur ne procède à l'intégration, lui **demander explicitement** s'il souhaite générer le bundle PLCopenXML (`CODE_Bundle.xml`) regroupant toutes les modifications pour un import automatique dans CODESYS.
+
+### ❓ Quand exécuter cette étape ?
+- À la fin de toute modification/création de fichiers `.st` dans le dossier `CODE/`.
+- Uniquement si l'utilisateur valide l'action (poser la question).
+
+### 🛠️ Comment exécuter la génération ?
+Si l'utilisateur accepte, exécuter la commande Python suivante.
+
+* **Répertoire de travail (Cwd) obligatoire :** `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\PLCOPENXML_TOOLING`
+* **Commande exacte :**
+  ```powershell
+  python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', '<version>']))"
+  ```
+  *(Remplacer `<version>` par la version actuelle du projet CODESYS présente dans le nom du fichier `.project` actif du dossier `PRJ_CODESYS/`, par exemple `Programme MGS_v0.3.11` ou `MGS_v0.3.11`)*
+
+### 🔍 Exemple concret avec la version `MGS_v0.3.11` :
+```powershell
+python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.3.11']))"
+```
+
+### 📥 Méthode d'import dans CODESYS :
+Une fois le fichier généré dans `PLCOPENXML_TOOLING/generated/CODE_Bundle.xml` :
+1. Dans l'arbre du projet CODESYS 3.5, sélectionner le nœud parent cible (généralement `Application`).
+2. Cliquer sur **Project** ➔ **Import PLCopenXML...**.
+3. Sélectionner `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\PLCOPENXML_TOOLING\generated\CODE_Bundle.xml`.
+4. Cocher les éléments voulus et valider (l'arborescence définie dans `ProjectStructure` sera recréée relativement au nœud parent sélectionné).
+
+---
+
 ## 🔁 Étape 5 — Retour d'expérience (si validé fonctionnel)
 
 Quand l'utilisateur confirme que ça marche :
@@ -126,5 +158,6 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 - [ ] Existant analysé (variables/PRG/FB)
 - [ ] Plan groupé par concept **validé**
 - [ ] Code ST à copier commenté FR + emoji **écrit dans `CODE/*.st`**
+- [ ] Proposition de génération du bundle PLCopenXML faite et exécutée si demandée
 - [ ] Doc métier + note d'application CODESYS 3.5 **dans `DOC/AF_PartieN_Fonction_*`**
 - [ ] REX + specs versionnées `vX.X`

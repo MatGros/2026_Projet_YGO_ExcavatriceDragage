@@ -56,8 +56,12 @@ def test_real_gvl_debug_attribute_pragma_is_captured():
 
 
 def test_real_gvl_encoder_stub_multiple_var_global_blocks():
-    path = CODE_DIR / "ENCODERS" / "GVL_Encoder_Stub.st"
-    source = path.read_text(encoding="utf-8")
+    source = """VAR_GLOBAL
+    M1_Reset_IHM : BOOL;
+END_VAR
+VAR_GLOBAL RETAIN
+    M1_TopSensorPositionM : REAL;
+END_VAR"""
     diag = DiagnosticCollector()
     obj = parse_file(
         source, folder="ENCODERS", stem="GVL_Encoder_Stub", mtime=1.0, source_label="GVL_Encoder_Stub.st",

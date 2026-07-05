@@ -102,8 +102,8 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
-PowerCutOff_A_RQ := PRG_3_Safety.instSafetyWinchM1.PowerCutOff 
-                    OR PRG_3_Safety.instSafetyWinchM2.PowerCutOff 
-                    OR PRG_3_Safety.instSafetyChariotM3.PowerCutOff;
+PowerCutOff_A_RQ := PRG_03_Safety.instSafetyWinchM1.PowerCutOff 
+                    OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff 
+                    OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff;
 
 PowerCutOff_B_RQ := PowerCutOff_A_RQ;

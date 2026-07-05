@@ -33,7 +33,7 @@ VAR_INPUT
     Mode                : E_Mode;      // Mode courant (autorisations)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
-    PhaseRotationOk     : BOOL;        // 🆕 PRG_0_Inputs.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
+    PhaseRotationOk     : BOOL;        // 🆕 PRG_00_Inputs.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
     // 🔴 TBD (EtherCAT AC600 non finalisé) : ajouter ici VariateurAvailable
     //     (FB_DiagEthercat AC600/M3) quand ce diag sera fiabilisé — ne PAS stubber en dur.
 END_VAR
