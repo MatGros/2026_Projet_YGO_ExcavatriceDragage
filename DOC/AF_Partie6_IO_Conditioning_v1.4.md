@@ -1,5 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.4)
 
+> 📌 **v1.4** — Correctif documentaire (voir Partie 13) : l'extrait `instEmergencyStopOk` (§ci-dessous)
+> référençait encore `GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST` (supprimé) — remplacé par
+> `GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal`. Aucun
+> autre changement vs v1.3.
+>
 > 📌 **v1.3 (2026-07-04)** — Alignement sur le modèle « Programmes ST Autonomes »
 > ([Partie2 v2.8](AF_Partie2_Architecture_Programme_v2.8.md)) : `GVL_IN`/`GVL_OUT` et les FB
 > composites `FB_InputsMachine`/`FB_OutputsMachine` **ont disparu**, remplacés par deux
@@ -118,7 +123,7 @@ VAR
     (* ... une instance par signal ... *)
 END_VAR
 
-instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST, FilterTime := T#20MS);
+instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
 EmergencyStopOk := instEmergencyStopOk.State;
 ```
 

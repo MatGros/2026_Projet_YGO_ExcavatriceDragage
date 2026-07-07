@@ -1,9 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.0)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.1)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
-> **Version** : v1.0 (Création - 2026-07-03)  
-> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md), [P10 Homing v1.6](AF_Partie10_Fonction_Encoder_Homing_v1.6.md), [P12 Grappin v1.0](AF_Partie12_Fonction_Grappin_v1.0.md).
+> **Version** : v1.1 (Correctif documentaire — voir Partie 13 : `GVL_DEBUG` supprimé, remplacé par
+> `GVL_Simulation`. Aucun autre changement vs v1.0.)  
+> 🔗 **Dépend de** : [P2 Architecture v2.9](AF_Partie2_Architecture_Programme_v2.9.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md), [P10 Homing v1.6](AF_Partie10_Fonction_Encoder_Homing_v1.6.md), [P12 Grappin v1.0](AF_Partie12_Fonction_Grappin_v1.0.md), [P13 Simulation v1.0](AF_Partie13_Fonction_Simulation_v1.0.md).
 
 ---
 
@@ -259,7 +260,7 @@ Le mapping bidirectionnel est divisé en deux parties dans `PRG_MAIN.st` :
 2. **À la toute fin de l'implémentation (avant le conditionnement des sorties physiques)** :
    * Les mesures réelles, les sorties d'état automates et les sous-structures de diagnostic (`FwdContactorCheck`, etc.) sont affectées à `GVL_IHM` pour alimenter les écrans de supervision.
    * Les paramètres de calibration modifiés à l'écran (`TopSensorPositionM`, `MaxStepDescente`, `RampAccelRate`, etc.) sont recopiés vers les registres de travail de l'automate.
-   * Une logique de synchronisation bidirectionnelle est mise en œuvre pour les bypasses de test (banc de simulation) afin que l'état sur l'écran d'un treuil soit cohérent avec l'état global simulation (`GVL_DEBUG`).
+   * Une logique de synchronisation bidirectionnelle est mise en œuvre pour les bypasses de test (banc de simulation) afin que l'état sur l'écran d'un treuil soit cohérent avec l'état effectif de simulation **par device** (`GVL_Simulation`, voir Partie 13) — chaque axe (M1/M2/Chariot) reflète son propre `<Device>_IsReal`, plus une copie unique du même bit global.
 
 ---
 

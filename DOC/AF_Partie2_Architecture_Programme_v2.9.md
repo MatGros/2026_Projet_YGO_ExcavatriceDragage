@@ -1,5 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.8)
+# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.9)
 
+> **v2.9** — Correctif documentaire (voir Partie 13) : `GVL_DEBUG` (§2bis) a été supprimé et
+> remplacé par `GVL_Simulation` (bit maître `SimulationModeActive` + granularité par device
+> `<Device>_IsReal`) — la table §2bis et la description de `PRG_9_Supervision` (§4) reflètent
+> désormais ce remplacement. Aucun autre changement vs v2.8.
+>
 > **v2.8** — Refonte du modèle d'orchestration (décision utilisateur, session 2026-07-04) :
 > abandon du modèle **`PLC_PRG_MAIN` unique + FB composés** (v2.5-v2.7) au profit du modèle
 > **« Programmes ST Autonomes »** : chaque étape de la tâche `MainTask` est un `PROGRAM`
@@ -151,8 +156,8 @@ uniquement à ce jour** (aucune logique métier — portée hors périmètre act
 Mapping bidirectionnel complet `GVL_IHM` ↔ programmes métier ↔ `GVL_PERSISTENT` : lecture des
 commandes IHM (boutons, sélecteurs), initialisation au boot depuis les valeurs persistées,
 propagation des réglages IHM vers `GVL_PERSISTENT`, calcul de `MachineReset_IHM` (OR de tous
-les boutons reset), calcul de `LimitLegalReached`, propagation des bypass banc de test
-(`GVL_DEBUG`) vers `GVL_IHM`.
+les boutons reset), calcul de `LimitLegalReached`, propagation de l'état simulation effectif par
+device (`GVL_Simulation`, voir Partie 13) vers `GVL_IHM`.
 
 ### `PRG_10_Outputs` (position 10)
 Instancie `FB_Output` (brique `_COMMON`) pour chaque sortie physique (relais sens/vitesse
@@ -171,7 +176,7 @@ interne machine brut** (E/S) ont disparu. Distinction stricte à conserver :
 |-----|------|--------|
 | `GVL_IHM` (`SUPERVISION`) | Échange bidirectionnel IHM (mesures, commandes, RETAIN) — **1 struct par objet métier** (`ST_WinchHMI`, `ST_GrappinHMI`…), voir Partie 7 | ✅ Conservée — usage IHM, pas état interne |
 | `GVL_PERSISTENT` (`SYSTEM`) | Paramètres/calibrations survivant coupure secteur + Download (`PERSISTENT RETAIN`) | ✅ Conservée — rôle distinct, jamais lue par un autre FB comme bus d'état cyclique |
-| `GVL_DEBUG` (`MAIN`) | Bypass banc de test (`DBG_*Bypass_TEST`) — **toujours `FALSE` en exploitation réelle** | ✅ Conservée — mise en service uniquement |
+| `GVL_Simulation` (`MAIN`) | Bit maître `SimulationModeActive` + granularité par device (`<Device>_IsReal`) — voir Partie 13 | ✅ Conservée — remplace `GVL_DEBUG` (supprimée), mise en service uniquement |
 | `GVL_Modes_Stub` (`MODES`) | Stub sélecteur mode/mot de passe (pas de vrai IHM câblé ce lot) | ✅ Conservée — temporaire, à terme absorbée par `GVL_IHM` |
 | `GVL_Encoder_Stub` (`ENCODERS`) | Stub boutons homing/reset codeur + `TopSensorPositionM` | ✅ Conservée — même statut que ci-dessus |
 | `GVL_Chariot_M3_Stub` (`CHARIOT`) | Stub sélecteur position test + signaux M3 non câblés | ✅ Conservée — même statut |
@@ -224,3 +229,4 @@ son domaine fonctionnel** :
 - **Partie 5** — Modes & maintenance : Manuel/N1/N2/SemiAuto, AU/`SafeStop`/`PowerCutOff`, limite légale (`FB_Modes`).
 - **Partie 6** — Conditionnement E/S : `FB_Input`, `FB_Output`, `PRG_0_Inputs`/`PRG_10_Outputs`.
 - **Partie 7** — Interface IHM (`GVL_IHM`, structs `ST_*HMI`).
+- **Partie 13** — Simulation (`GVL_Simulation`, `CODE/SIMULATION/FB_Sim_*`).

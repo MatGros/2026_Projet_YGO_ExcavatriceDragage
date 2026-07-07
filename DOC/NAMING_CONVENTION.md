@@ -74,8 +74,9 @@ correctement `FALSE` (aucun défaut). Diagnostic long car le câblage était irr
 Force expliquait la divergence entre la sortie calculée et l'entrée reçue.
 **Règle** : ne JAMAIS forcer manuellement une sortie de COMMANDE (`SafeStop`, `ForbidDescent`,
 `PowerCutOff`) — elle est TOUJOURS calculée par son bloc Safety. Si un test banc nécessite de
-neutraliser une condition, forcer/bypasser l'entrée CAPTEUR en amont (ex. `GVL_IN.PhaseRotationOk`,
-ou un `GVL_DEBUG.DBG_*Bypass_TEST` dédié), jamais la sortie de commande elle-même.
+neutraliser une condition, forcer/bypasser l'entrée CAPTEUR en amont (ex. `PRG_00_Inputs.PhaseRotationOk`,
+ou un override `GVL_Simulation.<Device>_IsReal` dédié — voir Partie 13), jamais la sortie de
+commande elle-même.
 
 ⚠️ **Deux bugs de câblage réels sur ce projet** (voir `AUDIT_Coherence_Documentaire_v1.0.md` §27
 D72a et §29 D74), famille "capteur de sécurité" :
