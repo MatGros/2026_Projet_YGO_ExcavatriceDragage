@@ -57,7 +57,8 @@
       "Bash(python3 -)",
       "Bash(python3 -c \"import uuid; print\\(uuid.uuid4\\(\\)\\); print\\(uuid.uuid4\\(\\)\\); print\\(uuid.uuid4\\(\\)\\)\")",
       "Bash(powershell -Command \"[guid]::NewGuid\\(\\).ToString\\(\\); [guid]::NewGuid\\(\\).ToString\\(\\); [guid]::NewGuid\\(\\).ToString\\(\\)\")",
-      "Bash(MSYS_NO_PATHCONV=1 git cat-file *)"
+      "Bash(MSYS_NO_PATHCONV=1 git cat-file *)",
+      "Bash(git -C \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage\" mv \"DOC/AF_Partie12_Fonction_Grappin_v1.0.md\" \"DOC/Archives/AF_Partie12_Fonction_Grappin_v1.0.md\")"
     ],
     "ask": [
       "Bash(git reset *)",

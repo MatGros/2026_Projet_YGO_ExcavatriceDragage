@@ -104,6 +104,8 @@ instGrappin(
     JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CablePosM2          := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    HomedM1             := PRG_02_Encoders.instHomingM1.Homed,
+    HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
     Config              := GVL_PERSISTENT.GrappinConfig,
     TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,
     GrappinState        := GVL_PERSISTENT.GrappinState

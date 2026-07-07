@@ -4,7 +4,7 @@
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
 > **Version** : v1.1 (Correctif documentaire — voir Partie 13 : `GVL_DEBUG` supprimé, remplacé par
 > `GVL_Simulation`. Aucun autre changement vs v1.0.)  
-> 🔗 **Dépend de** : [P2 Architecture v2.9](AF_Partie2_Architecture_Programme_v2.9.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md), [P10 Homing v1.6](AF_Partie10_Fonction_Encoder_Homing_v1.6.md), [P12 Grappin v1.0](AF_Partie12_Fonction_Grappin_v1.0.md), [P13 Simulation v1.0](AF_Partie13_Fonction_Simulation_v1.0.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.9](AF_Partie2_Architecture_Programme_v2.9.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md), [P10 Homing v1.6](AF_Partie10_Fonction_Encoder_Homing_v1.6.md), [P12 Grappin v1.1](AF_Partie12_Fonction_Grappin_v1.1.md), [P13 Simulation v1.0](AF_Partie13_Fonction_Simulation_v1.0.md).
 
 ---
 

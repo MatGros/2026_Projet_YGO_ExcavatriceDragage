@@ -1,8 +1,16 @@
 (* ═══════════════════════════════════════════════════════════════
    🪣 FB_Grappin — Commande d'ouverture/fermeture du grappin
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.0.md
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.1.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
+   ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
+      (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
+      FERME désormais le grappin, DEROULAGE M2 (Direction=-1) l'OUVRE
+      (c'était l'inverse avant). Voir Partie12 v1.1 §REX.
+   ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
+      ne sont fiables que si les codeurs absolus sont référencés (Partie10).
+      Sans ça, une position aberrante (codeur non homé) pourrait faire
+      mémoriser un IsOpen/IsClosed faux dès l'entrée en BUSY.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Grappin
@@ -17,6 +25,8 @@ VAR_INPUT
     JoystickY_Direction : INT;              // Sens joystick (AxisCmdY.Direction : 1=montée, -1=descente)
     CablePosM1          : REAL;             // Position réelle câble treuil M1 (mètres)
     CablePosM2          : REAL;             // Position réelle câble treuil M2 (mètres)
+    HomedM1             : BOOL;             // Codeur M1 référencé (instHomingM1.Homed) — REX 2026-07-07
+    HomedM2             : BOOL;             // Codeur M2 référencé (instHomingM2.Homed) — REX 2026-07-07
     Config              : ST_GrappinConfig; // Configuration (RETAIN site)
     TimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
 END_VAR
@@ -25,7 +35,7 @@ VAR_OUTPUT
     Busy                : BOOL;             // Mouvement en cours
     Done                : BOOL;             // Mouvement terminé avec succès
     Error               : BOOL;             // Présence d'un défaut
-    ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées
+    ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s)
     State               : E_State;          // État opérationnel du FB
     StateAtError        : E_State;          // État lors de l'apparition de l'erreur
     ActiveOffsetM       : REAL;             // Décalage cible à injecter dans FB_WinchSync
@@ -102,6 +112,15 @@ ELSE
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
 
+// 🧲 3bis. GARDE-FOU CODEURS NON RÉFÉRENCÉS (bit 3) — REX 2026-07-07
+// CablePosM1/CablePosM2 ne sont fiables que si le homing (Partie10) a été fait sur les 2 treuils.
+// Continu (pas de front Reset) : se lève/efface tout seul selon l'état réel du homing.
+IF NOT HomedM1 OR NOT HomedM2 THEN
+    ErrorId := ErrorId OR 16#0008;
+ELSE
+    ErrorId := ErrorId AND 16#FFF7;
+END_IF;
+
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
@@ -118,8 +137,8 @@ IF TonTimeout.Q THEN
     ErrorId := ErrorId OR 16#0001;
 END_IF;
 
-// ❌ Évaluation des erreurs graves (Timeout ou Limites dépassées)
-SevereError := (ErrorId AND 16#0005) <> 16#0000;
+// ❌ Évaluation des erreurs graves (Timeout, Limites dépassées, ou Codeur(s) non référencé(s))
+SevereError := (ErrorId AND 16#000D) <> 16#0000;
 
 IF SevereError THEN
     M2_StartStop := FALSE;
@@ -151,9 +170,10 @@ CASE State OF
         END_IF;
 
         // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
-        IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
+        // ⚠️ REX 2026-07-07 : sens inversés (enroulage ferme désormais, déroulage ouvre)
+        IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
             State := E_State.BUSY;
-        ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
+        ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
             State := E_State.BUSY;
         END_IF;
 
@@ -168,14 +188,14 @@ CASE State OF
             // Si relâchement du joystick, arrêt temporaire du mouvement
             M2_StartStop := FALSE;
             M2_Direction := 0;
-        ELSIF CloseReq AND (JoystickY_Direction = -1) THEN
-            // Fermeture en cours : M2 descend
-            M2_StartStop := TRUE;
-            M2_Direction := -1;
-        ELSIF OpenReq AND (JoystickY_Direction = 1) THEN
-            // Ouverture en cours : M2 monte
+        ELSIF CloseReq AND (JoystickY_Direction = 1) THEN
+            // Fermeture en cours : M2 enroule (monte) — REX 2026-07-07
             M2_StartStop := TRUE;
             M2_Direction := 1;
+        ELSIF OpenReq AND (JoystickY_Direction = -1) THEN
+            // Ouverture en cours : M2 déroule (descend) — REX 2026-07-07
+            M2_StartStop := TRUE;
+            M2_Direction := -1;
         ELSE
             // Joystick poussé dans la mauvaise direction pour la requête active : arrêt
             M2_StartStop := FALSE;
@@ -184,8 +204,8 @@ CASE State OF
 
         // Condition d'arrêt automatique de la fermeture
         IF CloseReq THEN
-            // Cible atteinte : M2 est descendu assez bas (CablePosM2 décroissant)
-            IF CablePosM2 <= (CablePosM1 + Config.OffsetCloseM) THEN
+            // Cible atteinte : M2 a assez enroulé (CablePosM2 croissant) — REX 2026-07-07
+            IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
                 
@@ -202,8 +222,8 @@ CASE State OF
 
         // Condition d'arrêt automatique de l'ouverture
         IF OpenReq THEN
-            // Cible atteinte : M2 est remonté assez haut (CablePosM2 croissant)
-            IF CablePosM2 >= (CablePosM1 + Config.OffsetOpenM) THEN
+            // Cible atteinte : M2 a assez déroulé (CablePosM2 décroissant) — REX 2026-07-07
+            IF CablePosM2 <= (CablePosM1 + Config.OffsetOpenM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
                 
