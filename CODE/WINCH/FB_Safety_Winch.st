@@ -127,18 +127,21 @@ VAR
     // 🔧 REX 2026-07-07 — Méca C (bit9, escalade)
     MecaC_Armed         : BOOL;
     MecaC_RefPosM       : REAL;
+
+    // Transition référencement
+    LastInReferencingMode : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
 
-// 🛑 1. GATE — sécurité par défaut : pas de surveillance active = arrêt forcé du domaine
-IF NOT Enable OR NOT EmergencyStopOk THEN
+// 🛑 1. GATE — neutralisation si désactivé
+IF NOT Enable THEN
     Ready := FALSE;
-    SafeStop := TRUE;              // Fail-safe : tant que la surveillance n'est pas garantie, on arrête
-    ForbidDescent := TRUE;         // Fail-safe : cohérent avec SafeStop (descente a fortiori interdite)
+    SafeStop := TRUE;
+    ForbidDescent := TRUE;
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
-    MecaA_Armed := FALSE;          // 🔧 REX 2026-07-07 : désarme, repart propre à la prochaine activation
+    MecaA_Armed := FALSE;
     MecaC_Armed := FALSE;
     RETURN;
 END_IF;
@@ -146,6 +149,21 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 CycleTimeCalc(DefaultValueS := 0.010); // 🔧 REX 2026-07-07 — Méca A
+
+// Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
+IF LastInReferencingMode AND NOT InReferencingMode THEN
+    LastCablePosM := CablePosM;
+    MecaA_Armed := FALSE;
+END_IF;
+LastInReferencingMode := InReferencingMode;
+
+// Si le contacteur de puissance est ouvert (EmergencyStopOk = FALSE), on force les sorties de sécurité
+// mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
+IF NOT EmergencyStopOk THEN
+    MecaA_Armed := FALSE;
+    MecaC_Armed := FALSE;
+    LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
+END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
@@ -202,9 +220,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
-// Sécurité active tout le temps. Si la position de câble descend sous la limite basse physique (CablePosM <= CableLimitDescentM),
+// Sécurité active hors référencement. Si la position de câble descend sous la limite basse physique (CablePosM <= CableLimitDescentM),
 // alors on interdit uniquement la descente.
-IF (CableLimitDescentM < 0.0) AND (CablePosM <= CableLimitDescentM) THEN
+IF (CableLimitDescentM < 0.0) AND (CablePosM <= CableLimitDescentM) AND NOT InReferencingMode THEN
     ErrorId := ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;
@@ -216,7 +234,7 @@ END_IF;
 MeasuredSpeedMps := ABS(CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
 LastCablePosM := CablePosM;
 
-IF FwdRevSpeedFeedbackOff AND BrakeFeedback THEN
+IF FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode THEN
     IF NOT MecaA_Armed THEN
         MecaA_Armed := TRUE;
         MecaA_RefPosM := CablePosM;   // Référence prise au moment de l'armement
@@ -269,17 +287,17 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique, MOU CÂBLE, phases) + 7/8/9 (REX
-// 2026-07-07 — Méca A/B/C, jamais exclus par OverrideSync, sans rapport avec la récupération mou câble)
-// ⚠️ bit3 (mou câble) est EXCLU du SafeStop si OverrideSync=TRUE (procédure récupération manuelle)
-IF OverrideSync THEN
+// 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique, MOU CÂBLE, phases) + 7/8/9 (Méca A/B/C) ou si contacteur coupé
+IF NOT EmergencyStopOk THEN
+    SafeStop := TRUE;
+ELSIF OverrideSync THEN
     SafeStop := (ErrorId AND 16#0397) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
     SafeStop := (ErrorId AND 16#039F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
-// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble). Le mou câble → SafeStop (pas ForbidDescent)
-ForbidDescent := (ErrorId AND 16#0040) <> 16#0000;
+// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
+ForbidDescent := (ErrorId AND 16#0040) <> 16#0000 OR NOT EmergencyStopOk;
 
 // ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble : montée interdite même en récup)
 ForbidAscent := (ErrorId AND 16#0020) <> 16#0000

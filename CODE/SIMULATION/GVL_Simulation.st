@@ -11,12 +11,7 @@
           device précis de la simulation un par un, au fur et à mesure du
           recâblage réel en mise en service — SANS modifier le code.
       État effectif "ce device est simulé" = `SimulationModeActive AND NOT <Device>_IsReal`.
-   🔧 REMPLACE `GVL_DEBUG.st` (6 flags indépendants ajoutés au coup par coup,
-      dont `DBG_ContactorFeedbackBypass_TEST` surchargé sur 3 responsabilités
-      sans rapport : bypass StuckClosed/StuckOpen contacteurs+thermique,
-      force Operational/WcState bus EtherCAT/CANopen, active la simulation
-      physique des codeurs). Voir AF_Partie13 §Table de migration pour le
-      mapping exhaustif ancien flag → nouveau pilote.
+   🔧 REMPLACE `GVL_DEBUG.st` (6 flags indépendants ajoutés au coup par coup).
    ⚠️ TOUJOURS repasser `SimulationModeActive` à `FALSE` avant exploitation réelle
       avec la machine effectivement câblée (ou basculer chaque `_IsReal` à `TRUE`
       au fur et à mesure du recâblage, sans toucher au bit maître).
@@ -44,8 +39,7 @@ VAR_GLOBAL
     ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) chariot M3
     ChariotPosition_IsReal     : BOOL := FALSE; // Capteurs Fosse1/Fosse2/Maintenance/Trémie
 
-    // ── Utilitaires (repris de GVL_DEBUG, sans préfixe DBG_) ───────────────────
-    BlinkClock1Hz              : BOOL;          // Horloge 1Hz pour simuler un capteur qui clignote
+    // ── Utilitaires banc d'essai (sans préfixe DBG_) ───────────────────────────
     JoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)
     JoystickForceMaxRaw        : INT := 10000;  // Simule une consigne à fond
 

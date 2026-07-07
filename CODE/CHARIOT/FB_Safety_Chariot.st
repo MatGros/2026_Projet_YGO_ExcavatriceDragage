@@ -55,10 +55,10 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Chariot) ===
 
-// 🛑 1. GATE — sécurité par défaut : pas de surveillance active = arrêt forcé du domaine
-IF NOT Enable OR NOT EmergencyStopOk THEN
+// 🛑 1. GATE — neutralisation si désactivé
+IF NOT Enable THEN
     Ready := FALSE;
-    SafeStop := TRUE;              // Fail-safe : tant que la surveillance n'est pas garantie, on arrête
+    SafeStop := TRUE;
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -97,7 +97,7 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-SafeStop := Error;          // 🟧 Tout défaut du domaine → rampe décélération rapide (Enable maintenu)
+SafeStop := Error OR NOT EmergencyStopOk;  // 🟧 Tout défaut du domaine ou contacteur coupé → SafeStop
 PowerCutOff := FALSE;       // 🧨 TBD — pas de ST_ContactorCheck de puissance câblé dans ce lot
 
 Busy := FALSE;

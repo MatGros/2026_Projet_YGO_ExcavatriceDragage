@@ -50,7 +50,7 @@ END_VAR
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Safety) ===
 
 // 🛑 1. GATE — expose la dernière valeur plausible connue même désactivé
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     CablePosMSafe := LastPlausibleCablePosM;

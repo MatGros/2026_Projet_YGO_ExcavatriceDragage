@@ -11,5 +11,7 @@ STRUCT
     SlaveOperational : BOOL;  (* 📡 Esclave EtherCAT opérationnel *)
     PresetTriggerCmd : WORD;  (* 🎯 Commande de preset active *)
     PresetValueOut   : UDINT; (* 📐 Valeur de preset envoyée au codeur *)
+    Error            : BOOL;  (* 🔴 Codeur en défaut (liaison EtherCAT ou preset) *)
+    ErrorId          : WORD;  (* ❌ Code défaut codeur *)
 END_STRUCT
 END_TYPE

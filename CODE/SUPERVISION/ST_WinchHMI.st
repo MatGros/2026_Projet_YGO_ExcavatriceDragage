@@ -61,5 +61,7 @@ STRUCT
     BypassContactorFeedback : BOOL;             (* 🔌 Bypass retours contacteurs (banc de test) *)
     BypassSlackCable        : BOOL;             (* ⚠️ Bypass capteur mou de câble (banc de test) *)
     BypassTopPositionSensor : BOOL;             (* 📐 Bypass capteur position haute (banc de test) *)
+    SafetyError             : BOOL;             (* 🛡️ Bloc sécurité (Safety) en défaut *)
+    SafetyErrorId           : WORD;             (* ❌ Code bitfield du défaut de sécurité *)
 END_STRUCT
 END_TYPE

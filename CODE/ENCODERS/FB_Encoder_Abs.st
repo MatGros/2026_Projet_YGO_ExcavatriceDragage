@@ -86,7 +86,7 @@ END_VAR
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
 // 🛑 1. GATE
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable THEN
     EncoderAvailable := FALSE;
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;

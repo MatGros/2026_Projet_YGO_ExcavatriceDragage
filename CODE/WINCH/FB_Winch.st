@@ -95,7 +95,7 @@ VAR_INPUT
     BrakeFeedbackTimeout    : TIME := T#1s;
     Homed                   : BOOL;             // 🆕 État de référencement du treuil
     CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
-    TopLimitM               : REAL := 12.5;     // 🆕 Position limite haute active (cible homing, m)
+    TopLimitM               : REAL := 12.5;     // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
     SlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
     SlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)
