@@ -6,7 +6,7 @@
 > **Version** : v1.0 (Création — 2026-07-05)
 > 🔗 **Dépend de** : [P2 Architecture v2.8](AF_Partie2_Architecture_Programme_v2.8.md),
 > [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
-> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md),
+> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md),
 > [P11 Chariot v1.2](AF_Partie11_Fonction_Chariot_v1.2.md) §7/§9bis.
 
 ---

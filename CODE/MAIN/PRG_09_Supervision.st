@@ -51,8 +51,20 @@ GVL_IHM.Modes.AnyFaultActive :=
     OR PRG_06_WinchControl.instWinchM2.Error
     OR PRG_07_ChariotControl.instChariotM3.Error;
 
-// 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont (canal A, redondant avec B)
-GVL_IHM.Modes.PowerCutOffActive := PowerCutOff_A_RQ;
+// 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont — polarité "alarme" (TRUE=
+// problème), PAS celle de PowerCutOff_A_RQ (qui est en fail-safe maintenu, TRUE=OK depuis
+// l'inversion de polarité). On relit directement les .PowerCutOff sources, pas la sortie physique.
+GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                                 OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                                 OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff;
+
+// 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
+GVL_IHM.Modes.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
+GVL_IHM.Modes.PowerContactorOk    := PRG_00_Inputs.EmergencyStopOk;
+GVL_IHM.Modes.EmergencyArmingBusy := PRG_10_Outputs.EmergencyArmingPulseActive OR PRG_10_Outputs.EmergencyArmingLockoutActive;
+GVL_IHM.Modes.EmergencyArmable    := PRG_00_Inputs.EmergencyChain
+                                    AND NOT PRG_10_Outputs.EmergencyArmingPulseActive
+                                    AND NOT PRG_10_Outputs.EmergencyArmingLockoutActive;
 
 // 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
 // homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
@@ -188,8 +200,7 @@ GVL_IHM.WinchM1.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.WinchM1.ThermalFault             := NOT PRG_00_Inputs.M1ThermalFeedback;
 GVL_IHM.WinchM1.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
 GVL_IHM.WinchM1.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
-GVL_IHM.WinchM1.FwdContactorCheck        := PRG_06_WinchControl.instWinchM1.FwdContactorCheck;
-GVL_IHM.WinchM1.RevContactorCheck        := PRG_06_WinchControl.instWinchM1.RevContactorCheck;
+GVL_IHM.WinchM1.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
 GVL_IHM.WinchM1.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM1.BrakeContactorCheck;
 
 GVL_IHM.WinchM1.Encoder.RawPos           := PRG_02_Encoders.instEncoderAbsM1.RawPos;
@@ -225,8 +236,7 @@ GVL_IHM.WinchM2.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.WinchM2.ThermalFault             := NOT PRG_00_Inputs.M2ThermalFeedback;
 GVL_IHM.WinchM2.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
 GVL_IHM.WinchM2.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
-GVL_IHM.WinchM2.FwdContactorCheck        := PRG_06_WinchControl.instWinchM2.FwdContactorCheck;
-GVL_IHM.WinchM2.RevContactorCheck        := PRG_06_WinchControl.instWinchM2.RevContactorCheck;
+GVL_IHM.WinchM2.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07
 GVL_IHM.WinchM2.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM2.BrakeContactorCheck;
 
 GVL_IHM.WinchM2.Encoder.RawPos           := PRG_02_Encoders.instEncoderAbsM2.RawPos;

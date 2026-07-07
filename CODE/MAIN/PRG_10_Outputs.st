@@ -29,6 +29,11 @@ VAR_INPUT
     // ── ↔️ CHARIOT M3 (sens/vitesse via variateur EtherCAT, TOR=frein uniquement) ────────
     ChariotBrakeCmd   : BOOL;  // 🔓 Frein M3 ⚠️INVERSÉ : TRUE=desserré/mouvement | FALSE=SERRÉ sécurité ✅
 END_VAR
+VAR_OUTPUT
+    // 🔧 REX 2026-07-07 — état séquence réarmement AU, exposé pour affichage IHM (PRG_09_Supervision)
+    EmergencyArmingPulseActive   : BOOL; // Pulse 1s en cours
+    EmergencyArmingLockoutActive: BOOL; // Verrouillage 5s après pulse (mécanisme à ressort)
+END_VAR
 VAR
     // Instances de sortie
     instM1RelayFwd        : FB_Output;
@@ -48,6 +53,12 @@ VAR
     instM2BrakeCmd        : FB_Output;
 
     instChariotBrakeCmd   : FB_Output;
+
+    // 🔧 REX 2026-07-07 — séquence réarmement AU (voir §🚨 en bas de fichier)
+    ArmReqEdge            : R_TRIG;
+    PulseDoneEdge         : R_TRIG;
+    TonArmingPulse        : TON; // 1s — durée de l'impulsion réarmement (mécanisme à ressort)
+    TonArmingLockout      : TON; // 5s — verrouillage avant nouvelle tentative possible
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_10_Outputs) ===
@@ -102,8 +113,43 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
-PowerCutOff_A_RQ := PRG_03_Safety.instSafetyWinchM1.PowerCutOff 
-                    OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff 
-                    OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff;
+// 🔴🔧 REX 2026-07-07 : ARCHITECTURE À COMMANDE MAINTENUE (fail-safe) — retour terrain.
+// PowerCutOff_A_RQ/B_RQ doivent être MAINTENUS à TRUE tant que tout va bien ; le circuit AU
+// s'ouvre (coupe le contacteur de puissance) dès que le PLC ARRÊTE de les maintenir — que ce
+// soit volontairement (défaut Méca A/B/C détecté) OU accidentellement (PLC tombe/coupure
+// automate). Polarité INVERSÉE par rapport à la 1ère version (qui mettait TRUE = "coupe",
+// erreur de conception : en cas de défaut réel, ça aurait MAINTENU la puissance au lieu de
+// la couper — pire cas de figure).
+PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                         OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                         OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff);
 
 PowerCutOff_B_RQ := PowerCutOff_A_RQ;
+
+// ─── 🚨 SÉQUENCE RÉARMEMENT CONTACTEUR PUISSANCE (REX 2026-07-07) ──────────────────────
+// Commande IHM (front, PAS de réarmement automatique) → impulsion 1s sur EmergencyArming_RQ
+// (mécanisme à ressort) → verrouillage 5s avant nouvelle tentative possible. N'accepte une
+// nouvelle demande que si la boucle AU (EmergencyChain) est saine.
+ArmReqEdge(CLK := GVL_IHM.Modes.CmdEmergencyArming);
+
+IF ArmReqEdge.Q AND PRG_00_Inputs.EmergencyChain
+   AND NOT EmergencyArmingPulseActive AND NOT EmergencyArmingLockoutActive THEN
+    EmergencyArmingPulseActive := TRUE;
+END_IF;
+
+TonArmingPulse(IN := EmergencyArmingPulseActive, PT := T#1S);
+IF TonArmingPulse.Q THEN
+    EmergencyArmingPulseActive := FALSE;
+END_IF;
+
+PulseDoneEdge(CLK := TonArmingPulse.Q); // front à la fin exacte du pulse → démarre le verrouillage
+IF PulseDoneEdge.Q THEN
+    EmergencyArmingLockoutActive := TRUE;
+END_IF;
+
+TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5S);
+IF TonArmingLockout.Q THEN
+    EmergencyArmingLockoutActive := FALSE;
+END_IF;
+
+EmergencyArming_RQ := EmergencyArmingPulseActive;

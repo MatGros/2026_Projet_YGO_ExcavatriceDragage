@@ -11,6 +11,13 @@
       ne sont fiables que si les codeurs absolus sont référencés (Partie10).
       Sans ça, une position aberrante (codeur non homé) pourrait faire
       mémoriser un IsOpen/IsClosed faux dès l'entrée en BUSY.
+   🔧 REX 2026-07-07 (3) : Méca C couche 1 (bit4) — M1 DOIT rester immobile pendant
+      que M2 bouge seul. Si M1 glisse de plus de M1SlipToleranceM (1.0 m) pendant
+      BUSY → SevereError (coupe M2 via le mécanisme existant) + sortie dédiée
+      M1SlipDetected (à consommer côté PRG_06_WinchControl pour forcer SafeStop
+      sur M1 spécifiquement — FB_Grappin ne pilote pas M1). Couche de secours si
+      cette couche ne suffit pas : voir FB_Safety_Winch bit9 (tolérance 2.0 m,
+      escalade PowerCutOff).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Grappin
@@ -29,13 +36,15 @@ VAR_INPUT
     HomedM2             : BOOL;             // Codeur M2 référencé (instHomingM2.Homed) — REX 2026-07-07
     Config              : ST_GrappinConfig; // Configuration (RETAIN site)
     TimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
+    M1SlipToleranceM    : REAL := 1.0;      // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;             // FB prêt à fonctionner
     Busy                : BOOL;             // Mouvement en cours
     Done                : BOOL;             // Mouvement terminé avec succès
     Error               : BOOL;             // Présence d'un défaut
-    ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s)
+    ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s), bit4: Glissement M1 pendant Busy
+    M1SlipDetected      : BOOL;             // 🔧 REX 2026-07-07 : à consommer côté PRG_06_WinchControl (force SafeStop M1)
     State               : E_State;          // État opérationnel du FB
     StateAtError        : E_State;          // État lors de l'apparition de l'erreur
     ActiveOffsetM       : REAL;             // Décalage cible à injecter dans FB_WinchSync
@@ -57,6 +66,8 @@ VAR
     OpenReq             : BOOL;             // Demande d'ouverture mémorisée
     SevereError         : BOOL;             // Erreur grave nécessitant l'arrêt
     MaxAllowedOffset    : REAL;             // Offset max calculé dynamiquement
+    BusyEdge            : R_TRIG;           // 🔧 REX 2026-07-07 — détecte l'entrée en Busy (arme la réf. M1)
+    M1RefPosM           : REAL;             // 🔧 REX 2026-07-07 — position M1 mémorisée à l'entrée en Busy
 END_VAR
 
 // 🛑 1. GATE DE SÉCURITÉ
@@ -68,6 +79,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
     State := E_State.DISABLED;
+    M1SlipDetected := FALSE; // 🔧 REX 2026-07-07
     // Les requêtes internes sont réinitialisées
     CloseReq := FALSE;
     OpenReq := FALSE;
@@ -123,6 +135,20 @@ ELSE
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
+// 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4) — REX 2026-07-07
+// M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l'entrée en Busy.
+BusyEdge(CLK := (State = E_State.BUSY));
+IF BusyEdge.Q THEN
+    M1RefPosM := CablePosM1;
+END_IF;
+
+IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) THEN
+    ErrorId := ErrorId OR 16#0010;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFEF;
+END_IF;
+M1SlipDetected := (ErrorId AND 16#0010) <> 16#0000;
+
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
@@ -139,8 +165,8 @@ IF TonTimeout.Q THEN
     ErrorId := ErrorId OR 16#0001;
 END_IF;
 
-// ❌ Évaluation des erreurs graves (Timeout, Limites dépassées, ou Codeur(s) non référencé(s))
-SevereError := (ErrorId AND 16#000D) <> 16#0000;
+// ❌ Évaluation des erreurs graves (Timeout, Limites dépassées, Codeur(s) non référencé(s), ou Glissement M1)
+SevereError := (ErrorId AND 16#001D) <> 16#0000;
 
 IF SevereError THEN
     M2_StartStop := FALSE;

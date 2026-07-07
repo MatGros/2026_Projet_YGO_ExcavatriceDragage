@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.6)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.7)
 
 > 📌 **État d'implémentation (2026-07-03quater, AUDIT D39)** : `FB_Encoder_Safety` **revive**
 > (§3.6/§3.7 uniquement) — `CODE/FB_Encoder_Safety.st`, 1 instance par treuil. Répond à
@@ -8,6 +8,14 @@
 > **uniquement par `FB_Modes`** (refuse `SEMI_AUTO`) — PAS de `SafeStop`, pour ne pas empêcher
 > de bouger les treuils en maintenance afin de re-référencer. §3.5 (saut en exploitation,
 > calcul sur cycles EtherCAT 4ms) **reste non codé**, lot dédié à part.
+>
+> **v1.7 (2026-07-07)** — REX terrain : retour contacteur individuel par sens
+> (`ContactorFeedbackFwd`/`Rev`) supprimé côté câblage réel des treuils M1/M2, remplacé par un
+> retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
+> `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
+> `BrakeFeedback` — voir `CODE/ENCODERS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
+> ici). Détail complet du changement : `DOC/AF_Partie9_Fonction_Winch_v1.5.md` (doc principale
+> treuil). Hors périmètre : Chariot M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
 > contacteur puissance/AU, résout AUDIT Q11 pour le pipeline codeur — §7). `Reset` des FB
@@ -102,12 +110,12 @@
 > **Cible** : CODESYS 3.5 — acquisition + mise à l'échelle codées depuis le 2026-07-02
 > (`FB_Encoder_Abs`/`FB_Encoder_Scale`/`ST_EncoderCalib`), homing (`FB_Encoder_Homing`) et
 > sélection treuil (`E_WinchSelect`) restent conception seule (voir §9 pour le détail exact).
-> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.2](AF_Partie1_Analyse_Fonctionnelle_v1.3.md) §Initialisation,
+> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie1_Analyse_Fonctionnelle_v1.5.md) §Initialisation,
 > [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md) (dossier `ENCODER`),
 > [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (profils FB),
 > [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
 > [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md) (`FB_Winch` unitaire M1/M2).
+> [P9 Fonction Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
@@ -360,7 +368,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
 | `RawPos` | `UDINT` | Valeur brute codeur courante (sortie `FB_Encoder_Abs`) |
 | `EncoderAvailable` | BOOL | État bus (sortie `FB_DiagEthercat`/`FB_Encoder_Abs`) |
-| `ContactorFeedbackFwd` / `Rev` | BOOL | Retours contacteurs de sens (sortie `FB_Winch`/`FB_Output_Relay`) — **arrêt confirmé** si les deux à `FALSE` |
+| `FwdRevSpeedFeedbackOff` 🔧 v1.7 | BOOL | Retour **unique** « tous contacteurs sens+vitesse de ce treuil retombés » (sortie `PRG_00_Inputs`, remplace `ContactorFeedbackFwd`/`Rev`) — **arrêt confirmé** si `TRUE` |
 | `BrakeFeedback` | BOOL | Retour contacteur frein — **collé** = confirmation mécanique d'arrêt |
 | `PresetAck` | BOOL | Acquittement bus de l'écriture preset (sortie `FB_Encoder_Abs`, §6) |
 
@@ -485,9 +493,10 @@ CoE, lui, agit directement sur la mesure native, sans hypothèse de plage côté
 - **Autorisation par flux** : nominal `MAINT_N1` suffit (cohérent Partie5 §2 : « positionnement
   init après démarrage » est un usage N1 explicite) ; unitaire paramétrable **exige** `MAINT_N2`
   (maintenance lourde, cohérent Partie5 §2 : « changement de treuil/câble »).
-- **Arrêt confirmé par retours d'état réels** (pas par le codeur qu'on référence) :
-  `ContactorFeedbackFwd = FALSE` **ET** `ContactorFeedbackRev = FALSE` **ET** `BrakeFeedback` =
-  collé. Ces retours (contacteurs sens, frein, **et disjoncteurs** — tous câblés, `ST_ContactorCheck`)
+- **Arrêt confirmé par retours d'état réels** (pas par le codeur qu'on référence) : 🔧 v1.7
+  `FwdRevSpeedFeedbackOff = TRUE` (tous contacteurs sens+vitesse retombés, remplace l'ancien
+  `ContactorFeedbackFwd = FALSE` **ET** `ContactorFeedbackRev = FALSE`) **ET** `BrakeFeedback` =
+  collé. Ces retours (contacteurs sens+vitesse, frein, **et disjoncteurs** — tous câblés, `ST_ContactorCheck`)
   sont des informations physiques indépendantes de la mesure que l'on s'apprête à recalibrer —
   bien plus robustes qu'une estimation de vitesse dérivée du codeur lui-même.
 - **`Home` unique, confirmation IHM en amont** : le double contrôle (mot de passe + message de
@@ -619,7 +628,7 @@ fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `M1_M2
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie9_Fonction_Winch_v1.1.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie9_Fonction_Winch_v1.5.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`
@@ -791,4 +800,4 @@ rejeté** (`ErrorId` bit4) — c'est le comportement voulu, pas une erreur.
   (« acquitter ≠ redémarrer », appliqué ici à la confiance dans la référence, §3.7/§7).
 - **Partie 4 v1.2** — Cycle & synchro (`FB_WinchSync`, suspension pendant phases sans mouvement commun).
 - **Partie 5 v1.2** — Modes & maintenance (droits `MAINT_N1`/`MAINT_N2`, usages homing/maintenance lourde).
-- **Partie 9 v1.1** — Fonction Winch (`FB_Winch` pilotable unitairement, base du pilotage indépendant).
+- **Partie 9 v1.5** — Fonction Winch (`FB_Winch` pilotable unitairement, base du pilotage indépendant).

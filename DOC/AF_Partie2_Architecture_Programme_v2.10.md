@@ -1,5 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.9)
+# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.10)
 
+> **v2.10 (2026-07-07)** — REX terrain (voir Partie 9) : l'exemple §3 citant
+> `PRG_0_Inputs.M1ContactorFeedbackFwd` (retour individuel par sens) est mis à jour — ce signal
+> est **supprimé côté câblage réel** pour les treuils M1/M2, remplacé par un retour unique par
+> treuil `M1FwdRevSpeedFeedbackOff`. Aucun autre changement vs v2.9. Détail complet :
+> `DOC/AF_Partie9_Fonction_Winch_v1.5.md`.
+>
 > **v2.9** — Correctif documentaire (voir Partie 13) : `GVL_DEBUG` (§2bis) a été supprimé et
 > remplacé par `GVL_Simulation` (bit maître `SimulationModeActive` + granularité par device
 > `<Device>_IsReal`) — la table §2bis et la description de `PRG_9_Supervision` (§4) reflètent
@@ -92,7 +98,7 @@ MainTask (10 ms)
 ```
 
 > 📌 Chaque programme **lit directement** les sorties des programmes précédents dans la liste
-> (ex. `PRG_6_WinchControl` lit `PRG_0_Inputs.M1ContactorFeedbackFwd`, `PRG_3_Safety.instSafetyWinchM1.SafeStop`,
+> (ex. `PRG_6_WinchControl` lit `PRG_0_Inputs.M1FwdRevSpeedFeedbackOff`, `PRG_3_Safety.instSafetyWinchM1.SafeStop`,
 > `PRG_4_Modes.instModes.Mode`) — pas d'agrégateur GVL entre les deux.
 > ⚠️ `PRG_9_Supervision` (position 9) calcule `MachineReset_IHM`, consommé par `PRG_1` à `PRG_7`
 > (positions **antérieures** dans la liste) : ce `Reset` centralisé est donc lu avec **1 cycle de

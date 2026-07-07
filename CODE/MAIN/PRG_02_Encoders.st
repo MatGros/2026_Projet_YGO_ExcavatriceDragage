@@ -101,8 +101,7 @@ instHomingM1(
     ConfirmCoherence     := GVL_IHM.WinchM1.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
-    ContactorFeedbackFwd := PRG_00_Inputs.M1ContactorFeedbackFwd,
-    ContactorFeedbackRev := PRG_00_Inputs.M1ContactorFeedbackRev,
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
     EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
@@ -147,8 +146,7 @@ instHomingM2(
     ConfirmCoherence     := GVL_IHM.WinchM2.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,
-    ContactorFeedbackFwd := PRG_00_Inputs.M2ContactorFeedbackFwd,
-    ContactorFeedbackRev := PRG_00_Inputs.M2ContactorFeedbackRev,
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
     EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,

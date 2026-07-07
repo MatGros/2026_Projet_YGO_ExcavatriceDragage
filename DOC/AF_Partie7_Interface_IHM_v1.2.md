@@ -1,10 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.2)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
-> **Version** : v1.1 (Correctif documentaire — voir Partie 13 : `GVL_DEBUG` supprimé, remplacé par
-> `GVL_Simulation`. Aucun autre changement vs v1.0.)  
-> 🔗 **Dépend de** : [P2 Architecture v2.9](AF_Partie2_Architecture_Programme_v2.9.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md), [P10 Homing v1.6](AF_Partie10_Fonction_Encoder_Homing_v1.6.md), [P12 Grappin v1.1](AF_Partie12_Fonction_Grappin_v1.1.md), [P13 Simulation v1.0](AF_Partie13_Fonction_Simulation_v1.0.md).
+> **Version** : v1.2 (2026-07-07, REX terrain — voir Partie 9 : le retour contacteur individuel
+> par sens des treuils M1/M2 est supprimé côté câblage réel ; `ST_WinchHMI.FwdContactorCheck`/
+> `RevContactorCheck` fusionnés en `ContactorsCheck` unique. Aucun autre changement vs v1.1.)  
+> 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md), [P10 Homing v1.7](AF_Partie10_Fonction_Encoder_Homing_v1.7.md), [P12 Grappin v1.2](AF_Partie12_Fonction_Grappin_v1.2.md), [P13 Simulation v1.0](AF_Partie13_Fonction_Simulation_v1.0.md).
 
 ---
 
@@ -60,8 +61,10 @@ STRUCT
     EncoderFault            : BOOL;             (* Perte de liaison ou incohérence codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
-    FwdContactorCheck       : ST_ContactorCheck; (* Coherence contacteur montée *)
-    RevContactorCheck       : ST_ContactorCheck; (* Coherence contacteur descente *)
+    ContactorsCheck         : ST_ContactorCheck; (* 🔧 v1.2 — coherence contacteurs sens+vitesse
+                                                     fusionnée (retour unique matériel), remplace
+                                                     FwdContactorCheck/RevContactorCheck ;
+                                                     StuckOpen inutilisé (toujours FALSE) *)
     BrakeContactorCheck     : ST_ContactorCheck; (* Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
@@ -258,7 +261,7 @@ Le mapping bidirectionnel est divisé en deux parties dans `PRG_MAIN.st` :
    * Les commandes de reset treuils et grappin sont agrégées pour piloter l'acquittement machine transverse `MachineReset_IHM`.
 
 2. **À la toute fin de l'implémentation (avant le conditionnement des sorties physiques)** :
-   * Les mesures réelles, les sorties d'état automates et les sous-structures de diagnostic (`FwdContactorCheck`, etc.) sont affectées à `GVL_IHM` pour alimenter les écrans de supervision.
+   * Les mesures réelles, les sorties d'état automates et les sous-structures de diagnostic (`ContactorsCheck`, etc.) sont affectées à `GVL_IHM` pour alimenter les écrans de supervision.
    * Les paramètres de calibration modifiés à l'écran (`TopSensorPositionM`, `MaxStepDescente`, `RampAccelRate`, etc.) sont recopiés vers les registres de travail de l'automate.
    * Une logique de synchronisation bidirectionnelle est mise en œuvre pour les bypasses de test (banc de simulation) afin que l'état sur l'écran d'un treuil soit cohérent avec l'état effectif de simulation **par device** (`GVL_Simulation`, voir Partie 13) — chaque axe (M1/M2/Chariot) reflète son propre `<Device>_IsReal`, plus une copie unique du même bit global.
 

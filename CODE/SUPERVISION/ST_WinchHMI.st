@@ -47,8 +47,9 @@ STRUCT
     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
-    FwdContactorCheck       : ST_ContactorCheck; (* 🔌 Coherence contacteur montée *)
-    RevContactorCheck       : ST_ContactorCheck; (* 🔌 Coherence contacteur descente *)
+    ContactorsCheck         : ST_ContactorCheck; (* 🔌 REX 2026-07-07 : coherence contacteurs sens+vitesse
+                                                     fusionnée (retour unique matériel) — StuckOpen inutilisé,
+                                                     remplace FwdContactorCheck/RevContactorCheck *)
     BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)

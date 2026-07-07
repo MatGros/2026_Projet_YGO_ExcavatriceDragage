@@ -60,7 +60,8 @@
       "Bash(MSYS_NO_PATHCONV=1 git cat-file *)",
       "Bash(git -C \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage\" mv \"DOC/AF_Partie12_Fonction_Grappin_v1.0.md\" \"DOC/Archives/AF_Partie12_Fonction_Grappin_v1.0.md\")",
       "Bash(grep -rn \"GVL_IHM.Modes.MachineReset\\\\b\" CODE/)",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "Bash(awk '/## 🚀 37\\\\./{f=1} f{print NR\": \"$0} /Fichiers impactés.*Sécurité électrique/{if\\(f\\)c++} c==1 && /^---$/{exit}' \"DOC/AUDIT_Coherence_Documentaire_v1.0.md\")"
     ],
     "ask": [
       "Bash(git reset *)",

@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.5)
 
 > 📌 **État d'implémentation (2026-07-03, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
@@ -15,6 +15,34 @@
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
 > 🔗 Dépend de : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
 >
+> 🔧 **v1.5 (2026-07-07)** — Implémentation du Cas B (« Mouvement non commandé / roue libre »,
+> §4quinquies-TBD ci-avant) et de 2 garde-fous supplémentaires en défense en profondeur, tous
+> câblés dans `FB_Safety_Winch` (nouveaux bits 7/8/9) : **Méca A** — mouvement/dérive détecté(e)
+> alors que tout est confirmé physiquement coupé (contacteurs + frein) ; **Méca B** — pilotage
+> actif constaté malgré absence de commande opérateur (perte CAN ou joystick au neutre) ;
+> **Méca C (couche 2, escalade)** — glissement M1 pendant un mouvement Grappin, au-delà de ce que
+> la couche 1 (`FB_Grappin`, voir Partie12 v1.2) a pu contenir. `PowerCutOff` devient **réel**
+> (`FALSE` codé en dur jusqu'ici) pour ces 3 cas — les contacteurs étant déjà confirmés coupés,
+> `SafeStop` seul ne suffit pas. Détail complet en §4quinquies ci-dessous ; interface
+> `FB_Safety_Winch` et tableau `ErrorId` mis à jour en §3.
+> 🔧 **v1.4 (2026-07-07)** — REX terrain : le retour contacteur individuel par sens
+> (`ContactorFeedbackFwd`/`ContactorFeedbackRev`) est **supprimé côté câblage réel** — remplacé
+> par **un seul retour par treuil**, `FwdRevSpeedFeedbackOff` (« tous les contacteurs sens+vitesse
+> de ce treuil sont retombés »), câblé sur les nouvelles entrées physiques
+> `M1/M2_FwdRevSpeedFeedbackOff_DI` (remplacent les 4 anciens canaux `M1/M2_FeedbackFwd/Rev_DI`).
+> Conséquences : `FwdContactorCheck`/`RevContactorCheck` fusionnés en un seul `ContactorsCheck`
+> (`ST_ContactorCheck`) ; vérification **StuckClosed uniquement, à l'arrêt commandé** (bit1
+> `ErrorId`) ; `StuckOpen` n'a plus de sens avec ce signal (toujours `FALSE`, champ conservé pour
+> compatibilité de type) ; bit2 `ErrorId` (ex-`RevContactorCheck`) **libéré/inutilisé**. Détail
+> complet dans `CODE/WINCH/FB_Winch.st` (règle anti-doublon — pas de recopie ici) — voir §3/§5/§6
+> ci-dessous pour l'interface et le mapping mis à jour. Hors périmètre : le Chariot M3
+> (`FB_Chariot.st`) garde ses retours individuels `ContactorFeedbackFwd`/`Rev` — ce changement
+> matériel ne concerne **que** les treuils M1/M2.
+> 🗂️ **Réalignement nom de fichier/version** : ce fichier restait suffixé `_v1.1` alors que son
+> contenu interne était déjà en v1.3 (changelog D_SLACK_1/2/3, D_OVERRIDESYNC ci-dessous, jamais
+> répercuté dans le nom de fichier — écart déjà repéré dans `DOC/PLAN_Finalisation_v1.0.md` §4.2).
+> Corrigé à partir de cette version : le suffixe de fichier suit désormais fidèlement le numéro de
+> version indiqué dans ce changelog.
 > 🔧 **v1.3 (2026-07-04)** — Révision §4ter : comportement mou de câble revu (D_SLACK_1 : SafeStop M1+M2 en mode normal, ForbidAscent en MAINT+OverrideSync), procédure de récupération grappin bloqué (D_SLACK_2), acquittement manuel alarme IHM (D_SLACK_3), clarification capteur physiquement sur M2 uniquement, OverrideSync applicable MAINT_N1 et MAINT_N2 (D_OVERRIDESYNC).
 > 🔧 **v1.2 (2026-07-03)** — Audit de sécurité et intégration du contrôle de cohérence des commandes (SafeStop sur bit 1 de `ErrorId`, bypass automatique sur Grappin actif et override MAINT_N2, avec effacement automatique des erreurs).
 > 🔧 **v1.1 (2026-07-02)** — Nouvel export `Device.export` avec I/O réel : `M1/M2_RelayFwd/Rev`,
@@ -46,16 +74,17 @@ FB_Joystick.AxisCmdY ──► FB_Winch(M1) ──┬─► FB_SpeedStep ──�
                                         ├─► RelayFwd / RelayRev (interlock changement de sens + ForbidDescent + ForbidAscent)
                                         └─► FB_Brake ──► BrakeCmd (séquence temporisée)
 
-FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — arrêt total (joystick/codeur/thermique/mou câble normal)
+FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — arrêt total (joystick/codeur/thermique/mou câble normal/Méca A/B/C)
                 ──► ForbidDescent   ──► (entrée) FB_Winch — masque UNIQUEMENT RelayRev (mou câble, MAINT+OverrideSync)
                 ──► ForbidAscent    ──► (entrée) FB_Winch — masque UNIQUEMENT RelayFwd  (mou câble, MAINT+OverrideSync)
+                ──► PowerCutOff 🆕  ──► (hors FB_Winch) coupure puissance amont — Méca A/B/C uniquement (SafeStop ne suffit pas, contacteurs déjà confirmés coupés)
 ```
 
 | Bloc | Rôle métier |
 |------|-------------|
 | `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
-| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, ou mou de câble (mode normal) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+OverrideSync — voir §4ter |
+| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, mou de câble (mode normal), ou Méca A/B/C (roue libre, pilotage sans commande, glissement grappin escaladé) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+OverrideSync — voir §4ter ; lève `PowerCutOff` sur Méca A/B/C — voir §4quinquies |
 | `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev`/`RelayFwd` sur `ForbidDescent`/`ForbidAscent` |
 
 > ♻️ **Réutilisation** (Partie3 §0) : `HYSTERESIS` (lib Util) pour les paliers, `FB_Ramp` +
@@ -81,7 +110,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | `Direction` | INT | -1/0/+1 |
 | `SpeedRefPct` | REAL | Consigne 0..100 % |
 | `SpeedStepTable` | `ST_SpeedStepTable` | Table des 5 paliers **propre à M1** (20 `BOOL` `P<palier>R<relais>` + seuils) |
-| `ContactorFeedbackFwd/Rev` | BOOL | Retours contacteurs de sens (I/O réel) |
+| `FwdRevSpeedFeedbackOff` 🔧 v1.4 | BOOL | Retour **unique** par treuil (I/O réel) : « tous les contacteurs sens+vitesse de ce treuil sont retombés » — remplace `ContactorFeedbackFwd/Rev` (retour individuel par sens, supprimé côté câblage réel) |
 | `BrakeFeedback` | BOOL | Retour contacteur bobine frein (stub, non câblé) |
 
 **📤 Sorties clés**
@@ -91,9 +120,9 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | `Contactor1..4` | BOOL | Contacteurs de vitesse du palier courant (lus dans `Table.P<palier>R<relais>`) |
 | `BrakeCmd` | BOOL | Commande bobine frein (`TRUE` = relâché) |
 | `Ready/Busy/Done/Error/ErrorId/State/StateAtError` | — | État standard (Partie3 §1) |
-| `FwdContactorCheck/RevContactorCheck/BrakeContactorCheck` | `ST_ContactorCheck` | Diagnostic détaillé (IHM) |
+| `ContactorsCheck/BrakeContactorCheck` 🔧 v1.4 | `ST_ContactorCheck` | Diagnostic détaillé (IHM) — `ContactorsCheck` fusionne l'ancien `FwdContactorCheck`+`RevContactorCheck` (un seul retour matériel désormais, plus de diagnostic par sens) ; `BrakeContactorCheck` inchangé |
 
-`ErrorId` : bit0 = défaut frein, bit1 = contacteur sens Fwd incohérent, bit2 = contacteur sens Rev incohérent.
+`ErrorId` : bit0 = défaut frein, bit1 = contacteur(s) sens/vitesse collé(s) (🔧 v1.4 : `ContactorsCheck.StuckClosed`, vérifié **uniquement à l'arrêt commandé** — plus de détection par sens), bit2 **libre/inutilisé** (🔧 v1.4, ex-contacteur sens Rev, fusionné dans bit1). `ContactorsCheck.StuckOpen` reste toujours `FALSE` (non détectable avec ce retour unique, champ conservé pour compatibilité de type `ST_ContactorCheck`).
 
 ### `FB_Safety_Winch` (1 instance par treuil, Partie3 §1/§7bis)
 
@@ -103,18 +132,28 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Partie3 §1) |
 | `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.Joystick` |
 | `EncoderAvailable` | BOOL | Sortie `FB_Encoder_Abs` **de ce treuil** |
-| `ThermalFeedback` 🆕 | BOOL | Retour TOR thermique **de ce moteur** (`M1/M2_ThermalFeedback`, I/O réel) |
-| `SlackCableDetected` 🆕 | BOOL | Détecteur mou de câble **commun** aux 2 treuils (`M1_M2_SlackCableSwitch`, I/O réel — même valeur sur les 2 instances) |
+| `ThermalFeedback` | BOOL | Retour TOR thermique **de ce moteur** (`M1/M2_ThermalFeedback`, I/O réel) |
+| `SlackCableDetected` | BOOL | Détecteur mou de câble **commun** aux 2 treuils (`M1_M2_SlackCableSwitch`, I/O réel — même valeur sur les 2 instances) |
+| `CablePosM` | REAL | Position câble **de ce treuil** en mètres (scalée) — réutilisée pour Méca A/C (dérive/vitesse) |
+| `CableLimitDescentM` | REAL | Limite basse physique descente (m, valeur négative) |
+| `FwdRevSpeedFeedbackOff` 🆕 v1.5 | BOOL | Retour unique « tous contacteurs sens+vitesse retombés » **de ce treuil** (déjà consommé par `FB_Winch`, désormais aussi par `FB_Safety_Winch` pour armer Méca A/B) |
+| `BrakeFeedback` 🆕 v1.5 | BOOL | Retour frein **de ce treuil** (I/O réel, `M1/M2_BrakeFeedback`) : `TRUE` = serré/collé — arme Méca A conjointement avec `FwdRevSpeedFeedbackOff` |
+| `JoystickYNeutral` 🆕 v1.5 | BOOL | `TRUE` = joystick axe Y au neutre (magnitude `ABS(SpeedRef) < 0.1`), précalculé en amont (`PRG_03_Safety`) — Méca B |
+| `GrappinHoldStillActive` 🆕 v1.5 | BOOL | `TRUE` **uniquement pour l'instance M1**, câblé sur `instGrappin.Busy` (toujours `FALSE` côté M2, qui doit bouger pendant le grappin) — arme Méca C (couche 2) |
+| `UncommandedSpeedThresholdMps` 🆕 v1.5 | REAL := 0.02 | Seuil vitesse mesurée (m/s) au-delà duquel Méca A se déclenche pendant qu'il est armé — théorique, à ajuster sur site |
+| `UncommandedDriftToleranceM` 🆕 v1.5 | REAL := 2.0 | Tolérance de dérive de position (m) par rapport à la référence prise à l'armement de Méca A |
+| `PostRampTimeout` 🆕 v1.5 | TIME := T#3S | Délai laissé après perte de commande opérateur pour que `FwdRevSpeedFeedbackOff` reconfirme l'arrêt réel (Méca B) — marge au-dessus du temps de décélération réel, théorique |
+| `GrappinSlipToleranceM` 🆕 v1.5 | REAL := 2.0 | Tolérance de dérive M1 (m) pour l'escalade Méca C — volontairement **supérieure** aux 1.0 m déjà surveillés côté `FB_Grappin` (couche 1, voir Partie12 v1.2) : n'intervient que si cette couche 1 n'a pas suffi |
 
 **📤 Sorties**
 | Sortie | Type | Rôle |
 |--------|------|------|
 | `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
-| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 🆕 : surchauffe moteur ; bit3 🆕 : mou de câble ; bit4 : rotation de phase |
-| `SafeStop` | BOOL | `(ErrorId AND 16#0017) <> 0` — bits 0/1/2/4 + **bit3 en mode NORMAL/SEMI_AUTO/MAINT sans OverrideSync** → arrêt total (Enable maintenu) |
-| `ForbidDescent` 🆕 | BOOL | bit3, **uniquement en MAINT+OverrideSync** → interdit la descente (aggrave le mou) ; inhibe le SafeStop câble |
-| `ForbidAscent` 🆕 | BOOL | bit3, **uniquement en MAINT+OverrideSync** → interdit la montée sur M1 ET M2 (aggrave le mou) |
-| `PowerCutOff` | BOOL | `FALSE` (TBD ce lot) |
+| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 : surchauffe moteur ; bit3 : mou de câble ; bit4 : rotation de phase ; bit5 : fin de course haut ; bit6 : longueur max câble ; bit7 🆕 v1.5 : Méca A (mouvement non commandé) ; bit8 🆕 v1.5 : Méca B (pilotage sans commande opérateur) ; bit9 🆕 v1.5 : Méca C couche 2 (glissement M1/grappin, escalade) |
+| `SafeStop` | BOOL | 🔧 v1.5 : `(ErrorId AND 16#039F) <> 0` hors OverrideSync (bits 0/1/2/3/4/7/8/9), `(ErrorId AND 16#0397) <> 0` sous OverrideSync (bit3 exclu, comme avant v1.5 — voir §4ter). Les bits 7/8/9 (Méca A/B/C) **ne sont jamais exclus** par `OverrideSync`, sans rapport avec la procédure de récupération mou de câble |
+| `ForbidDescent` | BOOL | bit6 uniquement (limite basse câble) — inchangé v1.5 |
+| `ForbidAscent` | BOOL | bit5 (fin de course haut) OU bit3+OverrideSync (récupération mou câble) — inchangé v1.5 |
+| `PowerCutOff` 🔧 v1.5 | BOOL | **Réel** depuis v1.5 (`FALSE` codé en dur jusqu'à v1.4) : `(ErrorId AND 16#0380) <> 0` — bits 7/8/9 (Méca A/B/C) **uniquement**. Coupure puissance amont : dans ces 3 cas précis, les contacteurs locaux sont déjà confirmés coupés/insuffisants, `SafeStop` seul ne sert à rien |
 
 ---
 
@@ -170,13 +209,13 @@ ne monte pas vraiment → du mou se forme sur le tambour M2. Ce scénario survie
 ```
 // Mode NORMAL/SEMI_AUTO/MAINT sans OverrideSync :
 ErrorId.bit3  := SlackCableDetected
-SafeStop      := (ErrorId AND 16#0017) <> 0    // bits 0/1/2/3/4 → arrêt total
+SafeStop      := (ErrorId AND 16#039F) <> 0    // 🔧 v1.5 : bits 0/1/2/3/4/7/8/9 → arrêt total
 ForbidDescent := FALSE                          // inutile, SafeStop bloque tout
 ForbidAscent  := FALSE                          // inutile, SafeStop bloque tout
 
 // Mode MAINT avec OverrideSync activé :
 ErrorId.bit3  := SlackCableDetected
-SafeStop      := (ErrorId AND 16#0016) <> 0    // bits 0/1/2/4 SEULEMENT — bit3 exclu
+SafeStop      := (ErrorId AND 16#0397) <> 0    // 🔧 v1.5 : bits 0/1/2/4/7/8/9 — bit3 SEUL exclu
 ForbidDescent := FALSE                          // descente autorisée pour rattraper le câble
 ForbidAscent  := (ErrorId AND 16#0008) <> 0    // bit3 → montée interdite M1 ET M2
 
@@ -184,6 +223,10 @@ ForbidAscent  := (ErrorId AND 16#0008) <> 0    // bit3 → montée interdite M1 
 RelayFwd forcé FALSE si ForbidAscent   // bloque la montée
 RelayRev forcé FALSE si ForbidDescent  // bloque la descente (+ EffectiveSafeStop si SafeStop)
 ```
+
+> 🔧 **v1.5** : les bits 7/8/9 (Méca A/B/C) participent à `SafeStop` **dans les deux formules**
+> ci-dessus (jamais exclus par `OverrideSync`) — voir §4quinquies pour le détail de ces 3
+> mécanismes, sans rapport avec la procédure de récupération mou de câble.
 
 `Error` reste le miroir de **tout** `ErrorId` (Partie3 §4, y compris bit3) : le défaut est
 visible à l'IHM comme **alarme acquittable** — voir §4ter-D_SLACK_3 ci-dessous.
@@ -294,11 +337,67 @@ Afin d'éviter tout dommage mécanique majeur (déchirement du câble, torsion d
   - **Mouvement Grappin** : Lorsque le grappin est en mouvement (`Grappin.Busy = TRUE`), le treuil M2 fonctionne de manière indépendante pour ouvrir/fermer le grappin. Le contrôle de cohérence des commandes est alors automatiquement désactivé en forçant `FB_WinchSync.Enable := FALSE` dans `PRG_MAIN`.
   - **Effacement automatique sur désactivation** : Lorsque `Enable` passe à `FALSE`, le bloc `FB_WinchSync` remet à zéro ses sorties `Error` (à `FALSE`) et `ErrorId` (à `16#0000`) afin de ne pas verrouiller le système en `SafeStop` pendant un bypass ou l'utilisation du grappin.
 
-### 🔴 TBD — Surveillance de cohérence mouvement (2026-07-02, PAS implémentée)
+### 🆕 4quinquies. Méca A/B/C — Garde-fous mouvement non commandé (2026-07-07, IMPLÉMENTÉS)
 
-> ⚠️ Statut : **idée capturée, non conçue en détail, non implémentée.** Nécessite le codeur
-> fiabilisé (Partie 10) pour au moins 3 des 4 cas ci-dessous. Ne pas commencer l'implémentation
-> sans repasser par le workflow complet (spec → plan → validation) le moment venu.
+> ✅ Statut : **implémentés et câblés** dans `FB_Safety_Winch` (bits 7/8/9) + `FB_Grappin` (bit4),
+> suite à la consolidation du retour contacteur unique par treuil (`FwdRevSpeedFeedbackOff`,
+> v1.4). Couvrent le **Cas B** identifié ci-dessous (« mouvement non commandé / roue libre ») et
+> son cas particulier propre au Grappin. Les Cas A et C (originaux, ci-dessous) restent **TBD**.
+
+**Méca A — mouvement non commandé général (`FB_Safety_Winch` bit7)**
+Armé dès que `FwdRevSpeedFeedbackOff AND BrakeFeedback` (tout est confirmé physiquement coupé :
+contacteurs de sens/vitesse **et** frein serré). Une fois armé, si la vitesse mesurée (voir TBD
+mesure vitesse ci-dessous) dépasse `UncommandedSpeedThresholdMps` (0.02 m/s, théorique) **ou** si
+la position dérive de plus de `UncommandedDriftToleranceM` (2.0 m) par rapport à la référence
+prise au moment de l'armement → défaut → `SafeStop` **et** `PowerCutOff`. `PowerCutOff` est
+nécessaire ici car les contacteurs sont déjà confirmés coupés : `SafeStop` seul (qui ne fait que
+commander une décélération rapide) ne changerait rien à une charge en roue libre.
+
+**Méca B — pilotage actif malgré absence de commande opérateur (`FB_Safety_Winch` bit8)**
+Indépendant de la logique interne de `FB_Winch` — défense en profondeur : reste valable même si
+l'arbitrage `FB_Winch` est lui-même en défaut. Si (perte communication CAN joystick, déjà bit0
+existant) **ou** (joystick axe Y au neutre, `JoystickYNeutral`, seuil `ABS(SpeedRef) < 0.1`) **et**
+que `FwdRevSpeedFeedbackOff` ne repasse **pas** à `TRUE` dans `PostRampTimeout` (3 s, théorique —
+marge au-dessus du temps de décélération réel) → défaut → `SafeStop` **et** `PowerCutOff`.
+
+**Méca C — glissement M1 pendant mouvement Grappin, à 2 couches**
+Pendant l'ouverture/fermeture du grappin (M2 bouge seul, M1 doit rester immobile) :
+- **Couche 1** (`FB_Grappin` bit4, tolérance `M1SlipToleranceM` = 1.0 m) : si M1 dérive de plus
+  d'1 m par rapport à sa position mémorisée à l'entrée en `Busy` → `SevereError` (coupe M2 via le
+  mécanisme existant) + nouvelle sortie `M1SlipDetected`, consommée dans `PRG_06_WinchControl.st`
+  (OR'ée dans `SafeStopM1_Raw` pour forcer `SafeStop` sur M1 spécifiquement — `FB_Grappin` ne
+  pilote pas M1 directement). Détail interface : Partie12 v1.2 §4.
+- **Couche 2** (`FB_Safety_Winch` bit9, tolérance `GrappinSlipToleranceM` = 2.0 m > tolérance
+  couche 1) : armée **uniquement** via `GrappinHoldStillActive`, câblée sur `instGrappin.Busy`
+  pour l'instance **M1 seule** (toujours `FALSE` côté M2, qui doit bouger pendant le grappin). Si
+  la dérive continue au-delà de 2.0 m malgré la couche 1 → escalade `PowerCutOff` (dernier
+  recours, la couche 1 n'a pas suffi).
+
+> 📄 Code de référence (règle anti-doublon, pas de recopie ici) : `CODE/WINCH/FB_Safety_Winch.st`
+> (Méca A/B/C, bits 7/8/9), `CODE/GRAPPIN/FB_Grappin.st` (Méca C couche 1, bit4),
+> `CODE/MAIN/PRG_03_Safety.st` (câblage des nouvelles entrées), `CODE/MAIN/PRG_06_WinchControl.st`
+> (consommation de `M1SlipDetected`).
+
+#### 🔴 TBD — Mesure de vitesse par différentiation logicielle (amélioration future)
+
+La mesure de vitesse utilisée par Méca A est aujourd'hui une **différentiation logicielle** de
+`CablePosM` (delta position / temps de cycle réel via `FB_CycleTime`), **pas** un mot vitesse
+natif du codeur. Or les PDO EtherCAT fournissent bien un mot vitesse natif (`COD1_SpdValue` /
+`COD2_SpdValue`, mappé `%IW10` côté COD1, « Speed value channel 1 »), jamais consommé dans
+`CODE/` à ce jour, qui serait probablement plus fiable/moins bruité que la différentiation sur un
+seul cycle (10 ms). **Mais l'échelle/unité de ce mot n'est pas connue** (points/seconde ? tr/min ?
+autre ?) — à déterminer via la fiche technique du codeur Kübler F58x8 ou empiriquement sur site.
+Amélioration prévue pour une phase projet plus avancée : utiliser `COD1_SpdValue`/`COD2_SpdValue`
+quand `EncoderM1/M2_IsReal = TRUE`, garder la différentiation logicielle comme repli en
+simulation (même principe que l'aiguillage `M1_RawPosToUse` déjà en place pour la position,
+Partie10 v1.7).
+
+### 🔴 TBD — Surveillance de cohérence mouvement, Cas A et C originaux (2026-07-02, PAS implémentés)
+
+> ⚠️ Statut : **idée capturée, non conçue en détail, non implémentée.** Le Cas B ci-dessous est
+> désormais couvert par Méca A/B/C ci-dessus (§4quinquies) — restent non traités : Cas A (sens
+> opposé) et Cas C (absence de mouvement malgré commande). Ne pas commencer l'implémentation sans
+> repasser par le workflow complet (spec → plan → validation) le moment venu.
 
 Piste de sécurité identifiée pendant les tests : au-delà du contrôle **commande vs retour d'un
 même contacteur** déjà fait par `ST_ContactorCheck` (Partie3 §7bis, existant dans `FB_Winch`),
@@ -308,23 +407,28 @@ qui devraient normalement toujours converger (à un délai de rampe/interlock pr
 divergence à couvrir séparément — ce ne sont pas des variantes d'un même défaut, chacun a une
 cause probable et une gravité différentes :
 
-| Cas | Divergence observée | Cause probable | Gravité |
-|-----|----------------------|-----------------|---------|
-| **A — Sens opposé** | Sens joystick **brut** (avant deadband/filtre/rampe, donc l'intention quasi instantanée) ≠ sens réellement constaté (contacteur engagé et/ou signe vitesse codeur), de façon **persistante** | Câblage de sens inversé, contacteur collé dans le mauvais sens, codeur mal orienté (signe inversé à la config) | Élevée — la machine bouge à l'opposé de la demande opérateur |
-| **B — Mouvement non commandé (roue libre)** | Le codeur indique un déplacement significatif alors qu'**aucun** contacteur de sens n'est engagé (`RelayFwd`/`RelayRev` = FALSE tous les deux) | Charge qui tombe (frein qui ne tient pas malgré `BrakeCmd=FALSE`), roue libre mécanique | **Très élevée** — mouvement incontrôlé, à détecter en priorité dès que le codeur est dispo |
-| **C — Absence de mouvement malgré commande** | Sens + palier commandés, frein relâché **confirmé** (`BrakeCmd=TRUE` et `BrakeContactorCheck` cohérent), mais le codeur ne montre **aucune** évolution de position après un délai raisonnable | Blocage mécanique, accouplement/câble rompu, contacteur de puissance qui ne répond pas malgré un retour TOR correct (défaut invisible à `ST_ContactorCheck`, qui ne voit que la bobine de commande, pas l'arbre moteur) | Élevée — aucune action physique alors que tout semble commandé correctement |
-| **D — Fenêtre de tolérance** | *(pas un cas de défaut, une règle transverse aux 3 ci-dessus)* Ne jamais déclencher pendant le temps normal de rampe + interlock (~0,5 à 1 s selon les taux réglés, voir §4) | — | — évite les faux positifs à chaque changement de sens/palier normal |
+| Cas | Divergence observée | Cause probable | Gravité | Statut |
+|-----|----------------------|-----------------|---------|--------|
+| **A — Sens opposé** | Sens joystick **brut** (avant deadband/filtre/rampe, donc l'intention quasi instantanée) ≠ sens réellement constaté (contacteur engagé et/ou signe vitesse codeur), de façon **persistante** | Câblage de sens inversé, contacteur collé dans le mauvais sens, codeur mal orienté (signe inversé à la config) | Élevée — la machine bouge à l'opposé de la demande opérateur | 🔴 TBD |
+| **B — Mouvement non commandé (roue libre)** | Le codeur indique un déplacement significatif alors qu'**aucun** contacteur de sens n'est engagé (`RelayFwd`/`RelayRev` = FALSE tous les deux) | Charge qui tombe (frein qui ne tient pas malgré `BrakeCmd=FALSE`), roue libre mécanique | **Très élevée** — mouvement incontrôlé | ✅ **Implémenté** — voir Méca A/B §4quinquies |
+| **C — Absence de mouvement malgré commande** | Sens + palier commandés, frein relâché **confirmé** (`BrakeCmd=TRUE` et `BrakeContactorCheck` cohérent), mais le codeur ne montre **aucune** évolution de position après un délai raisonnable | Blocage mécanique, accouplement/câble rompu, contacteur de puissance qui ne répond pas malgré un retour TOR correct (défaut invisible à `ST_ContactorCheck`, qui ne voit que la bobine de commande, pas l'arbre moteur) | Élevée — aucune action physique alors que tout semble commandé correctement | 🔴 TBD |
+| **D — Fenêtre de tolérance** | *(pas un cas de défaut, une règle transverse aux cas ci-dessus)* Ne jamais déclencher pendant le temps normal de rampe + interlock (~0,5 à 1 s selon les taux réglés, voir §4) | — | — évite les faux positifs à chaque changement de sens/palier normal | — |
 
-**Sources de données nécessaires** (aucune encore remontée jusqu'à `FB_Safety_Winch`) :
+> ⚠️ Le « Méca C » du §4quinquies (glissement M1/grappin) est un cas **distinct** de ce tableau
+> (spécifique au grappin, pas une variante générique du Cas A/B/C ci-dessus) — ne pas confondre.
+
+**Sources de données nécessaires pour les Cas A et C restants** (aucune encore remontée jusqu'à
+`FB_Safety_Winch`) :
 - Sens joystick **brut** (avant traitement) — actuellement `FB_Safety_Winch` ne voit que
   `Joystick.Online`/`Operational`, pas `RawX`/`RawY` ni un signe brut dérivé.
-- Signe + magnitude de la vitesse codeur (Cas A, B, C) — dépend de Partie 10 (homing/fiabilisation).
-- `RelayFwd`/`RelayRev`/`BrakeCmd` de `FB_Winch` (Cas B, C) — déjà disponibles en sortie de
+- Signe + magnitude de la vitesse codeur (Cas A, C) — la différentiation logicielle existe
+  désormais (Méca A), mais reste TBD un mot vitesse natif fiable (voir TBD ci-dessus).
+- `RelayFwd`/`RelayRev`/`BrakeCmd` de `FB_Winch` (Cas C) — déjà disponibles en sortie de
   `FB_Winch`, juste pas encore câblés vers `FB_Safety_Winch`.
 
 Chaque cas incohérent → un bit `ErrorId` **distinct** dans `FB_Safety_Winch` (1 bit = 1 cause,
 Partie3 §3), pas un bit générique "incohérence". Note miroir (condensée) laissée dans
-`CODE/FB_Safety_Winch.st` (en-tête).
+`CODE/WINCH/FB_Safety_Winch.st` (en-tête).
 
 ### ⚠️ Ce que « pas de codeur » signifie concrètement pour ce lot
 
@@ -349,11 +453,16 @@ descente sans surveillance visuelle des fins de câble physiques).
 | `M1/M2_RelayRev` | Sortie | 📡 I/O réel | Contacteur sens arrière (descente) |
 | `M1/M2_SpeedContactor_1..4` | Sortie | 📡 I/O réel | Contacteurs de vitesse (palier courant, table `P<palier>R<relais>`) — 🔧 renommé (ex `Contactor1..4`) |
 | `M1/M2_BrakeCmd` | Sortie | 📡 I/O réel | Bobine frein (`TRUE` = relâché) |
-| `M1/M2_ContactorFeedbackFwd/Rev` | Entrée | 📡 I/O réel | Retours contacteurs de sens |
-| `M1/M2_BrakeFeedback` | Entrée | 🧪 STUB | Retour contacteur bobine frein — seul signal encore non câblé |
+| `M1/M2_FwdRevSpeedFeedbackOff` 🔧 v1.4 | Entrée | 📡 I/O réel | Retour **unique** « tous contacteurs sens+vitesse retombés » — câblé sur `M1/M2_FwdRevSpeedFeedbackOff_DI` (remplace `M1/M2_ContactorFeedbackFwd/Rev`, 4 canaux `M1/M2_FeedbackFwd/Rev_DI` retirés). 🆕 v1.5 : consommé aussi par `FB_Safety_Winch` (arme Méca A/B) |
+| `M1/M2_BrakeFeedback` 🔧 v1.5 | Entrée | 📡 I/O réel | Retour contacteur bobine frein — câblé sur `M1/M2_BrakeFeedback_DI` (n'est plus un stub, contrairement à la mention v1.1). 🆕 v1.5 : consommé aussi par `FB_Safety_Winch` (arme Méca A conjointement avec `FwdRevSpeedFeedbackOff`) |
 | `M1_M2_TopPositionSensor` 🆕 | Entrée | 📡 I/O réel | Capteur position haute, **commun** M1+M2 (remplace `GVL_Homing_Stub`, supprimé) |
 | `M1/M2_ThermalFeedback` 🆕 | Entrée | 📡 I/O réel | Retour thermique **de ce moteur** → `FB_Safety_Winch.ThermalFeedback` |
 | `M1_M2_SlackCableSwitch` 🆕 | Entrée | 📡 I/O réel | Détecteur mou de câble, **commun** M1+M2 → `FB_Safety_Winch.SlackCableDetected` (même valeur sur les 2 instances) |
+
+> 🔧 **v1.5** : `JoystickYNeutral` (Méca B) et `GrappinHoldStillActive` (Méca C couche 2) ne sont
+> **pas** des canaux I/O physiques — ce sont des signaux **précalculés** dans `PRG_03_Safety`
+> (`ABS(FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1`, respectivement `instGrappin.Busy` câblé sur
+> l'instance M1 seule) avant d'être passés en entrée de `FB_Safety_Winch`.
 
 ---
 
@@ -367,9 +476,26 @@ descente sans surveillance visuelle des fins de câble physiques).
 - [`CODE/FB_Ramp.st`](../CODE/FB_Ramp.st) — **mise à jour** (POU déjà existant, correctif bug accel/décel lors d'une inversion rapide — voir §4)
 - [`CODE/FB_SpeedStep.st`](../CODE/FB_SpeedStep.st), [`CODE/FB_Brake.st`](../CODE/FB_Brake.st) — nouvelles briques composées
 - [`CODE/FB_Safety_Winch.st`](../CODE/FB_Safety_Winch.st) — **mise à jour v1.1** (`ThermalFeedback`, `SlackCableDetected`, `ForbidDescent` — voir §4ter)
-- [`CODE/FB_Winch.st`](../CODE/FB_Winch.st) — **mise à jour v1.1** (`ForbidDescent` en entrée, masque `RelayRev`)
-- [`CODE/GVL_Winch_M1_Stub.st`](../CODE/GVL_Winch_M1_Stub.st) / [`CODE/GVL_Winch_M2_Stub.st`](../CODE/GVL_Winch_M2_Stub.st) — **réduits v1.1** (`BrakeFeedback` seul, reste réel)
 - [`CODE/PRG_MAIN.st`](../CODE/PRG_MAIN.st) — **mise à jour** (câblage I/O réel + nouvelles entrées safety)
+
+📂 **🔧 v1.4 (2026-07-07)** — REX retour contacteur unique par treuil, fichiers réellement présents dans l'arborescence actuelle (`CODE/WINCH/`, `CODE/MAIN/`) :
+- [`CODE/WINCH/FB_Winch.st`](../CODE/WINCH/FB_Winch.st) — **mise à jour** (`FwdRevSpeedFeedbackOff` remplace `ContactorFeedbackFwd/Rev`, `ContactorsCheck` fusionne `FwdContactorCheck`/`RevContactorCheck`)
+- [`CODE/MAIN/PRG_00_Inputs.st`](../CODE/MAIN/PRG_00_Inputs.st) — **mise à jour** (`M1/M2FwdRevSpeedFeedbackOff` remplace `M1/M2ContactorFeedbackFwd/Rev`)
+- [`CODE/MAIN/PRG_02_Encoders.st`](../CODE/MAIN/PRG_02_Encoders.st), [`CODE/MAIN/PRG_06_WinchControl.st`](../CODE/MAIN/PRG_06_WinchControl.st) — **mise à jour** (câblages `instHomingM1/M2`/`instWinchM1/M2` vers `FwdRevSpeedFeedbackOff`)
+- [`CODE/ENCODERS/FB_Encoder_Homing.st`](../CODE/ENCODERS/FB_Encoder_Homing.st) — **mise à jour** (`ArretConfirme` utilise `FwdRevSpeedFeedbackOff`, voir Partie10 §7)
+- [`CODE/SUPERVISION/ST_WinchHMI.st`](../CODE/SUPERVISION/ST_WinchHMI.st), [`CODE/MAIN/PRG_09_Supervision.st`](../CODE/MAIN/PRG_09_Supervision.st) — **mise à jour** (IHM, `ContactorsCheck` unique)
+
+📂 **🔧 v1.5 (2026-07-07)** — Méca A/B/C (voir §4quinquies) :
+- [`CODE/WINCH/FB_Safety_Winch.st`](../CODE/WINCH/FB_Safety_Winch.st) — **mise à jour** (bits 7/8/9,
+  nouvelles entrées `FwdRevSpeedFeedbackOff`/`BrakeFeedback`/`JoystickYNeutral`/
+  `GrappinHoldStillActive`/seuils, `SafeStop`/`PowerCutOff` recalculés)
+- [`CODE/GRAPPIN/FB_Grappin.st`](../CODE/GRAPPIN/FB_Grappin.st) — **mise à jour** (bit4 glissement
+  M1, sortie `M1SlipDetected` — voir aussi Partie12 v1.2)
+- [`CODE/MAIN/PRG_03_Safety.st`](../CODE/MAIN/PRG_03_Safety.st) — **mise à jour** (câblage des
+  nouvelles entrées `FB_Safety_Winch`, `GrappinHoldStillActive` câblé sur `instGrappin.Busy`
+  UNIQUEMENT pour l'instance M1)
+- [`CODE/MAIN/PRG_06_WinchControl.st`](../CODE/MAIN/PRG_06_WinchControl.st) — **mise à jour**
+  (`SafeStopM1_Raw` OR'e désormais `instGrappin.M1SlipDetected`)
 
 *(Pas de recopie du corps ici — voir les fichiers `CODE/` pour le ST complet, règle anti-doublon.)*
 
@@ -424,7 +550,7 @@ refaire, juste vérifier la présence dans l'arbre projet, onglet I/O Mapping) :
 | Sortie contacteur sens avant/arrière M1/M2 | `M1_RelayFwd`/`M1_RelayRev`, `M2_RelayFwd`/`M2_RelayRev` |
 | Sortie contacteur vitesse 1..4 M1/M2 | `M1_SpeedContactor_1..4`, `M2_SpeedContactor_1..4` |
 | Sortie bobine frein M1/M2 | `M1_BrakeCmd`, `M2_BrakeCmd` |
-| Entrée retour contacteur sens avant/arrière M1/M2 | `M1_ContactorFeedbackFwd/Rev`, `M2_ContactorFeedbackFwd/Rev` |
+| Entrée retour unique contacteurs sens+vitesse M1/M2 🔧 v1.4 (remplace les 4 canaux `M1/M2_FeedbackFwd/Rev_DI`) | `M1_FwdRevSpeedFeedbackOff_DI`, `M2_FwdRevSpeedFeedbackOff_DI` |
 | Entrée capteur position haute (commun) | `M1_M2_TopPositionSensor` |
 | Entrée thermique moteur M1/M2 | `M1_ThermalFeedback`, `M2_ThermalFeedback` |
 | Entrée mou de câble (commun) | `M1_M2_SlackCableSwitch` |
@@ -449,6 +575,12 @@ Delete dans l'arbre projet) — `M1_M2_TopPositionSensor` est désormais réel.
 2. Corriger les éventuelles erreurs de référence résiduelles (noms de variables I/O Mapping
    pas encore saisis, typiquement — l'erreur indique la ligne exacte dans `PRG_MAIN`).
 3. **Ne pas télécharger sur l'automate avant d'avoir un Rebuild propre (0 erreur).**
+
+### 🔧 v1.5 — Méca A/B/C (2026-07-07)
+`CODE/WINCH/FB_Safety_Winch.st`, `CODE/GRAPPIN/FB_Grappin.st`, `CODE/MAIN/PRG_03_Safety.st` et
+`CODE/MAIN/PRG_06_WinchControl.st` sont **déjà à jour et validés** avec Méca A/B/C (voir
+§4quinquies) — aucune nouvelle recopie manuelle requise au-delà de ce qui a déjà été appliqué en
+session, sauf réimportation complète depuis `CODE/` suite à un nouvel export CODESYS.
 
 ### 🔒 À sécuriser après remise en service (stubs debug de ce lot)
 | Entrée debug | Remplacer par |
@@ -500,6 +632,34 @@ Delete dans l'arbre projet) — `M1_M2_TopPositionSensor` est désormais réel.
       bit3 visible IHM. Relâcher + Reset front → descente réautorisée.
 - [ ] 🆕 **v1.1** — Vérifier qu'un défaut thermique **et** un mou de câble simultanés cumulent
       bien `SafeStop=TRUE` **et** `ForbidDescent=TRUE` (les deux bits actifs, pas d'écrasement).
+- [ ] 🆕 **v1.4 (2026-07-07)** — Débrancher/simuler la perte du retour `M1_FwdRevSpeedFeedbackOff_DI`
+      pendant un arrêt commandé (tous relais/contacteurs à `FALSE`) → vérifier `ErrorId` bit1
+      (`ContactorsCheck.StuckClosed`) après `ContactorFeedbackTimeout` (500ms), puis Reset front
+      + retour réel confirmé → défaut effacé.
+- [ ] 🆕 **v1.4** — Confirmer qu'aucun scénario ne déclenche plus jamais bit2 `ErrorId` (libéré) ;
+      confirmer que `ContactorsCheck.StuckOpen` reste bien figé à `FALSE` en toutes circonstances
+      (plus de détection par sens possible avec ce nouveau câblage).
+- [ ] 🆕 **v1.5 (2026-07-07, Méca A)** — En banc, forcer `FwdRevSpeedFeedbackOff := TRUE` et
+      `BrakeFeedback := TRUE` (tout confirmé coupé), puis simuler une dérive de `CablePosM`
+      au-delà de `UncommandedDriftToleranceM` (2.0 m) → vérifier bit7 `ErrorId`, `SafeStop`
+      **et** `PowerCutOff` tous les deux à `TRUE`. Répéter en dépassant `UncommandedSpeedThresholdMps`
+      (0.02 m/s) plutôt que la dérive.
+- [ ] 🆕 **v1.5 (Méca B)** — Couper le CAN joystick (ou mettre l'axe Y au neutre) pendant un
+      mouvement, puis ne **pas** relâcher `FwdRevSpeedFeedbackOff` dans `PostRampTimeout` (3 s)
+      → vérifier bit8 `ErrorId`, `SafeStop` **et** `PowerCutOff`. Vérifier qu'un arrêt normal
+      (relais qui retombent bien dans les 3 s) ne déclenche **pas** le défaut (pas de faux positif).
+- [ ] 🆕 **v1.5 (Méca C couche 2)** — Pendant un mouvement grappin (`instGrappin.Busy = TRUE`),
+      simuler une dérive M1 au-delà de `GrappinSlipToleranceM` (2.0 m) alors que la couche 1
+      (`FB_Grappin` bit4, 1.0 m) a déjà réagi → vérifier l'escalade bit9 `ErrorId` et `PowerCutOff`
+      sur `instSafetyWinchM1` uniquement (jamais sur M2, `GrappinHoldStillActive` toujours `FALSE`
+      côté M2).
+- [ ] 🆕 **v1.5** — Vérifier qu'`OverrideSync` (MAINT_N2, procédure récupération mou de câble)
+      **n'exclut jamais** les bits 7/8/9 du calcul de `SafeStop` (contrairement au bit3 mou de
+      câble) — les deux masques (`16#039F`/`16#0397`) doivent différer **uniquement** sur le bit3.
+- [ ] 🆕 **v1.5 (TBD futur)** — Une fois l'échelle de `COD1_SpdValue`/`COD2_SpdValue` déterminée
+      (fiche technique Kübler F58x8 ou essai terrain), comparer la vitesse mesurée par ce mot
+      natif à la différentiation logicielle actuelle (`MeasuredSpeedMps`) sur un même mouvement,
+      pour évaluer le gain de fiabilité avant de basculer Méca A dessus en réel.
 
 ---
 
@@ -538,7 +698,7 @@ Pouvoir piloter le treuil **M2** en plus de M1, avec un choix opérateur explici
 ### Dépendance bloquante (toujours valable pour la synchro)
 `FB_WinchSync` (Partie2 §4, Partie4 §3) régule l'écart `ΔPos = |PosM1 − PosM2|` à partir des
 positions codeur validées. L'acquisition + mise à l'échelle (`FB_Encoder_Abs`→`FB_Encoder_Scale`)
-sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md` §9), mais
+sont codées depuis le 2026-07-02 (voir `DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md` §9), mais
 `HomingRefRaw` reste une valeur RETAIN modifiable **manuellement** (pas de vrai homing tant que
 `FB_Encoder_Homing` n'est pas codé) — construire une synchro sur cette base serait prématuré.
 **M1 et M2 bougent donc ensemble sans aucune régulation d'écart pour l'instant** : à surveiller
@@ -558,4 +718,6 @@ visuellement pendant tout essai avec les deux treuils actifs.
 - **Partie 4 v1.2** — Cycle (§3 Synchro, §4 Frein — règles reprises ici pour `FB_Brake`).
 - **Partie 5 v1.2** — Modes & maintenance (droits Maintenance N1).
 - **Partie 8 v1.2** — Fonction Joystick (source de `AxisCmdY`, corrections `ST_AxisCmd` liées).
-- **Partie 10 v1.6** — Encoder Homing (dépendance bloquante §9 ci-dessus, pas encore codée).
+- **Partie 10 v1.7** — Encoder Homing (dépendance bloquante §9 ci-dessus, pas encore codée).
+- **Partie 12 v1.2** 🆕 v1.5 — Fonction Grappin (Méca C couche 1, `M1SlipDetected` consommé par
+  Méca C couche 2 ci-dessus §4quinquies).

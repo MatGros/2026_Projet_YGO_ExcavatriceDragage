@@ -29,7 +29,14 @@ instSafetyWinchM1(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM1.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M
+    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M,
+    // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
+    BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
+    JoystickYNeutral       := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1,
+    GrappinHoldStillActive := PRG_06_WinchControl.instGrappin.Busy // Méca C — M1 doit rester immobile pendant le
+                                                                     // grappin ; 1 cycle de retard accepté (PRG_03
+                                                                     // avant PRG_06 dans l'ordre de tâche), négligeable
 );
 
 // 2. Sécurité Treuil M2
@@ -48,7 +55,13 @@ instSafetyWinchM2(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM2.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M
+    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M,
+    // 🔧 REX 2026-07-07 — Méca A/B (voir FB_Safety_Winch bandeau en-tête) — Méca C NON applicable
+    // à M2 (c'est M2 qui bouge pendant le grappin, GrappinHoldStillActive reste FALSE)
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
+    BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
+    JoystickYNeutral       := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1,
+    GrappinHoldStillActive := FALSE
 );
 
 // 3. Sécurité Chariot M3

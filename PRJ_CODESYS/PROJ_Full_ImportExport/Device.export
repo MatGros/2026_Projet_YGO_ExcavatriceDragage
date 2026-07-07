@@ -9822,7 +9822,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190314971517051</Single>
+        <Single Name="Timestamp" Type="long">639190511765380642</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4141</Single>
@@ -9987,13 +9987,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M1_FeedbackFwd_DI</Single>
+                                    <Single Name="Variable" Type="string">M1_FwdRevSpeedFeedbackOff_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour état contacteur sens avant</Single>
+                              <Single Name="Default" Type="string">Retour état contacteur sens avant arrière speed relachés</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -10022,13 +10022,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M1_FeedbackRev_DI</Single>
+                                    <Single Name="Variable" Type="string">M1_ThermalFeedback_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour état contacteur sens arrière</Single>
+                              <Single Name="Default" Type="string">Retour état disjoncteur thermique</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -10057,13 +10057,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M1_ThermalFeedback_DI</Single>
+                                    <Single Name="Variable" Type="string">M2_FwdRevSpeedFeedbackOff_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour état disjoncteur thermique</Single>
+                              <Single Name="Default" Type="string">Retour état contacteur sens avant arrière speed relachés</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -10092,13 +10092,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M2_FeedbackFwd_DI</Single>
+                                    <Single Name="Variable" Type="string">M2_ThermalFeedback_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour état contacteur sens avant</Single>
+                              <Single Name="Default" Type="string">Retour état disjoncteur thermique</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -10127,13 +10127,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M2_FeedbackRev_DI</Single>
+                                    <Single Name="Variable" Type="string">M2_SlackCableSwitch_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour état contacteur sens arrière</Single>
+                              <Single Name="Default" Type="string">Capteur détection mou de câble - câble hors gorges enrouleur</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -10157,19 +10157,6 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4118</Single>
                             <Single Name="EditorPositionId" Type="long">4119</Single>
-                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
-                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
-                                <List2 Name="Mappings">
-                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
-                                    <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M2_ThermalFeedback_DI</Single>
-                                  </Single>
-                                </List2>
-                              </Single>
-                            </Single>
-                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour état disjoncteur thermique</Single>
-                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit5</Single>
@@ -10192,19 +10179,6 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4120</Single>
                             <Single Name="EditorPositionId" Type="long">4121</Single>
-                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
-                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
-                                <List2 Name="Mappings">
-                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
-                                    <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M1_M2_SlackCableSwitch_DI</Single>
-                                  </Single>
-                                </List2>
-                              </Single>
-                            </Single>
-                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Capteur détection mou de câble - câble hors gorges enrouleur</Single>
-                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit6</Single>
@@ -21305,10 +21279,10 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639187295834958061</Single>
+        <Single Name="Timestamp" Type="long">639190509723797695</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
-        <Single Name="UniqueIdGenerator" Type="string">5451</Single>
+        <Single Name="UniqueIdGenerator" Type="string">5459</Single>
         <Null Name="TypeList" />
         <Single Name="NeedsBusCycle" Type="bool">False</Single>
         <Single Name="Id" Type="{05ee0b98-6639-4276-bc32-b75578b819ef}" Method="IArchivable">
@@ -21800,8 +21774,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5438</Single>
-                      <Single Name="EditorPositionId" Type="long">5439</Single>
+                      <Single Name="PositionId" Type="long">5456</Single>
+                      <Single Name="EditorPositionId" Type="long">5457</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_InputOffsets</Single>
                       </Single>
@@ -21819,8 +21793,8 @@
                     <Single Name="DalaElement" Type="{08a69302-82ff-4bf9-a55d-a6014ee63990}" Method="IArchivable">
                       <Single Name="OfflineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
                       <Single Name="OnlineAccess" Type="{f7a1fdea-1444-4931-82ab-fdb68bf81bcf}">Read</Single>
-                      <Single Name="PositionId" Type="long">5440</Single>
-                      <Single Name="EditorPositionId" Type="long">5441</Single>
+                      <Single Name="PositionId" Type="long">5458</Single>
+                      <Single Name="EditorPositionId" Type="long">5459</Single>
                       <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">MDP_OutputOffsets</Single>
                       </Single>
@@ -41918,7 +41892,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639186728700137560</Single>
+        <Single Name="Timestamp" Type="long">639190484651967227</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4154</Single>
@@ -42085,13 +42059,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">EmergencyStopOk_DI</Single>
+                                    <Single Name="Variable" Type="string">M1_BrakeFeedback_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour etat contacteur de puissance géré par arrêt d'urgence</Single>
+                              <Single Name="Default" Type="string">Retour etat contacteur de puissance frein</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -42122,7 +42096,7 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M1_BrakeFeedback_DI</Single>
+                                    <Single Name="Variable" Type="string">M2_BrakeFeedback_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
@@ -42159,7 +42133,7 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M2_BrakeFeedback_DI</Single>
+                                    <Single Name="Variable" Type="string">M3_BrakeFeedback_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
@@ -42196,13 +42170,13 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">M3_BrakeFeedback_DI</Single>
+                                    <Single Name="Variable" Type="string">CtrlPhaseRotation_DI</Single>
                                   </Single>
                                 </List2>
                               </Single>
                             </Single>
                             <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Retour etat contacteur de puissance frein</Single>
+                              <Single Name="Default" Type="string">Controle rotation phase</Single>
                             </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
@@ -42228,19 +42202,6 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4145</Single>
                             <Single Name="EditorPositionId" Type="long">4146</Single>
-                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
-                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
-                                <List2 Name="Mappings">
-                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
-                                    <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">CtrlPhaseRotation_DI</Single>
-                                  </Single>
-                                </List2>
-                              </Single>
-                            </Single>
-                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
-                              <Single Name="Default" Type="string">Controle rotation phase</Single>
-                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit4</Single>
@@ -42289,6 +42250,19 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4149</Single>
                             <Single Name="EditorPositionId" Type="long">4150</Single>
+                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                                <List2 Name="Mappings">
+                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                    <Single Name="CreateVariable" Type="bool">True</Single>
+                                    <Single Name="Variable" Type="string">EmergencyStopOk_DI</Single>
+                                  </Single>
+                                </List2>
+                              </Single>
+                            </Single>
+                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
+                              <Single Name="Default" Type="string">Retour etat contacteur de puissance géré par arrêt d'urgence</Single>
+                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit6</Single>
@@ -42313,6 +42287,19 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4151</Single>
                             <Single Name="EditorPositionId" Type="long">4152</Single>
+                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                                <List2 Name="Mappings">
+                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                    <Single Name="CreateVariable" Type="bool">True</Single>
+                                    <Single Name="Variable" Type="string">EmergencyChain_DI</Single>
+                                  </Single>
+                                </List2>
+                              </Single>
+                            </Single>
+                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
+                              <Single Name="Default" Type="string">Retour etat boucle d'arrêt d'urgence coup de point et contact PLC</Single>
+                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit7</Single>
@@ -42567,7 +42554,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639187315968450439</Single>
+        <Single Name="Timestamp" Type="long">639190442150301774</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4222</Single>
@@ -42872,7 +42859,7 @@
                                 <List2 Name="Mappings">
                                   <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
                                     <Single Name="CreateVariable" Type="bool">True</Single>
-                                    <Single Name="Variable" Type="string">GridDwn_RQ</Single>
+                                    <Single Name="Variable" Type="string">GridDown_RQ</Single>
                                   </Single>
                                 </List2>
                               </Single>
@@ -43700,7 +43687,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639187316020856443</Single>
+        <Single Name="Timestamp" Type="long">639190468232353223</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4159</Single>
@@ -43992,6 +43979,19 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4120</Single>
                             <Single Name="EditorPositionId" Type="long">4121</Single>
+                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                                <List2 Name="Mappings">
+                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                    <Single Name="CreateVariable" Type="bool">True</Single>
+                                    <Single Name="Variable" Type="string">EmergencyArming_RQ</Single>
+                                  </Single>
+                                </List2>
+                              </Single>
+                            </Single>
+                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
+                              <Single Name="Default" Type="string">Impulsion de 1s toutes les 5s minimum</Single>
+                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit6</Single>
@@ -46099,7 +46099,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">8e687a04-7ca7-42d3-be06-fcbda676c5ef</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190314258029498</Single>
+        <Single Name="Timestamp" Type="long">639190508470060176</Single>
       </Single>
       <Single Name="Object" Type="{8e687a04-7ca7-42d3-be06-fcbda676c5ef}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">165</Single>
@@ -46941,7 +46941,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+        <Single Name="Guid" Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">CHARIOT</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -46967,7 +46967,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405412460499</Single>
+        <Single Name="Timestamp" Type="long">639190455791396447</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -46983,7 +46983,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">0a7b6c3f-094f-4360-969f-f97b6273e060</Single>
+        <Single Name="Guid" Type="System.Guid">6d09e3cb-2142-4fda-bbdb-3238a4453a09</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">CYCLE</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47009,7 +47009,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405412550519</Single>
+        <Single Name="Timestamp" Type="long">639190455791501611</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47025,7 +47025,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+        <Single Name="Guid" Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">ENCODERS</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47051,7 +47051,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405413399035</Single>
+        <Single Name="Timestamp" Type="long">639190455795115634</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47067,7 +47067,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+        <Single Name="Guid" Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">GRAPPIN</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47093,7 +47093,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405414199830</Single>
+        <Single Name="Timestamp" Type="long">639190455795438618</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47109,7 +47109,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+        <Single Name="Guid" Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">JOYSTICK</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47135,7 +47135,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405412895437</Single>
+        <Single Name="Timestamp" Type="long">639190455791832242</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47151,7 +47151,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+        <Single Name="Guid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">MAIN</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47177,7 +47177,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405415679825</Single>
+        <Single Name="Timestamp" Type="long">639190455796923296</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47193,7 +47193,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+        <Single Name="Guid" Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">MODES</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47219,7 +47219,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405412712517</Single>
+        <Single Name="Timestamp" Type="long">639190455791673469</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47235,7 +47235,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+        <Single Name="Guid" Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">SIMULATION</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47261,7 +47261,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405414809809</Single>
+        <Single Name="Timestamp" Type="long">639190455796041885</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47277,7 +47277,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+        <Single Name="Guid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">SUPERVISION</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47303,7 +47303,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405415419807</Single>
+        <Single Name="Timestamp" Type="long">639190455796651144</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47319,7 +47319,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+        <Single Name="Guid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">SYSTEM</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47345,7 +47345,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405412622531</Single>
+        <Single Name="Timestamp" Type="long">639190455791593465</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47361,7 +47361,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+        <Single Name="Guid" Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">WINCH</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47387,7 +47387,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405414729809</Single>
+        <Single Name="Timestamp" Type="long">639190455795956802</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -47403,7 +47403,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+        <Single Name="Guid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
         <Single Name="ParentGuid" Type="System.Guid">00000000-0000-0000-0000-000000000000</Single>
         <Single Name="Name" Type="string">_COMMON</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -47429,7 +47429,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">738bea1e-99bb-4f04-90bb-a7a567e74e3a</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190405412812512</Single>
+        <Single Name="Timestamp" Type="long">639190455791748576</Single>
       </Single>
       <Single Name="Object" Type="{738bea1e-99bb-4f04-90bb-a7a567e74e3a}" Method="IArchivable">
         <Single Name="StructuredViewGuid" Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
@@ -49236,11 +49236,11 @@ END_VAR
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">f18bec89-9fef-401d-9953-2f11739a6808</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639190414039325128</Single>
+        <Single Name="Timestamp" Type="long">639190414901196059</Single>
       </Single>
       <Single Name="Object" Type="{f18bec89-9fef-401d-9953-2f11739a6808}" Method="IArchivable">
         <Null Name="LastVisuLanguageModelEntry" />
-        <Single Name="UniqueIdGenerator" Type="string">457</Single>
+        <Single Name="UniqueIdGenerator" Type="string">463</Single>
         <Single Name="VisualElemList" Type="{f285c9a3-7019-446b-b98c-ccec3a0af8fa}" Method="IArchivable">
           <List Name="VisualElementList" Type="{ef9d0b20-c96e-48db-b361-2ded4063150e}">
             <Single Type="{f86c2928-8614-4cca-824b-e819ac4d58c4}" Method="IArchivable">
@@ -51720,42 +51720,10 @@ END_VAR
                         <Dictionary Type="{02a85e84-ef2d-46fc-93f2-acb0bbff3eda}" Name="TypeNodeAttributesData">
                           <Entry>
                             <Key>
-                              <Single Type="string">DescriptionTextId</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">TL_ElementProperties.Desc_ColorAreas</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">''NORMAL__COMMENT</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string"> the structure with the dynamic array nodes	</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">ProvideInsertButton</Single>
+                              <Single Type="string">DisplayValue</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">conditionalshow</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">visu_coredev</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">DisplayTextId</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">TL_ElementProperties.ColorAreas</Single>
                             </Value>
                           </Entry>
                           <Entry>
@@ -51768,7 +51736,15 @@ END_VAR
                           </Entry>
                           <Entry>
                             <Key>
-                              <Single Type="string">DynamicArray</Single>
+                              <Single Type="string">DescriptionTextId</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">TL_ElementProperties.Desc_ColorAreas</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">ProvideInsertButton</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
@@ -51776,7 +51752,31 @@ END_VAR
                           </Entry>
                           <Entry>
                             <Key>
-                              <Single Type="string">DisplayValue</Single>
+                              <Single Type="string">DisplayTextId</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">TL_ElementProperties.ColorAreas</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">''NORMAL__COMMENT</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string"> the structure with the dynamic array nodes	</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">conditionalshow</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">visu_coredev</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">DynamicArray</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
@@ -52132,6 +52132,14 @@ END_VAR
                             <Dictionary Type="{02a85e84-ef2d-46fc-93f2-acb0bbff3eda}" Name="TypeNodeAttributesData">
                               <Entry>
                                 <Key>
+                                  <Single Type="string">ElementOrientation</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string"></Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DescriptionTextId</Single>
                                 </Key>
                                 <Value>
@@ -52144,6 +52152,14 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Simple|Standard</Single>
                                 </Value>
                               </Entry>
                               <Entry>
@@ -52173,22 +52189,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string">TL_ElementProperties.Orientation</Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Simple|Standard</Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">ElementOrientation</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string"></Single>
                                 </Value>
                               </Entry>
                               <Entry>
@@ -52253,6 +52253,14 @@ END_VAR
                               </Entry>
                               <Entry>
                                 <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Simple|Standard</Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DisplayTextId</Single>
                                 </Key>
                                 <Value>
@@ -52281,14 +52289,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Simple|Standard</Single>
                                 </Value>
                               </Entry>
                             </Dictionary>
@@ -52345,6 +52345,14 @@ END_VAR
                               </Entry>
                               <Entry>
                                 <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Simple|Standard</Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DisplayTextId</Single>
                                 </Key>
                                 <Value>
@@ -52373,14 +52381,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Simple|Standard</Single>
                                 </Value>
                               </Entry>
                             </Dictionary>
@@ -52425,6 +52425,14 @@ END_VAR
                               </Entry>
                               <Entry>
                                 <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Standard</Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DisplayTextId</Single>
                                 </Key>
                                 <Value>
@@ -52453,14 +52461,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Standard</Single>
                                 </Value>
                               </Entry>
                             </Dictionary>
@@ -53073,42 +53073,10 @@ END_VAR
                         <Dictionary Type="{02a85e84-ef2d-46fc-93f2-acb0bbff3eda}" Name="TypeNodeAttributesData">
                           <Entry>
                             <Key>
-                              <Single Type="string">DescriptionTextId</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">TL_ElementProperties.Desc_ColorAreas</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">''NORMAL__COMMENT</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string"> the structure with the dynamic array nodes	</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">ProvideInsertButton</Single>
+                              <Single Type="string">DisplayValue</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">conditionalshow</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">visu_coredev</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">DisplayTextId</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">TL_ElementProperties.ColorAreas</Single>
                             </Value>
                           </Entry>
                           <Entry>
@@ -53121,7 +53089,15 @@ END_VAR
                           </Entry>
                           <Entry>
                             <Key>
-                              <Single Type="string">DynamicArray</Single>
+                              <Single Type="string">DescriptionTextId</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">TL_ElementProperties.Desc_ColorAreas</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">ProvideInsertButton</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
@@ -53129,7 +53105,31 @@ END_VAR
                           </Entry>
                           <Entry>
                             <Key>
-                              <Single Type="string">DisplayValue</Single>
+                              <Single Type="string">DisplayTextId</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">TL_ElementProperties.ColorAreas</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">''NORMAL__COMMENT</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string"> the structure with the dynamic array nodes	</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">conditionalshow</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">visu_coredev</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">DynamicArray</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
@@ -53459,6 +53459,14 @@ END_VAR
                             <Dictionary Type="{02a85e84-ef2d-46fc-93f2-acb0bbff3eda}" Name="TypeNodeAttributesData">
                               <Entry>
                                 <Key>
+                                  <Single Type="string">ElementOrientation</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string"></Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DescriptionTextId</Single>
                                 </Key>
                                 <Value>
@@ -53471,6 +53479,14 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Simple|Standard</Single>
                                 </Value>
                               </Entry>
                               <Entry>
@@ -53500,22 +53516,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string">TL_ElementProperties.Orientation</Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Simple|Standard</Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">ElementOrientation</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string"></Single>
                                 </Value>
                               </Entry>
                               <Entry>
@@ -53580,6 +53580,14 @@ END_VAR
                               </Entry>
                               <Entry>
                                 <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Simple|Standard</Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DisplayTextId</Single>
                                 </Key>
                                 <Value>
@@ -53608,14 +53616,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Simple|Standard</Single>
                                 </Value>
                               </Entry>
                             </Dictionary>
@@ -53672,6 +53672,14 @@ END_VAR
                               </Entry>
                               <Entry>
                                 <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Simple|Standard</Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DisplayTextId</Single>
                                 </Key>
                                 <Value>
@@ -53700,14 +53708,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Simple|Standard</Single>
                                 </Value>
                               </Entry>
                             </Dictionary>
@@ -53752,6 +53752,14 @@ END_VAR
                               </Entry>
                               <Entry>
                                 <Key>
+                                  <Single Type="string">Category</Single>
+                                </Key>
+                                <Value>
+                                  <Single Type="string">Standard</Single>
+                                </Value>
+                              </Entry>
+                              <Entry>
+                                <Key>
                                   <Single Type="string">DisplayTextId</Single>
                                 </Key>
                                 <Value>
@@ -53780,14 +53788,6 @@ END_VAR
                                 </Key>
                                 <Value>
                                   <Single Type="string"></Single>
-                                </Value>
-                              </Entry>
-                              <Entry>
-                                <Key>
-                                  <Single Type="string">Category</Single>
-                                </Key>
-                                <Value>
-                                  <Single Type="string">Standard</Single>
                                 </Value>
                               </Entry>
                             </Dictionary>
@@ -54400,42 +54400,10 @@ END_VAR
                         <Dictionary Type="{02a85e84-ef2d-46fc-93f2-acb0bbff3eda}" Name="TypeNodeAttributesData">
                           <Entry>
                             <Key>
-                              <Single Type="string">DescriptionTextId</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">TL_ElementProperties.Desc_ColorAreas</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">''NORMAL__COMMENT</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string"> the structure with the dynamic array nodes	</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">ProvideInsertButton</Single>
+                              <Single Type="string">DisplayValue</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">conditionalshow</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">visu_coredev</Single>
-                            </Value>
-                          </Entry>
-                          <Entry>
-                            <Key>
-                              <Single Type="string">DisplayTextId</Single>
-                            </Key>
-                            <Value>
-                              <Single Type="string">TL_ElementProperties.ColorAreas</Single>
                             </Value>
                           </Entry>
                           <Entry>
@@ -54448,7 +54416,15 @@ END_VAR
                           </Entry>
                           <Entry>
                             <Key>
-                              <Single Type="string">DynamicArray</Single>
+                              <Single Type="string">DescriptionTextId</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">TL_ElementProperties.Desc_ColorAreas</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">ProvideInsertButton</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
@@ -54456,7 +54432,31 @@ END_VAR
                           </Entry>
                           <Entry>
                             <Key>
-                              <Single Type="string">DisplayValue</Single>
+                              <Single Type="string">DisplayTextId</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">TL_ElementProperties.ColorAreas</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">''NORMAL__COMMENT</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string"> the structure with the dynamic array nodes	</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">conditionalshow</Single>
+                            </Key>
+                            <Value>
+                              <Single Type="string">visu_coredev</Single>
+                            </Value>
+                          </Entry>
+                          <Entry>
+                            <Key>
+                              <Single Type="string">DynamicArray</Single>
                             </Key>
                             <Value>
                               <Single Type="string"></Single>
@@ -62624,7 +62624,7 @@ MAN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">1649127785</Single>
-                    <Single Name="Value" Type="int">49</Single>
+                    <Single Name="Value" Type="int">17</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">357335551</Single>
@@ -62632,7 +62632,7 @@ MAN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2422045748</Single>
-                    <Single Name="Value" Type="int">81</Single>
+                    <Single Name="Value" Type="int">135</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2134141914</Single>
@@ -62748,18 +62748,10 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">FB_Reinit</Single>
+                  <Single Type="string">SetStaticState</Single>
                 </Key>
                 <Value>
-                  <Single Type="System.Guid">d39579be-6fb6-4839-9635-c88a81e58edb</Single>
-                </Value>
-              </Entry>
-              <Entry>
-                <Key>
-                  <Single Type="string">HasInputAccess</Single>
-                </Key>
-                <Value>
-                  <Single Type="System.Guid">c9ba708e-27dc-410a-801e-46a5d81106dc</Single>
+                  <Single Type="System.Guid">0cd35809-494c-4e1e-a784-7af6ec67f1ff</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -62796,10 +62788,10 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">SetStaticState</Single>
+                  <Single Type="string">GetNamespace</Single>
                 </Key>
                 <Value>
-                  <Single Type="System.Guid">0cd35809-494c-4e1e-a784-7af6ec67f1ff</Single>
+                  <Single Type="System.Guid">459f0bad-2223-47cc-aeb8-bd55764de3aa</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -62900,10 +62892,18 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">Initialize</Single>
+                  <Single Type="string">GetTabOrderIdArray</Single>
                 </Key>
                 <Value>
-                  <Single Type="System.Guid">baf66a35-6c09-45cc-a927-e15a1df5eb68</Single>
+                  <Single Type="System.Guid">ebd7e163-5021-51ed-af17-05489c587fd6</Single>
+                </Value>
+              </Entry>
+              <Entry>
+                <Key>
+                  <Single Type="string">HasInputAccess</Single>
+                </Key>
+                <Value>
+                  <Single Type="System.Guid">c9ba708e-27dc-410a-801e-46a5d81106dc</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -62932,14 +62932,6 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">GetNamespace</Single>
-                </Key>
-                <Value>
-                  <Single Type="System.Guid">459f0bad-2223-47cc-aeb8-bd55764de3aa</Single>
-                </Value>
-              </Entry>
-              <Entry>
-                <Key>
                   <Single Type="string">GetResult</Single>
                 </Key>
                 <Value>
@@ -62964,6 +62956,14 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
+                  <Single Type="string">Initialize</Single>
+                </Key>
+                <Value>
+                  <Single Type="System.Guid">baf66a35-6c09-45cc-a927-e15a1df5eb68</Single>
+                </Value>
+              </Entry>
+              <Entry>
+                <Key>
                   <Single Type="string">GetSize</Single>
                 </Key>
                 <Value>
@@ -62980,10 +62980,10 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">GetTabOrderIdArray</Single>
+                  <Single Type="string">FB_Reinit</Single>
                 </Key>
                 <Value>
-                  <Single Type="System.Guid">ebd7e163-5021-51ed-af17-05489c587fd6</Single>
+                  <Single Type="System.Guid">d39579be-6fb6-4839-9635-c88a81e58edb</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -63054,18 +63054,18 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">FB_Reinit</Single>
-                </Key>
-                <Value>
-                  <Single Type="System.Guid">183d1471-ffdf-48d2-9fb0-29dd5c160aa5</Single>
-                </Value>
-              </Entry>
-              <Entry>
-                <Key>
                   <Single Type="string">FB_Exit</Single>
                 </Key>
                 <Value>
                   <Single Type="System.Guid">8f936bc6-f8b3-40b0-a5e3-ef17de1c3b25</Single>
+                </Value>
+              </Entry>
+              <Entry>
+                <Key>
+                  <Single Type="string">FB_Reinit</Single>
+                </Key>
+                <Value>
+                  <Single Type="System.Guid">183d1471-ffdf-48d2-9fb0-29dd5c160aa5</Single>
                 </Value>
               </Entry>
             </Dictionary>
@@ -63083,6 +63083,14 @@ MAN</Single>
                 </Key>
                 <Value>
                   <Single Type="System.Guid">ce675c1e-8a08-47fb-8333-7894ceb6cf29</Single>
+                </Value>
+              </Entry>
+              <Entry>
+                <Key>
+                  <Single Type="string">ExecuteMouseEnter</Single>
+                </Key>
+                <Value>
+                  <Single Type="System.Guid">6985d5bd-6c71-45d1-9950-21909cc14773</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -63143,10 +63151,10 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">ExecuteKeyDown</Single>
+                  <Single Type="string">ExecuteValueChanged</Single>
                 </Key>
                 <Value>
-                  <Single Type="System.Guid">476c5f87-bed0-4671-9f6e-8d633d0b4589</Single>
+                  <Single Type="System.Guid">7acde64a-2c8c-4107-baef-6d1e1e288546</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -63167,26 +63175,18 @@ MAN</Single>
               </Entry>
               <Entry>
                 <Key>
-                  <Single Type="string">ExecuteValueChanged</Single>
-                </Key>
-                <Value>
-                  <Single Type="System.Guid">7acde64a-2c8c-4107-baef-6d1e1e288546</Single>
-                </Value>
-              </Entry>
-              <Entry>
-                <Key>
-                  <Single Type="string">ExecuteMouseEnter</Single>
-                </Key>
-                <Value>
-                  <Single Type="System.Guid">6985d5bd-6c71-45d1-9950-21909cc14773</Single>
-                </Value>
-              </Entry>
-              <Entry>
-                <Key>
                   <Single Type="string">ExecuteMouseLeave</Single>
                 </Key>
                 <Value>
                   <Single Type="System.Guid">863ea1ab-7bae-4c86-97da-d97908710285</Single>
+                </Value>
+              </Entry>
+              <Entry>
+                <Key>
+                  <Single Type="string">ExecuteKeyDown</Single>
+                </Key>
+                <Value>
+                  <Single Type="System.Guid">476c5f87-bed0-4671-9f6e-8d633d0b4589</Single>
                 </Value>
               </Entry>
               <Entry>
@@ -63296,7 +63296,7 @@ END_VAR</Single>
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">085766fd-043e-4545-8e8d-d651d56d5d3b</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639186348768622492</Single>
+        <Single Name="Timestamp" Type="long">639190509723547655</Single>
       </Single>
       <Single Name="Object" Type="{085766fd-043e-4545-8e8d-d651d56d5d3b}" Method="IArchivable">
         <Single Name="Device" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
@@ -102285,7 +102285,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+                      <Single Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -102297,7 +102297,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405412530491</Single>
+        <Single Name="Timestamp" Type="long">639190455791471600</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -102318,7 +102318,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">11</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -102362,7 +102362,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+                      <Single Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -102374,7 +102374,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415399831</Single>
+        <Single Name="Timestamp" Type="long">639190455796631147</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -102421,7 +102421,7 @@ END_VAR</Single>
         <Single Name="ParameterList" Type="bool">False</Single>
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -102465,7 +102465,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+                      <Single Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -102478,7 +102478,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413089020</Single>
+        <Single Name="Timestamp" Type="long">639190455794805590</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -102949,7 +102949,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -102993,7 +102993,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+                      <Single Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -103006,7 +103006,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414709824</Single>
+        <Single Name="Timestamp" Type="long">639190455795936800</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -103138,7 +103138,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0e06abfc-6cb8-4aaa-b415-fb55c10a1cd6</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">d9004dbc-52c4-4ff7-b6c6-cb981db37f67</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -103182,7 +103182,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0a7b6c3f-094f-4360-969f-f97b6273e060</Single>
+                      <Single Type="System.Guid">6d09e3cb-2142-4fda-bbdb-3238a4453a09</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -103194,7 +103194,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405412602500</Single>
+        <Single Name="Timestamp" Type="long">639190455791553473</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -103237,7 +103237,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">33</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0a7b6c3f-094f-4360-969f-f97b6273e060</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">6d09e3cb-2142-4fda-bbdb-3238a4453a09</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -103281,7 +103281,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0a7b6c3f-094f-4360-969f-f97b6273e060</Single>
+                      <Single Type="System.Guid">6d09e3cb-2142-4fda-bbdb-3238a4453a09</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -103294,7 +103294,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413191232</Single>
+        <Single Name="Timestamp" Type="long">639190455794885601</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -103685,7 +103685,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0a7b6c3f-094f-4360-969f-f97b6273e060</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">6d09e3cb-2142-4fda-bbdb-3238a4453a09</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -103729,7 +103729,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+                      <Single Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -103741,7 +103741,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417510745</Single>
+        <Single Name="Timestamp" Type="long">639190455798070539</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -103776,7 +103776,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">25</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -103820,7 +103820,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+                      <Single Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -103833,7 +103833,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413469014</Single>
+        <Single Name="Timestamp" Type="long">639190455795175639</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -104043,7 +104043,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -104087,7 +104087,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+                      <Single Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -104100,7 +104100,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413979817</Single>
+        <Single Name="Timestamp" Type="long">639190455795238372</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -104348,7 +104348,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -104392,7 +104392,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+                      <Single Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -104405,7 +104405,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414049827</Single>
+        <Single Name="Timestamp" Type="long">639190455795293496</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -104533,7 +104533,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -104577,7 +104577,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+                      <Single Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -104590,7 +104590,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414129833</Single>
+        <Single Name="Timestamp" Type="long">639190455795358611</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -104661,7 +104661,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">0bc60266-d1a8-4825-9912-06fd7cc5b599</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">5fab966e-2af5-4aed-9880-40fcf5facecf</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -104705,7 +104705,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+                      <Single Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -104717,7 +104717,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417650753</Single>
+        <Single Name="Timestamp" Type="long">639190455798190527</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -104743,7 +104743,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">16</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -104787,7 +104787,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+                      <Single Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -104799,7 +104799,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417760755</Single>
+        <Single Name="Timestamp" Type="long">639190455798320536</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -104829,7 +104829,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">20</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -104873,7 +104873,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+                      <Single Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -104886,7 +104886,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414259826</Single>
+        <Single Name="Timestamp" Type="long">639190455795528616</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -104996,6 +104996,7 @@ CASE State OF
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
+        RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : pas de mouvement en cours
 
         // Mémorisation des requêtes IHM (l'une annule l'autre)
         IF CmdClose_IHM AND NOT SevereError THEN
@@ -105019,6 +105020,16 @@ CASE State OF
         Busy := TRUE;
         Done := FALSE;
         M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
+
+        // 📏 REX 2026-07-07 : distance restante avant cible, pour affichage IHM (aiguille/jauge)
+        // Toujours positive, décroît vers 0 à mesure que M2 approche la cible.
+        IF CloseReq THEN
+            RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+        ELSIF OpenReq THEN
+            RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+        ELSE
+            RemainingTravelM := 0.0;
+        END_IF;
 
         // Interlock Homme-mort joystick
         IF NOT JoystickY_StartStop THEN
@@ -105082,6 +105093,7 @@ CASE State OF
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
+        RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : cible atteinte
 
         // Attente du relâchement de la validation joystick pour repasser à READY
         IF NOT JoystickY_StartStop THEN
@@ -105177,6 +105189,8 @@ VAR_OUTPUT
 	M2_Direction: INT;
 	///TRUE = Bloque les contacteurs de vitesse de M2
 	M2_ForceSlowSpeed: BOOL;
+	///🔧 REX 2026-07-07 : distance restante avant cible (m, toujours
+	RemainingTravelM: REAL;
 END_VAR
 VAR_IN_OUT
 	///État physique du grappin mémorisé (RETAIN)
@@ -105204,12 +105218,12 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">0432d84c-44bd-50e6-858e-8078b44bb6d7_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">304</Single>
+        <Single Name="UniqueIdGenerator" Type="string">318</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">4354d05c-1376-448a-8003-fb7ddd6fe96d</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">23d80405-e009-4dbc-aeb6-46c5b09c85aa</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -105253,7 +105267,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+                      <Single Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -105265,7 +105279,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417280761</Single>
+        <Single Name="Timestamp" Type="long">639190455797810532</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -105308,7 +105322,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">33</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -105352,7 +105366,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+                      <Single Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -105365,7 +105379,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405412949019</Single>
+        <Single Name="Timestamp" Type="long">639190455791887366</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -105431,7 +105445,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -105475,7 +105489,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+                      <Single Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -105488,7 +105502,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414179825</Single>
+        <Single Name="Timestamp" Type="long">639190455795408616</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -105544,7 +105558,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -105588,7 +105602,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+                      <Single Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -105601,7 +105615,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414399826</Single>
+        <Single Name="Timestamp" Type="long">639190455795651047</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -105896,7 +105910,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">bd58ebe7-24da-42b5-9d64-190c44cb61ed</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">64356206-95c2-4edb-9433-f64eccbe0575</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -105940,7 +105954,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -105952,7 +105966,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415743394</Single>
+        <Single Name="Timestamp" Type="long">639190455796973282</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -106033,7 +106047,7 @@ END_VAR</Single>
         <Single Name="ParameterList" Type="bool">False</Single>
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -106077,7 +106091,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -106090,7 +106104,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415803386</Single>
+        <Single Name="Timestamp" Type="long">639190458105879497</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -106117,7 +106131,7 @@ instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.Simula
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
-instM1ContactorFwd(InputRaw := M1_FeedbackFwd_DI, FilterTime := T#20MS);
+instM1ContactorFwd(InputRaw := M1_FwdRevSpeedFeedbackOff_DI, FilterTime := T#20MS);
 M1ContactorFeedbackFwd := instM1ContactorFwd.State;
 
 instM1ContactorRev(InputRaw := M1_FeedbackRev_DI, FilterTime := T#20MS);
@@ -106250,12 +106264,12 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">42d1fbed-f208-5552-bbe3-157a02636904_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">146</Single>
+        <Single Name="UniqueIdGenerator" Type="string">290</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -106299,7 +106313,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -106312,7 +106326,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415863395</Single>
+        <Single Name="Timestamp" Type="long">639190455797103284</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -106415,7 +106429,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -106459,7 +106473,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -106472,7 +106486,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415923383</Single>
+        <Single Name="Timestamp" Type="long">639190455797163277</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -106682,7 +106696,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -106726,7 +106740,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -106739,7 +106753,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415995938</Single>
+        <Single Name="Timestamp" Type="long">639190455797223290</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -106827,7 +106841,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -106871,7 +106885,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -106884,7 +106898,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416055929</Single>
+        <Single Name="Timestamp" Type="long">639190455797283290</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -106931,7 +106945,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -106975,7 +106989,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -106988,7 +107002,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416115917</Single>
+        <Single Name="Timestamp" Type="long">639190455797353288</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -107075,7 +107089,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -107119,7 +107133,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -107132,7 +107146,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416205956</Single>
+        <Single Name="Timestamp" Type="long">639190455797420528</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -107244,13 +107258,30 @@ IF GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
-ForbidDescentM1_Active := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
-                          OR (GVL_PERSISTENT.LimitLegalEnabled
-                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+// ── 5bis. COUPLAGE CROISÉ M1/M2 — REX 2026-07-07 ────────────────────────
+// Hors synchro (Grappin.Busy ou OverrideSync N2) : chaque treuil réagit à SA PROPRE limite/
+// défaut uniquement (commande indépendante voulue). En synchro (SyncActive, mouvement cohérent
+// voulu) : n'importe quel arrêt (SafeStop, limite câble, limite légale, fin de course haut) sur
+// UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
+SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000);
+SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000);
 
-ForbidDescentM2_Active := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
-                          OR (GVL_PERSISTENT.LimitLegalEnabled
-                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
+                       OR (GVL_PERSISTENT.LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
+                       OR (GVL_PERSISTENT.LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+
+ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+
+SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
+SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+ForbidDescentM1_Active := ForbidDescentM1_Raw OR (instWinchSync.SyncActive AND ForbidDescentM2_Raw);
+ForbidDescentM2_Active := ForbidDescentM2_Raw OR (instWinchSync.SyncActive AND ForbidDescentM1_Raw);
+ForbidAscentM1_Active  := ForbidAscentM1_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM2_Raw);
+ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM1_Raw);
 
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
@@ -107259,9 +107290,9 @@ instWinchM1(
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M1_StartStop_Active,
-    SafeStop                := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000),
+    SafeStop                := SafeStopM1_Active,
     ForbidDescent           := ForbidDescentM1_Active,
-    ForbidAscent            := PRG_03_Safety.instSafetyWinchM1.ForbidAscent,
+    ForbidAscent            := ForbidAscentM1_Active,
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
@@ -107288,9 +107319,9 @@ instWinchM2(
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M2_StartStop_Active,
-    SafeStop                := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000),
+    SafeStop                := SafeStopM2_Active,
     ForbidDescent           := ForbidDescentM2_Active,
-    ForbidAscent            := PRG_03_Safety.instSafetyWinchM2.ForbidAscent,
+    ForbidAscent            := ForbidAscentM2_Active,
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
@@ -107369,17 +107400,30 @@ VAR
 	BottomLimitM2_Active: REAL;
 	ForbidDescentM1_Active: BOOL;
 	ForbidDescentM2_Active: BOOL;
+	///🔧 REX 2026-07-07 : couplage croisé M1/M2 des arrêts, UNIQUEMENT si SyncActive (mouvement
+	///coherent voulu). Hors synchro (Grappin.Busy ou OverrideSync MAINT_N2) : chaque treuil réagit
+	///à SA PROPRE limite/défaut uniquement — commande indépendante voulue dans ce cas.
+	SafeStopM1_Raw: BOOL;
+	SafeStopM2_Raw: BOOL;
+	SafeStopM1_Active: BOOL;
+	SafeStopM2_Active: BOOL;
+	ForbidDescentM1_Raw: BOOL;
+	ForbidDescentM2_Raw: BOOL;
+	ForbidAscentM1_Raw: BOOL;
+	ForbidAscentM2_Raw: BOOL;
+	ForbidAscentM1_Active: BOOL;
+	ForbidAscentM2_Active: BOOL;
 END_VAR
 </Single>
             <Single Name="LineInfoPersistence" Type="string">929cd808-ceb9-5310-b784-2c11eefd87f6_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">228</Single>
+        <Single Name="UniqueIdGenerator" Type="string">258</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -107423,7 +107467,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -107436,7 +107480,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416265926</Single>
+        <Single Name="Timestamp" Type="long">639190455797500541</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -107564,7 +107608,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -107608,7 +107652,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -107621,7 +107665,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416325920</Single>
+        <Single Name="Timestamp" Type="long">639190455797560536</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -107682,7 +107726,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -107726,7 +107770,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -107739,7 +107783,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416395937</Single>
+        <Single Name="Timestamp" Type="long">639190455797620542</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -107759,6 +107803,31 @@ FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
                     OR GVL_IHM.WinchM1.CmdReset
                     OR GVL_IHM.WinchM2.CmdReset
                     OR GVL_IHM.Grappin.CmdReset;
+
+// 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
+// (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
+// Sert à savoir, côté IHM, quand un appui sur FaultMachineReset est utile/attendu.
+GVL_IHM.Modes.AnyFaultActive :=
+       PRG_01_Diagnostics.instDiagCanOpen.Error
+    OR PRG_01_Diagnostics.instDiagEthercat.Error
+    OR PRG_01_Diagnostics.FB_Joystick_0.Error
+    OR PRG_02_Encoders.instEncoderAbsM1.Error
+    OR PRG_02_Encoders.instHomingM1.Error
+    OR PRG_02_Encoders.instEncoderSafetyM1.Error
+    OR PRG_02_Encoders.instEncoderAbsM2.Error
+    OR PRG_02_Encoders.instHomingM2.Error
+    OR PRG_02_Encoders.instEncoderSafetyM2.Error
+    OR PRG_03_Safety.instSafetyWinchM1.Error
+    OR PRG_03_Safety.instSafetyWinchM2.Error
+    OR PRG_03_Safety.instSafetyChariotM3.Error
+    OR PRG_06_WinchControl.instWinchSync.Error
+    OR PRG_06_WinchControl.instGrappin.Error
+    OR PRG_06_WinchControl.instWinchM1.Error
+    OR PRG_06_WinchControl.instWinchM2.Error
+    OR PRG_07_ChariotControl.instChariotM3.Error;
+
+// 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont (canal A, redondant avec B)
+GVL_IHM.Modes.PowerCutOffActive := PowerCutOff_A_RQ;
 
 // 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
 // homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
@@ -107954,6 +108023,10 @@ GVL_IHM.Grappin.Busy             := PRG_06_WinchControl.instGrappin.Busy;
 GVL_IHM.Grappin.Done             := PRG_06_WinchControl.instGrappin.Done;
 GVL_IHM.Grappin.Error            := PRG_06_WinchControl.instGrappin.Error;
 GVL_IHM.Grappin.ErrorId          := PRG_06_WinchControl.instGrappin.ErrorId;
+GVL_IHM.Grappin.RemainingTravelM := PRG_06_WinchControl.instGrappin.RemainingTravelM; // 🔧 REX 2026-07-07
+// 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
+// doit être égale à GVL_IHM.WinchM1.PositionM quand tout est nominal (voir bandeau ST_GrappinHMI).
+GVL_IHM.Grappin.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM;
 GVL_IHM.Grappin.State            := GVL_PERSISTENT.GrappinState;
 
 
@@ -108040,12 +108113,12 @@ END_VAR
             <Single Name="LineInfoPersistence" Type="string">84946444-e1ef-5f61-a3fc-7b8b648f3d87_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">287</Single>
+        <Single Name="UniqueIdGenerator" Type="string">316</Single>
         <Single Name="POULevel" Type="{8e575c5b-1d37-49c6-941b-5c0ec7874787}">Standard</Single>
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108089,7 +108162,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108102,7 +108175,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416455917</Single>
+        <Single Name="Timestamp" Type="long">639190455797690554</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -108245,7 +108318,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108289,7 +108362,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+                      <Single Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108302,7 +108375,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405416505940</Single>
+        <Single Name="Timestamp" Type="long">639190455797750551</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -108337,7 +108410,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">fcf8b399-3811-4eb1-986b-2628d3b51503</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">a8784476-eabf-48cc-b177-a590839f088e</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108381,7 +108454,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+                      <Single Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108393,7 +108466,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405412782526</Single>
+        <Single Name="Timestamp" Type="long">639190455791728579</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -108418,7 +108491,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">15</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108462,7 +108535,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+                      <Single Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108474,7 +108547,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415669829</Single>
+        <Single Name="Timestamp" Type="long">639190455796893283</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -108507,7 +108580,7 @@ END_VAR</Single>
         <Single Name="ParameterList" Type="bool">False</Single>
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108551,7 +108624,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+                      <Single Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108564,7 +108637,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414509819</Single>
+        <Single Name="Timestamp" Type="long">639190455795713829</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -108692,7 +108765,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">5e0d3788-f721-4ec2-bcf5-4e484e57ceeb</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">776cc4ed-692f-41df-9310-4a6d265a29a8</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108736,7 +108809,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+                      <Single Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108749,7 +108822,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414879811</Single>
+        <Single Name="Timestamp" Type="long">639190455796096985</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -108850,7 +108923,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -108894,7 +108967,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+                      <Single Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -108907,7 +108980,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414939826</Single>
+        <Single Name="Timestamp" Type="long">639190455796146996</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -108973,7 +109046,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109017,7 +109090,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+                      <Single Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109030,7 +109103,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414999841</Single>
+        <Single Name="Timestamp" Type="long">639190455796206988</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -109119,7 +109192,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109163,7 +109236,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+                      <Single Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109176,7 +109249,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415079823</Single>
+        <Single Name="Timestamp" Type="long">639190455796266979</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -109254,7 +109327,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">97fe044c-c636-4057-b90b-2d53cecefd42</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">55559301-cd5d-4502-8520-a9d7563005d2</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109298,7 +109371,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109310,7 +109383,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417340748</Single>
+        <Single Name="Timestamp" Type="long">639190455797860549</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109364,7 +109437,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">44</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109408,7 +109481,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109420,7 +109493,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417590777</Single>
+        <Single Name="Timestamp" Type="long">639190455798130535</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109452,7 +109525,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">22</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109496,7 +109569,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109508,7 +109581,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417710764</Single>
+        <Single Name="Timestamp" Type="long">639190455798250551</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109548,7 +109621,10 @@ STRUCT
 	Error: BOOL;
 	///❌ Code bitfield du défaut grappin
 	ErrorId: WORD;
-	///🎮 Commandes Opérateur (Boutons tactiles)
+	///📏 REX 2026-07-07 : distance restante avant cible (m),
+	RemainingTravelM: REAL;
+	///📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffsetM —
+	M2PositionCorrected: REAL;
 	///🪣 Bouton commande ouverture
 	CmdOpen: BOOL;
 	///🪣 Bouton commande fermeture
@@ -109561,9 +109637,9 @@ END_TYPE
             <Single Name="LineInfoPersistence" Type="string">44a0d7f9-1572-5144-85ea-029528b91e4b_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">45</Single>
+        <Single Name="UniqueIdGenerator" Type="string">48</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109607,7 +109683,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109619,7 +109695,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417830749</Single>
+        <Single Name="Timestamp" Type="long">639190455798380544</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109655,7 +109731,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">26</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109699,7 +109775,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109711,7 +109787,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417890764</Single>
+        <Single Name="Timestamp" Type="long">639190455798440532</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109733,15 +109809,19 @@ STRUCT
 	FaultMachineReset: BOOL;
 	///🔁 Acquittement défaut FB_Modes uniquement (REX 2026-07-07)
 	ModeReset: BOOL;
+	///🔴 REX 2026-07-07 : au moins un défaut/alarme actif dans le domaine
+	AnyFaultActive: BOOL;
+	///🧨 REX 2026-07-07 : miroir de PowerCutOff_A_RQ (coupure puissance
+	PowerCutOffActive: BOOL;
 END_STRUCT
 END_TYPE
 </Single>
             <Single Name="LineInfoPersistence" Type="string">a5e45711-d0fd-5c8a-87d0-1b76ece4083c_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">20</Single>
+        <Single Name="UniqueIdGenerator" Type="string">24</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109785,7 +109865,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109797,7 +109877,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417960759</Single>
+        <Single Name="Timestamp" Type="long">639190455798500531</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109837,7 +109917,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">30</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109881,7 +109961,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109893,7 +109973,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405418080754</Single>
+        <Single Name="Timestamp" Type="long">639190455798630551</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -109934,7 +110014,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">31</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -109978,7 +110058,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -109990,7 +110070,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405418150745</Single>
+        <Single Name="Timestamp" Type="long">639190455798700560</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -110101,7 +110181,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">101</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110145,7 +110225,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+                      <Single Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110157,7 +110237,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415479829</Single>
+        <Single Name="Timestamp" Type="long">639190455796713286</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -110203,7 +110283,7 @@ END_VAR</Single>
         <Single Name="ParameterList" Type="bool">False</Single>
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">188a1417-729e-4540-b01d-a0aac86ffa8a</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">ed8acd09-719e-41e3-b55c-b377c66e3989</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110247,7 +110327,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110259,7 +110339,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405412682505</Single>
+        <Single Name="Timestamp" Type="long">639190455791643504</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -110286,7 +110366,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">17</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110330,7 +110410,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110342,7 +110422,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417460754</Single>
+        <Single Name="Timestamp" Type="long">639190455798000553</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -110372,7 +110452,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">20</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110416,7 +110496,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110428,7 +110508,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415339829</Single>
+        <Single Name="Timestamp" Type="long">639190455796571132</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -110449,7 +110529,7 @@ END_VAR</Single>
         <Single Name="ParameterList" Type="bool">False</Single>
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110493,7 +110573,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110505,7 +110585,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415579829</Single>
+        <Single Name="Timestamp" Type="long">639190455796803275</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -110535,7 +110615,7 @@ END_VAR</Single>
         <Single Name="ParameterList" Type="bool">False</Single>
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110579,7 +110659,7 @@ END_VAR</Single>
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110592,7 +110672,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413259040</Single>
+        <Single Name="Timestamp" Type="long">639190455794935588</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -110660,7 +110740,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110704,7 +110784,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110717,7 +110797,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413319034</Single>
+        <Single Name="Timestamp" Type="long">639190455794995594</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -110851,7 +110931,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -110895,7 +110975,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+                      <Single Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -110908,7 +110988,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413379017</Single>
+        <Single Name="Timestamp" Type="long">639190455795085591</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -111139,7 +111219,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">961fe993-f611-4dc8-bad5-b662044dfb0c</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">45752c1a-a862-41e4-9f3b-2381fe44db80</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -111183,7 +111263,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+                      <Single Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -111195,7 +111275,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405418020749</Single>
+        <Single Name="Timestamp" Type="long">639190455798560527</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -111253,7 +111333,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">48</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -111297,7 +111377,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+                      <Single Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -111310,7 +111390,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414789831</Single>
+        <Single Name="Timestamp" Type="long">639190455796021906</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -111554,7 +111634,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -111598,7 +111678,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+                      <Single Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -111611,7 +111691,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415149822</Single>
+        <Single Name="Timestamp" Type="long">639190455796328331</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -111742,7 +111822,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -111786,7 +111866,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+                      <Single Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -111799,7 +111879,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415219842</Single>
+        <Single Name="Timestamp" Type="long">639190455796448336</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -112127,7 +112207,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -112171,7 +112251,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+                      <Single Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -112184,7 +112264,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405415279828</Single>
+        <Single Name="Timestamp" Type="long">639190455796508326</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -112364,7 +112444,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">e9148e2c-18c0-4b6d-8150-51037cc46230</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">15f593bc-974e-4843-b41f-ef70c6e7d9d1</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -112408,7 +112488,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+                      <Single Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -112420,7 +112500,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405412872508</Single>
+        <Single Name="Timestamp" Type="long">639190455791808573</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -112449,7 +112529,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">19</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -112493,7 +112573,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+                      <Single Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -112505,7 +112585,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405417400761</Single>
+        <Single Name="Timestamp" Type="long">639190455797930527</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -112538,7 +112618,7 @@ END_TYPE
         </Single>
         <Single Name="UniqueIdGenerator" Type="string">23</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -112582,7 +112662,7 @@ END_TYPE
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+                      <Single Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -112595,7 +112675,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405413019019</Single>
+        <Single Name="Timestamp" Type="long">639190455794731706</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -112756,7 +112836,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -112800,7 +112880,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+                      <Single Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -112813,7 +112893,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414329840</Single>
+        <Single Name="Timestamp" Type="long">639190455795591017</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -112893,7 +112973,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -112937,7 +113017,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+                      <Single Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -112950,7 +113030,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414599844</Single>
+        <Single Name="Timestamp" Type="long">639190455795773851</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -113060,7 +113140,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>
@@ -113104,7 +113184,7 @@ END_VAR
                       <Single Type="System.Guid">d9b2b2cc-ea99-4c3b-aa42-1e5c49e65b84</Single>
                     </Key>
                     <Value>
-                      <Single Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+                      <Single Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
                     </Value>
                   </Entry>
                 </Dictionary>
@@ -113117,7 +113197,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639190405414649819</Single>
+        <Single Name="Timestamp" Type="long">639190455795843845</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -113209,7 +113289,7 @@ END_VAR
         <List Name="ChildObjectGuids" Type="System.Collections.ArrayList" />
         <Single Name="AddAttributeSubsequent" Type="bool">False</Single>
       </Single>
-      <Single Name="ParentSVNodeGuid" Type="System.Guid">9e692ea9-85ac-4bc4-9849-c8c25f301980</Single>
+      <Single Name="ParentSVNodeGuid" Type="System.Guid">1a62202b-8926-4a25-9285-1177750fd401</Single>
       <Array Name="Path" Type="string">
         <Single Type="string">Device</Single>
         <Single Type="string">Logique API</Single>

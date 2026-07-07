@@ -780,4 +780,80 @@ descente comme supposé initialement. Par ailleurs, le rôle d'`OverrideSync` es
 
 ### Fichiers impactés (2026-07-04)
 - **DOC/** : `AF_Partie9_Fonction_Winch` (v1.2→**v1.3** — §4ter entièrement réécrit : SafeStop total en mode normal, ForbidAscent en MAINT+OverrideSync, procédure récupération D_SLACK_2, acquittement D_SLACK_3), `AF_Partie5_Modes_Maintenance` (v1.2 — §2 et §6 OverrideSync étendu MAINT_N1+N2, D_OVERRIDESYNC), AUDIT (ce §34).
+
+---
+
+## 🚀 35. Retour contacteur unique par treuil M1/M2 (2026-07-07)
+
+**Contexte** : Retour terrain — le câblage réel des treuils M1/M2 a changé. Le retour contacteur
+individuel par sens (`M1/M2_ContactorFeedbackFwd`/`Rev`, 2 signaux par treuil, un par sens)
+n'existe plus côté matériel. Il est remplacé par **un seul retour par treuil**,
+`M1/M2_FwdRevSpeedFeedbackOff` = « TOUS les contacteurs de ce treuil (sens avant, sens arrière,
+ET les 4 paliers de vitesse) sont physiquement retombés/désénergisés » — câblé sur les nouvelles
+entrées physiques `M1/M2_FwdRevSpeedFeedbackOff_DI` (remplacent les 4 anciens canaux
+`M1/M2_FeedbackFwd/Rev_DI`). Changement déjà implémenté et validé côté `CODE/` avant cet audit
+documentaire (voir fichiers impactés ci-dessous).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D84 | **Retour contacteur unique M1/M2 (`FwdRevSpeedFeedbackOff`)** | `FB_Winch` : `ContactorFeedbackFwd`/`Rev` (entrée) remplacés par l'entrée unique `FwdRevSpeedFeedbackOff`. Sorties `FwdContactorCheck`+`RevContactorCheck` (2×`ST_ContactorCheck`) fusionnées en **`ContactorsCheck`** (1 seul `ST_ContactorCheck`). Vérification **StuckClosed uniquement, à l'arrêt commandé** (tout ce que `FB_Winch` commande à `FALSE` mais `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` sous `ContactorFeedbackTimeout`=500ms → bit1 `ErrorId`). **Plus de détection StuckOpen** (impossible avec ce signal unique — `ContactorsCheck.StuckOpen` reste toujours `FALSE`, champ conservé pour compatibilité de type). Bit2 `ErrorId` (ex-`RevContactorCheck`) **libéré/inutilisé**. `FB_Encoder_Homing.ArretConfirme` recalculé sur `FwdRevSpeedFeedbackOff AND (NOT BrakeFeedback)` (remplace `(NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev) AND (NOT BrakeFeedback)`). **Hors périmètre** : Chariot M3 (`FB_Chariot.st`) conserve ses retours individuels `ContactorFeedbackFwd`/`Rev` — changement non confirmé pour M3. |
+
+### Fichiers impactés (2026-07-07)
+- **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/WINCH/FB_Winch.st`, `CODE/ENCODERS/FB_Encoder_Homing.st`, `CODE/MAIN/PRG_02_Encoders.st`, `CODE/MAIN/PRG_06_WinchControl.st`, `CODE/SUPERVISION/ST_WinchHMI.st`, `CODE/MAIN/PRG_09_Supervision.st`.
+- **DOC/** : `AF_Partie9_Fonction_Winch` (v1.1→**v1.4**, réalignement nom de fichier/version au passage — voir bandeau v1.4), `AF_Partie10_Fonction_Encoder_Homing` (v1.6→**v1.7**), `AF_Partie6_IO_Conditioning` (v1.4→**v1.5**), `AF_Partie2_Architecture_Programme` (v2.9→**v2.10**), `AF_Partie7_Interface_IHM` (v1.1→**v1.2**), références croisées corrigées dans `AF_Partie11_Fonction_Chariot`, `AF_Partie12_Fonction_Grappin`, `AF_Partie13_Fonction_Simulation` (pointeurs vers Partie9), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §35).
 - **CODE/** (à faire) : `FB_Safety_Winch.st` (logique SafeStop conditionnée par `OverrideSync` / nouveau `ForbidAscent`), `FB_Winch.st` (masquage `RelayFwd` sur `ForbidAscent`).
+
+---
+
+## 🚀 36. Implémentation Cas B (roue libre) + 2 garde-fous supplémentaires — Méca A/B/C (2026-07-07)
+
+**Contexte** : Suite à la consolidation du retour contacteur unique par treuil (§35, D84), l'utilisateur a
+demandé de couvrir enfin le **Cas B** identifié dans la piste de sécurité "surveillance de cohérence
+mouvement" (Partie9, jamais implémentée depuis son identification) — mouvement non commandé / roue libre —
+ainsi que 2 garde-fous supplémentaires en défense en profondeur : perte de commande opérateur non suivie
+d'un arrêt réel, et glissement du treuil M1 pendant un mouvement Grappin (M1 doit normalement rester
+immobile pendant que M2 seul bouge).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D85 | **Méca A — Mouvement non commandé général (`FB_Safety_Winch` bit7)** | Armé quand `FwdRevSpeedFeedbackOff AND BrakeFeedback` (tout confirmé physiquement coupé). Si pendant l'armement la vitesse mesurée (différentiation logicielle de `CablePosM` via `FB_CycleTime`, **pas** un mot vitesse natif codeur — voir D87 ci-dessous) dépasse `UncommandedSpeedThresholdMps` (0.02 m/s, théorique) **ou** la position dérive de plus de `UncommandedDriftToleranceM` (2.0 m) par rapport à la référence prise à l'armement → `SafeStop` **et** `PowerCutOff` (les contacteurs sont déjà confirmés coupés, `SafeStop` seul ne suffit pas). |
+| D86 | **Méca B — Pilotage actif sans commande opérateur (`FB_Safety_Winch` bit8)** | Indépendant de la logique interne `FB_Winch` (défense en profondeur). Si (perte CAN joystick, bit0 déjà existant) **ou** (joystick axe Y au neutre, nouvelle entrée `JoystickYNeutral`, seuil `ABS(SpeedRef) < 0.1`) **et** que `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` dans `PostRampTimeout` (3 s, théorique) → `SafeStop` **et** `PowerCutOff`. |
+| D87 | **Méca C — Glissement M1 pendant mouvement Grappin, 2 couches (`FB_Grappin` bit4 + `FB_Safety_Winch` bit9)** | **Couche 1** (`FB_Grappin`, tolérance `M1SlipToleranceM`=1.0 m) : si M1 dérive de plus d'1 m par rapport à sa position à l'entrée en `Busy` → `SevereError` (coupe M2) + sortie `M1SlipDetected` (consommée dans `PRG_06_WinchControl.st`, OR'ée dans `SafeStopM1_Raw`). **Couche 2** (`FB_Safety_Winch`, tolérance `GrappinSlipToleranceM`=2.0 m, armée uniquement via `GrappinHoldStillActive` câblée sur `instGrappin.Busy` pour l'instance M1 seule, toujours `FALSE` côté M2) : si la couche 1 n'a pas suffi (dérive continue au-delà de 2.0 m) → escalade `PowerCutOff`. |
+| D88 | **`PowerCutOff` de `FB_Safety_Winch` devient réel** | `(ErrorId AND 16#0380) <> 0` (bits 7/8/9) remplace l'ancien `FALSE` codé en dur (documenté "TBD" depuis Partie9 v1.1). `SafeStop` inclut désormais aussi les bits 7/8/9 (masques `16#039F`/`16#0397` selon `OverrideSync`, au lieu de `16#001F`/`16#0017`) — les bits 7/8/9 ne sont **jamais** exclus par `OverrideSync` (sans rapport avec la procédure de récupération mou de câble, D80). |
+| D89 | **TBD assumé — mesure de vitesse par mot natif codeur** | La vitesse mesurée par Méca A utilise une différentiation logicielle de `CablePosM` sur 1 cycle (10 ms), pas le mot vitesse natif EtherCAT (`COD1_SpdValue`/`COD2_SpdValue`, mappé `%IW10` côté COD1, jamais consommé dans `CODE/`). Échelle/unité de ce mot **inconnue** (à déterminer via fiche technique codeur Kübler F58x8 ou empiriquement sur site) — amélioration différée à une phase projet plus avancée : basculer Méca A sur `COD1/COD2_SpdValue` quand `EncoderM1/M2_IsReal=TRUE`, garder la différentiation logicielle en repli simulation. |
+
+**Cas A (sens opposé) et Cas C original (absence de mouvement malgré commande) de la piste "surveillance de
+cohérence mouvement"** restent **TBD, non implémentés** (sources encore manquantes : sens joystick brut,
+mot vitesse natif fiable).
+
+### Fichiers impactés (2026-07-07, session Méca A/B/C)
+- **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/WINCH/FB_Safety_Winch.st`, `CODE/GRAPPIN/FB_Grappin.st`, `CODE/MAIN/PRG_03_Safety.st`, `CODE/MAIN/PRG_06_WinchControl.st`.
+- **DOC/** : `AF_Partie9_Fonction_Winch` (v1.4→**v1.5**, §4quinquies nouveau — Méca A/B/C détaillés, remplace/complète la section TBD "surveillance de cohérence mouvement" pour le Cas B, interface `FB_Safety_Winch`/tableau `ErrorId`/formules `SafeStop`/`PowerCutOff` mis à jour), `AF_Partie12_Fonction_Grappin` (v1.1→**v1.2**, §4.D nouveau — Méca C couche 1, `M1SlipDetected`), références croisées corrigées dans `AF_Partie2_Architecture_Programme`, `AF_Partie6_IO_Conditioning`, `AF_Partie7_Interface_IHM`, `AF_Partie10_Fonction_Encoder_Homing`, `AF_Partie11_Fonction_Chariot`, `AF_Partie13_Fonction_Simulation` (pointeurs vers Partie9/Partie12), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §36).
+
+---
+
+## 🚀 37. Refonte §Sécurité électrique — 3 signaux AU distincts, polarité fail-safe `PowerCutOff`, séquence de réarmement (2026-07-07)
+
+**Contexte** : Retour terrain — l'unique signal `EmergencyStopOk_DI` utilisé jusqu'ici recouvrait en
+réalité **deux réalités physiques différentes** (la boucle AU elle-même, et l'état réel du
+contacteur de puissance), ce qui empêchait de documenter proprement le réarmement après coupure.
+Par ailleurs, la 1ère implémentation de `PowerCutOff_A_RQ`/`B_RQ` (canal PLC de la boucle AU) avait
+une **polarité inversée** : `TRUE` signifiait « coupe », ce qui aurait **maintenu la puissance** en
+cas de panne PLC réelle au lieu de la couper (pire cas de figure pour une fonction de sécurité).
+Ces deux points ont été corrigés côté `CODE/` (avant cet audit, non retouché ici) et sont
+désormais documentés en profondeur dans `AF_Partie1` (choix explicite de l'utilisateur : ce
+chantier reste dans la section "Sécurité électrique" existante de la Partie 1, pas de nouvelle
+Partie créée).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D90 | **3 signaux distincts autour de la chaîne AU** | `EmergencyChain_DI`/`EmergencyChain` (🆕, entrée) = retour de la boucle AU physique (coup-de-poing série + canal PLC), précondition à l'armement, PAS le portail maître. `EmergencyStopOk_DI`/`EmergencyStopOk` (conservé, renommé sémantiquement) = confirmation que le contacteur de puissance est réellement engagé, reste le portail maître utilisé par tout le programme (contrat FB standard Partie 3 §1). `EmergencyArming_RQ` (🆕, sortie) = commande PLC de réarmement du contacteur (mécanisme à ressort). |
+| D91 | **Polarité fail-safe `PowerCutOff_A_RQ`/`B_RQ`** | Architecture **à commande maintenue** : le PLC doit maintenir ces 2 sorties à `TRUE` en permanence ; toute transition `TRUE→FALSE` (volontaire — un Safety Mouvement de `FB_Safety_Winch` se déclenche, voir Partie9 v1.5 §4quinquies — ou accidentelle — PLC planté/coupure/watchdog dépassé) ouvre le circuit AU et coupe le contacteur, exactement comme un bouton coup-de-poing. Corrige la polarité inversée de la 1ère version (bug documenté en bandeau REX dans `AF_Partie1` pour ne jamais être reproduit). |
+| D92 | **Séquence de réarmement — IHM uniquement, jamais automatique** | Front sur `GVL_IHM.Modes.CmdEmergencyArming`, accepté seulement si `EmergencyChain=TRUE` et qu'aucune impulsion/verrouillage n'est en cours → impulsion 1 s sur `EmergencyArming_RQ` → verrouillage 5 s (recharge mécanique du ressort) avant toute nouvelle tentative. Retours IHM : `EmergencyChainOk`, `PowerContactorOk`, `EmergencyArmable`, `EmergencyArmingBusy`. Aucun réarmement auto même si `EmergencyChain` redevient sain seul — décision opérateur explicite requise. |
+| D93 | **Cas non couverts par du code dédié — assumés TBD** | (1) Aucune temporisation de confirmation post-pulse ne vérifie que `EmergencyStopOk` repasse bien à `TRUE` après une impulsion `EmergencyArming_RQ` — une défaillance mécanique du contacteur reste indiscernable, côté IHM, d'un simple "pas encore réarmé" (pas d'alarme dédiée). (2) La redondance des canaux `PowerCutOff_A_RQ`/`B_RQ` est purement logicielle (`B := A`) — aucune détection de divergence si un seul des deux canaux est réellement câblé/fonctionnel côté matériel. Les deux points sont documentés comme questions ouvertes dans la casuistique `AF_Partie1` (cas 9 et 10), à lever au câblage réel/tests terrain. |
+| D94 | **Nommage « Safety Mouvement » — abandon du vocabulaire « Méca A/B/C » en documentation** | Retour utilisateur en cours de relecture (2026-07-07) : le nom de code par lettre séquentielle (« Méca A/B/C », introduit en §36/D85-D87) est jugé **ni parlant ni évolutif** (rien n'indique combien de cas existeront à terme, un 4ᵉ casserait la convention). `AF_Partie1_Analyse_Fonctionnelle_v1.5` adopte **exclusivement** le vocabulaire descriptif **« Safety Mouvement — \<Rôle\> »** (Mouvement non commandé / Pilotage sans commande opérateur / Glissement grappin), catégorie **ouverte** sans limite de nombre, et n'utilise plus le nom par lettre nulle part dans son texte. **`CODE/` n'est pas retouché** (`FB_Safety_Winch.st`, `PRG_03_Safety.st`, `ST_WinchHMI.st` conservent aujourd'hui encore les commentaires/identifiants « Méca A/B/C », de même que `AF_Partie9_Fonction_Winch_v1.5` §4quinquies, non modifiée dans cette session) : un renommage effectif en `CODE/` + Partie9 est une **proposition distincte**, non validée/appliquée ici, nommage cible suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`, `SafetyMotionUncommandedDrive`, `SafetyMotionGrappinSlip`) — cohérent avec le préfixe `FB_Safety_<Metier>` déjà en usage. **Q ouverte** : valider ce renommage `CODE/`+Partie9 dans une session dédiée (guardrails codesys-workflow, impact `ErrorId`/commentaires/tests). |
+| D95 | **Clarification `PowerCutOff` multi-sources + couverture Grappin** | Retour utilisateur (2026-07-07) : `PowerCutOff_A_RQ` agrège **3 sources** (`instSafetyWinchM1`, `instSafetyWinchM2`, `instSafetyChariotM3`, voir `PRG_10_Outputs.st`), pas seulement `FB_Safety_Winch`. `FB_Safety_Chariot.PowerCutOff` participe déjà à la formule mais reste **codé en dur à `FALSE`** (TBD, pas de `ST_ContactorCheck` puissance M3 câblé) — aucun Safety Mouvement réel côté Chariot aujourd'hui. Le Grappin n'a pas de bloc safety dédié (pas de moteur propre) : sa protection glissement est **répartie sur 2 couches** — couche 1 dans `FB_Grappin` (`M1SlipDetected`, alimente `SafeStop` seulement) et couche 2 dans l'instance **M1** de `FB_Safety_Winch` (`GrappinHoldStillActive` sur `instGrappin.Busy`, peut escalader jusqu'à `PowerCutOff`) — donc `FB_Safety_Winch` couvre bien indirectement le Grappin via M1, sans bloc `FB_Safety_Grappin` séparé. Ces clarifications sont intégrées dans `AF_Partie1_v1.5` (encadré dédié §Sécurité électrique). |
+
+### Fichiers impactés (2026-07-07, session Sécurité électrique)
+- **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/MAIN/PRG_10_Outputs.st`, `CODE/MAIN/PRG_09_Supervision.st`, `CODE/SUPERVISION/ST_ModesHMI.st`. Aucun autre fichier `CODE/` touché dans cette session (le renommage `SafetyMotion*` proposé par D94 n'est **pas appliqué**).
+- **DOC/** : `AF_Partie1_Analyse_Fonctionnelle` (v1.4→**v1.5**, §Sécurité électrique entièrement réécrite/complétée : 3 signaux, polarité fail-safe, séquence de réarmement, 3 scénarios terrain, casuistique exhaustive 11 cas, vocabulaire « Safety Mouvement »), ancienne version archivée dans `DOC/Archives/` (gitignoré, via `git mv`), références croisées corrigées dans `AF_Partie8_Fonction_Joystick`, `AF_Partie10_Fonction_Encoder_Homing`, `AF_Partie3_Template_FB_Commun` (pointeurs vers Partie1), `CLAUDE.md` (racine, liste des docs + note §Architecture), AUDIT (ce §37). `AF_Partie9_Fonction_Winch_v1.5` **non modifiée** (le nom « Méca A/B/C » y reste tel quel, cohérent avec `CODE/` — voir D94).
