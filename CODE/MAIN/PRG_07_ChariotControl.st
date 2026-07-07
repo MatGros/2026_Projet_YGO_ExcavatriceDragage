@@ -82,6 +82,10 @@ M3_RelayFwd     := instChariotM3.RelayFwd;
 M3_RelayRev     := instChariotM3.RelayRev;
 M3_RelaySpeedGv := instChariotM3.RelaySpeedGv;
 
+// 🔴🔧 REX 2026-07-07 : alimentation PRG_10_Outputs (tâche indépendante, jamais appelée avec
+// paramètres — voir même correctif dans PRG_06_WinchControl.st §8).
+PRG_10_Outputs.ChariotBrakeCmd := instChariotM3.BrakeCmd;
+
 // 🧪 Retour contacteur M3 (Lot 5, non prioritaire) : miroir temporisé réaliste
 // (FB_Sim_DigitalMirror) au lieu de l'ancien miroir instantané inconditionnel.
 // Délai nettement sous ContactorFeedbackTimeout (500ms, GVL_PERSISTENT côté FB_Chariot)

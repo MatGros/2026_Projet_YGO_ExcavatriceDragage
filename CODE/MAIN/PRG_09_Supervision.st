@@ -29,6 +29,31 @@ FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
                     OR GVL_IHM.WinchM2.CmdReset
                     OR GVL_IHM.Grappin.CmdReset;
 
+// 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
+// (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
+// Sert à savoir, côté IHM, quand un appui sur FaultMachineReset est utile/attendu.
+GVL_IHM.Modes.AnyFaultActive :=
+       PRG_01_Diagnostics.instDiagCanOpen.Error
+    OR PRG_01_Diagnostics.instDiagEthercat.Error
+    OR PRG_01_Diagnostics.FB_Joystick_0.Error
+    OR PRG_02_Encoders.instEncoderAbsM1.Error
+    OR PRG_02_Encoders.instHomingM1.Error
+    OR PRG_02_Encoders.instEncoderSafetyM1.Error
+    OR PRG_02_Encoders.instEncoderAbsM2.Error
+    OR PRG_02_Encoders.instHomingM2.Error
+    OR PRG_02_Encoders.instEncoderSafetyM2.Error
+    OR PRG_03_Safety.instSafetyWinchM1.Error
+    OR PRG_03_Safety.instSafetyWinchM2.Error
+    OR PRG_03_Safety.instSafetyChariotM3.Error
+    OR PRG_06_WinchControl.instWinchSync.Error
+    OR PRG_06_WinchControl.instGrappin.Error
+    OR PRG_06_WinchControl.instWinchM1.Error
+    OR PRG_06_WinchControl.instWinchM2.Error
+    OR PRG_07_ChariotControl.instChariotM3.Error;
+
+// 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont (canal A, redondant avec B)
+GVL_IHM.Modes.PowerCutOffActive := PowerCutOff_A_RQ;
+
 // 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
 // homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
@@ -119,9 +144,10 @@ GVL_IHM.WinchM2.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 
 GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.LimitLegalDepthMinAllowed;
 GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.LimitLegalEnabled;
-GVL_IHM.LimitLegalReached                := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) 
-                                            AND GVL_PERSISTENT.LimitLegalEnabled 
-                                            AND ((PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed) 
+// 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
+// (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
+GVL_IHM.LimitLegalReached                := GVL_PERSISTENT.LimitLegalEnabled
+                                            AND ((PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed)
                                                  OR (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
 GVL_IHM.TopPositionSensorActive          := NOT PRG_00_Inputs.TopPositionSensor;
@@ -222,6 +248,10 @@ GVL_IHM.Grappin.Busy             := PRG_06_WinchControl.instGrappin.Busy;
 GVL_IHM.Grappin.Done             := PRG_06_WinchControl.instGrappin.Done;
 GVL_IHM.Grappin.Error            := PRG_06_WinchControl.instGrappin.Error;
 GVL_IHM.Grappin.ErrorId          := PRG_06_WinchControl.instGrappin.ErrorId;
+GVL_IHM.Grappin.RemainingTravelM := PRG_06_WinchControl.instGrappin.RemainingTravelM; // 🔧 REX 2026-07-07
+// 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
+// doit être égale à GVL_IHM.WinchM1.PositionM quand tout est nominal (voir bandeau ST_GrappinHMI).
+GVL_IHM.Grappin.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM;
 GVL_IHM.Grappin.State            := GVL_PERSISTENT.GrappinState;
 
 

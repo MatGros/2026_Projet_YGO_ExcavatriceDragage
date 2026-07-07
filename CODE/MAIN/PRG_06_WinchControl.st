@@ -32,6 +32,20 @@ VAR
     BottomLimitM2_Active    : REAL;
     ForbidDescentM1_Active  : BOOL;
     ForbidDescentM2_Active  : BOOL;
+
+    // 🔧 REX 2026-07-07 : couplage croisé M1/M2 des arrêts, UNIQUEMENT si SyncActive (mouvement
+    // coherent voulu). Hors synchro (Grappin.Busy ou OverrideSync MAINT_N2) : chaque treuil réagit
+    // à SA PROPRE limite/défaut uniquement — commande indépendante voulue dans ce cas.
+    SafeStopM1_Raw          : BOOL;
+    SafeStopM2_Raw          : BOOL;
+    SafeStopM1_Active       : BOOL;
+    SafeStopM2_Active       : BOOL;
+    ForbidDescentM1_Raw     : BOOL;
+    ForbidDescentM2_Raw     : BOOL;
+    ForbidAscentM1_Raw      : BOOL;
+    ForbidAscentM2_Raw      : BOOL;
+    ForbidAscentM1_Active   : BOOL;
+    ForbidAscentM2_Active   : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
@@ -125,25 +139,43 @@ ELSE
 END_IF;
 
 // ── 5. CALCUL DES LIMITES BASSES ACTIVES ET DU BLOCAGE DE DESCENTE ──────
+// 🔧 REX 2026-07-07 : limite légale appliquée sur LimitLegalEnabled SEUL, plus de garde
+// Mode=SEMI_AUTO — la limite légale doit stopper la descente dans TOUS les modes dès qu'elle
+// est activée (constat terrain : ne s'arrêtait pas en MAINT_N1/N2 alors qu'attendu).
 BottomLimitM1_Active := GVL_PERSISTENT.CableLimitDescent_M;
-IF (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
+IF GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM1_Active := MAX(BottomLimitM1_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
 BottomLimitM2_Active := GVL_PERSISTENT.CableLimitDescent_M;
-IF (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND GVL_PERSISTENT.LimitLegalEnabled THEN
+IF GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
-ForbidDescentM1_Active := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
-                          OR ((PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO)
-                              AND GVL_PERSISTENT.LimitLegalEnabled
-                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+// ── 5bis. COUPLAGE CROISÉ M1/M2 — REX 2026-07-07 ────────────────────────
+// Hors synchro (Grappin.Busy ou OverrideSync N2) : chaque treuil réagit à SA PROPRE limite/
+// défaut uniquement (commande indépendante voulue). En synchro (SyncActive, mouvement cohérent
+// voulu) : n'importe quel arrêt (SafeStop, limite câble, limite légale, fin de course haut) sur
+// UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
+SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
+SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
 
-ForbidDescentM2_Active := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
-                          OR ((PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO)
-                              AND GVL_PERSISTENT.LimitLegalEnabled
-                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
+                       OR (GVL_PERSISTENT.LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
+                       OR (GVL_PERSISTENT.LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+
+ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+
+SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
+SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+ForbidDescentM1_Active := ForbidDescentM1_Raw OR (instWinchSync.SyncActive AND ForbidDescentM2_Raw);
+ForbidDescentM2_Active := ForbidDescentM2_Raw OR (instWinchSync.SyncActive AND ForbidDescentM1_Raw);
+ForbidAscentM1_Active  := ForbidAscentM1_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM2_Raw);
+ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM1_Raw);
 
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
@@ -152,9 +184,9 @@ instWinchM1(
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M1_StartStop_Active,
-    SafeStop                := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
+    SafeStop                := SafeStopM1_Active,
     ForbidDescent           := ForbidDescentM1_Active,
-    ForbidAscent            := PRG_03_Safety.instSafetyWinchM1.ForbidAscent,
+    ForbidAscent            := ForbidAscentM1_Active,
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
@@ -181,9 +213,9 @@ instWinchM2(
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M2_StartStop_Active,
-    SafeStop                := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000),
+    SafeStop                := SafeStopM2_Active,
     ForbidDescent           := ForbidDescentM2_Active,
-    ForbidAscent            := PRG_03_Safety.instSafetyWinchM2.ForbidAscent,
+    ForbidAscent            := ForbidAscentM2_Active,
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
@@ -202,3 +234,24 @@ instWinchM2(
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
     SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct
 );
+
+// ── 8. ALIMENTATION PRG_10_Outputs (sorties physiques) ──────────────────
+// 🔴🔧 REX 2026-07-07 : PRG_10_Outputs est une tâche indépendante (MainTask, PouList),
+// jamais appelée avec paramètres — ses VAR_INPUT restaient à FALSE en permanence, y compris
+// sur machine réelle (aucun relais/contacteur/frein ne s'activait jamais). Alimentation directe
+// ici, AVANT PRG_10_Outputs dans l'ordre de tâche (position 6 < 10, même cycle API).
+PRG_10_Outputs.M1RelayFwd        := instWinchM1.RelayFwd;
+PRG_10_Outputs.M1RelayRev        := instWinchM1.RelayRev;
+PRG_10_Outputs.M1SpeedContactor1 := instWinchM1.Contactor1;
+PRG_10_Outputs.M1SpeedContactor2 := instWinchM1.Contactor2;
+PRG_10_Outputs.M1SpeedContactor3 := instWinchM1.Contactor3;
+PRG_10_Outputs.M1SpeedContactor4 := instWinchM1.Contactor4;
+PRG_10_Outputs.M1BrakeCmd        := instWinchM1.BrakeCmd;
+
+PRG_10_Outputs.M2RelayFwd        := instWinchM2.RelayFwd;
+PRG_10_Outputs.M2RelayRev        := instWinchM2.RelayRev;
+PRG_10_Outputs.M2SpeedContactor1 := instWinchM2.Contactor1;
+PRG_10_Outputs.M2SpeedContactor2 := instWinchM2.Contactor2;
+PRG_10_Outputs.M2SpeedContactor3 := instWinchM2.Contactor3;
+PRG_10_Outputs.M2SpeedContactor4 := instWinchM2.Contactor4;
+PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;

@@ -15,6 +15,9 @@
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
+   📥 SpeedScaleFactor : 🔧 REX 2026-07-07 — multiplicateur de vitesse simulation (confort de test
+      banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
+      d'origine. Câblé sur GVL_Simulation.EncoderSimSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
    ═══════════════════════════════════════════════════════════════ *)
@@ -23,18 +26,20 @@
 
 FUNCTION_BLOCK PUBLIC FB_Sim_Encoder
 VAR_INPUT
-    Enable      : BOOL;
-    RelayFwd    : BOOL;
-    RelayRev    : BOOL;
-    SpeedRefPct : REAL;
-    PresetCmd   : BOOL;
-    PresetValue : UDINT;
+    Enable           : BOOL;
+    RelayFwd         : BOOL;
+    RelayRev         : BOOL;
+    SpeedRefPct      : REAL;
+    PresetCmd        : BOOL;
+    PresetValue      : UDINT;
+    SpeedScaleFactor : REAL := 1.0;   // 🔧 REX 2026-07-07 — confort de test, voir bandeau ci-dessus
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;
 END_VAR
 VAR
     RawPos      : UDINT := 1000000;   // Valeur médiane arbitraire (même défaut que l'ancien SimulatedMxRaw)
+    Increment   : UDINT;              // 🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
@@ -44,13 +49,15 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
+Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
+
 IF PresetCmd THEN
     RawPos := PresetValue;
 ELSIF RelayFwd THEN
-    RawPos := RawPos + REAL_TO_UDINT(SpeedRefPct * 0.1);
+    RawPos := RawPos + Increment;
 ELSIF RelayRev THEN
-    IF RawPos >= REAL_TO_UDINT(SpeedRefPct * 0.1) THEN
-        RawPos := RawPos - REAL_TO_UDINT(SpeedRefPct * 0.1);
+    IF RawPos >= Increment THEN
+        RawPos := RawPos - Increment;
     ELSE
         RawPos := 0;
     END_IF;
