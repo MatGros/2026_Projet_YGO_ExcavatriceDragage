@@ -48,4 +48,9 @@ VAR_GLOBAL
     BlinkClock1Hz              : BOOL;          // Horloge 1Hz pour simuler un capteur qui clignote
     JoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)
     JoystickForceMaxRaw        : INT := 10000;  // Simule une consigne à fond
+
+    // 🔧 REX 2026-07-07 : confort de test banc — accélère le déplacement des codeurs simulés
+    // (FB_Sim_Encoder). 1.0 = comportement d'origine. Réglable à chaud, sans recompiler.
+    // Sans rapport avec une calibration réelle — reste à 1.0 hors essais bancs.
+    EncoderSimSpeedFactor      : REAL := 3.0;
 END_VAR

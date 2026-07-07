@@ -42,6 +42,8 @@ VAR_OUTPUT
     M2_StartStop        : BOOL;             // Sortie consigne StartStop vers Winch M2
     M2_Direction        : INT;              // Sortie consigne Direction vers Winch M2
     M2_ForceSlowSpeed   : BOOL;             // TRUE = Bloque les contacteurs de vitesse de M2
+    RemainingTravelM    : REAL;             // 🔧 REX 2026-07-07 : distance restante avant cible (m, toujours
+                                             // positive, décroît vers 0) — 0.0 hors mouvement (READY/DONE)
 END_VAR
 VAR_IN_OUT
     GrappinState        : ST_GrappinState;  // État physique du grappin mémorisé (RETAIN)
@@ -159,6 +161,7 @@ CASE State OF
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
+        RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : pas de mouvement en cours
 
         // Mémorisation des requêtes IHM (l'une annule l'autre)
         IF CmdClose_IHM AND NOT SevereError THEN
@@ -182,6 +185,16 @@ CASE State OF
         Busy := TRUE;
         Done := FALSE;
         M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
+
+        // 📏 REX 2026-07-07 : distance restante avant cible, pour affichage IHM (aiguille/jauge)
+        // Toujours positive, décroît vers 0 à mesure que M2 approche la cible.
+        IF CloseReq THEN
+            RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+        ELSIF OpenReq THEN
+            RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+        ELSE
+            RemainingTravelM := 0.0;
+        END_IF;
 
         // Interlock Homme-mort joystick
         IF NOT JoystickY_StartStop THEN
@@ -245,6 +258,7 @@ CASE State OF
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
+        RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : cible atteinte
 
         // Attente du relâchement de la validation joystick pour repasser à READY
         IF NOT JoystickY_StartStop THEN

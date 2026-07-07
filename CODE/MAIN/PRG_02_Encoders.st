@@ -38,7 +38,8 @@ instSimEncoderM1(
     RelayRev    := PRG_10_Outputs.M1RelayRev,
     SpeedRefPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
-    PresetValue := COD1_PresetValue
+    PresetValue := COD1_PresetValue,
+    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor  // 🔧 REX 2026-07-07 : confort de test
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
@@ -46,7 +47,8 @@ instSimEncoderM2(
     RelayRev    := PRG_10_Outputs.M2RelayRev,
     SpeedRefPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
-    PresetValue := COD2_PresetValue
+    PresetValue := COD2_PresetValue,
+    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor  // 🔧 REX 2026-07-07 : confort de test
 );
 
 // Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en

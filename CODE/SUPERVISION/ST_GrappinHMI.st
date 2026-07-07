@@ -21,6 +21,12 @@ STRUCT
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
     Error               : BOOL;             (* 🔴 Grappin en défaut *)
     ErrorId             : WORD;             (* ❌ Code bitfield du défaut grappin *)
+    RemainingTravelM    : REAL;             (* 📏 REX 2026-07-07 : distance restante avant cible (m),
+                                                pour jauge/aiguille IHM — 0.0 hors mouvement *)
+    M2PositionCorrected : REAL;             (* 📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffsetM —
+                                                pure valeur d'AFFICHAGE (bargraphe), égale à WinchM1.PositionM
+                                                quand tout est nominal ; ne remplace PAS DeltaPosM (Sync),
+                                                qui reste la valeur de sécurité/surveillance de référence *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
     CmdOpen             : BOOL;             (* 🪣 Bouton commande ouverture *)
