@@ -22,5 +22,7 @@ STRUCT
     DriveActualFreqHz       : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
     BypassContactorFeedback : BOOL;    (* 🔌 Activation du bypass des retours contacteurs *)
     BypassBrakeFeedback     : BOOL;    (* 🔓 Activation du bypass du retour frein *)
+    SafetyError             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
+    SafetyErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
 END_STRUCT
 END_TYPE

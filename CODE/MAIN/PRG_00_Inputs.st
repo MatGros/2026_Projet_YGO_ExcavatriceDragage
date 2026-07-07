@@ -64,6 +64,15 @@ VAR
 
     // 🧪 Simulation dynamique du trajet chariot M3 (Lot 4, non prioritaire — voir AF_Partie13)
     instSimChariot            : FB_Sim_Chariot;
+
+    // 🧪 Simulation de la chaîne de sécurité AU / réarmement (Lot 1, combler le trou d'intégration)
+    instSimSafety             : FB_Sim_Safety;
+
+    // 🧪 Simulation des retours contacteurs et freins M1/M2 (Lot 1)
+    M1_FwdRevSpeedFeedbackOff_Simulated : BOOL;
+    M1BrakeFeedback_Simulated           : BOOL;
+    M2_FwdRevSpeedFeedbackOff_Simulated : BOOL;
+    M2BrakeFeedback_Simulated           : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
@@ -72,12 +81,21 @@ END_VAR
 // 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille
 // sécurité, TRUE=OK) quand SimulationModeActive ET que ce capteur précis n'est
 // pas encore câblé réellement (GVL_Simulation.*_IsReal). Voir AF_Partie13.
-instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
+
+// Simulation de la chaîne de sécurité AU / réarmement (Lot 1)
+instSimSafety(
+    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal,
+    PowerCutOff_A   := PowerCutOff_A_RQ,
+    PowerCutOff_B   := PowerCutOff_B_RQ,
+    EmergencyArming := EmergencyArming_RQ
+);
+
+instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR instSimSafety.SimContactorOk, FilterTime := T#20MS);
 EmergencyStopOk := instEmergencyStopOk.State;
 
 // 🔧 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) — distincte du contacteur de
 // puissance ci-dessus. Réutilise le même flag simulation (même sous-système physique AU).
-instEmergencyChain(InputRaw := EmergencyChainOK_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
+instEmergencyChain(InputRaw := EmergencyChainOK_DI OR instSimSafety.SimChainOk, FilterTime := T#20MS);
 EmergencyChain := instEmergencyChain.State;
 
 // 🔧 REX 2026-07-07 : M1_M2_SlackCableSwitch_DI → M2_SlackCableSwitch_DI (capteur physiquement
@@ -92,25 +110,31 @@ instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.Simula
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
-// 🔧 REX 2026-07-07 : M1_FeedbackFwd_DI/M1_FeedbackRev_DI (par sens) remplacés par un retour
-// unique M1_FwdRevSpeedFeedbackOff_DI ("tous contacteurs sens+vitesse retombés").
-instM1FwdRevSpeedFeedbackOff(InputRaw := M1_FwdRevSpeedFeedbackOff_DI, FilterTime := T#20MS);
+// 🧪 Simulation des retours contacteurs M1 (retombés si aucun sens/vitesse commandé)
+M1_FwdRevSpeedFeedbackOff_Simulated := NOT (PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev OR PRG_10_Outputs.M1SpeedContactor1 OR PRG_10_Outputs.M1SpeedContactor2 OR PRG_10_Outputs.M1SpeedContactor3 OR PRG_10_Outputs.M1SpeedContactor4);
+instM1FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal, M1_FwdRevSpeedFeedbackOff_DI, M1_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
 M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
 
 instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ThermalM1_IsReal), FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
 
-instM1BrakeFeedback(InputRaw := M1_BrakeFeedback_DI, FilterTime := T#20MS);
+// 🧪 Simulation du retour frein M1 (fermé si commande inactive)
+M1BrakeFeedback_Simulated := NOT PRG_10_Outputs.M1BrakeCmd;
+instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
-instM2FwdRevSpeedFeedbackOff(InputRaw := M2_FwdRevSpeedFeedbackOff_DI, FilterTime := T#20MS);
+// 🧪 Simulation des retours contacteurs M2 (retombés si aucun sens/vitesse commandé)
+M2_FwdRevSpeedFeedbackOff_Simulated := NOT (PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev OR PRG_10_Outputs.M2SpeedContactor1 OR PRG_10_Outputs.M2SpeedContactor2 OR PRG_10_Outputs.M2SpeedContactor3 OR PRG_10_Outputs.M2SpeedContactor4);
+instM2FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal, M2_FwdRevSpeedFeedbackOff_DI, M2_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
 M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
 
 instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ThermalM2_IsReal), FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;
 
-instM2BrakeFeedback(InputRaw := M2_BrakeFeedback_DI, FilterTime := T#20MS);
+// 🧪 Simulation du retour frein M2 (fermé si commande inactive)
+M2BrakeFeedback_Simulated := NOT PRG_10_Outputs.M2BrakeCmd;
+instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── CHARIOT M3 ────────────────────────────────────────────────────────

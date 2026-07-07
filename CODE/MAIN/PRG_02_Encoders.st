@@ -67,7 +67,14 @@ ELSE
     M2_RawPosToUse := COD2_PosValue;
 END_IF;
 
-// 2. TREUIL M1 (Abs → Scale → Homing)
+// 2. TREUIL M1 (Abs → Homing → Scale)
+// 🔧 REX 2026-07-07 : Homing appelé AVANT Scale (et non l'inverse) — Scale lit HomingRefRaw en
+// entrée ; si Scale s'exécutait avant Homing, un homing réussi au cycle N ne serait répercuté
+// sur CablePosM qu'au cycle N+1, alors que instHomingM1.Busy (→ InReferencingMode côté
+// FB_Safety_Winch) retombe dès le cycle N — décalage d'1 cycle qui désynchronise le garde-fou
+// anti-transition de Méca A (bit7) et provoque un faux déclenchement PowerCutOff au cycle N+1
+// (saut de position vu hors fenêtre "référencement en cours"). Homing ne dépend d'aucune sortie
+// de Scale (RawPos vient d'instEncoderAbsM1) : aucune dépendance circulaire, réordonnancement sûr.
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
@@ -83,13 +90,6 @@ instEncoderAbsM1(
 COD1_PresettTrigCmd := instEncoderAbsM1.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderAbsM1.CodeSeqTriggerCmd;
 COD1_PresetValue    := instEncoderAbsM1.PresetValueOut;
-
-instEncoderScaleM1(
-    RawPos          := instEncoderAbsM1.RawPos,
-    HomingRefRaw    := instHomingM1.HomingRefRaw,
-    CableM_PerRev   := 2.0,
-    PointsPerRev    := 8192
-);
 
 instHomingM1(
     Enable               := TRUE,
@@ -112,7 +112,14 @@ instHomingM1(
     CableM_PerRev        := 2.0
 );
 
-// 3. TREUIL M2 (Abs → Scale → Homing)
+instEncoderScaleM1(
+    RawPos          := instEncoderAbsM1.RawPos,
+    HomingRefRaw    := instHomingM1.HomingRefRaw,
+    CableM_PerRev   := 2.0,
+    PointsPerRev    := 8192
+);
+
+// 3. TREUIL M2 (Abs → Homing → Scale)
 instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
@@ -128,13 +135,6 @@ instEncoderAbsM2(
 COD2_PresettTrigCmd := instEncoderAbsM2.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderAbsM2.CodeSeqTriggerCmd;
 COD2_PresetValue    := instEncoderAbsM2.PresetValueOut;
-
-instEncoderScaleM2(
-    RawPos          := instEncoderAbsM2.RawPos,
-    HomingRefRaw    := instHomingM2.HomingRefRaw,
-    CableM_PerRev   := 2.0,
-    PointsPerRev    := 8192
-);
 
 instHomingM2(
     Enable               := TRUE,
@@ -155,6 +155,13 @@ instHomingM2(
     PointsPerRev         := 8192,
     MultiTurnRevsMax     := 4096,
     CableM_PerRev        := 2.0
+);
+
+instEncoderScaleM2(
+    RawPos          := instEncoderAbsM2.RawPos,
+    HomingRefRaw    := instHomingM2.HomingRefRaw,
+    CableM_PerRev   := 2.0,
+    PointsPerRev    := 8192
 );
 
 // 4. SÉCURITÉ DE BORNAGE ET INCOHÉRENCE

@@ -216,6 +216,10 @@ GVL_IHM.WinchM1.Encoder.Warnings         := PRG_02_Encoders.instEncoderAbsM1.War
 GVL_IHM.WinchM1.Encoder.SlaveOperational := PRG_02_Encoders.instEncoderAbsM1.SlaveOperational;
 GVL_IHM.WinchM1.Encoder.PresetTriggerCmd := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd;
 GVL_IHM.WinchM1.Encoder.PresetValueOut   := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut;
+GVL_IHM.WinchM1.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM1.Error;
+GVL_IHM.WinchM1.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM1.ErrorId;
+GVL_IHM.WinchM1.SafetyError              := PRG_03_Safety.instSafetyWinchM1.Error;
+GVL_IHM.WinchM1.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM1.ErrorId;
 
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
@@ -252,6 +256,10 @@ GVL_IHM.WinchM2.Encoder.Warnings         := PRG_02_Encoders.instEncoderAbsM2.War
 GVL_IHM.WinchM2.Encoder.SlaveOperational := PRG_02_Encoders.instEncoderAbsM2.SlaveOperational;
 GVL_IHM.WinchM2.Encoder.PresetTriggerCmd := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd;
 GVL_IHM.WinchM2.Encoder.PresetValueOut   := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut;
+GVL_IHM.WinchM2.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM2.Error;
+GVL_IHM.WinchM2.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM2.ErrorId;
+GVL_IHM.WinchM2.SafetyError              := PRG_03_Safety.instSafetyWinchM2.Error;
+GVL_IHM.WinchM2.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM2.ErrorId;
 
 
 // ── 7. MAPPING ÉTATS GRAPPIN → IHM ───────────────────────────────────────
@@ -297,6 +305,8 @@ GVL_IHM.Chariot.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
 GVL_IHM.Chariot.PositionSensorTarget := PRG_07_ChariotControl.M3_PositionSensorTarget;
 GVL_IHM.Chariot.DriveStatusWord      := PRG_07_ChariotControl.instChariotM3.DriveStatusWord;
 GVL_IHM.Chariot.DriveActualFreqHz    := PRG_07_ChariotControl.instChariotM3.DriveActualFreqHz;
+GVL_IHM.Chariot.SafetyError          := PRG_03_Safety.instSafetyChariotM3.Error;
+GVL_IHM.Chariot.SafetyErrorId        := PRG_03_Safety.instSafetyChariotM3.ErrorId;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
@@ -307,6 +317,8 @@ GVL_IHM.Joystick.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
 GVL_IHM.Joystick.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
 GVL_IHM.Joystick.Online     := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online;
 GVL_IHM.Joystick.Operational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational;
+GVL_IHM.Joystick.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
+GVL_IHM.Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────

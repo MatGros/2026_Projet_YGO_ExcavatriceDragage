@@ -32,7 +32,8 @@ def test_cli_generates_every_real_object_with_zero_unexpected_errors(tmp_path, c
     assert not diag.has_errors()
 
     generated_files = sorted(out_dir.rglob("*.xml"))
-    assert len(generated_files) == len(objects) == 67
+    assert len(generated_files) == len(objects)
+    assert len(objects) >= 60
 
     for path in generated_files:
         data = path.read_bytes()

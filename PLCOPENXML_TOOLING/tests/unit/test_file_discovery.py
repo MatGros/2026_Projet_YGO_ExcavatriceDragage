@@ -82,8 +82,14 @@ def test_real_fb_winch_and_fb_winchsync_pairs_are_identical_info_only():
     diag = DiagnosticCollector()
     discover_objects(CODE_DIR, diag)
     infos = [str(d) for d in diag.of(Severity.INFO)]
-    assert any("FB_Winch_Decl.st + FB_Winch_Impl.st" in i and "FB_Winch.st" in i for i in infos)
     assert any("FB_WinchSync_Decl.st + FB_WinchSync_Impl.st" in i for i in infos)
+
+
+def test_real_fb_winch_pair_is_flagged_stale():
+    diag = DiagnosticCollector()
+    discover_objects(CODE_DIR, diag)
+    warnings = [str(d) for d in diag.of(Severity.WARNING)]
+    assert any("FB_Winch_Decl.st + FB_Winch_Impl.st" in w and "does NOT match" in w for w in warnings)
 
 
 def test_real_fb_safety_winch_pair_is_flagged_stale():
@@ -93,9 +99,9 @@ def test_real_fb_safety_winch_pair_is_flagged_stale():
     assert any("FB_Safety_Winch_Decl.st + FB_Safety_Winch_Impl.st" in w and "does NOT match" in w for w in warnings)
 
 
-def test_real_gvl_encoder_stub_object_present_and_named_from_stem():
+def test_real_gvl_modes_stub_object_present_and_named_from_stem():
     diag = DiagnosticCollector()
     objects = discover_objects(CODE_DIR, diag)
-    stub = next(o for o in objects if o.name == "GVL_Encoder_Stub")
+    stub = next(o for o in objects if o.name == "GVL_Modes_Stub")
     assert stub.kind == "gvl"
     assert len(stub.global_blocks) == 1

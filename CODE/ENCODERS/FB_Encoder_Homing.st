@@ -88,7 +88,7 @@ END_VAR
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
     State := E_State.DISABLED;
@@ -133,7 +133,7 @@ END_IF;
 // lot : c'est un paramètre RETAIN de mise en service (comme CableM_PerRev/PointsPerRev), pas une
 // saisie opérateur par requête — valeur indicative ≈12.50 m largement dans la plage.
 // 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
-ArretConfirme := FwdRevSpeedFeedbackOff AND (NOT BrakeFeedback);
+ArretConfirme := FwdRevSpeedFeedbackOff AND BrakeFeedback;
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
@@ -169,6 +169,11 @@ IF State = E_State.BUSY THEN
         Calib.LastKnownRawPos := PresetValueCalc;
         Done := TRUE;
         State := E_State.READY;
+        // 🔧 REX 2026-07-07 : un homing réussi re-établit la référence tout aussi validement
+        // qu'un ConfirmCoherence explicite — efface donc aussi bit9 (incohérence redémarrage),
+        // sinon ErrorId/Error restait bloqué à TRUE après un homing réussi (jamais mappé vers
+        // l'IHM, invisible sauf sur GVL_IHM.Modes.AnyFaultActive qui restait à 1 sans raison visible).
+        ErrorId := ErrorId AND 16#FDFF;
     ELSIF PresetNak THEN
         ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
         State := E_State.READY;

@@ -170,8 +170,27 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
                        OR (GVL_PERSISTENT.LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
-ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
-ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+// 🔧 REX 2026-07-08 : arrêt réel encodeur en fonctionnement NORMAL, distinct du capteur physique
+// (bit5 côté FB_Safety_Winch). Seuil = HomingTargetMx_M - WinchTopStopMarginM (RELATIF à la
+// position haute de référence, pas une valeur absolue) : si HomingTargetMx_M est recalibrée sur
+// site, la position d'arrêt normal suit automatiquement, toujours à la même marge du capteur.
+// Même principe que la limite légale de descente ci-dessus (condition LIVE, pas de bit
+// ErrorId/Reset dédié) — passe par ForbidAscentMx_Raw pour bénéficier DU MÊME couplage croisé
+// M1/M2 que le capteur physique (sinon un treuil qui atteint la limite une fraction de seconde
+// avant l'autre crée un écart RelayFwdM1<>RelayFwdM2 qui déclenche à tort le défaut FB_WinchSync
+// bit1 "incohérence de commande" — REX terrain 2026-07-08, testé et corrigé).
+// INHIBÉ en MAINT_N2 (référencement codeur : FB_Encoder_Homing n'exige déjà pas la confirmation du
+// capteur physique dans ce mode — autorise à remonter manuellement au-delà, jusqu'au capteur).
+ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
+                       OR (PRG_02_Encoders.instHomingM1.Homed
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >=
+                                (GVL_PERSISTENT.HomingTargetM1_M - GVL_PERSISTENT.WinchTopStopMarginM))
+                           AND (PRG_04_Modes.instModes.Mode <> E_Mode.MAINT_N2));
+ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
+                       OR (PRG_02_Encoders.instHomingM2.Homed
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
+                                (GVL_PERSISTENT.HomingTargetM2_M - GVL_PERSISTENT.WinchTopStopMarginM))
+                           AND (PRG_04_Modes.instModes.Mode <> E_Mode.MAINT_N2));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);

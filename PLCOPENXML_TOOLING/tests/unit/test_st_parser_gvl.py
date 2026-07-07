@@ -48,10 +48,10 @@ def test_real_gvl_persistent_parses_retain_persistent_qualifiers_and_composite_i
 
 
 def test_real_gvl_debug_attribute_pragma_is_captured():
-    path = CODE_DIR / "MAIN" / "GVL_Simulation.st"
+    path = CODE_DIR / "SIMULATION" / "GVL_Simulation.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
-    obj = parse_file(source, folder="MAIN", stem="GVL_Simulation", mtime=1.0, source_label="GVL_Simulation.st", diagnostics=diag)
+    obj = parse_file(source, folder="SIMULATION", stem="GVL_Simulation", mtime=1.0, source_label="GVL_Simulation.st", diagnostics=diag)
     assert obj.attribute_pragmas == ["qualified_only"]
 
 
