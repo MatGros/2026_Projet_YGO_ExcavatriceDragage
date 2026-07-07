@@ -259,7 +259,7 @@ Hmi : ST_<Objet>Hmi   // lecture (mesures, état, ErrorId, StateAtError)
 ---
 
 ## 📚 Documents liés
-- **Partie 1 v1.2** — Présentation & équipements.
+- **Partie 1 v1.5** — Présentation & équipements (dont §Sécurité électrique : `EmergencyStopOk`).
 - **Partie 2 v2.5** — Architecture (flux `SafeStop`/`StartStop`, `PowerCutOff`).
 - **Partie 4** — Cycle & séquenceur (usage `StartStop` par étape).
 - **Partie 5** — Modes & maintenance (`EmergencyStopOk`, `SafeStop`, limite légale `FB_Modes`).

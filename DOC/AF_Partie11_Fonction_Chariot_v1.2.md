@@ -17,7 +17,7 @@
 > (règle projet : ne jamais deviner). La partie `DEGRADED_IO` est fonctionnellement complète
 > (corrigée v1.1) mais reste conditionnée à la confirmation du bornier réel et du paramétrage
 > AC600 (§4bis) avant tout essai machine en charge.
-> 🔗 Dépend de : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis, [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §5, [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`).
+> 🔗 Dépend de : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis, [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §5, [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`).
 >
 > ℹ️ **Numérotation** : la branche `claude/encoder-homing-winch-control-h6ef89` (non fusionnée
 > dans `main` à la rédaction) occupe déjà `AF_Partie10_Fonction_Encoder_Homing_v1.1.md` — ce
@@ -342,4 +342,4 @@ opérationnel pendant que l'EtherCAT est en panne. Étapes (une fois validées) 
 - **Partie 2 v2.7** — Architecture (`FB_Chariot`, mapping M3/AC600).
 - **Partie 3 v1.3** — Contrat FB (`StartStop`/`SafeStop`, ErrorId, reset, §1bis FB de mouvement).
 - **Partie 4 v1.2** — Cycle (§5 Chariot — approche temporisée, arrêt sur capteur, source des paramètres `ApproachTime`/`ApproachSpeed`).
-- **Partie 9 v1.1** — Fonction Winch (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`, `HYSTERESIS`).
+- **Partie 9 v1.5** — Fonction Winch (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`, `HYSTERESIS`).

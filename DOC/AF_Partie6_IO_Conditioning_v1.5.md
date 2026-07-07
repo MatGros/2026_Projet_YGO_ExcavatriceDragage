@@ -1,5 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.4)
+# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.5)
 
+> 📌 **v1.5 (2026-07-07)** — REX terrain (voir Partie 9) : l'exemple d'instance §5 citait encore
+> `M1ContactorFeedbackFwd` (retour individuel par sens) — ce signal est **supprimé côté câblage
+> réel** pour les treuils M1/M2, remplacé par un retour unique par treuil `M1/M2FwdRevSpeedFeedbackOff`.
+> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie9_Fonction_Winch_v1.5.md`.
+>
 > 📌 **v1.4** — Correctif documentaire (voir Partie 13) : l'extrait `instEmergencyStopOk` (§ci-dessous)
 > référençait encore `GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST` (supprimé) — remplacé par
 > `GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal`. Aucun
@@ -119,7 +124,7 @@ VAR
     instEmergencyStopOk    : FB_Input;
     instSlackCableSwitch   : FB_Input;
     instTopPositionSensor  : FB_Input;
-    instM1ContactorFwd     : FB_Input;
+    instM1FwdRevSpeedFeedbackOff : FB_Input;    (* 🔧 v1.5 — remplace instM1ContactorFwd/Rev *)
     (* ... une instance par signal ... *)
 END_VAR
 
@@ -160,7 +165,7 @@ matérielle si ce besoin se confirme.
 ```
 MainTask (10 ms) — liste d'appel séquentielle, voir Partie2 v2.8 §3
  0. PRG_0_Inputs           → instX(InputRaw := ..., FilterTime := ...) pour chaque signal,
-                              expose en VAR_OUTPUT (EmergencyStopOk, M1ContactorFeedbackFwd, ...)
+                              expose en VAR_OUTPUT (EmergencyStopOk, M1FwdRevSpeedFeedbackOff, ...)
  1..9. (diag, codeurs, safety, modes, cycle, winch/chariot/aux control, supervision)
        → consomment PRG_0_Inputs.<Signal> directement (lecture, même cycle)
        → chaque FB de mouvement (FB_Winch/FB_Chariot) résout SON StartStop/SafeStop en interne

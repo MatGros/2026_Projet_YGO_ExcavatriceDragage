@@ -21,17 +21,17 @@ Chaque Function Block **métier** doit respecter :
 - Jamais autoriser le redémarrage automatique après défaut
 - **Précédence `Enable` > `SafeStop` > `StartStop`** : `Enable=FALSE` → neutralisation (sorties coupées) ; `SafeStop=TRUE` → rampe rapide (`Enable` maintenu) ; `StartStop=FALSE` → rampe normale. **`CoupeEnable` n'existe pas** (jamais une variable — vocabulaire abandonné).
 
-### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.7.md)** ← Pour comprendre
-Tâches, arborescence CODESYS, flux données. **v2.7 = référence** (modèle `SafeStop`/`StartStop`,
+### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.10.md)** ← Pour comprendre
+Tâches, arborescence CODESYS, flux données. **v2.10 = référence** (modèle `SafeStop`/`StartStop`,
 `SafeStop` **par métier** — pas de signal global ; pas de `GVL_BusHealth`/`E_DegradationLevel`/
 `FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff` ;
 câble mécanique de position haute retiré de la chaîne AU matérielle, géré par l'automate via
-`PowerCutOff` — voir Partie1 v1.4 §Sécurité électrique).
+`PowerCutOff` — voir Partie1 v1.5 §Sécurité électrique).
 
 ### 4. **Specs détaillées**
 - **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
 - **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.2.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
-- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.2.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
+- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.5.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
 - **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.2.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
@@ -115,17 +115,17 @@ dédié). Priorités **à définir** en config CODESYS (TBD).
 
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
-- [AF_Partie1_Analyse_Fonctionnelle_v1.4.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.4.md) — Équipements & fonctions
-- [AF_Partie2_Architecture_Programme_v2.7.md](DOC/AF_Partie2_Architecture_Programme_v2.7.md) — Architecture détaillée (**v2.7**)
+- [AF_Partie1_Analyse_Fonctionnelle_v1.5.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.5.md) — Équipements & fonctions (sécurité électrique : chaîne AU, `PowerCutOff` fail-safe, réarmement)
+- [AF_Partie2_Architecture_Programme_v2.10.md](DOC/AF_Partie2_Architecture_Programme_v2.10.md) — Architecture détaillée (**v2.10**)
 - [AF_Partie3_Template_FB_Commun_v1.3.md](DOC/AF_Partie3_Template_FB_Commun_v1.3.md) — Contrat FB & sécurité
 - [AF_Partie4_Cycle_Sequenceur_v1.2.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md) — Cycle, synchro, frein, grappin, rampes
 - [AF_Partie5_Modes_Maintenance_v1.2.md](DOC/AF_Partie5_Modes_Maintenance_v1.2.md) — Modes, maintenance N1/N2, AU, limite légale
-- [AF_Partie6_IO_Conditioning_v1.2.md](DOC/AF_Partie6_IO_Conditioning_v1.2.md) — Conditionnement E/S
+- [AF_Partie6_IO_Conditioning_v1.5.md](DOC/AF_Partie6_IO_Conditioning_v1.5.md) — Conditionnement E/S
 - [AF_Partie8_Fonction_Joystick_v1.2.md](DOC/AF_Partie8_Fonction_Joystick_v1.2.md) — Fonction métier Joystick (8+ = métier par FB)
-- [AF_Partie9_Fonction_Winch_v1.1.md](DOC/AF_Partie9_Fonction_Winch_v1.1.md) — Fonction Winch (M1/M2, safety mou de câble/thermique)
-- [AF_Partie10_Fonction_Encoder_Homing_v1.6.md](DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md) — Codeur & Homing
+- [AF_Partie9_Fonction_Winch_v1.5.md](DOC/AF_Partie9_Fonction_Winch_v1.5.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A/B/C roue libre)
+- [AF_Partie10_Fonction_Encoder_Homing_v1.7.md](DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md) — Codeur & Homing
 - [AF_Partie11_Fonction_Chariot_v1.2.md](DOC/AF_Partie11_Fonction_Chariot_v1.2.md) — Fonction Chariot (M3, ex-Translation)
-- [AF_Partie12_Fonction_Grappin_v1.1.md](DOC/AF_Partie12_Fonction_Grappin_v1.1.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture)
+- [AF_Partie12_Fonction_Grappin_v1.2.md](DOC/AF_Partie12_Fonction_Grappin_v1.2.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 
 ### 📐 Plan de numérotation

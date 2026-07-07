@@ -9,20 +9,27 @@
 PROGRAM PRG_00_Inputs
 VAR_OUTPUT
     // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
-    EmergencyStopOk      : BOOL;   // 🚨 Chaîne AU : TRUE=fermée/armée ✅ | FALSE=AU appuyé ou fil coupé 🔴
+    // 🔧 REX 2026-07-07 : précision terrain — EmergencyStopOk_DI (retour contact auxiliaire NO)
+    // est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
+    // PAS la boucle AU elle-même (ça, c'est EmergencyChain_DI, ci-dessous). Nom EmergencyStopOk
+    // conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
+    // maître du programme, car "puissance réellement présente" est la garantie la plus forte.
+    EmergencyStopOk      : BOOL;   // 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴
+    EmergencyChain       : BOOL;   // 🔗 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) : TRUE=saine ✅ | FALSE=AU appuyé ou PowerCutOff PLC actif 🔴 — précondition à l'armement, PAS le portail maître
     TopPositionSensor    : BOOL;   // 🔝 Fin de course HAUT (NC) : TRUE=libre ✅ | FALSE=butée atteinte 🔴→ForbidAscent
     SlackCableSwitch     : BOOL;   // 🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent
     PhaseRotationOk      : BOOL;   // ⚡ Rotation phases élec. (NC) : TRUE=phases OK ✅ | FALSE=inversées/absentes 🔴→SafeStop
 
-    // ── 🪝 TREUIL M1 (contacteurs=NO miroir bobine ; thermique/frein=NC) ────────────────
-    M1ContactorFeedbackFwd : BOOL; // 📡 Retour contacteur MONTÉE M1 (NO) : TRUE=contacteur fermé | FALSE=ouvert
-    M1ContactorFeedbackRev : BOOL; // 📡 Retour contacteur DESCENTE M1 (NO) : TRUE=contacteur fermé | FALSE=ouvert
+    // ── 🪝 TREUIL M1 (frein=NC ; feedback contacteurs=retour unique REX 2026-07-07) ─────
+    M1FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : retour unique "tous contacteurs (sens+vitesse)
+                                      // retombés" M1 — remplace M1ContactorFeedbackFwd/Rev (feedback
+                                      // individuel par sens supprimé côté matériel, plus jamais câblé).
+                                      // TRUE = tous retombés (sain, rien d'engagé)
     M1ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M1 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴
     M1BrakeFeedback        : BOOL; // 🔒 Retour frein M1 (NC) : TRUE=frein serré repos ✅ | FALSE=desserré/coupure 🔴
 
     // ── 🪝 TREUIL M2 (même logique que M1) ──────────────────────────────────────────────
-    M2ContactorFeedbackFwd : BOOL; // 📡 Retour contacteur MONTÉE M2 (NO) : TRUE=fermé | FALSE=ouvert
-    M2ContactorFeedbackRev : BOOL; // 📡 Retour contacteur DESCENTE M2 (NO) : TRUE=fermé | FALSE=ouvert
+    M2FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : idem M1, voir ci-dessus
     M2ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M2 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴
     M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴
 
@@ -36,17 +43,16 @@ END_VAR
 VAR
     // Instances de filtrage
     instEmergencyStopOk   : FB_Input;
+    instEmergencyChain    : FB_Input; // 🔧 REX 2026-07-07
     instSlackCableSwitch  : FB_Input;
     instTopPositionSensor : FB_Input;
     instCtrlPhaseRotation : FB_Input;
 
-    instM1ContactorFwd : FB_Input;
-    instM1ContactorRev : FB_Input;
+    instM1FwdRevSpeedFeedbackOff : FB_Input; // 🔧 REX 2026-07-07 : remplace instM1ContactorFwd/Rev
     instM1Thermal      : FB_Input;
     instM1BrakeFeedback: FB_Input;
 
-    instM2ContactorFwd : FB_Input;
-    instM2ContactorRev : FB_Input;
+    instM2FwdRevSpeedFeedbackOff : FB_Input; // 🔧 REX 2026-07-07 : remplace instM2ContactorFwd/Rev
     instM2Thermal      : FB_Input;
     instM2BrakeFeedback: FB_Input;
 
@@ -69,7 +75,14 @@ END_VAR
 instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
 EmergencyStopOk := instEmergencyStopOk.State;
 
-instSlackCableSwitch(InputRaw := M1_M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal), FilterTime := T#20MS);
+// 🔧 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) — distincte du contacteur de
+// puissance ci-dessus. Réutilise le même flag simulation (même sous-système physique AU).
+instEmergencyChain(InputRaw := EmergencyChain_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
+EmergencyChain := instEmergencyChain.State;
+
+// 🔧 REX 2026-07-07 : M1_M2_SlackCableSwitch_DI → M2_SlackCableSwitch_DI (capteur physiquement
+// uniquement sur le tambour M2, le préfixe M1_M2_ ne reflétait pas la réalité du câblage)
+instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal), FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
 
 instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal), FilterTime := T#20MS);
@@ -79,11 +92,10 @@ instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.Simula
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
-instM1ContactorFwd(InputRaw := M1_FeedbackFwd_DI, FilterTime := T#20MS);
-M1ContactorFeedbackFwd := instM1ContactorFwd.State;
-
-instM1ContactorRev(InputRaw := M1_FeedbackRev_DI, FilterTime := T#20MS);
-M1ContactorFeedbackRev := instM1ContactorRev.State;
+// 🔧 REX 2026-07-07 : M1_FeedbackFwd_DI/M1_FeedbackRev_DI (par sens) remplacés par un retour
+// unique M1_FwdRevSpeedFeedbackOff_DI ("tous contacteurs sens+vitesse retombés").
+instM1FwdRevSpeedFeedbackOff(InputRaw := M1_FwdRevSpeedFeedbackOff_DI, FilterTime := T#20MS);
+M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
 
 instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ThermalM1_IsReal), FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
@@ -92,11 +104,8 @@ instM1BrakeFeedback(InputRaw := M1_BrakeFeedback_DI, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
-instM2ContactorFwd(InputRaw := M2_FeedbackFwd_DI, FilterTime := T#20MS);
-M2ContactorFeedbackFwd := instM2ContactorFwd.State;
-
-instM2ContactorRev(InputRaw := M2_FeedbackRev_DI, FilterTime := T#20MS);
-M2ContactorFeedbackRev := instM2ContactorRev.State;
+instM2FwdRevSpeedFeedbackOff(InputRaw := M2_FwdRevSpeedFeedbackOff_DI, FilterTime := T#20MS);
+M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
 
 instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ThermalM2_IsReal), FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;

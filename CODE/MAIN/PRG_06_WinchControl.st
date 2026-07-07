@@ -157,7 +157,10 @@ END_IF;
 // défaut uniquement (commande indépendante voulue). En synchro (SyncActive, mouvement cohérent
 // voulu) : n'importe quel arrêt (SafeStop, limite câble, limite légale, fin de course haut) sur
 // UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
-SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
+// 🔧 REX 2026-07-07 : instGrappin.M1SlipDetected ajouté à M1 uniquement (Méca C couche 1) — M2
+// est déjà arrêté par son propre mécanisme SevereError interne à FB_Grappin, pas besoin ici.
+SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
+                       OR instGrappin.M1SlipDetected;
 SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
 
 ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
@@ -191,8 +194,7 @@ instWinchM1(
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
     MaxStepDescente         := GVL_PERSISTENT.WinchM1MaxStepDescente,
-    ContactorFeedbackFwd    := PRG_00_Inputs.M1ContactorFeedbackFwd,
-    ContactorFeedbackRev    := PRG_00_Inputs.M1ContactorFeedbackRev,
+    FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal,
     RampAccelRate           := GVL_PERSISTENT.WinchM1RampAccelRate_Pct,
@@ -220,8 +222,7 @@ instWinchM2(
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
     MaxStepDescente         := GVL_PERSISTENT.WinchM2MaxStepDescente,
-    ContactorFeedbackFwd    := PRG_00_Inputs.M2ContactorFeedbackFwd,
-    ContactorFeedbackRev    := PRG_00_Inputs.M2ContactorFeedbackRev,
+    FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal,
     RampAccelRate           := GVL_PERSISTENT.WinchM2RampAccelRate_Pct,

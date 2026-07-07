@@ -1,10 +1,14 @@
-# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.2)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Spécification de la fonction métier Grappin (ouverture/fermeture par désynchronisation M2) et intégration dans l'orchestration générale.
-> **Version** : v1.1 (Révision — 2026-07-07)
-> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.1](AF_Partie9_Fonction_Winch_v1.1.md) §9.
+> **Version** : v1.2 (Révision — 2026-07-07)
+> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md) §9/§4quinquies.
 >
+> 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement grappin (Méca C
+> couche 1, nouveau bit4 `ErrorId` + sortie `M1SlipDetected`) — voir §4bis nouveau ci-dessous.
+> Escalade en couche 2 (bit9 `FB_Safety_Winch`, `PowerCutOff`) documentée dans Partie9 v1.5
+> §4quinquies, hors périmètre de ce document.
 > 🔧 **v1.1 (2026-07-07)** — REX terrain : inversion de la sémantique moteur M2 vis-à-vis du
 > grappin (relabeling `%Q0.0`/`%Q0.3`). Révision §2.A/§2.B (cinématique + geste joystick) et §4.A
 > (commentaire `OffsetCloseM`). Voir bandeau REX ci-dessous.
@@ -154,7 +158,11 @@ JoystickY_StartStop : BOOL;        // Validation homme-mort (AxisCmdY.StartStop)
 JoystickY_Direction : INT;         // Sens joystick (AxisCmdY.Direction) — 🔧 REX 2026-07-07 : Fermeture exige désormais +1 (haut/enrouler), Ouverture exige -1 (bas/dérouler)
 CablePosM1          : REAL;        // Position réelle M1
 CablePosM2          : REAL;        // Position réelle M2
+HomedM1             : BOOL;        // 🆕 v1.2 (déjà codé, non documenté jusqu'ici) — Codeur M1 référencé (instHomingM1.Homed)
+HomedM2             : BOOL;        // 🆕 v1.2 (idem) — Codeur M2 référencé (instHomingM2.Homed)
 Config              : ST_GrappinConfig; // Configuration RETAIN
+TimeoutDuration     : TIME := T#30s;    // 🆕 v1.2 (déjà codé) — Timeout de mouvement configurable
+M1SlipToleranceM    : REAL := 1.0;      // 🆕 v1.2 — tolérance glissement M1 pendant Busy (m), voir §4bis
 
 (* Entrées/Sorties (VAR_IN_OUT) *)
 GrappinState        : ST_GrappinState;  // État mémorisé (RETAIN)
@@ -164,19 +172,45 @@ Ready               : BOOL;
 Busy                : BOOL;
 Done                : BOOL;
 Error               : BOOL;
-ErrorId             : WORD;        // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées
+ErrorId             : WORD;        // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s) 🆕 v1.2, bit4: Glissement M1 pendant Busy 🆕 v1.2
+M1SlipDetected      : BOOL;        // 🆕 v1.2 — miroir du bit4, à consommer côté PRG_06_WinchControl (force SafeStop M1) — voir §4bis
 State               : E_State;
 StateAtError        : E_State;
 ActiveOffsetM       : REAL;        // Offset à injecter dans FB_WinchSync
 M2_StartStop        : BOOL;        // Commande StartStop vers Winch M2
 M2_Direction        : INT;         // Commande Direction vers Winch M2 — 🔧 REX 2026-07-07 : Fermeture := +1 (enroulage), Ouverture := -1 (déroulage)
 M2_ForceSlowSpeed   : BOOL;        // Bloque les contacteurs de vitesse de M2
+RemainingTravelM    : REAL;        // 🆕 v1.2 (déjà codé, non documenté jusqu'ici) — distance restante avant cible (m, jauge IHM), 0.0 hors mouvement
 ```
 
-*(Signature du FB inchangée vs v1.0 — seule la sémantique interne de `Direction` en Fermeture/
-Ouverture est inversée, voir bandeau REX. Corps ST complet et à jour dans
+*(Signature du FB étendue en v1.2 : `HomedM1`/`HomedM2`/`TimeoutDuration`/`M1SlipToleranceM`
+(entrées) et `M1SlipDetected`/`RemainingTravelM` (sorties) — certains de ces champs existaient déjà
+dans `CODE/` avant ce lot (garde-fou homing, jauge IHM) mais n'avaient jamais été répercutés ici ;
+seuls `M1SlipToleranceM`/`M1SlipDetected` sont réellement nouveaux dans le code (Méca C couche 1,
+voir §4bis). Sémantique interne de `Direction` en Fermeture/Ouverture inversée depuis v1.1, voir
+bandeau REX. Corps ST complet et à jour dans
 [`CODE/GRAPPIN/FB_Grappin.st`](../CODE/GRAPPIN/FB_Grappin.st) — pas de recopie ici, règle
 anti-doublon.)*
+
+### 🆕 D. Méca C couche 1 — Glissement M1 pendant mouvement Grappin (v1.2, 2026-07-07)
+
+Pendant l'ouverture/fermeture (M2 bouge seul, M1 doit rester **immobile**) : la position `CablePosM1`
+est mémorisée à l'entrée en état `Busy`. Si elle dérive de plus de `M1SlipToleranceM` (1.0 m,
+défaut) pendant que `Busy` reste actif → bit4 `ErrorId` → `SevereError` (coupe `M2_StartStop`,
+comme les autres causes graves de ce FB : timeout, limites, codeur non référencé) + sortie dédiée
+**`M1SlipDetected`**.
+
+`FB_Grappin` ne pilote pas M1 directement (seul `FB_Winch` instance M1 le fait) — `M1SlipDetected`
+est donc **consommée côté `PRG_06_WinchControl.st`**, OR'ée dans `SafeStopM1_Raw` pour forcer un
+`SafeStop` sur M1 spécifiquement (le couplage croisé M1/M2 existant, actif seulement si
+`SyncActive`, ne suffit pas ici puisque le grappin désactive volontairement la synchro).
+
+**Couche de secours (défense en profondeur)** : si cette couche 1 ne suffit pas (dérive continue
+au-delà de 1.0 m), une **couche 2** existe côté `FB_Safety_Winch` (bit9, tolérance
+`GrappinSlipToleranceM` = 2.0 m, armée uniquement via `GrappinHoldStillActive` câblée sur
+`instGrappin.Busy` pour l'instance M1 seule) qui escalade jusqu'à `PowerCutOff` — voir
+**Partie9 v1.5 §4quinquies** pour le détail complet de cette couche 2, hors périmètre de ce
+document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Grappin).
 
 ---
 
@@ -189,6 +223,9 @@ anti-doublon.)*
    sont **déjà à jour** avec le nouveau modèle (voir bandeau REX en tête de document) — aucune
    nouvelle recopie manuelle requise au-delà de ce qui a déjà été appliqué en session, sauf si
    une réimportation complète depuis `CODE/` est nécessaire suite à un nouvel export CODESYS.
+5. 🆕 **v1.2 (2026-07-07)** : Méca C couche 1 (bit4, `M1SlipDetected`) est **déjà codé et
+   validé** dans `CODE/GRAPPIN/FB_Grappin.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
+   également aucune nouvelle recopie manuelle requise ce lot.
 
 ---
 
@@ -204,6 +241,13 @@ anti-doublon.)*
       précisément sur site selon le jeu mécanique réel du grappin.
 - [ ] Vérifier que la validation joystick homme-mort (axe Y) correspond bien au ressenti opérateur
       attendu (haut = fermeture, bas = ouverture) — geste inversé vs la première version testée.
+- [ ] 🆕 **v1.2 (2026-07-07, Méca C couche 1)** — Pendant `Busy`, simuler une dérive de `CablePosM1`
+      au-delà de `M1SlipToleranceM` (1.0 m) → vérifier bit4 `ErrorId`, `SevereError` (coupe M2),
+      et `M1SlipDetected = TRUE`. Vérifier ensuite que `PRG_06_WinchControl.SafeStopM1_Raw` force
+      bien `SafeStop` sur `instWinchM1` (et seulement M1, pas M2).
+- [ ] 🆕 **v1.2** — Vérifier que la couche 2 (`FB_Safety_Winch` bit9, `PowerCutOff`, Partie9 v1.5
+      §4quinquies) ne s'active que si la couche 1 ci-dessus n'a pas suffi à contenir la dérive
+      (tolérance 2.0 m > 1.0 m) — test d'escalade complet, pas seulement la couche 1 isolément.
 
 ---
 
@@ -211,5 +255,6 @@ anti-doublon.)*
 - **Partie 2 v2.7** — Architecture (mapping M1/M2, `FB_Grappin` dans l'arborescence `GRAPPIN`).
 - **Partie 3 v1.3** — Contrat FB (interface standard, `ErrorId`, reset).
 - **Partie 4 v1.2** §6 — Cycle (intégration du grappin dans la séquence de dragage).
-- **Partie 9 v1.1** §9 — Fonction Winch (M2, dépendance directe : `M2_StartStop`/`M2_Direction`
-  consommés par `FB_Winch` instance M2).
+- **Partie 9 v1.5** 🔧 v1.2 §9/§4quinquies — Fonction Winch (M2, dépendance directe :
+  `M2_StartStop`/`M2_Direction` consommés par `FB_Winch` instance M2 ; couche 2 de l'escalade
+  glissement M1, voir §4.D ci-dessus).

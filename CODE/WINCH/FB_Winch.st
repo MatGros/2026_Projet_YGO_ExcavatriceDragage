@@ -50,6 +50,18 @@
       librement remonter pour reprendre le mou, sans déclencher de décélération. Le
       masquage `RelayRev := FALSE` sur `ForbidDescent` reste EN PLUS, inconditionnel
       (filet de sécurité direct, indépendant de la rampe).
+   🔴🔧 REX 2026-07-07 : NOUVELLE DONNÉE TERRAIN — `ContactorFeedbackFwd`/`ContactorFeedbackRev`
+      (retour individuel par sens) SUPPRIMÉS côté matériel, remplacés par UN SEUL retour par
+      treuil (`FwdRevSpeedFeedbackOff` = "tous contacteurs sens+vitesse retombés"). Conséquences :
+      - `FwdContactorCheck`/`RevContactorCheck` (2 diagnostics séparés) fusionnés en UN seul
+        `ContactorsCheck` (`ST_ContactorCheck`) — on ne sait plus DIRE lequel est resté collé.
+      - Détection **StuckClosed uniquement**, vérifiée **seulement à l'arrêt commandé** (tous
+        relais/contacteurs à FALSE) : si `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` dans le
+        délai `ContactorFeedbackTimeout`, défaut "contacteur(s) collé(s)" global (bit1 `ErrorId`).
+      - `StuckOpen` n'a plus de sens (pas de confirmation individuelle par sens quand un
+        mouvement est commandé) — `ContactorsCheck.StuckOpen` reste toujours `FALSE`, gardé
+        uniquement pour la compatibilité de type `ST_ContactorCheck` (partagé avec `BrakeContactorCheck`).
+      - Bit2 `ErrorId` (ex-RevContactorCheck) est désormais **libre/inutilisé**.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
@@ -66,10 +78,10 @@ VAR_INPUT
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
     MaxStepDescente         : INT := 2;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse
-    ContactorFeedbackFwd    : BOOL;
-    ContactorFeedbackRev    : BOOL;
+    FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
+                                       // retombés" (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback           : BOOL;
-    BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,
+    BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed (axe simulé,
                                        // voir GVL_Simulation.ContactorFeedbackMx_IsReal — TOUJOURS FALSE réel)
     RampAccelRate           : REAL := 50.0;
     RampDecelNormalRate     : REAL := 150.0;
@@ -104,8 +116,7 @@ VAR_OUTPUT
     Contactor4          : BOOL;
     StepNumber          : INT;
     BrakeCmd            : BOOL;
-    FwdContactorCheck   : ST_ContactorCheck;
-    RevContactorCheck   : ST_ContactorCheck;
+    ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
     BrakeContactorCheck : ST_ContactorCheck;
 END_VAR
 VAR
@@ -117,8 +128,8 @@ VAR
     ErrorEdge           : R_TRIG;
     DirectionChangeDelay: TON;
     CommandedDirection  : INT;
-    TonFwdFeedback      : TON;
-    TonRevFeedback      : TON;
+    TonContactorsDropped: TON;   // 🔧 REX 2026-07-07 : remplace TonFwdFeedback/TonRevFeedback
+    AllContactorsCommandedOff : BOOL; // 🔧 REX 2026-07-07
     RampTargetPct       : REAL;
     DirectionChangePending : BOOL;
     EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
@@ -228,25 +239,20 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev
 BrakeCmd := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
 
-FwdContactorCheck.Command := RelayFwd;
-FwdContactorCheck.Feedback := ContactorFeedbackFwd;
-TonFwdFeedback(IN := (RelayFwd <> ContactorFeedbackFwd), PT := ContactorFeedbackTimeout);
-IF TonFwdFeedback.Q THEN
-    FwdContactorCheck.StuckClosed := (NOT RelayFwd AND ContactorFeedbackFwd);
-    FwdContactorCheck.StuckOpen   := (RelayFwd AND NOT ContactorFeedbackFwd);
-ELSIF ResetEdge.Q THEN
-    FwdContactorCheck.StuckClosed := FALSE; FwdContactorCheck.StuckOpen := FALSE;
-END_IF;
+// 🔧 REX 2026-07-07 : vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens —
+// voir bandeau en-tête). AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
+AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
+                             AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
 
-RevContactorCheck.Command := RelayRev;
-RevContactorCheck.Feedback := ContactorFeedbackRev;
-TonRevFeedback(IN := (RelayRev <> ContactorFeedbackRev), PT := ContactorFeedbackTimeout);
-IF TonRevFeedback.Q THEN
-    RevContactorCheck.StuckClosed := (NOT RelayRev AND ContactorFeedbackRev);
-    RevContactorCheck.StuckOpen   := (RelayRev AND NOT ContactorFeedbackRev);
+ContactorsCheck.Command  := NOT AllContactorsCommandedOff;   // TRUE = au moins un contacteur commandé
+ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;      // TRUE = au moins un contacteur pas retombé
+TonContactorsDropped(IN := AllContactorsCommandedOff AND NOT FwdRevSpeedFeedbackOff, PT := ContactorFeedbackTimeout);
+IF TonContactorsDropped.Q THEN
+    ContactorsCheck.StuckClosed := TRUE;
 ELSIF ResetEdge.Q THEN
-    RevContactorCheck.StuckClosed := FALSE; RevContactorCheck.StuckOpen := FALSE;
+    ContactorsCheck.StuckClosed := FALSE;
 END_IF;
+ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
 
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
@@ -255,22 +261,17 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🧪 Simulation (GVL_Simulation.ContactorFeedbackMx_IsReal, passé par l'appelant via
-// BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed/
-// StuckOpen se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
+// BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
+// se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
+// 🔧 REX 2026-07-07 : bit2 (ex-RevContactorCheck) libre/inutilisé, fusionné dans bit1.
 IF NOT BypassContactorCheck THEN
-    IF FwdContactorCheck.StuckClosed OR FwdContactorCheck.StuckOpen THEN
+    IF ContactorsCheck.StuckClosed THEN
         ErrorId := ErrorId OR 16#0002;
     ELSIF ResetEdge.Q THEN
         ErrorId := ErrorId AND 16#FFFD;
     END_IF;
-
-    IF RevContactorCheck.StuckClosed OR RevContactorCheck.StuckOpen THEN
-        ErrorId := ErrorId OR 16#0004;
-    ELSIF ResetEdge.Q THEN
-        ErrorId := ErrorId AND 16#FFFB;
-    END_IF;
 ELSE
-    ErrorId := ErrorId AND 16#FFF9;   // Bypass actif : efface/maintient à 0 les bits 1/2
+    ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
 END_IF;
 
 Error := (ErrorId <> 16#0000);

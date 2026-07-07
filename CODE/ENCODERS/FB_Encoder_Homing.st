@@ -44,8 +44,8 @@ VAR_INPUT
                                          // IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
                                          // voir PRG_MAIN.st
     TopSensorPositionM   : REAL := 12.5;  // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
-    ContactorFeedbackFwd : BOOL;        // Retour contacteur sens avant CE TREUIL — arrêt confirmé
-    ContactorFeedbackRev : BOOL;        // Retour contacteur sens arrière CE TREUIL — arrêt confirmé
+    FwdRevSpeedFeedbackOff : BOOL;      // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
+                                         // retombés" CE TREUIL — arrêt confirmé (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)
     RawPos               : UDINT;       // Sortie FB_Encoder_Abs (déjà gelée sur doute)
     EncoderAvailable     : BOOL;        // Sortie FB_Encoder_Abs
@@ -132,7 +132,8 @@ END_IF;
 // ⚠️ `TopSensorPositionM` n'est PAS revalidée contre le bornage [-99.00;+99.00] m (§3.6) dans ce
 // lot : c'est un paramètre RETAIN de mise en service (comme CableM_PerRev/PointsPerRev), pas une
 // saisie opérateur par requête — valeur indicative ≈12.50 m largement dans la plage.
-ArretConfirme := (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev) AND (NOT BrakeFeedback);
+// 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
+ArretConfirme := FwdRevSpeedFeedbackOff AND (NOT BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
