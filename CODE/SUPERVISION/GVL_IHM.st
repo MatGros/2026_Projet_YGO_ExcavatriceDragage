@@ -34,9 +34,11 @@ END_VAR
         device précis est déjà câblé réel, basculer UNIQUEMENT son
         `_IsReal` à TRUE (ex. GVL_Simulation.EmergencyStopChain_IsReal).
       - Forcer la demande de mode machine en maintenance N1 :
-        ModeRequest_IHM := E_Mode.MAINT_N1
-      - Acquitter les défauts initiaux en basculant la variable générale :
-        MachineReset_IHM := TRUE puis FALSE (front)
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1
+      - Acquitter les défauts initiaux domaine sécurité/métier (🔧 REX 2026-07-07 : plus de
+        reset unique — Modes/Cycle ont chacun le leur, voir GVL_IHM.Modes.ModeReset /
+        CmdResetCycle_IHM dans PRG_05_Cycle) :
+        GVL_IHM.Modes.FaultMachineReset := TRUE puis FALSE (front)
 
    2. TEST DU MOUVEMENT DES TREUILS :
       - Le homme-mort joystick reste RÉEL (plus de bypass) : simuler un appui

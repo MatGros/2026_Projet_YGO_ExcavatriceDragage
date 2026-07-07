@@ -13,10 +13,9 @@ END_VAR
 
 instModes(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    Reset               := GVL_IHM.Modes.ModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     ModeRequest         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
-    PasswordOk          := GVL_Modes_Stub.PasswordOk_IHM,       // 🖥️ Stub mot de passe
     OverrideSyncRequest := GVL_Modes_Stub.OverrideSyncRequest_IHM,
     EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent   // 1 cycle de retard (reçu de PRG_02_Encoders)
 );

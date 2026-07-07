@@ -7,10 +7,12 @@
       métier) + garde-fous minimaux :
       - Refuse `SEMI_AUTO` si un défaut codeur est présent (`EncoderFaultPresent`,
         agrégat `FB_Encoder_Safety` M1/M2) → repli `MAINT_N1`, ErrorId bit0.
-      - Refuse `MAINT_N2` sans mot de passe (`PasswordOk`, stub) → repli `MAINT_N1`,
-        ErrorId bit1.
       - Sort `OverrideSync` (= Mode=MAINT_N2 AND OverrideSyncRequest) pour `FB_WinchSync.Enable`
         (Partie5 §2 "Logique d'override" : `FB_WinchSync.Enable := NOT OverrideSync`).
+   🔧 REX 2026-07-07 : contrôle `PasswordOk`/bit1 (`MAINT_N2` sans mot de passe) retiré à la
+      demande explicite de l'utilisateur — l'accès à `MAINT_N2` est désormais géré **uniquement**
+      côté IHM (visibilité des actions selon niveau utilisateur), pas de filet de sécurité côté
+      automate. `ModeRequest = MAINT_N2` est donc accepté sans condition supplémentaire.
    🔴 HORS PÉRIMÈTRE CE LOT (Partie5 §2/§3, pas encore codé faute de FB_Cycle/FB_Grappin) :
       `OverrideGrappin`, `OverrideLimit`/limite légale de dragage. À ajouter quand
       `FB_Cycle`/`FB_Grappin` existeront — ne pas inventer un override sans consommateur.
@@ -24,10 +26,9 @@
 FUNCTION_BLOCK PUBLIC FB_Modes
 VAR_INPUT
     Enable              : BOOL;        // Standard
-    Reset               : BOOL;        // Acquittement défaut (front) — bits 0/1
+    Reset               : BOOL;        // Acquittement défaut (front) — bit0
     EmergencyStopOk     : BOOL;        // Standard
     ModeRequest         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
-    PasswordOk          : BOOL;        // 🖥️ GVL_Modes_Stub.PasswordOk_IHM — authentification MAINT_N2 (stub)
     OverrideSyncRequest : BOOL;        // 🖥️ GVL_Modes_Stub.OverrideSyncRequest_IHM — case à cocher N2
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
 END_VAR
@@ -36,7 +37,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : SEMI_AUTO refusé (défaut codeur) ; bit1 : MAINT_N2 refusé (mot de passe)
+    ErrorId             : WORD;        // bit0 : SEMI_AUTO refusé (défaut codeur)
     State               : E_State;
     StateAtError        : E_State;
     Mode                : E_Mode;      // 🎯 Mode ARBITRÉ — diffusé à TOUS les FB métier (remplace E_Mode.MAINT_N1 codé en dur)
@@ -73,17 +74,10 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// bit1 : MAINT_N2 demandé sans mot de passe → refusé, repli MAINT_N1
-IF (ModeRequest = E_Mode.MAINT_N2) AND NOT PasswordOk THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
-
 // 📤 4. ARBITRAGE DU MODE
+// 🔧 REX 2026-07-07 : plus de garde-fou mot de passe ici — MAINT_N2 accepté directement,
+// l'accès est filtré en amont côté IHM (visibilité des actions selon niveau utilisateur).
 IF (ModeRequest = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    Mode := E_Mode.MAINT_N1;
-ELSIF (ModeRequest = E_Mode.MAINT_N2) AND NOT PasswordOk THEN
     Mode := E_Mode.MAINT_N1;
 ELSE
     Mode := ModeRequest;

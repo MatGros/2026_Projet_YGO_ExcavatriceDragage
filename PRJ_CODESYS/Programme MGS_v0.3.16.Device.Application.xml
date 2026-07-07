@@ -121,12 +121,11 @@
       <UserDefElement iecname="Operational" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="Calibrate" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_ModesHMI" size="7" nativesize="8" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ModesHMI">
+    <TypeUserDef name="T_ST_ModesHMI" size="6" nativesize="6" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ModesHMI">
       <UserDefElement iecname="CurrentMode" type="T_E_Mode" byteoffset="0" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="ModeRequest" type="T_E_Mode" byteoffset="2" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="PasswordOk" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="EmergencyStopOk" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="MachineReset" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EmergencyStopOk" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MachineReset" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_SyncHMI" size="17" nativesize="20" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SyncHMI">
       <UserDefElement iecname="SyncToleranceM" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />

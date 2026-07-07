@@ -16,7 +16,7 @@ END_VAR
 // 1. Sécurité Treuil M1
 instSafetyWinchM1(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     OverrideSync        := PRG_04_Modes.instModes.OverrideSync,
@@ -35,7 +35,7 @@ instSafetyWinchM1(
 // 2. Sécurité Treuil M2
 instSafetyWinchM2(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     OverrideSync        := PRG_04_Modes.instModes.OverrideSync,
@@ -54,7 +54,7 @@ instSafetyWinchM2(
 // 3. Sécurité Chariot M3
 instSafetyChariotM3(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online,
