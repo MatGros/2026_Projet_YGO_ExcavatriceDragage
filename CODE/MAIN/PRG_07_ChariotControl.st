@@ -59,7 +59,7 @@ END_CASE;
 // ── 2. EXÉCUTION DU PILOTAGE DU CHARIOT M3 ──────────────────────────────
 instChariotM3(
     Enable                  := PRG_06_WinchControl.StubMachineEnableN1,
-    Reset                   := PRG_09_Supervision.MachineReset_IHM,
+    Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M3_StartStop_Active,

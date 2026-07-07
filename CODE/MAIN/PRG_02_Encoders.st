@@ -49,14 +49,17 @@ instSimEncoderM2(
     PresetValue := COD2_PresetValue
 );
 
-// Aiguillage (par device — suit l'état Operational réel, lui-même piloté par EncoderM1/M2_IsReal)
-IF NOT PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational THEN
+// Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
+// simulation par PRG_01_Diagnostics [SEL sur EncoderMx_IsReal] pour ne pas remonter de faux
+// défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
+// lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
+IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal THEN
     M1_RawPosToUse := instSimEncoderM1.RawPosOut;
 ELSE
     M1_RawPosToUse := COD1_PosValue;
 END_IF;
 
-IF NOT PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational THEN
+IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal THEN
     M2_RawPosToUse := instSimEncoderM2.RawPosOut;
 ELSE
     M2_RawPosToUse := COD2_PosValue;
@@ -65,7 +68,7 @@ END_IF;
 // 2. TREUIL M1 (Abs → Scale → Homing)
 instEncoderAbsM1(
     Enable              := TRUE,
-    Reset               := (GVL_Encoder_Stub.M1_Reset_IHM OR PRG_09_Supervision.MachineReset_IHM),
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
@@ -89,11 +92,11 @@ instEncoderScaleM1(
 instHomingM1(
     Enable               := TRUE,
     Calib                := GVL_PERSISTENT.CalibM1,
-    Reset                := (GVL_Encoder_Stub.M1_Reset_IHM OR PRG_09_Supervision.MachineReset_IHM),
+    Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := (GVL_Encoder_Stub.StubHomeButton_IHM AND ((GVL_Encoder_Stub.HomingMode_IHM = 1) OR (GVL_Encoder_Stub.HomingMode_IHM = 3))),
-    ConfirmCoherence     := GVL_Encoder_Stub.M1_ConfirmCoherence_IHM,
+    Home                 := GVL_IHM.WinchM1.CmdHome,          // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    ConfirmCoherence     := GVL_IHM.WinchM1.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
     ContactorFeedbackFwd := PRG_00_Inputs.M1ContactorFeedbackFwd,
@@ -111,7 +114,7 @@ instHomingM1(
 // 3. TREUIL M2 (Abs → Scale → Homing)
 instEncoderAbsM2(
     Enable              := TRUE,
-    Reset               := (GVL_Encoder_Stub.M2_Reset_IHM OR PRG_09_Supervision.MachineReset_IHM),
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
@@ -135,11 +138,11 @@ instEncoderScaleM2(
 instHomingM2(
     Enable               := TRUE,
     Calib                := GVL_PERSISTENT.CalibM2,
-    Reset                := (GVL_Encoder_Stub.M2_Reset_IHM OR PRG_09_Supervision.MachineReset_IHM),
+    Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := (GVL_Encoder_Stub.StubHomeButton_IHM AND ((GVL_Encoder_Stub.HomingMode_IHM = 2) OR (GVL_Encoder_Stub.HomingMode_IHM = 3))),
-    ConfirmCoherence     := GVL_Encoder_Stub.M2_ConfirmCoherence_IHM,
+    Home                 := GVL_IHM.WinchM2.CmdHome,          // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    ConfirmCoherence     := GVL_IHM.WinchM2.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,
     ContactorFeedbackFwd := PRG_00_Inputs.M2ContactorFeedbackFwd,
@@ -157,7 +160,7 @@ instHomingM2(
 // 4. SÉCURITÉ DE BORNAGE ET INCOHÉRENCE
 instEncoderSafetyM1(
     Enable          := TRUE,
-    Reset           := (GVL_Encoder_Stub.M1_Reset_IHM OR PRG_09_Supervision.MachineReset_IHM),
+    Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM1.CablePosM,
@@ -169,7 +172,7 @@ EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 
 instEncoderSafetyM2(
     Enable          := TRUE,
-    Reset           := (GVL_Encoder_Stub.M2_Reset_IHM OR PRG_09_Supervision.MachineReset_IHM),
+    Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM2.CablePosM,

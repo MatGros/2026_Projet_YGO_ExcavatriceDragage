@@ -14,6 +14,7 @@ VAR
     CmdStartCycle_IHM   : BOOL;         // Lancement cycle automatique
     CmdPauseCycle_IHM   : BOOL;         // Pause cycle automatique
     CmdAbortCycle_IHM   : BOOL;         // Abandon / arrêt cycle automatique
+    CmdResetCycle_IHM   : BOOL;         // 🔧 REX 2026-07-07 : reset dédié FB_Cycle, jamais mélangé au reset défauts général
 
     // Paramètres cibles réglés par l'opérateur
     TargetDepthM        : REAL := -12.5; // Profondeur de dragage cible (mètres, négative)
@@ -25,7 +26,7 @@ END_VAR
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
     Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
-    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     
     StartCycle          := CmdStartCycle_IHM,

@@ -67,7 +67,7 @@ END_IF;
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
     Enable          := NOT PRG_04_Modes.instModes.OverrideSync AND NOT instGrappin.Busy,
-    Reset           := PRG_09_Supervision.MachineReset_IHM,
+    Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM1      := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -95,7 +95,7 @@ instWinchSync(
 // ── 4. COMMANDE DU GRAPPIN (Séquence lente) ─────────────────────────────
 instGrappin(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.MachineReset_IHM,
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     CmdOpen_IHM         := GVL_IHM.Grappin.CmdOpen OR PRG_05_Cycle.instCycle.CmdGrappin_Open,
@@ -148,7 +148,7 @@ ForbidDescentM2_Active := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
     Enable                  := StubMachineEnableN1,
-    Reset                   := PRG_09_Supervision.MachineReset_IHM,
+    Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M1_StartStop_Active,
@@ -177,7 +177,7 @@ instWinchM1(
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
 instWinchM2(
     Enable                  := StubMachineEnableN1,
-    Reset                   := PRG_09_Supervision.MachineReset_IHM,
+    Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M2_StartStop_Active,

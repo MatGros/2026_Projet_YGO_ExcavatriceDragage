@@ -3,38 +3,35 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 9.
    ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
-   ✅ Expose MachineReset_IHM pour tous les autres programmes.
+   ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
+   🔧 REX 2026-07-07 : séparation des resets — l'ancien MachineReset_IHM (unique, câblé sur
+      TOUT y compris FB_Modes/FB_Cycle) est retiré. FaultMachineReset_IHM ne couvre plus que le
+      domaine sécurité/métier (Winch, Safety, Encodeurs, Grappin, Joystick, Chariot) ;
+      FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.ModeReset côté
+      PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_09_Supervision
 VAR_OUTPUT
-    MachineReset_IHM : BOOL; // 🔑 Signal d'acquittement général de la machine (OR des boutons HMI)
+    FaultMachineReset_IHM : BOOL; // 🔔 Acquittement défauts domaine sécurité/métier (OR des boutons HMI) — jamais Modes/Cycle
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_09_Supervision) ===
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
-GVL_Modes_Stub.PasswordOk_IHM          := GVL_IHM.Modes.PasswordOk;
 GVL_Modes_Stub.OverrideSyncRequest_IHM := GVL_IHM.Sync.OverrideSync;
 StubChariotPositionSelect_IHM          := GVL_IHM.Chariot.SelectedTargetNum;
 
-// Signal de reset général
-MachineReset_IHM := GVL_IHM.Modes.MachineReset 
-                    OR GVL_IHM.WinchM1.CmdReset 
-                    OR GVL_IHM.WinchM2.CmdReset 
+// Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
+FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
+                    OR GVL_IHM.WinchM1.CmdReset
+                    OR GVL_IHM.WinchM2.CmdReset
                     OR GVL_IHM.Grappin.CmdReset;
 
-// Bouton Homing IHM
-IF GVL_IHM.WinchM1.CmdHome THEN
-    GVL_Encoder_Stub.HomingMode_IHM := 1;
-    GVL_Encoder_Stub.StubHomeButton_IHM := TRUE;
-ELSIF GVL_IHM.WinchM2.CmdHome THEN
-    GVL_Encoder_Stub.HomingMode_IHM := 2;
-    GVL_Encoder_Stub.StubHomeButton_IHM := TRUE;
-ELSE
-    GVL_Encoder_Stub.StubHomeButton_IHM := FALSE;
-END_IF;
+// 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
+// homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
+// directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
 // ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.Joystick.Calibrate dans PRG_01_Diagnostics (ligne 48)
 // PRG_01_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.Joystick.Calibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)

@@ -28,7 +28,7 @@ instSimJoystick(
 // 1. Diagnostics CANopen
 instDiagCanOpen(
     Enable := TRUE,
-    Reset := PRG_09_Supervision.MachineReset_IHM,
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     CanOnline := (CANbus.GetBusState() = 1) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal), // 1 = ACTIVE (ou simulation)
     CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal)
 );
@@ -36,7 +36,7 @@ instDiagCanOpen(
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
 instDiagEthercat(
     Enable := TRUE,
-    Reset := PRG_09_Supervision.MachineReset_IHM,          // 🔑 Bouton général machine
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
     VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal),
     VariateurSlaveState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
     EncoderM1WcState := (COD1_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal),
@@ -46,22 +46,29 @@ instDiagEthercat(
 );
 
 // 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT Joystick_IsReal
+// 🔴🔧 REX 2026-07-07 — TEST BANC UNIQUEMENT, PAS DE VALEUR PRODUCTION :
+//    DeadmanRearmTimeout 10s → 5min, NeutralHoldTime 500ms → 1s (confort d'essai, moins de
+//    réappuis/traversées à gérer). ⚠️ RÉDUIT RÉELLEMENT LA SÉCURITÉ HOMME-MORT — à repasser
+//    impérativement à T#10S / T#500MS (ou retirer ces 2 lignes, le FB reprend ses défauts sûrs)
+//    avant toute mise en service réelle avec la machine.
 FB_Joystick_0(
-    Enable          := TRUE,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
-    Reset           := PRG_09_Supervision.MachineReset_IHM,
-    NeutralXMem     := GVL_PERSISTENT.JoystickNeutralX,
-    NeutralYMem     := GVL_PERSISTENT.JoystickNeutralY,
-    BusCanOpenOP    := instDiagCanOpen.busCanOpen,
-    JoystickOP      := instDiagCanOpen.Joystick,
-    RawX            := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
-    RawY            := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
-    RawButton       := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
-    Calibrate       := GVL_IHM.Joystick.Calibrate,
-    InvertX         := FALSE,
-    InvertY         := FALSE,
-    Deadband        := 10.0,
-    FilterTime      := TIME#100ms,
-    AccelRate       := 50.0,
-    DecelRate       := 150.0
+    Enable              := TRUE,
+    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    NeutralXMem         := GVL_PERSISTENT.JoystickNeutralX,
+    NeutralYMem         := GVL_PERSISTENT.JoystickNeutralY,
+    BusCanOpenOP        := instDiagCanOpen.busCanOpen,
+    JoystickOP          := instDiagCanOpen.Joystick,
+    RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
+    RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
+    RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
+    Calibrate           := GVL_IHM.Joystick.Calibrate,
+    InvertX             := FALSE,
+    InvertY             := FALSE,
+    Deadband            := 10.0,
+    FilterTime          := TIME#100ms,
+    AccelRate           := 50.0,
+    DecelRate           := 150.0,
+    DeadmanRearmTimeout := T#5M,    // 🔴 TEST BANC — défaut sûr T#10S, voir bandeau ci-dessus
+    NeutralHoldTime     := T#1S     // 🔴 TEST BANC — défaut sûr T#500MS, voir bandeau ci-dessus
 );
