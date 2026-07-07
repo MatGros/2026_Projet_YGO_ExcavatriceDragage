@@ -35,6 +35,7 @@ VAR_INPUT
     Enable          : BOOL;       // Active la logique
     Reset           : BOOL;       // Acquittement défaut
     EmergencyStopOk : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
+    Mode            : E_Mode;     // 🆕 REX 2026-07-08 — changement de mode désarme le homme-mort (voir §4ter)
     BusCanOpenOP    : ST_DeviceDiag;       // État présence nœud CAN
     JoystickOP      : ST_DeviceDiag;       // Mode esclave CANopen actif
     RawX            : INT;        // Valeur brute axe X
@@ -88,6 +89,7 @@ VAR
     DeadmanTimer    : TON;      // 🆕 2026-07-03decies — délai max entre 2 appuis en mouvement (reconfirmation)
     NeutralHoldTimer: TON;      // 🆕 2026-07-03duodecies — filtre les traversées rapides du neutre (inversion)
     LeftNeutralSinceArm : BOOL; // 🔧 2026-07-03terdecies — a réellement quitté le neutre depuis l'armement
+    LastMode        : E_Mode;  // 🆕 REX 2026-07-08 — détecte le changement de mode (voir §4ter)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
@@ -106,6 +108,7 @@ IF NOT Enable OR NOT EmergencyStopOk OR NOT BusCanOpenOP.Operational OR NOT Joys
     NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);   // 🆕 2026-07-03duodecies — idem
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
+    LastMode := Mode;   // 🆕 REX 2026-07-08 — pas de faux changement détecté à la réactivation
     RETURN;
 END_IF;
 
@@ -142,6 +145,17 @@ LastCalibrate := Calibrate;
 // 🧮 4bis. MISE À L'ÉCHELLE (avant homme-mort — le neutre s'évalue sur les 2 axes déjà deadbandés)
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, Deadband := Deadband);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
+
+// 🆕 4ter-bis. CHANGEMENT DE MODE (REX 2026-07-08, demande utilisateur) : désarme le homme-mort
+// dès que Mode change (MAINT_N1/N2/SEMI_AUTO/AUTO) — évite qu'une commande en cours (manche non
+// centré) ne "traverse" le changement de mode et ne soit réinterprétée soudainement dans le
+// nouveau contexte de mode (risque de mouvement soudain). Repassage par le neutre + nouvel appui
+// bouton exigé, comme n'importe quel désarmement (§4ter ci-dessous).
+IF Mode <> LastMode THEN
+    DeadmanArmed := FALSE;
+    LeftNeutralSinceArm := FALSE;
+END_IF;
+LastMode := Mode;
 
 // 🔴 4ter. BOUTON HOMME-MORT (2026-07-03octies + renforcé decies/duodecies/terdecies — voir en-tête)
 DeadmanEdge(CLK := RawButton);

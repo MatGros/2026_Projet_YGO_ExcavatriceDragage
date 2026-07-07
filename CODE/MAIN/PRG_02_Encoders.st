@@ -32,6 +32,8 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
 // 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
+// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 —
+// survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
     RelayFwd    := PRG_10_Outputs.M1RelayFwd,
@@ -39,7 +41,8 @@ instSimEncoderM1(
     SpeedRefPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor  // 🔧 REX 2026-07-07 : confort de test
+    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
+    RawPos      := GVL_PERSISTENT.SimEncoderRawPosM1
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
@@ -48,7 +51,8 @@ instSimEncoderM2(
     SpeedRefPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor  // 🔧 REX 2026-07-07 : confort de test
+    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
+    RawPos      := GVL_PERSISTENT.SimEncoderRawPosM2
 );
 
 // Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
