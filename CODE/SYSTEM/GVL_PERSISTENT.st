@@ -23,6 +23,16 @@ VAR_GLOBAL PERSISTENT RETAIN
     HomingTargetM1_M : REAL := 12.5; // 💾 Hauteur cible homing M1 (mètres) — ⚠️ perte = homing invalide
     HomingTargetM2_M : REAL := 12.5; // 💾 Hauteur cible homing M2 (mètres) — ⚠️ perte = homing invalide
 
+    // 🧪 REX 2026-07-08 : compteur brut du codeur SIMULÉ (FB_Sim_Encoder, banc de test UNIQUEMENT,
+    // sans rapport avec une calibration réelle). Doit survivre à un reset FROID comme le ferait un
+    // vrai codeur absolu physique (indépendant de l'automate) — regroupé ici avec le reste des
+    // PERSISTENT RETAIN plutôt que déclaré localement dans le FB (PERSISTENT n'est valide que sur
+    // du VAR_GLOBAL en CODESYS). Sans ça, HomingSuspect (§3.7) se levait à tort après chaque reboot
+    // à froid en simulation : CalibMx.LastKnownRawPos (vrai PERSISTENT) survivait, mais ce compteur
+    // simulé retombait à sa valeur par défaut, créant un écart artificiel détecté comme incohérent.
+    SimEncoderRawPosM1 : UDINT := 1000000; // 🧪 Simulation uniquement — pas une donnée de calibration réelle
+    SimEncoderRawPosM2 : UDINT := 1000000; // 🧪 Simulation uniquement — pas une donnée de calibration réelle
+
     // ═══════════════════════════════════════════════════════════
     // 🕹️ JOYSTICK — Points neutres calibrés
     // ═══════════════════════════════════════════════════════════

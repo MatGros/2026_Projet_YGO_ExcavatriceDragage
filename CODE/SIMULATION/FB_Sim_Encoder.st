@@ -20,6 +20,12 @@
       d'origine. Câblé sur GVL_Simulation.EncoderSimSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔧 REX 2026-07-08 : `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB (tenté en `VAR RETAIN` puis
+      `VAR PERSISTENT RETAIN` locaux, aucun des deux ne convient). Un vrai codeur absolu physique
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
+      il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===
@@ -37,8 +43,10 @@ END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;
 END_VAR
+VAR_IN_OUT
+    RawPos      : UDINT;   // 🔧 REX 2026-07-08 : référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 (survit au reset froid)
+END_VAR
 VAR
-    RawPos      : UDINT := 1000000;   // Valeur médiane arbitraire (même défaut que l'ancien SimulatedMxRaw)
     Increment   : UDINT;              // 🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x
 END_VAR
 

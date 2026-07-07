@@ -55,6 +55,7 @@ FB_Joystick_0(
     Enable              := TRUE,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
     NeutralXMem         := GVL_PERSISTENT.JoystickNeutralX,
     NeutralYMem         := GVL_PERSISTENT.JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.busCanOpen,
