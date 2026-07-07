@@ -125,6 +125,7 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie9_Fonction_Winch_v1.1.md](DOC/AF_Partie9_Fonction_Winch_v1.1.md) — Fonction Winch (M1/M2, safety mou de câble/thermique)
 - [AF_Partie10_Fonction_Encoder_Homing_v1.6.md](DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md) — Codeur & Homing
 - [AF_Partie11_Fonction_Chariot_v1.2.md](DOC/AF_Partie11_Fonction_Chariot_v1.2.md) — Fonction Chariot (M3, ex-Translation)
+- [AF_Partie12_Fonction_Grappin_v1.1.md](DOC/AF_Partie12_Fonction_Grappin_v1.1.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture)
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 
 ### 📐 Plan de numérotation

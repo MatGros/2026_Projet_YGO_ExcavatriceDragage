@@ -62,17 +62,21 @@ END_VAR
       - La position calculée (CablePosM) doit se caler exactement à 12.5m
         (ou la valeur définie par M1_TopSensorPositionM / M2_TopSensorPositionM).
 
-   4. TEST DU GRAPPIN (OUVERTURE / FERMETURE) :
-      - S'assurer que les treuils ont été préalablement référencés (Homed = TRUE).
+   4. TEST DU GRAPPIN (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
+      - S'assurer que les treuils ont été préalablement référencés (Homed = TRUE sur M1 ET M2 —
+        désormais vérifié en dur par FB_Grappin, bit3 ErrorId "Codeur(s) non référencé(s)" sinon).
       - Choisir une commande Grappin sur l'IHM :
         * Pour OUVRIR : GVL_IHM.Grappin.CmdOpen := TRUE (et CmdClose := FALSE)
         * Pour FERMER : GVL_IHM.Grappin.CmdClose := TRUE (et CmdOpen := FALSE)
       - Actionner et maintenir le joystick Y dans le sens correspondant :
-        * UP (Direction = 1) pour l'ouverture
-        * DOWN (Direction = -1) pour la fermeture
+        * UP / enrouler (Direction = 1) pour la FERMETURE
+        * DOWN / dérouler (Direction = -1) pour l'OUVERTURE
       - Le bloc Grappin prend le contrôle de M2 en vitesse lente forcée :
-        * En ouverture, le codeur simulé M2 augmente jusqu'à ce que CablePosM2 >= CablePosM1 + OffsetOpenM (12.5m + 0.0m = 12.5m).
-        * En fermeture, le codeur simulé M2 diminue jusqu'à ce que CablePosM2 <= CablePosM1 + OffsetCloseM (12.5m - 1.5m = 11.0m).
+        * En fermeture, le codeur simulé M2 augmente jusqu'à ce que CablePosM2 >= CablePosM1 + OffsetCloseM (12.5m + 10.0m = 22.5m).
+        * En ouverture, le codeur simulé M2 diminue jusqu'à ce que CablePosM2 <= CablePosM1 + OffsetOpenM (12.5m + 0.0m = 12.5m).
+          ⚠️ Juste après un homing M1+M2 (les deux à 12.5m), la cible d'ouverture est DÉJÀ atteinte
+          (CablePosM2 = CablePosM1) : une demande d'ouverture se termine donc immédiatement (Done)
+          sans mouvement réel de M2 — comportement normal, pas un bug.
       - Vérifier que Grappin.Busy passe à FALSE et Grappin.Done à TRUE lorsque la
         cible est atteinte, et que l'état physique du grappin est mis à jour.
       - Relâcher le joystick pour terminer le cycle de commande.

@@ -80,10 +80,15 @@ VAR_GLOBAL PERSISTENT RETAIN
     // ═══════════════════════════════════════════════════════════
     // 🪣 GRAPPIN — Offsets de position et état mécanique mémorisé
     //    ⚠️ Perte OffsetCloseM → retour à 0 = grappin ne se ferme plus
+    //    ⚠️ REX 2026-07-07 : signe de OffsetCloseM inversé (-1.5 → +10.0) suite au
+    //       constat terrain d'inversion du sens moteur M2 (ENROULAGE ferme désormais,
+    //       au lieu de DEROULAGE) — voir Partie12 v1.1 §REX. Amplitude corrigée à ~10 m
+    //       (valeur terrain, remplace l'ancienne estimation théorique de 1.5 m) — à
+    //       affiner au 1er essai réel du grappin.
     // ═══════════════════════════════════════════════════════════
     GrappinConfig : ST_GrappinConfig := (
         OffsetOpenM      := 0.0,   // 💾 Position d'ouverture relative (m)
-        OffsetCloseM     := -1.5,  // 💾 Position de fermeture relative (m) — CRITIQUE
+        OffsetCloseM     := 10.0,  // 💾 Position de fermeture relative (m) — CRITIQUE — signe inversé + amplitude corrigée REX 2026-07-07
         CoherenceLimitM  := 0.05   // 💾 Tolérance cohérence grappin (m)
     );
     GrappinState : ST_GrappinState; // 💾 État mécanique mémorisé du grappin (ouvert/fermé)
