@@ -49,7 +49,9 @@ GVL_IHM.Modes.AnyFaultActive :=
     OR PRG_06_WinchControl.instGrappin.Error
     OR PRG_06_WinchControl.instWinchM1.Error
     OR PRG_06_WinchControl.instWinchM2.Error
-    OR PRG_07_ChariotControl.instChariotM3.Error;
+    OR PRG_07_ChariotControl.instChariotM3.Error
+    OR PRG_10_Outputs.RedundancyTestFailed
+    OR PRG_10_Outputs.EmergencyArmingFailed;
 
 // 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont — polarité "alarme" (TRUE=
 // problème), PAS celle de PowerCutOff_A_RQ (qui est en fail-safe maintenu, TRUE=OK depuis
@@ -59,12 +61,17 @@ GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                                  OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff;
 
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
+// EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
+// pas seulement le pulse — ArmingSeqStep<>0 englobe déjà tout sauf le verrouillage final.
 GVL_IHM.Modes.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
 GVL_IHM.Modes.PowerContactorOk    := PRG_00_Inputs.EmergencyStopOk;
-GVL_IHM.Modes.EmergencyArmingBusy := PRG_10_Outputs.EmergencyArmingPulseActive OR PRG_10_Outputs.EmergencyArmingLockoutActive;
+GVL_IHM.Modes.EmergencyArmingBusy := (PRG_10_Outputs.ArmingSeqStep <> 0) OR PRG_10_Outputs.EmergencyArmingLockoutActive;
 GVL_IHM.Modes.EmergencyArmable    := PRG_00_Inputs.EmergencyChain
-                                    AND NOT PRG_10_Outputs.EmergencyArmingPulseActive
-                                    AND NOT PRG_10_Outputs.EmergencyArmingLockoutActive;
+                                    AND (PRG_10_Outputs.ArmingSeqStep = 0)
+                                    AND NOT PRG_10_Outputs.EmergencyArmingLockoutActive
+                                    AND NOT PRG_10_Outputs.RedundancyTestFailed;
+GVL_IHM.Modes.RedundancyTestFailed := PRG_10_Outputs.RedundancyTestFailed;
+GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 // 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
 // homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés

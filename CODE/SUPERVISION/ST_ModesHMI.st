@@ -24,7 +24,10 @@ STRUCT
     CmdEmergencyArming : BOOL;   (* 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique *)
     EmergencyChainOk   : BOOL;   (* 🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif) *)
     PowerContactorOk   : BOOL;   (* 🔌 Contacteur de puissance confirmé engagé (miroir EmergencyStopOk) *)
-    EmergencyArmable   : BOOL;   (* 🟢 Réarmement possible maintenant (chaîne saine, ni pulse ni verrouillage en cours) *)
-    EmergencyArmingBusy: BOOL;   (* ⏳ Pulse en cours OU verrouillage 5s après pulse — nouvelle demande ignorée *)
+    EmergencyArmable   : BOOL;   (* 🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,
+                                     ni RedundancyTestFailed) *)
+    EmergencyArmingBusy: BOOL;   (* ⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée *)
+    RedundancyTestFailed  : BOOL; (* 🔴 Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis) *)
+    EmergencyArmingFailed : BOOL; (* 🔴 Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis) *)
 END_STRUCT
 END_TYPE

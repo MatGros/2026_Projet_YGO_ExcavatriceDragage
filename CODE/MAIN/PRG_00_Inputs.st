@@ -11,7 +11,7 @@ VAR_OUTPUT
     // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
     // 🔧 REX 2026-07-07 : précision terrain — EmergencyStopOk_DI (retour contact auxiliaire NO)
     // est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
-    // PAS la boucle AU elle-même (ça, c'est EmergencyChain_DI, ci-dessous). Nom EmergencyStopOk
+    // PAS la boucle AU elle-même (ça, c'est EmergencyChainOK_DI, ci-dessous). Nom EmergencyStopOk
     // conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
     // maître du programme, car "puissance réellement présente" est la garantie la plus forte.
     EmergencyStopOk      : BOOL;   // 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴
@@ -77,7 +77,7 @@ EmergencyStopOk := instEmergencyStopOk.State;
 
 // 🔧 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) — distincte du contacteur de
 // puissance ci-dessus. Réutilise le même flag simulation (même sous-système physique AU).
-instEmergencyChain(InputRaw := EmergencyChain_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
+instEmergencyChain(InputRaw := EmergencyChainOK_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal), FilterTime := T#20MS);
 EmergencyChain := instEmergencyChain.State;
 
 // 🔧 REX 2026-07-07 : M1_M2_SlackCableSwitch_DI → M2_SlackCableSwitch_DI (capteur physiquement
