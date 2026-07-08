@@ -225,7 +225,7 @@ IF BusyEdge.Q THEN
     GrappinState.IsClosed := FALSE;
 END_IF;
 
-IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) THEN
+IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) AND NOT InhibitM1 THEN
     ErrorId := ErrorId OR 16#0010;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFEF;
