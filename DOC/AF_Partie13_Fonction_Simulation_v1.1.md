@@ -1,12 +1,13 @@
-# 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.1)
+# 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.2)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Architecture unifiée de simulation banc de test (bit maître + granularité par
 > device), remplaçant `GVL_DEBUG` (6 flags indépendants ajoutés au coup par coup).
-> **Version** : v1.1 (Revue et mise en œuvre du plan d'action — 2026-07-07)
+> **Version** : v1.2 (Revue et alignement - 2026-07-08 : Lot #9-17/18: Joystick simulation split into `Joystick_IsReal` (CANopen communication node) and `JoystickSignal_IsReal` (raw signals). Shared top sensor simulation automatically bypasses inhibited winches).
+> **Version 1.1** (Revue et mise en œuvre du plan d'action — 2026-07-07)
 > 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md),
 > [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
-> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md),
+> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.8](AF_Partie9_Fonction_Winch_v1.8.md),
 > [P11 Chariot v1.2](AF_Partie11_Fonction_Chariot_v1.3.md) §7/§9bis.
 > ⚙️ **Changements v1.1** : 
 > - Déplacement de [GVL_Simulation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st) vers `CODE/SIMULATION/` pour regrouper la GVL avec ses FB de simulation.
@@ -50,9 +51,10 @@ SimulationModeActive AND NOT <Device>_IsReal
 |---|---|
 | `VariateurM3_IsReal` | AC600 EtherCAT (chariot M3) |
 | `EncoderM1_IsReal` / `EncoderM2_IsReal` | COD1/COD2 EtherCAT |
-| `Joystick_IsReal` | CANopen JOY1 |
+| `Joystick_IsReal` | CANopen JOY1 (communication et état en ligne) |
+| `JoystickSignal_IsReal` | Signaux physiques bruts du Joystick (permet d'injecter des consignes simulées) |
 | `EmergencyStopChain_IsReal` | Chaîne AU câblée et contacteur de puissance |
-| `TopPositionSensor_IsReal` | Fin de course haut commun M1/M2 |
+| `TopPositionSensor_IsReal` | Fin de course haut physique commun M1/M2 |
 | `SlackCableSwitch_IsReal` | Mou de câble M2 |
 | `PhaseRotationOk_IsReal` | Contrôle rotation phases |
 | `ThermalM1_IsReal` / `ThermalM2_IsReal` | Thermique moteur M1/M2 |
@@ -63,6 +65,15 @@ SimulationModeActive AND NOT <Device>_IsReal
 
 ⚠️ Toujours repasser `SimulationModeActive` à `FALSE` avant exploitation réelle avec la machine
 effectivement câblée (ou basculer chaque `_IsReal` au fur et à mesure du recâblage).
+
+### 🔝 Simulation dynamique du Capteur de Position Haute (TopPositionSensor)
+
+En simulation (`TopPositionSensor_IsReal = FALSE`), l'état du capteur physique haut commun est déterminé dynamiquement par la position simulée des câbles de M1 and M2 :
+```
+SimTopSensorTriggered := (NOT InhibitM1 AND (CablePosM1 >= HomingTargetM1_M))
+                      OR (NOT InhibitM2 AND (CablePosM2 >= HomingTargetM2_M));
+```
+- **Bypass sur inhibition** : Si l'un des treuils est inhibé (`InhibitM1` ou `InhibitM2` actif), sa position est automatiquement exclue du calcul de déclenchement du capteur simulé. Cela permet de simuler et de tester le homing ou les mouvements du treuil restant sans qu'un treuil inhibé (dont la position simulée pourrait être figée en butée haute) ne vienne fausser ou bloquer l'état du capteur haut commun.
 
 ---
 

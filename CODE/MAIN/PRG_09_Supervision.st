@@ -36,19 +36,23 @@ GVL_IHM.Modes.AnyFaultActive :=
        PRG_01_Diagnostics.instDiagCanOpen.Error
     OR PRG_01_Diagnostics.instDiagEthercat.Error
     OR PRG_01_Diagnostics.FB_Joystick_0.Error
-    OR PRG_02_Encoders.instEncoderAbsM1.Error
-    OR PRG_02_Encoders.instHomingM1.Error
-    OR PRG_02_Encoders.instEncoderSafetyM1.Error
-    OR PRG_02_Encoders.instEncoderAbsM2.Error
-    OR PRG_02_Encoders.instHomingM2.Error
-    OR PRG_02_Encoders.instEncoderSafetyM2.Error
-    OR PRG_03_Safety.instSafetyWinchM1.Error
-    OR PRG_03_Safety.instSafetyWinchM2.Error
+    OR (NOT PRG_04_Modes.instModes.InhibitM1 AND (
+           PRG_02_Encoders.instEncoderAbsM1.Error
+        OR PRG_02_Encoders.instHomingM1.Error
+        OR PRG_02_Encoders.instEncoderSafetyM1.Error
+        OR PRG_03_Safety.instSafetyWinchM1.Error
+        OR PRG_06_WinchControl.instWinchM1.Error
+    ))
+    OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (
+           PRG_02_Encoders.instEncoderAbsM2.Error
+        OR PRG_02_Encoders.instHomingM2.Error
+        OR PRG_02_Encoders.instEncoderSafetyM2.Error
+        OR PRG_03_Safety.instSafetyWinchM2.Error
+        OR PRG_06_WinchControl.instWinchM2.Error
+    ))
     OR PRG_03_Safety.instSafetyChariotM3.Error
     OR PRG_06_WinchControl.instWinchSync.Error
     OR PRG_06_WinchControl.instGrappin.Error
-    OR PRG_06_WinchControl.instWinchM1.Error
-    OR PRG_06_WinchControl.instWinchM2.Error
     OR PRG_07_ChariotControl.instChariotM3.Error
     OR PRG_10_Outputs.RedundancyTestFailed
     OR PRG_10_Outputs.EmergencyArmingFailed;
@@ -58,7 +62,8 @@ GVL_IHM.Modes.AnyFaultActive :=
 // l'inversion de polarité). On relit directement les .PowerCutOff sources, pas la sortie physique.
 GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                                  OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                                 OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff;
+                                 OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff
+                                 OR GVL_IHM.Modes.CmdEmergencyCutOff;
 
 // 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 — signal UNIQUE (1 seul fil, pas de sens à
 // le dupliquer par axe), remonté une seule fois au niveau global GVL_IHM (même principe que
@@ -94,7 +99,7 @@ IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM1.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
     GVL_IHM.WinchM1.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
     GVL_IHM.WinchM1.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
-    GVL_IHM.WinchM1.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M;
+    GVL_IHM.WinchM1.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M;
     GVL_IHM.WinchM1.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
     GVL_IHM.WinchM1.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
@@ -105,7 +110,7 @@ IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM2.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
     GVL_IHM.WinchM2.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
     GVL_IHM.WinchM2.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
-    GVL_IHM.WinchM2.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M;
+    GVL_IHM.WinchM2.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M;
     GVL_IHM.WinchM2.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
     GVL_IHM.WinchM2.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
@@ -154,13 +159,15 @@ END_IF;
 GVL_IHM.WinchM1.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
 GVL_IHM.WinchM2.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
 
-IF GVL_IHM.WinchM1.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
-    GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM1.CableLimitDescentM;
-ELSIF GVL_IHM.WinchM2.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
-    GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM2.CableLimitDescentM;
+IF GVL_IHM.WinchM1.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM1_M THEN
+    GVL_PERSISTENT.CableLimitDescentM1_M := GVL_IHM.WinchM1.CableLimitDescentM;
 END_IF;
-GVL_IHM.WinchM1.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescent_M;
-GVL_IHM.WinchM2.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescent_M;
+GVL_IHM.WinchM1.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM1_M;
+
+IF GVL_IHM.WinchM2.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM2_M THEN
+    GVL_PERSISTENT.CableLimitDescentM2_M := GVL_IHM.WinchM2.CableLimitDescentM;
+END_IF;
+GVL_IHM.WinchM2.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM2_M;
 
 IF GVL_IHM.WinchM1.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
     GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM1.SlowdownDistanceM;
@@ -183,8 +190,8 @@ GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.Common.LimitLegalEnabled;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Common.LimitLegalReached         := GVL_PERSISTENT.LimitLegalEnabled
-                                            AND ((PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed)
-                                                 OR (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed))
+                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed)));
 
 GVL_IHM.Common.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 

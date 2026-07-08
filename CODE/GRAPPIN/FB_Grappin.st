@@ -57,8 +57,11 @@ VAR_INPUT
     M1SlipToleranceM    : REAL := 1.0;      // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
     M1_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM1.Busy — doit être à l'arrêt pour armer une demande
     M2_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM2.Busy — doit être à l'arrêt pour armer une demande
-    ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement grappin ouvert (front, mise en service — voir bandeau)
-END_VAR
+     ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement grappin ouvert (front, mise en service — voir bandeau)
+     ConfirmClosePosition : BOOL;            // 🆕 REX 2026-07-08 : bouton IHM référencement grappin fermé (front, mise en service)
+     InhibitM1           : BOOL;             // 🆕 REX 2026-07-08 : M1 est inhibé
+     InhibitM2           : BOOL;             // 🆕 REX 2026-07-08 : M2 est inhibé
+ END_VAR
 VAR_OUTPUT
     Ready               : BOOL;             // FB prêt à fonctionner
     Busy                : BOOL;             // Mouvement en cours
@@ -95,6 +98,7 @@ VAR
     WasClosedAtStart    : BOOL;             // 🆕 REX 2026-07-08 — état IsClosed mémorisé à l'entrée en Busy (restauré si recul complet)
     LeftStartSinceArm   : BOOL;             // 🆕 REX 2026-07-08 — a réellement quitté la position de départ (évite un retour instantané au 1er cycle Busy)
     ConfirmOpenEdge     : R_TRIG;           // 🆕 REX 2026-07-08 — détecteur de front ConfirmOpenPosition
+    ConfirmCloseEdge    : R_TRIG;           // 🆕 REX 2026-07-08 — détecteur de front ConfirmClosePosition
 END_VAR
 
 // 🛑 1. GATE DE SÉCURITÉ
@@ -152,6 +156,9 @@ END_IF;
 // Met à jour le bit1 d'erreur si incohérence détectée
 IF GrappinState.StateIncoherent THEN
     ErrorId := ErrorId OR 16#0002;
+    // 🆕 REX 2026-07-08 : Force l'état inconnu (ni ouvert ni fermé) si incohérence active
+    GrappinState.IsOpen := FALSE;
+    GrappinState.IsClosed := FALSE;
 ELSE
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
@@ -178,8 +185,28 @@ IF ConfirmOpenEdge.Q
     GrappinState.IsOpen := TRUE;
     GrappinState.IsClosed := FALSE;
     GrappinState.LastPosM2Open := CablePosM2;
+    GrappinState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
     GrappinState.StateIncoherent := FALSE;
-    ErrorId := ErrorId AND 16#FFFD; // efface bit1 (Incohérence boot) — cause levée manuellement
+    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts grappin lors du référencement manuel
+    CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
+    OpenReq := FALSE;
+END_IF;
+
+// 🆕 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE (mise en service, REX 2026-07-08)
+// Même principe que ConfirmOpenPosition, mais pour initialiser le grappin comme FERMÉ.
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+IF ConfirmCloseEdge.Q
+   AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
+   AND HomedM1 AND HomedM2
+   AND NOT M1_Busy AND NOT M2_Busy THEN
+    GrappinState.IsOpen := FALSE;
+    GrappinState.IsClosed := TRUE;
+    GrappinState.LastPosM2Close := CablePosM2;
+    GrappinState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
+    GrappinState.StateIncoherent := FALSE;
+    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts grappin lors du référencement manuel
+    CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
+    OpenReq := FALSE;
 END_IF;
 
 // 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4) — REX 2026-07-07
@@ -208,7 +235,7 @@ M1SlipDetected := (ErrorId AND 16#0010) <> 16#0000;
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
-IF ABS(CablePosM1 - CablePosM2) > MaxAllowedOffset THEN
+IF (ABS(CablePosM1 - CablePosM2) > MaxAllowedOffset) AND NOT InhibitM1 AND NOT InhibitM2 THEN
     ErrorId := ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;

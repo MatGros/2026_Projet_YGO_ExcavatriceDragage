@@ -59,7 +59,9 @@ END_VAR
 // acceptable : ça ne retarde que l'ACCEPTATION d'une nouvelle demande de ~1 scan (10ms), sans
 // aucun impact sécurité (contrairement au cas inverse, qui pouvait faire bouger M1 pendant Busy).
 instGrappin(
-    Enable              := TRUE,
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM2
+                           AND PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable
+                           AND PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable, // 🆕 Sécurisé : nécessite les deux codeurs valides et M2 non-inhibé
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -74,9 +76,12 @@ instGrappin(
     M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
     ConfirmOpenPosition := GVL_IHM.Grappin.CmdConfirmOpenPosition, // 🆕 REX 2026-07-08 — bouton IHM référencement grappin ouvert
+    ConfirmClosePosition:= GVL_IHM.Grappin.CmdConfirmClosePosition, // 🆕 REX 2026-07-08 — bouton IHM référencement grappin fermé
     Config              := GVL_PERSISTENT.GrappinConfig,
     TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,
-    GrappinState        := GVL_PERSISTENT.GrappinState
+    GrappinState        := GVL_PERSISTENT.GrappinState,
+    InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
+    InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
 );
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
@@ -174,12 +179,12 @@ END_IF;
 // 🔧 REX 2026-07-07 : limite légale appliquée sur LimitLegalEnabled SEUL, plus de garde
 // Mode=SEMI_AUTO — la limite légale doit stopper la descente dans TOUS les modes dès qu'elle
 // est activée (constat terrain : ne s'arrêtait pas en MAINT_N1/N2 alors qu'attendu).
-BottomLimitM1_Active := GVL_PERSISTENT.CableLimitDescent_M;
+BottomLimitM1_Active := GVL_PERSISTENT.CableLimitDescentM1_M;
 IF GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM1_Active := MAX(BottomLimitM1_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
 
-BottomLimitM2_Active := GVL_PERSISTENT.CableLimitDescent_M;
+BottomLimitM2_Active := GVL_PERSISTENT.CableLimitDescentM2_M;
 IF GVL_PERSISTENT.LimitLegalEnabled THEN
     BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
 END_IF;
@@ -191,9 +196,9 @@ END_IF;
 // UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
 // 🔧 REX 2026-07-07 : instGrappin.M1SlipDetected ajouté à M1 uniquement (Méca C couche 1) — M2
 // est déjà arrêté par son propre mécanisme SevereError interne à FB_Grappin, pas besoin ici.
-SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
+SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR instWinchSync.Error
                        OR instGrappin.M1SlipDetected;
-SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
+SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop OR instWinchSync.Error;
 
 ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
                        OR (GVL_PERSISTENT.LimitLegalEnabled
@@ -215,11 +220,19 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // même pattern qu'OverrideSync) : nécessite MAINT_N2 ET une case IHM activée consciemment.
 ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM1.Homed
+                           AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M))
+                       OR (PRG_02_Encoders.instHomingM1.Homed
+                           AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM1_M - GVL_PERSISTENT.WinchTopStopMarginM))
                            AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
+                           AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= GVL_PERSISTENT.HomingTargetM2_M))
+                       OR (PRG_02_Encoders.instHomingM2.Homed
+                           AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM2_M - GVL_PERSISTENT.WinchTopStopMarginM))
                            AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
@@ -245,6 +258,7 @@ instWinchM1(
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := GVL_PERSISTENT.WinchSpeedStepTable,
     MaxStepDescente         := GVL_PERSISTENT.WinchMaxStepDescente, // 🔧 REX 2026-07-08 : commun M1/M2
+    HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal,
@@ -252,6 +266,7 @@ instWinchM1(
     RampDecelNormalRate     := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct,
     RampDecelFastRate       := GVL_PERSISTENT.WinchM1RampDecelFast_Pct,
     Homed                   := PRG_02_Encoders.instHomingM1.Homed,
+    HomingSuspect           := PRG_02_Encoders.instHomingM1.HomingSuspect, // 🆕 Câblage de l'incertitude M1
     CablePosM               := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     TopLimitM               := GVL_PERSISTENT.HomingTargetM1_M,
     BottomLimitM            := BottomLimitM1_Active,
@@ -273,6 +288,7 @@ instWinchM2(
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
     MaxStepDescente         := GVL_PERSISTENT.WinchMaxStepDescente, // 🔧 REX 2026-07-08 : commun M1/M2
+    HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal,
@@ -280,6 +296,7 @@ instWinchM2(
     RampDecelNormalRate     := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct,
     RampDecelFastRate       := GVL_PERSISTENT.WinchM2RampDecelFast_Pct,
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
+    HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M,
     BottomLimitM            := BottomLimitM2_Active,

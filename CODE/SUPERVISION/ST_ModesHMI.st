@@ -22,6 +22,7 @@ STRUCT
 
     // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
     CmdEmergencyArming : BOOL;   (* 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique *)
+    CmdEmergencyCutOff : BOOL;   (* 🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance) *)
     EmergencyChainOk   : BOOL;   (* 🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif) *)
     PowerContactorOk   : BOOL;   (* 🔌 Contacteur de puissance confirmé engagé (miroir EmergencyStopOk) *)
     EmergencyArmable   : BOOL;   (* 🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,

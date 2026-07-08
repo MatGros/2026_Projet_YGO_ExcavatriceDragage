@@ -78,15 +78,11 @@ IF MovementRequested THEN
         State := E_State.BUSY;
     END_IF;
 ELSE
+    // 🆕 REX 2026-07-08 : Sécurité positive - fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
-    TonDecel(IN := TRUE, PT := DelayMotorDecel);
-    IF TonDecel.Q THEN
-        BrakeCmd := FALSE;             // ✅ Décélération/ouverture contacteur acquise → collage
-        State := E_State.READY;
-    ELSE
-        BrakeCmd := TRUE;              // ⏳ Encore relâché le temps que le moteur finisse de tourner
-        State := E_State.BUSY;
-    END_IF;
+    TonDecel(IN := FALSE, PT := DelayMotorDecel);
+    BrakeCmd := FALSE;                 // Fermeture immédiate
+    State := E_State.READY;
 END_IF;
 
 Busy := (State = E_State.BUSY);

@@ -1,12 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.4)
 
-> 📌 **État d'implémentation (2026-07-03quater, AUDIT D38)** : `FB_Modes` **codé (MVP)** —
-> `CODE/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
+> 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Modes` **codé et enrichi** —
+> `CODE/MODES/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
 > codés en dur dans `PRG_MAIN`), refuse `SEMI_AUTO` si défaut codeur (`FB_Encoder_Safety`),
-> refuse `MAINT_N2` sans mot de passe (stub), sort `OverrideSync` (→ `FB_WinchSync`). **Reste
-> non codé** : `OverrideGrappin`, limite légale `ST_LimitLegal` (§3) — pas de consommateur
-> tant que `FB_Cycle`/`FB_Grappin` n'existent pas.
->
+> refuse `MAINT_N2` sans mot de passe (stub), sort `OverrideSync` (→ `FB_WinchSync`).
+> **v1.4 (2026-07-08)** — Lot #9-17 : Intégration de l'inhibition unitaire des treuils (M1 ou M2) en `MAINT_N2` avec isolation complète de la sécurité (blocs de commande et de sécurité désactivés, erreurs effacées), exclusion mutuelle, filtrage supervision de `AnyFaultActive` et désactivation forcée d'`OverrideSync`.
 > **Version 1.3 (2026-07-04)** — D_OVERRIDESYNC : `OverrideSync` étendu à MAINT_N1 (pas restreint à N2) ; lève également le SafeStop mou de câble ; ajout §6bis détaillant le rôle complet de `OverrideSync`.
 > **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Grappin
 > (`OverrideGrappin`, `FB_Grappin`), Translation→Chariot — préfixe I/O physique M3 inchangé.
@@ -83,6 +81,7 @@ de l'opérateur (mot de passe + droits).
 | Override limite légale | ⛔→ désactivable (signalisation maintenue) |
 | Pilotage sans codeur | ✅ possible |
 | Pilotage sans/forçant frein | ✅ possible selon droits |
+| Inhibition unitaire treuil | ✅ possible (soit M1, soit M2, jamais les deux simultanément) |
 | Message IHM permanent | « ⚠️ MAINT N2 — Dégradation sécurité acceptée » |
 
 Usages **lourds** : changement de treuil / câble, changement de codeurs, remplacement de
@@ -103,16 +102,42 @@ IF Mode = MAINT_N2 AND PasswordOk THEN
     MsgIHM := "MAINT N2 active";
 END_IF
 
+// Exclusion mutuelle des demandes d'inhibition treuils (MAINT_N2)
+IF InhibitM1Request AND InhibitM2Request THEN
+    // Si M1 était déjà inhibé, rejette M2. Si M2 déjà inhibé, rejette M1.
+    IF PrevInhibitM1 THEN
+        InhibitM2Request := FALSE;
+    ELSIF PrevInhibitM2 THEN
+        InhibitM1Request := FALSE;
+    ELSE
+        InhibitM1Request := FALSE; InhibitM2Request := FALSE;
+    END_IF;
+END_IF;
+PrevInhibitM1 := InhibitM1Request;
+PrevInhibitM2 := InhibitM2Request;
+
+// Si l'un des treuils est inhibé, OverrideSync est désactivé et forcé à FALSE
+IF InhibitM1Request OR InhibitM2Request THEN
+    OverrideSync := FALSE;
+END_IF;
+
 // Application aux blocs concernés :
-FB_WinchSync.Enable       := NOT OverrideSync;  // désactive TOUTE synchronisation
-// Si OverrideSync actif : FB_Safety_Winch désactive le SafeStop mâble et active ForbidAscent
+FB_WinchSync.Enable       := NOT OverrideSync AND NOT InhibitM1Request AND NOT InhibitM2Request;  // désactive la synchro
 FB_Grappin.ControlEnable   := NOT OverrideGrappin;
 LimitLegal.Enabled        := NOT OverrideLimit;  // interne à FB_Modes (PAS FB_Safety, voir §3)
+
+// Activation unitaire des treuils et de leur sécurité
+FB_WinchM1.Enable          := NOT InhibitM1Request;
+FB_Safety_WinchM1.Enable   := NOT InhibitM1Request;
+FB_WinchM2.Enable          := NOT InhibitM2Request;
+FB_Safety_WinchM2.Enable   := NOT InhibitM2Request;
 
 IF NOT (Mode = MAINT_N1 OR Mode = MAINT_N2) THEN
     OverrideSync := FALSE; OverrideGrappin := FALSE; OverrideLimit := FALSE;  // tout actif
 END_IF
 ```
+
+> ⚠️ **Inhibition et isolation des défauts** : Lorsqu'un treuil est inhibé (ex: `InhibitM1Request = TRUE`), l'entrée `Enable` de `FB_WinchM1` et `FB_Safety_WinchM1` passe à `FALSE`, forçant leurs sorties d'erreur respectives `Error := FALSE` et `ErrorId := 16#0000`. De plus, dans le programme de supervision `PRG_09_Supervision`, les défauts de l'axe inhibé sont dynamiquement ignorés dans le calcul de `GVL_IHM.Modes.AnyFaultActive`.
 
 > ⚠️ **Correction v1.1** : la limite légale n'est **jamais** portée par un bloc safety
 > (`FB_Safety_<Metier>`) — c'est une interdiction **normale**, gérée en interne à `FB_Modes`

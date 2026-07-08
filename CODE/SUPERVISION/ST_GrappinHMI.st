@@ -38,5 +38,8 @@ STRUCT
     CmdConfirmOpenPosition : BOOL;          (* 🆕 REX 2026-07-08 : référencement grappin position ouverte (mise en
                                                 service) — confirmation pure, AUCUN mouvement, à utiliser juste après
                                                 le référencement des codeurs M1/M2 (grappin physiquement ouvert) *)
+    CmdConfirmClosePosition : BOOL;         (* 🆕 REX 2026-07-08 : référencement grappin position fermée (mise en
+                                                service) — confirmation pure, AUCUN mouvement, à utiliser juste après
+                                                le référencement des codeurs M1/M2 (grappin physiquement fermé) *)
 END_STRUCT
 END_TYPE

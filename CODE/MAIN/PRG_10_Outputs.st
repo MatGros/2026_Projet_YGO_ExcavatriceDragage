@@ -135,12 +135,14 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                          OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
                          OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff)
-                    AND NOT ForceTestA;
+                    AND NOT ForceTestA
+                    AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
 
 PowerCutOff_B_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                          OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
                          OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff)
-                    AND NOT ForceTestB;
+                    AND NOT ForceTestB
+                    AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
 
 // ─── 🚨 SÉQUENCE RÉARMEMENT CONTACTEUR PUISSANCE (REX 2026-07-07) ──────────────────────
 // Commande IHM (front, PAS de réarmement automatique) →
@@ -155,7 +157,8 @@ ResetEdge(CLK := PRG_09_Supervision.FaultMachineReset_IHM);
 
 ArmReqEdge(CLK := GVL_IHM.Modes.CmdEmergencyArming);
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND PRG_00_Inputs.EmergencyChain
-   AND NOT EmergencyArmingLockoutActive THEN
+   AND NOT EmergencyArmingLockoutActive
+   AND NOT PRG_00_Inputs.EmergencyStopOk THEN // 🆕 REX 2026-07-08 : Ignoré si déjà armé pour éviter une coupure intempestive lors de l'auto-test
     ArmingSeqStep := 1;
 END_IF;
 

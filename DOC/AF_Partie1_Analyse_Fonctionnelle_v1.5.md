@@ -1,7 +1,8 @@
-# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.5)
+# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.6)
 
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
+> **v1.6** — Alignment on latest changes (2026-07-08): Arming sequence safety (cannot start if contactor already closed) and arming failure detection (`EmergencyArmingFailed` active after 2s confirmation timeout).
 > **v1.5** — Retour terrain 2026-07-07 : refonte complète de la section **§Sécurité électrique**.
 > 3 signaux distincts désormais identifiés autour de la chaîne AU (`EmergencyChain_DI` boucle
 > physique, `EmergencyStopOk_DI` contacteur de puissance réellement engagé, `EmergencyArming_RQ`
@@ -57,10 +58,10 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 | Axe | Matériel | Pilotage |
 |-----|----------|----------|
 | 🪝 Plongée/Extraction | 2 treuils identiques (M1, M2) | 2 contacteurs sens + **2×4 contacteurs vitesse** (5 paliers, masque 4 bits/palier) |
-| 🧲 Position câble | 2 codeurs absolus tambour (COD1→M1, COD2→M2) | EtherCAT → déroulé en **mètres** |
+| 🛗 Position câble | 2 codeurs absolus tambour (COD1→M1, COD2→M2) | EtherCAT → déroulé en **mètres** |
 | 🛑 Maintien charge | 2 freins manque-courant | Logique levage (frein colle au repos) |
 | ↔️ Chariot | 1 moteur sur variateur AC600 (M3) | EtherCAT, commande **vitesse %** |
-| 🪣 Grappin | (= désynchro des 2 treuils) | Pas de moteur propre |
+| 🣣 Grappin | (= désynchro des 2 treuils) | Pas de moteur propre |
 | 🕹️ Commande | Joystick Hall → CANopen | 2 axes + bouton |
 | 📡 Capteurs | Fond touché, fdc haut/bas, positions travail/vidange/maintenance | TOR + position |
 | 🔌 Retour contacteurs | Contact auxiliaire par contacteur de puissance | TOR → surveillance collage |
@@ -84,7 +85,7 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 - 🕹️ **Joystick** → traduit le geste opérateur en consigne.
 - 🪝 **Treuil** ×2 → cœur métier : direction, vitesse, frein, position, limites.
 - ↔️ **Chariot** → amène le pont sur la bonne position.
-- 🪣 **Grappin** → ouvre/ferme via désynchro des treuils.
+- 🣣 **Grappin** → ouvre/ferme via désynchro des treuils.
 - 🔄 **Cycle** → enchaîne les étapes en semi-auto.
 - 🎚️ **Modes** → Manuel / Maint N1 / N2 / Semi-auto + autorisations.
 
@@ -99,7 +100,7 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 - 🎛️ Régulation arrêt → `PID_FIXCYCLE`.
 - 🪜 Paliers vitesse → `HYSTERESIS`.
 - 🚧 Bornes/limites → `LIMITALARM`.
-- 🧲 Codeur éclaté → Lecture / Mise à l'échelle / **Référencement** / Diag.
+- 🛗 Codeur éclaté → Lecture / Mise à l'échelle / **Référencement** / Diag.
 
 ---
 
@@ -145,9 +146,9 @@ précis :
 
 | Signal | Sens | Rôle | Conditionné en |
 |--------|------|------|-----------------|
-| **`EmergencyChain_DI`** 🆕 | Entrée TOR (NC, 1=sain) | Retour de la **boucle AU physique elle-même** : boutons coup-de-poing opérateur **en série ET** le canal `PowerCutOff` piloté par le PLC, tous deux insérés dans cette même boucle matérielle. `TRUE` = boutons relâchés **ET** pas de coupure PLC en cours. C'est une **précondition à l'armement**, **PAS** le portail maître du programme. | `PRG_00_Inputs.EmergencyChain` |
-| **`EmergencyStopOk_DI`** (nom conservé) | Entrée TOR (contact auxiliaire NO, 1=actif) | Confirmation que le **contacteur de puissance est réellement engagé** — la garantie la plus forte possible (« la puissance coule vraiment »). Reste le **portail maître** utilisé par tout le programme (`EmergencyStopOk` en entrée de chaque FB, contrat standard Partie 3 §1). Nom conservé tel quel pour ne pas casser l'interface FB partout dans le code. | `PRG_00_Inputs.EmergencyStopOk` |
-| **`EmergencyArming_RQ`** 🆕 | Sortie TOR (impulsion) | Commande PLC de **réarmement** du contacteur de puissance (mécanisme à ressort, un pulse suffit). | `PRG_10_Outputs` (voir séquence ci-dessous) |
+| **`EmergencyChain_DI`** | Entrée TOR (NC, 1=sain) | Retour de la **boucle AU physique elle-même** : boutons coup-de-poing opérateur **en série ET** le canal `PowerCutOff` piloté par le PLC, tous deux insérés dans cette même boucle matérielle. `TRUE` = boutons relâchés **ET** pas de coupure PLC en cours. C'est une **précondition à l'armement**, **PAS** le portail maître du programme. | `PRG_00_Inputs.EmergencyChain` |
+| **`EmergencyStopOk_DI`** | Entrée TOR (contact auxiliaire NO, 1=actif) | Confirmation que le **contacteur de puissance est réellement engagé** — la garantie la plus forte possible (« la puissance coule vraiment »). Reste le **portail maître** utilisé par tout le programme (`EmergencyStopOk` en entrée de chaque FB, contrat standard Partie 3 §1). Nom conservé tel quel pour ne pas casser l'interface FB partout dans le code. | `PRG_00_Inputs.EmergencyStopOk` |
+| **`EmergencyArming_RQ`** | Sortie TOR (impulsion) | Commande PLC de **réarmement** du contacteur de puissance (mécanisme à ressort, un pulse suffit). | `PRG_10_Outputs` (voir séquence ci-dessous) |
 
 ⚠️ **Ne pas confondre** : `EmergencyChain` dit « les conditions permettant d'armer sont réunies »,
 `EmergencyStopOk` dit « la puissance est effectivement là ». Les deux peuvent diverger
@@ -238,7 +239,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > version : maintenant, l'absence de PLC = coupure, pas l'inverse.
 
 ```
-PowerCutOff_A_RQ := NOT (instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyChariotM3.PowerCutOff);
+PowerCutOff_A_RQ := NOT (instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyChariotM3.PowerCutOff) AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
 PowerCutOff_B_RQ := PowerCutOff_A_RQ;
 ```
 (corps réel dans `CODE/MAIN/PRG_10_Outputs.st` — référencé ici, non recopié en détail).
@@ -250,6 +251,7 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 
 1. **Commande IHM** (`GVL_IHM.Modes.CmdEmergencyArming`, détectée sur **front montant**).
 2. Le front ne déclenche l'impulsion **que si** `EmergencyChain = TRUE` (boucle saine) **ET**
+   `EmergencyStopOk = FALSE` (bloqué/ignoré si déjà armé pour éviter une coupure intempestive lors de l'auto-test) **ET**
    qu'aucune impulsion ni verrouillage n'est déjà en cours.
 3. **Impulsion de 1 seconde** sur `EmergencyArming_RQ` — le contacteur utilise un mécanisme à
    ressort, un pulse suffit à l'armer, pas besoin de maintenir la commande.
@@ -334,11 +336,13 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 | 4 | **Coupure logicielle — Safety Mouvement déclenché** | `FB_Safety_Winch` lève `PowerCutOff` (bit7/8/9) | PLC arrête de maintenir `PowerCutOff_A/B_RQ` → coupure identique à un AU physique | `EmergencyChain=FALSE`, `EmergencyStopOk=FALSE`, `ErrorId` bit7/8/9 actif | Traiter la cause, **acquitter le défaut** (Reset front), puis réarmer via IHM (2 actions distinctes, voir cas 8) |
 | 5 | **PLC plante / perte alimentation / watchdog tâche dépassé** | Panne automate ou dépassement du seuil de surveillance tâche (fonction système CODESYS, 200 ms) | Le PLC ne peut plus **rien écrire** : les sorties (dont `PowerCutOff_A/B_RQ`) retombent à leur état de repos `FALSE` → coupure automatique, **aucune action logicielle nécessaire ni possible**. C'est le cas **le plus fail-safe** de tous : la sécurité ne dépend d'aucune décision du programme au moment du défaut. | `PowerCutOff_A/B_RQ` retombent à `FALSE` par absence d'écriture (pas par calcul) ; `EmergencyChain`/`EmergencyStopOk` suivent | Redémarrer/réparer l'automate, puis réarmer via IHM une fois le PLC de nouveau sain |
 | 6 | **Tentative de réarmement pendant boucle AU non saine** | Appui `CmdEmergencyArming` alors que bouton encore pressé ou `PowerCutOff` PLC encore actif | La demande est **rejetée** : la garde `AND PRG_00_Inputs.EmergencyChain` en tête de la séquence de pulse bloque toute impulsion | `EmergencyChain=FALSE` → pas d'impulsion, `EmergencyArmable=FALSE` | Lever la cause (relâcher bouton / acquitter défaut) avant de pouvoir réarmer |
-| 7 | **Tentative de réarmement pendant la fenêtre de verrouillage 5 s** | Appui `CmdEmergencyArming` juste après un pulse précédent | La demande est **ignorée** : garde `AND NOT EmergencyArmingLockoutActive` | `EmergencyArmingBusy=TRUE`, `EmergencyArmable=FALSE` | Attendre la fin des 5 s de verrouillage puis représenter la demande |
-| 8 | **Défaut Safety Mouvement acquitté mais contacteur non réarmé** | Reset du défaut à l'origine de la coupure (front Reset + cause disparue) | Le défaut disparaît de `ErrorId`, mais **le contacteur reste ouvert** — reset du défaut et réarmement du contacteur sont **deux actions distinctes et indépendantes** | `ErrorId`=0, `EmergencyChain` peut redevenir `TRUE`, mais `EmergencyStopOk` reste `FALSE` tant que le réarmement IHM n'a pas été fait | Presser en plus le réarmement IHM (2ᵉ action, après acquittement du défaut) |
-| 9 | **Impulsion envoyée mais le contacteur ne confirme jamais son engagement** | Défaillance mécanique du contacteur/ressort après le pulse `EmergencyArming_RQ` | ⚠️ **TBD — non détecté par du code dédié aujourd'hui.** La séquence (`TonArmingPulse`/`TonArmingLockout` dans `CODE/MAIN/PRG_10_Outputs.st`) ne relit **pas** `EmergencyStopOk` après la fin du pulse : il n'existe **aucune temporisation de confirmation** ni alarme IHM dédiée à ce cas précis. `EmergencyStopOk` reste simplement `FALSE`, indiscernable du cas 1 (pas encore réarmé) pour l'opérateur, qui peut retenter indéfiniment sans jamais voir d'alarme spécifique | `EmergencyArmingBusy` retombe normalement après pulse+verrouillage, `EmergencyStopOk` reste `FALSE` sans alarme dédiée | **Aucune procédure logicielle définie** — nécessite une amélioration : ajouter une temporisation post-pulse (ex. 2-3 s après la fin du verrouillage) qui compare `EmergencyStopOk` attendu vs obtenu et lève une alarme IHM dédiée si non conforme. Intervention terrain (vérification mécanique du contacteur) en attendant |
+| 6bis | **Tentative de réarmement alors que déjà armé** | Appui `CmdEmergencyArming` alors que `EmergencyStopOk = TRUE` | La demande est **bloquée / ignorée** pour éviter une coupure intempestive lors de l'auto-test redondant | `EmergencyStopOk=TRUE` → pas d'impulsion, `EmergencyArmable=FALSE` | Aucune action (déjà armé) |
+| 7 | **Tentative de réarmement pendant la fenêtre de verrouillage 5 s** | Appui `CmdEmergencyArming` juste après un pulse précédent | La demande est **ignorée** : garde `AND NOT EmergencyArmingLockoutActive` | `EmergencyArmingBusy=TRUE`, `EmergencyArmable=FALSE` | Attendre la fin des 5 s de verrouillage puis présenter la demande |
+| 8 | **Défaut Safety Mouvement acquitté mais contacteur non réarmé** | Reset du défaut à l'origine de la coupure (front Reset + cause disparue) | Le défaut disparaît de `ErrorId`, mais **le contacteur reste ouvert** — reset du défaut et réarmement du contacteur sont **deux actions distinctes et indépendantes** | `ErrorId`=0, `EmergencyChain` can become `TRUE`, but `EmergencyStopOk` remains `FALSE` tant que le réarmement IHM n'a pas été fait | Presser en plus le réarmement IHM (2ᵉ action, après acquittement du défaut) |
+| 9 | **Impulsion réarmement envoyée mais le contacteur ne s'enclenche pas** | Défaillance mécanique/électrique, pas de retour contacteur sous 2s | La séquence détecte l'absence de retour. La sortie `EmergencyArmingFailed` passe à `TRUE` pour signaler le défaut sur l'IHM | `EmergencyArmingFailed=TRUE`, `EmergencyStopOk=FALSE`, `EmergencyArmingBusy=FALSE` | Traiter la cause mécanique/électrique, acquitter via `FaultMachineReset_IHM`, puis retenter |
 | 10 | **Redondance des 2 canaux A/B — un seul réellement câblé/fonctionnel** | Défaut de câblage ou de comportement mécanique faisant qu'un seul des 2 canaux physiques (`PowerCutOff_A_RQ`/`B_RQ`) coupe réellement le contacteur (l'un colle, l'autre pas) | ❓ **Question ouverte, non tranchée par le code.** Les 2 sorties logicielles sont strictement identiques (`PowerCutOff_B_RQ := PowerCutOff_A_RQ`) — la redondance dépend entièrement du câblage matériel réel (2 chemins électriques indépendants jusqu'au contacteur) et non d'une logique de vote/comparaison côté PLC. Si un seul canal est réellement câblé ou qu'un des deux relais colle sans que l'autre coupe, **rien dans le programme actuel ne le détecte** | Les deux sorties logicielles restent identiques quel que soit l'état réel du câblage — pas de signal de divergence | **À vérifier au câblage réel** sur site (essai de coupure canal par canal) ; envisager, si nécessaire, un retour de chaque canal en entrée pour détecter une divergence A/B |
 | 11 | **Réarmement réussi (cas nominal)** | Séquence complète scénario (a)/(b)/(c) menée à bien | Contacteur confirmé engagé, machine opérationnelle | `EmergencyChain=TRUE`, `EmergencyStopOk=TRUE`, `EmergencyArmingBusy=FALSE`, `EmergencyArmable=FALSE` (déjà armé) | Aucune — état stable normal |
+| 12 | **Coupure d'urgence à distance IHM** | Appui sur le bouton HMI `CmdEmergencyCutOff` | Coupe immédiatement les deux canaux `PowerCutOff_A_RQ` / `PowerCutOff_B_RQ` | `CmdEmergencyCutOff=TRUE`, `EmergencyChain=FALSE`, `EmergencyStopOk=FALSE` | Relâcher le bouton HMI (repasse à `FALSE`) **puis** réarmer via IHM (scénario a/b) |
 
 > 🏷️ **Safety Mouvement** (cas 4 et 8 ci-dessus) = mouvement non commandé / pilotage sans commande
 > opérateur / glissement grappin — voir le rappel plain-langage juste au-dessus de « Polarité

@@ -199,6 +199,6 @@ IF EncoderAvailable AND (State <> E_State.BUSY) THEN
 END_IF;
 
 Busy := (State = E_State.BUSY);
-Homed := Calib.Homed;
+Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après ConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
