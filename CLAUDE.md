@@ -124,7 +124,7 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie-05_Modes_Maintenance_v1.3.md](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md) — Modes, maintenance N1/N2, AU, limite légale
 - [AF_Partie-06_IO_Conditioning_v1.5.md](DOC/AF_Partie-06_IO_Conditioning_v1.5.md) — Conditionnement E/S
 - [AF_Partie-08_Fonction_Joystick_v1.2.md](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md) — Fonction métier Joystick (8+ = métier par FB)
-- [AF_Partie-09_Fonction_Winch_v1.8.md](DOC/AF_Partie-09_Fonction_Winch_v1.8.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A/B/C/D roue libre)
+- [AF_Partie-09_Fonction_Winch_v1.9.md](DOC/AF_Partie-09_Fonction_Winch_v1.9.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A–E : roue libre/pilotage sans commande/glissement grappin/capteur haut/écart synchro critique)
 - [AF_Partie-10_Fonction_Encoder_Homing_v1.7.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.7.md) — Codeur & Homing
 - [AF_Partie-11_Fonction_Chariot_v1.3.md](DOC/AF_Partie-11_Fonction_Chariot_v1.3.md) — Fonction Chariot (M3, ex-Translation)
 - [AF_Partie-12_Fonction_Grappin_v1.2.md](DOC/AF_Partie-12_Fonction_Grappin_v1.2.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)

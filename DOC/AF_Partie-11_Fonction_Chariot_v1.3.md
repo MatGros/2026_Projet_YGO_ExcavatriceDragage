@@ -3,7 +3,7 @@
 > 🆕 **v1.3 (2026-07-08)** — Retour terrain frein (demande utilisateur) : nouveau retour thermique
 > **frein**, COMMUN aux 3 axes M1/M2/M3 (1 seul fil, `BrakeThermalFeedback_DI`, câblé
 > identiquement sur `FB_Safety_Chariot` **et** les 2 instances `FB_Safety_Winch` — voir
-> [Partie9 v1.7](AF_Partie-09_Fonction_Winch_v1.7.md) §4sexies) → nouveau bit3 `ErrorId`
+> [Partie9 v1.7](AF_Partie-09_Fonction_Winch_v1.9.md) §4sexies) → nouveau bit3 `ErrorId`
 > (`FB_Safety_Chariot`, bit1 reste réservé EtherCAT variateur, non câblé). **`PowerCutOff` devient
 > réel pour ce bit précis** (`(ErrorId AND 16#0008) <> 0`) — jusqu'ici toujours `FALSE` en dur
 > pour ce FB (les autres bits du domaine Chariot restent TBD, pas de `ST_ContactorCheck` de
@@ -29,7 +29,7 @@
 > (règle projet : ne jamais deviner). La partie `DEGRADED_IO` est fonctionnellement complète
 > (corrigée v1.1) mais reste conditionnée à la confirmation du bornier réel et du paramétrage
 > AC600 (§4bis) avant tout essai machine en charge.
-> 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie-02_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis, [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §5, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.7.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`, thermique frein commun §4sexies).
+> 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie-02_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis, [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §5, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.9.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`, thermique frein commun §4sexies).
 >
 > ℹ️ **Numérotation** : la branche `claude/encoder-homing-winch-control-h6ef89` (non fusionnée
 > dans `main` à la rédaction) occupe déjà `AF_Partie-10_Fonction_Encoder_Homing_v1.1.md` — ce
@@ -143,7 +143,7 @@ variateur non disponible, actif sur `FALSE`/`0`).
 | `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Partie3 §1) |
 | `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.Joystick` |
 | `PhaseRotationOk` | BOOL | `PRG_00_Inputs.PhaseRotationOk` (commun M1/M2/M3, I/O réel) |
-| `BrakeThermalFeedback` 🆕 v1.3 | BOOL | Retour TOR thermique **frein**, COMMUN aux 3 axes M1/M2/M3 (`BrakeThermalFeedback_DI`, 1 seul fil, câblé IDENTIQUEMENT sur cette instance et les 2 instances `FB_Safety_Winch` — voir [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.6.md) §4sexies) : `TRUE` = surchauffe/perte |
+| `BrakeThermalFeedback` 🆕 v1.3 | BOOL | Retour TOR thermique **frein**, COMMUN aux 3 axes M1/M2/M3 (`BrakeThermalFeedback_DI`, 1 seul fil, câblé IDENTIQUEMENT sur cette instance et les 2 instances `FB_Safety_Winch` — voir [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.9.md) §4sexies) : `TRUE` = surchauffe/perte |
 
 **📤 Sorties**
 | Sortie | Type | Rôle |
@@ -183,7 +183,7 @@ variateur non disponible, actif sur `FALSE`/`0`).
 ### 🆕 4ter. Thermique frein commun M1/M2/M3 + PowerCutOff (2026-07-08)
 
 > ✅ Statut : **implémenté et câblé** dans `FB_Safety_Chariot` (bit3) — même signal, même
-> raisonnement que [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.6.md) §4sexies (`FB_Safety_Winch`
+> raisonnement que [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.9.md) §4sexies (`FB_Safety_Winch`
 > bit10). Demande utilisateur directe, retour terrain frein.
 
 **Contexte** : le frein M3 (comme M1/M2) est **à manque de courant** — il colle au repos par

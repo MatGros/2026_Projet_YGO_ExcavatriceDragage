@@ -76,7 +76,14 @@ instSafetyWinchM2(
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
     JoystickYNeutral       := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1,
-    GrappinHoldStillActive := FALSE
+    GrappinHoldStillActive := FALSE,
+    // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
+    // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2
+    // à 0 au lieu de M1, déclenchement permanent dès que M2 > CriticalSyncToleranceM (2.0m)
+    // du zéro codeur. M1 corrigé de l'offset grappin actif, ramené dans le référentiel M2.
+    ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instGrappin.ActiveOffsetM,
+    GrappinBusy            := PRG_06_WinchControl.instGrappin.Busy,
+    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M
 );
 
 // 3. Sécurité Chariot M3
