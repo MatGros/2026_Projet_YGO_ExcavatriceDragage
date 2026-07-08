@@ -31,7 +31,7 @@
 
 > **Fonction métier** : acquisition et conditionnement de la commande opérateur (joystick Hall → CANopen).
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P1 équipements](AF_Partie1_Analyse_Fonctionnelle_v1.5.md), [P3 contrat FB](AF_Partie3_Template_FB_Commun_v1.2.md).
+> 🔗 Dépend de : [P1 équipements](AF_Partie-01_Analyse_Fonctionnelle_v1.5.md), [P3 contrat FB](AF_Partie-03_Template_FB_Commun_v1.2.md).
 
 ---
 
@@ -156,7 +156,7 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
    l'appel de `FB_Joystick` devrait être **inline dans `PLC_PRG_MAIN`**, pas dans un sous-programme
    séparé — changement structurel à valider avec l'utilisateur avant application.
 4. Corriger le commentaire d'en-tête du fichier `.st` qui référence l'ancien nom de doc
-   (`AF_Partie4_Fonction_Joystick_v1.0.md`) → doit pointer vers **`AF_Partie8_..._v1.1.md`**.
+   (`AF_Partie-04_Fonction_Joystick_v1.0.md`) → doit pointer vers **`AF_Partie-08_..._v1.1.md`**.
 
 ---
 
@@ -191,4 +191,4 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 - [ ] Sortie % cohérente (deadband 5 %, rampes douces) ?
 - [ ] CAN coupé → sorties à 0 (gate OK) ?
 - [x] Suppression effective de `SafeStop` et renommage `EmergencyStopOk` — fait 2026-07-03septdecies (§6bis).
-- [ ] Si validé → figer le mapping sécurité définitif dans `AF_Partie2_v2.x` + clôturer cette v1.1.
+- [ ] Si validé → figer le mapping sécurité définitif dans `AF_Partie-02_v2.x` + clôturer cette v1.1.

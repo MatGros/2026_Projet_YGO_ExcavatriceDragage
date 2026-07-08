@@ -42,6 +42,9 @@ instSimEncoderM1(
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
     SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
+    // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E) — 4096 = PointsPerRev/CableM_PerRev (8192/2.0)
+    TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM1,
+    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
     RawPos      := GVL_PERSISTENT.SimEncoderRawPosM1
 );
 instSimEncoderM2(
@@ -52,6 +55,9 @@ instSimEncoderM2(
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,
     SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
+    // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E)
+    TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM2,
+    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
     RawPos      := GVL_PERSISTENT.SimEncoderRawPosM2
 );
 

@@ -39,6 +39,8 @@ VAR_INPUT
     PresetCmd        : BOOL;
     PresetValue      : UDINT;
     SpeedScaleFactor : REAL := 1.0;   // 🔧 REX 2026-07-07 — confort de test, voir bandeau ci-dessus
+    TestOffsetCmd    : BOOL;          // 🆕 REX 2026-07-08 (4) — front montant = applique TestOffsetPts (test banc)
+    TestOffsetPts    : DINT := 0;     // 🆕 REX 2026-07-08 (4) — décalage signé à appliquer (points bruts)
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;
@@ -47,7 +49,8 @@ VAR_IN_OUT
     RawPos      : UDINT;   // 🔧 REX 2026-07-08 : référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 (survit au reset froid)
 END_VAR
 VAR
-    Increment   : UDINT;              // 🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x
+    Increment      : UDINT;              // 🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x
+    TestOffsetEdge : R_TRIG;             // 🆕 REX 2026-07-08 (4)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
@@ -55,6 +58,13 @@ END_VAR
 IF NOT Enable THEN
     RawPosOut := RawPos;
     RETURN;
+END_IF;
+
+// 🆕 REX 2026-07-08 (4) — injection test banc : VRAI saut de position (comme un glissement réel),
+// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
+TestOffsetEdge(CLK := TestOffsetCmd);
+IF TestOffsetEdge.Q THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
 END_IF;
 
 Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);

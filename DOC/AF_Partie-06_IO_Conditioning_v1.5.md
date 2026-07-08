@@ -3,7 +3,7 @@
 > 📌 **v1.5 (2026-07-07)** — REX terrain (voir Partie 9) : l'exemple d'instance §5 citait encore
 > `M1ContactorFeedbackFwd` (retour individuel par sens) — ce signal est **supprimé côté câblage
 > réel** pour les treuils M1/M2, remplacé par un retour unique par treuil `M1/M2FwdRevSpeedFeedbackOff`.
-> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie9_Fonction_Winch_v1.5.md`.
+> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie-09_Fonction_Winch_v1.5.md`.
 >
 > 📌 **v1.4** — Correctif documentaire (voir Partie 13) : l'extrait `instEmergencyStopOk` (§ci-dessous)
 > référençait encore `GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST` (supprimé) — remplacé par
@@ -11,7 +11,7 @@
 > autre changement vs v1.3.
 >
 > 📌 **v1.3 (2026-07-04)** — Alignement sur le modèle « Programmes ST Autonomes »
-> ([Partie2 v2.8](AF_Partie2_Architecture_Programme_v2.8.md)) : `GVL_IN`/`GVL_OUT` et les FB
+> ([Partie2 v2.8](AF_Partie-02_Architecture_Programme_v2.8.md)) : `GVL_IN`/`GVL_OUT` et les FB
 > composites `FB_InputsMachine`/`FB_OutputsMachine` **ont disparu**, remplacés par deux
 > `PROGRAM` numérotés — `PRG_0_Inputs` (position 0, `VAR_OUTPUT`) et `PRG_10_Outputs`
 > (position 10, `VAR_INPUT`). Le principe de brique (`FB_Input`/`FB_Output`) et leur
@@ -25,7 +25,7 @@
 > physique M3 inchangé). Historique GVL_IN/GVL_OUT/FB_InputsMachine/FB_OutputsMachine
 > (2026-07-03 et antérieur) **périmé** — voir Archives.
 >
-> 🔗 Dépend de : [Partie 2 v2.8](AF_Partie2_Architecture_Programme_v2.8.md) (architecture), Partie 3 v1.3 (contrat FB, §1bis interface réduite).
+> 🔗 Dépend de : [Partie 2 v2.8](AF_Partie-02_Architecture_Programme_v2.8.md) (architecture), Partie 3 v1.3 (contrat FB, §1bis interface réduite).
 
 ---
 

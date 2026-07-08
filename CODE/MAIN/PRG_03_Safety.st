@@ -39,9 +39,14 @@ instSafetyWinchM1(
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
     JoystickYNeutral       := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1,
-    GrappinHoldStillActive := PRG_06_WinchControl.instGrappin.Busy // Méca C — M1 doit rester immobile pendant le
+    GrappinHoldStillActive := PRG_06_WinchControl.instGrappin.Busy, // Méca C — M1 doit rester immobile pendant le
                                                                      // grappin ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
+    // 🆕 REX 2026-07-08 (4) — Méca E : M2 corrigé de l'offset grappin actif (0 si grappin absent/ouvert),
+    // ramené dans le référentiel M1 — comparaison valable quel que soit l'état du grappin
+    ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM,
+    GrappinBusy            := PRG_06_WinchControl.instGrappin.Busy,
+    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M
 );
 
 // 2. Sécurité Treuil M2

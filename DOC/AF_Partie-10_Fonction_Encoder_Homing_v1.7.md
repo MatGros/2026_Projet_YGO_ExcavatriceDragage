@@ -9,7 +9,7 @@
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
 > `BrakeFeedback` — voir `CODE/ENCODERS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
-> ici). Détail complet du changement : `DOC/AF_Partie9_Fonction_Winch_v1.7.md` (doc principale
+> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.7.md` (doc principale
 > treuil). Hors périmètre : Chariot M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
@@ -105,12 +105,12 @@
 > **Cible** : CODESYS 3.5 — acquisition + mise à l'échelle codées depuis le 2026-07-02
 > (`FB_Encoder_Abs`/`FB_Encoder_Scale`/`ST_EncoderCalib`), homing (`FB_Encoder_Homing`) et
 > sélection treuil (`E_WinchSelect`) restent conception seule (voir §9 pour le détail exact).
-> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie1_Analyse_Fonctionnelle_v1.5.md) §Initialisation,
-> [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md) (dossier `ENCODER`),
-> [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (profils FB),
-> [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
-> [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.7](AF_Partie9_Fonction_Winch_v1.7.md) (`FB_Winch` unitaire M1/M2).
+> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie-01_Analyse_Fonctionnelle_v1.5.md) §Initialisation,
+> [P2 Architecture v2.7](AF_Partie-02_Architecture_Programme_v2.7.md) (dossier `ENCODER`),
+> [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (profils FB),
+> [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
+> [P5 Modes v1.2](AF_Partie-05_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
+> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.7.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
@@ -611,7 +611,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie9_Fonction_Winch_v1.7.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie-09_Fonction_Winch_v1.7.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`
@@ -641,7 +641,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
       `PowerCutOff` — ✅ Codé et raccordé (2026-07-08)
 - [x] Concevoir + coder la limite haute « normale » (ralentissement avant position extrême, §7bis)
       — ✅ Codé et raccordé via `WinchTopStopMarginM` et `HomingApproachEnable` (2026-07-08)
-- [x] `AF_Partie2_Architecture_Programme` bumpée en v2.6 (2026-07-02, correctif AU/PowerCutOff §6)
+- [x] `AF_Partie-02_Architecture_Programme` bumpée en v2.6 (2026-07-02, correctif AU/PowerCutOff §6)
 
 **➕ Ajout hors checklist initiale — intégration M2 (décision 2026-07-02, voir Partie9 §9)** :
 `instWinchM2`/`instSafetyWinchM2` créés et **actifs**, consigne dupliquée sur l'axe Y du
@@ -653,7 +653,7 @@ bougent ensemble sans régulation d'écart. Canaux `COD2_*` (I/O Mapping) **mapp
 - [ ] Variateur **AC600 (M3, chariot)** : comportement pressenti sur perte de communication =
       **roue libre sans rampe** (proche d'un STO), différent du comportement treuil
       (contacteurs+frein, rampe rapide `SafeStop`). À valider et documenter dans une future mise à
-      jour de `AF_Partie2`/un document dédié `FB_Chariot` — pas traité ici (hors sujet codeur
+      jour de `AF_Partie-02`/un document dédié `FB_Chariot` — pas traité ici (hors sujet codeur
       treuil).
 
 ---

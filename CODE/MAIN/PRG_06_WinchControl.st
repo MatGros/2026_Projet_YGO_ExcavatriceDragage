@@ -52,6 +52,11 @@ VAR
     // structurel — PRG_01 s'exécute avant PRG_06). Corrige un bref "blip" de commande (RelayFwd/Rev
     // + BrakeCmd clignotant) observé sur M1 à l'arrivée en position grappin.
     GrappinBusyFallEdge     : F_TRIG;
+
+    // 🆕 REX 2026-07-08 (4) : instWinchSync appelé APRÈS l'arbitrage M1/M2 (§3, plus bas) — lu ici
+    // avec 1 scan de retard (~10ms), négligeable vu que DeltaPosM évolue progressivement, pas
+    // par à-coup (même raisonnement que M1_Busy/M2_Busy sur instGrappin, voir §0).
+    SyncMinorDeviation      : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
@@ -90,6 +95,12 @@ instGrappin(
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
 );
 
+// 🆕 REX 2026-07-08 (4) — Concept 1 (écart synchro mineur) : bit0 seul (écart position, hors
+// incohérence commande bit1) ne fait plus de SafeStop (fast) — bloque juste StartStop des DEUX
+// treuils → rampe de décél NORMALE. Recalage : voir SyncEnable=FALSE (MAINT_N2), procédure déjà
+// existante (mou de câble) — décocher, rattraper l'écart au joystick treuil par treuil, recocher.
+SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) <> 16#0000;
+
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop;
@@ -101,7 +112,8 @@ ELSE
     // décél, M1 bougeait/frein décollait à la fin d'un cycle grappin). DeadmanArmed reste FALSE
     // en continu jusqu'au repassage neutre + réappui, sans dépendre du temps de rampe.
     M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy
-                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND NOT SyncMinorDeviation; // 🆕 REX 2026-07-08 (4)
     M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
     M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
 END_IF;
@@ -119,7 +131,8 @@ ELSE
     ELSE
         // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
         M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND NOT SyncMinorDeviation; // 🆕 REX 2026-07-08 (4)
         M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
         M2_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
     END_IF;
@@ -224,9 +237,14 @@ END_IF;
 // UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
 // 🔧 REX 2026-07-07 : instGrappin.M1SlipDetected ajouté à M1 uniquement (Méca C couche 1) — M2
 // est déjà arrêté par son propre mécanisme SevereError interne à FB_Grappin, pas besoin ici.
-SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop OR instWinchSync.Error
+// 🔧 REX 2026-07-08 (4) : instWinchSync.Error (bit0+bit1) → SEUL bit1 (incohérence commande,
+// grave) reste ici en SafeStop fast. Bit0 (écart mineur) → arrêt rampe normale via StartStop
+// (voir SyncMinorDeviation, §1/§2 plus haut) — Concept 1, ne pas dégrader le comportement voulu.
+SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop
+                       OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
                        OR instGrappin.M1SlipDetected;
-SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop OR instWinchSync.Error;
+SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
+                       OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
 
 ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
                        OR (GVL_PERSISTENT.LimitLegalEnabled
