@@ -2,6 +2,8 @@
 
 Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
+📦 **Historique versions CODESYS ↔ DOC** : voir [DOC/VERSION_HISTORY.md](DOC/VERSION_HISTORY.md) — ajouter une ligne à chaque jalon significatif.
+
 ---
 
 ## 🎯 **Avant de coder : LIRE CECI**

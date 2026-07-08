@@ -1,5 +1,7 @@
 # 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.5)
 
+> 📦 **Programme CODESYS associé** : `v0.4.0_SimNoHardware` — voir [VERSION_HISTORY.md](VERSION_HISTORY.md)
+
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
 > **v1.6** — Alignment on latest changes (2026-07-08): Arming sequence safety (cannot start if contactor already closed) and arming failure detection (`EmergencyArmingFailed` active after 2s confirmation timeout).

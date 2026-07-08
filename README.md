@@ -15,14 +15,14 @@ Tous les documents sont dans le dossier **`DOC/`** :
 - Booléens : entrée = verbe (`Start`), sortie = état (`Ready`)
 - Exemples complets pour structures et instances
 
-### 2️⃣ **[Analyse Fonctionnelle — Partie 1](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.3.md)**
-Le projet en bref : équipements pilotés, fonctions principales, interactions.
+### 2️⃣ **[Analyse Fonctionnelle — Partie 1 (v1.5)](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.5.md)**
+Le projet en bref : équipements pilotés, fonctions principales, interactions, sécurité électrique.
 
-### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.6)](DOC/AF_Partie2_Architecture_Programme_v2.6.md)**
+### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.10)](DOC/AF_Partie2_Architecture_Programme_v2.10.md)**
 Architecture détaillée : cadencement (EtherCAT 4 / CANopen 20 / Main 10 ms), orchestration
-séquentielle `PLC_PRG_MAIN`, mapping M1/M2/M3, modèle d'arrêt `SafeStop`/`StartStop`, `PowerCutOff`.
+séquentielle `PLC_PRG_MAIN`, mapping M1/M2/M3, modèle d'arrêt `SafeStop`/`StartStop`, `PowerCutOff`. **Référence projet.**
 
-### 4️⃣ **[Analyse Fonctionnelle — Partie 3 (v1.2)](DOC/AF_Partie3_Template_FB_Commun_v1.2.md)**
+### 4️⃣ **[Analyse Fonctionnelle — Partie 3 (v1.3)](DOC/AF_Partie3_Template_FB_Commun_v1.3.md)**
 Contrat standard que **tout FB métier respecte** :
 - Interface VAR_INPUT/OUTPUT unifiée (`Enable`/`Reset`/`EmergencyStopOk`/`Mode`)
 - FB de mouvement : `StartStop` (rampe normale) + `SafeStop` (rampe rapide, par métier)
@@ -31,12 +31,20 @@ Contrat standard que **tout FB métier respecte** :
 - Logique Reset (front obligatoire, cause doit disparaître)
 - Précédence `Enable` > `SafeStop` > `StartStop` ; AU matériel (seul arrêt brutal) + `PowerCutOff`
 
-### 5️⃣ **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.1.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, godet, rampes).
-- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.1.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
-- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.1.md)** — Conditionnement E/S.
-- **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.1.md)** — Fonction métier Joystick (docs métier par FB en 8+).
-- **[Audit de cohérence](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions (`SafeStop`/`StartStop`/`EmergencyStopOk`, suppression `CoupeEnable`/`FB_Watchdog`…).
+### 5️⃣ **Specs détaillées — Transverses & Sécurité**
+- **[Partie 4 (v1.2)](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, synchro, frein, chariot, grappin, rampes).
+- **[Partie 5 (v1.3)](DOC/AF_Partie5_Modes_Maintenance_v1.3.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
+- **[Partie 6 (v1.5)](DOC/AF_Partie6_IO_Conditioning_v1.5.md)** — Conditionnement E/S.
+- **[Partie 7 (v1.2)](DOC/AF_Partie7_Interface_IHM_v1.2.md)** — Interface HMI.
+
+### 6️⃣ **Fonctions Métier (Partie 8+)**
+- **[Partie 8 (v1.2)](DOC/AF_Partie8_Fonction_Joystick_v1.2.md)** — Fonction Joystick.
+- **[Partie 9 (v1.7)](DOC/AF_Partie9_Fonction_Winch_v1.7.md)** — Fonction Winch (M1/M2, safety mou câble/thermique, garde-fous roue libre).
+- **[Partie 10 (v1.7)](DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md)** — Fonction Encoder & Homing.
+- **[Partie 11 (v1.3)](DOC/AF_Partie11_Fonction_Chariot_v1.3.md)** — Fonction Chariot (M3 variateur AC600).
+- **[Partie 12 (v1.2)](DOC/AF_Partie12_Fonction_Grappin_v1.2.md)** — Fonction Grappin (M2, désynchronisation, garde-fou glissement).
+- **[Partie 13 (v1.1)](DOC/AF_Partie13_Fonction_Simulation_v1.1.md)** — Fonction Simulation.
+- **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
 ---
 
@@ -46,20 +54,33 @@ Contrat standard que **tout FB métier respecte** :
 excavatrice-dragage/
 ├── DOC/                      # 📖 Documentation (ICI COMMENCE)
 │   ├── NAMING_CONVENTION.md
-│   ├── AF_Partie1_Analyse_Fonctionnelle_v1.3.md
-│   ├── AF_Partie2_Architecture_Programme_v2.6.md   (référence)
-│   ├── AF_Partie3_Template_FB_Commun_v1.2.md
-│   ├── AF_Partie4_Cycle_Sequenceur_v1.1.md
-│   ├── AF_Partie5_Modes_Maintenance_v1.1.md
-│   ├── AF_Partie6_IO_Conditioning_v1.1.md
-│   ├── AF_Partie8_Fonction_Joystick_v1.1.md
+│   ├── VERSION_HISTORY.md    (versions CODESYS testées/validées)
+│   ├── AF_Partie1_Analyse_Fonctionnelle_v1.5.md
+│   ├── AF_Partie2_Architecture_Programme_v2.10.md   (référence)
+│   ├── AF_Partie3_Template_FB_Commun_v1.3.md
+│   ├── AF_Partie4_Cycle_Sequenceur_v1.2.md
+│   ├── AF_Partie5_Modes_Maintenance_v1.3.md
+│   ├── AF_Partie6_IO_Conditioning_v1.5.md
+│   ├── AF_Partie7_Interface_IHM_v1.2.md
+│   ├── AF_Partie8_Fonction_Joystick_v1.2.md
+│   ├── AF_Partie9_Fonction_Winch_v1.7.md
+│   ├── AF_Partie10_Fonction_Encoder_Homing_v1.7.md
+│   ├── AF_Partie11_Fonction_Chariot_v1.3.md
+│   ├── AF_Partie12_Fonction_Grappin_v1.2.md
+│   ├── AF_Partie13_Fonction_Simulation_v1.1.md
 │   └── AUDIT_Coherence_Documentaire_v1.0.md
 │
-├── CODE/                     # 🔧 Fichiers ST bruts, à copier/coller manuellement dans CODESYS
-│   └── PRG_JOY1.st          (ex. — un fichier .st par POU/FB modifié)
+├── CODE/                     # 🔧 Fichiers ST à importer dans CODESYS
+│   ├── PRG_*.st              (fichiers ST à copier-coller ou via bundle PLCopenXML)
+│   ├── FB_*.st
+│   └── CODE_Bundle.xml       (bundle PLCopenXML généré, voir PLCOPENXML_TOOLING/)
 │
-├── PRJ_CODESYS/PROJ_Full_ImportExport/   # 📦 Projet CODESYS (export complet)
-│   └── Device.export         (export manuel depuis CODESYS — source de vérité pour l'analyse)
+├── PLCOPENXML_TOOLING/       # 🔧 Génération bundle PLCopenXML (importation auto CODESYS)
+│   └── (outillage Python pour grouper modifs CODE/*.st → CODE_Bundle.xml)
+│
+├── PRJ_CODESYS/              # 📦 Projet CODESYS
+│   ├── PROJ_Full_ImportExport/Device.export  (export analyse architecture)
+│   └── (fichiers .project, .device, simulation, etc.)
 │
 └── README.md               # 👈 Vous êtes ici
 ```
