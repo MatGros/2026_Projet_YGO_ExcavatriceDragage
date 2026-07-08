@@ -8,7 +8,7 @@
       le retour contacteur M3 (`PRG_07_ChariotControl.st`), remplace le miroir
       inconditionnel actuel. Réutilise `TON` (Partie3 §0 — pas de temporisation
       réimplémentée), même principe que `ContactorFeedbackTimeout` déjà en place
-      dans `FB_Winch_Impl.st`/`FB_Chariot.st`.
+      dans `FB_Winch.st`/`FB_Chariot.st`.
    📥 Enable       : simulation active (ex. SimulationModeActive AND NOT ContactorFeedbackM3_IsReal)
    📥 Command      : ordre envoyé au contacteur (TRUE = fermé/actif)
    📥 MirrorDelay  : délai de fermeture/ouverture simulé — À FIXER nettement SOUS le

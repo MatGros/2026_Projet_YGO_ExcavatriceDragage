@@ -3,7 +3,7 @@
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Spécification de la fonction métier Grappin (ouverture/fermeture par désynchronisation M2) et intégration dans l'orchestration générale.
 > **Version** : v1.2 (Révision — 2026-07-07)
-> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md) §9/§4quinquies.
+> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md) §9/§4quinquies.
 >
 > 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement grappin (Méca C
 > couche 1, nouveau bit4 `ErrorId` + sortie `M1SlipDetected`) — voir §4bis nouveau ci-dessous.

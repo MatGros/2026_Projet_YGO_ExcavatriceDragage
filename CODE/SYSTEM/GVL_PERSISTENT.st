@@ -40,19 +40,17 @@ VAR_GLOBAL PERSISTENT RETAIN
     JoystickNeutralY : INT := 5000; // 💾 Point neutre axe Y (valeur brute 0..10000)
 
     // ═══════════════════════════════════════════════════════════
-    // 🪜 TREUILS M1/M2 — Tables de paliers de vitesse
-    //    Réglées sur site selon le câblage réel des 4 contacteurs
+    // 🪜 TREUILS M1/M2 — Table de paliers de vitesse (COMMUNE aux 2 treuils)
+    //    Réglée sur site selon le câblage réel des 4 contacteurs
     //    ⚠️ Perte = paliers invalides → surintensité ou vitesse non régulée
+    //    🔧 REX 2026-07-08 : fusion WinchM1SpeedStepTable + WinchM2SpeedStepTable
+    //       → WinchSpeedStepTable UNIQUE (demande utilisateur : les 2 treuils sont
+    //       mécaniquement/électriquement identiques, les 2 tables étaient déjà
+    //       strictement identiques en valeurs — plus de duplication à maintenir).
+    //       Si un jour M1/M2 divergent réellement (câblage contacteur différent),
+    //       réintroduire 2 tables distinctes à ce moment-là.
     // ═══════════════════════════════════════════════════════════
-    WinchM1SpeedStepTable : ST_SpeedStepTable := (
-        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
-        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
-        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
-        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
-        P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
-        StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
-    );
-    WinchM2SpeedStepTable : ST_SpeedStepTable := (
+    WinchSpeedStepTable : ST_SpeedStepTable := (
         P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
         P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
         P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
@@ -62,8 +60,11 @@ VAR_GLOBAL PERSISTENT RETAIN
     );
 
     // Limitation du palier en descente (1..5) — ⚠️ perte = descente trop rapide possible
-    WinchM1MaxStepDescente : INT := 2; // 💾 Palier max descente M1
-    WinchM2MaxStepDescente : INT := 2; // 💾 Palier max descente M2
+    // 🔧 REX 2026-07-08 (demande utilisateur) : consolidé en UNE seule valeur commune M1/M2 (les
+    // 2 treuils doivent avoir le même profil de déplacement) — remplace WinchM1MaxStepDescente/
+    // WinchM2MaxStepDescente (2 valeurs indépendantes). Même pattern que CableLimitDescent_M/
+    // WinchSlowdownDistance_M/WinchSlowSpeedPct ci-dessous (miroir bidirectionnel PRG_09_Supervision).
+    WinchMaxStepDescente : INT := 3; // 💾 Palier max descente, commun M1/M2 — 🔧 REX 2026-07-08 : défaut relevé à 3 (demande utilisateur)
 
     // Rampes de vitesse treuils — ⚠️ perte = SafeStop non calibré → risque de choc mécanique
     WinchM1RampAccelRate_Pct    : REAL := 50.0;  // 💾 Accélération M1 (%/s)
@@ -103,10 +104,16 @@ VAR_GLOBAL PERSISTENT RETAIN
     //       au lieu de DEROULAGE) — voir Partie12 v1.1 §REX. Amplitude corrigée à ~10 m
     //       (valeur terrain, remplace l'ancienne estimation théorique de 1.5 m) — à
     //       affiner au 1er essai réel du grappin.
+    //    🔧 REX 2026-07-08 : OffsetCloseM réduit à 2.0 m (temporaire, confort mise en service
+    //       banc/simulation — cycle complet plus rapide à tester). ⚠️ PERSISTENT RETAIN : ce
+    //       nouveau défaut ne s'appliquera PAS automatiquement si une valeur est déjà retenue en
+    //       mémoire (ex. 10.0 déjà chargé) — forcer manuellement GrappinConfig.OffsetCloseM en vue
+    //       instance CODESYS après réimport si besoin. Remettre à la vraie valeur terrain avant
+    //       exploitation réelle.
     // ═══════════════════════════════════════════════════════════
     GrappinConfig : ST_GrappinConfig := (
         OffsetOpenM      := 0.0,   // 💾 Position d'ouverture relative (m)
-        OffsetCloseM     := 10.0,  // 💾 Position de fermeture relative (m) — CRITIQUE — signe inversé + amplitude corrigée REX 2026-07-07
+        OffsetCloseM     := 2.0,   // 🔴 TEST BANC — défaut réel 10.0 m, voir bandeau ci-dessus
         CoherenceLimitM  := 0.05   // 💾 Tolérance cohérence grappin (m)
     );
     GrappinState : ST_GrappinState; // 💾 État mécanique mémorisé du grappin (ouvert/fermé)

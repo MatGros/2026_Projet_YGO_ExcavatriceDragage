@@ -19,6 +19,12 @@ VAR_OUTPUT
     TopPositionSensor    : BOOL;   // 🔝 Fin de course HAUT (NC) : TRUE=libre ✅ | FALSE=butée atteinte 🔴→ForbidAscent
     SlackCableSwitch     : BOOL;   // 🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent
     PhaseRotationOk      : BOOL;   // ⚡ Rotation phases élec. (NC) : TRUE=phases OK ✅ | FALSE=inversées/absentes 🔴→SafeStop
+    // 🆕 REX 2026-07-08 : retour thermique COMMUN aux 3 freins M1/M2/M3 (1 seul fil, impossible
+    // de savoir lequel des 3 est en cause) — demande utilisateur : la perte de ce retour peut
+    // signifier un frein qui colle instantanément (frein à manque de courant) → traité comme
+    // les autres défauts francs du domaine, escalade PowerCutOff côté FB_Safety_Winch/_Chariot
+    // (voir bit10/bit3 respectifs).
+    BrakeThermalFeedback : BOOL;   // 🌡️ Thermique frein M1/M2/M3 commun (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
 
     // ── 🪝 TREUIL M1 (frein=NC ; feedback contacteurs=retour unique REX 2026-07-07) ─────
     M1FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : retour unique "tous contacteurs (sens+vitesse)
@@ -47,6 +53,7 @@ VAR
     instSlackCableSwitch  : FB_Input;
     instTopPositionSensor : FB_Input;
     instCtrlPhaseRotation : FB_Input;
+    instBrakeThermalFeedback : FB_Input; // 🆕 REX 2026-07-08
 
     instM1FwdRevSpeedFeedbackOff : FB_Input; // 🔧 REX 2026-07-07 : remplace instM1ContactorFwd/Rev
     instM1Thermal      : FB_Input;
@@ -108,6 +115,10 @@ TopPositionSensor := instTopPositionSensor.State;
 
 instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.PhaseRotationOk_IsReal), FilterTime := T#20MS);
 PhaseRotationOk := instCtrlPhaseRotation.State;
+
+// 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 (1 seul fil, voir bandeau ci-dessus)
+instBrakeThermalFeedback(InputRaw := BrakeThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BrakeThermal_IsReal), FilterTime := T#20MS);
+BrakeThermalFeedback := instBrakeThermalFeedback.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
 // 🧪 Simulation des retours contacteurs M1 (retombés si aucun sens/vitesse commandé)

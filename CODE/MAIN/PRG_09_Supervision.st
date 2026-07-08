@@ -60,6 +60,12 @@ GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                                  OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
                                  OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff;
 
+// 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 — signal UNIQUE (1 seul fil, pas de sens à
+// le dupliquer par axe), remonté une seule fois au niveau global GVL_IHM (même principe que
+// TopPositionSensorActive ci-dessus, PAS dans WinchM1/WinchM2/Chariot).
+GVL_IHM.Common.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
+GVL_IHM.Common.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
+
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
 // pas seulement le pulse — ArmingSeqStep<>0 englobe déjà tout sauf le verrouillage final.
@@ -84,7 +90,7 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
 IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM1.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM1_M;
-    GVL_IHM.WinchM1.MaxStepDescente     := GVL_PERSISTENT.WinchM1MaxStepDescente;
+    GVL_IHM.WinchM1.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.WinchM1.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
     GVL_IHM.WinchM1.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
     GVL_IHM.WinchM1.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
@@ -95,7 +101,7 @@ END_IF;
 
 IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM2.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM2_M;
-    GVL_IHM.WinchM2.MaxStepDescente     := GVL_PERSISTENT.WinchM2MaxStepDescente;
+    GVL_IHM.WinchM2.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.WinchM2.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
     GVL_IHM.WinchM2.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
     GVL_IHM.WinchM2.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
@@ -113,9 +119,9 @@ IF GVL_IHM.Grappin.Config.OffsetOpenM = 0.0 AND GVL_IHM.Grappin.Config.OffsetClo
     GVL_IHM.Grappin.TimeoutDuration := T#30s;
 END_IF;
 
-IF GVL_IHM.LimitLegalDepthMinAllowed = 0.0 THEN
-    GVL_IHM.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
-    GVL_IHM.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
+IF GVL_IHM.Common.LimitLegalDepthMinAllowed = 0.0 THEN
+    GVL_IHM.Common.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
+    GVL_IHM.Common.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
 END_IF;
 
 IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
@@ -126,8 +132,9 @@ END_IF;
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 GVL_PERSISTENT.HomingTargetM1_M           := GVL_IHM.WinchM1.TopSensorPositionM;
 GVL_PERSISTENT.HomingTargetM2_M           := GVL_IHM.WinchM2.TopSensorPositionM;
-GVL_PERSISTENT.WinchM1MaxStepDescente     := GVL_IHM.WinchM1.MaxStepDescente;
-GVL_PERSISTENT.WinchM2MaxStepDescente     := GVL_IHM.WinchM2.MaxStepDescente;
+// 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
+// ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
+// propagation à sens unique séparée par treuil ici.
 GVL_PERSISTENT.WinchM1RampAccelRate_Pct   := GVL_IHM.WinchM1.RampAccelRate;
 GVL_PERSISTENT.WinchM1RampDecelNormal_Pct := GVL_IHM.WinchM1.RampDecelNormalRate;
 GVL_PERSISTENT.WinchM1RampDecelFast_Pct   := GVL_IHM.WinchM1.RampDecelFastRate;
@@ -136,6 +143,16 @@ GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.WinchM2.RampDecelNormalRate
 GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.WinchM2.RampDecelFastRate;
 GVL_PERSISTENT.WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
 GVL_PERSISTENT.GrappinConfig              := GVL_IHM.Grappin.Config;
+
+// 🔧 REX 2026-07-08 (demande utilisateur) : MaxStepDescente commun M1/M2 — même profil de
+// déplacement des 2 treuils, même pattern miroir que CableLimitDescentM ci-dessous.
+IF GVL_IHM.WinchM1.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
+    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.WinchM1.MaxStepDescente;
+ELSIF GVL_IHM.WinchM2.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
+    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.WinchM2.MaxStepDescente;
+END_IF;
+GVL_IHM.WinchM1.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
+GVL_IHM.WinchM2.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
 
 IF GVL_IHM.WinchM1.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescent_M THEN
     GVL_PERSISTENT.CableLimitDescent_M := GVL_IHM.WinchM1.CableLimitDescentM;
@@ -161,15 +178,15 @@ END_IF;
 GVL_IHM.WinchM1.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 GVL_IHM.WinchM2.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 
-GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.LimitLegalDepthMinAllowed;
-GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.LimitLegalEnabled;
+GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.Common.LimitLegalDepthMinAllowed;
+GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.Common.LimitLegalEnabled;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
-GVL_IHM.LimitLegalReached                := GVL_PERSISTENT.LimitLegalEnabled
+GVL_IHM.Common.LimitLegalReached         := GVL_PERSISTENT.LimitLegalEnabled
                                             AND ((PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed)
                                                  OR (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
-GVL_IHM.TopPositionSensorActive          := NOT PRG_00_Inputs.TopPositionSensor;
+GVL_IHM.Common.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir AF_Partie13) ──────
@@ -274,6 +291,8 @@ GVL_IHM.Grappin.Done             := PRG_06_WinchControl.instGrappin.Done;
 GVL_IHM.Grappin.Error            := PRG_06_WinchControl.instGrappin.Error;
 GVL_IHM.Grappin.ErrorId          := PRG_06_WinchControl.instGrappin.ErrorId;
 GVL_IHM.Grappin.RemainingTravelM := PRG_06_WinchControl.instGrappin.RemainingTravelM; // 🔧 REX 2026-07-07
+GVL_IHM.Grappin.CloseReq         := PRG_06_WinchControl.instGrappin.CloseReq; // 🆕 REX 2026-07-08
+GVL_IHM.Grappin.OpenReq          := PRG_06_WinchControl.instGrappin.OpenReq;  // 🆕 REX 2026-07-08
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
 // doit être égale à GVL_IHM.WinchM1.PositionM quand tout est nominal (voir bandeau ST_GrappinHMI).
 GVL_IHM.Grappin.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM;

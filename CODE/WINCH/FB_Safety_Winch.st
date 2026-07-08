@@ -64,6 +64,18 @@
         n'a pas suffi → escalade `PowerCutOff` (dernier recours).
       Cas A (sens opposé) et Cas C original (absence de mouvement malgré commande)
       restent TBD, non implémentés (sources encore manquantes : sens joystick brut).
+   🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
+      - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT
+        sur les 2 instances Winch + l'instance Chariot — même principe que `SlackCableDetected`) :
+        défaut/perte → bit10 ErrorId → `SafeStop` **ET `PowerCutOff`**. Justification : le frein
+        est à manque de courant (colle au repos, voir FB_Brake) — la perte de ce retour peut
+        signifier qu'un frein colle INSTANTANÉMENT alors que le moteur est encore sous couple/en
+        mouvement ; une simple rampe de décélération (`SafeStop`) ne protège pas la mécanique
+        dans ce cas précis, il faut couper la puissance immédiatement.
+      - **Escalade PowerCutOff étendue à bit2 (surchauffe moteur, déjà existant)** : même
+        raisonnement — la perte du retour thermique moteur M1/M2 est traitée à l'identique du
+        thermique frein (défense en profondeur, demande explicite utilisateur), donc ajoutée au
+        masque `PowerCutOff` en plus du masque `SafeStop` (déjà présente).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
@@ -79,6 +91,7 @@ VAR_INPUT
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_00_Inputs.M1/M2ThermalFeedback)
+    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_00_Inputs.BrakeThermalFeedback)
     SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si OverrideSync
     PhaseRotationOk     : BOOL;        // PRG_00_Inputs.PhaseRotationOk (commun) — TRUE = rotation phases correcte
     TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
@@ -101,7 +114,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe ; bit3:mou câble M2 (SafeStop ou ForbidAscent si OverrideSync) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur ; bit9:Méca C glissement M1/grappin (escalade)
+    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si OverrideSync) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4 (mou câble inclus SAUF si OverrideSync)
@@ -280,6 +293,16 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FDFF;
 END_IF;
 
+// 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 (REX 2026-07-08, demande utilisateur) — bit10
+// Signal commun (1 seul fil, câblé identiquement sur les 3 instances Safety) : sa perte peut
+// signifier qu'un frein colle instantanément (frein à manque de courant) → SafeStop ET
+// PowerCutOff (voir bandeau en-tête).
+IF BrakeThermalFeedback THEN
+    ErrorId := ErrorId OR 16#0400;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FBFF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -287,13 +310,14 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique, MOU CÂBLE, phases) + 7/8/9 (Méca A/B/C) ou si contacteur coupé
+// 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
+// (Méca A/B/C) + 10 (🆕 REX 2026-07-08 : thermique frein commun) ou si contacteur coupé
 IF NOT EmergencyStopOk THEN
     SafeStop := TRUE;
 ELSIF OverrideSync THEN
-    SafeStop := (ErrorId AND 16#0397) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (ErrorId AND 16#0797) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#039F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (ErrorId AND 16#079F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
@@ -306,7 +330,12 @@ ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
 // SafeStop seul ne sert à rien dans ces 3 cas précis.
-PowerCutOff := (ErrorId AND 16#0380) <> 16#0000;
+// 🆕 REX 2026-07-08 (demande utilisateur) : bit2 (surchauffe/perte thermique MOTEUR) et bit10
+// (surchauffe/perte thermique FREIN commun) ajoutés — un frein à manque de courant peut coller
+// instantanément sur perte de son retour thermique : une rampe SafeStop seule ne protège pas la
+// mécanique dans ce cas, coupure puissance immédiate nécessaire. Même raisonnement appliqué au
+// thermique moteur par cohérence/défense en profondeur (demande explicite).
+PowerCutOff := (ErrorId AND 16#0784) <> 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)
 Busy := FALSE;

@@ -97,7 +97,7 @@
       <UserDefElement iecname="State" type="T_E_DiagState" byteoffset="6" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="StateAtError" type="T_E_DiagState" byteoffset="8" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_GrappinHMI" size="59" nativesize="64" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_GrappinHMI">
+    <TypeUserDef name="T_ST_GrappinHMI" size="63" nativesize="68" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_GrappinHMI">
       <UserDefElement iecname="Config" type="T_ST_GrappinConfig" byteoffset="0" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="TimeoutDuration" type="T_TIME" byteoffset="12" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="State" type="T_ST_GrappinState" byteoffset="16" vartype="VAR" access="ReadWrite" />
@@ -112,10 +112,12 @@
       <UserDefElement iecname="Error" type="T_BOOL" byteoffset="44" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="46" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="RemainingTravelM" type="T_REAL" byteoffset="48" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M2PositionCorrected" type="T_REAL" byteoffset="52" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="CmdOpen" type="T_BOOL" byteoffset="56" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="CmdClose" type="T_BOOL" byteoffset="57" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="CmdReset" type="T_BOOL" byteoffset="58" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CloseReq" type="T_BOOL" byteoffset="52" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="OpenReq" type="T_BOOL" byteoffset="53" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2PositionCorrected" type="T_REAL" byteoffset="56" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CmdOpen" type="T_BOOL" byteoffset="60" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CmdClose" type="T_BOOL" byteoffset="61" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CmdReset" type="T_BOOL" byteoffset="62" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_JoystickHMI" size="36" nativesize="40" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_JoystickHMI">
       <UserDefElement iecname="RawX" type="T_INT" byteoffset="0" vartype="VAR" access="ReadWrite" />
