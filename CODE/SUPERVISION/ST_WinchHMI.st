@@ -59,12 +59,19 @@ STRUCT
     CmdReset                : BOOL;             (* 🔑 Acquittement défauts spécifique treuil *)
     CmdHome                 : BOOL;             (* 🎯 Lancement de la prise d'origine *)
     ConfirmCoherence        : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
-    
+    CmdInhibit              : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
+                                                    UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)
+
     (* 🐞 Bypasses de Test (Visualisation / Forçage) *)
     BypassContactorFeedback : BOOL;             (* 🔌 Bypass retours contacteurs (banc de test) *)
     BypassSlackCable        : BOOL;             (* ⚠️ Bypass capteur mou de câble (banc de test) *)
     BypassTopPositionSensor : BOOL;             (* 📐 Bypass capteur position haute (banc de test) *)
     SafetyError             : BOOL;             (* 🛡️ Bloc sécurité (Safety) en défaut *)
     SafetyErrorId           : WORD;             (* ❌ Code bitfield du défaut de sécurité *)
+    InhibitActive           : BOOL;             (* 🆕 REX 2026-07-08 : miroir lecture seule — confirme que
+                                                    l'inhibition a bien été arbitrée (actif seulement si MAINT_N2) *)
+    MecaADriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM *)
+    MecaCDriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca C (m, grappin M1) — réglage GrappinSlipToleranceM *)
+    MecaBElapsedTime        : TIME;             (* 🆕 REX 2026-07-08 : temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout *)
 END_STRUCT
 END_TYPE

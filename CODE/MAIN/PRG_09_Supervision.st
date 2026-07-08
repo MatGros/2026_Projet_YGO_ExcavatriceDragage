@@ -237,6 +237,10 @@ GVL_IHM.WinchM1.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM1.Err
 GVL_IHM.WinchM1.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM1.ErrorId;
 GVL_IHM.WinchM1.SafetyError              := PRG_03_Safety.instSafetyWinchM1.Error;
 GVL_IHM.WinchM1.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM1.ErrorId;
+GVL_IHM.WinchM1.MecaADriftM              := PRG_03_Safety.instSafetyWinchM1.MecaADriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.WinchM1.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM1.MecaCDriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.WinchM1.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM1.MecaBElapsedTime; // 🆕 REX 2026-07-08
+GVL_IHM.WinchM1.InhibitActive            := PRG_04_Modes.instModes.InhibitM1; // 🆕 REX 2026-07-08
 
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
@@ -277,6 +281,10 @@ GVL_IHM.WinchM2.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM2.Err
 GVL_IHM.WinchM2.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM2.ErrorId;
 GVL_IHM.WinchM2.SafetyError              := PRG_03_Safety.instSafetyWinchM2.Error;
 GVL_IHM.WinchM2.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM2.ErrorId;
+GVL_IHM.WinchM2.MecaADriftM              := PRG_03_Safety.instSafetyWinchM2.MecaADriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.WinchM2.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM2.MecaCDriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.WinchM2.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM2.MecaBElapsedTime; // 🆕 REX 2026-07-08
+GVL_IHM.WinchM2.InhibitActive            := PRG_04_Modes.instModes.InhibitM2; // 🆕 REX 2026-07-08
 
 
 // ── 7. MAPPING ÉTATS GRAPPIN → IHM ───────────────────────────────────────

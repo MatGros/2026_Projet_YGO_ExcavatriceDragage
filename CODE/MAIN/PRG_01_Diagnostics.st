@@ -17,15 +17,19 @@ END_VAR
 // 🧪 0. Simulation Joystick (Lot 3, priorité — voir CODE/SIMULATION/FB_Sim_Joystick.st) : appelée
 // AVANT FB_Joystick_0 pour que ses sorties soient à jour au même cycle. Remplace l'ancien bypass
 // homme-mort codé en dur dans FB_Joystick (GVL_DEBUG.DBG_DeadmanBypass_TEST) : quand
-// NOT Joystick_IsReal, ses sorties remplacent les entrées brutes ci-dessous ; le homme-mort réel
-// de FB_Joystick n'est plus jamais contourné.
+// NOT JoystickSignal_IsReal, ses sorties remplacent les entrées brutes ci-dessous ; le homme-mort
+// réel de FB_Joystick n'est plus jamais contourné.
+// 🆕 REX 2026-07-08 : gardé désormais par JoystickSignal_IsReal (PAS Joystick_IsReal, qui ne
+// couvre que le bus CANopen ci-dessous) — granularité séparée demandée par l'utilisateur : tester
+// le signal joystick réel sans dépendre du diagnostic bus/nœud CANopen (encore simulé sain).
 instSimJoystick(
-    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal,
+    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.JoystickSignal_IsReal,
     NeutralRaw      := GVL_Simulation.JoystickForceNeutralRaw,
     MaxRaw          := GVL_Simulation.JoystickForceMaxRaw
 );
 
-// 1. Diagnostics CANopen
+// 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par Joystick_IsReal UNIQUEMENT (bus/nœud),
+// indépendant de JoystickSignal_IsReal (signal brut ci-dessus) — granularité séparée.
 instDiagCanOpen(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
@@ -45,7 +49,7 @@ instDiagEthercat(
     EncoderM2SlaveState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
 );
 
-// 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT Joystick_IsReal
+// 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT JoystickSignal_IsReal
 // 🔴🔧 REX 2026-07-07 — TEST BANC UNIQUEMENT, PAS DE VALEUR PRODUCTION :
 //    DeadmanRearmTimeout 10s → 5min, NeutralHoldTime 500ms → 1s (confort d'essai, moins de
 //    réappuis/traversées à gérer). ⚠️ RÉDUIT RÉELLEMENT LA SÉCURITÉ HOMME-MORT — à repasser

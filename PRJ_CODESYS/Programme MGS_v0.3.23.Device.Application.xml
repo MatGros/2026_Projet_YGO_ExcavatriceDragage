@@ -167,7 +167,7 @@
       <UserDefElement iecname="State" type="T_E_State" byteoffset="14" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="OverrideSync" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_WinchHMI" size="106" nativesize="108" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchHMI">
+    <TypeUserDef name="T_ST_WinchHMI" size="107" nativesize="108" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchHMI">
       <UserDefElement iecname="TopSensorPositionM" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="MaxStepDescente" type="T_INT" byteoffset="4" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="RampAccelRate" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
@@ -206,11 +206,13 @@
       <UserDefElement iecname="CmdReset" type="T_BOOL" byteoffset="96" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="CmdHome" type="T_BOOL" byteoffset="97" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="ConfirmCoherence" type="T_BOOL" byteoffset="98" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="BypassContactorFeedback" type="T_BOOL" byteoffset="99" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="BypassSlackCable" type="T_BOOL" byteoffset="100" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="BypassTopPositionSensor" type="T_BOOL" byteoffset="101" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="SafetyError" type="T_BOOL" byteoffset="102" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CmdInhibit" type="T_BOOL" byteoffset="99" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BypassContactorFeedback" type="T_BOOL" byteoffset="100" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BypassSlackCable" type="T_BOOL" byteoffset="101" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BypassTopPositionSensor" type="T_BOOL" byteoffset="102" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyError" type="T_BOOL" byteoffset="103" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="SafetyErrorId" type="T_WORD" byteoffset="104" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="InhibitActive" type="T_BOOL" byteoffset="106" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_NetworkDiagHMI" size="68" nativesize="68" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_NetworkDiagHMI">
       <UserDefElement iecname="BusCanOpen" type="T_ST_DeviceDiag" byteoffset="0" vartype="VAR" access="ReadWrite" />

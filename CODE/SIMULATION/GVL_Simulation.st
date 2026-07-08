@@ -25,7 +25,12 @@ VAR_GLOBAL
     VariateurM3_IsReal         : BOOL := FALSE; // AC600 EtherCAT (chariot M3)
     EncoderM1_IsReal           : BOOL := FALSE; // COD1 EtherCAT
     EncoderM2_IsReal           : BOOL := FALSE; // COD2 EtherCAT
-    Joystick_IsReal            : BOOL := FALSE; // CANopen JOY1
+    Joystick_IsReal            : BOOL := FALSE; // CANopen JOY1 — bus/nœud (CanOnline/CanOperational)
+    // 🆕 REX 2026-07-08 (demande utilisateur) : granularité séparée du bus ci-dessus — permet de
+    // câbler le joystick réel (signal analogique/CAN brut RawX/RawY/RawButton) tout en laissant le
+    // bus/nœud CANopen (Joystick_IsReal) simulé sain, pour tester le joystick physique avant que le
+    // diagnostic CANopen/EtherCAT ne soit fiabilisé (sans faux défaut CAN pendant ce test).
+    JoystickSignal_IsReal      : BOOL := FALSE; // Signal joystick brut (RawX/RawY/RawButton uniquement)
 
     // ── Capteurs/retours câblés (I/O discrètes, indépendantes du bus) ──────────
     EmergencyStopChain_IsReal  : BOOL := FALSE; // Chaîne AU câblée (EmergencyStopOk_DI)
