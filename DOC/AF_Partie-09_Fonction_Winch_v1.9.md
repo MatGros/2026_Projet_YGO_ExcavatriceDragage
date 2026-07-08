@@ -1,6 +1,6 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.8)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.9)
 
-> 🆕 **v1.8 (2026-07-08)** — Lot TBD : Ajout note d'investigation sur montée en charge et temporisation frein (§4undecies).
+> 🆕 **v1.9 (2026-07-09)** — Documentation exhaustive des 5 mécanismes de sécurité (Méca A–E, bits 7/8/9/11/12/13), extraits du code réel `FB_Safety_Winch.st` : comportement d'armement, seuils, conséquences, escalades PowerCutOff, et subtilités critiques (§4novies ci-dessous).
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
 > `SafeStop` pour l'écart de position), `SyncActive` selon Mode (imposé N1, configurable en N2 via `SyncEnable`
@@ -236,6 +236,182 @@ après décélération/ouverture des contacteurs) s'appuie sur des temporisation
 **Refactoring demandé** : À définir lors d'un lot dédié — validation terrain + éventuels réglages
 de temporisations, voire refonte du modèle séquentiel du frein selon le retour d'expérience mise
 en service. **Pas d'action immédiate** ; point à tracker pour essais de charge.
+
+### 🆕 4novies. Défense en profondeur : Les 5 mécanismes de sécurité (Méca A–E, v1.9)
+
+`FB_Safety_Winch` implémente **5 mécanismes de sécurité indépendants** en défense en profondeur contre les défauts de mouvement (roue libre), les défaillances de capteurs, et les écarts de synchronisation. Chaque mécanisme dispose d'un **bit `ErrorId` dédié**, d'une **condition d'armement**, d'une **condition de déclenchement**, et d'une **conséquence** (arrêt `SafeStop` classique, ou escalade `PowerCutOff` amont quand les contacteurs confirment déjà être coupés ou quand la protection du couple est en jeu).
+
+#### Tableau récapitulatif
+
+| **Méca** | **Rôle** | **Bit** | **Armement** | **Déclenchement** | **Conséquence** | **Seuil / Délai** |
+|---|---|---|---|---|---|---|
+| **A** | Mouvement non commandé (roue libre) | bit7 (16#0080) | Contacteurs + frein confirmés coupés, hors homing | Dérive > 2.0m OU vitesse > 0.02 m/s | SafeStop + **PowerCutOff** | `UncommandedDriftToleranceM` (2.0m), `UncommandedSpeedThresholdMps` (0.02 m/s) |
+| **B** | Pilotage sans commande opérateur | bit8 (16#0100) | Perte CAN ou joystick au neutre | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
+| **C** | Glissement M1 pendant grappin | bit9 (16#0200) | Grappin en mouvement (M1 seul) | Dérive M1 > 2.0m (escalade au-delà de `FB_Grappin`) | SafeStop + **PowerCutOff** | `GrappinSlipToleranceM` (2.0m) |
+| **D** | Capteur haut non confirmé arrêté | bit11 (16#0800) | Capteur physique atteint OU limite logicielle dépassée, hors homing | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
+| **E** | Écart synchro M1/M2 critique | bit12 (16#1000) + bit13 (16#2000) | Synchro activée, hors grappin/homing | Écart > 2.0m → **bit12 immédiat** ; pas confirmé arrêté → **bit13 escalade** | Bit12 : SafeStop seul ; Bit13 : SafeStop + **PowerCutOff** | `CriticalSyncToleranceM` (2.0m), `PostRampTimeout` (3s) |
+
+---
+
+#### Méca A — Mouvement non commandé général (Bit7)
+
+**Rôle** : Détecter la **roue libre ou le glissement du frein** au repos — tout mouvement lors que l'automate a commandé l'arrêt complet (tous les contacteurs et le frein confirmés fermés).
+
+**Armement** : 
+- Condition : `FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode`
+  - `FwdRevSpeedFeedbackOff` = tous les contacteurs sens+vitesse retombés ✓
+  - `BrakeFeedback` = frein serré (contact fermé) ✓
+  - Hors phase de référencement (position instable)
+
+**Déclenchement** :
+- Condition : Toujours vraie dans ce cycle, **OU** (vitesse mesurée dans le cycle > 0.02 m/s)
+- Brique `FB_DriftGuard` : capture la position de référence à l'armement ; chaque scan, calcule `ABS(CablePosM - RefPos)` → si > 2.0 m → `Violation := TRUE`
+- Littéralement : `DriftGuardA.Violation OR (Vitesse > 0.02 m/s)`
+
+**Conséquence** : 
+- `ErrorId` bit7 levé → inclus dans le **masque `SafeStop`** (bits 0/1/2/3/4/7/8/9/10/11/12/13)
+- **Escalade immédiate** : bit7 aussi dans le **masque `PowerCutOff`** (bits 2/7/8/9/10/11/13) → coupure puissance amont sans délai
+- Raison : les contacteurs et le frein confirment déjà être arrêtés ; `SafeStop` seul ne suffit pas (frein peut avoir flanché)
+
+**Paramètres réglables** :
+- `UncommandedDriftToleranceM` (défaut 2.0 m) — Tolérance spatiale avant défaut
+- `UncommandedSpeedThresholdMps` (défaut 0.02 m/s) — Seuil vitesse (mesurée par différence position entre 2 scans, à 10 ms)
+
+**Subtilités** :
+- Deux conditions en **OR** : dérive OU vitesse. L'une ou l'autre suffit à déclencher le défaut.
+- Frein doit être confirmé **serré** (pas juste les contacteurs) — protection contre un frein qui aurait relâché prématurément.
+- Sortie diagnostic : `MecaADriftM` (dérive mesurée en mètres) — affichée à l'IHM pour mise en service.
+
+---
+
+#### Méca B — Pilotage actif sans commande opérateur (Bit8)
+
+**Rôle** : Détecter un **mouvement non autorisé suite à une perte de commande** (perte du lien CAN ou joystick au neutre), en tant que **garde-fou indépendant** même si `FB_Winch` défaillerait.
+
+**Armement** :
+- Condition : `(NOT JoystickOnline) OR (NOT JoystickOperational) OR JoystickYNeutral`
+  - Perte du nœud CAN, OU
+  - Nœud en défaut d'exploitation, OU
+  - Manche au neutre (magnitude < 0.1)
+  - → `MecaB_NoOperatorCmd := TRUE`
+
+**Déclenchement** :
+- Condition : Si `MecaB_NoOperatorCmd = TRUE` **ET** que `NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)` (contacteurs OU frein ne confirmant pas arrêt) pendant **3 secondes**
+- Timer `TonMecaB` : si la condition reste vraie tout ce temps, `TonMecaB.Q` bascule → bit8 levé
+- Littéralement : perte de commande + pas de confirmation physique d'arrêt après 3s = mouvement indésirable
+
+**Conséquence** :
+- `ErrorId` bit8 levé → inclus dans masque **`SafeStop`**
+- **Escalade immédiate** : aussi dans le masque **`PowerCutOff`** → coupure puissance amont
+
+**Paramètres réglables** :
+- `PostRampTimeout` (défaut T#3S) — Délai de confirmation contacteurs/frein (partagé avec Méca D)
+
+**Subtilités** :
+- **Vérification combinée des deux retours** : Les contacteurs **ET** le frein doivent tous deux confirmer l'arrêt — c'est une **évolution v1.7** (auparavant seuls les contacteurs étaient vérifiés).
+- La perte de frein (pas de serrage) seule suffit à déclencher Méca B, même si les contacteurs retombent correctement.
+- Sortie diagnostic : `MecaBElapsedTime` (temps écoulé depuis le début de la temporisation) — monitoré à l'IHM.
+
+---
+
+#### Méca C — Glissement M1 pendant grappin (Bit9 — Escalade)
+
+**Rôle** : Détecter l'**escalade d'un glissement partiel du treuil M1** qui avait déjà été en partie contenu par la couche 1 (`FB_Grappin`, tolérance 1.0 m). Si même avec le `SafeStop` du grappin M1 ne suffit pas à l'arrêter, cela signifie un problème mécanique grave (roue libre augmentée, surcharge).
+
+**Armement** :
+- Condition : `GrappinHoldStillActive`
+  - Variable câblée sur `instGrappin.Busy` pour l'instance M1 **seulement**
+  - Toujours `FALSE` côté M2 (qui doit continuer son mouvement normalement pendant que le grappin s'ouvre/ferme)
+  - → Surveillance active uniquement pendant le cycle du grappin, sur M1
+
+**Déclenchement** :
+- Brique `FB_DriftGuard` : capture position de référence à l'armement ; chaque scan, calcule dérive absolue
+- Si dérive M1 > 2.0 m (seuil > 1.0 m de `FB_Grappin`) → `DriftGuardC.Violation := TRUE` → bit9 levé
+- Littéralement : M1 a dévié de plus de 2 mètres **malgré** l'arrêt de sécurité du grappin
+
+**Conséquence** :
+- `ErrorId` bit9 levé → inclus dans masque **`SafeStop`**
+- **Escalade immédiate** : aussi dans le masque **`PowerCutOff`** → coupure puissance amont
+
+**Paramètres réglables** :
+- `GrappinSlipToleranceM` (défaut 2.0 m) — Tolérance d'escalade (> au seuil de `FB_Grappin` 1.0 m)
+
+**Subtilités** :
+- **Armé UNIQUEMENT côté M1** — M2 n'est jamais surveillé pour cela, car il doit tourner pendant le grappin.
+- Le grappin (`FB_Grappin`) implémente déjà un niveau 1 de surveillance (arrêt M1 si glissement > 1.0 m) — Méca C est une couche 2 (si même ce premier niveau échoue).
+- Sortie diagnostic : `MecaCDriftM` (dérive mesurée) — affichée à l'IHM pour mise en service et réglage du seuil.
+
+---
+
+#### Méca D — Capteur haut non confirmé arrêté (Bit11)
+
+**Rôle** : Compléter la protection **à 3 couches** lors de l'approche du capteur haut physique (fin de course) :
+1. **Couche 1** : Arrêt normal logiciel à ~12.0 m (ou dépassement autorisé en homing avec `HomingApproachEnable`).
+2. **Couche 2** : `ForbidAscent` immédiat si capteur atteint (bit5, visible IHM, acquittable).
+3. **Couche 3** : **Méca D** (bit11) — si malgré `ForbidAscent`, les contacteurs/frein ne confirment pas l'arrêt → défaut + `PowerCutOff`.
+
+**Armement** :
+- Condition : `(((NOT TopPositionSensor AND NOT InReferencingMode) OR (Homed AND NOT HomingSuspect AND CablePosM >= (TopLimitM + 0.10))) AND (Direction >= 0)) AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)`
+  - **Cas 1** : Capteur physique haut atteint (`TopPositionSensor = FALSE`, contact NF ouvert), hors homing, ET montée commandée (`Direction >= 0`)
+  - **OU Cas 2** : Position logicielle dépassée (`CablePosM >= TopLimitM + 0.10`) tout en étant référencé
+  - **ET** : Les contacteurs/frein **ne confirment PAS** l'arrêt (`FwdRevSpeedFeedbackOff = FALSE` OU `BrakeFeedback = FALSE`)
+  - Neutralisée si `Direction < 0` (descente)
+
+**Déclenchement** :
+- Timer `TonMecaD` : si la condition d'armement reste vraie pendant **3 secondes** → `TonMecaD.Q` bascule → bit11 levé
+
+**Conséquence** :
+- `ErrorId` bit11 levé → inclus dans masque **`SafeStop`**
+- **Escalade immédiate** : aussi dans le masque **`PowerCutOff`** → coupure puissance amont
+
+**Paramètres réglables** :
+- `PostRampTimeout` (défaut T#3S) — Délai de confirmation (partagé avec Méca B)
+- `TopLimitM` (fourni en entrée) — Limite logicielle haute (12.5 m par défaut)
+
+**Subtilités** :
+- **Deux conditions d'armement** : capteur physique OU limite logicielle redondante — défense en profondeur.
+- Neutralisée en **descente** (`Direction = -1`) — pas de risque de collision vers le bas, donc pas de surveillance.
+- L'alarme IHM de fin de course (bit5, `ForbidAscent`) peut être acquittée une fois la commande de montée relâchée — mais Méca D surveille le physique indépendamment.
+- Timer partagé avec Méca B (`PostRampTimeout`) — le même délai s'applique.
+
+---
+
+#### Méca E — Écart synchro M1/M2 critique (Bits12 + Bit13 — Escalade)
+
+**Rôle** : Détection d'une **dégradation importante de la synchronisation** entre M1 et M2 → défense en profondeur au-delà du premier niveau (`FB_WinchSync`, écart mineur).
+
+**Armement** :
+- Condition : `SyncEnable AND NOT GrappinBusy AND NOT InReferencingMode`
+  - Synchro activée (peut être désactivée en maintenance N2)
+  - Hors cycle grappin (où un écart M1/M2 est normal/volontaire)
+  - Hors phase de référencement (position instable)
+
+**Déclenchement** :
+
+**Bit12 (Détection écart critique)** :
+- Condition : `ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM` (2.0 m par défaut)
+  - Entrée `ExpectedOtherWinchPosM` déjà corrigée de l'offset grappin actif par l'appelant — comparaison directe valable
+  - Si écart > 2.0 m → bit12 immédiatement levé
+
+**Bit13 (Escalade — pas de confirmation d'arrêt)** :
+- Condition : Si bit12 est actif **ET** `NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)` pendant `PostRampTimeout` (3s)
+  - Timer `TonMecaE` : si le frein/contacteurs ne confirment pas l'arrêt malgré le `SafeStop` du bit12 → bit13 levé
+
+**Conséquence** :
+- **Bit12** : `ErrorId` bit12 (16#1000) → inclus dans masque **`SafeStop`** uniquement (pas de `PowerCutOff` immédiat)
+  - L'écart critique est grave, mais `SafeStop` doit suffire à arrêter les deux treuils ensemble
+- **Bit13** : `ErrorId` bit13 (16#2000) → escalade : aussi dans masque **`PowerCutOff`**
+  - Si même après 3s le `SafeStop` du bit12 ne suffit pas à confirmer l'arrêt, l'un des deux treuils n'a probablement pas décéléré → `PowerCutOff` amont
+
+**Paramètres réglables** :
+- `CriticalSyncToleranceM` (défaut 2.0 m) — Seuil d'écart critique
+- `PostRampTimeout` (défaut T#3S) — Délai d'escalade (partagé avec Méca B/D)
+
+**Subtilités** :
+- **Deux bits coordonnés** : bit12 = alerte (SafeStop), bit13 = aggravation (PowerCutOff). Permet une IHM différenciée (warning vs alerte).
+- `ExpectedOtherWinchPosM` est **déjà offset-corrigé** par l'appelant — le FB ne refait pas le calcul (règle anti-duplication).
+- Suppression pendant `GrappinBusy` — le grappin peut créer des écarts transitoires inévitables, ce n'est pas un défaut tant qu'il bouge.
+- Premier niveau (`FB_WinchSync`, écart mineur) met une alerte IHM ; cet écart critique → `SafeStop` automatique.
 
 ---
 

@@ -986,3 +986,36 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 **Non affecté** : `DOC/Archives/` (versions périmées, gitignoré) — fichiers restent en format ancien (inutile de les renommer).
 
 ---
+
+## 🚀 43. Documentation exhaustive des 5 mécanismes de sécurité Winch (2026-07-09)
+
+**Contexte** : Les 5 mécanismes de sécurité (`FB_Safety_Winch` bits 7/8/9/11/12/13) avaient chacun un paragraphe de description dans le bandeau du code ST et dans la Partie 9, mais sans structure unifiée — absence de tableau récapitulatif, conditions d'armement/déclenchement éparpillées, conséquences pas toujours explicites. Demande utilisateur : documentation exhaustive et structurée (un tableau + une sous-section détaillée par Méca).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D103 | **Documentation Méca A–E complète (v1.9)** | Nouvelle section §4novies dans `AF_Partie-09_Fonction_Winch_v1.9.md` : (1) **tableau récapitulatif** 5 lignes (Méca / Bit / Armement / Déclenchement / Conséquence / Seuils) — vue d'ensemble 30 secondes ; (2) **5 sous-sections détaillées** (Méca A / B / C / D / E) listant **Rôle** (1 phrase), **Armement** (condition exact du code, commentée), **Déclenchement** (logique), **Conséquence** (SafeStop / PowerCutOff escalade), **Paramètres réglables** (noms variables réelles, défauts, unités), **Subtilités** (ex. Méca C UNIQUEMENT M1, Méca E escalade PowerCutOff sur bit13, pas bit12 seul). **Comportement extracté 100% du code réel** `CODE/WINCH/FB_Safety_Winch.st` (pas de duplication ST, description du comportement seulement). Versionning : v1.8 → v1.9. |
+
+**Fichiers modifiés** :
+- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.9.md` (NOUVEAU, section §4novies ; v1.8 archivé)
+- ✅ `DOC/Archives/AF_Partie-09_Fonction_Winch_v1.8.md` (copie conservée pour traçabilité)
+- ✅ `CLAUDE.md` (1 référence : AF_Partie-09 v1.8→v1.9 + description améliorée)
+- ✅ `CODE/WINCH/FB_Safety_Winch.st` (bandeau : DOC ref v1.1→v1.9)
+
+**Contenu section 4novies** :
+1. Tableau récapitulatif 5 lignes × 7 colonnes (Méca / Bit / Armement / Déclenchement / Conséquence / Seuil/Délai)
+2. **Méca A (bit7)** — Mouvement non commandé / roue libre : armé contacteurs+frein coupés, déclenchement dérive>2m OU vitesse>0.02m/s, PowerCutOff escalade
+3. **Méca B (bit8)** — Pilotage sans commande opérateur : armé perte CAN/joystick neutre, déclenchement pas d'arrêt confirmé après 3s (contacteurs+frein), PowerCutOff
+4. **Méca C (bit9)** — Glissement M1 grappin : armé UNIQUEMENT M1 (GrappinHoldStillActive), dérive>2m escalade, PowerCutOff
+5. **Méca D (bit11)** — Capteur haut / limite logicielle : armé capteur atteint OU limite dépassée, pas confirmé arrêt après 3s, PowerCutOff
+6. **Méca E (bits 12/13)** — Écart synchro critique : bit12 détection immédiate SafeStop seul, bit13 escalade PowerCutOff si pas confirmé après 3s
+7. Chaque Méca inclut : Rôle (1 phrase), Armement (condition exacte), Déclenchement (logique), Conséquence, Paramètres (noms/défauts/unités), Subtilités (alertes critiques)
+
+**Conformité** : Toutes les conditions/seuils extraits du code réel — garantit que la doc reflète le comportement codé, pas une interprétation théorique. Pas de code ST recopié (règle anti-duplication), comportement descriptif uniquement.
+
+**Traçabilité** : Utile pour :
+- Mise en service : tableau permet de comprendre RAPIDEMENT quels seuils ajuster (colonnes Seuil/Délai)
+- Diagnostic : tableau guide le technicien « mon bit X est levé → voir Méca Y, regarder le seuil ZZ »
+- Audit de sécurité : structure explicite + escalades PowerCutOff justifiées pour chaque Méca
+- Évolution future : un nouveau mécanisme se documente sur le même pattern
+
+---

@@ -4,7 +4,7 @@
 > `PRG_0_Inputs.M1ContactorFeedbackFwd` (retour individuel par sens) est mis à jour — ce signal
 > est **supprimé côté câblage réel** pour les treuils M1/M2, remplacé par un retour unique par
 > treuil `M1FwdRevSpeedFeedbackOff`. Aucun autre changement vs v2.9. Détail complet :
-> `DOC/AF_Partie-09_Fonction_Winch_v1.5.md`.
+> `DOC/AF_Partie-09_Fonction_Winch_v1.9.md`.
 >
 > **v2.9** — Correctif documentaire (voir Partie 13) : `GVL_DEBUG` (§2bis) a été supprimé et
 > remplacé par `GVL_Simulation` (bit maître `SimulationModeActive` + granularité par device
