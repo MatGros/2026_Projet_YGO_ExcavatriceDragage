@@ -31,6 +31,7 @@ instSafetyWinchM1(
     InReferencingMode   := PRG_02_Encoders.instHomingM1.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M,
+    Direction           := PRG_06_WinchControl.M1_Direction_Active,
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
@@ -58,6 +59,7 @@ instSafetyWinchM2(
     InReferencingMode   := PRG_02_Encoders.instHomingM2.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescent_M,
+    Direction           := PRG_06_WinchControl.M2_Direction_Active,
     // 🔧 REX 2026-07-07 — Méca A/B (voir FB_Safety_Winch bandeau en-tête) — Méca C NON applicable
     // à M2 (c'est M2 qui bouge pendant le grappin, GrappinHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,

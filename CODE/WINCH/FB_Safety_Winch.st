@@ -119,6 +119,7 @@ VAR_INPUT
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
     CableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
+    Direction           : INT;         // 🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)
 
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir bandeau en-tête)
     FwdRevSpeedFeedbackOff  : BOOL;         // Retour unique "tous contacteurs sens+vitesse retombés" CE treuil
@@ -252,11 +253,9 @@ END_IF;
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
 // ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
-// (TopPositionSensor=FALSE) ET qu'on n'est pas en phase de référencement (homing), alors on lève
-// le défaut pour interdire uniquement la montée. 🔧 CORRIGÉ 2026-07-04 : polarité inversée
-// (testait TopPositionSensor au lieu de NOT TopPositionSensor), bloquait la montée en permanence
-// en fonctionnement normal au lieu de la bloquer au fin de course haut.
-IF NOT TopPositionSensor AND NOT InReferencingMode THEN
+// (TopPositionSensor=FALSE), qu'on n'est pas en phase de référencement (homing), ET qu'on
+// commande un mouvement vers le haut (Direction > 0), alors on lève le défaut.
+IF NOT TopPositionSensor AND NOT InReferencingMode AND (Direction > 0) THEN
     ErrorId := ErrorId OR 16#0020;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFDF;
@@ -371,7 +370,10 @@ END_IF;
 ForbidDescent := (ErrorId AND 16#0040) <> 16#0000 OR NOT EmergencyStopOk;
 
 // ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble : montée interdite même en récup)
+// 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement,
+// même si l'alarme IHM (bit5) a été acquittée pour permettre la descente.
 ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
+             OR (NOT TopPositionSensor AND NOT InReferencingMode)
              OR ((ErrorId AND 16#0008) <> 16#0000 AND OverrideSync);
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
