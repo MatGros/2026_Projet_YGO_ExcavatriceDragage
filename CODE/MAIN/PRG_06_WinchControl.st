@@ -188,8 +188,19 @@ END_IF;
 
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
+    // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain, simulation) : écart transitoire (~0.27m)
+    // constaté UNIQUEMENT à l'approche d'une butée (haute 12m ici), pas pendant le pilotage normal
+    // (précision <0.001m confirmée par l'opérateur). Cause : ForbidAscent/ForbidDescent coupent
+    // M1/M2 au même scan (couplage croisé), mais leur arrêt PHYSIQUE (rampe de décél, même en
+    // simulation) n'est jamais parfaitement simultané à la position exacte — écart normal et non
+    // significatif à ce moment précis, pas une vraie désynchro. Suppression pendant qu'un des deux
+    // treuils est en butée (Ascent OU Descent), même principe que la suppression pendant GrappinBusy
+    // déjà existante. Lu avec 1 scan de retard (ForbidAscent/DescentMx_Active calculés plus bas dans
+    // ce fichier) — acceptable, même raisonnement que SyncMinorDeviation ci-dessous.
     Enable          := PRG_04_Modes.instModes.SyncEnable AND NOT instGrappin.Busy
-                        AND NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : évite un faux défaut synchro pendant un test treuil seul
+                        AND NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_04_Modes.instModes.InhibitM2
+                        AND NOT (ForbidAscentM1_Active OR ForbidAscentM2_Active
+                                 OR ForbidDescentM1_Active OR ForbidDescentM2_Active), // 🆕 REX 2026-07-08 (7)
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     Mode            := PRG_04_Modes.instModes.Mode,
