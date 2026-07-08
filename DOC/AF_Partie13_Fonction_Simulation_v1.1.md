@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.1)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Architecture unifiée de simulation banc de test (bit maître + granularité par
@@ -7,7 +7,7 @@
 > **Version 1.1** (Revue et mise en œuvre du plan d'action — 2026-07-07)
 > 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md),
 > [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
-> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.8](AF_Partie9_Fonction_Winch_v1.8.md),
+> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.7](AF_Partie9_Fonction_Winch_v1.7.md),
 > [P11 Chariot v1.2](AF_Partie11_Fonction_Chariot_v1.3.md) §7/§9bis.
 > ⚙️ **Changements v1.1** : 
 > - Déplacement de [GVL_Simulation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st) vers `CODE/SIMULATION/` pour regrouper la GVL avec ses FB de simulation.

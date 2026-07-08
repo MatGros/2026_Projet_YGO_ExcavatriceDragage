@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.4)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.2)
 
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Modes` **codé et enrichi** —
 > `CODE/MODES/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`

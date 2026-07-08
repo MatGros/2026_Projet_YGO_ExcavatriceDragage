@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.8)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.7)
 
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Encoder_Safety` **implémenté and raccordé**
 > (§3.6/§3.7) — `CODE/ENCODERS/FB_Encoder_Safety.st`, 1 instance par treuil. Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7) → `EncoderIncoherent`, bloquant le mode `SEMI_AUTO` sans provoquer de `SafeStop` direct. Le ralentissement et l'arrêt avant capteur haut (§7bis) ainsi que `HomingApproachEnable` sont désormais codés et intégrés.
@@ -9,7 +9,7 @@
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
 > `BrakeFeedback` — voir `CODE/ENCODERS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
-> ici). Détail complet du changement : `DOC/AF_Partie9_Fonction_Winch_v1.5.md` (doc principale
+> ici). Détail complet du changement : `DOC/AF_Partie9_Fonction_Winch_v1.7.md` (doc principale
 > treuil). Hors périmètre : Chariot M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
@@ -110,7 +110,7 @@
 > [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (profils FB),
 > [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
 > [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md) (`FB_Winch` unitaire M1/M2).
+> [P9 Fonction Winch v1.7](AF_Partie9_Fonction_Winch_v1.7.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
@@ -611,7 +611,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie9_Fonction_Winch_v1.5.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie9_Fonction_Winch_v1.7.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`
