@@ -21,7 +21,7 @@
       seul, désynchronisation assumée. UNIQUEMENT actionnable en MAINT_N2 (plus restrictif
       qu'`OverrideSync`) — arbitrage centralisé ICI, aucun autre fichier ne doit re-tester
       Mode=MAINT_N2 pour ce besoin.
-   🆕 REX 2026-07-08 (2) : `OverrideTopStop` — corrige un trou constaté en test : l'arrêt normal à
+   🆕 REX 2026-07-08 (2) : `HomingApproachEnable` — corrige un trou constaté en test : l'arrêt normal à
       l'approche du capteur haut (`PRG_06_WinchControl.st`, seuil `HomingTargetMx_M -
       WinchTopStopMarginM`) était bypassé par le simple fait d'être en MAINT_N2, SANS bit dédié —
       donc désactivé pendant N'IMPORTE QUELLE opération N2, même sans rapport avec un homing.
@@ -44,7 +44,7 @@ VAR_INPUT
     OverrideSyncRequest : BOOL;        // 🖥️ GVL_Modes_Stub.OverrideSyncRequest_IHM — case à cocher N2
     InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.WinchM1.CmdInhibit — bouton IHM inhibition M1
     InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.WinchM2.CmdInhibit — bouton IHM inhibition M2
-    OverrideTopStopRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Common.OverrideTopStopRequest — case IHM
+    HomingApproachEnableRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Common.HomingApproachEnableRequest — case IHM
                                         // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
 END_VAR
@@ -60,7 +60,7 @@ VAR_OUTPUT
     OverrideSync        : BOOL;        // → Actif si Mode=MAINT_N1 OU MAINT_N2 AND OverrideSyncRequest (Décision D_OVERRIDESYNC 2026-07-04)
     InhibitM1           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM1Request
     InhibitM2           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM2Request
-    OverrideTopStop     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND OverrideTopStopRequest
+    HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND HomingApproachEnableRequest
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -76,7 +76,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     OverrideSync := FALSE;
     InhibitM1 := FALSE;
     InhibitM2 := FALSE;
-    OverrideTopStop := FALSE;
+    HomingApproachEnable := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -122,7 +122,7 @@ InhibitM2 := (Mode = E_Mode.MAINT_N2) AND InhibitM2Request;
 // UNIQUEMENT actionnable en MAINT_N2 — remplace l'ancien test direct Mode<>MAINT_N2 dans
 // PRG_06_WinchControl.st, qui bypassait l'arrêt normal pour N'IMPORTE QUELLE opération N2.
 // Désormais un choix conscient explicite est requis EN PLUS du mode.
-OverrideTopStop := (Mode = E_Mode.MAINT_N2) AND OverrideTopStopRequest;
+HomingApproachEnable := (Mode = E_Mode.MAINT_N2) AND HomingApproachEnableRequest;
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);

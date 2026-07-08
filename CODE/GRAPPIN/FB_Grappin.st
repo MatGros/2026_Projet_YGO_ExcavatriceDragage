@@ -99,6 +99,9 @@ END_VAR
 
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT EmergencyStopOk THEN
+    IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+        GrappinState.StateIncoherent := TRUE;
+    END_IF;
     Ready := FALSE;
     Busy := FALSE;
     Done := FALSE;
@@ -222,6 +225,9 @@ END_IF;
 SevereError := (ErrorId AND 16#001D) <> 16#0000;
 
 IF SevereError THEN
+    IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+        GrappinState.StateIncoherent := TRUE;
+    END_IF;
     M2_StartStop := FALSE;
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
