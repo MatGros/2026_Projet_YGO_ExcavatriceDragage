@@ -1,9 +1,9 @@
-# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.2)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Spécification de la fonction métier Grappin (ouverture/fermeture par désynchronisation M2) et intégration dans l'orchestration générale.
 > **Version** : v1.3 (Révision — 2026-07-08)
-> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.8](AF_Partie9_Fonction_Winch_v1.7.md) §9/§4quinquies.
+> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.7](AF_Partie9_Fonction_Winch_v1.7.md) §9/§4quinquies.
 >
 > 🆕 **v1.3 (2026-07-08)** — Alignement sur la sécurité d'inhibition et ajout du référencement fermé : le grappin est désactivé (`Enable := FALSE`) si le treuil M2 (fermeture) est inhibé en Maintenance N2, OU si l'un des deux codeurs de position M1 ou M2 est en défaut ou non référencé. Si seul M1 (retenue) est inhibé, le grappin reste manœuvrable. Ajout de deux commandes de référencement manuel IHM à l'arrêt (`CmdConfirmOpenPosition` et `CmdConfirmClosePosition`) qui initialisent l'état mécanique (ouvert/fermé) et recalent de manière cohérente les positions mémorisées de boot en éliminant toutes les erreurs actives.
 > 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement grappin (Méca C

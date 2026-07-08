@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.2)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
