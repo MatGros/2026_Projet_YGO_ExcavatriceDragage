@@ -13,10 +13,7 @@ VAR_GLOBAL RETAIN
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
     Chariot : ST_ChariotHMI;(* ↔️ Variables d'échange IHM Chariot M3 *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
-    LimitLegalDepthMinAllowed : REAL; (* 📐 Cote min de dragage autorisée (m, négatif) *)
-    LimitLegalEnabled : BOOL;         (* 🟢 Activation de la limite légale *)
-    LimitLegalReached : BOOL;         (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
-    TopPositionSensorActive : BOOL;   // ⚠️ Capteur de position haute commun détecté (global)
+    Common  : ST_CommonHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal*) *)
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
 END_VAR
 

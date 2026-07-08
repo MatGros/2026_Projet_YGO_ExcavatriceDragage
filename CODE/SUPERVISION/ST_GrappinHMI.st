@@ -23,6 +23,9 @@ STRUCT
     ErrorId             : WORD;             (* ❌ Code bitfield du défaut grappin *)
     RemainingTravelM    : REAL;             (* 📏 REX 2026-07-07 : distance restante avant cible (m),
                                                 pour jauge/aiguille IHM — 0.0 hors mouvement *)
+    CloseReq            : BOOL;             (* 🆕 REX 2026-07-08 : demande de fermeture active (image FB_Grappin) —
+                                                FALSE dès la cible atteinte OU le retour à la position de départ *)
+    OpenReq             : BOOL;             (* 🆕 REX 2026-07-08 : demande d'ouverture active (image FB_Grappin), même principe *)
     M2PositionCorrected : REAL;             (* 📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffsetM —
                                                 pure valeur d'AFFICHAGE (bargraphe), égale à WinchM1.PositionM
                                                 quand tout est nominal ; ne remplace PAS DeltaPosM (Sync),
@@ -32,5 +35,8 @@ STRUCT
     CmdOpen             : BOOL;             (* 🪣 Bouton commande ouverture *)
     CmdClose            : BOOL;             (* 🪣 Bouton commande fermeture *)
     CmdReset            : BOOL;             (* 🔑 Acquittement défaut grappin *)
+    CmdConfirmOpenPosition : BOOL;          (* 🆕 REX 2026-07-08 : référencement grappin position ouverte (mise en
+                                                service) — confirmation pure, AUCUN mouvement, à utiliser juste après
+                                                le référencement des codeurs M1/M2 (grappin physiquement ouvert) *)
 END_STRUCT
 END_TYPE

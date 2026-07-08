@@ -5,7 +5,7 @@
 > **Version** : v1.2 (2026-07-07, REX terrain — voir Partie 9 : le retour contacteur individuel
 > par sens des treuils M1/M2 est supprimé côté câblage réel ; `ST_WinchHMI.FwdContactorCheck`/
 > `RevContactorCheck` fusionnés en `ContactorsCheck` unique. Aucun autre changement vs v1.1.)  
-> 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md), [P10 Homing v1.7](AF_Partie10_Fonction_Encoder_Homing_v1.7.md), [P12 Grappin v1.2](AF_Partie12_Fonction_Grappin_v1.2.md), [P13 Simulation v1.1](AF_Partie13_Fonction_Simulation_v1.1.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md), [P10 Homing v1.7](AF_Partie10_Fonction_Encoder_Homing_v1.7.md), [P12 Grappin v1.2](AF_Partie12_Fonction_Grappin_v1.2.md), [P13 Simulation v1.1](AF_Partie13_Fonction_Simulation_v1.1.md).
 
 ---
 

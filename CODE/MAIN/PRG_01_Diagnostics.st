@@ -56,6 +56,11 @@ FB_Joystick_0(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
+    // 🆕 REX 2026-07-08 : PRG_01 (position 1) s'exécute AVANT PRG_06 (position 6) — GrappinBusy lu
+    // ici reflète donc le Busy du scan PRÉCÉDENT (retard d'1 scan, ~10ms, sur la détection du front
+    // descendant). Sans impact pratique : très inférieur aux temps de réponse frein/contacteurs
+    // (100-300ms, voir FB_Brake) — la commande n'a pas le temps de produire un mouvement réel.
+    GrappinBusy         := PRG_06_WinchControl.instGrappin.Busy,
     NeutralXMem         := GVL_PERSISTENT.JoystickNeutralX,
     NeutralYMem         := GVL_PERSISTENT.JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.busCanOpen,

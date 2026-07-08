@@ -34,6 +34,7 @@ VAR_GLOBAL
     PhaseRotationOk_IsReal     : BOOL := FALSE; // Contrôle rotation phases
     ThermalM1_IsReal           : BOOL := FALSE; // Thermique moteur M1
     ThermalM2_IsReal           : BOOL := FALSE; // Thermique moteur M2
+    BrakeThermal_IsReal        : BOOL := FALSE; // 🆕 REX 2026-07-08 : thermique frein COMMUN M1/M2/M3 (1 seul fil)
     ContactorFeedbackM1_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M1
     ContactorFeedbackM2_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M2
     ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) chariot M3

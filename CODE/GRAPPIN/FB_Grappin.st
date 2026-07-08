@@ -18,6 +18,24 @@
       sur M1 spécifiquement — FB_Grappin ne pilote pas M1). Couche de secours si
       cette couche ne suffit pas : voir FB_Safety_Winch bit9 (tolérance 2.0 m,
       escalade PowerCutOff).
+   🆕 REX 2026-07-08 (mise en service, demande utilisateur) :
+      - `ConfirmOpenPosition` : bouton IHM dédié de RÉFÉRENCEMENT du grappin en position ouverte
+        (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
+        GrappinState.IsOpen directement, à utiliser juste après le référencement des codeurs
+        M1/M2 (les 2 à la même valeur, grappin physiquement ouvert vérifié par l'opérateur —
+        voir DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md "flux nominal, grappin ouvert").
+        Remplace le contournement précédent (un CmdOpen qui se terminait par coïncidence car la
+        cible était déjà atteinte) par une action explicite et auditable. Même principe que
+        `ConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
+   🆕 REX 2026-07-08 (audit sécurité, demande utilisateur) :
+      - `M1_Busy`/`M2_Busy` : la demande d'ouverture/fermeture n'est acceptée (mémorisation
+        `CloseReq`/`OpenReq` + transition vers BUSY) QUE si les deux treuils sont à l'arrêt —
+        tous modes. Avant ce correctif, rien ne le garantissait ; un mouvement manuel sur M1
+        pouvait "traverser" l'armement du grappin (trou détecté par audit automatisme/IHM).
+      - Sens inverse borné pendant BUSY : l'opérateur peut désormais pousser le joystick dans
+        le sens opposé au sens principal (recul/annulation partielle), mais UNIQUEMENT jusqu'à
+        la position M2 mémorisée au démarrage de la demande (`M2StartPosM`) — jamais au-delà
+        (pas de réouverture/refermeture complète depuis ce sens inverse).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Grappin
@@ -37,6 +55,9 @@ VAR_INPUT
     Config              : ST_GrappinConfig; // Configuration (RETAIN site)
     TimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
     M1SlipToleranceM    : REAL := 1.0;      // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
+    M1_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM1.Busy — doit être à l'arrêt pour armer une demande
+    M2_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM2.Busy — doit être à l'arrêt pour armer une demande
+    ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement grappin ouvert (front, mise en service — voir bandeau)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;             // FB prêt à fonctionner
@@ -45,6 +66,9 @@ VAR_OUTPUT
     Error               : BOOL;             // Présence d'un défaut
     ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s), bit4: Glissement M1 pendant Busy
     M1SlipDetected      : BOOL;             // 🔧 REX 2026-07-07 : à consommer côté PRG_06_WinchControl (force SafeStop M1)
+    CloseReq            : BOOL;             // 🆕 REX 2026-07-08 : demande de fermeture mémorisée — image IHM (FALSE = pas de demande active
+                                             // ou objectif atteint/retour position départ ; TRUE = demande armée ou mouvement en cours)
+    OpenReq             : BOOL;             // 🆕 REX 2026-07-08 : demande d'ouverture mémorisée — même principe
     State               : E_State;          // État opérationnel du FB
     StateAtError        : E_State;          // État lors de l'apparition de l'erreur
     ActiveOffsetM       : REAL;             // Décalage cible à injecter dans FB_WinchSync
@@ -62,12 +86,15 @@ VAR
     ResetEdge           : R_TRIG;           // Détecteur de front montant Reset
     ErrorEdge           : R_TRIG;           // Détecteur de front montant Error
     TonTimeout          : TON;              // Temporisateur de timeout de mouvement
-    CloseReq            : BOOL;             // Demande de fermeture mémorisée
-    OpenReq             : BOOL;             // Demande d'ouverture mémorisée
     SevereError         : BOOL;             // Erreur grave nécessitant l'arrêt
     MaxAllowedOffset    : REAL;             // Offset max calculé dynamiquement
     BusyEdge            : R_TRIG;           // 🔧 REX 2026-07-07 — détecte l'entrée en Busy (arme la réf. M1)
     M1RefPosM           : REAL;             // 🔧 REX 2026-07-07 — position M1 mémorisée à l'entrée en Busy
+    M2StartPosM         : REAL;             // 🆕 REX 2026-07-08 — position M2 mémorisée à l'entrée en Busy (borne le recul autorisé)
+    WasOpenAtStart      : BOOL;             // 🆕 REX 2026-07-08 — état IsOpen mémorisé à l'entrée en Busy (restauré si recul complet)
+    WasClosedAtStart    : BOOL;             // 🆕 REX 2026-07-08 — état IsClosed mémorisé à l'entrée en Busy (restauré si recul complet)
+    LeftStartSinceArm   : BOOL;             // 🆕 REX 2026-07-08 — a réellement quitté la position de départ (évite un retour instantané au 1er cycle Busy)
+    ConfirmOpenEdge     : R_TRIG;           // 🆕 REX 2026-07-08 — détecteur de front ConfirmOpenPosition
 END_VAR
 
 // 🛑 1. GATE DE SÉCURITÉ
@@ -135,11 +162,37 @@ ELSE
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
+// 🆕 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE (mise en service, REX 2026-07-08) — voir bandeau
+// Action de CONFIRMATION pure (aucun mouvement, ne pilote pas M2) : mémorise GrappinState.IsOpen
+// directement, à utiliser juste après le référencement des codeurs (M1=M2, grappin physiquement
+// ouvert vérifié par l'opérateur). Gardée comme ConfirmCoherence (FB_Encoder_Homing) : front,
+// MAINT_N1/N2 uniquement, codeurs déjà référencés, treuils à l'arrêt (pas de séquence en cours).
+ConfirmOpenEdge(CLK := ConfirmOpenPosition);
+IF ConfirmOpenEdge.Q
+   AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
+   AND HomedM1 AND HomedM2
+   AND NOT M1_Busy AND NOT M2_Busy THEN
+    GrappinState.IsOpen := TRUE;
+    GrappinState.IsClosed := FALSE;
+    GrappinState.LastPosM2Open := CablePosM2;
+    GrappinState.StateIncoherent := FALSE;
+    ErrorId := ErrorId AND 16#FFFD; // efface bit1 (Incohérence boot) — cause levée manuellement
+END_IF;
+
 // 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4) — REX 2026-07-07
 // M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l'entrée en Busy.
 BusyEdge(CLK := (State = E_State.BUSY));
 IF BusyEdge.Q THEN
     M1RefPosM := CablePosM1;
+    M2StartPosM := CablePosM2;   // 🆕 REX 2026-07-08 — borne le recul autorisé (voir §6 CASE BUSY)
+    // 🆕 REX 2026-07-08 (demande utilisateur) : mémorise l'état d'origine (restauré si recul complet
+    // jusqu'à M2StartPosM, voir §6 CASE BUSY) puis passe en position transitoire dès le démarrage du
+    // mouvement — ni ouvert ni fermé pendant le trajet, quel que soit l'état mémorisé avant.
+    WasOpenAtStart := GrappinState.IsOpen;
+    WasClosedAtStart := GrappinState.IsClosed;
+    LeftStartSinceArm := FALSE;
+    GrappinState.IsOpen := FALSE;
+    GrappinState.IsClosed := FALSE;
 END_IF;
 
 IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) THEN
@@ -189,21 +242,27 @@ CASE State OF
         M2_ForceSlowSpeed := FALSE;
         RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : pas de mouvement en cours
 
-        // Mémorisation des requêtes IHM (l'une annule l'autre)
-        IF CmdClose_IHM AND NOT SevereError THEN
-            CloseReq := TRUE;
-            OpenReq := FALSE;
-        ELSIF CmdOpen_IHM AND NOT SevereError THEN
-            OpenReq := TRUE;
-            CloseReq := FALSE;
-        END_IF;
+        // 🆕 REX 2026-07-08 : demande grappin acceptée UNIQUEMENT si M1 ET M2 sont à l'arrêt (tous
+        // modes) — évite qu'un mouvement en cours sur l'un des deux treuils "traverse" l'armement
+        // du grappin (audit sécurité). Ni mémorisation de la requête, ni démarrage tant que ce
+        // n'est pas vrai — l'opérateur doit refaire la demande une fois les treuils arrêtés.
+        IF NOT M1_Busy AND NOT M2_Busy THEN
+            // Mémorisation des requêtes IHM (l'une annule l'autre)
+            IF CmdClose_IHM AND NOT SevereError THEN
+                CloseReq := TRUE;
+                OpenReq := FALSE;
+            ELSIF CmdOpen_IHM AND NOT SevereError THEN
+                OpenReq := TRUE;
+                CloseReq := FALSE;
+            END_IF;
 
-        // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
-        // ⚠️ REX 2026-07-07 : sens inversés (enroulage ferme désormais, déroulage ouvre)
-        IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
-            State := E_State.BUSY;
-        ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
-            State := E_State.BUSY;
+            // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
+            // ⚠️ REX 2026-07-07 : sens inversés (enroulage ferme désormais, déroulage ouvre)
+            IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
+                State := E_State.BUSY;
+            ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
+                State := E_State.BUSY;
+            END_IF;
         END_IF;
 
     E_State.BUSY:
@@ -223,22 +282,52 @@ CASE State OF
         END_IF;
 
         // Interlock Homme-mort joystick
+        // 🆕 REX 2026-07-08 : sens inverse autorisé (recul/annulation partielle) pendant CloseReq/
+        // OpenReq, mais BORNÉ à la position de départ (M2StartPosM, mémorisée à l'entrée en Busy) —
+        // ne permet jamais de dépasser cette position dans le sens opposé au sens principal.
         IF NOT JoystickY_StartStop THEN
             // Si relâchement du joystick, arrêt temporaire du mouvement
             M2_StartStop := FALSE;
             M2_Direction := 0;
-        ELSIF CloseReq AND (JoystickY_Direction = 1) THEN
-            // Fermeture en cours : M2 enroule (monte) — REX 2026-07-07
-            M2_StartStop := TRUE;
-            M2_Direction := 1;
-        ELSIF OpenReq AND (JoystickY_Direction = -1) THEN
-            // Ouverture en cours : M2 déroule (descend) — REX 2026-07-07
-            M2_StartStop := TRUE;
-            M2_Direction := -1;
+        ELSIF CloseReq THEN
+            IF (JoystickY_Direction = 1) THEN
+                // Sens principal (fermeture) : M2 enroule (monte) — REX 2026-07-07
+                M2_StartStop := TRUE;
+                M2_Direction := 1;
+            ELSIF (JoystickY_Direction = -1) AND (CablePosM2 > M2StartPosM) THEN
+                // Sens inverse : recul autorisé UNIQUEMENT tant qu'on n'est pas revenu à la position
+                // de départ (pas au-delà, donc pas de ré-ouverture complète depuis ici)
+                M2_StartStop := TRUE;
+                M2_Direction := -1;
+            ELSE
+                // Mauvais sens, ou position de départ déjà atteinte en reculant : arrêt
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+            END_IF;
+        ELSIF OpenReq THEN
+            IF (JoystickY_Direction = -1) THEN
+                // Sens principal (ouverture) : M2 déroule (descend) — REX 2026-07-07
+                M2_StartStop := TRUE;
+                M2_Direction := -1;
+            ELSIF (JoystickY_Direction = 1) AND (CablePosM2 < M2StartPosM) THEN
+                // Sens inverse : recul autorisé UNIQUEMENT tant qu'on n'est pas revenu à la position
+                // de départ (pas au-delà, donc pas de re-fermeture complète depuis ici)
+                M2_StartStop := TRUE;
+                M2_Direction := 1;
+            ELSE
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+            END_IF;
         ELSE
-            // Joystick poussé dans la mauvaise direction pour la requête active : arrêt
             M2_StartStop := FALSE;
             M2_Direction := 0;
+        END_IF;
+
+        // 🆕 REX 2026-07-08 : détecte qu'on a réellement quitté la position de départ (évite que le
+        // test de retour ci-dessous ne se déclenche instantanément au 1er cycle de Busy, où
+        // CablePosM2 = M2StartPosM par définition).
+        IF (CloseReq AND (CablePosM2 > M2StartPosM)) OR (OpenReq AND (CablePosM2 < M2StartPosM)) THEN
+            LeftStartSinceArm := TRUE;
         END_IF;
 
         // Condition d'arrêt automatique de la fermeture
@@ -247,13 +336,24 @@ CASE State OF
             IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
-                
+
                 // Mémorisation de l'état physique fermé
                 GrappinState.IsOpen := FALSE;
                 GrappinState.IsClosed := TRUE;
                 GrappinState.LastPosM2Close := CablePosM2;
                 GrappinState.StateIncoherent := FALSE; // recalage réussi
-                
+
+                CloseReq := FALSE;
+                State := E_State.DONE;
+            // 🆕 REX 2026-07-08 (demande utilisateur) : recul complet jusqu'à la position de départ —
+            // restaure l'état d'origine (physiquement, on est revenu là où on a commencé)
+            ELSIF LeftStartSinceArm AND (CablePosM2 <= M2StartPosM) THEN
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+
+                GrappinState.IsOpen := WasOpenAtStart;
+                GrappinState.IsClosed := WasClosedAtStart;
+
                 CloseReq := FALSE;
                 State := E_State.DONE;
             END_IF;
@@ -265,13 +365,24 @@ CASE State OF
             IF CablePosM2 <= (CablePosM1 + Config.OffsetOpenM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
-                
+
                 // Mémorisation de l'état physique ouvert
                 GrappinState.IsOpen := TRUE;
                 GrappinState.IsClosed := FALSE;
                 GrappinState.LastPosM2Open := CablePosM2;
                 GrappinState.StateIncoherent := FALSE; // recalage réussi
-                
+
+                OpenReq := FALSE;
+                State := E_State.DONE;
+            // 🆕 REX 2026-07-08 (demande utilisateur) : recul complet jusqu'à la position de départ —
+            // restaure l'état d'origine (physiquement, on est revenu là où on a commencé)
+            ELSIF LeftStartSinceArm AND (CablePosM2 >= M2StartPosM) THEN
+                M2_StartStop := FALSE;
+                M2_Direction := 0;
+
+                GrappinState.IsOpen := WasOpenAtStart;
+                GrappinState.IsClosed := WasClosedAtStart;
+
                 OpenReq := FALSE;
                 State := E_State.DONE;
             END_IF;

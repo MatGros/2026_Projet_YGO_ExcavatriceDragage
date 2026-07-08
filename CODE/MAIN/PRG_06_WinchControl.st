@@ -50,6 +50,35 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
 
+// ── 0. COMMANDE DU GRAPPIN (Séquence lente) ─────────────────────────────
+// 🔧 REX 2026-07-08 : appelé EN PREMIER (avant l'arbitrage M1/M2 ci-dessous) — audit sécurité :
+// l'ancien ordre (Grappin appelé après l'arbitrage) faisait que M1_StartStop_Active lisait
+// instGrappin.Busy du scan PRÉCÉDENT, créant une fenêtre d'1 scan où M1 pouvait recevoir une
+// commande manuelle au moment exact où le grappin démarre. instGrappin.M1_Busy/M2_Busy (ci-dessous)
+// lisent en retour instWinchM1/M2.Busy du scan précédent (ces FB sont appelés plus loin, §6/§7) —
+// acceptable : ça ne retarde que l'ACCEPTATION d'une nouvelle demande de ~1 scan (10ms), sans
+// aucun impact sécurité (contrairement au cas inverse, qui pouvait faire bouger M1 pendant Busy).
+instGrappin(
+    Enable              := TRUE,
+    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    Mode                := PRG_04_Modes.instModes.Mode,
+    CmdOpen_IHM         := GVL_IHM.Grappin.CmdOpen OR PRG_05_Cycle.instCycle.CmdGrappin_Open,
+    CmdClose_IHM        := GVL_IHM.Grappin.CmdClose OR PRG_05_Cycle.instCycle.CmdGrappin_Close,
+    JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
+    JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
+    CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
+    CablePosM2          := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    HomedM1             := PRG_02_Encoders.instHomingM1.Homed,
+    HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
+    M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
+    M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
+    ConfirmOpenPosition := GVL_IHM.Grappin.CmdConfirmOpenPosition, // 🆕 REX 2026-07-08 — bouton IHM référencement grappin ouvert
+    Config              := GVL_PERSISTENT.GrappinConfig,
+    TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,
+    GrappinState        := GVL_PERSISTENT.GrappinState
+);
+
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop;
@@ -106,36 +135,38 @@ instWinchSync(
     Contactor4_M2   := instWinchM2.Contactor4
 );
 
-// ── 4. COMMANDE DU GRAPPIN (Séquence lente) ─────────────────────────────
-instGrappin(
-    Enable              := TRUE,
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
-    Mode                := PRG_04_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.Grappin.CmdOpen OR PRG_05_Cycle.instCycle.CmdGrappin_Open,
-    CmdClose_IHM        := GVL_IHM.Grappin.CmdClose OR PRG_05_Cycle.instCycle.CmdGrappin_Close,
-    JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
-    JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
-    CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
-    CablePosM2          := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    HomedM1             := PRG_02_Encoders.instHomingM1.Homed,
-    HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
-    Config              := GVL_PERSISTENT.GrappinConfig,
-    TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,
-    GrappinState        := GVL_PERSISTENT.GrappinState
-);
-
-
-// Table active M2 (court-circuite les contacteurs si vitesse lente requise pour le grappin)
+// Table active M2 (verrouille TOUS les paliers sur la combinaison réelle du palier 1 si
+// vitesse lente requise pour le grappin — REX 2026-07-08 : l'ancienne version mettait
+// TOUS les contacteurs à FALSE pour tous les paliers, y compris le palier 1 lui-même, ce qui
+// donnait un mouvement à vitesse quasi nulle/insuffisante (résistance rotorique maximale, aucun
+// contacteur de vitesse engagé). Le palier 1 réel (`WinchSpeedStepTable.P1Rx`) engage déjà le
+// contacteur le plus lent prévu pour un fonctionnement normal — on le duplique sur les 5 paliers
+// pour que M2 reste TOUJOURS à cette vitesse pendant le grappin, quelle que soit l'amplitude
+// joystick (peu importe le palier sélectionné par l'hystérésis, le résultat est identique).
 IF instGrappin.M2_ForceSlowSpeed THEN
-    M2_SpeedStepTableActive.P1R1 := FALSE; M2_SpeedStepTableActive.P1R2 := FALSE; M2_SpeedStepTableActive.P1R3 := FALSE; M2_SpeedStepTableActive.P1R4 := FALSE;
-    M2_SpeedStepTableActive.P2R1 := FALSE; M2_SpeedStepTableActive.P2R2 := FALSE; M2_SpeedStepTableActive.P2R3 := FALSE; M2_SpeedStepTableActive.P2R4 := FALSE;
-    M2_SpeedStepTableActive.P3R1 := FALSE; M2_SpeedStepTableActive.P3R2 := FALSE; M2_SpeedStepTableActive.P3R3 := FALSE; M2_SpeedStepTableActive.P3R4 := FALSE;
-    M2_SpeedStepTableActive.P4R1 := FALSE; M2_SpeedStepTableActive.P4R2 := FALSE; M2_SpeedStepTableActive.P4R3 := FALSE; M2_SpeedStepTableActive.P4R4 := FALSE;
-    M2_SpeedStepTableActive.P5R1 := FALSE; M2_SpeedStepTableActive.P5R2 := FALSE; M2_SpeedStepTableActive.P5R3 := FALSE; M2_SpeedStepTableActive.P5R4 := FALSE;
-    M2_SpeedStepTableActive.StepThreshold_Pct := GVL_PERSISTENT.WinchM2SpeedStepTable.StepThreshold_Pct;
+    M2_SpeedStepTableActive.P1R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P1R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P1R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P1R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P2R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P2R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P2R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P2R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P3R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P3R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P3R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P3R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P4R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P4R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P4R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P4R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P5R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P5R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P5R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P5R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.StepThreshold_Pct := GVL_PERSISTENT.WinchSpeedStepTable.StepThreshold_Pct;
 ELSE
-    M2_SpeedStepTableActive := GVL_PERSISTENT.WinchM2SpeedStepTable;
+    M2_SpeedStepTableActive := GVL_PERSISTENT.WinchSpeedStepTable;
 END_IF;
 
 // ── 5. CALCUL DES LIMITES BASSES ACTIVES ET DU BLOCAGE DE DESCENTE ──────
@@ -211,8 +242,8 @@ instWinchM1(
     ForbidAscent            := ForbidAscentM1_Active,
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
-    SpeedStepTable          := GVL_PERSISTENT.WinchM1SpeedStepTable,
-    MaxStepDescente         := GVL_PERSISTENT.WinchM1MaxStepDescente,
+    SpeedStepTable          := GVL_PERSISTENT.WinchSpeedStepTable,
+    MaxStepDescente         := GVL_PERSISTENT.WinchMaxStepDescente, // 🔧 REX 2026-07-08 : commun M1/M2
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal,
@@ -240,7 +271,7 @@ instWinchM2(
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
-    MaxStepDescente         := GVL_PERSISTENT.WinchM2MaxStepDescente,
+    MaxStepDescente         := GVL_PERSISTENT.WinchMaxStepDescente, // 🔧 REX 2026-07-08 : commun M1/M2
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal,

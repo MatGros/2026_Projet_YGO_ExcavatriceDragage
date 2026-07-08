@@ -77,7 +77,7 @@ VAR_INPUT
     Direction               : INT;
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
-    MaxStepDescente         : INT := 2;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse
+    MaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
     FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback           : BOOL;

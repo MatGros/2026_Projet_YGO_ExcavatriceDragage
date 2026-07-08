@@ -6,8 +6,8 @@
 > **Version** : v1.1 (Revue et mise en œuvre du plan d'action — 2026-07-07)
 > 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md),
 > [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
-> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.5.md),
-> [P11 Chariot v1.2](AF_Partie11_Fonction_Chariot_v1.2.md) §7/§9bis.
+> [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md),
+> [P11 Chariot v1.2](AF_Partie11_Fonction_Chariot_v1.3.md) §7/§9bis.
 > ⚙️ **Changements v1.1** : 
 > - Déplacement de [GVL_Simulation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st) vers `CODE/SIMULATION/` pour regrouper la GVL avec ses FB de simulation.
 > - Extraction de la variable `BlinkClock1Hz` vers une nouvelle GVL système globale [GVL_Global.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/GVL_Global.st) dans `CODE/MAIN/`.
@@ -105,7 +105,7 @@ CANopen (`CanOnline`/`CanOperational`) est forcé de la même façon.
 
 ### `FB_Sim_Chariot` (M3, non prioritaire)
 Simulation de trajet M3 par temps de parcours — remplace le forçage manuel du capteur de
-position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie11_Fonction_Chariot_v1.2.md)).
+position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie11_Fonction_Chariot_v1.3.md)).
 * Fichier associé : [FB_Sim_Chariot.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/FB_Sim_Chariot.st)
 
 Sorties `PosFosse1/PosFosse2/PosMaintenance/PosTremie` (BOOL), OR'ées sur `InputRaw` des
