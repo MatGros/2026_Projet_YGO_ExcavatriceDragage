@@ -211,20 +211,18 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // M1/M2 que le capteur physique (sinon un treuil qui atteint la limite une fraction de seconde
 // avant l'autre crée un écart RelayFwdM1<>RelayFwdM2 qui déclenche à tort le défaut FB_WinchSync
 // bit1 "incohérence de commande" — REX terrain 2026-07-08, testé et corrigé).
-// 🔧 REX 2026-07-08 (2) : bypass corrigé, retour terrain — l'ancien test "Mode<>MAINT_N2" seul
-// désactivait cet arrêt pour N'IMPORTE QUELLE opération N2 (pas seulement en préparation d'un
-// homing), sans qu'aucun bit dédié ne soit requis. Remplacé par `OverrideTopStop` (FB_Modes,
+// homing), sans qu'aucun bit dédié ne soit requis. Remplacé par `HomingApproachEnable` (FB_Modes,
 // même pattern qu'OverrideSync) : nécessite MAINT_N2 ET une case IHM activée consciemment.
 ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM1.Homed
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM1_M - GVL_PERSISTENT.WinchTopStopMarginM))
-                           AND NOT PRG_04_Modes.instModes.OverrideTopStop);
+                           AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM2_M - GVL_PERSISTENT.WinchTopStopMarginM))
-                           AND NOT PRG_04_Modes.instModes.OverrideTopStop);
+                           AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);

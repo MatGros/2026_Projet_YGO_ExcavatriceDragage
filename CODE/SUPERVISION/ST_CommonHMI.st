@@ -18,8 +18,8 @@ STRUCT
     LimitLegalDepthMinAllowed : REAL; (* 📐 Cote min de dragage autorisée (m, négatif) *)
     LimitLegalEnabled         : BOOL; (* 🟢 Activation de la limite légale *)
     LimitLegalReached         : BOOL; (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
-    OverrideTopStopRequest    : BOOL; (* 🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser
+    HomingApproachEnableRequest    : BOOL; (* 🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser
                                           l'arrêt normal haut pour approcher le capteur physique (préparation
-                                          homing) — voir FB_Modes.OverrideTopStop, commun M1/M2 *)
+                                          homing) — voir FB_Modes.HomingApproachEnable, commun M1/M2 *)
 END_STRUCT
 END_TYPE

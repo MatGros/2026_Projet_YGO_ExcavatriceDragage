@@ -91,7 +91,7 @@
    🆕 REX 2026-07-08 (3) — MÉCA D (bit11), demande utilisateur (retour terrain test banc) :
       modèle à 3 couches en fonctionnement NORMAL (hors référencement) à l'approche du capteur
       haut : (1) ~arrêt rampé normal à `HomingTargetMx_M - WinchTopStopMarginM` (voir
-      `PRG_06_WinchControl.st`, gardé par `OverrideTopStop` désormais — REX 2026-07-08 (2)) ;
+       `PRG_06_WinchControl.st`, gardé par `HomingApproachEnable` désormais — REX 2026-07-08 (2)) ;
       (2) coupure immédiate `ForbidAscent` si le capteur physique est réellement atteint (bit5,
       déjà existant) ; (3) **Méca D** : si malgré la coupure (2), les contacteurs ET le frein ne
       confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
@@ -274,7 +274,7 @@ END_IF;
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
 // Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
-// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (_COMMON) — comportement inchangé,
+// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé,
 // seul le check vitesse (MeasuredSpeedMps) reste géré ici (hors périmètre de la brique).
 MeasuredSpeedMps := ABS(CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
 LastCablePosM := CablePosM;

@@ -47,7 +47,7 @@
       <UserDefElement iecname="LimitLegalDepthMinAllowed" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="LimitLegalEnabled" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="LimitLegalReached" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="OverrideTopStopRequest" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingApproachEnableRequest" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_ContactorCheck" size="4" nativesize="4" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ContactorCheck">
       <UserDefElement iecname="Command" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
