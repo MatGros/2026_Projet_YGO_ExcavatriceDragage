@@ -53,4 +53,15 @@ VAR_GLOBAL
     // (FB_Sim_Encoder). 1.0 = comportement d'origine. Réglable à chaud, sans recompiler.
     // Sans rapport avec une calibration réelle — reste à 1.0 hors essais bancs.
     EncoderSimSpeedFactor      : REAL := 3.0;
+
+    // 🆕 REX 2026-07-08 (4) — test banc : injecte un VRAI saut de position dans le compteur codeur
+    // simulé (front montant), comme un glissement mécanique réel — pas un offset artificiel figé.
+    // Permet de tester Concept 1 (arrêt rampe normale, écart mineur), Méca E (écart critique) ET
+    // le rattrapage au joystick (SyncEnable=FALSE → bouger le treuil décalé → SyncEnable=TRUE),
+    // puisque c'est une vraie position simulée, pas un overlay — le rattrapage la résorbe réellement.
+    InjectSyncDeviationM1      : BOOL := FALSE; // Front montant = applique le saut sur M1
+    InjectSyncDeviationM2      : BOOL := FALSE; // Front montant = applique le saut sur M2
+    SyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.10)
+                                                  // pour tester Concept 1 ; > WinchCriticalSyncTolerance_M
+                                                  // (2.0) pour tester Méca E
 END_VAR

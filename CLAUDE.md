@@ -14,7 +14,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 - Booléens entrée = verbe (`Enable`, `Start`), sortie = état (`Ready`, `Done`)
 - Suffixes unité si besoin : `_M` (mètres), `_Pct` (%), `_Ms` (ms)
 
-### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie3_Template_FB_Commun_v1.3.md)** ← Contrat FB
+### 2. **[Analyse Fonctionnelle Partie 3](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md)** ← Contrat FB
 Chaque Function Block **métier** doit respecter :
 - Interface : `Enable`, `Reset`, `EmergencyStopOk`, `Mode` (entrées) — **FB de mouvement en plus** : `StartStop` (accel/decel normale) + `SafeStop` (decel rapide, sortie du bloc safety métier concerné)
 - Sorties : `Ready`, `Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError`
@@ -23,7 +23,7 @@ Chaque Function Block **métier** doit respecter :
 - Jamais autoriser le redémarrage automatique après défaut
 - **Précédence `Enable` > `SafeStop` > `StartStop`** : `Enable=FALSE` → neutralisation (sorties coupées) ; `SafeStop=TRUE` → rampe rapide (`Enable` maintenu) ; `StartStop=FALSE` → rampe normale. **`CoupeEnable` n'existe pas** (jamais une variable — vocabulaire abandonné).
 
-### 3. **[Architecture](DOC/AF_Partie2_Architecture_Programme_v2.10.md)** ← Pour comprendre
+### 3. **[Architecture](DOC/AF_Partie-02_Architecture_Programme_v2.10.md)** ← Pour comprendre
 Tâches, arborescence CODESYS, flux données. **v2.10 = référence** (modèle `SafeStop`/`StartStop`,
 `SafeStop` **par métier** — pas de signal global ; pas de `GVL_BusHealth`/`E_DegradationLevel`/
 `FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff` ;
@@ -31,10 +31,10 @@ câble mécanique de position haute retiré de la chaîne AU matérielle, géré
 `PowerCutOff` — voir Partie1 v1.5 §Sécurité électrique).
 
 ### 4. **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
-- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.3.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
-- **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.5.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
-- **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.2.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
+- **[Partie 4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
+- **[Partie 5](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
+- **[Partie 6](DOC/AF_Partie-06_IO_Conditioning_v1.5.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
+- **[Partie 8](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
 
@@ -117,18 +117,18 @@ dédié). Priorités **à définir** en config CODESYS (TBD).
 
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
-- [AF_Partie1_Analyse_Fonctionnelle_v1.5.md](DOC/AF_Partie1_Analyse_Fonctionnelle_v1.5.md) — Équipements & fonctions (sécurité électrique : chaîne AU, `PowerCutOff` fail-safe, réarmement)
-- [AF_Partie2_Architecture_Programme_v2.10.md](DOC/AF_Partie2_Architecture_Programme_v2.10.md) — Architecture détaillée (**v2.10**)
-- [AF_Partie3_Template_FB_Commun_v1.3.md](DOC/AF_Partie3_Template_FB_Commun_v1.3.md) — Contrat FB & sécurité
-- [AF_Partie4_Cycle_Sequenceur_v1.2.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md) — Cycle, synchro, frein, grappin, rampes
-- [AF_Partie5_Modes_Maintenance_v1.3.md](DOC/AF_Partie5_Modes_Maintenance_v1.3.md) — Modes, maintenance N1/N2, AU, limite légale
-- [AF_Partie6_IO_Conditioning_v1.5.md](DOC/AF_Partie6_IO_Conditioning_v1.5.md) — Conditionnement E/S
-- [AF_Partie8_Fonction_Joystick_v1.2.md](DOC/AF_Partie8_Fonction_Joystick_v1.2.md) — Fonction métier Joystick (8+ = métier par FB)
-- [AF_Partie9_Fonction_Winch_v1.7.md](DOC/AF_Partie9_Fonction_Winch_v1.7.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A/B/C/D roue libre)
-- [AF_Partie10_Fonction_Encoder_Homing_v1.7.md](DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md) — Codeur & Homing
-- [AF_Partie11_Fonction_Chariot_v1.3.md](DOC/AF_Partie11_Fonction_Chariot_v1.3.md) — Fonction Chariot (M3, ex-Translation)
-- [AF_Partie12_Fonction_Grappin_v1.2.md](DOC/AF_Partie12_Fonction_Grappin_v1.2.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
-- [AF_Partie13_Fonction_Simulation_v1.1.md](DOC/AF_Partie13_Fonction_Simulation_v1.1.md) — Fonction Simulation (flags bits maître + granularité par device)
+- [AF_Partie-01_Analyse_Fonctionnelle_v1.5.md](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.5.md) — Équipements & fonctions (sécurité électrique : chaîne AU, `PowerCutOff` fail-safe, réarmement)
+- [AF_Partie-02_Architecture_Programme_v2.10.md](DOC/AF_Partie-02_Architecture_Programme_v2.10.md) — Architecture détaillée (**v2.10**)
+- [AF_Partie-03_Template_FB_Commun_v1.3.md](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md) — Contrat FB & sécurité
+- [AF_Partie-04_Cycle_Sequenceur_v1.2.md](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md) — Cycle, synchro, frein, grappin, rampes
+- [AF_Partie-05_Modes_Maintenance_v1.3.md](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md) — Modes, maintenance N1/N2, AU, limite légale
+- [AF_Partie-06_IO_Conditioning_v1.5.md](DOC/AF_Partie-06_IO_Conditioning_v1.5.md) — Conditionnement E/S
+- [AF_Partie-08_Fonction_Joystick_v1.2.md](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md) — Fonction métier Joystick (8+ = métier par FB)
+- [AF_Partie-09_Fonction_Winch_v1.8.md](DOC/AF_Partie-09_Fonction_Winch_v1.8.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A/B/C/D roue libre)
+- [AF_Partie-10_Fonction_Encoder_Homing_v1.7.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.7.md) — Codeur & Homing
+- [AF_Partie-11_Fonction_Chariot_v1.3.md](DOC/AF_Partie-11_Fonction_Chariot_v1.3.md) — Fonction Chariot (M3, ex-Translation)
+- [AF_Partie-12_Fonction_Grappin_v1.2.md](DOC/AF_Partie-12_Fonction_Grappin_v1.2.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
+- [AF_Partie-13_Fonction_Simulation_v1.1.md](DOC/AF_Partie-13_Fonction_Simulation_v1.1.md) — Fonction Simulation (flags bits maître + granularité par device)
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 
 ### 📐 Plan de numérotation
@@ -141,7 +141,7 @@ Tous les docs dans **`DOC/`** :
 **Si l'utilisateur demande modification CODE/, FB_, PRG_, ou "codesys" :**
 
 1. ✅ **Charger automatiquement** la skill `.claude/skills/codesys-workflow.md`
-2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie3_Template_FB_Commun_v1.3.md (ajuster selon métier concerné : Winch=Partie9, Chariot=Partie11, Homing=Partie10)
+2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie-03_Template_FB_Commun_v1.3.md (ajuster selon métier concerné : Winch=Partie9, Chariot=Partie11, Homing=Partie10)
 3. ✅ **Vérifier spec complète** → Sinon demander clarifications
 4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
 5. ✅ **Tracer checklist** avant génération
@@ -177,7 +177,7 @@ L'IA charge les règles DOC + valide avant de générer.
 ## ✅ **Checklist Avant de Coder**
 
 - [ ] Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)
-- [ ] Lire [AF_Partie3](DOC/AF_Partie3_Template_FB_Commun_v1.3.md) si nouveau FB
+- [ ] Lire [AF_Partie-03](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md) si nouveau FB
 - [ ] Vérifier que le nom suit : **PascalCase, sémantique, sans hongrois**
 - [ ] `ErrorId` = bitfield ? Reset = front obligatoire ?
 - [ ] Précédence `Enable` > `SafeStop` > `StartStop` respectée ? `StartStop`/`SafeStop` uniquement si FB de mouvement ?

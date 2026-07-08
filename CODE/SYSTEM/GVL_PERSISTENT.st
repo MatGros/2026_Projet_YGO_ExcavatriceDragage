@@ -50,11 +50,13 @@ VAR_GLOBAL PERSISTENT RETAIN
     //       Si un jour M1/M2 divergent réellement (câblage contacteur différent),
     //       réintroduire 2 tables distinctes à ce moment-là.
     // ═══════════════════════════════════════════════════════════
+    // 🔧 REX 2026-07-08 (2) : valeurs relevées en ligne (IHM) et reportées ici comme nouveau
+    // défaut — palier 1 sans contacteur engagé (roue libre lente), progression 1 contacteur/palier
     WinchSpeedStepTable : ST_SpeedStepTable := (
-        P1R1 := TRUE,  P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
-        P2R1 := TRUE,  P2R2 := TRUE,  P2R3 := FALSE, P2R4 := FALSE,
-        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := TRUE,  P3R4 := FALSE,
-        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := TRUE,
+        P1R1 := FALSE, P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
+        P2R1 := TRUE,  P2R2 := FALSE, P2R3 := FALSE, P2R4 := FALSE,
+        P3R1 := TRUE,  P3R2 := TRUE,  P3R3 := FALSE, P3R4 := FALSE,
+        P4R1 := TRUE,  P4R2 := TRUE,  P4R3 := TRUE,  P4R4 := FALSE,
         P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     );
@@ -96,6 +98,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     // ⚖️ SYNCHRONISATION — Tolérance d'écart M1/M2
     // ═══════════════════════════════════════════════════════════
     WinchSyncTolerance_M : REAL := 0.10; // 💾 Écart max toléré entre M1/M2 (mètres) — réglé selon jeu mécanique
+    WinchCriticalSyncTolerance_M : REAL := 2.0; // 🆕 REX 2026-07-08 (4) : Méca E — écart critique, défense en profondeur (théorique)
 
     // ═══════════════════════════════════════════════════════════
     // 🪣 GRAPPIN — Offsets de position et état mécanique mémorisé
@@ -105,29 +108,20 @@ VAR_GLOBAL PERSISTENT RETAIN
     //       au lieu de DEROULAGE) — voir Partie12 v1.1 §REX. Amplitude corrigée à ~10 m
     //       (valeur terrain, remplace l'ancienne estimation théorique de 1.5 m) — à
     //       affiner au 1er essai réel du grappin.
-    //    🔧 REX 2026-07-08 : OffsetCloseM réduit à 2.0 m (temporaire, confort mise en service
-    //       banc/simulation — cycle complet plus rapide à tester). ⚠️ PERSISTENT RETAIN : ce
-    //       nouveau défaut ne s'appliquera PAS automatiquement si une valeur est déjà retenue en
-    //       mémoire (ex. 10.0 déjà chargé) — forcer manuellement GrappinConfig.OffsetCloseM en vue
-    //       instance CODESYS après réimport si besoin. Remettre à la vraie valeur terrain avant
-    //       exploitation réelle.
+    //    🔧 REX 2026-07-08 (2) : défaut revenu à 10.0 m (valeur terrain réelle) — le 2.0 m
+    //       "confort test banc" se force ponctuellement en vue instance CODESYS si besoin,
+    //       pas dans le défaut source (⚠️ PERSISTENT RETAIN : rappel, un changement de défaut
+    //       seul ne remplace pas une valeur déjà retenue en mémoire sur un PLC déjà chargé).
     // ═══════════════════════════════════════════════════════════
     GrappinConfig : ST_GrappinConfig := (
         OffsetOpenM      := 0.0,   // 💾 Position d'ouverture relative (m)
-        OffsetCloseM     := 2.0,   // 🔴 TEST BANC — défaut réel 10.0 m, voir bandeau ci-dessus
+        OffsetCloseM     := 10.0,  // 💾 Position de fermeture relative (m) — valeur terrain
         CoherenceLimitM  := 0.05   // 💾 Tolérance cohérence grappin (m)
     );
     GrappinState : ST_GrappinState; // 💾 État mécanique mémorisé du grappin (ouvert/fermé)
 
-    // ═══════════════════════════════════════════════════════════
-    // 🏗️ PARAMÈTRES HISTORIQUES (hérités de PV, renommés aux normes)
-    //    ⚠️ Perte = protections de fin de course perdues
-    // ═══════════════════════════════════════════════════════════
-    CableSafetyLimit_Pts   : UDINT; // 💾 Valeur max codeur pour sécurité longueur câble — CRITIQUE
-    MotorAccelDuration_Ms  : WORD;  // 💾 Durée rampe accélération moteur (ms)
-    AnalogInMin_Pts        : WORD;  // 💾 Calibrage borne min entrée analogique
-    AnalogInMax_Pts        : WORD;  // 💾 Calibrage borne max entrée analogique
-    AnalogOutMin_Pts       : WORD;  // 💾 Calibrage borne min sortie analogique
-    AnalogOutMax_Pts       : WORD;  // 💾 Calibrage borne max sortie analogique
-
+    // 🔧 REX 2026-07-08 : bloc "PARAMÈTRES HISTORIQUES (hérités de PV)" supprimé — audit confirmé
+    // (CableSafetyLimit_Pts, MotorAccelDuration_Ms, AnalogInMin/Max_Pts, AnalogOutMin/Max_Pts) :
+    // 0 référence CODE/, 0 mention DOC/. ⚠️ Suppression = changement de structure GVL_PERSISTENT →
+    // reset retain de TOUT le bloc au prochain download (voir bandeau en-tête fichier).
 END_VAR

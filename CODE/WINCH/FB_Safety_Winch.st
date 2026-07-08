@@ -97,6 +97,21 @@
       confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
       même motif exact que Méca B (`TonMecaD`, même vérification), juste une condition d'armement
       différente (capteur haut atteint hors référencement, au lieu de perte commande opérateur).
+   🆕 REX 2026-07-08 (4) — MÉCA E (bits 12/13), écart synchro M1/M2 CRITIQUE, demande utilisateur
+      (analyse redondance synchro) : `FB_WinchSync` (écart mineur, `WinchSyncTolerance_M`) reste
+      le 1er niveau (arrêt rampe normale, `PRG_06_WinchControl.st`). Méca E est une couche
+      SUPPLÉMENTAIRE et INDÉPENDANTE dans `FB_Safety_Winch` pour un écart VRAIMENT important
+      (`CriticalSyncToleranceM`, théorique 2.0m) — défense en profondeur si le 1er niveau n'a pas
+      suffi (ex. treuil qui continue malgré l'arrêt demandé). Nouvelles entrées `OtherWinchPosM`
+      (position croisée : M2 côté instance M1, M1 côté instance M2) et `GrappinBusy` (suppression
+      pendant un cycle grappin — l'écart M1/M2 y est volontaire, PAS un défaut ; 1 cycle de retard
+      accepté, même principe que `GrappinHoldStillActive`, négligeable vu l'amplitude en jeu).
+      - **Bit12** : écart critique détecté (`SyncEnable AND NOT GrappinBusy AND NOT
+        InReferencingMode AND ABS(CablePosM - OtherWinchPosM) > CriticalSyncToleranceM`) →
+        `SafeStop` immédiat (rampe rapide), PAS de `PowerCutOff` à ce stade.
+      - **Bit13** : escalade — si l'arrêt (bit12) n'est PAS confirmé (contacteurs ET frein) dans
+        `PostRampTimeout` → `SafeStop` ET `PowerCutOff` (dernier recours, même logique que Méca
+        B/D : la rampe seule n'a visiblement pas suffi à arrêter réellement le treuil).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
@@ -133,13 +148,21 @@ VAR_INPUT
     UncommandedDriftToleranceM   : REAL := 2.0;  // 🔧 Méca A — théorique, à ajuster sur site
     PostRampTimeout              : TIME := T#3S; // 🔧 Méca B — théorique, à ajuster sur site
     GrappinSlipToleranceM        : REAL := 2.0;  // 🔧 Méca C — escalade safety (> 1.0 m déjà surveillé côté FB_Grappin)
+
+    // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13), écart synchro M1/M2 critique
+    ExpectedOtherWinchPosM  : REAL;         // Position ATTENDUE de l'AUTRE treuil, DÉJÀ corrigée de
+                                             // l'offset grappin actif par l'appelant (PRG_03_Safety) —
+                                             // ce FB ne fait qu'un ABS(CablePosM - ExpectedOtherWinchPosM)
+    GrappinBusy             : BOOL;         // instGrappin.Busy (les 2 instances) — suppression pendant
+                                             // le trajet actif (écart transitoire normal, pas un défaut)
+    CriticalSyncToleranceM  : REAL := 2.0;  // 🔧 Méca E — théorique, à ajuster sur site
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3))
+    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12:Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13:Méca E escalade non confirmé (SafeStop+PowerCutOff)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)
@@ -175,6 +198,9 @@ VAR
 
     // Transition référencement
     LastInReferencingMode : BOOL;
+
+    // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13)
+    TonMecaE               : TON;   // Confirmation arrêt après détection écart critique (escalade PowerCutOff)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
@@ -359,6 +385,28 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#F7FF;
 END_IF;
 
+// 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE (REX 2026-07-08 (4)) — bits 12/13
+// Couche INDÉPENDANTE de FB_WinchSync (écart mineur, 1er niveau) — défense en profondeur pour un
+// écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l'offset grappin actif par
+// l'appelant : comparaison directe valable que le grappin soit ouvert, fermé, ou absent du calcul.
+// Suppression pendant GrappinBusy (trajet actif = écart transitoire normal, pas un défaut) et
+// InReferencingMode (position pas fiable pendant homing).
+// Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
+IF SyncEnable AND NOT GrappinBusy AND NOT InReferencingMode
+   AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
+    ErrorId := ErrorId OR 16#1000;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#EFFF;
+END_IF;
+
+TonMecaE(IN := ((ErrorId AND 16#1000) <> 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback),
+         PT := PostRampTimeout);
+IF TonMecaE.Q THEN
+    ErrorId := ErrorId OR 16#2000;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#DFFF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -367,14 +415,14 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
-// (Méca A/B/C) + 10 (thermique frein commun) + 11 (🆕 REX 2026-07-08 (3) : Méca D, capteur haut
-// non confirmé arrêté) ou si contacteur coupé
+// (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (🆕 REX 2026-07-08 (4) :
+// Méca E, écart synchro critique) ou si contacteur coupé
 IF NOT EmergencyStopOk THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (ErrorId AND 16#0F97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (ErrorId AND 16#3F97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#0F9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (ErrorId AND 16#3F9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
@@ -398,7 +446,9 @@ ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
 // 🆕 REX 2026-07-08 (3) : bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B :
 // contacteurs/frein déjà censés être coupés (ForbidAscent immédiat sur capteur), une confirmation
 // manquante après délai signifie que la coupure locale n'a pas suffi.
-PowerCutOff := (ErrorId AND 16#0F84) <> 16#0000;
+// 🆕 REX 2026-07-08 (4) : bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate =
+// SafeStop uniquement ; PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
+PowerCutOff := (ErrorId AND 16#2F84) <> 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)
 Busy := FALSE;

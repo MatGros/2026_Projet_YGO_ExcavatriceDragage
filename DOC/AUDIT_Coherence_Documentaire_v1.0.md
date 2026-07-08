@@ -43,7 +43,7 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 | D12 | **Interface FB & modèle d'arrêt** | **Tous les FB** ont l'interface standard de base, dont **`Enable`**. `Enable = FALSE` = **FB désactivé = coupure de toutes ses sorties** (neutralisation dure). Pour les **FB de mouvement** : entrée **`StartStop`** (BOOL) → `TRUE` = **rampe d'accélération** vers consigne, `FALSE` = **rampe de décélération normale** (arrêt) ; **`SafeStop`** (entrée, issue du bloc safety) = **rampe de décélération rapide** (FB reste `Enable`). |
 | D13 | **Guardrail « arrêt sûr » (CLAUDE.md)** | Le guardrail « arrêt sûr = retrait de l'`Enable` » est **remplacé** : arrêt sûr = **`SafeStop` → rampe rapide** (Enable maintenu) ; `Enable` off = **coupure des sorties** (neutralisation, cas distinct). |
 | D14 | **Précédence (Q8)** | Hiérarchie confirmée **`Enable` > `SafeStop` > `StartStop`**. Défaut process → **`SafeStop`** (rampe rapide, `Enable` maintenu). `Enable = FALSE` réservé à la **neutralisation** (déjà à l'arrêt / mode non sélectionné). |
-| D15 | **Arrêt = `StartStop := FALSE` (Q9)** | L'arrêt d'un mouvement se fait par **`StartStop := FALSE`** (décélération normale), **pas** par retrait d'`Enable`. ⚠️ `AF_Partie4` §0 (« passage à une étape sans mouvement = retrait `Enable` → rampe ») est **à réécrire**. |
+| D15 | **Arrêt = `StartStop := FALSE` (Q9)** | L'arrêt d'un mouvement se fait par **`StartStop := FALSE`** (décélération normale), **pas** par retrait d'`Enable`. ⚠️ `AF_Partie-04` §0 (« passage à une étape sans mouvement = retrait `Enable` → rampe ») est **à réécrire**. |
 | D16 | **Source de `StartStop` (Q10)** | `StartStop` est commandé par **`FB_Cycle`** (semi-auto) et par les **commandes IHM** (manuel/maintenance), via la **source légitime arbitrée par `FB_Modes`**. |
 | D17 | **Granularité `SafeStop` (Q1)** | **1 `SafeStop` par métier** (chaque bloc safety métier surveille des choses différentes → sa propre sortie `SafeStop`, consommée par le/les FB de mouvement de son domaine). Pas de `SafeStop` global unique. |
 | D18 | **`SafetyOk` → `EmergencyStopOk` (Q2)** | L'entrée standard `SafetyOk` est **renommée `EmergencyStopOk`** : information de la **chaîne de sécurité AU** **ou** du **contacteur de puissance** (**source à définir**). Résout le `EStopOk` fautif de la Partie 8 (B2). |
@@ -62,36 +62,36 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 
 | Réf | Localisation | Constat | Statut |
 |-----|--------------|---------|--------|
-| B1 | `AF_Partie8` §3/§4/§5/§7 ; `CODE/PRG_JOY1.st:20` | `SafeStop` traité comme **entrée-commande qui force les sorties à 0** | ✅ Recadré par **D1** : `SafeStop` = **sortie** safety (info arrêt sûr), pas une entrée qui zérote. Le FB Joystick réagit via **retrait d'`Enable`**. |
-| B2 | `AF_Partie8` §7 | `SafetyOk := NOT SafeStop AND EStopOk` → réintroduit **`EStopOk`** (censé absorbé par `SafetyOk`, P3 §1) | ✅ **D18** : `SafetyOk` **renommé `EmergencyStopOk`** (chaîne AU / contacteur puissance, source à définir). `EStopOk` disparaît. |
+| B1 | `AF_Partie-08` §3/§4/§5/§7 ; `CODE/PRG_JOY1.st:20` | `SafeStop` traité comme **entrée-commande qui force les sorties à 0** | ✅ Recadré par **D1** : `SafeStop` = **sortie** safety (info arrêt sûr), pas une entrée qui zérote. Le FB Joystick réagit via **retrait d'`Enable`**. |
+| B2 | `AF_Partie-08` §7 | `SafetyOk := NOT SafeStop AND EStopOk` → réintroduit **`EStopOk`** (censé absorbé par `SafetyOk`, P3 §1) | ✅ **D18** : `SafetyOk` **renommé `EmergencyStopOk`** (chaîne AU / contacteur puissance, source à définir). `EStopOk` disparaît. |
 | B3 | `NAMING_CONVENTION.md:35` | `SafeStop` listé en « entrée de commande » | 🛠️ À reclasser : `SafeStop` = **sortie** safety (D1), pas entrée de commande. |
 
 ### 🟠 Sévérité MAJEURE
 
 | Réf | Localisation | Constat | Statut |
 |-----|--------------|---------|--------|
-| M1 | `AF_Partie5` §2 vs §3 | Le pseudo-code override met la limite légale dans `FB_Safety.CheckLimitLegal`, alors que §3 dit « **pas `FB_Safety`**, c'est `FB_Modes` » | ✅ **D5** : limite légale = `FB_Modes`. Corriger le pseudo-code §2. |
-| M2 | `AF_Partie6` §5 (`:163`) vs `AF_Partie4` §7 / `AF_Partie5` §5 | `Command := ordre AND NOT CoupeEnable` sur la sortie relais = **coupure sèche**, contredit la « rampe non destructive » | ✅ **D2+D4** : pas de `CoupeEnable` ; arrêt = **rampe sur relais vitesse/sens**, pas coupure de sortie. Reformuler §5. |
-| M3 | `AF_Partie4` §3 vs §6 | `FB_WinchSync` (`ΔPos>SyncStop`→arrêt) vs désynchro **volontaire** M2 pour le godet → risque de faux défaut synchro | ✅ **D6** : phase godet = pas de mouvement M1 → **sync suspendue**. Documenter l'interlock. |
-| M4 | `AF_Partie2` §2/§9 vs `AF_Partie8` §7 | Traitement joystick en `CanTask` (20 ms) **ou** `MainTask` (10 ms) ? Ambigu | ✅ **D7** : comm 20 ms, **traitement 10 ms** (MainTask). |
-| M5 | `AF_Partie2` §0 vs `AF_Partie5` §1, `AF_Partie6` §5, `AF_Partie8` | Terminologie flottante : `PLC_PRG_MAIN` unique vs `PRG_MODES`/`PRG_IO`/`PRG_JOY1` séparés | ✅ **D8** : **1 POU main**, plus de `PRG_*`. Nettoyer le vocabulaire. |
-| M6 | `AF_Partie4` §0 | « passage à une étape sans mouvement = retrait `Enable` → arrêt sur rampe » | ✅ **D15** : arrêt = **`StartStop := FALSE`** (décélération normale), pas retrait d'`Enable`. Réécrire §0. |
+| M1 | `AF_Partie-05` §2 vs §3 | Le pseudo-code override met la limite légale dans `FB_Safety.CheckLimitLegal`, alors que §3 dit « **pas `FB_Safety`**, c'est `FB_Modes` » | ✅ **D5** : limite légale = `FB_Modes`. Corriger le pseudo-code §2. |
+| M2 | `AF_Partie-06` §5 (`:163`) vs `AF_Partie-04` §7 / `AF_Partie-05` §5 | `Command := ordre AND NOT CoupeEnable` sur la sortie relais = **coupure sèche**, contredit la « rampe non destructive » | ✅ **D2+D4** : pas de `CoupeEnable` ; arrêt = **rampe sur relais vitesse/sens**, pas coupure de sortie. Reformuler §5. |
+| M3 | `AF_Partie-04` §3 vs §6 | `FB_WinchSync` (`ΔPos>SyncStop`→arrêt) vs désynchro **volontaire** M2 pour le godet → risque de faux défaut synchro | ✅ **D6** : phase godet = pas de mouvement M1 → **sync suspendue**. Documenter l'interlock. |
+| M4 | `AF_Partie-02` §2/§9 vs `AF_Partie-08` §7 | Traitement joystick en `CanTask` (20 ms) **ou** `MainTask` (10 ms) ? Ambigu | ✅ **D7** : comm 20 ms, **traitement 10 ms** (MainTask). |
+| M5 | `AF_Partie-02` §0 vs `AF_Partie-05` §1, `AF_Partie-06` §5, `AF_Partie-08` | Terminologie flottante : `PLC_PRG_MAIN` unique vs `PRG_MODES`/`PRG_IO`/`PRG_JOY1` séparés | ✅ **D8** : **1 POU main**, plus de `PRG_*`. Nettoyer le vocabulaire. |
+| M6 | `AF_Partie-04` §0 | « passage à une étape sans mouvement = retrait `Enable` → arrêt sur rampe » | ✅ **D15** : arrêt = **`StartStop := FALSE`** (décélération normale), pas retrait d'`Enable`. Réécrire §0. |
 
 ### 🟡 Sévérité MINEURE
 
 | Réf | Localisation | Constat | Statut |
 |-----|--------------|---------|--------|
 | m1 | `NAMING_CONVENTION.md:121` (`ST_WinchIO`) | `ErrorId : INT` | ✅ **D9** : `WORD`. |
-| m2 | `AF_Partie2` (_COMMON) / `CLAUDE.md` vs `AF_Partie8` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ **D10** : `FB_FilterPT1`. |
-| m3 | `AF_Partie8` §2/§7 vs `AF_Partie2` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
-| m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie2_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
-| m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie4_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
+| m2 | `AF_Partie-02` (_COMMON) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ **D10** : `FB_FilterPT1`. |
+| m3 | `AF_Partie-08` §2/§7 vs `AF_Partie-02` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
+| m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie-02_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
+| m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
 | m6 | `README.md` (structure `CODE/`, workflow) | Décrit `CODE/*.xml` + `extract/inject` round-trip, alors que `CODE/` contient un `.st` et la skill impose la **copie manuelle `.st`** | ✅ **D19** : workflow XML **supprimé** ; export manuel `Device.export` + copie ST manuelle. Corriger README (structure `CODE/`, section « Workflow Édition », `extract.bat`/`inject.bat`, `tools/`). |
-| m7 | `AF_Partie3` (« **tout** FB respecte le contrat ») vs `AF_Partie6` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12 + D20** : FB de mouvement = interface standard + `StartStop` ; briques E/S & diag = **types de données propres** (pas de `StartStop`). |
-| m8 | `AF_Partie2` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ✅ **Sans objet (D21)** : `FB_Watchdog` supprimé (fonction système). Retirer toutes ses références. |
-| m9 | `NAMING_CONVENTION.md` (ex. `E_Error`) vs `AF_Partie3` §3 | Exemple d'enum `E_Error` alors que design = bitfield **sans mnémonique** | 🛠️ Harmoniser l'exemple. |
-| m10 | `AF_Partie1` §Initialisation | « preset codeurs à une valeur **positive** » puis « **Affichage 0 m** » au plan d'eau — logique correcte mais **non expliquée** (risque de lecture contradictoire) | 🛠️ Ajouter une phrase d'explication (offset brut vs échelle 0). |
-| m11 | `Plan_Action` / `CLAUDE.md` (« Auto ») vs `AF_Partie5` (`SEMI_AUTO`) | Vocabulaire « Auto » vs « semi-auto » | 🛠️ Harmoniser (« semi-auto »). |
+| m7 | `AF_Partie-03` (« **tout** FB respecte le contrat ») vs `AF_Partie-06` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12 + D20** : FB de mouvement = interface standard + `StartStop` ; briques E/S & diag = **types de données propres** (pas de `StartStop`). |
+| m8 | `AF_Partie-02` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ✅ **Sans objet (D21)** : `FB_Watchdog` supprimé (fonction système). Retirer toutes ses références. |
+| m9 | `NAMING_CONVENTION.md` (ex. `E_Error`) vs `AF_Partie-03` §3 | Exemple d'enum `E_Error` alors que design = bitfield **sans mnémonique** | 🛠️ Harmoniser l'exemple. |
+| m10 | `AF_Partie-01` §Initialisation | « preset codeurs à une valeur **positive** » puis « **Affichage 0 m** » au plan d'eau — logique correcte mais **non expliquée** (risque de lecture contradictoire) | 🛠️ Ajouter une phrase d'explication (offset brut vs échelle 0). |
+| m11 | `Plan_Action` / `CLAUDE.md` (« Auto ») vs `AF_Partie-05` (`SEMI_AUTO`) | Vocabulaire « Auto » vs « semi-auto » | 🛠️ Harmoniser (« semi-auto »). |
 
 ---
 
@@ -100,12 +100,12 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 `CoupeEnable` est **omniprésent** dans la v2.4 et les fichiers de tête. Sa suppression (D2)
 impose une révision coordonnée (à faire lors d'une mise à jour de specs, hors du présent audit) :
 
-- `AF_Partie1` : §Interactions, §Sécurité (flux `Safety ──CoupeEnable──►`).
-- `AF_Partie2` : §0 (décision 4), §4, §5, §6 (titre + tableau), §7, §9.
-- `AF_Partie3` : §1 (note v2.4), §2, §7, §9.
-- `AF_Partie4` : §0, §1 (`E_CycleStep.ERROR_HOLD`, transitions), §7.
-- `AF_Partie5` : §1, §4, §5 (titre + flux).
-- `AF_Partie6` : §2 (note feedback), §5.
+- `AF_Partie-01` : §Interactions, §Sécurité (flux `Safety ──CoupeEnable──►`).
+- `AF_Partie-02` : §0 (décision 4), §4, §5, §6 (titre + tableau), §7, §9.
+- `AF_Partie-03` : §1 (note v2.4), §2, §7, §9.
+- `AF_Partie-04` : §0, §1 (`E_CycleStep.ERROR_HOLD`, transitions), §7.
+- `AF_Partie-05` : §1, §4, §5 (titre + flux).
+- `AF_Partie-06` : §2 (note feedback), §5.
 - `CLAUDE.md`, `README.md`, skill : nombreuses occurrences.
 
 ➡️ **Motif de remplacement** (révisé par D12/D13) : supprimer `CoupeEnable` **sans** le
@@ -132,7 +132,7 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 
 | Q | Question | Enjeu |
 |---|----------|-------|
-| Q6 | **Séquence `INIT`** (`AF_Partie4` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. **→ TBD (D22).** |
+| Q6 | **Séquence `INIT`** (`AF_Partie-04` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. **→ TBD (D22).** |
 | Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. **→ TBD (D22).** |
 | Q11 | **Source de `EmergencyStopOk`** : chaîne de sécurité AU **ou** retour du **contacteur de puissance** ? (marquée « à définir » en D18) | ✅ **Résolue (2026-07-03), partiellement** : I/O réel confirmé = **retour contacteur de puissance géré par l'arrêt d'urgence** (les deux à la fois, en fait — pas un "ou"). Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` (D31). ⚠️ Reste `GVL_DEBUG.DBG_True` sur Joystick/Safety_Winch/Winch/Safety_Chariot/Chariot — même variable réelle à reprendre, pas encore fait sur ces FB. |
 
@@ -156,9 +156,9 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 
 ## 📚 Documents audités (état initial)
 
-`DOC/NAMING_CONVENTION.md` · `DOC/AF_Partie1_..._v1.1` · `DOC/AF_Partie2_..._v2.4` ·
-`DOC/AF_Partie3_..._v1.1` · `DOC/AF_Partie4_..._v1.0` · `DOC/AF_Partie5_..._v1.0` ·
-`DOC/AF_Partie6_..._v1.0` · `DOC/AF_Partie8_..._v1.0` · `CLAUDE.md` · `README.md` ·
+`DOC/NAMING_CONVENTION.md` · `DOC/AF_Partie-01_..._v1.1` · `DOC/AF_Partie-02_..._v2.4` ·
+`DOC/AF_Partie-03_..._v1.1` · `DOC/AF_Partie-04_..._v1.0` · `DOC/AF_Partie-05_..._v1.0` ·
+`DOC/AF_Partie-06_..._v1.0` · `DOC/AF_Partie-08_..._v1.0` · `CLAUDE.md` · `README.md` ·
 `.claude/skills/codesys-workflow.md` · `CODE/PRG_JOY1.st` · `Plan_Action_Excavatrice_Detaillee.md`.
 
 ---
@@ -172,13 +172,13 @@ anciennes versions ont été déplacées vers `DOC/Archives/` (gitignoré, non v
 | Fichier | Ancienne version | Nouvelle version | Changements clés |
 |---------|-------------------|-------------------|-------------------|
 | `DOC/NAMING_CONVENTION.md` | (sans version) | édité en place | `SafeStop` reclassé sortie safety métier, `StartStop` ajouté, `EmergencyStopOk` ajouté, `ErrorId` en `WORD`, exemple `E_Error` retiré |
-| `AF_Partie1_Analyse_Fonctionnelle` | v1.1 | **v1.2** | Suppression `CoupeEnable`, flux `SafeStop`/`StartStop`, explication init codeurs (m10) |
-| `AF_Partie2_Architecture_Programme` | v2.4 | **v2.5** | Suppression `CoupeEnable` et `FB_Watchdog` ; modèle `SafeStop` (par métier) / `StartStop` ; `EmergencyStopOk` ; interlock godet/synchro documenté ; composition pipeline joystick précisée (m3) |
-| `AF_Partie3_Template_FB_Commun` | v1.1 | **v1.2** | Nouveau §1bis (profils d'interface FB standard / mouvement / briques réduites) ; `EmergencyStopOk` ; précédence `Enable`>`SafeStop`>`StartStop` ; §7/§9 réécrits |
-| `AF_Partie4_Cycle_Sequenceur` | v1.0 | **v1.1** | §0 réécrit (`StartStop:=FALSE`, pas retrait Enable) ; nouveau §3bis (suspension `FB_WinchSync` en phase godet, M3) ; `ERROR_HOLD` déclenché par `SafeStop` |
-| `AF_Partie5_Modes_Maintenance` | v1.0 | **v1.1** | Pseudo-code §2 corrigé (limite légale hors `FB_Safety`, M1) ; §4/§5 réécrits (`SafeStop` par métier, watchdog système) |
-| `AF_Partie6_IO_Conditioning` | v1.0 | **v1.1** | §5 corrigé (pas de coupure sèche de sortie relais, M2) ; terminologie `PRG_IO` retirée (M5) |
-| `AF_Partie8_Fonction_Joystick` | v1.0 | **v1.1** | `SafeStop` retiré de l'interface (B1) ; `EStopOk`/`SafetyOk` → `EmergencyStopOk` (B2) ; lien mort corrigé (m5) ; `FB_FilterPT1` (m2) ; nouveau §6bis (écarts avec `CODE/PRG_JOY1.st` actuel) |
+| `AF_Partie-01_Analyse_Fonctionnelle` | v1.1 | **v1.2** | Suppression `CoupeEnable`, flux `SafeStop`/`StartStop`, explication init codeurs (m10) |
+| `AF_Partie-02_Architecture_Programme` | v2.4 | **v2.5** | Suppression `CoupeEnable` et `FB_Watchdog` ; modèle `SafeStop` (par métier) / `StartStop` ; `EmergencyStopOk` ; interlock godet/synchro documenté ; composition pipeline joystick précisée (m3) |
+| `AF_Partie-03_Template_FB_Commun` | v1.1 | **v1.2** | Nouveau §1bis (profils d'interface FB standard / mouvement / briques réduites) ; `EmergencyStopOk` ; précédence `Enable`>`SafeStop`>`StartStop` ; §7/§9 réécrits |
+| `AF_Partie-04_Cycle_Sequenceur` | v1.0 | **v1.1** | §0 réécrit (`StartStop:=FALSE`, pas retrait Enable) ; nouveau §3bis (suspension `FB_WinchSync` en phase godet, M3) ; `ERROR_HOLD` déclenché par `SafeStop` |
+| `AF_Partie-05_Modes_Maintenance` | v1.0 | **v1.1** | Pseudo-code §2 corrigé (limite légale hors `FB_Safety`, M1) ; §4/§5 réécrits (`SafeStop` par métier, watchdog système) |
+| `AF_Partie-06_IO_Conditioning` | v1.0 | **v1.1** | §5 corrigé (pas de coupure sèche de sortie relais, M2) ; terminologie `PRG_IO` retirée (M5) |
+| `AF_Partie-08_Fonction_Joystick` | v1.0 | **v1.1** | `SafeStop` retiré de l'interface (B1) ; `EStopOk`/`SafetyOk` → `EmergencyStopOk` (B2) ; lien mort corrigé (m5) ; `FB_FilterPT1` (m2) ; nouveau §6bis (écarts avec `CODE/PRG_JOY1.st` actuel) |
 | `CLAUDE.md` | — | édité en place | Guardrails, arborescence, liens de version, cas d'arrêt mis à jour |
 | `README.md` | — | édité en place | Workflow XML `extract/inject` remplacé par export/copie manuelle (D19, m6) ; liens de version |
 | `.claude/skills/codesys-workflow.md` | — | édité en place | Référence v2.3→v2.5 corrigée (m4) ; exemple `SafeStop`/`EmergencyStopOk` mis à jour |
@@ -187,7 +187,7 @@ anciennes versions ont été déplacées vers `DOC/Archives/` (gitignoré, non v
 ### ⚠️ Hors périmètre (non modifié)
 - **`CODE/PRG_JOY1.st`** : non touché — reste **hors périmètre** d'un audit documentaire (le code
   CODESYS s'édite via le workflow `codesys-workflow` avec validation utilisateur explicite). Les
-  écarts entre ce fichier et la Partie 8 v1.1 sont listés dans `AF_Partie8_..._v1.1.md` §6bis
+  écarts entre ce fichier et la Partie 8 v1.1 sont listés dans `AF_Partie-08_..._v1.1.md` §6bis
   (câblage `SafeStop`/`SafetyOk` à corriger, nom `PRG_JOY1` à faire évoluer).
 - **Q6/Q7/Q11** (séquence `INIT` fine, priorités tâches, source exacte de `EmergencyStopOk`) :
   restent **TBD**, non spécifiées dans cette passe.
@@ -256,7 +256,7 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 ### Fichiers impactés (2026-07-03bis)
 - **CODE/** : `PRG_MAIN.st` (`instEmergencyStopOk : FB_Input_Digital`, `EmergencyStopOkCond`,
   remplace `EmergencyStopOk`/`GVL_DEBUG.DBG_True` sur les 11 câblages FB métier).
-- **DOC/** : `AF_Partie6_IO_Conditioning` (état d'implémentation — `FB_Input_Digital` intégré pour
+- **DOC/** : `AF_Partie-06_IO_Conditioning` (état d'implémentation — `FB_Input_Digital` intégré pour
   `EmergencyStopOk`), AUDIT Q11 close.
 
 ---
@@ -272,7 +272,7 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 - **CODE/** : `FB_IO_Machine.st` (nouveau, remplace `FB_IO_Winch.st`/`FB_IO_Winch_In.st`/
   `FB_IO_Winch_Out.st` supprimés en cours de route), `PRG_MAIN.st` (1 seule instance
   `instIoMachine`, 2 appels ; `instSafety`/`LocalEmergencyStopTOR`/`LocalEthercatOk` retirés).
-- **DOC/** : `AF_Partie6_IO_Conditioning` (état d'implémentation mis à jour), AUDIT (ce §11).
+- **DOC/** : `AF_Partie-06_IO_Conditioning` (état d'implémentation mis à jour), AUDIT (ce §11).
 
 ---
 
@@ -290,8 +290,8 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
   (nouveau, revive), `FB_WinchSync.st` (nouveau), `PRG_MAIN.st` (`instModes`/`instEncoderSafetyM1/2`/
   `instWinchSync`, remplacement des 10 `E_Mode.MAINT_N1`, `WinchSyncToleranceM` RETAIN,
   renommage `StubMachineEnableN1`).
-- **DOC/** : `AF_Partie5_Modes_Maintenance` (état d'implémentation `FB_Modes` MVP),
-  `AF_Partie9_Fonction_Winch` (§9 `FB_WinchSync` squelette), `AF_Partie10...` (§3.6/§3.7
+- **DOC/** : `AF_Partie-05_Modes_Maintenance` (état d'implémentation `FB_Modes` MVP),
+  `AF_Partie-09_Fonction_Winch` (§9 `FB_WinchSync` squelette), `AF_Partie-10...` (§3.6/§3.7
   `FB_Encoder_Safety` revive), AUDIT (ce §12).
 - **Audit indépendant** : un agent spécialisé automatisme a cartographié tous les flux
   inter-FB de `PRG_MAIN` avant ce lot — confirme la liste des 10 `E_Mode.MAINT_N1`, signale
@@ -310,7 +310,7 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 ### Fichiers impactés (2026-07-03quinquies)
 - **CODE/** : `FB_SpeedStep.st` (`MaxStepNumber`, plafond post-hystérésis), `FB_Winch.st`
   (`MaxStepDescente` + câblage direction-dépendant sur l'appel `SpeedStep`).
-- **DOC/** : `AF_Partie9_Fonction_Winch` (REX §8), AUDIT (ce §13).
+- **DOC/** : `AF_Partie-09_Fonction_Winch` (REX §8), AUDIT (ce §13).
 
 ---
 
@@ -398,7 +398,7 @@ terminologie standard de ce canal — cohérent avec l'intention d'origine du FB
 - **CODE/** : `PRG_MAIN.st` (retrait `.xError`/`.wState`, retour littéraux TODO §0),
   `FB_Joystick.st` (`DeadmanArmed`, `DeadmanEdge`, restructuration §4bis Scale avant homme-mort,
   gate `RampX`/`RampY`).
-- **DOC/** : AUDIT (ce §16), `AF_Partie8_Fonction_Joystick` (à mettre à jour — bouton homme-mort).
+- **DOC/** : AUDIT (ce §16), `AF_Partie-08_Fonction_Joystick` (à mettre à jour — bouton homme-mort).
 
 ---
 
@@ -418,7 +418,7 @@ plutôt qu'accepter le risque résiduel documenté.
 - **CODE/** : `FB_Joystick.st` (`DeadmanRearmTimeout`, `DeadmanTimer`, §4quater), `FB_InputsMachine.st`
   (nouveau), `FB_OutputsMachine.st` (nouveau), `FB_IO_Machine.st` (supprimé), `PRG_MAIN.st`
   (`instInputsMachine`/`instOutputsMachine` remplacent `instIoMachine`).
-- **DOC/** : `AF_Partie8_Fonction_Joystick` (état d'implémentation mis à jour), AUDIT (ce §17).
+- **DOC/** : `AF_Partie-08_Fonction_Joystick` (état d'implémentation mis à jour), AUDIT (ce §17).
 
 ---
 
@@ -439,7 +439,7 @@ homme-mort (traité ici en D54) + demande utilisateur simultanée de renommer/re
 - **CODE/** : `FB_Input_Digital.st` (`State`), `FB_InputsMachine.st` (restructuré, référence I/O
   directe), `FB_Joystick.st` (fix watchdog `NOT RawButton`), `PRG_MAIN.st` (`instInputsMachine()`
   sans paramètre).
-- **DOC/** : `AF_Partie6_IO_Conditioning` (état d'implémentation), AUDIT (ce §18).
+- **DOC/** : `AF_Partie-06_IO_Conditioning` (état d'implémentation), AUDIT (ce §18).
 
 ---
 
@@ -452,7 +452,7 @@ homme-mort (traité ici en D54) + demande utilisateur simultanée de renommer/re
 
 ### Fichiers impactés (2026-07-03duodecies)
 - **CODE/** : `FB_Joystick.st` (`DeadmanRearmTimeout:=T#10S`, nouveau `NeutralHoldTime`/`NeutralHoldTimer`).
-- **DOC/** : `AF_Partie8_Fonction_Joystick` (état d'implémentation), AUDIT (ce §19).
+- **DOC/** : `AF_Partie-08_Fonction_Joystick` (état d'implémentation), AUDIT (ce §19).
 
 ---
 
@@ -561,7 +561,7 @@ mouvement), documenté comme tel depuis la doc Partie8 v1.1 mais jamais nettoyé
 
 ### Fichiers impactés (2026-07-03septdecies)
 - **CODE/** : `FB_Joystick.st` (`SafeStop` retiré : VAR_INPUT + GATE), `PRG_MAIN.st` (câblage retiré).
-- **DOC/** : `AF_Partie8_Fonction_Joystick_v1.2.md` (§6bis points 1/2 fermés, retex §8 coché),
+- **DOC/** : `AF_Partie-08_Fonction_Joystick_v1.2.md` (§6bis points 1/2 fermés, retex §8 coché),
   AUDIT (ce §24).
 
 ---
@@ -758,7 +758,7 @@ de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
 
 ### Fichiers impactés (2026-07-03quadravicies)
 - **CODE/** : `FB_Grappin.st`, `ST_GrappinConfig.st`, `ST_GrappinState.st`, `PRG_MAIN.st`.
-- **DOC/** : `AF_Partie12_Fonction_Grappin_v1.0.md` (mise à jour des interfaces documentées), `AUDIT_Coherence_Documentaire_v1.0.md` (ce §33).
+- **DOC/** : `AF_Partie-12_Fonction_Grappin_v1.0.md` (mise à jour des interfaces documentées), `AUDIT_Coherence_Documentaire_v1.0.md` (ce §33).
 
 ---
 
@@ -779,7 +779,7 @@ descente comme supposé initialement. Par ailleurs, le rôle d'`OverrideSync` es
 | D83 | **D_OVERRIDESYNC — Rôle élargi d'OverrideSync** | `OverrideSync` = désactive **toute** synchronisation ET tout contrôle de synchronisation. Applicable en **MAINT_N1 ET MAINT_N2** (pas restreint à N2 comme documenté initialement en §2 de Partie5 v1.2). Permet de piloter M1 et M2 **indépendamment sans contrôle d'écart de position**. **Lève également le SafeStop dû au mou de câble** (procédure de récupération manuelle autorisée). Corrige le pseudo-code de §2 Partie5 qui conditionne `OverrideSync` à `Mode = MAINT_N2` uniquement. |
 
 ### Fichiers impactés (2026-07-04)
-- **DOC/** : `AF_Partie9_Fonction_Winch` (v1.2→**v1.3** — §4ter entièrement réécrit : SafeStop total en mode normal, ForbidAscent en MAINT+OverrideSync, procédure récupération D_SLACK_2, acquittement D_SLACK_3), `AF_Partie5_Modes_Maintenance` (v1.2 — §2 et §6 OverrideSync étendu MAINT_N1+N2, D_OVERRIDESYNC), AUDIT (ce §34).
+- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.2→**v1.3** — §4ter entièrement réécrit : SafeStop total en mode normal, ForbidAscent en MAINT+OverrideSync, procédure récupération D_SLACK_2, acquittement D_SLACK_3), `AF_Partie-05_Modes_Maintenance` (v1.2 — §2 et §6 OverrideSync étendu MAINT_N1+N2, D_OVERRIDESYNC), AUDIT (ce §34).
 
 ---
 
@@ -800,7 +800,7 @@ documentaire (voir fichiers impactés ci-dessous).
 
 ### Fichiers impactés (2026-07-07)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/WINCH/FB_Winch.st`, `CODE/ENCODERS/FB_Encoder_Homing.st`, `CODE/MAIN/PRG_02_Encoders.st`, `CODE/MAIN/PRG_06_WinchControl.st`, `CODE/SUPERVISION/ST_WinchHMI.st`, `CODE/MAIN/PRG_09_Supervision.st`.
-- **DOC/** : `AF_Partie9_Fonction_Winch` (v1.1→**v1.4**, réalignement nom de fichier/version au passage — voir bandeau v1.4), `AF_Partie10_Fonction_Encoder_Homing` (v1.6→**v1.7**), `AF_Partie6_IO_Conditioning` (v1.4→**v1.5**), `AF_Partie2_Architecture_Programme` (v2.9→**v2.10**), `AF_Partie7_Interface_IHM` (v1.1→**v1.2**), références croisées corrigées dans `AF_Partie11_Fonction_Chariot`, `AF_Partie12_Fonction_Grappin`, `AF_Partie13_Fonction_Simulation` (pointeurs vers Partie9), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §35).
+- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.1→**v1.4**, réalignement nom de fichier/version au passage — voir bandeau v1.4), `AF_Partie-10_Fonction_Encoder_Homing` (v1.6→**v1.7**), `AF_Partie-06_IO_Conditioning` (v1.4→**v1.5**), `AF_Partie-02_Architecture_Programme` (v2.9→**v2.10**), `AF_Partie-07_Interface_IHM` (v1.1→**v1.2**), références croisées corrigées dans `AF_Partie-11_Fonction_Chariot`, `AF_Partie-12_Fonction_Grappin`, `AF_Partie-13_Fonction_Simulation` (pointeurs vers Partie9), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §35).
 - **CODE/** (à faire) : `FB_Safety_Winch.st` (logique SafeStop conditionnée par `OverrideSync` / nouveau `ForbidAscent`), `FB_Winch.st` (masquage `RelayFwd` sur `ForbidAscent`).
 
 ---
@@ -828,7 +828,7 @@ mot vitesse natif fiable).
 
 ### Fichiers impactés (2026-07-07, session Méca A/B/C)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/WINCH/FB_Safety_Winch.st`, `CODE/GRAPPIN/FB_Grappin.st`, `CODE/MAIN/PRG_03_Safety.st`, `CODE/MAIN/PRG_06_WinchControl.st`.
-- **DOC/** : `AF_Partie9_Fonction_Winch` (v1.4→**v1.5**, §4quinquies nouveau — Méca A/B/C détaillés, remplace/complète la section TBD "surveillance de cohérence mouvement" pour le Cas B, interface `FB_Safety_Winch`/tableau `ErrorId`/formules `SafeStop`/`PowerCutOff` mis à jour), `AF_Partie12_Fonction_Grappin` (v1.1→**v1.2**, §4.D nouveau — Méca C couche 1, `M1SlipDetected`), références croisées corrigées dans `AF_Partie2_Architecture_Programme`, `AF_Partie6_IO_Conditioning`, `AF_Partie7_Interface_IHM`, `AF_Partie10_Fonction_Encoder_Homing`, `AF_Partie11_Fonction_Chariot`, `AF_Partie13_Fonction_Simulation` (pointeurs vers Partie9/Partie12), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §36).
+- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.4→**v1.5**, §4quinquies nouveau — Méca A/B/C détaillés, remplace/complète la section TBD "surveillance de cohérence mouvement" pour le Cas B, interface `FB_Safety_Winch`/tableau `ErrorId`/formules `SafeStop`/`PowerCutOff` mis à jour), `AF_Partie-12_Fonction_Grappin` (v1.1→**v1.2**, §4.D nouveau — Méca C couche 1, `M1SlipDetected`), références croisées corrigées dans `AF_Partie-02_Architecture_Programme`, `AF_Partie-06_IO_Conditioning`, `AF_Partie-07_Interface_IHM`, `AF_Partie-10_Fonction_Encoder_Homing`, `AF_Partie-11_Fonction_Chariot`, `AF_Partie-13_Fonction_Simulation` (pointeurs vers Partie9/Partie12), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §36).
 
 ---
 
@@ -841,29 +841,29 @@ Par ailleurs, la 1ère implémentation de `PowerCutOff_A_RQ`/`B_RQ` (canal PLC d
 une **polarité inversée** : `TRUE` signifiait « coupe », ce qui aurait **maintenu la puissance** en
 cas de panne PLC réelle au lieu de la couper (pire cas de figure pour une fonction de sécurité).
 Ces deux points ont été corrigés côté `CODE/` (avant cet audit, non retouché ici) et sont
-désormais documentés en profondeur dans `AF_Partie1` (choix explicite de l'utilisateur : ce
+désormais documentés en profondeur dans `AF_Partie-01` (choix explicite de l'utilisateur : ce
 chantier reste dans la section "Sécurité électrique" existante de la Partie 1, pas de nouvelle
 Partie créée).
 
 | # | Sujet | Décision |
 |---|-------|----------|
 | D90 | **3 signaux distincts autour de la chaîne AU** | `EmergencyChain_DI`/`EmergencyChain` (🆕, entrée) = retour de la boucle AU physique (coup-de-poing série + canal PLC), précondition à l'armement, PAS le portail maître. `EmergencyStopOk_DI`/`EmergencyStopOk` (conservé, renommé sémantiquement) = confirmation que le contacteur de puissance est réellement engagé, reste le portail maître utilisé par tout le programme (contrat FB standard Partie 3 §1). `EmergencyArming_RQ` (🆕, sortie) = commande PLC de réarmement du contacteur (mécanisme à ressort). |
-| D91 | **Polarité fail-safe `PowerCutOff_A_RQ`/`B_RQ`** | Architecture **à commande maintenue** : le PLC doit maintenir ces 2 sorties à `TRUE` en permanence ; toute transition `TRUE→FALSE` (volontaire — un Safety Mouvement de `FB_Safety_Winch` se déclenche, voir Partie9 v1.5 §4quinquies — ou accidentelle — PLC planté/coupure/watchdog dépassé) ouvre le circuit AU et coupe le contacteur, exactement comme un bouton coup-de-poing. Corrige la polarité inversée de la 1ère version (bug documenté en bandeau REX dans `AF_Partie1` pour ne jamais être reproduit). |
+| D91 | **Polarité fail-safe `PowerCutOff_A_RQ`/`B_RQ`** | Architecture **à commande maintenue** : le PLC doit maintenir ces 2 sorties à `TRUE` en permanence ; toute transition `TRUE→FALSE` (volontaire — un Safety Mouvement de `FB_Safety_Winch` se déclenche, voir Partie9 v1.5 §4quinquies — ou accidentelle — PLC planté/coupure/watchdog dépassé) ouvre le circuit AU et coupe le contacteur, exactement comme un bouton coup-de-poing. Corrige la polarité inversée de la 1ère version (bug documenté en bandeau REX dans `AF_Partie-01` pour ne jamais être reproduit). |
 | D92 | **Séquence de réarmement — IHM uniquement, jamais automatique** | Front sur `GVL_IHM.Modes.CmdEmergencyArming`, accepté seulement si `EmergencyChain=TRUE` et qu'aucune impulsion/verrouillage n'est en cours → impulsion 1 s sur `EmergencyArming_RQ` → verrouillage 5 s (recharge mécanique du ressort) avant toute nouvelle tentative. Retours IHM : `EmergencyChainOk`, `PowerContactorOk`, `EmergencyArmable`, `EmergencyArmingBusy`. Aucun réarmement auto même si `EmergencyChain` redevient sain seul — décision opérateur explicite requise. |
-| D93 | **Cas non couverts par du code dédié — assumés TBD** | (1) Aucune temporisation de confirmation post-pulse ne vérifie que `EmergencyStopOk` repasse bien à `TRUE` après une impulsion `EmergencyArming_RQ` — une défaillance mécanique du contacteur reste indiscernable, côté IHM, d'un simple "pas encore réarmé" (pas d'alarme dédiée). (2) La redondance des canaux `PowerCutOff_A_RQ`/`B_RQ` est purement logicielle (`B := A`) — aucune détection de divergence si un seul des deux canaux est réellement câblé/fonctionnel côté matériel. Les deux points sont documentés comme questions ouvertes dans la casuistique `AF_Partie1` (cas 9 et 10), à lever au câblage réel/tests terrain. |
-| D94 | **Nommage « Safety Mouvement » — abandon du vocabulaire « Méca A/B/C » en documentation** | Retour utilisateur en cours de relecture (2026-07-07) : le nom de code par lettre séquentielle (« Méca A/B/C », introduit en §36/D85-D87) est jugé **ni parlant ni évolutif** (rien n'indique combien de cas existeront à terme, un 4ᵉ casserait la convention). `AF_Partie1_Analyse_Fonctionnelle_v1.5` adopte **exclusivement** le vocabulaire descriptif **« Safety Mouvement — \<Rôle\> »** (Mouvement non commandé / Pilotage sans commande opérateur / Glissement grappin), catégorie **ouverte** sans limite de nombre, et n'utilise plus le nom par lettre nulle part dans son texte. **`CODE/` n'est pas retouché** (`FB_Safety_Winch.st`, `PRG_03_Safety.st`, `ST_WinchHMI.st` conservent aujourd'hui encore les commentaires/identifiants « Méca A/B/C », de même que `AF_Partie9_Fonction_Winch_v1.5` §4quinquies, non modifiée dans cette session) : un renommage effectif en `CODE/` + Partie9 est une **proposition distincte**, non validée/appliquée ici, nommage cible suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`, `SafetyMotionUncommandedDrive`, `SafetyMotionGrappinSlip`) — cohérent avec le préfixe `FB_Safety_<Metier>` déjà en usage. **Q ouverte** : valider ce renommage `CODE/`+Partie9 dans une session dédiée (guardrails codesys-workflow, impact `ErrorId`/commentaires/tests). |
-| D95 | **Clarification `PowerCutOff` multi-sources + couverture Grappin** | Retour utilisateur (2026-07-07) : `PowerCutOff_A_RQ` agrège **3 sources** (`instSafetyWinchM1`, `instSafetyWinchM2`, `instSafetyChariotM3`, voir `PRG_10_Outputs.st`), pas seulement `FB_Safety_Winch`. `FB_Safety_Chariot.PowerCutOff` participe déjà à la formule mais reste **codé en dur à `FALSE`** (TBD, pas de `ST_ContactorCheck` puissance M3 câblé) — aucun Safety Mouvement réel côté Chariot aujourd'hui. Le Grappin n'a pas de bloc safety dédié (pas de moteur propre) : sa protection glissement est **répartie sur 2 couches** — couche 1 dans `FB_Grappin` (`M1SlipDetected`, alimente `SafeStop` seulement) et couche 2 dans l'instance **M1** de `FB_Safety_Winch` (`GrappinHoldStillActive` sur `instGrappin.Busy`, peut escalader jusqu'à `PowerCutOff`) — donc `FB_Safety_Winch` couvre bien indirectement le Grappin via M1, sans bloc `FB_Safety_Grappin` séparé. Ces clarifications sont intégrées dans `AF_Partie1_v1.5` (encadré dédié §Sécurité électrique). |
+| D93 | **Cas non couverts par du code dédié — assumés TBD** | (1) Aucune temporisation de confirmation post-pulse ne vérifie que `EmergencyStopOk` repasse bien à `TRUE` après une impulsion `EmergencyArming_RQ` — une défaillance mécanique du contacteur reste indiscernable, côté IHM, d'un simple "pas encore réarmé" (pas d'alarme dédiée). (2) La redondance des canaux `PowerCutOff_A_RQ`/`B_RQ` est purement logicielle (`B := A`) — aucune détection de divergence si un seul des deux canaux est réellement câblé/fonctionnel côté matériel. Les deux points sont documentés comme questions ouvertes dans la casuistique `AF_Partie-01` (cas 9 et 10), à lever au câblage réel/tests terrain. |
+| D94 | **Nommage « Safety Mouvement » — abandon du vocabulaire « Méca A/B/C » en documentation** | Retour utilisateur en cours de relecture (2026-07-07) : le nom de code par lettre séquentielle (« Méca A/B/C », introduit en §36/D85-D87) est jugé **ni parlant ni évolutif** (rien n'indique combien de cas existeront à terme, un 4ᵉ casserait la convention). `AF_Partie-01_Analyse_Fonctionnelle_v1.5` adopte **exclusivement** le vocabulaire descriptif **« Safety Mouvement — \<Rôle\> »** (Mouvement non commandé / Pilotage sans commande opérateur / Glissement grappin), catégorie **ouverte** sans limite de nombre, et n'utilise plus le nom par lettre nulle part dans son texte. **`CODE/` n'est pas retouché** (`FB_Safety_Winch.st`, `PRG_03_Safety.st`, `ST_WinchHMI.st` conservent aujourd'hui encore les commentaires/identifiants « Méca A/B/C », de même que `AF_Partie-09_Fonction_Winch_v1.5` §4quinquies, non modifiée dans cette session) : un renommage effectif en `CODE/` + Partie9 est une **proposition distincte**, non validée/appliquée ici, nommage cible suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`, `SafetyMotionUncommandedDrive`, `SafetyMotionGrappinSlip`) — cohérent avec le préfixe `FB_Safety_<Metier>` déjà en usage. **Q ouverte** : valider ce renommage `CODE/`+Partie9 dans une session dédiée (guardrails codesys-workflow, impact `ErrorId`/commentaires/tests). |
+| D95 | **Clarification `PowerCutOff` multi-sources + couverture Grappin** | Retour utilisateur (2026-07-07) : `PowerCutOff_A_RQ` agrège **3 sources** (`instSafetyWinchM1`, `instSafetyWinchM2`, `instSafetyChariotM3`, voir `PRG_10_Outputs.st`), pas seulement `FB_Safety_Winch`. `FB_Safety_Chariot.PowerCutOff` participe déjà à la formule mais reste **codé en dur à `FALSE`** (TBD, pas de `ST_ContactorCheck` puissance M3 câblé) — aucun Safety Mouvement réel côté Chariot aujourd'hui. Le Grappin n'a pas de bloc safety dédié (pas de moteur propre) : sa protection glissement est **répartie sur 2 couches** — couche 1 dans `FB_Grappin` (`M1SlipDetected`, alimente `SafeStop` seulement) et couche 2 dans l'instance **M1** de `FB_Safety_Winch` (`GrappinHoldStillActive` sur `instGrappin.Busy`, peut escalader jusqu'à `PowerCutOff`) — donc `FB_Safety_Winch` couvre bien indirectement le Grappin via M1, sans bloc `FB_Safety_Grappin` séparé. Ces clarifications sont intégrées dans `AF_Partie-01_v1.5` (encadré dédié §Sécurité électrique). |
 
 ### Fichiers impactés (2026-07-07, session Sécurité électrique)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/MAIN/PRG_10_Outputs.st`, `CODE/MAIN/PRG_09_Supervision.st`, `CODE/SUPERVISION/ST_ModesHMI.st`. Aucun autre fichier `CODE/` touché dans cette session (le renommage `SafetyMotion*` proposé par D94 n'est **pas appliqué**).
-- **DOC/** : `AF_Partie1_Analyse_Fonctionnelle` (v1.4→**v1.5**, §Sécurité électrique entièrement réécrite/complétée : 3 signaux, polarité fail-safe, séquence de réarmement, 3 scénarios terrain, casuistique exhaustive 11 cas, vocabulaire « Safety Mouvement »), ancienne version archivée dans `DOC/Archives/` (gitignoré, via `git mv`), références croisées corrigées dans `AF_Partie8_Fonction_Joystick`, `AF_Partie10_Fonction_Encoder_Homing`, `AF_Partie3_Template_FB_Commun` (pointeurs vers Partie1), `CLAUDE.md` (racine, liste des docs + note §Architecture), AUDIT (ce §37). `AF_Partie9_Fonction_Winch_v1.5` **non modifiée** (le nom « Méca A/B/C » y reste tel quel, cohérent avec `CODE/` — voir D94).
+- **DOC/** : `AF_Partie-01_Analyse_Fonctionnelle` (v1.4→**v1.5**, §Sécurité électrique entièrement réécrite/complétée : 3 signaux, polarité fail-safe, séquence de réarmement, 3 scénarios terrain, casuistique exhaustive 11 cas, vocabulaire « Safety Mouvement »), ancienne version archivée dans `DOC/Archives/` (gitignoré, via `git mv`), références croisées corrigées dans `AF_Partie-08_Fonction_Joystick`, `AF_Partie-10_Fonction_Encoder_Homing`, `AF_Partie-03_Template_FB_Commun` (pointeurs vers Partie1), `CLAUDE.md` (racine, liste des docs + note §Architecture), AUDIT (ce §37). `AF_Partie-09_Fonction_Winch_v1.5` **non modifiée** (le nom « Méca A/B/C » y reste tel quel, cohérent avec `CODE/` — voir D94).
 
 ---
 
 ## 🚀 38. Harmonisation documentaire titre ↔ filename (2026-07-08)
 
 **Constat** : 7 fichiers AF_Partie ont incohérence entre titre interne (entête `# v1.X`) et nom de
-fichier (suffixe `_vX.Y.md`). Exemple : `AF_Partie5_Modes_Maintenance_v1.2.md` avec titre `(v1.4)`.
+fichier (suffixe `_vX.Y.md`). Exemple : `AF_Partie-05_Modes_Maintenance_v1.2.md` avec titre `(v1.4)`.
 Cause probable : rechargement de versions lors de commit 26a9f1c (« full doc audit ») sans
 synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais mentionné dans
 `CLAUDE.md`. Référence dans `CLAUDE.md` pointant vers v1.6 qui n'existe plus (actual : v1.7).
@@ -871,18 +871,18 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 | # | Sujet | Décision |
 |---|-------|----------|
 | D96 | **Resynchronisation titre = filename (pas de renommage fichier, correction titre)** | Les 7 fichiers ont leur **titre** corrigé pour matcher le **filename version** (source de vérité). Filenames **inchangés** (conserve l'historique git). Fichiers affectés : Partie1 v1.6→v1.5, Partie5 v1.4→v1.2, Partie7 v1.3→v1.2, Partie9 v1.8→v1.7, Partie10 v1.8→v1.7, Partie12 v1.3→v1.2, Partie13 v1.2→v1.1. |
-| D97 | **Misse à jour références croisées (Partie1/10/11/12 → Partie9 v1.7)** | 8 références internes ajustées : `AF_Partie1` (3 occurrences v1.5/v1.6→v1.7), `AF_Partie10` (2 occurrences v1.5→v1.7), `AF_Partie11` (2 occurrences v1.6→v1.7), `AF_Partie12` (1 occurrence v1.8→v1.7), `AF_Partie13` (1 occurrence v1.8→v1.7). |
+| D97 | **Misse à jour références croisées (Partie1/10/11/12 → Partie9 v1.7)** | 8 références internes ajustées : `AF_Partie-01` (3 occurrences v1.5/v1.6→v1.7), `AF_Partie-10` (2 occurrences v1.5→v1.7), `AF_Partie-11` (2 occurrences v1.6→v1.7), `AF_Partie-12` (1 occurrence v1.8→v1.7), `AF_Partie-13` (1 occurrence v1.8→v1.7). |
 | D98 | **Mise à jour CLAUDE.md : Partie9 v1.6→v1.7 + ajout Partie13** | Lien dans `CLAUDE.md` ligne 125 pointant vers version fantasme v1.6 remplacé par v1.7 (actual). Ajout Partie13 dans la liste docs (ligne 129, avant AUDIT). Partie 13 décrite brièvement (« Fonction Simulation — flags bits maître + granularité par device »). |
 
 ### Fichiers impactés (2026-07-08, audit harmonisation)
-- **DOC/** : `AF_Partie1_Analyse_Fonctionnelle_v1.5.md` (titre corrigé + 3 refs Partie9),
-  `AF_Partie5_Modes_Maintenance_v1.2.md` (titre corrigé),
-  `AF_Partie7_Interface_IHM_v1.2.md` (titre corrigé),
-  `AF_Partie9_Fonction_Winch_v1.7.md` (titre corrigé),
-  `AF_Partie10_Fonction_Encoder_Homing_v1.7.md` (titre + 2 refs Partie9 corrigés),
-  `AF_Partie11_Fonction_Chariot_v1.3.md` (2 refs Partie9 v1.6→v1.7),
-  `AF_Partie12_Fonction_Grappin_v1.2.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
-  `AF_Partie13_Fonction_Simulation_v1.1.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
+- **DOC/** : `AF_Partie-01_Analyse_Fonctionnelle_v1.5.md` (titre corrigé + 3 refs Partie9),
+  `AF_Partie-05_Modes_Maintenance_v1.2.md` (titre corrigé),
+  `AF_Partie-07_Interface_IHM_v1.2.md` (titre corrigé),
+  `AF_Partie-09_Fonction_Winch_v1.7.md` (titre corrigé),
+  `AF_Partie-10_Fonction_Encoder_Homing_v1.7.md` (titre + 2 refs Partie9 corrigés),
+  `AF_Partie-11_Fonction_Chariot_v1.3.md` (2 refs Partie9 v1.6→v1.7),
+  `AF_Partie-12_Fonction_Grappin_v1.2.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
+  `AF_Partie-13_Fonction_Simulation_v1.1.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
   `CLAUDE.md` (racine, 2 mises à jour : Partie9 v1.6→v1.7 + ajout Partie13).
 - **Reste ouvert (non corrigé)** : Références de code à `OverrideSync` vs `SyncEnable` (renommage code 2026-07-08 non répercuté en DOC — voir D99 ci-après). Ces corrections visent la **forme** (version numbers cohérence) ; le fond technique (variable renommée dans code mais doc non mise à jour) est documenté séparement pour décision utilisateur.
 
@@ -893,13 +893,13 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 **Constat** : Commit 26a9f1c (feat grappin, 2026-07-08, 15h25) a renommé `OverrideSync`
 → `SyncEnable` dans le code avec inversion de polarité (logique positive désormais), répercuté sur
 5 fichiers `CODE/` (`FB_Modes.st`, `FB_Safety_Winch.st`, `FB_WinchSync.st`, `ST_SyncHMI.st`,
-`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie5_Modes_Maintenance_v1.2.md`
+`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie-05_Modes_Maintenance_v1.2.md`
 **n'a pas suivi** — elle parle toujours de `OverrideSync` partout (13 occurrences confirmées au
 2026-07-08 après le commit).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D99 | **Documentation NON CORRIGÉE, question ouverte** | Audit découvert l'incohérence doc/code, mais **correction documentaire dépasse le périmètre** « correction forme » (D96-D98) ; cela demande une **relecture métier complète** de AF_Partie5 pour tracer tous les impacts (logique positive affectant les formules de guard, état IHM, messages). Recommandation : valider en session dédiée **après relecture code-review des changements 26a9f1c** (grappin, sécurité, IHM) — une mauvaise traduction `OverrideSync`→`SyncEnable` dans la doc pourrait introduire une confusion dangeuse. **Balisé à corriger** : Partie5 v1.2 **doit être mise à jour en v1.3** (au minimum) avec les 13 occurrences et la logique inversée documentée, à faire à titre de **nettoyage documentaire décidé par l'utilisateur, hors cet audit**. |
+| D99 | **Documentation NON CORRIGÉE, question ouverte** | Audit découvert l'incohérence doc/code, mais **correction documentaire dépasse le périmètre** « correction forme » (D96-D98) ; cela demande une **relecture métier complète** de AF_Partie-05 pour tracer tous les impacts (logique positive affectant les formules de guard, état IHM, messages). Recommandation : valider en session dédiée **après relecture code-review des changements 26a9f1c** (grappin, sécurité, IHM) — une mauvaise traduction `OverrideSync`→`SyncEnable` dans la doc pourrait introduire une confusion dangeuse. **Balisé à corriger** : Partie5 v1.2 **doit être mise à jour en v1.3** (au minimum) avec les 13 occurrences et la logique inversée documentée, à faire à titre de **nettoyage documentaire décidé par l'utilisateur, hors cet audit**. |
 
 **Fichiers affectés (code, déjà modifiés en production)** :
 - `CODE/MODES/FB_Modes.st:21` (commentaire REX 2026-07-08)
@@ -907,7 +907,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 - `CODE/WINCH/FB_WinchSync.st:30` (entrée), ligne 95 (logique)
 - `CODE/SUPERVISION/ST_SyncHMI.st:5` (commentaire)
 - `CODE/MAIN/PRG_06_WinchControl.st:múltiples` (appels)
-- **Documentation affectée (NON mise à jour)** : `AF_Partie5_Modes_Maintenance_v1.2.md` ligne 6, 61,
+- **Documentation affectée (NON mise à jour)** : `AF_Partie-05_Modes_Maintenance_v1.2.md` ligne 6, 61,
   78-79, 95-97, 100, 107, 119-120, et détails §6bis entier.
 
 ---
@@ -918,14 +918,71 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie5_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `DOC/Archives/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie2_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie9_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie7_Interface_IHM_v1.2.md` (1 occurrence). |
+| D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie-05_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `DOC/Archives/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie-02_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie-09_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie-07_Interface_IHM_v1.2.md` (1 occurrence). |
 
 **Fichiers modifiés (documentation)** :
-- ✅ `DOC/AF_Partie5_Modes_Maintenance_v1.3.md` (NOUVEAU, corrigé avec polarité positive)
-- ✅ `DOC/Archives/AF_Partie5_Modes_Maintenance_v1.2.md` (archivé, ancien)
+- ✅ `DOC/AF_Partie-05_Modes_Maintenance_v1.3.md` (NOUVEAU, corrigé avec polarité positive)
+- ✅ `DOC/Archives/AF_Partie-05_Modes_Maintenance_v1.2.md` (archivé, ancien)
 - ✅ `CLAUDE.md` (2 références Partie5 v1.2→v1.3)
-- ✅ `AF_Partie2_Architecture_Programme_v2.10.md` (2 refs ligne 91, 138)
-- ✅ `AF_Partie9_Fonction_Winch_v1.7.md` (7 refs + 1 lien Partie5 v1.2→v1.3)
-- ✅ `AF_Partie7_Interface_IHM_v1.2.md` (1 ref `ST_SyncHMI`)
+- ✅ `AF_Partie-02_Architecture_Programme_v2.10.md` (2 refs ligne 91, 138)
+- ✅ `AF_Partie-09_Fonction_Winch_v1.7.md` (7 refs + 1 lien Partie5 v1.2→v1.3)
+- ✅ `AF_Partie-07_Interface_IHM_v1.2.md` (1 ref `ST_SyncHMI`)
 
 **Conformité** : Toutes les occurrences documentées par D99 ont été corrigées. Polarité systématiquement inversée : `OverrideSync=TRUE` (synchro désactivée) → `SyncEnable=FALSE` (synchro désactivée). Défaut IHM aussi mis à jour (ancien défaut `FALSE` pour case «Override» → nouveau défaut `TRUE` pour case «Synchro active»).
+
+---
+
+## 🚀 41. Note TBD — Montée en charge et temporisation frein (2026-07-08)
+
+**Contexte & vigilance métier** : Retour utilisateur identifié lors d'une discussion mise en service — **phase critique de remontée chargée** (après récupération de charge en descente, puis inversion de consigne joystick). Le poids de la charge peut créer un **effet entraînant mécanique** qui contredise les hypothèses sous-jacentes à la séquence de frein actuelle (`FB_Brake.st` §3 : temporisations fixes `DelayMagnetise`/`DelayMotorDecel`).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D101 | **Ajout note d'investigation — Montée en charge & frein (v1.8)** | Note documentaire ajoutée à `AF_Partie-09_Fonction_Winch_v1.8.md` §4undecies (nouvelle sous-section après §4decies). **Pas de correction de code**, juste identification de **point de vigilance** à tracker pour essais de charge/mise en service complète. Trois paramètres à valider terrain : (1) délai magnétisation suffisant pour transférer charge au moteur sans à-coup ; (2) délai décélération suffisant pour que moteur arrête avant serrage frein ; (3) aucun rebondissement/glissement frein en transition charge-neutre. **Scope complet de refactoring (si besoin)** : possibilité d'ajuster temporisations fixes ou refonte du modèle séquentiel — **déterminé par REX terrain**, non assumé d'avance. Archive v1.7 conservée pour traçabilité historique. Référence croisée mise à jour dans `CLAUDE.md` (pointer v1.8 au lieu de v1.7). |
+
+**Fichiers modifiés (documentation)** :
+- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.8.md` (NOUVEAU, contient note §4undecies)
+- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.8.md` (header mis à jour, v1.7→v1.8)
+- ✅ `CLAUDE.md` (1 référence Partie9 v1.7→v1.8)
+- ✅ `AUDIT` (ce §41, nouvelle entrée)
+
+**Traçabilité** : Essais de charge recommandés **avant** déploiement en production — surtout tester le scénario « plongée + récupération + extraction sous charge » pour observer le comportement du frein en transition et valider que les temporisations couvrent l'effet entraînant mécanique de la charge. Point de vigilance, **pas un bug confirmé aujourd'hui**.
+
+---
+
+## 🚀 42. Renommage documentation — tri alphabétique `AF_Partie-0N` (2026-07-08)
+
+**Contexte** : Amélioration lisibilité GitHub (tri lexicographique, problème avec Partie1/Partie10/Partie2 qui se mélangent).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D102 | **Renommage 13 fichiers AF_PartieN en AF_Partie-0N** | Tous les fichiers de documentation `AF_PartieN_...vX.Y.md` renommés avec numérotation zéro-paddée sur 2 chiffres (`AF_Partie-01_...` à `AF_Partie-13_...`) pour assurer un tri alphabétique correct dans GitHub. **Format du renommage strict** : `AF_PartieN_SUFFIX_vX.Y.md` → `AF_Partie-0N_SUFFIX_vX.Y.md` (N ≤ 9) ou `AF_Partie-NN_SUFFIX_vX.Y.md` (N ≥ 10). Aucune modification de contenu des fichiers — renommage pur. |
+
+**Fichiers renommés (13 fichiers, via `git mv`)** :
+- `AF_Partie1_Analyse_Fonctionnelle_v1.5.md` → `AF_Partie-01_Analyse_Fonctionnelle_v1.5.md`
+- `AF_Partie2_Architecture_Programme_v2.10.md` → `AF_Partie-02_Architecture_Programme_v2.10.md`
+- `AF_Partie3_Template_FB_Commun_v1.3.md` → `AF_Partie-03_Template_FB_Commun_v1.3.md`
+- `AF_Partie4_Cycle_Sequenceur_v1.2.md` → `AF_Partie-04_Cycle_Sequenceur_v1.2.md`
+- `AF_Partie5_Modes_Maintenance_v1.3.md` → `AF_Partie-05_Modes_Maintenance_v1.3.md`
+- `AF_Partie6_IO_Conditioning_v1.5.md` → `AF_Partie-06_IO_Conditioning_v1.5.md`
+- `AF_Partie7_Interface_IHM_v1.2.md` → `AF_Partie-07_Interface_IHM_v1.2.md`
+- `AF_Partie8_Fonction_Joystick_v1.2.md` → `AF_Partie-08_Fonction_Joystick_v1.2.md`
+- `AF_Partie9_Fonction_Winch_v1.8.md` → `AF_Partie-09_Fonction_Winch_v1.8.md`
+- `AF_Partie10_Fonction_Encoder_Homing_v1.7.md` → `AF_Partie-10_Fonction_Encoder_Homing_v1.7.md`
+- `AF_Partie11_Fonction_Chariot_v1.3.md` → `AF_Partie-11_Fonction_Chariot_v1.3.md`
+- `AF_Partie12_Fonction_Grappin_v1.2.md` → `AF_Partie-12_Fonction_Grappin_v1.2.md`
+- `AF_Partie13_Fonction_Simulation_v1.1.md` → `AF_Partie-13_Fonction_Simulation_v1.1.md`
+
+**Références croisées mises à jour** (sed multi-fichier, ordre : noms de fichiers d'abord, puis références avec/sans underscores) :
+- ✅ `CLAUDE.md` : 13 liens + 4 mentions de versions (ex. « Winch=Partie9 »)
+- ✅ `.claude/skills/codesys-workflow.md` : 3 liens + 1 pattern
+- ✅ `README.md` : mentions s'il y en avait (vérification complète)
+- ✅ `DOC/*.md` (les 13 fichiers eux-mêmes) : bandeaux "Dépend de", références internes (ex. « voir Partie9 §4quinquies » → « voir Partie-09 §4quinquies »)
+- ✅ `DOC/VERSION_HISTORY.md` : références historiques
+- ✅ `DOC/NAMING_CONVENTION.md` : 2 mentions (Partie3)
+
+**Audit conformité** : `grep -r "AF_Partie[0-9][^-]" DOC/*.md CLAUDE.md README.md` (recherche de format ancien sans tiret) = 0 résultat → **aucun lien cassé subsiste**.
+
+**Non affecté** : `DOC/Archives/` (versions périmées, gitignoré) — fichiers restent en format ancien (inutile de les renommer).
+
+---
