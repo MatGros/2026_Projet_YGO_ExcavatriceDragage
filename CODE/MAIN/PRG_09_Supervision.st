@@ -146,6 +146,12 @@ GVL_PERSISTENT.WinchM1RampDecelFast_Pct   := GVL_IHM.WinchM1.RampDecelFastRate;
 GVL_PERSISTENT.WinchM2RampAccelRate_Pct   := GVL_IHM.WinchM2.RampAccelRate;
 GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.WinchM2.RampDecelNormalRate;
 GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.WinchM2.RampDecelFastRate;
+// ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit : cette ligne
+// écrase GVL_PERSISTENT.WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
+// Si on change UNIQUEMENT la valeur par défaut dans GVL_PERSISTENT.st (ou ST_SyncHMI.st), ça ne
+// suffit pas : la valeur restaurée au boot (bloc §2 ci-dessus, `IF ... = 0.0 THEN`) ne s'applique
+// que si le RETAIN IHM est à 0.0 (premier démarrage) — sinon l'ancienne valeur IHM re-propage ici
+// et écrase silencieusement toute nouvelle valeur par défaut au scan suivant.
 GVL_PERSISTENT.WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
 GVL_PERSISTENT.GrappinConfig              := GVL_IHM.Grappin.Config;
 

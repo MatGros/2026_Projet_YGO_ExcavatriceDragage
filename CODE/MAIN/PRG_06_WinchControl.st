@@ -57,6 +57,9 @@ VAR
     // avec 1 scan de retard (~10ms), négligeable vu que DeltaPosM évolue progressivement, pas
     // par à-coup (même raisonnement que M1_Busy/M2_Busy sur instGrappin, voir §0).
     SyncMinorDeviation      : BOOL;
+    SyncMinorDeviationBlocksUp   : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la montée
+    SyncMinorDeviationBlocksDown : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la descente
+    M2_LimitShift                : REAL;   // 🆕 REX 2026-07-08 : décalage dynamique de la butée haute de M2
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
@@ -96,25 +99,43 @@ instGrappin(
 );
 
 // 🆕 REX 2026-07-08 (4) — Concept 1 (écart synchro mineur) : bit0 seul (écart position, hors
-// incohérence commande bit1) ne fait plus de SafeStop (fast) — bloque juste StartStop des DEUX
-// treuils → rampe de décél NORMALE. Recalage : voir SyncEnable=FALSE (MAINT_N2), procédure déjà
-// existante (mou de câble) — décocher, rattraper l'écart au joystick treuil par treuil, recocher.
+// incohérence commande bit1) ne fait plus de SafeStop (fast) — bloque StartStop → rampe de décél
+// NORMALE. Recalage : voir SyncEnable=FALSE (MAINT_N2), procédure déjà existante (mou de câble).
 SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) <> 16#0000;
+
+// 🔧 REX 2026-07-08 (5) — audit sécurité : ne bloque plus StartStop dans les 2 sens (déblocage
+// impossible sans Reset+MAINT_N2, régression terrain constatée, écart mécanique transitoire
+// normal à l'arrêt). SignedDeltaPosM > 0 = M1 plus "haut" que M2 : la montée (Direction=+1)
+// aggrave cet écart, la descente (-1) le réduit — et inversement si < 0. Seul le sens aggravant
+// reste bloqué ; Méca E (FB_Safety_Winch, écart critique 2.0m) et bit1 (incohérence commande)
+// restent le filet réel si l'écart continue de dériver malgré cette autorisation directionnelle.
+// 🆕 REX 2026-07-08 (6) : gate global SyncSoftStopEnable — FALSE (défaut) = ces 2 sorties
+// restent FALSE en permanence (bit0 déjà géré en SafeStop fast classique ci-dessus, §5bis) ;
+// TRUE = active le blocage directionnel (nouvelle fonctionnalité, opt-in).
+SyncMinorDeviationBlocksUp   := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0);
+SyncMinorDeviationBlocksDown := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
-    M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop;
+    // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche (bug trouvé en
+    // review code), le cycle auto pouvait aggraver un écart mineur sans aucune protection quand
+    // SyncSoftStopEnable=TRUE. Ajouté ici, symétrique à la branche manuelle ci-dessous.
     M1_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM1_Direction;
+    M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop
+                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
+                                 OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
     M1_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
 ELSE
     // 🔧 REX 2026-07-08 : + AND DeadmanArmed — NOT Busy seul insuffisant (rampe joystick met du
     // temps à redescendre à 0 après désarmement homme-mort ⇒ StartStop reste TRUE le temps de la
     // décél, M1 bougeait/frein décollait à la fin d'un cycle grappin). DeadmanArmed reste FALSE
     // en continu jusqu'au repassage neutre + réappui, sans dépendre du temps de rampe.
+    // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (nécessaire pour le gate directionnel ci-dessous).
+    M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
     M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy
                             AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                            AND NOT SyncMinorDeviation; // 🆕 REX 2026-07-08 (4)
-    M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
+                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
+                                 OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
     M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
 END_IF;
 
@@ -125,15 +146,27 @@ IF instGrappin.Busy THEN
     M2_SpeedRef_Active  := 15.0; // Vitesse lente forcée pour fermeture grappin
 ELSE
     IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
-        M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop;
+        // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche, ajouté
+        // symétrique à la branche manuelle ci-dessous (signe M2, voir note ci-dessous).
         M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
+        M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop
+                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
+                                     OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
     ELSE
         // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
+        // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (gate directionnel)
+        // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (review code) : signe inversé pour M2. SignedDeltaPosM
+        // (référentiel M1 : CablePosM1-CablePosM2+Offset) > 0 signifie M1 en avance — pour RATTRAPER,
+        // M2 doit MONTER (+1), pas descendre. Donc BlocksUp (écart M1-en-avance) doit bloquer côté M2
+        // le sens qui AGGRAVE, c-à-d Direction=-1 (descendre, M2 prend encore plus de retard) — PAS
+        // Direction=+1 (monter, qui RATTRAPE). Symétrique inversé par rapport à M1 (qui utilise +1/-1
+        // directement car SignedDeltaPosM est déjà dans SON référentiel).
+        M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
         M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                                 AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                                AND NOT SyncMinorDeviation; // 🆕 REX 2026-07-08 (4)
-        M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
+                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
+                                     OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1))); // 🔧 REX 2026-07-08 (7)
         M2_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
     END_IF;
 END_IF;
@@ -240,11 +273,16 @@ END_IF;
 // 🔧 REX 2026-07-08 (4) : instWinchSync.Error (bit0+bit1) → SEUL bit1 (incohérence commande,
 // grave) reste ici en SafeStop fast. Bit0 (écart mineur) → arrêt rampe normale via StartStop
 // (voir SyncMinorDeviation, §1/§2 plus haut) — Concept 1, ne pas dégrader le comportement voulu.
+// 🆕 REX 2026-07-08 (6) : GVL_PERSISTENT.SyncSoftStopEnable=FALSE (défaut) → comportement D'AVANT,
+// bit0 réintégré ici en SafeStop fast classique comme n'importe quel autre défaut winch. TRUE →
+// bit0 exclu d'ici, géré exclusivement par le gate directionnel StartStop (§1/§2).
 SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
+                       OR (NOT GVL_PERSISTENT.SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000))
                        OR instGrappin.M1SlipDetected;
 SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
-                       OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
+                       OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
+                       OR (NOT GVL_PERSISTENT.SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000));
 
 ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
                        OR (GVL_PERSISTENT.LimitLegalEnabled
@@ -273,14 +311,20 @@ ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM1_M - GVL_PERSISTENT.WinchTopStopMarginM))
                            AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
+// 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
+// La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le grappin est fermé (IsClosed)
+// ou en cours de fermeture (CloseReq). Sinon (grappin ouvert/en cours d'ouverture), M2 doit
+// s'arrêter à la butée normale de 12.00m (HomingTargetM2_M - margin) pour s'arrêter proprement en même temps que M1.
+M2_LimitShift := SEL(GVL_PERSISTENT.GrappinState.IsClosed OR instGrappin.CloseReq, 0.0, GVL_PERSISTENT.GrappinConfig.OffsetCloseM);
+
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (GVL_PERSISTENT.HomingTargetM2_M + GVL_PERSISTENT.GrappinConfig.OffsetCloseM)))
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift)))
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
-                                (GVL_PERSISTENT.HomingTargetM2_M + GVL_PERSISTENT.GrappinConfig.OffsetCloseM - GVL_PERSISTENT.WinchTopStopMarginM))
+                                (GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift - GVL_PERSISTENT.WinchTopStopMarginM))
                            AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
@@ -344,7 +388,7 @@ instWinchM2(
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M + GVL_PERSISTENT.GrappinConfig.OffsetCloseM,
+    TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
     SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct

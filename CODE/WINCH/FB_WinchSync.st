@@ -17,6 +17,20 @@
    🔴 HORS PÉRIMÈTRE CE LOT : régulation/correction active de l'écart (nécessiterait une
       entrée de correction sur FB_Winch, pas encore conçue) — squelette de surveillance
       uniquement, comme demandé (« même s'il n'est pas complet à l'intérieur »).
+
+   🔧 REX 2026-07-08 (5) — incident terrain : écart mineur transitoire (0.24m, mécanique,
+      coast-down différentiel M1/M2 à l'arrêt réel — normal et inévitable) déclenchait bit0
+      et bloquait le mouvement dans les DEUX sens (régression, déblocage possible seulement
+      via Reset+MAINT_N2+SyncEnable=FALSE). Root cause : phénomène mécanique, pas un bug du
+      couplage croisé logiciel (bit1). Deux correctifs :
+      1) `SignedDeltaPosM` (nouvelle sortie, calculé AVANT le ABS() de `DeltaPosM`) : signe
+         positif = M1 "plus haut" que M2, négatif = M2 plus haut. Consommé par PRG_06 pour
+         arbitrer DIRECTIONNELLEMENT le blocage bit0 — seul le sens qui AGGRAVE l'écart reste
+         bloqué, l'autre sens (qui le réduit) reste autorisé. Méca E (FB_Safety_Winch, écart
+         critique 2.0m) et bit1 restent le filet réel si l'écart continue de dériver.
+      2) Filtre temporel `DeviationTimer` (même pattern que `MismatchTimer` bit1) sur bit0,
+         800ms 🔧 théorique à ajuster sur site — absorbe le transitoire mécanique normal
+         d'arrêt (~900ms de temporisations frein cumulées M1+M2).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_WinchSync) ===
@@ -58,6 +72,7 @@ VAR_OUTPUT
     State           : E_State;
     StateAtError    : E_State;
     DeltaPosM       : REAL;        // |CablePosM1 - CablePosM2|, 0.0 si pas les 2 homés
+    SignedDeltaPosM : REAL;        // 🆕 REX 2026-07-08 (5) : signé, > 0 = M1 plus haut que M2 — pour arbitrage directionnel PRG_06
     SyncActive      : BOOL;        // Surveillance imposée/activable selon Mode (voir en-tête)
     SyncWarn        : BOOL;        // ⚠️ Avertissement IHM uniquement (Partie5 §6) — PAS de SafeStop
 END_VAR
@@ -66,6 +81,8 @@ VAR
     ErrorEdge       : R_TRIG;
     MismatchActive  : BOOL;        // 🆕 Indique une discordance active de commande
     MismatchTimer   : TON;         // 🆕 Filtre temporel pour éviter les faux déclenchements transitoires
+    DeviationActive : BOOL;        // 🆕 REX 2026-07-08 (5) : écart hors tolérance actif (avant filtre)
+    DeviationTimer  : TON;         // 🆕 REX 2026-07-08 (5) : filtre temporel bit0, même pattern que MismatchTimer
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
@@ -100,15 +117,22 @@ END_CASE;
 
 // 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
 IF HomedM1 AND HomedM2 THEN
-    DeltaPosM := ABS(CablePosM1 - CablePosM2 + ActiveOffsetM);
+    SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
+    DeltaPosM := ABS(SignedDeltaPosM);
 ELSE
+    SignedDeltaPosM := 0.0;
     DeltaPosM := 0.0;
 END_IF;
 
 // 🔍 5. DÉTECTION ÉCART HORS TOLÉRANCE — bit0
-IF SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > SyncToleranceM) THEN
+// 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
+// transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2), évite le blocage
+// intempestif constaté sur incident terrain (0.24m transitoire).
+DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > SyncToleranceM);
+DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
+IF DeviationTimer.Q THEN
     ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
+ELSIF ResetEdge.Q AND NOT DeviationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
