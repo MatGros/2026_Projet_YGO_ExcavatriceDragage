@@ -109,7 +109,8 @@ END_IF;
 
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
-    Enable          := NOT PRG_04_Modes.instModes.OverrideSync AND NOT instGrappin.Busy,
+    Enable          := NOT PRG_04_Modes.instModes.OverrideSync AND NOT instGrappin.Busy
+                        AND NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : évite un faux défaut synchro pendant un test treuil seul
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     Mode            := PRG_04_Modes.instModes.Mode,
@@ -210,18 +211,20 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // M1/M2 que le capteur physique (sinon un treuil qui atteint la limite une fraction de seconde
 // avant l'autre crée un écart RelayFwdM1<>RelayFwdM2 qui déclenche à tort le défaut FB_WinchSync
 // bit1 "incohérence de commande" — REX terrain 2026-07-08, testé et corrigé).
-// INHIBÉ en MAINT_N2 (référencement codeur : FB_Encoder_Homing n'exige déjà pas la confirmation du
-// capteur physique dans ce mode — autorise à remonter manuellement au-delà, jusqu'au capteur).
+// 🔧 REX 2026-07-08 (2) : bypass corrigé, retour terrain — l'ancien test "Mode<>MAINT_N2" seul
+// désactivait cet arrêt pour N'IMPORTE QUELLE opération N2 (pas seulement en préparation d'un
+// homing), sans qu'aucun bit dédié ne soit requis. Remplacé par `OverrideTopStop` (FB_Modes,
+// même pattern qu'OverrideSync) : nécessite MAINT_N2 ET une case IHM activée consciemment.
 ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM1.Homed
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM1_M - GVL_PERSISTENT.WinchTopStopMarginM))
-                           AND (PRG_04_Modes.instModes.Mode <> E_Mode.MAINT_N2));
+                           AND NOT PRG_04_Modes.instModes.OverrideTopStop);
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
                                 (GVL_PERSISTENT.HomingTargetM2_M - GVL_PERSISTENT.WinchTopStopMarginM))
-                           AND (PRG_04_Modes.instModes.Mode <> E_Mode.MAINT_N2));
+                           AND NOT PRG_04_Modes.instModes.OverrideTopStop);
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -232,7 +235,7 @@ ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND F
 
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
-    Enable                  := StubMachineEnableN1,
+    Enable                  := StubMachineEnableN1 AND NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
@@ -260,7 +263,7 @@ instWinchM1(
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
 instWinchM2(
-    Enable                  := StubMachineEnableN1,
+    Enable                  := StubMachineEnableN1 AND NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,

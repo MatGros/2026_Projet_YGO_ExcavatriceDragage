@@ -10,7 +10,8 @@
       de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
       (forcer `RawButton` en instance CODESYS) pour armer — comportement
       métier testé pour de vrai, pas contourné.
-   📥 Enable        : simulation active (SimulationModeActive AND NOT Joystick_IsReal)
+   📥 Enable        : simulation active (SimulationModeActive AND NOT JoystickSignal_IsReal) — 🔧 REX
+      2026-07-08 : granularité séparée du bus CANopen (Joystick_IsReal, voir GVL_Simulation)
    📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.JoystickForceNeutralRaw)
    📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.JoystickForceMaxRaw)
    📤 RawX/RawY     : forçables en instance CODESYS (par défaut = NeutralRaw, repos)

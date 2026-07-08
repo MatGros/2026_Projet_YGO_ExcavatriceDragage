@@ -80,6 +80,9 @@ VAR
     M1BrakeFeedback_Simulated           : BOOL;
     M2_FwdRevSpeedFeedbackOff_Simulated : BOOL;
     M2BrakeFeedback_Simulated           : BOOL;
+
+    // 🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)
+    SimTopSensorTriggered                : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
@@ -110,7 +113,15 @@ EmergencyChain := instEmergencyChain.State;
 instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal), FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
 
-instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal), FilterTime := T#20MS);
+// 🆕 REX 2026-07-08 (4) : cohérence simulation (demande utilisateur) — l'ancien câblage forçait
+// TopPositionSensor à TOUJOURS TRUE (sain) en simulation, quelle que soit la position codeur :
+// impossible de tester bit5/Méca D (capteur haut) en simulation, il ne se déclenchait JAMAIS.
+// Dérivé désormais de la position M1 simulée (référence de l'ensemble, voir FB_Grappin/
+// ActiveOffsetM) — 1 cycle de retard (PRG_00 avant PRG_02 dans l'ordre de tâche), négligeable,
+// même principe déjà assumé ailleurs (EncoderFaultPresent, GrappinHoldStillActive).
+SimTopSensorTriggered := PRG_02_Encoders.instHomingM1.Homed
+                        AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M);
+instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
 TopPositionSensor := instTopPositionSensor.State;
 
 instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.PhaseRotationOk_IsReal), FilterTime := T#20MS);

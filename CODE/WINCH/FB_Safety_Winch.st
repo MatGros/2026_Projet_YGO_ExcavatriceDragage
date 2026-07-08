@@ -76,6 +76,27 @@
         raisonnement — la perte du retour thermique moteur M1/M2 est traitée à l'identique du
         thermique frein (défense en profondeur, demande explicite utilisateur), donc ajoutée au
         masque `PowerCutOff` en plus du masque `SafeStop` (déjà présente).
+   🔧 REX 2026-07-08 (audit + demande utilisateur, factorisation/renforcement Méca A/B/C) :
+      - **Méca A et Méca C factorisés** via la nouvelle brique réutilisable `FB_DriftGuard`
+        (`CODE/WINCH/` — seul consommateur réel à ce jour, pas `_COMMON` : voir bandeau du FB) :
+        les deux partageaient ~15 lignes identiques (armement + capture position référence +
+        calcul dérive) — remplacé par 2 instances (`DriftGuardA`/`DriftGuardC`), comportement
+        strictement inchangé. Méca A garde son propre check vitesse en plus (câblé en OR, hors
+        périmètre de la brique). `MecaADriftM`/`MecaCDriftM`/`MecaBElapsedTime` exposés en sortie
+        pour diagnostic/réglage tolérances côté IHM (voir §6 mapping).
+      - **Méca B étendu au frein** : vérifiait uniquement `FwdRevSpeedFeedbackOff` (contacteurs)
+        sous `PostRampTimeout` — `BrakeFeedback` (frein) ajouté à la même condition. Un frein qui
+        ne confirme pas son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui
+        ne retombe pas (risque de mouvement/roue libre non détecté).
+   🆕 REX 2026-07-08 (3) — MÉCA D (bit11), demande utilisateur (retour terrain test banc) :
+      modèle à 3 couches en fonctionnement NORMAL (hors référencement) à l'approche du capteur
+      haut : (1) ~arrêt rampé normal à `HomingTargetMx_M - WinchTopStopMarginM` (voir
+      `PRG_06_WinchControl.st`, gardé par `OverrideTopStop` désormais — REX 2026-07-08 (2)) ;
+      (2) coupure immédiate `ForbidAscent` si le capteur physique est réellement atteint (bit5,
+      déjà existant) ; (3) **Méca D** : si malgré la coupure (2), les contacteurs ET le frein ne
+      confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
+      même motif exact que Méca B (`TonMecaD`, même vérification), juste une condition d'armement
+      différente (capteur haut atteint hors référencement, au lieu de perte commande opérateur).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
@@ -114,13 +135,19 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si OverrideSync) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff)
+    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si OverrideSync) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3))
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4 (mou câble inclus SAUF si OverrideSync)
+    SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si OverrideSync)
     ForbidDescent       : BOOL;        // ⬇️ Interdit descente uniquement — bit6 (limite basse câble)
     ForbidAscent        : BOOL;        // ⬆️ Interdit montée uniquement — bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble)
-    PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont (FALSE, TBD ce lot)
+    PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
+
+    // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
+    // par l'IHM pour la mise en service (voir PRG_09_Supervision, GVL_IHM.WinchM1/M2)
+    MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
+    MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, grappin M1) — réglage GrappinSlipToleranceM
+    MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -130,16 +157,17 @@ VAR
     CycleTimeCalc       : FB_CycleTime;
     LastCablePosM       : REAL;
     MeasuredSpeedMps    : REAL;
-    MecaA_Armed         : BOOL;
-    MecaA_RefPosM       : REAL;
+    DriftGuardA         : FB_DriftGuard;   // 🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)
 
     // 🔧 REX 2026-07-07 — Méca B (bit8)
     MecaB_NoOperatorCmd : BOOL;         // (perte CAN joystick) OU (joystick au neutre)
     TonMecaB            : TON;
 
+    // 🆕 REX 2026-07-08 (3) — Méca D (bit11) : arrivée capteur haut hors référencement
+    TonMecaD            : TON;
+
     // 🔧 REX 2026-07-07 — Méca C (bit9, escalade)
-    MecaC_Armed         : BOOL;
-    MecaC_RefPosM       : REAL;
+    DriftGuardC         : FB_DriftGuard;   // 🔧 REX 2026-07-08 : factorise Méca C (remplace MecaC_Armed/MecaC_RefPosM)
 
     // Transition référencement
     LastInReferencingMode : BOOL;
@@ -154,8 +182,10 @@ IF NOT Enable THEN
     ForbidDescent := TRUE;
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
-    MecaA_Armed := FALSE;
-    MecaC_Armed := FALSE;
+    // 🔧 REX 2026-07-08 : force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement
+    // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
+    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := GrappinSlipToleranceM);
     RETURN;
 END_IF;
 
@@ -166,15 +196,15 @@ CycleTimeCalc(DefaultValueS := 0.010); // 🔧 REX 2026-07-07 — Méca A
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
     LastCablePosM := CablePosM;
-    MecaA_Armed := FALSE;
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
 END_IF;
 LastInReferencingMode := InReferencingMode;
 
 // Si le contacteur de puissance est ouvert (EmergencyStopOk = FALSE), on force les sorties de sécurité
 // mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
 IF NOT EmergencyStopOk THEN
-    MecaA_Armed := FALSE;
-    MecaC_Armed := FALSE;
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
+    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := GrappinSlipToleranceM);       // 🔧 REX 2026-07-08
     LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
 END_IF;
 
@@ -244,20 +274,19 @@ END_IF;
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
 // Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
+// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (_COMMON) — comportement inchangé,
+// seul le check vitesse (MeasuredSpeedMps) reste géré ici (hors périmètre de la brique).
 MeasuredSpeedMps := ABS(CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
 LastCablePosM := CablePosM;
 
-IF FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode THEN
-    IF NOT MecaA_Armed THEN
-        MecaA_Armed := TRUE;
-        MecaA_RefPosM := CablePosM;   // Référence prise au moment de l'armement
-    END_IF;
-ELSE
-    MecaA_Armed := FALSE;
-END_IF;
+DriftGuardA(
+    Arm        := FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
+    PositionM  := CablePosM,
+    ToleranceM := UncommandedDriftToleranceM
+);
+MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
-IF MecaA_Armed AND ((MeasuredSpeedMps > UncommandedSpeedThresholdMps)
-                     OR (ABS(CablePosM - MecaA_RefPosM) > UncommandedDriftToleranceM)) THEN
+IF DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps)) THEN
     ErrorId := ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
@@ -265,9 +294,13 @@ END_IF;
 
 // 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR (REX 2026-07-07) — bit8
 // Indépendant de FB_Winch (défense en profondeur). Perte CAN (bit0) OU joystick au neutre ;
-// si les contacteurs ne confirment pas être retombés dans PostRampTimeout, défaut.
+// si les contacteurs OU LE FREIN ne confirment pas être retombés/serrés dans PostRampTimeout, défaut.
+// 🔧 REX 2026-07-08 (demande utilisateur) : BrakeFeedback ajouté — un frein qui ne confirme pas
+// son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui ne retombe pas
+// (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational) OR JoystickYNeutral;
-TonMecaB(IN := MecaB_NoOperatorCmd AND NOT FwdRevSpeedFeedbackOff, PT := PostRampTimeout);
+TonMecaB(IN := MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
+MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
 IF TonMecaB.Q THEN
     ErrorId := ErrorId OR 16#0100;
 ELSIF ResetEdge.Q THEN
@@ -278,16 +311,15 @@ END_IF;
 // Armé UNIQUEMENT pour l'instance M1 (GrappinHoldStillActive câblé sur instGrappin.Busy côté M1
 // seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Grappin (1.0 m) —
 // n'intervient que si la couche Grappin (SafeStop M1 seul) n'a pas suffi.
-IF GrappinHoldStillActive THEN
-    IF NOT MecaC_Armed THEN
-        MecaC_Armed := TRUE;
-        MecaC_RefPosM := CablePosM;
-    END_IF;
-ELSE
-    MecaC_Armed := FALSE;
-END_IF;
+// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé.
+DriftGuardC(
+    Arm        := GrappinHoldStillActive,
+    PositionM  := CablePosM,
+    ToleranceM := GrappinSlipToleranceM
+);
+MecaCDriftM := DriftGuardC.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
-IF MecaC_Armed AND (ABS(CablePosM - MecaC_RefPosM) > GrappinSlipToleranceM) THEN
+IF DriftGuardC.Violation THEN
     ErrorId := ErrorId OR 16#0200;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FDFF;
@@ -303,6 +335,20 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FBFF;
 END_IF;
 
+// 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT (REX 2026-07-08 (3),
+// demande utilisateur) — bit11
+// Complète le bit5 (ForbidAscent immédiat) : arme la MÊME condition (capteur haut atteint, hors
+// homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
+// confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
+// → SafeStop ET PowerCutOff (la coupure ForbidAscent seule n'a visiblement pas suffi à arrêter
+// réellement le treuil : roue libre ou contacteur/frein défaillant).
+TonMecaD(IN := (NOT TopPositionSensor AND NOT InReferencingMode) AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
+IF TonMecaD.Q THEN
+    ErrorId := ErrorId OR 16#0800;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#F7FF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -311,13 +357,14 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
-// (Méca A/B/C) + 10 (🆕 REX 2026-07-08 : thermique frein commun) ou si contacteur coupé
+// (Méca A/B/C) + 10 (thermique frein commun) + 11 (🆕 REX 2026-07-08 (3) : Méca D, capteur haut
+// non confirmé arrêté) ou si contacteur coupé
 IF NOT EmergencyStopOk THEN
     SafeStop := TRUE;
 ELSIF OverrideSync THEN
-    SafeStop := (ErrorId AND 16#0797) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (ErrorId AND 16#0F97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#079F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (ErrorId AND 16#0F9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
@@ -335,7 +382,10 @@ ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
 // instantanément sur perte de son retour thermique : une rampe SafeStop seule ne protège pas la
 // mécanique dans ce cas, coupure puissance immédiate nécessaire. Même raisonnement appliqué au
 // thermique moteur par cohérence/défense en profondeur (demande explicite).
-PowerCutOff := (ErrorId AND 16#0784) <> 16#0000;
+// 🆕 REX 2026-07-08 (3) : bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B :
+// contacteurs/frein déjà censés être coupés (ForbidAscent immédiat sur capteur), une confirmation
+// manquante après délai signifie que la coupure locale n'a pas suffi.
+PowerCutOff := (ErrorId AND 16#0F84) <> 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)
 Busy := FALSE;
