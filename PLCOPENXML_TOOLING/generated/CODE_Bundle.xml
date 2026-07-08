@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.208802" />
-  <contentHeader name="MGS_v0.4.1_SimNoHardware-SyncUpdate.project" modificationDateTime="2026-07-04T06:07:15.208802">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-04T06:07:15.208802">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.1_SimNoHardware-SyncUpdate</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1226,6 +1226,161 @@
    🚦 ST_GrappinState — État mémorisé et diagnostic du grappin
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.0.md §4.B
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IHM_MANU">
+        <baseType>
+          <struct>
+            <variable name="PositionM_M1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M1 — Holding / Retenue
+📊 [m] Position brute du treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M1 (Relais forward + Frein desserré) — ⚠️ Interlock M1_RelayRev requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M1 (Relais reverse + Frein desserré) — ⚠️ Interlock M1_RelayFwd requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionM_M2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M2 — Closing / Fermeture
+📊 [m] Position brute du treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M2 (Relais forward + Frein desserré) — ⚠️ Interlock M2_RelayRev requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M2 (Relais reverse + Frein desserré) — ⚠️ Interlock M2_RelayFwd requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande Couplée M1 + M2 (Mouvement Synchrone)
+🔗 Commande montée simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayRev requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande descente simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayFwd requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_Contactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 1 : Contacteur de vitesse K1 pour M1 et M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_Contactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 2 : Contacteur de vitesse K2 pour M1 et M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_Contactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 3 : Contacteur de vitesse K3 pour M1 et M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_Contactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 4 : Contacteur de vitesse K4 pour M1 et M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Variateur Chariot M3 (AC600)
+↔️ Marche avant M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayRev requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Marche arrière M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayFwd requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_FreqSetpoint">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 [Hz] Consigne de fréquence (ex: 50.0Hz envoie la valeur 5000 sans mot de commande)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_FreqActual">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 [Hz] Fréquence réelle lue (ex: 50.0Hz correspond à la valeur 5000)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>aa605808-33c6-5f61-aa7b-b33b5fd12b1b</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌐 ST_IHM_MANU — Table d'échange IHM provisoire pour mise en service
+   ───────────────────────────────────────────────────────────────
+   ⚙️ Permet le pilotage manuel direct des sorties physiques (contacteurs, 
+      relais, freins, mots de commande variateurs) en mode dégradé 
+      pour la mise en service des treuils M1/M2 et du chariot M3.
+   ⚠️ Avertissement : Ce mode désactive les sécurités normales et les interlocks
+      logiciels standards. Les interlocks de sécurité de base (ex: Fwd vs Rev)
+      doivent être gérés directement dans le code d'activation de secours.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -14761,7 +14916,23 @@ END_IF;
             <derived name="ST_CommonHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="IHM_MANU">
+          <type>
+            <derived name="ST_IHM_MANU" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ Variables d'échange IHM provisoires pour pilotage manuel direct (Secours)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="HmiInitDone">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -15251,6 +15422,7 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="ST_CommonHMI" ObjectId="cfa66972-2233-53b1-9281-aff4fc557e01" />
           <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
           <Object Name="ST_GrappinHMI" ObjectId="44a0d7f9-1572-5144-85ea-029528b91e4b" />
+          <Object Name="ST_IHM_MANU" ObjectId="aa605808-33c6-5f61-aa7b-b33b5fd12b1b" />
           <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
           <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
           <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
