@@ -180,7 +180,6 @@ END_IF;
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
-   AND HomedM1 AND HomedM2
    AND NOT M1_Busy AND NOT M2_Busy THEN
     GrappinState.IsOpen := TRUE;
     GrappinState.IsClosed := FALSE;
@@ -197,7 +196,6 @@ END_IF;
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
-   AND HomedM1 AND HomedM2
    AND NOT M1_Busy AND NOT M2_Busy THEN
     GrappinState.IsOpen := FALSE;
     GrappinState.IsClosed := TRUE;

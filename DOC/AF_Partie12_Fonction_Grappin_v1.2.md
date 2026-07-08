@@ -228,10 +228,11 @@ document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Gra
    validé** dans `CODE/GRAPPIN/FB_Grappin.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
    également aucune nouvelle recopie manuelle requise ce lot.
 6. 🆕 **v1.3 (2026-07-08, Inhibition)** : Le bloc grappin est activé si le treuil M2 n'est pas inhibé, et que les deux codeurs de position M1 et M2 sont disponibles / en bonne santé (`Enable := NOT InhibitM2 AND EncoderAbsM1.EncoderAvailable AND EncoderAbsM2.EncoderAvailable` dans `PRG_06_WinchControl.st`). Si seul M1 (retenue) est inhibé, le grappin reste manœuvrable puisque seul M2 se déplace pour ouvrir ou fermer (M1 restant verrouillé au frein). Cependant, le codeur M1 doit obligatoirement être disponible et référencé (`HomedM1 = TRUE`) pour permettre le calcul de fin de course du grappin ; dans le cas contraire, le grappin est bloqué en sécurité. De plus, si M1 est inhibé, la surveillance de glissement de M1 pendant le mouvement (`M1SlipDetected`, bit 4 de `ErrorId`) est automatiquement désactivée pour éviter tout déclenchement intempestif dû à des fluctuations ou une isolation de l'axe M1.
-7. 🆕 **v1.3 (2026-07-08, Référencement)** : Deux boutons de référencement manuel sont prévus pour la mise en service du grappin à l'arrêt :
+7. 🆕 **v1.3 (2026-07-08, Référencement)** : Deux boutons de référencement manuel sont prévus pour la mise en service du grappin à l'arrêt. Pour simplifier les essais, ces commandes sont autorisées même si les codeurs de treuils M1/M2 ne sont pas encore référencés (`HomedM1/M2 = FALSE`) :
    * **`ConfirmOpenPosition`** (grappin ouvert de visu) : Force `IsOpen := TRUE`, `IsClosed := FALSE`, initialise `LastPosM2Open := CablePosM2`, et calcule la position fermée théorique `LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM`.
    * **`ConfirmClosePosition`** (grappin fermé de visu) : Force `IsOpen := FALSE`, `IsClosed := TRUE`, initialise `LastPosM2Close := CablePosM2`, et calcule la position ouverte théorique `LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM`.
    Ces deux commandes effacent complètement les défauts du grappin (`ErrorId := 16#0000`) et recalent l'état mécanique sans exiger d'acquittement machine supplémentaire.
+   *(Note : si les treuils ne sont pas homés, le défaut permanent bit 3 `16#0008` reviendra au scan suivant, mais la réinitialisation des variables persistantes de calibrage de boot aura bien été effectuée).*
 
 ---
 
