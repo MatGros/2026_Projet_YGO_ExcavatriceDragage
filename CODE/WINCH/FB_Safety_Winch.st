@@ -156,6 +156,12 @@ VAR_INPUT
     GrappinBusy             : BOOL;         // instGrappin.Busy (les 2 instances) — suppression pendant
                                              // le trajet actif (écart transitoire normal, pas un défaut)
     CriticalSyncToleranceM  : REAL := 2.0;  // 🔧 Méca E — théorique, à ajuster sur site
+    // 🆕 REX 2026-07-08 (7) : retour terrain — InhibitM1 côté instance M1 (Enable global) ne suffit
+    // pas : si c'est l'AUTRE treuil qui est inhibé (ex. M2 en maintenance), M1 continue de comparer
+    // sa position à ExpectedOtherWinchPosM (calculé depuis la position figée de M2) — écart croît
+    // sans borne pendant que M1 travaille seul normalement → faux Méca E. Croisé (M2 côté instance
+    // M1, M1 côté instance M2), même principe que ExpectedOtherWinchPosM.
+    OtherWinchInhibited     : BOOL;         // Inhibition de l'AUTRE treuil (mise en service N2)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -389,10 +395,11 @@ END_IF;
 // Couche INDÉPENDANTE de FB_WinchSync (écart mineur, 1er niveau) — défense en profondeur pour un
 // écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l'offset grappin actif par
 // l'appelant : comparaison directe valable que le grappin soit ouvert, fermé, ou absent du calcul.
-// Suppression pendant GrappinBusy (trajet actif = écart transitoire normal, pas un défaut) et
-// InReferencingMode (position pas fiable pendant homing).
+// Suppression pendant GrappinBusy (trajet actif = écart transitoire normal, pas un défaut),
+// InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (🆕 REX
+// 2026-07-08 (7) : l'autre treuil en maintenance a une position figée, non comparable).
 // Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
-IF SyncEnable AND NOT GrappinBusy AND NOT InReferencingMode
+IF SyncEnable AND NOT GrappinBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
    AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
     ErrorId := ErrorId OR 16#1000;
 ELSIF ResetEdge.Q THEN

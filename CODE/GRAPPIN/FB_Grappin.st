@@ -448,7 +448,12 @@ END_IF;
 // ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant le trajet entier d'une fermeture,
 // donc M2PositionCorrected = CablePosM2 brut tout du long, avec un saut brutal uniquement à
 // l'arrivée (constat terrain) au lieu de converger progressivement vers M1 pendant l'enroulage.
-IF CloseReq OR GrappinState.IsClosed THEN
+IF State = E_State.BUSY THEN
+    // 🔧 REX 2026-07-08 : pendant le déplacement, l'offset actif suit la différence réelle
+    // de câble (M2 - M1) afin que la position corrigée de M2 reste stable (égale à M1, cad la hauteur du grappin)
+    // sans à-coup, tandis que le câble brut de M2 montre son enroulement.
+    ActiveOffsetM := CablePosM2 - CablePosM1;
+ELSIF CloseReq OR GrappinState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
 ELSE
     // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert

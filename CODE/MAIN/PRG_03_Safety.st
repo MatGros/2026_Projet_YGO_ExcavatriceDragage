@@ -46,7 +46,8 @@ instSafetyWinchM1(
     // ramené dans le référentiel M1 — comparaison valable quel que soit l'état du grappin
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM,
     GrappinBusy            := PRG_06_WinchControl.instGrappin.Busy,
-    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M
+    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
+    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2 // 🆕 REX 2026-07-08 (7)
 );
 
 // 2. Sécurité Treuil M2
@@ -83,7 +84,8 @@ instSafetyWinchM2(
     // du zéro codeur. M1 corrigé de l'offset grappin actif, ramené dans le référentiel M2.
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instGrappin.ActiveOffsetM,
     GrappinBusy            := PRG_06_WinchControl.instGrappin.Busy,
-    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M
+    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
+    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
 );
 
 // 3. Sécurité Chariot M3

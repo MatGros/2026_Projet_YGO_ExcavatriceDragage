@@ -88,7 +88,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     // de devoir aussi corriger une 2e valeur absolue à la main). Commun aux 2 treuils (même
     // ensemble mécanique hissé ensemble). Bypass en MAINT_N2 (référencement codeur) pour
     // pouvoir remonter manuellement en petite vitesse au-delà, jusqu'au capteur physique.
-    WinchTopStopMarginM        : REAL := 0.5;    // 💾 Marge sous HomingTargetM1/M2_M pour l'arrêt normal (m)
+    WinchTopStopMarginM        : REAL := 0.20;   // 💾 Marge sous HomingTargetM1/M2_M pour l'arrêt normal (m) — 🔧 REX 2026-07-08 (7) : 0.5→0.20, demande utilisateur
 
     // 📏 LIMITE LÉGALE DE DRAGAGE (Nouveau 2026-07-03)
     LimitLegalDepthMinAllowed   : REAL := -15.0; // 💾 Cote min de dragage autorisée (m, négatif)
@@ -97,8 +97,17 @@ VAR_GLOBAL PERSISTENT RETAIN
     // ═══════════════════════════════════════════════════════════
     // ⚖️ SYNCHRONISATION — Tolérance d'écart M1/M2
     // ═══════════════════════════════════════════════════════════
-    WinchSyncTolerance_M : REAL := 0.10; // 💾 Écart max toléré entre M1/M2 (mètres) — réglé selon jeu mécanique
+    WinchSyncTolerance_M : REAL := 0.25; // 🔧 REX 2026-07-08 (5) : 0.10→0.25, mesuré 0.24m coast-down différentiel M1/M2 à l'arrêt réel — théorique, à ajuster sur site
     WinchCriticalSyncTolerance_M : REAL := 2.0; // 🆕 REX 2026-07-08 (4) : Méca E — écart critique, défense en profondeur (théorique)
+    // 🆕 REX 2026-07-08 (6) : bit d'activation du rattrapage directionnel (Concept 1 + fix REX(5)).
+    // FALSE (défaut, demande utilisateur explicite REX(7) : "je veux laisser à false, je veux que
+    // les treuils sync ou pas s'arrêtent à la butée logicielle 12m") : bit0 écart mineur → SafeStop
+    // rampe rapide classique — l'arrêt propre en haut de course (ForbidAscent, rampe normale) doit
+    // fonctionner SANS dépendre de ce bit, uniquement grâce au filtre/tolérance de FB_WinchSync
+    // (WinchSyncTolerance_M=0.25m + DeviationTimer 800ms) qui absorbe le transitoire mécanique normal.
+    // TRUE = active en plus le rattrapage directionnel (bit0 ne bloque QUE le sens aggravant) —
+    // fonctionnalité indépendante, NE PAS activer par défaut (choix utilisateur).
+    SyncSoftStopEnable : BOOL := FALSE; // 💾 Défaut désactivé (demande utilisateur)
 
     // ═══════════════════════════════════════════════════════════
     // 🪣 GRAPPIN — Offsets de position et état mécanique mémorisé

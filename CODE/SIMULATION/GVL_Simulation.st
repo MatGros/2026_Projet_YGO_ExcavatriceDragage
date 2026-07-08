@@ -61,7 +61,7 @@ VAR_GLOBAL
     // puisque c'est une vraie position simulée, pas un overlay — le rattrapage la résorbe réellement.
     InjectSyncDeviationM1      : BOOL := FALSE; // Front montant = applique le saut sur M1
     InjectSyncDeviationM2      : BOOL := FALSE; // Front montant = applique le saut sur M2
-    SyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.10)
+    SyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)
                                                   // pour tester Concept 1 ; > WinchCriticalSyncTolerance_M
                                                   // (2.0) pour tester Méca E
 END_VAR
