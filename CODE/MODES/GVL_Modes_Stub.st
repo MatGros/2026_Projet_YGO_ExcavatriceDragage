@@ -18,7 +18,7 @@ VAR_GLOBAL
     // 🎚️ Sélecteur mode machine — forcer directement pour tester MANUEL/MAINT_N1/MAINT_N2/SEMI_AUTO
     ModeRequest_IHM         : E_Mode := E_Mode.MAINT_N1;
 
-    // ☑️ Case à cocher opérateur — désactive la synchro M1/M2 (FB_WinchSync), UNIQUEMENT actif
-    // si Mode=MAINT_N2 (arbitré par FB_Modes.OverrideSync, voir Partie5 §2 "Logique d'override")
-    OverrideSyncRequest_IHM : BOOL := FALSE;
+    // ☑️ REX 2026-07-08 : logique inversée (positive) — coché = synchro M1/M2 ACTIVE (FB_WinchSync).
+    // Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Partie5 §2).
+    SyncEnableRequest_IHM   : BOOL := TRUE;
 END_VAR

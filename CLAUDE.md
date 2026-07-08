@@ -30,7 +30,7 @@ câble mécanique de position haute retiré de la chaîne AU matérielle, géré
 
 ### 4. **Specs détaillées**
 - **[Partie 4](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
-- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.2.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
+- **[Partie 5](DOC/AF_Partie5_Modes_Maintenance_v1.3.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
 - **[Partie 6](DOC/AF_Partie6_IO_Conditioning_v1.5.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
 - **[Partie 8](DOC/AF_Partie8_Fonction_Joystick_v1.2.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
@@ -119,7 +119,7 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie2_Architecture_Programme_v2.10.md](DOC/AF_Partie2_Architecture_Programme_v2.10.md) — Architecture détaillée (**v2.10**)
 - [AF_Partie3_Template_FB_Commun_v1.3.md](DOC/AF_Partie3_Template_FB_Commun_v1.3.md) — Contrat FB & sécurité
 - [AF_Partie4_Cycle_Sequenceur_v1.2.md](DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md) — Cycle, synchro, frein, grappin, rampes
-- [AF_Partie5_Modes_Maintenance_v1.2.md](DOC/AF_Partie5_Modes_Maintenance_v1.2.md) — Modes, maintenance N1/N2, AU, limite légale
+- [AF_Partie5_Modes_Maintenance_v1.3.md](DOC/AF_Partie5_Modes_Maintenance_v1.3.md) — Modes, maintenance N1/N2, AU, limite légale
 - [AF_Partie6_IO_Conditioning_v1.5.md](DOC/AF_Partie6_IO_Conditioning_v1.5.md) — Conditionnement E/S
 - [AF_Partie8_Fonction_Joystick_v1.2.md](DOC/AF_Partie8_Fonction_Joystick_v1.2.md) — Fonction métier Joystick (8+ = métier par FB)
 - [AF_Partie9_Fonction_Winch_v1.7.md](DOC/AF_Partie9_Fonction_Winch_v1.7.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A/B/C/D roue libre)

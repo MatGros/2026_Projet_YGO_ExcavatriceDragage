@@ -31,9 +31,10 @@ END_IF;
 PrevInhibitM1 := GVL_IHM.WinchM1.CmdInhibit;
 PrevInhibitM2 := GVL_IHM.WinchM2.CmdInhibit;
 
-// 🆕 Si l'un des treuils est inhibé, le synchronisme est désactivé par nature -> force OverrideSync à FALSE sur l'IHM
+// 🆕 Si l'un des treuils est inhibé, synchro impossible par nature -> reset case IHM à TRUE
+// (🔧 REX 2026-07-08 : polarité inversée, TRUE = état neutre "synchro voulue")
 IF GVL_IHM.WinchM1.CmdInhibit OR GVL_IHM.WinchM2.CmdInhibit THEN
-    GVL_IHM.Sync.OverrideSync := FALSE;
+    GVL_IHM.Sync.SyncEnableRequest := TRUE;
 END_IF;
 
 instModes(
@@ -41,7 +42,7 @@ instModes(
     Reset               := GVL_IHM.Modes.ModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     ModeRequest         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
-    OverrideSyncRequest := GVL_Modes_Stub.OverrideSyncRequest_IHM,
+    SyncEnableRequest   := GVL_Modes_Stub.SyncEnableRequest_IHM,
     InhibitM1Request    := GVL_IHM.WinchM1.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     InhibitM2Request    := GVL_IHM.WinchM2.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     HomingApproachEnableRequest := GVL_IHM.Common.HomingApproachEnableRequest, // 🆕 REX 2026-07-08 (2)

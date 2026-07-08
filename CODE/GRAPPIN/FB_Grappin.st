@@ -441,10 +441,16 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// Détermination de l'offset actif pour le synchronisme de FB_WinchSync
-IF GrappinState.IsClosed THEN
+// Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
+// (M2PositionCorrected, côté PRG_09_Supervision).
+// 🔧 REX 2026-07-08 : ajout de CloseReq/OpenReq (pas seulement IsClosed/IsOpen, qui sont FALSE
+// pendant TOUT le trajet depuis le REX du 2026-07-08 sur l'état transitoire) — sinon
+// ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant le trajet entier d'une fermeture,
+// donc M2PositionCorrected = CablePosM2 brut tout du long, avec un saut brutal uniquement à
+// l'arrivée (constat terrain) au lieu de converger progressivement vers M1 pendant l'enroulage.
+IF CloseReq OR GrappinState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
 ELSE
-    // Par défaut ou si ouvert, on applique l'offset ouvert
+    // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert
     ActiveOffsetM := Config.OffsetOpenM;
 END_IF;

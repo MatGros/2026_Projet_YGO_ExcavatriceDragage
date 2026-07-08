@@ -34,7 +34,7 @@ VAR
     ForbidDescentM2_Active  : BOOL;
 
     // 🔧 REX 2026-07-07 : couplage croisé M1/M2 des arrêts, UNIQUEMENT si SyncActive (mouvement
-    // coherent voulu). Hors synchro (Grappin.Busy ou OverrideSync MAINT_N2) : chaque treuil réagit
+    // coherent voulu). Hors synchro (Grappin.Busy ou SyncEnable=FALSE MAINT_N2) : chaque treuil réagit
     // à SA PROPRE limite/défaut uniquement — commande indépendante voulue dans ce cas.
     SafeStopM1_Raw          : BOOL;
     SafeStopM2_Raw          : BOOL;
@@ -46,6 +46,12 @@ VAR
     ForbidAscentM2_Raw      : BOOL;
     ForbidAscentM1_Active   : BOOL;
     ForbidAscentM2_Active   : BOOL;
+
+    // 🆕 REX 2026-07-08 : voir §2bis — coupure immédiate M1/M2 au même scan que la fin du cycle
+    // grappin (contrairement au désarmement homme-mort côté FB_Joystick, qui a 1 scan de retard
+    // structurel — PRG_01 s'exécute avant PRG_06). Corrige un bref "blip" de commande (RelayFwd/Rev
+    // + BrakeCmd clignotant) observé sur M1 à l'arrivée en position grappin.
+    GrappinBusyFallEdge     : F_TRIG;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
@@ -90,7 +96,12 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     M1_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM1_Direction;
     M1_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
 ELSE
-    M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy;
+    // 🔧 REX 2026-07-08 : + AND DeadmanArmed — NOT Busy seul insuffisant (rampe joystick met du
+    // temps à redescendre à 0 après désarmement homme-mort ⇒ StartStop reste TRUE le temps de la
+    // décél, M1 bougeait/frein décollait à la fin d'un cycle grappin). DeadmanArmed reste FALSE
+    // en continu jusqu'au repassage neutre + réappui, sans dépendre du temps de rampe.
+    M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy
+                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
     M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
     M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
 END_IF;
@@ -106,15 +117,32 @@ ELSE
         M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
         M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
     ELSE
-        M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+        // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
+        M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
+                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
         M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
         M2_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
     END_IF;
 END_IF;
 
+// ── 2bis. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE GRAPPIN ─────
+// 🆕 REX 2026-07-08 : instGrappin est appelé en premier (§0), donc son Busy est frais dans CE scan
+// (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de FB_Joystick_0 (PRG_01),
+// calculé AVANT ce scan de PRG_06. Le désarmement homme-mort sur front descendant de Grappin.Busy
+// (FB_Joystick §4ter-ter) ne prend donc effet qu'au scan SUIVANT (~10ms de retard structurel). Si
+// l'opérateur tient encore le manche poussé au moment exact où le grappin termine, M1 ET M2
+// recevaient pendant ce scan la commande manche brute (RelayFwd/Rev + BrakeCmd qui s'engage puis se
+// coupe aussitôt = "clignotement" du frein, constaté sur site). On force ici l'arrêt immédiat,
+// sans attendre le désarmement (qui reste nécessaire pour la suite : repassage au neutre exigé).
+GrappinBusyFallEdge(CLK := instGrappin.Busy);
+IF GrappinBusyFallEdge.Q THEN
+    M1_StartStop_Active := FALSE;
+    M2_StartStop_Active := FALSE;
+END_IF;
+
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
-    Enable          := NOT PRG_04_Modes.instModes.OverrideSync AND NOT instGrappin.Busy
+    Enable          := PRG_04_Modes.instModes.SyncEnable AND NOT instGrappin.Busy
                         AND NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : évite un faux défaut synchro pendant un test treuil seul
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
@@ -123,7 +151,7 @@ instWinchSync(
     CablePosM2      := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
-    OverrideSync    := PRG_04_Modes.instModes.OverrideSync,
+    SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
     SyncToleranceM  := GVL_PERSISTENT.WinchSyncTolerance_M,
     ActiveOffsetM   := instGrappin.ActiveOffsetM,
     
@@ -190,7 +218,7 @@ IF GVL_PERSISTENT.LimitLegalEnabled THEN
 END_IF;
 
 // ── 5bis. COUPLAGE CROISÉ M1/M2 — REX 2026-07-07 ────────────────────────
-// Hors synchro (Grappin.Busy ou OverrideSync N2) : chaque treuil réagit à SA PROPRE limite/
+// Hors synchro (Grappin.Busy ou SyncEnable=FALSE N2) : chaque treuil réagit à SA PROPRE limite/
 // défaut uniquement (commande indépendante voulue). En synchro (SyncActive, mouvement cohérent
 // voulu) : n'importe quel arrêt (SafeStop, limite câble, limite légale, fin de course haut) sur
 // UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
@@ -217,7 +245,7 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // avant l'autre crée un écart RelayFwdM1<>RelayFwdM2 qui déclenche à tort le défaut FB_WinchSync
 // bit1 "incohérence de commande" — REX terrain 2026-07-08, testé et corrigé).
 // homing), sans qu'aucun bit dédié ne soit requis. Remplacé par `HomingApproachEnable` (FB_Modes,
-// même pattern qu'OverrideSync) : nécessite MAINT_N2 ET une case IHM activée consciemment.
+// même pattern que SyncEnable) : nécessite MAINT_N2 ET une case IHM activée consciemment.
 ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM1.Homed
                            AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
@@ -230,11 +258,11 @@ ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= GVL_PERSISTENT.HomingTargetM2_M))
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (GVL_PERSISTENT.HomingTargetM2_M + GVL_PERSISTENT.GrappinConfig.OffsetCloseM)))
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
-                                (GVL_PERSISTENT.HomingTargetM2_M - GVL_PERSISTENT.WinchTopStopMarginM))
+                                (GVL_PERSISTENT.HomingTargetM2_M + GVL_PERSISTENT.GrappinConfig.OffsetCloseM - GVL_PERSISTENT.WinchTopStopMarginM))
                            AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
@@ -298,7 +326,7 @@ instWinchM2(
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M,
+    TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M + GVL_PERSISTENT.GrappinConfig.OffsetCloseM,
     BottomLimitM            := BottomLimitM2_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
     SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct

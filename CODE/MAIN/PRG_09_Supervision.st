@@ -20,7 +20,7 @@ END_VAR
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
-GVL_Modes_Stub.OverrideSyncRequest_IHM := GVL_IHM.Sync.OverrideSync;
+GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SyncEnableRequest; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubChariotPositionSelect_IHM          := GVL_IHM.Chariot.SelectedTargetNum;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)

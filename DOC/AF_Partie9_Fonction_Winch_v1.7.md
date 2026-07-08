@@ -2,7 +2,7 @@
 
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
-> `SafeStop` pour l'écart de position), `SyncActive` selon Mode (imposé N1, activable/désactivable N2 via `OverrideSync`
+> `SafeStop` pour l'écart de position), `SyncActive` selon Mode (imposé N1, configurable en N2 via `SyncEnable`
 > de `FB_Modes`).
 > **Contrôle de cohérence de commande intégré** : `ErrorId` bit 1 (16#0002) entraîne un `SafeStop` des deux treuils.
 > **Pas de correction/régulation active** de l'écart — `FB_Winch` n'a aucune entrée de
@@ -13,7 +13,7 @@
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
+> 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.3](AF_Partie5_Modes_Maintenance_v1.3.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
 >
 > 🆕 **v1.8 (2026-07-08)** — Lot #9-18 : Alignment and clarifications on independent cable limit descent (M1 and M2 cable limits are fully independent, using dedicated GVL_PERSISTENT and HMI variables).
 > 🆕 **v1.7 (2026-07-08)** — Lot #9-17 : Inhibition treuils, HomingApproachEnable, Méca B étendu, Méca D et refactoring Méca A/C :
@@ -35,7 +35,7 @@
 > ce cas, il faut couper la puissance immédiatement. **Même raisonnement appliqué à bit2 (surchauffe
 > moteur, déjà existant depuis v1.1)** : ajouté au masque `PowerCutOff` par cohérence/défense en
 > profondeur (demande explicite utilisateur). Nouveaux masques : `SafeStop = (ErrorId AND 16#0F9F)` /
-> `16#0F97` (OverrideSync), `PowerCutOff = (ErrorId AND 16#0F84)` (bits 2/7/8/9/10/11). Détail §3/§4sexies/§4nonies.
+> `16#0F97` (si SyncEnable=FALSE), `PowerCutOff = (ErrorId AND 16#0F84)` (bits 2/7/8/9/10/11). Détail §3/§4sexies/§4nonies.
 > 🔧 **v1.5 (2026-07-07)** — Implémentation du Cas B (« Mouvement non commandé / roue libre »,
 > §4quinquies-TBD ci-avant) et de 2 garde-fous supplémentaires en défense en profondeur, tous
 > câblés dans `FB_Safety_Winch` (nouveaux bits 7/8/9) : **Méca A** — mouvement/dérive détecté(e)
@@ -88,8 +88,8 @@ FB_Joystick.AxisCmdY ──► FB_Winch(M1) ──┬─► FB_SpeedStep ──�
                                         └─► FB_Brake ──► BrakeCmd (séquence temporisée)
 
 FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — arrêt total (joystick/codeur/thermique moteur/thermique frein/mou câble normal/Méca A/B/C/D 🆕)
-                ──► ForbidDescent   ──► (entrée) FB_Winch — masque UNIQUEMENT RelayRev (mou câble, MAINT+OverrideSync)
-                ──► ForbidAscent    ──► (entrée) FB_Winch — masque UNIQUEMENT RelayFwd (mou câble, MAINT+OverrideSync ; ou arrêt normal haut hors HomingApproachEnable 🆕)
+                ──► ForbidDescent   ──► (entrée) FB_Winch — masque UNIQUEMENT RelayRev (mou câble, MAINT+SyncEnable=FALSE)
+                ──► ForbidAscent    ──► (entrée) FB_Winch — masque UNIQUEMENT RelayFwd (mou câble, MAINT+SyncEnable=FALSE ; ou arrêt normal haut hors HomingApproachEnable 🆕)
                 ──► PowerCutOff 🆕  ──► (hors FB_Winch) coupure puissance amont — Méca A/B/C/D 🆕 + thermique moteur + thermique frein (SafeStop ne suffit pas, contacteurs déjà confirmés coupés OU frein risque de coller instantanément)
 ```
 
@@ -97,7 +97,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 |------|-------------|
 | `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
-| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, surchauffe/perte thermique frein, mou de câble (mode normal), Méca A/B/C/D (roue libre, pilotage sans commande, glissement grappin escaladé, capteur haut non confirmé arrêté) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+OverrideSync — voir §4ter, §4octies et §4nonies ; lève `PowerCutOff` sur thermique moteur/frein et Méca A/B/C/D — voir §4sexies et §4nonies |
+| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, surchauffe/perte thermique frein, mou de câble (mode normal), Méca A/B/C/D (roue libre, pilotage sans commande, glissement grappin escaladé, capteur haut non confirmé arrêté) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+SyncEnable=FALSE — voir §4ter, §4octies et §4nonies ; lève `PowerCutOff` sur thermique moteur/frein et Méca A/B/C/D — voir §4sexies et §4nonies |
 | `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev`/`RelayFwd` sur `ForbidDescent`/`ForbidAscent`. Inhibé (`Enable` forcé à `FALSE`) si `InhibitMx` est actif. |
 
 ---
@@ -138,7 +138,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | Entrée | Type | Rôle |
 |--------|------|------|
 | `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Inhibé/`FALSE` si `InhibitMx` actif) |
-| `OverrideSync` | BOOL | OverrideSync actif (MAINT N1/N2) → exclut le bit3 (mou de câble) du SafeStop |
+| `SyncEnable` | BOOL | SyncEnable (MAINT N1/N2) — `FALSE` exclut le bit3 (mou de câble) du SafeStop |
 | `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.Joystick` |
 | `EncoderAvailable` | BOOL | Sortie `FB_Encoder_Abs` **de ce treuil** |
 | `ThermalFeedback` | BOOL | Retour TOR thermique **de ce moteur** (`M1/M2_ThermalFeedback`, I/O réel) |
@@ -162,9 +162,9 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 |--------|------|------|
 | `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
 | `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 : surchauffe moteur ; bit3 : mou de câble ; bit4 : rotation de phase ; bit5 : fin de course haut ; bit6 : longueur max câble ; bit7 : Méca A (mouvement non commandé) ; bit8 : Méca B (pilotage sans commande opérateur, vérifie contacteurs + frein) ; bit9 : Méca C (glissement M1 grappin) ; bit10 : surchauffe/perte thermique frein commun ; bit11 🆕 v1.7 : Méca D (capteur haut non confirmé arrêté hors homing, SafeStop+PowerCutOff) |
-| `SafeStop` | BOOL | `(ErrorId AND 16#0F9F) <> 0` hors OverrideSync (bits 0/1/2/3/4/7/8/9/10/11), `(ErrorId AND 16#0F97) <> 0` sous OverrideSync (bit3 exclu). |
+| `SafeStop` | BOOL | `(ErrorId AND 16#0F9F) <> 0` si SyncEnable=TRUE (bits 0/1/2/3/4/7/8/9/10/11), `(ErrorId AND 16#0F97) <> 0` si SyncEnable=FALSE (bit3 exclu). |
 | `ForbidDescent` | BOOL | bit6 uniquement (limite basse câble) |
-| `ForbidAscent` | BOOL | bit5 (fin de course haut) OU bit3+OverrideSync (récupération mou câble) |
+| `ForbidAscent` | BOOL | bit5 (fin de course haut) OU bit3+SyncEnable=FALSE (récupération mou câble) |
 | `PowerCutOff` | BOOL | `(ErrorId AND 16#0F84) <> 0` — bits 2 (surchauffe moteur), 7/8/9 (Méca A/B/C), 10 (thermique frein), 11 (Méca D). |
 | `MecaADriftM` 🆕 v1.7 | REAL | Dérive mesurée Méca A (m) via `FB_DriftGuard` |
 | `MecaCDriftM` 🆕 v1.7 | REAL | Dérive mesurée Méca C (m) via `FB_DriftGuard` |
