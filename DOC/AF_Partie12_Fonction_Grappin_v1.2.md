@@ -1,10 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.3)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Spécification de la fonction métier Grappin (ouverture/fermeture par désynchronisation M2) et intégration dans l'orchestration générale.
-> **Version** : v1.2 (Révision — 2026-07-07)
-> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md) §9/§4quinquies.
+> **Version** : v1.3 (Révision — 2026-07-08)
+> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie2_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.8](AF_Partie9_Fonction_Winch_v1.7.md) §9/§4quinquies.
 >
+> 🆕 **v1.3 (2026-07-08)** — Alignement sur la sécurité d'inhibition et ajout du référencement fermé : le grappin est désactivé (`Enable := FALSE`) si le treuil M2 (fermeture) est inhibé en Maintenance N2, OU si l'un des deux codeurs de position M1 ou M2 est en défaut ou non référencé. Si seul M1 (retenue) est inhibé, le grappin reste manœuvrable. Ajout de deux commandes de référencement manuel IHM à l'arrêt (`CmdConfirmOpenPosition` et `CmdConfirmClosePosition`) qui initialisent l'état mécanique (ouvert/fermé) et recalent de manière cohérente les positions mémorisées de boot en éliminant toutes les erreurs actives.
 > 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement grappin (Méca C
 > couche 1, nouveau bit4 `ErrorId` + sortie `M1SlipDetected`) — voir §4bis nouveau ci-dessous.
 > Escalade en couche 2 (bit9 `FB_Safety_Winch`, `PowerCutOff`) documentée dans Partie9 v1.5
@@ -223,9 +224,14 @@ document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Gra
    sont **déjà à jour** avec le nouveau modèle (voir bandeau REX en tête de document) — aucune
    nouvelle recopie manuelle requise au-delà de ce qui a déjà été appliqué en session, sauf si
    une réimportation complète depuis `CODE/` est nécessaire suite à un nouvel export CODESYS.
-5. 🆕 **v1.2 (2026-07-07)** : Méca C couche 1 (bit4, `M1SlipDetected`) est **déjà codé et
+5. 🆕 **v1.2 (2026-07-07, Méca C couche 1)** : Méca C couche 1 (bit4, `M1SlipDetected`) est **déjà codé et
    validé** dans `CODE/GRAPPIN/FB_Grappin.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
    également aucune nouvelle recopie manuelle requise ce lot.
+6. 🆕 **v1.3 (2026-07-08, Inhibition)** : Le bloc grappin est activé si le treuil M2 n'est pas inhibé, et que les deux codeurs de position M1 et M2 sont disponibles / en bonne santé (`Enable := NOT InhibitM2 AND EncoderAbsM1.EncoderAvailable AND EncoderAbsM2.EncoderAvailable` dans `PRG_06_WinchControl.st`). Si seul M1 (retenue) est inhibé, le grappin reste manœuvrable puisque seul M2 se déplace pour ouvrir ou fermer (M1 restant verrouillé au frein). Cependant, le codeur M1 doit obligatoirement être disponible et référencé (`HomedM1 = TRUE`) pour permettre le calcul de fin de course du grappin ; dans le cas contraire, le grappin est bloqué en sécurité.
+7. 🆕 **v1.3 (2026-07-08, Référencement)** : Deux boutons de référencement manuel sont prévus pour la mise en service du grappin à l'arrêt :
+   * **`ConfirmOpenPosition`** (grappin ouvert de visu) : Force `IsOpen := TRUE`, `IsClosed := FALSE`, initialise `LastPosM2Open := CablePosM2`, et calcule la position fermée théorique `LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM`.
+   * **`ConfirmClosePosition`** (grappin fermé de visu) : Force `IsOpen := FALSE`, `IsClosed := TRUE`, initialise `LastPosM2Close := CablePosM2`, et calcule la position ouverte théorique `LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM`.
+   Ces deux commandes effacent complètement les défauts du grappin (`ErrorId := 16#0000`) et recalent l'état mécanique sans exiger d'acquittement machine supplémentaire.
 
 ---
 

@@ -75,7 +75,8 @@ VAR_GLOBAL PERSISTENT RETAIN
     WinchM2RampDecelFast_Pct    : REAL := 400.0; // 💾 Décélération SafeStop M2 (%/s) — CRITIQUE
 
     // 📐 PARAMÈTRES DE LIMITES DE DESCENTE ET DE RALENTISSEMENT SUR BORDURE (Nouveau 2026-07-03)
-    CableLimitDescent_M         : REAL := -20.0; // 💾 Limite basse physique de descente commune (m, négatif)
+    CableLimitDescentM1_M       : REAL := -20.0; // 💾 Limite basse physique de descente M1 (m, négatif)
+    CableLimitDescentM2_M       : REAL := -20.0; // 💾 Limite basse physique de descente M2 (m, négatif)
     WinchSlowdownDistance_M     : REAL := 1.0;   // 💾 Distance de ralentissement commune (m)
     WinchSlowSpeedPct           : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement commune (%)
     // 🔧 REX 2026-07-08 : arrêt réel encodeur en fonctionnement NORMAL, distinct du capteur

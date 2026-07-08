@@ -120,6 +120,9 @@ VAR_INPUT
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
     CableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
     Direction           : INT;         // 🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)
+    Homed               : BOOL;        // Indique si le treuil est référencé
+    HomingSuspect       : BOOL;        // Indique si le référencement est suspect
+    TopLimitM           : REAL;        // Position limite haute active (cible homing, m)
 
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir bandeau en-tête)
     FwdRevSpeedFeedbackOff  : BOOL;         // Retour unique "tous contacteurs sens+vitesse retombés" CE treuil
@@ -183,6 +186,8 @@ IF NOT Enable THEN
     ForbidDescent := TRUE;
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
+    Error := FALSE;
+    ErrorId := 16#0000;
     // 🔧 REX 2026-07-08 : force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement
     // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
@@ -341,7 +346,13 @@ END_IF;
 // confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
 // → SafeStop ET PowerCutOff (la coupure ForbidAscent seule n'a visiblement pas suffi à arrêter
 // réellement le treuil : roue libre ou contacteur/frein défaillant).
-TonMecaD(IN := (NOT TopPositionSensor AND NOT InReferencingMode) AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
+TonMecaD(
+    IN := (((NOT TopPositionSensor AND NOT InReferencingMode) 
+            OR (Homed AND NOT HomingSuspect AND (CablePosM >= (TopLimitM + 0.10))))
+           AND (Direction >= 0)) // 🆕 Neutralise la butée haute en descente (Direction = -1)
+          AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), 
+    PT := PostRampTimeout
+);
 IF TonMecaD.Q THEN
     ErrorId := ErrorId OR 16#0800;
 ELSIF ResetEdge.Q THEN

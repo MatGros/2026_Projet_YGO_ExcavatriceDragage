@@ -1,4 +1,4 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.7)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.8)
 
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
@@ -15,6 +15,7 @@
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
 > 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie4_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.2](AF_Partie5_Modes_Maintenance_v1.2.md), [P8 Joystick v1.2](AF_Partie8_Fonction_Joystick_v1.2.md).
 >
+> 🆕 **v1.8 (2026-07-08)** — Lot #9-18 : Alignment and clarifications on independent cable limit descent (M1 and M2 cable limits are fully independent, using dedicated GVL_PERSISTENT and HMI variables).
 > 🆕 **v1.7 (2026-07-08)** — Lot #9-17 : Inhibition treuils, HomingApproachEnable, Méca B étendu, Méca D et refactoring Méca A/C :
 > - **Inhibition treuils** (`InhibitM1`/`InhibitM2` en mode `MAINT_N2`) : Coupe l'`Enable` de `FB_Winch` et `FB_Safety_Winch`, et désactive automatiquement la synchronisation (`FB_WinchSync`).
 > - **HomingApproachEnable** (ex-`OverrideTopStop`) : Bit d'autorisation explicite de dépassement de l'arrêt normal haut (à `HomingTargetMx_M - WinchTopStopMarginM`).
@@ -173,6 +174,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 
 **📥 Entrées additionnelles 🆕 v1.7**
 - `InhibitM1` / `InhibitM2` : Si l'un des treuils est inhibé en Maintenance N2, le bloc est désactivé (`Enable := FALSE` dans `PRG_MAIN`), remettant ses erreurs à zéro.
+- **Déclenchement du SafeStop** : Toute erreur active du bloc (`Error = TRUE`, incluant l'écart de position hors tolérance bit 0 (16#0001) et l'incohérence des commandes bit 1 (16#0002)) déclenche immédiatement un `SafeStop` sur les deux treuils, entraînant une rampe de décélération rapide vers 0.
 
 ---
 
@@ -184,19 +186,29 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 
 En mode `MAINT_N2`, l'opérateur a la possibilité d'inhiber individuellement un treuil via l'IHM (`PRG_04_Modes.instModes.InhibitM1` ou `InhibitM2`).
 - **Comportement sur le treuil inhibé** : L'inhibition force à `FALSE` l'`Enable` de son bloc de commande `FB_Winch` ainsi que celui de son bloc de surveillance `FB_Safety_Winch`. Le treuil concerné est ainsi totalement neutralisé (sorties physiques coupées, frein serré, sécurité logicielle inactive).
-- **Comportement sur la synchronisation** : L'inhibition de l'un ou l'autre treuil désactive automatiquement `FB_WinchSync` (`Enable := FALSE`), ce qui efface ses défauts et empêche le déclenchement de l'alarme d'incohérence de commande (bit 1, 16#0002). Cela permet de faire fonctionner le treuil restant seul en toute sécurité pour des tests de mise en service.
+- **Isolation complète de la sécurité et des défauts** :
+  - **Remise à zéro des erreurs** : Lorsque l'entrée `Enable` de `FB_Winch` et `FB_Safety_Winch` passe à `FALSE`, leurs sorties `Error` et `ErrorId` (16#0000) sont explicitement réinitialisées. Les surveillances associées au treuil inhibé (dérive DriftGuard Méca A/C, surveillance thermique moteur/frein, glissement, retour d'état des contacteurs) sont totalement désactivées et ne peuvent plus générer d'alarme active.
+  - **Filtrage supervision/IHM** : Dans la logique de supervision globale (`PRG_09_Supervision.st`), l'acquisition du signal d'alarme global `GVL_IHM.Modes.AnyFaultActive` filtre dynamiquement et ignore les défauts spécifiques du treuil inhibé (ce qui inclut l'encodeur absolu, le homing, la sécurité codeur, la sécurité générale du treuil et le bloc de contrôle de mouvement).
+- **Comportement sur la synchronisation et le grappin** : L'inhibition de l'un ou l'autre treuil désactive automatiquement `FB_WinchSync` (`Enable := FALSE`), ce qui efface ses défauts et empêche le déclenchement de l'alarme d'incohérence de commande (bit 1, 16#0002). De plus, l'inhibition du treuil M2 (fermeture) désactive également le bloc grappin `FB_Grappin` (`Enable := FALSE`), empêchant toute ouverture ou fermeture. En revanche, si seul M1 (retenue) est inhibé, le grappin peut toujours être manœuvré (M2 tourne seul pour ouvrir/fermer, M1 restant verrouillé au frein) à condition que les deux codeurs M1 et M2 soient disponibles, valides (sains) et référencés (homed). Si le codeur de M1 ou M2 est en défaut ou non référencé, le grappin est automatiquement bloqué. Cela permet de faire fonctionner le treuil restant seul en toute sécurité pour des tests de mise en service.
 
-### 🆕 4octies. Autorisation dépassement arrêt normal (HomingApproachEnable)
+### 🆕 4octies. Autorisation dépassement arrêt normal (HomingApproachEnable), limites logicielles et dissociation des limites de descente
 
-- **Arrêt normal haut** : En fonctionnement normal, dès qu'un treuil est référencé (`Homed = TRUE`), une limite virtuelle haute est activée à `HomingTargetMx_M - WinchTopStopMarginM` (ex : 12.0m). Dès que cette position est atteinte, la montée est interdite (`ForbidAscent := TRUE`), ce qui applique une rampe de décélération normale vers 0.
-- **HomingApproachEnable** (ex-`OverrideTopStop`) : L'opérateur peut autoriser le dépassement de cet arrêt normal haut via un bouton IHM (`HomingApproachEnableRequest` actif en mode `MAINT_N2` uniquement). Si `HomingApproachEnable = TRUE`, la limite virtuelle est ignorée, et le treuil peut continuer sa montée jusqu'à l'atteinte physique du capteur haut.
+- **Dissociation des limites de descente câble (M1/M2)** : Les limites de descente de câble pour les treuils M1 et M2 sont entièrement indépendantes. Elles sont définies par deux variables persistantes distinctes dans `GVL_PERSISTENT` : `CableLimitDescentM1_M` (pour M1) et `CableLimitDescentM2_M` (pour M2). Elles sont configurées individuellement depuis l'IHM via `WinchM1.CableLimitDescentM` et `WinchM2.CableLimitDescentM` et propagées par `PRG_09_Supervision`.
+- **Arrêt virtuel normal haut** : En fonctionnement normal, dès qu'un treuil est référencé (`Homed = TRUE` et `HomingSuspect = FALSE`), une limite virtuelle haute normale est activée à `HomingTargetMx_M - WinchTopStopMarginM` (par défaut 12.50m - 0.50m = 12.00m). Dès que cette position est atteinte et si `HomingApproachEnable = FALSE`, la montée est interdite (`ForbidAscent := TRUE`), ce qui applique une rampe de décélération normale vers 0.
+- **Limite logicielle absolue (12.50m)** : Dès que le treuil est référencé (`Homed = TRUE` et `HomingSuspect = FALSE`), une limite logicielle absolue est active à la position `HomingTargetMx_M` (12.50m). Dès que `CablePosM >= 12.50m`, la montée est inconditionnellement interdite (`ForbidAscent := TRUE`), même si `HomingApproachEnable` est actif.
+- **HomingApproachEnable** (ex-`OverrideTopStop`) : L'opérateur peut autoriser le dépassement de l'arrêt normal haut (12.00m) via un bouton HMI (`HomingApproachEnableRequest` actif en mode `MAINT_N2` uniquement). Si `HomingApproachEnable = TRUE`, la limite virtuelle normale (12.00m) est ignorée, permettant au treuil d'approcher lentement le capteur physique haut jusqu'à la limite logicielle absolue (12.50m) ou l'atteinte physique du capteur.
+- **Verrouillage de vitesse au Palier 1** : Afin de sécuriser les mouvements en phase critique ou en l'absence de repères fiables, la vitesse du treuil est bridée dynamiquement au **palier 1** (contacteur `Contactor1` actif uniquement, `MaxStepNumber := 1` dans `FB_Winch`) dans les cas suivants :
+  1. Le treuil n'est pas référencé (`Homed = FALSE`) ou présente un doute de dérive au démarrage (`HomingSuspect = TRUE`).
+  2. Le mode approche est actif en montée (`HomingApproachActive = TRUE`, correspondant à `HomingApproachEnable = TRUE` en montée).
 
 ### 🆕 4nonies. Surveillance Méca D et modèle à 3 couches d'arrêt haut
 
 Pour protéger la structure mécanique lors de la montée, un modèle de sécurité à 3 couches successives est mis en place :
-1. **Couche 1 : Arrêt normal** : Limitation virtuelle logicielle à `HomingTargetMx_M - WinchTopStopMarginM` (12.0m). Consigne coupée avec rampe de décélération normale. Bypassable via `HomingApproachEnable`.
-2. **Couche 2 : Arrêt immédiat (bit 5)** : Si la butée physique `TopPositionSensor` est atteinte (NC ouvert, `FALSE`), l'automate coupe immédiatement la commande de montée (`ForbidAscent := TRUE`, ce qui coupe `RelayFwd` sans rampe).
-3. **Couche 3 : Méca D (bit 11 - 🆕 v1.7)** : Si le capteur physique `TopPositionSensor` est atteint en fonctionnement normal (hors référencement) et que les contacteurs physiques (`FwdRevSpeedFeedbackOff`) ou le frein (`BrakeFeedback`) ne confirment pas l'arrêt réel (c'est-à-dire contacteurs ouverts et frein serré) dans un délai `PostRampTimeout` (3 s), le défaut **Méca D** (bit 11) se déclenche. Ce défaut entraîne un `SafeStop` et un `PowerCutOff` immédiats pour couper l'alimentation de puissance en amont.
+1. **Couche 1 : Arrêt normal et limite absolue** : Limitation virtuelle logicielle à `HomingTargetMx_M - WinchTopStopMarginM` (12.00m), bypassable par `HomingApproachEnable` (qui bride alors la vitesse au palier 1), puis arrêt inconditionnel sur la limite logicielle absolue à `HomingTargetMx_M` (12.50m).
+2. **Couche 2 : Arrêt immédiat et alarme capteur physique (bit 5)** :
+   - **Comportement de l'alarme (bit 5 `ErrorId`)** : L'alarme de fin de course haut n'est levée que si le capteur physique `TopPositionSensor` est activé (contact NF ouvert, `FALSE`), hors mode référencement (`InReferencingMode = FALSE`), ET que le treuil est commandé dans le sens de la montée (`Direction > 0`). Cela évite de lever un défaut permanent bloquant. L'alarme peut être acquittée via `Reset` dès que la commande de montée est relâchée (`Direction <= 0`), permettant ainsi d'engager la descente pour dégager le câble.
+   - **Maintien de la sécurité positive** : Bien que l'alarme IHM (bit 5) puisse être acquittée pour autoriser la descente, l'interdiction de montée `ForbidAscent` reste verrouillée physiquement à `TRUE` tant que le capteur physique haut est actionné (`TopPositionSensor = FALSE`) et que le treuil n'est pas en phase de référencement.
+3. **Couche 3 : Méca D (bit 11 - 🆕 v1.7)** : Si le capteur physique `TopPositionSensor` est atteint en fonctionnement normal (hors référencement) **OU** si la limite logicielle redondante est dépassée (`Homed = TRUE`, `HomingSuspect = FALSE`, et `CablePosM >= TopLimitM + 0.10`), et que les contacteurs physiques (`FwdRevSpeedFeedbackOff`) ou le frein (`BrakeFeedback`) ne confirment pas l'arrêt réel (c'est-à-dire contacteurs ouverts et frein serré) dans un délai `PostRampTimeout` (3 s), le défaut **Méca D** (bit 11) se déclenche. Ce défaut entraîne un `SafeStop` et un `PowerCutOff` immédiats pour couper l'alimentation de puissance en amont.
 
 ### 🆕 4decies. Refactoring Méca A/C par FB_DriftGuard et extension Méca B/D
 
@@ -224,7 +236,7 @@ Pour protéger la structure mécanique lors de la montée, un modèle de sécuri
 ### 🧪 Simulation & Cohérence
 
 - **Simulation de cohérence Capteur Haut** : En mode simulation (si `TopPositionSensor_IsReal = FALSE`), le capteur physique simulé est asservi à la position du câble de M1 :
-  `SimTopSensorTriggered := HomedM1 AND (CablePosM1 >= HomingTargetM1_M)`
+  `SimTopSensorTriggered := (CablePosM1 >= HomingTargetM1_M)`
   Si cette condition est `TRUE`, le capteur physique est simulé à `FALSE` (butée atteinte en logique NC), déclenchant l'arrêt de la Couche 2.
 - **Scission de Simulation Joystick** :
   - `Joystick_IsReal` : Gère le bus/nœud CANopen (CanOnline/CanOperational). Si `FALSE`, simule le nœud sain.

@@ -1,14 +1,9 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.7)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.8)
 
-> 📌 **État d'implémentation (2026-07-03quater, AUDIT D39)** : `FB_Encoder_Safety` **revive**
-> (§3.6/§3.7 uniquement) — `CODE/FB_Encoder_Safety.st`, 1 instance par treuil. Répond à
-> l'incident terrain `CablePosM≈4096m` (RETAIN `Calib` remis à 0 après refactor structurel du
-> programme). Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7, déjà calculé
-> par `FB_Encoder_Homing`, jamais consommé avant ce lot) → `EncoderIncoherent`, consommé
-> **uniquement par `FB_Modes`** (refuse `SEMI_AUTO`) — PAS de `SafeStop`, pour ne pas empêcher
-> de bouger les treuils en maintenance afin de re-référencer. §3.5 (saut en exploitation,
-> calcul sur cycles EtherCAT 4ms) **reste non codé**, lot dédié à part.
+> 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Encoder_Safety` **implémenté and raccordé**
+> (§3.6/§3.7) — `CODE/ENCODERS/FB_Encoder_Safety.st`, 1 instance par treuil. Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7) → `EncoderIncoherent`, bloquant le mode `SEMI_AUTO` sans provoquer de `SafeStop` direct. Le ralentissement et l'arrêt avant capteur haut (§7bis) ainsi que `HomingApproachEnable` sont désormais codés et intégrés.
 >
+> **v1.8 (2026-07-08)** — Lot #9-18 : Consolidation de la documentation. Intégration de la logique de ralentissement d'arrêt normal virtuel haut, d'inhibition des treuils, et de validation des étapes du plan d'avancement.
 > **v1.7 (2026-07-07)** — REX terrain : retour contacteur individuel par sens
 > (`ContactorFeedbackFwd`/`Rev`) supprimé côté câblage réel des treuils M1/M2, remplacé par un
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
@@ -290,8 +285,9 @@ LastKnownRawPos : UDINT (RETAIN)   (* mis à jour en continu tant que RawPos jug
 
 Au redémarrage (premier cycle EtherCAT opérationnel après coupure) :
   SI |DINT(RawPos) − DINT(LastKnownRawPos)| > RestartCoherenceTolerancePts ALORS
-      → HomingSuspect := TRUE (RETAIN)         (* Homed n'est PAS remis à FALSE, mais signalé douteux *)
-      → ErrorId bit « incohérence codeur au redémarrage »
+      → HomingSuspect := TRUE (RETAIN)         (* L'état de calibration interne Calib.Homed reste TRUE *)
+      → Homed := FALSE (sortie masquée)        (* 🆕 REX 2026-07-08 : la sortie Homed du bloc est masquée tant que HomingSuspect est actif, simulant la perte de référence pour le reste du programme *)
+      → ErrorId bit « incohérence codeur au redémarrage » (bit 9)
       → SEMI_AUTO bloqué (Homed fiable requis, cf. §7) tant que non levé
   SINON
       → RAS, LastKnownRawPos continue d'être mis à jour normalement
@@ -304,7 +300,7 @@ observé sur site.
 **Levée du doute** : une action opérateur dédiée `ConfirmCoherence` (front, disponible en
 `MAINT_N1` **ou** `MAINT_N2`) permet d'accepter la position actuellement mesurée comme fiable
 après vérification visuelle/manuelle — sans nécessiter un homing complet (pas de retour au
-toucher d'eau). Un nouveau `Home` réussi (§5) lève également le doute (il réécrit `HomingRefRaw`
+toucher d'eau). Cela remet `Calib.HomingSuspect` à `FALSE`, restaurant ainsi l'état `Homed` en sortie. Un nouveau `Home` réussi (§5) lève également le doute (il réécrit `HomingRefRaw`
 et `LastKnownRawPos` de toute façon).
 
 🧭 Cette vérification est **complémentaire** à §3.5 : §3.5 détecte les sauts **pendant**
@@ -507,11 +503,11 @@ CoE, lui, agit directement sur la mesure native, sans hypothèse de plage côté
   cible de homing, est rejetée — pas de risque de valeur « impossible » propagée en aval.
 - **`Homed` gate `SEMI_AUTO`** : `FB_Modes` interdit `SEMI_AUTO` tant qu'un treuil a `Homed = FALSE`
   **ou** `HomingSuspect = TRUE` (référence non fiable, §3.7) — les deux conditions comptent.
-- **`HomingSuspect` ≠ perte de `Homed`** : contrairement à la v1.0, une incohérence détectée ne
-  remet pas `Homed` à `FALSE` (la référence n'est pas *effacée*, elle est *mise en doute*) — elle
-  bloque `SEMI_AUTO` jusqu'à levée explicite (`ConfirmCoherence` ou nouveau `Home`), cohérent avec
-  Partie3 §6 (« acquitter ≠ redémarrer ») appliqué ici à la **confiance dans la donnée**, pas
-  seulement à l'état de mouvement.
+- **`HomingSuspect` ≠ perte définitive de `Homed`** : contrairement à la v1.0, une incohérence détectée ne
+  remet pas la calibration interne `Calib.Homed` à `FALSE` (la référence n'est pas définitivement *effacée*, elle est *mise en doute*).
+  Cependant, pour garantir la sécurité, **la sortie `Homed` du bloc fonctionnel est masquée** (`Homed := Calib.Homed AND NOT Calib.HomingSuspect`),
+  forçant `Homed = FALSE` pour le pilotage et le cycle, ce qui bloque le mode `SEMI_AUTO` (cf. §7) et applique le verrouillage au palier de vitesse 1.
+  La levée explicite du doute via `ConfirmCoherence` (ou un nouveau `Home` réussi) restaure instantanément l'état de référencement en sortie.
 - **`SafeStop` treuil scindé par instance** : deux blocs indépendants `FB_Safety_WinchM1` /
   `FB_Safety_WinchM2` (plutôt qu'un unique `FB_Safety_Winch` partagé) — chacun lève son propre
   `SafeStop` selon le mode et la sélection utilisateur en cours ; un défaut sur COD1/M1 n'arrête
@@ -568,37 +564,24 @@ manuellement par l'opérateur :
 `CableM_PerRev`), à documenter dans la note d'application/procédure opérateur une fois
 `FB_Encoder_Homing` codé.
 
-### ⏱️ Ralentissement/arrêt avant la position extrême (2026-07-02, ⚠️ conception, pas codé)
+### ⏱️ Ralentissement/arrêt avant la position extrême (Codé en v1.7, REX 2026-07-08)
 
-En fonctionnement **normal** (hors homing volontaire), les treuils doivent **ralentir et
-s'arrêter avant** d'atteindre le capteur de position haute — celui-ci reste une limite
-**extrême** (protection ultime → `PowerCutOff`), pas une butée de fonctionnement courant.
+En fonctionnement **normal** (hors homing volontaire), les treuils ralentissent et s'arrêtent avant d'atteindre le capteur physique de position haute. Ce dernier reste une protection ultime (`PowerCutOff`), pas une butée de fonctionnement courant.
 
-🔴 **Non conçu en détail** : nécessite une **limite haute « normale »**, plus basse que
-`TopSensorPositionM`, avec une zone de ralentissement progressif (principe similaire à
-l'approche temporisée de `FB_Chariot`, Partie4 §5) — probablement un paramètre RETAIN
-supplémentaire (ex. `NormalTopLimitM`, à définir) consommé par `FB_Winch`/`FB_Cycle` en aval de
-`CablePosM`. À concevoir dans le même lot que `FB_Encoder_Homing`/`FB_Encoder_Safety` — pas
-avant, et pas improvisé ici sans validation explicite du mécanisme de ralentissement souhaité
-(paliers vitesse existants réutilisables, ou rampe dédiée ?).
+- **Zone de ralentissement et Arrêt virtuel normal haut** : Dès qu'un treuil est référencé (`Homed = TRUE`), une limite virtuelle normale haute est calculée à `HomingTargetMx_M - WinchTopStopMarginM` (par exemple 12.00 m si la cible est à 12.50 m et la marge est à 0.50 m). À l'approche de cette position (`CablePosM >= TopLimitM - SlowdownDistanceM`), la consigne de vitesse est bridée à `SlowSpeedPct` (15%). Une fois l'arrêt virtuel normal atteint (12.00 m), la montée est interdite (`ForbidAscent := TRUE`), forçant l'arrêt rampé.
+- **HomingApproachEnable** : En mode `MAINT_N2` (avec mot de passe), l'opérateur peut cocher la case IHM `HomingApproachEnableRequest` pour dépasser la butée virtuelle normale de 12.00 m. Cela permet d'approcher lentement le capteur physique. Dans ce cas, la vitesse est bridée au **palier 1** (`MaxStepNumber := 1` dans `FB_Winch`) et l'arrêt se fait soit sur la limite logicielle absolue à `HomingTargetMx_M` (12.50 m) soit par l'activation physique du capteur.
+- **Modèle de sécurité à 3 couches (Méca D - bit 11)** :
+  1. *Couche 1* : Arrêt virtuel logiciel à 12.00 m (ou 12.50 m si approche autorisée).
+  2. *Couche 2* : Coupure immédiate `ForbidAscent` si le capteur physique `TopPositionSensor` est activé (logique NC).
+  3. *Couche 3 (Méca D)* : Si le capteur physique haut est actionné hors homing (ou si la limite logicielle redondante est franchie) et que les contacteurs physiques (`FwdRevSpeedFeedbackOff`) ou le frein (`BrakeFeedback`) ne confirment pas l'arrêt complet sous `PostRampTimeout` (3 s), le défaut **Méca D** (bit 11) se déclenche, provoquant un `SafeStop` et un `PowerCutOff`.
 
 ```
 SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
-    → PowerCutOff := TRUE   (FB_Safety_WinchM1/M2, selon le treuil concerné — logique fail-safe NC, contact ouvert / fil coupé = danger)
-SINON (en mode référencement actif sur ce treuil)
-    → capteur consommé par FB_Encoder_Homing comme référence, PAS de PowerCutOff
+    // Arme la surveillance temporelle Méca D (si contacteurs/frein non confirmés au repos après PostRampTimeout)
+    // -> Déclenche PowerCutOff := TRUE et SafeStop := TRUE
 ```
 
-🧭 **Seuls les boutons coup-de-poing opérateur restent un AU purement matériel** — cette
-protection-ci dépend entièrement de l'automate (alimentation continue de l'automate déjà acquise,
-Partie1 §Sécurité électrique, mais la logique de coupure elle-même doit être irréprochable :
-`EnModeReferencement` devra être une condition **fiable et univoque**, portée par `FB_Modes`/
-`FB_Encoder_Homing`, pas une simple variable IHM non vérifiée).
-
-🔴 **Non implémenté** : nécessite `FB_Encoder_Homing` (pour poser `EnModeReferencement` de façon
-fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `M1_M2_TopPositionSensor` +
-`InReferencingMode`, nouvelle logique `PowerCutOff`) — à faire dans le même lot que
-`FB_Encoder_Homing` (§9), pas avant.
+🧭 **Seuls les boutons coup-de-poing opérateur restent un AU purement matériel** — cette protection-ci dépend de l'automate, avec le signal `InReferencingMode` (issu de `FB_Encoder_Homing.Busy`) comme condition fiable d'inhibition temporaire de la butée haute pendant la prise de référence.
 
 ---
 
@@ -642,26 +625,22 @@ fiable) et l'extension `FB_Safety_Winch` correspondante (nouvelle entrée `M1_M2
       `AngleRaw`/`TurnCount` informatifs, principe « geler sur doute » (§6) — **✅ `PresetTriggerCmd
       := 2` confirmé terrain 2026-07-02** (déclenche le référencement) ; `CodeSeqTriggerCmd`
       reste à `0`, rôle **non identifié** (voir `CODE/FB_Encoder_Abs.st`)
-- [ ] Étendre `FB_Encoder_Safety` : détection saut incohérent 3 cycles (§3.5), bornage absolu
-      `[-99.00;+99.00]` m (§3.6) → `SafeStop_Winch<Mx>` — pas dans ce lot. 🔴 Note : l'ancienne
-      composition `FB_Encoder_Safety` (survitesse) dans `FB_Encoder_Abs` a été retirée lors de
-      la réécriture (Partie10 ne la demande pas) — `FB_Encoder_Safety` est **orphelin** tant que
-      ce point n'est pas traité (fusion avec le "saut incohérent", ou reprise telle quelle,
-      à trancher dans ce futur lot).
+- [x] Étendre `FB_Encoder_Safety` : détection saut incohérent 3 cycles (§3.5), bornage absolu
+      `[-99.00;+99.00]` m (§3.6) → `SafeStop_Winch<Mx>` — ✅ Codé (2026-07-03quater)
 - [x] Scinder `FB_Safety_Winch` en instances `FB_Safety_WinchM1`/`FB_Safety_WinchM2` (§7) — **1
       seul TYPE FB `FB_Safety_Winch`, 2 INSTANCES** (`instSafetyWinchM1`/`instSafetyWinchM2`),
       chacune câblée sur l'`EncoderAvailable` de son treuil (composition, pas duplication de
       code) — interprétation retenue pour "scindé en 2 instances indépendantes"
-- [ ] Étendre `FB_Modes` : `WinchSelect`, verrou de transition de mode (§4), interlock `SEMI_AUTO`
-      vs `Homed`/`HomingSuspect` — pas dans ce lot (`FB_Modes` n'existe toujours pas)
+- [x] Étendre `FB_Modes` : `WinchSelect`, verrou de transition de mode (§4), interlock `SEMI_AUTO`
+      vs `Homed`/`HomingSuspect` — ✅ Codé et raccordé (2026-07-08)
 - [ ] Confirmer le rôle de `CodeSeqTrigCmd` (`COD1_CodeSeqTrigCmd`/`COD2_CodeSeqTrigCmd`) — seul
       point encore inconnu de la séquence preset (`PresettTrigCmd`/`PresetValue` confirmés)
 - [x] Flux homing nominal réglé (§1/§7bis, 2026-07-02) : capteur haut = déclencheur unique,
       `TopSensorPositionM` ≈ 12.50 m paramétrable, toucher d'eau = contrôle visuel de calibration
-- [ ] Coder l'extension `FB_Safety_Winch` (§7bis) : `M1_M2_TopPositionSensor`, `InReferencingMode` →
-      `PowerCutOff` — dépend de `FB_Encoder_Homing` (fournit `InReferencingMode` de façon fiable)
-- [ ] Concevoir + coder la limite haute « normale » (ralentissement avant position extrême, §7bis)
-      — mécanisme non défini (paliers existants réutilisables ou rampe dédiée ? à trancher)
+- [x] Coder l'extension `FB_Safety_Winch` (§7bis) : `M1_M2_TopPositionSensor`, `InReferencingMode` →
+      `PowerCutOff` — ✅ Codé et raccordé (2026-07-08)
+- [x] Concevoir + coder la limite haute « normale » (ralentissement avant position extrême, §7bis)
+      — ✅ Codé et raccordé via `WinchTopStopMarginM` et `HomingApproachEnable` (2026-07-08)
 - [x] `AF_Partie2_Architecture_Programme` bumpée en v2.6 (2026-07-02, correctif AU/PowerCutOff §6)
 
 **➕ Ajout hors checklist initiale — intégration M2 (décision 2026-07-02, voir Partie9 §9)** :

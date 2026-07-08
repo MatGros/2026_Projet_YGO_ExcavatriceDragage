@@ -7,9 +7,34 @@
 PROGRAM PRG_04_Modes
 VAR
     instModes : FB_Modes; // Arbitrage du mode machine (DISABLE, MAINT, SEMI_AUTO, etc.)
+    PrevInhibitM1 : BOOL; // 🆕 Mémoire d'état M1
+    PrevInhibitM2 : BOOL; // 🆕 Mémoire d'état M2
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_04_Modes) ===
+
+// 🆕 Exclusion mutuelle des inhibitions de treuils (soit M1, soit M2, jamais les deux)
+IF GVL_IHM.WinchM1.CmdInhibit AND GVL_IHM.WinchM2.CmdInhibit THEN
+    // Si M1 était déjà activé, on rejette la demande sur M2 (M2 retombe à FALSE)
+    IF PrevInhibitM1 THEN
+        GVL_IHM.WinchM2.CmdInhibit := FALSE;
+    // Si M2 était déjà activé, on rejette la demande sur M1 (M1 retombe à FALSE)
+    ELSIF PrevInhibitM2 THEN
+        GVL_IHM.WinchM1.CmdInhibit := FALSE;
+    ELSE
+        // repli de sécurité si les deux s'activent de façon synchrone sans transition
+        GVL_IHM.WinchM1.CmdInhibit := FALSE;
+        GVL_IHM.WinchM2.CmdInhibit := FALSE;
+    END_IF;
+END_IF;
+
+PrevInhibitM1 := GVL_IHM.WinchM1.CmdInhibit;
+PrevInhibitM2 := GVL_IHM.WinchM2.CmdInhibit;
+
+// 🆕 Si l'un des treuils est inhibé, le synchronisme est désactivé par nature -> force OverrideSync à FALSE sur l'IHM
+IF GVL_IHM.WinchM1.CmdInhibit OR GVL_IHM.WinchM2.CmdInhibit THEN
+    GVL_IHM.Sync.OverrideSync := FALSE;
+END_IF;
 
 instModes(
     Enable              := TRUE,

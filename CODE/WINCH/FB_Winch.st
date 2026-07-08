@@ -78,6 +78,7 @@ VAR_INPUT
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
     MaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
+    HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
     FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback           : BOOL;
@@ -94,6 +95,7 @@ VAR_INPUT
     BrakeDelayMotorDecel    : TIME := T#500ms;
     BrakeFeedbackTimeout    : TIME := T#1s;
     Homed                   : BOOL;             // 🆕 État de référencement du treuil
+    HomingSuspect           : BOOL;             // 🆕 REX 2026-07-08 : Incertitude/doute sur le référencement (§3.7)
     CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
     TopLimitM               : REAL := 12.5;     // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
@@ -133,6 +135,7 @@ VAR
     RampTargetPct       : REAL;
     DirectionChangePending : BOOL;
     EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
+    ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
 END_VAR
 
 IF NOT Enable OR NOT EmergencyStopOk THEN
@@ -150,6 +153,8 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Error := FALSE;
+    ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -172,9 +177,9 @@ RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
     
-    // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé)
+    // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect)
     // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
-    IF Homed THEN
+    IF Homed AND NOT HomingSuspect THEN
         // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
         IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM >= (TopLimitM - SlowdownDistanceM)) THEN
             RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
@@ -209,11 +214,20 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-// 🆕 Plafond palier descente (couple, pas vitesse) : 5 = inchangé en montée/neutre,
-// MaxStepDescente uniquement si CommandedDirection = -1 (Rev)
+// 🆕 Plafond dynamique de palier (MaxStepDescente en descente, Palier 1 si non référencé ou douteux, Palier 1 en approche homing)
+IF NOT Homed OR HomingSuspect THEN
+    ActiveMaxStep := 1;
+ELSIF CommandedDirection = -1 THEN
+    ActiveMaxStep := MaxStepDescente;
+ELSIF (CommandedDirection = 1) AND HomingApproachActive THEN
+    ActiveMaxStep := 1;
+ELSE
+    ActiveMaxStep := 5;
+END_IF;
+
 SpeedStep(Enable := (ABS(SpeedRamp.Current) > 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
-          MaxStepNumber := SEL(CommandedDirection = -1, 5, MaxStepDescente));
+          MaxStepNumber := ActiveMaxStep);
 StepNumber := SpeedStep.StepNumber;
 Contactor1 := SpeedStep.Contactor1;
 Contactor2 := SpeedStep.Contactor2;

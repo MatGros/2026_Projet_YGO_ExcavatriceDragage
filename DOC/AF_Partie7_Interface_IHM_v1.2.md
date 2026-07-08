@@ -1,11 +1,9 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.3)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
-> **Version** : v1.2 (2026-07-07, REX terrain — voir Partie 9 : le retour contacteur individuel
-> par sens des treuils M1/M2 est supprimé côté câblage réel ; `ST_WinchHMI.FwdContactorCheck`/
-> `RevContactorCheck` fusionnés en `ContactorsCheck` unique. Aucun autre changement vs v1.1.)  
-> 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.5](AF_Partie9_Fonction_Winch_v1.6.md), [P10 Homing v1.7](AF_Partie10_Fonction_Encoder_Homing_v1.7.md), [P12 Grappin v1.2](AF_Partie12_Fonction_Grappin_v1.2.md), [P13 Simulation v1.1](AF_Partie13_Fonction_Simulation_v1.1.md).
+> **Version** : v1.3 (2026-07-08, Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs).  
+> 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie2_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie3_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie9_Fonction_Winch_v1.7.md), [P10 Homing v1.7](AF_Partie10_Fonction_Encoder_Homing_v1.7.md), [P12 Grappin v1.2](AF_Partie12_Fonction_Grappin_v1.2.md), [P13 Simulation v1.1](AF_Partie13_Fonction_Simulation_v1.1.md).
 
 ---
 
@@ -27,10 +25,13 @@ TYPE ST_WinchHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture RETAIN) *)
     TopSensorPositionM      : REAL := 12.5;     (* Position cible du capteur haut (m) *)
-    MaxStepDescente         : INT := 2;         (* Limitation palier vitesse en descente (1..5) *)
+    MaxStepDescente         : INT := 3;         (* Limitation palier vitesse en descente (1..5) - commun M1/M2 *)
     RampAccelRate           : REAL := 50.0;     (* Rampe d'accélération (%/s) *)
     RampDecelNormalRate     : REAL := 150.0;    (* Rampe de décélération normale (%/s) *)
     RampDecelFastRate       : REAL := 400.0;    (* Rampe de décélération rapide / SafeStop (%/s) *)
+    CableLimitDescentM      : REAL := -20.0;    (* Limite basse physique de descente (m, négatif) - dédiée/indépendante *)
+    SlowdownDistanceM       : REAL := 1.0;      (* Distance avant limite pour ralentir (m) *)
+    SlowSpeedPct            : REAL := 15.0;     (* Vitesse consigne lente dans zone ralentissement (%) *)
 
     (* 🚦 États & Mesures (Lecture seule) *)
     PositionM               : REAL;             (* Position actuelle du câble (mètres) *)
@@ -55,27 +56,34 @@ STRUCT
     (* 🛡️ Sécurités & Diagnostics *)
     Homed                   : BOOL;             (* Prise d'origine (Homing) validée *)
     SafeStopActive          : BOOL;             (* Arrêt rapide activé par la sécurité *)
-    ForbidDescentActive     : BOOL;             (* Descente interdite (détecteur mou de câble) *)
+    ForbidDescentActive     : BOOL;             (* Descente interdite (mou de câble / limites) *)
+    ForbidAscentActive      : BOOL;             (* Montée interdite (fin de course haut) *)
     SlackCableDetected      : BOOL;             (* Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* Perte de liaison ou incohérence codeur *)
+    CableLimitDescentReached: BOOL;             (* Longueur max de câble atteinte (limite basse physique) *)
+    Encoder                 : ST_EncoderHMI;    (* Données d'échange et diagnostic du codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
-    ContactorsCheck         : ST_ContactorCheck; (* 🔧 v1.2 — coherence contacteurs sens+vitesse
-                                                     fusionnée (retour unique matériel), remplace
-                                                     FwdContactorCheck/RevContactorCheck ;
-                                                     StuckOpen inutilisé (toujours FALSE) *)
+    ContactorsCheck         : ST_ContactorCheck; (* Coherence contacteurs sens+vitesse fusionnée *)
     BrakeContactorCheck     : ST_ContactorCheck; (* Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
     CmdReset                : BOOL;             (* Acquittement défauts spécifique treuil *)
     CmdHome                 : BOOL;             (* Lancement de la prise d'origine *)
     ConfirmCoherence        : BOOL;             (* Confirmation de cohérence au démarrage *)
+    CmdInhibit              : BOOL;             (* Bouton IHM inhibition treuil (MAINT_N2) *)
     
     (* 🐞 Bypasses de Test (Visualisation / Forçage) *)
     BypassContactorFeedback : BOOL;             (* Bypass retours contacteurs (banc de test) *)
     BypassSlackCable        : BOOL;             (* Bypass capteur mou de câble (banc de test) *)
     BypassTopPositionSensor : BOOL;             (* Bypass capteur position haute (banc de test) *)
+    SafetyError             : BOOL;             (* Bloc sécurité (Safety) en défaut *)
+    SafetyErrorId           : WORD;             (* Code défaut de sécurité *)
+    InhibitActive           : BOOL;             (* Miroir lecture seule : inhibition active *)
+    MecaADriftM             : REAL;             (* Dérive mesurée Méca A (m) *)
+    MecaCDriftM             : REAL;             (* Dérive mesurée Méca C (m) *)
+    MecaBElapsedTime        : TIME;             (* Temps écoulé confirmation contacteurs/frein *)
 END_STRUCT
 END_TYPE
 ```
@@ -159,11 +167,23 @@ Permet de piloter et de surveiller l'état des modes de marche de la machine.
 ```pascal
 TYPE ST_ModesHMI :
 STRUCT
-    CurrentMode     : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
-    ModeRequest     : E_Mode; (* 🖥️ Demande de changement de mode de marche *)
-    PasswordOk      : BOOL;   (* 🔑 Authentification pour le mode maintenance N2 *)
-    EmergencyStopOk : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
-    MachineReset    : BOOL;   (* 🔁 Commande d'acquittement général de la machine *)
+    CurrentMode           : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
+    ModeRequest           : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode *)
+    EmergencyStopOk       : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
+    FaultMachineReset     : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier *)
+    ModeReset             : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement *)
+    AnyFaultActive        : BOOL;   (* 🔴 Au moins un défaut actif dans le domaine *)
+    PowerCutOffActive     : BOOL;   (* 🧨 Au moins une coupure de puissance logicielle ou physique active *)
+    
+    (* 🔧 Séquence de réarmement et diagnostics *)
+    CmdEmergencyArming    : BOOL;   (* 🎮 Commande réarmement contacteur puissance *)
+    CmdEmergencyCutOff    : BOOL;   (* 🎮 Commande coupure d'urgence puissance amont *)
+    EmergencyChainOk      : BOOL;   (* 🔗 Boucle AU physique saine *)
+    PowerContactorOk      : BOOL;   (* 🔌 Contacteur puissance engagé (miroir EmergencyStopOk) *)
+    EmergencyArmable      : BOOL;   (* 🟢 Réarmement possible maintenant *)
+    EmergencyArmingBusy   : BOOL;   (* ⏳ Séquence de réarmement ou verrouillage 5s en cours *)
+    RedundancyTestFailed  : BOOL;   (* 🔴 Échec de l'auto-test de redondance canal A/B *)
+    EmergencyArmingFailed : BOOL;   (* 🔴 Impulsion envoyée sans engagement sous 2s *)
 END_STRUCT
 END_TYPE
 ```

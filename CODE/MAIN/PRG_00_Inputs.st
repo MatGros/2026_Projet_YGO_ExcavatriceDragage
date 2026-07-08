@@ -119,8 +119,8 @@ SlackCableSwitch := instSlackCableSwitch.State;
 // Dérivé désormais de la position M1 simulée (référence de l'ensemble, voir FB_Grappin/
 // ActiveOffsetM) — 1 cycle de retard (PRG_00 avant PRG_02 dans l'ordre de tâche), négligeable,
 // même principe déjà assumé ailleurs (EncoderFaultPresent, GrappinHoldStillActive).
-SimTopSensorTriggered := PRG_02_Encoders.instHomingM1.Homed
-                        AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M);
+SimTopSensorTriggered := (NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M))
+                      OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= GVL_PERSISTENT.HomingTargetM2_M));
 instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
 TopPositionSensor := instTopPositionSensor.State;
 
