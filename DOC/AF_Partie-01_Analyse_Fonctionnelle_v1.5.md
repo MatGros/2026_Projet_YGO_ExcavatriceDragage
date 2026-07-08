@@ -1,6 +1,6 @@
-# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.5)
+# 📋 Analyse Fonctionnelle — Partie 1 : Présentation & Fonctions (v1.6)
 
-> 📦 **Programme CODESYS associé** : `v0.4.1_SimNoHardware-SyncUpdate` — voir [VERSION_HISTORY.md](VERSION_HISTORY.md)
+> 📦 **Programme CODESYS associé** : `v0.4.3_SimNoHardware-YGO_CablePre-Commissioning` — voir [VERSION_HISTORY.md](VERSION_HISTORY.md)
 
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
