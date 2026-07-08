@@ -18,6 +18,6 @@ STRUCT
     State               : E_State;          (* 🤖 État de l'automate interne *)
 
     (* 🎮 Commandes / Bypasses *)
-    OverrideSync        : BOOL;             (* 🔓 Désactivation de la synchro (MAINT_N2) *)
+    SyncEnableRequest   : BOOL := TRUE;      (* ☑️ 🔧 REX 2026-07-08 : coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé *)
 END_STRUCT
 END_TYPE

@@ -8,8 +8,8 @@
       - Calcule `DeltaPosM = |CablePosM1 - CablePosM2|` (fiable seulement si les 2 treuils
         sont homés — sinon 0.0, pas de comparaison).
       - `SyncActive` selon `Mode` : MAINT_N1 = imposée (non désactivable, sécurité
-        maintenue) ; MAINT_N2 = activable/désactivable via `OverrideSync` (FB_Modes) ;
-        MANUEL/SEMI_AUTO = active par défaut (pas de logique dédiée sans FB_Cycle).
+        maintenue) ; MAINT_N2 = activable/désactivable via `SyncEnable` (FB_Modes, 🔧 REX
+        2026-07-08 : ex-`OverrideSync` inversé) ; MANUEL/SEMI_AUTO = active par défaut.
       - `SyncWarn` = AVERTISSEMENT IHM SEULEMENT (Partie5 §6, comme `SyncWarn`/
         `ForceImbalance` cités en exemple) — **PAS de SafeStop** : aucune correction de
         vitesse n'existe aujourd'hui côté FB_Winch (pas d'entrée dédiée), donc rien à
@@ -23,7 +23,7 @@
 
 FUNCTION_BLOCK PUBLIC FB_WinchSync
 VAR_INPUT
-    Enable          : BOOL;        // Standard — Partie5 §2 : FB_WinchSync.Enable := NOT OverrideSync (câblage PRG_MAIN)
+    Enable          : BOOL;        // Standard — Partie5 §2 : FB_WinchSync.Enable := SyncEnable (câblage PRG_MAIN)
     Reset           : BOOL;        // Acquittement défaut (front)
     EmergencyStopOk : BOOL;        // Standard
     Mode            : E_Mode;      // Arbitre SyncActive (voir en-tête)
@@ -31,7 +31,7 @@ VAR_INPUT
     CablePosM2      : REAL;        // Sortie FB_Encoder_Scale M2
     HomedM1         : BOOL;        // Sortie FB_Encoder_Homing M1
     HomedM2         : BOOL;        // Sortie FB_Encoder_Homing M2
-    OverrideSync    : BOOL;        // Sortie FB_Modes (actionnable UNIQUEMENT MAINT_N2)
+    SyncEnable      : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — Sortie FB_Modes, TRUE=synchro voulue
     SyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
     ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: grappin fermé/ouvert)
     
@@ -93,7 +93,7 @@ CASE Mode OF
     E_Mode.MAINT_N1:
         SyncActive := TRUE;                  // Imposée, non désactivable (sécurité maintenue N1)
     E_Mode.MAINT_N2:
-        SyncActive := NOT OverrideSync;       // Activable/désactivable par l'opérateur N2
+        SyncActive := SyncEnable;             // 🔧 REX 2026-07-08 : ex-NOT OverrideSync, polarité déjà positive
     ELSE
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;

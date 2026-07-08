@@ -107,13 +107,13 @@ VAR_INPUT
     Reset               : BOOL;        // Front acquittement défauts
     EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
     Mode                : E_Mode;      // Mode courant (autorisations)
-    OverrideSync        : BOOL;        // 🆕 OverrideSync actif (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (procédure récupération manuelle)
+    SyncEnable          : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — FALSE (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (récupération manuelle)
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_00_Inputs.M1/M2ThermalFeedback)
     BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_00_Inputs.BrakeThermalFeedback)
-    SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si OverrideSync
+    SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si NOT SyncEnable
     PhaseRotationOk     : BOOL;        // PRG_00_Inputs.PhaseRotationOk (commun) — TRUE = rotation phases correcte
     TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
@@ -139,12 +139,12 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si OverrideSync) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3))
+    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3))
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si OverrideSync)
+    SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)
     ForbidDescent       : BOOL;        // ⬇️ Interdit descente uniquement — bit6 (limite basse câble)
-    ForbidAscent        : BOOL;        // ⬆️ Interdit montée uniquement — bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble)
+    ForbidAscent        : BOOL;        // ⬆️ Interdit montée uniquement — bit5 (fin course haut) OU bit3+(NOT SyncEnable) (récupération mou câble)
     PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
 
     // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
@@ -239,8 +239,8 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
-// Mode NORMAL (OverrideSync=FALSE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
-// Mode RÉCUPÉRATION (OverrideSync=TRUE) → ForbidAscent uniquement (montée interdite, descente OK)
+// Mode NORMAL (SyncEnable=TRUE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
+// Mode RÉCUPÉRATION (SyncEnable=FALSE) → ForbidAscent uniquement (montée interdite, descente OK)
 IF SlackCableDetected THEN
     ErrorId := ErrorId OR 16#0008;
 ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
@@ -371,7 +371,7 @@ END_IF;
 // non confirmé arrêté) ou si contacteur coupé
 IF NOT EmergencyStopOk THEN
     SafeStop := TRUE;
-ELSIF OverrideSync THEN
+ELSIF NOT SyncEnable THEN
     SafeStop := (ErrorId AND 16#0F97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
     SafeStop := (ErrorId AND 16#0F9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
@@ -380,12 +380,12 @@ END_IF;
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
 ForbidDescent := (ErrorId AND 16#0040) <> 16#0000 OR NOT EmergencyStopOk;
 
-// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+OverrideSync (récupération mou câble : montée interdite même en récup)
+// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (récupération mou câble : montée interdite même en récup)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement,
 // même si l'alarme IHM (bit5) a été acquittée pour permettre la descente.
 ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
              OR (NOT TopPositionSensor AND NOT InReferencingMode)
-             OR ((ErrorId AND 16#0008) <> 16#0000 AND OverrideSync);
+             OR ((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable);
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,

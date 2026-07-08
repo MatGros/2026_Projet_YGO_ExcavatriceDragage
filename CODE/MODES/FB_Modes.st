@@ -7,8 +7,8 @@
       métier) + garde-fous minimaux :
       - Refuse `SEMI_AUTO` si un défaut codeur est présent (`EncoderFaultPresent`,
         agrégat `FB_Encoder_Safety` M1/M2) → repli `MAINT_N1`, ErrorId bit0.
-      - Sort `OverrideSync` (= Mode=MAINT_N2 AND OverrideSyncRequest) pour `FB_WinchSync.Enable`
-        (Partie5 §2 "Logique d'override" : `FB_WinchSync.Enable := NOT OverrideSync`).
+      - Sort `SyncEnable` (🔧 REX 2026-07-08 : logique positive, ex-`OverrideSync` inversé) pour
+        `FB_WinchSync.Enable` (Partie5 §2 : `FB_WinchSync.Enable := SyncEnable`).
    🔧 REX 2026-07-07 : contrôle `PasswordOk`/bit1 (`MAINT_N2` sans mot de passe) retiré à la
       demande explicite de l'utilisateur — l'accès à `MAINT_N2` est désormais géré **uniquement**
       côté IHM (visibilité des actions selon niveau utilisateur), pas de filet de sécurité côté
@@ -19,15 +19,17 @@
    🆕 REX 2026-07-08 : `InhibitM1`/`InhibitM2` (mise en service, demande utilisateur) — permet
       d'inhiber complètement un treuil (commande ET sa propre supervision safety) pour le tester
       seul, désynchronisation assumée. UNIQUEMENT actionnable en MAINT_N2 (plus restrictif
-      qu'`OverrideSync`) — arbitrage centralisé ICI, aucun autre fichier ne doit re-tester
+      que `SyncEnable`) — arbitrage centralisé ICI, aucun autre fichier ne doit re-tester
       Mode=MAINT_N2 pour ce besoin.
    🆕 REX 2026-07-08 (2) : `HomingApproachEnable` — corrige un trou constaté en test : l'arrêt normal à
       l'approche du capteur haut (`PRG_06_WinchControl.st`, seuil `HomingTargetMx_M -
       WinchTopStopMarginM`) était bypassé par le simple fait d'être en MAINT_N2, SANS bit dédié —
       donc désactivé pendant N'IMPORTE QUELLE opération N2, même sans rapport avec un homing.
-      Remplacé par un vrai bit d'autorisation explicite (même pattern qu'`OverrideSync`), commun
+      Remplacé par un vrai bit d'autorisation explicite (même pattern que `SyncEnable`), commun
       aux 2 treuils (référencement nominal déjà sur les 2 ensemble) : l'opérateur doit désormais
       ACTIVER consciemment cette case en plus d'être en MAINT_N2, pas juste sélectionner le mode.
+   🔧 REX 2026-07-08 (3) : `OverrideSync` renommé `SyncEnable`, polarité inversée (demande
+      utilisateur, IHM plus simple) — TRUE = synchro ACTIVE (au lieu de TRUE = synchro désactivée).
    ⚠️ Dépendance croisée `EncoderFaultPresent` (FB_Encoder_Safety, appelé APRÈS ce FB dans
       PRG_MAIN car dépend de CablePosM/Homing) consommée avec 1 CYCLE DE RETARD — même
       principe déjà assumé pour HomingRefRaw (Partie10 §9bis).
@@ -41,7 +43,7 @@ VAR_INPUT
     Reset               : BOOL;        // Acquittement défaut (front) — bit0
     EmergencyStopOk     : BOOL;        // Standard
     ModeRequest         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
-    OverrideSyncRequest : BOOL;        // 🖥️ GVL_Modes_Stub.OverrideSyncRequest_IHM — case à cocher N2
+    SyncEnableRequest   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
     InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.WinchM1.CmdInhibit — bouton IHM inhibition M1
     InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.WinchM2.CmdInhibit — bouton IHM inhibition M2
     HomingApproachEnableRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Common.HomingApproachEnableRequest — case IHM
@@ -57,7 +59,7 @@ VAR_OUTPUT
     State               : E_State;
     StateAtError        : E_State;
     Mode                : E_Mode;      // 🎯 Mode ARBITRÉ — diffusé à TOUS les FB métier (remplace E_Mode.MAINT_N1 codé en dur)
-    OverrideSync        : BOOL;        // → Actif si Mode=MAINT_N1 OU MAINT_N2 AND OverrideSyncRequest (Décision D_OVERRIDESYNC 2026-07-04)
+    SyncEnable          : BOOL;        // → FALSE seulement si Mode=MAINT_N1/N2 ET SyncEnableRequest décoché (Décision D_OVERRIDESYNC 2026-07-04)
     InhibitM1           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM1Request
     InhibitM2           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM2Request
     HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND HomingApproachEnableRequest
@@ -73,7 +75,7 @@ END_VAR
 // ou si l'arrêt d'urgence est déclenché.
 IF NOT Enable OR NOT EmergencyStopOk THEN
     Mode := E_Mode.DISABLE;
-    OverrideSync := FALSE;
+    SyncEnable := TRUE;
     InhibitM1 := FALSE;
     InhibitM2 := FALSE;
     HomingApproachEnable := FALSE;
@@ -105,15 +107,16 @@ ELSE
     Mode := ModeRequest;
 END_IF;
 
-// 📤 5. OVERRIDE SYNC — actionnable en MAINT_N1 OU MAINT_N2 (Décision D_OVERRIDESYNC 2026-07-04)
+// 📤 5. SYNC ENABLE — actionnable en MAINT_N1 OU MAINT_N2 (Décision D_OVERRIDESYNC 2026-07-04)
 // Anciennement restreint à MAINT_N2 uniquement, mais l'opérateur peut avoir besoin de la
-// procédure de récupération mou câble dès MAINT_N1.
-OverrideSync := (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) AND OverrideSyncRequest;
+// procédure de récupération mou câble dès MAINT_N1. 🔧 REX 2026-07-08 : polarité inversée —
+// FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
+SyncEnable := NOT ((Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) AND NOT SyncEnableRequest);
 
 // 📤 5bis. INHIBITION TREUIL — mise en service, demande utilisateur (REX 2026-07-08)
-// UNIQUEMENT actionnable en MAINT_N2 (contrairement à OverrideSync, actionnable aussi N1) —
+// UNIQUEMENT actionnable en MAINT_N2 (contrairement à SyncEnable, actionnable aussi N1) —
 // action plus sensible (neutralise complètement un treuil ET sa propre supervision safety),
-// réservée au niveau de droits le plus élevé. Centralisé ICI (comme OverrideSync) : aucun
+// réservée au niveau de droits le plus élevé. Centralisé ICI (comme SyncEnable) : aucun
 // autre fichier ne doit re-tester Mode=MAINT_N2 pour ce besoin.
 InhibitM1 := (Mode = E_Mode.MAINT_N2) AND InhibitM1Request;
 InhibitM2 := (Mode = E_Mode.MAINT_N2) AND InhibitM2Request;

@@ -857,3 +857,75 @@ Partie créée).
 ### Fichiers impactés (2026-07-07, session Sécurité électrique)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/MAIN/PRG_10_Outputs.st`, `CODE/MAIN/PRG_09_Supervision.st`, `CODE/SUPERVISION/ST_ModesHMI.st`. Aucun autre fichier `CODE/` touché dans cette session (le renommage `SafetyMotion*` proposé par D94 n'est **pas appliqué**).
 - **DOC/** : `AF_Partie1_Analyse_Fonctionnelle` (v1.4→**v1.5**, §Sécurité électrique entièrement réécrite/complétée : 3 signaux, polarité fail-safe, séquence de réarmement, 3 scénarios terrain, casuistique exhaustive 11 cas, vocabulaire « Safety Mouvement »), ancienne version archivée dans `DOC/Archives/` (gitignoré, via `git mv`), références croisées corrigées dans `AF_Partie8_Fonction_Joystick`, `AF_Partie10_Fonction_Encoder_Homing`, `AF_Partie3_Template_FB_Commun` (pointeurs vers Partie1), `CLAUDE.md` (racine, liste des docs + note §Architecture), AUDIT (ce §37). `AF_Partie9_Fonction_Winch_v1.5` **non modifiée** (le nom « Méca A/B/C » y reste tel quel, cohérent avec `CODE/` — voir D94).
+
+---
+
+## 🚀 38. Harmonisation documentaire titre ↔ filename (2026-07-08)
+
+**Constat** : 7 fichiers AF_Partie ont incohérence entre titre interne (entête `# v1.X`) et nom de
+fichier (suffixe `_vX.Y.md`). Exemple : `AF_Partie5_Modes_Maintenance_v1.2.md` avec titre `(v1.4)`.
+Cause probable : rechargement de versions lors de commit 26a9f1c (« full doc audit ») sans
+synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais mentionné dans
+`CLAUDE.md`. Référence dans `CLAUDE.md` pointant vers v1.6 qui n'existe plus (actual : v1.7).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D96 | **Resynchronisation titre = filename (pas de renommage fichier, correction titre)** | Les 7 fichiers ont leur **titre** corrigé pour matcher le **filename version** (source de vérité). Filenames **inchangés** (conserve l'historique git). Fichiers affectés : Partie1 v1.6→v1.5, Partie5 v1.4→v1.2, Partie7 v1.3→v1.2, Partie9 v1.8→v1.7, Partie10 v1.8→v1.7, Partie12 v1.3→v1.2, Partie13 v1.2→v1.1. |
+| D97 | **Misse à jour références croisées (Partie1/10/11/12 → Partie9 v1.7)** | 8 références internes ajustées : `AF_Partie1` (3 occurrences v1.5/v1.6→v1.7), `AF_Partie10` (2 occurrences v1.5→v1.7), `AF_Partie11` (2 occurrences v1.6→v1.7), `AF_Partie12` (1 occurrence v1.8→v1.7), `AF_Partie13` (1 occurrence v1.8→v1.7). |
+| D98 | **Mise à jour CLAUDE.md : Partie9 v1.6→v1.7 + ajout Partie13** | Lien dans `CLAUDE.md` ligne 125 pointant vers version fantasme v1.6 remplacé par v1.7 (actual). Ajout Partie13 dans la liste docs (ligne 129, avant AUDIT). Partie 13 décrite brièvement (« Fonction Simulation — flags bits maître + granularité par device »). |
+
+### Fichiers impactés (2026-07-08, audit harmonisation)
+- **DOC/** : `AF_Partie1_Analyse_Fonctionnelle_v1.5.md` (titre corrigé + 3 refs Partie9),
+  `AF_Partie5_Modes_Maintenance_v1.2.md` (titre corrigé),
+  `AF_Partie7_Interface_IHM_v1.2.md` (titre corrigé),
+  `AF_Partie9_Fonction_Winch_v1.7.md` (titre corrigé),
+  `AF_Partie10_Fonction_Encoder_Homing_v1.7.md` (titre + 2 refs Partie9 corrigés),
+  `AF_Partie11_Fonction_Chariot_v1.3.md` (2 refs Partie9 v1.6→v1.7),
+  `AF_Partie12_Fonction_Grappin_v1.2.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
+  `AF_Partie13_Fonction_Simulation_v1.1.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
+  `CLAUDE.md` (racine, 2 mises à jour : Partie9 v1.6→v1.7 + ajout Partie13).
+- **Reste ouvert (non corrigé)** : Références de code à `OverrideSync` vs `SyncEnable` (renommage code 2026-07-08 non répercuté en DOC — voir D99 ci-après). Ces corrections visent la **forme** (version numbers cohérence) ; le fond technique (variable renommée dans code mais doc non mise à jour) est documenté séparement pour décision utilisateur.
+
+---
+
+## 🚀 39. ⚠️ Incohérence persistante — `OverrideSync` (doc) vs `SyncEnable` (code, 2026-07-08)
+
+**Constat** : Commit 26a9f1c (feat grappin, 2026-07-08, 15h25) a renommé `OverrideSync`
+→ `SyncEnable` dans le code avec inversion de polarité (logique positive désormais), répercuté sur
+5 fichiers `CODE/` (`FB_Modes.st`, `FB_Safety_Winch.st`, `FB_WinchSync.st`, `ST_SyncHMI.st`,
+`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie5_Modes_Maintenance_v1.2.md`
+**n'a pas suivi** — elle parle toujours de `OverrideSync` partout (13 occurrences confirmées au
+2026-07-08 après le commit).
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D99 | **Documentation NON CORRIGÉE, question ouverte** | Audit découvert l'incohérence doc/code, mais **correction documentaire dépasse le périmètre** « correction forme » (D96-D98) ; cela demande une **relecture métier complète** de AF_Partie5 pour tracer tous les impacts (logique positive affectant les formules de guard, état IHM, messages). Recommandation : valider en session dédiée **après relecture code-review des changements 26a9f1c** (grappin, sécurité, IHM) — une mauvaise traduction `OverrideSync`→`SyncEnable` dans la doc pourrait introduire une confusion dangeuse. **Balisé à corriger** : Partie5 v1.2 **doit être mise à jour en v1.3** (au minimum) avec les 13 occurrences et la logique inversée documentée, à faire à titre de **nettoyage documentaire décidé par l'utilisateur, hors cet audit**. |
+
+**Fichiers affectés (code, déjà modifiés en production)** :
+- `CODE/MODES/FB_Modes.st:21` (commentaire REX 2026-07-08)
+- `CODE/WINCH/FB_Safety_Winch.st:50` (entrée)
+- `CODE/WINCH/FB_WinchSync.st:30` (entrée), ligne 95 (logique)
+- `CODE/SUPERVISION/ST_SyncHMI.st:5` (commentaire)
+- `CODE/MAIN/PRG_06_WinchControl.st:múltiples` (appels)
+- **Documentation affectée (NON mise à jour)** : `AF_Partie5_Modes_Maintenance_v1.2.md` ligne 6, 61,
+  78-79, 95-97, 100, 107, 119-120, et détails §6bis entier.
+
+---
+
+## 🚀 40. ✅ Correction documentaire — `OverrideSync` → `SyncEnable` (2026-07-08)
+
+**Constat** : Suite à D99, correction systématique de toutes les références `OverrideSync` en `SyncEnable` avec inversion de polarité dans la documentation.
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie5_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `DOC/Archives/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie2_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie9_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie7_Interface_IHM_v1.2.md` (1 occurrence). |
+
+**Fichiers modifiés (documentation)** :
+- ✅ `DOC/AF_Partie5_Modes_Maintenance_v1.3.md` (NOUVEAU, corrigé avec polarité positive)
+- ✅ `DOC/Archives/AF_Partie5_Modes_Maintenance_v1.2.md` (archivé, ancien)
+- ✅ `CLAUDE.md` (2 références Partie5 v1.2→v1.3)
+- ✅ `AF_Partie2_Architecture_Programme_v2.10.md` (2 refs ligne 91, 138)
+- ✅ `AF_Partie9_Fonction_Winch_v1.7.md` (7 refs + 1 lien Partie5 v1.2→v1.3)
+- ✅ `AF_Partie7_Interface_IHM_v1.2.md` (1 ref `ST_SyncHMI`)
+
+**Conformité** : Toutes les occurrences documentées par D99 ont été corrigées. Polarité systématiquement inversée : `OverrideSync=TRUE` (synchro désactivée) → `SyncEnable=FALSE` (synchro désactivée). Défaut IHM aussi mis à jour (ancien défaut `FALSE` pour case «Override» → nouveau défaut `TRUE` pour case «Synchro active»).

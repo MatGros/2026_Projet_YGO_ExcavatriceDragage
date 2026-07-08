@@ -88,7 +88,7 @@ MainTask (10 ms)
  1.  PRG_1_Diagnostics      — CODE/DIAG/          — FB_DiagCanOpen, FB_DiagEthercat ×3, FB_Joystick (traitement complet)
  2.  PRG_2_Encoders         — CODE/ENCODERS/      — FB_Encoder_Abs → Scale → Homing → Safety (COD1/M1, COD2/M2)
  3.  PRG_3_Safety           — CODE/SAFETY/        — FB_Safety_Winch ×2 (M1/M2), FB_Safety_Chariot → SafeStop/ForbidX/PowerCutOff par domaine
- 4.  PRG_4_Modes            — CODE/MODES/         — FB_Modes : arbitrage Mode + OverrideSync
+ 4.  PRG_4_Modes            — CODE/MODES/         — FB_Modes : arbitrage Mode + SyncEnable
  5.  PRG_5_Cycle            — CODE/CYCLE/         — FB_Cycle : séquenceur E_CycleStep (13 étapes)
  6.  PRG_6_WinchControl     — CODE/CONTROL/       — FB_Winch M1/M2, FB_WinchSync, FB_Grappin ; arbitrage manuel/auto
  7.  PRG_7_ChariotControl   — CODE/CONTROL/       — FB_Chariot (M3) ; arbitrage manuel/auto, sélection cible
@@ -135,7 +135,7 @@ défini dans `CODE/CHARIOT/`). Chaque instance calcule son propre `SafeStop`/`Fo
 
 ### `PRG_4_Modes` (position 4)
 `FB_Modes` : arbitre `Mode` (diffusé à tous les consommateurs en aval), refuse `SEMI_AUTO` si
-défaut codeur, refuse `MAINT_N2` sans mot de passe, calcule `OverrideSync` (MAINT_N1 ou N2).
+défaut codeur, refuse `MAINT_N2` sans mot de passe, calcule `SyncEnable` (MAINT_N1 ou N2).
 
 ### `PRG_5_Cycle` (position 5)
 `FB_Cycle` : séquenceur `E_CycleStep` (13 étapes, Partie4). Émet des commandes discrètes

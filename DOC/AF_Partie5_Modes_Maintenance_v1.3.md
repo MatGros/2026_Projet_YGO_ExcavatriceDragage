@@ -1,12 +1,12 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.3)
 
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Modes` **codé et enrichi** —
 > `CODE/MODES/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
 > codés en dur dans `PRG_MAIN`), refuse `SEMI_AUTO` si défaut codeur (`FB_Encoder_Safety`),
-> refuse `MAINT_N2` sans mot de passe (stub), sort `OverrideSync` (→ `FB_WinchSync`).
-> **v1.4 (2026-07-08)** — Lot #9-17 : Intégration de l'inhibition unitaire des treuils (M1 ou M2) en `MAINT_N2` avec isolation complète de la sécurité (blocs de commande et de sécurité désactivés, erreurs effacées), exclusion mutuelle, filtrage supervision de `AnyFaultActive` et désactivation forcée d'`OverrideSync`.
-> **Version 1.3 (2026-07-04)** — D_OVERRIDESYNC : `OverrideSync` étendu à MAINT_N1 (pas restreint à N2) ; lève également le SafeStop mou de câble ; ajout §6bis détaillant le rôle complet de `OverrideSync`.
-> **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Grappin
+> refuse `MAINT_N2` sans mot de passe (stub), sort `SyncEnable` (→ `FB_WinchSync`).
+> **v1.4 (2026-07-08)** — Lot #9-17 : Intégration de l'inhibition unitaire des treuils (M1 ou M2) en `MAINT_N2` avec isolation complète de la sécurité (blocs de commande et de sécurité désactivés, erreurs effacées), exclusion mutuelle, filtrage supervision de `AnyFaultActive` et désactivation forcée de `SyncEnable`.
+> **Version 1.3 (2026-07-08)** — D_SYNCEN : Polarité inversée de `OverrideSync` → `SyncEnable` ; `TRUE` = synchro active (logique positive), défaut démande IHM devenu `TRUE`; pseudo-codes et descriptions mises à jour en conséquence.
+> **Version 1.2 (2026-07-04)** — Renommage terminologique (demande utilisateur) : Bucket→Grappin
 > (`OverrideGrappin`, `FB_Grappin`), Translation→Chariot — préfixe I/O physique M3 inchangé.
 > **Version 1.1** — Suite audit documentaire : correction du pseudo-code d'override (§2) qui
 > plaçait à tort la limite légale dans `FB_Safety` (elle est **exclusivement** gérée par
@@ -58,7 +58,7 @@ ponctuelles**, mais en conservant **un niveau de sécurité correct**.
 |-----------------|------|
 | Commande | Joystick, treuils **pilotables unitairement** (M1, M2 séparés) |
 | Contrôle synchro (`FB_WinchSync`) | ✅ Actif (sauf phase grappin — suspension automatique, Partie 4 §3bis) |
-| **Override synchro (`OverrideSync`)** | ✅ **Disponible en MAINT_N1** (voir §6bis — OverrideSync lève aussi le SafeStop mou de câble) |
+| **Demande de synchronisation (`SyncEnable`)** | ✅ **Disponible en MAINT_N1** (voir §6bis — `SyncEnable=FALSE` désactive la synchro et lève aussi le SafeStop mou de câble) |
 | Contrôle grappin (`FB_Grappin`) | ✅ Actif |
 | Codeurs / freins / capteurs | ✅ Actifs (sécurités maintenues) |
 | Limite légale profondeur | ⚠️ Non bloquante, **signalisation** IHM |
@@ -76,7 +76,7 @@ de l'opérateur (mot de passe + droits).
 |-----------------|------|
 | Authentification | 🔑 Mot de passe + droits |
 | Commande | Joystick, treuils **indépendants** |
-| Override synchro | ⛔→ désactivable (ex. codeur mort) |
+| Demande de synchro | ✅ Configurable (ex. codeur mort) |
 | Override contrôle grappin | ⛔→ désactivable |
 | Override limite légale | ⛔→ désactivable (signalisation maintenue) |
 | Pilotage sans codeur | ✅ possible |
@@ -92,9 +92,9 @@ freins, déplacements **malgré** défauts ou incohérences, récupération apr�
 
 ### Logique d'override (`FB_Modes`)
 ```
-// OverrideSync est disponible en MAINT_N1 ET MAINT_N2 (D_OVERRIDESYNC, D83)
+// SyncEnable est disponible en MAINT_N1 ET MAINT_N2 (D_SYNCEN, D83)
 IF (Mode = MAINT_N1 OR (Mode = MAINT_N2 AND PasswordOk)) THEN
-    OverrideSync   := UserSelectIHM;   // case à cocher opérateur (MAINT_N1 ou N2)
+    SyncEnable   := SyncEnableRequest;   // case à cocher opérateur (MAINT_N1 ou N2), TRUE = synchro active
 END_IF
 IF Mode = MAINT_N2 AND PasswordOk THEN
     OverrideGrappin := UserSelectIHM;
@@ -116,13 +116,13 @@ END_IF;
 PrevInhibitM1 := InhibitM1Request;
 PrevInhibitM2 := InhibitM2Request;
 
-// Si l'un des treuils est inhibé, OverrideSync est désactivé et forcé à FALSE
+// Si l'un des treuils est inhibé, SyncEnable est désactivé et forcé à FALSE
 IF InhibitM1Request OR InhibitM2Request THEN
-    OverrideSync := FALSE;
+    SyncEnable := FALSE;
 END_IF;
 
 // Application aux blocs concernés :
-FB_WinchSync.Enable       := NOT OverrideSync AND NOT InhibitM1Request AND NOT InhibitM2Request;  // désactive la synchro
+FB_WinchSync.Enable       := SyncEnable AND NOT InhibitM1Request AND NOT InhibitM2Request;  // synchro active si SyncEnable=TRUE
 FB_Grappin.ControlEnable   := NOT OverrideGrappin;
 LimitLegal.Enabled        := NOT OverrideLimit;  // interne à FB_Modes (PAS FB_Safety, voir §3)
 
@@ -133,7 +133,7 @@ FB_WinchM2.Enable          := NOT InhibitM2Request;
 FB_Safety_WinchM2.Enable   := NOT InhibitM2Request;
 
 IF NOT (Mode = MAINT_N1 OR Mode = MAINT_N2) THEN
-    OverrideSync := FALSE; OverrideGrappin := FALSE; OverrideLimit := FALSE;  // tout actif
+    SyncEnable := TRUE; OverrideGrappin := FALSE; OverrideLimit := FALSE;  // synchro active par défaut, autres overrides désactivés
 END_IF
 ```
 
@@ -143,9 +143,9 @@ END_IF
 > (`FB_Safety_<Metier>`) — c'est une interdiction **normale**, gérée en interne à `FB_Modes`
 > (voir §3). L'ancienne formulation `FB_Safety.CheckLimitLegal` était une erreur de conception.
 
-> 🔧 **Correction v1.3 (D_OVERRIDESYNC, D83)** : `OverrideSync` est désormais accessible
-> **dès MAINT_N1** (pas seulement N2). Le pseudo-code précédent conditionnait `OverrideSync`
-> à `Mode = MAINT_N2 AND PasswordOk` — corrigé ci-dessus.
+> 🔧 **Correction v1.3 (D_SYNCEN, D83)** : Polarité inversée de `SyncEnable` ; `TRUE` = synchro
+> active (avant : `OverrideSync`, `TRUE` = synchro désactivée). Pseudo-codes et descriptions
+> mises à jour. `SyncEnable` accessible **dès MAINT_N1** (pas seulement N2).
 
 ---
 
@@ -220,7 +220,7 @@ conditions globales OK ».
 - Le treuil M2 reste fonctionnel (ex. ouvrir/fermer grappin possible via M2).
 - Meilleure pratique : passer en MAINT_N2 :
     → choisir de remonter SYNCHRONE mais SANS contrôle de synchronisme
-      (codeurs morts → override OverrideSync) ;
+      (codeurs morts → désactiver SyncEnable) ;
     → piloter les contacteurs, les deux moteurs (sains) montent ensemble ;
     → revenir en position, puis aller RÉPARER le codeur.
 ```
@@ -251,24 +251,24 @@ Règle de conception : **prévoir, en sortie de chaque FB, de l'information pens
 
 ---
 
-## 🔒 6bis. Rôle complet de `OverrideSync` (D_OVERRIDESYNC, D83, 2026-07-04)
+## 🔒 6bis. Rôle complet de `SyncEnable` (D_SYNCEN, D83, 2026-07-08)
 
-`OverrideSync` est un **override de sécurité étendu** (case à cocher IHM, conditionné par
+`SyncEnable` est une **demande de synchronisation** (case à cocher IHM, conditionné par
 l'activation d'un niveau de Maintenance) qui réunit **trois effets simultanés** :
 
 | Effet | Détail |
 |-------|--------|
-| **Désactive la synchronisation** | `FB_WinchSync.Enable := FALSE` — plus de calcul `DeltaPosM`/`SyncWarn`, surveillance d'écart suspendue |
-| **Désactive le contrôle de cohérence des commandes** | `FB_WinchSync` étant `Enable=FALSE`, le SafeStop de cohérence de commande (bit1 `ErrorId WinchSync`) est également inhibé et effacé |
-| **Lève le SafeStop mou de câble** | `FB_Safety_Winch` : si `OverrideSync=TRUE`, le bit3 n'alimente plus `SafeStop` mais active `ForbidAscent` (montée interdite M1+M2) et laisse la descente libre (pour rattraper le câble) — voir Partie9 §4ter et D_SLACK_1 |
+| **Active la synchronisation** | `FB_WinchSync.Enable := TRUE` — calcul `DeltaPosM`/`SyncWarn`, surveillance d'écart active (par défaut) |
+| **Active le contrôle de cohérence des commandes** | `FB_WinchSync` étant `Enable=TRUE`, le SafeStop de cohérence de commande est armé ; si `SyncEnable=FALSE`, le bit1 `ErrorId WinchSync` est inhibé et effacé |
+| **Lève ou maintient le SafeStop mou de câble selon l'état** | `FB_Safety_Winch` : si `SyncEnable=FALSE`, le bit3 n'alimente plus `SafeStop` mais active `ForbidAscent` (montée interdite M1+M2) et laisse la descente libre (pour rattraper le câble) — voir Partie9 §4ter et D_SLACK_1 |
 
-**Disponibilité** : `OverrideSync` est accessible **dès MAINT_N1** (sans mot de passe) et bien
+**Disponibilité** : `SyncEnable` est accessible **dès MAINT_N1** (sans mot de passe) et bien
 sûr en MAINT_N2. Les autres overrides (`OverrideGrappin`, `OverrideLimit`) restent
 **exclusifs à MAINT_N2** (droits étendus, mot de passe requis).
 
-> ⚠️ **Rappel sécurité** : avec `OverrideSync` actif, l'opérateur pilote M1 et M2 **sans
-> aucun contrôle d'écart de position**. Il est responsable de la cohérence du mouvement.
-> `ForbidAscent` reste actif tant que `SlackCableDetected = TRUE` : on ne peut pas
+> ⚠️ **Rappel sécurité** : avec `SyncEnable=FALSE` (demande de synchro désactivée), l'opérateur
+> pilote M1 et M2 **sans aucun contrôle d'écart de position**. Il est responsable de la cohérence
+> du mouvement. `ForbidAscent` reste actif tant que `SlackCableDetected = TRUE` : on ne peut pas
 > aggraver le mou en remontant, mais la cause doit être réglée avant de reprendre un
 > mouvement synchrone normal.
 
