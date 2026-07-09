@@ -1,9 +1,13 @@
-# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 12 : Fonction Grappin (v1.4)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Spécification de la fonction métier Grappin (ouverture/fermeture par désynchronisation M2) et intégration dans l'orchestration générale.
-> **Version** : v1.3 (Révision — 2026-07-08)
-> 🔗 **Dépend de** : [P2 Architecture v2.7](AF_Partie-02_Architecture_Programme_v2.7.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §6, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.9.md) §9/§4quinquies.
+> **Version** : v1.4 (2026-07-08, Offset dynamique + butées dynamiques M2 — voir §4 point 8)
+> 🔧 **Nettoyage documentaire (audit doc, 2026-07-09)** : harmonisation titre/nom de fichier (le
+> titre affichait v1.2, le champ "Version" v1.3, alors que le contenu interne (§4 point 8)
+> introduisait déjà une v1.4) + checklist de mise en service (§6) remplacée par un renvoi court
+> vers `DOC/PLAN_TASK_v1.0.md` §3 (T27). Aucun changement de contenu fonctionnel.
+> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.3](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §6, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md) §9/§4quinquies.
 >
 > 🆕 **v1.3 (2026-07-08)** — Alignement sur la sécurité d'inhibition et ajout du référencement fermé : le grappin est désactivé (`Enable := FALSE`) si le treuil M2 (fermeture) est inhibé en Maintenance N2, OU si l'un des deux codeurs de position M1 ou M2 est en défaut ou non référencé. Si seul M1 (retenue) est inhibé, le grappin reste manœuvrable. Ajout de deux commandes de référencement manuel IHM à l'arrêt (`CmdConfirmOpenPosition` et `CmdConfirmClosePosition`) qui initialisent l'état mécanique (ouvert/fermé) et recalent de manière cohérente les positions mémorisées de boot en éliminant toutes les erreurs actives.
 > 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement grappin (Méca C
@@ -239,25 +243,15 @@ document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Gra
 
 ---
 
-## 🔁 6. Retour d'expérience (à compléter après test)
+## 🔁 6. Retour d'expérience
 
 - [x] **2026-07-07** — Constat terrain : sens moteur M2 inversé vis-à-vis du grappin (relabeling
       `%Q0.0`/`%Q0.3`) — code corrigé (`FB_Grappin.st`, `GVL_PERSISTENT.st`), documentation
       révisée (ce document).
-- [ ] **Premier essai réel** : valider que l'ENROULAGE M2 ferme bien le grappin et que le
-      DEROULAGE M2 l'ouvre bien (sens physique conforme au nouveau modèle).
-- [ ] **Amplitude des offsets** : `OffsetCloseM ≈ 10.0 m` (valeur terrain, corrigée depuis
-      l'estimation initiale de 1.5 m) / `OffsetOpenM = 0.0 m` — encore approximatifs, à affiner
-      précisément sur site selon le jeu mécanique réel du grappin.
-- [ ] Vérifier que la validation joystick homme-mort (axe Y) correspond bien au ressenti opérateur
-      attendu (haut = fermeture, bas = ouverture) — geste inversé vs la première version testée.
-- [ ] 🆕 **v1.2 (2026-07-07, Méca C couche 1)** — Pendant `Busy`, simuler une dérive de `CablePosM1`
-      au-delà de `M1SlipToleranceM` (1.0 m) → vérifier bit4 `ErrorId`, `SevereError` (coupe M2),
-      et `M1SlipDetected = TRUE`. Vérifier ensuite que `PRG_06_WinchControl.SafeStopM1_Raw` force
-      bien `SafeStop` sur `instWinchM1` (et seulement M1, pas M2).
-- [ ] 🆕 **v1.2** — Vérifier que la couche 2 (`FB_Safety_Winch` bit9, `PowerCutOff`, Partie9 v1.5
-      §4quinquies) ne s'active que si la couche 1 ci-dessus n'a pas suffi à contenir la dérive
-      (tolérance 2.0 m > 1.0 m) — test d'escalade complet, pas seulement la couche 1 isolément.
+
+📌 Suivi (essais de mise en service restants — cinématique enroulage/déroulage, amplitude des
+offsets, ressenti joystick homme-mort, Méca C couches 1/2) : voir `DOC/PLAN_TASK_v1.0.md` §3
+(T27).
 
 ---
 

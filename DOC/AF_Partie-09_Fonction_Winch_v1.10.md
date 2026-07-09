@@ -1,5 +1,8 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.9)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.10)
 
+> **v1.10** — Nettoyage documentaire (audit doc) : remarques organisationnelles (sélecteur treuil
+> IHM non codé, §4undecies montée en charge, checklist validation v1.7) remplacées par des renvois
+> courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T9/T20/T21). Aucun changement fonctionnel.
 > 🆕 **v1.9 (2026-07-09)** — Documentation exhaustive des 5 mécanismes de sécurité (Méca A–E, bits 7/8/9/11/12/13), extraits du code réel `FB_Safety_Winch.st` : comportement d'armement, seuils, conséquences, escalades PowerCutOff, et subtilités critiques (§4novies ci-dessous).
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_WinchSync` **codé et audité**
 > — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
@@ -7,14 +10,14 @@
 > de `FB_Modes`).
 > **Contrôle de cohérence de commande intégré** : `ErrorId` bit 1 (16#0002) entraîne un `SafeStop` des deux treuils.
 > **Pas de correction/régulation active** de l'écart — `FB_Winch` n'a aucune entrée de
-> correction de vitesse aujourd'hui, hors périmètre de ce lot (§9 "reste à faire"). Sélecteur
-> treuil IHM (M1/M2/Les deux) et bit « Prise de main IHM » : toujours **non codés**.
+> correction de vitesse aujourd'hui. 📌 Suivi (sélecteur treuil IHM M1/M2/Les deux + bit « Prise de
+> main IHM », toujours non codés) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T20).
 >
 > **Fonction métier** : chaîne de commande Joystick (axe Y, Plongée/Extraction) → `FB_Winch` →
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie-02_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §3bis/§4, [P5 Modes v1.3](AF_Partie-05_Modes_Maintenance_v1.3.md), [P8 Joystick v1.2](AF_Partie-08_Fonction_Joystick_v1.2.md).
+> 🔗 Dépend de : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.3](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §3bis/§4, [P5 Modes v1.5](AF_Partie-05_Modes_Maintenance_v1.5.md), [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md).
 >
 > 🆕 **v1.8 (2026-07-08)** — Lot #9-18 : Alignment and clarifications on independent cable limit descent (M1 and M2 cable limits are fully independent, using dedicated GVL_PERSISTENT and HMI variables).
 > 🆕 **v1.7 (2026-07-08)** — Lot #9-17 : Inhibition treuils, HomingApproachEnable, Méca B étendu, Méca D et refactoring Méca A/C :
@@ -217,25 +220,15 @@ Pour protéger la structure mécanique lors de la montée, un modèle de sécuri
 - **Méca B étendu** : La surveillance Méca B (pilotage actif sans commande opérateur) a été étendue au retour frein : le défaut se déclenche si les contacteurs ne retombent pas **OU** si le frein ne confirme pas son serrage (`BrakeFeedback = FALSE`) à la fin de la temporisation.
 - **Diagnostics IHM** : Afin de faciliter la mise en service et le réglage des seuils sur site, les valeurs de dérive mesurées (`MecaADriftM`, `MecaCDriftM`) ainsi que le temps d'attente d'arrêt réel (`MecaBElapsedTime`) sont exposés en sorties de `FB_Safety_Winch` et mappés vers l'IHM.
 
-### 🆕 4undecies. Investigations futures — Montée en charge et temporisation frein (TBD, v1.8)
+### 🆕 4undecies. Investigations futures — Montée en charge et temporisation frein
 
 **Contexte** : Phase opérationnelle de descente (récupération de charge), puis remontée chargée
 (montée en charge). Le poids de la charge crée un effet entraînant mécanique sur le système,
-susceptible de contredire l'hypothèse des temporisations de frein actuelles (voir `FB_Brake.st` §3).
+susceptible de contredire l'hypothèse des temporisations de frein actuelles (voir `FB_Brake.st` §3),
+en particulier sur le délai de relâche (magnétisation) et de collage (décélération) du frein.
 
-**Point de vigilance** : La séquence de frein (relâche après magnétisation du moteur, collage
-après décélération/ouverture des contacteurs) s'appuie sur des temporisations fixes
-(`DelayMagnetise`, `DelayMotorDecel`). **En montée chargée**, il faut valider que :
-- Le frein relâché assez tôt (délai magnétisation) pour transférer la charge au moteur sans
-  à-coup brutal.
-- Le frein collé assez tard (délai décélération) pour que le moteur ait bien arrêté sa rotation
-  avant serrage (sinon usure/casse mécanique).
-- Aucun "rebondissement" ou "glissement frein" induit par la charge entraînante durant la phase
-  de transition.
-
-**Refactoring demandé** : À définir lors d'un lot dédié — validation terrain + éventuels réglages
-de temporisations, voire refonte du modèle séquentiel du frein selon le retour d'expérience mise
-en service. **Pas d'action immédiate** ; point à tracker pour essais de charge.
+📌 Suivi (validation terrain + réglages de temporisations différés après essais de charge) : voir
+`DOC/PLAN_TASK_v1.0.md` §3 (T9).
 
 ### 🆕 4novies. Défense en profondeur : Les 5 mécanismes de sécurité (Méca A–E, v1.9)
 
@@ -473,12 +466,8 @@ en service. **Pas d'action immédiate** ; point à tracker pour essais de charge
 
 ---
 
-## 🔁 8. Retour d'expérience (Checklist Validation v1.7)
+## 🔁 8. Retour d'expérience
 
-- [ ] **Inhibition treuils** : Activer `InhibitM1` (IHM) en MAINT_N2 → vérifier `Enable` de `FB_Winch(M1)` et `FB_Safety_Winch(M1)` coupés, et `FB_WinchSync` désactivé (pas d'erreur de mismatch). Répéter pour M2.
-- [ ] **HomingApproachEnable** : Sans activer, monter le câble référencé → vérifier l'interdiction de montée à 12.0m. Activer la case IHM → vérifier que la montée est autorisée au-delà de 12.0m.
-- [ ] **Modèle 3 couches (Méca D)** : Monter le treuil hors référencement jusqu'au capteur haut physique (NC ouvert) → forcer un contacteur ou le frein à rester collé (par simulation) → vérifier que le défaut **Méca D** (bit 11) se déclenche après 3s, coupant le `SafeStop` et le `PowerCutOff`.
-- [ ] **Méca B étendu** : Mettre le joystick au neutre → forcer le retour contacteur ou frein à `FALSE` → vérifier que le défaut Méca B se déclenche après 3s.
-- [ ] **Diagnostics IHM** : Vérifier que les variables `MecaADriftM`, `MecaCDriftM` et `MecaBElapsedTime` sont correctement rafraîchies à l'écran de supervision.
-- [ ] **Simulation cohérence capteur haut** : En simulation, monter au-dessus du point de butée virtuelle → vérifier que le capteur physique simulé `TopPositionSensor` passe bien à `FALSE` de manière synchrone.
-- [ ] **Scission Joystick** : Configurer `Joystick_IsReal := TRUE` et `JoystickSignal_IsReal := FALSE` → vérifier que le nœud CAN est diagnostiqué sain sur le bus, tout en pouvant injecter une consigne simulée via `instSimJoystick`.
+📌 Suivi (checklist de validation v1.7 non réalisée — inhibition treuils, `HomingApproachEnable`,
+modèle 3 couches Méca D, Méca B étendu, diagnostics IHM, simulation capteur haut, scission
+Joystick) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T21).

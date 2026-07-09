@@ -14,7 +14,7 @@
 > polarité inversée (bug documenté ci-dessous en bandeau REX, pour ne jamais reproduire l'erreur).
 > Ajout de la **séquence de réarmement** (impulsion 1 s + verrouillage 5 s, commande IHM
 > uniquement, jamais automatique) et d'une **casuistique exhaustive** de tous les cas de figure
-> de la chaîne de coupure de puissance. Voir `DOC/AF_Partie-09_Fonction_Winch_v1.9.md` §4quinquies
+> de la chaîne de coupure de puissance. Voir `DOC/AF_Partie-09_Fonction_Winch_v1.10.md` §4quinquies
 > pour le détail des **Safety Mouvement** (3 aujourd'hui, d'autres pourront s'ajouter — catégorie
 > ouverte, non limitée à un nombre fixe) qui peuvent déclencher une coupure logicielle — non
 > re-décrits ici, seulement référencés. ⚠️ Remarque nommage (retour utilisateur 2026-07-07) :
@@ -160,7 +160,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 
 > 🏷️ **Rappel — « Safety Mouvement ».** Il s'agit d'une **catégorie ouverte** de protections
 > logicielles de `FB_Safety_Winch`, capables de déclencher une coupure de puissance (détail
-> technique complet en `DOC/AF_Partie-09_Fonction_Winch_v1.9.md` §4quinquies, non re-décrit ici).
+> technique complet en `DOC/AF_Partie-09_Fonction_Winch_v1.10.md` §4quinquies, non re-décrit ici).
 > **3 existent aujourd'hui**, nommées par leur **rôle** (voir remarque de nommage plus bas pour
 > pourquoi un simple suffixe de lettre est délibérément évité — d'autres cas viendront s'ajouter
 > à cette liste avec le temps, sans limite de nombre) :
@@ -184,8 +184,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > `FB_Safety_Winch` (M1 et M2, qui portent les 3 Safety Mouvement ci-dessus) **et**
 > `FB_Safety_Chariot` (M3). Ce 3ᵉ bloc participe déjà à la formule agrégée mais **ne câble
 > aujourd'hui aucun Safety Mouvement réel** : sa sortie `PowerCutOff` reste codée en dur à `FALSE`
-> (TBD — voir `CODE/CHARIOT/FB_Safety_Chariot.st`, en attente d'un `ST_ContactorCheck` de puissance
-> pour M3, même limitation que `FB_Safety_Winch` avant l'ajout de ses 3 Safety Mouvement actuels).
+> (voir `CODE/CHARIOT/FB_Safety_Chariot.st`). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T12).
 > Tout Safety Mouvement futur pour le Chariot viendrait donc naturellement s'ajouter **côté
 > `FB_Safety_Chariot`**, pas forcément côté Winch.
 >
@@ -197,7 +196,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > (`GrappinHoldStillActive` sur `instGrappin.Busy`, toujours `FALSE` côté M2) → peut escalader
 > jusqu'à `PowerCutOff` si la couche 1 n'a pas suffi. Donc **oui**, `FB_Safety_Winch` couvre bien
 > indirectement le Grappin (via son instance M1), mais il n'existe pas de `FB_Safety_Grappin`
-> séparé — voir `DOC/AF_Partie-12_Fonction_Grappin_v1.2.md` pour la couche 1 et Partie9 §4quinquies
+> séparé — voir `DOC/AF_Partie-12_Fonction_Grappin_v1.4.md` pour la couche 1 et Partie9 §4quinquies
 > pour la couche 2.
 >
 > ⚠️ **Remarque de nommage (retour utilisateur 2026-07-07, confirmé/renforcé en cours de
@@ -210,11 +209,9 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > nom descriptif, sans dépendre d'un rang alphabétique. **Le code actuel** (`FB_Safety_Winch.st`,
 > `PRG_03_Safety.st`, `ST_WinchHMI.st`, ainsi que `AF_Partie-09_Fonction_Winch`) utilise encore en
 > interne l'ancien nom par lettre pour ces 3 cas — un renommage effectif en `CODE/` (identifiants,
-> commentaires) est une **proposition à valider séparément**, hors périmètre de cette révision
-> Partie 1 qui reste **documentaire uniquement**. Nommage cible suggéré pour ce renommage futur,
-> préfixé `SafetyMotion` (cohérent avec le préfixe `FB_Safety_<Metier>` déjà en usage dans le
-> projet) : `SafetyMotionUncommandedMotion`, `SafetyMotionUncommandedDrive`,
-> `SafetyMotionGrappinSlip`.
+> commentaires), suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`,
+> `SafetyMotionUncommandedDrive`, `SafetyMotionGrappinSlip`), reste hors périmètre de cette révision
+> Partie 1 (documentaire uniquement). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T13).
 
 #### 🧨 Polarité fail-safe de `PowerCutOff_A_RQ` / `B_RQ`
 

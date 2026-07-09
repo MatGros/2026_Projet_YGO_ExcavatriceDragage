@@ -1,9 +1,13 @@
-# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.5)
+# 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.6)
 
+> 📌 **v1.6** — Nettoyage documentaire (audit doc) : la remarque "mapping `ChannelOk` à définir"
+> (§4) était organisationnelle — remplacée par un renvoi court vers `DOC/PLAN_TASK_v1.0.md` §3
+> (T19). Aucun changement fonctionnel.
+>
 > 📌 **v1.5 (2026-07-07)** — REX terrain (voir Partie 9) : l'exemple d'instance §5 citait encore
 > `M1ContactorFeedbackFwd` (retour individuel par sens) — ce signal est **supprimé côté câblage
 > réel** pour les treuils M1/M2, remplacé par un retour unique par treuil `M1/M2FwdRevSpeedFeedbackOff`.
-> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie-09_Fonction_Winch_v1.9.md`.
+> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie-09_Fonction_Winch_v1.10.md`.
 >
 > 📌 **v1.4** — Correctif documentaire (voir Partie 13) : l'extrait `instEmergencyStopOk` (§ci-dessous)
 > référençait encore `GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST` (supprimé) — remplacé par
@@ -155,8 +159,8 @@ M1_RelayFwd_DQ := instM1RelayFwd.State;
 
 Inchangé (v1.2) : `ChannelOk` par voie **non exploité à ce jour** (toutes les instances
 observées dans `PRG_0_Inputs`/`PRG_10_Outputs` utilisent la valeur par défaut `TRUE`) — pas de
-diagnostic carte/voie remonté pour l'instant. Mapping précis **à définir** à la configuration
-matérielle si ce besoin se confirme.
+diagnostic carte/voie remonté pour l'instant. 📌 Suivi (mapping précis si le besoin se confirme) :
+voir `DOC/PLAN_TASK_v1.0.md` §3 (T19).
 
 ---
 

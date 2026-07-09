@@ -1,13 +1,16 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Chariot (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Chariot (v1.4)
 
+> **v1.4** — Nettoyage documentaire (audit doc) : remarques organisationnelles (ST_ContactorCheck
+> chariot manquant, protocole AC600, checklist de mise en service) remplacées par des renvois
+> courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T4/T12/T26). Aucun changement fonctionnel.
 > 🆕 **v1.3 (2026-07-08)** — Retour terrain frein (demande utilisateur) : nouveau retour thermique
 > **frein**, COMMUN aux 3 axes M1/M2/M3 (1 seul fil, `BrakeThermalFeedback_DI`, câblé
 > identiquement sur `FB_Safety_Chariot` **et** les 2 instances `FB_Safety_Winch` — voir
-> [Partie9 v1.7](AF_Partie-09_Fonction_Winch_v1.9.md) §4sexies) → nouveau bit3 `ErrorId`
+> [Partie9 v1.7](AF_Partie-09_Fonction_Winch_v1.10.md) §4sexies) → nouveau bit3 `ErrorId`
 > (`FB_Safety_Chariot`, bit1 reste réservé EtherCAT variateur, non câblé). **`PowerCutOff` devient
 > réel pour ce bit précis** (`(ErrorId AND 16#0008) <> 0`) — jusqu'ici toujours `FALSE` en dur
-> pour ce FB (les autres bits du domaine Chariot restent TBD, pas de `ST_ContactorCheck` de
-> puissance câblé). Justification : le frein M3 est à manque de courant (colle au repos, comme
+> pour ce FB (les autres bits du domaine Chariot restent `FALSE` — 📌 voir
+> `DOC/PLAN_TASK_v1.0.md` §3 T12). Justification : le frein M3 est à manque de courant (colle au repos, comme
 > `FB_Brake` — voir Partie9) — la perte de ce retour peut signifier un collage instantané pendant
 > que le chariot est encore en mouvement, une rampe `SafeStop` seule ne suffit pas. Nouveau champ
 > IHM `ST_ChariotHMI.BrakeThermalFault` (demande utilisateur explicite : info accessible via
@@ -29,7 +32,7 @@
 > (règle projet : ne jamais deviner). La partie `DEGRADED_IO` est fonctionnellement complète
 > (corrigée v1.1) mais reste conditionnée à la confirmation du bornier réel et du paramétrage
 > AC600 (§4bis) avant tout essai machine en charge.
-> 🔗 Dépend de : [P2 Architecture v2.10](AF_Partie-02_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis, [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §5, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.9.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`, thermique frein commun §4sexies).
+> 🔗 Dépend de : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis, [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §5, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md) (patterns réutilisés : interlock sens, `FB_Brake`, `FB_Safety_<Metier>`, thermique frein commun §4sexies).
 >
 > ℹ️ **Numérotation** : la branche `claude/encoder-homing-winch-control-h6ef89` (non fusionnée
 > dans `main` à la rédaction) occupe déjà `AF_Partie-10_Fonction_Encoder_Homing_v1.1.md` — ce
@@ -143,7 +146,7 @@ variateur non disponible, actif sur `FALSE`/`0`).
 | `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Partie3 §1) |
 | `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.Joystick` |
 | `PhaseRotationOk` | BOOL | `PRG_00_Inputs.PhaseRotationOk` (commun M1/M2/M3, I/O réel) |
-| `BrakeThermalFeedback` 🆕 v1.3 | BOOL | Retour TOR thermique **frein**, COMMUN aux 3 axes M1/M2/M3 (`BrakeThermalFeedback_DI`, 1 seul fil, câblé IDENTIQUEMENT sur cette instance et les 2 instances `FB_Safety_Winch` — voir [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.9.md) §4sexies) : `TRUE` = surchauffe/perte |
+| `BrakeThermalFeedback` 🆕 v1.3 | BOOL | Retour TOR thermique **frein**, COMMUN aux 3 axes M1/M2/M3 (`BrakeThermalFeedback_DI`, 1 seul fil, câblé IDENTIQUEMENT sur cette instance et les 2 instances `FB_Safety_Winch` — voir [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.10.md) §4sexies) : `TRUE` = surchauffe/perte |
 
 **📤 Sorties**
 | Sortie | Type | Rôle |
@@ -151,7 +154,7 @@ variateur non disponible, actif sur `FALSE`/`0`).
 | `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
 | `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 **réservé** (EtherCAT variateur AC600, non câblé, TBD) ; bit2 : mauvaise rotation de phase (commun M1/M2/M3) ; bit3 🆕 v1.3 : surchauffe/perte thermique frein commun M1/M2/M3 (`SafeStop` via `Error` + `PowerCutOff`) |
 | `SafeStop` | BOOL | `Error OR NOT EmergencyStopOk` (miroir de tout `ErrorId`, y compris bit3 — inchangé structurellement) |
-| `PowerCutOff` 🔧 v1.3 | BOOL | **Réel pour bit3 uniquement** : `(ErrorId AND 16#0008) <> 0`. Coupure puissance amont : un frein à manque de courant qui perd son retour thermique peut coller instantanément pendant le mouvement — `SafeStop` seul ne suffit pas. Les autres bits du domaine Chariot restent `FALSE` (TBD, pas de `ST_ContactorCheck` de puissance câblé) |
+| `PowerCutOff` 🔧 v1.3 | BOOL | **Réel pour bit3 uniquement** : `(ErrorId AND 16#0008) <> 0`. Coupure puissance amont : un frein à manque de courant qui perd son retour thermique peut coller instantanément pendant le mouvement — `SafeStop` seul ne suffit pas. Les autres bits du domaine Chariot restent `FALSE` (📌 voir `DOC/PLAN_TASK_v1.0.md` §3 T12) |
 
 ---
 
@@ -183,7 +186,7 @@ variateur non disponible, actif sur `FALSE`/`0`).
 ### 🆕 4ter. Thermique frein commun M1/M2/M3 + PowerCutOff (2026-07-08)
 
 > ✅ Statut : **implémenté et câblé** dans `FB_Safety_Chariot` (bit3) — même signal, même
-> raisonnement que [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.9.md) §4sexies (`FB_Safety_Winch`
+> raisonnement que [Partie9 v1.6](AF_Partie-09_Fonction_Winch_v1.10.md) §4sexies (`FB_Safety_Winch`
 > bit10). Demande utilisateur directe, retour terrain frein.
 
 **Contexte** : le frein M3 (comme M1/M2) est **à manque de courant** — il colle au repos par
@@ -200,7 +203,8 @@ couper la puissance **immédiatement** (`PowerCutOff`) — les 3 axes sont coup�
 puisque le signal ne permet pas d'isoler lequel est réellement en cause.
 
 **Différence avec `FB_Safety_Winch`** : côté Chariot, `PowerCutOff` était **toujours `FALSE`**
-avant ce lot (TBD, aucun `ST_ContactorCheck` de puissance câblé pour ce domaine). Ce lot ne rend
+avant ce lot (aucun `ST_ContactorCheck` de puissance câblé pour ce domaine — 📌 voir
+`DOC/PLAN_TASK_v1.0.md` §3 T12). Ce lot ne rend
 `PowerCutOff` réel **que pour le bit3** (thermique frein) — les autres bits (perte joystick/CAN,
 rotation de phase) restent `FALSE` pour `PowerCutOff`, inchangés.
 
@@ -216,19 +220,13 @@ PowerCutOff := (ErrorId AND 16#0008) <> 0   // bit3 (thermique frein commun) uni
 
 ### ⚠️ Ce qui reste TBD (ne pas approximer)
 
-| Point | Détail |
-|-------|--------|
-| Layout `DriveControlWord`/`DriveStatusWord` | Encodage bit à bit du protocole AC600 non disponible à la rédaction — **à confirmer sur la doc constructeur du variateur** avant tout collage CODESYS de la branche `ETHERCAT` |
-| Interface `LIN_TRAFO` (Util) | Non vérifiée ici — le projet a déjà eu une mauvaise supposition d'interface sur `HYSTERESIS` (correctif `FB_SpeedStep` 2026-07-01). En attendant, mise à l'échelle %→Hz par calcul linéaire explicite dans `FB_Chariot.st`, à remplacer par `LIN_TRAFO` si son interface réelle est vérifiée |
-| Bornier TOR réel `DEGRADED_IO` | Nombre exact d'entrées présélection vitesse dispo sur l'AC600, câblage physique — à valider à la mise en service (comme `ST_SpeedStepTable` pour le treuil) |
-| `VariateurAvailable` (`FB_DiagEthercat` AC600/M3) | Diag EtherCAT non finalisé — `FB_Safety_Chariot` ne le surveille pas encore (bit1 réservé, non stubé), comme le codeur pour `FB_Safety_Winch` |
-
-> 🧭 **Note de portée vs Partie2 §5** : la table "Dégradation par domaine" de
-> [Partie2 §5](AF_Partie-02_Architecture_Programme_v2.10.md) indique « Variateur M3 down →
-> Chariot interdite ». Cette règle s'entend **hors activation volontaire de
-> `CommMode := DEGRADED_IO`** — Partie2 n'a pas encore été mise à jour pour référencer ce mode
-> (mise à jour transverse à faire lors d'une prochaine revue de cohérence documentaire, hors
-> périmètre de ce lot qui ne touche que les fichiers Chariot).
+Layout `DriveControlWord`/`DriveStatusWord` (protocole AC600), interface `LIN_TRAFO` non
+vérifiée, bornier TOR réel `DEGRADED_IO` et `VariateurAvailable`/diag EtherCAT AC600 non finalisé
+— tous liés au même point bloquant : le protocole/constructeur du variateur AC600 n'a pas encore
+été confirmé. 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T4, T12). La table "Dégradation par
+domaine" de [Partie2 §5](AF_Partie-02_Architecture_Programme_v2.11.md) reste également à mettre à
+jour pour référencer `CommMode := DEGRADED_IO` (hors périmètre de ce document, ne touche que les
+fichiers Chariot).
 
 ---
 
@@ -400,44 +398,21 @@ PLCopenXML (`PLCOPENXML_TOOLING/generated/CODE_Bundle.xml`) ou recopie manuelle 
 
 ---
 
-## 🔁 8. Retour d'expérience (à compléter après test)
+## 🔁 8. Retour d'expérience
 
 - [x] **Intégré dans `PRG_MAIN` (2026-07-02, revue par une 2ᵉ IA/session)** : `instSafetyChariotM3`
       + `instChariotM3`, `CommMode` figé `DEGRADED_IO`, câblé sur `FB_Joystick_0.AxisCmdX`.
       Stubs `GVL_Chariot_M3_Stub` (relais/retours/capteur cible), même principe que
       `GVL_Winch_M1_Stub`/`M2_Stub`.
-- [ ] **Finding revue (2026-07-02)** : en mode `ETHERCAT`, `IsStoppedConfirmed` repose sur
-      `ABS(SpeedRamp.Current) < 0.1` (rampe logicielle) — même classe de bug que celui corrigé
-      dans `FB_Winch` (inversion joystick plus rapide que la décélération = fenêtre jamais
-      atteinte, cf. `FB_Winch.st` §3/`DirectionChangePending`). **Non bloquant aujourd'hui**
-      (`ETHERCAT` reste TBD/non câblé), mais **à corriger avant d'activer ce mode** — appliquer
-      le même correctif que `FB_Winch` (forcer la cible de rampe à 0.0 dès qu'un changement de
-      sens est en attente, indépendamment du signal joystick).
-- [ ] Sens (Fwd/Rev) cohérent avec le joystick axe X (à vérifier au 1er essai, à vide — §7)
-- [ ] Sélection PV/GV : seuils `DegradedGvThresholdHighPct`/`LowPct` à régler selon ressenti opérateur
-- [ ] Arrêt sur capteur cible : comportement §9bis (verrouillage sens identique, déverrouillage sur inversion) — coupure relais **immédiate** depuis correctif v1.1 (F1), à confirmer en conditions réelles que `DegradedStopSettleTime` est suffisant compte tenu de la décélération physique réelle du variateur (§4bis)
-- [ ] `DegradedStopSettleTime` : régler selon le temps d'arrêt physique réel observé (rampe interne AC600, §4bis) — valeur par défaut (1s) non validée terrain
-- [ ] Frein chariot : mêmes réglages temporisés que le treuil, ou délais différents à ajuster (`BrakeDelay*`) ?
-- [ ] Vérifier qu'un changement de `CommMode` pendant un mouvement est bien ignoré (`CommModeLocked`, correctif v1.1 F5)
-- [ ] Une fois l'EtherCAT AC600 fiabilisé : lever les TBD §4 (protocole variateur), passer des tests en `CommMode := ETHERCAT`
-- [ ] `FB_Safety_Chariot` : périmètre étendu (perte joystick/CAN, rotation de phase, 🆕 thermique frein commun) — revoir le reste (EtherCAT variateur, bit1) avant mise en service définitive
-- [ ] Paramètre "source de commande" AC600 (§4bis) confirmé verrouillé sur Terminal pendant `DEGRADED_IO` — vérifier qu'une reprise EtherCAT intermittente ne perturbe pas la commande relais
-- [ ] 🆕 **v1.2** — Vérifier `M3_BrakeCmd` (désormais I/O réel) : commande cohérente avec `MovementRequested`, pas de régression suite au retrait du miroir logiciel.
-- [ ] 🆕 **v1.2** — Tester le sélecteur STUB position (§5bis) : chaque valeur 1..4 de `StubChariotPositionSelect_IHM` active bien le bon capteur (`PosFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`) sur `M3_PositionSensorTarget`, 0 = aucun (comportement neutre, pas d'arrêt sur capteur).
-- [ ] 🆕 **v1.3 (2026-07-08)** — Une fois `BrakeThermalFeedback_DI` mappé en I/O réel : forcer une
-      perte du retour → vérifier bit3 `ErrorId` sur `instSafetyChariotM3`, `SafeStop` (via `Error`)
-      **et** `PowerCutOff` (`(ErrorId AND 16#0008) <> 0`) tous les deux à `TRUE`, **simultanément
-      sur M1 ET M2** (`FB_Safety_Winch` bit10, voir Partie9 v1.6 §8) — signal commun, pas
-      d'isolement possible par axe. `GVL_IHM.Chariot.BrakeThermalFault` visible IHM. Puis
-      relâcher + Reset front → mouvement réautorisé sur les 3 axes.
-- [ ] 🆕 **v1.3** — Confirmer que `PowerCutOff` reste `FALSE` pour les autres bits du domaine
-      Chariot (perte joystick/CAN bit0, rotation de phase bit2) — seul bit3 doit déclencher
-      `PowerCutOff` à ce stade, comportement inchangé pour les autres défauts.
+
+📌 Suivi (checklist de mise en service restante — finding `IsStoppedConfirmed`/`ETHERCAT`, essai à
+vide, réglages `DegradedStopSettleTime`/PV-GV/frein, verrou `CommMode`, protocole AC600,
+`BrakeThermalFeedback_DI`) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T26).
 
 ---
 
 ## 📚 Documents liés
-- **Partie 2 v2.10** — Architecture (`FB_Chariot`, mapping M3/AC600).
+- **Partie 2 v2.11** — Architecture (`FB_Chariot`, mapping M3/AC600).
 - **Partie 3 v1.3** — Contrat FB (`StartStop`/`SafeStop`, ErrorId, reset, §1bis FB de mouvement).
 - **Partie 4 v1.2** — Cycle (§5 Chariot — approche temporisée, arrêt sur capteur, source des paramètres `ApproachTime`/`ApproachSpeed`).
 - **Partie 9 v1.6** — Fonction Winch (patterns réutilisés : interlock sens, `FB_Brake`,

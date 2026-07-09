@@ -1,5 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 8 : Fonction Joystick (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 8 : Fonction Joystick (v1.3)
 
+> **Version 1.3** — Nettoyage documentaire (audit doc) : remarques organisationnelles (renommage
+> `PRG_JOY1` à valider, source `EmergencyStopOk` à définir, checklist de mise en service) remplacées
+> par des renvois courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T15/T16/T17). Aucun changement
+> fonctionnel.
+>
 > 📌 **État d'implémentation (2026-07-03septdecies, AUDIT D69)** : `SafeStop` enfin RETIRÉ du
 > code (`CODE/FB_Joystick.st`) — la spec v1.1 le demandait depuis longtemps, mais le vestige
 > (entrée `SafeStop` câblée sur un stub `GVL_DEBUG.DBG_False`, agissant comme un second `Enable`
@@ -31,7 +36,7 @@
 
 > **Fonction métier** : acquisition et conditionnement de la commande opérateur (joystick Hall → CANopen).
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P1 équipements](AF_Partie-01_Analyse_Fonctionnelle_v1.5.md), [P3 contrat FB](AF_Partie-03_Template_FB_Commun_v1.2.md).
+> 🔗 Dépend de : [P1 équipements](AF_Partie-01_Analyse_Fonctionnelle_v1.6.md), [P3 contrat FB](AF_Partie-03_Template_FB_Commun_v1.2.md).
 
 ---
 
@@ -151,12 +156,9 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 `CODE/FB_Joystick.st`/`PRG_MAIN.st` à jour ; 3 et 4 restent ouverts) :
 1. ✅ **FERMÉ** : câblage `SafeStop := GVL_DEBUG.DBG_False` retiré (entrée supprimée du contrat).
 2. ✅ **FERMÉ** : `EmergencyStopOk` (déjà renommé, câblé sur I/O réel via `GVL_IN`).
-3. Le nom de programme `PRG_JOY1` est un **vestige** de l'ancienne architecture multi-`PRG_*`
-   (Partie 2 abandonne ce découpage — 1 seul POU `PLC_PRG_MAIN`, appels séquentiels). À terme,
-   l'appel de `FB_Joystick` devrait être **inline dans `PLC_PRG_MAIN`**, pas dans un sous-programme
-   séparé — changement structurel à valider avec l'utilisateur avant application.
-4. Corriger le commentaire d'en-tête du fichier `.st` qui référence l'ancien nom de doc
-   (`AF_Partie-04_Fonction_Joystick_v1.0.md`) → doit pointer vers **`AF_Partie-08_..._v1.1.md`**.
+3. Le nom de programme `PRG_JOY1` reste un **vestige** de nommage historique, ainsi que le
+   commentaire d'en-tête du fichier `.st` qui référence l'ancien nom de doc
+   (`AF_Partie-04_Fonction_Joystick_v1.0.md`). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T16).
 
 ---
 
@@ -179,16 +181,15 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 | Entrée debug | Remplacer par |
 |--------------|---------------|
 | `Enable := GVL_DEBUG.DBG_True` | autorisation réelle (`FB_Modes`) |
-| `EmergencyStopOk := GVL_DEBUG.DBG_True` | chaîne AU réarmée (source à définir, voir Partie 3 §1) |
+| `EmergencyStopOk := GVL_DEBUG.DBG_True` | chaîne AU réarmée — 📌 Suivi (source exacte) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T15) |
 | `Reset := FALSE` | bit acquittement IHM |
 | `Calibrate := FALSE` | bouton calibration IHM (front) |
 
 ---
 
-## 🔁 8. Retour d'expérience (à compléter après test)
+## 🔁 8. Retour d'expérience
 
-- [ ] Calibration OK (front `Calibrate`, neutre 2000..8000) ?
-- [ ] Sortie % cohérente (deadband 5 %, rampes douces) ?
-- [ ] CAN coupé → sorties à 0 (gate OK) ?
 - [x] Suppression effective de `SafeStop` et renommage `EmergencyStopOk` — fait 2026-07-03septdecies (§6bis).
-- [ ] Si validé → figer le mapping sécurité définitif dans `AF_Partie-02_v2.x` + clôturer cette v1.1.
+
+📌 Suivi (checklist de mise en service restante — calibration, deadband, coupure CAN) : voir
+`DOC/PLAN_TASK_v1.0.md` §3 (T17).

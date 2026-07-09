@@ -1,5 +1,12 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.7)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.9)
 
+> **v1.9** — Nettoyage documentaire (audit doc) : harmonisation titre/nom de fichier (le titre
+> affichait encore v1.7 alors que le contenu interne était déjà en v1.8) + remarques
+> organisationnelles (tolérance de calibration, mapping IHM restant, rôle `CodeSeqTriggerCmd`,
+> `FB_Encoder_Safety` orphelin, checklist de validation, AC600 hors périmètre) remplacées par des
+> renvois courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T4/T8/T22/T23/T24/T25). Aucun changement
+> fonctionnel.
+>
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Encoder_Safety` **implémenté and raccordé**
 > (§3.6/§3.7) — `CODE/ENCODERS/FB_Encoder_Safety.st`, 1 instance par treuil. Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7) → `EncoderIncoherent`, bloquant le mode `SEMI_AUTO` sans provoquer de `SafeStop` direct. Le ralentissement et l'arrêt avant capteur haut (§7bis) ainsi que `HomingApproachEnable` sont désormais codés et intégrés.
 >
@@ -9,7 +16,7 @@
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
 > `BrakeFeedback` — voir `CODE/ENCODERS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
-> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.9.md` (doc principale
+> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.10.md` (doc principale
 > treuil). Hors périmètre : Chariot M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
@@ -105,12 +112,12 @@
 > **Cible** : CODESYS 3.5 — acquisition + mise à l'échelle codées depuis le 2026-07-02
 > (`FB_Encoder_Abs`/`FB_Encoder_Scale`/`ST_EncoderCalib`), homing (`FB_Encoder_Homing`) et
 > sélection treuil (`E_WinchSelect`) restent conception seule (voir §9 pour le détail exact).
-> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie-01_Analyse_Fonctionnelle_v1.5.md) §Initialisation,
-> [P2 Architecture v2.7](AF_Partie-02_Architecture_Programme_v2.7.md) (dossier `ENCODER`),
+> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie-01_Analyse_Fonctionnelle_v1.6.md) §Initialisation,
+> [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md) (dossier `ENCODER`),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (profils FB),
-> [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.2.md) §Initialisation/§3 Synchro,
+> [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §Initialisation/§3 Synchro,
 > [P5 Modes v1.2](AF_Partie-05_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.9.md) (`FB_Winch` unitaire M1/M2).
+> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
@@ -555,7 +562,8 @@ manuellement par l'opérateur :
 1. Référencer au capteur haut (flux nominal §1) → CablePosM = TopSensorPositionM (ex. 12.50 m)
 2. Descendre les 2 treuils jusqu'au contact visuel réel de l'eau
 3. Lire CablePosM à cet instant :
-     SI CablePosM ≈ 0.00 m (tolérance à définir, ex. ±0.10 m) → TopSensorPositionM correct
+     SI CablePosM ≈ 0.00 m (tolérance ex. ±0.10 m, 📌 à fixer sur site — voir
+     `DOC/PLAN_TASK_v1.0.md` §3 T22) → TopSensorPositionM correct
      SINON → ajuster TopSensorPositionM de l'écart constaté (RETAIN, réglage mise en service),
              puis répéter la vérification
 ```
@@ -604,14 +612,15 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 > `Reset := FALSE` figé qui empêchait tout acquittement), `M1/M2_ConfirmCoherence_IHM`,
 > `StubHomeButton_IHM` (partagé M1+M2, inchangé), `M1/M2_TopSensorPositionM` (RETAIN, déplacé
 > depuis `PRG_MAIN` pour visibilité). Tout regroupé dans **un seul GVL** dédié au pipeline
-> codeur — reste TBD/non codé : `WinchSelect_IHM`, `HomingTargetM_IHM`, voyants/affichages IHM.
+> codeur. 📌 Suivi (mapping IHM restant non codé — `WinchSelect_IHM`, `HomingTargetM_IHM`,
+> voyants/affichages) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T23).
 
 ---
 
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie-09_Fonction_Winch_v1.9.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie-09_Fonction_Winch_v1.10.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`
@@ -624,7 +633,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 - [x] Étendre `FB_Encoder_Abs` : `PresetRequest`/`PresetValue`/`PresetAck`/`PresetNak`,
       `AngleRaw`/`TurnCount` informatifs, principe « geler sur doute » (§6) — **✅ `PresetTriggerCmd
       := 2` confirmé terrain 2026-07-02** (déclenche le référencement) ; `CodeSeqTriggerCmd`
-      reste à `0`, rôle **non identifié** (voir `CODE/FB_Encoder_Abs.st`)
+      reste à `0`, rôle non identifié — 📌 voir `DOC/PLAN_TASK_v1.0.md` §3 (T8)
 - [x] Étendre `FB_Encoder_Safety` : détection saut incohérent 3 cycles (§3.5), bornage absolu
       `[-99.00;+99.00]` m (§3.6) → `SafeStop_Winch<Mx>` — ✅ Codé (2026-07-03quater)
 - [x] Scinder `FB_Safety_Winch` en instances `FB_Safety_WinchM1`/`FB_Safety_WinchM2` (§7) — **1
@@ -633,8 +642,8 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
       code) — interprétation retenue pour "scindé en 2 instances indépendantes"
 - [x] Étendre `FB_Modes` : `WinchSelect`, verrou de transition de mode (§4), interlock `SEMI_AUTO`
       vs `Homed`/`HomingSuspect` — ✅ Codé et raccordé (2026-07-08)
-- [ ] Confirmer le rôle de `CodeSeqTrigCmd` (`COD1_CodeSeqTrigCmd`/`COD2_CodeSeqTrigCmd`) — seul
-      point encore inconnu de la séquence preset (`PresettTrigCmd`/`PresetValue` confirmés)
+- [ ] Confirmer le rôle de `CodeSeqTrigCmd` (`COD1_CodeSeqTrigCmd`/`COD2_CodeSeqTrigCmd`) —
+      📌 voir `DOC/PLAN_TASK_v1.0.md` §3 (T8)
 - [x] Flux homing nominal réglé (§1/§7bis, 2026-07-02) : capteur haut = déclencheur unique,
       `TopSensorPositionM` ≈ 12.50 m paramétrable, toucher d'eau = contrôle visuel de calibration
 - [x] Coder l'extension `FB_Safety_Winch` (§7bis) : `M1_M2_TopPositionSensor`, `InReferencingMode` →
@@ -650,11 +659,10 @@ bougent ensemble sans régulation d'écart. Canaux `COD2_*` (I/O Mapping) **mapp
 (miroir de `COD1_*`, voir §9bis point 9).
 
 **Hors périmètre — à traiter séparément** :
-- [ ] Variateur **AC600 (M3, chariot)** : comportement pressenti sur perte de communication =
-      **roue libre sans rampe** (proche d'un STO), différent du comportement treuil
-      (contacteurs+frein, rampe rapide `SafeStop`). À valider et documenter dans une future mise à
-      jour de `AF_Partie-02`/un document dédié `FB_Chariot` — pas traité ici (hors sujet codeur
-      treuil).
+- Variateur **AC600 (M3, chariot)** : comportement pressenti sur perte de communication =
+  **roue libre sans rampe** (proche d'un STO), différent du comportement treuil
+  (contacteurs+frein, rampe rapide `SafeStop`) — pas traité ici (hors sujet codeur treuil).
+  📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T4).
 
 ---
 
@@ -739,36 +747,23 @@ rejeté** (`ErrorId` bit4) — c'est le comportement voulu, pas une erreur.
 
 ### 🔒 Points bloquants avant tout essai réel (pas des bugs, des TODO explicites)
 - **Séquence preset** : `PresetTriggerCmd := 2` **confirmé terrain** (déclenche le
-  référencement à `PresetValueOut`). Seul `CodeSeqTriggerCmd` reste de rôle **inconnu** (laissé
-  à `0`, non piloté). `PresetRequest` est de toute façon figé `FALSE` dans `PRG_MAIN` pour
-  l'instant (aucun risque immédiat, la séquence ne se déclenche jamais tant que
-  `FB_Encoder_Homing` ne pilote pas `PresetRequest`).
-- **`FB_Encoder_Safety` (survitesse) orphelin** : plus appelé depuis la réécriture de
-  `FB_Encoder_Abs` — à trancher dans le lot dédié `FB_Encoder_Safety` (§9).
+  référencement à `PresetValueOut`). `PresetRequest` est de toute façon figé `FALSE` dans
+  `PRG_MAIN` pour l'instant (aucun risque immédiat, la séquence ne se déclenche jamais tant que
+  `FB_Encoder_Homing` ne pilote pas `PresetRequest`). 📌 Rôle de `CodeSeqTriggerCmd` : voir
+  `DOC/PLAN_TASK_v1.0.md` §3 (T8).
 - **M1 et M2 bougent ensemble sans synchro** (voir Partie9 §9) — vigilance visuelle requise
   pendant tout essai avec les deux treuils actifs.
 
+📌 Suivi (`FB_Encoder_Safety` orphelin depuis la réécriture de `FB_Encoder_Abs`) : voir
+`DOC/PLAN_TASK_v1.0.md` §3 (T24).
+
 ---
 
-## 🔁 10. Retour d'expérience (à compléter après implémentation + test)
+## 🔁 10. Retour d'expérience
 
-- [ ] `HomingRefTargetNominal` = 16 777 216 pts confirmé conforme à la fiche technique définitive ?
-- [ ] Flux nominal (2 treuils, `MAINT_N1`) : `Home` refusé sans `M1_M2_TopPositionSensor` confirmé sur
-      les deux, `CablePosM` ≈ `TopSensorPositionM` après homing, sur les deux treuils simultanément ?
-- [ ] Calibration `TopSensorPositionM` (§7bis) : après homing haut, `CablePosM` ≈ 0.00 m au
-      contact visuel réel de l'eau ? Sinon, ajustement du paramètre suffisant pour converger ?
-- [ ] Flux unitaire (`MAINT_N2`, cible paramétrable) testé sur un seul treuil, l'autre restant
-      bien immobile (neutralisation croisée effective) ?
-- [ ] Arrêt confirmé (contacteurs + frein) : pas de faux positif/négatif en usage réel ?
-- [ ] Bornage absolu `[-99.00;+99.00]` m : jamais déclenché en usage normal, bien bloquant si
-      valeur aberrante simulée ?
-- [ ] Détection de saut incohérent (3 cycles) : ni fausse alarme sur à-coup treuil en charge, ni
-      détection manquée sur rebouclage simulé ?
-- [ ] Détection d'incohérence au redémarrage (§3.7) testée (rotation simulée hors tension) →
-      `HomingSuspect` levé, `SEMI_AUTO` bloqué, `ConfirmCoherence` fonctionnelle en `MAINT_N1`/`N2` ?
-- [ ] Verrou de transition de mode (`WinchSelect:=NONE` forcé en sortie `MAINT_N2`) vérifié sur
-      tous les chemins de sortie (bascule brutale, perte mot de passe, etc.) ?
-- [ ] Si validé → figer les paramètres définitifs, clôturer cette v1.1.
+📌 Suivi (checklist de validation non réalisée — flux nominal/unitaire, calibration, bornage,
+détection de saut, incohérence au redémarrage, verrou de transition de mode) : voir
+`DOC/PLAN_TASK_v1.0.md` §3 (T25).
 
 ---
 

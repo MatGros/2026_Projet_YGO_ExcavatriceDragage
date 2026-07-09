@@ -1,10 +1,15 @@
-# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.10)
+# 📋 Analyse Fonctionnelle — Partie 2 : Architecture Programme (v2.11)
 
+> **v2.11 (2026-07-09)** — Nettoyage documentaire (audit doc) : la note "priorités de tâches à
+> définir" (§2) était une remarque organisationnelle (TBD) — remplacée par un renvoi court vers
+> `DOC/PLAN_TASK_v1.0.md` §3 (T5), qui centralise désormais ce reliquat. Aucun changement
+> fonctionnel.
+>
 > **v2.10 (2026-07-07)** — REX terrain (voir Partie 9) : l'exemple §3 citant
 > `PRG_0_Inputs.M1ContactorFeedbackFwd` (retour individuel par sens) est mis à jour — ce signal
 > est **supprimé côté câblage réel** pour les treuils M1/M2, remplacé par un retour unique par
 > treuil `M1FwdRevSpeedFeedbackOff`. Aucun autre changement vs v2.9. Détail complet :
-> `DOC/AF_Partie-09_Fonction_Winch_v1.9.md`.
+> `DOC/AF_Partie-09_Fonction_Winch_v1.10.md`.
 >
 > **v2.9** — Correctif documentaire (voir Partie 13) : `GVL_DEBUG` (§2bis) a été supprimé et
 > remplacé par `GVL_Simulation` (bit maître `SimulationModeActive` + granularité par device
@@ -74,7 +79,8 @@ cascade) rendait l'ordre d'exécution **invisible** sans lire le corps du POU ra
 | 🔌 **CanTask** | à définir¹ | **20 ms** | Rafraîchit **uniquement** l'image process CANopen (joystick Hall). Le **traitement** (`FB_Joystick` dans `PRG_1_Diagnostics`) s'exécute dans `MainTask` (10 ms) |
 | 🧠 **MainTask** | à définir¹ | **10 ms** | Exécute **séquentiellement** `PRG_0_Inputs` → `PRG_10_Outputs` (liste d'appel §3) |
 
-> ¹ **Priorités à définir** en configuration CODESYS (TBD — voir `DOC/AUDIT_Coherence_Documentaire_v1.0.md` Q7, jamais tranché). Critère : les tâches bus rafraîchissent l'image process **avant** que `MainTask` ne la consomme.
+> ¹ **Priorités** en configuration CODESYS — critère : les tâches bus rafraîchissent l'image
+> process **avant** que `MainTask` ne la consomme. 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T5).
 
 ⏲️ **Surveillance périodicité des tâches** : fonction système CODESYS (seuil **200 ms**), **pas de programme applicatif dédié**.
 

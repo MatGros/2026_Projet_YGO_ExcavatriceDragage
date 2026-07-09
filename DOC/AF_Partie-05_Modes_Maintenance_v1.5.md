@@ -1,5 +1,10 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.5)
 
+> **Version 1.5** — Nettoyage documentaire (audit doc) : la remarque "GVL d'échange IHM à créer
+> (à définir)" (§6) était organisationnelle — remplacée par un renvoi court vers
+> `DOC/PLAN_TASK_v1.0.md` §3 (T18). Aucun changement fonctionnel. Corrige au passage le nom de
+> fichier, resté suffixé `_v1.3` alors que le contenu interne était déjà en v1.4 (voir bandeau
+> ci-dessous).
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Modes` **codé et enrichi** —
 > `CODE/MODES/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
 > codés en dur dans `PRG_MAIN`), refuse `SEMI_AUTO` si défaut codeur (`FB_Encoder_Safety`),
@@ -246,8 +251,8 @@ Règle de conception : **prévoir, en sortie de chaque FB, de l'information pens
   warnings (`SyncWarn`, `ForceImbalance`…), positions, vitesses estimées.
 - Les **textes** des messages sont écrits **dans l'IHM** ; les FB exposent des **mots / bits / valeurs**
   que l'intégrateur **mappe** manuellement (DFD entrée pour les paramètres, sortie pour l'affichage).
-- Une **GVL d'échange IHM** *pourra* être créée à cette fin (à définir) — c'est le seul usage
-  de GVL envisagé, l'état interne machine restant porté par les E/S des FB.
+- Une **GVL d'échange IHM** est le seul usage de GVL envisagé, l'état interne machine restant
+  porté par les E/S des FB. 📌 Suivi (création ou non) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T18).
 
 ---
 

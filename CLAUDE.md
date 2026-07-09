@@ -23,18 +23,18 @@ Chaque Function Block **métier** doit respecter :
 - Jamais autoriser le redémarrage automatique après défaut
 - **Précédence `Enable` > `SafeStop` > `StartStop`** : `Enable=FALSE` → neutralisation (sorties coupées) ; `SafeStop=TRUE` → rampe rapide (`Enable` maintenu) ; `StartStop=FALSE` → rampe normale. **`CoupeEnable` n'existe pas** (jamais une variable — vocabulaire abandonné).
 
-### 3. **[Architecture](DOC/AF_Partie-02_Architecture_Programme_v2.10.md)** ← Pour comprendre
-Tâches, arborescence CODESYS, flux données. **v2.10 = référence** (modèle `SafeStop`/`StartStop`,
+### 3. **[Architecture](DOC/AF_Partie-02_Architecture_Programme_v2.11.md)** ← Pour comprendre
+Tâches, arborescence CODESYS, flux données. **v2.11 = référence** (modèle `SafeStop`/`StartStop`,
 `SafeStop` **par métier** — pas de signal global ; pas de `GVL_BusHealth`/`E_DegradationLevel`/
 `FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff` ;
 câble mécanique de position haute retiré de la chaîne AU matérielle, géré par l'automate via
-`PowerCutOff` — voir Partie1 v1.5 §Sécurité électrique).
+`PowerCutOff` — voir Partie1 v1.6 §Sécurité électrique).
 
 ### 4. **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
-- **[Partie 5](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
-- **[Partie 6](DOC/AF_Partie-06_IO_Conditioning_v1.5.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
-- **[Partie 8](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
+- **[Partie 4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, chariot, grappin, rampes).
+- **[Partie 5](DOC/AF_Partie-05_Modes_Maintenance_v1.5.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
+- **[Partie 6](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
+- **[Partie 8](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
 
@@ -117,22 +117,32 @@ dédié). Priorités **à définir** en config CODESYS (TBD).
 
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
-- [AF_Partie-01_Analyse_Fonctionnelle_v1.5.md](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.5.md) — Équipements & fonctions (sécurité électrique : chaîne AU, `PowerCutOff` fail-safe, réarmement)
-- [AF_Partie-02_Architecture_Programme_v2.10.md](DOC/AF_Partie-02_Architecture_Programme_v2.10.md) — Architecture détaillée (**v2.10**)
+- [AF_Partie-01_Analyse_Fonctionnelle_v1.6.md](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md) — Équipements & fonctions (sécurité électrique : chaîne AU, `PowerCutOff` fail-safe, réarmement)
+- [AF_Partie-02_Architecture_Programme_v2.11.md](DOC/AF_Partie-02_Architecture_Programme_v2.11.md) — Architecture détaillée (**v2.11**)
 - [AF_Partie-03_Template_FB_Commun_v1.3.md](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md) — Contrat FB & sécurité
-- [AF_Partie-04_Cycle_Sequenceur_v1.2.md](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md) — Cycle, synchro, frein, grappin, rampes
-- [AF_Partie-05_Modes_Maintenance_v1.3.md](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md) — Modes, maintenance N1/N2, AU, limite légale
-- [AF_Partie-06_IO_Conditioning_v1.5.md](DOC/AF_Partie-06_IO_Conditioning_v1.5.md) — Conditionnement E/S
-- [AF_Partie-08_Fonction_Joystick_v1.2.md](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md) — Fonction métier Joystick (8+ = métier par FB)
-- [AF_Partie-09_Fonction_Winch_v1.9.md](DOC/AF_Partie-09_Fonction_Winch_v1.9.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A–E : roue libre/pilotage sans commande/glissement grappin/capteur haut/écart synchro critique)
-- [AF_Partie-10_Fonction_Encoder_Homing_v1.7.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.7.md) — Codeur & Homing
-- [AF_Partie-11_Fonction_Chariot_v1.3.md](DOC/AF_Partie-11_Fonction_Chariot_v1.3.md) — Fonction Chariot (M3, ex-Translation)
-- [AF_Partie-12_Fonction_Grappin_v1.2.md](DOC/AF_Partie-12_Fonction_Grappin_v1.2.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
-- [AF_Partie-13_Fonction_Simulation_v1.1.md](DOC/AF_Partie-13_Fonction_Simulation_v1.1.md) — Fonction Simulation (flags bits maître + granularité par device)
+- [AF_Partie-04_Cycle_Sequenceur_v1.3.md](DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md) — Cycle, synchro, frein, grappin, rampes
+- [AF_Partie-05_Modes_Maintenance_v1.5.md](DOC/AF_Partie-05_Modes_Maintenance_v1.5.md) — Modes, maintenance N1/N2, AU, limite légale
+- [AF_Partie-06_IO_Conditioning_v1.6.md](DOC/AF_Partie-06_IO_Conditioning_v1.6.md) — Conditionnement E/S
+- [AF_Partie-08_Fonction_Joystick_v1.3.md](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md) — Fonction métier Joystick (8+ = métier par FB)
+- [AF_Partie-09_Fonction_Winch_v1.10.md](DOC/AF_Partie-09_Fonction_Winch_v1.10.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A–E : roue libre/pilotage sans commande/glissement grappin/capteur haut/écart synchro critique)
+- [AF_Partie-10_Fonction_Encoder_Homing_v1.9.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.9.md) — Codeur & Homing
+- [AF_Partie-11_Fonction_Chariot_v1.4.md](DOC/AF_Partie-11_Fonction_Chariot_v1.4.md) — Fonction Chariot (M3, ex-Translation)
+- [AF_Partie-12_Fonction_Grappin_v1.4.md](DOC/AF_Partie-12_Fonction_Grappin_v1.4.md) — Fonction Grappin (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
+- [AF_Partie-13_Fonction_Simulation_v1.2.md](DOC/AF_Partie-13_Fonction_Simulation_v1.2.md) — Fonction Simulation (flags bits maître + granularité par device)
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
+- [PLAN_TASK_v1.0.md](DOC/PLAN_TASK_v1.0.md) — 🗂️ **Pilotage projet, PAS une spec** : jalons connus de l'affaire, état des tâches/features (fait/priorisé/partiel/différé/manquant), reliquats/TBD/questions client. Toute info organisationnelle trouvée dans une `AF_PartieN` doit y renvoyer (`📌 Suivi : PLAN_TASK.md §3`) au lieu d'y rester — garde les `AF_PartieN` focalisées sur la spec fonctionnelle pure.
 
 ### 📐 Plan de numérotation
 - **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…).
+
+### ✍️ Style rédaction — docs de pilotage
+Toujours **concis, direct, TDAH-friendly, emoji, tokens minimaux** pour :
+`AUDIT_Coherence_Documentaire_v1.0.md` · `NAMING_CONVENTION.md` · `VERSION_HISTORY.md` · `PLAN_TASK_v1.0.md`
+👉 Tables/listes courtes > prose.
+
+### ✍️ Style rédaction — `AF_PartieN` (specs fonctionnelles)
+Toujours **concis et technique, zéro perte d'information, emoji** pour la clarté (repères visuels, pas de décoration).
+👉 Précision technique prioritaire sur la brièveté — contrairement aux docs de pilotage ci-dessus, on ne sacrifie aucun détail métier/sécurité pour raccourcir.
 
 ---
 

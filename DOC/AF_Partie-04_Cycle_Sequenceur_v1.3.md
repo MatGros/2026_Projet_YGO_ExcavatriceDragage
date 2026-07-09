@@ -1,5 +1,8 @@
-# 📋 Analyse Fonctionnelle — Partie 4 : Cycle & Séquenceur (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 4 : Cycle & Séquenceur (v1.3)
 
+> **Version 1.3** — Nettoyage documentaire (audit doc) : la note TBD sur le détail fin de la
+> séquence INIT (§2) était une remarque organisationnelle (décision D22 reportée) — remplacée par
+> un renvoi court vers `DOC/PLAN_TASK_v1.0.md` §3 (T1). Aucun changement fonctionnel.
 > **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Godet→Grappin,
 > Translation→Chariot — y compris l'étape `E_CycleStep.TRANSLATION_MOVE` renommée
 > **`CHARIOT_MOVE`** (préfixe I/O physique M3 inchangé).
@@ -70,11 +73,10 @@ DESCENDING_OPEN_DUMP ──(grappin ouvert)──► RETURN_WORK_POS ──(posi
 
 ---
 
-## 🧭 2. Séquence d'initialisation (INIT) — *partiellement TBD*
+## 🧭 2. Séquence d'initialisation (INIT)
 
-> ⚠️ **TBD (To Be Defined)** : le détail fin de la séquence INIT reste à arrêter (voir
-> `DOC/AUDIT_Coherence_Documentaire_v1.0.md` — décision D22, reportée).
-> Le squelette ci-dessous fixe les vérifications **sûres et vérifiées** attendues.
+> 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T1) pour le détail fin restant à arrêter. Le squelette
+> ci-dessous fixe les vérifications **sûres et vérifiées** attendues.
 
 `INIT` doit garantir un état machine **cohérent et vérifié** avant d'autoriser le cycle.
 

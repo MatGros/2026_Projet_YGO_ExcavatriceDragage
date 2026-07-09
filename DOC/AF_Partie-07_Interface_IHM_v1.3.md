@@ -1,9 +1,12 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.2)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.3)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
-> **Version** : v1.3 (2026-07-08, Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs).  
-> 🔗 **Dépend de** : [P2 Architecture v2.10](AF_Partie-02_Architecture_Programme_v2.10.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.9.md), [P10 Homing v1.7](AF_Partie-10_Fonction_Encoder_Homing_v1.7.md), [P12 Grappin v1.2](AF_Partie-12_Fonction_Grappin_v1.2.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.1.md).
+> **Version** : v1.3 (2026-07-08, Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs).
+> 🔧 **Nettoyage documentaire (audit doc, 2026-07-09)** : harmonisation titre/nom de fichier — le
+> titre affichait encore v1.2 alors que le champ "Version" (ci-dessus) était déjà en v1.3 ; le nom
+> de fichier suit désormais la version la plus haute. Aucun changement de contenu fonctionnel.  
+> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md), [P10 Homing v1.7](AF_Partie-10_Fonction_Encoder_Homing_v1.9.md), [P12 Grappin v1.4](AF_Partie-12_Fonction_Grappin_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
 
 ---
 
