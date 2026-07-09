@@ -158,8 +158,8 @@ Code ajouté tout à la fin du POU `PRG_02_Encoders` pour détecter le succès (
 
 ### 5. **CODE/ENCODERS/FB_Encoder_Abs.st** — Temporisation visuelle de l'écriture
 
-#### 🔶 **Bloc 1 : Maintien visuel à 1.5s dans le step 1**
-Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fois le codeur recalé, le bit `PresetTriggerCmd := 2` est maintenu pendant **1.5 seconde** avant d'être repassé à `0` (step 0).
+#### 🔶 **Bloc 1 : Maintien visuel à 0.5s dans le step 1**
+Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fois le codeur recalé, le bit `PresetTriggerCmd := 2` est maintenu pendant **0.5 seconde** avant d'être repassé à `0` (step 0).
 
 **Rôle :** Permet à l'œil humain et aux visualisations CODESYS de voir passer l'impulsion et l'écriture de valeur brute sur le bus en simulation.
 

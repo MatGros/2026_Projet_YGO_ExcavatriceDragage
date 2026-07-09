@@ -5521,7 +5521,7 @@ IF NOT Enable THEN
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
-    PresetTimerVisual(IN := FALSE, PT := T#1500MS);
+    PresetTimerVisual(IN := FALSE, PT := T#500MS);
     RETURN;
 END_IF;
 
@@ -5566,17 +5566,17 @@ CASE PresetSeqStep OF
             PresetSeqStep := 1;
             PresetTimer(IN := TRUE, PT := PresetTimeout);
         END_IF;
-    1: // Déclenchement preset (laissé actif pendant 1.5s pour confort visuel en simulation/bus)
+    1: // Déclenchement preset (laissé actif pendant 0.5s pour confort visuel en simulation/bus)
         PresetTriggerCmd := 2;   // ✅ Valeur confirmée terrain — référence le codeur à PresetValueOut
         RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
         IF ABS(RawDiff) &lt;= UDINT_TO_DINT(PresetTolerancePts) THEN
             PresetTimer(IN := FALSE, PT := PresetTimeout);
-            PresetTimerVisual(IN := TRUE, PT := T#1500MS);
+            PresetTimerVisual(IN := TRUE, PT := T#500MS);
             IF PresetTimerVisual.Q THEN
                 PresetTriggerCmd := 0;
                 PresetAck := TRUE;
                 PresetSeqStep := 0;
-                PresetTimerVisual(IN := FALSE, PT := T#1500MS);
+                PresetTimerVisual(IN := FALSE, PT := T#500MS);
             END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
@@ -5584,7 +5584,7 @@ CASE PresetSeqStep OF
             ErrorId := ErrorId OR 16#0002;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
-            PresetTimerVisual(IN := FALSE, PT := T#1500MS);
+            PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
