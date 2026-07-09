@@ -121,8 +121,8 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ```st
 IF ManuActive THEN
-    PowerCutOff_A_RQ := NOT ForceTestA;
-    PowerCutOff_B_RQ := NOT ForceTestB;
+    PowerCutOff_A_RQ := TRUE;
+    PowerCutOff_B_RQ := TRUE;
     // ─────────  Fin modification IHM_MANU  ─────────
 ELSE
     PowerCutOff_A_RQ := NOT (PRG_03_Safety... ) AND NOT ForceTestA AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
@@ -130,7 +130,7 @@ ELSE
 END_IF;
 ```
 
-**Rôle :** **Imbriqué dans le IF/ELSE existant**, en mode Manu force la puissance à `TRUE` en ignorant les défauts Méca A/B/C ou le bouton CmdEmergencyCutOff, tout en laissant passer les signaux d'auto-test `ForceTestA` et `ForceTestB` pour permettre le réarmement de puissance.
+**Rôle :** **Imbriqué dans le IF/ELSE existant**, en mode Manu force `PowerCutOff_A_RQ = TRUE` et `PowerCutOff_B_RQ = TRUE` FIXES (pas de logique Méca A/B/C, pas d'auto-test ForceTestA/B, pas de bouton CmdEmergencyCutOff — seul l'AU physique protège).
 
 **À modifier au nettoyage :** Retirer le bloc IF ManuActive/ELSE, replacer directement la logique normale dans le code.
 
@@ -184,8 +184,8 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
     ```st
     // ❌ AVANT :
     IF ManuActive THEN
-        PowerCutOff_A_RQ := NOT ForceTestA;
-        PowerCutOff_B_RQ := NOT ForceTestB;
+        PowerCutOff_A_RQ := TRUE;
+        PowerCutOff_B_RQ := TRUE;
     ELSE
         PowerCutOff_A_RQ := NOT (...) AND ...
         ...
