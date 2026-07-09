@@ -77,23 +77,26 @@
       <UserDefElement iecname="LastPosM2Close" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="StateIncoherent" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_IHM_MANU" size="20" nativesize="20" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_IHM_MANU">
+    <TypeUserDef name="T_ST_IHM_MANU" size="36" nativesize="36" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_IHM_MANU">
       <UserDefElement iecname="ModeDisable" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_RelayFwd" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_RelayRev" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="HomingEncoder_M1" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M2_RelayFwd" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M2_RelayRev" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="HomingEncoder_M2" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_RelayFwd" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_RelayRev" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor1" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor2" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor3" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor4" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M3_RelayFwd" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M3_RelayRev" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M3_FreqSetpoint" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionM_M1" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_RelayFwd" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_RelayRev" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingEncoder_M1" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionM_M2" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2_RelayFwd" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2_RelayRev" type="T_BOOL" byteoffset="17" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingEncoder_M2" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_RelayFwd" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_RelayRev" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor1" type="T_BOOL" byteoffset="21" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor2" type="T_BOOL" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor3" type="T_BOOL" byteoffset="23" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor4" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_RelayFwd" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_RelayRev" type="T_BOOL" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_FreqSetpoint" type="T_REAL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_FreqActual" type="T_REAL" byteoffset="32" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_ChariotHMI" size="30" nativesize="32" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChariotHMI">
       <UserDefElement iecname="FBState" type="T_E_State" byteoffset="0" vartype="VAR" access="ReadWrite" />

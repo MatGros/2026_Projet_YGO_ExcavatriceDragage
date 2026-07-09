@@ -138,33 +138,32 @@ END_IF;
 
 ---
 
-### 4. **CODE/MAIN/PRG_02_Encoders.st** — Deux blocs homing (M1 et M2)
+### 4. **CODE/MAIN/PRG_02_Encoders.st** — Override direct et bypass sécurité homing
 
-#### 🔶 **Bloc 1 : Homing M1** (lignes 110–114)
+#### 🔶 **Bloc 1 : M1 et M2 - PresetRequest/Value direct (Bypass de instHoming)**
+Si `ManuActive` est activé, les commandes `HomingEncoder_M1/M2` pilotent directement le bloc `instEncoderAbsM1/M2` :
+*   `PresetRequest` = `instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1)`
+*   `PresetValue` = `16777216` (milieu de plage)
 
-```st
-// ─────────  Début modification IHM_MANU  ─────────
-Home := GVL_IHM.WinchM1.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1,
-// ─────────  Fin modification IHM_MANU  ─────────
-```
+**Rôle :** Permet d'envoyer l'écriture dans les mots physiques sans aucune condition de mode (MAINT_N1/N2 non requis) ni de sécurité (contacteur sens/frein non vérifiés).
 
-**Rôle :** Simple OR entre la commande homing normale et la commande IHM_MANU. **Aucune dérogation sécurité** — les conditions internes de `FB_Encoder_Homing` (Mode MAINT_N1/N2, arrêt confirmé, capteur haut requis en N1) restent pleinement actives.
+#### 🔶 **Bloc 2 : Enregistrement manuel de calibration et reset bouton HMI**
+Code ajouté tout à la fin du POU `PRG_02_Encoders` pour détecter le succès (`PresetAck`) ou le timeout (`PresetNak`) afin d'écrire directement l'offset de position dans la mémoire persistante pour faire `12.5` mètres (Offset = `16726016`), puis de désactiver le bouton HMI.
 
-**À modifier au nettoyage :** Retirer le OR avec HomingEncoder_M1 — laisser juste `Home := GVL_IHM.WinchM1.CmdHome,`.
+**À modifier au nettoyage :** 
+*   Rétablir les entrées `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur `instEncoderAbsM1` et `instEncoderAbsM2`.
+*   Retirer le bloc de code conditionnel `IF PRG_10_Outputs.ManuActive THEN ... END_IF` tout à la fin du fichier.
 
 ---
 
-#### 🔶 **Bloc 2 : Homing M2** (lignes 159–163)
+### 5. **CODE/ENCODERS/FB_Encoder_Abs.st** — Temporisation visuelle de l'écriture
 
-```st
-// ─────────  Début modification IHM_MANU  ─────────
-Home := GVL_IHM.WinchM2.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2,
-// ─────────  Fin modification IHM_MANU  ─────────
-```
+#### 🔶 **Bloc 1 : Maintien visuel à 1.5s dans le step 1**
+Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fois le codeur recalé, le bit `PresetTriggerCmd := 2` est maintenu pendant **1.5 seconde** avant d'être repassé à `0` (step 0).
 
-**Identique à M1.**
+**Rôle :** Permet à l'œil humain et aux visualisations CODESYS de voir passer l'impulsion et l'écriture de valeur brute sur le bus en simulation.
 
-**À modifier au nettoyage :** Retirer le OR avec HomingEncoder_M2.
+**À modifier au nettoyage :** Rétablir la transition immédiate sans `PresetTimerVisual` dans le Step 1, et supprimer la déclaration du timer dans `VAR`.
 
 ---
 
