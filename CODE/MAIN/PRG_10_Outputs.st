@@ -265,8 +265,6 @@ ELSE
     M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
     M3_SetpointFrequencyHz := 0;
 END_IF;
-GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
-GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
 GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
 
 // 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur

@@ -5455,6 +5455,14 @@ END_IF;
                 <DINT />
               </type>
             </variable>
+            <variable name="PresetTimerVisual">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timer pour laisser le temps de voir l'impulsion (1.5s)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -5513,6 +5521,7 @@ IF NOT Enable THEN
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
+    PresetTimerVisual(IN := FALSE, PT := T#1500MS);
     RETURN;
 END_IF;
 
@@ -5557,20 +5566,25 @@ CASE PresetSeqStep OF
             PresetSeqStep := 1;
             PresetTimer(IN := TRUE, PT := PresetTimeout);
         END_IF;
-    1: // Déclenchement preset (1 cycle suffit normalement, laissé actif jusqu'à confirmation)
+    1: // Déclenchement preset (laissé actif pendant 1.5s pour confort visuel en simulation/bus)
         PresetTriggerCmd := 2;   // ✅ Valeur confirmée terrain — référence le codeur à PresetValueOut
         RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
         IF ABS(RawDiff) &lt;= UDINT_TO_DINT(PresetTolerancePts) THEN
-            PresetTriggerCmd := 0;
-            PresetAck := TRUE;
-            PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
+            PresetTimerVisual(IN := TRUE, PT := T#1500MS);
+            IF PresetTimerVisual.Q THEN
+                PresetTriggerCmd := 0;
+                PresetAck := TRUE;
+                PresetSeqStep := 0;
+                PresetTimerVisual(IN := FALSE, PT := T#1500MS);
+            END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
             PresetNak := TRUE;
             ErrorId := ErrorId OR 16#0002;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
+            PresetTimerVisual(IN := FALSE, PT := T#1500MS);
         END_IF;
 END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
@@ -12460,8 +12474,8 @@ instEncoderAbsM1(
     AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational OR instSimEncoderM1.Enable,
-    PresetRequest       := instHomingM1.PresetRequest,
-    PresetValue         := instHomingM1.PresetValue
+    PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
+    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
 );
 COD1_PresettTrigCmd := instEncoderAbsM1.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderAbsM1.CodeSeqTriggerCmd;
@@ -12509,8 +12523,8 @@ instEncoderAbsM2(
     AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational OR instSimEncoderM2.Enable,
-    PresetRequest       := instHomingM2.PresetRequest,
-    PresetValue         := instHomingM2.PresetValue
+    PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
+    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
 );
 COD2_PresettTrigCmd := instEncoderAbsM2.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderAbsM2.CodeSeqTriggerCmd;
@@ -12574,6 +12588,35 @@ instEncoderSafetyM2(
 EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 
 EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
+
+// ─────────  Début modification IHM_MANU  ─────────
+// 🎯 Référencement direct (bypass sécurité et modes) si HomingEncoder_M1/M2 activés en Manu
+IF PRG_10_Outputs.ManuActive THEN
+    IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
+        IF instEncoderAbsM1.PresetAck THEN
+            GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+            GVL_PERSISTENT.CalibM1.Homed := TRUE;
+            GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
+            GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
+            GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
+        ELSIF instEncoderAbsM1.PresetNak THEN
+            GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+        END_IF;
+    END_IF;
+
+    IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
+        IF instEncoderAbsM2.PresetAck THEN
+            GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+            GVL_PERSISTENT.CalibM2.Homed := TRUE;
+            GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
+            GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
+            GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
+        ELSIF instEncoderAbsM2.PresetNak THEN
+            GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+        END_IF;
+    END_IF;
+END_IF;
+// ─────────  Fin modification IHM_MANU  ─────────
 </xhtml>
           </ST>
         </body>
@@ -14843,8 +14886,6 @@ ELSE
     M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
     M3_SetpointFrequencyHz := 0;
 END_IF;
-GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
-GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
 GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
 
 // 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur

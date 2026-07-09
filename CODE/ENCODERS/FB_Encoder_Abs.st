@@ -81,6 +81,7 @@ VAR
     PresetTimer         : TON;
     PresetSeqStep       : INT;         // 0=IDLE, 1=pulse CodeSeq, 2=pulse Trig, 3=attente confirmation
     RawDiff             : DINT;
+    PresetTimerVisual   : TON;         // Timer pour laisser le temps de voir l'impulsion (1.5s)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
@@ -93,6 +94,7 @@ IF NOT Enable THEN
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
+    PresetTimerVisual(IN := FALSE, PT := T#1500MS);
     RETURN;
 END_IF;
 
@@ -137,20 +139,25 @@ CASE PresetSeqStep OF
             PresetSeqStep := 1;
             PresetTimer(IN := TRUE, PT := PresetTimeout);
         END_IF;
-    1: // Déclenchement preset (1 cycle suffit normalement, laissé actif jusqu'à confirmation)
+    1: // Déclenchement preset (laissé actif pendant 1.5s pour confort visuel en simulation/bus)
         PresetTriggerCmd := 2;   // ✅ Valeur confirmée terrain — référence le codeur à PresetValueOut
         RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
         IF ABS(RawDiff) <= UDINT_TO_DINT(PresetTolerancePts) THEN
-            PresetTriggerCmd := 0;
-            PresetAck := TRUE;
-            PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
+            PresetTimerVisual(IN := TRUE, PT := T#1500MS);
+            IF PresetTimerVisual.Q THEN
+                PresetTriggerCmd := 0;
+                PresetAck := TRUE;
+                PresetSeqStep := 0;
+                PresetTimerVisual(IN := FALSE, PT := T#1500MS);
+            END_IF;
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
             PresetNak := TRUE;
             ErrorId := ErrorId OR 16#0002;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
+            PresetTimerVisual(IN := FALSE, PT := T#1500MS);
         END_IF;
 END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
