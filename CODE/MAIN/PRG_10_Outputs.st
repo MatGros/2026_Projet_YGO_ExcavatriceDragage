@@ -73,8 +73,24 @@ VAR
     // ─────────  Début modification IHM_MANU  ─────────
     // 🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
     ManuActive            : BOOL; // NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)
-    UseIndividual         : BOOL; // Mode couplé/individuel mutuellement exclusifs — voir REX (3)
-    UseCoupled            : BOOL;
+    // Détection de fronts montants pour priorité temporelle
+    TrigM1Fwd             : BOOL;
+    TrigM1Rev             : BOOL;
+    TrigM2Fwd             : BOOL;
+    TrigM2Rev             : BOOL;
+    TrigCoupledFwd        : BOOL;
+    TrigCoupledRev        : BOOL;
+    TrigM3Fwd             : BOOL;
+    TrigM3Rev             : BOOL;
+    // États au scan précédent
+    LastM1Fwd             : BOOL;
+    LastM1Rev             : BOOL;
+    LastM2Fwd             : BOOL;
+    LastM2Rev             : BOOL;
+    LastCoupledFwd        : BOOL;
+    LastCoupledRev        : BOOL;
+    LastM3Fwd             : BOOL;
+    LastM3Rev             : BOOL;
     M1Fwd_Eff             : BOOL;
     M1Rev_Eff             : BOOL;
     M2Fwd_Eff             : BOOL;
@@ -115,43 +131,104 @@ GVL_IHM.IHM_MANU.PositionM_M1 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 
 IF ManuActive THEN
-    // ── Treuils M1/M2 — couplé et individuel MUTUELLEMENT EXCLUSIFS (pas un OR) ──
-    // 🔧 REX 2026-07-09 (3) : BUG CORRIGÉ — l'ancien OR (individuel OR couplé) combiné à la
-    // réécriture des bits individuels pour le retour visuel créait une boucle de rétroaction :
-    // le couplé mettait M1_RelayFwd à TRUE, qui restait bloqué à TRUE même après relâchement du
-    // bouton couplé (plus aucun moyen de l'arrêter). Fix structurel : couplé et individuel
-    // s'excluent — mélanger les deux (ex: coupler ET tirer sur M1 seul en même temps) coupe TOUT,
-    // comme pour Fwd/Rev.
-    UseIndividual := (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev
-                       OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev)
-                      AND NOT (GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev);
-    UseCoupled    := (GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev)
-                      AND NOT (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev
-                               OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev);
+    // 1️⃣ Détection des nouveaux appuis (fronts montants)
+    TrigM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT LastM1Fwd;
+    TrigM1Rev      := GVL_IHM.IHM_MANU.M1_RelayRev AND NOT LastM1Rev;
+    TrigM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT LastM2Fwd;
+    TrigM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev AND NOT LastM2Rev;
+    TrigCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT LastCoupledFwd;
+    TrigCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT LastCoupledRev;
+    TrigM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT LastM3Fwd;
+    TrigM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT LastM3Rev;
 
-    M1Fwd_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev)
-                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev);
-    M1Rev_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M1_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd)
-                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd);
-    M2Fwd_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev)
-                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev);
-    M2Rev_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd)
-                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd);
+    // 2️⃣ Interlock M1 (Montée vs Descente) : Premier actif conservé, le nouveau est rejeté à FALSE
+    IF GVL_IHM.IHM_MANU.M1_RelayFwd AND GVL_IHM.IHM_MANU.M1_RelayRev THEN
+        IF TrigM1Rev THEN
+            GVL_IHM.IHM_MANU.M1_RelayRev := FALSE; (* Rejet Rev *)
+        ELSIF TrigM1Fwd THEN
+            GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE; (* Rejet Fwd *)
+        ELSE
+            GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE;
+            GVL_IHM.IHM_MANU.M1_RelayRev := FALSE;
+        END_IF;
+    END_IF;
 
-    // ── Contacteurs vitesse K1-K4 (communs M1+M2) — PAS d'interlock, activables indépendamment ──
-    // 🔧 REX 2026-07-09 : retiré l'exclusivité mutuelle initiale — cohérent avec l'architecture
-    // normale (SpeedStep = masque 4 bits combinable, PAS un sélecteur "un seul bit à la fois"),
-    // confirmé par l'utilisateur. Passthrough direct, aucune combinaison bloquée.
+    // 3️⃣ Interlock M2 (Montée vs Descente)
+    IF GVL_IHM.IHM_MANU.M2_RelayFwd AND GVL_IHM.IHM_MANU.M2_RelayRev THEN
+        IF TrigM2Rev THEN
+            GVL_IHM.IHM_MANU.M2_RelayRev := FALSE;
+        ELSIF TrigM2Fwd THEN
+            GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE;
+        ELSE
+            GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE;
+            GVL_IHM.IHM_MANU.M2_RelayRev := FALSE;
+        END_IF;
+    END_IF;
+
+    // 4️⃣ Interlock Couplé M1_M2 (Montée vs Descente)
+    IF GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
+        IF TrigCoupledRev THEN
+            GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
+        ELSIF TrigCoupledFwd THEN
+            GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
+        ELSE
+            GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
+            GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
+        END_IF;
+    END_IF;
+
+    // 5️⃣ Interlock Chariot M3 (Marche avant vs arrière)
+    IF GVL_IHM.IHM_MANU.M3_RelayFwd AND GVL_IHM.IHM_MANU.M3_RelayRev THEN
+        IF TrigM3Rev THEN
+            GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
+        ELSIF TrigM3Fwd THEN
+            GVL_IHM.IHM_MANU.M3_RelayFwd := FALSE;
+        ELSE
+            GVL_IHM.IHM_MANU.M3_RelayFwd := FALSE;
+            GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
+        END_IF;
+    END_IF;
+
+    // 6️⃣ Conflits entre mouvements Individuels et Couplés (Couplé Fwd/Rev vs Individuel Rev/Fwd)
+    // Si Couplé Fwd actif -> rejeter individuel Rev M1 ou M2
+    IF GVL_IHM.IHM_MANU.M1_M2_RelayFwd THEN
+        IF GVL_IHM.IHM_MANU.M1_RelayRev THEN GVL_IHM.IHM_MANU.M1_RelayRev := FALSE; END_IF;
+        IF GVL_IHM.IHM_MANU.M2_RelayRev THEN GVL_IHM.IHM_MANU.M2_RelayRev := FALSE; END_IF;
+    END_IF;
+
+    // Si Couplé Rev actif -> rejeter individuel Fwd M1 ou M2
+    IF GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
+        IF GVL_IHM.IHM_MANU.M1_RelayFwd THEN GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE; END_IF;
+        IF GVL_IHM.IHM_MANU.M2_RelayFwd THEN GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE; END_IF;
+    END_IF;
+
+    // Si individuel Rev actif -> rejeter Couplé Fwd
+    IF (GVL_IHM.IHM_MANU.M1_RelayRev OR GVL_IHM.IHM_MANU.M2_RelayRev) AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd THEN
+        GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
+    END_IF;
+
+    // Si individuel Fwd actif -> rejeter Couplé Rev
+    IF (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayFwd) AND GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
+        GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
+    END_IF;
+
+    // 7️⃣ Évaluation finale des mouvements effectifs (les HMI sont désormais garanties propres)
+    M1Fwd_Eff := GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
+    M1Rev_Eff := GVL_IHM.IHM_MANU.M1_RelayRev OR GVL_IHM.IHM_MANU.M1_M2_RelayRev;
+    M2Fwd_Eff := GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
+    M2Rev_Eff := GVL_IHM.IHM_MANU.M2_RelayRev OR GVL_IHM.IHM_MANU.M1_M2_RelayRev;
+
+    // Contacteurs de vitesse K1-K4 (direct)
     K1_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor1;
     K2_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor2;
     K3_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor3;
     K4_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor4;
 
-    // ── Chariot M3 — demande interlockée (pilotage réel variateur : §M3 EtherCAT plus bas) ──
-    M3Fwd_Eff := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT GVL_IHM.IHM_MANU.M3_RelayRev;
-    M3Rev_Eff := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT GVL_IHM.IHM_MANU.M3_RelayFwd;
+    // Chariot M3 (sens)
+    M3Fwd_Eff := GVL_IHM.IHM_MANU.M3_RelayFwd;
+    M3Rev_Eff := GVL_IHM.IHM_MANU.M3_RelayRev;
 
-    // ── Recopie vers les VAR_INPUT existants (mêmes FB_Output que le mode normal) ──
+    // Recopie vers les VAR_INPUT existants
     M1RelayFwd        := M1Fwd_Eff;
     M1RelayRev        := M1Rev_Eff;
     M1BrakeCmd        := M1Fwd_Eff OR M1Rev_Eff;
@@ -188,13 +265,25 @@ ELSE
     M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
     M3_SetpointFrequencyHz := 0;
 END_IF;
-GVL_IHM.IHM_MANU.M3_FreqActual := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
+GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
+GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
+GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
 
 // 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur
 instM3RelayFwdLed(Command := ManuActive AND M3Fwd_Eff);
 M3_RelayFwd_DQ := instM3RelayFwdLed.State;
 instM3RelayRevLed(Command := ManuActive AND M3Rev_Eff);
 M3_RelayRev_DQ := instM3RelayRevLed.State;
+
+// 8️⃣ Enregistrement de l'état précédent (pour le cycle suivant)
+LastM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd;
+LastM1Rev      := GVL_IHM.IHM_MANU.M1_RelayRev;
+LastM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd;
+LastM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev;
+LastCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
+LastCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev;
+LastM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd;
+LastM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev;
 // ─────────  Fin modification IHM_MANU  ─────────
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
