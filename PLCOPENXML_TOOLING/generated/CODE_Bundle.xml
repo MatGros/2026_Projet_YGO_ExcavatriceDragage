@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.208802" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-04T06:07:15.208802">
+  <contentHeader name="MGS_v0.4.4_IHM_MANU.project" modificationDateTime="2026-07-04T06:07:15.208802">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">MGS_v0.4.4_IHM_MANU</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1232,13 +1232,21 @@
       <dataType name="ST_IHM_MANU">
         <baseType>
           <struct>
+            <variable name="ModeDisable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Activation — logique INVERSÉE volontaire (REX 2026-07-09)
+🔴 FALSE (défaut, y compris à CHAQUE démarrage/download automate,</xhtml>
+              </documentation>
+            </variable>
             <variable name="PositionM_M1">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M1 — Holding / Retenue
-📊 [m] Position brute du treuil M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 [m] Position brute codeur M1</xhtml>
               </documentation>
             </variable>
             <variable name="M1_RelayFwd">
@@ -1246,7 +1254,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M1 (Relais forward + Frein desserré) — ⚠️ Interlock M1_RelayRev requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M1 + frein</xhtml>
               </documentation>
             </variable>
             <variable name="M1_RelayRev">
@@ -1254,7 +1262,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M1 (Relais reverse + Frein desserré) — ⚠️ Interlock M1_RelayFwd requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M1 + frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingEncoder_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Front = référencement codeur M1 (OR avec GVL_IHM.WinchM1.CmdHome existant)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionM_M2">
@@ -1262,8 +1278,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M2 — Closing / Fermeture
-📊 [m] Position brute du treuil M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M2
+📊 [m] Position brute codeur M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2_RelayFwd">
@@ -1271,7 +1287,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M2 (Relais forward + Frein desserré) — ⚠️ Interlock M2_RelayRev requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M2 + frein</xhtml>
               </documentation>
             </variable>
             <variable name="M2_RelayRev">
@@ -1279,7 +1295,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M2 (Relais reverse + Frein desserré) — ⚠️ Interlock M2_RelayFwd requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M2 + frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingEncoder_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Front = référencement codeur M2 (OR avec GVL_IHM.WinchM2.CmdHome existant)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_RelayFwd">
@@ -1287,8 +1311,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande Couplée M1 + M2 (Mouvement Synchrone)
-🔗 Commande montée simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayRev requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande couplée M1+M2
+🔗 Commande montée M1 et M2 + frein</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_RelayRev">
@@ -1296,7 +1320,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande descente simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayFwd requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande descente M1 et M2 + frein</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_Contactor1">
@@ -1304,7 +1328,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 1 : Contacteur de vitesse K1 pour M1 et M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_Contactor2">
@@ -1312,7 +1336,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 2 : Contacteur de vitesse K2 pour M1 et M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_Contactor3">
@@ -1320,7 +1344,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 3 : Contacteur de vitesse K3 pour M1 et M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_Contactor4">
@@ -1328,7 +1352,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse 4 : Contacteur de vitesse K4 pour M1 et M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
               </documentation>
             </variable>
             <variable name="M3_RelayFwd">
@@ -1336,8 +1360,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Variateur Chariot M3 (AC600)
-↔️ Marche avant M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayRev requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Chariot M3 (variateur AC600)
+↔️ Commande frein + envoi valeur dans mot de commande</xhtml>
               </documentation>
             </variable>
             <variable name="M3_RelayRev">
@@ -1345,7 +1369,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Marche arrière M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayFwd requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande frein + envoi valeur dans mot de commande</xhtml>
               </documentation>
             </variable>
             <variable name="M3_FreqSetpoint">
@@ -1353,7 +1377,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 [Hz] Consigne de fréquence (ex: 50.0Hz envoie la valeur 5000 sans mot de commande)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 50.0Hz envoie 5000 sans mot de commande</xhtml>
               </documentation>
             </variable>
             <variable name="M3_FreqActual">
@@ -1361,7 +1385,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 [Hz] Fréquence réelle lue (ex: 50.0Hz correspond à la valeur 5000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 50.0Hz envoie 5000 sans mot de commande</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1373,14 +1397,18 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌐 ST_IHM_MANU — Table d'échange IHM provisoire pour mise en service
+   🚨 ST_IHM_MANU — Table d'échange IHM provisoire (mise en service URGENCE)
    ───────────────────────────────────────────────────────────────
-   ⚙️ Permet le pilotage manuel direct des sorties physiques (contacteurs, 
-      relais, freins, mots de commande variateurs) en mode dégradé 
-      pour la mise en service des treuils M1/M2 et du chariot M3.
-   ⚠️ Avertissement : Ce mode désactive les sécurités normales et les interlocks
-      logiciels standards. Les interlocks de sécurité de base (ex: Fwd vs Rev)
-      doivent être gérés directement dans le code d'activation de secours.
+   🎨 Pilotage manuel DIRECT des sorties physiques (relais, contacteurs
+      vitesse, freins) et du variateur M3 (EtherCAT, mot de commande) —
+      programme fonctionnel normal bypassé en sortie (PRG_10_Outputs
+      uniquement), aucune sécurité logicielle métier active.
+   ⚠️ DANGER : seuls les interlocks Fwd/Rev (couplé/individuel mutuellement
+      exclusifs, voir PRG_10_Outputs) protègent, plus la chaîne AU/PowerCutOff
+      (toujours active, non bypassée). Pas de limites logicielles, pas de synchro.
+   🔧 REX 2026-07-09 : M3_CommandWord (registre 0x3101 côté carte EtherCAT, PAS le
+      0x3001 natif variateur) = 0 arrêt / 1 marche avant / 2 marche arrière (recette
+      fournisseur) — ⚠️ non vérifié sur banc au moment du codage, à confirmer.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -12445,7 +12473,11 @@ instHomingM1(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.WinchM1.CmdHome,          // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Début modification IHM_MANU  ─────────
+    // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M1 (mise en service urgence) — même FB, mêmes
+    // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
+    Home                 := GVL_IHM.WinchM1.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.WinchM1.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
@@ -12490,7 +12522,11 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.WinchM2.CmdHome,          // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Début modification IHM_MANU  ─────────
+    // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M2 (mise en service urgence) — même FB, mêmes
+    // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
+    Home                 := GVL_IHM.WinchM2.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.WinchM2.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,
@@ -14465,6 +14501,101 @@ Pulse 1s en cours</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">5s — verrouillage avant nouvelle tentative possible</xhtml>
               </documentation>
             </variable>
+            <variable name="ManuActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">─────────  Début modification IHM_MANU  ─────────
+🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
+NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseIndividual">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode couplé/individuel mutuellement exclusifs — voir REX (3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseCoupled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1Fwd_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1Rev_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2Fwd_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2Rev_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="K1_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteurs vitesse communs M1+M2 — activables indépendamment</xhtml>
+              </documentation>
+            </variable>
+            <variable name="K2_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="K3_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="K4_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3Fwd_Eff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3Rev_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande interlockée — voir §M3 EtherCAT : ne pilote PAS le variateur tant que non confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instM3RelayFwdLed">
+              <type>
+                <derived name="FB_Output" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instM3RelayRevLed">
+              <type>
+                <derived name="FB_Output" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -14481,6 +14612,111 @@ Pulse 1s en cours</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_10_Outputs) ===
+
+// ─────────  Début modification IHM_MANU  ─────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 🚨 MODE IHM_MANU — override direct des sorties (mise en service urgence)
+// ───────────────────────────────────────────────────────────────────────────
+// 🆕 REX 2026-07-09 : logique inversée VOLONTAIRE — GVL_IHM.IHM_MANU.ModeDisable
+// est non-RETAIN, donc FALSE à CHAQUE démarrage/download automate = mode Manu
+// ACTIF d'origine, sans action opérateur. Il faut explicitement passer
+// ModeDisable=TRUE pour rendre la main au programme fonctionnel normal
+// (PRG_06_WinchControl/PRG_07_ChariotControl/PRG_03_Safety, intouchés).
+// ⚠️ Aucune sécurité logicielle métier active en Manu (safety M1/M2/M3, synchro,
+// limites logicielles, homing) — seuls les interlocks Fwd/Rev et K1-K4 ci-dessous,
+// et la chaîne AU/PowerCutOff (§ plus bas, TOUJOURS active, non bypassée),
+// protègent la machine et les personnes.
+// 📍 Placé en tête de PRG_10_Outputs (position tâche 10, la plus en aval) : écrase
+// les VAR_INPUT juste avant leur écriture réelle, APRÈS que PRG_06/07 (positions
+// 6/7) les aient déjà remplis — le programme normal tourne dans le vide, ignoré.
+ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable;
+
+// Affichage position — utile même hors Manu pour vérifier le câblage codeur en direct
+GVL_IHM.IHM_MANU.PositionM_M1 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+
+IF ManuActive THEN
+    // ── Treuils M1/M2 — couplé et individuel MUTUELLEMENT EXCLUSIFS (pas un OR) ──
+    // 🔧 REX 2026-07-09 (3) : BUG CORRIGÉ — l'ancien OR (individuel OR couplé) combiné à la
+    // réécriture des bits individuels pour le retour visuel créait une boucle de rétroaction :
+    // le couplé mettait M1_RelayFwd à TRUE, qui restait bloqué à TRUE même après relâchement du
+    // bouton couplé (plus aucun moyen de l'arrêter). Fix structurel : couplé et individuel
+    // s'excluent — mélanger les deux (ex: coupler ET tirer sur M1 seul en même temps) coupe TOUT,
+    // comme pour Fwd/Rev.
+    UseIndividual := (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev
+                       OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev)
+                      AND NOT (GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev);
+    UseCoupled    := (GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev)
+                      AND NOT (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev
+                               OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev);
+
+    M1Fwd_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev);
+    M1Rev_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M1_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd);
+    M2Fwd_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev);
+    M2Rev_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd);
+
+    // ── Contacteurs vitesse K1-K4 (communs M1+M2) — PAS d'interlock, activables indépendamment ──
+    // 🔧 REX 2026-07-09 : retiré l'exclusivité mutuelle initiale — cohérent avec l'architecture
+    // normale (SpeedStep = masque 4 bits combinable, PAS un sélecteur "un seul bit à la fois"),
+    // confirmé par l'utilisateur. Passthrough direct, aucune combinaison bloquée.
+    K1_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor1;
+    K2_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor2;
+    K3_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor3;
+    K4_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor4;
+
+    // ── Chariot M3 — demande interlockée (pilotage réel variateur : §M3 EtherCAT plus bas) ──
+    M3Fwd_Eff := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT GVL_IHM.IHM_MANU.M3_RelayRev;
+    M3Rev_Eff := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT GVL_IHM.IHM_MANU.M3_RelayFwd;
+
+    // ── Recopie vers les VAR_INPUT existants (mêmes FB_Output que le mode normal) ──
+    M1RelayFwd        := M1Fwd_Eff;
+    M1RelayRev        := M1Rev_Eff;
+    M1BrakeCmd        := M1Fwd_Eff OR M1Rev_Eff;
+    M1SpeedContactor1 := K1_Eff;
+    M1SpeedContactor2 := K2_Eff;
+    M1SpeedContactor3 := K3_Eff;
+    M1SpeedContactor4 := K4_Eff;
+
+    M2RelayFwd        := M2Fwd_Eff;
+    M2RelayRev        := M2Rev_Eff;
+    M2BrakeCmd        := M2Fwd_Eff OR M2Rev_Eff;
+    M2SpeedContactor1 := K1_Eff;
+    M2SpeedContactor2 := K2_Eff;
+    M2SpeedContactor3 := K3_Eff;
+    M2SpeedContactor4 := K4_Eff;
+
+    ChariotBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
+END_IF;
+
+// ── Chariot M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
+// 🔧 REX 2026-07-09 : recette fournisseur pour LE REGISTRE 0x3101 Command (carte EtherCAT,
+// PAS le 0x3001 natif du variateur — sémantique différente) : 0=arrêt, 1=marche avant,
+// 2=marche arrière. ⚠️ Non vérifié sur banc au moment du codage — à confirmer par
+// l'opérateur (Force CODESYS sur M3_CommandWord, moteur à vide si possible) avant un
+// usage prolongé. Rien d'autre n'écrit ces PDO aujourd'hui (FB_Chariot encore stubbé,
+// DriveStatusWord/ActualFreqHz à 0 en dur) — pas de conflit avec le mode normal.
+IF ManuActive AND M3Fwd_Eff THEN
+    M3_CommandWord         := 1;
+    M3_SetpointFrequencyHz := REAL_TO_UINT(GVL_IHM.IHM_MANU.M3_FreqSetpoint * 100.0);
+ELSIF ManuActive AND M3Rev_Eff THEN
+    M3_CommandWord         := 2;
+    M3_SetpointFrequencyHz := REAL_TO_UINT(GVL_IHM.IHM_MANU.M3_FreqSetpoint * 100.0);
+ELSE
+    M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
+    M3_SetpointFrequencyHz := 0;
+END_IF;
+GVL_IHM.IHM_MANU.M3_FreqActual := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
+
+// 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur
+instM3RelayFwdLed(Command := ManuActive AND M3Fwd_Eff);
+M3_RelayFwd_DQ := instM3RelayFwdLed.State;
+instM3RelayRevLed(Command := ManuActive AND M3Rev_Eff);
+M3_RelayRev_DQ := instM3RelayRevLed.State;
+// ─────────  Fin modification IHM_MANU  ─────────
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
 instM1RelayFwd(Command := M1RelayFwd);
@@ -14541,6 +14777,16 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 // la couper — pire cas de figure).
 // 🔧 REX 2026-07-07 (2) : ForceTestA/ForceTestB permettent à l'auto-test de redondance
 // (ci-dessous) de forcer UN SEUL canal bas à la fois, sans dépendre d'un vrai défaut Méca A/B/C.
+// ─────────  Début modification IHM_MANU  ─────────
+// 🆕 REX 2026-07-09 — MODE IHM_MANU : demande explicite utilisateur — en Manu, RQ_A/B = TRUE
+// FIXE dès que l'automate tourne, SANS EXCEPTION (ni Méca A/B/C, ni auto-test ForceTestA/B, ni
+// bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
+// Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
+IF ManuActive THEN
+    PowerCutOff_A_RQ := TRUE;
+    PowerCutOff_B_RQ := TRUE;
+    // ─────────  Fin modification IHM_MANU  ─────────
+ELSE
 PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                          OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
                          OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff)
@@ -14552,6 +14798,7 @@ PowerCutOff_B_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                          OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff)
                     AND NOT ForceTestB
                     AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
+END_IF;
 
 // ─── 🚨 SÉQUENCE RÉARMEMENT CONTACTEUR PUISSANCE (REX 2026-07-07) ──────────────────────
 // Commande IHM (front, PAS de réarmement automatique) →

@@ -9822,7 +9822,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639191470696761176</Single>
+        <Single Name="Timestamp" Type="long">639191539943143403</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">4141</Single>
@@ -10403,6 +10403,19 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4134</Single>
                             <Single Name="EditorPositionId" Type="long">4135</Single>
+                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                                <List2 Name="Mappings">
+                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                    <Single Name="CreateVariable" Type="bool">True</Single>
+                                    <Single Name="Variable" Type="string">M3_RelayFwd_DQ</Single>
+                                  </Single>
+                                </List2>
+                              </Single>
+                            </Single>
+                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
+                              <Single Name="Default" Type="string">Provisoire IHM_MANU pour debug avec led PLC</Single>
+                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit4</Single>
@@ -10425,6 +10438,19 @@
                             <Null Name="FilterFlags" />
                             <Single Name="PositionId" Type="long">4136</Single>
                             <Single Name="EditorPositionId" Type="long">4137</Single>
+                            <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                              <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                                <List2 Name="Mappings">
+                                  <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                                    <Single Name="CreateVariable" Type="bool">True</Single>
+                                    <Single Name="Variable" Type="string">M3_RelayRev_DQ</Single>
+                                  </Single>
+                                </List2>
+                              </Single>
+                            </Single>
+                            <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
+                              <Single Name="Default" Type="string">Provisoire IHM_MANU pour debug avec led PLC</Single>
+                            </Single>
                             <Single Name="VisibleName" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                               <Single Name="Namespace" Type="string">local</Single>
                               <Single Name="Identifier" Type="string">Byte_Bit.Bit5</Single>
@@ -29837,7 +29863,7 @@
         </Dictionary>
         <Single Name="TypeGuid" Type="System.Guid">225bfe47-7336-4dbc-9419-4105a7c831fa</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639187295590381519</Single>
+        <Single Name="Timestamp" Type="long">639191543187941408</Single>
       </Single>
       <Single Name="Object" Type="{225bfe47-7336-4dbc-9419-4105a7c831fa}" Method="IArchivable">
         <Single Name="UniqueIdGenerator" Type="string">6089</Single>
@@ -30354,6 +30380,16 @@
                       </Single>
                       <Single Name="PositionId" Type="long">5936</Single>
                       <Single Name="EditorPositionId" Type="long">5937</Single>
+                      <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                        <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                          <List2 Name="Mappings">
+                            <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                              <Single Name="CreateVariable" Type="bool">True</Single>
+                              <Single Name="Variable" Type="string">M3_CommandWord</Single>
+                            </Single>
+                          </List2>
+                        </Single>
+                      </Single>
                       <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">0x3101 Command</Single>
                       </Single>
@@ -30792,6 +30828,16 @@
                       </Single>
                       <Single Name="PositionId" Type="long">5970</Single>
                       <Single Name="EditorPositionId" Type="long">5971</Single>
+                      <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                        <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                          <List2 Name="Mappings">
+                            <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                              <Single Name="CreateVariable" Type="bool">True</Single>
+                              <Single Name="Variable" Type="string">M3_SetpointFrequencyHz</Single>
+                            </Single>
+                          </List2>
+                        </Single>
+                      </Single>
                       <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">0x3100 Frequency</Single>
                       </Single>
@@ -31255,6 +31301,16 @@
                       </Single>
                       <Single Name="PositionId" Type="long">6004</Single>
                       <Single Name="EditorPositionId" Type="long">6005</Single>
+                      <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                        <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                          <List2 Name="Mappings">
+                            <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                              <Single Name="CreateVariable" Type="bool">True</Single>
+                              <Single Name="Variable" Type="string">M3_StatusWord</Single>
+                            </Single>
+                          </List2>
+                        </Single>
+                      </Single>
                       <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">0x3102 Drive Status</Single>
                       </Single>
@@ -31693,6 +31749,16 @@
                       </Single>
                       <Single Name="PositionId" Type="long">6038</Single>
                       <Single Name="EditorPositionId" Type="long">6039</Single>
+                      <Single Name="IoMapping" Type="{d6d934cf-5ec0-42c3-b628-2a7aea7d364c}" Method="IArchivable">
+                        <Single Name="Mappings" Type="{8a62c05c-4fee-4b4a-8600-a677aedc92c7}" Method="IArchivable">
+                          <List2 Name="Mappings">
+                            <Single Type="{47edf8ea-3f84-452c-b998-e18f878578d3}" Method="IArchivable">
+                              <Single Name="CreateVariable" Type="bool">True</Single>
+                              <Single Name="Variable" Type="string">M3_ActualFrequencyHz</Single>
+                            </Single>
+                          </List2>
+                        </Single>
+                      </Single>
                       <Single Name="Description" Type="{35cf7b1a-a4cd-490b-8ebe-385e61fcc6d9}" Method="IArchivable">
                         <Single Name="Default" Type="string">C00.01 Output Frequency</Single>
                       </Single>
@@ -117019,7 +117085,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964267186</Single>
+        <Single Name="Timestamp" Type="long">639191511800295294</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -117096,7 +117162,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966215777</Single>
+        <Single Name="Timestamp" Type="long">639191511804402419</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -117200,7 +117266,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964677863</Single>
+        <Single Name="Timestamp" Type="long">639191511800922914</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -117728,7 +117794,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965689558</Single>
+        <Single Name="Timestamp" Type="long">639191511803021442</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -117940,7 +118006,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964341109</Single>
+        <Single Name="Timestamp" Type="long">639191511800376627</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -118040,7 +118106,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964729420</Single>
+        <Single Name="Timestamp" Type="long">639191511801030515</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -118487,7 +118553,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967282026</Single>
+        <Single Name="Timestamp" Type="long">639191511807694471</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -118579,7 +118645,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964997205</Single>
+        <Single Name="Timestamp" Type="long">639191511801924944</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -118846,7 +118912,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965042321</Single>
+        <Single Name="Timestamp" Type="long">639191511802011788</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -119156,7 +119222,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965082338</Single>
+        <Single Name="Timestamp" Type="long">639191511802097469</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -119341,7 +119407,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965347445</Single>
+        <Single Name="Timestamp" Type="long">639191511802233722</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -119468,7 +119534,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967362857</Single>
+        <Single Name="Timestamp" Type="long">639191511807850735</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -119550,7 +119616,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967446336</Single>
+        <Single Name="Timestamp" Type="long">639191511808025687</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -119637,7 +119703,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965480408</Single>
+        <Single Name="Timestamp" Type="long">639191511802441539</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -120225,7 +120291,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967011774</Single>
+        <Single Name="Timestamp" Type="long">639191511807227652</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -120325,7 +120391,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964577482</Single>
+        <Single Name="Timestamp" Type="long">639191511800699260</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -120448,7 +120514,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965387429</Single>
+        <Single Name="Timestamp" Type="long">639191511802330411</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -120561,7 +120627,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965546336</Single>
+        <Single Name="Timestamp" Type="long">639191511802632158</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -120945,7 +121011,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966291842</Single>
+        <Single Name="Timestamp" Type="long">639191511804613796</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -121026,7 +121092,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966523662</Single>
+        <Single Name="Timestamp" Type="long">639191511805621012</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -121304,7 +121370,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966563658</Single>
+        <Single Name="Timestamp" Type="long">639191511805712799</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -121474,7 +121540,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966608785</Single>
+        <Single Name="Timestamp" Type="long">639191511805803635</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -121756,7 +121822,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966653876</Single>
+        <Single Name="Timestamp" Type="long">639191511805910315</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -121939,7 +122005,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966694802</Single>
+        <Single Name="Timestamp" Type="long">639191511805987755</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -122074,7 +122140,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966724799</Single>
+        <Single Name="Timestamp" Type="long">639191511806075087</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -122218,7 +122284,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966774808</Single>
+        <Single Name="Timestamp" Type="long">639191511806192555</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -122723,7 +122789,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966815189</Single>
+        <Single Name="Timestamp" Type="long">639191511806278658</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -122908,7 +122974,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966855193</Single>
+        <Single Name="Timestamp" Type="long">639191511806355661</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -123026,7 +123092,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966906392</Single>
+        <Single Name="Timestamp" Type="long">639191511806955529</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -123487,7 +123553,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966946383</Single>
+        <Single Name="Timestamp" Type="long">639191511807074650</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -123841,7 +123907,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966981490</Single>
+        <Single Name="Timestamp" Type="long">639191511807150929</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -123932,7 +123998,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964461182</Single>
+        <Single Name="Timestamp" Type="long">639191511800537706</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -124013,7 +124079,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966441467</Single>
+        <Single Name="Timestamp" Type="long">639191511805336017</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -124103,7 +124169,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965583458</Single>
+        <Single Name="Timestamp" Type="long">639191511802743501</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -124332,7 +124398,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966483657</Single>
+        <Single Name="Timestamp" Type="long">639191511805544632</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -124482,7 +124548,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965791872</Single>
+        <Single Name="Timestamp" Type="long">639191511803303181</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -124640,7 +124706,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965833664</Single>
+        <Single Name="Timestamp" Type="long">639191511803400187</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -124763,7 +124829,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965865208</Single>
+        <Single Name="Timestamp" Type="long">639191511803490377</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -124930,7 +124996,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965905212</Single>
+        <Single Name="Timestamp" Type="long">639191511803596612</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -125066,7 +125132,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965929215</Single>
+        <Single Name="Timestamp" Type="long">639191511803682476</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -125204,7 +125270,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967044415</Single>
+        <Single Name="Timestamp" Type="long">639191511807364093</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -125318,7 +125384,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967160393</Single>
+        <Single Name="Timestamp" Type="long">639191511807455057</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -125414,7 +125480,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967318675</Single>
+        <Single Name="Timestamp" Type="long">639191511807779802</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -125506,7 +125572,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967413883</Single>
+        <Single Name="Timestamp" Type="long">639191511807942119</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -125584,7 +125650,7 @@ END_TYPE
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">6316c4c4-0a87-441e-85be-5d9fe547ff94</Single>
+        <Single Name="Guid" Type="System.Guid">a4712cd5-fd5f-44d5-9df8-b20d3e53ff3b</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">ST_IHM_MANU</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -125628,56 +125694,66 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191506089781450</Single>
+        <Single Name="Timestamp" Type="long">639191511808085915</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
-            <Single Name="TextBlobForSerialisation" Type="string">(* ═══════════════════════════════════════════════════════════════
-   🌐 ST_IHM_MANU — Table d'échange IHM provisoire pour mise en service
-   ───────────────────────────────────────────────────────────────
-   ⚙️ Permet le pilotage manuel direct des sorties physiques (contacteurs, 
-      relais, freins, mots de commande variateurs) en mode dégradé 
-      pour la mise en service des treuils M1/M2 et du chariot M3.
-   ⚠️ Avertissement : Ce mode désactive les sécurités normales et les interlocks
-      logiciels standards. Les interlocks de sécurité de base (ex: Fwd vs Rev)
-      doivent être gérés directement dans le code d'activation de secours.
-   ═══════════════════════════════════════════════════════════════ *)
-   
+            <Single Name="TextBlobForSerialisation" Type="string">///═══════════════════════════════════════════════════════════════
+///   🌐 ST_IHM_MANU — Table d'échange IHM provisoire pour mise en service
+///   ───────────────────────────────────────────────────────────────
+///   ⚙️ Permet le pilotage manuel direct des sorties physiques (contacteurs, 
+///      relais, freins, mots de commande variateurs) en mode dégradé 
+///      pour la mise en service des treuils M1/M2 et du chariot M3.
+///   ⚠️ Avertissement : Ce mode désactive les sécurités normales et les interlocks
+///      logiciels standards. Les interlocks de sécurité de base (ex: Fwd vs Rev)
+///      doivent être gérés directement dans le code d'activation de secours.
+///   ═══════════════════════════════════════════════════════════════
 TYPE ST_IHM_MANU :
 STRUCT
-    (* 🪝 Treuil M1 — Holding / Retenue *)
-    PositionM_M1    : REAL; (* 📊 [m] Position brute du treuil M1 *)
-    M1_RelayFwd     : BOOL; (* 🛗 Commande montée M1 (Relais forward + Frein desserré) — ⚠️ Interlock M1_RelayRev requis *)
-    M1_RelayRev     : BOOL; (* 🛗 Commande descente M1 (Relais reverse + Frein desserré) — ⚠️ Interlock M1_RelayFwd requis *)
-
-    (* 🪝 Treuil M2 — Closing / Fermeture *)
-    PositionM_M2    : REAL; (* 📊 [m] Position brute du treuil M2 *)
-    M2_RelayFwd     : BOOL; (* 🛗 Commande montée M2 (Relais forward + Frein desserré) — ⚠️ Interlock M2_RelayRev requis *)
-    M2_RelayRev     : BOOL; (* 🛗 Commande descente M2 (Relais reverse + Frein desserré) — ⚠️ Interlock M2_RelayFwd requis *)
-
-    (* 🔗 Commande Couplée M1 + M2 (Mouvement Synchrone) *)
-    M1_M2_RelayFwd  : BOOL; (* 🔗 Commande montée simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayRev requis *)
-    M1_M2_RelayRev  : BOOL; (* 🔗 Commande descente simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayFwd requis *)
-    M1_M2_Contactor1: BOOL; (* ⚡ Vitesse 1 : Contacteur de vitesse K1 pour M1 et M2 *)
-    M1_M2_Contactor2: BOOL; (* ⚡ Vitesse 2 : Contacteur de vitesse K2 pour M1 et M2 *)
-    M1_M2_Contactor3: BOOL; (* ⚡ Vitesse 3 : Contacteur de vitesse K3 pour M1 et M2 *)
-    M1_M2_Contactor4: BOOL; (* ⚡ Vitesse 4 : Contacteur de vitesse K4 pour M1 et M2 *)
-
-    (* ↔️ Variateur Chariot M3 (AC600) *)
-    M3_RelayFwd     : BOOL; (* ↔️ Marche avant M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayRev requis *)
-    M3_RelayRev     : BOOL; (* ↔️ Marche arrière M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayFwd requis *)
-    M3_FreqSetpoint : REAL; (* 🎯 [Hz] Consigne de fréquence (ex: 50.0Hz envoie la valeur 5000 sans mot de commande) *)
-    M3_FreqActual   : REAL; (* 📊 [Hz] Fréquence réelle lue (ex: 50.0Hz correspond à la valeur 5000) *)
-
+	///🪝 Treuil M1 — Holding / Retenue
+	///📊 [m] Position brute du treuil M1
+	PositionM_M1: REAL;
+	///🛗 Commande montée M1 (Relais forward + Frein desserré) — ⚠️ Interlock M1_RelayRev requis
+	M1_RelayFwd: BOOL;
+	///🛗 Commande descente M1 (Relais reverse + Frein desserré) — ⚠️ Interlock M1_RelayFwd requis
+	M1_RelayRev: BOOL;
+	///🪝 Treuil M2 — Closing / Fermeture
+	///📊 [m] Position brute du treuil M2
+	PositionM_M2: REAL;
+	///🛗 Commande montée M2 (Relais forward + Frein desserré) — ⚠️ Interlock M2_RelayRev requis
+	M2_RelayFwd: BOOL;
+	///🛗 Commande descente M2 (Relais reverse + Frein desserré) — ⚠️ Interlock M2_RelayFwd requis
+	M2_RelayRev: BOOL;
+	///🔗 Commande Couplée M1 + M2 (Mouvement Synchrone)
+	///🔗 Commande montée simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayRev requis
+	M1_M2_RelayFwd: BOOL;
+	///🔗 Commande descente simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayFwd requis
+	M1_M2_RelayRev: BOOL;
+	///⚡ Vitesse 1 : Contacteur de vitesse K1 pour M1 et M2
+	M1_M2_Contactor1: BOOL;
+	///⚡ Vitesse 2 : Contacteur de vitesse K2 pour M1 et M2
+	M1_M2_Contactor2: BOOL;
+	///⚡ Vitesse 3 : Contacteur de vitesse K3 pour M1 et M2
+	M1_M2_Contactor3: BOOL;
+	///⚡ Vitesse 4 : Contacteur de vitesse K4 pour M1 et M2
+	M1_M2_Contactor4: BOOL;
+	///↔️ Variateur Chariot M3 (AC600)
+	///↔️ Marche avant M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayRev requis
+	M3_RelayFwd: BOOL;
+	///↔️ Marche arrière M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayFwd requis
+	M3_RelayRev: BOOL;
+	///🎯 [Hz] Consigne de fréquence (ex: 50.0Hz envoie la valeur 5000 sans mot de commande)
+	M3_FreqSetpoint: REAL;
+	///📊 [Hz] Fréquence réelle lue (ex: 50.0Hz correspond à la valeur 5000)
+	M3_FreqActual: REAL;
 END_STRUCT
 END_TYPE
-
 </Single>
-            <Single Name="LineInfoPersistence" Type="string">6316c4c4-0a87-441e-85be-5d9fe547ff94_Decl_LineIds</Single>
+            <Single Name="LineInfoPersistence" Type="string">a4712cd5-fd5f-44d5-9df8-b20d3e53ff3b_Decl_LineIds</Single>
           </Single>
         </Single>
-        <Single Name="UniqueIdGenerator" Type="string">439</Single>
+        <Single Name="UniqueIdGenerator" Type="string">51</Single>
       </Single>
       <Single Name="ParentSVNodeGuid" Type="System.Guid">9a6a3fb4-465e-4c6f-a867-a1cfc5fe71b7</Single>
       <Array Name="Path" Type="string">
@@ -125735,7 +125811,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967481511</Single>
+        <Single Name="Timestamp" Type="long">639191511808167937</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -125831,7 +125907,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967518353</Single>
+        <Single Name="Timestamp" Type="long">639191511808264163</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -125938,7 +126014,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967556343</Single>
+        <Single Name="Timestamp" Type="long">639191511808356238</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126034,7 +126110,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967627039</Single>
+        <Single Name="Timestamp" Type="long">639191511808531460</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126131,7 +126207,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967667116</Single>
+        <Single Name="Timestamp" Type="long">639191511808631720</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126310,7 +126386,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191479895522246</Single>
+        <Single Name="Timestamp" Type="long">639191511804819205</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126338,10 +126414,12 @@ VAR_GLOBAL RETAIN
 	Chariot: ST_ChariotHMI;
 	///📡 Variables d'échange IHM Diagnostics réseau
 	Network: ST_NetworkDiagHMI;
-	///🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal
+	///🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)
 	Common: ST_CommonHMI;
-	
-	IHM_MANU : ST_IHM_MANU;
+	///🛠️ Variables d'échange IHM provisoires pour pilotage manuel direct (Secours)
+	IHM_MANU: ST_IHM_MANU;
+	///🚩 Indicateur d'initialisation IHM depuis PERSISTENT
+	HmiInitDone: BOOL;
 END_VAR</Single>
             <Single Name="LineInfoPersistence" Type="string">978cfa54-3431-5207-985f-5b2fcc137a7b_Decl_LineIds</Single>
           </Single>
@@ -126406,7 +126484,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964399916</Single>
+        <Single Name="Timestamp" Type="long">639191511800461679</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126489,7 +126567,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967235555</Single>
+        <Single Name="Timestamp" Type="long">639191511807614051</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126575,7 +126653,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966086540</Single>
+        <Single Name="Timestamp" Type="long">639191511804160288</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126652,7 +126730,7 @@ END_VAR</Single>
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966401282</Single>
+        <Single Name="Timestamp" Type="long">639191511805093802</Single>
       </Single>
       <Single Name="Object" Type="{ffbfa93a-b94d-45fc-a329-229860183b1d}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -126739,7 +126817,7 @@ END_VAR</Single>
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964759408</Single>
+        <Single Name="Timestamp" Type="long">639191511801147159</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -126864,7 +126942,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964793819</Single>
+        <Single Name="Timestamp" Type="long">639191511801590306</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -127055,7 +127133,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964840571</Single>
+        <Single Name="Timestamp" Type="long">639191511801696521</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -127342,7 +127420,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967586426</Single>
+        <Single Name="Timestamp" Type="long">639191511808436302</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -127457,7 +127535,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964921869</Single>
+        <Single Name="Timestamp" Type="long">639191511801787955</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -127593,7 +127671,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965726729</Single>
+        <Single Name="Timestamp" Type="long">639191511803147893</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -128167,7 +128245,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965966034</Single>
+        <Single Name="Timestamp" Type="long">639191511803761628</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -128355,7 +128433,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965991548</Single>
+        <Single Name="Timestamp" Type="long">639191511803862862</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -128762,7 +128840,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446966031315</Single>
+        <Single Name="Timestamp" Type="long">639191511803958108</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -129025,7 +129103,7 @@ END_VAR
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964517487</Single>
+        <Single Name="Timestamp" Type="long">639191511800612809</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -129110,7 +129188,7 @@ END_TYPE
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446967190419</Single>
+        <Single Name="Timestamp" Type="long">639191511807538950</Single>
       </Single>
       <Single Name="Object" Type="{2db5746d-d284-4425-9f7f-2663a34b0ebc}" Method="IArchivable">
         <Single Name="Interface" Type="{a9ed5b7e-75c5-4651-af16-d2c27e98cb94}" Method="IArchivable">
@@ -129200,7 +129278,7 @@ END_TYPE
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446964637872</Single>
+        <Single Name="Timestamp" Type="long">639191511800810814</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -129414,7 +129492,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965510402</Single>
+        <Single Name="Timestamp" Type="long">639191511802531877</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -129551,7 +129629,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965613518</Single>
+        <Single Name="Timestamp" Type="long">639191511802833720</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>
@@ -129718,7 +129796,7 @@ END_VAR
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
           <Single Type="System.Guid">3b83b776-fb25-43b8-99f2-3c507c9143fc</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639191446965649478</Single>
+        <Single Name="Timestamp" Type="long">639191511802925207</Single>
       </Single>
       <Single Name="Object" Type="{6f9dac99-8de1-4efc-8465-68ac443b7d08}" Method="IArchivable">
         <Single Name="SpecialFunc" Type="{0db3d7bb-cde0-4416-9a7b-ce49a0124323}">None</Single>

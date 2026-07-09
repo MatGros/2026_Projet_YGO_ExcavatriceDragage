@@ -1,38 +1,48 @@
 (* ═══════════════════════════════════════════════════════════════
-   🌐 ST_IHM_MANU — Table d'échange IHM provisoire pour mise en service
+   🚨 ST_IHM_MANU — Table d'échange IHM provisoire (mise en service URGENCE)
    ───────────────────────────────────────────────────────────────
-   ⚙️ Permet le pilotage manuel direct des sorties physiques (contacteurs, 
-      relais, freins, mots de commande variateurs) en mode dégradé 
-      pour la mise en service des treuils M1/M2 et du chariot M3.
-   ⚠️ Avertissement : Ce mode désactive les sécurités normales et les interlocks
-      logiciels standards. Les interlocks de sécurité de base (ex: Fwd vs Rev)
-      doivent être gérés directement dans le code d'activation de secours.
+   🎨 Pilotage manuel DIRECT des sorties physiques (relais, contacteurs
+      vitesse, freins) et du variateur M3 (EtherCAT, mot de commande) —
+      programme fonctionnel normal bypassé en sortie (PRG_10_Outputs
+      uniquement), aucune sécurité logicielle métier active.
+   ⚠️ DANGER : seuls les interlocks Fwd/Rev (couplé/individuel mutuellement
+      exclusifs, voir PRG_10_Outputs) protègent, plus la chaîne AU/PowerCutOff
+      (toujours active, non bypassée). Pas de limites logicielles, pas de synchro.
+   🔧 REX 2026-07-09 : M3_CommandWord (registre 0x3101 côté carte EtherCAT, PAS le
+      0x3001 natif variateur) = 0 arrêt / 1 marche avant / 2 marche arrière (recette
+      fournisseur) — ⚠️ non vérifié sur banc au moment du codage, à confirmer.
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_IHM_MANU :
 STRUCT
-    (* 🪝 Treuil M1 — Holding / Retenue *)
-    PositionM_M1    : REAL; (* 📊 [m] Position brute du treuil M1 *)
-    M1_RelayFwd     : BOOL; (* 🛗 Commande montée M1 (Relais forward + Frein desserré) — ⚠️ Interlock M1_RelayRev requis *)
-    M1_RelayRev     : BOOL; (* 🛗 Commande descente M1 (Relais reverse + Frein desserré) — ⚠️ Interlock M1_RelayFwd requis *)
+    (* 🔑 Activation — logique INVERSÉE volontaire (REX 2026-07-09) *)
+    ModeDisable      : BOOL; (* 🔴 FALSE (défaut, y compris à CHAQUE démarrage/download automate,
+                                 variable non-RETAIN) = mode Manu ACTIF d'origine. Passer à TRUE
+                                 pour rendre la main au programme fonctionnel normal (PRG_06/07/03). *)
 
-    (* 🪝 Treuil M2 — Closing / Fermeture *)
-    PositionM_M2    : REAL; (* 📊 [m] Position brute du treuil M2 *)
-    M2_RelayFwd     : BOOL; (* 🛗 Commande montée M2 (Relais forward + Frein desserré) — ⚠️ Interlock M2_RelayRev requis *)
-    M2_RelayRev     : BOOL; (* 🛗 Commande descente M2 (Relais reverse + Frein desserré) — ⚠️ Interlock M2_RelayFwd requis *)
+    (* 🪝 Treuil M1 *)
+    PositionM_M1     : REAL; (* 📊 [m] Position brute codeur M1 *)
+    M1_RelayFwd      : BOOL; (* 🛗 Commande montée M1 + frein *)
+    M1_RelayRev      : BOOL; (* 🛗 Commande descente M1 + frein *)
+    HomingEncoder_M1 : BOOL; (* 🎯 Front = référencement codeur M1 (OR avec GVL_IHM.WinchM1.CmdHome existant) *)
 
-    (* 🔗 Commande Couplée M1 + M2 (Mouvement Synchrone) *)
-    M1_M2_RelayFwd  : BOOL; (* 🔗 Commande montée simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayRev requis *)
-    M1_M2_RelayRev  : BOOL; (* 🔗 Commande descente simultanée M1+M2 + Desserrage freins — ⚠️ Interlock M1_M2_RelayFwd requis *)
-    M1_M2_Contactor1: BOOL; (* ⚡ Vitesse 1 : Contacteur de vitesse K1 pour M1 et M2 *)
-    M1_M2_Contactor2: BOOL; (* ⚡ Vitesse 2 : Contacteur de vitesse K2 pour M1 et M2 *)
-    M1_M2_Contactor3: BOOL; (* ⚡ Vitesse 3 : Contacteur de vitesse K3 pour M1 et M2 *)
-    M1_M2_Contactor4: BOOL; (* ⚡ Vitesse 4 : Contacteur de vitesse K4 pour M1 et M2 *)
+    (* 🪝 Treuil M2 *)
+    PositionM_M2     : REAL; (* 📊 [m] Position brute codeur M2 *)
+    M2_RelayFwd      : BOOL; (* 🛗 Commande montée M2 + frein *)
+    M2_RelayRev      : BOOL; (* 🛗 Commande descente M2 + frein *)
+    HomingEncoder_M2 : BOOL; (* 🎯 Front = référencement codeur M2 (OR avec GVL_IHM.WinchM2.CmdHome existant) *)
 
-    (* ↔️ Variateur Chariot M3 (AC600) *)
-    M3_RelayFwd     : BOOL; (* ↔️ Marche avant M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayRev requis *)
-    M3_RelayRev     : BOOL; (* ↔️ Marche arrière M3 (Commande frein + bit control_word = 6 puis démarrage) — ⚠️ Interlock M3_RelayFwd requis *)
-    M3_FreqSetpoint : REAL; (* 🎯 [Hz] Consigne de fréquence (ex: 50.0Hz envoie la valeur 5000 sans mot de commande) *)
-    M3_FreqActual   : REAL; (* 📊 [Hz] Fréquence réelle lue (ex: 50.0Hz correspond à la valeur 5000) *)
+    (* 🔗 Commande couplée M1+M2 *)
+    M1_M2_RelayFwd   : BOOL; (* 🔗 Commande montée M1 et M2 + frein *)
+    M1_M2_RelayRev   : BOOL; (* 🔗 Commande descente M1 et M2 + frein *)
+    M1_M2_Contactor1 : BOOL; (* ⚡ Vitesse M1 et M2 *)
+    M1_M2_Contactor2 : BOOL; (* ⚡ Vitesse M1 et M2 *)
+    M1_M2_Contactor3 : BOOL; (* ⚡ Vitesse M1 et M2 *)
+    M1_M2_Contactor4 : BOOL; (* ⚡ Vitesse M1 et M2 *)
 
+    (* ↔️ Chariot M3 (variateur AC600) *)
+    M3_RelayFwd      : BOOL; (* ↔️ Commande frein + envoi valeur dans mot de commande *)
+    M3_RelayRev      : BOOL; (* ↔️ Commande frein + envoi valeur dans mot de commande *)
+    M3_FreqSetpoint  : REAL; (* 🎯 50.0Hz envoie 5000 sans mot de commande *)
+    M3_FreqActual    : REAL; (* 📊 50.0Hz envoie 5000 sans mot de commande *)
 END_STRUCT
 END_TYPE
