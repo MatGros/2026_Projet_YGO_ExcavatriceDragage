@@ -50,21 +50,48 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ### 3. **CODE/MAIN/PRG_10_Outputs.st** — Trois blocs balisés Début/Fin IHM_MANU
 
-#### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–88)
+#### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–90)
 
 ```st
 // ─────────  Début modification IHM_MANU  ─────────
-ManuActive            : BOOL;
-M1Fwd_Eff, M1Rev_Eff, M2Fwd_Eff, M2Rev_Eff : BOOL;
-K1_Eff, K2_Eff, K3_Eff, K4_Eff : BOOL;
-M3Fwd_Eff, M3Rev_Eff : BOOL;
-instM3RelayFwdLed, instM3RelayRevLed : FB_Output;
+    // 🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
+    ManuActive            : BOOL; // NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)
+    // Détection de fronts montants pour priorité temporelle
+    TrigM1Fwd             : BOOL;
+    TrigM1Rev             : BOOL;
+    TrigM2Fwd             : BOOL;
+    TrigM2Rev             : BOOL;
+    TrigCoupledFwd        : BOOL;
+    TrigCoupledRev        : BOOL;
+    TrigM3Fwd             : BOOL;
+    TrigM3Rev             : BOOL;
+    // États au scan précédent
+    LastM1Fwd             : BOOL;
+    LastM1Rev             : BOOL;
+    LastM2Fwd             : BOOL;
+    LastM2Rev             : BOOL;
+    LastCoupledFwd        : BOOL;
+    LastCoupledRev        : BOOL;
+    LastM3Fwd             : BOOL;
+    LastM3Rev             : BOOL;
+    M1Fwd_Eff             : BOOL;
+    M1Rev_Eff             : BOOL;
+    M2Fwd_Eff             : BOOL;
+    M2Rev_Eff             : BOOL;
+    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2 — activables indépendamment
+    K2_Eff                : BOOL;
+    K3_Eff                : BOOL;
+    K4_Eff                : BOOL;
+    M3Fwd_Eff             : BOOL;
+    M3Rev_Eff             : BOOL; // Demande interlockée — voir §M3 EtherCAT : ne pilote PAS le variateur tant que non confirmé
+    instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
+    instM3RelayRevLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel
 // ─────────  Fin modification IHM_MANU  ─────────
 ```
 
-**Rôle :** Variables de travail et instances FB de sortie pour LEDs de mise en service M3.
+**Rôle :** Variables de travail, états précédents (Last*) et détection de fronts (Trig*) pour les interlocks temporels actifs, et instances FB de sortie pour LEDs de mise en service M3.
 
-**À supprimer au nettoyage :** Bloc entier (7 lignes de déclarations + 2 FB_Output).
+**À supprimer au nettoyage :** Bloc entier (23 lignes de déclarations + 2 FB_Output).
 
 ---
 
