@@ -107,7 +107,11 @@ instHomingM1(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.WinchM1.CmdHome,          // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Début modification IHM_MANU  ─────────
+    // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M1 (mise en service urgence) — même FB, mêmes
+    // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
+    Home                 := GVL_IHM.WinchM1.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.WinchM1.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
@@ -152,7 +156,11 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.WinchM2.CmdHome,          // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Début modification IHM_MANU  ─────────
+    // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M2 (mise en service urgence) — même FB, mêmes
+    // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
+    Home                 := GVL_IHM.WinchM2.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.WinchM2.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,

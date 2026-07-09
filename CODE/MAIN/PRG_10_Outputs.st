@@ -69,9 +69,133 @@ VAR
     TonArmingPulse        : TON;  // 1s — durée de l'impulsion réarmement (mécanisme à ressort)
     TonArmingConfirm      : TON;  // 2s — attente confirmation contacteur après le pulse
     TonArmingLockout      : TON;  // 5s — verrouillage avant nouvelle tentative possible
+
+    // ─────────  Début modification IHM_MANU  ─────────
+    // 🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
+    ManuActive            : BOOL; // NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)
+    UseIndividual         : BOOL; // Mode couplé/individuel mutuellement exclusifs — voir REX (3)
+    UseCoupled            : BOOL;
+    M1Fwd_Eff             : BOOL;
+    M1Rev_Eff             : BOOL;
+    M2Fwd_Eff             : BOOL;
+    M2Rev_Eff             : BOOL;
+    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2 — activables indépendamment
+    K2_Eff                : BOOL;
+    K3_Eff                : BOOL;
+    K4_Eff                : BOOL;
+    M3Fwd_Eff             : BOOL;
+    M3Rev_Eff             : BOOL; // Demande interlockée — voir §M3 EtherCAT : ne pilote PAS le variateur tant que non confirmé
+    instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
+    instM3RelayRevLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel
+    // ─────────  Fin modification IHM_MANU  ─────────
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_10_Outputs) ===
+
+// ─────────  Début modification IHM_MANU  ─────────
+// ═══════════════════════════════════════════════════════════════════════════
+// 🚨 MODE IHM_MANU — override direct des sorties (mise en service urgence)
+// ───────────────────────────────────────────────────────────────────────────
+// 🆕 REX 2026-07-09 : logique inversée VOLONTAIRE — GVL_IHM.IHM_MANU.ModeDisable
+// est non-RETAIN, donc FALSE à CHAQUE démarrage/download automate = mode Manu
+// ACTIF d'origine, sans action opérateur. Il faut explicitement passer
+// ModeDisable=TRUE pour rendre la main au programme fonctionnel normal
+// (PRG_06_WinchControl/PRG_07_ChariotControl/PRG_03_Safety, intouchés).
+// ⚠️ Aucune sécurité logicielle métier active en Manu (safety M1/M2/M3, synchro,
+// limites logicielles, homing) — seuls les interlocks Fwd/Rev et K1-K4 ci-dessous,
+// et la chaîne AU/PowerCutOff (§ plus bas, TOUJOURS active, non bypassée),
+// protègent la machine et les personnes.
+// 📍 Placé en tête de PRG_10_Outputs (position tâche 10, la plus en aval) : écrase
+// les VAR_INPUT juste avant leur écriture réelle, APRÈS que PRG_06/07 (positions
+// 6/7) les aient déjà remplis — le programme normal tourne dans le vide, ignoré.
+ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable;
+
+// Affichage position — utile même hors Manu pour vérifier le câblage codeur en direct
+GVL_IHM.IHM_MANU.PositionM_M1 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+
+IF ManuActive THEN
+    // ── Treuils M1/M2 — couplé et individuel MUTUELLEMENT EXCLUSIFS (pas un OR) ──
+    // 🔧 REX 2026-07-09 (3) : BUG CORRIGÉ — l'ancien OR (individuel OR couplé) combiné à la
+    // réécriture des bits individuels pour le retour visuel créait une boucle de rétroaction :
+    // le couplé mettait M1_RelayFwd à TRUE, qui restait bloqué à TRUE même après relâchement du
+    // bouton couplé (plus aucun moyen de l'arrêter). Fix structurel : couplé et individuel
+    // s'excluent — mélanger les deux (ex: coupler ET tirer sur M1 seul en même temps) coupe TOUT,
+    // comme pour Fwd/Rev.
+    UseIndividual := (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev
+                       OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev)
+                      AND NOT (GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev);
+    UseCoupled    := (GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev)
+                      AND NOT (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev
+                               OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev);
+
+    M1Fwd_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev);
+    M1Rev_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M1_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd);
+    M2Fwd_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev);
+    M2Rev_Eff := (UseIndividual AND GVL_IHM.IHM_MANU.M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd)
+                 OR (UseCoupled AND GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd);
+
+    // ── Contacteurs vitesse K1-K4 (communs M1+M2) — PAS d'interlock, activables indépendamment ──
+    // 🔧 REX 2026-07-09 : retiré l'exclusivité mutuelle initiale — cohérent avec l'architecture
+    // normale (SpeedStep = masque 4 bits combinable, PAS un sélecteur "un seul bit à la fois"),
+    // confirmé par l'utilisateur. Passthrough direct, aucune combinaison bloquée.
+    K1_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor1;
+    K2_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor2;
+    K3_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor3;
+    K4_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor4;
+
+    // ── Chariot M3 — demande interlockée (pilotage réel variateur : §M3 EtherCAT plus bas) ──
+    M3Fwd_Eff := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT GVL_IHM.IHM_MANU.M3_RelayRev;
+    M3Rev_Eff := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT GVL_IHM.IHM_MANU.M3_RelayFwd;
+
+    // ── Recopie vers les VAR_INPUT existants (mêmes FB_Output que le mode normal) ──
+    M1RelayFwd        := M1Fwd_Eff;
+    M1RelayRev        := M1Rev_Eff;
+    M1BrakeCmd        := M1Fwd_Eff OR M1Rev_Eff;
+    M1SpeedContactor1 := K1_Eff;
+    M1SpeedContactor2 := K2_Eff;
+    M1SpeedContactor3 := K3_Eff;
+    M1SpeedContactor4 := K4_Eff;
+
+    M2RelayFwd        := M2Fwd_Eff;
+    M2RelayRev        := M2Rev_Eff;
+    M2BrakeCmd        := M2Fwd_Eff OR M2Rev_Eff;
+    M2SpeedContactor1 := K1_Eff;
+    M2SpeedContactor2 := K2_Eff;
+    M2SpeedContactor3 := K3_Eff;
+    M2SpeedContactor4 := K4_Eff;
+
+    ChariotBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
+END_IF;
+
+// ── Chariot M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
+// 🔧 REX 2026-07-09 : recette fournisseur pour LE REGISTRE 0x3101 Command (carte EtherCAT,
+// PAS le 0x3001 natif du variateur — sémantique différente) : 0=arrêt, 1=marche avant,
+// 2=marche arrière. ⚠️ Non vérifié sur banc au moment du codage — à confirmer par
+// l'opérateur (Force CODESYS sur M3_CommandWord, moteur à vide si possible) avant un
+// usage prolongé. Rien d'autre n'écrit ces PDO aujourd'hui (FB_Chariot encore stubbé,
+// DriveStatusWord/ActualFreqHz à 0 en dur) — pas de conflit avec le mode normal.
+IF ManuActive AND M3Fwd_Eff THEN
+    M3_CommandWord         := 1;
+    M3_SetpointFrequencyHz := REAL_TO_UINT(GVL_IHM.IHM_MANU.M3_FreqSetpoint * 100.0);
+ELSIF ManuActive AND M3Rev_Eff THEN
+    M3_CommandWord         := 2;
+    M3_SetpointFrequencyHz := REAL_TO_UINT(GVL_IHM.IHM_MANU.M3_FreqSetpoint * 100.0);
+ELSE
+    M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
+    M3_SetpointFrequencyHz := 0;
+END_IF;
+GVL_IHM.IHM_MANU.M3_FreqActual := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
+
+// 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur
+instM3RelayFwdLed(Command := ManuActive AND M3Fwd_Eff);
+M3_RelayFwd_DQ := instM3RelayFwdLed.State;
+instM3RelayRevLed(Command := ManuActive AND M3Rev_Eff);
+M3_RelayRev_DQ := instM3RelayRevLed.State;
+// ─────────  Fin modification IHM_MANU  ─────────
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
 instM1RelayFwd(Command := M1RelayFwd);
@@ -132,6 +256,16 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 // la couper — pire cas de figure).
 // 🔧 REX 2026-07-07 (2) : ForceTestA/ForceTestB permettent à l'auto-test de redondance
 // (ci-dessous) de forcer UN SEUL canal bas à la fois, sans dépendre d'un vrai défaut Méca A/B/C.
+// ─────────  Début modification IHM_MANU  ─────────
+// 🆕 REX 2026-07-09 — MODE IHM_MANU : demande explicite utilisateur — en Manu, RQ_A/B = TRUE
+// FIXE dès que l'automate tourne, SANS EXCEPTION (ni Méca A/B/C, ni auto-test ForceTestA/B, ni
+// bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
+// Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
+IF ManuActive THEN
+    PowerCutOff_A_RQ := TRUE;
+    PowerCutOff_B_RQ := TRUE;
+    // ─────────  Fin modification IHM_MANU  ─────────
+ELSE
 PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                          OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
                          OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff)
@@ -143,6 +277,7 @@ PowerCutOff_B_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                          OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff)
                     AND NOT ForceTestB
                     AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
+END_IF;
 
 // ─── 🚨 SÉQUENCE RÉARMEMENT CONTACTEUR PUISSANCE (REX 2026-07-07) ──────────────────────
 // Commande IHM (front, PAS de réarmement automatique) →
