@@ -121,8 +121,8 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ```st
 IF ManuActive THEN
-    PowerCutOff_A_RQ := TRUE;
-    PowerCutOff_B_RQ := TRUE;
+    PowerCutOff_A_RQ := NOT ForceTestA;
+    PowerCutOff_B_RQ := NOT ForceTestB;
     // ─────────  Fin modification IHM_MANU  ─────────
 ELSE
     PowerCutOff_A_RQ := NOT (PRG_03_Safety... ) AND NOT ForceTestA AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
@@ -130,7 +130,7 @@ ELSE
 END_IF;
 ```
 
-**Rôle :** **Imbriqué dans le IF/ELSE existant**, en mode Manu force `PowerCutOff_A_RQ = TRUE` FIXE (pas de logique Méca A/B/C, pas d'auto-test ForceTestA/B, pas de bouton CmdEmergencyCutOff — seul l'AU physique protège).
+**Rôle :** **Imbriqué dans le IF/ELSE existant**, en mode Manu force la puissance à `TRUE` en ignorant les défauts Méca A/B/C ou le bouton CmdEmergencyCutOff, tout en laissant passer les signaux d'auto-test `ForceTestA` et `ForceTestB` pour permettre le réarmement de puissance.
 
 **À modifier au nettoyage :** Retirer le bloc IF ManuActive/ELSE, replacer directement la logique normale dans le code.
 
@@ -180,12 +180,12 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
 - [ ] **PRG_10_Outputs.st** :
   - [ ] Supprimer les déclarations VAR (lignes 73–88, bloc Début/Fin)
   - [ ] Supprimer le bloc override principal (lignes 93–183, bloc Début/Fin)
-  - [ ] **Bloc PowerCutOff_A_RQ/B_RQ (lignes 244–252)** : Retirer le IF ManuActive, recollage du ELSE à la place
+  - [ ] **Bloc PowerCutOff_A_RQ/B_RQ (lignes 351–355)** : Retirer le IF ManuActive, recollage du ELSE à la place
     ```st
     // ❌ AVANT :
     IF ManuActive THEN
-        PowerCutOff_A_RQ := TRUE;
-        PowerCutOff_B_RQ := TRUE;
+        PowerCutOff_A_RQ := NOT ForceTestA;
+        PowerCutOff_B_RQ := NOT ForceTestB;
     ELSE
         PowerCutOff_A_RQ := NOT (...) AND ...
         ...
@@ -196,8 +196,9 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
     PowerCutOff_B_RQ := NOT (...) AND ...
     ```
 - [ ] **PRG_02_Encoders.st** :
-  - [ ] Homing M1 (ligne 113) : Remplacer `Home := GVL_IHM.WinchM1.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1,` par `Home := GVL_IHM.WinchM1.CmdHome,`
-  - [ ] Homing M2 (ligne 162) : Remplacer `Home := GVL_IHM.WinchM2.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2,` par `Home := GVL_IHM.WinchM2.CmdHome,`
+  - [ ] Restaurer `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur les appels de `instEncoderAbsM1` et `instEncoderAbsM2` (lignes 97-98 et 146-147).
+  - [ ] Retirer le bit de forçage dérogatoire sur l'entrée `Home` des blocs `instHomingM1` et `instHomingM2` (lignes 113 et 162).
+  - [ ] Supprimer entièrement le bloc conditionnel de fin de fichier (lignes 214-239).
 
 ### Phase 3 : Tests de validation
 - [ ] Compiler le projet CODESYS sans erreur

@@ -14970,8 +14970,8 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 // bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
 // Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
 IF ManuActive THEN
-    PowerCutOff_A_RQ := TRUE;
-    PowerCutOff_B_RQ := TRUE;
+    PowerCutOff_A_RQ := NOT ForceTestA;
+    PowerCutOff_B_RQ := NOT ForceTestB;
     // ─────────  Fin modification IHM_MANU  ─────────
 ELSE
 PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
