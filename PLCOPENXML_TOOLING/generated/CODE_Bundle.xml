@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.208802" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-04T06:07:15.208802">
+  <contentHeader name="Programme MGS_v0.4.5_IHM_MANU.project" modificationDateTime="2026-07-04T06:07:15.208802">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">Programme MGS_v0.4.5_IHM_MANU</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -12445,13 +12445,13 @@ instSimEncoderM2(
 // simulation par PRG_01_Diagnostics [SEL sur EncoderMx_IsReal] pour ne pas remonter de faux
 // défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
 // lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
-IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) AND NOT PRG_10_Outputs.ManuActive THEN
     M1_RawPosToUse := instSimEncoderM1.RawPosOut;
 ELSE
     M1_RawPosToUse := COD1_PosValue;
 END_IF;
 
-IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) AND NOT PRG_10_Outputs.ManuActive THEN
     M2_RawPosToUse := instSimEncoderM2.RawPosOut;
 ELSE
     M2_RawPosToUse := COD2_PosValue;

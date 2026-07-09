@@ -150,7 +150,11 @@ Si `ManuActive` est activé, les commandes `HomingEncoder_M1/M2` pilotent direct
 #### 🔶 **Bloc 2 : Enregistrement manuel de calibration et reset bouton HMI**
 Code ajouté tout à la fin du POU `PRG_02_Encoders` pour détecter le succès (`PresetAck`) ou le timeout (`PresetNak`) afin d'écrire directement l'offset de position dans la mémoire persistante pour faire `12.5` mètres (Offset = `16726016`), puis de désactiver le bouton HMI.
 
+#### 🔶 **Bloc 3 : Aiguillage codeur réel forcé en ManuActive (Lot Secours - Correctif bug)**
+Aiguillage d'entrée des codeurs modifié (lignes 68-78) pour contourner le simulateur `instSimEncoderM1/M2` (qui resterait figé à 12.5m à cause de la rampe à 0.0) et forcer la relecture de `COD1_PosValue`/`COD2_PosValue` réel dès que `ManuActive` est actif.
+
 **À modifier au nettoyage :** 
+*   Retirer la condition `AND NOT PRG_10_Outputs.ManuActive` de l'aiguillage simulation/réel (lignes 68-78) pour rétablir la logique nominale.
 *   Rétablir les entrées `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur `instEncoderAbsM1` et `instEncoderAbsM2`.
 *   Retirer le bloc de code conditionnel `IF PRG_10_Outputs.ManuActive THEN ... END_IF` tout à la fin du fichier.
 
@@ -196,6 +200,7 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
     PowerCutOff_B_RQ := NOT (...) AND ...
     ```
 - [ ] **PRG_02_Encoders.st** :
+  - [ ] Retirer la condition `AND NOT PRG_10_Outputs.ManuActive` de l'aiguillage simulation/réel (lignes 68-78) pour rétablir la logique nominale.
   - [ ] Restaurer `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur les appels de `instEncoderAbsM1` et `instEncoderAbsM2` (lignes 97-98 et 146-147).
   - [ ] Retirer le bit de forçage dérogatoire sur l'entrée `Home` des blocs `instHomingM1` et `instHomingM2` (lignes 113 et 162).
   - [ ] Supprimer entièrement le bloc conditionnel de fin de fichier (lignes 214-239).
