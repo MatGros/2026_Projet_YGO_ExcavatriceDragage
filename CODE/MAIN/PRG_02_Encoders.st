@@ -65,13 +65,13 @@ instSimEncoderM2(
 // simulation par PRG_01_Diagnostics [SEL sur EncoderMx_IsReal] pour ne pas remonter de faux
 // défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
 // lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
-IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) AND NOT PRG_10_Outputs.ManuActive THEN
     M1_RawPosToUse := instSimEncoderM1.RawPosOut;
 ELSE
     M1_RawPosToUse := COD1_PosValue;
 END_IF;
 
-IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) AND NOT PRG_10_Outputs.ManuActive THEN
     M2_RawPosToUse := instSimEncoderM2.RawPosOut;
 ELSE
     M2_RawPosToUse := COD2_PosValue;
