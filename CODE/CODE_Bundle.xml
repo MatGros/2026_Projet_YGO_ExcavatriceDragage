@@ -12601,8 +12601,8 @@ M2_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
-    RelayFwd    := PRG_10_Outputs.M1RelayFwd,
-    RelayRev    := PRG_10_Outputs.M1RelayRev,
+    RelayFwd    := PRG_10_Outputs.SimM1Fwd_Eff,  // 🆕 2026-07-15 : signaux Sim dédiés — respectent SafeStop/ForbidAscent/ForbidDescent même en doctrine simulation
+    RelayRev    := PRG_10_Outputs.SimM1Rev_Eff,  // (était M1RelayFwd/Rev → bypassait toutes les butées logicielles en simulation)
     SpeedRefPct := M1_SimSpeedPct,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
@@ -12614,8 +12614,8 @@ instSimEncoderM1(
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
-    RelayFwd    := PRG_10_Outputs.M2RelayFwd,
-    RelayRev    := PRG_10_Outputs.M2RelayRev,
+    RelayFwd    := PRG_10_Outputs.SimM2Fwd_Eff,  // 🆕 2026-07-15 : signaux Sim dédiés — respectent SafeStop/ForbidAscent/ForbidDescent même en doctrine simulation
+    RelayRev    := PRG_10_Outputs.SimM2Rev_Eff,  // (était M2RelayFwd/Rev → bypassait toutes les butées logicielles en simulation)
     SpeedRefPct := M2_SimSpeedPct,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,
@@ -12865,7 +12865,13 @@ END_IF;
 
 // 1. Sécurité Treuil M1
 instSafetyWinchM1(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM1 AND (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM1
+                           AND (
+                               // Actif si composant réel en mode IHM_MANU (Conditional Bypass Doctrine)
+                               (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal)
+                               // 🆕 2026-07-15 : TOUJOURS actif si codeur M1 est simulé (pour calcul des butées logicielles en simulation)
+                               OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal)
+                           ), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -12902,7 +12908,13 @@ instSafetyWinchM1(
 
 // 2. Sécurité Treuil M2
 instSafetyWinchM2(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM2 AND (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM2
+                           AND (
+                               // Actif si composant réel en mode IHM_MANU (Conditional Bypass Doctrine)
+                               (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal)
+                               // 🆕 2026-07-15 : TOUJOURS actif si codeur M2 est simulé (pour calcul des butées logicielles en simulation)
+                               OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal)
+                           ), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -14940,6 +14952,39 @@ NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="SimM1Fwd_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signaux dédiés simulation : toujours interlockés avec les butées et SafeStop (hors doctrine Conditional Bypass)
+Codeur simulé M1 : respecte ForbidAscent et SafeStop quelle que soit la doctrine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM1Rev_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur simulé M1 : respecte ForbidDescent et SafeStop quelle que soit la doctrine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM2Fwd_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur simulé M2 : respecte ForbidAscent et SafeStop quelle que soit la doctrine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM2Rev_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur simulé M2 : respecte ForbidDescent et SafeStop quelle que soit la doctrine</xhtml>
+              </documentation>
+            </variable>
             <variable name="instManuSpeedStep">
               <type>
                 <derived name="FB_SpeedStep" />
@@ -15305,6 +15350,23 @@ IF ManuActive THEN
                  AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent));
     M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
                  AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent));
+
+    // 🆕 5bis — Signaux dédiés CODEUR SIMULÉ : butées et SafeStop TOUJOURS actifs (hors doctrine Conditional Bypass)
+    // En simulation (M1_IsReal=FALSE), M1Fwd_Eff ignore les SafeStop — normal pour ne pas bloquer l'opérateur.
+    // MAIS le codeur simulé doit s'arrêter aux butées logicielles comme un vrai codeur le ferait sur site.
+    // → On reforce ici les SafeStop/ForbidAscent/ForbidDescent sans condition de réalité.
+    SimM1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+    SimM1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidDescent;
+    SimM2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+    SimM2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent;
 
     // ⚡ Bornage et valeur par défaut des paliers de vitesse max demandés (1..5)
     ActiveMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
