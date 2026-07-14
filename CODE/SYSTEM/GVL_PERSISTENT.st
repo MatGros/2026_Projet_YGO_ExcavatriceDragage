@@ -129,6 +129,11 @@ VAR_GLOBAL PERSISTENT RETAIN
     );
     GrappinState : ST_GrappinState; // 💾 État mécanique mémorisé du grappin (ouvert/fermé)
 
+    // ═══════════════════════════════════════════════════════════
+    // ↔️ CHARIOT M3 — Paramètres de vitesse/fréquence (variateur AC600)
+    // ═══════════════════════════════════════════════════════════
+    ChariotMaxFreqHz : REAL := 50.0; // 💾 Fréquence maximale absolue autorisée pour M3 (Hz, toutes consignes confondues)
+
     // 🔧 REX 2026-07-08 : bloc "PARAMÈTRES HISTORIQUES (hérités de PV)" supprimé — audit confirmé
     // (CableSafetyLimit_Pts, MotorAccelDuration_Ms, AnalogInMin/Max_Pts, AnalogOutMin/Max_Pts) :
     // 0 référence CODE/, 0 mention DOC/. ⚠️ Suppression = changement de structure GVL_PERSISTENT →
