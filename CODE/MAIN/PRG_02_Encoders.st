@@ -58,8 +58,8 @@ M2_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
-    RelayFwd    := PRG_10_Outputs.M1RelayFwd,
-    RelayRev    := PRG_10_Outputs.M1RelayRev,
+    RelayFwd    := PRG_10_Outputs.SimM1Fwd_Eff,  // 🆕 2026-07-15 : signaux Sim dédiés — respectent SafeStop/ForbidAscent/ForbidDescent même en doctrine simulation
+    RelayRev    := PRG_10_Outputs.SimM1Rev_Eff,  // (était M1RelayFwd/Rev → bypassait toutes les butées logicielles en simulation)
     SpeedRefPct := M1_SimSpeedPct,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
@@ -71,8 +71,8 @@ instSimEncoderM1(
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
-    RelayFwd    := PRG_10_Outputs.M2RelayFwd,
-    RelayRev    := PRG_10_Outputs.M2RelayRev,
+    RelayFwd    := PRG_10_Outputs.SimM2Fwd_Eff,  // 🆕 2026-07-15 : signaux Sim dédiés — respectent SafeStop/ForbidAscent/ForbidDescent même en doctrine simulation
+    RelayRev    := PRG_10_Outputs.SimM2Rev_Eff,  // (était M2RelayFwd/Rev → bypassait toutes les butées logicielles en simulation)
     SpeedRefPct := M2_SimSpeedPct,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,

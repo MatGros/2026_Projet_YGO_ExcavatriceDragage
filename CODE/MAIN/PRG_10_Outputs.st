@@ -113,6 +113,11 @@ VAR
     K4_Eff                : BOOL;
     M3Fwd_Eff             : BOOL;
     M3Rev_Eff             : BOOL;
+    // Signaux dédiés simulation : toujours interlockés avec les butées et SafeStop (hors doctrine Conditional Bypass)
+    SimM1Fwd_Eff          : BOOL; // Codeur simulé M1 : respecte ForbidAscent et SafeStop quelle que soit la doctrine
+    SimM1Rev_Eff          : BOOL; // Codeur simulé M1 : respecte ForbidDescent et SafeStop quelle que soit la doctrine
+    SimM2Fwd_Eff          : BOOL; // Codeur simulé M2 : respecte ForbidAscent et SafeStop quelle que soit la doctrine
+    SimM2Rev_Eff          : BOOL; // Codeur simulé M2 : respecte ForbidDescent et SafeStop quelle que soit la doctrine
 
     instManuSpeedStep     : FB_SpeedStep; // 🪜 FB de décodage palier pour Joystick en mode Manu
     instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
@@ -346,6 +351,23 @@ IF ManuActive THEN
                  AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent));
     M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
                  AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent));
+
+    // 🆕 5bis — Signaux dédiés CODEUR SIMULÉ : butées et SafeStop TOUJOURS actifs (hors doctrine Conditional Bypass)
+    // En simulation (M1_IsReal=FALSE), M1Fwd_Eff ignore les SafeStop — normal pour ne pas bloquer l'opérateur.
+    // MAIS le codeur simulé doit s'arrêter aux butées logicielles comme un vrai codeur le ferait sur site.
+    // → On reforce ici les SafeStop/ForbidAscent/ForbidDescent sans condition de réalité.
+    SimM1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+    SimM1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidDescent;
+    SimM2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+    SimM2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.SafeStop
+                    AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent;
 
     // ⚡ Bornage et valeur par défaut des paliers de vitesse max demandés (1..5)
     ActiveMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
