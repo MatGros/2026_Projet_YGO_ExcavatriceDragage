@@ -135,6 +135,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
    - **Contrôle Winch M2** : Sécurité FDC Grappin active applique le blocage individuel de M2 (`FdcGrappinOpenActive` coupe la descente, `FdcGrappinCloseActive` coupe la montée). Les commandes couplées contournent cette limite pour éviter la divergence.
    - **Vitesse Winch** : Si Joystick, utilisation de `FB_SpeedStep` pour décoder K1-K4 sur la vitesse du joystick (avec limitation en descente). Si HMI bouton, utilisation de la même fonction `FB_SpeedStep` connectée à la rampe de vitesse `instHmiSpeedRamp` (démarrage à 0%, montée progressive à 100% tant que le bouton est maintenu, décélération progressive vers 0% au relâchement, avec limitation en descente).
    - **Auxiliaires Hydrauliques** : Mappage des commandes Grille / Casque action maintenue, avec interlock logique, et forçage automatique de `PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := TRUE` en mouvement.
+   - **Verrouillage de sécurité global** : Toutes les commandes effectives (treuils, chariot, auxiliaires) sont filtrées par `PRG_00_Inputs.EmergencyStopOk` afin de couper immédiatement tout mouvement (et arrêter la simulation des codeurs sur PC) en cas d'arrêt d'urgence actif ou de défaut critique.
    - Recalcul des VAR_INPUT existants (M1RelayFwd, M1RelayRev, M1BrakeCmd, M1/M2SpeedContactor1-4, ChariotBrakeCmd).
 5. **Chariot M3 — mot de commande EtherCAT direct :**
    - Si `ManuActive AND M3Fwd_Eff` → `M3_CommandWord := 1` + fréquence
@@ -205,6 +206,11 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
 
 **À modifier au nettoyage :** Rétablir la transition immédiate sans `PresetTimerVisual` dans le Step 1, et supprimer la déclaration du timer dans `VAR`.
 
+### 7. **CODE/MAIN/PRG_03_Safety.st** — Désactivation des sécurités logicielles métier en mode IHM_MANU
+Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyChariotM3` sont désactivées (`Enable := FALSE`) dès que `ManuActive` est actif.
+
+**À modifier au nettoyage :** Rétablir les entrées `Enable` d'origine (`Enable := NOT PRG_04_Modes.instModes.InhibitMx` pour les treuils, et `Enable := NOT PRG_10_Outputs.ManuActive` pour le chariot M3 doit être retiré pour redevenir `Enable := TRUE`).
+
 ---
 
 ## 🧹 CHECKLIST NETTOYAGE COMPLET
@@ -242,6 +248,9 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
   - [ ] Supprimer entièrement le bloc conditionnel de fin de fichier (lignes 214-239).
 - [ ] **PRG_08_AuxiliaryControl.st** :
   - [ ] Rétablir le bloc de variables locales en `VAR` au lieu de `VAR_INPUT`.
+- [ ] **PRG_03_Safety.st** :
+  - [ ] Rétablir les entrées `Enable` d'origine sur `instSafetyWinchM1` et `instSafetyWinchM2` (supprimer `AND NOT PRG_10_Outputs.ManuActive`).
+  - [ ] Rétablir `Enable := TRUE` sur `instSafetyChariotM3` (supprimer `NOT PRG_10_Outputs.ManuActive`).
 
 ### Phase 3 : Tests de validation
 - [ ] Compiler le projet CODESYS sans erreur
