@@ -27,9 +27,26 @@ VAR
     instHomingM2       : FB_Encoder_Homing;
     instEncoderSafetyM1 : FB_Encoder_Safety;
     instEncoderSafetyM2 : FB_Encoder_Safety;
+
+    // 🆕 REX 2026-07-14 — Variables de vitesse simulée adaptées au mode IHM_MANU
+    M1_SimSpeedPct      : REAL;
+    M2_SimSpeedPct      : REAL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
+
+// 🆕 Calcul de la vitesse de simulation adaptée (mode normal ou mode Manu avec rampes/joystick)
+M1_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
+                      PRG_06_WinchControl.instWinchM1.SpeedRamp.Current,
+                      SEL(GVL_IHM.IHM_MANU.JoystickSelect,
+                          PRG_10_Outputs.SpeedRefPct,
+                          ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef)));
+
+M2_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
+                      PRG_06_WinchControl.instWinchM2.SpeedRamp.Current,
+                      SEL(GVL_IHM.IHM_MANU.JoystickSelect,
+                          PRG_10_Outputs.SpeedRefPct,
+                          ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef)));
 
 // 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
 // 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 —
@@ -38,7 +55,7 @@ instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
     RelayFwd    := PRG_10_Outputs.M1RelayFwd,
     RelayRev    := PRG_10_Outputs.M1RelayRev,
-    SpeedRefPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current,
+    SpeedRefPct := M1_SimSpeedPct,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
     SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
@@ -51,7 +68,7 @@ instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
     RelayFwd    := PRG_10_Outputs.M2RelayFwd,
     RelayRev    := PRG_10_Outputs.M2RelayRev,
-    SpeedRefPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current,
+    SpeedRefPct := M2_SimSpeedPct,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,
     SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
@@ -65,13 +82,13 @@ instSimEncoderM2(
 // simulation par PRG_01_Diagnostics [SEL sur EncoderMx_IsReal] pour ne pas remonter de faux
 // défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
 // lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) AND NOT PRG_10_Outputs.ManuActive THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) THEN
     M1_RawPosToUse := instSimEncoderM1.RawPosOut;
 ELSE
     M1_RawPosToUse := COD1_PosValue;
 END_IF;
 
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) AND NOT PRG_10_Outputs.ManuActive THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) THEN
     M2_RawPosToUse := instSimEncoderM2.RawPosOut;
 ELSE
     M2_RawPosToUse := COD2_PosValue;

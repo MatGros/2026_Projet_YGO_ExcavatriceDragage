@@ -1,5 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.9)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.10)
 
+> **v1.10** — 🧮 Documente le **calcul pratique** `PresetValue`/`HomingRefRaw` pour une cible de
+> homing **≠ 0** (§2), jusqu'ici seulement implémenté en code (`FB_Encoder_Homing.st`), absent de
+> la doc. Corrige aussi le § Machine d'état qui montrait encore l'ancienne hypothèse
+> `HomingRefRaw:=PresetValue` (valable uniquement cible 0.00 m — obsolète depuis passage à
+> `TopSensorPositionM ≈ 12.50 m`).
+>
 > **v1.9** — Nettoyage documentaire (audit doc) : harmonisation titre/nom de fichier (le titre
 > affichait encore v1.7 alors que le contenu interne était déjà en v1.8) + remarques
 > organisationnelles (tolérance de calibration, mapping IHM restant, rôle `CodeSeqTriggerCmd`,
@@ -182,6 +188,41 @@ CablePosM   = (RawPos − HomingRefRaw) × (CableM_PerRev / PointsPerRev)
 de vérité et de sécurité unique** pour tout calcul de position. Un angle intra-tour et un compteur
 de tours peuvent en être **dérivés séparément à titre informatif maintenance** (IHM), sans jamais
 se substituer à la valeur combinée pour la sécurité (§6).
+
+🎯 **Cas homing nominal — cible ≠ 0 (calcul pratique, `FB_Encoder_Homing`, §5)**
+
+Le homing nominal écrit toujours la **même constante** au codeur (`PresetValue = HomingRefTargetNominal`,
+centre exact, §3.3) — **jamais** `TopSensorPositionM` directement. La correction se fait sur
+`HomingRefRaw`, pas sur la valeur écrite :
+
+```
+PresetValue  := HomingRefTargetNominal                                         (constante, §3.3)
+HomingRefRaw := PresetValue − round(TopSensorPositionM × PointsPerRev / CableM_PerRev)
+```
+
+Ainsi `CablePosM = TopSensorPositionM` (≈ 12.50 m) exactement au moment du homing — **pas** 0.00 m.
+Formule inverse (mètres → `RawPos`, ex. calcul terrain/maintenance) :
+
+```
+RawPos(m) = HomingRefRaw + round(m × PointsPerRev / CableM_PerRev)
+          = PresetValue + round((m − TopSensorPositionM) × PointsPerM)
+```
+
+📐 **Exemple complet — position codeur à 8.5 m** (`PointsPerRev = 8192`, `MultiTurnRevsMax = 4096`,
+`CableM_PerRev = 2.0`, `TopSensorPositionM = 12.50 m`) :
+```
+Centre    = (PointsPerRev × MultiTurnRevsMax) / 2 = (8192 × 4096) / 2 = 16 777 216
+RawPos(m) = Centre + (m − TopSensorPositionM) × (PointsPerRev/CableM_PerRev)
+          = Centre + (m − TopSensorPositionM) × 4096
+
+RawPos(8.5) = 16 777 216 + (8.5 − 12.5) × 4096
+            = 16 777 216 − 16 384
+            = 16 760 832 pts
+```
+
+⚠️ Ne pas confondre avec l'hypothèse d'origine (obsolète) `HomingRefRaw := PresetValue`, valable
+**uniquement** pour une cible 0.00 m — ne s'applique plus depuis le passage à une cible réelle
+non nulle (`TopSensorPositionM`, §5). Voir aussi § Machine d'état (§5) qui applique cette formule.
 
 ---
 
@@ -405,7 +446,7 @@ DISABLED → (Enable) → INIT
 INIT     → compare RawPos vs LastKnownRawPos (§3.7) → HomingSuspect si écart → READY
 READY    → (front Home, conditions ErrorId 0/1/2/3/4 OK) → BUSY (écriture preset + attente PresetAck)
 BUSY     → (PresetAck reçu + RawPos == PresetValue) → DONE → Homed:=TRUE, HomingSuspect:=FALSE,
-                                                             HomingRefRaw:=PresetValue,
+                                                             HomingRefRaw:=PresetValue − round(TopSensorPositionM × PointsPerRev / CableM_PerRev)  (* §2, PAS PresetValue direct *)
                                                              LastKnownRawPos:=PresetValue → READY
 BUSY     → (timeout / incohérence) → ErrorId set → READY (Homed inchangé)
 READY    → (front ConfirmCoherence, Mode IN MAINT_N1/N2) → HomingSuspect:=FALSE (Homed inchangé,

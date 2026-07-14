@@ -6,7 +6,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_08_AuxiliaryControl
-VAR
+VAR_INPUT
     // 🌡️ Groupe Hydraulique
     HydraulicPumpRunCmd   : BOOL;   // Commande démarrage centrale hydraulique
     HydraulicFaultOk      : BOOL;   // Retour défaut groupe hydraulique (NC)
