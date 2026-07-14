@@ -15,7 +15,7 @@ END_VAR
 
 // 1. Sécurité Treuil M1
 instSafetyWinchM1(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : inhibition mise en service (MAINT_N2)
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_10_Outputs.ManuActive, // 🆕 REX 2026-07-08 : inhibition mise en service (MAINT_N2) / 2026-07-14 : ManuActive
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -52,7 +52,7 @@ instSafetyWinchM1(
 
 // 2. Sécurité Treuil M2
 instSafetyWinchM2(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : inhibition mise en service (MAINT_N2)
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM2 AND NOT PRG_10_Outputs.ManuActive, // 🆕 REX 2026-07-08 : inhibition mise en service (MAINT_N2) / 2026-07-14 : ManuActive
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -90,7 +90,7 @@ instSafetyWinchM2(
 
 // 3. Sécurité Chariot M3
 instSafetyChariotM3(
-    Enable              := TRUE,
+    Enable              := NOT PRG_10_Outputs.ManuActive, // 🆕 REX 2026-07-14 : ManuActive
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,

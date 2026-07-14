@@ -294,16 +294,17 @@ IF ManuActive THEN
 
     // 5️⃣ Évaluation finale des mouvements effectifs avec interlocks de fin de course grappin
     // Remarque : les limites FdcGrappin ne s'appliquent qu'au pilotage INDIVIDUEL de M2
-    M1Fwd_Eff := M1Fwd_Demand OR CoupledFwd_Demand;
-    M1Rev_Eff := M1Rev_Demand OR CoupledRev_Demand;
-    M2Fwd_Eff := (M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand;
-    M2Rev_Eff := (M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand;
+    // 🛡️ 2026-07-14 : verrouillage de sécurité obligatoire avec EmergencyStopOk sur PC / terrain
+    M1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk;
+    M1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk;
+    M2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk;
+    M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk;
 
     // 6️⃣ Décodage de la vitesse des Winchs K1-K4
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
         // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse du joystick Y (0..100%)
         instManuSpeedStep(
-            Enable := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
+            Enable := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND PRG_00_Inputs.EmergencyStopOk,
             SpeedRefPct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef),
             Table := GVL_PERSISTENT.WinchSpeedStepTable,
             HystMargin := 2.0,
@@ -316,7 +317,7 @@ IF ManuActive THEN
     ELSE
         // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse de la rampe HMI (0..100%)
         instManuSpeedStep(
-            Enable := (SpeedRefPct > 0.1),
+            Enable := (SpeedRefPct > 0.1) AND PRG_00_Inputs.EmergencyStopOk,
             SpeedRefPct := SpeedRefPct,
             Table := GVL_PERSISTENT.WinchSpeedStepTable,
             HystMargin := 2.0,
@@ -329,14 +330,14 @@ IF ManuActive THEN
     END_IF;
 
     // 7️⃣ Commandes effectives Chariot M3
-    M3Fwd_Eff := M3Fwd_Demand;
-    M3Rev_Eff := M3Rev_Demand;
+    M3Fwd_Eff := M3Fwd_Demand AND PRG_00_Inputs.EmergencyStopOk;
+    M3Rev_Eff := M3Rev_Demand AND PRG_00_Inputs.EmergencyStopOk;
 
     // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
-    IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd THEN
+    IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
         GridUp_RQ := TRUE;
         GridDown_RQ := FALSE;
-    ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd THEN
+    ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
         GridUp_RQ := FALSE;
         GridDown_RQ := TRUE;
     ELSE
@@ -344,10 +345,10 @@ IF ManuActive THEN
         GridDown_RQ := FALSE;
     END_IF;
 
-    IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd THEN
+    IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
         HelmetOpen_RQ := TRUE;
         HelmetClose_RQ := FALSE;
-    ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd THEN
+    ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
         HelmetOpen_RQ := FALSE;
         HelmetClose_RQ := TRUE;
     ELSE
@@ -355,11 +356,12 @@ IF ManuActive THEN
         HelmetClose_RQ := FALSE;
     END_IF;
 
-    // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé
-    PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := GVL_IHM.IHM_MANU.GridOpenCmd 
-                                                OR GVL_IHM.IHM_MANU.GridCloseCmd 
-                                                OR GVL_IHM.IHM_MANU.HelmetOpenCmd 
-                                                OR GVL_IHM.IHM_MANU.HelmetCloseCmd;
+    // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé et AU armé
+    PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := (GVL_IHM.IHM_MANU.GridOpenCmd 
+                                                 OR GVL_IHM.IHM_MANU.GridCloseCmd 
+                                                 OR GVL_IHM.IHM_MANU.HelmetOpenCmd 
+                                                 OR GVL_IHM.IHM_MANU.HelmetCloseCmd)
+                                                 AND PRG_00_Inputs.EmergencyStopOk;
 
     // Recopie vers les VAR_INPUT existants pour forcer les sorties physiques
     M1RelayFwd        := M1Fwd_Eff;
