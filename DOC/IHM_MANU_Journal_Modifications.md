@@ -40,6 +40,7 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 - `GrappinDelta : REAL` — écart en mètres M1-M2 en temps réel.
 - `FdcGrappinOpenActive/CloseActive : BOOL` — états actifs de fin de course grappin (coupe les relais M2).
 - `M3_CommandWordMonitor/StatusWordMonitor : WORD` — diagnostics mot commande/état envoyés/reçus au variateur.
+- `WinchMaxStepFwd/WinchMaxStepRev : INT` — réglage dynamique des limites de vitesse manuelles (paliers max en montée/descente).
 
 **À supprimer au nettoyage :** Fichier entier.
 ---

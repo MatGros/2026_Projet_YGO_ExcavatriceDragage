@@ -65,5 +65,9 @@ STRUCT
     (* 🔍 Diagnostics Variateur M3 *)
     M3_CommandWordMonitor : WORD; (* 🔍 Mot de commande envoyé au variateur *)
     M3_StatusWordMonitor  : WORD; (* 🔍 Mot d'état reçu du variateur *)
+
+    (* ⚡ Réglages dynamiques des limites de vitesse (paliers max) *)
+    WinchMaxStepFwd  : INT; (* ⚡ Palier max en montée (1..5, défaut 5) *)
+    WinchMaxStepRev  : INT; (* ⚡ Palier max en descente (1..5, défaut 2) *)
 END_STRUCT
 END_TYPE

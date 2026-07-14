@@ -124,6 +124,8 @@ VAR
     WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active
     HmiRampTarget         : REAL;         // 🎯 Cible de la rampe HMI
     SpeedRefPct           : REAL;         // 📊 Consigne vitesse courante (issue de la rampe)
+    ActiveMaxStepFwd      : INT;          // ⚡ Limite dynamique palier max montée (1..5)
+    ActiveMaxStepRev      : INT;          // ⚡ Limite dynamique palier max descente (1..5)
     // ─────────  Fin modification IHM_MANU  ─────────
 END_VAR
 
@@ -300,6 +302,17 @@ IF ManuActive THEN
     M2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk;
     M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk;
 
+    // ⚡ Bornage et valeur par défaut des paliers de vitesse max demandés (1..5)
+    ActiveMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
+    IF (ActiveMaxStepFwd < 1) OR (ActiveMaxStepFwd > 5) THEN
+        ActiveMaxStepFwd := 5; // Pleine vitesse (5 paliers max) par défaut si non initialisé ou invalide
+    END_IF;
+
+    ActiveMaxStepRev := GVL_IHM.IHM_MANU.WinchMaxStepRev;
+    IF (ActiveMaxStepRev < 1) OR (ActiveMaxStepRev > 5) THEN
+        ActiveMaxStepRev := 2; // Palier 2 max par défaut en descente (conforme AF) si non initialisé ou invalide
+    END_IF;
+
     // 6️⃣ Décodage de la vitesse des Winchs K1-K4
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
         // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse du joystick Y (0..100%)
@@ -308,7 +321,7 @@ IF ManuActive THEN
             SpeedRefPct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef),
             Table := GVL_PERSISTENT.WinchSpeedStepTable,
             HystMargin := 2.0,
-            MaxStepNumber := SEL(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1, 5, GVL_PERSISTENT.WinchMaxStepDescente)
+            MaxStepNumber := SEL(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1, ActiveMaxStepFwd, ActiveMaxStepRev)
         );
         K1_Eff := instManuSpeedStep.Contactor1;
         K2_Eff := instManuSpeedStep.Contactor2;
@@ -321,7 +334,7 @@ IF ManuActive THEN
             SpeedRefPct := SpeedRefPct,
             Table := GVL_PERSISTENT.WinchSpeedStepTable,
             HystMargin := 2.0,
-            MaxStepNumber := SEL(M1Rev_Demand OR M2Rev_Demand OR CoupledRev_Demand, 5, GVL_PERSISTENT.WinchMaxStepDescente)
+            MaxStepNumber := SEL(M1Rev_Demand OR M2Rev_Demand OR CoupledRev_Demand, ActiveMaxStepFwd, ActiveMaxStepRev)
         );
         K1_Eff := instManuSpeedStep.Contactor1;
         K2_Eff := instManuSpeedStep.Contactor2;
