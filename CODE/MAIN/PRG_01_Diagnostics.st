@@ -79,6 +79,7 @@ FB_Joystick_0(
     FilterTime          := TIME#100ms,
     AccelRate           := 50.0,
     DecelRate           := 150.0,
-    DeadmanRearmTimeout := T#5M,    // 🔴 TEST BANC — défaut sûr T#10S, voir bandeau ci-dessus
-    NeutralHoldTime     := T#1S     // 🔴 TEST BANC — défaut sûr T#500MS, voir bandeau ci-dessus
+    // 🛡️ Délais de sécurité Homme-Mort : temporisations courtes (10s/500ms) si joystick réel, longues (5min/1s) si simulé
+    DeadmanRearmTimeout := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#5M, T#10S),
+    NeutralHoldTime     := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#1S, T#500MS)
 );

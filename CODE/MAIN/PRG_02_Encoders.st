@@ -28,12 +28,17 @@ VAR
     instEncoderSafetyM1 : FB_Encoder_Safety;
     instEncoderSafetyM2 : FB_Encoder_Safety;
 
-    // 🆕 REX 2026-07-14 — Variables de vitesse simulée adaptées au mode IHM_MANU
     M1_SimSpeedPct      : REAL;
     M2_SimSpeedPct      : REAL;
+    M1_IsReal           : BOOL;         // ⚡ Indique si le treuil M1 est configuré comme réel
+    M2_IsReal           : BOOL;         // ⚡ Indique si le treuil M2 est configuré comme réel
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
+
+// 🆕 Détermination de la réalité des treuils (Conditional Bypass Doctrine)
+M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
+M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
 
 // 🆕 Calcul de la vitesse de simulation adaptée (mode normal ou mode Manu avec rampes/joystick)
 M1_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
@@ -111,8 +116,8 @@ instEncoderAbsM1(
     AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational OR instSimEncoderM1.Enable,
-    PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
-    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
+    PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
+    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
 );
 COD1_PresettTrigCmd := instEncoderAbsM1.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderAbsM1.CodeSeqTriggerCmd;
@@ -160,8 +165,8 @@ instEncoderAbsM2(
     AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational OR instSimEncoderM2.Enable,
-    PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
-    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
+    PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
+    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
 );
 COD2_PresettTrigCmd := instEncoderAbsM2.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderAbsM2.CodeSeqTriggerCmd;
@@ -227,29 +232,46 @@ EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
 
 // ─────────  Début modification IHM_MANU  ─────────
-// 🎯 Référencement direct (bypass sécurité et modes) si HomingEncoder_M1/M2 activés en Manu
+// 🎯 Référencement direct (bypass sécurité et modes) si HomingEncoder_M1/M2 activés en Manu (uniquement si SIMULÉ)
+// Sinon, si les treuils sont réels, on utilise le homing normal sécurisé, et on réinitialise le bouton HMI dès que homing ok/erreur.
 IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
-        IF instEncoderAbsM1.PresetAck THEN
-            GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-            GVL_PERSISTENT.CalibM1.Homed := TRUE;
-            GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
-            GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
-            GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
-        ELSIF instEncoderAbsM1.PresetNak THEN
-            GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+        IF NOT M1_IsReal THEN
+            IF instEncoderAbsM1.PresetAck THEN
+                GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                GVL_PERSISTENT.CalibM1.Homed := TRUE;
+                GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
+                GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
+            ELSIF instEncoderAbsM1.PresetNak THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+            END_IF;
+        ELSE
+            IF instEncoderAbsM1.PresetAck OR instHomingM1.Homed THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+            ELSIF instEncoderAbsM1.PresetNak OR instHomingM1.Error THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+            END_IF;
         END_IF;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
-        IF instEncoderAbsM2.PresetAck THEN
-            GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-            GVL_PERSISTENT.CalibM2.Homed := TRUE;
-            GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
-            GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
-            GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
-        ELSIF instEncoderAbsM2.PresetNak THEN
-            GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+        IF NOT M2_IsReal THEN
+            IF instEncoderAbsM2.PresetAck THEN
+                GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                GVL_PERSISTENT.CalibM2.Homed := TRUE;
+                GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
+                GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
+            ELSIF instEncoderAbsM2.PresetNak THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+            END_IF;
+        ELSE
+            IF instEncoderAbsM2.PresetAck OR instHomingM2.Homed THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+            ELSIF instEncoderAbsM2.PresetNak OR instHomingM2.Error THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+            END_IF;
         END_IF;
     END_IF;
 END_IF;

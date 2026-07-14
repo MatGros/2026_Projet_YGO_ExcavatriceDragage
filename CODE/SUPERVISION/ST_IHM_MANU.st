@@ -47,7 +47,6 @@ STRUCT
     M3_RelayFwd      : BOOL; (* ↔️ Commande frein + envoi valeur dans mot de commande *)
     M3_RelayRev      : BOOL; (* ↔️ Commande frein + envoi valeur dans mot de commande *)
     M3_FreqSetpoint  : REAL; (* 🎯 Consigne fréquence variateur [Hz] *)
-    M3_FreqLimit     : REAL; (* ⚡ Limite dynamique fréquence HMI [Hz] (clampée par GVL_PERSISTENT.ChariotMaxFreqHz) *)
     M3_FreqActual    : REAL; (* 📊 Retour fréquence mesurée [Hz] *)
 
     (* 🌾 Auxiliaires Hydrauliques (HMI maintained action) *)
@@ -66,6 +65,8 @@ STRUCT
     (* 🔍 Diagnostics Variateur M3 *)
     M3_CommandWordMonitor : WORD; (* 🔍 Mot de commande envoyé au variateur *)
     M3_StatusWordMonitor  : WORD; (* 🔍 Mot d'état reçu du variateur *)
+    M3_CommReady          : BOOL; (* 🔍 Variateur M3 : communication prête (bit 7) *)
+    M3_PowerReady         : BOOL; (* 🔍 Variateur M3 : puissance prête (bit 0) *)
 
     (* ⚡ Réglages dynamiques des limites de vitesse (paliers max) *)
     WinchMaxStepFwd  : INT; (* ⚡ Palier max en montée (1..5, défaut 5) *)

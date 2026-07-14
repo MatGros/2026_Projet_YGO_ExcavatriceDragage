@@ -25,7 +25,7 @@ END_VAR
 
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
-    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
+    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND NOT PRG_10_Outputs.ManuActive,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     

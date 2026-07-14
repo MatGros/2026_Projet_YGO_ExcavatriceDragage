@@ -23,10 +23,10 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
 // --- STUBS LOGIQUES TEMPORAIRES (comportement passif / neutre) ---
-HydraulicPumpRunCmd := FALSE;
-SifterRunCmd        := FALSE;
-GridOpenCmd         := FALSE;
-HelmetCloseCmd      := FALSE;
+// HydraulicPumpRunCmd := FALSE; // Commenté pour permettre le pilotage externe (ex: PRG_10_Outputs)
+// SifterRunCmd        := FALSE;
+// GridOpenCmd         := FALSE;
+// HelmetCloseCmd      := FALSE;
 
 HydraulicFaultOk    := TRUE; // Par défaut sain (NC)
 SifterFaultOk       := TRUE; // Par défaut sain (NC)
