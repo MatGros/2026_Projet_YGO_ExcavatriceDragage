@@ -19,6 +19,10 @@ STRUCT
                                  variable non-RETAIN) = mode Manu ACTIF d'origine. Passer à TRUE
                                  pour rendre la main au programme fonctionnel normal (PRG_06/07/03). *)
 
+    (* 🕹️ Source & Sélection Mouvement *)
+    JoystickSelect   : BOOL; (* 🔌 TRUE = Joystick CANopen | FALSE = Boutons IHM *)
+    JoystickWinchSelect : INT; (* 🛗 1 = M1, 2 = M2, 3 = Couplé *)
+
     (* 🪝 Treuil M1 *)
     PositionM_M1     : REAL; (* 📊 [m] Position brute codeur M1 *)
     M1_RelayFwd      : BOOL; (* 🛗 Commande montée M1 + frein *)
@@ -42,7 +46,24 @@ STRUCT
     (* ↔️ Chariot M3 (variateur AC600) *)
     M3_RelayFwd      : BOOL; (* ↔️ Commande frein + envoi valeur dans mot de commande *)
     M3_RelayRev      : BOOL; (* ↔️ Commande frein + envoi valeur dans mot de commande *)
-    M3_FreqSetpoint  : REAL; (* 🎯 50.0Hz envoie 5000 sans mot de commande *)
-    M3_FreqActual    : REAL; (* 📊 50.0Hz envoie 5000 sans mot de commande *)
+    M3_FreqSetpoint  : REAL; (* 🎯 Consigne fréquence variateur [Hz] *)
+    M3_FreqActual    : REAL; (* 📊 Retour fréquence mesurée [Hz] *)
+
+    (* 🌾 Auxiliaires Hydrauliques (HMI maintained action) *)
+    GridOpenCmd      : BOOL; (* 🌾 Commande ouverture grille *)
+    GridCloseCmd     : BOOL; (* 🌾 Commande fermeture grille *)
+    HelmetOpenCmd    : BOOL; (* 🪖 Commande ouverture casque *)
+    HelmetCloseCmd   : BOOL; (* 🪖 Commande fermeture casque *)
+
+    (* 📊 Fins de Course Virtuels Grappin (delta M1 - M2) *)
+    FdcGrappinOpen   : BOOL; (* 🎚️ Activer FDC Ouvert (stop M2 descente si delta >= 0.0m) *)
+    FdcGrappinClose  : BOOL; (* 🎚️ Activer FDC Fermé (stop M2 montée si delta <= -10.0m) *)
+    GrappinDelta     : REAL; (* 📊 [m] Écart M1-M2 en temps réel *)
+    FdcGrappinOpenActive  : BOOL; (* 🚨 Limite basse M2 atteinte (descente coupée) *)
+    FdcGrappinCloseActive : BOOL; (* 🚨 Limite haute M2 atteinte (montée coupée) *)
+
+    (* 🔍 Diagnostics Variateur M3 *)
+    M3_CommandWordMonitor : WORD; (* 🔍 Mot de commande envoyé au variateur *)
+    M3_StatusWordMonitor  : WORD; (* 🔍 Mot d'état reçu du variateur *)
 END_STRUCT
 END_TYPE

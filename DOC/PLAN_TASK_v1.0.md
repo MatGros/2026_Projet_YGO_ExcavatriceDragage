@@ -10,13 +10,13 @@
 
 | Date | Jalon |
 |---|---|
-| 2026-06-30 | Bootstrap projet (init CODESYS, skill workflow, convention nommage) |
-| 2026-07-04 | `PLAN_Finalisation_v1.0` — 1er état des lieux (bloquants, écarts, TBD) |
-| 2026-07-07/08 | Réarchitecture `PRG_00`→`PRG_10` (abandon `PLC_PRG_MAIN`), campagne doc massive, audit cohérence documentaire |
-| 2026-07-08 | `v0.4.0`→`v0.4.3` : simulation stable Winch/Grappin + synchro critique Méca E, pré-commissioning câble réel |
-| 2026-07-08/09 | `v0.4.4`/`v0.4.5` **IHM_MANU** — mise en service d'urgence (dérogation active, voir §3 ⏸️) |
-| 2026-07-09 | `PLAN_Finalisation_v1.1` (bloquants résolus + priorités actées) + `SAT_Protocole_Essais_v1.0` (protocole recette écrit) — ⚠️ pas encore commités |
 | 2026-07-09 | Audit complet + ce `PLAN_TASK` |
+| 2026-07-09 | `PLAN_Finalisation_v1.1` (bloquants résolus + priorités actées) + `SAT_Protocole_Essais_v1.0` (protocole recette écrit) — ⚠️ pas encore commités |
+| 2026-07-08/09 | `v0.4.4`/`v0.4.5` **IHM_MANU** — mise en service d'urgence (dérogation active, voir §3 ⏸️) |
+| 2026-07-08 | `v0.4.0`→`v0.4.3` : simulation stable Winch/Grappin + synchro critique Méca E, pré-commissioning câble réel |
+| 2026-07-07/08 | Réarchitecture `PRG_00`→`PRG_10` (abandon `PLC_PRG_MAIN`), campagne doc massive, audit cohérence documentaire |
+| 2026-07-04 | `PLAN_Finalisation_v1.0` — 1er état des lieux (bloquants, écarts, TBD) |
+| 2026-06-30 | Bootstrap projet (init CODESYS, skill workflow, convention nommage) |
 
 ---
 

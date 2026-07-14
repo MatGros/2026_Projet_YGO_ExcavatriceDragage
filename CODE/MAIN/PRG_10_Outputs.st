@@ -73,7 +73,7 @@ VAR
     // ─────────  Début modification IHM_MANU  ─────────
     // 🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
     ManuActive            : BOOL; // NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)
-    // Détection de fronts montants pour priorité temporelle
+    // Détection de fronts montants pour priorité temporelle (Boutons HMI uniquement)
     TrigM1Fwd             : BOOL;
     TrigM1Rev             : BOOL;
     TrigM2Fwd             : BOOL;
@@ -82,7 +82,7 @@ VAR
     TrigCoupledRev        : BOOL;
     TrigM3Fwd             : BOOL;
     TrigM3Rev             : BOOL;
-    // États au scan précédent
+    // États au scan précédent (Boutons HMI uniquement)
     LastM1Fwd             : BOOL;
     LastM1Rev             : BOOL;
     LastM2Fwd             : BOOL;
@@ -91,18 +91,39 @@ VAR
     LastCoupledRev        : BOOL;
     LastM3Fwd             : BOOL;
     LastM3Rev             : BOOL;
+
+    // Commandes brutes demandées (après aiguillage HMI / Joystick)
+    M1Fwd_Demand          : BOOL;
+    M1Rev_Demand          : BOOL;
+    M2Fwd_Demand          : BOOL;
+    M2Rev_Demand          : BOOL;
+    CoupledFwd_Demand     : BOOL;
+    CoupledRev_Demand     : BOOL;
+    M3Fwd_Demand          : BOOL;
+    M3Rev_Demand          : BOOL;
+
+    // États effectifs calculés (après interlocks et limites)
     M1Fwd_Eff             : BOOL;
     M1Rev_Eff             : BOOL;
     M2Fwd_Eff             : BOOL;
     M2Rev_Eff             : BOOL;
-    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2 — activables indépendamment
+    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2
     K2_Eff                : BOOL;
     K3_Eff                : BOOL;
     K4_Eff                : BOOL;
     M3Fwd_Eff             : BOOL;
-    M3Rev_Eff             : BOOL; // Demande interlockée — voir §M3 EtherCAT : ne pilote PAS le variateur tant que non confirmé
+    M3Rev_Eff             : BOOL;
+
+    instManuSpeedStep     : FB_SpeedStep; // 🪜 FB de décodage palier pour Joystick en mode Manu
     instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
     instM3RelayRevLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel
+
+    // 🆕 REX 2026-07-14 — Gestion RAMPES / décodage à la volée en mode HMI bouton
+    CycleTimeCalc         : FB_CycleTime; // ⏱️ Calculateur temps de cycle réel
+    instHmiSpeedRamp      : FB_Ramp;      // 📈 Rampe d'accélération pour vitesse HMI
+    WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active
+    HmiRampTarget         : REAL;         // 🎯 Cible de la rampe HMI
+    SpeedRefPct           : REAL;         // 📊 Consigne vitesse courante (issue de la rampe)
     // ─────────  Fin modification IHM_MANU  ─────────
 END_VAR
 
@@ -118,9 +139,9 @@ END_VAR
 // ModeDisable=TRUE pour rendre la main au programme fonctionnel normal
 // (PRG_06_WinchControl/PRG_07_ChariotControl/PRG_03_Safety, intouchés).
 // ⚠️ Aucune sécurité logicielle métier active en Manu (safety M1/M2/M3, synchro,
-// limites logicielles, homing) — seuls les interlocks Fwd/Rev et K1-K4 ci-dessous,
-// et la chaîne AU/PowerCutOff (§ plus bas, TOUJOURS active, non bypassée),
-// protègent la machine et les personnes.
+// limites logicielles, homing) — seuls les interlocks Fwd/Rev, K1-K4 ci-dessous,
+// les fins de course grappin, et la chaîne AU/PowerCutOff (§ plus bas, TOUJOURS
+// active, non bypassée), protègent la machine et les personnes.
 // 📍 Placé en tête de PRG_10_Outputs (position tâche 10, la plus en aval) : écrase
 // les VAR_INPUT juste avant leur écriture réelle, APRÈS que PRG_06/07 (positions
 // 6/7) les aient déjà remplis — le programme normal tourne dans le vide, ignoré.
@@ -130,8 +151,13 @@ ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable;
 GVL_IHM.IHM_MANU.PositionM_M1 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 
+// 📊 Calcul de l'écart grappin et des états de fin de course (delta = M1 - M2)
+GVL_IHM.IHM_MANU.GrappinDelta := GVL_IHM.IHM_MANU.PositionM_M1 - GVL_IHM.IHM_MANU.PositionM_M2;
+GVL_IHM.IHM_MANU.FdcGrappinOpenActive  := GVL_IHM.IHM_MANU.FdcGrappinOpen AND (GVL_IHM.IHM_MANU.GrappinDelta >= 0.0);
+GVL_IHM.IHM_MANU.FdcGrappinCloseActive := GVL_IHM.IHM_MANU.FdcGrappinClose AND (GVL_IHM.IHM_MANU.GrappinDelta <= -10.0);
+
 IF ManuActive THEN
-    // 1️⃣ Détection des nouveaux appuis (fronts montants)
+    // 1️⃣ Détection des nouveaux appuis sur boutons HMI (uniquement pour interlocks HMI)
     TrigM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT LastM1Fwd;
     TrigM1Rev      := GVL_IHM.IHM_MANU.M1_RelayRev AND NOT LastM1Rev;
     TrigM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT LastM2Fwd;
@@ -141,7 +167,7 @@ IF ManuActive THEN
     TrigM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT LastM3Fwd;
     TrigM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT LastM3Rev;
 
-    // 2️⃣ Interlock M1 (Montée vs Descente) : Premier actif conservé, le nouveau est rejeté à FALSE
+    // 2️⃣ Interlocks de sécurité sur boutons HMI (Montée vs Descente)
     IF GVL_IHM.IHM_MANU.M1_RelayFwd AND GVL_IHM.IHM_MANU.M1_RelayRev THEN
         IF TrigM1Rev THEN
             GVL_IHM.IHM_MANU.M1_RelayRev := FALSE; (* Rejet Rev *)
@@ -153,7 +179,6 @@ IF ManuActive THEN
         END_IF;
     END_IF;
 
-    // 3️⃣ Interlock M2 (Montée vs Descente)
     IF GVL_IHM.IHM_MANU.M2_RelayFwd AND GVL_IHM.IHM_MANU.M2_RelayRev THEN
         IF TrigM2Rev THEN
             GVL_IHM.IHM_MANU.M2_RelayRev := FALSE;
@@ -165,7 +190,6 @@ IF ManuActive THEN
         END_IF;
     END_IF;
 
-    // 4️⃣ Interlock Couplé M1_M2 (Montée vs Descente)
     IF GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
         IF TrigCoupledRev THEN
             GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
@@ -177,7 +201,6 @@ IF ManuActive THEN
         END_IF;
     END_IF;
 
-    // 5️⃣ Interlock Chariot M3 (Marche avant vs arrière)
     IF GVL_IHM.IHM_MANU.M3_RelayFwd AND GVL_IHM.IHM_MANU.M3_RelayRev THEN
         IF TrigM3Rev THEN
             GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
@@ -189,46 +212,156 @@ IF ManuActive THEN
         END_IF;
     END_IF;
 
-    // 6️⃣ Conflits entre mouvements Individuels et Couplés (Couplé Fwd/Rev vs Individuel Rev/Fwd)
-    // Si Couplé Fwd actif -> rejeter individuel Rev M1 ou M2
+    // 3️⃣ Conflits boutons HMI entre mouvements Individuels et Couplés
     IF GVL_IHM.IHM_MANU.M1_M2_RelayFwd THEN
         IF GVL_IHM.IHM_MANU.M1_RelayRev THEN GVL_IHM.IHM_MANU.M1_RelayRev := FALSE; END_IF;
         IF GVL_IHM.IHM_MANU.M2_RelayRev THEN GVL_IHM.IHM_MANU.M2_RelayRev := FALSE; END_IF;
     END_IF;
 
-    // Si Couplé Rev actif -> rejeter individuel Fwd M1 ou M2
     IF GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
         IF GVL_IHM.IHM_MANU.M1_RelayFwd THEN GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE; END_IF;
         IF GVL_IHM.IHM_MANU.M2_RelayFwd THEN GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE; END_IF;
     END_IF;
 
-    // Si individuel Rev actif -> rejeter Couplé Fwd
     IF (GVL_IHM.IHM_MANU.M1_RelayRev OR GVL_IHM.IHM_MANU.M2_RelayRev) AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd THEN
         GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
     END_IF;
 
-    // Si individuel Fwd actif -> rejeter Couplé Rev
     IF (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayFwd) AND GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
         GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
     END_IF;
 
-    // 7️⃣ Évaluation finale des mouvements effectifs (les HMI sont désormais garanties propres)
-    M1Fwd_Eff := GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
-    M1Rev_Eff := GVL_IHM.IHM_MANU.M1_RelayRev OR GVL_IHM.IHM_MANU.M1_M2_RelayRev;
-    M2Fwd_Eff := GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
-    M2Rev_Eff := GVL_IHM.IHM_MANU.M2_RelayRev OR GVL_IHM.IHM_MANU.M1_M2_RelayRev;
+    // 4️⃣ Aiguillage de la commande de mouvement (HMI vs Joystick CANopen)
+    IF GVL_IHM.IHM_MANU.JoystickSelect THEN
+        // Commandes via le Joystick CANopen
+        M1Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        M1Rev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        
+        M2Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        M2Rev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        
+        CoupledFwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        CoupledRev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        
+        M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
+        M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
+        
+        // Commande vitesse analogique Chariot M3 (0..50Hz) via déflexion X
+        GVL_IHM.IHM_MANU.M3_FreqSetpoint := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) * 0.5;
+    ELSE
+        // ⏱️ Calcul temps de cycle réel pour la rampe HMI
+        CycleTimeCalc();
 
-    // Contacteurs de vitesse K1-K4 (direct)
-    K1_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor1;
-    K2_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor2;
-    K3_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor3;
-    K4_Eff := GVL_IHM.IHM_MANU.M1_M2_Contactor4;
+        // 💡 Détection de mouvement en cours (pour verrouillage croisé)
+        WinchMoving := M1Fwd_Demand OR M1Rev_Demand OR M2Fwd_Demand OR M2Rev_Demand OR CoupledFwd_Demand OR CoupledRev_Demand;
 
-    // Chariot M3 (sens)
-    M3Fwd_Eff := GVL_IHM.IHM_MANU.M3_RelayFwd;
-    M3Rev_Eff := GVL_IHM.IHM_MANU.M3_RelayRev;
+        // 🔒 Verrouillage d'aiguillage HMI : on ne démarre un mouvement que si aucun autre n'est en cours (arrêt complet)
+        M1Fwd_Demand := (GVL_IHM.IHM_MANU.M1_RelayFwd AND (NOT WinchMoving OR M1Fwd_Demand)) OR (M1Fwd_Demand AND SpeedRefPct > 0.1);
+        M1Rev_Demand := (GVL_IHM.IHM_MANU.M1_RelayRev AND (NOT WinchMoving OR M1Rev_Demand)) OR (M1Rev_Demand AND SpeedRefPct > 0.1);
+        M2Fwd_Demand := (GVL_IHM.IHM_MANU.M2_RelayFwd AND (NOT WinchMoving OR M2Fwd_Demand)) OR (M2Fwd_Demand AND SpeedRefPct > 0.1);
+        M2Rev_Demand := (GVL_IHM.IHM_MANU.M2_RelayRev AND (NOT WinchMoving OR M2Rev_Demand)) OR (M2Rev_Demand AND SpeedRefPct > 0.1);
+        CoupledFwd_Demand := (GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND (NOT WinchMoving OR CoupledFwd_Demand)) OR (CoupledFwd_Demand AND SpeedRefPct > 0.1);
+        CoupledRev_Demand := (GVL_IHM.IHM_MANU.M1_M2_RelayRev AND (NOT WinchMoving OR CoupledRev_Demand)) OR (CoupledRev_Demand AND SpeedRefPct > 0.1);
 
-    // Recopie vers les VAR_INPUT existants
+        M3Fwd_Demand := GVL_IHM.IHM_MANU.M3_RelayFwd;
+        M3Rev_Demand := GVL_IHM.IHM_MANU.M3_RelayRev;
+
+        // 🎯 Détermination de la cible pour la rampe HMI (100% si un bouton est pressé, 0% sinon)
+        IF GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev 
+           OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev 
+           OR GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
+            HmiRampTarget := 100.0;
+        ELSE
+            HmiRampTarget := 0.0;
+        END_IF;
+
+        // 📈 Calcul de la rampe de vitesse HMI
+        instHmiSpeedRamp(
+            Target := HmiRampTarget,
+            AccelRate := 50.0,
+            DecelRate := 150.0,
+            CycleTimeS := CycleTimeCalc.CycleTimeS
+        );
+        SpeedRefPct := instHmiSpeedRamp.Current;
+
+        // Consigne de fréquence de l'IHM pour M3 (bornage de sécurité)
+        IF GVL_IHM.IHM_MANU.M3_FreqSetpoint > 50.0 THEN
+            GVL_IHM.IHM_MANU.M3_FreqSetpoint := 50.0;
+        ELSIF GVL_IHM.IHM_MANU.M3_FreqSetpoint < 0.0 THEN
+            GVL_IHM.IHM_MANU.M3_FreqSetpoint := 0.0;
+        END_IF;
+    END_IF;
+
+    // 5️⃣ Évaluation finale des mouvements effectifs avec interlocks de fin de course grappin
+    // Remarque : les limites FdcGrappin ne s'appliquent qu'au pilotage INDIVIDUEL de M2
+    M1Fwd_Eff := M1Fwd_Demand OR CoupledFwd_Demand;
+    M1Rev_Eff := M1Rev_Demand OR CoupledRev_Demand;
+    M2Fwd_Eff := (M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand;
+    M2Rev_Eff := (M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand;
+
+    // 6️⃣ Décodage de la vitesse des Winchs K1-K4
+    IF GVL_IHM.IHM_MANU.JoystickSelect THEN
+        // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse du joystick Y (0..100%)
+        instManuSpeedStep(
+            Enable := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
+            SpeedRefPct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef),
+            Table := GVL_PERSISTENT.WinchSpeedStepTable,
+            HystMargin := 2.0,
+            MaxStepNumber := SEL(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1, 5, GVL_PERSISTENT.WinchMaxStepDescente)
+        );
+        K1_Eff := instManuSpeedStep.Contactor1;
+        K2_Eff := instManuSpeedStep.Contactor2;
+        K3_Eff := instManuSpeedStep.Contactor3;
+        K4_Eff := instManuSpeedStep.Contactor4;
+    ELSE
+        // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse de la rampe HMI (0..100%)
+        instManuSpeedStep(
+            Enable := (SpeedRefPct > 0.1),
+            SpeedRefPct := SpeedRefPct,
+            Table := GVL_PERSISTENT.WinchSpeedStepTable,
+            HystMargin := 2.0,
+            MaxStepNumber := SEL(M1Rev_Demand OR M2Rev_Demand OR CoupledRev_Demand, 5, GVL_PERSISTENT.WinchMaxStepDescente)
+        );
+        K1_Eff := instManuSpeedStep.Contactor1;
+        K2_Eff := instManuSpeedStep.Contactor2;
+        K3_Eff := instManuSpeedStep.Contactor3;
+        K4_Eff := instManuSpeedStep.Contactor4;
+    END_IF;
+
+    // 7️⃣ Commandes effectives Chariot M3
+    M3Fwd_Eff := M3Fwd_Demand;
+    M3Rev_Eff := M3Rev_Demand;
+
+    // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
+    IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd THEN
+        GridUp_RQ := TRUE;
+        GridDown_RQ := FALSE;
+    ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd THEN
+        GridUp_RQ := FALSE;
+        GridDown_RQ := TRUE;
+    ELSE
+        GridUp_RQ := FALSE;
+        GridDown_RQ := FALSE;
+    END_IF;
+
+    IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd THEN
+        HelmetOpen_RQ := TRUE;
+        HelmetClose_RQ := FALSE;
+    ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd THEN
+        HelmetOpen_RQ := FALSE;
+        HelmetClose_RQ := TRUE;
+    ELSE
+        HelmetOpen_RQ := FALSE;
+        HelmetClose_RQ := FALSE;
+    END_IF;
+
+    // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé
+    PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := GVL_IHM.IHM_MANU.GridOpenCmd 
+                                                OR GVL_IHM.IHM_MANU.GridCloseCmd 
+                                                OR GVL_IHM.IHM_MANU.HelmetOpenCmd 
+                                                OR GVL_IHM.IHM_MANU.HelmetCloseCmd;
+
+    // Recopie vers les VAR_INPUT existants pour forcer les sorties physiques
     M1RelayFwd        := M1Fwd_Eff;
     M1RelayRev        := M1Rev_Eff;
     M1BrakeCmd        := M1Fwd_Eff OR M1Rev_Eff;
@@ -246,6 +379,16 @@ IF ManuActive THEN
     M2SpeedContactor4 := K4_Eff;
 
     ChariotBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
+ELSE
+    // Nettoyage en cas de désactivation du mode Manu
+    instManuSpeedStep(Enable := FALSE);
+    instHmiSpeedRamp(Target := 0.0, AccelRate := 100.0, DecelRate := 500.0, CycleTimeS := 0.010);
+    SpeedRefPct := 0.0;
+    
+    GridUp_RQ := FALSE;
+    GridDown_RQ := FALSE;
+    HelmetOpen_RQ := FALSE;
+    HelmetClose_RQ := FALSE;
 END_IF;
 
 // ── Chariot M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
@@ -267,13 +410,17 @@ ELSE
 END_IF;
 GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
 
+// Recopie des mots de commande et d'état pour monitoring HMI
+GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
+GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
+
 // 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur
 instM3RelayFwdLed(Command := ManuActive AND M3Fwd_Eff);
 M3_RelayFwd_DQ := instM3RelayFwdLed.State;
 instM3RelayRevLed(Command := ManuActive AND M3Rev_Eff);
 M3_RelayRev_DQ := instM3RelayRevLed.State;
 
-// 8️⃣ Enregistrement de l'état précédent (pour le cycle suivant)
+// 9️⃣ Enregistrement de l'état précédent (pour le cycle suivant)
 LastM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd;
 LastM1Rev      := GVL_IHM.IHM_MANU.M1_RelayRev;
 LastM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd;
@@ -349,8 +496,8 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 // bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
 // Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
 IF ManuActive THEN
-    PowerCutOff_A_RQ := TRUE;
-    PowerCutOff_B_RQ := TRUE;
+    PowerCutOff_A_RQ := NOT ForceTestA;
+    PowerCutOff_B_RQ := NOT ForceTestB;
     // ─────────  Fin modification IHM_MANU  ─────────
 ELSE
 PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff

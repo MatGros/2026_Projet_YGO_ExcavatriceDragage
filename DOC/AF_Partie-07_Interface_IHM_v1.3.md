@@ -6,7 +6,7 @@
 > 🔧 **Nettoyage documentaire (audit doc, 2026-07-09)** : harmonisation titre/nom de fichier — le
 > titre affichait encore v1.2 alors que le champ "Version" (ci-dessus) était déjà en v1.3 ; le nom
 > de fichier suit désormais la version la plus haute. Aucun changement de contenu fonctionnel.  
-> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md), [P10 Homing v1.7](AF_Partie-10_Fonction_Encoder_Homing_v1.9.md), [P12 Grappin v1.4](AF_Partie-12_Fonction_Grappin_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md), [P10 Homing v1.10](AF_Partie-10_Fonction_Encoder_Homing_v1.10.md), [P12 Grappin v1.4](AF_Partie-12_Fonction_Grappin_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
 
 ---
 

@@ -25,6 +25,8 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 
 **Champs du struct :**
 - `ModeDisable : BOOL` — **logique inversée VOLONTAIRE** : FALSE (défaut, non-RETAIN) = mode Manu ACTIF sans action opérateur. Doit passer explicitement à TRUE pour revenir au normal. ⚠️ **Ceci est le point le plus dangereux et le premier à corriger au nettoyage.**
+- `JoystickSelect : BOOL` — choix de la source de commande (TRUE = Joystick CANopen, FALSE = boutons HMI).
+- `JoystickWinchSelect : INT` — sélection du treuil piloté par le joystick Y (1 = M1, 2 = M2, 3 = M1+M2).
 - `PositionM_M1/M2 : REAL` — lecture brute position codeur (affichage diagnostic)
 - `M1/M2_RelayFwd/Rev : BOOL` — commandes montée/descente par axe, interlock Fwd/Rev
 - `HomingEncoder_M1/M2 : BOOL` — front = référencement codeur (OR avec CmdHome existant, **aucune dérogation sécurité**)
@@ -32,10 +34,14 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 - `M1_M2_Contactor1-4 : BOOL` — contacteurs vitesse K1-K4 communs (un seul actif à la fois, interlock fail-safe)
 - `M3_RelayFwd/Rev : BOOL` — commandes chariot (sens via variateur EtherCAT)
 - `M3_FreqSetpoint/Actual : REAL` — consigne/retour fréquence variateur [Hz]
-- `M3_CommandWordMonitor/StatusWordMonitor : WORD` — diagnostics mot commande/état envoyés au variateur
+- `GridOpenCmd/GridCloseCmd : BOOL` — commandes maintenues ouverture/fermeture grille.
+- `HelmetOpenCmd/HelmetCloseCmd : BOOL` — commandes maintenues ouverture/fermeture casque.
+- `FdcGrappinOpen/Close : BOOL` — activation HMI des sécurités virtuelles grappin.
+- `GrappinDelta : REAL` — écart en mètres M1-M2 en temps réel.
+- `FdcGrappinOpenActive/CloseActive : BOOL` — états actifs de fin de course grappin (coupe les relais M2).
+- `M3_CommandWordMonitor/StatusWordMonitor : WORD` — diagnostics mot commande/état envoyés/reçus au variateur.
 
 **À supprimer au nettoyage :** Fichier entier.
-
 ---
 
 ### 2. **CODE/SUPERVISION/GVL_IHM.st** — Déclaration instance (ligne 17)
@@ -56,7 +62,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 // ─────────  Début modification IHM_MANU  ─────────
     // 🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
     ManuActive            : BOOL; // NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)
-    // Détection de fronts montants pour priorité temporelle
+    // Détection de fronts montants pour priorité temporelle (Boutons HMI uniquement)
     TrigM1Fwd             : BOOL;
     TrigM1Rev             : BOOL;
     TrigM2Fwd             : BOOL;
@@ -65,7 +71,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
     TrigCoupledRev        : BOOL;
     TrigM3Fwd             : BOOL;
     TrigM3Rev             : BOOL;
-    // États au scan précédent
+    // États au scan précédent (Boutons HMI uniquement)
     LastM1Fwd             : BOOL;
     LastM1Rev             : BOOL;
     LastM2Fwd             : BOOL;
@@ -74,24 +80,45 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
     LastCoupledRev        : BOOL;
     LastM3Fwd             : BOOL;
     LastM3Rev             : BOOL;
+
+    // Commandes brutes demandées (après aiguillage HMI / Joystick)
+    M1Fwd_Demand          : BOOL;
+    M1Rev_Demand          : BOOL;
+    M2Fwd_Demand          : BOOL;
+    M2Rev_Demand          : BOOL;
+    CoupledFwd_Demand     : BOOL;
+    CoupledRev_Demand     : BOOL;
+    M3Fwd_Demand          : BOOL;
+    M3Rev_Demand          : BOOL;
+
+    // États effectifs calculés (après interlocks et limites)
     M1Fwd_Eff             : BOOL;
     M1Rev_Eff             : BOOL;
     M2Fwd_Eff             : BOOL;
     M2Rev_Eff             : BOOL;
-    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2 — activables indépendamment
+    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2
     K2_Eff                : BOOL;
     K3_Eff                : BOOL;
     K4_Eff                : BOOL;
     M3Fwd_Eff             : BOOL;
-    M3Rev_Eff             : BOOL; // Demande interlockée — voir §M3 EtherCAT : ne pilote PAS le variateur tant que non confirmé
+    M3Rev_Eff             : BOOL;
+
+    instManuSpeedStep     : FB_SpeedStep; // 🪜 FB de décodage palier pour Joystick en mode Manu
     instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
     instM3RelayRevLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel
+
+    // 🆕 REX 2026-07-14 — Gestion RAMPES / décodage à la volée en mode HMI bouton
+    CycleTimeCalc         : FB_CycleTime; // ⏱️ Calculateur temps de cycle réel
+    instHmiSpeedRamp      : FB_Ramp;      // 📈 Rampe d'accélération pour vitesse HMI
+    WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active
+    HmiRampTarget         : REAL;         // 🎯 Cible de la rampe HMI
+    SpeedRefPct           : REAL;         // 📊 Consigne vitesse courante (issue de la rampe)
 // ─────────  Fin modification IHM_MANU  ─────────
 ```
 
-**Rôle :** Variables de travail, états précédents (Last*) et détection de fronts (Trig*) pour les interlocks temporels actifs, et instances FB de sortie pour LEDs de mise en service M3.
+**Rôle :** Variables de travail, états précédents (Last*) et détection de fronts (Trig*) pour les interlocks temporels actifs, et instances FB de sortie pour LEDs de mise en service M3, ainsi que les blocs de rampe/timing HMI.
 
-**À supprimer au nettoyage :** Bloc entier (23 lignes de déclarations + 2 FB_Output).
+**À supprimer au nettoyage :** Bloc entier (30 lignes de déclarations + instances FB).
 
 ---
 
@@ -101,19 +128,22 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 **Logique :**
 1. Calcul `ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable` (logique inversée)
-2. Affichage position codeurs M1/M2 (diagnostic)
-3. **IF ManuActive THEN :**
-   - Interlock Fwd/Rev par axe (M1/M2 seuls ET simultanés) : `Xfwd_Eff := (Cmd_Fwd OR Cmd_M1M2_Fwd) AND NOT (Cmd_Rev OR Cmd_M1M2_Rev)`
-   - Interlock K1-K4 : un seul contacteur actif à la fois
-   - Recalcul des VAR_INPUT existants (M1RelayFwd, M1RelayRev, M1BrakeCmd, M1/M2SpeedContactor1-4, ChariotBrakeCmd)
-4. **Chariot M3 — mot de commande EtherCAT direct :**
+2. Affichage position codeurs M1/M2 et calcul de l'écart `GrappinDelta` (M1 - M2).
+3. Évaluation des sécurités actives : `FdcGrappinOpenActive` (si `FdcGrappinOpen` est coché et `delta >= 0.0`) et `FdcGrappinCloseActive` (si `FdcGrappinClose` est coché et `delta <= -10.0`).
+4. **IF ManuActive THEN :**
+   - **Aiguillage Source** : Si `JoystickSelect` = TRUE, les commandes `Demand` viennent du Joystick CANopen (Y -> Winch sélectionné par `JoystickWinchSelect`, X -> Chariot M3 avec consigne fréquence calculée `SpeedRef * 0.5`). Sinon (mode HMI bouton), les commandes sont automatiquement maintenues pendant la décélération de la rampe HMI pour un arrêt progressif et sécurisé, et les demandes antagonistes sont verrouillées croisées.
+   - **Contrôle Winch M2** : Sécurité FDC Grappin active applique le blocage individuel de M2 (`FdcGrappinOpenActive` coupe la descente, `FdcGrappinCloseActive` coupe la montée). Les commandes couplées contournent cette limite pour éviter la divergence.
+   - **Vitesse Winch** : Si Joystick, utilisation de `FB_SpeedStep` pour décoder K1-K4 sur la vitesse du joystick (avec limitation en descente). Si HMI bouton, utilisation de la même fonction `FB_SpeedStep` connectée à la rampe de vitesse `instHmiSpeedRamp` (démarrage à 0%, montée progressive à 100% tant que le bouton est maintenu, décélération progressive vers 0% au relâchement, avec limitation en descente).
+   - **Auxiliaires Hydrauliques** : Mappage des commandes Grille / Casque action maintenue, avec interlock logique, et forçage automatique de `PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := TRUE` en mouvement.
+   - Recalcul des VAR_INPUT existants (M1RelayFwd, M1RelayRev, M1BrakeCmd, M1/M2SpeedContactor1-4, ChariotBrakeCmd).
+5. **Chariot M3 — mot de commande EtherCAT direct :**
    - Si `ManuActive AND M3Fwd_Eff` → `M3_CommandWord := 1` + fréquence
    - Si `ManuActive AND M3Rev_Eff` → `M3_CommandWord := 2` + fréquence
    - Sinon → `M3_CommandWord := 0` (arrêt, couvre aussi le mode normal)
    - Copie vars de diagnostic (CommandWordMonitor, StatusWordMonitor, FreqActual)
    - 💡 Pilotage LEDs M3 (M3_RelayFwd_DQ, M3_RelayRev_DQ) — **témoins mise en service uniquement, ne pilotent PAS le variateur**
 
-**À supprimer au nettoyage :** Bloc entier (91 lignes + commentaires d'en-tête).
+**À supprimer au nettoyage :** Bloc entier (incluant la réinitialisation des variables temporaires et des auxiliaires dans le bloc `ELSE` de désactivation du mode Manu).
 
 ---
 
@@ -121,8 +151,8 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ```st
 IF ManuActive THEN
-    PowerCutOff_A_RQ := TRUE;
-    PowerCutOff_B_RQ := TRUE;
+    PowerCutOff_A_RQ := NOT ForceTestA;
+    PowerCutOff_B_RQ := NOT ForceTestB;
     // ─────────  Fin modification IHM_MANU  ─────────
 ELSE
     PowerCutOff_A_RQ := NOT (PRG_03_Safety... ) AND NOT ForceTestA AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
@@ -130,7 +160,7 @@ ELSE
 END_IF;
 ```
 
-**Rôle :** **Imbriqué dans le IF/ELSE existant**, en mode Manu force `PowerCutOff_A_RQ = TRUE` et `PowerCutOff_B_RQ = TRUE` FIXES (pas de logique Méca A/B/C, pas d'auto-test ForceTestA/B, pas de bouton CmdEmergencyCutOff — seul l'AU physique protège).
+**Rôle :** **Imbriqué dans le IF/ELSE existant**, en mode Manu force les sorties `PowerCutOff_A_RQ` et `PowerCutOff_B_RQ` à `TRUE` (pour shunter les coupures logicielles des blocs sécurités) **sauf** si l'auto-test du réarmement (`ForceTestA` ou `ForceTestB`) est en cours, ce qui permet de tester et réarmer la boucle de sécurité physique.
 
 **À modifier au nettoyage :** Retirer le bloc IF ManuActive/ELSE, replacer directement la logique normale dans le code.
 
@@ -150,17 +180,23 @@ Si `ManuActive` est activé, les commandes `HomingEncoder_M1/M2` pilotent direct
 #### 🔶 **Bloc 2 : Enregistrement manuel de calibration et reset bouton HMI**
 Code ajouté tout à la fin du POU `PRG_02_Encoders` pour détecter le succès (`PresetAck`) ou le timeout (`PresetNak`) afin d'écrire directement l'offset de position dans la mémoire persistante pour faire `12.5` mètres (Offset = `16726016`), puis de désactiver le bouton HMI.
 
-#### 🔶 **Bloc 3 : Aiguillage codeur réel forcé en ManuActive (Lot Secours - Correctif bug)**
-Aiguillage d'entrée des codeurs modifié (lignes 68-78) pour contourner le simulateur `instSimEncoderM1/M2` (qui resterait figé à 12.5m à cause de la rampe à 0.0) et forcer la relecture de `COD1_PosValue`/`COD2_PosValue` réel dès que `ManuActive` est actif.
+#### 🔶 **Bloc 3 : Aiguillage codeur réel / simulé (Restauration logique propre)**
+L'aiguillage d'entrée des codeurs (lignes 68-78) a été nettoyé de la condition `AND NOT PRG_10_Outputs.ManuActive` afin de permettre au simulateur de codeur `instSimEncoderM1/M2` de fonctionner correctement sur PC même lorsque `ManuActive = TRUE`. Pour basculer sur les codeurs réels, il suffit de configurer `EncoderM1_IsReal` et `EncoderM2_IsReal` à `TRUE` dans `GVL_Simulation` (ou désactiver `SimulationModeActive`).
 
 **À modifier au nettoyage :** 
-*   Retirer la condition `AND NOT PRG_10_Outputs.ManuActive` de l'aiguillage simulation/réel (lignes 68-78) pour rétablir la logique nominale.
 *   Rétablir les entrées `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur `instEncoderAbsM1` et `instEncoderAbsM2`.
 *   Retirer le bloc de code conditionnel `IF PRG_10_Outputs.ManuActive THEN ... END_IF` tout à la fin du fichier.
 
 ---
 
-### 5. **CODE/ENCODERS/FB_Encoder_Abs.st** — Temporisation visuelle de l'écriture
+### 5. **CODE/MAIN/PRG_08_AuxiliaryControl.st** — Modification du bloc VAR en VAR_INPUT
+Pour permettre à `PRG_10_Outputs.st` d'écrire directement dans `HydraulicPumpRunCmd` pour la logique de démarrage automatique de la centrale hydraulique en mode dérogatoire, le bloc de variables locales a été converti en `VAR_INPUT`.
+
+**À modifier au nettoyage :** Changer `VAR_INPUT` en `VAR` pour rétablir la portée locale.
+
+---
+
+### 6. **CODE/ENCODERS/FB_Encoder_Abs.st** — Temporisation visuelle de l'écriture
 
 #### 🔶 **Bloc 1 : Maintien visuel à 0.5s dans le step 1**
 Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fois le codeur recalé, le bit `PresetTriggerCmd := 2` est maintenu pendant **0.5 seconde** avant d'être repassé à `0` (step 0).
@@ -204,6 +240,8 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
   - [ ] Restaurer `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur les appels de `instEncoderAbsM1` et `instEncoderAbsM2` (lignes 97-98 et 146-147).
   - [ ] Retirer le bit de forçage dérogatoire sur l'entrée `Home` des blocs `instHomingM1` et `instHomingM2` (lignes 113 et 162).
   - [ ] Supprimer entièrement le bloc conditionnel de fin de fichier (lignes 214-239).
+- [ ] **PRG_08_AuxiliaryControl.st** :
+  - [ ] Rétablir le bloc de variables locales en `VAR` au lieu de `VAR_INPUT`.
 
 ### Phase 3 : Tests de validation
 - [ ] Compiler le projet CODESYS sans erreur

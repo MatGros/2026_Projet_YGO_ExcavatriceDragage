@@ -40,7 +40,7 @@ Contrat standard que **tout FB métier respecte** :
 ### 6️⃣ **Fonctions Métier (Partie 8+)**
 - **[Partie 8 (v1.2)](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md)** — Fonction Joystick.
 - **[Partie 9 (v1.7)](DOC/AF_Partie-09_Fonction_Winch_v1.7.md)** — Fonction Winch (M1/M2, safety mou câble/thermique, garde-fous roue libre).
-- **[Partie 10 (v1.7)](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.7.md)** — Fonction Encoder & Homing.
+- **[Partie 10 (v1.10)](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md)** — Fonction Encoder & Homing.
 - **[Partie 11 (v1.3)](DOC/AF_Partie-11_Fonction_Chariot_v1.3.md)** — Fonction Chariot (M3 variateur AC600).
 - **[Partie 12 (v1.2)](DOC/AF_Partie-12_Fonction_Grappin_v1.2.md)** — Fonction Grappin (M2, désynchronisation, garde-fou glissement).
 - **[Partie 13 (v1.1)](DOC/AF_Partie-13_Fonction_Simulation_v1.1.md)** — Fonction Simulation.
@@ -67,7 +67,7 @@ excavatrice-dragage/
 │   ├── AF_Partie-07_Interface_IHM_v1.2.md
 │   ├── AF_Partie-08_Fonction_Joystick_v1.2.md
 │   ├── AF_Partie-09_Fonction_Winch_v1.7.md
-│   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.7.md
+│   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
 │   ├── AF_Partie-11_Fonction_Chariot_v1.3.md
 │   ├── AF_Partie-12_Fonction_Grappin_v1.2.md
 │   ├── AF_Partie-13_Fonction_Simulation_v1.1.md
