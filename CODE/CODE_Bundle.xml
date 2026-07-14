@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.208802" />
-  <contentHeader name="Programme MGS_v0.4.6_IHM_MANU_JOY.project" modificationDateTime="2026-07-04T06:07:15.208802">
+  <contentHeader name="Programme MGS_v0.4.7_IHM_MANU_JOY.project" modificationDateTime="2026-07-04T06:07:15.208802">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Programme MGS_v0.4.6_IHM_MANU_JOY</property>
+          <property name="Project" type="string">Programme MGS_v0.4.7_IHM_MANU_JOY</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1397,14 +1397,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence variateur [Hz]</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_FreqLimit">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Limite dynamique fréquence HMI [Hz] (clampée par GVL_PERSISTENT.ChariotMaxFreqHz)</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_FreqActual">
               <type>
                 <REAL />
@@ -1502,6 +1494,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Mot d'état reçu du variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_CommReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Variateur M3 : communication prête (bit 7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PowerReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Variateur M3 : puissance prête (bit 0)</xhtml>
               </documentation>
             </variable>
             <variable name="WinchMaxStepFwd">
@@ -12426,8 +12434,9 @@ FB_Joystick_0(
     FilterTime          := TIME#100ms,
     AccelRate           := 50.0,
     DecelRate           := 150.0,
-    DeadmanRearmTimeout := T#5M,    // 🔴 TEST BANC — défaut sûr T#10S, voir bandeau ci-dessus
-    NeutralHoldTime     := T#1S     // 🔴 TEST BANC — défaut sûr T#500MS, voir bandeau ci-dessus
+    // 🛡️ Délais de sécurité Homme-Mort : temporisations courtes (10s/500ms) si joystick réel, longues (5min/1s) si simulé
+    DeadmanRearmTimeout := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#5M, T#10S),
+    NeutralHoldTime     := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#1S, T#500MS)
 );
 </xhtml>
           </ST>
@@ -12532,14 +12541,27 @@ FB_Joystick_0(
               <type>
                 <REAL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-14 — Variables de vitesse simulée adaptées au mode IHM_MANU</xhtml>
-              </documentation>
             </variable>
             <variable name="M2_SimSpeedPct">
               <type>
                 <REAL />
               </type>
+            </variable>
+            <variable name="M1_IsReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le treuil M1 est configuré comme réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_IsReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le treuil M2 est configuré comme réel</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
@@ -12556,6 +12578,10 @@ FB_Joystick_0(
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
+
+// 🆕 Détermination de la réalité des treuils (Conditional Bypass Doctrine)
+M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
+M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
 
 // 🆕 Calcul de la vitesse de simulation adaptée (mode normal ou mode Manu avec rampes/joystick)
 M1_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
@@ -12633,8 +12659,8 @@ instEncoderAbsM1(
     AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational OR instSimEncoderM1.Enable,
-    PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
-    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
+    PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
+    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
 );
 COD1_PresettTrigCmd := instEncoderAbsM1.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderAbsM1.CodeSeqTriggerCmd;
@@ -12682,8 +12708,8 @@ instEncoderAbsM2(
     AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational OR instSimEncoderM2.Enable,
-    PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
-    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
+    PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
+    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
 );
 COD2_PresettTrigCmd := instEncoderAbsM2.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderAbsM2.CodeSeqTriggerCmd;
@@ -12749,29 +12775,46 @@ EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
 
 // ─────────  Début modification IHM_MANU  ─────────
-// 🎯 Référencement direct (bypass sécurité et modes) si HomingEncoder_M1/M2 activés en Manu
+// 🎯 Référencement direct (bypass sécurité et modes) si HomingEncoder_M1/M2 activés en Manu (uniquement si SIMULÉ)
+// Sinon, si les treuils sont réels, on utilise le homing normal sécurisé, et on réinitialise le bouton HMI dès que homing ok/erreur.
 IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
-        IF instEncoderAbsM1.PresetAck THEN
-            GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-            GVL_PERSISTENT.CalibM1.Homed := TRUE;
-            GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
-            GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
-            GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
-        ELSIF instEncoderAbsM1.PresetNak THEN
-            GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+        IF NOT M1_IsReal THEN
+            IF instEncoderAbsM1.PresetAck THEN
+                GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                GVL_PERSISTENT.CalibM1.Homed := TRUE;
+                GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
+                GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
+            ELSIF instEncoderAbsM1.PresetNak THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+            END_IF;
+        ELSE
+            IF instEncoderAbsM1.PresetAck OR instHomingM1.Homed THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+            ELSIF instEncoderAbsM1.PresetNak OR instHomingM1.Error THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
+            END_IF;
         END_IF;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
-        IF instEncoderAbsM2.PresetAck THEN
-            GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-            GVL_PERSISTENT.CalibM2.Homed := TRUE;
-            GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
-            GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
-            GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
-        ELSIF instEncoderAbsM2.PresetNak THEN
-            GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+        IF NOT M2_IsReal THEN
+            IF instEncoderAbsM2.PresetAck THEN
+                GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                GVL_PERSISTENT.CalibM2.Homed := TRUE;
+                GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
+                GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
+            ELSIF instEncoderAbsM2.PresetNak THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+            END_IF;
+        ELSE
+            IF instEncoderAbsM2.PresetAck OR instHomingM2.Homed THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+            ELSIF instEncoderAbsM2.PresetNak OR instHomingM2.Error THEN
+                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
+            END_IF;
         END_IF;
     END_IF;
 END_IF;
@@ -12822,7 +12865,7 @@ END_IF;
 
 // 1. Sécurité Treuil M1
 instSafetyWinchM1(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_10_Outputs.ManuActive, // 🆕 REX 2026-07-08 : inhibition mise en service (MAINT_N2) / 2026-07-14 : ManuActive
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM1 AND (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -12859,7 +12902,7 @@ instSafetyWinchM1(
 
 // 2. Sécurité Treuil M2
 instSafetyWinchM2(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM2 AND NOT PRG_10_Outputs.ManuActive, // 🆕 REX 2026-07-08 : inhibition mise en service (MAINT_N2) / 2026-07-14 : ManuActive
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM2 AND (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -12897,7 +12940,7 @@ instSafetyWinchM2(
 
 // 3. Sécurité Chariot M3
 instSafetyChariotM3(
-    Enable              := NOT PRG_10_Outputs.ManuActive, // 🆕 REX 2026-07-14 : ManuActive
+    Enable              := NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.ChariotPosition_IsReal, // 🆕 REX 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -13090,7 +13133,7 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
 
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
-    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
+    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND NOT PRG_10_Outputs.ManuActive,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     
@@ -13949,10 +13992,10 @@ Commande ouverture grille</xhtml>
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
 // --- STUBS LOGIQUES TEMPORAIRES (comportement passif / neutre) ---
-HydraulicPumpRunCmd := FALSE;
-SifterRunCmd        := FALSE;
-GridOpenCmd         := FALSE;
-HelmetCloseCmd      := FALSE;
+// HydraulicPumpRunCmd := FALSE; // Commenté pour permettre le pilotage externe (ex: PRG_10_Outputs)
+// SifterRunCmd        := FALSE;
+// GridOpenCmd         := FALSE;
+// HelmetCloseCmd      := FALSE;
 
 HydraulicFaultOk    := TRUE; // Par défaut sain (NC)
 SifterFaultOk       := TRUE; // Par défaut sain (NC)
@@ -14978,12 +15021,63 @@ NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Limite dynamique palier max descente (1..5)</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveM3FreqLimit">
+            <variable name="M3_ActiveFreqCmd">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Limite active fréquence Chariot M3 (Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Consigne active fréquence Chariot M3 au cycle courant (Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_DriveIsReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le variateur Chariot M3 est configuré comme réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_IsReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le treuil M1 est configuré comme réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_IsReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le treuil M2 est configuré comme réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_IsReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le chariot M3 est configuré comme réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive_Eff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si une coupure de puissance est active sur un équipement réel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupNeutralOk">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Sécurité démarrage : exige le retour au neutre initial</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -15106,10 +15200,19 @@ IF ManuActive THEN
     END_IF;
 
     // 4️⃣ Aiguillage de la commande de mouvement (HMI vs Joystick CANopen)
-    // ⚡ Détermination de la limite active de fréquence pour le Chariot M3 (clampé par GVL_PERSISTENT.ChariotMaxFreqHz)
-    ActiveM3FreqLimit := GVL_IHM.IHM_MANU.M3_FreqLimit;
-    IF (ActiveM3FreqLimit &lt;= 0.0) OR (ActiveM3FreqLimit &gt; GVL_PERSISTENT.ChariotMaxFreqHz) THEN
-        ActiveM3FreqLimit := GVL_PERSISTENT.ChariotMaxFreqHz;
+    M3_DriveIsReal := (NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal)
+                      AND (NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.ChariotPosition_IsReal);
+    M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
+    M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
+    M3_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.ChariotPosition_IsReal;
+    PowerCutOffActive_Eff := (M1_IsReal AND PRG_03_Safety.instSafetyWinchM1.PowerCutOff)
+                             OR (M2_IsReal AND PRG_03_Safety.instSafetyWinchM2.PowerCutOff)
+                             OR (M3_IsReal AND PRG_03_Safety.instSafetyChariotM3.PowerCutOff);
+    // ⚡ Clamp de sécurité sur la consigne saisie par l'opérateur (limité par le plafond absolu persistant)
+    IF GVL_IHM.IHM_MANU.M3_FreqSetpoint &gt; GVL_PERSISTENT.ChariotMaxFreqHz THEN
+        GVL_IHM.IHM_MANU.M3_FreqSetpoint := GVL_PERSISTENT.ChariotMaxFreqHz;
+    ELSIF GVL_IHM.IHM_MANU.M3_FreqSetpoint &lt; 0.0 THEN
+        GVL_IHM.IHM_MANU.M3_FreqSetpoint := 0.0;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
@@ -15126,8 +15229,8 @@ IF ManuActive THEN
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
         
-        // Commande vitesse analogique Chariot M3 (0..ActiveM3FreqLimit Hz) via déflexion X (vitesse limite active prise pour 100%)
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * ActiveM3FreqLimit;
+        // Consigne active Chariot M3 (0..M3_FreqSetpoint Hz) via déflexion X (la consigne HMI est prise pour 100%)
+        M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.IHM_MANU.M3_FreqSetpoint;
     ELSE
         // ⏱️ Calcul temps de cycle réel pour la rampe HMI
         CycleTimeCalc();
@@ -15146,8 +15249,8 @@ IF ManuActive THEN
         M3Fwd_Demand := GVL_IHM.IHM_MANU.M3_RelayFwd;
         M3Rev_Demand := GVL_IHM.IHM_MANU.M3_RelayRev;
 
-        // Commande vitesse analogique Chariot M3 via boutons HMI (vitesse limite active prise pour 100%)
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := ActiveM3FreqLimit;
+        // En mode HMI boutons / Simulation, la consigne active envoyée est directement M3_FreqSetpoint
+        M3_ActiveFreqCmd := GVL_IHM.IHM_MANU.M3_FreqSetpoint;
 
         // 🎯 Détermination de la cible pour la rampe HMI (100% si un bouton est pressé, 0% sinon)
         IF GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev 
@@ -15168,13 +15271,40 @@ IF ManuActive THEN
         SpeedRefPct := instHmiSpeedRamp.Current;
     END_IF;
 
+    // 🔒 Sécurité démarrage : exige que toutes les commandes HMI et Joystick soient au repos (neutre) au démarrage
+    IF NOT StartupNeutralOk THEN
+        IF NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
+           AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
+           AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev
+           AND NOT GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT GVL_IHM.IHM_MANU.M3_RelayRev
+           AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) &lt; 1.0
+           AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 1.0 THEN
+            StartupNeutralOk := TRUE;
+        END_IF;
+    END_IF;
+
+    IF NOT StartupNeutralOk THEN
+        M1Fwd_Demand := FALSE;
+        M1Rev_Demand := FALSE;
+        M2Fwd_Demand := FALSE;
+        M2Rev_Demand := FALSE;
+        CoupledFwd_Demand := FALSE;
+        CoupledRev_Demand := FALSE;
+        M3Fwd_Demand := FALSE;
+        M3Rev_Demand := FALSE;
+    END_IF;
+
     // 5️⃣ Évaluation finale des mouvements effectifs avec interlocks de fin de course grappin
     // Remarque : les limites FdcGrappin ne s'appliquent qu'au pilotage INDIVIDUEL de M2
     // 🛡️ 2026-07-14 : verrouillage de sécurité obligatoire avec EmergencyStopOk sur PC / terrain
-    M1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk;
-    M1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk;
-    M2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk;
-    M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk;
+    M1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                 AND (NOT M1_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM1.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidAscent));
+    M1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                 AND (NOT M1_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM1.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidDescent));
+    M2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                 AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent));
+    M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
+                 AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent));
 
     // ⚡ Bornage et valeur par défaut des paliers de vitesse max demandés (1..5)
     ActiveMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
@@ -15216,9 +15346,16 @@ IF ManuActive THEN
         K4_Eff := instManuSpeedStep.Contactor4;
     END_IF;
 
-    // 7️⃣ Commandes effectives Chariot M3
-    M3Fwd_Eff := M3Fwd_Demand AND PRG_00_Inputs.EmergencyStopOk;
-    M3Rev_Eff := M3Rev_Demand AND PRG_00_Inputs.EmergencyStopOk;
+    // 7️⃣ Commandes effectives Chariot M3 (interlockées avec l'AU, et avec la disponibilité variateur SEULEMENT s'il est configuré Réel)
+    M3Fwd_Eff := M3Fwd_Demand AND PRG_00_Inputs.EmergencyStopOk 
+                 AND (M3_StatusWord.7 OR NOT M3_DriveIsReal) 
+                 AND (M3_StatusWord.0 OR NOT M3_DriveIsReal)
+                 AND (NOT M3_IsReal OR NOT PRG_03_Safety.instSafetyChariotM3.SafeStop);
+
+    M3Rev_Eff := M3Rev_Demand AND PRG_00_Inputs.EmergencyStopOk 
+                 AND (M3_StatusWord.7 OR NOT M3_DriveIsReal) 
+                 AND (M3_StatusWord.0 OR NOT M3_DriveIsReal)
+                 AND (NOT M3_IsReal OR NOT PRG_03_Safety.instSafetyChariotM3.SafeStop);
 
     // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
     IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
@@ -15289,10 +15426,10 @@ END_IF;
 // DriveStatusWord/ActualFreqHz à 0 en dur) — pas de conflit avec le mode normal.
 IF ManuActive AND M3Fwd_Eff THEN
     M3_CommandWord         := 1;
-    M3_SetpointFrequencyHz := REAL_TO_UINT(GVL_IHM.IHM_MANU.M3_FreqSetpoint * 100.0);
+    M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.ChariotMaxFreqHz) * 100.0);
 ELSIF ManuActive AND M3Rev_Eff THEN
     M3_CommandWord         := 2;
-    M3_SetpointFrequencyHz := REAL_TO_UINT(GVL_IHM.IHM_MANU.M3_FreqSetpoint * 100.0);
+    M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.ChariotMaxFreqHz) * 100.0);
 ELSE
     M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
     M3_SetpointFrequencyHz := 0;
@@ -15302,6 +15439,8 @@ GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 1
 // Recopie des mots de commande et d'état pour monitoring HMI
 GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
 GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
+GVL_IHM.IHM_MANU.M3_CommReady          := M3_StatusWord.7 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.IHM_MANU.M3_PowerReady         := M3_StatusWord.0 OR GVL_Simulation.SimulationModeActive;
 
 // 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur
 instM3RelayFwdLed(Command := ManuActive AND M3Fwd_Eff);
@@ -15385,8 +15524,8 @@ M3_BrakeCmd_RQ := instChariotBrakeCmd.State;
 // bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
 // Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
 IF ManuActive THEN
-    PowerCutOff_A_RQ := NOT ForceTestA;
-    PowerCutOff_B_RQ := NOT ForceTestB;
+    PowerCutOff_A_RQ := NOT PowerCutOffActive_Eff AND NOT ForceTestA;
+    PowerCutOff_B_RQ := NOT PowerCutOffActive_Eff AND NOT ForceTestB;
     // ─────────  Fin modification IHM_MANU  ─────────
 ELSE
 PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
@@ -16200,7 +16339,6 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_DiagEthercat" ObjectId="268197d6-ad0a-5ec3-82c7-3a1f88f6bae6" />
           <Object Name="GVL_BUS" ObjectId="8d106fd1-f467-5b81-9fa8-241243fdede4" />
           <Object Name="GVL_Machine_Stub" ObjectId="7834019e-fea7-59eb-b31f-8f35e12a198a" />
-          <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
           <Object Name="ST_DeviceDiag" ObjectId="30d8c96b-f84b-5d5c-afe4-0417d2adeea2" />
         </Folder>
         <Folder Name="MODES">
@@ -16277,6 +16415,9 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
           <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
           <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
+        </Folder>
+        <Folder Name="CODE">
+          <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
         </Folder>
       </ProjectStructure>
     </data>

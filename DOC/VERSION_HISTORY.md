@@ -6,6 +6,8 @@ Une ligne par jalon significatif — pas besoin de logguer chaque sous-version m
 
 | Version CODESYS | Date | Commentaire |
 |---|---|---|
+| `v0.4.7_IHM_MANU_JOY` | 2026-07-14 | Alignement avec la doctrine "Conditional Bypass" (sécurités et homing bloquants si réels, shuntés si simulés). Correctifs : blocage démarrage au repos (Startup in Neutral), reset Grafcet auto sous IHM_MANU, timers homme-mort dynamiques et déblocage stub pompe hydraulique. |
+| `v0.4.6_IHM_MANU_JOY` | 2026-07-14 | Intégration du Joystick CANopen (déflexion X/Y), décodage paliers K1-K4, fins de course virtuelles grappin (delta M1-M2), commande auxiliaires hydrauliques, bornage de vitesse paliers et consigne de fréquence chariot M3 réglable/clampée. |
 | `v0.4.5_IHM_MANU` | 2026-07-09 | Correctif : Lecture codeur réel forcée en mode Manu, même si la simulation générale est active. |
 | `v0.4.4_IHM_MANU` | 2026-07-08 | Ajout de la structure d'échange IHM_MANU pour pilotage direct de secours (mise en service). |
 | `v0.4.3_SimNoHardware-YGO_CablePre-Commissioning` | 2026-07-08 | Validation de pilotage sans blocage en simulation (recul, vitesses, butée dynamique M2, affichage HMI stable, bypass synchro) avant l'enroulage réel de demain. |
