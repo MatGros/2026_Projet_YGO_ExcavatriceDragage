@@ -77,7 +77,7 @@
       <UserDefElement iecname="LastPosM2Close" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="StateIncoherent" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_IHM_MANU" size="54" nativesize="56" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_IHM_MANU">
+    <TypeUserDef name="T_ST_IHM_MANU" size="58" nativesize="60" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_IHM_MANU">
       <UserDefElement iecname="ModeDisable" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="JoystickSelect" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="JoystickWinchSelect" type="T_INT" byteoffset="2" vartype="VAR" access="ReadWrite" />
@@ -110,6 +110,8 @@
       <UserDefElement iecname="FdcGrappinCloseActive" type="T_BOOL" byteoffset="49" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="M3_CommandWordMonitor" type="T_WORD" byteoffset="50" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="M3_StatusWordMonitor" type="T_WORD" byteoffset="52" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchMaxStepFwd" type="T_INT" byteoffset="54" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchMaxStepRev" type="T_INT" byteoffset="56" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_ChariotHMI" size="30" nativesize="32" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChariotHMI">
       <UserDefElement iecname="FBState" type="T_E_State" byteoffset="0" vartype="VAR" access="ReadWrite" />

@@ -126,6 +126,7 @@ VAR
     SpeedRefPct           : REAL;         // 📊 Consigne vitesse courante (issue de la rampe)
     ActiveMaxStepFwd      : INT;          // ⚡ Limite dynamique palier max montée (1..5)
     ActiveMaxStepRev      : INT;          // ⚡ Limite dynamique palier max descente (1..5)
+    ActiveM3FreqLimit     : REAL;         // ⚡ Limite active fréquence Chariot M3 (Hz)
     // ─────────  Fin modification IHM_MANU  ─────────
 END_VAR
 
@@ -234,6 +235,12 @@ IF ManuActive THEN
     END_IF;
 
     // 4️⃣ Aiguillage de la commande de mouvement (HMI vs Joystick CANopen)
+    // ⚡ Détermination de la limite active de fréquence pour le Chariot M3 (clampé par GVL_PERSISTENT.ChariotMaxFreqHz)
+    ActiveM3FreqLimit := GVL_IHM.IHM_MANU.M3_FreqLimit;
+    IF (ActiveM3FreqLimit <= 0.0) OR (ActiveM3FreqLimit > GVL_PERSISTENT.ChariotMaxFreqHz) THEN
+        ActiveM3FreqLimit := GVL_PERSISTENT.ChariotMaxFreqHz;
+    END_IF;
+
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
         // Commandes via le Joystick CANopen
         M1Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
@@ -248,8 +255,8 @@ IF ManuActive THEN
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
         
-        // Commande vitesse analogique Chariot M3 (0..50Hz) via déflexion X
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) * 0.5;
+        // Commande vitesse analogique Chariot M3 (0..ActiveM3FreqLimit Hz) via déflexion X (vitesse limite active prise pour 100%)
+        GVL_IHM.IHM_MANU.M3_FreqSetpoint := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * ActiveM3FreqLimit;
     ELSE
         // ⏱️ Calcul temps de cycle réel pour la rampe HMI
         CycleTimeCalc();
@@ -268,6 +275,9 @@ IF ManuActive THEN
         M3Fwd_Demand := GVL_IHM.IHM_MANU.M3_RelayFwd;
         M3Rev_Demand := GVL_IHM.IHM_MANU.M3_RelayRev;
 
+        // Commande vitesse analogique Chariot M3 via boutons HMI (vitesse limite active prise pour 100%)
+        GVL_IHM.IHM_MANU.M3_FreqSetpoint := ActiveM3FreqLimit;
+
         // 🎯 Détermination de la cible pour la rampe HMI (100% si un bouton est pressé, 0% sinon)
         IF GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev 
            OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev 
@@ -285,13 +295,6 @@ IF ManuActive THEN
             CycleTimeS := CycleTimeCalc.CycleTimeS
         );
         SpeedRefPct := instHmiSpeedRamp.Current;
-
-        // Consigne de fréquence de l'IHM pour M3 (bornage de sécurité)
-        IF GVL_IHM.IHM_MANU.M3_FreqSetpoint > 50.0 THEN
-            GVL_IHM.IHM_MANU.M3_FreqSetpoint := 50.0;
-        ELSIF GVL_IHM.IHM_MANU.M3_FreqSetpoint < 0.0 THEN
-            GVL_IHM.IHM_MANU.M3_FreqSetpoint := 0.0;
-        END_IF;
     END_IF;
 
     // 5️⃣ Évaluation finale des mouvements effectifs avec interlocks de fin de course grappin
