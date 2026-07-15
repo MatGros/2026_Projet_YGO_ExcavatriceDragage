@@ -220,13 +220,13 @@ son domaine fonctionnel** :
 | `E_State` | `_COMMON` | Machine d'état standard (Partie3 §2) |
 | `E_CycleStep` | `CYCLE` | 13 étapes du séquenceur |
 | `E_ChariotCommMode` | `CHARIOT` | `ETHERCAT`/`DEGRADED_IO` |
-| `E_DiagState` | `SYSTEM` | États diagnostic bus |
+| `E_DiagState` | `DIAG` | États diagnostic bus |
 | `ST_AxisCmd` | `JOYSTICK` | Consigne Enable/StartStop/SpeedRef/Direction |
 | `ST_ContactorCheck` | `_COMMON` | Diag commande/retour contacteur |
 | `ST_SpeedStepTable` | `WINCH` | 5 paliers masque 4 bits |
 | `ST_EncoderCalib` | `ENCODERS` | RETAIN homing (Homed, HomingRefRaw, LastKnownRawPos) |
 | `ST_GrappinConfig` / `ST_GrappinState` | `GRAPPIN` | Offsets + mémoire mécanique |
-| `ST_DeviceDiag` | `SYSTEM` | Diag esclave bus générique |
+| `ST_DeviceDiag` | `DIAG` | Diag esclave bus générique |
 | `ST_*HMI` (Winch/Grappin/Sync/Joystick/Modes/Encoder/Chariot/NetworkDiag) | `SUPERVISION` | Structs d'échange `GVL_IHM`, voir Partie 7 |
 
 `_COMMON` reste le dossier des **briques génériques réutilisables** (`FB_Brake`, `FB_Input`,

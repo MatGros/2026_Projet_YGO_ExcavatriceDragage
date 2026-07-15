@@ -75,7 +75,7 @@ Toute modif passe par la skill **[`codesys-workflow`](.claude/skills/codesys-wor
 PLC_PRG_MAIN (MainTask 10 ms — orchestration séquentielle : diag PUIS métier)
 ├── _COMMON      (FB_FilterPT1, FB_Brake, FB_Input_Digital, FB_Output_Relay)
 ├── _TYPES       (ST_*, ST_SpeedStepTable, ST_ContactorCheck, ST_LimitLegal, E_Mode/State/CycleStep)
-├── _DIAG        (FB_DiagCanOpen, FB_DiagEthercat ×3 — appelés dans PLC_PRG_MAIN, pas de GVL)
+├── DIAG         (FB_DiagCanOpen, FB_DiagEthercat ×3 — appelés dans PLC_PRG_MAIN, pas de GVL)
 ├── JOYSTICK     (FB_Joystick — compose FB_AxisScale/FB_FilterPT1/FB_Ramp/FB_CycleTime en interne)
 ├── WINCH        (FB_Winch M1/M2 — StartStop/SafeStop, FB_SpeedStep masque 4 bits, FB_WinchSync)
 ├── ENCODER      (FB_Encoder_Abs COD1/COD2 → Scale → Safety)
