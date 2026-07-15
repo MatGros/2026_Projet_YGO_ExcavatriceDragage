@@ -25,7 +25,7 @@
 > une option valable pour un futur lot à plus grand nombre de voies, mais ce n'est pas ce qui a
 > été implémenté). Voir §5 réécrit.
 >
-> **v1.2** — Renommage terminologique (Translation→Chariot dans les exemples, préfixe I/O
+> **v1.2** — Renommage terminologique (Translation→Translation dans les exemples, préfixe I/O
 > physique M3 inchangé). Historique GVL_IN/GVL_OUT/FB_InputsMachine/FB_OutputsMachine
 > (2026-07-03 et antérieur) **périmé** — voir Archives.
 >
@@ -38,7 +38,7 @@
 Faciliter l'implémentation des E/S, **surtout à la mise en service**, quand il faut
 **inverser** une logique (NO/NC), **filtrer** un rebond, vérifier un **retour d'état**, etc.
 
-L'idée : des briques **réutilisables** (`FB_Input`/`FB_Output`, dossier `_COMMON`),
+L'idée : des briques **réutilisables** (`FB_Input`/`FB_Output`, dossier `COMMUN`),
 instanciées individuellement dans `PRG_0_Inputs`/`PRG_10_Outputs`, qui centralisent le
 traitement bas niveau et remontent un **diagnostic**.
 
@@ -50,7 +50,7 @@ traitement bas niveau et remontent un **diagnostic**.
 
 ## 📥 1. `FB_Input` — Entrée TOR conditionnée
 
-### Interface (implémentée, `CODE/_COMMON/FB_Input.st`)
+### Interface (implémentée, `CODE/COMMUN/FB_Input.st`)
 ```codesys
 FUNCTION_BLOCK PUBLIC FB_Input
 VAR_INPUT
@@ -81,7 +81,7 @@ END_VAR
 
 ## 📤 2. `FB_Output` — Sortie relais + feedback
 
-### Interface (implémentée, `CODE/_COMMON/FB_Output.st`)
+### Interface (implémentée, `CODE/COMMUN/FB_Output.st`)
 ```codesys
 FUNCTION_BLOCK PUBLIC FB_Output
 VAR_INPUT
@@ -103,15 +103,15 @@ END_VAR
 
 > 🧭 Ce FB est un **relais de commande bas niveau** : il transmet fidèlement `Command`
 > (après inversion/blink) et **ne décide pas** d'un arrêt de mouvement. La logique de rampe
-> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Chariot`
-> (`PRG_6_WinchControl`/`PRG_7_ChariotControl`), qui pilote `Command` déjà « rampé ».
+> (`StartStop`/`SafeStop`) est résolue **en amont**, dans `FB_Winch`/`FB_Translation`
+> (`PRG_6_WinchControl`/`PRG_7_TranslationControl`), qui pilote `Command` déjà « rampé ».
 
-> 🧷 **Constat d'implémentation** : les instances actuelles de `FB_Winch`/`FB_Chariot` gèrent
+> 🧷 **Constat d'implémentation** : les instances actuelles de `FB_Winch`/`FB_Translation` gèrent
 > **elles-mêmes** la double vérification commande/retour contacteur (`ST_ContactorCheck`,
 > `TonFwdFeedback`/`TonRevFeedback` en interne) — `FB_Output.UseFeedback` n'est **pas activé**
 > dans `PRG_10_Outputs` à ce jour (appels `instX(Command := ...)` sans `FeedbackRaw`/
 > `UseFeedback`). Les deux mécanismes de double vérification **coexistent sans conflit**
-> (celui de `FB_Winch`/`FB_Chariot` fait foi pour la sécurité), mais `FB_Output` reste pour
+> (celui de `FB_Winch`/`FB_Translation` fait foi pour la sécurité), mais `FB_Output` reste pour
 > l'instant un simple conditionneur NO/NC dans ce projet — pas encore le point unique de
 > contrôle de feedback envisagé en v1.0/v1.1.
 
@@ -170,9 +170,9 @@ voir `DOC/PLAN_TASK_v1.0.md` §3 (T19).
 MainTask (10 ms) — liste d'appel séquentielle, voir Partie2 v2.8 §3
  0. PRG_0_Inputs           → instX(InputRaw := ..., FilterTime := ...) pour chaque signal,
                               expose en VAR_OUTPUT (EmergencyStopOk, M1FwdRevSpeedFeedbackOff, ...)
- 1..9. (diag, codeurs, safety, modes, cycle, winch/chariot/aux control, supervision)
+ 1..9. (diag, codeurs, safety, modes, cycle, winch/translation/aux control, supervision)
        → consomment PRG_0_Inputs.<Signal> directement (lecture, même cycle)
-       → chaque FB de mouvement (FB_Winch/FB_Chariot) résout SON StartStop/SafeStop en interne
+       → chaque FB de mouvement (FB_Winch/FB_Translation) résout SON StartStop/SafeStop en interne
 10. PRG_10_Outputs        → reçoit les commandes déjà rampées en VAR_INPUT (M1RelayFwd, ...),
                               instX(Command := ...) pour chaque signal, écrit les canaux Q réels
                               + PowerCutOff_A_RQ/PowerCutOff_B_RQ (redondance, Partie2 §5)

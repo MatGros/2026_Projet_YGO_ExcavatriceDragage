@@ -82,7 +82,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | Réf | Localisation | Constat | Statut |
 |-----|--------------|---------|--------|
 | m1 | `NAMING_CONVENTION.md:121` (`ST_WinchIO`) | `ErrorId : INT` | ✅ **D9** : `WORD`. |
-| m2 | `AF_Partie-02` (_COMMON) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ **D10** : `FB_FilterPT1`. |
+| m2 | `AF_Partie-02` (COMMUN) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ **D10** : `FB_FilterPT1`. |
 | m3 | `AF_Partie-08` §2/§7 vs `AF_Partie-02` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
 | m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie-02_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
 | m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
@@ -134,7 +134,7 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 |---|----------|-------|
 | Q6 | **Séquence `INIT`** (`AF_Partie-04` §2, marquée *TBD*) : à spécifier maintenant ou laisser ouverte ? | Bloc fonctionnel encore incomplet. **→ TBD (D22).** |
 | Q7 | **Priorités des tâches** (EtherCAT/CAN/Main, « à définir ») : figer maintenant ou plus tard ? | Config CODESYS. **→ TBD (D22).** |
-| Q11 | **Source de `EmergencyStopOk`** : chaîne de sécurité AU **ou** retour du **contacteur de puissance** ? (marquée « à définir » en D18) | ✅ **Résolue (2026-07-03), partiellement** : I/O réel confirmé = **retour contacteur de puissance géré par l'arrêt d'urgence** (les deux à la fois, en fait — pas un "ou"). Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` (D31). ⚠️ Reste `GVL_DEBUG.DBG_True` sur Joystick/Safety_Winch/Winch/Safety_Chariot/Chariot — même variable réelle à reprendre, pas encore fait sur ces FB. |
+| Q11 | **Source de `EmergencyStopOk`** : chaîne de sécurité AU **ou** retour du **contacteur de puissance** ? (marquée « à définir » en D18) | ✅ **Résolue (2026-07-03), partiellement** : I/O réel confirmé = **retour contacteur de puissance géré par l'arrêt d'urgence** (les deux à la fois, en fait — pas un "ou"). Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` (D31). ⚠️ Reste `GVL_DEBUG.DBG_True` sur Joystick/Safety_Winch/Winch/Safety_Translation/Translation — même variable réelle à reprendre, pas encore fait sur ces FB. |
 
 > ✅ **Q1→Q5, Q8→Q10 résolues** → actées en **D14…D21** (§2). **Q11 résolue partiellement**
 > (2026-07-03, D31 — pipeline codeur seulement). Ne reste ouvert que **Q6/Q7** (TBD).
@@ -203,18 +203,18 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D23 | **Godet→Grappin** | Terme métier définitif : **Grappin** (ouverture/fermeture, prévention gravats). `Bucket`/`Godet` retirés du vocabulaire des specs. `FB_Grappin`, `ST_GrappinConfig`/`ST_GrappinState` (aspirationnels, non codés). |
-| D24 | **Translation→Chariot** | Terme métier définitif : **Chariot** (axe transversal M3, objet métier qui se déplace) — conserve **Plongée/Extraction** pour les treuils (inchangé). `FB_Chariot`, `FB_Safety_Chariot`, `E_ChariotCommMode`, `GVL_Chariot_M3_Stub`, `ST_ChariotIO`. Préfixe I/O physique **M3 inchangé** (mapping matériel), `E_CycleStep.TRANSLATION_MOVE` renommé **`CHARIOT_MOVE`**. |
+| D23 | **Godet→Benne** | Terme métier définitif : **Benne** (ouverture/fermeture, prévention gravats). `Bucket`/`Godet` retirés du vocabulaire des specs. `FB_Benne`, `ST_BenneConfig`/`ST_BenneState` (aspirationnels, non codés). |
+| D24 | **Translation→Translation** | Terme métier définitif : **Translation** (axe transversal M3, objet métier qui se déplace) — conserve **Plongée/Extraction** pour les treuils (inchangé). `FB_Translation`, `FB_Safety_Translation`, `E_TranslationCommMode`, `GVL_Translation_M3_Stub`, `ST_TranslationIO`. Préfixe I/O physique **M3 inchangé** (mapping matériel), `E_CycleStep.TRANSLATION_MOVE` renommé **`TRANSLATION_MOVE`**. |
 | D25 | **I/O réel M1/M2 winch** | `RelayFwd/Rev`, `SpeedContactor_1..4` (renommé, ex `Contactor1..4`), `BrakeCmd`, `ContactorFeedbackFwd/Rev` désormais câblés en I/O Mapping réel → stubs `GVL_Winch_M1/M2_Stub` réduits à `BrakeFeedback` seul (dernier signal non câblé). |
 | D26 | **Capteur position haute réel** | `M1_M2_TopPositionSensor` (I/O réel, commun M1+M2) — résout la clarification terminologique laissée ouverte en Partie10 v1.3. `GVL_Homing_Stub` **supprimé**. |
 | D27 | **Mou de câble → `ForbidDescent`** | Nouveau signal `M1_M2_SlackCableSwitch` (I/O réel, commun). Ne peut **pas** être porté par `SafeStop` (arrête les 2 sens) : nouvelle sortie dédiée `FB_Safety_Winch.ForbidDescent`, masque **uniquement** `RelayRev` (descente) — `RelayFwd` (montée) reste libre pour vérification câblage. Défaut visible IHM (`ErrorId` bit3), reset front standard. Pattern **spécifique à ce cas**, pas une généralisation du contrat Partie3. |
 | D28 | **Thermique moteur → `SafeStop`** | `M1/M2_ThermalFeedback` (I/O réel, par treuil) → nouveau bit `ErrorId` (bit2) dans `FB_Safety_Winch`, participe à `SafeStop` (arrêt total classique, protection moteur). |
-| D29 | **Capteurs position Chariot** | 4 capteurs réels (`PosiFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`) câblés, mais sélection de cible normale différée à `FB_Cycle` (non codé). Sélecteur **STUB maintenance** (`StubChariotPositionSelect_IHM`) ajouté pour tester chaque capteur individuellement dès ce lot. |
+| D29 | **Capteurs position Translation** | 4 capteurs réels (`PosiFosse1`/`PosFosse2`/`PosMaintenance`/`PosTremie`) câblés, mais sélection de cible normale différée à `FB_Cycle` (non codé). Sélecteur **STUB maintenance** (`StubTranslationPositionSelect_IHM`) ajouté pour tester chaque capteur individuellement dès ce lot. |
 | D30 | **Nouveaux équipements (convoyeur, grille, casque, hydraulique)** | **Hors périmètre explicite** de ce lot (décision utilisateur : "pour l'instant, il n'y a rien à faire") — non traités, ni en code ni en doc. |
 
 ### Fichiers impactés (2026-07-02)
-- **CODE/** : `FB_Chariot.st` (ex-`FB_Translation`), `FB_Safety_Chariot.st`, `E_ChariotCommMode.st`,
-  `GVL_Chariot_M3_Stub.st` (renommés + M3_BrakeCmd retiré, sélecteur position ajouté),
+- **CODE/** : `FB_Translation.st` (ex-`FB_Translation`), `FB_Safety_Translation.st`, `E_TranslationCommMode.st`,
+  `GVL_Translation_M3_Stub.st` (renommés + M3_BrakeCmd retiré, sélecteur position ajouté),
   `FB_Safety_Winch.st`/`FB_Winch.st` (ThermalFeedback/SlackCableDetected/ForbidDescent),
   `GVL_Winch_M1/M2_Stub.st` (réduits à BrakeFeedback), `GVL_Homing_Stub.st` (supprimé),
   `PRG_MAIN.st` (câblage complet), + mentions croisées (`FB_Brake`, `FB_Encoder_*`,
@@ -231,7 +231,7 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 | # | Sujet | Décision |
 |---|-------|----------|
 | D31 | **Sens de comptage codeur** | `InvertDirection` (calcul PLC) **retiré** de `FB_Encoder_Abs` — était buggé (inversait sur la plage `UDINT` 32 bits au lieu de la plage réelle 25 bits du codeur, `PointsPerRev × MultiTurnRevsMax`). Confirmé terrain : objet CoE **`6000h`** (bit0 : `4`→`5`) inverse le sens **côté codeur** (Kübler F58x8), réglé en **Startup Parameter CODESYS** (init automate, pas un paramètre PLC). |
-| D32 | **`EmergencyStopOk` réel (Q11, partiel)** | I/O réel confirmé = retour contacteur de puissance géré par l'AU. Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` **uniquement ce lot** — Joystick/Safety_Winch/Winch/Safety_Chariot/Chariot restent sur `GVL_DEBUG.DBG_True` (même câblage à reprendre, prochain lot). |
+| D32 | **`EmergencyStopOk` réel (Q11, partiel)** | I/O réel confirmé = retour contacteur de puissance géré par l'AU. Câblé sur `instEncoderAbsM1/M2`/`instHomingM1/M2` **uniquement ce lot** — Joystick/Safety_Winch/Winch/Safety_Translation/Translation restent sur `GVL_DEBUG.DBG_True` (même câblage à reprendre, prochain lot). |
 | D33 | **`Reset` codeur/homing câblé + `GVL_Encoder_Stub`** | `Reset` des FB codeur/homing (`FALSE` figé jusqu'ici — alarmes jamais acquittables) câblé sur `M1/M2_Reset_IHM` (un bouton par codeur, acquitte `instEncoderAbsMx` + `instHomingMx`). Nouveau `CODE/GVL_Encoder_Stub.st` : centralise Reset/`ConfirmCoherence`/`Home`/`TopSensorPositionM` (déplacés depuis `PRG_MAIN`) — un seul endroit à consulter pour le mapping IHM et les paramètres de homing (mètres). |
 
 ### Fichiers impactés (2026-07-03)
@@ -248,7 +248,7 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D34 | **`EmergencyStopOk` réel généralisé (Q11 close)** | Le câblage direct de l'I/O réel `EmergencyStopOk` (D32) est étendu à **tous** les FB métier (Joystick/Safety_Winch M1+M2/Winch M1+M2/Safety_Chariot/Chariot), en plus d'Encoder/Homing. `GVL_DEBUG.DBG_True` **disparaît** de `PRG_MAIN` pour ce signal. |
+| D34 | **`EmergencyStopOk` réel généralisé (Q11 close)** | Le câblage direct de l'I/O réel `EmergencyStopOk` (D32) est étendu à **tous** les FB métier (Joystick/Safety_Winch M1+M2/Winch M1+M2/Safety_Translation/Translation), en plus d'Encoder/Homing. `GVL_DEBUG.DBG_True` **disparaît** de `PRG_MAIN` pour ce signal. |
 | D35 | **Intégration `FB_Input_Digital` (Partie6 §0, "en attente")** | Choix tranché **pour `EmergencyStopOk` uniquement** (pas pour tous les I/O) : une instance `instEmergencyStopOk` conditionne le raw I/O (anti-rebond `T#20MS` + `InvertLogic` pour bascule NO/NC en mise en service sans retoucher le câblage) → sortie `EmergencyStopOkCond`, seule variable distribuée aux FB métier. Motivation utilisateur : pouvoir **forcer/inverser facilement** en mise en service sans toucher les GVL. `ChannelOk` laissé au défaut `TRUE` (pas de diagnostic voie/carte disponible ce lot). |
 
 > ✅ **Q11 entièrement résolue** (D32 + D34/D35).
@@ -265,8 +265,8 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D36 | **Consolidation en 1 seul FB `FB_IO_Machine` (revient sur D35 "uniquement EmergencyStopOk")** | Après tests successifs (par métier `FB_IO_Winch`/`FB_IO_Chariot`, ou par sens In/Out séparé), choix final utilisateur : **un seul FB, une seule instance** (`instIoMachine`) couvrant TOUT le conditionnement I/O réel de la machine (Commun + Winch M1 + Winch M2 + Chariot M3, entrées ET sorties). Interface volontairement longue (~28 voies) mais **tout au même endroit**, classé par section métier commentée — priorité choisie : lisibilité/maintenabilité (1 seul fichier à ouvrir) plutôt que modularité par FB. `instSafety`/`LocalEmergencyStopTOR` (résidu mort, sorties jamais consommées) retirés de `PRG_MAIN` à cette occasion. |
-| D37 | **Appel 2×/cycle d'une même instance (pattern retenu)** | `instIoMachine` est appelée deux fois dans `PRG_MAIN` : 1er appel tout en haut (entrées réelles → `*Cond`, consommées par Homing/Safety_Winch/Winch/Safety_Chariot/Chariot), 2e appel tout en bas (commandes `*Cmd` des FB métier, disponibles seulement à ce point → `*Out` vers I/O Mapping réel). Sans risque sur les timers anti-rebond internes (écart de temps ≈0 entre les 2 appels du même scan). Chariot M3 : seuls les signaux réellement câblés (`PosFosse1/2/Maintenance/Tremie`, `M3_BrakeCmd`) sont conditionnés — `M3_RelayFwd/Rev/RelaySpeedGv` restent STUB logiciel (pas de matériel réel). |
+| D36 | **Consolidation en 1 seul FB `FB_IO_Machine` (revient sur D35 "uniquement EmergencyStopOk")** | Après tests successifs (par métier `FB_IO_Winch`/`FB_IO_Translation`, ou par sens In/Out séparé), choix final utilisateur : **un seul FB, une seule instance** (`instIoMachine`) couvrant TOUT le conditionnement I/O réel de la machine (Commun + Winch M1 + Winch M2 + Translation M3, entrées ET sorties). Interface volontairement longue (~28 voies) mais **tout au même endroit**, classé par section métier commentée — priorité choisie : lisibilité/maintenabilité (1 seul fichier à ouvrir) plutôt que modularité par FB. `instSafety`/`LocalEmergencyStopTOR` (résidu mort, sorties jamais consommées) retirés de `PRG_MAIN` à cette occasion. |
+| D37 | **Appel 2×/cycle d'une même instance (pattern retenu)** | `instIoMachine` est appelée deux fois dans `PRG_MAIN` : 1er appel tout en haut (entrées réelles → `*Cond`, consommées par Homing/Safety_Winch/Winch/Safety_Translation/Translation), 2e appel tout en bas (commandes `*Cmd` des FB métier, disponibles seulement à ce point → `*Out` vers I/O Mapping réel). Sans risque sur les timers anti-rebond internes (écart de temps ≈0 entre les 2 appels du même scan). Translation M3 : seuls les signaux réellement câblés (`PosFosse1/2/Maintenance/Tremie`, `M3_BrakeCmd`) sont conditionnés — `M3_RelayFwd/Rev/RelaySpeedGv` restent STUB logiciel (pas de matériel réel). |
 
 ### Fichiers impactés (2026-07-03ter)
 - **CODE/** : `FB_IO_Machine.st` (nouveau, remplace `FB_IO_Winch.st`/`FB_IO_Winch_In.st`/
@@ -280,10 +280,10 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D38 | **`FB_Modes` MVP — diffusion du mode uniquement** | Nouveau `FB_Modes` (+ `GVL_Modes_Stub.ModeRequest_IHM` forceable) remplace les **10 `E_Mode.MAINT_N1` codés en dur** dans `PRG_MAIN` (liste confirmée par audit indépendant). Garde-fous : refuse `SEMI_AUTO` si `EncoderFaultPresent` (agrégat `FB_Encoder_Safety` M1/M2, 1 cycle de retard) ; refuse `MAINT_N2` sans `PasswordOk` (stub). Sort `OverrideSync` pour `FB_WinchSync`. **Hors périmètre** : `OverrideGrappin`/limite légale — pas de consommateur (`FB_Grappin`/`FB_Cycle` inexistants), pas de dead code ajouté sans raison. |
+| D38 | **`FB_Modes` MVP — diffusion du mode uniquement** | Nouveau `FB_Modes` (+ `GVL_Modes_Stub.ModeRequest_IHM` forceable) remplace les **10 `E_Mode.MAINT_N1` codés en dur** dans `PRG_MAIN` (liste confirmée par audit indépendant). Garde-fous : refuse `SEMI_AUTO` si `EncoderFaultPresent` (agrégat `FB_Encoder_Safety` M1/M2, 1 cycle de retard) ; refuse `MAINT_N2` sans `PasswordOk` (stub). Sort `OverrideSync` pour `FB_WinchSync`. **Hors périmètre** : `OverrideBenne`/limite légale — pas de consommateur (`FB_Benne`/`FB_Cycle` inexistants), pas de dead code ajouté sans raison. |
 | D39 | **`FB_Encoder_Safety` revive — bornage ±99m + relais `HomingSuspect`** | Répond à l'incident `CablePosM≈4096m` (RETAIN `Calib` remis à 0 après refactor structurel). Périmètre limité à Partie10 §3.6 (bornage) + relais §3.7 (`HomingSuspect`, déjà calculé par `FB_Encoder_Homing`, jamais consommé avant ce lot). §3.5 (saut en exploitation, calcul 4ms EtherCAT) **reporté**, lot dédié. `EncoderIncoherent` alimente **`FB_Modes` uniquement** (pas `FB_Safety_Winch`/`SafeStop`) — décision explicite utilisateur : un défaut codeur doit bloquer `SEMI_AUTO`, PAS empêcher de bouger les treuils en MAINT_N1/N2 pour re-référencer. |
 | D40 | **`FB_WinchSync` — squelette de surveillance, pas de correction** | Nouveau FB (1 instance), calcule `DeltaPosM`/`SyncWarn` (Partie9 §9 : imposé N1, activable/désactivable N2 via `OverrideSync`, actif par défaut MANUEL/SEMI_AUTO faute de `FB_Cycle`). `SyncWarn` = **avertissement IHM uniquement** (Partie5 §6), pas de `SafeStop` : aucune entrée de correction n'existe sur `FB_Winch` aujourd'hui, rien à piloter automatiquement. Squelette de liaisons volontaire (« même si pas complet à l'intérieur »), pas de logique de régulation inventée. |
-| D41 | **`StubWinchEnableN1` → `StubMachineEnableN1`** | Renommage (signalé par audit indépendant) : la variable est utilisée par `FB_Winch` **et** `FB_Chariot`, le nom `Winch` était trompeur. |
+| D41 | **`StubWinchEnableN1` → `StubMachineEnableN1`** | Renommage (signalé par audit indépendant) : la variable est utilisée par `FB_Winch` **et** `FB_Translation`, le nom `Winch` était trompeur. |
 
 ### Fichiers impactés (2026-07-03quater)
 - **CODE/** : `GVL_Modes_Stub.st` (nouveau), `FB_Modes.st` (nouveau), `FB_Encoder_Safety.st`
@@ -432,7 +432,7 @@ homme-mort (traité ici en D54) + demande utilisateur simultanée de renommer/re
 | # | Sujet | Décision |
 |---|-------|----------|
 | D53 | **`FB_Input_Digital.OutputClean` → `State`** | Renommage demandé par l'utilisateur (modifié directement dans son CODESYS) — répercuté dans `CODE/FB_Input_Digital.st` et tous ses consommateurs (`FB_InputsMachine.st`, 13 instances). |
-| D54 | **`FB_InputsMachine` référence directement les I/O réels (plus de `*Raw`/`Invert*` depuis `PRG_MAIN`)** | Demande utilisateur : simplifier `PRG_MAIN` (appel `instInputsMachine()` sans paramètre) — `FB_InputsMachine` devient un FB SPÉCIFIQUE machine (référence directement `EmergencyStopOk`, `M1_ContactorFeedbackFwd`, `PosFosse1`, etc. en interne), pas une brique générique réutilisable. `InvertLogic`/`ChannelOk` de chaque sous-instance restent à leur défaut (FALSE/TRUE), forçables directement en vue instance CODESYS (`instInputsMachine.instXxx.InvertLogic`) pour inverser NO/NC en mise en service sans recompiler. `FB_OutputsMachine` INCHANGÉ (les commandes `*Cmd` proviennent d'instances FB_Winch/FB_Chariot locales à `PRG_MAIN`, pas de variable globale à référencer directement). |
+| D54 | **`FB_InputsMachine` référence directement les I/O réels (plus de `*Raw`/`Invert*` depuis `PRG_MAIN`)** | Demande utilisateur : simplifier `PRG_MAIN` (appel `instInputsMachine()` sans paramètre) — `FB_InputsMachine` devient un FB SPÉCIFIQUE machine (référence directement `EmergencyStopOk`, `M1_ContactorFeedbackFwd`, `PosFosse1`, etc. en interne), pas une brique générique réutilisable. `InvertLogic`/`ChannelOk` de chaque sous-instance restent à leur défaut (FALSE/TRUE), forçables directement en vue instance CODESYS (`instInputsMachine.instXxx.InvertLogic`) pour inverser NO/NC en mise en service sans recompiler. `FB_OutputsMachine` INCHANGÉ (les commandes `*Cmd` proviennent d'instances FB_Winch/FB_Translation locales à `PRG_MAIN`, pas de variable globale à référencer directement). |
 | D55 | **Bug watchdog homme-mort corrigé (review D51)** | Le renforcement D51 ne détectait qu'un FRONT bouton (`DeadmanEdge.Q`) — un opérateur qui MAINTIENT le bouton enfoncé en continu (réflexe naturel) ne génère plus de front après le 1er appui → désarmement surprise au bout de 3s malgré présence continue. Corrigé : condition sur `NOT RawButton` (niveau) au lieu de `NOT DeadmanEdge.Q` — maintenir OU réappuyer dans le délai remettent tous les deux le timer à zéro, seul un relâchement prolongé désarme. |
 
 ### Fichiers impactés (2026-07-03undecies)
@@ -482,13 +482,13 @@ miroir logiciel STUB jusqu'ici, sont désormais réellement câblés.
 | # | Sujet | Décision |
 |---|-------|----------|
 | D60 | **Renommage systématique `_DI`/`_DQ`/`_RQ`** | Toutes les variables I/O réel utilisées dans `PRG_MAIN`/`FB_InputsMachine`/`FB_OutputsMachine` renommées (ex. `EmergencyStopOk`→`EmergencyStopOk_DI`, `M1_SpeedContactor_1`→`M1_SpeedContactor_1_DQ`, `M1_BrakeCmd`→`M1_BrakeCmd_RQ`). Répercuté dans `FB_InputsMachine.st` (référence directe interne) et dans les affectations de sortie de `PRG_MAIN.st`. |
-| D61 | **Retours frein M1/M2/M3 réels (`*_BrakeContactorFeedback_DI`)** | Ferme un point ouvert du Lot A mise en service. Remplace les miroirs logiciels `GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub` (fichiers supprimés, devenus vides) et `M3_BrakeFeedback` de `GVL_Chariot_M3_Stub` (variable retirée, reste du stub Chariot inchangé — relais sens/PV-GV toujours pas de matériel réel). Conditionnés via 3 nouvelles instances `FB_Input_Digital` dans `FB_InputsMachine`. |
-| D62 | **Signaux nouveaux non câblés (pas de consommateur)** | Le nouvel export ajoute `ConveyorInfeedReady_DI`, `GridDwn_RQ`/`GridUp_RQ`, `HelmetClose_RQ`/`HelmetOpen_RQ`, `PosCasque_DI`, `PosGrille_DI`, `ThermHydraulique_DI` — probablement pour un futur `FB_Grappin` (inexistant). Volontairement laissés non câblés (pas de logique inventée sans spec ni FB consommateur). |
+| D61 | **Retours frein M1/M2/M3 réels (`*_BrakeContactorFeedback_DI`)** | Ferme un point ouvert du Lot A mise en service. Remplace les miroirs logiciels `GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub` (fichiers supprimés, devenus vides) et `M3_BrakeFeedback` de `GVL_Translation_M3_Stub` (variable retirée, reste du stub Translation inchangé — relais sens/PV-GV toujours pas de matériel réel). Conditionnés via 3 nouvelles instances `FB_Input_Digital` dans `FB_InputsMachine`. |
+| D62 | **Signaux nouveaux non câblés (pas de consommateur)** | Le nouvel export ajoute `ConveyorInfeedReady_DI`, `GridDwn_RQ`/`GridUp_RQ`, `HelmetClose_RQ`/`HelmetOpen_RQ`, `PosCasque_DI`, `PosGrille_DI`, `ThermHydraulique_DI` — probablement pour un futur `FB_Benne` (inexistant). Volontairement laissés non câblés (pas de logique inventée sans spec ni FB consommateur). |
 
 ### Fichiers impactés (2026-07-03quattuordecies)
 - **CODE/** : `PRG_MAIN.st` (renommage §0/§7bis, retours frein réels), `FB_InputsMachine.st`
   (renommage interne + 3 nouvelles entrées BrakeFeedback), `GVL_Winch_M1_Stub.st`/
-  `GVL_Winch_M2_Stub.st` (supprimés), `GVL_Chariot_M3_Stub.st` (`M3_BrakeFeedback` retiré).
+  `GVL_Winch_M2_Stub.st` (supprimés), `GVL_Translation_M3_Stub.st` (`M3_BrakeFeedback` retiré).
 - **DOC/** : AUDIT (ce §21).
 
 ---
@@ -505,8 +505,8 @@ en LD (1 rung = 1 bobine) qu'un appel de FB à 15 paramètres.
 | # | Sujet | Décision |
 |---|-------|----------|
 | D63 | **`FB_Output_Relay.OutputCmd` → `State`** | Renommage demandé (cohérence avec `FB_Input_Digital.State`), répercuté dans `FB_OutputsMachine.st`. |
-| D64 | **`GVL_IN` — sorties conditionnées de `FB_InputsMachine`** | `FB_InputsMachine` n'a plus de `VAR_OUTPUT` : il écrit directement `GVL_IN.Xxx` (noms COURTS, sans suffixe — `GVL_IN.EmergencyStopOk`, pas `EmergencyStopOkState`/`Cond`). Tous les consommateurs (`Homing`/`Safety_Winch`/`Winch`/`Safety_Chariot`/`Chariot`) lisent `GVL_IN.Xxx` directement. Les variables locales `*Cond` de `PRG_MAIN` supprimées. |
-| D65 | **`GVL_OUT` — commandes brutes vers `FB_OutputsMachine`** | `FB_OutputsMachine` n'a plus ni `VAR_INPUT` ni `VAR_OUTPUT` : `PRG_MAIN` écrit `GVL_OUT.Xxx` par simples affectations juste après `FB_Winch`/`FB_Chariot` (naturel en LD), puis appelle `instOutputsMachine()` SANS PARAMÈTRE — le FB lit `GVL_OUT.Xxx` et écrit directement les I/O réels (`_DQ`/`_RQ`) en interne. |
+| D64 | **`GVL_IN` — sorties conditionnées de `FB_InputsMachine`** | `FB_InputsMachine` n'a plus de `VAR_OUTPUT` : il écrit directement `GVL_IN.Xxx` (noms COURTS, sans suffixe — `GVL_IN.EmergencyStopOk`, pas `EmergencyStopOkState`/`Cond`). Tous les consommateurs (`Homing`/`Safety_Winch`/`Winch`/`Safety_Translation`/`Translation`) lisent `GVL_IN.Xxx` directement. Les variables locales `*Cond` de `PRG_MAIN` supprimées. |
+| D65 | **`GVL_OUT` — commandes brutes vers `FB_OutputsMachine`** | `FB_OutputsMachine` n'a plus ni `VAR_INPUT` ni `VAR_OUTPUT` : `PRG_MAIN` écrit `GVL_OUT.Xxx` par simples affectations juste après `FB_Winch`/`FB_Translation` (naturel en LD), puis appelle `instOutputsMachine()` SANS PARAMÈTRE — le FB lit `GVL_OUT.Xxx` et écrit directement les I/O réels (`_DQ`/`_RQ`) en interne. |
 
 ⚠️ Écart assumé à Partie2 §0 ("quasi pas de GVL, sauf échange IHM") pour `GVL_IN`/
 `GVL_OUT` — choix pragmatique utilisateur pour la lisibilité/maintenabilité en Ladder,
@@ -518,7 +518,7 @@ documenté explicitement dans chaque GVL, pas un oubli architectural.
   `FB_OutputsMachine.st` (plus de `VAR_INPUT`/`VAR_OUTPUT`, lit `GVL_OUT`/écrit I/O réels),
   `PRG_MAIN.st` (variables locales `*Cond` supprimées, câblage `GVL_IN`/`GVL_OUT`).
 
-| D66 | **`PowerCutOff_RQ` réel — ferme D45** | Nouvel export : relais coupure puissance amont câblé en I/O Mapping. `GVL_Machine_Stub.PowerCutOffCmd` (stub) retiré, `PRG_MAIN.st` §8 écrit directement `PowerCutOff_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyChariotM3.PowerCutOff;`. |
+| D66 | **`PowerCutOff_RQ` réel — ferme D45** | Nouvel export : relais coupure puissance amont câblé en I/O Mapping. `GVL_Machine_Stub.PowerCutOffCmd` (stub) retiré, `PRG_MAIN.st` §8 écrit directement `PowerCutOff_RQ := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyTranslationM3.PowerCutOff;`. |
 - **DOC/** : AUDIT (ce §22).
 
 ---
@@ -549,7 +549,7 @@ inversé, danger machine entière. Pas de réponse utilisateur aux questions de 
 
 L'utilisateur a demandé de vérifier si `SafeStop` était toujours utilisé sur `FB_Joystick`.
 Vérification (grep `SafeStop` sur `CODE/*.st`) : bien utilisé et correctement câblé sur
-`FB_Winch`/`FB_Chariot` (les 2 vrais FB de mouvement) via `FB_Safety_Winch`/`FB_Safety_Chariot`
+`FB_Winch`/`FB_Translation` (les 2 vrais FB de mouvement) via `FB_Safety_Winch`/`FB_Safety_Translation`
 → arbitrage rampe rapide/normale. En revanche `FB_Joystick` portait encore une entrée `SafeStop`
 câblée sur un stub `GVL_DEBUG.DBG_False` — non conforme Partie3 §1bis/Partie8 §3 (pas un FB de
 mouvement), documenté comme tel depuis la doc Partie8 v1.1 mais jamais nettoyé côté code
@@ -603,11 +603,11 @@ en place pour `ThermalFeedback`/`SlackCableDetected` dans `FB_Safety_Winch`.
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D71 | **`PhaseRotationOk` intégré à `FB_Safety_Winch`/`FB_Safety_Chariot`** | D68 annulé. Nouvelle entrée `PhaseRotationOk` sur les deux FB Safety métier. `FB_Safety_Winch` : bit4 ErrorId (`NOT PhaseRotationOk`), participe au `SafeStop` total (bits 0/1/2/4, masque `16#0017`) — mou de câble (bit3) reste exclu, comme avant. `FB_Safety_Chariot` : bit2 ErrorId (bit1 réservé EtherCAT variateur), `SafeStop := Error` inchangé (couvre tous les bits). `PRG_MAIN.st` : les 15 `EmergencyStopOk :=` REVERTÉS à `GVL_IN.EmergencyStopOk` seul ; `PhaseRotationOk := GVL_IN.PhaseRotationOk` ajouté UNIQUEMENT sur `instSafetyWinchM1/M2`/`instSafetyChariotM3`. |
+| D71 | **`PhaseRotationOk` intégré à `FB_Safety_Winch`/`FB_Safety_Translation`** | D68 annulé. Nouvelle entrée `PhaseRotationOk` sur les deux FB Safety métier. `FB_Safety_Winch` : bit4 ErrorId (`NOT PhaseRotationOk`), participe au `SafeStop` total (bits 0/1/2/4, masque `16#0017`) — mou de câble (bit3) reste exclu, comme avant. `FB_Safety_Translation` : bit2 ErrorId (bit1 réservé EtherCAT variateur), `SafeStop := Error` inchangé (couvre tous les bits). `PRG_MAIN.st` : les 15 `EmergencyStopOk :=` REVERTÉS à `GVL_IN.EmergencyStopOk` seul ; `PhaseRotationOk := GVL_IN.PhaseRotationOk` ajouté UNIQUEMENT sur `instSafetyWinchM1/M2`/`instSafetyTranslationM3`. |
 
 ### Fichiers impactés (2026-07-03novodecies)
 - **CODE/** : `FB_Safety_Winch.st` (`PhaseRotationOk`, bit4, `SafeStop` masque `16#0017`),
-  `FB_Safety_Chariot.st` (`PhaseRotationOk`, bit2), `PRG_MAIN.st` (revert AND généralisé,
+  `FB_Safety_Translation.st` (`PhaseRotationOk`, bit2), `PRG_MAIN.st` (revert AND généralisé,
   câblage restreint aux 3 blocs Safety).
 
 ---
@@ -631,7 +631,7 @@ câble (l'opérateur doit pouvoir librement reprendre le mou en remontant).
 
 ---
 
-## 🚀 28. Bypass test banc — contrôle contacteur `FB_Winch`/`FB_Chariot` (2026-07-03vicies)
+## 🚀 28. Bypass test banc — contrôle contacteur `FB_Winch`/`FB_Translation` (2026-07-03vicies)
 
 Demande utilisateur : sans contacteurs réels câblés/cohérents en essai, le contrôle
 `StuckClosed`/`StuckOpen` (incohérence commande/retour > `ContactorFeedbackTimeout`) se déclenche
@@ -642,10 +642,10 @@ suffit (le Force prend le dessus sur l'écriture cyclique du programme).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D73 | **`GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST`** | Nouveau bypass bench, même famille que les précédents. `FB_Winch.st`/`FB_Chariot.st` : les blocs `IF FwdContactorCheck.StuckClosed OR ... THEN ErrorId := ErrorId OR 16#0002` (bit1) et bit2 (Rev) sont gardés par `IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN ... ELSE ErrorId := ErrorId AND 16#FFF9; END_IF` — bypass actif = bits 1/2 forcés à 0, pas de blocage. ⚠️ TOUJOURS FALSE en exploitation réelle. |
+| D73 | **`GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST`** | Nouveau bypass bench, même famille que les précédents. `FB_Winch.st`/`FB_Translation.st` : les blocs `IF FwdContactorCheck.StuckClosed OR ... THEN ErrorId := ErrorId OR 16#0002` (bit1) et bit2 (Rev) sont gardés par `IF NOT GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST THEN ... ELSE ErrorId := ErrorId AND 16#FFF9; END_IF` — bypass actif = bits 1/2 forcés à 0, pas de blocage. ⚠️ TOUJOURS FALSE en exploitation réelle. |
 
 ### Fichiers impactés (2026-07-03vicies, partie 2/2)
-- **CODE/** : `GVL_DEBUG.st` (`DBG_ContactorFeedbackBypass_TEST`), `FB_Winch.st`/`FB_Chariot.st`
+- **CODE/** : `GVL_DEBUG.st` (`DBG_ContactorFeedbackBypass_TEST`), `FB_Winch.st`/`FB_Translation.st`
   (bypass appliqué autour des blocs StuckClosed/StuckOpen).
 - **DOC/** : AUDIT (ce §28).
 
@@ -658,7 +658,7 @@ rampe/relais totalement bloqués malgré `StartStop`/`SpeedRefPct` corrects) : `
 bit4 (`PhaseRotationOk`) levé en permanence, car `GVL_IN.PhaseRotationOk` n'a jamais été
 initialisé — un `BOOL` non initialisé démarre à `FALSE` (IEC 61131-3), et tant que
 `CtrlPhaseRotation_DI` n'existe pas en I/O Mapping, `FB_InputsMachine` n'écrit jamais cette
-variable. Résultat : `SafeStop` bloqué à `TRUE` en permanence sur M1/M2/Chariot sans aucun vrai
+variable. Résultat : `SafeStop` bloqué à `TRUE` en permanence sur M1/M2/Translation sans aucun vrai
 défaut. Principe rappelé par l'utilisateur : **toute information de sécurité doit démarrer à
 l'état OK/nominal tant qu'elle n'est pas réellement câblée** (même logique que la polarité
 `SlackCableSwitch`, D72a).
@@ -740,7 +740,7 @@ de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D78 | **Bypass diagnostic frein dans `FB_Brake`** | `FB_Brake.st` intègre désormais la vérification de `GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST` dans son diagnostic de retour. Si actif, le défaut de retour de frein (bit 0) est forcé à 0 et les erreurs de collage/non-collage sont effacées, évitant le verrouillage des sorties treuil/chariot sur banc. |
+| D78 | **Bypass diagnostic frein dans `FB_Brake`** | `FB_Brake.st` intègre désormais la vérification de `GVL_DEBUG.DBG_ContactorFeedbackBypass_TEST` dans son diagnostic de retour. Si actif, le défaut de retour de frein (bit 0) est forcé à 0 et les erreurs de collage/non-collage sont effacées, évitant le verrouillage des sorties treuil/translation sur banc. |
 
 ### Fichiers impactés (2026-07-03trivicies)
 - **CODE/** : `FB_Brake.st` (intégration du bypass dans l'étape 4).
@@ -748,17 +748,17 @@ de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
 
 ---
 
-## 🚀 33. Revue de cohérence et correctifs de la fonction Grappin (2026-07-03quadravicies)
+## 🚀 33. Revue de cohérence et correctifs de la fonction Benne (2026-07-03quadravicies)
 
-**Contexte** : Suite à un audit approfondi de la fonction Grappin, deux points d'amélioration ont été identifiés et résolus : (1) Une faille de sécurité dans `FB_Grappin` permettait d'acquitter le défaut d'incohérence mécanique de démarrage sans recalage réel, et (2) Plusieurs variables de configuration et d'état contenaient des tirets du bas, enfreignant `NAMING_CONVENTION.md`.
+**Contexte** : Suite à un audit approfondi de la fonction Benne, deux points d'amélioration ont été identifiés et résolus : (1) Une faille de sécurité dans `FB_Benne` permettait d'acquitter le défaut d'incohérence mécanique de démarrage sans recalage réel, et (2) Plusieurs variables de configuration et d'état contenaient des tirets du bas, enfreignant `NAMING_CONVENTION.md`.
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D79 | **Sécurisation du Reset Grappin, PascalCase & Correction de Compilation** | 1. Suppression du forçage de `GrappinState.StateIncoherent` à FALSE dans le bloc Reset de `FB_Grappin.st` (le recalage reste obligatoire). <br> 2. Suppression de tous les tirets du bas dans les variables de `ST_GrappinConfig.st` et `ST_GrappinState.st` pour respecter strictement la convention de nommage. <br> 3. Passage de `GrappinState` en `VAR_IN_OUT` pour résoudre l'erreur CODESYS C0037 (écriture sur variable de sortie non autorisée). |
+| D79 | **Sécurisation du Reset Benne, PascalCase & Correction de Compilation** | 1. Suppression du forçage de `BenneState.StateIncoherent` à FALSE dans le bloc Reset de `FB_Benne.st` (le recalage reste obligatoire). <br> 2. Suppression de tous les tirets du bas dans les variables de `ST_BenneConfig.st` et `ST_BenneState.st` pour respecter strictement la convention de nommage. <br> 3. Passage de `BenneState` en `VAR_IN_OUT` pour résoudre l'erreur CODESYS C0037 (écriture sur variable de sortie non autorisée). |
 
 ### Fichiers impactés (2026-07-03quadravicies)
-- **CODE/** : `FB_Grappin.st`, `ST_GrappinConfig.st`, `ST_GrappinState.st`, `PRG_MAIN.st`.
-- **DOC/** : `AF_Partie-12_Fonction_Grappin_v1.0.md` (mise à jour des interfaces documentées), `AUDIT_Coherence_Documentaire_v1.0.md` (ce §33).
+- **CODE/** : `FB_Benne.st`, `ST_BenneConfig.st`, `ST_BenneState.st`, `PRG_MAIN.st`.
+- **DOC/** : `AF_Partie-12_Fonction_Benne_v1.0.md` (mise à jour des interfaces documentées), `AUDIT_Coherence_Documentaire_v1.0.md` (ce §33).
 
 ---
 
@@ -766,15 +766,15 @@ de fichier `.st` nécessaire, uniquement une action côté CODESYS runtime).
 
 **Contexte** : Retour utilisateur après analyse terrain — le scénario physique du mou de câble
 est différent de celui documenté en v1.1 (D27). Le capteur `M1_M2_SlackCableSwitch` est
-**physiquement localisé sur le tambour M2 uniquement** (grappin). Le mou se forme lors d'une
-**remontée** (grappin se ferme mal, câble continue de s'enrouler sans tension), et non en
+**physiquement localisé sur le tambour M2 uniquement** (benne). Le mou se forme lors d'une
+**remontée** (benne se ferme mal, câble continue de s'enrouler sans tension), et non en
 descente comme supposé initialement. Par ailleurs, le rôle d'`OverrideSync` est clarifié et
 étendu : il est applicable à la fois en MAINT_N1 et MAINT_N2 (pas restreint à N2).
 
 | # | Sujet | Décision |
 |---|-------|----------|
 | D80 | **D_SLACK_1 — Comportement mou de câble revu (SafeStop total en mode normal)** | En mode **NORMAL / SEMI_AUTO / MAINT_N1 sans OverrideSync** : un mou de câble déclenche un **SafeStop M1 ET M2** (arrêt total des 2 sens, rampe rapide) + **alarme IHM acquittable** — ce n'est plus un simple `ForbidDescent` (D27). En mode **MAINT avec OverrideSync activé** : le SafeStop câble est **levé** ; `ForbidAscent` (montée interdite sur M1 ET M2) remplace le blocage directionnel ; la descente reste autorisée pour rattraper le câble sur le tambour. L'opérateur pilote M1 et M2 indépendamment. Le capteur est physiquement sur le tambour M2 uniquement. |
-| D81 | **D_SLACK_2 — Procédure de récupération grappin bloqué** | En SEMI_AUTO : mou de câble → SafeStop → cycle **suspendu en mémoire** (non réinitialisé). L'opérateur doit passer en MAINT_N1 ou MAINT_N2. La réouverture du grappin est **manuelle** depuis l'IHM (`CmdOpen` sur `FB_Grappin`). Séquence de récupération typique : (a) MAINT_N2 + OverrideSync, (b) redescendre M2 pour rattraper câble, (c) redescendre M1 si grappin vraiment bloqué, (d) ouvrir grappin (CmdOpen IHM), (e) remonter en position connue, (f) désactiver OverrideSync, (g) acquitter alarme (Reset IHM), (h) reprendre cycle. L'opérateur a la possibilité d'utiliser d'autres axes (chariot) — ce choix fait perdre la mémoire du cycle. |
+| D81 | **D_SLACK_2 — Procédure de récupération benne bloqué** | En SEMI_AUTO : mou de câble → SafeStop → cycle **suspendu en mémoire** (non réinitialisé). L'opérateur doit passer en MAINT_N1 ou MAINT_N2. La réouverture du benne est **manuelle** depuis l'IHM (`CmdOpen` sur `FB_Benne`). Séquence de récupération typique : (a) MAINT_N2 + OverrideSync, (b) redescendre M2 pour rattraper câble, (c) redescendre M1 si benne vraiment bloqué, (d) ouvrir benne (CmdOpen IHM), (e) remonter en position connue, (f) désactiver OverrideSync, (g) acquitter alarme (Reset IHM), (h) reprendre cycle. L'opérateur a la possibilité d'utiliser d'autres axes (translation) — ce choix fait perdre la mémoire du cycle. |
 | D82 | **D_SLACK_3 — Acquittement manuel des alarmes mou de câble** | Les défauts mou de câble (bit3 `ErrorId`) sont exposés comme **alarmes sur l'IHM**. Acquittement **Manuel obligatoire** : pas de reset automatique, même si la cause disparaît. Condition : `GVL_IN.SlackCableSwitch = TRUE` (sain) **ET** appui Reset front montant. Pattern standard Partie3 §5 (front Reset + cause disparue) — identique aux autres défauts du domaine treuil. |
 | D83 | **D_OVERRIDESYNC — Rôle élargi d'OverrideSync** | `OverrideSync` = désactive **toute** synchronisation ET tout contrôle de synchronisation. Applicable en **MAINT_N1 ET MAINT_N2** (pas restreint à N2 comme documenté initialement en §2 de Partie5 v1.2). Permet de piloter M1 et M2 **indépendamment sans contrôle d'écart de position**. **Lève également le SafeStop dû au mou de câble** (procédure de récupération manuelle autorisée). Corrige le pseudo-code de §2 Partie5 qui conditionne `OverrideSync` à `Mode = MAINT_N2` uniquement. |
 
@@ -796,11 +796,11 @@ documentaire (voir fichiers impactés ci-dessous).
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D84 | **Retour contacteur unique M1/M2 (`FwdRevSpeedFeedbackOff`)** | `FB_Winch` : `ContactorFeedbackFwd`/`Rev` (entrée) remplacés par l'entrée unique `FwdRevSpeedFeedbackOff`. Sorties `FwdContactorCheck`+`RevContactorCheck` (2×`ST_ContactorCheck`) fusionnées en **`ContactorsCheck`** (1 seul `ST_ContactorCheck`). Vérification **StuckClosed uniquement, à l'arrêt commandé** (tout ce que `FB_Winch` commande à `FALSE` mais `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` sous `ContactorFeedbackTimeout`=500ms → bit1 `ErrorId`). **Plus de détection StuckOpen** (impossible avec ce signal unique — `ContactorsCheck.StuckOpen` reste toujours `FALSE`, champ conservé pour compatibilité de type). Bit2 `ErrorId` (ex-`RevContactorCheck`) **libéré/inutilisé**. `FB_Encoder_Homing.ArretConfirme` recalculé sur `FwdRevSpeedFeedbackOff AND (NOT BrakeFeedback)` (remplace `(NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev) AND (NOT BrakeFeedback)`). **Hors périmètre** : Chariot M3 (`FB_Chariot.st`) conserve ses retours individuels `ContactorFeedbackFwd`/`Rev` — changement non confirmé pour M3. |
+| D84 | **Retour contacteur unique M1/M2 (`FwdRevSpeedFeedbackOff`)** | `FB_Winch` : `ContactorFeedbackFwd`/`Rev` (entrée) remplacés par l'entrée unique `FwdRevSpeedFeedbackOff`. Sorties `FwdContactorCheck`+`RevContactorCheck` (2×`ST_ContactorCheck`) fusionnées en **`ContactorsCheck`** (1 seul `ST_ContactorCheck`). Vérification **StuckClosed uniquement, à l'arrêt commandé** (tout ce que `FB_Winch` commande à `FALSE` mais `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` sous `ContactorFeedbackTimeout`=500ms → bit1 `ErrorId`). **Plus de détection StuckOpen** (impossible avec ce signal unique — `ContactorsCheck.StuckOpen` reste toujours `FALSE`, champ conservé pour compatibilité de type). Bit2 `ErrorId` (ex-`RevContactorCheck`) **libéré/inutilisé**. `FB_Encoder_Homing.ArretConfirme` recalculé sur `FwdRevSpeedFeedbackOff AND (NOT BrakeFeedback)` (remplace `(NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev) AND (NOT BrakeFeedback)`). **Hors périmètre** : Translation M3 (`FB_Translation.st`) conserve ses retours individuels `ContactorFeedbackFwd`/`Rev` — changement non confirmé pour M3. |
 
 ### Fichiers impactés (2026-07-07)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/WINCH/FB_Winch.st`, `CODE/ENCODERS/FB_Encoder_Homing.st`, `CODE/MAIN/PRG_02_Encoders.st`, `CODE/MAIN/PRG_06_WinchControl.st`, `CODE/SUPERVISION/ST_WinchHMI.st`, `CODE/MAIN/PRG_09_Supervision.st`.
-- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.1→**v1.4**, réalignement nom de fichier/version au passage — voir bandeau v1.4), `AF_Partie-10_Fonction_Encoder_Homing` (v1.6→**v1.7**), `AF_Partie-06_IO_Conditioning` (v1.4→**v1.5**), `AF_Partie-02_Architecture_Programme` (v2.9→**v2.10**), `AF_Partie-07_Interface_IHM` (v1.1→**v1.2**), références croisées corrigées dans `AF_Partie-11_Fonction_Chariot`, `AF_Partie-12_Fonction_Grappin`, `AF_Partie-13_Fonction_Simulation` (pointeurs vers Partie9), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §35).
+- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.1→**v1.4**, réalignement nom de fichier/version au passage — voir bandeau v1.4), `AF_Partie-10_Fonction_Encoder_Homing` (v1.6→**v1.7**), `AF_Partie-06_IO_Conditioning` (v1.4→**v1.5**), `AF_Partie-02_Architecture_Programme` (v2.9→**v2.10**), `AF_Partie-07_Interface_IHM` (v1.1→**v1.2**), références croisées corrigées dans `AF_Partie-11_Fonction_Translation`, `AF_Partie-12_Fonction_Benne`, `AF_Partie-13_Fonction_Simulation` (pointeurs vers Partie9), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §35).
 - **CODE/** (à faire) : `FB_Safety_Winch.st` (logique SafeStop conditionnée par `OverrideSync` / nouveau `ForbidAscent`), `FB_Winch.st` (masquage `RelayFwd` sur `ForbidAscent`).
 
 ---
@@ -811,14 +811,14 @@ documentaire (voir fichiers impactés ci-dessous).
 demandé de couvrir enfin le **Cas B** identifié dans la piste de sécurité "surveillance de cohérence
 mouvement" (Partie9, jamais implémentée depuis son identification) — mouvement non commandé / roue libre —
 ainsi que 2 garde-fous supplémentaires en défense en profondeur : perte de commande opérateur non suivie
-d'un arrêt réel, et glissement du treuil M1 pendant un mouvement Grappin (M1 doit normalement rester
+d'un arrêt réel, et glissement du treuil M1 pendant un mouvement Benne (M1 doit normalement rester
 immobile pendant que M2 seul bouge).
 
 | # | Sujet | Décision |
 |---|-------|----------|
 | D85 | **Méca A — Mouvement non commandé général (`FB_Safety_Winch` bit7)** | Armé quand `FwdRevSpeedFeedbackOff AND BrakeFeedback` (tout confirmé physiquement coupé). Si pendant l'armement la vitesse mesurée (différentiation logicielle de `CablePosM` via `FB_CycleTime`, **pas** un mot vitesse natif codeur — voir D87 ci-dessous) dépasse `UncommandedSpeedThresholdMps` (0.02 m/s, théorique) **ou** la position dérive de plus de `UncommandedDriftToleranceM` (2.0 m) par rapport à la référence prise à l'armement → `SafeStop` **et** `PowerCutOff` (les contacteurs sont déjà confirmés coupés, `SafeStop` seul ne suffit pas). |
 | D86 | **Méca B — Pilotage actif sans commande opérateur (`FB_Safety_Winch` bit8)** | Indépendant de la logique interne `FB_Winch` (défense en profondeur). Si (perte CAN joystick, bit0 déjà existant) **ou** (joystick axe Y au neutre, nouvelle entrée `JoystickYNeutral`, seuil `ABS(SpeedRef) < 0.1`) **et** que `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` dans `PostRampTimeout` (3 s, théorique) → `SafeStop` **et** `PowerCutOff`. |
-| D87 | **Méca C — Glissement M1 pendant mouvement Grappin, 2 couches (`FB_Grappin` bit4 + `FB_Safety_Winch` bit9)** | **Couche 1** (`FB_Grappin`, tolérance `M1SlipToleranceM`=1.0 m) : si M1 dérive de plus d'1 m par rapport à sa position à l'entrée en `Busy` → `SevereError` (coupe M2) + sortie `M1SlipDetected` (consommée dans `PRG_06_WinchControl.st`, OR'ée dans `SafeStopM1_Raw`). **Couche 2** (`FB_Safety_Winch`, tolérance `GrappinSlipToleranceM`=2.0 m, armée uniquement via `GrappinHoldStillActive` câblée sur `instGrappin.Busy` pour l'instance M1 seule, toujours `FALSE` côté M2) : si la couche 1 n'a pas suffi (dérive continue au-delà de 2.0 m) → escalade `PowerCutOff`. |
+| D87 | **Méca C — Glissement M1 pendant mouvement Benne, 2 couches (`FB_Benne` bit4 + `FB_Safety_Winch` bit9)** | **Couche 1** (`FB_Benne`, tolérance `M1SlipToleranceM`=1.0 m) : si M1 dérive de plus d'1 m par rapport à sa position à l'entrée en `Busy` → `SevereError` (coupe M2) + sortie `M1SlipDetected` (consommée dans `PRG_06_WinchControl.st`, OR'ée dans `SafeStopM1_Raw`). **Couche 2** (`FB_Safety_Winch`, tolérance `BenneSlipToleranceM`=2.0 m, armée uniquement via `BenneHoldStillActive` câblée sur `instBenne.Busy` pour l'instance M1 seule, toujours `FALSE` côté M2) : si la couche 1 n'a pas suffi (dérive continue au-delà de 2.0 m) → escalade `PowerCutOff`. |
 | D88 | **`PowerCutOff` de `FB_Safety_Winch` devient réel** | `(ErrorId AND 16#0380) <> 0` (bits 7/8/9) remplace l'ancien `FALSE` codé en dur (documenté "TBD" depuis Partie9 v1.1). `SafeStop` inclut désormais aussi les bits 7/8/9 (masques `16#039F`/`16#0397` selon `OverrideSync`, au lieu de `16#001F`/`16#0017`) — les bits 7/8/9 ne sont **jamais** exclus par `OverrideSync` (sans rapport avec la procédure de récupération mou de câble, D80). |
 | D89 | **TBD assumé — mesure de vitesse par mot natif codeur** | La vitesse mesurée par Méca A utilise une différentiation logicielle de `CablePosM` sur 1 cycle (10 ms), pas le mot vitesse natif EtherCAT (`COD1_SpdValue`/`COD2_SpdValue`, mappé `%IW10` côté COD1, jamais consommé dans `CODE/`). Échelle/unité de ce mot **inconnue** (à déterminer via fiche technique codeur Kübler F58x8 ou empiriquement sur site) — amélioration différée à une phase projet plus avancée : basculer Méca A sur `COD1/COD2_SpdValue` quand `EncoderM1/M2_IsReal=TRUE`, garder la différentiation logicielle en repli simulation. |
 
@@ -827,8 +827,8 @@ cohérence mouvement"** restent **TBD, non implémentés** (sources encore manqu
 mot vitesse natif fiable).
 
 ### Fichiers impactés (2026-07-07, session Méca A/B/C)
-- **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/WINCH/FB_Safety_Winch.st`, `CODE/GRAPPIN/FB_Grappin.st`, `CODE/MAIN/PRG_03_Safety.st`, `CODE/MAIN/PRG_06_WinchControl.st`.
-- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.4→**v1.5**, §4quinquies nouveau — Méca A/B/C détaillés, remplace/complète la section TBD "surveillance de cohérence mouvement" pour le Cas B, interface `FB_Safety_Winch`/tableau `ErrorId`/formules `SafeStop`/`PowerCutOff` mis à jour), `AF_Partie-12_Fonction_Grappin` (v1.1→**v1.2**, §4.D nouveau — Méca C couche 1, `M1SlipDetected`), références croisées corrigées dans `AF_Partie-02_Architecture_Programme`, `AF_Partie-06_IO_Conditioning`, `AF_Partie-07_Interface_IHM`, `AF_Partie-10_Fonction_Encoder_Homing`, `AF_Partie-11_Fonction_Chariot`, `AF_Partie-13_Fonction_Simulation` (pointeurs vers Partie9/Partie12), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §36).
+- **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/WINCH/FB_Safety_Winch.st`, `CODE/BENNE/FB_Benne.st`, `CODE/MAIN/PRG_03_Safety.st`, `CODE/MAIN/PRG_06_WinchControl.st`.
+- **DOC/** : `AF_Partie-09_Fonction_Winch` (v1.4→**v1.5**, §4quinquies nouveau — Méca A/B/C détaillés, remplace/complète la section TBD "surveillance de cohérence mouvement" pour le Cas B, interface `FB_Safety_Winch`/tableau `ErrorId`/formules `SafeStop`/`PowerCutOff` mis à jour), `AF_Partie-12_Fonction_Benne` (v1.1→**v1.2**, §4.D nouveau — Méca C couche 1, `M1SlipDetected`), références croisées corrigées dans `AF_Partie-02_Architecture_Programme`, `AF_Partie-06_IO_Conditioning`, `AF_Partie-07_Interface_IHM`, `AF_Partie-10_Fonction_Encoder_Homing`, `AF_Partie-11_Fonction_Translation`, `AF_Partie-13_Fonction_Simulation` (pointeurs vers Partie9/Partie12), `CLAUDE.md` (racine, liste des docs), AUDIT (ce §36).
 
 ---
 
@@ -851,8 +851,8 @@ Partie créée).
 | D91 | **Polarité fail-safe `PowerCutOff_A_RQ`/`B_RQ`** | Architecture **à commande maintenue** : le PLC doit maintenir ces 2 sorties à `TRUE` en permanence ; toute transition `TRUE→FALSE` (volontaire — un Safety Mouvement de `FB_Safety_Winch` se déclenche, voir Partie9 v1.5 §4quinquies — ou accidentelle — PLC planté/coupure/watchdog dépassé) ouvre le circuit AU et coupe le contacteur, exactement comme un bouton coup-de-poing. Corrige la polarité inversée de la 1ère version (bug documenté en bandeau REX dans `AF_Partie-01` pour ne jamais être reproduit). |
 | D92 | **Séquence de réarmement — IHM uniquement, jamais automatique** | Front sur `GVL_IHM.Modes.CmdEmergencyArming`, accepté seulement si `EmergencyChain=TRUE` et qu'aucune impulsion/verrouillage n'est en cours → impulsion 1 s sur `EmergencyArming_RQ` → verrouillage 5 s (recharge mécanique du ressort) avant toute nouvelle tentative. Retours IHM : `EmergencyChainOk`, `PowerContactorOk`, `EmergencyArmable`, `EmergencyArmingBusy`. Aucun réarmement auto même si `EmergencyChain` redevient sain seul — décision opérateur explicite requise. |
 | D93 | **Cas non couverts par du code dédié — assumés TBD** | (1) Aucune temporisation de confirmation post-pulse ne vérifie que `EmergencyStopOk` repasse bien à `TRUE` après une impulsion `EmergencyArming_RQ` — une défaillance mécanique du contacteur reste indiscernable, côté IHM, d'un simple "pas encore réarmé" (pas d'alarme dédiée). (2) La redondance des canaux `PowerCutOff_A_RQ`/`B_RQ` est purement logicielle (`B := A`) — aucune détection de divergence si un seul des deux canaux est réellement câblé/fonctionnel côté matériel. Les deux points sont documentés comme questions ouvertes dans la casuistique `AF_Partie-01` (cas 9 et 10), à lever au câblage réel/tests terrain. |
-| D94 | **Nommage « Safety Mouvement » — abandon du vocabulaire « Méca A/B/C » en documentation** | Retour utilisateur en cours de relecture (2026-07-07) : le nom de code par lettre séquentielle (« Méca A/B/C », introduit en §36/D85-D87) est jugé **ni parlant ni évolutif** (rien n'indique combien de cas existeront à terme, un 4ᵉ casserait la convention). `AF_Partie-01_Analyse_Fonctionnelle_v1.5` adopte **exclusivement** le vocabulaire descriptif **« Safety Mouvement — \<Rôle\> »** (Mouvement non commandé / Pilotage sans commande opérateur / Glissement grappin), catégorie **ouverte** sans limite de nombre, et n'utilise plus le nom par lettre nulle part dans son texte. **`CODE/` n'est pas retouché** (`FB_Safety_Winch.st`, `PRG_03_Safety.st`, `ST_WinchHMI.st` conservent aujourd'hui encore les commentaires/identifiants « Méca A/B/C », de même que `AF_Partie-09_Fonction_Winch_v1.5` §4quinquies, non modifiée dans cette session) : un renommage effectif en `CODE/` + Partie9 est une **proposition distincte**, non validée/appliquée ici, nommage cible suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`, `SafetyMotionUncommandedDrive`, `SafetyMotionGrappinSlip`) — cohérent avec le préfixe `FB_Safety_<Metier>` déjà en usage. **Q ouverte** : valider ce renommage `CODE/`+Partie9 dans une session dédiée (guardrails codesys-workflow, impact `ErrorId`/commentaires/tests). |
-| D95 | **Clarification `PowerCutOff` multi-sources + couverture Grappin** | Retour utilisateur (2026-07-07) : `PowerCutOff_A_RQ` agrège **3 sources** (`instSafetyWinchM1`, `instSafetyWinchM2`, `instSafetyChariotM3`, voir `PRG_10_Outputs.st`), pas seulement `FB_Safety_Winch`. `FB_Safety_Chariot.PowerCutOff` participe déjà à la formule mais reste **codé en dur à `FALSE`** (TBD, pas de `ST_ContactorCheck` puissance M3 câblé) — aucun Safety Mouvement réel côté Chariot aujourd'hui. Le Grappin n'a pas de bloc safety dédié (pas de moteur propre) : sa protection glissement est **répartie sur 2 couches** — couche 1 dans `FB_Grappin` (`M1SlipDetected`, alimente `SafeStop` seulement) et couche 2 dans l'instance **M1** de `FB_Safety_Winch` (`GrappinHoldStillActive` sur `instGrappin.Busy`, peut escalader jusqu'à `PowerCutOff`) — donc `FB_Safety_Winch` couvre bien indirectement le Grappin via M1, sans bloc `FB_Safety_Grappin` séparé. Ces clarifications sont intégrées dans `AF_Partie-01_v1.5` (encadré dédié §Sécurité électrique). |
+| D94 | **Nommage « Safety Mouvement » — abandon du vocabulaire « Méca A/B/C » en documentation** | Retour utilisateur en cours de relecture (2026-07-07) : le nom de code par lettre séquentielle (« Méca A/B/C », introduit en §36/D85-D87) est jugé **ni parlant ni évolutif** (rien n'indique combien de cas existeront à terme, un 4ᵉ casserait la convention). `AF_Partie-01_Analyse_Fonctionnelle_v1.5` adopte **exclusivement** le vocabulaire descriptif **« Safety Mouvement — \<Rôle\> »** (Mouvement non commandé / Pilotage sans commande opérateur / Glissement benne), catégorie **ouverte** sans limite de nombre, et n'utilise plus le nom par lettre nulle part dans son texte. **`CODE/` n'est pas retouché** (`FB_Safety_Winch.st`, `PRG_03_Safety.st`, `ST_WinchHMI.st` conservent aujourd'hui encore les commentaires/identifiants « Méca A/B/C », de même que `AF_Partie-09_Fonction_Winch_v1.5` §4quinquies, non modifiée dans cette session) : un renommage effectif en `CODE/` + Partie9 est une **proposition distincte**, non validée/appliquée ici, nommage cible suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`, `SafetyMotionUncommandedDrive`, `SafetyMotionBenneSlip`) — cohérent avec le préfixe `FB_Safety_<Metier>` déjà en usage. **Q ouverte** : valider ce renommage `CODE/`+Partie9 dans une session dédiée (guardrails codesys-workflow, impact `ErrorId`/commentaires/tests). |
+| D95 | **Clarification `PowerCutOff` multi-sources + couverture Benne** | Retour utilisateur (2026-07-07) : `PowerCutOff_A_RQ` agrège **3 sources** (`instSafetyWinchM1`, `instSafetyWinchM2`, `instSafetyTranslationM3`, voir `PRG_10_Outputs.st`), pas seulement `FB_Safety_Winch`. `FB_Safety_Translation.PowerCutOff` participe déjà à la formule mais reste **codé en dur à `FALSE`** (TBD, pas de `ST_ContactorCheck` puissance M3 câblé) — aucun Safety Mouvement réel côté Translation aujourd'hui. Le Benne n'a pas de bloc safety dédié (pas de moteur propre) : sa protection glissement est **répartie sur 2 couches** — couche 1 dans `FB_Benne` (`M1SlipDetected`, alimente `SafeStop` seulement) et couche 2 dans l'instance **M1** de `FB_Safety_Winch` (`BenneHoldStillActive` sur `instBenne.Busy`, peut escalader jusqu'à `PowerCutOff`) — donc `FB_Safety_Winch` couvre bien indirectement le Benne via M1, sans bloc `FB_Safety_Benne` séparé. Ces clarifications sont intégrées dans `AF_Partie-01_v1.5` (encadré dédié §Sécurité électrique). |
 
 ### Fichiers impactés (2026-07-07, session Sécurité électrique)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/MAIN/PRG_10_Outputs.st`, `CODE/MAIN/PRG_09_Supervision.st`, `CODE/SUPERVISION/ST_ModesHMI.st`. Aucun autre fichier `CODE/` touché dans cette session (le renommage `SafetyMotion*` proposé par D94 n'est **pas appliqué**).
@@ -880,8 +880,8 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
   `AF_Partie-07_Interface_IHM_v1.2.md` (titre corrigé),
   `AF_Partie-09_Fonction_Winch_v1.7.md` (titre corrigé),
   `AF_Partie-10_Fonction_Encoder_Homing_v1.7.md` (titre + 2 refs Partie9 corrigés),
-  `AF_Partie-11_Fonction_Chariot_v1.3.md` (2 refs Partie9 v1.6→v1.7),
-  `AF_Partie-12_Fonction_Grappin_v1.2.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
+  `AF_Partie-11_Fonction_Translation_v1.3.md` (2 refs Partie9 v1.6→v1.7),
+  `AF_Partie-12_Fonction_Benne_v1.2.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
   `AF_Partie-13_Fonction_Simulation_v1.1.md` (titre + 1 ref Partie9 v1.8→v1.7 corrigés),
   `CLAUDE.md` (racine, 2 mises à jour : Partie9 v1.6→v1.7 + ajout Partie13).
 - **Reste ouvert (non corrigé)** : Références de code à `OverrideSync` vs `SyncEnable` (renommage code 2026-07-08 non répercuté en DOC — voir D99 ci-après). Ces corrections visent la **forme** (version numbers cohérence) ; le fond technique (variable renommée dans code mais doc non mise à jour) est documenté séparement pour décision utilisateur.
@@ -890,7 +890,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 
 ## 🚀 39. ⚠️ Incohérence persistante — `OverrideSync` (doc) vs `SyncEnable` (code, 2026-07-08)
 
-**Constat** : Commit 26a9f1c (feat grappin, 2026-07-08, 15h25) a renommé `OverrideSync`
+**Constat** : Commit 26a9f1c (feat benne, 2026-07-08, 15h25) a renommé `OverrideSync`
 → `SyncEnable` dans le code avec inversion de polarité (logique positive désormais), répercuté sur
 5 fichiers `CODE/` (`FB_Modes.st`, `FB_Safety_Winch.st`, `FB_WinchSync.st`, `ST_SyncHMI.st`,
 `PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie-05_Modes_Maintenance_v1.2.md`
@@ -899,7 +899,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D99 | **Documentation NON CORRIGÉE, question ouverte** | Audit découvert l'incohérence doc/code, mais **correction documentaire dépasse le périmètre** « correction forme » (D96-D98) ; cela demande une **relecture métier complète** de AF_Partie-05 pour tracer tous les impacts (logique positive affectant les formules de guard, état IHM, messages). Recommandation : valider en session dédiée **après relecture code-review des changements 26a9f1c** (grappin, sécurité, IHM) — une mauvaise traduction `OverrideSync`→`SyncEnable` dans la doc pourrait introduire une confusion dangeuse. **Balisé à corriger** : Partie5 v1.2 **doit être mise à jour en v1.3** (au minimum) avec les 13 occurrences et la logique inversée documentée, à faire à titre de **nettoyage documentaire décidé par l'utilisateur, hors cet audit**. |
+| D99 | **Documentation NON CORRIGÉE, question ouverte** | Audit découvert l'incohérence doc/code, mais **correction documentaire dépasse le périmètre** « correction forme » (D96-D98) ; cela demande une **relecture métier complète** de AF_Partie-05 pour tracer tous les impacts (logique positive affectant les formules de guard, état IHM, messages). Recommandation : valider en session dédiée **après relecture code-review des changements 26a9f1c** (benne, sécurité, IHM) — une mauvaise traduction `OverrideSync`→`SyncEnable` dans la doc pourrait introduire une confusion dangeuse. **Balisé à corriger** : Partie5 v1.2 **doit être mise à jour en v1.3** (au minimum) avec les 13 occurrences et la logique inversée documentée, à faire à titre de **nettoyage documentaire décidé par l'utilisateur, hors cet audit**. |
 
 **Fichiers affectés (code, déjà modifiés en production)** :
 - `CODE/MODES/FB_Modes.st:21` (commentaire REX 2026-07-08)
@@ -969,8 +969,8 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 - `AF_Partie8_Fonction_Joystick_v1.2.md` → `AF_Partie-08_Fonction_Joystick_v1.2.md`
 - `AF_Partie9_Fonction_Winch_v1.8.md` → `AF_Partie-09_Fonction_Winch_v1.8.md`
 - `AF_Partie10_Fonction_Encoder_Homing_v1.7.md` → `AF_Partie-10_Fonction_Encoder_Homing_v1.7.md`
-- `AF_Partie11_Fonction_Chariot_v1.3.md` → `AF_Partie-11_Fonction_Chariot_v1.3.md`
-- `AF_Partie12_Fonction_Grappin_v1.2.md` → `AF_Partie-12_Fonction_Grappin_v1.2.md`
+- `AF_Partie11_Fonction_Translation_v1.3.md` → `AF_Partie-11_Fonction_Translation_v1.3.md`
+- `AF_Partie12_Fonction_Benne_v1.2.md` → `AF_Partie-12_Fonction_Benne_v1.2.md`
 - `AF_Partie13_Fonction_Simulation_v1.1.md` → `AF_Partie-13_Fonction_Simulation_v1.1.md`
 
 **Références croisées mises à jour** (sed multi-fichier, ordre : noms de fichiers d'abord, puis références avec/sans underscores) :
@@ -1005,7 +1005,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 1. Tableau récapitulatif 5 lignes × 7 colonnes (Méca / Bit / Armement / Déclenchement / Conséquence / Seuil/Délai)
 2. **Méca A (bit7)** — Mouvement non commandé / roue libre : armé contacteurs+frein coupés, déclenchement dérive>2m OU vitesse>0.02m/s, PowerCutOff escalade
 3. **Méca B (bit8)** — Pilotage sans commande opérateur : armé perte CAN/joystick neutre, déclenchement pas d'arrêt confirmé après 3s (contacteurs+frein), PowerCutOff
-4. **Méca C (bit9)** — Glissement M1 grappin : armé UNIQUEMENT M1 (GrappinHoldStillActive), dérive>2m escalade, PowerCutOff
+4. **Méca C (bit9)** — Glissement M1 benne : armé UNIQUEMENT M1 (BenneHoldStillActive), dérive>2m escalade, PowerCutOff
 5. **Méca D (bit11)** — Capteur haut / limite logicielle : armé capteur atteint OU limite dépassée, pas confirmé arrêt après 3s, PowerCutOff
 6. **Méca E (bits 12/13)** — Écart synchro critique : bit12 détection immédiate SafeStop seul, bit13 escalade PowerCutOff si pas confirmé après 3s
 7. Chaque Méca inclut : Rôle (1 phrase), Armement (condition exacte), Déclenchement (logique), Conséquence, Paramètres (noms/défauts/unités), Subtilités (alertes critiques)

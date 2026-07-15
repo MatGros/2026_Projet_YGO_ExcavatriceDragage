@@ -26,16 +26,16 @@ complet) : retirées de la liste "autorisée", déplacées en "à éviter" ci-de
 ### Rôle / catégorie
 | Abrév. | Sens | Exemple réel dans `CODE/` |
 |---|---|---|
-| `Cmd` | Commande (signal final vers actionneur/bus — Niveau 2, préfixe) | `CmdX` (ex. `ReqFwd`/`CmdX` du Chariot), `BrakeCmd` (legacy, suffixe) |
+| `Cmd` | Commande (signal final vers actionneur/bus — Niveau 2, préfixe) | `CmdX` (ex. `ReqFwd`/`CmdX` du Translation), `BrakeCmd` (legacy, suffixe) |
 | `Req` | Requête brute, pas encore arbitrée (Niveau 2, préfixe) | `ReqFwd`/`ReqRev`, `OpenReq`/`CloseReq` (legacy, suffixe) |
 | `Ref` | Consigne | `SpeedRef`, `CablePosRef`, `RefPosM` |
 | `Act` | Valeur mesurée/actuelle | `SpeedAct`, `CablePosAct` |
-| `Diag` | Diagnostic | `FB_DiagCanOpen`, `FB_DiagEthercat`, `ST_DeviceDiag` |
+| `Diag` | Diagnostic | `FB_DiagCanOpen`, `FB_DiagEthercat`, `ST_DiagDevice` |
 | `Calc` | Calcul / calculateur (nom d'instance) | `CycleTimeCalc` (instance de `FB_CycleTime`) |
 | `Trig` | Détection de front (variable de travail interne) | `TrigM1Fwd`, `TrigM3Rev` |
 | `Fwd` / `Rev` | Avant / Arrière (forward/reverse) | `RelayFwd`, `LimitSwitchFwd`, `ReqFwd` |
 | `Min` / `Max` | Limite basse / haute | `MaxStepDescente`, `LimitLegalDepthMinAllowed` |
-| `Pos` | Position — coexiste avec la forme complète (les deux existent dans le code, pas de règle stricte) | `CablePosM`, `ChariotPosFosse1` **et** `PositionM`, `PositionSensorTarget` |
+| `Pos` | Position — coexiste avec la forme complète (les deux existent dans le code, pas de règle stricte) | `CablePosM`, `TranslationPosFosse1` **et** `PositionM`, `PositionSensorTarget` |
 
 ### ⚠️ Dans l'ancien doc mais PAS utilisées dans le code — préférer le mot complet
 | Abrév. (à éviter) | Toujours écrire |
@@ -69,7 +69,7 @@ physique/matériel, `ReqX`/`CmdX` = logique métier/IHM.
 ```
 Enable, Reset
 StartStop            → BOOL : TRUE = rampe accélération, FALSE = rampe décélération normale
-                        (FB de mouvement uniquement — Winch, Chariot)
+                        (FB de mouvement uniquement — Winch, Translation)
 ```
 
 ### Entrées sécurité / contexte
@@ -98,7 +98,7 @@ complète sur ce projet (voir incident ci-dessous).
 | Famille | Convention | Exemples | Pourquoi |
 |---|---|---|---|
 | **Capteur de sécurité** (entrée brute, suffixe `Ok` ou assimilé fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `EmergencyStopOk`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk`, `GVL_IN.TopPositionSensor` (sain si non atteint), `GVL_IN.DriveFaultOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
-| **Information / état classique** (entrée brute) | `FALSE` = repos ; `TRUE` = capteur atteint/déclenché | `ChariotPosFosse1/Fosse2/Maintenance/Tremie` | Logique directe : "je suis arrivé à la position" = `TRUE`. Pas d'enjeu fail-safe. |
+| **Information / état classique** (entrée brute) | `FALSE` = repos ; `TRUE` = capteur atteint/déclenché | `TranslationPosFosse1/Fosse2/Maintenance/Tremie` | Logique directe : "je suis arrivé à la position" = `TRUE`. Pas d'enjeu fail-safe. |
 | **Sortie de COMMANDE d'un bloc Safety** (calculée, PAS un capteur) | `TRUE` = **déclenche** l'action | `SafeStop` (déclenche décél. rapide), `ForbidDescent` (déclenche l'interdiction), `PowerCutOff` (déclenche la coupure) | Nom = un verbe d'action, pas un état de capteur — c'est l'inverse de la famille "sécurité" ci-dessus, volontairement. |
 
 ⚠️ **Confusion réelle vécue sur ce projet** (retour terrain, session mise en service) :
@@ -167,9 +167,9 @@ SoftStartRampActive          → gestion rampe soft-start
 | `ReqX` | Requête brute (bouton IHM / séquenceur), **pas encore arbitrée** | Entrée d'un arbitrage (interlocks, sélection Manu/Auto, clamp) |
 | `CmdX` | Signal **final** vers l'actionneur/le bus, après arbitrage | Sortie FB ou variable écrite juste avant le matériel |
 
-Exemple de pipeline complet (Chariot M3) :
+Exemple de pipeline complet (Translation M3) :
 ```
-ST_ChariotHMI.ReqFwd (bouton IHM, brut)
+ST_TranslationHMI.ReqFwd (bouton IHM, brut)
   → PRG_10_Outputs.M3Fwd_Demand (arbitré Manu/Joystick)
   → PRG_10_Outputs.M3Fwd_Eff (après interlocks AU/SafeStop)
   → M3_CommandWord (signal final envoyé sur le bus EtherCAT)
@@ -182,18 +182,18 @@ quelle variable, peu importe le mécanisme. Gros chantier (renomme `Ready`/`Busy
 `SpeedRef`/`CablePosM`/`TopPositionSensor`... utilisés dans tout le projet) — **à planifier à
 part**, jamais en improvisé. Voir `PLAN_TASK.md` §🏷️ Nommage.
 
-⚠️ **Périmètre appliqué ce soir : uniquement `ST_ChariotHMI.ReqFwd`/`ReqRev`** (ex-`M3_RelayFwd/Rev`,
+⚠️ **Périmètre appliqué ce soir : uniquement `ST_TranslationHMI.ReqFwd`/`ReqRev`** (ex-`M3_RelayFwd/Rev`,
 seuls champs `Req`/`Cmd` créés cette session). Tout le reste de l'existant garde sa forme
 d'origine, **non touché, pas une nouvelle incohérence accidentelle** — audit/rename à part si
 un jour voulu (voir `PLAN_TASK.md`) :
-- `CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/`CmdInhibit` (`FB_Grappin`/`FB_Winch`/`ST_GrappinHMI`/
+- `CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/`CmdInhibit` (`FB_Benne`/`FB_Winch`/`ST_BenneHMI`/
   `ST_WinchHMI`) — déjà en préfixe, cohérent avec la règle, mais catégorie `Cmd` utilisée ici pour
   une **requête** (pas un signal final) : à harmoniser vers `Req` dans ce chantier séparé.
-- `CmdWinchM1_*`/`CmdChariotM3_*`/`CmdGrappin_*` (`FB_Cycle`) — idem, préfixe déjà correct,
+- `CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBenne_*` (`FB_Cycle`) — idem, préfixe déjà correct,
   catégorie à revoir.
-- `BrakeCmd` (`FB_Brake`/`FB_Chariot`/`FB_Safety_Chariot`/`ST_WinchHMI`/`ST_ChariotHMI`) — en
+- `BrakeCmd` (`FB_Brake`/`FB_Translation`/`FB_Safety_Translation`/`ST_WinchHMI`/`ST_TranslationHMI`) — en
   **suffixe**, contredit la règle ci-dessus mais établi dans 5 fichiers : laissé tel quel.
-- `ST_GrappinHMI.OpenReq`/`CloseReq` — en **suffixe** également (ancien usage qui a inspiré la
+- `ST_BenneHMI.OpenReq`/`CloseReq` — en **suffixe** également (ancien usage qui a inspiré la
   distinction `Req`/`Cmd`, avant qu'on tranche pour le préfixe) : laissé tel quel.
 
 ### Paramètre → Mesure → État atteint → État actif (fin de course logiciel, seuils)
@@ -211,10 +211,10 @@ production côté Winch (`ST_WinchHMI`), pris comme référence :
 Différence 3 vs 4 : `CableLimitAscentReached` dit juste "on est arrivé au seuil" (info) ;
 `ForbidAscentActive` dit "en conséquence, la montée est interdite maintenant" (action). Les deux
 existent souvent en paire, mais pas toujours 1:1 — un même "actif" peut agréger plusieurs
-"atteint"/conditions (ex. `FdcGrappinOpenActive` dépend d'un seuil ET d'un `Enable` de config).
+"atteint"/conditions (ex. `FdcBenneOpenActive` dépend d'un seuil ET d'un `Enable` de config).
 
 **Paramètres/réglages (Config)** vs **Consignes (`Ref`)** : un paramètre change rarement (RETAIN,
-réglage banc/mise en service — `RampAccelRate`, `TopSensorPositionM`, `Config : ST_GrappinConfig`) ;
+réglage banc/mise en service — `RampAccelRate`, `TopSensorPositionM`, `Config : ST_BenneConfig`) ;
 une consigne (`Ref`) est recalculée à chaque cycle par la logique (`SpeedRef`, `CablePosRef`).
 Les deux peuvent partager un suffixe d'unité (`M`, `Pct`) mais ne sont pas la même catégorie —
 un paramètre ne doit pas s'appeler `XxxRef`, une consigne calculée ne doit pas ressembler à un
@@ -248,21 +248,21 @@ DrumRevs          → rotations tambour
  
 ## Construction d'un nom : instance → champ (2 niveaux, jamais mélangés)
 
-🔧 REX 2026-07-15 : formalisé après plusieurs allers-retours sur le Chariot M3 — un nom se
+🔧 REX 2026-07-15 : formalisé après plusieurs allers-retours sur le Translation M3 — un nom se
 construit toujours en 2 étapes distinctes, chacune avec sa propre règle.
 
 ### Niveau 1 — Instance (membre `GVL_IHM`, instance de FB)
 `<Mécanisme>[<Repère>]`
-- **Mécanisme** : nom métier court (`Winch`, `Chariot`, `Grappin`, `Joystick`, `Sync`, `Modes`)
+- **Mécanisme** : nom métier court (`Winch`, `Translation`, `Benne`, `Joystick`, `Sync`, `Modes`)
 - **Repère** : identifiant matériel (`M1`/`M2`/`M3`/`JOY1`...) — **uniquement si plusieurs
   instances du même mécanisme existent**, pour les distinguer. Un mécanisme unique n'a pas de repère.
 
 | Instance | Repère ? | Pourquoi |
 |---|---|---|
 | `WinchM1`, `WinchM2` | Oui | 2 treuils physiques, il faut distinguer lequel |
-| `ChariotM3` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
+| `TranslationM3` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
 | `JoystickJOY1` | Oui | Repère = ID noeud CANopen physique |
-| `Grappin` | **Non** | Un seul grappin sur la machine — un repère (`GrappinM2`) répéterait le `M2` déjà présent dans ses propres champs (`M2PositionCorrected`, `LastPosM2Close`...) : tenté puis annulé le 2026-07-15, stutter |
+| `Benne` | **Non** | Un seul benne sur la machine — un repère (`BenneM2`) répéterait le `M2` déjà présent dans ses propres champs (`M2PositionCorrected`, `LastPosM2Close`...) : tenté puis annulé le 2026-07-15, stutter |
 
 ### Niveau 2 — Champ à l'intérieur du struct
 `<Rôle><Fonction>` — **uniquement pour les catégories réellement ambiguës** (commande vs
@@ -275,18 +275,18 @@ requête, voir `Req`/`Cmd` plus haut). Les catégories déjà univoques gardent 
 ⚠️ **Ne jamais répéter le Repère du niveau 1 à l'intérieur du champ** — le nom du struct porte
 déjà le contexte matériel :
 ```
-✅ GVL_IHM.ChariotM3.ReqFwd
-❌ GVL_IHM.ChariotM3.M3ReqFwd   (M3 déjà dans ChariotM3, répétition inutile)
+✅ GVL_IHM.TranslationM3.ReqFwd
+❌ GVL_IHM.TranslationM3.M3ReqFwd   (M3 déjà dans TranslationM3, répétition inutile)
 ```
 
 ### Exemple complet (les 2 niveaux assemblés)
 ```
-GVL_IHM . ChariotM3 . ReqFwd
+GVL_IHM . TranslationM3 . ReqFwd
           └───┬────┘  └─┬─┘
           Niveau 1    Niveau 2
         Mécanisme+   Rôle+Fonction
          Repère      (Req = requête
-       (Chariot+M3)   brute, Fwd =
+       (Translation+M3)   brute, Fwd =
                        avant)
 ```
 

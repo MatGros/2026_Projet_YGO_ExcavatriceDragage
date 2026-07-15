@@ -11,7 +11,7 @@
 > 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
 > [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md),
-> [P11 Chariot v1.2](AF_Partie-11_Fonction_Chariot_v1.6.md) §7/§9bis.
+> [P11 Translation v1.2](AF_Partie-11_Fonction_Translation_v1.6.md) §7/§9bis.
 > ⚙️ **Changements v1.1** : 
 > - Déplacement de [GVL_Simulation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st) vers `CODE/SIMULATION/` pour regrouper la GVL avec ses FB de simulation.
 > - Extraction de la variable `BlinkClock1Hz` vers une nouvelle GVL système globale [GVL_Global.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/GVL_Global.st) dans `CODE/MAIN/`.
@@ -24,7 +24,7 @@
 Le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'est pas disponible pour les
 essais. Le programme doit pouvoir tourner **intégralement en simulation CODESYS** (devices hors
 ligne), tout en restant testable de façon réaliste : codeurs qui comptent quand un treuil
-« tourne », chariot qui se déplace, capteurs qui suivent les commandes.
+« tourne », translation qui se déplace, capteurs qui suivent les commandes.
 
 Une simulation existait déjà, mais de façon organique : `GVL_DEBUG.st` empilait 6 flags
 indépendants ajoutés au coup par coup, dont un (`DBG_ContactorFeedbackBypass_TEST`) surchargé sur
@@ -32,8 +32,8 @@ indépendants ajoutés au coup par coup, dont un (`DBG_ContactorFeedbackBypass_T
 active la simulation physique des codeurs). Cette Partie 13 remplace cet empilement par un
 modèle hiérarchique explicite.
 
-**Priorité de développement** : treuils (M1/M2) + grappin + codeurs d'abord (Lots 1-3). Le
-chariot M3 (translation) est couvert mais n'est pas la priorité (Lots 4-5).
+**Priorité de développement** : treuils (M1/M2) + benne + codeurs d'abord (Lots 1-3). Le
+translation M3 (translation) est couvert mais n'est pas la priorité (Lots 4-5).
 
 ---
 
@@ -52,7 +52,7 @@ SimulationModeActive AND NOT <Device>_IsReal
 
 | Variable | Device couvert |
 |---|---|
-| `VariateurM3_IsReal` | AC600 EtherCAT (chariot M3) |
+| `VariateurM3_IsReal` | AC600 EtherCAT (translation M3) |
 | `EncoderM1_IsReal` / `EncoderM2_IsReal` | COD1/COD2 EtherCAT |
 | `Joystick_IsReal` | CANopen JOY1 (communication et état en ligne) |
 | `JoystickSignal_IsReal` | Signaux physiques bruts du Joystick (permet d'injecter des consignes simulées) |
@@ -62,7 +62,7 @@ SimulationModeActive AND NOT <Device>_IsReal
 | `PhaseRotationOk_IsReal` | Contrôle rotation phases |
 | `ThermalM1_IsReal` / `ThermalM2_IsReal` | Thermique moteur M1/M2 |
 | `ContactorFeedbackM1/M2/M3_IsReal` | Retours contacteurs (sens + frein) par axe |
-| `ChariotPosition_IsReal` | Capteurs Fosse1/Fosse2/Maintenance/Trémie |
+| `TranslationPosition_IsReal` | Capteurs Fosse1/Fosse2/Maintenance/Trémie |
 
 `JoystickForceNeutralRaw`, `JoystickForceMaxRaw` et `EncoderSimSpeedFactor` restent dans la [GVL_Simulation](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st). L'horloge utilitaire générique `BlinkClock1Hz` est déplacée dans [GVL_Global.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/GVL_Global.st).
 
@@ -108,7 +108,7 @@ Fait « compter » un codeur absolu comme si le treuil tournait réellement.
 Sortie `RawPosOut` (UDINT), aiguillée à la place de la valeur EtherCAT réelle quand le device
 n'est pas `Operational` (deux instances indépendantes M1/M2 dans [PRG_02_Encoders.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_02_Encoders.st)).
 
-### `FB_Sim_Joystick` (priorité — homme-mort réel des treuils/grappin)
+### `FB_Sim_Joystick` (priorité — homme-mort réel des treuils/benne)
 Simule les **entrées brutes** (`RawX`/`RawY`/`RawButton`) : le homme-mort réel de `FB_Joystick` reste
 pleinement actif et doit toujours être « actionné » pour armer.
 * Fichier associé : [FB_Sim_Joystick.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/FB_Sim_Joystick.st)
@@ -117,10 +117,10 @@ Instancié dans [PRG_01_Diagnostics.st](file:///C:/_MGS/DEV/2026_Projet_YGO_Exca
 sorties remplacent `JoyXRaw_ANA1`/`JoyYRaw_ANA2`/`JoyBtnRaw` (via `SEL`), et le bus
 CANopen (`CanOnline`/`CanOperational`) est forcé de la même façon.
 
-### `FB_Sim_Chariot` (M3, non prioritaire)
+### `FB_Sim_Translation` (M3, non prioritaire)
 Simulation de trajet M3 par temps de parcours — remplace le forçage manuel du capteur de
-position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie-11_Fonction_Chariot_v1.6.md)).
-* Fichier associé : [FB_Sim_Chariot.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/FB_Sim_Chariot.st)
+position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie-11_Fonction_Translation_v1.6.md)).
+* Fichier associé : [FB_Sim_Translation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/FB_Sim_Translation.st)
 
 Sorties `PosFosse1/PosFosse2/PosMaintenance/PosTremie` (BOOL), OR'ées sur `InputRaw` des
 capteurs réels correspondants dans [PRG_00_Inputs.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_00_Inputs.st).
@@ -139,7 +139,7 @@ Miroir commande→retour temporisé (délai mécanique simulé) réutilisant `TO
 | [PRG_01_Diagnostics.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_01_Diagnostics.st) | `instSimJoystick` inséré avant `FB_Joystick_0`. OR de bypass Operational/WcState (EtherCAT ×3, CANopen) par device. |
 | [PRG_02_Encoders.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_02_Encoders.st) | Bloc inline remplacé par 2 instances `FB_Sim_Encoder` (M1/M2 indépendantes). |
 | [PRG_06_WinchControl.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_06_WinchControl.st) | `BypassContactorCheck` calculé par axe, passé à `instWinchM1`/`instWinchM2`. |
-| [PRG_07_ChariotControl.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_07_ChariotControl.st) | `BypassContactorCheck` pour `instChariotM3` ; miroir contacteur M3 remplacé par `FB_Sim_DigitalMirror` (×2, Fwd/Rev). |
+| [PRG_07_TranslationControl.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_07_TranslationControl.st) | `BypassContactorCheck` pour `instTranslationM3` ; miroir contacteur M3 remplacé par `FB_Sim_DigitalMirror` (×2, Fwd/Rev). |
 | [PRG_09_Supervision.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_09_Supervision.st) | Mirrors IHM pointent vers l'état effectif par device de `GVL_Simulation`. |
 
 ---

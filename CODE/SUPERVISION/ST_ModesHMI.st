@@ -15,7 +15,7 @@ STRUCT
                                      FaultMachineReset a été pressé (OR de tous les .Error du domaine,
                                      même périmètre que FaultMachineReset) *)
     PowerCutOffActive  : BOOL;   (* 🧨 REX 2026-07-07 : au moins un Méca A/B/C (FB_Safety_Winch) ou
-                                     PowerCutOff Chariot actif — TRUE = coupure demandée. Attention :
+                                     PowerCutOff Translation actif — TRUE = coupure demandée. Attention :
                                      PowerCutOff_A_RQ/B_RQ (sortie physique réelle) sont à la polarité
                                      INVERSÉE (fail-safe, TRUE=maintenu/OK) — ce champ IHM reste en
                                      polarité "alarme" (TRUE=problème) pour cohérence avec AnyFaultActive *)

@@ -18,7 +18,7 @@ VAR
 
     // Paramètres cibles réglés par l'opérateur
     TargetDepthM        : REAL := -12.5; // Profondeur de dragage cible (mètres, négative)
-    TargetOffsetM       : REAL := 1.5;  // Décalage cible de fermeture du grappin (mètres)
+    TargetOffsetM       : REAL := 1.5;  // Décalage cible de fermeture du benne (mètres)
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
@@ -35,24 +35,24 @@ instCycle(
     
     TargetDepthM        := TargetDepthM,
     TargetOffsetM       := TargetOffsetM,
-    SelectedTargetNum_IHM := GVL_IHM.ChariotM3.SelectedTargetNum,
+    SelectedTargetNum_IHM := GVL_IHM.TranslationM3.SelectedTargetNum,
 
     // Capteur fond touché détecté par le mou de câble physique (sécurité positive)
     BottomTouched       := NOT PRG_00_Inputs.SlackCableSwitch,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
 
-    // Position chariot
-    Chariot_At_Fosse1   := PRG_00_Inputs.ChariotPosFosse1,
-    Chariot_At_Fosse2   := PRG_00_Inputs.ChariotPosFosse2,
-    Chariot_At_Maintenance := PRG_00_Inputs.ChariotPosMaintenance,
-    Chariot_At_Tremie   := PRG_00_Inputs.ChariotPosTremie,
-    Chariot_Busy        := PRG_07_ChariotControl.instChariotM3.Busy,
-    Chariot_Done        := PRG_07_ChariotControl.instChariotM3.Done,
+    // Position translation
+    Translation_At_Fosse1   := PRG_00_Inputs.TranslationPosFosse1,
+    Translation_At_Fosse2   := PRG_00_Inputs.TranslationPosFosse2,
+    Translation_At_Maintenance := PRG_00_Inputs.TranslationPosMaintenance,
+    Translation_At_Tremie   := PRG_00_Inputs.TranslationPosTremie,
+    Translation_Busy        := PRG_07_TranslationControl.instTranslationM3.Busy,
+    Translation_Done        := PRG_07_TranslationControl.instTranslationM3.Done,
 
-    // Mouvements mâchoires grappin (gérés par instGrappin)
-    Grappin_Busy        := PRG_06_WinchControl.instGrappin.Busy,
-    Grappin_Done        := PRG_06_WinchControl.instGrappin.Done,
-    Grappin_IsOpen      := GVL_PERSISTENT.GrappinState.IsOpen,
-    Grappin_IsClosed    := GVL_PERSISTENT.GrappinState.IsClosed
+    // Mouvements mâchoires benne (gérés par instBucket)
+    Benne_Busy        := PRG_06_WinchControl.instBucket.Busy,
+    Benne_Done        := PRG_06_WinchControl.instBucket.Done,
+    Benne_IsOpen      := GVL_PERSISTENT.BucketState.IsOpen,
+    Benne_IsClosed    := GVL_PERSISTENT.BucketState.IsClosed
 );

@@ -5,14 +5,14 @@
    🧩 Brique réduite (Partie3 §1bis), générique et réutilisable — outil de banc.
    🎯 Rôle : simule un retour de contacteur réaliste (délai mécanique de
       fermeture/ouverture), au lieu d'un miroir "idéal" instantané. Utilisée pour
-      le retour contacteur M3 (`PRG_07_ChariotControl.st`), remplace le miroir
+      le retour contacteur M3 (`PRG_07_TranslationControl.st`), remplace le miroir
       inconditionnel actuel. Réutilise `TON` (Partie3 §0 — pas de temporisation
       réimplémentée), même principe que `ContactorFeedbackTimeout` déjà en place
-      dans `FB_Winch.st`/`FB_Chariot.st`.
+      dans `FB_Winch.st`/`FB_Translation.st`.
    📥 Enable       : simulation active (ex. SimulationModeActive AND NOT ContactorFeedbackM3_IsReal)
    📥 Command      : ordre envoyé au contacteur (TRUE = fermé/actif)
    📥 MirrorDelay  : délai de fermeture/ouverture simulé — À FIXER nettement SOUS le
-      `ContactorFeedbackTimeout` du FB consommateur (`FB_Winch`/`FB_Chariot`), sinon le
+      `ContactorFeedbackTimeout` du FB consommateur (`FB_Winch`/`FB_Translation`), sinon le
       StuckClosed/StuckOpen se déclenche à tort pendant le délai simulé.
    📤 Feedback     : retour simulé (suit Command après MirrorDelay)
    ═══════════════════════════════════════════════════════════════ *)

@@ -1,21 +1,21 @@
 (* ═══════════════════════════════════════════════════════════════
-   ↔️ FB_Chariot — Directeur de l'axe transversal M3 (variateur AC600)
+   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.6.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
-   🧩 Compose FB_Brake (réutilisé TEL QUEL depuis _COMMON).
+   🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
    ═══════════════════════════════════════════════════════════════ *)
 
-FUNCTION_BLOCK PUBLIC FB_Chariot
+FUNCTION_BLOCK PUBLIC FB_Translation
 VAR_INPUT
     Enable                      : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
     Reset                       : BOOL;        // Acquittement défaut (front)
     EmergencyStopOk             : BOOL;        // Chaîne AU réarmée + conditions globales OK
     Mode                        : E_Mode;      // Mode courant
     StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
-    SafeStop                    : BOOL;        // Sortie FB_Safety_Chariot : TRUE = rampe décélération RAPIDE (Enable maintenu)
+    SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
     Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
     SpeedRefPct                 : REAL;        // Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // Capteur position cible courante
@@ -27,7 +27,7 @@ VAR_INPUT
     DriveActualFreqHz            : REAL;       // Fréquence réelle mesurée (Hz)
 
     BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
-    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein chariot
+    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
 
     // Réglages rampe (RETAIN)
     RampAccelRate                : REAL := 20.0;    // %/s — accélération

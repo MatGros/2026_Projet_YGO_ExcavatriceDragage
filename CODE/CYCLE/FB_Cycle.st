@@ -18,7 +18,7 @@ VAR_INPUT
 
     // Cibles et paramètres
     TargetDepthM        : REAL;         // Profondeur de consigne (négative)
-    TargetOffsetM       : REAL;         // Écart de fermeture grappin cible
+    TargetOffsetM       : REAL;         // Écart de fermeture benne cible
     SelectedTargetNum_IHM : INT;        // Cible sélectionnée (1=Fosse1, 2=Fosse2)
 
     // Feedbacks physique & matériel
@@ -26,19 +26,19 @@ VAR_INPUT
     M1_CablePosM        : REAL;         // Position câble treuil M1 (recalée)
     M2_CablePosM        : REAL;         // Position câble treuil M2 (recalée)
 
-    // Feedbacks Chariot M3
-    Chariot_At_Fosse1   : BOOL;         // Capteur fin de course fosse 1
-    Chariot_At_Fosse2   : BOOL;         // Capteur fin de course fosse 2
-    Chariot_At_Maintenance : BOOL;      // Capteur fin de course maintenance
-    Chariot_At_Tremie   : BOOL;         // Capteur fin de course trémie
-    Chariot_Busy        : BOOL;         // Mouvement chariot en cours
-    Chariot_Done        : BOOL;         // Cible chariot atteinte
+    // Feedbacks Translation M3
+    Translation_At_Fosse1   : BOOL;         // Capteur fin de course fosse 1
+    Translation_At_Fosse2   : BOOL;         // Capteur fin de course fosse 2
+    Translation_At_Maintenance : BOOL;      // Capteur fin de course maintenance
+    Translation_At_Tremie   : BOOL;         // Capteur fin de course trémie
+    Translation_Busy        : BOOL;         // Mouvement translation en cours
+    Translation_Done        : BOOL;         // Cible translation atteinte
 
-    // Feedbacks Grappin
-    Grappin_Busy        : BOOL;         // Mouvement mâchoires grappin en cours
-    Grappin_Done        : BOOL;         // Mouvement ouverture/fermeture terminé
-    Grappin_IsOpen      : BOOL;         // Grappin mécaniquement ouvert mémorisé
-    Grappin_IsClosed    : BOOL;         // Grappin mécaniquement fermé mémorisé
+    // Feedbacks Benne
+    Benne_Busy        : BOOL;         // Mouvement mâchoires benne en cours
+    Benne_Done        : BOOL;         // Mouvement ouverture/fermeture terminé
+    Benne_IsOpen      : BOOL;         // Benne mécaniquement ouvert mémorisé
+    Benne_IsClosed    : BOOL;         // Benne mécaniquement fermé mémorisé
 END_VAR
 
 VAR_OUTPUT
@@ -53,18 +53,18 @@ VAR_OUTPUT
     CmdWinchM1_Direction : INT;
     CmdWinchM1_SpeedPct  : REAL;
 
-    // Commandes Winch M2 (Grappin)
+    // Commandes Winch M2 (Benne)
     CmdWinchM2_StartStop : BOOL;
     CmdWinchM2_Direction : INT;
     CmdWinchM2_SpeedPct  : REAL;
 
-    // Commandes Chariot M3 (Translation)
-    CmdChariotM3_Start   : BOOL;
-    CmdChariotM3_Target  : INT;
+    // Commandes Translation M3 (Translation)
+    CmdTranslationM3_Start   : BOOL;
+    CmdTranslationM3_Target  : INT;
 
-    // Commandes FB_Grappin
-    CmdGrappin_Open      : BOOL;
-    CmdGrappin_Close     : BOOL;
+    // Commandes FB_Bucket
+    CmdBucket_Open      : BOOL;
+    CmdBucket_Close     : BOOL;
 
     // Métadonnées d'affichage IHM
     CycleStep           : E_CycleStep;  // Étape active du Grafcet
@@ -105,10 +105,10 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     CmdWinchM2_Direction := 0;
     CmdWinchM2_SpeedPct  := 0.0;
 
-    CmdChariotM3_Start   := FALSE;
-    CmdChariotM3_Target  := 0;
-    CmdGrappin_Open      := FALSE;
-    CmdGrappin_Close     := FALSE;
+    CmdTranslationM3_Start   := FALSE;
+    CmdTranslationM3_Target  := 0;
+    CmdBucket_Open      := FALSE;
+    CmdBucket_Close     := FALSE;
 
     State                := E_CycleStep.INIT;
     CycleStep            := E_CycleStep.INIT;
@@ -151,9 +151,9 @@ CASE State OF
         
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
-        CmdChariotM3_Start   := FALSE;
-        CmdGrappin_Open      := FALSE;
-        CmdGrappin_Close     := FALSE;
+        CmdTranslationM3_Start   := FALSE;
+        CmdBucket_Open      := FALSE;
+        CmdBucket_Close     := FALSE;
         Busy                 := FALSE;
         Done                 := FALSE;
 
@@ -170,20 +170,20 @@ CASE State OF
         // Choix cible
         IF SelectedTargetNum_IHM = 1 OR SelectedTargetNum_IHM = 2 THEN
             SelectedWorkTarget := SelectedTargetNum_IHM;
-            CmdChariotM3_Target := SelectedWorkTarget;
-            CmdChariotM3_Start := TRUE;
+            CmdTranslationM3_Target := SelectedWorkTarget;
+            CmdTranslationM3_Start := TRUE;
             
-            // Attente positionnement chariot
-            IF (SelectedWorkTarget = 1 AND Chariot_At_Fosse1) 
-               OR (SelectedWorkTarget = 2 AND Chariot_At_Fosse2) THEN
-                CmdChariotM3_Start := FALSE;
+            // Attente positionnement translation
+            IF (SelectedWorkTarget = 1 AND Translation_At_Fosse1) 
+               OR (SelectedWorkTarget = 2 AND Translation_At_Fosse2) THEN
+                CmdTranslationM3_Start := FALSE;
                 State := E_CycleStep.DESCENDING_OPEN;
             END_IF;
         END_IF;
 
-    E_CycleStep.DESCENDING_OPEN: // ⬇️ ÉTAPE 2 : Plongée grappin ouvert
+    E_CycleStep.DESCENDING_OPEN: // ⬇️ ÉTAPE 2 : Plongée benne ouvert
         CycleStep := E_CycleStep.DESCENDING_OPEN;
-        CycleStateStr := 'PLONGÉE GRAPPIN OUVERT';
+        CycleStateStr := 'PLONGÉE BENNE OUVERT';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
         CmdWinchM1_StartStop := TRUE;
@@ -212,18 +212,18 @@ CASE State OF
         // Transition après pose confirmée (ici instantanée, prête pour tempo)
         State := E_CycleStep.SYNCHRO_ADJUST;
 
-    E_CycleStep.SYNCHRO_ADJUST: // 🪣 ÉTAPE 4 : Fermeture du grappin (Excavation)
+    E_CycleStep.SYNCHRO_ADJUST: // 🪣 ÉTAPE 4 : Fermeture du benne (Excavation)
         CycleStep := E_CycleStep.SYNCHRO_ADJUST;
         CycleStateStr := 'FERMETURE DU GODET / EXCAVATION';
 
         CmdWinchM1_StartStop := FALSE; // M1 reste immobile
         
-        // Déclenchement fermeture grappin
-        CmdGrappin_Close := TRUE;
+        // Déclenchement fermeture benne
+        CmdBucket_Close := TRUE;
 
-        // Transition si grappin fermé avec succès
-        IF Grappin_Done AND Grappin_IsClosed THEN
-            CmdGrappin_Close := FALSE;
+        // Transition si benne fermé avec succès
+        IF Benne_Done AND Benne_IsClosed THEN
+            CmdBucket_Close := FALSE;
             State := E_CycleStep.CTRL_ASCENDING;
         END_IF;
 
@@ -274,32 +274,32 @@ CASE State OF
         DrainingTimer(IN := TRUE, PT := DrainingTime);
         IF DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
-            State := E_CycleStep.CHARIOT_MOVE;
+            State := E_CycleStep.TRANSLATION_MOVE;
         END_IF;
 
-    E_CycleStep.CHARIOT_MOVE: // ↔️ ÉTAPE 8 : Déplacement vers trémie
-        CycleStep := E_CycleStep.CHARIOT_MOVE;
+    E_CycleStep.TRANSLATION_MOVE: // ↔️ ÉTAPE 8 : Déplacement vers trémie
+        CycleStep := E_CycleStep.TRANSLATION_MOVE;
         CycleStateStr := 'DÉPLACEMENT VERS TRÉMIE DE VIDANGE';
 
-        CmdChariotM3_Target := 4; // Trémie
-        CmdChariotM3_Start := TRUE;
+        CmdTranslationM3_Target := 4; // Trémie
+        CmdTranslationM3_Start := TRUE;
 
-        // Transition si chariot arrivé à la trémie
-        IF Chariot_At_Tremie THEN
-            CmdChariotM3_Start := FALSE;
+        // Transition si translation arrivé à la trémie
+        IF Translation_At_Tremie THEN
+            CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.DESCENDING_OPEN_DUMP;
         END_IF;
 
-    E_CycleStep.DESCENDING_OPEN_DUMP: // 🗑️ ÉTAPE 9 : Ouverture grappin (Vidange)
+    E_CycleStep.DESCENDING_OPEN_DUMP: // 🗑️ ÉTAPE 9 : Ouverture benne (Vidange)
         CycleStep := E_CycleStep.DESCENDING_OPEN_DUMP;
         CycleStateStr := 'VIDANGE / OUVERTURE DU GODET';
 
-        // Déclenchement ouverture grappin
-        CmdGrappin_Open := TRUE;
+        // Déclenchement ouverture benne
+        CmdBucket_Open := TRUE;
 
-        // Transition si grappin ouvert avec succès
-        IF Grappin_Done AND Grappin_IsOpen THEN
-            CmdGrappin_Open := FALSE;
+        // Transition si benne ouvert avec succès
+        IF Benne_Done AND Benne_IsOpen THEN
+            CmdBucket_Open := FALSE;
             State := E_CycleStep.RETURN_WORK_POS;
         END_IF;
 
@@ -307,13 +307,13 @@ CASE State OF
         CycleStep := E_CycleStep.RETURN_WORK_POS;
         CycleStateStr := 'RETOUR VERS FOSSE DE TRAVAIL';
 
-        CmdChariotM3_Target := SelectedWorkTarget;
-        CmdChariotM3_Start := TRUE;
+        CmdTranslationM3_Target := SelectedWorkTarget;
+        CmdTranslationM3_Start := TRUE;
 
-        // Transition si chariot de retour sur sa fosse
-        IF (SelectedWorkTarget = 1 AND Chariot_At_Fosse1) 
-           OR (SelectedWorkTarget = 2 AND Chariot_At_Fosse2) THEN
-            CmdChariotM3_Start := FALSE;
+        // Transition si translation de retour sur sa fosse
+        IF (SelectedWorkTarget = 1 AND Translation_At_Fosse1) 
+           OR (SelectedWorkTarget = 2 AND Translation_At_Fosse2) THEN
+            CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.READY;
         END_IF;
 
@@ -323,7 +323,7 @@ CASE State OF
         
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
-        CmdChariotM3_Start   := FALSE;
+        CmdTranslationM3_Start   := FALSE;
         Done                 := TRUE;
         Busy                 := FALSE;
 
@@ -339,9 +339,9 @@ CASE State OF
 
         CmdWinchM1_StartStop := FALSE;
         CmdWinchM2_StartStop := FALSE;
-        CmdChariotM3_Start   := FALSE;
+        CmdTranslationM3_Start   := FALSE;
         
-        // Relâchement des commandes grappin
-        CmdGrappin_Open := FALSE;
-        CmdGrappin_Close := FALSE;
+        // Relâchement des commandes benne
+        CmdBucket_Open := FALSE;
+        CmdBucket_Close := FALSE;
 END_CASE;

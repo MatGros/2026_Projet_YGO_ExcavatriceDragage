@@ -23,7 +23,7 @@
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
 > `BrakeFeedback` — voir `CODE/ENCODERS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
 > ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.10.md` (doc principale
-> treuil). Hors périmètre : Chariot M3 non concerné (retours individuels inchangés).
+> treuil). Hors périmètre : Translation M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
 > contacteur puissance/AU, résout AUDIT Q11 pour le pipeline codeur — §7). `Reset` des FB
@@ -42,8 +42,8 @@
 > exacte en cours de clarification »). `CODE/GVL_Homing_Stub.st` est **supprimé** (conflit de nom
 > avec la variable réelle sinon) ; le port d'entrée `FB_Encoder_Homing.TopPositionSensor`
 > **reste nommé ainsi** côté FB (seule la variable globale qui l'alimente dans `PRG_MAIN.st`
-> change de nom). Renommage métier Translation→Chariot répercuté dans les renvois croisés
-> (`FB_Chariot`, préfixe I/O physique M3 inchangé).
+> change de nom). Renommage métier Translation→Translation répercuté dans les renvois croisés
+> (`FB_Translation`, préfixe I/O physique M3 inchangé).
 >
 > **v1.3** — Retour terrain 2026-07-02 (correction implémentation) :
 > - 🔧 **`TopPositionSensor` : UN SEUL capteur physique, COMMUN aux 2 treuils** — pas un par
@@ -87,7 +87,7 @@
 > - 🔢 Résolution codeur **confirmée** (8192 pts/tour × 4096 tours, plage totale 33 554 432 pts) —
 >   n'est plus un exemple hypothétique (§3.3). Cible de homing nominal = **centre exact** de la
 >   plage (16 777 216 pts = 0.00 m) : marge symétrique maximale, aucun risque de rebouclage.
-> - 🎯 **Deux flux de homing distincts** : nominal (les 2 treuils ensemble, grappin ouvert, cible
+> - 🎯 **Deux flux de homing distincts** : nominal (les 2 treuils ensemble, benne ouvert, cible
 >   fixe 0.00 m, `MAINT_N1` suffit) vs unitaire maintenance (1 treuil seul, cible **paramétrable**,
 >   `MAINT_N2` requis) — voir §5.
 > - 🖥️ **Confirmation déportée à l'IHM** : `Home` devient une entrée BOOL unique (front) — mot de
@@ -104,9 +104,9 @@
 >   (12 ms) — perte de quelques trames jugée sans risque temporel, évite les fausses alarmes.
 > - 🧩 **`FB_Safety_Winch` scindé en 2 instances indépendantes** (`WinchM1`/`WinchM2`) — lève
 >   l'ambiguïté relevée en revue (§7).
-> - 📝 Note hors périmètre : variateur **AC600 (M3, chariot)** — sur perte de communication,
+> - 📝 Note hors périmètre : variateur **AC600 (M3, translation)** — sur perte de communication,
 >   comportement pressenti **roue libre sans rampe** (proche d'un STO) ≠ comportement treuil
->   (contacteurs/frein). À traiter dans un futur document dédié `FB_Chariot`/Partie2 (§9).
+>   (contacteurs/frein). À traiter dans un futur document dédié `FB_Translation`/Partie2 (§9).
 >
 > **v1.0** — Version initiale (cinématique câble/tambour, analyse anti-débordement générique,
 > sélection treuil indépendante, `FB_Encoder_Homing`).
@@ -384,7 +384,7 @@ END_TYPE
 
 🧭 **Portée du principe** : la même logique de sélection/neutralisation croisée (et le même
 verrou de transition de mode) s'applique par construction à d'autres actionneurs pilotables en
-maintenance (grappin, chariot) — hors périmètre détaillé de ce document, mais `FB_Modes` doit
+maintenance (benne, translation) — hors périmètre détaillé de ce document, mais `FB_Modes` doit
 généraliser cet interlock, pas le réserver aux seuls treuils.
 
 ---
@@ -570,7 +570,7 @@ CoE, lui, agit directement sur la mesure native, sans hypothèse de plage côté
   contacteur de puissance géré par l'arrêt d'urgence** (I/O Mapping réel, description device :
   "Retour état contacteur de puissance géré par arrêt d'urgence"), câblé directement sur
   `instEncoderAbsM1/M2` et `instHomingM1/M2`. ⚠️ **Portée limitée à ce lot** : Joystick,
-  `FB_Safety_Winch`, `FB_Winch`, `FB_Safety_Chariot`, `FB_Chariot` restent sur le stub
+  `FB_Safety_Winch`, `FB_Winch`, `FB_Safety_Translation`, `FB_Translation` restent sur le stub
   `GVL_DEBUG.DBG_True` — même câblage réel à reprendre pour ces FB dans un prochain lot.
 
 ### 7bis. Capteur de position haute — double rôle (2026-07-02, ⚠️ conception, pas codé)
@@ -700,7 +700,7 @@ bougent ensemble sans régulation d'écart. Canaux `COD2_*` (I/O Mapping) **mapp
 (miroir de `COD1_*`, voir §9bis point 9).
 
 **Hors périmètre — à traiter séparément** :
-- Variateur **AC600 (M3, chariot)** : comportement pressenti sur perte de communication =
+- Variateur **AC600 (M3, translation)** : comportement pressenti sur perte de communication =
   **roue libre sans rampe** (proche d'un STO), différent du comportement treuil
   (contacteurs+frein, rampe rapide `SafeStop`) — pas traité ici (hors sujet codeur treuil).
   📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T4).

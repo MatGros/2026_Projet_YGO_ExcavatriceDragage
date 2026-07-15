@@ -5,15 +5,15 @@
    💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
    ═══════════════════════════════════════════════════════════════ *)
 VAR_GLOBAL RETAIN
-    WinchM1 : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Principal M1 *)
-    WinchM2 : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Auxiliaire M2 *)
-    Grappin : ST_GrappinHMI;(* 🪣 Variables d'échange IHM Mécanisme Grappin (M2) *)
+    M1TreuilRetenue : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Retenue (M1) *)
+    M2TreuilBucket : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Benne (M2) *)
+    Bucket : ST_BucketHMI;(* 🪣 Variables d'échange IHM Mécanisme Benne (M2) *)
     Sync    : ST_SyncHMI;   (* ⚖️ Variables d'échange IHM Surveillance de synchro *)
     JoystickJOY1 : ST_JoystickHMI; (* 🕹️ Variables d'échange IHM Joystick (noeud CANopen JOY1) *)
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
-    ChariotM3 : ST_ChariotHMI;(* ↔️ Variables d'échange IHM Chariot M3 *)
+    TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
-    Common  : ST_CommonHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
+    Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pilotage manuel direct (Secours) *)
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
 END_VAR
@@ -23,7 +23,7 @@ END_VAR
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
    Cette simulation (GVL_Simulation + CODE/SIMULATION/FB_Sim_*) permet de
-   valider le comportement des treuils M1/M2, du Homing et du Grappin sans
+   valider le comportement des treuils M1/M2, du Homing et du Benne sans
    moteurs ni codeurs physiques connectés.
 
    1. CONFIGURATION INITIALE DU BANC DE TEST :
@@ -62,23 +62,23 @@ END_VAR
       - La position calculée (CablePosM) doit se caler exactement à 12.5m
         (ou la valeur définie par M1_TopSensorPositionM / M2_TopSensorPositionM).
 
-   4. TEST DU GRAPPIN (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
+   4. TEST DU BENNE (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
       - S'assurer que les treuils ont été préalablement référencés (Homed = TRUE sur M1 ET M2 —
-        désormais vérifié en dur par FB_Grappin, bit3 ErrorId "Codeur(s) non référencé(s)" sinon).
-      - Choisir une commande Grappin sur l'IHM :
-        * Pour OUVRIR : GVL_IHM.Grappin.CmdOpen := TRUE (et CmdClose := FALSE)
-        * Pour FERMER : GVL_IHM.Grappin.CmdClose := TRUE (et CmdOpen := FALSE)
+        désormais vérifié en dur par FB_Bucket, bit3 ErrorId "Codeur(s) non référencé(s)" sinon).
+      - Choisir une commande Benne sur l'IHM :
+        * Pour OUVRIR : GVL_IHM.Bucket.CmdOpen := TRUE (et CmdClose := FALSE)
+        * Pour FERMER : GVL_IHM.Bucket.CmdClose := TRUE (et CmdOpen := FALSE)
       - Actionner et maintenir le joystick Y dans le sens correspondant :
         * UP / enrouler (Direction = 1) pour la FERMETURE
         * DOWN / dérouler (Direction = -1) pour l'OUVERTURE
-      - Le bloc Grappin prend le contrôle de M2 en vitesse lente forcée :
+      - Le bloc Benne prend le contrôle de M2 en vitesse lente forcée :
         * En fermeture, le codeur simulé M2 augmente jusqu'à ce que CablePosM2 >= CablePosM1 + OffsetCloseM (12.5m + 10.0m = 22.5m).
         * En ouverture, le codeur simulé M2 diminue jusqu'à ce que CablePosM2 <= CablePosM1 + OffsetOpenM (12.5m + 0.0m = 12.5m).
           ⚠️ Juste après un homing M1+M2 (les deux à 12.5m), la cible d'ouverture est DÉJÀ atteinte
           (CablePosM2 = CablePosM1) : une demande d'ouverture se termine donc immédiatement (Done)
           sans mouvement réel de M2 — comportement normal, pas un bug.
-      - Vérifier que Grappin.Busy passe à FALSE et Grappin.Done à TRUE lorsque la
-        cible est atteinte, et que l'état physique du grappin est mis à jour.
+      - Vérifier que Benne.Busy passe à FALSE et Benne.Done à TRUE lorsque la
+        cible est atteinte, et que l'état physique du benne est mis à jour.
       - Relâcher le joystick pour terminer le cycle de commande.
    ═══════════════════════════════════════════════════════════════ *)
 

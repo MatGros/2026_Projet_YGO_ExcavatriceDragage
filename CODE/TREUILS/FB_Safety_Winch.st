@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1/M2)
+   🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.9.md,
                    DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §7
@@ -55,18 +55,18 @@
         bit0 déjà existant) OU (joystick au neutre, `JoystickYNeutral`) ET que
         `FwdRevSpeedFeedbackOff` ne repasse PAS à `TRUE` dans `PostRampTimeout` (3s,
         théorique) → défaut → `SafeStop` ET `PowerCutOff`.
-      - **Bit9 — Méca C "glissement M1 pendant mouvement Grappin" (escalade)** :
-        armé UNIQUEMENT si `GrappinHoldStillActive=TRUE` (câblé sur `instGrappin.Busy`
+      - **Bit9 — Méca C "glissement M1 pendant mouvement Benne" (escalade)** :
+        armé UNIQUEMENT si `BenneHoldStillActive=TRUE` (câblé sur `instBucket.Busy`
         pour l'instance M1 SEULEMENT — toujours `FALSE` côté M2, qui doit bouger
-        pendant le grappin). Référence position prise à l'armement ; si dérive
-        `GrappinSlipToleranceM` (2.0 m, > à la tolérance 1.0 m déjà surveillée côté
-        `FB_Grappin` lui-même) dépassée → la couche Grappin (`SafeStop` M1 seul, 1m)
+        pendant le benne). Référence position prise à l'armement ; si dérive
+        `BenneSlipToleranceM` (2.0 m, > à la tolérance 1.0 m déjà surveillée côté
+        `FB_Bucket` lui-même) dépassée → la couche Benne (`SafeStop` M1 seul, 1m)
         n'a pas suffi → escalade `PowerCutOff` (dernier recours).
       Cas A (sens opposé) et Cas C original (absence de mouvement malgré commande)
       restent TBD, non implémentés (sources encore manquantes : sens joystick brut).
    🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
       - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT
-        sur les 2 instances Winch + l'instance Chariot — même principe que `SlackCableDetected`) :
+        sur les 2 instances Winch + l'instance Translation — même principe que `SlackCableDetected`) :
         défaut/perte → bit10 ErrorId → `SafeStop` **ET `PowerCutOff`**. Justification : le frein
         est à manque de courant (colle au repos, voir FB_Brake) — la perte de ce retour peut
         signifier qu'un frein colle INSTANTANÉMENT alors que le moteur est encore sous couple/en
@@ -78,7 +78,7 @@
         masque `PowerCutOff` en plus du masque `SafeStop` (déjà présente).
    🔧 REX 2026-07-08 (audit + demande utilisateur, factorisation/renforcement Méca A/B/C) :
       - **Méca A et Méca C factorisés** via la nouvelle brique réutilisable `FB_DriftGuard`
-        (`CODE/WINCH/` — seul consommateur réel à ce jour, pas `_COMMON` : voir bandeau du FB) :
+        (`CODE/WINCH/` — seul consommateur réel à ce jour, pas `COMMUN` : voir bandeau du FB) :
         les deux partageaient ~15 lignes identiques (armement + capture position référence +
         calcul dérive) — remplacé par 2 instances (`DriftGuardA`/`DriftGuardC`), comportement
         strictement inchangé. Méca A garde son propre check vitesse en plus (câblé en OR, hors
@@ -103,10 +103,10 @@
       SUPPLÉMENTAIRE et INDÉPENDANTE dans `FB_Safety_Winch` pour un écart VRAIMENT important
       (`CriticalSyncToleranceM`, théorique 2.0m) — défense en profondeur si le 1er niveau n'a pas
       suffi (ex. treuil qui continue malgré l'arrêt demandé). Nouvelles entrées `OtherWinchPosM`
-      (position croisée : M2 côté instance M1, M1 côté instance M2) et `GrappinBusy` (suppression
-      pendant un cycle grappin — l'écart M1/M2 y est volontaire, PAS un défaut ; 1 cycle de retard
-      accepté, même principe que `GrappinHoldStillActive`, négligeable vu l'amplitude en jeu).
-      - **Bit12** : écart critique détecté (`SyncEnable AND NOT GrappinBusy AND NOT
+      (position croisée : M2 côté instance M1, M1 côté instance M2) et `BenneBusy` (suppression
+      pendant un cycle benne — l'écart M1/M2 y est volontaire, PAS un défaut ; 1 cycle de retard
+      accepté, même principe que `BenneHoldStillActive`, négligeable vu l'amplitude en jeu).
+      - **Bit12** : écart critique détecté (`SyncEnable AND NOT BenneBusy AND NOT
         InReferencingMode AND ABS(CablePosM - OtherWinchPosM) > CriticalSyncToleranceM`) →
         `SafeStop` immédiat (rampe rapide), PAS de `PowerCutOff` à ce stade.
       - **Bit13** : escalade — si l'arrêt (bit12) n'est PAS confirmé (contacteurs ET frein) dans
@@ -123,8 +123,8 @@ VAR_INPUT
     EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
     Mode                : E_Mode;      // Mode courant (autorisations)
     SyncEnable          : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — FALSE (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (récupération manuelle)
-    JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
-    JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
+    JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
+    JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_00_Inputs.M1/M2ThermalFeedback)
     BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_00_Inputs.BrakeThermalFeedback)
@@ -143,17 +143,17 @@ VAR_INPUT
     FwdRevSpeedFeedbackOff  : BOOL;         // Retour unique "tous contacteurs sens+vitesse retombés" CE treuil
     BrakeFeedback           : BOOL;         // Retour frein CE treuil (TRUE = serré/collé)
     JoystickYNeutral        : BOOL;         // TRUE = joystick axe Y au neutre (magnitude ~0), précalculé en amont
-    GrappinHoldStillActive  : BOOL;         // TRUE seulement pour l'instance M1 pendant que le grappin bouge M2 seul (instGrappin.Busy) — toujours FALSE côté M2
+    BenneHoldStillActive  : BOOL;         // TRUE seulement pour l'instance M1 pendant que le benne bouge M2 seul (instBucket.Busy) — toujours FALSE côté M2
     UncommandedSpeedThresholdMps : REAL := 0.02; // 🔧 Méca A — théorique, à ajuster sur site
     UncommandedDriftToleranceM   : REAL := 2.0;  // 🔧 Méca A — théorique, à ajuster sur site
     PostRampTimeout              : TIME := T#3S; // 🔧 Méca B — théorique, à ajuster sur site
-    GrappinSlipToleranceM        : REAL := 2.0;  // 🔧 Méca C — escalade safety (> 1.0 m déjà surveillé côté FB_Grappin)
+    BenneSlipToleranceM        : REAL := 2.0;  // 🔧 Méca C — escalade safety (> 1.0 m déjà surveillé côté FB_Bucket)
 
     // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13), écart synchro M1/M2 critique
     ExpectedOtherWinchPosM  : REAL;         // Position ATTENDUE de l'AUTRE treuil, DÉJÀ corrigée de
-                                             // l'offset grappin actif par l'appelant (PRG_03_Safety) —
+                                             // l'offset benne actif par l'appelant (PRG_03_Safety) —
                                              // ce FB ne fait qu'un ABS(CablePosM - ExpectedOtherWinchPosM)
-    GrappinBusy             : BOOL;         // instGrappin.Busy (les 2 instances) — suppression pendant
+    BenneBusy             : BOOL;         // instBucket.Busy (les 2 instances) — suppression pendant
                                              // le trajet actif (écart transitoire normal, pas un défaut)
     CriticalSyncToleranceM  : REAL := 2.0;  // 🔧 Méca E — théorique, à ajuster sur site
     // 🆕 REX 2026-07-08 (7) : retour terrain — InhibitM1 côté instance M1 (Enable global) ne suffit
@@ -168,7 +168,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/grappin (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12:Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13:Méca E escalade non confirmé (SafeStop+PowerCutOff)
+    ErrorId             : WORD;        // bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/benne (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12:Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13:Méca E escalade non confirmé (SafeStop+PowerCutOff)
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)
@@ -177,9 +177,9 @@ VAR_OUTPUT
     PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
 
     // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
-    // par l'IHM pour la mise en service (voir PRG_09_Supervision, GVL_IHM.WinchM1/M2)
+    // par l'IHM pour la mise en service (voir PRG_09_Supervision, GVL_IHM.M1TreuilRetenue/M2)
     MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
-    MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, grappin M1) — réglage GrappinSlipToleranceM
+    MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM
     MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout
 END_VAR
 VAR
@@ -223,7 +223,7 @@ IF NOT Enable THEN
     // 🔧 REX 2026-07-08 : force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement
     // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
-    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := GrappinSlipToleranceM);
+    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
     RETURN;
 END_IF;
 
@@ -242,7 +242,7 @@ LastInReferencingMode := InReferencingMode;
 // mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
 IF NOT EmergencyStopOk THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
-    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := GrappinSlipToleranceM);       // 🔧 REX 2026-07-08
+    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
     LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
 END_IF;
 
@@ -343,15 +343,15 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FEFF;
 END_IF;
 
-// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT GRAPPIN, ESCALADE (REX 2026-07-07) — bit9
-// Armé UNIQUEMENT pour l'instance M1 (GrappinHoldStillActive câblé sur instGrappin.Busy côté M1
-// seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Grappin (1.0 m) —
-// n'intervient que si la couche Grappin (SafeStop M1 seul) n'a pas suffi.
+// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE (REX 2026-07-07) — bit9
+// Armé UNIQUEMENT pour l'instance M1 (BenneHoldStillActive câblé sur instBucket.Busy côté M1
+// seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Bucket (1.0 m) —
+// n'intervient que si la couche Benne (SafeStop M1 seul) n'a pas suffi.
 // 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé.
 DriftGuardC(
-    Arm        := GrappinHoldStillActive,
+    Arm        := BenneHoldStillActive,
     PositionM  := CablePosM,
-    ToleranceM := GrappinSlipToleranceM
+    ToleranceM := BenneSlipToleranceM
 );
 MecaCDriftM := DriftGuardC.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
@@ -393,13 +393,13 @@ END_IF;
 
 // 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE (REX 2026-07-08 (4)) — bits 12/13
 // Couche INDÉPENDANTE de FB_WinchSync (écart mineur, 1er niveau) — défense en profondeur pour un
-// écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l'offset grappin actif par
-// l'appelant : comparaison directe valable que le grappin soit ouvert, fermé, ou absent du calcul.
-// Suppression pendant GrappinBusy (trajet actif = écart transitoire normal, pas un défaut),
+// écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l'offset benne actif par
+// l'appelant : comparaison directe valable que le benne soit ouvert, fermé, ou absent du calcul.
+// Suppression pendant BenneBusy (trajet actif = écart transitoire normal, pas un défaut),
 // InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (🆕 REX
 // 2026-07-08 (7) : l'autre treuil en maintenance a une position figée, non comparable).
 // Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
-IF SyncEnable AND NOT GrappinBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+IF SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
    AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
     ErrorId := ErrorId OR 16#1000;
 ELSIF ResetEdge.Q THEN

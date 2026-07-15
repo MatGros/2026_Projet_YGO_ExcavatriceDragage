@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🪝 FB_Winch — Directeur d'un treuil individuel (M1/M2 — instance par treuil)
+   🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en

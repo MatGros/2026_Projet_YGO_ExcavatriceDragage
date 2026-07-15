@@ -33,20 +33,20 @@ instSimJoystick(
 instDiagCanOpen(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    CanOnline := (CANbus.GetBusState() = 1) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal), // 1 = ACTIVE (ou simulation)
-    CanOperational := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal)
+    CANbusOnline := (CANbus.GetBusState() = 1) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal), // 1 = ACTIVE (ou simulation)
+    DeviceJoystickOnline := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.Joystick_IsReal)
 );
 
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
 instDiagEthercat(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
-    VariateurWcState := (AC600_ECAT_Drive.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal),
-    VariateurSlaveState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
-    EncoderM1WcState := (COD1_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal),
-    EncoderM1SlaveState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
-    EncoderM2WcState := (COD2_CODEUR.GetDeviceState() <> DEVICE_STATE.RUNNING) AND NOT (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal),
-    EncoderM2SlaveState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
+    DeviceVariateurOnline := (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal),
+    DeviceVariateurState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
+    DeviceEncoderM1Online := (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal),
+    DeviceEncoderM1State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
+    DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal),
+    DeviceEncoderM2State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
 );
 
 // 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT JoystickSignal_IsReal
@@ -60,15 +60,15 @@ FB_Joystick_0(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
-    // 🆕 REX 2026-07-08 : PRG_01 (position 1) s'exécute AVANT PRG_06 (position 6) — GrappinBusy lu
+    // 🆕 REX 2026-07-08 : PRG_01 (position 1) s'exécute AVANT PRG_06 (position 6) — BenneBusy lu
     // ici reflète donc le Busy du scan PRÉCÉDENT (retard d'1 scan, ~10ms, sur la détection du front
     // descendant). Sans impact pratique : très inférieur aux temps de réponse frein/contacteurs
     // (100-300ms, voir FB_Brake) — la commande n'a pas le temps de produire un mouvement réel.
-    GrappinBusy         := PRG_06_WinchControl.instGrappin.Busy,
+    BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
     NeutralXMem         := GVL_PERSISTENT.JoystickNeutralX,
     NeutralYMem         := GVL_PERSISTENT.JoystickNeutralY,
-    BusCanOpenOP        := instDiagCanOpen.busCanOpen,
-    JoystickOP          := instDiagCanOpen.Joystick,
+    BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
+    JoystickOP          := instDiagCanOpen.DeviceJoystick,
     RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
     RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
     RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),

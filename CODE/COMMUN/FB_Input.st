@@ -1,13 +1,13 @@
 (* ═══════════════════════════════════════════════════════════════
    📥 FB_Input — Entrée TOR conditionnée (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie6_IO_Conditioning_v1.2.md §1
+   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §1
    🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
       complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
       de conditionnement bas niveau, à instancier en tableau (§3) ou
       composée directement dans un FB métier.
    🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Chariot/etc. : PAS encore décidée (choix
+   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
       d'architecture en attente — composition interne vs FB_IO générique
       séparé). Ce fichier ne fait QUE créer la brique elle-même.
    ═══════════════════════════════════════════════════════════════ *)

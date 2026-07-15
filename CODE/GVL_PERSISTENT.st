@@ -42,16 +42,16 @@ VAR_GLOBAL PERSISTENT RETAIN
     WinchCriticalSyncTolerance_M : REAL := 2.0; // Méca E : écart critique
     SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
-    // 🪣 GRAPPIN
-    GrappinConfig : ST_GrappinConfig := (
+    // 🪣 BENNE
+    BucketConfig : ST_BucketConfig := (
         OffsetOpenM      := 0.0,   // Position ouverture relative (m)
         OffsetCloseM     := 10.0,  // Position fermeture relative (m) - Valeur terrain
         CoherenceLimitM  := 0.05   // Tolérance cohérence (m)
     );
-    GrappinState : ST_GrappinState; // État mécanique mémorisé (ouvert/fermé)
+    BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
 
-    // ↔️ CHARIOT (M3)
-    ChariotMaxFreqHz : REAL := 50.0; // Fréquence max absolue M3 (Hz)
+    // ↔️ TRANSLATION (M3)
+    TranslationMaxFreqHz : REAL := 50.0; // Fréquence max absolue M3 (Hz)
 
     // 🕹️ JOYSTICK
     JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)

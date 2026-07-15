@@ -1,13 +1,13 @@
 # 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.4)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
-> **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
-> **Version** : v1.4 (2026-07-15, ST_ChariotHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist)).  
+> **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Benne, Synchro).  
+> **Version** : v1.4 (2026-07-15, ST_TranslationHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist)).  
 >
-> **v1.4 (2026-07-15)** : ST_ChariotHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist).  
+> **v1.4 (2026-07-15)** : ST_TranslationHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist).  
 > **v1.3 (2026-07-08)** : Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs.  
 > 🔧 **Nettoyage documentaire (audit doc, 2026-07-09)** : harmonisation titre/nom de fichier — le titre affichait encore v1.2 alors que le champ "Version" (ci-dessus) était déjà en v1.3 ; le nom de fichier suit désormais la version la plus haute. Aucun changement de contenu fonctionnel.  
-> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md), [P10 Homing v1.10](AF_Partie-10_Fonction_Encoder_Homing_v1.10.md), [P12 Grappin v1.4](AF_Partie-12_Fonction_Grappin_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md), [P10 Homing v1.10](AF_Partie-10_Fonction_Encoder_Homing_v1.10.md), [P12 Benne v1.4](AF_Partie-12_Fonction_Benne_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
 
 ---
 
@@ -92,19 +92,19 @@ END_STRUCT
 END_TYPE
 ```
 
-### B. Mécanisme Grappin (`ST_GrappinHMI`)
-Permet de manipuler la configuration de l'ouverture et de la fermeture du grappin et de surveiller l'état cinématique.
+### B. Mécanisme Benne (`ST_BenneHMI`)
+Permet de manipuler la configuration de l'ouverture et de la fermeture du benne et de surveiller l'état cinématique.
 
 ```pascal
-TYPE ST_GrappinHMI :
+TYPE ST_BenneHMI :
 STRUCT
     (* ⚙️ Configurations & Paramètres (Lecture/Écriture RETAIN) *)
-    Config              : ST_GrappinConfig; (* Offsets Open/Close/Coherence *)
+    Config              : ST_BenneConfig; (* Offsets Open/Close/Coherence *)
     TimeoutDuration     : TIME := T#30s;    (* Temps max pour l'ouverture/fermeture *)
 
     (* 🚦 États & Retours (Lecture seule) *)
-    State               : ST_GrappinState;  (* État mémorisé (IsOpen, IsClosed, etc.) *)
-    FBState             : E_State;          (* État de l'automate interne (FB_Grappin) *)
+    State               : ST_BenneState;  (* État mémorisé (IsOpen, IsClosed, etc.) *)
+    FBState             : E_State;          (* État de l'automate interne (FB_Benne) *)
     ActiveOffsetM       : REAL;             (* Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* Commande Start/Stop forcée vers M2 *)
     M2Direction         : INT;              (* Commande direction forcée vers M2 *)
@@ -112,13 +112,13 @@ STRUCT
     Ready               : BOOL;             (* Bloc opérationnel *)
     Busy                : BOOL;             (* Mouvement d'ouverture/fermeture en cours *)
     Done                : BOOL;             (* Mouvement terminé avec succès *)
-    Error               : BOOL;             (* Grappin en défaut *)
-    ErrorId             : WORD;             (* Code bitfield du défaut grappin *)
+    Error               : BOOL;             (* Benne en défaut *)
+    ErrorId             : WORD;             (* Code bitfield du défaut benne *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
     CmdOpen             : BOOL;             (* Bouton commande ouverture *)
     CmdClose            : BOOL;             (* Bouton commande fermeture *)
-    CmdReset            : BOOL;             (* Acquittement défaut grappin *)
+    CmdReset            : BOOL;             (* Acquittement défaut benne *)
 END_STRUCT
 END_TYPE
 ```
@@ -208,11 +208,11 @@ END_STRUCT
 END_TYPE
 ```
 
-### G. Chariot M3 (`ST_ChariotHMI`)
+### G. Translation M3 (`ST_TranslationHMI`)
 Regroupe les informations de commande, d'état et de diagnostic de l'axe transversal de la machine (M3).
 
 ```pascal
-TYPE ST_ChariotHMI :
+TYPE ST_TranslationHMI :
 STRUCT
     (* Commandes opérateur (manuel / maintenance) *)
     SelectedTargetNum       : INT;     (* Numéro de la cible de position sélectionnée *)
@@ -220,8 +220,8 @@ STRUCT
     ReqRev                  : BOOL;    (* Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
     FreqSetpointHz          : REAL;    (* Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs *)
 
-    (* États & diagnostics FB_Chariot *)
-    FBState                 : E_State; (* État de l'automate interne (FB_Chariot) *)
+    (* États & diagnostics FB_Translation *)
+    FBState                 : E_State; (* État de l'automate interne (FB_Translation) *)
     Ready                   : BOOL;
     Busy                    : BOOL;
     Done                    : BOOL;
@@ -239,7 +239,7 @@ STRUCT
     (* Bypass diag (banc de test — auto-calculé depuis GVL_Simulation) *)
     BypassContactorFeedback : BOOL;    (* Activation du bypass des retours contacteurs (sens + frein) *)
 
-    (* Sécurité (FB_Safety_Chariot) *)
+    (* Sécurité (FB_Safety_Translation) *)
     SafetyError             : BOOL;
     SafetyErrorId           : WORD;
 END_STRUCT
@@ -252,15 +252,15 @@ Regroupe les états de diagnostics des bus de communication CANopen et EtherCAT.
 ```pascal
 TYPE ST_NetworkDiagHMI :
 STRUCT
-    BusCanOpen          : ST_DeviceDiag;  (* 📡 Diagnostics bus CANopen *)
-    Joystick            : ST_DeviceDiag;  (* 🕹️ Diagnostics esclave Joystick *)
+    BusCanOpen          : ST_DiagDevice;  (* 📡 Diagnostics bus CANopen *)
+    Joystick            : ST_DiagDevice;  (* 🕹️ Diagnostics esclave Joystick *)
     CanError            : BOOL;           (* ⚠️ Anomalie CANopen *)
     CanErrorId          : WORD;           (* ❌ Code anomalie CANopen *)
     
-    BusEthercat         : ST_DeviceDiag;  (* 📡 Diagnostics bus EtherCAT *)
-    EncoderM1           : ST_DeviceDiag;  (* 🧲 Diagnostics esclave COD1 *)
-    EncoderM2           : ST_DeviceDiag;  (* 🧲 Diagnostics esclave COD2 *)
-    VariateurM3         : ST_DeviceDiag;  (* ↔️ Diagnostics esclave AC600 *)
+    BusEthercat         : ST_DiagDevice;  (* 📡 Diagnostics bus EtherCAT *)
+    EncoderM1           : ST_DiagDevice;  (* 🧲 Diagnostics esclave COD1 *)
+    EncoderM2           : ST_DiagDevice;  (* 🧲 Diagnostics esclave COD2 *)
+    VariateurM3         : ST_DiagDevice;  (* ↔️ Diagnostics esclave AC600 *)
     EcatError           : BOOL;           (* ⚠️ Anomalie EtherCAT *)
     EcatErrorId         : WORD;           (* ❌ Code anomalie EtherCAT *)
 END_STRUCT
@@ -275,11 +275,11 @@ END_TYPE
 VAR_GLOBAL RETAIN
     WinchM1 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Principal M1 *)
     WinchM2 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Auxiliaire M2 *)
-    Grappin : ST_GrappinHMI;(* Variables d'échange IHM Mécanisme Grappin *)
+    Benne : ST_BenneHMI;(* Variables d'échange IHM Mécanisme Benne *)
     Sync    : ST_SyncHMI;   (* Variables d'échange IHM Surveillance de synchro *)
     JoystickJOY1 : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
     Modes   : ST_ModesHMI;  (* Variables d'échange IHM Modes de marche *)
-    ChariotM3 : ST_ChariotHMI;(* Variables d'échange IHM Chariot M3 *)
+    TranslationM3 : ST_TranslationHMI;(* Variables d'échange IHM Translation M3 *)
     Network : ST_NetworkDiagHMI;(* Variables d'échange IHM Diagnostics réseau *)
 END_VAR
 ```
@@ -293,19 +293,19 @@ Le mapping bidirectionnel est divisé en deux parties dans `PRG_MAIN.st` :
 1. **Au tout début de l'implémentation** :
    Les commandes issues de l'IHM sont recopiées dans les variables globales de commande stub de l'application (compatibilité descendante).
    * Les boutons tactiles `CmdHome` des deux treuils sont analysés pour positionner `HomingMode_IHM` (1, 2 ou 3) et générer l'impulsion `StubHomeButton_IHM`.
-   * Les commandes de reset treuils et grappin sont agrégées pour piloter l'acquittement machine transverse `MachineReset_IHM`.
+   * Les commandes de reset treuils et benne sont agrégées pour piloter l'acquittement machine transverse `MachineReset_IHM`.
 
 2. **À la toute fin de l'implémentation (avant le conditionnement des sorties physiques)** :
    * Les mesures réelles, les sorties d'état automates et les sous-structures de diagnostic (`ContactorsCheck`, etc.) sont affectées à `GVL_IHM` pour alimenter les écrans de supervision.
    * Les paramètres de calibration modifiés à l'écran (`TopSensorPositionM`, `MaxStepDescente`, `RampAccelRate`, etc.) sont recopiés vers les registres de travail de l'automate.
-   * Une logique de synchronisation bidirectionnelle est mise en œuvre pour les bypasses de test (banc de simulation) afin que l'état sur l'écran d'un treuil soit cohérent avec l'état effectif de simulation **par device** (`GVL_Simulation`, voir Partie 13) — chaque axe (M1/M2/Chariot) reflète son propre `<Device>_IsReal`, plus une copie unique du même bit global.
+   * Une logique de synchronisation bidirectionnelle est mise en œuvre pour les bypasses de test (banc de simulation) afin que l'état sur l'écran d'un treuil soit cohérent avec l'état effectif de simulation **par device** (`GVL_Simulation`, voir Partie 13) — chaque axe (M1/M2/Translation) reflète son propre `<Device>_IsReal`, plus une copie unique du même bit global.
 
 ---
 
 ## 🔌 5. Note d'application CODESYS 3.5
 
 1. **Création des types de données** :
-   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_GrappinHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_GrappinHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_EncoderHMI.st), [ST_ChariotHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ChariotHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_NetworkDiagHMI.st).
+   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_BenneHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_BenneHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_EncoderHMI.st), [ST_TranslationHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_TranslationHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_NetworkDiagHMI.st).
 
 2. **Déclaration de la GVL** :
    Créer une GVL nommée `GVL_IHM` et y copier le contenu de [GVL_IHM.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/GVL_IHM.st). S'assurer de la cocher en **Retain** si requis par votre configuration automate (la directive `VAR_GLOBAL RETAIN` assure la persistance des données au niveau du compilateur).

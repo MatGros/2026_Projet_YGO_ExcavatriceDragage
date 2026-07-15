@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🪝 PRG_06_WinchControl — Commande des Treuils M1/M2, Synchro et Grappin
+   🪝 PRG_06_WinchControl — Commande des Treuils M1 (moteur de retenue) / M2 (moteur Benne), Synchro et Benne
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
@@ -12,7 +12,7 @@ VAR
 
     // Instances
     instWinchSync : FB_WinchSync;
-    instGrappin   : FB_Grappin;
+    instBucket   : FB_Bucket;
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
 
@@ -21,7 +21,7 @@ VAR
     M1_Direction_Active     : INT;
     M1_SpeedRef_Active      : REAL;
 
-    // Variables de commande M2 après arbitrage Grappin/Manuel/Auto
+    // Variables de commande M2 après arbitrage Benne/Manuel/Auto
     M2_StartStop_Active     : BOOL;
     M2_Direction_Active     : INT;
     M2_SpeedRef_Active      : REAL;
@@ -39,7 +39,7 @@ VAR
     CableLimitAscentM2Reached : BOOL;
 
     // 🔧 REX 2026-07-07 : couplage croisé M1/M2 des arrêts, UNIQUEMENT si SyncActive (mouvement
-    // coherent voulu). Hors synchro (Grappin.Busy ou SyncEnable=FALSE MAINT_N2) : chaque treuil réagit
+    // coherent voulu). Hors synchro (Benne.Busy ou SyncEnable=FALSE MAINT_N2) : chaque treuil réagit
     // à SA PROPRE limite/défaut uniquement — commande indépendante voulue dans ce cas.
     SafeStopM1_Raw          : BOOL;
     SafeStopM2_Raw          : BOOL;
@@ -53,27 +53,27 @@ VAR
     ForbidAscentM2_Active   : BOOL;
 
     // 🆕 REX 2026-07-08 : voir §2bis — coupure immédiate M1/M2 au même scan que la fin du cycle
-    // grappin (contrairement au désarmement homme-mort côté FB_Joystick, qui a 1 scan de retard
+    // benne (contrairement au désarmement homme-mort côté FB_Joystick, qui a 1 scan de retard
     // structurel — PRG_01 s'exécute avant PRG_06). Corrige un bref "blip" de commande (RelayFwd/Rev
-    // + BrakeCmd clignotant) observé sur M1 à l'arrivée en position grappin.
-    GrappinBusyFallEdge     : F_TRIG;
+    // + BrakeCmd clignotant) observé sur M1 à l'arrivée en position benne.
+    BenneBusyFallEdge     : F_TRIG;
 
     // 🆕 REX 2026-07-08 (4) : instWinchSync appelé APRÈS l'arbitrage M1/M2 (§3, plus bas) — lu ici
     // avec 1 scan de retard (~10ms), négligeable vu que DeltaPosM évolue progressivement, pas
-    // par à-coup (même raisonnement que M1_Busy/M2_Busy sur instGrappin, voir §0).
+    // par à-coup (même raisonnement que M1_Busy/M2_Busy sur instBucket, voir §0).
     SyncMinorDeviation      : BOOL;
     SyncMinorDeviationBlocksUp   : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la montée
     SyncMinorDeviationBlocksDown : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la descente
     M2_LimitShift                : REAL;   // 🆕 REX 2026-07-08 : décalage dynamique de la butée haute de M2
 
-    // 🆕 REX 2026-07-15 (3) — demande utilisateur : les fins de course virtuelles grappin
-    // (FdcGrappinOpen/CloseActive) doivent bloquer le mouvement AUSSI en pilotage COUPLÉ IHM_MANU
+    // 🆕 REX 2026-07-15 (3) — demande utilisateur : les fins de course virtuelles benne
+    // (FdcBucketOpen/CloseActive) doivent bloquer le mouvement AUSSI en pilotage COUPLÉ IHM_MANU
     // (M1+M2 simultané), pas seulement en pilotage individuel M2 — sinon un opérateur qui pousse le
-    // couplage alors que le grappin est déjà en butée virtuelle n'est protégé que par la butée
+    // couplage alors que le benne est déjà en butée virtuelle n'est protégé que par la butée
     // mécanique passive. Masque calculé UNE FOIS ici, consommé par M1 ET M2 (§1/§2 ci-dessous) pour
     // que les deux treuils s'arrêtent ENSEMBLE (pas de désynchro M1/M2 en cas de blocage partiel).
-    CoupledFwdGrappinOk          : BOOL;   // Couplage montée autorisé (pas de butée fermeture grappin)
-    CoupledRevGrappinOk          : BOOL;   // Couplage descente autorisé (pas de butée ouverture grappin)
+    CoupledFwdBucketOk          : BOOL;   // Couplage montée autorisé (pas de butée fermeture benne)
+    CoupledRevBucketOk          : BOOL;   // Couplage descente autorisé (pas de butée ouverture benne)
 
     // 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (demande utilisateur,
     // TEMPORAIRE tant que les vitesses définitives ne sont pas figées, à retirer ensuite) : commun
@@ -89,23 +89,23 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
 
-// ── 0. COMMANDE DU GRAPPIN (Séquence lente) ─────────────────────────────
+// ── 0. COMMANDE DU BENNE (Séquence lente) ─────────────────────────────
 // 🔧 REX 2026-07-08 : appelé EN PREMIER (avant l'arbitrage M1/M2 ci-dessous) — audit sécurité :
-// l'ancien ordre (Grappin appelé après l'arbitrage) faisait que M1_StartStop_Active lisait
-// instGrappin.Busy du scan PRÉCÉDENT, créant une fenêtre d'1 scan où M1 pouvait recevoir une
-// commande manuelle au moment exact où le grappin démarre. instGrappin.M1_Busy/M2_Busy (ci-dessous)
+// l'ancien ordre (Benne appelé après l'arbitrage) faisait que M1_StartStop_Active lisait
+// instBucket.Busy du scan PRÉCÉDENT, créant une fenêtre d'1 scan où M1 pouvait recevoir une
+// commande manuelle au moment exact où le benne démarre. instBucket.M1_Busy/M2_Busy (ci-dessous)
 // lisent en retour instWinchM1/M2.Busy du scan précédent (ces FB sont appelés plus loin, §6/§7) —
 // acceptable : ça ne retarde que l'ACCEPTATION d'une nouvelle demande de ~1 scan (10ms), sans
 // aucun impact sécurité (contrairement au cas inverse, qui pouvait faire bouger M1 pendant Busy).
-instGrappin(
+instBucket(
     Enable              := NOT PRG_04_Modes.instModes.InhibitM2
                            AND PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable
                            AND PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable, // 🆕 Sécurisé : nécessite les deux codeurs valides et M2 non-inhibé
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.Grappin.CmdOpen OR PRG_05_Cycle.instCycle.CmdGrappin_Open,
-    CmdClose_IHM        := GVL_IHM.Grappin.CmdClose OR PRG_05_Cycle.instCycle.CmdGrappin_Close,
+    CmdOpen_IHM         := GVL_IHM.Bucket.CmdOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
+    CmdClose_IHM        := GVL_IHM.Bucket.CmdClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
     JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
     JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -114,11 +114,11 @@ instGrappin(
     HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
-    ConfirmOpenPosition := GVL_IHM.Grappin.CmdConfirmOpenPosition, // 🆕 REX 2026-07-08 — bouton IHM référencement grappin ouvert
-    ConfirmClosePosition:= GVL_IHM.Grappin.CmdConfirmClosePosition, // 🆕 REX 2026-07-08 — bouton IHM référencement grappin fermé
-    Config              := GVL_PERSISTENT.GrappinConfig,
-    TimeoutDuration     := GVL_IHM.Grappin.TimeoutDuration,
-    GrappinState        := GVL_PERSISTENT.GrappinState,
+    ConfirmOpenPosition := GVL_IHM.Bucket.CmdConfirmOpenPosition, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
+    ConfirmClosePosition:= GVL_IHM.Bucket.CmdConfirmClosePosition, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
+    Config              := GVL_PERSISTENT.BucketConfig,
+    TimeoutDuration     := GVL_IHM.Bucket.TimeoutDuration,
+    BucketState        := GVL_PERSISTENT.BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
 );
@@ -141,10 +141,10 @@ SyncMinorDeviationBlocksUp   := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorD
 SyncMinorDeviationBlocksDown := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
 
 // 🆕 REX 2026-07-15 (3) — voir déclaration VAR ci-dessus : couplé masqué par les mêmes fins de
-// course grappin que l'individuel M2, appliqué à M1 ET M2 (§1/§2) pour arrêter les DEUX treuils
+// course benne que l'individuel M2, appliqué à M1 ET M2 (§1/§2) pour arrêter les DEUX treuils
 // ensemble plutôt que de désynchroniser M1/M2 en ne bloquant que la moitié du couplage.
-CoupledFwdGrappinOk := NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive;
-CoupledRevGrappinOk := NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive;
+CoupledFwdBucketOk := NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive;
+CoupledRevBucketOk := NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive;
 
 // 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (voir déclaration VAR
 // ci-dessus). Bornage identique à l'ex-logique PRG_10_Outputs retirée lors du passage sur FB_Winch.
@@ -176,19 +176,19 @@ ELSIF PRG_10_Outputs.ManuActive THEN
     // persistants qu'en Auto, voir instWinchM1 plus bas §6). Demande (boutons IHM ou joystick, déjà
     // arbitrée par PRG_10_Outputs : M1Fwd_Demand/M1Rev_Demand/CoupledFwd_Demand/CoupledRev_Demand)
     // lue avec 1 scan de retard (~10ms, PRG_10 position 10 > PRG_06 position 6) — même principe
-    // déjà accepté ailleurs dans ce fichier (Grappin.Busy, SyncMinorDeviation).
+    // déjà accepté ailleurs dans ce fichier (Benne.Busy, SyncMinorDeviation).
     // 🔧 REX 2026-07-15 (5) — trouvé en revue croisée (agent Haiku + relecture manuelle) : M1
     // INDIVIDUEL (bouton M1_RelayFwd/Rev, indépendant de M2) n'était masqué par AUCUNE butée
-    // grappin — delta = CablePosM1 - CablePosM2, donc bouger M1 seul aggrave la MÊME sur-contrainte
+    // benne — delta = CablePosM1 - CablePosM2, donc bouger M1 seul aggrave la MÊME sur-contrainte
     // mécanique que le couplé (déjà corrigé ci-dessous) : M1 Fwd augmente le delta (aggrave
-    // FdcGrappinOpenActive, delta déjà >= 0) ; M1 Rev diminue le delta (aggrave
-    // FdcGrappinCloseActive, delta déjà <= -10). Sens INVERSÉ par rapport à M2 (M2Fwd↔Close,
+    // FdcBucketOpenActive, delta déjà >= 0) ; M1 Rev diminue le delta (aggrave
+    // FdcBucketCloseActive, delta déjà <= -10). Sens INVERSÉ par rapport à M2 (M2Fwd↔Close,
     // M2Rev↔Open) car M1 et M2 ont un effet opposé sur le même delta. Couplé masqué par
-    // CoupledFwdGrappinOk/CoupledRevGrappinOk (REX 2026-07-15 (3)) — M1 s'arrête EN MÊME TEMPS que
-    // M2 si le couplage OU son propre individuel violerait une butée grappin.
-    IF (PRG_10_Outputs.M1Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdGrappinOk) THEN
+    // CoupledFwdBucketOk/CoupledRevBucketOk (REX 2026-07-15 (3)) — M1 s'arrête EN MÊME TEMPS que
+    // M2 si le couplage OU son propre individuel violerait une butée benne.
+    IF (PRG_10_Outputs.M1Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdBucketOk) THEN
         M1_Direction_Active := 1;
-    ELSIF (PRG_10_Outputs.M1Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevGrappinOk) THEN
+    ELSIF (PRG_10_Outputs.M1Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevBucketOk) THEN
         M1_Direction_Active := -1;
     ELSE
         M1_Direction_Active := 0;
@@ -200,22 +200,22 @@ ELSIF PRG_10_Outputs.ManuActive THEN
 ELSE
     // 🔧 REX 2026-07-08 : + AND DeadmanArmed — NOT Busy seul insuffisant (rampe joystick met du
     // temps à redescendre à 0 après désarmement homme-mort ⇒ StartStop reste TRUE le temps de la
-    // décél, M1 bougeait/frein décollait à la fin d'un cycle grappin). DeadmanArmed reste FALSE
+    // décél, M1 bougeait/frein décollait à la fin d'un cycle benne). DeadmanArmed reste FALSE
     // en continu jusqu'au repassage neutre + réappui, sans dépendre du temps de rampe.
     // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (nécessaire pour le gate directionnel ci-dessous).
     M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-    M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instGrappin.Busy
+    M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instBucket.Busy
                             AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
     M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
 END_IF;
 
-// ── 2. ARBITRAGE DES CONSIGNES M2 (Grappin vs Cycle Automatique vs Joystick) ──
-IF instGrappin.Busy THEN
-    M2_StartStop_Active := instGrappin.M2_StartStop;
-    M2_Direction_Active := instGrappin.M2_Direction;
-    M2_SpeedRef_Active  := 15.0; // Vitesse lente forcée pour fermeture grappin
+// ── 2. ARBITRAGE DES CONSIGNES M2 (Benne vs Cycle Automatique vs Joystick) ──
+IF instBucket.Busy THEN
+    M2_StartStop_Active := instBucket.M2_StartStop;
+    M2_Direction_Active := instBucket.M2_Direction;
+    M2_SpeedRef_Active  := 15.0; // Vitesse lente forcée pour fermeture benne
 ELSE
     IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
         // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche, ajouté
@@ -226,13 +226,13 @@ ELSE
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
     ELSIF PRG_10_Outputs.ManuActive THEN
-        // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course grappin (FdcGrappin) appliquées
+        // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course benne (FdcBucket) appliquées
         // au pilotage INDIVIDUEL **ET** COUPLÉ de M2 désormais (demande utilisateur — "que ce soit
         // couplé ou pas couplé, il faut rester dans les butées"). Ex-comportement (couplé non
         // masqué) retiré : c'était une incohérence, pas un choix voulu.
-        IF (PRG_10_Outputs.M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdGrappinOk) THEN
+        IF (PRG_10_Outputs.M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdBucketOk) THEN
             M2_Direction_Active := 1;
-        ELSIF (PRG_10_Outputs.M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevGrappinOk) THEN
+        ELSIF (PRG_10_Outputs.M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevBucketOk) THEN
             M2_Direction_Active := -1;
         ELSE
             M2_Direction_Active := 0;
@@ -257,17 +257,17 @@ ELSE
     END_IF;
 END_IF;
 
-// ── 2bis. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE GRAPPIN ─────
-// 🆕 REX 2026-07-08 : instGrappin est appelé en premier (§0), donc son Busy est frais dans CE scan
+// ── 2bis. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE BENNE ─────
+// 🆕 REX 2026-07-08 : instBucket est appelé en premier (§0), donc son Busy est frais dans CE scan
 // (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de FB_Joystick_0 (PRG_01),
-// calculé AVANT ce scan de PRG_06. Le désarmement homme-mort sur front descendant de Grappin.Busy
+// calculé AVANT ce scan de PRG_06. Le désarmement homme-mort sur front descendant de Benne.Busy
 // (FB_Joystick §4ter-ter) ne prend donc effet qu'au scan SUIVANT (~10ms de retard structurel). Si
-// l'opérateur tient encore le manche poussé au moment exact où le grappin termine, M1 ET M2
+// l'opérateur tient encore le manche poussé au moment exact où le benne termine, M1 ET M2
 // recevaient pendant ce scan la commande manche brute (RelayFwd/Rev + BrakeCmd qui s'engage puis se
 // coupe aussitôt = "clignotement" du frein, constaté sur site). On force ici l'arrêt immédiat,
 // sans attendre le désarmement (qui reste nécessaire pour la suite : repassage au neutre exigé).
-GrappinBusyFallEdge(CLK := instGrappin.Busy);
-IF GrappinBusyFallEdge.Q THEN
+BenneBusyFallEdge(CLK := instBucket.Busy);
+IF BenneBusyFallEdge.Q THEN
     M1_StartStop_Active := FALSE;
     M2_StartStop_Active := FALSE;
 END_IF;
@@ -280,10 +280,10 @@ instWinchSync(
     // M1/M2 au même scan (couplage croisé), mais leur arrêt PHYSIQUE (rampe de décél, même en
     // simulation) n'est jamais parfaitement simultané à la position exacte — écart normal et non
     // significatif à ce moment précis, pas une vraie désynchro. Suppression pendant qu'un des deux
-    // treuils est en butée (Ascent OU Descent), même principe que la suppression pendant GrappinBusy
+    // treuils est en butée (Ascent OU Descent), même principe que la suppression pendant BenneBusy
     // déjà existante. Lu avec 1 scan de retard (ForbidAscent/DescentMx_Active calculés plus bas dans
     // ce fichier) — acceptable, même raisonnement que SyncMinorDeviation ci-dessous.
-    Enable          := PRG_04_Modes.instModes.SyncEnable AND NOT instGrappin.Busy
+    Enable          := PRG_04_Modes.instModes.SyncEnable AND NOT instBucket.Busy
                         AND NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_04_Modes.instModes.InhibitM2
                         AND NOT (ForbidAscentM1_Active OR ForbidAscentM2_Active
                                  OR ForbidDescentM1_Active OR ForbidDescentM2_Active), // 🆕 REX 2026-07-08 (7)
@@ -296,7 +296,7 @@ instWinchSync(
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
     SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
     SyncToleranceM  := GVL_PERSISTENT.WinchSyncTolerance_M,
-    ActiveOffsetM   := instGrappin.ActiveOffsetM,
+    ActiveOffsetM   := instBucket.ActiveOffsetM,
     
     RelayFwdM1      := instWinchM1.RelayFwd,
     RelayFwdM2      := instWinchM2.RelayFwd,
@@ -313,14 +313,14 @@ instWinchSync(
 );
 
 // Table active M2 (verrouille TOUS les paliers sur la combinaison réelle du palier 1 si
-// vitesse lente requise pour le grappin — REX 2026-07-08 : l'ancienne version mettait
+// vitesse lente requise pour le benne — REX 2026-07-08 : l'ancienne version mettait
 // TOUS les contacteurs à FALSE pour tous les paliers, y compris le palier 1 lui-même, ce qui
 // donnait un mouvement à vitesse quasi nulle/insuffisante (résistance rotorique maximale, aucun
 // contacteur de vitesse engagé). Le palier 1 réel (`WinchSpeedStepTable.P1Rx`) engage déjà le
 // contacteur le plus lent prévu pour un fonctionnement normal — on le duplique sur les 5 paliers
-// pour que M2 reste TOUJOURS à cette vitesse pendant le grappin, quelle que soit l'amplitude
+// pour que M2 reste TOUJOURS à cette vitesse pendant le benne, quelle que soit l'amplitude
 // joystick (peu importe le palier sélectionné par l'hystérésis, le résultat est identique).
-IF instGrappin.M2_ForceSlowSpeed THEN
+IF instBucket.M2_ForceSlowSpeed THEN
     M2_SpeedStepTableActive.P1R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
     M2_SpeedStepTableActive.P1R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
     M2_SpeedStepTableActive.P1R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
@@ -361,12 +361,12 @@ IF GVL_PERSISTENT.LimitLegalEnabled THEN
 END_IF;
 
 // ── 5bis. COUPLAGE CROISÉ M1/M2 — REX 2026-07-07 ────────────────────────
-// Hors synchro (Grappin.Busy ou SyncEnable=FALSE N2) : chaque treuil réagit à SA PROPRE limite/
+// Hors synchro (Benne.Busy ou SyncEnable=FALSE N2) : chaque treuil réagit à SA PROPRE limite/
 // défaut uniquement (commande indépendante voulue). En synchro (SyncActive, mouvement cohérent
 // voulu) : n'importe quel arrêt (SafeStop, limite câble, limite légale, fin de course haut) sur
 // UN treuil coupe IMMÉDIATEMENT les deux — pas d'attente du filtre 500ms de FB_WinchSync.
-// 🔧 REX 2026-07-07 : instGrappin.M1SlipDetected ajouté à M1 uniquement (Méca C couche 1) — M2
-// est déjà arrêté par son propre mécanisme SevereError interne à FB_Grappin, pas besoin ici.
+// 🔧 REX 2026-07-07 : instBucket.M1SlipDetected ajouté à M1 uniquement (Méca C couche 1) — M2
+// est déjà arrêté par son propre mécanisme SevereError interne à FB_Bucket, pas besoin ici.
 // 🔧 REX 2026-07-08 (4) : instWinchSync.Error (bit0+bit1) → SEUL bit1 (incohérence commande,
 // grave) reste ici en SafeStop fast. Bit0 (écart mineur) → arrêt rampe normale via StartStop
 // (voir SyncMinorDeviation, §1/§2 plus haut) — Concept 1, ne pas dégrader le comportement voulu.
@@ -376,7 +376,7 @@ END_IF;
 SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
                        OR (NOT GVL_PERSISTENT.SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000))
-                       OR instGrappin.M1SlipDetected;
+                       OR instBucket.M1SlipDetected;
 SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
                        OR (NOT GVL_PERSISTENT.SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000));
@@ -404,7 +404,7 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // Bypass en MAINT_N2 via `HomingApproachEnable` (FB_Modes, même pattern que SyncEnable) :
 // nécessite MAINT_N2 ET une case IHM activée consciemment pour dépasser CableLimitAscentMx_M
 // et aller chercher le capteur physique en petite vitesse (Homing).
-// 🆕 REX 2026-07-15 (8) : flag dédié — miroir IHM (GVL_IHM.WinchM1.CableLimitAscentReached, voir
+// 🆕 REX 2026-07-15 (8) : flag dédié — miroir IHM (GVL_IHM.M1TreuilRetenue.CableLimitAscentReached, voir
 // PRG_09_Supervision), symétrique à CableLimitDescentReached. Réutilisé ci-dessous dans ForbidAscentM1_Raw.
 CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
@@ -417,10 +417,10 @@ ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M))
                        OR CableLimitAscentM1Reached;
 // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
-// La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le grappin est fermé (IsClosed)
-// ou en cours de fermeture (CloseReq). Sinon (grappin ouvert/en cours d'ouverture), M2 doit
+// La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le benne est fermé (IsClosed)
+// ou en cours de fermeture (CloseReq). Sinon (benne ouvert/en cours d'ouverture), M2 doit
 // s'arrêter à la butée normale (CableLimitAscentM2_M) pour s'arrêter proprement en même temps que M1.
-M2_LimitShift := SEL(GVL_PERSISTENT.GrappinState.IsClosed OR instGrappin.CloseReq, 0.0, GVL_PERSISTENT.GrappinConfig.OffsetCloseM);
+M2_LimitShift := SEL(GVL_PERSISTENT.BucketState.IsClosed OR instBucket.CloseReq, 0.0, GVL_PERSISTENT.BucketConfig.OffsetCloseM);
 
 // 🆕 REX 2026-07-15 (8) : idem M1 (voir ci-dessus).
 CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
@@ -503,7 +503,7 @@ instWinchM2(
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage grappin fermé).
+    // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage benne fermé).
     TopLimitM               := GVL_PERSISTENT.CableLimitAscentM2_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,

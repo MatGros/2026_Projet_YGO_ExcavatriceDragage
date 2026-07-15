@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   🪣 FB_Grappin — Commande d'ouverture/fermeture du grappin
+   🪣 FB_Bucket — Commande d'ouverture/fermeture du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie12_Fonction_Grappin_v1.1.md
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Benne_v1.1.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
       (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
-      FERME désormais le grappin, DEROULAGE M2 (Direction=-1) l'OUVRE
+      FERME désormais le benne, DEROULAGE M2 (Direction=-1) l'OUVRE
       (c'était l'inverse avant). Voir Partie12 v1.1 §REX.
    ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
       ne sont fiables que si les codeurs absolus sont référencés (Partie10).
@@ -15,15 +15,15 @@
       que M2 bouge seul. Si M1 glisse de plus de M1SlipToleranceM (1.0 m) pendant
       BUSY → SevereError (coupe M2 via le mécanisme existant) + sortie dédiée
       M1SlipDetected (à consommer côté PRG_06_WinchControl pour forcer SafeStop
-      sur M1 spécifiquement — FB_Grappin ne pilote pas M1). Couche de secours si
+      sur M1 spécifiquement — FB_Bucket ne pilote pas M1). Couche de secours si
       cette couche ne suffit pas : voir FB_Safety_Winch bit9 (tolérance 2.0 m,
       escalade PowerCutOff).
    🆕 REX 2026-07-08 (mise en service, demande utilisateur) :
-      - `ConfirmOpenPosition` : bouton IHM dédié de RÉFÉRENCEMENT du grappin en position ouverte
+      - `ConfirmOpenPosition` : bouton IHM dédié de RÉFÉRENCEMENT du benne en position ouverte
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
-        GrappinState.IsOpen directement, à utiliser juste après le référencement des codeurs
-        M1/M2 (les 2 à la même valeur, grappin physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md "flux nominal, grappin ouvert").
+        BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
+        M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
+        voir DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un CmdOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `ConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
@@ -31,14 +31,14 @@
       - `M1_Busy`/`M2_Busy` : la demande d'ouverture/fermeture n'est acceptée (mémorisation
         `CloseReq`/`OpenReq` + transition vers BUSY) QUE si les deux treuils sont à l'arrêt —
         tous modes. Avant ce correctif, rien ne le garantissait ; un mouvement manuel sur M1
-        pouvait "traverser" l'armement du grappin (trou détecté par audit automatisme/IHM).
+        pouvait "traverser" l'armement du benne (trou détecté par audit automatisme/IHM).
       - Sens inverse borné pendant BUSY : l'opérateur peut désormais pousser le joystick dans
         le sens opposé au sens principal (recul/annulation partielle), mais UNIQUEMENT jusqu'à
         la position M2 mémorisée au démarrage de la demande (`M2StartPosM`) — jamais au-delà
         (pas de réouverture/refermeture complète depuis ce sens inverse).
    ═══════════════════════════════════════════════════════════════ *)
 
-FUNCTION_BLOCK PUBLIC FB_Grappin
+FUNCTION_BLOCK PUBLIC FB_Bucket
 VAR_INPUT
     Enable              : BOOL;             // Activation générale
     Reset               : BOOL;             // Acquittement défauts (front)
@@ -52,13 +52,13 @@ VAR_INPUT
     CablePosM2          : REAL;             // Position réelle câble treuil M2 (mètres)
     HomedM1             : BOOL;             // Codeur M1 référencé (instHomingM1.Homed) — REX 2026-07-07
     HomedM2             : BOOL;             // Codeur M2 référencé (instHomingM2.Homed) — REX 2026-07-07
-    Config              : ST_GrappinConfig; // Configuration (RETAIN site)
+    Config              : ST_BucketConfig; // Configuration (RETAIN site)
     TimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
     M1SlipToleranceM    : REAL := 1.0;      // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
     M1_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM1.Busy — doit être à l'arrêt pour armer une demande
     M2_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM2.Busy — doit être à l'arrêt pour armer une demande
-     ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement grappin ouvert (front, mise en service — voir bandeau)
-     ConfirmClosePosition : BOOL;            // 🆕 REX 2026-07-08 : bouton IHM référencement grappin fermé (front, mise en service)
+     ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement benne ouvert (front, mise en service — voir bandeau)
+     ConfirmClosePosition : BOOL;            // 🆕 REX 2026-07-08 : bouton IHM référencement benne fermé (front, mise en service)
      InhibitM1           : BOOL;             // 🆕 REX 2026-07-08 : M1 est inhibé
      InhibitM2           : BOOL;             // 🆕 REX 2026-07-08 : M2 est inhibé
  END_VAR
@@ -82,7 +82,7 @@ VAR_OUTPUT
                                              // positive, décroît vers 0) — 0.0 hors mouvement (READY/DONE)
 END_VAR
 VAR_IN_OUT
-    GrappinState        : ST_GrappinState;  // État physique du grappin mémorisé (RETAIN)
+    BucketState        : ST_BucketState;  // État physique du benne mémorisé (RETAIN)
 END_VAR
 VAR
     FirstCycle          : BOOL := TRUE;     // Drapeau de premier cycle API
@@ -104,7 +104,7 @@ END_VAR
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT EmergencyStopOk THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
-        GrappinState.StateIncoherent := TRUE;
+        BucketState.StateIncoherent := TRUE;
     END_IF;
     Ready := FALSE;
     Busy := FALSE;
@@ -135,30 +135,30 @@ END_IF;
 IF FirstCycle THEN
     FirstCycle := FALSE;
     IF Config.CoherenceLimitM > 0.01 THEN
-        IF GrappinState.IsOpen AND NOT GrappinState.IsClosed THEN
-            IF ABS(CablePosM2 - GrappinState.LastPosM2Open) > Config.CoherenceLimitM THEN
-                GrappinState.StateIncoherent := TRUE;
+        IF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+            IF ABS(CablePosM2 - BucketState.LastPosM2Open) > Config.CoherenceLimitM THEN
+                BucketState.StateIncoherent := TRUE;
             END_IF;
-        ELSIF GrappinState.IsClosed AND NOT GrappinState.IsOpen THEN
-            IF ABS(CablePosM2 - GrappinState.LastPosM2Close) > Config.CoherenceLimitM THEN
-                GrappinState.StateIncoherent := TRUE;
+        ELSIF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
+            IF ABS(CablePosM2 - BucketState.LastPosM2Close) > Config.CoherenceLimitM THEN
+                BucketState.StateIncoherent := TRUE;
             END_IF;
         ELSE
             // Si l'état n'a jamais été initialisé (les deux FALSE/TRUE), on signale une incohérence
-            GrappinState.StateIncoherent := TRUE;
+            BucketState.StateIncoherent := TRUE;
         END_IF;
     ELSE
         // Limite non configurée ou invalide, par précaution on force l'incohérence
-        GrappinState.StateIncoherent := TRUE;
+        BucketState.StateIncoherent := TRUE;
     END_IF;
 END_IF;
 
 // Met à jour le bit1 d'erreur si incohérence détectée
-IF GrappinState.StateIncoherent THEN
+IF BucketState.StateIncoherent THEN
     ErrorId := ErrorId OR 16#0002;
     // 🆕 REX 2026-07-08 : Force l'état inconnu (ni ouvert ni fermé) si incohérence active
-    GrappinState.IsOpen := FALSE;
-    GrappinState.IsClosed := FALSE;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
 ELSE
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
@@ -173,36 +173,36 @@ ELSE
 END_IF;
 
 // 🆕 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE (mise en service, REX 2026-07-08) — voir bandeau
-// Action de CONFIRMATION pure (aucun mouvement, ne pilote pas M2) : mémorise GrappinState.IsOpen
-// directement, à utiliser juste après le référencement des codeurs (M1=M2, grappin physiquement
+// Action de CONFIRMATION pure (aucun mouvement, ne pilote pas M2) : mémorise BucketState.IsOpen
+// directement, à utiliser juste après le référencement des codeurs (M1=M2, benne physiquement
 // ouvert vérifié par l'opérateur). Gardée comme ConfirmCoherence (FB_Encoder_Homing) : front,
 // MAINT_N1/N2 uniquement, codeurs déjà référencés, treuils à l'arrêt (pas de séquence en cours).
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
    AND NOT M1_Busy AND NOT M2_Busy THEN
-    GrappinState.IsOpen := TRUE;
-    GrappinState.IsClosed := FALSE;
-    GrappinState.LastPosM2Open := CablePosM2;
-    GrappinState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
-    GrappinState.StateIncoherent := FALSE;
-    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts grappin lors du référencement manuel
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+    BucketState.LastPosM2Open := CablePosM2;
+    BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
+    BucketState.StateIncoherent := FALSE;
+    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
 // 🆕 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE (mise en service, REX 2026-07-08)
-// Même principe que ConfirmOpenPosition, mais pour initialiser le grappin comme FERMÉ.
+// Même principe que ConfirmOpenPosition, mais pour initialiser le benne comme FERMÉ.
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
    AND NOT M1_Busy AND NOT M2_Busy THEN
-    GrappinState.IsOpen := FALSE;
-    GrappinState.IsClosed := TRUE;
-    GrappinState.LastPosM2Close := CablePosM2;
-    GrappinState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
-    GrappinState.StateIncoherent := FALSE;
-    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts grappin lors du référencement manuel
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+    BucketState.LastPosM2Close := CablePosM2;
+    BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
+    BucketState.StateIncoherent := FALSE;
+    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
@@ -216,11 +216,11 @@ IF BusyEdge.Q THEN
     // 🆕 REX 2026-07-08 (demande utilisateur) : mémorise l'état d'origine (restauré si recul complet
     // jusqu'à M2StartPosM, voir §6 CASE BUSY) puis passe en position transitoire dès le démarrage du
     // mouvement — ni ouvert ni fermé pendant le trajet, quel que soit l'état mémorisé avant.
-    WasOpenAtStart := GrappinState.IsOpen;
-    WasClosedAtStart := GrappinState.IsClosed;
+    WasOpenAtStart := BucketState.IsOpen;
+    WasClosedAtStart := BucketState.IsClosed;
     LeftStartSinceArm := FALSE;
-    GrappinState.IsOpen := FALSE;
-    GrappinState.IsClosed := FALSE;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
 END_IF;
 
 IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) AND NOT InhibitM1 THEN
@@ -251,7 +251,7 @@ SevereError := (ErrorId AND 16#001D) <> 16#0000;
 
 IF SevereError THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
-        GrappinState.StateIncoherent := TRUE;
+        BucketState.StateIncoherent := TRUE;
     END_IF;
     M2_StartStop := FALSE;
     M2_Direction := 0;
@@ -273,9 +273,9 @@ CASE State OF
         M2_ForceSlowSpeed := FALSE;
         RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : pas de mouvement en cours
 
-        // 🆕 REX 2026-07-08 : demande grappin acceptée UNIQUEMENT si M1 ET M2 sont à l'arrêt (tous
+        // 🆕 REX 2026-07-08 : demande benne acceptée UNIQUEMENT si M1 ET M2 sont à l'arrêt (tous
         // modes) — évite qu'un mouvement en cours sur l'un des deux treuils "traverse" l'armement
-        // du grappin (audit sécurité). Ni mémorisation de la requête, ni démarrage tant que ce
+        // du benne (audit sécurité). Ni mémorisation de la requête, ni démarrage tant que ce
         // n'est pas vrai — l'opérateur doit refaire la demande une fois les treuils arrêtés.
         IF NOT M1_Busy AND NOT M2_Busy THEN
             // Mémorisation des requêtes IHM (l'une annule l'autre)
@@ -369,10 +369,10 @@ CASE State OF
                 M2_Direction := 0;
 
                 // Mémorisation de l'état physique fermé
-                GrappinState.IsOpen := FALSE;
-                GrappinState.IsClosed := TRUE;
-                GrappinState.LastPosM2Close := CablePosM2;
-                GrappinState.StateIncoherent := FALSE; // recalage réussi
+                BucketState.IsOpen := FALSE;
+                BucketState.IsClosed := TRUE;
+                BucketState.LastPosM2Close := CablePosM2;
+                BucketState.StateIncoherent := FALSE; // recalage réussi
 
                 CloseReq := FALSE;
                 State := E_State.DONE;
@@ -382,8 +382,8 @@ CASE State OF
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
 
-                GrappinState.IsOpen := WasOpenAtStart;
-                GrappinState.IsClosed := WasClosedAtStart;
+                BucketState.IsOpen := WasOpenAtStart;
+                BucketState.IsClosed := WasClosedAtStart;
 
                 CloseReq := FALSE;
                 State := E_State.DONE;
@@ -398,10 +398,10 @@ CASE State OF
                 M2_Direction := 0;
 
                 // Mémorisation de l'état physique ouvert
-                GrappinState.IsOpen := TRUE;
-                GrappinState.IsClosed := FALSE;
-                GrappinState.LastPosM2Open := CablePosM2;
-                GrappinState.StateIncoherent := FALSE; // recalage réussi
+                BucketState.IsOpen := TRUE;
+                BucketState.IsClosed := FALSE;
+                BucketState.LastPosM2Open := CablePosM2;
+                BucketState.StateIncoherent := FALSE; // recalage réussi
 
                 OpenReq := FALSE;
                 State := E_State.DONE;
@@ -411,8 +411,8 @@ CASE State OF
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
 
-                GrappinState.IsOpen := WasOpenAtStart;
-                GrappinState.IsClosed := WasClosedAtStart;
+                BucketState.IsOpen := WasOpenAtStart;
+                BucketState.IsClosed := WasClosedAtStart;
 
                 OpenReq := FALSE;
                 State := E_State.DONE;
@@ -450,10 +450,10 @@ END_IF;
 // l'arrivée (constat terrain) au lieu de converger progressivement vers M1 pendant l'enroulage.
 IF State = E_State.BUSY THEN
     // 🔧 REX 2026-07-08 : pendant le déplacement, l'offset actif suit la différence réelle
-    // de câble (M2 - M1) afin que la position corrigée de M2 reste stable (égale à M1, cad la hauteur du grappin)
+    // de câble (M2 - M1) afin que la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne)
     // sans à-coup, tandis que le câble brut de M2 montre son enroulement.
     ActiveOffsetM := CablePosM2 - CablePosM1;
-ELSIF CloseReq OR GrappinState.IsClosed THEN
+ELSIF CloseReq OR BucketState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
 ELSE
     // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert

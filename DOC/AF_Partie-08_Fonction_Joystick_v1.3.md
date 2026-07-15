@@ -21,7 +21,7 @@
 > rapide en inversion de sens (Fwd↔Rev) ne désarme pas. `DeadmanArmed` exposé en sortie. Défend
 > contre le calage AVANT et APRÈS armement, sans pénaliser les inversions de sens fréquentes.
 >
-> **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Translation→Chariot
+> **Version 1.2** — Renommage terminologique (demande utilisateur, 2026-07-02) : Translation→Translation
 > dans les renvois croisés (préfixe I/O physique M3 inchangé).
 > **Version 1.1** — Suite audit documentaire : `SafeStop` **retiré** de l'interface `FB_Joystick`
 > — ce FB **n'est pas un FB de mouvement** (Partie 3 v1.3 §1bis), il n'a donc pas `StartStop`/
@@ -42,7 +42,7 @@
 
 ## 🎯 1. Rôle métier
 
-Traduire le **geste opérateur** (2 axes + bouton) en une **consigne normalisée en %** exploitable par les treuils et la chariot.
+Traduire le **geste opérateur** (2 axes + bouton) en une **consigne normalisée en %** exploitable par les treuils et la translation.
 
 - 🕹️ 2 axes analogiques bruts (0..10000 pts) via nœud **CANopen**.
 - 🔘 1 bouton.
@@ -94,7 +94,7 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 **📤 Sorties clés**
 | Sortie | Type | Rôle |
 |--------|------|------|
-| `AxisCmdX` / `AxisCmdY` | `ST_AxisCmd` | Consigne normalisée. 🔧 (2026-07-02) `SpeedRef` désormais SIGNÉ (-100..+100 %, signe = sens) — consommée par `FB_Winch`/`FB_Chariot`, qui extraient la magnitude via `ABS()` |
+| `AxisCmdX` / `AxisCmdY` | `ST_AxisCmd` | Consigne normalisée. 🔧 (2026-07-02) `SpeedRef` désormais SIGNÉ (-100..+100 %, signe = sens) — consommée par `FB_Winch`/`FB_Translation`, qui extraient la magnitude via `ABS()` |
 | `SpeedXPct` / `SpeedYPct` | REAL | 🆕 (2026-07-02) Miroir direct de `AxisCmdX/Y.SpeedRef` (%) — lecture maintenance sans dépliage struct |
 | `DirectionX` / `DirectionY` | INT | 🆕 (2026-07-02) Miroir direct de `AxisCmdX/Y.Direction` (-1/0/+1) — lecture maintenance sans dépliage struct |
 | `Button` | BOOL | Bouton filtré |

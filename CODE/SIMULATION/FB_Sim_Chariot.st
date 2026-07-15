@@ -1,18 +1,18 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Chariot — Simulation dynamique du trajet chariot M3 (temps de parcours)
+   🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
-      instance CODESYS (voir `GVL_Chariot_M3_Stub.st`, doc Partie11 §9bis) par
-      une simulation par temps de parcours : le chariot "arrive" à la cible
+      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
+      une simulation par temps de parcours : le translation "arrive" à la cible
       sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
       continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
-      (M3 translation) — treuils/grappin/codeurs sont la priorité de ce lot.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT ChariotPosition_IsReal)
+      (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT TranslationPosition_IsReal)
    📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)
-                    — réutilise `GVL_Chariot_M3_Stub.StubChariotPositionSelect_IHM`
-   📥 RelayFwd/RelayRev : sens commandé (sorties du chariot, DEGRADED_IO)
+                    — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
+   📥 RelayFwd/RelayRev : sens commandé (sorties du translation, DEGRADED_IO)
    📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
                     utilisateur, pas de donnée réelle pour calibrer plus précisément)
    📤 PosFosse1/PosFosse2/PosMaintenance/PosTremie : TRUE quand la cible correspondante
@@ -21,9 +21,9 @@
       Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
    ═══════════════════════════════════════════════════════════════ *)
 
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Chariot) ===
+// === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Translation) ===
 
-FUNCTION_BLOCK PUBLIC FB_Sim_Chariot
+FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
     Enable      : BOOL;
     TargetNum   : INT;
@@ -45,7 +45,7 @@ VAR
     Reached         : BOOL;
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Chariot) ===
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Translation) ===
 
 IF NOT Enable THEN
     ElapsedS := 0.0;

@@ -13,8 +13,8 @@
 > refuse `MAINT_N2` sans mot de passe (stub), sort `SyncEnable` (→ `FB_WinchSync`).
 > **v1.4 (2026-07-08)** — Lot #9-17 : Intégration de l'inhibition unitaire des treuils (M1 ou M2) en `MAINT_N2` avec isolation complète de la sécurité (blocs de commande et de sécurité désactivés, erreurs effacées), exclusion mutuelle, filtrage supervision de `AnyFaultActive` et désactivation forcée de `SyncEnable`.
 > **Version 1.3 (2026-07-08)** — D_SYNCEN : Polarité inversée de `OverrideSync` → `SyncEnable` ; `TRUE` = synchro active (logique positive), défaut démande IHM devenu `TRUE`; pseudo-codes et descriptions mises à jour en conséquence.
-> **Version 1.2 (2026-07-04)** — Renommage terminologique (demande utilisateur) : Bucket→Grappin
-> (`OverrideGrappin`, `FB_Grappin`), Translation→Chariot — préfixe I/O physique M3 inchangé.
+> **Version 1.2 (2026-07-04)** — Renommage terminologique (demande utilisateur) : Bucket→Benne
+> (`OverrideBenne`, `FB_Benne`), Translation→Translation — préfixe I/O physique M3 inchangé.
 > **Version 1.1** — Suite audit documentaire : correction du pseudo-code d'override (§2) qui
 > plaçait à tort la limite légale dans `FB_Safety` (elle est **exclusivement** gérée par
 > `FB_Modes`, §3) ; `CoupeEnable` retiré (jamais une variable) au profit de `SafeStop`/`StartStop` ;
@@ -64,15 +64,15 @@ ponctuelles**, mais en conservant **un niveau de sécurité correct**.
 | Caractéristique | État |
 |-----------------|------|
 | Commande | Joystick, treuils **pilotables unitairement** (M1, M2 séparés) |
-| Contrôle synchro (`FB_WinchSync`) | ✅ Actif (sauf phase grappin — suspension automatique, Partie 4 §3bis) |
+| Contrôle synchro (`FB_WinchSync`) | ✅ Actif (sauf phase benne — suspension automatique, Partie 4 §3bis) |
 | **Demande de synchronisation (`SyncEnable`)** | ✅ **Disponible en MAINT_N1** (voir §6bis — `SyncEnable=FALSE` désactive la synchro et lève aussi le SafeStop mou de câble) |
-| Contrôle grappin (`FB_Grappin`) | ✅ Actif |
+| Contrôle benne (`FB_Benne`) | ✅ Actif |
 | Codeurs / freins / capteurs | ✅ Actifs (sécurités maintenues) |
 | Limite légale profondeur | ⚠️ Non bloquante, **signalisation** IHM |
 | Authentification | Aucune (un sélecteur de choix pourra élargir vers N2 à la marche) |
 
 Usages : positionnement init après démarrage, tests moteurs/freins en conditions sûres,
-remise en ordre légère (ex. grappin à recaler en vitesse réduite).
+remise en ordre légère (ex. benne à recaler en vitesse réduite).
 
 ### 🔴 Maintenance Niveau 2 (`MAINT_N2`)
 Mode à **mot de passe** plus dur, **droits augmentés**, avec la possibilité de **désactiver
@@ -84,7 +84,7 @@ de l'opérateur (mot de passe + droits).
 | Authentification | 🔑 Mot de passe + droits |
 | Commande | Joystick, treuils **indépendants** |
 | Demande de synchro | ✅ Configurable (ex. codeur mort) |
-| Override contrôle grappin | ⛔→ désactivable |
+| Override contrôle benne | ⛔→ désactivable |
 | Override limite légale | ⛔→ désactivable (signalisation maintenue) |
 | Pilotage sans codeur | ✅ possible |
 | Pilotage sans/forçant frein | ✅ possible selon droits |
@@ -104,7 +104,7 @@ IF (Mode = MAINT_N1 OR (Mode = MAINT_N2 AND PasswordOk)) THEN
     SyncEnable   := SyncEnableRequest;   // case à cocher opérateur (MAINT_N1 ou N2), TRUE = synchro active
 END_IF
 IF Mode = MAINT_N2 AND PasswordOk THEN
-    OverrideGrappin := UserSelectIHM;
+    OverrideBenne := UserSelectIHM;
     OverrideLimit  := UserSelectIHM;
     MsgIHM := "MAINT N2 active";
 END_IF
@@ -140,7 +140,7 @@ END_IF;
 
 // Application aux blocs concernés :
 FB_WinchSync.Enable       := SyncEnable AND NOT InhibitM1Request AND NOT InhibitM2Request;  // synchro active si SyncEnable=TRUE
-FB_Grappin.ControlEnable   := NOT OverrideGrappin;
+FB_Benne.ControlEnable   := NOT OverrideBenne;
 LimitLegal.Enabled        := NOT OverrideLimit;  // interne à FB_Modes (PAS FB_Safety, voir §3)
 
 // Activation unitaire des treuils et de leur sécurité
@@ -150,7 +150,7 @@ FB_WinchM2.Enable          := NOT InhibitM2Request;
 FB_Safety_WinchM2.Enable   := NOT InhibitM2Request;
 
 IF NOT (Mode = MAINT_N1 OR Mode = MAINT_N2) THEN
-    SyncEnable := TRUE; OverrideGrappin := FALSE; OverrideLimit := FALSE;  // synchro active par défaut, autres overrides désactivés
+    SyncEnable := TRUE; OverrideBenne := FALSE; OverrideLimit := FALSE;  // synchro active par défaut, autres overrides désactivés
 END_IF
 ```
 
@@ -234,7 +234,7 @@ conditions globales OK ».
 ### Récupération (exemple : codeur M1 mort)
 ```
 - L'axe treuil M1 est SIGNALÉ en défaut ; ses commandes seront compliquées/inopérantes.
-- Le treuil M2 reste fonctionnel (ex. ouvrir/fermer grappin possible via M2).
+- Le treuil M2 reste fonctionnel (ex. ouvrir/fermer benne possible via M2).
 - Meilleure pratique : passer en MAINT_N2 :
     → choisir de remonter SYNCHRONE mais SANS contrôle de synchronisme
       (codeurs morts → désactiver SyncEnable) ;
@@ -280,7 +280,7 @@ l'activation d'un niveau de Maintenance) qui réunit **trois effets simultanés*
 | **Lève ou maintient le SafeStop mou de câble selon l'état** | `FB_Safety_Winch` : si `SyncEnable=FALSE`, le bit3 n'alimente plus `SafeStop` mais active `ForbidAscent` (montée interdite M1+M2) et laisse la descente libre (pour rattraper le câble) — voir Partie9 §4ter et D_SLACK_1 |
 
 **Disponibilité** : `SyncEnable` est accessible **dès MAINT_N1** (sans mot de passe) et bien
-sûr en MAINT_N2. Les autres overrides (`OverrideGrappin`, `OverrideLimit`) restent
+sûr en MAINT_N2. Les autres overrides (`OverrideBenne`, `OverrideLimit`) restent
 **exclusifs à MAINT_N2** (droits étendus, mot de passe requis).
 
 > ⚠️ **Rappel sécurité** : avec `SyncEnable=FALSE` (demande de synchro désactivée), l'opérateur
@@ -294,5 +294,5 @@ sûr en MAINT_N2. Les autres overrides (`OverrideGrappin`, `OverrideLimit`) rest
 ## 📚 Documents liés
 - **Partie 2 v2.5** — Architecture (`FB_Modes`, `SafeStop`/`StartStop`, AU).
 - **Partie 3 v1.2** — Contrat FB (`Mode`, `EmergencyStopOk`, `SafeStop`, reset).
-- **Partie 4** — Cycle (étapes, synchro, grappin, rampes).
+- **Partie 4** — Cycle (étapes, synchro, benne, rampes).
 - **Partie 6** — Conditionnement E/S.

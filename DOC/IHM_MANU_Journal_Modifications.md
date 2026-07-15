@@ -5,7 +5,7 @@
 
 ## 📌 BANDEAU D'INTRODUCTION
 
-La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE** ajouté pour les besoins de mise en service terrain (2026-07-09). Elle permet un **pilotage direct des sorties physiques** (relais M1/M2, contacteurs vitesse K1-K4, variateur M3 EtherCAT) en **contournant complètement le programme fonctionnel normal** (PRG_06_WinchControl, PRG_07_ChariotControl, PRG_03_Safety), avec un **minimum de sécurités logicielles**.
+La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE** ajouté pour les besoins de mise en service terrain (2026-07-09). Elle permet un **pilotage direct des sorties physiques** (relais M1/M2, contacteurs vitesse K1-K4, variateur M3 EtherCAT) en **contournant complètement le programme fonctionnel normal** (PRG_06_WinchControl, PRG_07_TranslationControl, PRG_03_Safety), avec un **minimum de sécurités logicielles**.
 
 **Responsabilité du nettoyage futur :** Ce document enumère CHAQUE modification pour que, une fois la mise en service achevée, il soit simple et exhaustif de supprimer/rétablir le code normal.
 
@@ -19,26 +19,26 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 
 **Résumé du changement :** IHM_MANU ne bypass plus `PRG_06_WinchControl`/`FB_Safety_Winch` pour M1/M2 — il devient une **3ᵉ source d'arbitrage** (à côté de SEMI_AUTO et joystick Auto), au même titre que les autres, pour bénéficier nativement de la rampe accel/décel, du ralentissement en zone d'approche de butée, et de la sécurité `FB_Safety_Winch` (désormais **toujours active**, plus de bypass conditionnel). **Motif** : arrêts violents constatés en simulation aux butées logicielles (pas de ralentissement, coupure relais instantanée) + confusions "Fault allumé mais je peux bouger" (butées logicielles traitées comme un vrai défaut machine).
 
-**Ce qui reste un VRAI bypass dérogatoire (inchangé, sections 3/4/5/6 toujours valables) :** Chariot M3 (logique de bypass — voir nuance section 11 ci-dessous), Auxiliaires Hydrauliques (Grille/Casque), homing direct simulé M1/M2 (`PRG_02_Encoders`), timer visuel `FB_Encoder_Abs`.
+**Ce qui reste un VRAI bypass dérogatoire (inchangé, sections 3/4/5/6 toujours valables) :** Translation M3 (logique de bypass — voir nuance section 11 ci-dessous), Auxiliaires Hydrauliques (Grille/Casque), homing direct simulé M1/M2 (`PRG_02_Encoders`), timer visuel `FB_Encoder_Abs`.
 
 **Nouveau point provisoire ajouté (section 10)** : plafond palier "essais progressifs" (`WinchMaxStepFwd/Rev`) — réactivé spécifiquement pour cette session, TEMPORAIRE, à retirer avec le reste (voir `PLAN_TASK_v1.0.md` T28).
 
-## 🆕 MISE À JOUR — SESSION 2026-07-15 (2), sortie Chariot M3 de `ST_IHM_MANU`
+## 🆕 MISE À JOUR — SESSION 2026-07-15 (2), sortie Translation M3 de `ST_IHM_MANU`
 
 **Ce qui a changé pour M3 :** Les champs de commande/diagnostic manuels M3 (`M3_RelayFwd/Rev`,
 `M3_FreqSetpoint/Actual`, `M3_CommandWordMonitor/StatusWordMonitor`, `M3_CommReady/PowerReady`)
-sont **retirés de `ST_IHM_MANU`** (struct provisoire) et migrés vers `ST_ChariotHMI`
-(`GVL_IHM.ChariotM3`, struct **définitif**), renommés sans préfixe `M3_` (`ReqFwd`/`ReqRev`/
+sont **retirés de `ST_IHM_MANU`** (struct provisoire) et migrés vers `ST_TranslationHMI`
+(`GVL_IHM.TranslationM3`, struct **définitif**), renommés sans préfixe `M3_` (`ReqFwd`/`ReqRev`/
 `FreqSetpointHz`) et avec le diag variateur décodé (`DriveCommReady`/`DrivePowerReady` au lieu
 d'un `WORD` brut). Voir section 11 pour le détail.
 
 **Ce qui n'a PAS changé (la vraie dérogation reste active) :** La logique de bypass elle-même
 — `PRG_10_Outputs` écrit toujours `M3_CommandWord`/`M3_SetpointFrequencyHz` directement quand
-`ManuActive=TRUE`, sans passer par `FB_Chariot`/`FB_Safety_Chariot` (sections 3/7 toujours
+`ManuActive=TRUE`, sans passer par `FB_Translation`/`FB_Safety_Translation` (sections 3/7 toujours
 valables sur le fond). Seule la **localisation des variables** change — objectif : permettre
 de développer/tester l'IHM (activation progressive bus EtherCAT → mouvements → freins/
 sécurité, via `GVL_Simulation.VariateurM3_IsReal`/`ContactorFeedbackM3_IsReal`/
-`ChariotPosition_IsReal`, déjà granulaires) sans dépendre du switch global `ModeDisable`.
+`TranslationPosition_IsReal`, déjà granulaires) sans dépendre du switch global `ModeDisable`.
 
 ---
 
@@ -61,12 +61,12 @@ sécurité, via `GVL_Simulation.VariateurM3_IsReal`/`ContactorFeedbackM3_IsReal`
 - `HomingEncoder_M1/M2 : BOOL` — front = référencement codeur (OR avec CmdHome existant, **aucune dérogation sécurité**)
 - `M1_M2_RelayFwd/Rev : BOOL` — commandes couplées (mouvement simultané M1+M2)
 - `M1_M2_Contactor1-4 : BOOL` — contacteurs vitesse K1-K4 communs (un seul actif à la fois, interlock fail-safe)
-- ~~`M3_RelayFwd/Rev`~~, ~~`M3_FreqSetpoint/Actual`~~, ~~`M3_CommandWordMonitor/StatusWordMonitor`~~, ~~`M3_CommReady/PowerReady`~~ — **retirés le 2026-07-15 (2)**, migrés vers `GVL_IHM.ChariotM3` (`ST_ChariotHMI`, struct définitif — voir section 11).
+- ~~`M3_RelayFwd/Rev`~~, ~~`M3_FreqSetpoint/Actual`~~, ~~`M3_CommandWordMonitor/StatusWordMonitor`~~, ~~`M3_CommReady/PowerReady`~~ — **retirés le 2026-07-15 (2)**, migrés vers `GVL_IHM.TranslationM3` (`ST_TranslationHMI`, struct définitif — voir section 11).
 - `GridOpenCmd/GridCloseCmd : BOOL` — commandes maintenues ouverture/fermeture grille.
 - `HelmetOpenCmd/HelmetCloseCmd : BOOL` — commandes maintenues ouverture/fermeture casque.
-- `FdcGrappinOpenEnable/CloseEnable : BOOL` — activation HMI des sécurités virtuelles grappin.
-- `GrappinDelta : REAL` — écart en mètres M1-M2 en temps réel.
-- `FdcGrappinOpenActive/CloseActive : BOOL` — états actifs de fin de course grappin (coupe les relais M2).
+- `FdcBenneOpenEnable/CloseEnable : BOOL` — activation HMI des sécurités virtuelles benne.
+- `BenneDelta : REAL` — écart en mètres M1-M2 en temps réel.
+- `FdcBenneOpenActive/CloseActive : BOOL` — états actifs de fin de course benne (coupe les relais M2).
 - `WinchMaxStepFwd/WinchMaxStepRev : INT` — réglage dynamique des limites de vitesse manuelles (paliers max en montée/descente).
 
 **À supprimer au nettoyage :** Fichier entier.
@@ -84,7 +84,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ### 3. **CODE/MAIN/PRG_10_Outputs.st** — Trois blocs balisés Début/Fin IHM_MANU
 
-> ⚠️ **PARTIELLEMENT PÉRIMÉ (session 2026-07-15)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 — remplacé par le pilotage `FB_Winch` (voir section 8). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcGrappin`) qui alimente désormais `PRG_06_WinchControl`, et la partie **M3/Auxiliaires qui reste un vrai bypass, inchangée**. Le "Bloc 3" (PowerCutOff) reste valable tel quel.
+> ⚠️ **PARTIELLEMENT PÉRIMÉ (session 2026-07-15)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 — remplacé par le pilotage `FB_Winch` (voir section 8). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBenne`) qui alimente désormais `PRG_06_WinchControl`, et la partie **M3/Auxiliaires qui reste un vrai bypass, inchangée**. Le "Bloc 3" (PowerCutOff) reste valable tel quel.
 
 #### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–90)
 
@@ -158,16 +158,16 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 **Logique :**
 1. Calcul `ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable` (logique inversée)
-2. Affichage position codeurs M1/M2 et calcul de l'écart `GrappinDelta` (M1 - M2).
-3. Évaluation des sécurités actives : `FdcGrappinOpenActive` (si `FdcGrappinOpen` est coché et `delta >= 0.0`) et `FdcGrappinCloseActive` (si `FdcGrappinClose` est coché et `delta <= -10.0`).
+2. Affichage position codeurs M1/M2 et calcul de l'écart `BenneDelta` (M1 - M2).
+3. Évaluation des sécurités actives : `FdcBenneOpenActive` (si `FdcBenneOpen` est coché et `delta >= 0.0`) et `FdcBenneCloseActive` (si `FdcBenneClose` est coché et `delta <= -10.0`).
 4. **IF ManuActive THEN :**
-   - **Aiguillage Source** : Si `JoystickSelect` = TRUE, les commandes `Demand` viennent du Joystick CANopen (Y -> Winch sélectionné par `JoystickWinchSelect`, X -> Chariot M3 avec consigne fréquence calculée `SpeedRef * 0.5`). Sinon (mode HMI bouton), les commandes sont automatiquement maintenues pendant la décélération de la rampe HMI pour un arrêt progressif et sécurisé, et les demandes antagonistes sont verrouillées croisées.
-   - **Contrôle Winch M2** : Sécurité FDC Grappin active applique le blocage individuel de M2 (`FdcGrappinOpenActive` coupe la descente, `FdcGrappinCloseActive` coupe la montée). Les commandes couplées contournent cette limite pour éviter la divergence.
+   - **Aiguillage Source** : Si `JoystickSelect` = TRUE, les commandes `Demand` viennent du Joystick CANopen (Y -> Winch sélectionné par `JoystickWinchSelect`, X -> Translation M3 avec consigne fréquence calculée `SpeedRef * 0.5`). Sinon (mode HMI bouton), les commandes sont automatiquement maintenues pendant la décélération de la rampe HMI pour un arrêt progressif et sécurisé, et les demandes antagonistes sont verrouillées croisées.
+   - **Contrôle Winch M2** : Sécurité FDC Benne active applique le blocage individuel de M2 (`FdcBenneOpenActive` coupe la descente, `FdcBenneCloseActive` coupe la montée). Les commandes couplées contournent cette limite pour éviter la divergence.
    - **Vitesse Winch** : Si Joystick, utilisation de `FB_SpeedStep` pour décoder K1-K4 sur la vitesse du joystick (avec limitation en descente). Si HMI bouton, utilisation de la même fonction `FB_SpeedStep` connectée à la rampe de vitesse `instHmiSpeedRamp` (démarrage à 0%, montée progressive à 100% tant que le bouton est maintenu, décélération progressive vers 0% au relâchement, avec limitation en descente).
    - **Auxiliaires Hydrauliques** : Mappage des commandes Grille / Casque action maintenue, avec interlock logique, et forçage automatique de `PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := TRUE` en mouvement.
-   - **Verrouillage de sécurité global** : Toutes les commandes effectives (treuils, chariot, auxiliaires) sont filtrées par `PRG_00_Inputs.EmergencyStopOk` afin de couper immédiatement tout mouvement (et arrêter la simulation des codeurs sur PC) en cas d'arrêt d'urgence actif ou de défaut critique.
-   - Recalcul des VAR_INPUT existants (M1RelayFwd, M1RelayRev, M1BrakeCmd, M1/M2SpeedContactor1-4, ChariotBrakeCmd).
-5. **Chariot M3 — mot de commande EtherCAT direct :**
+   - **Verrouillage de sécurité global** : Toutes les commandes effectives (treuils, translation, auxiliaires) sont filtrées par `PRG_00_Inputs.EmergencyStopOk` afin de couper immédiatement tout mouvement (et arrêter la simulation des codeurs sur PC) en cas d'arrêt d'urgence actif ou de défaut critique.
+   - Recalcul des VAR_INPUT existants (M1RelayFwd, M1RelayRev, M1BrakeCmd, M1/M2SpeedContactor1-4, TranslationBrakeCmd).
+5. **Translation M3 — mot de commande EtherCAT direct :**
    - Si `ManuActive AND M3Fwd_Eff` → `M3_CommandWord := 1` + fréquence
    - Si `ManuActive AND M3Rev_Eff` → `M3_CommandWord := 2` + fréquence
    - Sinon → `M3_CommandWord := 0` (arrêt, couvre aussi le mode normal)
@@ -244,12 +244,12 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
 > désormais **inconditionnels** (`NOT InhibitM1`/`NOT InhibitM2`, comme en Auto — voir section 9).
 > La fausse alarme Méca B a été corrigée à la racine (voir section 9.3 : `JoystickYNeutral`
 > regarde aussi les boutons IHM, pas juste le joystick) plutôt que masquée par un bypass complet.
-> **`instSafetyChariotM3` reste inchangé** (toujours `Enable := NOT ManuActive OR ...`, bypass
+> **`instSafetyTranslationM3` reste inchangé** (toujours `Enable := NOT ManuActive OR ...`, bypass
 > conditionnel d'origine conservé — M3 reste hors scope, voir bandeau §2 en tête de document).
 
-Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyChariotM3` étaient désactivées (`Enable := FALSE`) dès que `ManuActive` était actif *(état pré-2026-07-15, M1/M2 uniquement)*.
+Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyTranslationM3` étaient désactivées (`Enable := FALSE`) dès que `ManuActive` était actif *(état pré-2026-07-15, M1/M2 uniquement)*.
 
-**À modifier au nettoyage :** ~~Rétablir les entrées `Enable` d'origine~~ **Déjà fait pour M1/M2** (2026-07-15). Reste à faire pour M3 : `Enable := NOT PRG_10_Outputs.ManuActive OR ...` (chariot) doit être retiré pour redevenir `Enable := TRUE` inconditionnel, une fois M3 sorti du bypass (dépend de la finalisation `FB_Chariot`, cf. `PLAN_TASK` T4/T12/T26).
+**À modifier au nettoyage :** ~~Rétablir les entrées `Enable` d'origine~~ **Déjà fait pour M1/M2** (2026-07-15). Reste à faire pour M3 : `Enable := NOT PRG_10_Outputs.ManuActive OR ...` (translation) doit être retiré pour redevenir `Enable := TRUE` inconditionnel, une fois M3 sorti du bypass (dépend de la finalisation `FB_Translation`, cf. `PLAN_TASK` T4/T12/T26).
 
 ---
 
@@ -258,9 +258,9 @@ Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilot
 **Rôle :** Remplace le bypass direct des sections 3 (Bloc 2) — M1/M2 sont désormais pilotés par les MÊMES instances `instWinchM1`/`instWinchM2` (`FB_Winch`) qu'en Auto/SEMI_AUTO, avec une branche `ELSIF PRG_10_Outputs.ManuActive THEN` insérée entre la branche SEMI_AUTO et la branche joystick Auto (§1 pour M1, §2 pour M2).
 
 **Logique de la branche Manu (par treuil) :**
-- Lit `PRG_10_Outputs.M1Fwd_Demand`/`M1Rev_Demand`/`CoupledFwd_Demand`/`CoupledRev_Demand` (calculés dans `PRG_10_Outputs`, lus avec **1 scan de retard** ~10ms — PRG_10 en position 10, PRG_06 en position 6, même principe que `Grappin.Busy`/`SyncMinorDeviation` déjà accepté ailleurs dans ce fichier) pour déterminer `Direction`/`StartStop`.
+- Lit `PRG_10_Outputs.M1Fwd_Demand`/`M1Rev_Demand`/`CoupledFwd_Demand`/`CoupledRev_Demand` (calculés dans `PRG_10_Outputs`, lus avec **1 scan de retard** ~10ms — PRG_10 en position 10, PRG_06 en position 6, même principe que `Benne.Busy`/`SyncMinorDeviation` déjà accepté ailleurs dans ce fichier) pour déterminer `Direction`/`StartStop`.
 - `SpeedRefPct` = déflexion joystick brute (si `JoystickSelect=TRUE`, vitesse proportionnelle comme en Auto) ou `100.0` (si boutons HMI — `FB_Winch` rampe déjà en interne, plus besoin de rampe locale).
-- Fins de course grappin (`FdcGrappinOpen/CloseActive`) appliquées au pilotage **individuel M2 ET couplé** (M1+M2), et désormais **aussi à M1 individuel** (`CoupledFwdGrappinOk`/`CoupledRevGrappinOk`, calculés une fois, réutilisés M1+M2 pour un arrêt synchrone) — corrige un trou trouvé en revue (ex-code ne masquait QUE M2 individuel, jamais M1 seul ni le couplé).
+- Fins de course benne (`FdcBenneOpen/CloseActive`) appliquées au pilotage **individuel M2 ET couplé** (M1+M2), et désormais **aussi à M1 individuel** (`CoupledFwdBenneOk`/`CoupledRevBenneOk`, calculés une fois, réutilisés M1+M2 pour un arrêt synchrone) — corrige un trou trouvé en revue (ex-code ne masquait QUE M2 individuel, jamais M1 seul ni le couplé).
 
 **Conséquence :** M1/M2 bénéficient nativement en Manu de : rampe accel/décel (`WinchM1/M2RampAccelRate/DecelNormal/DecelFast_Pct`), ralentissement en zone d'approche de butée (`WinchSlowdownDistance_M`/`WinchSlowSpeedPct`), maintien du relais de sens pendant la décélération (pas de coupure instantanée à pleine vitesse).
 
@@ -280,9 +280,9 @@ Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilot
 
 **9.3 — Correctif Méca B (`SafetyErrorId=256`, bit8) :** `JoystickYNeutral` (entrée `FB_Safety_Winch`) ne regardait que le joystick CANopen — piloter M1/M2 via boutons HMI (IHM_MANU, `JoystickSelect=FALSE`) faisait croire à "aucune commande opérateur" en continu (joystick physiquement au neutre) → `SafeStop` après 3s de mouvement légitime aux boutons. **Fix** (`PRG_03_Safety.st`) : `JoystickYNeutral` regarde aussi les boutons IHM_MANU bruts (individuel M1/M2 + couplé), en plus du joystick — défense en profondeur conservée (lecture directe des boutons, indépendante de l'arbitrage `FB_Winch`/`PRG_06`).
 
-**9.4 — `FB_Safety_Chariot.st` :** correctif bug indépendant (pas spécifique Manu) — `Error`/`ErrorId` n'étaient pas remis à zéro quand `Enable=FALSE`, causant un défaut latché à vie (remontait comme faux défaut M3 en simulation). Aligné sur `FB_Safety_Winch`, qui le faisait déjà.
+**9.4 — `FB_Safety_Translation.st` :** correctif bug indépendant (pas spécifique Manu) — `Error`/`ErrorId` n'étaient pas remis à zéro quand `Enable=FALSE`, causant un défaut latché à vie (remontait comme faux défaut M3 en simulation). Aligné sur `FB_Safety_Winch`, qui le faisait déjà.
 
-**À modifier au nettoyage :** Rien — ce sont des corrections d'architecture définitives (limite haute + fix Méca B + fix latch Chariot), pas des dérogations IHM_MANU.
+**À modifier au nettoyage :** Rien — ce sont des corrections d'architecture définitives (limite haute + fix Méca B + fix latch Translation), pas des dérogations IHM_MANU.
 
 ---
 
@@ -303,47 +303,47 @@ Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilot
 
 ---
 
-### 11. **`ST_ChariotHMI.st` / `GVL_IHM.st` / `PRG_07/09/10` — Chariot M3 sort de `ST_IHM_MANU`** *(NOUVEAU 2026-07-15 (2))*
+### 11. **`ST_TranslationHMI.st` / `GVL_IHM.st` / `PRG_07/09/10` — Translation M3 sort de `ST_IHM_MANU`** *(NOUVEAU 2026-07-15 (2))*
 
-**Rôle :** `ST_ChariotHMI` (`GVL_IHM.ChariotM3`, déjà existant mais partiel) devient la structure
+**Rôle :** `ST_TranslationHMI` (`GVL_IHM.TranslationM3`, déjà existant mais partiel) devient la structure
 IHM pour M3 : migre les commandes manuelles ex-`ST_IHM_MANU`
-(`ReqFwd`/`ReqRev`/`FreqSetpointHz`, sans préfixe `M3_` — redondant sous `GVL_IHM.ChariotM3.xxx`),
+(`ReqFwd`/`ReqRev`/`FreqSetpointHz`, sans préfixe `M3_` — redondant sous `GVL_IHM.TranslationM3.xxx`),
 et décode le diagnostic variateur (`DriveCommReady`/`DrivePowerReady`, StatusWord bit7/bit0) au
 lieu d'exposer un `WORD` brut — objectif : simplifier le binding pour le développeur IHM (LED/
 checkbox direct, pas de bit-masking manuel côté visu).
 
 **Corrections faites au passage :**
-- `BypassBrakeFeedback` (`ST_ChariotHMI`) supprimé — n'était **jamais écrit** nulle part
+- `BypassBrakeFeedback` (`ST_TranslationHMI`) supprimé — n'était **jamais écrit** nulle part
   (contrairement à `BypassContactorFeedback`, auto-calculé en `PRG_09` depuis
-  `GVL_Simulation.ContactorFeedbackM3_IsReal`, qui couvre déjà "sens + frein"). `PRG_07_ChariotControl`
+  `GVL_Simulation.ContactorFeedbackM3_IsReal`, qui couvre déjà "sens + frein"). `PRG_07_TranslationControl`
   utilise désormais `BypassContactorFeedback` pour le `SEL` de `BrakeFeedback` (champ mort corrigé).
 - `DriveActualFreqHz` : source unique `PRG_00_Inputs.M3_ActualFrequencyHz_Filtered`, écrite une
   seule fois en `PRG_09` (Auto ET Manu) — supprime le doublon `IHM_MANU.M3_FreqActual` et la
-  lecture fragile de l'ex-`instChariotM3.DriveActualFreqHz` (qui lisait en réalité le `VAR_INPUT`
+  lecture fragile de l'ex-`instTranslationM3.DriveActualFreqHz` (qui lisait en réalité le `VAR_INPUT`
   de l'instance, pas une sortie du FB).
-- **Bug corrigé (simulation position M3)** : `FB_Sim_Chariot` (`instSimChariot`, `PRG_00_Inputs`)
-  lisait `RelayFwd`/`RelayRev` depuis `GVL_Chariot_M3_Stub.M3_RelayFwd/Rev` — variables **jamais
+- **Bug corrigé (simulation position M3)** : `FB_Sim_Translation` (`instSimTranslation`, `PRG_00_Inputs`)
+  lisait `RelayFwd`/`RelayRev` depuis `GVL_Translation_M3_Stub.M3_RelayFwd/Rev` — variables **jamais
   écrites** depuis l'abandon du mode relais `DEGRADED_IO` (v0.4.11) : la simulation de trajet M3
   (Fosse1/Fosse2/Maintenance/Trémie) restait bloquée en permanence. Rebranché sur `M3_CommandWord
-  = 1/2` (valeur EtherCAT réellement envoyée, Auto ET Manu). `GVL_Chariot_M3_Stub.M3_RelayFwd/
+  = 1/2` (valeur EtherCAT réellement envoyée, Auto ET Manu). `GVL_Translation_M3_Stub.M3_RelayFwd/
   Rev/RelaySpeedGv/ContactorFeedbackFwd/Rev` sont maintenant des reliquats 100% orphelins de
   l'ère `DEGRADED_IO` — candidats nettoyage (`PLAN_TASK_v1.0.md`, à ajouter §🗑️).
 
-**Rename `GVL_IHM` (portée plus large, hors IHM_MANU) :** `Chariot`→`ChariotM3`, `Grappin`→
+**Rename `GVL_IHM` (portée plus large, hors IHM_MANU) :** `Translation`→`TranslationM3`, `Benne`→
 `Joystick`→`JoystickJOY1` (aligne sur `WinchM1`/`WinchM2` — le nom du membre porte son
-identifiant matériel). `Grappin` reste sans suffixe (⚠️ tentative `GrappinM2` faite puis
+identifiant matériel). `Benne` reste sans suffixe (⚠️ tentative `BenneM2` faite puis
 **annulée** le même jour — répétait `M2` avec les champs internes du struct, ex.
-`M2PositionCorrected`/`M2StartStop`/`State.LastPosM2Close` : un seul grappin, pas de paire à
+`M2PositionCorrected`/`M2StartStop`/`State.LastPosM2Close` : un seul benne, pas de paire à
 distinguer comme M1/M2 treuils, donc pas besoin de suffixe axe). Ne concerne pas la dérogation
-IHM_MANU elle-même (Grappin/Joystick n'y ont jamais été).
+IHM_MANU elle-même (Benne/Joystick n'y ont jamais été).
 
 **Ce qui N'A PAS changé (dérogation toujours active) :** `PRG_10_Outputs` écrit toujours
 `M3_CommandWord`/`M3_SetpointFrequencyHz` en direct quand `ManuActive=TRUE`, sans passer par
-`FB_Chariot`/`FB_Safety_Chariot` — voir sections 3/7. Le passage de M3 sur le même modèle que
-M1/M2 (section 8, arbitrage natif `FB_Chariot`/`PRG_07` même en Manu) reste un chantier séparé
+`FB_Translation`/`FB_Safety_Translation` — voir sections 3/7. Le passage de M3 sur le même modèle que
+M1/M2 (section 8, arbitrage natif `FB_Translation`/`PRG_07` même en Manu) reste un chantier séparé
 (`PLAN_TASK_v1.0.md` T4/T12/T26).
 
-**À modifier au nettoyage :** Rien de spécifique à cette section — `GVL_IHM.ChariotM3` est
+**À modifier au nettoyage :** Rien de spécifique à cette section — `GVL_IHM.TranslationM3` est
 définitif, seul le bypass `ManuActive` sur `M3_CommandWord` (sections 3/7) reste à retirer plus
 tard.
 
@@ -386,13 +386,13 @@ tard.
   - [ ] Rétablir le bloc de variables locales en `VAR` au lieu de `VAR_INPUT`.
 - [ ] **PRG_03_Safety.st** :
   - [ ] Rétablir les entrées `Enable` d'origine sur `instSafetyWinchM1` et `instSafetyWinchM2` (supprimer `AND NOT PRG_10_Outputs.ManuActive`).
-  - [ ] Rétablir `Enable := TRUE` sur `instSafetyChariotM3` (supprimer `NOT PRG_10_Outputs.ManuActive`).
+  - [ ] Rétablir `Enable := TRUE` sur `instSafetyTranslationM3` (supprimer `NOT PRG_10_Outputs.ManuActive`).
 
 ### Phase 3 : Tests de validation
 - [ ] Compiler le projet CODESYS sans erreur
 - [ ] Télécharger sur l'automate
 - [ ] Vérifier que le joystick commande correctement M1/M2/M3 (pas d'override resté actif)
-- [ ] Confirmer que les sécurités métier (FB_Safety_Winch/Chariot, limites, synchro) sont à nouveau actives
+- [ ] Confirmer que les sécurités métier (FB_Safety_Winch/Translation, limites, synchro) sont à nouveau actives
 - [ ] Tester l'auto-test redondance AU et le réarmement (EmergencyCutOff doit refonctionner)
 
 ### Phase 4 : Commit git
@@ -424,7 +424,7 @@ Actuellement, il n'y a **pas de vérification du mode machine** (Mode N1/N2/N3/e
 
 ### 3. **Fréquence M3 — pas de bounds-check**
 
-`GVL_IHM.ChariotM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est clampé à `GVL_PERSISTENT.ChariotMaxFreqHz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
+`GVL_IHM.TranslationM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est clampé à `GVL_PERSISTENT.TranslationMaxFreqHz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
 
 **À confirmer :** Les limites du variateur AC600 doivent-elles être respectées en mode Manu ou peut-on libérer complètement ?
 
@@ -455,7 +455,7 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 
 - **DOC/AF_Partie-03_Template_FB_Commun_v1.3.md** — Contrat FB (interface, précédence Enable/SafeStop/StartStop)
 - **DOC/AF_Partie-09_Fonction_Winch_v1.9.md** — Winch M1/M2, safety, garde-fous Méca A–E
-- **DOC/AF_Partie-11_Fonction_Chariot_v1.3.md** — Chariot M3, variateur AC600
+- **DOC/AF_Partie-11_Fonction_Translation_v1.3.md** — Translation M3, variateur AC600
 - **DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.7.md** — Homing codeurs (conditions Mode/arrêt/capteur)
 - **CODE/MAIN/PRG_03_Safety.st** — Logique sécurité normales (PowerCutOff Méca A/B/C)
 
@@ -466,8 +466,8 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 | Date | Auteur | Action |
 |------|--------|--------|
 | **2026-07-09** | Mise en service urgence | Ajout fonctionnalité IHM_MANU provisoire (ST_IHM_MANU, blocs PR G_10/PRG_02) |
-| **2026-07-15** | Session refonte sécurité | M1/M2 branchés sur `FB_Winch`/`PRG_06_WinchControl` (fin du bypass total, sections 8-9) ; nouvelle limite `CableLimitAscentM1/2_M` ; fix Méca B (bit8, boutons HMI) ; fix grappin couplé+M1 individuel ; fix latch `FB_Safety_Chariot` ; réactivation TEMPORAIRE `WinchMaxStepFwd/Rev` (section 10, **vraie dérogation restante**) |
-| **2026-07-15 (2)** | Refonte IHM Chariot M3 | Commandes/diag manuels M3 sortis de `ST_IHM_MANU` → `ST_ChariotHMI`/`GVL_IHM.ChariotM3` (définitif, section 11) ; diag variateur décodé ; fix `BypassBrakeFeedback` (fusionné `BypassContactorFeedback`) ; fix simulation position M3 (`FB_Sim_Chariot` rebranché, était bloquée) ; rename `GVL_IHM.Joystick` → `JoystickJOY1` (`Grappin` : tenté `GrappinM2` puis annulé, stutter
+| **2026-07-15** | Session refonte sécurité | M1/M2 branchés sur `FB_Winch`/`PRG_06_WinchControl` (fin du bypass total, sections 8-9) ; nouvelle limite `CableLimitAscentM1/2_M` ; fix Méca B (bit8, boutons HMI) ; fix benne couplé+M1 individuel ; fix latch `FB_Safety_Translation` ; réactivation TEMPORAIRE `WinchMaxStepFwd/Rev` (section 10, **vraie dérogation restante**) |
+| **2026-07-15 (2)** | Refonte IHM Translation M3 | Commandes/diag manuels M3 sortis de `ST_IHM_MANU` → `ST_TranslationHMI`/`GVL_IHM.TranslationM3` (définitif, section 11) ; diag variateur décodé ; fix `BypassBrakeFeedback` (fusionné `BypassContactorFeedback`) ; fix simulation position M3 (`FB_Sim_Translation` rebranché, était bloquée) ; rename `GVL_IHM.Joystick` → `JoystickJOY1` (`Benne` : tenté `BenneM2` puis annulé, stutter
 avec champs internes M2) — **la dérogation bypass `ManuActive`→`M3_CommandWord` reste, elle, inchangée** |
 | **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain (M3/Auxiliaires bypass logique + section 10 restent à retirer) |
 

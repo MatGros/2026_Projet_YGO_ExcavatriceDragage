@@ -34,7 +34,7 @@
 >
 > 🔧 **v1.6 (2026-07-08)** — Retour terrain frein (demande utilisateur) : nouveau retour thermique
 > **frein**, COMMUN aux 3 axes M1/M2/M3 (1 seul fil, `BrakeThermalFeedback_DI`, câblé identiquement
-> sur les 2 instances `FB_Safety_Winch` **et** sur `FB_Safety_Chariot` — voir Partie11 v1.3) → bit10
+> sur les 2 instances `FB_Safety_Winch` **et** sur `FB_Safety_Translation` — voir Partie11 v1.3) → bit10
 > `ErrorId`. **Escalade `PowerCutOff`** : un frein est à manque de courant (colle au repos, voir
 > `FB_Brake`) — la perte de ce retour peut signifier qu'un frein colle **instantanément** alors que
 > le moteur est encore en mouvement ; une simple rampe `SafeStop` ne protège pas la mécanique dans
@@ -47,8 +47,8 @@
 > câblés dans `FB_Safety_Winch` (nouveaux bits 7/8/9) : **Méca A** — mouvement/dérive détecté(e)
 > alors que tout est confirmé physiquement coupé (contacteurs + frein) ; **Méca B** — pilotage
 > actif constaté malgré absence de commande opérateur (perte CAN ou joystick au neutre) ;
-> **Méca C (couche 2, escalade)** — glissement M1 pendant un mouvement Grappin, au-delà de ce que
-> la couche 1 (`FB_Grappin`, voir Partie12 v1.2) a pu contenir. `PowerCutOff` devient **réel**
+> **Méca C (couche 2, escalade)** — glissement M1 pendant un mouvement Benne, au-delà de ce que
+> la couche 1 (`FB_Benne`, voir Partie12 v1.2) a pu contenir. `PowerCutOff` devient **réel**
 > (`FALSE` codé en dur jusqu'ici) pour ces 3 cas — les contacteurs étant déjà confirmés coupés,
 > `SafeStop` seul ne suffit pas. Détail complet en §4quinquies ci-dessous ; interface
 > `FB_Safety_Winch` et tableau `ErrorId` mis à jour en §3.
@@ -62,8 +62,8 @@
 > `ErrorId`) ; `StuckOpen` n'a plus de sens avec ce signal (toujours `FALSE`, champ conservé pour
 > compatibilité de type) ; bit2 `ErrorId` (ex-`RevContactorCheck`) **libéré/inutilisé**. Détail
 > complet dans `CODE/WINCH/FB_Winch.st` (règle anti-doublon — pas de recopie ici) — voir §3/§5/§6
-> ci-dessous pour l'interface et le mapping mis à jour. Hors périmètre : le Chariot M3
-> (`FB_Chariot.st`) garde ses retours individuels `ContactorFeedbackFwd`/`Rev` — ce changement
+> ci-dessous pour l'interface et le mapping mis à jour. Hors périmètre : le Translation M3
+> (`FB_Translation.st`) garde ses retours individuels `ContactorFeedbackFwd`/`Rev` — ce changement
 > matériel ne concerne **que** les treuils M1/M2.
 > 🗂️ **Réalignement nom de fichier/version** : ce fichier restait suffixé `_v1.1` alors que son
 > contenu interne était déjà en v1.3. Corrigé à partir de v1.4.
@@ -103,7 +103,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 |------|-------------|
 | `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
-| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, surchauffe/perte thermique frein, mou de câble (mode normal), Méca A/B/C/D (roue libre, pilotage sans commande, glissement grappin escaladé, capteur haut non confirmé arrêté) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+SyncEnable=FALSE — voir §4ter, §4octies et §4nonies ; lève `PowerCutOff` sur thermique moteur/frein et Méca A/B/C/D — voir §4sexies et §4nonies |
+| `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, surchauffe/perte thermique frein, mou de câble (mode normal), Méca A/B/C/D (roue libre, pilotage sans commande, glissement benne escaladé, capteur haut non confirmé arrêté) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+SyncEnable=FALSE — voir §4ter, §4octies et §4nonies ; lève `PowerCutOff` sur thermique moteur/frein et Méca A/B/C/D — voir §4sexies et §4nonies |
 | `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev`/`RelayFwd` sur `ForbidDescent`/`ForbidAscent`. Inhibé (`Enable` forcé à `FALSE`) si `InhibitMx` est actif. |
 
 ---
@@ -145,7 +145,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 |--------|------|------|
 | `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Inhibé/`FALSE` si `InhibitMx` actif) |
 | `SyncEnable` | BOOL | SyncEnable (MAINT N1/N2) — `FALSE` exclut le bit3 (mou de câble) du SafeStop |
-| `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.Joystick` |
+| `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.DeviceJoystick` |
 | `EncoderAvailable` | BOOL | Sortie `FB_Encoder_Abs` **de ce treuil** |
 | `ThermalFeedback` | BOOL | Retour TOR thermique **de ce moteur** (`M1/M2_ThermalFeedback`, I/O réel) |
 | `BrakeThermalFeedback` | BOOL | Retour TOR thermique **frein**, COMMUN aux 3 axes M1/M2/M3 |
@@ -157,17 +157,17 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | `FwdRevSpeedFeedbackOff` | BOOL | Retour unique « tous contacteurs sens+vitesse retombés » |
 | `BrakeFeedback` | BOOL | Retour frein **de ce treuil** (I/O réel) : `TRUE` = serré |
 | `JoystickYNeutral` | BOOL | `TRUE` = joystick axe Y au neutre (magnitude `< 0.1`) |
-| `GrappinHoldStillActive` | BOOL | `TRUE` pour l'instance M1 (glissement pendant `Grappin.Busy`) |
+| `BenneHoldStillActive` | BOOL | `TRUE` pour l'instance M1 (glissement pendant `Benne.Busy`) |
 | `UncommandedSpeedThresholdMps` | REAL := 0.02 | Seuil vitesse unitaire Méca A |
 | `UncommandedDriftToleranceM` | REAL := 2.0 | Tolérance dérive position Méca A |
 | `PostRampTimeout` | TIME := T#3S | Délai de confirmation pour Méca B / Méca D |
-| `GrappinSlipToleranceM` | REAL := 2.0 | Tolérance dérive M1 Méca C (escalade) |
+| `BenneSlipToleranceM` | REAL := 2.0 | Tolérance dérive M1 Méca C (escalade) |
 
 **📤 Sorties**
 | Sortie | Type | Rôle |
 |--------|------|------|
 | `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
-| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 : surchauffe moteur ; bit3 : mou de câble ; bit4 : rotation de phase ; bit5 : fin de course haut ; bit6 : longueur max câble ; bit7 : Méca A (mouvement non commandé) ; bit8 : Méca B (pilotage sans commande opérateur, vérifie contacteurs + frein) ; bit9 : Méca C (glissement M1 grappin) ; bit10 : surchauffe/perte thermique frein commun ; bit11 🆕 v1.7 : Méca D (capteur haut non confirmé arrêté hors homing, SafeStop+PowerCutOff) |
+| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 : surchauffe moteur ; bit3 : mou de câble ; bit4 : rotation de phase ; bit5 : fin de course haut ; bit6 : longueur max câble ; bit7 : Méca A (mouvement non commandé) ; bit8 : Méca B (pilotage sans commande opérateur, vérifie contacteurs + frein) ; bit9 : Méca C (glissement M1 benne) ; bit10 : surchauffe/perte thermique frein commun ; bit11 🆕 v1.7 : Méca D (capteur haut non confirmé arrêté hors homing, SafeStop+PowerCutOff) |
 | `SafeStop` | BOOL | `(ErrorId AND 16#0F9F) <> 0` si SyncEnable=TRUE (bits 0/1/2/3/4/7/8/9/10/11), `(ErrorId AND 16#0F97) <> 0` si SyncEnable=FALSE (bit3 exclu). |
 | `ForbidDescent` | BOOL | bit6 uniquement (limite basse câble) |
 | `ForbidAscent` | BOOL | bit5 (fin de course haut) OU bit3+SyncEnable=FALSE (récupération mou câble) |
@@ -195,13 +195,13 @@ En mode `MAINT_N2`, l'opérateur a la possibilité d'inhiber individuellement un
 - **Isolation complète de la sécurité et des défauts** :
   - **Remise à zéro des erreurs** : Lorsque l'entrée `Enable` de `FB_Winch` et `FB_Safety_Winch` passe à `FALSE`, leurs sorties `Error` et `ErrorId` (16#0000) sont explicitement réinitialisées. Les surveillances associées au treuil inhibé (dérive DriftGuard Méca A/C, surveillance thermique moteur/frein, glissement, retour d'état des contacteurs) sont totalement désactivées et ne peuvent plus générer d'alarme active.
   - **Filtrage supervision/IHM** : Dans la logique de supervision globale (`PRG_09_Supervision.st`), l'acquisition du signal d'alarme global `GVL_IHM.Modes.AnyFaultActive` filtre dynamiquement et ignore les défauts spécifiques du treuil inhibé (ce qui inclut l'encodeur absolu, le homing, la sécurité codeur, la sécurité générale du treuil et le bloc de contrôle de mouvement).
-- **Comportement sur la synchronisation et le grappin** : L'inhibition de l'un ou l'autre treuil désactive automatiquement `FB_WinchSync` (`Enable := FALSE`), ce qui efface ses défauts et empêche le déclenchement de l'alarme d'incohérence de commande (bit 1, 16#0002). De plus, l'inhibition du treuil M2 (fermeture) désactive également le bloc grappin `FB_Grappin` (`Enable := FALSE`), empêchant toute ouverture ou fermeture. En revanche, si seul M1 (retenue) est inhibé, le grappin peut toujours être manœuvré (M2 tourne seul pour ouvrir/fermer, M1 restant verrouillé au frein) à condition que les deux codeurs M1 et M2 soient disponibles, valides (sains) et référencés (homed). Si le codeur de M1 ou M2 est en défaut ou non référencé, le grappin est automatiquement bloqué. Cela permet de faire fonctionner le treuil restant seul en toute sécurité pour des tests de mise en service.
+- **Comportement sur la synchronisation et le benne** : L'inhibition de l'un ou l'autre treuil désactive automatiquement `FB_WinchSync` (`Enable := FALSE`), ce qui efface ses défauts et empêche le déclenchement de l'alarme d'incohérence de commande (bit 1, 16#0002). De plus, l'inhibition du treuil M2 (fermeture) désactive également le bloc benne `FB_Benne` (`Enable := FALSE`), empêchant toute ouverture ou fermeture. En revanche, si seul M1 (retenue) est inhibé, le benne peut toujours être manœuvré (M2 tourne seul pour ouvrir/fermer, M1 restant verrouillé au frein) à condition que les deux codeurs M1 et M2 soient disponibles, valides (sains) et référencés (homed). Si le codeur de M1 ou M2 est en défaut ou non référencé, le benne est automatiquement bloqué. Cela permet de faire fonctionner le treuil restant seul en toute sécurité pour des tests de mise en service.
 
 ### 🆕 4octies. Autorisation dépassement arrêt normal (HomingApproachEnable), limites logicielles et dissociation des limites de descente
 
 - **Dissociation des limites de descente câble (M1/M2)** : Les limites de descente de câble pour les treuils M1 et M2 sont entièrement indépendantes. Elles sont définies par deux variables persistantes distinctes dans `GVL_PERSISTENT` : `CableLimitDescentM1_M` (pour M1) et `CableLimitDescentM2_M` (pour M2). Elles sont configurées individuellement depuis l'IHM via `WinchM1.CableLimitDescentM` et `WinchM2.CableLimitDescentM` et propagées par `PRG_09_Supervision`.
-- **Arrêt virtuel normal haut** : En fonctionnement normal, dès qu'un treuil est référencé (`Homed = TRUE` et `HomingSuspect = FALSE`), une limite virtuelle haute normale est activée. Pour le treuil M1 (holding), elle est à `HomingTargetM1_M - WinchTopStopMarginM` (par défaut 12.00m). Pour le treuil M2 (closing), afin de permettre la fermeture complète du grappin y compris à hauteur maximale sans déclencher de butée prématurée, cette limite est décalée dynamiquement de l'offset de fermeture et se situe à `HomingTargetM2_M + M2_LimitShift - WinchTopStopMarginM` (soit 14.00m si `OffsetCloseM = 2.0m`). Ce décalage `M2_LimitShift` est égal à `OffsetCloseM` uniquement si le grappin est fermé ou en cours de fermeture (`IsClosed OR CloseReq`), et vaut `0.0` si le grappin est ouvert (ramenant la butée de M2 à 12.00m comme M1 pour un arrêt synchrone en remontée normale). Dès que cette position est atteinte et si `HomingApproachEnable = FALSE`, la montée est interdite (`ForbidAscent := TRUE`), ce qui applique une rampe de décélération normale vers 0.
-- **Limite logicielle absolue** : Dès que le treuil est référencé (`Homed = TRUE` et `HomingSuspect = FALSE`), une limite logicielle absolue est active. Pour le treuil M1, elle est à `HomingTargetM1_M` (12.50m). Pour le treuil M2, elle est décalée dynamiquement de l'offset de fermeture et se situe à `HomingTargetM2_M + M2_LimitShift` (soit 14.50m si `OffsetCloseM = 2.0m` et grappin fermé/fermeture). Dès que cette limite absolue est dépassée, la montée est inconditionnellement interdite (`ForbidAscent := TRUE`).
+- **Arrêt virtuel normal haut** : En fonctionnement normal, dès qu'un treuil est référencé (`Homed = TRUE` et `HomingSuspect = FALSE`), une limite virtuelle haute normale est activée. Pour le treuil M1 (holding), elle est à `HomingTargetM1_M - WinchTopStopMarginM` (par défaut 12.00m). Pour le treuil M2 (closing), afin de permettre la fermeture complète du benne y compris à hauteur maximale sans déclencher de butée prématurée, cette limite est décalée dynamiquement de l'offset de fermeture et se situe à `HomingTargetM2_M + M2_LimitShift - WinchTopStopMarginM` (soit 14.00m si `OffsetCloseM = 2.0m`). Ce décalage `M2_LimitShift` est égal à `OffsetCloseM` uniquement si le benne est fermé ou en cours de fermeture (`IsClosed OR CloseReq`), et vaut `0.0` si le benne est ouvert (ramenant la butée de M2 à 12.00m comme M1 pour un arrêt synchrone en remontée normale). Dès que cette position est atteinte et si `HomingApproachEnable = FALSE`, la montée est interdite (`ForbidAscent := TRUE`), ce qui applique une rampe de décélération normale vers 0.
+- **Limite logicielle absolue** : Dès que le treuil est référencé (`Homed = TRUE` et `HomingSuspect = FALSE`), une limite logicielle absolue est active. Pour le treuil M1, elle est à `HomingTargetM1_M` (12.50m). Pour le treuil M2, elle est décalée dynamiquement de l'offset de fermeture et se situe à `HomingTargetM2_M + M2_LimitShift` (soit 14.50m si `OffsetCloseM = 2.0m` et benne fermé/fermeture). Dès que cette limite absolue est dépassée, la montée est inconditionnellement interdite (`ForbidAscent := TRUE`).
 - **HomingApproachEnable** (ex-`OverrideTopStop`) : L'opérateur peut autoriser le dépassement de l'arrêt normal haut (12.00m) via un bouton HMI (`HomingApproachEnableRequest` actif en mode `MAINT_N2` uniquement). Si `HomingApproachEnable = TRUE`, la limite virtuelle normale (12.00m) est ignorée, permettant au treuil d'approcher lentement le capteur physique haut jusqu'à la limite logicielle absolue (12.50m) ou l'atteinte physique du capteur.
 - **Verrouillage de vitesse au Palier 1** : Afin de sécuriser les mouvements en phase critique ou en l'absence de repères fiables, la vitesse du treuil est bridée dynamiquement au **palier 1** (contacteur `Contactor1` actif uniquement, `MaxStepNumber := 1` dans `FB_Winch`) dans les cas suivants :
   1. Le treuil n'est pas référencé (`Homed = FALSE`) ou présente un doute de dérive au démarrage (`HomingSuspect = TRUE`).
@@ -242,9 +242,9 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 |---|---|---|---|---|---|---|
 | **A** | Mouvement non commandé (roue libre) | bit7 (16#0080) | Contacteurs + frein confirmés coupés, hors homing | Dérive > 2.0m OU vitesse > 0.02 m/s | SafeStop + **PowerCutOff** | `UncommandedDriftToleranceM` (2.0m), `UncommandedSpeedThresholdMps` (0.02 m/s) |
 | **B** | Pilotage sans commande opérateur | bit8 (16#0100) | Perte CAN ou joystick au neutre | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
-| **C** | Glissement M1 pendant grappin | bit9 (16#0200) | Grappin en mouvement (M1 seul) | Dérive M1 > 2.0m (escalade au-delà de `FB_Grappin`) | SafeStop + **PowerCutOff** | `GrappinSlipToleranceM` (2.0m) |
+| **C** | Glissement M1 pendant benne | bit9 (16#0200) | Benne en mouvement (M1 seul) | Dérive M1 > 2.0m (escalade au-delà de `FB_Benne`) | SafeStop + **PowerCutOff** | `BenneSlipToleranceM` (2.0m) |
 | **D** | Capteur haut non confirmé arrêté | bit11 (16#0800) | Capteur physique atteint OU limite logicielle dépassée, hors homing | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
-| **E** | Écart synchro M1/M2 critique | bit12 (16#1000) + bit13 (16#2000) | Synchro activée, hors grappin/homing | Écart > 2.0m → **bit12 immédiat** ; pas confirmé arrêté → **bit13 escalade** | Bit12 : SafeStop seul ; Bit13 : SafeStop + **PowerCutOff** | `CriticalSyncToleranceM` (2.0m), `PostRampTimeout` (3s) |
+| **E** | Écart synchro M1/M2 critique | bit12 (16#1000) + bit13 (16#2000) | Synchro activée, hors benne/homing | Écart > 2.0m → **bit12 immédiat** ; pas confirmé arrêté → **bit13 escalade** | Bit12 : SafeStop seul ; Bit13 : SafeStop + **PowerCutOff** | `CriticalSyncToleranceM` (2.0m), `PostRampTimeout` (3s) |
 
 ---
 
@@ -309,31 +309,31 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 
 ---
 
-#### Méca C — Glissement M1 pendant grappin (Bit9 — Escalade)
+#### Méca C — Glissement M1 pendant benne (Bit9 — Escalade)
 
-**Rôle** : Détecter l'**escalade d'un glissement partiel du treuil M1** qui avait déjà été en partie contenu par la couche 1 (`FB_Grappin`, tolérance 1.0 m). Si même avec le `SafeStop` du grappin M1 ne suffit pas à l'arrêter, cela signifie un problème mécanique grave (roue libre augmentée, surcharge).
+**Rôle** : Détecter l'**escalade d'un glissement partiel du treuil M1** qui avait déjà été en partie contenu par la couche 1 (`FB_Benne`, tolérance 1.0 m). Si même avec le `SafeStop` du benne M1 ne suffit pas à l'arrêter, cela signifie un problème mécanique grave (roue libre augmentée, surcharge).
 
 **Armement** :
-- Condition : `GrappinHoldStillActive`
-  - Variable câblée sur `instGrappin.Busy` pour l'instance M1 **seulement**
-  - Toujours `FALSE` côté M2 (qui doit continuer son mouvement normalement pendant que le grappin s'ouvre/ferme)
-  - → Surveillance active uniquement pendant le cycle du grappin, sur M1
+- Condition : `BenneHoldStillActive`
+  - Variable câblée sur `instBenne.Busy` pour l'instance M1 **seulement**
+  - Toujours `FALSE` côté M2 (qui doit continuer son mouvement normalement pendant que le benne s'ouvre/ferme)
+  - → Surveillance active uniquement pendant le cycle du benne, sur M1
 
 **Déclenchement** :
 - Brique `FB_DriftGuard` : capture position de référence à l'armement ; chaque scan, calcule dérive absolue
-- Si dérive M1 > 2.0 m (seuil > 1.0 m de `FB_Grappin`) → `DriftGuardC.Violation := TRUE` → bit9 levé
-- Littéralement : M1 a dévié de plus de 2 mètres **malgré** l'arrêt de sécurité du grappin
+- Si dérive M1 > 2.0 m (seuil > 1.0 m de `FB_Benne`) → `DriftGuardC.Violation := TRUE` → bit9 levé
+- Littéralement : M1 a dévié de plus de 2 mètres **malgré** l'arrêt de sécurité du benne
 
 **Conséquence** :
 - `ErrorId` bit9 levé → inclus dans masque **`SafeStop`**
 - **Escalade immédiate** : aussi dans le masque **`PowerCutOff`** → coupure puissance amont
 
 **Paramètres réglables** :
-- `GrappinSlipToleranceM` (défaut 2.0 m) — Tolérance d'escalade (> au seuil de `FB_Grappin` 1.0 m)
+- `BenneSlipToleranceM` (défaut 2.0 m) — Tolérance d'escalade (> au seuil de `FB_Benne` 1.0 m)
 
 **Subtilités** :
-- **Armé UNIQUEMENT côté M1** — M2 n'est jamais surveillé pour cela, car il doit tourner pendant le grappin.
-- Le grappin (`FB_Grappin`) implémente déjà un niveau 1 de surveillance (arrêt M1 si glissement > 1.0 m) — Méca C est une couche 2 (si même ce premier niveau échoue).
+- **Armé UNIQUEMENT côté M1** — M2 n'est jamais surveillé pour cela, car il doit tourner pendant le benne.
+- Le benne (`FB_Benne`) implémente déjà un niveau 1 de surveillance (arrêt M1 si glissement > 1.0 m) — Méca C est une couche 2 (si même ce premier niveau échoue).
 - Sortie diagnostic : `MecaCDriftM` (dérive mesurée) — affichée à l'IHM pour mise en service et réglage du seuil.
 
 ---
@@ -376,16 +376,16 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 **Rôle** : Détection d'une **dégradation importante de la synchronisation** entre M1 et M2 → défense en profondeur au-delà du premier niveau (`FB_WinchSync`, écart mineur).
 
 **Armement** :
-- Condition : `SyncEnable AND NOT GrappinBusy AND NOT InReferencingMode`
+- Condition : `SyncEnable AND NOT BenneBusy AND NOT InReferencingMode`
   - Synchro activée (peut être désactivée en maintenance N2)
-  - Hors cycle grappin (où un écart M1/M2 est normal/volontaire)
+  - Hors cycle benne (où un écart M1/M2 est normal/volontaire)
   - Hors phase de référencement (position instable)
 
 **Déclenchement** :
 
 **Bit12 (Détection écart critique)** :
 - Condition : `ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM` (2.0 m par défaut)
-  - Entrée `ExpectedOtherWinchPosM` déjà corrigée de l'offset grappin actif par l'appelant — comparaison directe valable
+  - Entrée `ExpectedOtherWinchPosM` déjà corrigée de l'offset benne actif par l'appelant — comparaison directe valable
   - Si écart > 2.0 m → bit12 immédiatement levé
 
 **Bit13 (Escalade — pas de confirmation d'arrêt)** :
@@ -405,7 +405,7 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 **Subtilités** :
 - **Deux bits coordonnés** : bit12 = alerte (SafeStop), bit13 = aggravation (PowerCutOff). Permet une IHM différenciée (warning vs alerte).
 - `ExpectedOtherWinchPosM` est **déjà offset-corrigé** par l'appelant — le FB ne refait pas le calcul (règle anti-duplication).
-- Suppression pendant `GrappinBusy` — le grappin peut créer des écarts transitoires inévitables, ce n'est pas un défaut tant qu'il bouge.
+- Suppression pendant `BenneBusy` — le benne peut créer des écarts transitoires inévitables, ce n'est pas un défaut tant qu'il bouge.
 - Premier niveau (`FB_WinchSync`, écart mineur) met une alerte IHM ; cet écart critique → `SafeStop` automatique.
 
 ---

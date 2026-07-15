@@ -5,12 +5,12 @@
    🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
       Méca C de FB_Safety_Winch (armement + capture position référence + calcul
       dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
-   📂 REX 2026-07-08 (2) : placé dans CODE/WINCH/ (pas _COMMON) — son seul
+   📂 REX 2026-07-08 (2) : placé dans CODE/WINCH/ (pas COMMUN) — son seul
       consommateur réel est FB_Safety_Winch (2 instances, Méca A et C, dans le
-      MÊME FB). _COMMON est réservé aux briques à usage cross-domaine AVÉRÉ
-      (ex. FB_Brake, réutilisé par Winch ET Chariot aujourd'hui) — pas à un
-      usage hypothétique futur. À remonter en _COMMON le jour où un autre
-      domaine (ex. FB_Safety_Chariot) l'utilise réellement.
+      MÊME FB). COMMUN est réservé aux briques à usage cross-domaine AVÉRÉ
+      (ex. FB_Brake, réutilisé par Winch ET Translation aujourd'hui) — pas à un
+      usage hypothétique futur. À remonter en COMMUN le jour où un autre
+      domaine (ex. FB_Safety_Translation) l'utilise réellement.
    🎯 Rôle : tant que Arm=TRUE, mémorise la position au moment du premier cycle
       armé (RefPosM), puis calcule en continu la dérive absolue par rapport à
       cette référence. Violation si la dérive dépasse ToleranceM.

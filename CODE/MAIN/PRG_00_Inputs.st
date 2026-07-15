@@ -22,7 +22,7 @@ VAR_OUTPUT
     // 🆕 REX 2026-07-08 : retour thermique COMMUN aux 3 freins M1/M2/M3 (1 seul fil, impossible
     // de savoir lequel des 3 est en cause) — demande utilisateur : la perte de ce retour peut
     // signifier un frein qui colle instantanément (frein à manque de courant) → traité comme
-    // les autres défauts francs du domaine, escalade PowerCutOff côté FB_Safety_Winch/_Chariot
+    // les autres défauts francs du domaine, escalade PowerCutOff côté FB_Safety_Winch/_Translation
     // (voir bit10/bit3 respectifs).
     BrakeThermalFeedback : BOOL;   // 🌡️ Thermique frein M1/M2/M3 commun (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
 
@@ -39,12 +39,12 @@ VAR_OUTPUT
     M2ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M2 (NC) : TRUE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
     M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴
 
-    // ── ↔️ CHARIOT M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
-    ChariotPosFosse1      : BOOL;  // 📍 Position fosse 1 (NO) : TRUE=chariot en fosse 1 ✅ | FALSE=absent
-    ChariotPosFosse2      : BOOL;  // 📍 Position fosse 2 (NO) : TRUE=chariot en fosse 2 ✅ | FALSE=absent
-    ChariotPosMaintenance : BOOL;  // 🔧 Position maintenance (NO) : TRUE=en position service ✅ | FALSE=absent
-    ChariotPosTremie      : BOOL;  // 🗑️ Position trémie vidange (NO) : TRUE=en position trémie ✅ | FALSE=absent
-    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein chariot M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
+    // ── ↔️ TRANSLATION M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
+    TranslationPosFosse1      : BOOL;  // 📍 Position fosse 1 (NO) : TRUE=translation en fosse 1 ✅ | FALSE=absent
+    TranslationPosFosse2      : BOOL;  // 📍 Position fosse 2 (NO) : TRUE=translation en fosse 2 ✅ | FALSE=absent
+    TranslationPosMaintenance : BOOL;  // 🔧 Position maintenance (NO) : TRUE=en position service ✅ | FALSE=absent
+    TranslationPosTremie      : BOOL;  // 🗑️ Position trémie vidange (NO) : TRUE=en position trémie ✅ | FALSE=absent
+    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein translation M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
 
     // 🆕 Variables intermédiaires filtrées/simulées pour contourner la lecture seule des PDO
     M3_StatusWord_Filtered        : WORD;
@@ -67,14 +67,14 @@ VAR
     instM2Thermal      : FB_Input;
     instM2BrakeFeedback: FB_Input;
 
-    instChariotPosFosse1      : FB_Input;
-    instChariotPosFosse2      : FB_Input;
-    instChariotPosMaintenance : FB_Input;
-    instChariotPosTremie      : FB_Input;
+    instTranslationPosFosse1      : FB_Input;
+    instTranslationPosFosse2      : FB_Input;
+    instTranslationPosMaintenance : FB_Input;
+    instTranslationPosTremie      : FB_Input;
     instM3BrakeFeedback       : FB_Input;
 
-    // 🧪 Simulation dynamique du trajet chariot M3 (Lot 4, non prioritaire — voir AF_Partie13)
-    instSimChariot            : FB_Sim_Chariot;
+    // 🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir AF_Partie13)
+    instSimTranslation            : FB_Sim_Translation;
 
     // 🧪 Simulation de la chaîne de sécurité AU / réarmement (Lot 1, combler le trou d'intégration)
     instSimSafety             : FB_Sim_Safety;
@@ -121,9 +121,9 @@ SlackCableSwitch := instSlackCableSwitch.State;
 // 🆕 REX 2026-07-08 (4) : cohérence simulation (demande utilisateur) — l'ancien câblage forçait
 // TopPositionSensor à TOUJOURS TRUE (sain) en simulation, quelle que soit la position codeur :
 // impossible de tester bit5/Méca D (capteur haut) en simulation, il ne se déclenchait JAMAIS.
-// Dérivé désormais de la position M1 simulée (référence de l'ensemble, voir FB_Grappin/
+// Dérivé désormais de la position M1 simulée (référence de l'ensemble, voir FB_Bucket/
 // ActiveOffsetM) — 1 cycle de retard (PRG_00 avant PRG_02 dans l'ordre de tâche), négligeable,
-// même principe déjà assumé ailleurs (EncoderFaultPresent, GrappinHoldStillActive).
+// même principe déjà assumé ailleurs (EncoderFaultPresent, BenneHoldStillActive).
 SimTopSensorTriggered := (NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M))
                       OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= GVL_PERSISTENT.HomingTargetM2_M));
 instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
@@ -164,38 +164,38 @@ M2BrakeFeedback_Simulated := NOT PRG_10_Outputs.M2BrakeCmd;
 instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
-// ↔️ ─── CHARIOT M3 ────────────────────────────────────────────────────────
-// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Chariot, non prioritaire — voir AF_Partie13
-// §Chariot). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
+// ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
+// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir AF_Partie13
+// §Translation). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
 // (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
 // 🔧 REX 2026-07-15 (3) : RelayFwd/RelayRev câblés sur M3_CommandWord (variable globale
 // mappée PDO EtherCAT, valeur réellement envoyée, Auto ET Manu confondus) — ex-
-// GVL_Chariot_M3_Stub.M3_RelayFwd/Rev n'étaient plus jamais écrits depuis l'abandon du mode
+// GVL_Translation_M3_Stub.M3_RelayFwd/Rev n'étaient plus jamais écrits depuis l'abandon du mode
 // relais DEGRADED_IO (v0.4.11), la simulation de trajet M3 restait bloquée en permanence
 // (relais toujours FALSE). Lecture décalée d'1 cycle (10ms, M3_CommandWord réécrit en position
 // 10 par PRG_10_Outputs après ce PRG_00) — négligeable devant TravelTimeS (8s).
-instSimChariot(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ChariotPosition_IsReal,
-    TargetNum   := GVL_Chariot_M3_Stub.StubChariotPositionSelect_IHM,
+instSimTranslation(
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal,
+    TargetNum   := GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM,
     RelayFwd    := M3_CommandWord = 1,
     RelayRev    := M3_CommandWord = 2,
     TravelTimeS := 8.0
 );
 
-instChariotPosFosse1(InputRaw := PosFosse1_DI OR instSimChariot.PosFosse1, FilterTime := T#20MS);
-ChariotPosFosse1 := instChariotPosFosse1.State;
+instTranslationPosFosse1(InputRaw := PosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
+TranslationPosFosse1 := instTranslationPosFosse1.State;
 
-instChariotPosFosse2(InputRaw := PosFosse2_DI OR instSimChariot.PosFosse2, FilterTime := T#20MS);
-ChariotPosFosse2 := instChariotPosFosse2.State;
+instTranslationPosFosse2(InputRaw := PosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
+TranslationPosFosse2 := instTranslationPosFosse2.State;
 
-instChariotPosMaintenance(InputRaw := PosMaintenance_DI OR instSimChariot.PosMaintenance, FilterTime := T#20MS);
-ChariotPosMaintenance := instChariotPosMaintenance.State;
+instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
+TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
-instChariotPosTremie(InputRaw := PosTremie_DI OR instSimChariot.PosTremie, FilterTime := T#20MS);
-ChariotPosTremie := instChariotPosTremie.State;
+instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+TranslationPosTremie := instTranslationPosTremie.State;
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
-M3BrakeFeedback_Simulated := NOT PRG_07_ChariotControl.instChariotM3.BrakeCmd;
+M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
 instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
 

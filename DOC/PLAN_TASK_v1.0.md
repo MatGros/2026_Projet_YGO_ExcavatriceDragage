@@ -10,11 +10,11 @@
 
 | Date | Jalon |
 |---|---|
-| 2026-07-15 | `v0.4.8` — IHM_MANU M1/M2 pilotés via `FB_Winch` (rampe/ralentissement natifs, retrait doctrine "Conditional Bypass"), nouvelle limite `CableLimitAscentM1/2_M`, correctifs Méca B (bit8) + grappin couplé + `FB_Safety_Chariot` (latch défaut) |
+| 2026-07-15 | `v0.4.8` — IHM_MANU M1/M2 pilotés via `FB_Winch` (rampe/ralentissement natifs, retrait doctrine "Conditional Bypass"), nouvelle limite `CableLimitAscentM1/2_M`, correctifs Méca B (bit8) + benne couplé + `FB_Safety_Translation` (latch défaut) |
 | 2026-07-09 | Audit complet + ce `PLAN_TASK` |
 | 2026-07-09 | `PLAN_Finalisation_v1.1` (bloquants résolus + priorités actées) + `SAT_Protocole_Essais_v1.0` (protocole recette écrit) — ⚠️ pas encore commités |
 | 2026-07-08/09 | `v0.4.4`/`v0.4.5` **IHM_MANU** — mise en service d'urgence (dérogation active, voir §3 ⏸️) |
-| 2026-07-08 | `v0.4.0`→`v0.4.3` : simulation stable Winch/Grappin + synchro critique Méca E, pré-commissioning câble réel |
+| 2026-07-08 | `v0.4.0`→`v0.4.3` : simulation stable Winch/Benne + synchro critique Méca E, pré-commissioning câble réel |
 | 2026-07-07/08 | Réarchitecture `PRG_00`→`PRG_10` (abandon `PLC_PRG_MAIN`), campagne doc massive, audit cohérence documentaire |
 | 2026-07-04 | `PLAN_Finalisation_v1.0` — 1er état des lieux (bloquants, écarts, TBD) |
 | 2026-06-30 | Bootstrap projet (init CODESYS, skill workflow, convention nommage) |
@@ -24,7 +24,7 @@
 ## 🧩 2. Tâches / Features — état
 
 ### ✅ Fait
-Joystick · Winch/SpeedStep · Grappin · Encoder (pipeline) · Safety_Winch (14 bits) · Modes · Diag CanOpen/EtherCAT · Brake/Ramp · GVL_Simulation
+Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 bits) · Modes · Diag CanOpen/EtherCAT · Brake/Ramp · GVL_Simulation
 
 ### 🎯 Priorisé (v1.1 §2 — sécurité, à coder en premier)
 | # | Sujet |
@@ -36,10 +36,10 @@ Joystick · Winch/SpeedStep · Grappin · Encoder (pipeline) · Safety_Winch (14
 | Brique | Manque |
 |---|---|
 | `FB_WinchSync` | Surveillance seule (assumé), pas de correction active |
-| `FB_Chariot` | Mot de commande AC600 jamais câblé, `LIN_TRAFO` non vérifié, arrêt exact sur capteur non validé |
-| `FB_Safety_Chariot` | 4 bits seulement (vs 14 côté Winch) |
+| `FB_Translation` | Mot de commande AC600 jamais câblé, `LIN_TRAFO` non vérifié, arrêt exact sur capteur non validé |
+| `FB_Safety_Translation` | 4 bits seulement (vs 14 côté Winch) |
 | `FB_Cycle` | **Trouvé à l'audit, absent de v1.1** : `Error`/`ErrorId`/`StateAtError` jamais assignés, `ResetEdge` mort |
-| `FB_Input`/`FB_Output` (_COMMON) | Existent mais pas intégrés dans Winch/Chariot (logique contacteur dupliquée) |
+| `FB_Input`/`FB_Output` (COMMUN) | Existent mais pas intégrés dans Winch/Translation (logique contacteur dupliquée) |
 
 ### ⏸️ Différé assumé (pas un trou béant)
 `PRG_08_AuxiliaryControl` (crible/hydraulique/grille/casque) — code prêt (`ST_AuxiliaryHMI`), en attente validation client des specs fonctionnelles.
@@ -48,17 +48,23 @@ Joystick · Winch/SpeedStep · Grappin · Encoder (pipeline) · Safety_Winch (14
 IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` existe).
 
 ### 🗑️ Nettoyage dû
-`GVL_BUS`, `GVL_Machine_Stub` (orphelins) · `ST_IHM_MANU` (post-qualification, v1.1 §4.3) ·
-`GVL_Chariot_M3_Stub.M3_RelayFwd/Rev/RelaySpeedGv/ContactorFeedbackFwd/Rev` (100% orphelins
+`GVL_BUS`/`GVL_Machine_Stub` ✅ supprimés (2026-07-15, orphelins confirmés) · `ST_IHM_MANU` (post-qualification, v1.1 §4.3) ·
+`GVL_Translation_M3_Stub.M3_RelayFwd/Rev/RelaySpeedGv/ContactorFeedbackFwd/Rev` (100% orphelins
 depuis abandon DEGRADED_IO v0.4.11, confirmé 2026-07-15 — `M3_PositionSensorTarget`/
-`StubChariotPositionSelect_IHM` du même GVL restent utilisés, ne pas supprimer le fichier entier).
+`StubTranslationPositionSelect_IHM` du même GVL restent utilisés, ne pas supprimer le fichier entier).
 
 ### 🏷️ Nommage — chantier séparé (2026-07-15)
-Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), pilotée sur Chariot M3
-uniquement (`ST_ChariotHMI.ReqFwd/ReqRev`). Reste en préfixe `CmdX`, à auditer/migrer plus tard :
-`FB_Grappin`/`FB_Winch`/`ST_GrappinHMI`/`ST_WinchHMI` (`CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/
-`CmdInhibit`) et `FB_Cycle` (`CmdWinchM1_*`/`CmdChariotM3_*`/`CmdGrappin_*`) — blast radius plus
+Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), pilotée sur Translation M3
+uniquement (`ST_TranslationHMI.ReqFwd/ReqRev`). Reste en préfixe `CmdX`, à auditer/migrer plus tard :
+`FB_Benne`/`FB_Winch`/`ST_BenneHMI`/`ST_WinchHMI` (`CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/
+`CmdInhibit`) et `FB_Cycle` (`CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBenne_*`) — blast radius plus
 large (interfaces FB largement utilisées), plan dédié à valider avant d'y toucher.
+
+📌 **Décisions client (2026-07-15)** :
+- Le dossier `treuil` est conservé.
+- **M1** est officiellement le **moteur de retenue**.
+- **M2** devient le **moteur Benne** (le terme "Benne" disparaît au profit de "**Benne**").
+- Le "**Translation**" devient "**Translation**" (terme abrégé cible à définir : `Trans`, `Translat` ?).
 
 🎯 **Cap long terme** (demande explicite utilisateur 2026-07-15) : généraliser le préfixe
 (rôle/type d'abord, ex. `Req`/`Cmd`/`Sensor`/`Position`) à TOUT le projet — objectif : recherche/
@@ -83,7 +89,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T1 | Détail séquence `INIT` (sous-vérifications position/cohérence) | Projet | AF_Partie-04 §2, D22 |
 | T2 | Statut `PRG_IP.st` dans la liste de tâches CODESYS | Projet (vérif config) | v1.0 §3.3 |
 | T3 | Nom exact `FB_Filter_PT1` vs `FB_FilterPT1` | Vérif prochain export CODESYS | v1.0 §3.4 |
-| T4 | Protocole registre AC600 (`DriveControlWord`/`StatusWord`) | **Constructeur variateur** | Chariot/Safety_Chariot |
+| T4 | Protocole registre AC600 (`DriveControlWord`/`StatusWord`) | **Constructeur variateur** | Translation/Safety_Translation |
 | T5 | Priorités des tâches CODESYS (EtherCAT/CAN/Main) | Projet | AF_Partie-02 §Q7 |
 | T6 | Périmètre `PRG_08` Auxiliaire | **Client** (en cours, différé assumé) | v1.1 §3 |
 | T7 | Critère explicite de "machine qualifiée" pour retirer `IHM_MANU` | Projet | v1.1 §4.3 |
@@ -91,7 +97,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T9 | Comportement frein en montée chargée | Différé après essais terrain | AF_Partie-09 §4undecies |
 | T10 | `Safety_Winch` : cas sens opposé + absence de mouvement malgré commande | Projet | v1.0 |
 | T11 | `EmergencyStopOk` : pas de confirmation temporisée post-réarmement, redondance A/B logicielle seulement | Projet | AUDIT D93 |
-| T12 | `FB_Safety_Chariot`/domaine Chariot : pas de `ST_ContactorCheck` de puissance câblé pour M3, `PowerCutOff` des autres bits reste figé `FALSE` | Projet | AF_Partie-01, AF_Partie-11 |
+| T12 | `FB_Safety_Translation`/domaine Translation : pas de `ST_ContactorCheck` de puissance câblé pour M3, `PowerCutOff` des autres bits reste figé `FALSE` | Projet | AF_Partie-01, AF_Partie-11 |
 | T13 | Renommage identifiants CODE Safety Mouvement (lettres A/B/C → `SafetyMotion<Role>`) | Projet | AF_Partie-01 |
 | T15 | Source exacte de `EmergencyStopOk` selon métier (AU réarmé vs retour contacteur) à sécuriser en remise en service | Projet | AF_Partie-03 §1, AF_Partie-08 §7 |
 | T16 | Vestige `PRG_JOY1` (nommage historique + header `.st`) à nettoyer, architecture pré `PRG_00-10` | Projet | AF_Partie-08 §6bis |
@@ -104,9 +110,13 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T23 | Mapping IHM Encoder/Homing restant non codé (`WinchSelect_IHM`, `HomingTargetM_IHM`, voyants) | Projet | AF_Partie-10 §8 |
 | T24 | `FB_Encoder_Safety` (survitesse) orphelin depuis réécriture `FB_Encoder_Abs` — à retrancher/réintégrer | Projet | AF_Partie-10 §9bis |
 | T25 | Checklist validation Encoder/Homing non réalisée (flux nominal/unitaire, bornage, redémarrage, verrou transition) | Terrain | AF_Partie-10 §10 |
-| T26 | Checklist mise en service Chariot AC600 non réalisée (essai à vide, interlock sens, ETHERCAT, thermique frein) | Terrain | AF_Partie-11 §8 |
-| T27 | Grappin : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-12 §6 |
+| T26 | Checklist mise en service Translation AC600 non réalisée (essai à vide, interlock sens, ETHERCAT, thermique frein) | Terrain | AF_Partie-11 §8 |
+| T27 | Benne : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-12 §6 |
 | T28 | `GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev` (plafond palier "essais progressifs") : branchement **TEMPORAIRE** dans `FB_Winch`/`PRG_06_WinchControl` (`MaxStepAscent`) — à retirer une fois les vitesses définitives figées, cf. T7 (critère de retrait `IHM_MANU`) | Projet | Session 2026-07-15 |
+| T29 | Renommer "Translation" en "Translation" (terme abrégé à valider) et "Benne" en "Benne" (M1=Retenue, M2=Benne) | Projet | Point client 2026-07-15 |
+| T30 | Configurer le variateur de translation : fonctionnement classique à 30 Hz, max 60 Hz | Projet | Point client 2026-07-15 |
+| T31 | Calculer la vitesse codeur en m/s et la diviser en 5 paliers par rapport à la vitesse maximale | Projet | Point client 2026-07-15 |
+| T32 | Estimer la charge benne en % via un tableau 2D (état contacteurs vitesse montée × 5 paliers vitesse codeur) réglable manuellement | Projet | Point client 2026-07-15 |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 

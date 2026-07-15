@@ -114,7 +114,7 @@ instEncoderAbsM1(
     RawPosIn            := M1_RawPosToUse,
     AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM1.Operational OR instSimEncoderM1.Enable,
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational OR instSimEncoderM1.Enable,
     PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
     PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
 );
@@ -131,9 +131,9 @@ instHomingM1(
     // ─────────  Début modification IHM_MANU  ─────────
     // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M1 (mise en service urgence) — même FB, mêmes
     // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
-    Home                 := GVL_IHM.WinchM1.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M1TreuilRetenue.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     // ─────────  Fin modification IHM_MANU  ─────────
-    ConfirmCoherence     := GVL_IHM.WinchM1.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
@@ -163,7 +163,7 @@ instEncoderAbsM2(
     RawPosIn            := M2_RawPosToUse,
     AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.EncoderM2.Operational OR instSimEncoderM2.Enable,
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational OR instSimEncoderM2.Enable,
     PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
     PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
 );
@@ -180,9 +180,9 @@ instHomingM2(
     // ─────────  Début modification IHM_MANU  ─────────
     // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M2 (mise en service urgence) — même FB, mêmes
     // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
-    Home                 := GVL_IHM.WinchM2.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M2TreuilBucket.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     // ─────────  Fin modification IHM_MANU  ─────────
-    ConfirmCoherence     := GVL_IHM.WinchM2.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
