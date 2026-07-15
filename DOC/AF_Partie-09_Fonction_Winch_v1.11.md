@@ -1,5 +1,7 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.10)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.11)
 
+> **v1.11 (2026-07-15)** — TASK-0001 : Mise à jour de la référence T20 (arbitrage du sélecteur JoystickWinchSelect déplacé dans FB_Modes, voir AF_Partie-05 v1.6).
+>
 > **v1.10** — Nettoyage documentaire (audit doc) : remarques organisationnelles (sélecteur treuil
 > IHM non codé, §4undecies montée en charge, checklist validation v1.7) remplacées par des renvois
 > courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T9/T20/T21). Aucun changement fonctionnel.
@@ -17,7 +19,7 @@
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.3](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §3bis/§4, [P5 Modes v1.5](AF_Partie-05_Modes_Maintenance_v1.5.md), [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md).
+> 🔗 Dépend de : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.3](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §3bis/§4, [P5 Modes v1.6](AF_Partie-05_Modes_Maintenance_v1.6.md), [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md).
 >
 > 🆕 **v1.8 (2026-07-08)** — Lot #9-18 : Alignment and clarifications on independent cable limit descent (M1 and M2 cable limits are fully independent, using dedicated GVL_PERSISTENT and HMI variables).
 > 🆕 **v1.7 (2026-07-08)** — Lot #9-17 : Inhibition treuils, HomingApproachEnable, Méca B étendu, Méca D et refactoring Méca A/C :

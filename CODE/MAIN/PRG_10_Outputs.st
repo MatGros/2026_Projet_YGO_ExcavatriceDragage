@@ -246,15 +246,15 @@ IF ManuActive THEN
     END_IF;
 
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
-        // Commandes via le Joystick CANopen
-        M1Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        M1Rev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        // Commandes via le Joystick CANopen (arbitrées selon le mode de sécurité de FB_Modes, cf. TASK-0001)
+        M1Fwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        M1Rev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
         
-        M2Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        M2Rev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        M2Fwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        M2Rev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
         
-        CoupledFwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        CoupledRev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        CoupledFwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        CoupledRev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
         
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);

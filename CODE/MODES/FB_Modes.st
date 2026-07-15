@@ -49,6 +49,7 @@ VAR_INPUT
     HomingApproachEnableRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Common.HomingApproachEnableRequest — case IHM
                                         // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
+    JoystickWinchSelectRequest : INT;  // 🆕 TASK-0001 : 1=M1, 2=M2, 3=Couplé (brut IHM)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -63,6 +64,7 @@ VAR_OUTPUT
     InhibitM1           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM1Request
     InhibitM2           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM2Request
     HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND HomingApproachEnableRequest
+    JoystickWinchSelectArbitrated : INT; // 🆕 TASK-0001 : arbitré, forcé à 3 (Couplé) hors MAINT_N2
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -79,6 +81,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     InhibitM1 := FALSE;
     InhibitM2 := FALSE;
     HomingApproachEnable := FALSE;
+    JoystickWinchSelectArbitrated := 3; // Par défaut couplé
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -126,6 +129,16 @@ InhibitM2 := (Mode = E_Mode.MAINT_N2) AND InhibitM2Request;
 // PRG_06_WinchControl.st, qui bypassait l'arrêt normal pour N'IMPORTE QUELLE opération N2.
 // Désormais un choix conscient explicite est requis EN PLUS du mode.
 HomingApproachEnable := (Mode = E_Mode.MAINT_N2) AND HomingApproachEnableRequest;
+
+// 📤 5quater. SÉLECTEUR JOYSTICK — TASK-0001 (2026-07-15)
+// M1 seul (=1) ou M2 seul (=2) au joystick est réservé au mode MAINT_N2
+// pour éviter de désynchroniser accidentellement les treuils (câble en travers).
+// Forcé à Couplé (=3) dans tous les autres modes (MAINT_N1, SEMI_AUTO, DISABLE).
+IF Mode = E_Mode.MAINT_N2 THEN
+    JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSE
+    JoystickWinchSelectArbitrated := 3; // Couplé forcé
+END_IF;
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);

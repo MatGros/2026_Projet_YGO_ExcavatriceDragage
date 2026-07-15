@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.208802" />
-  <contentHeader name="MGS_v0.4.8_IHM_MANU_FBWinch.project" modificationDateTime="2026-07-04T06:07:15.208802">
+  <contentHeader name="Programme MGS_v0.4.8_IHM_MANU_JOY.project" modificationDateTime="2026-07-04T06:07:15.208802">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.8_IHM_MANU_FBWinch</property>
+          <property name="Project" type="string">Programme MGS_v0.4.8_IHM_MANU_JOY</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -8329,6 +8329,14 @@ Done := NOT Error;
 Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickWinchSelectRequest">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TASK-0001 : 1=M1, 2=M2, 3=Couplé (brut IHM)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -8409,6 +8417,14 @@ Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND HomingApproachEnableRequest</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TASK-0001 : arbitré, forcé à 3 (Couplé) hors MAINT_N2</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -8476,6 +8492,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     InhibitM1 := FALSE;
     InhibitM2 := FALSE;
     HomingApproachEnable := FALSE;
+    JoystickWinchSelectArbitrated := 3; // Par défaut couplé
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -8523,6 +8540,16 @@ InhibitM2 := (Mode = E_Mode.MAINT_N2) AND InhibitM2Request;
 // PRG_06_WinchControl.st, qui bypassait l'arrêt normal pour N'IMPORTE QUELLE opération N2.
 // Désormais un choix conscient explicite est requis EN PLUS du mode.
 HomingApproachEnable := (Mode = E_Mode.MAINT_N2) AND HomingApproachEnableRequest;
+
+// 📤 5quater. SÉLECTEUR JOYSTICK — TASK-0001 (2026-07-15)
+// M1 seul (=1) ou M2 seul (=2) au joystick est réservé au mode MAINT_N2
+// pour éviter de désynchroniser accidentellement les treuils (câble en travers).
+// Forcé à Couplé (=3) dans tous les autres modes (MAINT_N1, SEMI_AUTO, DISABLE).
+IF Mode = E_Mode.MAINT_N2 THEN
+    JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSE
+    JoystickWinchSelectArbitrated := 3; // Couplé forcé
+END_IF;
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -13098,7 +13125,8 @@ instModes(
     InhibitM1Request    := GVL_IHM.WinchM1.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     InhibitM2Request    := GVL_IHM.WinchM2.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     HomingApproachEnableRequest := GVL_IHM.Common.HomingApproachEnableRequest, // 🆕 REX 2026-07-08 (2)
-    EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent   // 1 cycle de retard (reçu de PRG_02_Encoders)
+    EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
+    JoystickWinchSelectRequest := GVL_IHM.IHM_MANU.JoystickWinchSelect // 🆕 TASK-0001
 );
 </xhtml>
           </ST>
@@ -15360,15 +15388,15 @@ IF ManuActive THEN
     END_IF;
 
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
-        // Commandes via le Joystick CANopen
-        M1Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        M1Rev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        // Commandes via le Joystick CANopen (arbitrées selon le mode de sécurité de FB_Modes, cf. TASK-0001)
+        M1Fwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        M1Rev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
         
-        M2Fwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        M2Rev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        M2Fwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        M2Rev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
         
-        CoupledFwd_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        CoupledRev_Demand := (GVL_IHM.IHM_MANU.JoystickWinchSelect = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
+        CoupledFwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
+        CoupledRev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
         
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);

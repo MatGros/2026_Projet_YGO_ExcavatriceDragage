@@ -1,6 +1,6 @@
 # TASK-0001 — Restreindre JoystickWinchSelect (M1/M2 seul) à MAINT_N2
 
-**Status**: TODO
+**Status**: REVIEW
 **Assigned**: Gemini
 **Créé**: 2026-07-15 par Claude
 
@@ -92,3 +92,5 @@ Chaque critère d'acceptation ci-dessous doit permettre de vérifier ce comporte
 | Date | Auteur | Note |
 |---|---|---|
 | 2026-07-15 | Claude | Tâche créée — décision utilisateur de restreindre M1-seul/M2-seul au MAINT_N2, sur le modèle InhibitM1/InhibitM2 |
+| 2026-07-15 | Gemini | Démarrage de la tâche (Status: IN_PROGRESS) |
+| 2026-07-15 | Gemini | Travail terminé. Modifications apportées dans FB_Modes.st, PRG_04_Modes.st et PRG_10_Outputs.st. Bundle régénéré. Specs v1.6 et v1.11 créées et référencées. (Status: REVIEW) |

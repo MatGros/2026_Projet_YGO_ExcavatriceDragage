@@ -1,5 +1,7 @@
-# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.5)
+# 📋 Analyse Fonctionnelle — Partie 5 : Modes & Maintenance (v1.6)
 
+> **Version 1.6 (2026-07-15)** — TASK-0001 : Arbitrage de la sélection JoystickWinchSelect (M1 seul/M2 seul/Couplé) réservé au mode MAINT_N2, forcé à Couplé (3) dans tous les autres modes.
+>
 > **Version 1.5** — Nettoyage documentaire (audit doc) : la remarque "GVL d'échange IHM à créer
 > (à définir)" (§6) était organisationnelle — remplacée par un renvoi court vers
 > `DOC/PLAN_TASK_v1.0.md` §3 (T18). Aucun changement fonctionnel. Corrige au passage le nom de
@@ -124,6 +126,16 @@ PrevInhibitM2 := InhibitM2Request;
 // Si l'un des treuils est inhibé, SyncEnable est désactivé et forcé à FALSE
 IF InhibitM1Request OR InhibitM2Request THEN
     SyncEnable := FALSE;
+END_IF;
+
+// Arbitrage sélecteur Joystick (TASK-0001, v1.6)
+// M1 seul (=1) ou M2 seul (=2) au joystick est restreint au mode MAINT_N2
+// pour éviter de désynchroniser accidentellement les treuils (câble en travers).
+// Forcé à Couplé (=3) dans tous les autres modes (MAINT_N1, SEMI_AUTO, DISABLE).
+IF Mode = E_Mode.MAINT_N2 THEN
+    JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSE
+    JoystickWinchSelectArbitrated := 3; // Couplé forcé
 END_IF;
 
 // Application aux blocs concernés :
