@@ -102,35 +102,19 @@ VAR
     M3Fwd_Demand          : BOOL;
     M3Rev_Demand          : BOOL;
 
-    // États effectifs calculés (après interlocks et limites)
-    M1Fwd_Eff             : BOOL;
-    M1Rev_Eff             : BOOL;
-    M2Fwd_Eff             : BOOL;
-    M2Rev_Eff             : BOOL;
-    K1_Eff                : BOOL; // Contacteurs vitesse communs M1+M2
-    K2_Eff                : BOOL;
-    K3_Eff                : BOOL;
-    K4_Eff                : BOOL;
+    // États effectifs calculés (après interlocks) — M3 uniquement : M1/M2 pilotés désormais via
+    // FB_Winch (PRG_06_WinchControl §1/§2, REX 2026-07-15 (2)) — ex-M1Fwd_Eff/M1Rev_Eff/M2Fwd_Eff/
+    // M2Rev_Eff/K1-4_Eff/SimM1Fwd_Eff/SimM1Rev_Eff/SimM2Fwd_Eff/SimM2Rev_Eff RETIRÉS (obsolètes,
+    // FB_Winch gère nativement rampe+paliers+ralentissement bordure+relais tenu pendant décél).
     M3Fwd_Eff             : BOOL;
     M3Rev_Eff             : BOOL;
-    // Signaux dédiés simulation : toujours interlockés avec les butées et SafeStop (hors doctrine Conditional Bypass)
-    SimM1Fwd_Eff          : BOOL; // Codeur simulé M1 : respecte ForbidAscent et SafeStop quelle que soit la doctrine
-    SimM1Rev_Eff          : BOOL; // Codeur simulé M1 : respecte ForbidDescent et SafeStop quelle que soit la doctrine
-    SimM2Fwd_Eff          : BOOL; // Codeur simulé M2 : respecte ForbidAscent et SafeStop quelle que soit la doctrine
-    SimM2Rev_Eff          : BOOL; // Codeur simulé M2 : respecte ForbidDescent et SafeStop quelle que soit la doctrine
 
-    instManuSpeedStep     : FB_SpeedStep; // 🪜 FB de décodage palier pour Joystick en mode Manu
     instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
     instM3RelayRevLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel
 
-    // 🆕 REX 2026-07-14 — Gestion RAMPES / décodage à la volée en mode HMI bouton
-    CycleTimeCalc         : FB_CycleTime; // ⏱️ Calculateur temps de cycle réel
-    instHmiSpeedRamp      : FB_Ramp;      // 📈 Rampe d'accélération pour vitesse HMI
-    WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active
-    HmiRampTarget         : REAL;         // 🎯 Cible de la rampe HMI
-    SpeedRefPct           : REAL;         // 📊 Consigne vitesse courante (issue de la rampe)
-    ActiveMaxStepFwd      : INT;          // ⚡ Limite dynamique palier max montée (1..5)
-    ActiveMaxStepRev      : INT;          // ⚡ Limite dynamique palier max descente (1..5)
+    // 🔧 REX 2026-07-15 (2) : rampe HMI locale (CycleTimeCalc/instHmiSpeedRamp/SpeedRefPct) et
+    // décodage paliers (instManuSpeedStep/ActiveMaxStepFwd/Rev) RETIRÉS avec M1Fwd_Eff ci-dessus.
+    WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active (verrouillage aiguillage)
     M3_ActiveFreqCmd      : REAL;         // ⚡ Consigne active fréquence Chariot M3 au cycle courant (Hz)
     M3_DriveIsReal        : BOOL;         // ⚡ Indique si le variateur Chariot M3 est configuré comme réel
     M1_IsReal             : BOOL;         // ⚡ Indique si le treuil M1 est configuré comme réel
@@ -278,43 +262,26 @@ IF ManuActive THEN
         // Consigne active Chariot M3 (0..M3_FreqSetpoint Hz) via déflexion X (la consigne HMI est prise pour 100%)
         M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.IHM_MANU.M3_FreqSetpoint;
     ELSE
-        // ⏱️ Calcul temps de cycle réel pour la rampe HMI
-        CycleTimeCalc();
-
         // 💡 Détection de mouvement en cours (pour verrouillage croisé)
         WinchMoving := M1Fwd_Demand OR M1Rev_Demand OR M2Fwd_Demand OR M2Rev_Demand OR CoupledFwd_Demand OR CoupledRev_Demand;
 
-        // 🔒 Verrouillage d'aiguillage HMI : on ne démarre un mouvement que si aucun autre n'est en cours (arrêt complet)
-        M1Fwd_Demand := (GVL_IHM.IHM_MANU.M1_RelayFwd AND (NOT WinchMoving OR M1Fwd_Demand)) OR (M1Fwd_Demand AND SpeedRefPct > 0.1);
-        M1Rev_Demand := (GVL_IHM.IHM_MANU.M1_RelayRev AND (NOT WinchMoving OR M1Rev_Demand)) OR (M1Rev_Demand AND SpeedRefPct > 0.1);
-        M2Fwd_Demand := (GVL_IHM.IHM_MANU.M2_RelayFwd AND (NOT WinchMoving OR M2Fwd_Demand)) OR (M2Fwd_Demand AND SpeedRefPct > 0.1);
-        M2Rev_Demand := (GVL_IHM.IHM_MANU.M2_RelayRev AND (NOT WinchMoving OR M2Rev_Demand)) OR (M2Rev_Demand AND SpeedRefPct > 0.1);
-        CoupledFwd_Demand := (GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND (NOT WinchMoving OR CoupledFwd_Demand)) OR (CoupledFwd_Demand AND SpeedRefPct > 0.1);
-        CoupledRev_Demand := (GVL_IHM.IHM_MANU.M1_M2_RelayRev AND (NOT WinchMoving OR CoupledRev_Demand)) OR (CoupledRev_Demand AND SpeedRefPct > 0.1);
+        // 🔒 Verrouillage d'aiguillage HMI : on ne démarre un mouvement que si aucun autre n'est en cours
+        // 🔧 REX 2026-07-15 (2) : ex-tenue "AND SpeedRefPct > 0.1" retirée — rampe HMI locale
+        // supprimée (M1/M2 pilotés via FB_Winch, PRG_06_WinchControl), qui gère désormais SEUL la
+        // rampe et l'interlock de changement de sens (DirectionChangePending/DirectionChangeDelay,
+        // voir FB_Winch.st) : plus besoin de tenir la demande le temps d'une décél locale ici.
+        M1Fwd_Demand := GVL_IHM.IHM_MANU.M1_RelayFwd AND (NOT WinchMoving OR M1Fwd_Demand);
+        M1Rev_Demand := GVL_IHM.IHM_MANU.M1_RelayRev AND (NOT WinchMoving OR M1Rev_Demand);
+        M2Fwd_Demand := GVL_IHM.IHM_MANU.M2_RelayFwd AND (NOT WinchMoving OR M2Fwd_Demand);
+        M2Rev_Demand := GVL_IHM.IHM_MANU.M2_RelayRev AND (NOT WinchMoving OR M2Rev_Demand);
+        CoupledFwd_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND (NOT WinchMoving OR CoupledFwd_Demand);
+        CoupledRev_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND (NOT WinchMoving OR CoupledRev_Demand);
 
         M3Fwd_Demand := GVL_IHM.IHM_MANU.M3_RelayFwd;
         M3Rev_Demand := GVL_IHM.IHM_MANU.M3_RelayRev;
 
         // En mode HMI boutons / Simulation, la consigne active envoyée est directement M3_FreqSetpoint
         M3_ActiveFreqCmd := GVL_IHM.IHM_MANU.M3_FreqSetpoint;
-
-        // 🎯 Détermination de la cible pour la rampe HMI (100% si un bouton est pressé, 0% sinon)
-        IF GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M1_RelayRev 
-           OR GVL_IHM.IHM_MANU.M2_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayRev 
-           OR GVL_IHM.IHM_MANU.M1_M2_RelayFwd OR GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
-            HmiRampTarget := 100.0;
-        ELSE
-            HmiRampTarget := 0.0;
-        END_IF;
-
-        // 📈 Calcul de la rampe de vitesse HMI
-        instHmiSpeedRamp(
-            Target := HmiRampTarget,
-            AccelRate := 50.0,
-            DecelRate := 150.0,
-            CycleTimeS := CycleTimeCalc.CycleTimeS
-        );
-        SpeedRefPct := instHmiSpeedRamp.Current;
     END_IF;
 
     // 🔒 Sécurité démarrage : exige que toutes les commandes HMI et Joystick soient au repos (neutre) au démarrage
@@ -340,74 +307,12 @@ IF ManuActive THEN
         M3Rev_Demand := FALSE;
     END_IF;
 
-    // 5️⃣ Évaluation finale des mouvements effectifs avec interlocks de fin de course grappin
-    // Remarque : les limites FdcGrappin ne s'appliquent qu'au pilotage INDIVIDUEL de M2
-    // 🛡️ 2026-07-14 : verrouillage de sécurité obligatoire avec EmergencyStopOk sur PC / terrain
-    M1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                 AND (NOT M1_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM1.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidAscent));
-    M1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                 AND (NOT M1_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM1.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidDescent));
-    M2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                 AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent));
-    M2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                 AND (NOT M2_IsReal OR (NOT PRG_03_Safety.instSafetyWinchM2.SafeStop AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent));
-
-    // 🆕 5bis — Signaux dédiés CODEUR SIMULÉ : butées et SafeStop TOUJOURS actifs (hors doctrine Conditional Bypass)
-    // En simulation (M1_IsReal=FALSE), M1Fwd_Eff ignore les SafeStop — normal pour ne pas bloquer l'opérateur.
-    // MAIS le codeur simulé doit s'arrêter aux butées logicielles comme un vrai codeur le ferait sur site.
-    // → On reforce ici les SafeStop/ForbidAscent/ForbidDescent sans condition de réalité.
-    SimM1Fwd_Eff := (M1Fwd_Demand OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                    AND NOT PRG_03_Safety.instSafetyWinchM1.SafeStop
-                    AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
-    SimM1Rev_Eff := (M1Rev_Demand OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                    AND NOT PRG_03_Safety.instSafetyWinchM1.SafeStop
-                    AND NOT PRG_03_Safety.instSafetyWinchM1.ForbidDescent;
-    SimM2Fwd_Eff := ((M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR CoupledFwd_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                    AND NOT PRG_03_Safety.instSafetyWinchM2.SafeStop
-                    AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
-    SimM2Rev_Eff := ((M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR CoupledRev_Demand) AND PRG_00_Inputs.EmergencyStopOk
-                    AND NOT PRG_03_Safety.instSafetyWinchM2.SafeStop
-                    AND NOT PRG_03_Safety.instSafetyWinchM2.ForbidDescent;
-
-    // ⚡ Bornage et valeur par défaut des paliers de vitesse max demandés (1..5)
-    ActiveMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
-    IF (ActiveMaxStepFwd < 1) OR (ActiveMaxStepFwd > 5) THEN
-        ActiveMaxStepFwd := 5; // Pleine vitesse (5 paliers max) par défaut si non initialisé ou invalide
-    END_IF;
-
-    ActiveMaxStepRev := GVL_IHM.IHM_MANU.WinchMaxStepRev;
-    IF (ActiveMaxStepRev < 1) OR (ActiveMaxStepRev > 5) THEN
-        ActiveMaxStepRev := 2; // Palier 2 max par défaut en descente (conforme AF) si non initialisé ou invalide
-    END_IF;
-
-    // 6️⃣ Décodage de la vitesse des Winchs K1-K4
-    IF GVL_IHM.IHM_MANU.JoystickSelect THEN
-        // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse du joystick Y (0..100%)
-        instManuSpeedStep(
-            Enable := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND PRG_00_Inputs.EmergencyStopOk,
-            SpeedRefPct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef),
-            Table := GVL_PERSISTENT.WinchSpeedStepTable,
-            HystMargin := 2.0,
-            MaxStepNumber := SEL(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1, ActiveMaxStepFwd, ActiveMaxStepRev)
-        );
-        K1_Eff := instManuSpeedStep.Contactor1;
-        K2_Eff := instManuSpeedStep.Contactor2;
-        K3_Eff := instManuSpeedStep.Contactor3;
-        K4_Eff := instManuSpeedStep.Contactor4;
-    ELSE
-        // 🪜 Utilisation de FB_SpeedStep pour décoder la vitesse de la rampe HMI (0..100%)
-        instManuSpeedStep(
-            Enable := (SpeedRefPct > 0.1) AND PRG_00_Inputs.EmergencyStopOk,
-            SpeedRefPct := SpeedRefPct,
-            Table := GVL_PERSISTENT.WinchSpeedStepTable,
-            HystMargin := 2.0,
-            MaxStepNumber := SEL(M1Rev_Demand OR M2Rev_Demand OR CoupledRev_Demand, ActiveMaxStepFwd, ActiveMaxStepRev)
-        );
-        K1_Eff := instManuSpeedStep.Contactor1;
-        K2_Eff := instManuSpeedStep.Contactor2;
-        K3_Eff := instManuSpeedStep.Contactor3;
-        K4_Eff := instManuSpeedStep.Contactor4;
-    END_IF;
+    // 🔧 REX 2026-07-15 (2) : ex-§5️⃣/§5bis/§6️⃣ (M1Fwd_Eff/M1Rev_Eff/M2Fwd_Eff/M2Rev_Eff/
+    // SimM1Fwd_Eff.../décodage K1-K4 via instManuSpeedStep) RETIRÉS — M1/M2 pilotés désormais par
+    // instWinchM1/instWinchM2 (PRG_06_WinchControl §1/§2/§6/§7), qui écrivent directement
+    // PRG_10_Outputs.M1RelayFwd/M1RelayRev/M1SpeedContactor1-4/M1BrakeCmd (et M2) via §8 de ce
+    // même fichier PRG_06 — AVANT que ce PRG_10_Outputs ne s'exécute (position 6 < 10). Plus besoin
+    // de "Recopie vers les VAR_INPUT" ci-dessous pour M1/M2 (voir fin de fichier).
 
     // 7️⃣ Commandes effectives Chariot M3 (interlockées avec l'AU, et avec la disponibilité variateur SEULEMENT s'il est configuré Réel)
     M3Fwd_Eff := M3Fwd_Demand AND PRG_00_Inputs.EmergencyStopOk 
@@ -450,30 +355,12 @@ IF ManuActive THEN
                                                  OR GVL_IHM.IHM_MANU.HelmetCloseCmd)
                                                  AND PRG_00_Inputs.EmergencyStopOk;
 
-    // Recopie vers les VAR_INPUT existants pour forcer les sorties physiques
-    M1RelayFwd        := M1Fwd_Eff;
-    M1RelayRev        := M1Rev_Eff;
-    M1BrakeCmd        := M1Fwd_Eff OR M1Rev_Eff;
-    M1SpeedContactor1 := K1_Eff;
-    M1SpeedContactor2 := K2_Eff;
-    M1SpeedContactor3 := K3_Eff;
-    M1SpeedContactor4 := K4_Eff;
-
-    M2RelayFwd        := M2Fwd_Eff;
-    M2RelayRev        := M2Rev_Eff;
-    M2BrakeCmd        := M2Fwd_Eff OR M2Rev_Eff;
-    M2SpeedContactor1 := K1_Eff;
-    M2SpeedContactor2 := K2_Eff;
-    M2SpeedContactor3 := K3_Eff;
-    M2SpeedContactor4 := K4_Eff;
-
+    // 🔧 REX 2026-07-15 (2) : plus de recopie M1/M2 ici — déjà écrites par PRG_06_WinchControl §8
+    // (instWinchM1/instWinchM2.RelayFwd/RelayRev/Contactor1-4/BrakeCmd), AVANT ce PRG_10_Outputs
+    // dans l'ordre de tâche (position 6 < 10), pour Auto ET Manu désormais.
     ChariotBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
 ELSE
     // Nettoyage en cas de désactivation du mode Manu
-    instManuSpeedStep(Enable := FALSE);
-    instHmiSpeedRamp(Target := 0.0, AccelRate := 100.0, DecelRate := 500.0, CycleTimeS := 0.010);
-    SpeedRefPct := 0.0;
-    
     GridUp_RQ := FALSE;
     GridDown_RQ := FALSE;
     HelmetOpen_RQ := FALSE;

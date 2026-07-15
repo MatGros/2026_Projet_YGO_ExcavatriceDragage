@@ -15,6 +15,8 @@ STRUCT
     RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     RampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
     CableLimitDescentM      : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
+    CableLimitAscentM       : REAL := 12.0;     (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) —
+                                                    distincte de TopSensorPositionM (12.5m, réservé au Homing) *)
     SlowdownDistanceM       : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
     SlowSpeedPct            : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
 
@@ -47,6 +49,7 @@ STRUCT
     ThermalFault            : BOOL;             (* 🔥 Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)
     CableLimitDescentReached: BOOL;             (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
+    CableLimitAscentReached : BOOL;             (* ⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscentM) *)
     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)

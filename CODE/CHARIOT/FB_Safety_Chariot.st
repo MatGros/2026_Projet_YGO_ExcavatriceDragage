@@ -66,11 +66,18 @@ END_VAR
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Chariot) ===
 
 // 🛑 1. GATE — neutralisation si désactivé
+// 🔧 REX 2026-07-15 (2) : Error/ErrorId RAJOUTÉS ici (bug corrigé, retour terrain — un défaut
+// transitoire survenu pendant qu'Enable=TRUE restait LATCHÉ à vie une fois Enable repassé à
+// FALSE, puisque Reset/ResetEdge ne sont traités que dans la branche Enable=TRUE ci-dessous ;
+// remontait comme un "faux défaut M3 en simulation" alors qu'aucun composant réel n'est en
+// cause). Aligné sur FB_Safety_Winch, qui le faisait déjà correctement.
 IF NOT Enable THEN
     Ready := FALSE;
     SafeStop := TRUE;
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
+    Error := FALSE;
+    ErrorId := 16#0000;
     RETURN;
 END_IF;
 

@@ -40,26 +40,24 @@ END_VAR
 M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
 M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
 
-// 🆕 Calcul de la vitesse de simulation adaptée (mode normal ou mode Manu avec rampes/joystick)
-M1_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
-                      PRG_06_WinchControl.instWinchM1.SpeedRamp.Current,
-                      SEL(GVL_IHM.IHM_MANU.JoystickSelect,
-                          PRG_10_Outputs.SpeedRefPct,
-                          ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef)));
-
-M2_SimSpeedPct := SEL(PRG_10_Outputs.ManuActive,
-                      PRG_06_WinchControl.instWinchM2.SpeedRamp.Current,
-                      SEL(GVL_IHM.IHM_MANU.JoystickSelect,
-                          PRG_10_Outputs.SpeedRefPct,
-                          ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef)));
+// 🔧 REX 2026-07-15 (4) — CORRECTIF COMPILATION : ex-SEL(ManuActive, ...) référençait
+// PRG_10_Outputs.SpeedRefPct, supprimé lors du passage de Manu sur FB_Winch (REX 2026-07-15 (2)).
+// Plus besoin de distinguer Auto/Manu ici : instWinchM1/M2.SpeedRamp.Current est désormais LA
+// vitesse rampée réelle dans les DEUX cas (FB_Winch pilote M1/M2 qu'on soit en Auto ou en Manu).
+M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
+M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 
 // 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
 // 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 —
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
-    RelayFwd    := PRG_10_Outputs.SimM1Fwd_Eff,  // 🆕 2026-07-15 : signaux Sim dédiés — respectent SafeStop/ForbidAscent/ForbidDescent même en doctrine simulation
-    RelayRev    := PRG_10_Outputs.SimM1Rev_Eff,  // (était M1RelayFwd/Rev → bypassait toutes les butées logicielles en simulation)
+    // 🔧 REX 2026-07-15 (2) : lit directement instWinchM1 (PRG_06_WinchControl) — M1 est désormais
+    // piloté par FB_Winch en Auto ET en Manu (ex-SimM1Fwd_Eff/PRG_10_Outputs retiré, obsolète) :
+    // RelayFwd/RelayRev respectent déjà SafeStop/ForbidAscent/ForbidDescent nativement, plus besoin
+    // de signaux Sim dédiés.
+    RelayFwd    := PRG_06_WinchControl.instWinchM1.RelayFwd,
+    RelayRev    := PRG_06_WinchControl.instWinchM1.RelayRev,
     SpeedRefPct := M1_SimSpeedPct,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
@@ -71,8 +69,9 @@ instSimEncoderM1(
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
-    RelayFwd    := PRG_10_Outputs.SimM2Fwd_Eff,  // 🆕 2026-07-15 : signaux Sim dédiés — respectent SafeStop/ForbidAscent/ForbidDescent même en doctrine simulation
-    RelayRev    := PRG_10_Outputs.SimM2Rev_Eff,  // (était M2RelayFwd/Rev → bypassait toutes les butées logicielles en simulation)
+    // 🔧 REX 2026-07-15 (2) : idem M1 ci-dessus, lit instWinchM2 (ex-SimM2Fwd_Eff retiré).
+    RelayFwd    := PRG_06_WinchControl.instWinchM2.RelayFwd,
+    RelayRev    := PRG_06_WinchControl.instWinchM2.RelayRev,
     SpeedRefPct := M2_SimSpeedPct,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,
