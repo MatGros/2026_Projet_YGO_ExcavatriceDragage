@@ -32,6 +32,14 @@ Avant toute modif dans `CODE/` :
 
 ---
 
+## 🔄 Système de Push Notifications (Réveil Temps Réel ⚡)
+Pour un réveil instantané de Gemini sans dépendre d'un cron passif, un serveur HTTP local et des Git Hooks sont intégrés :
+* **Serveur local** : `python PLCOPENXML_TOOLING/push_server.py` tourne en tâche de fond sur le port **`9090`**.
+* **Git Hooks** : Des hooks `.git/hooks/post-commit` et `post-merge` appellent `curl http://localhost:9090/wake` dès que `QUEUE.md` est modifié dans Git.
+* **Appel manuel** : Si Claude ou toi-même modifiez `QUEUE.md` sans commiter, tu peux envoyer un push manuel en exécutant `curl -s http://localhost:9090/wake` ou en ouvrant `http://localhost:9090/wake` dans ton navigateur pour réveiller Gemini immédiatement.
+
+---
+
 ## 📋 Où trouver ton travail
 
 1. Ouvre `DOC/AGENT_HANDOFF/QUEUE.md` — cherche les lignes `Assigned: Gemini` avec `Status: TODO`.
