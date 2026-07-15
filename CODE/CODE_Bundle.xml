@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-15T20:01:12.631307" />
-  <contentHeader name="Programme MGS_v0.4.12_ChariotHMI_Migration.project" modificationDateTime="2026-07-15T20:01:12.631307">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-15T20:01:12.631307">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Programme MGS_v0.4.12_ChariotHMI_Migration</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1799,7 +1799,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Paramètres / Calibration (Lecture/Écriture)
-📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné GVL_PERSISTENT.WinchSyncTolerance_M</xhtml>
+📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaPosM">
@@ -4327,7 +4327,7 @@ CASE State OF
         CmdWinchM2_SpeedPct  := 70.0;
 
         // Transition si position haute (butée haute virtuelle) atteinte
-        IF M1_CablePosM &gt;= GVL_PERSISTENT.HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
+        IF M1_CablePosM &gt;= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.DRAINING_PAUSE;
@@ -9260,7 +9260,7 @@ END_IF;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -12072,8 +12072,8 @@ SlackCableSwitch := instSlackCableSwitch.State;
 // Dérivé désormais de la position M1 simulée (référence de l'ensemble, voir FB_Bucket/
 // ActiveOffsetM) — 1 cycle de retard (PRG_00 avant PRG_02 dans l'ordre de tâche), négligeable,
 // même principe déjà assumé ailleurs (EncoderFaultPresent, BenneHoldStillActive).
-SimTopSensorTriggered := (NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= GVL_PERSISTENT.HomingTargetM1_M))
-                      OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= GVL_PERSISTENT.HomingTargetM2_M));
+SimTopSensorTriggered := (NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _HomingTargetM1_M))
+                      OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= _HomingTargetM2_M));
 instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
 TopPositionSensor := instTopPositionSensor.State;
 
@@ -12275,8 +12275,8 @@ FB_Joystick_0(
     // descendant). Sans impact pratique : très inférieur aux temps de réponse frein/contacteurs
     // (100-300ms, voir FB_Brake) — la commande n'a pas le temps de produire un mouvement réel.
     BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
-    NeutralXMem         := GVL_PERSISTENT.JoystickNeutralX,
-    NeutralYMem         := GVL_PERSISTENT.JoystickNeutralY,
+    NeutralXMem         := _JoystickNeutralX,
+    NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP          := instDiagCanOpen.DeviceJoystick,
     RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
@@ -12446,7 +12446,7 @@ M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 
 // 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
-// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 —
+// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
@@ -12463,7 +12463,7 @@ instSimEncoderM1(
     // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E) — 4096 = PointsPerRev/CableM_PerRev (8192/2.0)
     TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM1,
     TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
-    RawPos      := GVL_PERSISTENT.SimEncoderRawPosM1
+    RawPos      := _SimEncoderRawPosM1
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
@@ -12477,7 +12477,7 @@ instSimEncoderM2(
     // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E)
     TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM2,
     TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
-    RawPos      := GVL_PERSISTENT.SimEncoderRawPosM2
+    RawPos      := _SimEncoderRawPosM2
 );
 
 // Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
@@ -12522,7 +12522,7 @@ COD1_PresetValue    := instEncoderAbsM1.PresetValueOut;
 
 instHomingM1(
     Enable               := TRUE,
-    Calib                := GVL_PERSISTENT.CalibM1,
+    Calib                := _CalibM1,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
@@ -12533,7 +12533,7 @@ instHomingM1(
     // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
+    TopSensorPositionM   := _HomingTargetM1_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
@@ -12571,7 +12571,7 @@ COD2_PresetValue    := instEncoderAbsM2.PresetValueOut;
 
 instHomingM2(
     Enable               := TRUE,
-    Calib                := GVL_PERSISTENT.CalibM2,
+    Calib                := _CalibM2,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
@@ -12582,7 +12582,7 @@ instHomingM2(
     // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,
+    TopSensorPositionM   := _HomingTargetM2_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
@@ -12635,10 +12635,10 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
         IF NOT M1_IsReal THEN
             IF instEncoderAbsM1.PresetAck THEN
-                GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-                GVL_PERSISTENT.CalibM1.Homed := TRUE;
-                GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
-                GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
+                _CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM1.Homed := TRUE;
+                _CalibM1.HomingSuspect := FALSE;
+                _CalibM1.LastKnownRawPos := 16777216;
                 GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
             ELSIF instEncoderAbsM1.PresetNak THEN
                 GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
@@ -12655,10 +12655,10 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
         IF NOT M2_IsReal THEN
             IF instEncoderAbsM2.PresetAck THEN
-                GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-                GVL_PERSISTENT.CalibM2.Homed := TRUE;
-                GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
-                GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
+                _CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM2.Homed := TRUE;
+                _CalibM2.HomingSuspect := FALSE;
+                _CalibM2.LastKnownRawPos := 16777216;
                 GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
             ELSIF instEncoderAbsM2.PresetNak THEN
                 GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
@@ -12742,11 +12742,11 @@ instSafetyWinchM1(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM1.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M,
+    CableLimitDescentM  := _CableLimitM1Descent_M,
     Direction           := PRG_06_WinchControl.M1_Direction_Active,
     Homed               := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM1.HomingSuspect,
-    TopLimitM           := GVL_PERSISTENT.HomingTargetM1_M,
+    TopLimitM           := _HomingTargetM1_M,
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
@@ -12768,7 +12768,7 @@ instSafetyWinchM1(
     // ramené dans le référentiel M1 — comparaison valable quel que soit l'état du benne
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
-    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
+    CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2 // 🆕 REX 2026-07-08 (7)
 );
 
@@ -12790,11 +12790,11 @@ instSafetyWinchM2(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM2.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M,
+    CableLimitDescentM  := _CableLimitM2Descent_M,
     Direction           := PRG_06_WinchControl.M2_Direction_Active,
     Homed               := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM2.HomingSuspect,
-    TopLimitM           := GVL_PERSISTENT.HomingTargetM2_M,
+    TopLimitM           := _HomingTargetM2_M,
     // 🔧 REX 2026-07-07 — Méca A/B (voir FB_Safety_Winch bandeau en-tête) — Méca C NON applicable
     // à M2 (c'est M2 qui bouge pendant le benne, BenneHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
@@ -12810,7 +12810,7 @@ instSafetyWinchM2(
     // du zéro codeur. M1 corrigé de l'offset benne actif, ramené dans le référentiel M2.
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
-    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
+    CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
 );
 
@@ -13047,8 +13047,8 @@ instCycle(
     // Mouvements mâchoires benne (gérés par instBucket)
     Benne_Busy        := PRG_06_WinchControl.instBucket.Busy,
     Benne_Done        := PRG_06_WinchControl.instBucket.Done,
-    Benne_IsOpen      := GVL_PERSISTENT.BucketState.IsOpen,
-    Benne_IsClosed    := GVL_PERSISTENT.BucketState.IsClosed
+    Benne_IsOpen      := _BucketState.IsOpen,
+    Benne_IsClosed    := _BucketState.IsClosed
 );
 </xhtml>
           </ST>
@@ -13370,9 +13370,9 @@ instBucket(
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
     ConfirmOpenPosition := GVL_IHM.Bucket.CmdConfirmOpenPosition, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
     ConfirmClosePosition:= GVL_IHM.Bucket.CmdConfirmClosePosition, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
-    Config              := GVL_PERSISTENT.BucketConfig,
+    Config              := _BucketConfig,
     TimeoutDuration     := GVL_IHM.Bucket.TimeoutDuration,
-    BucketState        := GVL_PERSISTENT.BucketState,
+    BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
 );
@@ -13391,8 +13391,8 @@ SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000;
 // 🆕 REX 2026-07-08 (6) : gate global SyncSoftStopEnable — FALSE (défaut) = ces 2 sorties
 // restent FALSE en permanence (bit0 déjà géré en SafeStop fast classique ci-dessus, §5bis) ;
 // TRUE = active le blocage directionnel (nouvelle fonctionnalité, opt-in).
-SyncMinorDeviationBlocksUp   := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
-SyncMinorDeviationBlocksDown := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &lt; 0.0);
+SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
+SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &lt; 0.0);
 
 // 🆕 REX 2026-07-15 (3) — voir déclaration VAR ci-dessus : couplé masqué par les mêmes fins de
 // course benne que l'individuel M2, appliqué à M1 ET M2 (§1/§2) pour arrêter les DEUX treuils
@@ -13411,7 +13411,7 @@ IF (ManuMaxStepRev &lt; 1) OR (ManuMaxStepRev &gt; 5) THEN
     ManuMaxStepRev := 2; // Palier 2 max par défaut en descente (conforme AF) si non initialisé/invalide
 END_IF;
 EffectiveMaxStepAscent   := SEL(PRG_10_Outputs.ManuActive, 5, ManuMaxStepFwd);
-EffectiveMaxStepDescente := SEL(PRG_10_Outputs.ManuActive, GVL_PERSISTENT.WinchMaxStepDescente, MIN(GVL_PERSISTENT.WinchMaxStepDescente, ManuMaxStepRev));
+EffectiveMaxStepDescente := SEL(PRG_10_Outputs.ManuActive, _WinchMaxStepDescent, MIN(_WinchMaxStepDescent, ManuMaxStepRev));
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -13549,7 +13549,7 @@ instWinchSync(
     HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
     SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
-    SyncToleranceM  := GVL_PERSISTENT.WinchSyncTolerance_M,
+    SyncToleranceM  := _WinchSyncTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
     
     RelayFwdM1      := instWinchM1.RelayFwd,
@@ -13575,43 +13575,43 @@ instWinchSync(
 // pour que M2 reste TOUJOURS à cette vitesse pendant le benne, quelle que soit l'amplitude
 // joystick (peu importe le palier sélectionné par l'hystérésis, le résultat est identique).
 IF instBucket.M2_ForceSlowSpeed THEN
-    M2_SpeedStepTableActive.P1R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P1R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P1R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P1R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P2R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P2R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P2R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P2R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P3R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P3R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P3R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P3R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P4R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P4R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P4R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P4R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P5R1 := GVL_PERSISTENT.WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P5R2 := GVL_PERSISTENT.WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P5R3 := GVL_PERSISTENT.WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P5R4 := GVL_PERSISTENT.WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.StepThreshold_Pct := GVL_PERSISTENT.WinchSpeedStepTable.StepThreshold_Pct;
+    M2_SpeedStepTableActive.P1R1 := _WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P1R2 := _WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P1R3 := _WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P1R4 := _WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P2R1 := _WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P2R2 := _WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P2R3 := _WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P2R4 := _WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P3R1 := _WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P3R2 := _WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P3R3 := _WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P3R4 := _WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P4R1 := _WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P4R2 := _WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P4R3 := _WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P4R4 := _WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.P5R1 := _WinchSpeedStepTable.P1R1;
+    M2_SpeedStepTableActive.P5R2 := _WinchSpeedStepTable.P1R2;
+    M2_SpeedStepTableActive.P5R3 := _WinchSpeedStepTable.P1R3;
+    M2_SpeedStepTableActive.P5R4 := _WinchSpeedStepTable.P1R4;
+    M2_SpeedStepTableActive.StepThreshold_Pct := _WinchSpeedStepTable.StepThreshold_Pct;
 ELSE
-    M2_SpeedStepTableActive := GVL_PERSISTENT.WinchSpeedStepTable;
+    M2_SpeedStepTableActive := _WinchSpeedStepTable;
 END_IF;
 
 // ── 5. CALCUL DES LIMITES BASSES ACTIVES ET DU BLOCAGE DE DESCENTE ──────
 // 🔧 REX 2026-07-07 : limite légale appliquée sur LimitLegalEnabled SEUL, plus de garde
 // Mode=SEMI_AUTO — la limite légale doit stopper la descente dans TOUS les modes dès qu'elle
 // est activée (constat terrain : ne s'arrêtait pas en MAINT_N1/N2 alors qu'attendu).
-BottomLimitM1_Active := GVL_PERSISTENT.CableLimitDescentM1_M;
-IF GVL_PERSISTENT.LimitLegalEnabled THEN
-    BottomLimitM1_Active := MAX(BottomLimitM1_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
+BottomLimitM1_Active := _CableLimitM1Descent_M;
+IF _LimitLegalEnabled THEN
+    BottomLimitM1_Active := MAX(BottomLimitM1_Active, _LimitLegalDepthMinAllowed_M);
 END_IF;
 
-BottomLimitM2_Active := GVL_PERSISTENT.CableLimitDescentM2_M;
-IF GVL_PERSISTENT.LimitLegalEnabled THEN
-    BottomLimitM2_Active := MAX(BottomLimitM2_Active, GVL_PERSISTENT.LimitLegalDepthMinAllowed);
+BottomLimitM2_Active := _CableLimitM2Descent_M;
+IF _LimitLegalEnabled THEN
+    BottomLimitM2_Active := MAX(BottomLimitM2_Active, _LimitLegalDepthMinAllowed_M);
 END_IF;
 
 // ── 5bis. COUPLAGE CROISÉ M1/M2 — REX 2026-07-07 ────────────────────────
@@ -13624,23 +13624,23 @@ END_IF;
 // 🔧 REX 2026-07-08 (4) : instWinchSync.Error (bit0+bit1) → SEUL bit1 (incohérence commande,
 // grave) reste ici en SafeStop fast. Bit0 (écart mineur) → arrêt rampe normale via StartStop
 // (voir SyncMinorDeviation, §1/§2 plus haut) — Concept 1, ne pas dégrader le comportement voulu.
-// 🆕 REX 2026-07-08 (6) : GVL_PERSISTENT.SyncSoftStopEnable=FALSE (défaut) → comportement D'AVANT,
+// 🆕 REX 2026-07-08 (6) : _SyncSoftStopEnable=FALSE (défaut) → comportement D'AVANT,
 // bit0 réintégré ici en SafeStop fast classique comme n'importe quel autre défaut winch. TRUE →
 // bit0 exclu d'ici, géré exclusivement par le gate directionnel StartStop (§1/§2).
 SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000)
-                       OR (NOT GVL_PERSISTENT.SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000))
+                       OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000))
                        OR instBucket.M1SlipDetected;
 SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000)
-                       OR (NOT GVL_PERSISTENT.SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000));
+                       OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
 ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
-                       OR (GVL_PERSISTENT.LimitLegalEnabled
-                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                       OR (_LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _LimitLegalDepthMinAllowed_M));
 ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
-                       OR (GVL_PERSISTENT.LimitLegalEnabled
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
+                       OR (_LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _LimitLegalDepthMinAllowed_M));
 
 // 🔧 REX 2026-07-15 (6) — demande utilisateur : arrêt réel encodeur en fonctionnement NORMAL,
 // distinct du capteur physique (bit5/Méca D côté FB_Safety_Winch). Seuil = CableLimitAscentMx_M,
@@ -13662,30 +13662,30 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // PRG_09_Supervision), symétrique à CableLimitDescentReached. Réutilisé ci-dessous dans ForbidAscentM1_Raw.
 CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                             AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= GVL_PERSISTENT.CableLimitAscentM1_M)
+                             AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _CableLimitM1Ascent_M)
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
 ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM1.Homed
                            AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= GVL_PERSISTENT.HomingTargetM1_M))
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _HomingTargetM1_M))
                        OR CableLimitAscentM1Reached;
 // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
 // La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le benne est fermé (IsClosed)
 // ou en cours de fermeture (CloseReq). Sinon (benne ouvert/en cours d'ouverture), M2 doit
 // s'arrêter à la butée normale (CableLimitAscentM2_M) pour s'arrêter proprement en même temps que M1.
-M2_LimitShift := SEL(GVL_PERSISTENT.BucketState.IsClosed OR instBucket.CloseReq, 0.0, GVL_PERSISTENT.BucketConfig.OffsetCloseM);
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketConfig.OffsetCloseM);
 
 // 🆕 REX 2026-07-15 (8) : idem M1 (voir ci-dessus).
 CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
                              AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                             AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (GVL_PERSISTENT.CableLimitAscentM2_M + M2_LimitShift))
+                             AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (_CableLimitM2Ascent_M + M2_LimitShift))
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift)))
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (_HomingTargetM2_M + M2_LimitShift)))
                        OR CableLimitAscentM2Reached;
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
@@ -13707,7 +13707,7 @@ instWinchM1(
     ForbidAscent            := ForbidAscentM1_Active,
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
-    SpeedStepTable          := GVL_PERSISTENT.WinchSpeedStepTable,
+    SpeedStepTable          := _WinchSpeedStepTable,
     // 🔧 REX 2026-07-15 (9) : EffectiveMaxStepDescente/Ascent (voir calcul plus haut) — Auto garde
     // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
     MaxStepDescente         := EffectiveMaxStepDescente,
@@ -13716,19 +13716,19 @@ instWinchM1(
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal,
-    RampAccelRate           := GVL_PERSISTENT.WinchM1RampAccelRate_Pct,
-    RampDecelNormalRate     := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct,
-    RampDecelFastRate       := GVL_PERSISTENT.WinchM1RampDecelFast_Pct,
+    RampAccelRate           := _WinchM1RampAccelRate_Pct,
+    RampDecelNormalRate     := _WinchM1RampDecelNormal_Pct,
+    RampDecelFastRate       := _WinchM1RampDecelFast_Pct,
     Homed                   := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM1.HomingSuspect, // 🆕 Câblage de l'incertitude M1
     CablePosM               := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     // 🔧 REX 2026-07-15 (6) : CableLimitAscentM1_M (limite ABSOLUE d'exploitation normale, ex-
     // HomingTargetM1_M) — la rampe/ralentissement de FB_Winch cible désormais la même limite que
     // ForbidAscentM1_Raw ci-dessus, pas le capteur physique (réservé au Homing).
-    TopLimitM               := GVL_PERSISTENT.CableLimitAscentM1_M,
+    TopLimitM               := _CableLimitM1Ascent_M,
     BottomLimitM            := BottomLimitM1_Active,
-    SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
-    SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct
+    SlowdownDistanceM       := _WinchSlowdownDistance_M,
+    SlowSpeedPct            := _WinchSlowSpeed_Pct
 );
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
@@ -13751,17 +13751,17 @@ instWinchM2(
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal,
-    RampAccelRate           := GVL_PERSISTENT.WinchM2RampAccelRate_Pct,
-    RampDecelNormalRate     := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct,
-    RampDecelFastRate       := GVL_PERSISTENT.WinchM2RampDecelFast_Pct,
+    RampAccelRate           := _WinchM2RampAccelRate_Pct,
+    RampDecelNormalRate     := _WinchM2RampDecelNormal_Pct,
+    RampDecelFastRate       := _WinchM2RampDecelFast_Pct,
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage benne fermé).
-    TopLimitM               := GVL_PERSISTENT.CableLimitAscentM2_M + M2_LimitShift,
+    TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
-    SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
-    SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct
+    SlowdownDistanceM       := _WinchSlowdownDistance_M,
+    SlowSpeedPct            := _WinchSlowSpeed_Pct
 );
 
 // ── 8. ALIMENTATION PRG_10_Outputs (sorties physiques) ──────────────────
@@ -14111,41 +14111,41 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
 IF GVL_IHM.M1TreuilRetenue.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M1TreuilRetenue.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
-    GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
-    GVL_IHM.M1TreuilRetenue.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
-    GVL_IHM.M1TreuilRetenue.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M;
-    GVL_IHM.M1TreuilRetenue.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM1_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.M1TreuilRetenue.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
-    GVL_IHM.M1TreuilRetenue.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
+    GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := _HomingTargetM1_M;
+    GVL_IHM.M1TreuilRetenue.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M1TreuilRetenue.RampAccelRate       := _WinchM1RampAccelRate_Pct;
+    GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
+    GVL_IHM.M1TreuilRetenue.RampDecelFastRate   := _WinchM1RampDecelFast_Pct;
+    GVL_IHM.M1TreuilRetenue.CableLimitDescentM  := _CableLimitM1Descent_M;
+    GVL_IHM.M1TreuilRetenue.CableLimitAscentM   := _CableLimitM1Ascent_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M1TreuilRetenue.SlowdownDistanceM   := _WinchSlowdownDistance_M;
+    GVL_IHM.M1TreuilRetenue.SlowSpeedPct        := _WinchSlowSpeed_Pct;
 END_IF;
 
 IF GVL_IHM.M2TreuilBucket.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.M2TreuilBucket.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM2_M;
-    GVL_IHM.M2TreuilBucket.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M2TreuilBucket.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
-    GVL_IHM.M2TreuilBucket.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
-    GVL_IHM.M2TreuilBucket.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
-    GVL_IHM.M2TreuilBucket.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M;
-    GVL_IHM.M2TreuilBucket.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM2_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.M2TreuilBucket.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBucket.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
+    GVL_IHM.M2TreuilBucket.TopSensorPositionM  := _HomingTargetM2_M;
+    GVL_IHM.M2TreuilBucket.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M2TreuilBucket.RampAccelRate       := _WinchM2RampAccelRate_Pct;
+    GVL_IHM.M2TreuilBucket.RampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
+    GVL_IHM.M2TreuilBucket.RampDecelFastRate   := _WinchM2RampDecelFast_Pct;
+    GVL_IHM.M2TreuilBucket.CableLimitDescentM  := _CableLimitM2Descent_M;
+    GVL_IHM.M2TreuilBucket.CableLimitAscentM   := _CableLimitM2Ascent_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M2TreuilBucket.SlowdownDistanceM   := _WinchSlowdownDistance_M;
+    GVL_IHM.M2TreuilBucket.SlowSpeedPct        := _WinchSlowSpeed_Pct;
 END_IF;
 
 IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
-    GVL_IHM.Sync.SyncToleranceM         := GVL_PERSISTENT.WinchSyncTolerance_M;
+    GVL_IHM.Sync.SyncToleranceM         := _WinchSyncTolerance_M;
 END_IF;
 
 IF GVL_IHM.Bucket.Config.OffsetOpenM = 0.0 AND GVL_IHM.Bucket.Config.OffsetCloseM = 0.0 THEN
-    GVL_IHM.Bucket.Config := GVL_PERSISTENT.BucketConfig;
+    GVL_IHM.Bucket.Config := _BucketConfig;
     GVL_IHM.Bucket.TimeoutDuration := T#30s;
 END_IF;
 
 IF GVL_IHM.Commun.LimitLegalDepthMinAllowed = 0.0 THEN
-    GVL_IHM.Commun.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
-    GVL_IHM.Commun.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
+    GVL_IHM.Commun.LimitLegalDepthMinAllowed := _LimitLegalDepthMinAllowed_M;
+    GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
 // 🆕 REX 2026-07-15 (10) — BUG CORRIGÉ (retour terrain) : WinchMaxStepFwd/Rev (essais progressifs
@@ -14170,80 +14170,80 @@ END_IF;
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-GVL_PERSISTENT.HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
-GVL_PERSISTENT.HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
+_HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
+_HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
 // 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
 // ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
 // propagation à sens unique séparée par treuil ici.
-GVL_PERSISTENT.WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.RampAccelRate;
-GVL_PERSISTENT.WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.RampDecelNormalRate;
-GVL_PERSISTENT.WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.RampDecelFastRate;
-GVL_PERSISTENT.WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBucket.RampAccelRate;
-GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBucket.RampDecelNormalRate;
-GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBucket.RampDecelFastRate;
+_WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.RampAccelRate;
+_WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.RampDecelNormalRate;
+_WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.RampDecelFastRate;
+_WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBucket.RampAccelRate;
+_WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBucket.RampDecelNormalRate;
+_WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBucket.RampDecelFastRate;
 // ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit : cette ligne
-// écrase GVL_PERSISTENT.WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
+// écrase _WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
 // Si on change UNIQUEMENT la valeur par défaut dans GVL_PERSISTENT.st (ou ST_SyncHMI.st), ça ne
 // suffit pas : la valeur restaurée au boot (bloc §2 ci-dessus, `IF ... = 0.0 THEN`) ne s'applique
 // que si le RETAIN IHM est à 0.0 (premier démarrage) — sinon l'ancienne valeur IHM re-propage ici
 // et écrase silencieusement toute nouvelle valeur par défaut au scan suivant.
-GVL_PERSISTENT.WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
-GVL_PERSISTENT.BucketConfig              := GVL_IHM.Bucket.Config;
+_WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
+_BucketConfig              := GVL_IHM.Bucket.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : MaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescentM ci-dessous.
-IF GVL_IHM.M1TreuilRetenue.MaxStepDescente &lt;&gt; GVL_PERSISTENT.WinchMaxStepDescente THEN
-    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.M1TreuilRetenue.MaxStepDescente;
-ELSIF GVL_IHM.M2TreuilBucket.MaxStepDescente &lt;&gt; GVL_PERSISTENT.WinchMaxStepDescente THEN
-    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.M2TreuilBucket.MaxStepDescente;
+IF GVL_IHM.M1TreuilRetenue.MaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
+    _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.MaxStepDescente;
+ELSIF GVL_IHM.M2TreuilBucket.MaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
+    _WinchMaxStepDescent := GVL_IHM.M2TreuilBucket.MaxStepDescente;
 END_IF;
-GVL_IHM.M1TreuilRetenue.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
-GVL_IHM.M2TreuilBucket.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
+GVL_IHM.M1TreuilRetenue.MaxStepDescente := _WinchMaxStepDescent;
+GVL_IHM.M2TreuilBucket.MaxStepDescente := _WinchMaxStepDescent;
 
-IF GVL_IHM.M1TreuilRetenue.CableLimitDescentM &lt;&gt; GVL_PERSISTENT.CableLimitDescentM1_M THEN
-    GVL_PERSISTENT.CableLimitDescentM1_M := GVL_IHM.M1TreuilRetenue.CableLimitDescentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitDescentM &lt;&gt; _CableLimitM1Descent_M THEN
+    _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.CableLimitDescentM;
 END_IF;
-GVL_IHM.M1TreuilRetenue.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM1_M;
+GVL_IHM.M1TreuilRetenue.CableLimitDescentM := _CableLimitM1Descent_M;
 
-IF GVL_IHM.M2TreuilBucket.CableLimitDescentM &lt;&gt; GVL_PERSISTENT.CableLimitDescentM2_M THEN
-    GVL_PERSISTENT.CableLimitDescentM2_M := GVL_IHM.M2TreuilBucket.CableLimitDescentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitDescentM &lt;&gt; _CableLimitM2Descent_M THEN
+    _CableLimitM2Descent_M := GVL_IHM.M2TreuilBucket.CableLimitDescentM;
 END_IF;
-GVL_IHM.M2TreuilBucket.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM2_M;
+GVL_IHM.M2TreuilBucket.CableLimitDescentM := _CableLimitM2Descent_M;
 
 // 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescentM ci-dessus.
-IF GVL_IHM.M1TreuilRetenue.CableLimitAscentM &lt;&gt; GVL_PERSISTENT.CableLimitAscentM1_M THEN
-    GVL_PERSISTENT.CableLimitAscentM1_M := GVL_IHM.M1TreuilRetenue.CableLimitAscentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitAscentM &lt;&gt; _CableLimitM1Ascent_M THEN
+    _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.CableLimitAscentM;
 END_IF;
-GVL_IHM.M1TreuilRetenue.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM1_M;
+GVL_IHM.M1TreuilRetenue.CableLimitAscentM := _CableLimitM1Ascent_M;
 
-IF GVL_IHM.M2TreuilBucket.CableLimitAscentM &lt;&gt; GVL_PERSISTENT.CableLimitAscentM2_M THEN
-    GVL_PERSISTENT.CableLimitAscentM2_M := GVL_IHM.M2TreuilBucket.CableLimitAscentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitAscentM &lt;&gt; _CableLimitM2Ascent_M THEN
+    _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBucket.CableLimitAscentM;
 END_IF;
-GVL_IHM.M2TreuilBucket.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM2_M;
+GVL_IHM.M2TreuilBucket.CableLimitAscentM := _CableLimitM2Ascent_M;
 
-IF GVL_IHM.M1TreuilRetenue.SlowdownDistanceM &lt;&gt; GVL_PERSISTENT.WinchSlowdownDistance_M THEN
-    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistanceM;
-ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistanceM &lt;&gt; GVL_PERSISTENT.WinchSlowdownDistance_M THEN
-    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistanceM;
+IF GVL_IHM.M1TreuilRetenue.SlowdownDistanceM &lt;&gt; _WinchSlowdownDistance_M THEN
+    _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistanceM;
+ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistanceM &lt;&gt; _WinchSlowdownDistance_M THEN
+    _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistanceM;
 END_IF;
-GVL_IHM.M1TreuilRetenue.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
-GVL_IHM.M2TreuilBucket.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
+GVL_IHM.M1TreuilRetenue.SlowdownDistanceM := _WinchSlowdownDistance_M;
+GVL_IHM.M2TreuilBucket.SlowdownDistanceM := _WinchSlowdownDistance_M;
 
-IF GVL_IHM.M1TreuilRetenue.SlowSpeedPct &lt;&gt; GVL_PERSISTENT.WinchSlowSpeedPct THEN
-    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.M1TreuilRetenue.SlowSpeedPct;
-ELSIF GVL_IHM.M2TreuilBucket.SlowSpeedPct &lt;&gt; GVL_PERSISTENT.WinchSlowSpeedPct THEN
-    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.M2TreuilBucket.SlowSpeedPct;
+IF GVL_IHM.M1TreuilRetenue.SlowSpeedPct &lt;&gt; _WinchSlowSpeed_Pct THEN
+    _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.SlowSpeedPct;
+ELSIF GVL_IHM.M2TreuilBucket.SlowSpeedPct &lt;&gt; _WinchSlowSpeed_Pct THEN
+    _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBucket.SlowSpeedPct;
 END_IF;
-GVL_IHM.M1TreuilRetenue.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
-GVL_IHM.M2TreuilBucket.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
+GVL_IHM.M1TreuilRetenue.SlowSpeedPct := _WinchSlowSpeed_Pct;
+GVL_IHM.M2TreuilBucket.SlowSpeedPct := _WinchSlowSpeed_Pct;
 
-GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
-GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
+_LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+_LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
-GVL_IHM.Commun.LimitLegalReached         := GVL_PERSISTENT.LimitLegalEnabled
-                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed))
-                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= GVL_PERSISTENT.LimitLegalDepthMinAllowed)));
+GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
+                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _LimitLegalDepthMinAllowed_M))
+                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _LimitLegalDepthMinAllowed_M)));
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
@@ -14365,7 +14365,7 @@ GVL_IHM.Bucket.OpenReq          := PRG_06_WinchControl.instBucket.OpenReq;  // �
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
 // doit être égale à GVL_IHM.M1TreuilRetenue.PositionM quand tout est nominal (voir bandeau ST_BucketHMI).
 GVL_IHM.Bucket.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
-GVL_IHM.Bucket.State            := GVL_PERSISTENT.BucketState;
+GVL_IHM.Bucket.State            := _BucketState;
 
 
 // ── 8. MAPPING ÉTATS SYNCHRONISATION → IHM ─────────────────────────────────
@@ -15124,8 +15124,8 @@ IF ManuActive THEN
                              OR (M2_IsReal AND PRG_03_Safety.instSafetyWinchM2.PowerCutOff)
                              OR (M3_IsReal AND PRG_03_Safety.instSafetyTranslationM3.PowerCutOff);
     // ⚡ Clamp de sécurité sur la consigne saisie par l'opérateur (limité par le plafond absolu persistant)
-    IF GVL_IHM.TranslationM3.FreqSetpointHz &gt; GVL_PERSISTENT.TranslationMaxFreqHz THEN
-        GVL_IHM.TranslationM3.FreqSetpointHz := GVL_PERSISTENT.TranslationMaxFreqHz;
+    IF GVL_IHM.TranslationM3.FreqSetpointHz &gt; _TranslationMaxFreq_Hz THEN
+        GVL_IHM.TranslationM3.FreqSetpointHz := _TranslationMaxFreq_Hz;
     ELSIF GVL_IHM.TranslationM3.FreqSetpointHz &lt; 0.0 THEN
         GVL_IHM.TranslationM3.FreqSetpointHz := 0.0;
     END_IF;
@@ -15262,10 +15262,10 @@ END_IF;
 IF ManuActive THEN
     IF M3Fwd_Eff THEN
         M3_CommandWord         := 1;
-        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.TranslationMaxFreqHz) * 100.0);
+        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, _TranslationMaxFreq_Hz) * 100.0);
     ELSIF M3Rev_Eff THEN
         M3_CommandWord         := 2;
-        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.TranslationMaxFreqHz) * 100.0);
+        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, _TranslationMaxFreq_Hz) * 100.0);
     ELSE
         M3_CommandWord         := 0;
         M3_SetpointFrequencyHz := 0;

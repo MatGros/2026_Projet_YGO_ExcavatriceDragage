@@ -94,41 +94,41 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
 IF GVL_IHM.M1TreuilRetenue.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M1TreuilRetenue.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
-    GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
-    GVL_IHM.M1TreuilRetenue.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
-    GVL_IHM.M1TreuilRetenue.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M;
-    GVL_IHM.M1TreuilRetenue.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM1_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.M1TreuilRetenue.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
-    GVL_IHM.M1TreuilRetenue.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
+    GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := _HomingTargetM1_M;
+    GVL_IHM.M1TreuilRetenue.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M1TreuilRetenue.RampAccelRate       := _WinchM1RampAccelRate_Pct;
+    GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
+    GVL_IHM.M1TreuilRetenue.RampDecelFastRate   := _WinchM1RampDecelFast_Pct;
+    GVL_IHM.M1TreuilRetenue.CableLimitDescentM  := _CableLimitM1Descent_M;
+    GVL_IHM.M1TreuilRetenue.CableLimitAscentM   := _CableLimitM1Ascent_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M1TreuilRetenue.SlowdownDistanceM   := _WinchSlowdownDistance_M;
+    GVL_IHM.M1TreuilRetenue.SlowSpeedPct        := _WinchSlowSpeed_Pct;
 END_IF;
 
 IF GVL_IHM.M2TreuilBucket.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.M2TreuilBucket.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM2_M;
-    GVL_IHM.M2TreuilBucket.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M2TreuilBucket.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
-    GVL_IHM.M2TreuilBucket.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
-    GVL_IHM.M2TreuilBucket.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
-    GVL_IHM.M2TreuilBucket.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M;
-    GVL_IHM.M2TreuilBucket.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM2_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.M2TreuilBucket.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBucket.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
+    GVL_IHM.M2TreuilBucket.TopSensorPositionM  := _HomingTargetM2_M;
+    GVL_IHM.M2TreuilBucket.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M2TreuilBucket.RampAccelRate       := _WinchM2RampAccelRate_Pct;
+    GVL_IHM.M2TreuilBucket.RampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
+    GVL_IHM.M2TreuilBucket.RampDecelFastRate   := _WinchM2RampDecelFast_Pct;
+    GVL_IHM.M2TreuilBucket.CableLimitDescentM  := _CableLimitM2Descent_M;
+    GVL_IHM.M2TreuilBucket.CableLimitAscentM   := _CableLimitM2Ascent_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M2TreuilBucket.SlowdownDistanceM   := _WinchSlowdownDistance_M;
+    GVL_IHM.M2TreuilBucket.SlowSpeedPct        := _WinchSlowSpeed_Pct;
 END_IF;
 
 IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
-    GVL_IHM.Sync.SyncToleranceM         := GVL_PERSISTENT.WinchSyncTolerance_M;
+    GVL_IHM.Sync.SyncToleranceM         := _WinchSyncTolerance_M;
 END_IF;
 
 IF GVL_IHM.Bucket.Config.OffsetOpenM = 0.0 AND GVL_IHM.Bucket.Config.OffsetCloseM = 0.0 THEN
-    GVL_IHM.Bucket.Config := GVL_PERSISTENT.BucketConfig;
+    GVL_IHM.Bucket.Config := _BucketConfig;
     GVL_IHM.Bucket.TimeoutDuration := T#30s;
 END_IF;
 
 IF GVL_IHM.Commun.LimitLegalDepthMinAllowed = 0.0 THEN
-    GVL_IHM.Commun.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
-    GVL_IHM.Commun.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
+    GVL_IHM.Commun.LimitLegalDepthMinAllowed := _LimitLegalDepthMinAllowed_M;
+    GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
 // 🆕 REX 2026-07-15 (10) — BUG CORRIGÉ (retour terrain) : WinchMaxStepFwd/Rev (essais progressifs
@@ -153,80 +153,80 @@ END_IF;
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-GVL_PERSISTENT.HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
-GVL_PERSISTENT.HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
+_HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
+_HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
 // 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
 // ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
 // propagation à sens unique séparée par treuil ici.
-GVL_PERSISTENT.WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.RampAccelRate;
-GVL_PERSISTENT.WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.RampDecelNormalRate;
-GVL_PERSISTENT.WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.RampDecelFastRate;
-GVL_PERSISTENT.WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBucket.RampAccelRate;
-GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBucket.RampDecelNormalRate;
-GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBucket.RampDecelFastRate;
+_WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.RampAccelRate;
+_WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.RampDecelNormalRate;
+_WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.RampDecelFastRate;
+_WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBucket.RampAccelRate;
+_WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBucket.RampDecelNormalRate;
+_WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBucket.RampDecelFastRate;
 // ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit : cette ligne
-// écrase GVL_PERSISTENT.WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
+// écrase _WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
 // Si on change UNIQUEMENT la valeur par défaut dans GVL_PERSISTENT.st (ou ST_SyncHMI.st), ça ne
 // suffit pas : la valeur restaurée au boot (bloc §2 ci-dessus, `IF ... = 0.0 THEN`) ne s'applique
 // que si le RETAIN IHM est à 0.0 (premier démarrage) — sinon l'ancienne valeur IHM re-propage ici
 // et écrase silencieusement toute nouvelle valeur par défaut au scan suivant.
-GVL_PERSISTENT.WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
-GVL_PERSISTENT.BucketConfig              := GVL_IHM.Bucket.Config;
+_WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
+_BucketConfig              := GVL_IHM.Bucket.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : MaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescentM ci-dessous.
-IF GVL_IHM.M1TreuilRetenue.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
-    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.M1TreuilRetenue.MaxStepDescente;
-ELSIF GVL_IHM.M2TreuilBucket.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
-    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.M2TreuilBucket.MaxStepDescente;
+IF GVL_IHM.M1TreuilRetenue.MaxStepDescente <> _WinchMaxStepDescent THEN
+    _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.MaxStepDescente;
+ELSIF GVL_IHM.M2TreuilBucket.MaxStepDescente <> _WinchMaxStepDescent THEN
+    _WinchMaxStepDescent := GVL_IHM.M2TreuilBucket.MaxStepDescente;
 END_IF;
-GVL_IHM.M1TreuilRetenue.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
-GVL_IHM.M2TreuilBucket.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
+GVL_IHM.M1TreuilRetenue.MaxStepDescente := _WinchMaxStepDescent;
+GVL_IHM.M2TreuilBucket.MaxStepDescente := _WinchMaxStepDescent;
 
-IF GVL_IHM.M1TreuilRetenue.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM1_M THEN
-    GVL_PERSISTENT.CableLimitDescentM1_M := GVL_IHM.M1TreuilRetenue.CableLimitDescentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitDescentM <> _CableLimitM1Descent_M THEN
+    _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.CableLimitDescentM;
 END_IF;
-GVL_IHM.M1TreuilRetenue.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM1_M;
+GVL_IHM.M1TreuilRetenue.CableLimitDescentM := _CableLimitM1Descent_M;
 
-IF GVL_IHM.M2TreuilBucket.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM2_M THEN
-    GVL_PERSISTENT.CableLimitDescentM2_M := GVL_IHM.M2TreuilBucket.CableLimitDescentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitDescentM <> _CableLimitM2Descent_M THEN
+    _CableLimitM2Descent_M := GVL_IHM.M2TreuilBucket.CableLimitDescentM;
 END_IF;
-GVL_IHM.M2TreuilBucket.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM2_M;
+GVL_IHM.M2TreuilBucket.CableLimitDescentM := _CableLimitM2Descent_M;
 
 // 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescentM ci-dessus.
-IF GVL_IHM.M1TreuilRetenue.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM1_M THEN
-    GVL_PERSISTENT.CableLimitAscentM1_M := GVL_IHM.M1TreuilRetenue.CableLimitAscentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitAscentM <> _CableLimitM1Ascent_M THEN
+    _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.CableLimitAscentM;
 END_IF;
-GVL_IHM.M1TreuilRetenue.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM1_M;
+GVL_IHM.M1TreuilRetenue.CableLimitAscentM := _CableLimitM1Ascent_M;
 
-IF GVL_IHM.M2TreuilBucket.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM2_M THEN
-    GVL_PERSISTENT.CableLimitAscentM2_M := GVL_IHM.M2TreuilBucket.CableLimitAscentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitAscentM <> _CableLimitM2Ascent_M THEN
+    _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBucket.CableLimitAscentM;
 END_IF;
-GVL_IHM.M2TreuilBucket.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM2_M;
+GVL_IHM.M2TreuilBucket.CableLimitAscentM := _CableLimitM2Ascent_M;
 
-IF GVL_IHM.M1TreuilRetenue.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
-    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistanceM;
-ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
-    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistanceM;
+IF GVL_IHM.M1TreuilRetenue.SlowdownDistanceM <> _WinchSlowdownDistance_M THEN
+    _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistanceM;
+ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistanceM <> _WinchSlowdownDistance_M THEN
+    _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistanceM;
 END_IF;
-GVL_IHM.M1TreuilRetenue.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
-GVL_IHM.M2TreuilBucket.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
+GVL_IHM.M1TreuilRetenue.SlowdownDistanceM := _WinchSlowdownDistance_M;
+GVL_IHM.M2TreuilBucket.SlowdownDistanceM := _WinchSlowdownDistance_M;
 
-IF GVL_IHM.M1TreuilRetenue.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
-    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.M1TreuilRetenue.SlowSpeedPct;
-ELSIF GVL_IHM.M2TreuilBucket.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
-    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.M2TreuilBucket.SlowSpeedPct;
+IF GVL_IHM.M1TreuilRetenue.SlowSpeedPct <> _WinchSlowSpeed_Pct THEN
+    _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.SlowSpeedPct;
+ELSIF GVL_IHM.M2TreuilBucket.SlowSpeedPct <> _WinchSlowSpeed_Pct THEN
+    _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBucket.SlowSpeedPct;
 END_IF;
-GVL_IHM.M1TreuilRetenue.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
-GVL_IHM.M2TreuilBucket.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
+GVL_IHM.M1TreuilRetenue.SlowSpeedPct := _WinchSlowSpeed_Pct;
+GVL_IHM.M2TreuilBucket.SlowSpeedPct := _WinchSlowSpeed_Pct;
 
-GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
-GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
+_LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+_LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
-GVL_IHM.Commun.LimitLegalReached         := GVL_PERSISTENT.LimitLegalEnabled
-                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed))
-                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed)));
+GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
+                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _LimitLegalDepthMinAllowed_M))
+                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _LimitLegalDepthMinAllowed_M)));
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
@@ -348,7 +348,7 @@ GVL_IHM.Bucket.OpenReq          := PRG_06_WinchControl.instBucket.OpenReq;  // �
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
 // doit être égale à GVL_IHM.M1TreuilRetenue.PositionM quand tout est nominal (voir bandeau ST_BucketHMI).
 GVL_IHM.Bucket.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
-GVL_IHM.Bucket.State            := GVL_PERSISTENT.BucketState;
+GVL_IHM.Bucket.State            := _BucketState;
 
 
 // ── 8. MAPPING ÉTATS SYNCHRONISATION → IHM ─────────────────────────────────

@@ -199,7 +199,7 @@ logique, voir `DOC/IHM_MANU_Journal_Modifications.md` §11).
 |-------|------|------|------|
 | `SelectedTargetNum` | INT | IHM→PLC | Cible position 1-4 (Fosse1/Fosse2/Maintenance/Trémie) |
 | `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) |
-| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `GVL_PERSISTENT.TranslationMaxFreqHz` |
+| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `_TranslationMaxFreq_Hz` |
 | `FBState` | E_State | PLC→IHM | État interne `FB_Translation` (diagnostic) |
 | `Ready/Busy/Done/Error/ErrorId` | — | PLC→IHM | Statuts standards `FB_Translation` |
 | `BrakeCmd` | BOOL | PLC→IHM | Miroir lecture seule (TRUE = desserré) — pas de forçage inconditionnel : le déblocage en MAINT passe par `ReqFwd`/`ReqRev` (mouvement), qui desserre le frein nativement via `FB_Brake` (même doctrine que `ST_WinchHMI`) |

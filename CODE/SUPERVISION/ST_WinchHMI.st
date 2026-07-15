@@ -9,7 +9,7 @@ STRUCT
     TopSensorPositionM      : REAL := 12.5;     (* 📐 Position cible du capteur haut (m) *)
     MaxStepDescente         : INT := 3;         (* 🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
                                                     commun M1/M2 (même profil de déplacement), miroir bidirectionnel
-                                                    GVL_PERSISTENT.WinchMaxStepDescente (voir PRG_09_Supervision),
+                                                    _WinchMaxStepDescent (voir PRG_09_Supervision),
                                                     même principe que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct *)
     RampAccelRate           : REAL := 50.0;     (* 📈 Rampe d'accélération (%/s) *)
     RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)

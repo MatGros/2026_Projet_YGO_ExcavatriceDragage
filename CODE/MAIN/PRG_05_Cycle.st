@@ -53,6 +53,6 @@ instCycle(
     // Mouvements mâchoires benne (gérés par instBucket)
     Benne_Busy        := PRG_06_WinchControl.instBucket.Busy,
     Benne_Done        := PRG_06_WinchControl.instBucket.Done,
-    Benne_IsOpen      := GVL_PERSISTENT.BucketState.IsOpen,
-    Benne_IsClosed    := GVL_PERSISTENT.BucketState.IsClosed
+    Benne_IsOpen      := _BucketState.IsOpen,
+    Benne_IsClosed    := _BucketState.IsClosed
 );
