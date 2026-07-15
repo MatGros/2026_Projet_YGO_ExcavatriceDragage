@@ -165,6 +165,8 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 
 ⛔ **Règle d'or de cette section** : je ne fais PAS le travail moi-même, je le prépare pour Gemini.
 
+🔒 **Garde-fous automatiques (Hooks CLI)** : Un hook système global (`~/.gemini/config/hooks.json` → `PLCOPENXML_TOOLING/guardrails.py`) intercepte et valide automatiquement chaque action de Gemini si le workflow multi-agent est actif. Il bloque les commits directs de Gemini et les modifications de fichiers hors-scope.
+
 1. **Comprendre la demande** — si le scope n'est pas clair (quels fichiers, quel comportement attendu), demander avant de créer la tâche. Ne jamais deviner un scope flou dans une tâche qui partira vers un agent qui n'a pas le contexte de cette conversation.
 2. **Déterminer le prochain ID** — lire `DOC/AGENT_HANDOFF/QUEUE.md` + lister `DOC/AGENT_HANDOFF/tasks/`, trouver le dernier `TASK-00NN`, incrémenter. Jamais réutiliser un ID.
 3. **Créer `DOC/AGENT_HANDOFF/tasks/TASK-00NN-slug.md`** depuis `TASK-0000-template.md`, rempli **intégralement et de façon autonome** :
