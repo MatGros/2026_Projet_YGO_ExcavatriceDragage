@@ -10165,10 +10165,10 @@ Temps estimé avant ralentissement auto</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="50" />
+                <simpleValue value="60" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Échelle 0..100 % → 0..50Hz</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Échelle 0..100 % → 0..60Hz (T30: Max 60Hz, fonctionnement standard/nominal 30Hz à 50% de consigne)</xhtml>
               </documentation>
             </variable>
             <variable name="CaptorDebounce">
@@ -12130,16 +12130,16 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosFosse1(InputRaw := TranslationPosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
+instTranslationPosFosse1(InputRaw := PosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
 TranslationPosFosse1 := instTranslationPosFosse1.State;
 
-instTranslationPosFosse2(InputRaw := TranslationPosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
+instTranslationPosFosse2(InputRaw := PosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
 TranslationPosFosse2 := instTranslationPosFosse2.State;
 
-instTranslationPosMaintenance(InputRaw := TranslationPosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
-instTranslationPosTremie(InputRaw := TranslationPosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
@@ -15212,25 +15212,25 @@ IF ManuActive THEN
 
     // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
     IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GrilleUp_RQ := TRUE;
-        GrilleDown_RQ := FALSE;
+        GridUp_RQ := TRUE;
+        GridDown_RQ := FALSE;
     ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GrilleUp_RQ := FALSE;
-        GrilleDown_RQ := TRUE;
+        GridUp_RQ := FALSE;
+        GridDown_RQ := TRUE;
     ELSE
-        GrilleUp_RQ := FALSE;
-        GrilleDown_RQ := FALSE;
+        GridUp_RQ := FALSE;
+        GridDown_RQ := FALSE;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        CasqueOpen_RQ := TRUE;
-        CasqueClose_RQ := FALSE;
+        HelmetOpen_RQ := TRUE;
+        HelmetClose_RQ := FALSE;
     ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        CasqueOpen_RQ := FALSE;
-        CasqueClose_RQ := TRUE;
+        HelmetOpen_RQ := FALSE;
+        HelmetClose_RQ := TRUE;
     ELSE
-        CasqueOpen_RQ := FALSE;
-        CasqueClose_RQ := FALSE;
+        HelmetOpen_RQ := FALSE;
+        HelmetClose_RQ := FALSE;
     END_IF;
 
     // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé et AU armé
@@ -15246,10 +15246,10 @@ IF ManuActive THEN
     TranslationBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
 ELSE
     // Nettoyage en cas de désactivation du mode Manu
-    GrilleUp_RQ := FALSE;
-    GrilleDown_RQ := FALSE;
-    CasqueOpen_RQ := FALSE;
-    CasqueClose_RQ := FALSE;
+    GridUp_RQ := FALSE;
+    GridDown_RQ := FALSE;
+    HelmetOpen_RQ := FALSE;
+    HelmetClose_RQ := FALSE;
 END_IF;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──

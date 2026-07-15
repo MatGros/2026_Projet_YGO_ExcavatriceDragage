@@ -38,7 +38,7 @@ VAR_INPUT
     // Réglages ETHERCAT uniquement (RETAIN)
     ApproachTime                 : TIME := T#5s;    // Temps estimé avant ralentissement auto
     ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (PV)
-    DriveFreqScaleMaxHz          : REAL := 50.0;    // Échelle 0..100 % → 0..50Hz
+    DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → 0..60Hz (T30: Max 60Hz, fonctionnement standard/nominal 30Hz à 50% de consigne)
 
     // Réglages communs
     CaptorDebounce                : TIME := T#100ms; // Filtrage capteur de position cible
