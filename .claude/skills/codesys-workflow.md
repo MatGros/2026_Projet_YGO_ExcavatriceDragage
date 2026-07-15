@@ -1,6 +1,6 @@
 ---
 name: codesys-workflow
-description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5 (Device.export). Impose lecture des règles DOC, analyse architecture, plan groupé par concept, génération ST commentée FR, note d'application manuelle, et retour d'expérience versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser FB, PRG, variables, ou "le programme automate". Déclencher AUSSI dès que l'utilisateur demande de déléguer/confier/envoyer ce travail à Gemini (agent d'exécution) — la skill aiguille alors vers la procédure de délégation (§Aiguillage) au lieu d'exécuter directement.
+description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5 (Device.export). Impose lecture des règles DOC, analyse architecture, plan groupé par concept, génération ST commentée FR, note d'application manuelle, et retour d'expérience versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser FB, PRG, variables, ou "le programme automate". Déclencher AUSSI dès que l'utilisateur demande de déléguer/confier/envoyer ce travail à Gemini (agent d'exécution) — les règles ci-dessous (nommage, contrat FB, sécurité) s'appliquent aussi au résultat produit via le plugin antigravity (skill `antigravity:delegate`).
 ---
 
 # 🏗️ Workflow CODESYS — Excavatrice de Dragage
@@ -14,7 +14,7 @@ L'utilisateur applique **manuellement** chaque modif dans CODESYS 3.5 (copie du 
 
 **Avant l'Étape 0**, déterminer QUI fait le travail :
 
-- **Utilisateur dit "délègue à Gemini" / "utilise l'agent Gemini" / "confie/envoie ça à Gemini"** (ou toute formulation équivalente, même approximative) → **Claude n'exécute PAS lui-même.** Aller directement à la section **§ Délégation à Gemini** plus bas, ignorer les Étapes 0-6 (elles décrivent ce que GEMINI doit suivre, répliquées dans `DOC/AGENT_HANDOFF/GEMINI_BRIEF.md` — Claude les traduit en contraintes copiées dans le fichier tâche, il ne les applique pas lui-même).
+- **Utilisateur dit "délègue à Gemini" / "utilise l'agent Gemini" / "confie/envoie ça à Gemini"** (ou toute formulation équivalente) → utiliser la skill `antigravity:delegate` (plugin antigravity, voir `CLAUDE.md`). Avant de déléguer, préparer le contexte à transmettre en reprenant les MÊMES règles que l'Étape 0/2 ci-dessous (`NAMING_CONVENTION.md`, contrat FB `AF_Partie-03`, doc métier `AF_PartieN` concerné) — Gemini n'a pas le contexte de cette conversation. Relire le résultat (`git diff`) avant tout commit, même exigence de validation qu'un code écrit par Claude directement.
 - **Sinon (cas normal)** → Claude exécute directement, Étapes 0 à 6 ci-dessous s'appliquent à lui.
 
 ⚠️ Cet aiguillage ne concerne QUE le pathway Gemini — l'usage normal de l'outil `Agent` (subagents Claude, forks) reste libre et indépendant de cette skill.
@@ -165,37 +165,13 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 
 ⛔ **Règle d'or de cette section** : je ne fais PAS le travail moi-même, je le prépare pour Gemini.
 
-> 🔔 **Prérequis côté Gemini** : Gemini doit avoir lancé `PLCOPENXML_TOOLING/push_server.py` (port 9090) en début de session, en écoute. Procédure complète → `DOC/AGENT_HANDOFF/GEMINI_BRIEF.md` §Push Notifications.
->
-> ⚡ **Réveil = découplé du commit (REX 2026-07-15)** : le hook git `post-commit` ne suffit pas à
-> lui seul (délai/fiabilité). **Dès que `QUEUE.md`/le fichier tâche est édité ET validé par
-> l'utilisateur**, j'appelle **directement** `curl -s -X POST http://localhost:9090/wake` — pas
-> besoin d'attendre ou de faire un commit pour déclencher le réveil. Le commit reste soumis à la
-> règle habituelle (jamais sans validation), il arrive **après** le retour Gemini (`REVIEW`) et
-> la validation finale de l'utilisateur, pas pour déclencher le réveil.
+1. **Comprendre la demande** — si le scope n'est pas clair (quels fichiers, quel comportement attendu), demander avant de déléguer. Ne jamais deviner un scope flou dans un prompt qui partira vers un agent qui n'a pas le contexte de cette conversation.
+2. **Préparer le contexte** : objectif (le POURQUOI, pas juste "modifier X"), scope exact (fichiers + ce qui est explicitement HORS scope), contraintes copiées depuis l'Étape 0/2 ci-dessus (`NAMING_CONVENTION.md`, contrat FB `AF_Partie-03`, doc métier `AF_PartieN` concerné), critères d'acceptation vérifiables.
+3. **Déléguer via `antigravity:delegate`** (ou `antigravity:resume` pour continuer une conversation Antigravity existante).
+4. **Relire le résultat** : diff réel (`git diff`/`git status`), vérifier les critères d'acceptation, régénérer le bundle PLCopenXML (Étape 4bis ci-dessus) si du ST a été touché. `antigravity:review` peut faire une revue croisée read-only en complément.
+5. **Jamais de commit** du résultat délégué sans validation utilisateur (même règle que tout le reste).
 
-🔒 **Garde-fous automatiques (Hooks CLI)** : Un hook système global (`~/.gemini/config/hooks.json` → `PLCOPENXML_TOOLING/guardrails.py`) intercepte et valide automatiquement chaque action de Gemini si le workflow multi-agent est actif. Il bloque les commits directs de Gemini et les modifications de fichiers hors-scope.
-
-1. **Comprendre la demande** — si le scope n'est pas clair (quels fichiers, quel comportement attendu), demander avant de créer la tâche. Ne jamais deviner un scope flou dans une tâche qui partira vers un agent qui n'a pas le contexte de cette conversation.
-2. **Déterminer le prochain ID** — lire `DOC/AGENT_HANDOFF/QUEUE.md` + lister `DOC/AGENT_HANDOFF/tasks/`, trouver le dernier `TASK-00NN`, incrémenter. Jamais réutiliser un ID.
-3. **Créer `DOC/AGENT_HANDOFF/tasks/TASK-00NN-slug.md`** depuis `TASK-0000-template.md`, rempli **intégralement et de façon autonome** :
-   - Objectif : contexte métier/utilisateur réel (le POURQUOI), pas juste "modifier X"
-   - Scope : fichiers exacts + ce qui est explicitement HORS scope
-   - Contraintes **copiées-collées** (pas de simple lien) — reprendre les MÊMES règles que l'Étape 0/2 ci-dessus : `NAMING_CONVENTION.md`, contrat FB `AF_Partie-03` (précédence `Enable > SafeStop > StartStop`, `Reset` = front), doc métier `AF_PartieN` concerné
-   - Critères d'acceptation concrets et vérifiables
-   - `Status: TODO`, `Assigned: Gemini`
-4. **Ajouter la ligne dans `DOC/AGENT_HANDOFF/QUEUE.md`**.
-5. **Demander validation utilisateur** sur le fichier tâche + la ligne `QUEUE.md` (règle habituelle de validation fichier).
-6. **Une fois validé → réveiller Gemini directement** : `curl -s -X POST http://localhost:9090/wake` (pas de commit nécessaire pour ça, voir note ci-dessus). Rien d'autre à faire côté Claude tant que `Status` n'est pas `REVIEW`.
-7. **Jamais de commit** de cette création de tâche sans validation (même règle que tout le reste) — le commit peut attendre le retour Gemini, il n'est plus le déclencheur du réveil.
-
-### Quand l'utilisateur revient avec un résultat Gemini (`Status: REVIEW`)
-Relire le `Log` de la tâche + le diff réel (`git diff`/`git status`), vérifier les critères d'acceptation, régénérer le bundle PLCopenXML (Étape 4bis ci-dessus) si du ST a été touché, **puis seulement** passer `Status: DONE` dans le fichier tâche ET `QUEUE.md`. Ne jamais passer `DONE` sur la seule confiance du `Log` rempli par Gemini.
-
-💡 **La lecture du diff peut être déléguée à un subagent Claude** (fork, ou agent `code-reviewer`/`general-purpose` via l'outil `Agent` — usage libre, pas concerné par l'aiguillage Gemini) pour garder ce contexte propre — utile en particulier sur un gros diff Gemini. Mais **la décision finale `REVIEW → DONE` reste toujours prise par Claude orchestrateur lui-même**, jamais déléguée plus loin : lire le résultat du subagent, pas juste lui faire confiance aveuglément.
-
-### Cycle de vie / nettoyage des tâches (voir aussi `DOC/AGENT_HANDOFF/QUEUE.md` §Cycle de vie)
-Une fois `DONE` (ou abandon explicite) : déplacer la ligne de `QUEUE.md` vers son archive, puis **supprimer** le fichier détaillé `tasks/TASK-00NN-slug.md` — jamais avant que le commit correspondant soit validé par l'utilisateur (la trace git doit exister avant que le fichier de travail disparaisse). Tâches `TODO`/`IN_PROGRESS`/`BLOCKED`/`REVIEW` : jamais supprimées.
+💡 **La lecture du diff peut être déléguée à un subagent Claude** (fork, ou agent `code-reviewer`/`general-purpose` via l'outil `Agent`) pour garder ce contexte propre, en plus/à la place de `antigravity:review` — utile sur un gros diff. Mais **la décision finale de valider reste toujours prise par Claude orchestrateur lui-même**, jamais déléguée plus loin : lire le résultat, pas juste lui faire confiance aveuglément.
 
 ---
 
