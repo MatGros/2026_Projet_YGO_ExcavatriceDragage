@@ -109,9 +109,6 @@ VAR
     M3Fwd_Eff             : BOOL;
     M3Rev_Eff             : BOOL;
 
-    instM3RelayFwdLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayFwd_DQ) — PAS de mouvement réel
-    instM3RelayRevLed     : FB_Output; // 💡 LED témoin mise en service (M3_RelayRev_DQ) — PAS de mouvement réel
-
     // 🔧 REX 2026-07-15 (2) : rampe HMI locale (CycleTimeCalc/instHmiSpeedRamp/SpeedRefPct) et
     // décodage paliers (instManuSpeedStep/ActiveMaxStepFwd/Rev) RETIRÉS avec M1Fwd_Eff ci-dessus.
     WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active (verrouillage aiguillage)
@@ -374,15 +371,21 @@ END_IF;
 // l'opérateur (Force CODESYS sur M3_CommandWord, moteur à vide si possible) avant un
 // usage prolongé. Rien d'autre n'écrit ces PDO aujourd'hui (FB_Chariot encore stubbé,
 // DriveStatusWord/ActualFreqHz à 0 en dur) — pas de conflit avec le mode normal.
-IF ManuActive AND M3Fwd_Eff THEN
-    M3_CommandWord         := 1;
-    M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.ChariotMaxFreqHz) * 100.0);
-ELSIF ManuActive AND M3Rev_Eff THEN
-    M3_CommandWord         := 2;
-    M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.ChariotMaxFreqHz) * 100.0);
+IF ManuActive THEN
+    IF M3Fwd_Eff THEN
+        M3_CommandWord         := 1;
+        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.ChariotMaxFreqHz) * 100.0);
+    ELSIF M3Rev_Eff THEN
+        M3_CommandWord         := 2;
+        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.ChariotMaxFreqHz) * 100.0);
+    ELSE
+        M3_CommandWord         := 0;
+        M3_SetpointFrequencyHz := 0;
+    END_IF;
 ELSE
-    M3_CommandWord         := 0; // Arrêt — couvre repos ET mode normal (non-Manu)
-    M3_SetpointFrequencyHz := 0;
+    // Mode normal (Auto / Semi-Auto) : piloté par le bloc instChariotM3
+    M3_CommandWord         := PRG_07_ChariotControl.instChariotM3.DriveControlWord;
+    M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_ChariotControl.instChariotM3.DriveFreqRefHz * 100.0);
 END_IF;
 GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
 
@@ -392,11 +395,9 @@ GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
 GVL_IHM.IHM_MANU.M3_CommReady          := M3_StatusWord.7 OR GVL_Simulation.SimulationModeActive;
 GVL_IHM.IHM_MANU.M3_PowerReady         := M3_StatusWord.0 OR GVL_Simulation.SimulationModeActive;
 
-// 💡 LED témoin M3 (mise en service) — reflète la demande interlockée, PAS le mouvement réel du variateur
-instM3RelayFwdLed(Command := ManuActive AND M3Fwd_Eff);
-M3_RelayFwd_DQ := instM3RelayFwdLed.State;
-instM3RelayRevLed(Command := ManuActive AND M3Rev_Eff);
-M3_RelayRev_DQ := instM3RelayRevLed.State;
+// Relais de direction M3 obsolètes forcés à FALSE
+M3_RelayFwd_DQ := FALSE;
+M3_RelayRev_DQ := FALSE;
 
 // 9️⃣ Enregistrement de l'état précédent (pour le cycle suivant)
 LastM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd;
