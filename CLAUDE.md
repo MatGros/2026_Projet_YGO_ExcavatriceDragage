@@ -155,10 +155,11 @@ Toujours **concis et technique, zéro perte d'information, emoji** pour la clart
 
 1. ✅ **Charger automatiquement** la skill `.claude/skills/codesys-workflow.md`
 2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie-03_Template_FB_Commun_v1.3.md (ajuster selon métier concerné : Winch=Partie9, Chariot=Partie11, Homing=Partie10)
-3. ✅ **Vérifier spec complète** → Sinon demander clarifications
-4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
-5. ✅ **Tracer checklist** avant génération
-6. ✅ **Refuser code non-conforme** → Ne JAMAIS approximer
+3. 🔒 **Garde-fous automatiques (Hooks CLI)** : Un hook global (`~/.gemini/config/hooks.json` → `PLCOPENXML_TOOLING/guardrails.py`) est actif sur le système. Il bloque automatiquement les commits et les modifications hors-scope si le workflow multi-agent (Claude/Gemini) est actif dans `QUEUE.md`.
+4. ✅ **Vérifier spec complète** → Sinon demander clarifications
+5. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
+6. ✅ **Tracer checklist** avant génération
+7. ✅ **Refuser code non-conforme** → Ne JAMAIS approximer
 
 **Cas d'arrêt (refuse génération) :**
 - Nommage ambigu ou non-PascalCase
