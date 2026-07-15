@@ -36,11 +36,11 @@ Lire et appliquer **systématiquement** :
 - `DOC/AF_Partie-02_Architecture_Programme_v2.6.md` → architecture, tâches, flux
 - `DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.3.md` → équipements & fonctions
 
-⚠️ Toujours utiliser la **version la plus récente** (suffixe `_vX.X` le plus élevé). Anciennes versions dans `DOC/Archives/`.
+⚠️ Toujours utiliser la **version la plus récente** (suffixe `_vX.X` le plus élevé). Anciennes versions dans `ARCHIVES/Doc/`.
 
 ✋ Si une règle DOC contredit la demande → signaler avant de coder.
 
-🚫 **`DOC/Archives/` = versions PÉRIMÉES** : ne jamais lire ni prendre en compte ce dossier (gitignoré). Toujours la version active (suffixe `_vX.Y` le plus élevé à la racine de `DOC/`).
+🚫 **`ARCHIVES/Doc/` = versions PÉRIMÉES** : ne jamais lire ni prendre en compte ce dossier (gitignoré). Toujours la version active (suffixe `_vX.Y` le plus élevé à la racine de `DOC/`).
 
 ---
 
@@ -92,7 +92,7 @@ Après validation du plan :
 2. 📄 **Doc métier + note d'application → dossier `DOC/`** (série AF).
    - `AF_PartieN_Fonction_<Metier>_vX.Y.md`, **N ≥ 8** (ex. `AF_Partie-08_Fonction_Joystick_v1.1.md`, `AF_Partie-09_Fonction_Winch_v1.0.md`).
    - Structure : rôle métier → pipeline/blocs → interface → sécurité → mapping E/S → **référence au(x) fichier(s) `CODE/*.st`** → note d'application CODESYS 3.5 → REX.
-   - Versionner `vX.Y`, anciens dans `DOC/Archives/`.
+   - Versionner `vX.Y`, anciens dans `ARCHIVES/Doc/`.
 
 🧭 **Règle anti-doublon (STRICTE)** : le **corps/implémentation** ST n'existe **qu'une seule fois**, dans `CODE/*.st`.
 - ✅ `DOC/` PEUT contenir : l'**interface IN/OUT** (tableaux des entrées/sorties, types, rôles), le mapping E/S, le pipeline.
@@ -125,7 +125,7 @@ Style commentaires :
 ### 🛠️ Comment exécuter la génération ?
 Si l'utilisateur accepte, exécuter la commande Python suivante.
 
-* **Répertoire de travail (Cwd) obligatoire :** `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\PLCOPENXML_TOOLING`
+* **Répertoire de travail (Cwd) obligatoire :** `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS`
 * **Commande exacte :**
   ```powershell
   python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', '<version>']))"
@@ -138,10 +138,10 @@ python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle'
 ```
 
 ### 📥 Méthode d'import dans CODESYS :
-Une fois le fichier généré dans `PLCOPENXML_TOOLING/generated/CODE_Bundle.xml` :
+Une fois le fichier généré dans `TOOLS/generated/CODE_Bundle.xml` :
 1. Dans l'arbre du projet CODESYS 3.5, sélectionner le nœud parent cible (généralement `Application`).
 2. Cliquer sur **Project** ➔ **Import PLCopenXML...**.
-3. Sélectionner `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\PLCOPENXML_TOOLING\generated\CODE_Bundle.xml`.
+3. Sélectionner `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\generated\CODE_Bundle.xml`.
 4. Cocher les éléments voulus et valider (l'arborescence définie dans `ProjectStructure` sera recréée relativement au nœud parent sélectionné).
 
 ---

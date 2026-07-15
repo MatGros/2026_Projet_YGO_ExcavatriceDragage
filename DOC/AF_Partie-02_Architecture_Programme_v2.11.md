@@ -33,7 +33,7 @@
 > compilation** (pas de GVL fourre-tout).
 >
 > 🗂️ Historique : v2.5→v2.7 = modèle `PLC_PRG_MAIN` + arborescence `_COMMON/_TYPES/_DIAG/
-> JOYSTICK/WINCH/ENCODER/CHARIOT/GRAPPIN/SAFETY/SEQUENCE` (voir `DOC/Archives/`, gitignoré,
+> JOYSTICK/WINCH/ENCODER/CHARIOT/GRAPPIN/SAFETY/SEQUENCE` (voir `ARCHIVES/Doc/`, gitignoré,
 > ne pas s'y référer). **v2.8 = seule référence à jour.**
 
 ---

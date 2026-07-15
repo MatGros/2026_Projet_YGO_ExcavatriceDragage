@@ -166,7 +166,7 @@ remplacer par un retrait d'`Enable`. Deux mécanismes **distincts** à documente
 ## 🚀 7. Implémentation des décisions (2026-07-01)
 
 Toutes les décisions **D1→D21** (D22 = TBD assumé) ont été répercutées dans les specs. Les
-anciennes versions ont été déplacées vers `DOC/Archives/` (gitignoré, non versionné) conformément
+anciennes versions ont été déplacées vers `ARCHIVES/Doc/` (gitignoré, non versionné) conformément
 à la règle de versionnement stricte de la skill `codesys-workflow`.
 
 | Fichier | Ancienne version | Nouvelle version | Changements clés |
@@ -222,7 +222,7 @@ partiel du 2026-07-02 (`f194b2d`/`9fd9627`).
 - **DOC/** : Partie1 v1.3→**v1.4**, Partie2 v2.6→**v2.7**, Partie3 v1.2→**v1.3**,
   Partie4 v1.1→**v1.2**, Partie5 v1.1→**v1.2**, Partie6 v1.1→**v1.2**, Partie8 v1.1→**v1.2**,
   Partie9 v1.0→**v1.1**, Partie10 v1.3→**v1.4**, Partie11 (renommé) v1.1→**v1.2**,
-  `NAMING_CONVENTION.md`/`CLAUDE.md` édités en place. Anciennes versions → `DOC/Archives/`.
+  `NAMING_CONVENTION.md`/`CLAUDE.md` édités en place. Anciennes versions → `ARCHIVES/Doc/`.
 
 ---
 
@@ -856,7 +856,7 @@ Partie créée).
 
 ### Fichiers impactés (2026-07-07, session Sécurité électrique)
 - **CODE/** (déjà fait avant cet audit, non retouché ici) : `CODE/MAIN/PRG_00_Inputs.st`, `CODE/MAIN/PRG_10_Outputs.st`, `CODE/MAIN/PRG_09_Supervision.st`, `CODE/SUPERVISION/ST_ModesHMI.st`. Aucun autre fichier `CODE/` touché dans cette session (le renommage `SafetyMotion*` proposé par D94 n'est **pas appliqué**).
-- **DOC/** : `AF_Partie-01_Analyse_Fonctionnelle` (v1.4→**v1.5**, §Sécurité électrique entièrement réécrite/complétée : 3 signaux, polarité fail-safe, séquence de réarmement, 3 scénarios terrain, casuistique exhaustive 11 cas, vocabulaire « Safety Mouvement »), ancienne version archivée dans `DOC/Archives/` (gitignoré, via `git mv`), références croisées corrigées dans `AF_Partie-08_Fonction_Joystick`, `AF_Partie-10_Fonction_Encoder_Homing`, `AF_Partie-03_Template_FB_Commun` (pointeurs vers Partie1), `CLAUDE.md` (racine, liste des docs + note §Architecture), AUDIT (ce §37). `AF_Partie-09_Fonction_Winch_v1.5` **non modifiée** (le nom « Méca A/B/C » y reste tel quel, cohérent avec `CODE/` — voir D94).
+- **DOC/** : `AF_Partie-01_Analyse_Fonctionnelle` (v1.4→**v1.5**, §Sécurité électrique entièrement réécrite/complétée : 3 signaux, polarité fail-safe, séquence de réarmement, 3 scénarios terrain, casuistique exhaustive 11 cas, vocabulaire « Safety Mouvement »), ancienne version archivée dans `ARCHIVES/Doc/` (gitignoré, via `git mv`), références croisées corrigées dans `AF_Partie-08_Fonction_Joystick`, `AF_Partie-10_Fonction_Encoder_Homing`, `AF_Partie-03_Template_FB_Commun` (pointeurs vers Partie1), `CLAUDE.md` (racine, liste des docs + note §Architecture), AUDIT (ce §37). `AF_Partie-09_Fonction_Winch_v1.5` **non modifiée** (le nom « Méca A/B/C » y reste tel quel, cohérent avec `CODE/` — voir D94).
 
 ---
 
@@ -918,11 +918,11 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie-05_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `DOC/Archives/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie-02_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie-09_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie-07_Interface_IHM_v1.2.md` (1 occurrence). |
+| D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie-05_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `ARCHIVES/Doc/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie-02_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie-09_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie-07_Interface_IHM_v1.2.md` (1 occurrence). |
 
 **Fichiers modifiés (documentation)** :
 - ✅ `DOC/AF_Partie-05_Modes_Maintenance_v1.3.md` (NOUVEAU, corrigé avec polarité positive)
-- ✅ `DOC/Archives/AF_Partie-05_Modes_Maintenance_v1.2.md` (archivé, ancien)
+- ✅ `ARCHIVES/Doc/AF_Partie-05_Modes_Maintenance_v1.2.md` (archivé, ancien)
 - ✅ `CLAUDE.md` (2 références Partie5 v1.2→v1.3)
 - ✅ `AF_Partie-02_Architecture_Programme_v2.10.md` (2 refs ligne 91, 138)
 - ✅ `AF_Partie-09_Fonction_Winch_v1.7.md` (7 refs + 1 lien Partie5 v1.2→v1.3)
@@ -983,7 +983,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 
 **Audit conformité** : `grep -r "AF_Partie[0-9][^-]" DOC/*.md CLAUDE.md README.md` (recherche de format ancien sans tiret) = 0 résultat → **aucun lien cassé subsiste**.
 
-**Non affecté** : `DOC/Archives/` (versions périmées, gitignoré) — fichiers restent en format ancien (inutile de les renommer).
+**Non affecté** : `ARCHIVES/Doc/` (versions périmées, gitignoré) — fichiers restent en format ancien (inutile de les renommer).
 
 ---
 
@@ -997,7 +997,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 
 **Fichiers modifiés** :
 - ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.9.md` (NOUVEAU, section §4novies ; v1.8 archivé)
-- ✅ `DOC/Archives/AF_Partie-09_Fonction_Winch_v1.8.md` (copie conservée pour traçabilité)
+- ✅ `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.8.md` (copie conservée pour traçabilité)
 - ✅ `CLAUDE.md` (1 référence : AF_Partie-09 v1.8→v1.9 + description améliorée)
 - ✅ `CODE/WINCH/FB_Safety_Winch.st` (bandeau : DOC ref v1.1→v1.9)
 

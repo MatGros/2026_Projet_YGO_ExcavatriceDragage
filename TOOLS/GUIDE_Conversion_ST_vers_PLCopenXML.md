@@ -484,7 +484,7 @@ ou un conflit de type différent) : à garder en tête, pas encore expliqué.
 
 ### ✅ Confirmé : un `ProjectStructure` avec plusieurs `<Folder>` s'importe correctement
 
-Testé en conditions réelles : le générateur (`PLCOPENXML_TOOLING/generator/`, voir son propre
+Testé en conditions réelles : le générateur (`TOOLS/generator/`, voir son propre
 README) produit, avec l'option `--bundle`, un seul fichier XML regroupant plusieurs objets
 répartis sur plusieurs dossiers d'origine (`<ProjectStructure>` avec un `<Folder Name="...">`
 par dossier `CODE/` distinct, chacun listant ses objets). Import réel du bundle complet de
@@ -506,7 +506,7 @@ un même fichier s'importe sans problème, chacun à sa bonne place.
 
 ## 📚 Sources
 
-- Échantillons réels : `PLCOPENXML_TOOLING/samples_reference_codesys/*.xml` (CODESYS V3.5 SP19 Patch 1)
+- Échantillons réels : `TOOLS/samples_reference_codesys/*.xml` (CODESYS V3.5 SP19 Patch 1)
 - [Command: Export PLCopenXML](https://content.helpme-codesys.com/en/CODESYS%20Development%20System/_cds_cmd_export_plcopenxml.html)
 - [Command: Import PLCopenXML](https://content.helpme-codesys.com/en/CODESYS%20Development%20System/_cds_cmd_import_plcopenxml.html)
 - [Exporting and Importing Projects (CODESYS)](https://content.helpme-codesys.com/en/CODESYS%20Development%20System/_cds_project_export_import.html)

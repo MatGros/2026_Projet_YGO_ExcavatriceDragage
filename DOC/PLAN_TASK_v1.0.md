@@ -1,7 +1,7 @@
 # 🗂️ PLAN_TASK — Suivi Planning & Reliquats (v1.0)
 
 > 🎯 **Rôle** : seul document de pilotage projet (jalons, tâches, TBD, questions client). Les `AF_PartieN` restent **spec fonctionnelle pure** — tout ce qui est planning/organisationnel vit ici, pas dans les specs.
-> 📥 **Remplace** : `PLAN_Finalisation_v1.0.md` + `v1.1.md` + `SAT_Protocole_Essais_v1.0.md` (les 3 archivés dans `DOC/Archives/`, contenu ingéré ci-dessous).
+> 📥 **Remplace** : `PLAN_Finalisation_v1.0.md` + `v1.1.md` + `SAT_Protocole_Essais_v1.0.md` (les 3 archivés dans `ARCHIVES/Doc/`, contenu ingéré ci-dessous).
 > 🗓️ Créé 2026-07-09.
 
 ---
@@ -96,7 +96,7 @@ IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` e
 
 ## 📋 4. Recette
 
-📥 **Ingéré depuis** `SAT_Protocole_Essais_v1.0.md` (archivé dans `DOC/Archives/`, contenu ci-dessous fait foi).
+📥 **Ingéré depuis** `SAT_Protocole_Essais_v1.0.md` (archivé dans `ARCHIVES/Doc/`, contenu ci-dessous fait foi).
 
 ⚠️ **NO-GO mouvement** (diag EtherCAT + câblage CAN joystick, AUDIT D47) à lever formellement avant de dérouler ce protocole.
 
@@ -140,7 +140,7 @@ organisationnel trouvé). Détail fichier par fichier :
 | Partie 12 | `..._v1.2.md` | `..._v1.4.md` | 1 | T27 |
 | Partie 13 | `..._v1.1.md` | `..._v1.2.md` | 0 (harmonisation titre/fichier uniquement) | — |
 
-📌 Chaque fichier renommé a été archivé tel quel (version pré-nettoyage) dans `DOC/Archives/`
+📌 Chaque fichier renommé a été archivé tel quel (version pré-nettoyage) dans `ARCHIVES/Doc/`
 avant incrémentation, conformément à la convention de versionnage du projet. Toutes les
 références croisées connues (`CLAUDE.md` + liens inter-`AF_PartieN`) ont été mises à jour vers les
 nouveaux noms de fichier.
@@ -148,4 +148,4 @@ nouveaux noms de fichier.
 ---
 
 ## 📎 Sources archivées
-`DOC/Archives/PLAN_Finalisation_v1.0.md` · `DOC/Archives/PLAN_Finalisation_v1.1.md` · `DOC/Archives/SAT_Protocole_Essais_v1.0.md`
+`ARCHIVES/Doc/PLAN_Finalisation_v1.0.md` · `ARCHIVES/Doc/PLAN_Finalisation_v1.1.md` · `ARCHIVES/Doc/SAT_Protocole_Essais_v1.0.md`
