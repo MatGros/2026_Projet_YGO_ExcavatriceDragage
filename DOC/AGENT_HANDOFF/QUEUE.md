@@ -3,6 +3,7 @@
 > 🎯 Tableau de bord des tâches déléguées. Une ligne = une tâche = un fichier `tasks/TASK-00NN-slug.md`.
 > **Seul Claude ajoute des lignes ici.** Chaque agent met à jour `Status` sur SES tâches assignées.
 > 📌 Onboarding Gemini : lire `GEMINI_BRIEF.md` d'abord, à chaque session.
+> 🧪 Test hook 2026-07-15 : commit de contrôle pour vérifier le réveil `push_server.py`.
 
 | ID | Titre | Assigned | Status | Maj |
 |---|---|---|---|---|
