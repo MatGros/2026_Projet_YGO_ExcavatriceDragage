@@ -39,4 +39,4 @@ Les tâches `TODO`/`IN_PROGRESS`/`BLOCKED`/`REVIEW` ne sont **jamais** supprimé
 ### Archive (tâches terminées)
 | ID | Titre | Statut final | Date |
 |---|---|---|---|
-| TASK-0001 | Restreindre JoystickWinchSelect (M1/M2 seul) à MAINT_N2 | DONE | 2026-07-15 |
+| TASK-0001 | Restreindre JoystickWinchSelect (M1/M2 seul) à MAINT_N2 | DONE | 2026-07-15 - |
