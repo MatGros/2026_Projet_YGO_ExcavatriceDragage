@@ -33,10 +33,38 @@ Avant toute modif dans `CODE/` :
 ---
 
 ## 🔄 Système de Push Notifications (Réveil Temps Réel ⚡)
-Pour un réveil instantané de Gemini sans dépendre d'un cron passif, un serveur HTTP local et des Git Hooks sont intégrés :
-* **Serveur local** : `python PLCOPENXML_TOOLING/push_server.py` tourne en tâche de fond sur le port **`9090`**.
-* **Git Hooks** : Des hooks `.git/hooks/post-commit` et `post-merge` appellent `curl http://localhost:9090/wake` dès que `QUEUE.md` est modifié dans Git.
-* **Appel manuel** : Si Claude ou toi-même modifiez `QUEUE.md` sans commiter, tu peux envoyer un push manuel en exécutant `curl -s http://localhost:9090/wake` ou en ouvrant `http://localhost:9090/wake` dans ton navigateur pour réveiller Gemini immédiatement.
+
+### 🚀 Gemini lance le serveur — OBLIGATOIRE au démarrage de session
+
+**C'est toi (Gemini) qui lances le serveur** en tâche de fond dès le début de chaque session, avant de toucher au moindre fichier.
+
+**Commande à exécuter depuis la racine du projet :**
+```powershell
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "python PLCOPENXML_TOOLING/push_server.py" -WindowStyle Minimized
+```
+Ou en terminal dédié (laissé ouvert) :
+```powershell
+python PLCOPENXML_TOOLING/push_server.py
+```
+➡️ Le serveur écoute sur le port **`9090`**. Tu verras `Push Notification Server listening on port 9090...` confirmer le démarrage.
+
+**⚠️ Si le port est déjà occupé** (session précédente non terminée) → le serveur ne démarre pas, c'est OK : le process précédent est toujours actif.
+
+### 🔔 Comment le système fonctionne
+* **Git Hooks** : Des hooks `.git/hooks/post-commit` et `post-merge` appellent `curl http://localhost:9090/wake` dès que `QUEUE.md` est modifié dans Git → réveil immédiat.
+* **Appel manuel** : Si Claude ou l'utilisateur modifient `QUEUE.md` sans commiter :
+  ```powershell
+  curl -s http://localhost:9090/wake
+  ```
+  ou ouvrir `http://localhost:9090/wake` dans le navigateur.
+
+### 📋 Intégration dans le cycle de vie des tâches
+```
+[DÉBUT SESSION] → Lancer push_server.py → Lire QUEUE.md → Prendre tâche TODO
+                                                               ↓
+                                              TODO → IN_PROGRESS → REVIEW → DONE
+```
+**Le serveur reste actif toute la session.** Ne pas le couper entre deux tâches.
 
 ---
 
