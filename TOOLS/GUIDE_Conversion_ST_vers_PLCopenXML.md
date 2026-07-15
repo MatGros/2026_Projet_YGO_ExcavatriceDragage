@@ -504,6 +504,91 @@ un même fichier s'importe sans problème, chacun à sa bonne place.
 
 ---
 
+## 8. Architecture de l'outillage de génération Python (`TOOLS/`)
+
+Ce dossier contient l'outil en ligne de commande de génération automatique de fichiers PLCopenXML (`st2plcopenxml`) à partir des fichiers sources Structured Text (`CODE/*.st`).
+
+### 📦 Structure des modules et rôles
+
+```mermaid
+graph TD
+    CLI[generator.cli] --> FD[generator.file_discovery]
+    CLI --> DR[generator.dependency_resolver]
+    CLI --> XB[generator.xml_builder]
+    CLI --> XS[generator.xml_serializer]
+    
+    FD --> SP[generator.st_parser]
+    SP --> SL[generator.st_lexer]
+    SP --> SS[generator.st_sections]
+    SP --> SD[generator.st_declarations]
+    SP --> ST[generator.st_types]
+    
+    XB --> GUID[generator.guid]
+    
+    classDef main fill:#d4f0fc,stroke:#1a5f7a,stroke-width:2px;
+    class CLI main;
+```
+
+*   **`generator.cli`** : Point d'entrée de l'application en ligne de commande. Reçoit les paramètres de l'utilisateur, orchestre les différentes étapes de génération et écrit le résultat sur le disque.
+*   **`generator.file_discovery`** : Parcourt récursivement le dossier source `CODE/` pour découvrir tous les fichiers `.st` et filtrer les anciennes structures de fichiers (`_Decl.st` et `_Impl.st`).
+*   **`generator.st_parser`** : Module central de parsing. Il orchestre les modules bas niveau pour construire la représentation intermédiaire (`IR`) :
+    *   `st_lexer` : Effectue l'analyse lexicale.
+    *   `st_sections` : Extrait et nettoie les sections de code (déclaration vs corps ST).
+    *   `st_declarations` : Analyse le bloc de déclaration des variables (`VAR_INPUT`, `VAR_OUTPUT`, etc.).
+    *   `st_types` : Analyse les types définis par l'utilisateur (STRUCT, ENUM).
+*   **`generator.dependency_resolver`** : Résout les dépendances transitives des types d'un objet (détection des STRUCT ou ENUM utilisés par un FB) pour les inclure dans le bundle d'importation.
+*   **`generator.xml_builder`** : Construit l'arbre XML PLCopenXML compatible CODESYS en y ajoutant les extensions requises (`ProjectStructure`, `Retain/Persistent`, `xhtml`, etc.).
+*   **`generator.guid`** : Fournit une génération déterministe de GUID (`uuid5` basé sur le nom qualifié de l'objet) pour assurer que les ré-imports dans CODESYS ciblent bien les mêmes identifiants internes.
+*   **`generator.xml_serializer`** : Sérialise proprement l'arbre XML généré en préservant le formatage (indentation, retours chariot, en-tête XML).
+*   **`generator.diagnostics`** : Collecte de façon centralisée les alertes et erreurs rencontrées lors de la découverte, du parsing ou de la génération.
+
+### 🔄 Séquences d'appel et flux de données
+
+#### Usage 1 : Mode unitaire (génération par fichier dans `out-dir`)
+Génère un fichier `.xml` individuel par objet ST, en reproduisant la structure de dossiers.
+
+```
+[cli.py] -- (1. discover_objects) --> [file_discovery.py]
+                                           |--> lit CODE/**/*.st
+                                           |--> parse chaque fichier via [st_parser.py]
+                                           |--> retourne liste de SourceObject (IR)
+[cli.py] <-- (2. liste SourceObjects) ---- [file_discovery.py]
+[cli.py] -- (3. build_project_xml) --> [xml_builder.py]
+                                           |--> génère GUID via [guid.py]
+                                           |--> convertit l'IR en structure XML
+[cli.py] <-- (4. XML Tree) ------------ [xml_builder.py]
+[cli.py] -- (5. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: CODE/WINCH/FB_Winch.xml)
+```
+
+#### Usage 2 : Mode Bundle (génération groupée via `--bundle`)
+Regroupe tous les objets demandés ainsi que leurs dépendances transitives dans un seul fichier XML global.
+
+```
+[cli.py] -- (1. discover_objects) --> [file_discovery.py]
+[cli.py] <-- (2. liste SourceObjects) ---- [file_discovery.py]
+[cli.py] -- (3. resolve_dependencies) -> [dependency_resolver.py] (calcule la fermeture transitive des types)
+[cli.py] <-- (4. dépendances résolues) --- [dependency_resolver.py]
+[cli.py] -- (5. build_project_xml) --> [xml_builder.py] (inclut objets + dépendances + ProjectStructure multi-dossiers)
+[cli.py] <-- (6. XML Tree) ------------ [xml_builder.py]
+[cli.py] -- (7. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: CODE/CODE_Bundle.xml)
+```
+
+### 🧪 Stratégie de tests avec `pytest`
+
+La suite de tests est configurée dans [pyproject.toml](file:///c:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS/pyproject.toml) et s'articule autour de trois dossiers de tests (`TOOLS/tests/`) :
+
+1.  **Tests unitaires (`tests/unit/`)** :
+    *   Valident individuellement chaque brique : résolveur de dépendance, analyseur de déclarations ST, parser d'enums, parser de GVLs.
+    *   Le module `test_file_discovery.py` vérifie le bon comportement de filtrage et de détection des doublons ou fichiers orphelins.
+2.  **Tests d'intégration (`tests/integration/`)** :
+    *   Valident les flux de bout en bout en simulant l'exécution du CLI (appel de `main` avec divers arguments).
+    *   Vérifient la bonne reproduction de l'arborescence physique ou l'incorporation correcte des dépendances dans un fichier unique de bundle.
+3.  **Tests Golden (`tests/golden/`)** :
+    *   Comparent structurellement le XML généré à partir du code de `CODE/` avec les exports originaux stockés dans `TOOLS/samples_reference_codesys/`.
+    *   *Note de robustesse* : Afin de tolérer l'évolution naturelle du code et des commentaires de mise en service, les tests ignorent les valeurs brutes fluctuantes (`simpleValue`) et valident la simple présence du texte (`xhtml`) sans blocage strict de contenu textuel.
+
+---
+
 ## 📚 Sources
 
 - Échantillons réels : `TOOLS/samples_reference_codesys/*.xml` (CODESYS V3.5 SP19 Patch 1)

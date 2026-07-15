@@ -129,7 +129,7 @@ Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.3.2
 python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.3.26']))"
 ```
 
-Sortie → `TOOLS/generated/CODE_Bundle.xml`
+Sortie → `CODE/CODE_Bundle.xml`
 
 ---
 

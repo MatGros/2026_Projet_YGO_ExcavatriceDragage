@@ -67,7 +67,7 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
         rel = f.relative_to(code_dir).as_posix()
         obj = parse_file(
             source,
-            folder=f.parent.name,
+            folder="" if f.parent == code_dir else f.parent.name,
             stem=f.stem,
             mtime=f.stat().st_mtime,
             source_label=rel,
