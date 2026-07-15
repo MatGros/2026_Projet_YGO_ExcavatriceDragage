@@ -3,6 +3,9 @@ import socketserver
 import sys
 import json
 
+# Reconfigure stdout to use UTF-8 to prevent UnicodeEncodeError on Windows command prompt
+sys.stdout.reconfigure(encoding='utf-8')
+
 PORT = 9090
 
 class PushHandler(http.server.SimpleHTTPRequestHandler):
@@ -17,7 +20,6 @@ class PushHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"status": "woken"}).encode())
             print("\n🚨 [PUSH] Notification reçue : Réveil de Gemini demandé !\n", flush=True)
-            sys.stdout.flush()
         else:
             self.send_response(404)
             self.end_headers()
@@ -29,16 +31,14 @@ class PushHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"status": "woken"}).encode())
             print("\n🚨 [PUSH] Notification reçue : La file d'attente (QUEUE.md) a été modifiée !\n", flush=True)
-            sys.stdout.flush()
         else:
             self.send_response(404)
             self.end_headers()
 
 if __name__ == '__main__':
-    # Allow port reuse
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), PushHandler) as httpd:
-        print(f"Push Notification Server listening on port {PORT}...", flush=True)
+        print("Push Notification Server listening on port 9090...", flush=True)
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

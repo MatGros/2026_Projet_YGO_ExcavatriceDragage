@@ -46,5 +46,6 @@ instModes(
     InhibitM1Request    := GVL_IHM.WinchM1.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     InhibitM2Request    := GVL_IHM.WinchM2.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     HomingApproachEnableRequest := GVL_IHM.Common.HomingApproachEnableRequest, // 🆕 REX 2026-07-08 (2)
-    EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent   // 1 cycle de retard (reçu de PRG_02_Encoders)
+    EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
+    JoystickWinchSelectRequest := GVL_IHM.IHM_MANU.JoystickWinchSelect // 🆕 TASK-0001
 );

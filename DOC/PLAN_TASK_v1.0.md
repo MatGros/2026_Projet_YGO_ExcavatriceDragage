@@ -80,7 +80,7 @@ IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` e
 | T17 | Checklist mise en service Joystick non réalisée (calibration, deadband, coupure CAN) | Terrain | AF_Partie-08 §8 |
 | T18 | GVL d'échange IHM à créer ou non (mapping paramètres/mesures) | Projet | AF_Partie-05 §6 |
 | T19 | Mapping `ChannelOk` carte/voie E-S (diagnostic carte non exploité) à définir si besoin confirmé | Projet | AF_Partie-06 §4 |
-| T20 | Sélecteur treuil IHM (M1/M2/Les deux) + bit « Prise de main IHM » jamais codés | Projet | AF_Partie-09 §1 |
+| T20 | Sélecteur treuil IHM (visu/physique) + Prise de main IHM (l'arbitrage MAINT_N2 est fait, cf. AF_Partie-05 v1.6) | Projet | AF_Partie-05 §2, AF_Partie-09 §1 |
 | T21 | Checklist validation Winch v1.7 non réalisée (inhibition, HomingApproachEnable, Méca B/D, diagnostics IHM, simulation) | Terrain | AF_Partie-09 §8 |
 | T22 | Tolérance de calibration `TopSensorPositionM` (contrôle visuel) à fixer sur site | Terrain | AF_Partie-10 §7bis |
 | T23 | Mapping IHM Encoder/Homing restant non codé (`WinchSelect_IHM`, `HomingTargetM_IHM`, voyants) | Projet | AF_Partie-10 §8 |
