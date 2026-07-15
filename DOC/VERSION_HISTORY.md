@@ -6,6 +6,12 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### `v0.4.13_DIAG_Folder_Split` — 2026-07-15
+- Nouveau dossier `CODE/DIAG/` : E_DiagState, FB_DiagCanOpen, FB_DiagEthercat, ST_DeviceDiag
+- Sortis de `SYSTEM` (qui garde FB_CycleTime + GVL_BUS/GVL_Machine_Stub orphelins)
+- Aligne le repo sur l'archi documentée (Partie2 v2.11 §3)
+- ⚠️ pas encore réimporté/compilé dans CODESYS
+
 ### `v0.4.12_ChariotHMI_Migration` — 2026-07-15
 - ST_ChariotHMI migre ReqFwd/ReqRev/FreqSetpointHz depuis IHM_MANU
 - + diag décodé DriveCommReady/DrivePowerReady (pas de WORD brut)

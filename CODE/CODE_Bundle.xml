@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.215337" />
-  <contentHeader name="Programme MGS.project" modificationDateTime="2026-07-04T06:07:15.215337">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-15T14:11:15.384968" />
+  <contentHeader name="MGS_v0.4.13.project" modificationDateTime="2026-07-15T14:11:15.384968">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Programme MGS</property>
+          <property name="Project" type="string">MGS_v0.4.13</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -16157,13 +16157,10 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
           <Object Name="FB_Cycle" ObjectId="17fb99b4-f1ad-50d8-8736-de2357b93935" />
         </Folder>
-        <Folder Name="SYSTEM">
+        <Folder Name="DIAG">
           <Object Name="E_DiagState" ObjectId="39664b51-89a6-5c70-97d4-b9cecb9f2e88" />
-          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_DiagCanOpen" ObjectId="94985939-6432-5df4-8717-0ad1efb0fdb4" />
           <Object Name="FB_DiagEthercat" ObjectId="268197d6-ad0a-5ec3-82c7-3a1f88f6bae6" />
-          <Object Name="GVL_BUS" ObjectId="8d106fd1-f467-5b81-9fa8-241243fdede4" />
-          <Object Name="GVL_Machine_Stub" ObjectId="7834019e-fea7-59eb-b31f-8f35e12a198a" />
           <Object Name="ST_DeviceDiag" ObjectId="30d8c96b-f84b-5d5c-afe4-0417d2adeea2" />
         </Folder>
         <Folder Name="MODES">
@@ -16189,6 +16186,11 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Chariot" ObjectId="ef50ec73-97ee-5083-8ff7-f8da85fffc5c" />
           <Object Name="FB_Safety_Chariot" ObjectId="87440a21-1b92-5f1c-8ebe-229c99e4a6bf" />
           <Object Name="GVL_Chariot_M3_Stub" ObjectId="c1937428-1b87-5c72-892f-db94f445ff5d" />
+        </Folder>
+        <Folder Name="SYSTEM">
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+          <Object Name="GVL_BUS" ObjectId="8d106fd1-f467-5b81-9fa8-241243fdede4" />
+          <Object Name="GVL_Machine_Stub" ObjectId="7834019e-fea7-59eb-b31f-8f35e12a198a" />
         </Folder>
         <Folder Name="WINCH">
           <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
