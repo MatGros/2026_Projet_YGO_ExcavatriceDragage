@@ -35,7 +35,7 @@ instCycle(
     
     TargetDepthM        := TargetDepthM,
     TargetOffsetM       := TargetOffsetM,
-    SelectedTargetNum_IHM := GVL_IHM.Chariot.SelectedTargetNum,
+    SelectedTargetNum_IHM := GVL_IHM.ChariotM3.SelectedTargetNum,
 
     // Capteur fond touché détecté par le mou de câble physique (sécurité positive)
     BottomTouched       := NOT PRG_00_Inputs.SlackCableSwitch,

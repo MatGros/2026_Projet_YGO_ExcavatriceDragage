@@ -21,7 +21,7 @@ END_VAR
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SyncEnableRequest; // 🔧 REX 2026-07-08 : renommé, polarité inversée
-StubChariotPositionSelect_IHM          := GVL_IHM.Chariot.SelectedTargetNum;
+StubChariotPositionSelect_IHM          := GVL_IHM.ChariotM3.SelectedTargetNum;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
@@ -88,8 +88,8 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 // homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
-// ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.Joystick.Calibrate dans PRG_01_Diagnostics (ligne 48)
-// PRG_01_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.Joystick.Calibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
+// ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.JoystickJOY1.Calibrate dans PRG_01_Diagnostics (ligne 48)
+// PRG_01_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.JoystickJOY1.Calibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
@@ -234,7 +234,7 @@ GVL_IHM.Common.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir AF_Partie13) ──────
 GVL_IHM.WinchM1.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
 GVL_IHM.WinchM2.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal;
-GVL_IHM.Chariot.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
+GVL_IHM.ChariotM3.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
 GVL_IHM.WinchM1.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
 GVL_IHM.WinchM2.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
 GVL_IHM.WinchM1.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
@@ -362,31 +362,34 @@ GVL_IHM.Sync.State      := PRG_06_WinchControl.instWinchSync.State;
 
 
 // ── 9. MAPPING ÉTATS CHARIOT M3 → IHM ────────────────────────────────────
-GVL_IHM.Chariot.FBState              := PRG_07_ChariotControl.instChariotM3.State;
-GVL_IHM.Chariot.Ready                := PRG_07_ChariotControl.instChariotM3.Ready;
-GVL_IHM.Chariot.Busy                 := PRG_07_ChariotControl.instChariotM3.Busy;
-GVL_IHM.Chariot.Done                 := PRG_07_ChariotControl.instChariotM3.Done;
-GVL_IHM.Chariot.Error                := PRG_07_ChariotControl.instChariotM3.Error;
-GVL_IHM.Chariot.ErrorId              := PRG_07_ChariotControl.instChariotM3.ErrorId;
-GVL_IHM.Chariot.BrakeCmd             := PRG_07_ChariotControl.instChariotM3.BrakeCmd;
-GVL_IHM.Chariot.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
-GVL_IHM.Chariot.PositionSensorTarget := PRG_07_ChariotControl.M3_PositionSensorTarget;
-GVL_IHM.Chariot.DriveStatusWord      := PRG_07_ChariotControl.instChariotM3.DriveStatusWord;
-GVL_IHM.Chariot.DriveActualFreqHz    := PRG_07_ChariotControl.instChariotM3.DriveActualFreqHz;
-GVL_IHM.Chariot.SafetyError          := PRG_03_Safety.instSafetyChariotM3.Error;
-GVL_IHM.Chariot.SafetyErrorId        := PRG_03_Safety.instSafetyChariotM3.ErrorId;
+GVL_IHM.ChariotM3.FBState              := PRG_07_ChariotControl.instChariotM3.State;
+GVL_IHM.ChariotM3.Ready                := PRG_07_ChariotControl.instChariotM3.Ready;
+GVL_IHM.ChariotM3.Busy                 := PRG_07_ChariotControl.instChariotM3.Busy;
+GVL_IHM.ChariotM3.Done                 := PRG_07_ChariotControl.instChariotM3.Done;
+GVL_IHM.ChariotM3.Error                := PRG_07_ChariotControl.instChariotM3.Error;
+GVL_IHM.ChariotM3.ErrorId              := PRG_07_ChariotControl.instChariotM3.ErrorId;
+GVL_IHM.ChariotM3.BrakeCmd             := PRG_07_ChariotControl.instChariotM3.BrakeCmd;
+GVL_IHM.ChariotM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
+GVL_IHM.ChariotM3.PositionSensorTarget := PRG_07_ChariotControl.M3_PositionSensorTarget;
+// 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
+GVL_IHM.ChariotM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.ChariotM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+// 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
+GVL_IHM.ChariotM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.ChariotM3.SafetyError          := PRG_03_Safety.instSafetyChariotM3.Error;
+GVL_IHM.ChariotM3.SafetyErrorId        := PRG_03_Safety.instSafetyChariotM3.ErrorId;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.Joystick.RawX       := JoyXRaw_ANA1;
-GVL_IHM.Joystick.RawY       := JoyYRaw_ANA2;
-GVL_IHM.Joystick.RawButton  := JoyBtnRaw;
-GVL_IHM.Joystick.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.Joystick.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.Joystick.Online     := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online;
-GVL_IHM.Joystick.Operational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational;
-GVL_IHM.Joystick.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JoystickJOY1.RawX       := JoyXRaw_ANA1;
+GVL_IHM.JoystickJOY1.RawY       := JoyYRaw_ANA2;
+GVL_IHM.JoystickJOY1.RawButton  := JoyBtnRaw;
+GVL_IHM.JoystickJOY1.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
+GVL_IHM.JoystickJOY1.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JoystickJOY1.Online     := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online;
+GVL_IHM.JoystickJOY1.Operational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational;
+GVL_IHM.JoystickJOY1.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
+GVL_IHM.JoystickJOY1.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────

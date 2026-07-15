@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Chariot — Bloc Safety pour le Chariot M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.5.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.

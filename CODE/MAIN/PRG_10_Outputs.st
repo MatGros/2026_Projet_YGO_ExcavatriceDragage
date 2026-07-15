@@ -161,8 +161,8 @@ IF ManuActive THEN
     TrigM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev AND NOT LastM2Rev;
     TrigCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT LastCoupledFwd;
     TrigCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT LastCoupledRev;
-    TrigM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT LastM3Fwd;
-    TrigM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT LastM3Rev;
+    TrigM3Fwd      := GVL_IHM.ChariotM3.ReqFwd AND NOT LastM3Fwd;
+    TrigM3Rev      := GVL_IHM.ChariotM3.ReqRev AND NOT LastM3Rev;
 
     // 2️⃣ Interlocks de sécurité sur boutons HMI (Montée vs Descente)
     IF GVL_IHM.IHM_MANU.M1_RelayFwd AND GVL_IHM.IHM_MANU.M1_RelayRev THEN
@@ -198,14 +198,14 @@ IF ManuActive THEN
         END_IF;
     END_IF;
 
-    IF GVL_IHM.IHM_MANU.M3_RelayFwd AND GVL_IHM.IHM_MANU.M3_RelayRev THEN
+    IF GVL_IHM.ChariotM3.ReqFwd AND GVL_IHM.ChariotM3.ReqRev THEN
         IF TrigM3Rev THEN
-            GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
+            GVL_IHM.ChariotM3.ReqRev := FALSE;
         ELSIF TrigM3Fwd THEN
-            GVL_IHM.IHM_MANU.M3_RelayFwd := FALSE;
+            GVL_IHM.ChariotM3.ReqFwd := FALSE;
         ELSE
-            GVL_IHM.IHM_MANU.M3_RelayFwd := FALSE;
-            GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
+            GVL_IHM.ChariotM3.ReqFwd := FALSE;
+            GVL_IHM.ChariotM3.ReqRev := FALSE;
         END_IF;
     END_IF;
 
@@ -238,10 +238,10 @@ IF ManuActive THEN
                              OR (M2_IsReal AND PRG_03_Safety.instSafetyWinchM2.PowerCutOff)
                              OR (M3_IsReal AND PRG_03_Safety.instSafetyChariotM3.PowerCutOff);
     // ⚡ Clamp de sécurité sur la consigne saisie par l'opérateur (limité par le plafond absolu persistant)
-    IF GVL_IHM.IHM_MANU.M3_FreqSetpoint > GVL_PERSISTENT.ChariotMaxFreqHz THEN
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := GVL_PERSISTENT.ChariotMaxFreqHz;
-    ELSIF GVL_IHM.IHM_MANU.M3_FreqSetpoint < 0.0 THEN
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := 0.0;
+    IF GVL_IHM.ChariotM3.FreqSetpointHz > GVL_PERSISTENT.ChariotMaxFreqHz THEN
+        GVL_IHM.ChariotM3.FreqSetpointHz := GVL_PERSISTENT.ChariotMaxFreqHz;
+    ELSIF GVL_IHM.ChariotM3.FreqSetpointHz < 0.0 THEN
+        GVL_IHM.ChariotM3.FreqSetpointHz := 0.0;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
@@ -257,9 +257,9 @@ IF ManuActive THEN
         
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
-        
-        // Consigne active Chariot M3 (0..M3_FreqSetpoint Hz) via déflexion X (la consigne HMI est prise pour 100%)
-        M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.IHM_MANU.M3_FreqSetpoint;
+
+        // Consigne active Chariot M3 (0..FreqSetpointHz Hz) via déflexion X (la consigne HMI est prise pour 100%)
+        M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.ChariotM3.FreqSetpointHz;
     ELSE
         // 💡 Détection de mouvement en cours (pour verrouillage croisé)
         WinchMoving := M1Fwd_Demand OR M1Rev_Demand OR M2Fwd_Demand OR M2Rev_Demand OR CoupledFwd_Demand OR CoupledRev_Demand;
@@ -276,11 +276,11 @@ IF ManuActive THEN
         CoupledFwd_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND (NOT WinchMoving OR CoupledFwd_Demand);
         CoupledRev_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND (NOT WinchMoving OR CoupledRev_Demand);
 
-        M3Fwd_Demand := GVL_IHM.IHM_MANU.M3_RelayFwd;
-        M3Rev_Demand := GVL_IHM.IHM_MANU.M3_RelayRev;
+        M3Fwd_Demand := GVL_IHM.ChariotM3.ReqFwd;
+        M3Rev_Demand := GVL_IHM.ChariotM3.ReqRev;
 
-        // En mode HMI boutons / Simulation, la consigne active envoyée est directement M3_FreqSetpoint
-        M3_ActiveFreqCmd := GVL_IHM.IHM_MANU.M3_FreqSetpoint;
+        // En mode HMI boutons / Simulation, la consigne active envoyée est directement FreqSetpointHz
+        M3_ActiveFreqCmd := GVL_IHM.ChariotM3.FreqSetpointHz;
     END_IF;
 
     // 🔒 Sécurité démarrage : exige que toutes les commandes HMI et Joystick soient au repos (neutre) au démarrage
@@ -288,7 +288,7 @@ IF ManuActive THEN
         IF NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
            AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
            AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev
-           AND NOT GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT GVL_IHM.IHM_MANU.M3_RelayRev
+           AND NOT GVL_IHM.ChariotM3.ReqFwd AND NOT GVL_IHM.ChariotM3.ReqRev
            AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) < 1.0
            AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 1.0 THEN
             StartupNeutralOk := TRUE;
@@ -389,13 +389,9 @@ ELSE
     M3_CommandWord         := PRG_07_ChariotControl.instChariotM3.DriveControlWord;
     M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_ChariotControl.instChariotM3.DriveFreqRefHz * 100.0);
 END_IF;
-GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
-
-// Recopie des mots de commande et d'état pour monitoring HMI
-GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
-GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := PRG_00_Inputs.M3_StatusWord_Filtered;
-GVL_IHM.IHM_MANU.M3_CommReady          := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.IHM_MANU.M3_PowerReady         := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+// 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
+// PRG_09_Supervision (GVL_IHM.ChariotM3), valables Auto ET Manu — ex-doublons IHM_MANU
+// M3_FreqActual/M3_CommandWordMonitor/M3_StatusWordMonitor/M3_CommReady/M3_PowerReady retirés.
 
 // Relais de direction M3 obsolètes forcés à FALSE
 M3_RelayFwd_DQ := FALSE;
@@ -408,8 +404,8 @@ LastM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd;
 LastM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev;
 LastCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
 LastCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev;
-LastM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd;
-LastM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev;
+LastM3Fwd      := GVL_IHM.ChariotM3.ReqFwd;
+LastM3Rev      := GVL_IHM.ChariotM3.ReqRev;
 // ─────────  Fin modification IHM_MANU  ─────────
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────

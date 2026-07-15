@@ -1,6 +1,34 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Chariot (v1.5)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Chariot (v1.6)
 
-> 🆕 **v1.5 (2026-07-15) — Intégration nominale EtherCAT & Sécurités** :
+> 🆕 **v1.6 (2026-07-15) — Finalisation IHM (`ST_ChariotHMI`)** :
+> * `ST_ChariotHMI` (`GVL_IHM.ChariotM3`) reprend les commandes manuelles ex-`ST_IHM_MANU`
+>   (`ReqFwd`/`ReqRev`/`FreqSetpointHz`, sans préfixe `M3_` — redondant une fois scopé sous
+>   `GVL_IHM.ChariotM3.xxx`) — étape de migration, **pas l'état final** : le bypass
+>   `ManuActive`→`M3_CommandWord` reste, M3 n'est pas encore aligné sur le modèle M1/M2.
+> * Diagnostic variateur **décodé** : `DriveCommReady`/`DrivePowerReady` (booléens, StatusWord
+>   bit7/bit0) remplacent le `WORD` brut `DriveStatusWord` — binding visu direct (LED/checkbox),
+>   pas de bit-masking côté développeur IHM. Le défaut variateur (bit4) reste couvert par
+>   `Chariot.Error`/`ErrorId` (bit3 `FB_Chariot`), pas de 3ᵉ booléen dédié.
+> * `BypassBrakeFeedback` **supprimé** (n'était jamais écrit, redondant avec
+>   `BypassContactorFeedback` qui couvre déjà "sens + frein" — voir `GVL_Simulation.ContactorFeedbackM3_IsReal`).
+>   `PRG_07_ChariotControl` utilise désormais `BypassContactorFeedback` pour le `SEL` de
+>   `BrakeFeedback` transmis à `FB_Chariot`.
+> * `DriveActualFreqHz` : source unique `PRG_00_Inputs.M3_ActualFrequencyHz_Filtered`, écrite
+>   une seule fois (`PRG_09_Supervision`), valable Auto ET Manu.
+> * `GVL_IHM.Chariot` renommé `GVL_IHM.ChariotM3` (cohérence avec `WinchM1`/`WinchM2` — le nom
+>   du membre porte son identifiant matériel). Idem `Joystick`→`JoystickJOY1`. `Grappin` reste
+>   sans suffixe (contrairement à Chariot/Joystick, pas de paire M1/M2 à distinguer — un suffixe
+>   `M2` répéterait `M2` déjà présent dans ses propres champs, ex. `M2PositionCorrected`).
+> * **Bug corrigé** (hors périmètre IHM strict, découvert au passage) : la simulation de trajet
+>   M3 (`FB_Sim_Chariot`) lisait `RelayFwd`/`RelayRev` depuis `GVL_Chariot_M3_Stub.M3_RelayFwd/Rev`
+>   — variables jamais écrites depuis l'abandon du mode relais `DEGRADED_IO` (v0.4.11) : la
+>   progression de trajet restait bloquée en permanence. Rebranché sur `M3_CommandWord = 1/2`.
+> * ⚠️ **Ce qui n'a pas changé** : en mode `IHM_MANU` (dérogatoire, voir
+>   `DOC/IHM_MANU_Journal_Modifications.md`), `PRG_10_Outputs` écrit toujours `M3_CommandWord`
+>   directement, sans passer par `FB_Chariot`/`FB_Safety_Chariot`. Le passage de M3 sur le même
+>   modèle que M1/M2 (arbitrage natif même en Manu) reste un chantier séparé.
+>
+> **v1.5 (2026-07-15) — Intégration nominale EtherCAT & Sécurités** :
 > * **Abandon du mode dégradé par relais (`DEGRADED_IO`)** : La vraie machine n'étant équipée d'aucun I/O digital physique pour la commande de sens/vitesse du variateur, le pilotage s'effectue exclusivement par le bus de terrain EtherCAT. Si une défaillance de com ou du variateur est détectée, la sécurité PLC déclenche l'arrêt et coupe le circuit d'urgence (AU/PowerCutOff) pour coller le frein par manque de courant.
 > * **Spécifications AC600 EtherCAT intégrées** :
 >   * Mot de commande (`DriveControlWord`, donné par Given Command 1 à l'adresse 0x3101/0x3001) : `0` = Aucun/Arrêt, `1` = Marche avant, `2` = Marche arrière, `7` = Reset défaut.
@@ -158,3 +186,27 @@ Les variables physiques suivantes doivent être configurées dans l'I/O Mapping 
 | `M3_SetpointFrequencyHz` | Sortie | frequency setpoint (0x3100) | Consigne vitesse ($\text{Hz} \times 100$) |
 | `M3_StatusWord` | Entrée | Drive Status 1 (0x3102) | Mot d'état variateur AC600 |
 | `M3_ActualFrequencyHz` | Entrée | Actual Frequency C00.01 (0x3103) | Vitesse réelle mesurée ($\text{Hz} \times 100$) |
+
+---
+
+## 🖥️ 6. Interface IHM (`ST_ChariotHMI`, `GVL_IHM.ChariotM3`)
+
+Structure d'échange IHM (migration depuis `ST_IHM_MANU`, provisoire, pour les
+champs listés ci-dessous — mais le pilotage M3 en mode Manu reste un vrai bypass au niveau
+logique, voir `DOC/IHM_MANU_Journal_Modifications.md` §11).
+
+| Champ | Type | Sens | Rôle |
+|-------|------|------|------|
+| `SelectedTargetNum` | INT | IHM→PLC | Cible position 1-4 (Fosse1/Fosse2/Maintenance/Trémie) |
+| `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) |
+| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `GVL_PERSISTENT.ChariotMaxFreqHz` |
+| `FBState` | E_State | PLC→IHM | État interne `FB_Chariot` (diagnostic) |
+| `Ready/Busy/Done/Error/ErrorId` | — | PLC→IHM | Statuts standards `FB_Chariot` |
+| `BrakeCmd` | BOOL | PLC→IHM | Miroir lecture seule (TRUE = desserré) — pas de forçage inconditionnel : le déblocage en MAINT passe par `ReqFwd`/`ReqRev` (mouvement), qui desserre le frein nativement via `FB_Brake` (même doctrine que `ST_WinchHMI`) |
+| `BrakeFeedback` | BOOL | PLC→IHM | Retour physique bobine frein |
+| `PositionSensorTarget` | BOOL | PLC→IHM | Capteur position cible atteint |
+| `DriveActualFreqHz` | REAL | PLC→IHM | Fréquence réelle mesurée (Hz), source unique `PRG_00_Inputs`, Auto ET Manu |
+| `DriveCommReady` | BOOL | PLC→IHM | StatusWord bit7 (communication prête) — décodé, pas de bit-masking IHM |
+| `DrivePowerReady` | BOOL | PLC→IHM | StatusWord bit0 (puissance prête) — décodé |
+| `BypassContactorFeedback` | BOOL | PLC→IHM | Diag banc de test, auto-calculé (`GVL_Simulation.ContactorFeedbackM3_IsReal`) — couvre sens + frein |
+| `SafetyError` / `SafetyErrorId` | — | PLC→IHM | Statuts `FB_Safety_Chariot` |

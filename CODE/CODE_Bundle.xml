@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.215337" />
-  <contentHeader name="v0.4.11.project" modificationDateTime="2026-07-04T06:07:15.215337">
+  <contentHeader name="Programme MGS.project" modificationDateTime="2026-07-04T06:07:15.215337">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.4.11</property>
+          <property name="Project" type="string">Programme MGS</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -379,12 +379,46 @@
       <dataType name="ST_ChariotHMI">
         <baseType>
           <struct>
+            <variable name="SelectedTargetNum">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes opérateur (manuel / maintenance)
+🔢 Numéro de la cible de position sélectionnée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant manuelle (bouton IHM, pas encore arbitrée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FreqSetpointHz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs</xhtml>
+              </documentation>
+            </variable>
             <variable name="FBState">
               <type>
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_Chariot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États &amp; diagnostics FB_Chariot
+🤖 État de l'automate interne (FB_Chariot)</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -432,7 +466,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Commande de desserrage du frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Commande de desserrage du frein (lecture seule, TRUE = desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -451,22 +485,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Capteur de détection de la position cible atteint</xhtml>
               </documentation>
             </variable>
-            <variable name="SelectedTargetNum">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Numéro de la cible de position sélectionnée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DriveStatusWord">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Mot d'état du variateur (EtherCAT)</xhtml>
-              </documentation>
-            </variable>
             <variable name="DriveActualFreqHz">
               <type>
                 <REAL />
@@ -475,20 +493,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Fréquence de sortie réelle du variateur (Hz)</xhtml>
               </documentation>
             </variable>
+            <variable name="DriveCommReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic variateur EtherCAT (décodé — pas de bit-masking côté IHM)
+📡 Variateur M3 : communication prête (StatusWord bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrivePowerReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Variateur M3 : puissance prête (StatusWord bit0)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassContactorFeedback">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Activation du bypass des retours contacteurs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassBrakeFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Activation du bypass du retour frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐞 Bypass diag (banc de test — auto-calculé depuis GVL_Simulation)
+🔌 Activation du bypass des retours contacteurs (sens + frein)</xhtml>
               </documentation>
             </variable>
             <variable name="SafetyError">
@@ -496,7 +524,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bloc sécurité (Safety) en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sécurité (FB_Safety_Chariot)
+🛡️ Bloc sécurité (Safety) en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="SafetyErrorId">
@@ -519,6 +548,8 @@
    ↔️ ST_ChariotHMI — Données d'échange IHM pour le Chariot M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du chariot.
+   📄 Migration des champs manuels ex-ST_IHM_MANU (étape en cours, pas l'état final) —
+      doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1311,39 +1342,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Chariot M3 (variateur AC600)
-↔️ Commande frein + envoi valeur dans mot de commande</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande frein + envoi valeur dans mot de commande</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_FreqSetpoint">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence variateur [Hz]</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_FreqActual">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Retour fréquence mesurée [Hz]</xhtml>
-              </documentation>
-            </variable>
             <variable name="GridOpenCmd">
               <type>
                 <BOOL />
@@ -1434,39 +1432,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Limite haute M2 atteinte (montée coupée)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_CommandWordMonitor">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Diagnostics Variateur M3
-🔍 Mot de commande envoyé au variateur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_StatusWordMonitor">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Mot d'état reçu du variateur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_CommReady">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Variateur M3 : communication prête (bit 7)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_PowerReady">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Variateur M3 : puissance prête (bit 0)</xhtml>
-              </documentation>
-            </variable>
             <variable name="WinchMaxStepFwd">
               <type>
                 <INT />
@@ -1496,15 +1461,11 @@
    🚨 ST_IHM_MANU — Table d'échange IHM provisoire (mise en service URGENCE)
    ───────────────────────────────────────────────────────────────
    🎨 Pilotage manuel DIRECT des sorties physiques (relais, contacteurs
-      vitesse, freins) et du variateur M3 (EtherCAT, mot de commande) —
-      programme fonctionnel normal bypassé en sortie (PRG_10_Outputs
-      uniquement), aucune sécurité logicielle métier active.
+      vitesse, freins) — programme fonctionnel normal bypassé en sortie
+      (PRG_10_Outputs uniquement), aucune sécurité logicielle métier active.
    ⚠️ DANGER : seuls les interlocks Fwd/Rev (couplé/individuel mutuellement
       exclusifs, voir PRG_10_Outputs) protègent, plus la chaîne AU/PowerCutOff
       (toujours active, non bypassée). Pas de limites logicielles, pas de synchro.
-   🔧 REX 2026-07-09 : M3_CommandWord (registre 0x3101 côté carte EtherCAT, PAS le
-      0x3001 natif variateur) = 0 arrêt / 1 marche avant / 2 marche arrière (recette
-      fournisseur) — ⚠️ non vérifié sur banc au moment du codage, à confirmer.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3366,7 +3327,7 @@ Filtrage capteur de position cible</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Chariot — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.5.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -8783,7 +8744,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Chariot — Bloc Safety pour le Chariot M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.5.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -12151,11 +12112,17 @@ M2BrakeFeedback := instM2BrakeFeedback.State;
 // 🧪 Simulation dynamique du trajet M3 (FB_Sim_Chariot, non prioritaire — voir AF_Partie13
 // §Chariot). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
 // (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
+// 🔧 REX 2026-07-15 (3) : RelayFwd/RelayRev câblés sur M3_CommandWord (variable globale
+// mappée PDO EtherCAT, valeur réellement envoyée, Auto ET Manu confondus) — ex-
+// GVL_Chariot_M3_Stub.M3_RelayFwd/Rev n'étaient plus jamais écrits depuis l'abandon du mode
+// relais DEGRADED_IO (v0.4.11), la simulation de trajet M3 restait bloquée en permanence
+// (relais toujours FALSE). Lecture décalée d'1 cycle (10ms, M3_CommandWord réécrit en position
+// 10 par PRG_10_Outputs après ce PRG_00) — négligeable devant TravelTimeS (8s).
 instSimChariot(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ChariotPosition_IsReal,
     TargetNum   := GVL_Chariot_M3_Stub.StubChariotPositionSelect_IHM,
-    RelayFwd    := GVL_Chariot_M3_Stub.M3_RelayFwd,
-    RelayRev    := GVL_Chariot_M3_Stub.M3_RelayRev,
+    RelayFwd    := M3_CommandWord = 1,
+    RelayRev    := M3_CommandWord = 2,
     TravelTimeS := 8.0
 );
 
@@ -12311,7 +12278,7 @@ FB_Joystick_0(
     RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
     RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
     RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
-    Calibrate           := GVL_IHM.Joystick.Calibrate,
+    Calibrate           := GVL_IHM.JoystickJOY1.Calibrate,
     InvertX             := FALSE,
     InvertY             := FALSE,
     Deadband            := 10.0,
@@ -13058,7 +13025,7 @@ instCycle(
     
     TargetDepthM        := TargetDepthM,
     TargetOffsetM       := TargetOffsetM,
-    SelectedTargetNum_IHM := GVL_IHM.Chariot.SelectedTargetNum,
+    SelectedTargetNum_IHM := GVL_IHM.ChariotM3.SelectedTargetNum,
 
     // Capteur fond touché détecté par le mou de câble physique (sécurité positive)
     BottomTouched       := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -13927,7 +13894,7 @@ instChariotM3(
     LimitSwitchRev          := PRG_00_Inputs.ChariotPosFosse1,
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
-    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd),
+    BrakeFeedback           := SEL(GVL_IHM.ChariotM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd),
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
 );
 
@@ -14067,7 +14034,7 @@ SifterFaultOk       := TRUE; // Par défaut sain (NC)
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SyncEnableRequest; // 🔧 REX 2026-07-08 : renommé, polarité inversée
-StubChariotPositionSelect_IHM          := GVL_IHM.Chariot.SelectedTargetNum;
+StubChariotPositionSelect_IHM          := GVL_IHM.ChariotM3.SelectedTargetNum;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
@@ -14134,8 +14101,8 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 // homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
-// ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.Joystick.Calibrate dans PRG_01_Diagnostics (ligne 48)
-// PRG_01_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.Joystick.Calibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
+// ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.JoystickJOY1.Calibrate dans PRG_01_Diagnostics (ligne 48)
+// PRG_01_Diagnostics.FB_Joystick_0.Calibrate := GVL_IHM.JoystickJOY1.Calibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
@@ -14280,7 +14247,7 @@ GVL_IHM.Common.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir AF_Partie13) ──────
 GVL_IHM.WinchM1.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
 GVL_IHM.WinchM2.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal;
-GVL_IHM.Chariot.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
+GVL_IHM.ChariotM3.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
 GVL_IHM.WinchM1.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
 GVL_IHM.WinchM2.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
 GVL_IHM.WinchM1.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
@@ -14408,31 +14375,34 @@ GVL_IHM.Sync.State      := PRG_06_WinchControl.instWinchSync.State;
 
 
 // ── 9. MAPPING ÉTATS CHARIOT M3 → IHM ────────────────────────────────────
-GVL_IHM.Chariot.FBState              := PRG_07_ChariotControl.instChariotM3.State;
-GVL_IHM.Chariot.Ready                := PRG_07_ChariotControl.instChariotM3.Ready;
-GVL_IHM.Chariot.Busy                 := PRG_07_ChariotControl.instChariotM3.Busy;
-GVL_IHM.Chariot.Done                 := PRG_07_ChariotControl.instChariotM3.Done;
-GVL_IHM.Chariot.Error                := PRG_07_ChariotControl.instChariotM3.Error;
-GVL_IHM.Chariot.ErrorId              := PRG_07_ChariotControl.instChariotM3.ErrorId;
-GVL_IHM.Chariot.BrakeCmd             := PRG_07_ChariotControl.instChariotM3.BrakeCmd;
-GVL_IHM.Chariot.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
-GVL_IHM.Chariot.PositionSensorTarget := PRG_07_ChariotControl.M3_PositionSensorTarget;
-GVL_IHM.Chariot.DriveStatusWord      := PRG_07_ChariotControl.instChariotM3.DriveStatusWord;
-GVL_IHM.Chariot.DriveActualFreqHz    := PRG_07_ChariotControl.instChariotM3.DriveActualFreqHz;
-GVL_IHM.Chariot.SafetyError          := PRG_03_Safety.instSafetyChariotM3.Error;
-GVL_IHM.Chariot.SafetyErrorId        := PRG_03_Safety.instSafetyChariotM3.ErrorId;
+GVL_IHM.ChariotM3.FBState              := PRG_07_ChariotControl.instChariotM3.State;
+GVL_IHM.ChariotM3.Ready                := PRG_07_ChariotControl.instChariotM3.Ready;
+GVL_IHM.ChariotM3.Busy                 := PRG_07_ChariotControl.instChariotM3.Busy;
+GVL_IHM.ChariotM3.Done                 := PRG_07_ChariotControl.instChariotM3.Done;
+GVL_IHM.ChariotM3.Error                := PRG_07_ChariotControl.instChariotM3.Error;
+GVL_IHM.ChariotM3.ErrorId              := PRG_07_ChariotControl.instChariotM3.ErrorId;
+GVL_IHM.ChariotM3.BrakeCmd             := PRG_07_ChariotControl.instChariotM3.BrakeCmd;
+GVL_IHM.ChariotM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
+GVL_IHM.ChariotM3.PositionSensorTarget := PRG_07_ChariotControl.M3_PositionSensorTarget;
+// 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
+GVL_IHM.ChariotM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.ChariotM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+// 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
+GVL_IHM.ChariotM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.ChariotM3.SafetyError          := PRG_03_Safety.instSafetyChariotM3.Error;
+GVL_IHM.ChariotM3.SafetyErrorId        := PRG_03_Safety.instSafetyChariotM3.ErrorId;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.Joystick.RawX       := JoyXRaw_ANA1;
-GVL_IHM.Joystick.RawY       := JoyYRaw_ANA2;
-GVL_IHM.Joystick.RawButton  := JoyBtnRaw;
-GVL_IHM.Joystick.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.Joystick.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.Joystick.Online     := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online;
-GVL_IHM.Joystick.Operational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational;
-GVL_IHM.Joystick.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JoystickJOY1.RawX       := JoyXRaw_ANA1;
+GVL_IHM.JoystickJOY1.RawY       := JoyYRaw_ANA2;
+GVL_IHM.JoystickJOY1.RawButton  := JoyBtnRaw;
+GVL_IHM.JoystickJOY1.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
+GVL_IHM.JoystickJOY1.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JoystickJOY1.Online     := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online;
+GVL_IHM.JoystickJOY1.Operational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational;
+GVL_IHM.JoystickJOY1.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
+GVL_IHM.JoystickJOY1.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
@@ -15073,8 +15043,8 @@ IF ManuActive THEN
     TrigM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev AND NOT LastM2Rev;
     TrigCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT LastCoupledFwd;
     TrigCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT LastCoupledRev;
-    TrigM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT LastM3Fwd;
-    TrigM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev AND NOT LastM3Rev;
+    TrigM3Fwd      := GVL_IHM.ChariotM3.ReqFwd AND NOT LastM3Fwd;
+    TrigM3Rev      := GVL_IHM.ChariotM3.ReqRev AND NOT LastM3Rev;
 
     // 2️⃣ Interlocks de sécurité sur boutons HMI (Montée vs Descente)
     IF GVL_IHM.IHM_MANU.M1_RelayFwd AND GVL_IHM.IHM_MANU.M1_RelayRev THEN
@@ -15110,14 +15080,14 @@ IF ManuActive THEN
         END_IF;
     END_IF;
 
-    IF GVL_IHM.IHM_MANU.M3_RelayFwd AND GVL_IHM.IHM_MANU.M3_RelayRev THEN
+    IF GVL_IHM.ChariotM3.ReqFwd AND GVL_IHM.ChariotM3.ReqRev THEN
         IF TrigM3Rev THEN
-            GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
+            GVL_IHM.ChariotM3.ReqRev := FALSE;
         ELSIF TrigM3Fwd THEN
-            GVL_IHM.IHM_MANU.M3_RelayFwd := FALSE;
+            GVL_IHM.ChariotM3.ReqFwd := FALSE;
         ELSE
-            GVL_IHM.IHM_MANU.M3_RelayFwd := FALSE;
-            GVL_IHM.IHM_MANU.M3_RelayRev := FALSE;
+            GVL_IHM.ChariotM3.ReqFwd := FALSE;
+            GVL_IHM.ChariotM3.ReqRev := FALSE;
         END_IF;
     END_IF;
 
@@ -15150,10 +15120,10 @@ IF ManuActive THEN
                              OR (M2_IsReal AND PRG_03_Safety.instSafetyWinchM2.PowerCutOff)
                              OR (M3_IsReal AND PRG_03_Safety.instSafetyChariotM3.PowerCutOff);
     // ⚡ Clamp de sécurité sur la consigne saisie par l'opérateur (limité par le plafond absolu persistant)
-    IF GVL_IHM.IHM_MANU.M3_FreqSetpoint &gt; GVL_PERSISTENT.ChariotMaxFreqHz THEN
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := GVL_PERSISTENT.ChariotMaxFreqHz;
-    ELSIF GVL_IHM.IHM_MANU.M3_FreqSetpoint &lt; 0.0 THEN
-        GVL_IHM.IHM_MANU.M3_FreqSetpoint := 0.0;
+    IF GVL_IHM.ChariotM3.FreqSetpointHz &gt; GVL_PERSISTENT.ChariotMaxFreqHz THEN
+        GVL_IHM.ChariotM3.FreqSetpointHz := GVL_PERSISTENT.ChariotMaxFreqHz;
+    ELSIF GVL_IHM.ChariotM3.FreqSetpointHz &lt; 0.0 THEN
+        GVL_IHM.ChariotM3.FreqSetpointHz := 0.0;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.JoystickSelect THEN
@@ -15169,9 +15139,9 @@ IF ManuActive THEN
         
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
-        
-        // Consigne active Chariot M3 (0..M3_FreqSetpoint Hz) via déflexion X (la consigne HMI est prise pour 100%)
-        M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.IHM_MANU.M3_FreqSetpoint;
+
+        // Consigne active Chariot M3 (0..FreqSetpointHz Hz) via déflexion X (la consigne HMI est prise pour 100%)
+        M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.ChariotM3.FreqSetpointHz;
     ELSE
         // 💡 Détection de mouvement en cours (pour verrouillage croisé)
         WinchMoving := M1Fwd_Demand OR M1Rev_Demand OR M2Fwd_Demand OR M2Rev_Demand OR CoupledFwd_Demand OR CoupledRev_Demand;
@@ -15188,11 +15158,11 @@ IF ManuActive THEN
         CoupledFwd_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND (NOT WinchMoving OR CoupledFwd_Demand);
         CoupledRev_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND (NOT WinchMoving OR CoupledRev_Demand);
 
-        M3Fwd_Demand := GVL_IHM.IHM_MANU.M3_RelayFwd;
-        M3Rev_Demand := GVL_IHM.IHM_MANU.M3_RelayRev;
+        M3Fwd_Demand := GVL_IHM.ChariotM3.ReqFwd;
+        M3Rev_Demand := GVL_IHM.ChariotM3.ReqRev;
 
-        // En mode HMI boutons / Simulation, la consigne active envoyée est directement M3_FreqSetpoint
-        M3_ActiveFreqCmd := GVL_IHM.IHM_MANU.M3_FreqSetpoint;
+        // En mode HMI boutons / Simulation, la consigne active envoyée est directement FreqSetpointHz
+        M3_ActiveFreqCmd := GVL_IHM.ChariotM3.FreqSetpointHz;
     END_IF;
 
     // 🔒 Sécurité démarrage : exige que toutes les commandes HMI et Joystick soient au repos (neutre) au démarrage
@@ -15200,7 +15170,7 @@ IF ManuActive THEN
         IF NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
            AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
            AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev
-           AND NOT GVL_IHM.IHM_MANU.M3_RelayFwd AND NOT GVL_IHM.IHM_MANU.M3_RelayRev
+           AND NOT GVL_IHM.ChariotM3.ReqFwd AND NOT GVL_IHM.ChariotM3.ReqRev
            AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) &lt; 1.0
            AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 1.0 THEN
             StartupNeutralOk := TRUE;
@@ -15301,13 +15271,9 @@ ELSE
     M3_CommandWord         := PRG_07_ChariotControl.instChariotM3.DriveControlWord;
     M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_ChariotControl.instChariotM3.DriveFreqRefHz * 100.0);
 END_IF;
-GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
-
-// Recopie des mots de commande et d'état pour monitoring HMI
-GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
-GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := PRG_00_Inputs.M3_StatusWord_Filtered;
-GVL_IHM.IHM_MANU.M3_CommReady          := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.IHM_MANU.M3_PowerReady         := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+// 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
+// PRG_09_Supervision (GVL_IHM.ChariotM3), valables Auto ET Manu — ex-doublons IHM_MANU
+// M3_FreqActual/M3_CommandWordMonitor/M3_StatusWordMonitor/M3_CommReady/M3_PowerReady retirés.
 
 // Relais de direction M3 obsolètes forcés à FALSE
 M3_RelayFwd_DQ := FALSE;
@@ -15320,8 +15286,8 @@ LastM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd;
 LastM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev;
 LastCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
 LastCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev;
-LastM3Fwd      := GVL_IHM.IHM_MANU.M3_RelayFwd;
-LastM3Rev      := GVL_IHM.IHM_MANU.M3_RelayRev;
+LastM3Fwd      := GVL_IHM.ChariotM3.ReqFwd;
+LastM3Rev      := GVL_IHM.ChariotM3.ReqRev;
 // ─────────  Fin modification IHM_MANU  ─────────
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
@@ -15721,7 +15687,7 @@ END_IF;
             <derived name="ST_GrappinHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Variables d'échange IHM Mécanisme Grappin</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Variables d'échange IHM Mécanisme Grappin (M2)</xhtml>
           </documentation>
         </variable>
         <variable name="Sync">
@@ -15732,12 +15698,12 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Variables d'échange IHM Surveillance de synchro</xhtml>
           </documentation>
         </variable>
-        <variable name="Joystick">
+        <variable name="JoystickJOY1">
           <type>
             <derived name="ST_JoystickHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Variables d'échange IHM Joystick</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Variables d'échange IHM Joystick (noeud CANopen JOY1)</xhtml>
           </documentation>
         </variable>
         <variable name="Modes">
@@ -15748,7 +15714,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ Variables d'échange IHM Modes de marche</xhtml>
           </documentation>
         </variable>
-        <variable name="Chariot">
+        <variable name="ChariotM3">
           <type>
             <derived name="ST_ChariotHMI" />
           </type>

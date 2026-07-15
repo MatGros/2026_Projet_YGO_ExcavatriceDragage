@@ -2,21 +2,91 @@
 
 Trace le programme CODESYS testé/validé à un instant donné, pour retrouver quelle version de l'analyse fonctionnelle (`DOC/AF_Partie*`) lui correspondait (retour arrière, FAT/SAT, essais site).
 
-Une ligne par jalon significatif — pas besoin de logguer chaque sous-version mineure.
+Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
-| Version CODESYS | Date | Commentaire |
-|---|---|---|
-| `v0.4.11_Chariot_AC600_Safety` | 2026-07-15 | Intégration nominale EtherCAT de l'AC600 pour le chariot M3. Suppression définitive du mode dégradé par relais (DEGRADED_IO). Ajout des sécurités Méca A (dérive vitesse à l'arrêt), Méca B (incohérence frein/variateur) et arrêt immédiat sur fins de course extrêmes physiques (fosses 1 et trémie). Diagnostic communication bus EtherCAT. Simulation dynamique et cohérente des signaux variateur (StatusWord, ActualFrequency, frein). Documentation STO ajoutée. |
-| `v0.4.10_FdcGrappin_Rename` | 2026-07-15 | TASK-0002 : Renommer les variables d'activation des fins de course virtuelles grappin `FdcGrappinOpen` et `FdcGrappinClose` en `FdcGrappinOpenEnable` et `FdcGrappinCloseEnable` dans `ST_IHM_MANU` (CODE/SUPERVISION) pour clarifier leur rôle de configuration (verbe d'action) et éviter toute confusion avec un état. Mise à jour de la logique dans `PRG_10_Outputs` (CODE/MAIN). |
-| — | 2026-07-15 | 🗑️ Retrait de l'orchestration fichier `DOC/AGENT_HANDOFF/` (queue, `push_server.py`, hooks de réveil) mise en place en `v0.4.8`. TASK-0001 et TASK-0002 (ci-dessus) sont les seules tâches réelles produites par ce système — le reste (TASK-0003 à 0010) était du test de pipeline factice. Remplacé par le plugin `antigravity` (délégation directe Claude↔Gemini depuis Claude Code, voir `CLAUDE.md`). |
-| `v0.4.9_JoystickWinchSelect_N2` | 2026-07-15 | TASK-0001 : Restreindre le pilotage Joystick M1-seul ou M2-seul au mode MAINT_N2 (éviter la désynchronisation fortuite des treuils). Hors de ce mode (MAINT_N1, SEMI_AUTO, DISABLE), la sélection est forcée à Couplé (3). Entrée JoystickWinchSelectRequest et sortie JoystickWinchSelectArbitrated ajoutées dans FB_Modes.st (dossier CODE/MODES). PRG_04_Modes.st câble la liaison IHM. PRG_10_Outputs.st utilise la consigne arbitrée à la place de la variable brute IHM. |
-| `v0.4.8_IHM_MANU_FBWinch` | 2026-07-15 | IHM_MANU pilote désormais M1/M2 via `FB_Winch` (`PRG_06_WinchControl`, 3e source d'arbitrage à côté de SEMI_AUTO/joystick auto) au lieu du bypass direct : récupère nativement rampe accel/décel, ralentissement en zone d'approche de butée, relais tenu pendant la décél. Doctrine "Conditional Bypass" retirée pour `FB_Safety_Winch` (Enable redevenu inconditionnel, `NOT InhibitM1/M2`) — chaque capteur garde sa granularité réel/simulé propre (`TopPositionSensor_IsReal`, `SlackCableSwitch_IsReal`, etc.), plus besoin d'un bypass global du domaine. Correctif : `FB_Safety_Chariot` ne remettait pas `Error`/`ErrorId` à zéro quand `Enable=FALSE` (défaut transitoire latché à vie, remontait comme faux défaut M3 en simulation). Chariot M3 hors scope (FB_Chariot encore stub). Correctifs suite revue croisée (agent Haiku + relecture) : fins de course virtuelles grappin (`FdcGrappinOpen/CloseActive`) désormais appliquées au pilotage COUPLÉ **et** à M1 INDIVIDUEL (pas seulement M2 individuel) — "rester dans les butées" quel que soit le mode de pilotage. Fix compilation : `PRG_02_Encoders` référençait une variable supprimée (`PRG_10_Outputs.SpeedRefPct`), remplacée par `instWinchM1/M2.SpeedRamp.Current`. Nouvelle limite haute d'exploitation `CableLimitAscentM1/M2_M` (12.0m, persistante, exposée IHM comme `CableLimitDescentM`) : `HomingTargetM1/M2_M` (12.5m) redevient réservée à l'approche petite vitesse du capteur physique pendant un Homing explicite — expliquait le SafeStop/blocage observé en approchant 12m (le capteur physique/Méca D étaient réveillés par l'exploitation normale, traités comme une anomalie). `WinchTopStopMarginM` (marge relative) retiré, remplacé par cette limite absolue. Correctif `SafetyErrorId=256` (bit8, Méca B) : `JoystickYNeutral` ne regardait que le joystick CANopen — piloter M1/M2 via boutons HMI (IHM_MANU) faisait croire à "aucune commande opérateur" en continu → SafeStop après 3s de mouvement légitime aux boutons. Ajout des boutons IHM_MANU bruts (individuel + couplé) à la détection, indépendamment de l'arbitrage FB_Winch (défense en profondeur conservée). Restauration `GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev` (essais progressifs, TEMPORAIRE) : orphelins depuis le passage de Manu sur `FB_Winch` (ancien décodeur palier Manu supprimé) — re-branchés via un nouveau plafond `MaxStepAscent` côté `FB_Winch` (mirroir de `MaxStepDescente`), actif uniquement si `ManuActive`, jamais moins protecteur qu'Auto (MIN avec `WinchMaxStepDescente` côté descente). Fix boot-init `WinchMaxStepFwd/Rev` (`PRG_09_Supervision`) : restaient à 0 (jamais initialisés, contrairement aux autres réglages IHM) → traités comme "invalide" par le bornage et silencieusement remplacés par 5 (aucune restriction), sans jamais corriger l'affichage IHM — contacteurs commutaient normalement malgré un "0" à l'écran. |
-| `v0.4.7_IHM_MANU_JOY` | 2026-07-14 | Alignement avec la doctrine "Conditional Bypass" (sécurités et homing bloquants si réels, shuntés si simulés). Correctifs : blocage démarrage au repos (Startup in Neutral), reset Grafcet auto sous IHM_MANU, timers homme-mort dynamiques et déblocage stub pompe hydraulique. |
-| `v0.4.6_IHM_MANU_JOY` | 2026-07-14 | Intégration du Joystick CANopen (déflexion X/Y), décodage paliers K1-K4, fins de course virtuelles grappin (delta M1-M2), commande auxiliaires hydrauliques, bornage de vitesse paliers et consigne de fréquence chariot M3 réglable/clampée. |
-| `v0.4.5_IHM_MANU` | 2026-07-09 | Correctif : Lecture codeur réel forcée en mode Manu, même si la simulation générale est active. |
-| `v0.4.4_IHM_MANU` | 2026-07-08 | Ajout de la structure d'échange IHM_MANU pour pilotage direct de secours (mise en service). |
-| `v0.4.3_SimNoHardware-YGO_CablePre-Commissioning` | 2026-07-08 | Validation de pilotage sans blocage en simulation (recul, vitesses, butée dynamique M2, affichage HMI stable, bypass synchro) avant l'enroulage réel de demain. |
-| `v0.4.2_SimNoHardware-SyncBypass` | 2026-07-08 | Butée haute de M2 dynamique (12m/14m). Offset de bargraphe stabilisé en mouvement. Bypass synchro en butées. |
-| `v0.4.1_SimNoHardware-SyncUpdate` | 2026-07-08 | Méca E synchro critique ajoutée. Arrêt rampe normale sur écart mineur (vs SafeStop). Simulation stable, pas de mise en service matérielle. |
-| `v0.4.0_SimNoHardware` | 2026-07-08 | Mouvements treuils M1/M2 + grappin stables en **simulation**. Aucune mise en service matérielle réelle. |
+---
 
+### `v0.4.12_ChariotHMI_Migration` — 2026-07-15
+- ST_ChariotHMI migre ReqFwd/ReqRev/FreqSetpointHz depuis IHM_MANU
+- + diag décodé DriveCommReady/DrivePowerReady (pas de WORD brut)
+- Pas l'état final : bypass ManuActive→M3_CommandWord reste
+- Fix FB_Sim_Chariot bloqué (relais morts ère DEGRADED_IO)
+- → rebranché sur M3_CommandWord
+- BypassBrakeFeedback supprimé (fusion BypassContactorFeedback)
+- Rename Chariot/Joystick→ChariotM3/JoystickJOY1 (Grappin : GrappinM2 tenté puis annulé, stutter M2)
+- ⚠️ pas encore réimporté/compilé dans CODESYS
+
+### `v0.4.11_Chariot_AC600_Safety` — 2026-07-15
+- EtherCAT AC600 nominal M3 · fin définitive mode relais DEGRADED_IO
+- Sécurités Méca A (dérive vitesse à l'arrêt)
+- + Méca B (incohérence frein/variateur)
+- + arrêt fins de course extrêmes (fosses/trémie)
+- Diag com EtherCAT · simu StatusWord/ActualFrequency/frein
+- Doc STO ajoutée
+
+### `v0.4.10_FdcGrappin_Rename` — 2026-07-15
+- TASK-0002 : FdcGrappinOpen/Close→OpenEnable/CloseEnable
+- (ST_IHM_MANU) — clarifie rôle config vs état
+- MAJ logique PRG_10_Outputs
+
+### — 2026-07-15
+- 🗑️ Retrait DOC/AGENT_HANDOFF/ (queue, push_server.py, hooks)
+- Posé en v0.4.8 · TASK-0001/0002 seules tâches réelles produites
+- (TASK-0003-0010 = test pipeline factice)
+- Remplacé par plugin antigravity (délégation Claude↔Gemini)
+
+### `v0.4.9_JoystickWinchSelect_N2` — 2026-07-15
+- TASK-0001 : Joystick M1/M2-seul restreint à MAINT_N2
+- (évite désynchro fortuite) — sinon forcé Couplé (3)
+- JoystickWinchSelectRequest/Arbitrated ajoutés FB_Modes
+- Câblé PRG_04_Modes · PRG_10_Outputs utilise la consigne arbitrée
+
+### `v0.4.8_IHM_MANU_FBWinch` — 2026-07-15
+- IHM_MANU pilote M1/M2 via FB_Winch (PRG_06, 3ᵉ source arbitrage)
+- Rampe/ralentissement natifs · doctrine "Conditional Bypass"
+- retirée FB_Safety_Winch (Enable inconditionnel, granularité _IsReal)
+- Fix latch FB_Safety_Chariot (Error pas remis à 0 si Enable=FALSE)
+- Fix Fdc grappin appliqué M1 individuel + couplé (pas que M2)
+- Fix compil PRG_02_Encoders (var supprimée)
+- Nouvelle limite CableLimitAscentM1/M2_M (12.0m, exploitation)
+- distincte HomingTarget (12.5m, réservé Homing)
+- Fix Méca B bit8 (boutons HMI ignorés par JoystickYNeutral)
+- WinchMaxStepFwd/Rev réactivé temporaire + fix boot-init à 0
+
+### `v0.4.7_IHM_MANU_JOY` — 2026-07-14
+- Alignement doctrine "Conditional Bypass" (sécu/homing)
+- bloquants si réel, shuntés si simulé
+- Fix Startup in Neutral · reset Grafcet auto sous IHM_MANU
+- Timers homme-mort dynamiques · déblocage stub pompe hydraulique
+
+### `v0.4.6_IHM_MANU_JOY` — 2026-07-14
+- Joystick CANopen (X/Y) · décodage paliers K1-K4
+- Fdc virtuelles grappin (delta M1-M2)
+- Commande auxiliaires hydrauliques · bornage vitesse paliers
+- Consigne fréquence chariot M3 réglable/clampée
+
+### `v0.4.5_IHM_MANU` — 2026-07-09
+- Fix lecture codeur réel forcée en mode Manu
+- même si simu générale active
+
+### `v0.4.4_IHM_MANU` — 2026-07-08
+- Ajout structure IHM_MANU (pilotage direct secours)
+- Mise en service urgence
+
+### `v0.4.3_SimNoHardware-YGO_CablePre-Commissioning` — 2026-07-08
+- Simu sans blocage validée (recul, vitesses, butée M2)
+- HMI stable, bypass synchro — avant enroulage réel
+
+### `v0.4.2_SimNoHardware-SyncBypass` — 2026-07-08
+- Butée haute M2 dynamique (12m/14m)
+- Offset bargraphe stabilisé en mouvement
+- Bypass synchro en butées
+
+### `v0.4.1_SimNoHardware-SyncUpdate` — 2026-07-08
+- Méca E synchro critique ajoutée
+- Arrêt rampe normale sur écart mineur (vs SafeStop)
+- Simu stable, pas de MES matérielle
+
+### `v0.4.0_SimNoHardware` — 2026-07-08
+- Mouvements M1/M2 + grappin stables en simulation
+- Aucune MES matérielle réelle
