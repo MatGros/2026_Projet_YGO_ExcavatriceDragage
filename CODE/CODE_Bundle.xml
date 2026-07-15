@@ -801,8 +801,8 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.6.md §8,
-                   DOC/AF_Partie3_Template_FB_Commun_v1.2.md §7bis
+   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.11.md §5,
+                   DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §7bis
    Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
    détecter un collage / une absence de fermeture d'un contacteur de
    puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
@@ -2789,8 +2789,8 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
-                   (règles issues de DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md §4)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §3
+                   (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
    📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
@@ -4485,6 +4485,9 @@ END_CASE;
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2
+      (base de temps utilisée par FB_FilterPT1, composé dans FB_Joystick)
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -4711,7 +4714,7 @@ IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
     END_IF;
 ELSIF NOT (DeviceJoystick.Online AND DeviceJoystick.Operational) THEN
     DeviceJoystick.State := E_DiagState.INIT;
-else
+ELSE
     DeviceJoystick.State := E_DiagState.READY;
 END_IF;
 
@@ -6579,7 +6582,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📥 FB_Input — Entrée TOR conditionnée (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie6_IO_Conditioning_v1.2.md §1
+   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §1
    🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
       complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
       de conditionnement bas niveau, à instancier en tableau (§3) ou
@@ -7685,7 +7688,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 FB_Output — Sortie relais + feedback (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie6_IO_Conditioning_v1.2.md §2
+   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §2
    🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
       transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
       appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
@@ -7810,8 +7813,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie8_Fonction_Joystick_v1.1.md §2 (usage),
-                   DOC/AF_Partie9_Fonction_Winch_v1.0.md (correctif ci-dessous)
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2 (usage),
+                   DOC/AF_Partie-09_Fonction_Winch_v1.11.md (correctif ci-dessous)
    🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
       SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
       jamais concernée par ce bug — voir analyse d'impact ci-dessous).
@@ -12127,16 +12130,16 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosFosse1(InputRaw := PosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
+instTranslationPosFosse1(InputRaw := TranslationPosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
 TranslationPosFosse1 := instTranslationPosFosse1.State;
 
-instTranslationPosFosse2(InputRaw := PosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
+instTranslationPosFosse2(InputRaw := TranslationPosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
 TranslationPosFosse2 := instTranslationPosFosse2.State;
 
-instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := TranslationPosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
-instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := TranslationPosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
@@ -15209,25 +15212,25 @@ IF ManuActive THEN
 
     // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
     IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := TRUE;
-        GridDown_RQ := FALSE;
+        GrilleUp_RQ := TRUE;
+        GrilleDown_RQ := FALSE;
     ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := FALSE;
-        GridDown_RQ := TRUE;
+        GrilleUp_RQ := FALSE;
+        GrilleDown_RQ := TRUE;
     ELSE
-        GridUp_RQ := FALSE;
-        GridDown_RQ := FALSE;
+        GrilleUp_RQ := FALSE;
+        GrilleDown_RQ := FALSE;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := TRUE;
-        HelmetClose_RQ := FALSE;
+        CasqueOpen_RQ := TRUE;
+        CasqueClose_RQ := FALSE;
     ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := TRUE;
+        CasqueOpen_RQ := FALSE;
+        CasqueClose_RQ := TRUE;
     ELSE
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := FALSE;
+        CasqueOpen_RQ := FALSE;
+        CasqueClose_RQ := FALSE;
     END_IF;
 
     // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé et AU armé
@@ -15243,10 +15246,10 @@ IF ManuActive THEN
     TranslationBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
 ELSE
     // Nettoyage en cas de désactivation du mode Manu
-    GridUp_RQ := FALSE;
-    GridDown_RQ := FALSE;
-    HelmetOpen_RQ := FALSE;
-    HelmetClose_RQ := FALSE;
+    GrilleUp_RQ := FALSE;
+    GrilleDown_RQ := FALSE;
+    CasqueOpen_RQ := FALSE;
+    CasqueClose_RQ := FALSE;
 END_IF;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
@@ -15522,24 +15525,6 @@ END_IF;
   </instances>
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_BUS">
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>8d106fd1-f467-5b81-9fa8-241243fdede4</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🗑️ GVL_BUS — Obsolete / Archive
-   ───────────────────────────────────────────────────────────────
-   Note : Suite à la décision d'architecture D2, la surveillance par
-   dégradation de bus (GVL_BusHealth / E_DegradationLevel) a été
-   supprimée. Ce fichier est conservé uniquement pour archive de structure.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Global">
         <variable name="BlinkClock1Hz">
           <type>
@@ -15672,39 +15657,6 @@ END_IF;
    📄 Lot A : Mise en service et calibration de la machine de dragage.
    💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_Machine_Stub">
-        <variable name="MachineReset_IHM">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Acquittement général machine (front) — acquitte TOUS les FB d'un coup
-🖥️ À mapper bouton IHM — basculer TRUE puis FALSE pour simuler l'appui</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>7834019e-fea7-59eb-b31f-8f35e12a198a</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🏭 GVL_Machine_Stub — Variables IHM transverses machine (Lot A mise en service)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie3_Template_FB_Commun_v1.3.md §5 (bouton général)
-   🎯 `MachineReset_IHM` : bouton acquittement GÉNÉRAL (front) — distribué à TOUTES les
-      instances (diag, modes, safety, winch, translation, winchsync + OR-é avec les boutons
-      par codeur M1/M2_Reset_IHM). Partie3 §5 : « bouton général ».
-   🔧 CORRECTIF (2026-07-03quindecies) : `PowerCutOffCmd` retiré — relais réel câblé en
-      I/O Mapping (`PowerCutOff_RQ`), voir PRG_MAIN.st §8.
-   🔴 TOUJOURS STUB (pas de vrai bouton IHM câblé) : `MachineReset_IHM` se force en vue
-      instance CODESYS (TRUE puis FALSE = front).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du GVL GVL_Machine_Stub) ===</xhtml>
         </documentation>
       </globalVars>
     </data>
@@ -16172,6 +16124,7 @@ Front montant = applique le saut sur M1</xhtml>
         <Folder Name="COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
           <Object Name="FB_Output" ObjectId="b60dd37c-0508-57b7-805e-ba43b1805814" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
@@ -16187,11 +16140,6 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
           <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
           <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
-        </Folder>
-        <Folder Name="SYSTEM">
-          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
-          <Object Name="GVL_BUS" ObjectId="8d106fd1-f467-5b81-9fa8-241243fdede4" />
-          <Object Name="GVL_Machine_Stub" ObjectId="7834019e-fea7-59eb-b31f-8f35e12a198a" />
         </Folder>
         <Folder Name="TREUILS">
           <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />

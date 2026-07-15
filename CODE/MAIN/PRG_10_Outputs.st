@@ -326,25 +326,25 @@ IF ManuActive THEN
 
     // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
     IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := TRUE;
-        GridDown_RQ := FALSE;
+        GrilleUp_RQ := TRUE;
+        GrilleDown_RQ := FALSE;
     ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := FALSE;
-        GridDown_RQ := TRUE;
+        GrilleUp_RQ := FALSE;
+        GrilleDown_RQ := TRUE;
     ELSE
-        GridUp_RQ := FALSE;
-        GridDown_RQ := FALSE;
+        GrilleUp_RQ := FALSE;
+        GrilleDown_RQ := FALSE;
     END_IF;
 
     IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := TRUE;
-        HelmetClose_RQ := FALSE;
+        CasqueOpen_RQ := TRUE;
+        CasqueClose_RQ := FALSE;
     ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := TRUE;
+        CasqueOpen_RQ := FALSE;
+        CasqueClose_RQ := TRUE;
     ELSE
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := FALSE;
+        CasqueOpen_RQ := FALSE;
+        CasqueClose_RQ := FALSE;
     END_IF;
 
     // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé et AU armé
@@ -360,10 +360,10 @@ IF ManuActive THEN
     TranslationBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
 ELSE
     // Nettoyage en cas de désactivation du mode Manu
-    GridUp_RQ := FALSE;
-    GridDown_RQ := FALSE;
-    HelmetOpen_RQ := FALSE;
-    HelmetClose_RQ := FALSE;
+    GrilleUp_RQ := FALSE;
+    GrilleDown_RQ := FALSE;
+    CasqueOpen_RQ := FALSE;
+    CasqueClose_RQ := FALSE;
 END_IF;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
