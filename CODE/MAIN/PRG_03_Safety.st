@@ -38,11 +38,11 @@ instSafetyWinchM1(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM1.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M,
+    CableLimitDescentM  := _CableLimitM1Descent_M,
     Direction           := PRG_06_WinchControl.M1_Direction_Active,
     Homed               := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM1.HomingSuspect,
-    TopLimitM           := GVL_PERSISTENT.HomingTargetM1_M,
+    TopLimitM           := _HomingTargetM1_M,
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
@@ -64,7 +64,7 @@ instSafetyWinchM1(
     // ramené dans le référentiel M1 — comparaison valable quel que soit l'état du benne
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
-    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
+    CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2 // 🆕 REX 2026-07-08 (7)
 );
 
@@ -86,11 +86,11 @@ instSafetyWinchM2(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM2.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M,
+    CableLimitDescentM  := _CableLimitM2Descent_M,
     Direction           := PRG_06_WinchControl.M2_Direction_Active,
     Homed               := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM2.HomingSuspect,
-    TopLimitM           := GVL_PERSISTENT.HomingTargetM2_M,
+    TopLimitM           := _HomingTargetM2_M,
     // 🔧 REX 2026-07-07 — Méca A/B (voir FB_Safety_Winch bandeau en-tête) — Méca C NON applicable
     // à M2 (c'est M2 qui bouge pendant le benne, BenneHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
@@ -106,7 +106,7 @@ instSafetyWinchM2(
     // du zéro codeur. M1 corrigé de l'offset benne actif, ramené dans le référentiel M2.
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
-    CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
+    CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
 );
 

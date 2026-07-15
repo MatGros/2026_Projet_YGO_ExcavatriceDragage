@@ -48,7 +48,7 @@ M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 
 // 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
-// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 —
+// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
@@ -65,7 +65,7 @@ instSimEncoderM1(
     // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E) — 4096 = PointsPerRev/CableM_PerRev (8192/2.0)
     TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM1,
     TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
-    RawPos      := GVL_PERSISTENT.SimEncoderRawPosM1
+    RawPos      := _SimEncoderRawPosM1
 );
 instSimEncoderM2(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
@@ -79,7 +79,7 @@ instSimEncoderM2(
     // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E)
     TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM2,
     TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
-    RawPos      := GVL_PERSISTENT.SimEncoderRawPosM2
+    RawPos      := _SimEncoderRawPosM2
 );
 
 // Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
@@ -124,7 +124,7 @@ COD1_PresetValue    := instEncoderAbsM1.PresetValueOut;
 
 instHomingM1(
     Enable               := TRUE,
-    Calib                := GVL_PERSISTENT.CalibM1,
+    Calib                := _CalibM1,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
@@ -135,7 +135,7 @@ instHomingM1(
     // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM1_M,
+    TopSensorPositionM   := _HomingTargetM1_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
@@ -173,7 +173,7 @@ COD2_PresetValue    := instEncoderAbsM2.PresetValueOut;
 
 instHomingM2(
     Enable               := TRUE,
-    Calib                := GVL_PERSISTENT.CalibM2,
+    Calib                := _CalibM2,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
@@ -184,7 +184,7 @@ instHomingM2(
     // ─────────  Fin modification IHM_MANU  ─────────
     ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    TopSensorPositionM   := GVL_PERSISTENT.HomingTargetM2_M,
+    TopSensorPositionM   := _HomingTargetM2_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
@@ -237,10 +237,10 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
         IF NOT M1_IsReal THEN
             IF instEncoderAbsM1.PresetAck THEN
-                GVL_PERSISTENT.CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-                GVL_PERSISTENT.CalibM1.Homed := TRUE;
-                GVL_PERSISTENT.CalibM1.HomingSuspect := FALSE;
-                GVL_PERSISTENT.CalibM1.LastKnownRawPos := 16777216;
+                _CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM1.Homed := TRUE;
+                _CalibM1.HomingSuspect := FALSE;
+                _CalibM1.LastKnownRawPos := 16777216;
                 GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
             ELSIF instEncoderAbsM1.PresetNak THEN
                 GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
@@ -257,10 +257,10 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
         IF NOT M2_IsReal THEN
             IF instEncoderAbsM2.PresetAck THEN
-                GVL_PERSISTENT.CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
-                GVL_PERSISTENT.CalibM2.Homed := TRUE;
-                GVL_PERSISTENT.CalibM2.HomingSuspect := FALSE;
-                GVL_PERSISTENT.CalibM2.LastKnownRawPos := 16777216;
+                _CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM2.Homed := TRUE;
+                _CalibM2.HomingSuspect := FALSE;
+                _CalibM2.LastKnownRawPos := 16777216;
                 GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
             ELSIF instEncoderAbsM2.PresetNak THEN
                 GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;

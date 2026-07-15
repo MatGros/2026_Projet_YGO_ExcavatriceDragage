@@ -65,8 +65,8 @@ FB_Joystick_0(
     // descendant). Sans impact pratique : très inférieur aux temps de réponse frein/contacteurs
     // (100-300ms, voir FB_Brake) — la commande n'a pas le temps de produire un mouvement réel.
     BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
-    NeutralXMem         := GVL_PERSISTENT.JoystickNeutralX,
-    NeutralYMem         := GVL_PERSISTENT.JoystickNeutralY,
+    NeutralXMem         := _JoystickNeutralX,
+    NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP          := instDiagCanOpen.DeviceJoystick,
     RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),

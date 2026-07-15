@@ -243,7 +243,22 @@ SpeedPct          → vitesse en % nominal
 RampTimeMs        → temps de rampe en ms
 DrumRevs          → rotations tambour
 ```
- 
+*Note* : Pour les variables locales et d'IHM, le suffixe d'unité est collé directement sans underscore (ex. `CablePosM`). Pour les variables persistantes de configuration globale, l'unité est séparée par un underscore (ex. `_M`, `_Pct`, `_Hz`) comme détaillé ci-dessous.
+
+---
+
+## Variables globales persistantes (GVL_PERSISTENT)
+Les variables déclarées dans la liste globale persistante (`GVL_PERSISTENT.st`) suivent une règle spécifique pour assurer leur lisibilité et identifier leur persistance :
+- L'attribut `{attribute 'qualified_only'}` est **retiré** pour permettre un accès direct partout dans l'application.
+- Toutes les variables persistantes sont **obligatoirement préfixées par un underscore** `_` (qui sert de décorateur pour les identifier instantanément).
+- Les suffixes d'unités physiques doivent être **précédés d'un underscore** (ex. `_M`, `_Pct`, `_Hz`).
+
+*Exemples de variables persistantes :*
+- `_CableLimitM1Descent_M` (mètres)
+- `_WinchM1RampAccelRate_Pct` (pourcentage)
+- `_TranslationMaxFreq_Hz` (Hz)
+- `_WinchMaxStepDescent` (sans unité, correction linguistique de "Descente" en "Descent")
+
 ---
  
 ## Construction d'un nom : instance → champ (2 niveaux, jamais mélangés)

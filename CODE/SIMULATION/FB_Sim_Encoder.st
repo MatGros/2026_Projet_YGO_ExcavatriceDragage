@@ -46,7 +46,7 @@ VAR_OUTPUT
     RawPosOut   : UDINT;
 END_VAR
 VAR_IN_OUT
-    RawPos      : UDINT;   // 🔧 REX 2026-07-08 : référence GVL_PERSISTENT.SimEncoderRawPosM1/M2 (survit au reset froid)
+    RawPos      : UDINT;   // 🔧 REX 2026-07-08 : référence _SimEncoderRawPosM1/M2 (survit au reset froid)
 END_VAR
 VAR
     Increment      : UDINT;              // 🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x

@@ -298,7 +298,7 @@ Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilot
 
 **À supprimer au nettoyage (AVANT ou PENDANT le nettoyage général IHM_MANU, cf. `PLAN_TASK_v1.0.md` T28) :**
 - [ ] `FB_Winch.st` : retirer le paramètre `MaxStepAscent` (ou le laisser à son défaut 5 partout, inoffensif si plus rien ne le branche à autre chose)
-- [ ] `PRG_06_WinchControl.st` : retirer `ManuMaxStepFwd`/`ManuMaxStepRev`/`EffectiveMaxStepAscent`/`EffectiveMaxStepDescente`, rebrancher `MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente` directement (comme avant), `MaxStepAscent` non branché (défaut 5)
+- [ ] `PRG_06_WinchControl.st` : retirer `ManuMaxStepFwd`/`ManuMaxStepRev`/`EffectiveMaxStepAscent`/`EffectiveMaxStepDescente`, rebrancher `MaxStepDescente := _WinchMaxStepDescent` directement (comme avant), `MaxStepAscent` non branché (défaut 5)
 - [ ] `ST_IHM_MANU.st` : `WinchMaxStepFwd`/`WinchMaxStepRev` redeviennent orphelins (ou supprimés avec le reste du struct, section §1)
 
 ---
@@ -424,7 +424,7 @@ Actuellement, il n'y a **pas de vérification du mode machine** (Mode N1/N2/N3/e
 
 ### 3. **Fréquence M3 — pas de bounds-check**
 
-`GVL_IHM.TranslationM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est clampé à `GVL_PERSISTENT.TranslationMaxFreqHz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
+`GVL_IHM.TranslationM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est clampé à `_TranslationMaxFreq_Hz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
 
 **À confirmer :** Les limites du variateur AC600 doivent-elles être respectées en mode Manu ou peut-on libérer complètement ?
 

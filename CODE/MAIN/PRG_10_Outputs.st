@@ -238,8 +238,8 @@ IF ManuActive THEN
                              OR (M2_IsReal AND PRG_03_Safety.instSafetyWinchM2.PowerCutOff)
                              OR (M3_IsReal AND PRG_03_Safety.instSafetyTranslationM3.PowerCutOff);
     // ⚡ Clamp de sécurité sur la consigne saisie par l'opérateur (limité par le plafond absolu persistant)
-    IF GVL_IHM.TranslationM3.FreqSetpointHz > GVL_PERSISTENT.TranslationMaxFreqHz THEN
-        GVL_IHM.TranslationM3.FreqSetpointHz := GVL_PERSISTENT.TranslationMaxFreqHz;
+    IF GVL_IHM.TranslationM3.FreqSetpointHz > _TranslationMaxFreq_Hz THEN
+        GVL_IHM.TranslationM3.FreqSetpointHz := _TranslationMaxFreq_Hz;
     ELSIF GVL_IHM.TranslationM3.FreqSetpointHz < 0.0 THEN
         GVL_IHM.TranslationM3.FreqSetpointHz := 0.0;
     END_IF;
@@ -376,10 +376,10 @@ END_IF;
 IF ManuActive THEN
     IF M3Fwd_Eff THEN
         M3_CommandWord         := 1;
-        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.TranslationMaxFreqHz) * 100.0);
+        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, _TranslationMaxFreq_Hz) * 100.0);
     ELSIF M3Rev_Eff THEN
         M3_CommandWord         := 2;
-        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, GVL_PERSISTENT.TranslationMaxFreqHz) * 100.0);
+        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, _TranslationMaxFreq_Hz) * 100.0);
     ELSE
         M3_CommandWord         := 0;
         M3_SetpointFrequencyHz := 0;

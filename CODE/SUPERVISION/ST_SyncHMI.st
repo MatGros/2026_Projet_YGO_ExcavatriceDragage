@@ -6,7 +6,7 @@
 TYPE ST_SyncHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
-    SyncToleranceM      : REAL := 0.25;     (* 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné GVL_PERSISTENT.WinchSyncTolerance_M *)
+    SyncToleranceM      : REAL := 0.25;     (* 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M *)
 
     (* 🚦 États (Lecture seule) *)
     DeltaPosM           : REAL;             (* 📊 Écart de position réel mesuré (m) *)

@@ -258,7 +258,7 @@ CASE State OF
         CmdWinchM2_SpeedPct  := 70.0;
 
         // Transition si position haute (butée haute virtuelle) atteinte
-        IF M1_CablePosM >= GVL_PERSISTENT.HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
+        IF M1_CablePosM >= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.DRAINING_PAUSE;
