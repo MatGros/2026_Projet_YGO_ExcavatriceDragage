@@ -182,16 +182,16 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosFosse1(InputRaw := PosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
+instTranslationPosFosse1(InputRaw := TranslationPosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
 TranslationPosFosse1 := instTranslationPosFosse1.State;
 
-instTranslationPosFosse2(InputRaw := PosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
+instTranslationPosFosse2(InputRaw := TranslationPosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
 TranslationPosFosse2 := instTranslationPosFosse2.State;
 
-instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := TranslationPosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
-instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := TranslationPosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)

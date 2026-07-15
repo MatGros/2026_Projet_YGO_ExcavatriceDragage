@@ -50659,8 +50659,7 @@ END_VAR
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2216112</Single>
-                    <Single Name="Value" Type="string">Grappin.M2PositionCorrected</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.M2PositionCorrected</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">BarDisplayImage</Single>
@@ -50765,8 +50764,7 @@ END_VAR
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Grappin.State.IsClosed</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.State.IsClosed</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -50871,8 +50869,7 @@ END_VAR
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Grappin.State.IsOpen</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.State.IsOpen</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -50901,8 +50898,7 @@ END_VAR
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">Grappin.CmdClose</Single>
-                      </Single>
+<Single Name="Value" Type="string">Bucket.CmdClose</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -51093,8 +51089,7 @@ FERMETURE GRAPPIN</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">Grappin.CmdOpen</Single>
-                      </Single>
+<Single Name="Value" Type="string">Bucket.CmdOpen</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -51285,8 +51280,7 @@ OUVERTURE GRAPPIN</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">WinchM1.CmdHome</Single>
-                      </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.CmdHome</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -51492,8 +51486,7 @@ OUVERTURE GRAPPIN</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">WinchM2.CmdHome</Single>
-                      </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.CmdHome</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -54653,8 +54646,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2216112</Single>
-                    <Single Name="Value" Type="string">WinchM1.PositionM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.PositionM</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">BarDisplayImage</Single>
@@ -55980,8 +55972,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2216112</Single>
-                    <Single Name="Value" Type="string">WinchM2.PositionM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.PositionM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">3087024125</Single>
                     <Single Name="Value" Type="string">SCALE_BESIDE_BAR</Single>
@@ -56154,8 +56145,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.PositionM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.PositionM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -56272,8 +56262,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.RelayRev</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.RelayRev</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -56378,8 +56367,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.BrakeContactorCheck.Command</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.BrakeContactorCheck.Command</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -56484,8 +56472,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.RelayFwd</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.RelayFwd</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -56590,8 +56577,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Contactor1</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Contactor1</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -56898,8 +56884,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2216112</Single>
-                    <Single Name="Value" Type="string">WinchM1.SpeedRefPct</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.SpeedRefPct</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2597686782</Single>
                     <Single Name="Value" Type="bool">False</Single>
@@ -57008,8 +56993,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Contactor2</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Contactor2</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57114,8 +57098,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Contactor3</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Contactor3</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57220,8 +57203,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Contactor4</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Contactor4</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57326,8 +57308,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.RelayRev</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.RelayRev</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57432,8 +57413,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.BrakeContactorCheck.Command</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.BrakeContactorCheck.Command</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57538,8 +57518,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.RelayFwd</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.RelayFwd</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57644,8 +57623,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Contactor1</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Contactor1</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -57952,8 +57930,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2216112</Single>
-                    <Single Name="Value" Type="string">WinchM2.SpeedRefPct</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.SpeedRefPct</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2597686782</Single>
                     <Single Name="Value" Type="bool">False</Single>
@@ -58062,8 +58039,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Contactor2</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Contactor2</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -58168,8 +58144,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Contactor3</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Contactor3</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -58274,8 +58249,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Contactor4</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Contactor4</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -58444,8 +58418,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.SpeedRefPct</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.SpeedRefPct</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -58626,8 +58599,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.PositionM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.PositionM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -58808,8 +58780,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.SpeedRefPct</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.SpeedRefPct</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -58926,8 +58897,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.SlackCableDetected</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.SlackCableDetected</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -59032,8 +59002,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.SafeStopActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.SafeStopActive</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -59138,8 +59107,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.ThermalFault</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.ThermalFault</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -59244,8 +59212,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Homed</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Homed</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -60060,8 +60027,7 @@ OUVERTURE GRAPPIN</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Common.TopPositionSensorActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">Commun.TopPositionSensorActive</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -60309,8 +60275,7 @@ Sensor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.SafeStopActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.SafeStopActive</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -60415,8 +60380,7 @@ Sensor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.ThermalFault</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.ThermalFault</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -61011,8 +60975,7 @@ Sensor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Common.LimitLegalDepthMinAllowed</Single>
-                  </Single>
+<Single Name="Value" Type="string">Commun.LimitLegalDepthMinAllowed</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -61320,8 +61283,7 @@ REQ</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Common.LimitLegalReached</Single>
-                  </Single>
+<Single Name="Value" Type="string">Commun.LimitLegalReached</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -61426,8 +61388,7 @@ REQ</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Common.PhaseRotationFault</Single>
-                  </Single>
+<Single Name="Value" Type="string">Commun.PhaseRotationFault</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -61738,8 +61699,7 @@ REQ</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.CableLimitDescentM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.CableLimitDescentM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -64297,8 +64257,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.CableLimitDescentReached</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.CableLimitDescentReached</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -64403,8 +64362,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -64651,8 +64609,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -64899,8 +64856,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Grappin.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -65147,8 +65103,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Joystick.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">JoystickJOY1.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -65891,8 +65846,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Chariot.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">TranslationM3.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -66955,8 +66909,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.SafetyError</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.SafetyError</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -67203,8 +67156,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.SafetyError</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.SafetyError</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -67451,8 +67403,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Encoder.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Encoder.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -67727,8 +67678,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Grappin.M2PositionCorrected</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.M2PositionCorrected</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -68015,8 +67965,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Grappin.RemainingTravelM</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.RemainingTravelM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -68701,8 +68650,7 @@ Contactor</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Common.BrakeThermalFault</Single>
-                  </Single>
+<Single Name="Value" Type="string">Commun.BrakeThermalFault</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -71280,8 +71228,7 @@ FERME FWD</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">Grappin.CmdConfirmOpenPosition</Single>
-                      </Single>
+<Single Name="Value" Type="string">Bucket.CmdConfirmOpenPosition</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -71564,8 +71511,7 @@ OUVERT</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.Homed</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.Homed</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -71670,8 +71616,7 @@ OUVERT</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.Encoder.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.Encoder.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -71882,8 +71827,7 @@ OUVERT</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">WinchM1.CmdInhibit</Single>
-                      </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.CmdInhibit</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_ToggleInput</Single>
@@ -72039,8 +71983,7 @@ M1</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">1999528970</Single>
-                    <Single Name="Value" Type="string">WinchM1.InhibitActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.InhibitActive</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2880254039</Single>
                     <Single Name="Value" Type="string">Modes.CurrentMode&lt;&gt;2</Single>
@@ -72094,8 +72037,7 @@ M1</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">WinchM2.CmdInhibit</Single>
-                      </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.CmdInhibit</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_ToggleInput</Single>
@@ -72251,8 +72193,7 @@ M2</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">1999528970</Single>
-                    <Single Name="Value" Type="string">WinchM2.InhibitActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.InhibitActive</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2880254039</Single>
                     <Single Name="Value" Type="string">Modes.CurrentMode&lt;&gt;2</Single>
@@ -72306,8 +72247,7 @@ M2</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">Common.HomingApproachEnableRequest</Single>
-                      </Single>
+<Single Name="Value" Type="string">Commun.HomingApproachEnableRequest</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_ToggleInput</Single>
@@ -72942,8 +72882,7 @@ MODE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.MecaADriftM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.MecaADriftM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -73124,8 +73063,7 @@ MODE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.MecaADriftM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.MecaADriftM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -73448,8 +73386,7 @@ MODE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.MecaCDriftM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.MecaCDriftM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -73630,8 +73567,7 @@ MODE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.MecaCDriftM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.MecaCDriftM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -73812,8 +73748,7 @@ MODE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.MecaBElapsedTime</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.MecaBElapsedTime</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -74136,8 +74071,7 @@ MODE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.MecaBElapsedTime</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.MecaBElapsedTime</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -74469,8 +74403,7 @@ CUTOFF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Grappin.State.StateIncoherent</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.State.StateIncoherent</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -74575,8 +74508,7 @@ CUTOFF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Grappin.OpenReq</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.OpenReq</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -74681,8 +74613,7 @@ CUTOFF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Grappin.CloseReq</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.CloseReq</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -74817,8 +74748,7 @@ CUTOFF</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">Grappin.CmdConfirmClosePosition</Single>
-                      </Single>
+<Single Name="Value" Type="string">Bucket.CmdConfirmClosePosition</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -75165,8 +75095,7 @@ FERMÉ </Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Grappin.State.LastPosM2Close</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.State.LastPosM2Close</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -75347,8 +75276,7 @@ FERMÉ </Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Grappin.State.LastPosM2Open</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.State.LastPosM2Open</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -75529,8 +75457,7 @@ FERMÉ </Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Grappin.Config.OffsetCloseM</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.Config.OffsetCloseM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -75995,8 +75922,7 @@ FERMÉ </Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">Grappin.Config.OffsetOpenM</Single>
-                  </Single>
+<Single Name="Value" Type="string">Bucket.Config.OffsetOpenM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -77610,8 +77536,7 @@ Enable</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">IHM_MANU.M3_RelayFwd</Single>
-                      </Single>
+<Single Name="Value" Type="string">GVL_IHM.TranslationM3.ReqFwd</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -77797,8 +77722,7 @@ Enable</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">IHM_MANU.M3_RelayRev</Single>
-                      </Single>
+<Single Name="Value" Type="string">GVL_IHM.TranslationM3.ReqRev</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_TapInput</Single>
@@ -79867,8 +79791,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Chariot.SafetyError</Single>
-                  </Single>
+<Single Name="Value" Type="string">TranslationM3.SafetyError</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -80115,8 +80038,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">Chariot.Error</Single>
-                  </Single>
+<Single Name="Value" Type="string">TranslationM3.Error</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -80427,8 +80349,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.CableLimitAscentM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.CableLimitAscentM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -80609,8 +80530,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM1.TopSensorPositionM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.TopSensorPositionM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -80727,8 +80647,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM1.CableLimitAscentReached</Single>
-                  </Single>
+<Single Name="Value" Type="string">M1TreuilRetenue.CableLimitAscentReached</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -81039,8 +80958,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.CableLimitDescentM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.CableLimitDescentM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -81157,8 +81075,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.CableLimitDescentReached</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.CableLimitDescentReached</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -81469,8 +81386,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2477733581</Single>
-                    <Single Name="Value" Type="string">WinchM2.CableLimitAscentM</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.CableLimitAscentM</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2496894244</Single>
                     <Single Name="Value" Type="string"></Single>
@@ -81587,8 +81503,7 @@ Enable</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">WinchM2.CableLimitAscentReached</Single>
-                  </Single>
+<Single Name="Value" Type="string">M2TreuilBucket.CableLimitAscentReached</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -82457,8 +82372,7 @@ Enable</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">IHM_MANU.FdcGrappinCloseActive</Single>
-                      </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketCloseActive</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_ToggleInput</Single>
@@ -82614,8 +82528,7 @@ ACTIF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">1999528970</Single>
-                    <Single Name="Value" Type="string">IHM_MANU.FdcGrappinCloseActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketCloseActive</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2880254039</Single>
                     <Single Name="Value" Type="string">Modes.CurrentMode&lt;&gt;2</Single>
@@ -82826,8 +82739,7 @@ ENABLE</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">1999528970</Single>
-                    <Single Name="Value" Type="string">IHM_MANU.FdcGrappinCloseActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketCloseActive</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2880254039</Single>
                     <Single Name="Value" Type="string">Modes.CurrentMode&lt;&gt;2</Single>
@@ -83234,8 +83146,7 @@ ENABLE</Single>
                     <List Name="VisualElemMemberList" Type="{a4b83bea-3742-489c-9fe8-d96d68dba7ab}">
                       <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                         <Single Name="Id" Type="long">1186196937</Single>
-                        <Single Name="Value" Type="string">IHM_MANU.FdcGrappinOpenActive</Single>
-                      </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketOpenActive</Single>                      </Single>
                     </List>
                   </Single>
                   <Single Name="SignatureName" Type="string">Visu_ToggleInput</Single>
@@ -83391,8 +83302,7 @@ ACTIF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">1999528970</Single>
-                    <Single Name="Value" Type="string">IHM_MANU.FdcGrappinCloseActive</Single>
-                  </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketCloseActive</Single>                  </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">2880254039</Single>
                     <Single Name="Value" Type="string">Modes.CurrentMode&lt;&gt;2</Single>
@@ -83522,8 +83432,7 @@ ACTIF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">IHM_MANU.FdcGrappinOpen</Single>
-                  </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketOpen</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -83628,8 +83537,7 @@ ACTIF</Single>
                   </Single>
                   <Single Type="{c694e3a2-5c0b-4177-ab35-cb06bd5a6a02}" Method="IArchivable">
                     <Single Name="Id" Type="long">743958181</Single>
-                    <Single Name="Value" Type="string">IHM_MANU.FdcGrappinClose</Single>
-                  </Single>
+<Single Name="Value" Type="string">IHM_MANU.FdcBucketClose</Single>                  </Single>
                 </List>
               </Single>
               <Single Name="VisualElementName" Type="string">Lamp1</Single>
@@ -128939,7 +128847,7 @@ END_VAR
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
         <Single Name="Guid" Type="System.Guid">4bfda7d4-9d50-52db-b984-cf34212ef495</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
-        <Single Name="Name" Type="string">PRG_07_ChariotControl</Single>
+        <Single Name="Name" Type="string">PRG_07_TranslationControl</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
           <Entry>
             <Key>
@@ -136687,7 +136595,7 @@ END_VAR
             <Single Name="Comment" Type="string"></Single>
           </Single>
           <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
-            <Single Name="Name" Type="string">PRG_07_ChariotControl</Single>
+            <Single Name="Name" Type="string">PRG_07_TranslationControl</Single>
             <Single Name="Comment" Type="string"></Single>
           </Single>
           <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
