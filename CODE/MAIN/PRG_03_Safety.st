@@ -119,5 +119,14 @@ instSafetyChariotM3(
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational,
     PhaseRotationOk     := PRG_00_Inputs.PhaseRotationOk,
-    BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback // 🆕 REX 2026-07-08 — commun M1/M2/M3
+    BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
+    DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.Variateur.Online,
+    DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.Variateur.Operational,
+    DriveStatusWord     := M3_StatusWord,
+    DriveActualFreqHz   := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0,
+    BrakeFeedback       := PRG_00_Inputs.M3BrakeFeedback,
+    BrakeCmd            := PRG_07_ChariotControl.instChariotM3.BrakeCmd,
+    Direction           := PRG_07_ChariotControl.M3_Direction_Active,
+    LimitSwitchFwd      := PRG_00_Inputs.ChariotPosTremie,
+    LimitSwitchRev      := PRG_00_Inputs.ChariotPosFosse1
 );

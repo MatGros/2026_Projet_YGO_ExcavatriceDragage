@@ -80,7 +80,8 @@ VAR
     M1BrakeFeedback_Simulated           : BOOL;
     M2_FwdRevSpeedFeedbackOff_Simulated : BOOL;
     M2BrakeFeedback_Simulated           : BOOL;
-
+    M3BrakeFeedback_Simulated           : BOOL;
+ 
     // 🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)
     SimTopSensorTriggered                : BOOL;
 END_VAR
@@ -182,6 +183,22 @@ ChariotPosMaintenance := instChariotPosMaintenance.State;
 
 instChariotPosTremie(InputRaw := PosTremie_DI OR instSimChariot.PosTremie, FilterTime := T#20MS);
 ChariotPosTremie := instChariotPosTremie.State;
-
-instM3BrakeFeedback(InputRaw := M3_BrakeFeedback_DI, FilterTime := T#20MS);
+ 
+// 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
+M3BrakeFeedback_Simulated := NOT PRG_07_ChariotControl.instChariotM3.BrakeCmd;
+instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
+
+// 🧪 Simulation des retours variateur EtherCAT M3
+IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal THEN
+    M3_ActualFrequencyHz := M3_SetpointFrequencyHz;
+    
+    // Status Word : Bit0 (Operation), Bit7 (Operation Enable)
+    IF M3_CommandWord = 1 THEN
+        M3_StatusWord := 16#0081; // Operation + Operation Enable
+    ELSIF M3_CommandWord = 2 THEN
+        M3_StatusWord := 16#0089; // Operation + Operation Enable + Reverse (bit3)
+    ELSE
+        M3_StatusWord := 16#0080; // Stopped + Operation Enable
+    END_IF;
+END_IF;

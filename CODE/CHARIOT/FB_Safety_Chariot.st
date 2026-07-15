@@ -1,120 +1,139 @@
 (* ═══════════════════════════════════════════════════════════════
-   🔌 FB_Safety_Chariot — Bloc safety MÉTIER du domaine Chariot (M3)
+   🛡️ FB_Safety_Chariot — Bloc Safety pour le Chariot M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.2.md
-                   (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
-   🔧 2026-07-02 : renommage métier Translation→Chariot (demande utilisateur).
-      Préfixe I/O physique M3 inchangé (mapping matériel).
-   🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
-      un FB métier à part entière (pas une brique réduite).
-   📤 Sortie maîtresse SafeStop_Chariot : consommée en entrée par
-      FB_Chariot (M3).
-   ⚠️ PÉRIMÈTRE MINIMAL DE CE LOT (même logique que FB_Safety_Winch,
-      Partie9 §2 — premier lot testable) :
-      - ✅ Détecte la perte joystick/CAN (sans commande valide, le
-        chariot ne doit pas pouvoir bouger).
-      - 🔴 TBD (non câblé, PAS simulé) : perte EtherCAT variateur AC600
-        (VariateurAvailable de FB_DiagEthercat, non finalisé), défaut
-        variateur détaillé (au-delà du simple DriveFaultFeedback TOR
-        déjà géré dans FB_Chariot lui-même, bit3 ErrorId). Zone
-        clairement marquée ci-dessous — à câbler quand FB_DiagEthercat
-        AC600/M3 sera fiabilisé.
-      - `PowerCutOff` : FALSE pour ce lot (pas encore de
-        ST_ContactorCheck de puissance câblé — comme FB_Safety_Winch).
-   🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
-      - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT sur
-        cette instance ET les 2 instances FB_Safety_Winch) : défaut/perte → bit3 ErrorId →
-        `SafeStop` (déjà via `Error`) **ET `PowerCutOff`, qui devient réel pour ce bit précis**
-        (les autres bits du domaine Chariot restent `PowerCutOff=FALSE`, TBD). Justification :
-        frein à manque de courant (colle au repos) — perte du retour thermique frein peut
-        signifier collage instantané pendant que le chariot est encore en mouvement, une simple
-        rampe SafeStop ne suffit pas, coupure puissance immédiate nécessaire (même raisonnement
-        que FB_Safety_Winch bit10, voir son bandeau en-tête).
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.5.md
+   🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
+      thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
+      Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
    ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Chariot) ===
 
 FUNCTION_BLOCK PUBLIC FB_Safety_Chariot
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
-    EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
-    Mode                : E_Mode;      // Mode courant (autorisations)
+    EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK
+    Mode                : E_Mode;      // Mode courant
     JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
-    PhaseRotationOk     : BOOL;        // 🆕 PRG_00_Inputs.PhaseRotationOk (commun, I/O réel) — TRUE = rotation phases élec. correcte
-    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_00_Inputs.BrakeThermalFeedback)
-    // 🔴 TBD (EtherCAT AC600 non finalisé) : ajouter ici VariateurAvailable
-    //     (FB_DiagEthercat AC600/M3) quand ce diag sera fiabilisé — ne PAS stubber en dur.
+    PhaseRotationOk     : BOOL;        // PRG_00_Inputs.PhaseRotationOk (TRUE = OK)
+    BrakeThermalFeedback: BOOL;        // Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)
+
+    // 🔌 Spécifique EtherCAT & Capteurs réels
+    DriveOnline         : BOOL;        // Status diagnostic communication EtherCAT (Online)
+    DriveOperational    : BOOL;        // Status diagnostic communication EtherCAT (Operational)
+    DriveStatusWord     : WORD;        // Mot d'état variateur AC600
+    DriveActualFreqHz   : REAL;        // Vitesse réelle variateur (Hz)
+    BrakeFeedback       : BOOL;        // Retour d'état bobine frein (NC conditionné)
+    BrakeCmd            : BOOL;        // Commande frein
+    Direction           : INT;         // Direction commandée
+    LimitSwitchFwd      : BOOL;        // Fin de course extrême avant
+    LimitSwitchRev      : BOOL;        // Fin de course extrême arrière
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick/CAN (domaine chariot sans commande valide) ; bit2 : mauvaise rotation de phase (commun, bit1 réservé EtherCAT variateur) ; bit3 : surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff, REX 2026-07-08)
+    ErrorId             : WORD;        // bit0 : perte joystick ; bit1 : perte com EtherCAT ; bit2 : rotation phases ; bit3 : thermique frein ; bit4 : Méca B (incohérence arrêt) ; bit5 : Méca A (mouvement non commandé) ; bit6 : Fdc extrême atteint
     State               : E_State;
     StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Sortie maîtresse : rampe décélération RAPIDE (Enable maintenu)
-    PowerCutOff         : BOOL;        // 🧨 Sortie maîtresse : coupure puissance amont (FALSE, TBD ce lot)
+    SafeStop            : BOOL;        // 🟧 Décélération rapide (PLC)
+    PowerCutOff         : BOOL;        // 🧨 Coup de poing / coupure puissance amont
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
+    TonMecaB            : TON;         // Sécurité à l'arrêt (Méca B)
+    TonMecaA            : TON;         // Sécurité mouvement non commandé (Méca A)
+    PostRampTimeout     : TIME := T#3S;
+    UncommandedActiveB  : BOOL;
+    UncommandedActiveA  : BOOL;
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Chariot) ===
+// === IMPLEMENTATION ===
 
 // 🛑 1. GATE — neutralisation si désactivé
-// 🔧 REX 2026-07-15 (2) : Error/ErrorId RAJOUTÉS ici (bug corrigé, retour terrain — un défaut
-// transitoire survenu pendant qu'Enable=TRUE restait LATCHÉ à vie une fois Enable repassé à
-// FALSE, puisque Reset/ResetEdge ne sont traités que dans la branche Enable=TRUE ci-dessous ;
-// remontait comme un "faux défaut M3 en simulation" alors qu'aucun composant réel n'est en
-// cause). Aligné sur FB_Safety_Winch, qui le faisait déjà correctement.
 IF NOT Enable THEN
-    Ready := FALSE;
-    SafeStop := TRUE;
-    PowerCutOff := FALSE;
-    State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
+    SafeStop := FALSE;
+    PowerCutOff := FALSE;
+    TonMecaB(IN := FALSE);
+    TonMecaA(IN := FALSE);
+    State := E_State.DISABLED;
+    Busy := FALSE; Done := FALSE; Ready := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
-
-// 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 
-// 🔍 3. DIAGNOSTIC DU DOMAINE CHARIOT
-IF NOT JoystickOnline OR NOT JoystickOperational THEN
-    ErrorId := ErrorId OR 16#0001;       // Perte joystick/CAN : pas de commande opérateur valide
+// 🔍 2. PERTE JOYSTICK/CAN (bit0)
+IF (NOT JoystickOnline OR NOT JoystickOperational) THEN
+    ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🔴 TBD (EtherCAT AC600 non finalisé) : bit1 réservé perte EtherCAT variateur — NON câblé
-// dans ce lot. Ne jamais mettre un stub qui masquerait un vrai défaut : laisser le bit à 0
-// tant que la surveillance EtherCAT n'est pas fiabilisée revient à accepter ce risque, comme
-// pour le codeur treuil (FB_Safety_Winch) — décision à revalider avec l'utilisateur avant
-// mise en service réelle en mode ETHERCAT.
+// 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
+IF (NOT DriveOnline OR NOT DriveOperational) THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
 
-// 🔍 3bis. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2/M3, 2026-07-03octodecies) — bit2
+// 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
 IF NOT PhaseRotationOk THEN
     ErrorId := ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
 END_IF;
 
-// 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (REX 2026-07-08, demande utilisateur) — bit3
-// Signal commun (1 seul fil, câblé identiquement sur les 3 instances Safety) : sa perte peut
-// signifier qu'un frein colle instantanément (frein à manque de courant) → SafeStop (via Error)
-// ET PowerCutOff (voir bandeau en-tête).
+// 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
 IF BrakeThermalFeedback THEN
     ErrorId := ErrorId OR 16#0008;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFF7;
+END_IF;
+
+// 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
+// Si le chariot est commandé à l'arrêt (Direction = 0 et frein appliqué) mais que le variateur 
+// tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) > 3s
+IF (Direction = 0) AND NOT BrakeCmd THEN
+    UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+ELSE
+    UncommandedActiveB := FALSE;
+END_IF;
+
+TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
+
+IF TonMecaB.Q THEN
+    ErrorId := ErrorId OR 16#0010;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFEF;
+END_IF;
+
+// 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
+// Si le chariot est commandé à l'arrêt, mais qu'une fréquence réelle est mesurée (> 0.5 Hz) pendant > 1s
+IF (Direction = 0) AND NOT BrakeCmd THEN
+    UncommandedActiveA := ABS(DriveActualFreqHz) > 0.5;
+ELSE
+    UncommandedActiveA := FALSE;
+END_IF;
+
+TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+
+IF TonMecaA.Q THEN
+    ErrorId := ErrorId OR 16#0020;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFDF;
+END_IF;
+
+// 🔍 3sexies. DÉPASSEMENT FINS DE COURSE EXTRÊMES (bit6)
+IF LimitSwitchFwd OR LimitSwitchRev THEN
+    ErrorId := ErrorId OR 16#0040;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
@@ -124,11 +143,18 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-SafeStop := Error OR NOT EmergencyStopOk;  // 🟧 Tout défaut du domaine ou contacteur coupé → SafeStop
-// 🧨 REX 2026-07-08 : PowerCutOff devient réel pour bit3 (thermique frein commun) uniquement —
-// même raisonnement que FB_Safety_Winch bit10 (voir bandeau en-tête). Les autres bits du domaine
-// Chariot (joystick/CAN, rotation phase) restent TBD, pas de ST_ContactorCheck de puissance câblé.
-PowerCutOff := (ErrorId AND 16#0008) <> 16#0000;
+SafeStop := Error OR NOT EmergencyStopOk;
+
+// PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
+// mouvement non commandé (bit5), ou dépassement de fin de course (bit6)
+PowerCutOff := (ErrorId AND 16#0078) <> 16#0000;
 
 Busy := FALSE;
 Done := FALSE;
+
+// 🚦 5. STATE MACHINE (phase diagnostic)
+IF Error THEN
+    State := E_State.ERROR;
+ELSE
+    State := E_State.READY;
+END_IF;

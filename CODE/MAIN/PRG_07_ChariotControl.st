@@ -8,9 +8,7 @@
 PROGRAM PRG_07_ChariotControl
 VAR
     instChariotM3           : FB_Chariot;
-    instSimMirrorM3Fwd      : FB_Sim_DigitalMirror; // 🧪 Lot 5 — retour contacteur M3 réaliste (temporisé)
-    instSimMirrorM3Rev      : FB_Sim_DigitalMirror;
-
+ 
     // Commandes arbitrées après sélection Manuel/Auto
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
@@ -64,41 +62,16 @@ instChariotM3(
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := PRG_03_Safety.instSafetyChariotM3.SafeStop,
-    CommMode                := E_ChariotCommMode.DEGRADED_IO,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    DriveStatusWord         := 0,
-    DriveActualFreqHz       := 0.0,
-    ContactorFeedbackFwd    := M3_ContactorFeedbackFwd,
-    ContactorFeedbackRev    := M3_ContactorFeedbackRev,
-    DriveFaultFeedback      := M3_DriveFaultFeedback,
+    LimitSwitchFwd          := PRG_00_Inputs.ChariotPosTremie,
+    LimitSwitchRev          := PRG_00_Inputs.ChariotPosFosse1,
+    DriveStatusWord         := M3_StatusWord,
+    DriveActualFreqHz       := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd),
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
 );
 
-// ── 3. RECOPIE VERS LES VARIABLES GLOBALES DE SIMULATION / STUBS ─────────
-M3_RelayFwd     := instChariotM3.RelayFwd;
-M3_RelayRev     := instChariotM3.RelayRev;
-M3_RelaySpeedGv := instChariotM3.RelaySpeedGv;
-
-// 🔴🔧 REX 2026-07-07 : alimentation PRG_10_Outputs (tâche indépendante, jamais appelée avec
-// paramètres — voir même correctif dans PRG_06_WinchControl.st §8).
+// 🔴 Recopie commande de frein chariot
 PRG_10_Outputs.ChariotBrakeCmd := instChariotM3.BrakeCmd;
-
-// 🧪 Retour contacteur M3 (Lot 5, non prioritaire) : miroir temporisé réaliste
-// (FB_Sim_DigitalMirror) au lieu de l'ancien miroir instantané inconditionnel.
-// Délai nettement sous ContactorFeedbackTimeout (500ms, GVL_PERSISTENT côté FB_Chariot)
-// pour ne pas déclencher StuckClosed/StuckOpen à tort pendant le délai simulé.
-instSimMirrorM3Fwd(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal,
-    Command     := M3_RelayFwd,
-    MirrorDelay := T#150ms
-);
-instSimMirrorM3Rev(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal,
-    Command     := M3_RelayRev,
-    MirrorDelay := T#150ms
-);
-M3_ContactorFeedbackFwd := instSimMirrorM3Fwd.Feedback;
-M3_ContactorFeedbackRev := instSimMirrorM3Rev.Feedback;
