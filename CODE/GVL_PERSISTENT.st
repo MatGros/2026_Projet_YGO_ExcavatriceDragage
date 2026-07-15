@@ -51,7 +51,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
 
     // ↔️ TRANSLATION (M3)
-    TranslationMaxFreqHz : REAL := 50.0; // Fréquence max absolue M3 (Hz)
+    TranslationMaxFreqHz : REAL := 60.0; // Fréquence max absolue M3 (Hz)
 
     // 🕹️ JOYSTICK
     JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
