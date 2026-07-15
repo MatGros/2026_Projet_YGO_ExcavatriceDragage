@@ -4,8 +4,8 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 📦 **Historique versions CODESYS ↔ DOC** : voir [DOC/VERSION_HISTORY.md](DOC/VERSION_HISTORY.md) — ajouter une ligne à chaque jalon significatif.
 
-🤝 **Travail multi-agents (Claude orchestrateur ↔ Gemini exécution)** : voir [DOC/AGENT_HANDOFF/](DOC/AGENT_HANDOFF/) — `GEMINI_BRIEF.md` (onboarding), `QUEUE.md` (tâches en cours), `tasks/TASK-00NN-*.md` (détail par tâche). Claude crée les tâches et seul à valider `REVIEW→DONE` ; jamais de commit sans validation utilisateur, même règle pour les 2 agents.
-⚠️ **OBLIGATOIRE** : dès que l'utilisateur demande de déléguer/confier/envoyer du travail à Gemini (formulation quelconque) → la skill `.claude/skills/codesys-workflow.md` (§ Aiguillage préalable) redirige vers la procédure de délégation **au lieu d'exécuter la tâche soi-même**. Ne s'applique pas à l'usage normal de l'outil `Agent` (subagents Claude), qui reste libre.
+🤖 **Délégation multi-modèle (Claude ↔ Gemini)** : plugin **antigravity** (Idun Group, `/plugin install antigravity@idun-antigravity`). Skills : `antigravity:delegate` (confier une tâche à Gemini 3.5), `antigravity:resume` (continuer la conversation Antigravity), `antigravity:review` (revue croisée read-only), `antigravity:status`/`antigravity:setup`/`antigravity:cancel`/`antigravity:result`. Délégation **synchrone dans la session** (pas de queue fichier ni de serveur local à maintenir).
+📦 Remplace l'ancienne orchestration fichier `DOC/AGENT_HANDOFF/` (queue + `push_server.py`, retirée 2026-07-15 — voir [DOC/VERSION_HISTORY.md](DOC/VERSION_HISTORY.md)). Le workflow CODESYS (`.claude/skills/codesys-workflow.md`) reste **obligatoire** pour toute modif `CODE/` quel que soit l'exécutant (Claude direct ou délégué via antigravity).
 
 ---
 
@@ -155,11 +155,10 @@ Toujours **concis et technique, zéro perte d'information, emoji** pour la clart
 
 1. ✅ **Charger automatiquement** la skill `.claude/skills/codesys-workflow.md`
 2. ✅ **Lire docs pertinentes** : NAMING_CONVENTION.md, AF_Partie-03_Template_FB_Commun_v1.3.md (ajuster selon métier concerné : Winch=Partie9, Chariot=Partie11, Homing=Partie10)
-3. 🔒 **Garde-fous automatiques (Hooks CLI)** : Un hook global (`~/.gemini/config/hooks.json` → `PLCOPENXML_TOOLING/guardrails.py`) est actif sur le système. Il bloque automatiquement les commits et les modifications hors-scope si le workflow multi-agent (Claude/Gemini) est actif dans `QUEUE.md`.
-4. ✅ **Vérifier spec complète** → Sinon demander clarifications
-5. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
-6. ✅ **Tracer checklist** avant génération
-7. ✅ **Refuser code non-conforme** → Ne JAMAIS approximer
+3. ✅ **Vérifier spec complète** → Sinon demander clarifications
+4. ✅ **Auditer conformité** : nommage PascalCase, interface FB, sécurité
+5. ✅ **Tracer checklist** avant génération
+6. ✅ **Refuser code non-conforme** → Ne JAMAIS approximer
 
 **Cas d'arrêt (refuse génération) :**
 - Nommage ambigu ou non-PascalCase
