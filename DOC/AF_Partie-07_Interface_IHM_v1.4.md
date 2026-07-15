@@ -1,12 +1,13 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.4)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Grappin, Synchro).  
-> **Version** : v1.3 (2026-07-08, Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs).
-> 🔧 **Nettoyage documentaire (audit doc, 2026-07-09)** : harmonisation titre/nom de fichier — le
-> titre affichait encore v1.2 alors que le champ "Version" (ci-dessus) était déjà en v1.3 ; le nom
-> de fichier suit désormais la version la plus haute. Aucun changement de contenu fonctionnel.  
-> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md), [P10 Homing v1.10](AF_Partie-10_Fonction_Encoder_Homing_v1.10.md), [P12 Grappin v1.4](AF_Partie-12_Fonction_Grappin_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
+> **Version** : v1.4 (2026-07-15, ST_ChariotHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist)).  
+>
+> **v1.4 (2026-07-15)** : ST_ChariotHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist).  
+> **v1.3 (2026-07-08)** : Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs.  
+> 🔧 **Nettoyage documentaire (audit doc, 2026-07-09)** : harmonisation titre/nom de fichier — le titre affichait encore v1.2 alors que le champ "Version" (ci-dessus) était déjà en v1.3 ; le nom de fichier suit désormais la version la plus haute. Aucun changement de contenu fonctionnel.  
+> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md), [P10 Homing v1.10](AF_Partie-10_Fonction_Encoder_Homing_v1.10.md), [P12 Grappin v1.4](AF_Partie-12_Fonction_Grappin_v1.4.md), [P13 Simulation v1.1](AF_Partie-13_Fonction_Simulation_v1.2.md).
 
 ---
 
@@ -213,23 +214,34 @@ Regroupe les informations de commande, d'état et de diagnostic de l'axe transve
 ```pascal
 TYPE ST_ChariotHMI :
 STRUCT
-    FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Chariot) *)
-    Ready                   : BOOL;    (* 🟢 Chariot prêt à fonctionner *)
-    Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
-    Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
-    Error                   : BOOL;    (* 🔴 Chariot en défaut *)
-    ErrorId                 : WORD;    (* ❌ Code du défaut actif *)
-    RelayFwd                : BOOL;    (* 🔌 Relais direction avant activé *)
-    RelayRev                : BOOL;    (* 🔌 Relais direction arrière activé *)
-    RelaySpeedGv            : BOOL;    (* 🔌 Relais grande vitesse (GV) activé *)
-    BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein *)
-    BrakeFeedback           : BOOL;    (* 🔌 Retour physique de l'état du frein *)
-    PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
-    SelectedTargetNum       : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
-    DriveStatusWord         : WORD;    (* 📡 Mot d'état du variateur (EtherCAT) *)
-    DriveActualFreqHz       : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
-    BypassContactorFeedback : BOOL;    (* 🔌 Activation du bypass des retours contacteurs *)
-    BypassBrakeFeedback     : BOOL;    (* 🔓 Activation du bypass du retour frein *)
+    (* Commandes opérateur (manuel / maintenance) *)
+    SelectedTargetNum       : INT;     (* Numéro de la cible de position sélectionnée *)
+    ReqFwd                  : BOOL;    (* Requête marche avant manuelle (bouton IHM, pas encore arbitrée) *)
+    ReqRev                  : BOOL;    (* Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
+    FreqSetpointHz          : REAL;    (* Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs *)
+
+    (* États & diagnostics FB_Chariot *)
+    FBState                 : E_State; (* État de l'automate interne (FB_Chariot) *)
+    Ready                   : BOOL;
+    Busy                    : BOOL;
+    Done                    : BOOL;
+    Error                   : BOOL;
+    ErrorId                 : WORD;
+    BrakeCmd                : BOOL;    (* Commande de desserrage du frein (lecture seule, TRUE = desserré) *)
+    BrakeFeedback           : BOOL;    (* Retour physique de l'état du frein *)
+    PositionSensorTarget    : BOOL;    (* Capteur de détection de la position cible atteint *)
+    DriveActualFreqHz       : REAL;    (* Fréquence de sortie réelle du variateur (Hz) *)
+
+    (* Diagnostic variateur EtherCAT (décodé) *)
+    DriveCommReady          : BOOL;    (* Variateur M3 : communication prête (StatusWord bit7) *)
+    DrivePowerReady         : BOOL;    (* Variateur M3 : puissance prête (StatusWord bit0) *)
+
+    (* Bypass diag (banc de test — auto-calculé depuis GVL_Simulation) *)
+    BypassContactorFeedback : BOOL;    (* Activation du bypass des retours contacteurs (sens + frein) *)
+
+    (* Sécurité (FB_Safety_Chariot) *)
+    SafetyError             : BOOL;
+    SafetyErrorId           : WORD;
 END_STRUCT
 END_TYPE
 ```
@@ -265,9 +277,9 @@ VAR_GLOBAL RETAIN
     WinchM2 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Auxiliaire M2 *)
     Grappin : ST_GrappinHMI;(* Variables d'échange IHM Mécanisme Grappin *)
     Sync    : ST_SyncHMI;   (* Variables d'échange IHM Surveillance de synchro *)
-    Joystick : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
+    JoystickJOY1 : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
     Modes   : ST_ModesHMI;  (* Variables d'échange IHM Modes de marche *)
-    Chariot : ST_ChariotHMI;(* Variables d'échange IHM Chariot M3 *)
+    ChariotM3 : ST_ChariotHMI;(* Variables d'échange IHM Chariot M3 *)
     Network : ST_NetworkDiagHMI;(* Variables d'échange IHM Diagnostics réseau *)
 END_VAR
 ```

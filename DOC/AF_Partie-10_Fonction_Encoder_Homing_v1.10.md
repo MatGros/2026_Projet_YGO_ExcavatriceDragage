@@ -122,8 +122,8 @@
 > [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md) (dossier `ENCODER`),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (profils FB),
 > [P4 Cycle v1.2](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §Initialisation/§3 Synchro,
-> [P5 Modes v1.2](AF_Partie-05_Modes_Maintenance_v1.2.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md) (`FB_Winch` unitaire M1/M2).
+> [P5 Modes v1.2](AF_Partie-05_Modes_Maintenance_v1.6.md) §2 (`MAINT_N1`/`MAINT_N2`),
+> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
