@@ -147,6 +147,8 @@ GVL_IHM.IHM_MANU.PositionM_M1 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 
 // 📊 Calcul de l'écart grappin et des états de fin de course (delta = M1 - M2)
+GVL_IHM.IHM_MANU.FdcGrappinOpenEnable := GVL_IHM.IHM_MANU.FdcGrappinOpen;
+GVL_IHM.IHM_MANU.FdcGrappinCloseEnable := GVL_IHM.IHM_MANU.FdcGrappinClose;
 GVL_IHM.IHM_MANU.GrappinDelta := GVL_IHM.IHM_MANU.PositionM_M1 - GVL_IHM.IHM_MANU.PositionM_M2;
 GVL_IHM.IHM_MANU.FdcGrappinOpenActive  := GVL_IHM.IHM_MANU.FdcGrappinOpenEnable AND (GVL_IHM.IHM_MANU.GrappinDelta >= 0.0);
 GVL_IHM.IHM_MANU.FdcGrappinCloseActive := GVL_IHM.IHM_MANU.FdcGrappinCloseEnable AND (GVL_IHM.IHM_MANU.GrappinDelta <= -10.0);
@@ -387,13 +389,13 @@ ELSE
     M3_CommandWord         := PRG_07_ChariotControl.instChariotM3.DriveControlWord;
     M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_ChariotControl.instChariotM3.DriveFreqRefHz * 100.0);
 END_IF;
-GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0;
+GVL_IHM.IHM_MANU.M3_FreqActual         := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 
 // Recopie des mots de commande et d'état pour monitoring HMI
 GVL_IHM.IHM_MANU.M3_CommandWordMonitor := M3_CommandWord;
-GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := M3_StatusWord;
-GVL_IHM.IHM_MANU.M3_CommReady          := M3_StatusWord.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.IHM_MANU.M3_PowerReady         := M3_StatusWord.0 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.IHM_MANU.M3_StatusWordMonitor  := PRG_00_Inputs.M3_StatusWord_Filtered;
+GVL_IHM.IHM_MANU.M3_CommReady          := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.IHM_MANU.M3_PowerReady         := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
 
 // Relais de direction M3 obsolètes forcés à FALSE
 M3_RelayFwd_DQ := FALSE;

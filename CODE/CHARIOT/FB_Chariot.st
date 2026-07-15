@@ -189,7 +189,7 @@ END_IF;
 IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
     DriveControlWord := 0;
     DriveFreqRefHz := 0.0;
-    SpeedRamp.Current := 0.0;
+    SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
 END_IF;
 
 // 🛑 6. FREIN (composé, réutilisé tel quel)

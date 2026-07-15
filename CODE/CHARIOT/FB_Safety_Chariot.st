@@ -153,8 +153,5 @@ Busy := FALSE;
 Done := FALSE;
 
 // 🚦 5. STATE MACHINE (phase diagnostic)
-IF Error THEN
-    State := E_State.ERROR;
-ELSE
-    State := E_State.READY;
-END_IF;
+State := E_State.READY;
+
