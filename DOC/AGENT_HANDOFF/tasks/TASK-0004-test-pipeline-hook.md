@@ -1,6 +1,6 @@
 # TASK-0004 — [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice)
 
-**Status**: TODO
+**Status**: REVIEW
 **Assigned**: Gemini
 **Créé**: 2026-07-15 par Claude
 
@@ -20,7 +20,7 @@ ligne dans le `Log` ci-dessous confirmant la réception (ex. "Réveil reçu, tâ
 - Ce fichier uniquement (`tasks/TASK-0004-test-pipeline-hook.md`) — section `Log` seulement.
 - `QUEUE.md` — mise à jour du `Status` sur la ligne TASK-0004 (comme d'habitude).
 
-**Explicitement HORS scope** (ne pas toucher même si tentant) :
+## 🗂️ Explicitement HORS scope
 - Tout fichier `CODE/*.st` — cette tâche est un test de pipeline, pas une demande fonctionnelle.
 - Tout fichier `DOC/AF_Partie*` ou `PLAN_TASK_v1.0.md`.
 - `TASK-0002`/`TASK-0003` — tâches séparées, ne pas les mélanger.
@@ -30,7 +30,7 @@ ligne dans le `Log` ci-dessous confirmant la réception (ex. "Réveil reçu, tâ
 - Ne rien committer sans validation utilisateur (règle identique à toutes les tâches).
 
 ## ✅ Critère d'acceptation
-- [ ] `Status` passé `TODO → IN_PROGRESS → REVIEW` par Gemini
+- [ ] `Status` passé `TODO → IN_PROGRESS → REVIEW` by Gemini
 - [ ] Une ligne `Log` ajoutée confirmant la réception du réveil
 - [ ] Aucun fichier `CODE/` ou `DOC/AF_PartieN` modifié
 
@@ -38,3 +38,7 @@ ligne dans le `Log` ci-dessous confirmant la réception (ex. "Réveil reçu, tâ
 | Date | Auteur | Note |
 |---|---|---|
 | 2026-07-15 | Claude | Tâche créée — nouveau test de bout-en-bout du pipeline queue/hook/push_server, motif factice, aucun code réel à modifier |
+| 2026-07-15 | Gemini | Réveil local reçu via push_server, tâche lue et passée en IN_PROGRESS |
+| 2026-07-15 | Gemini | Réveil reçu instantanément via push_server relancé. Tâche lue et validée. |
+| 2026-07-15 | Gemini | Réveil reçu, tâche lue et traitée avec succès. Passage en REVIEW. |
+| 2026-07-15 | Gemini | Réveil push_server reçu et décodé. Tâche lue, exécutée localement et mise en REVIEW. |

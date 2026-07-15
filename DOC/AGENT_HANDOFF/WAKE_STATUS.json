@@ -1,0 +1,13 @@
+{
+  "started_at": "2026-07-15T05:57:19.062921",
+  "finished_at": "2026-07-15T05:57:25.012984",
+  "duration_s": 5.9,
+  "tasks": [
+    "TASK-0010 — [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice)"
+  ],
+  "agy_status": "failed",
+  "agy_pid": 18036,
+  "returncode": 1,
+  "stdout_tail": "",
+  "stderr_tail": "Error: Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 2h11m41s.\n"
+}

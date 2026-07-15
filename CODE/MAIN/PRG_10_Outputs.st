@@ -151,8 +151,8 @@ GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 
 // 📊 Calcul de l'écart grappin et des états de fin de course (delta = M1 - M2)
 GVL_IHM.IHM_MANU.GrappinDelta := GVL_IHM.IHM_MANU.PositionM_M1 - GVL_IHM.IHM_MANU.PositionM_M2;
-GVL_IHM.IHM_MANU.FdcGrappinOpenActive  := GVL_IHM.IHM_MANU.FdcGrappinOpen AND (GVL_IHM.IHM_MANU.GrappinDelta >= 0.0);
-GVL_IHM.IHM_MANU.FdcGrappinCloseActive := GVL_IHM.IHM_MANU.FdcGrappinClose AND (GVL_IHM.IHM_MANU.GrappinDelta <= -10.0);
+GVL_IHM.IHM_MANU.FdcGrappinOpenActive  := GVL_IHM.IHM_MANU.FdcGrappinOpenEnable AND (GVL_IHM.IHM_MANU.GrappinDelta >= 0.0);
+GVL_IHM.IHM_MANU.FdcGrappinCloseActive := GVL_IHM.IHM_MANU.FdcGrappinCloseEnable AND (GVL_IHM.IHM_MANU.GrappinDelta <= -10.0);
 
 IF ManuActive THEN
     // 1️⃣ Détection des nouveaux appuis sur boutons HMI (uniquement pour interlocks HMI)

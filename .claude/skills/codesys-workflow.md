@@ -165,7 +165,14 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 
 ⛔ **Règle d'or de cette section** : je ne fais PAS le travail moi-même, je le prépare pour Gemini.
 
-> 🔔 **Prérequis côté Gemini** : Gemini doit avoir lancé `PLCOPENXML_TOOLING/push_server.py` (port 9090) en début de session pour recevoir la notification push dès que `QUEUE.md` est commité. Procédure complète → `DOC/AGENT_HANDOFF/GEMINI_BRIEF.md` §Push Notifications. Si le hook git ne peut pas déclencher le push (ex. pas de commit immédiat), rappeler à l'utilisateur d'appeler manuellement `curl -s http://localhost:9090/wake` ou d'ouvrir `http://localhost:9090/wake` dans le navigateur.
+> 🔔 **Prérequis côté Gemini** : Gemini doit avoir lancé `PLCOPENXML_TOOLING/push_server.py` (port 9090) en début de session, en écoute. Procédure complète → `DOC/AGENT_HANDOFF/GEMINI_BRIEF.md` §Push Notifications.
+>
+> ⚡ **Réveil = découplé du commit (REX 2026-07-15)** : le hook git `post-commit` ne suffit pas à
+> lui seul (délai/fiabilité). **Dès que `QUEUE.md`/le fichier tâche est édité ET validé par
+> l'utilisateur**, j'appelle **directement** `curl -s -X POST http://localhost:9090/wake` — pas
+> besoin d'attendre ou de faire un commit pour déclencher le réveil. Le commit reste soumis à la
+> règle habituelle (jamais sans validation), il arrive **après** le retour Gemini (`REVIEW`) et
+> la validation finale de l'utilisateur, pas pour déclencher le réveil.
 
 🔒 **Garde-fous automatiques (Hooks CLI)** : Un hook système global (`~/.gemini/config/hooks.json` → `PLCOPENXML_TOOLING/guardrails.py`) intercepte et valide automatiquement chaque action de Gemini si le workflow multi-agent est actif. Il bloque les commits directs de Gemini et les modifications de fichiers hors-scope.
 
@@ -178,8 +185,9 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
    - Critères d'acceptation concrets et vérifiables
    - `Status: TODO`, `Assigned: Gemini`
 4. **Ajouter la ligne dans `DOC/AGENT_HANDOFF/QUEUE.md`**.
-5. **Remettre à l'utilisateur** : chemin exact du fichier créé + rappel qu'il transmet à Gemini (lire `GEMINI_BRIEF.md` puis la tâche). Rien d'autre à faire côté Claude tant que `Status` n'est pas `REVIEW`.
-6. **Jamais de commit** de cette création de tâche sans validation (même règle que tout le reste).
+5. **Demander validation utilisateur** sur le fichier tâche + la ligne `QUEUE.md` (règle habituelle de validation fichier).
+6. **Une fois validé → réveiller Gemini directement** : `curl -s -X POST http://localhost:9090/wake` (pas de commit nécessaire pour ça, voir note ci-dessus). Rien d'autre à faire côté Claude tant que `Status` n'est pas `REVIEW`.
+7. **Jamais de commit** de cette création de tâche sans validation (même règle que tout le reste) — le commit peut attendre le retour Gemini, il n'est plus le déclencheur du réveil.
 
 ### Quand l'utilisateur revient avec un résultat Gemini (`Status: REVIEW`)
 Relire le `Log` de la tâche + le diff réel (`git diff`/`git status`), vérifier les critères d'acceptation, régénérer le bundle PLCopenXML (Étape 4bis ci-dessus) si du ST a été touché, **puis seulement** passer `Status: DONE` dans le fichier tâche ET `QUEUE.md`. Ne jamais passer `DONE` sur la seule confiance du `Log` rempli par Gemini.
