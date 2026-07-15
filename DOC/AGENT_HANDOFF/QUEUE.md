@@ -6,7 +6,7 @@
 
 | ID | Titre | Assigned | Status | Maj |
 |---|---|---|---|---|
-| _(aucune tâche pour l'instant — Claude en crée ici au fil de l'eau)_ | | | | |
+| [TASK-0001](tasks/TASK-0001-restrict-joystick-winch-select-n2.md) | Restreindre JoystickWinchSelect (M1/M2 seul) à MAINT_N2 | Gemini | TODO | 2026-07-15 |
 
 ---
 
