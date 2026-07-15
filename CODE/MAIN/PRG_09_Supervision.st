@@ -6,7 +6,7 @@
    ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
    🔧 REX 2026-07-07 : séparation des resets — l'ancien MachineReset_IHM (unique, câblé sur
       TOUT y compris FB_Modes/FB_Cycle) est retiré. FaultMachineReset_IHM ne couvre plus que le
-      domaine sécurité/métier (Winch, Safety, Encodeurs, Grappin, Joystick, Chariot) ;
+      domaine sécurité/métier (Winch, Safety, Encodeurs, Benne, Joystick, Translation) ;
       FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.ModeReset côté
       PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
    ═══════════════════════════════════════════════════════════════ *)
@@ -21,13 +21,13 @@ END_VAR
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SyncEnableRequest; // 🔧 REX 2026-07-08 : renommé, polarité inversée
-StubChariotPositionSelect_IHM          := GVL_IHM.ChariotM3.SelectedTargetNum;
+StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.SelectedTargetNum;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
-                    OR GVL_IHM.WinchM1.CmdReset
-                    OR GVL_IHM.WinchM2.CmdReset
-                    OR GVL_IHM.Grappin.CmdReset;
+                    OR GVL_IHM.M1TreuilRetenue.CmdReset
+                    OR GVL_IHM.M2TreuilBucket.CmdReset
+                    OR GVL_IHM.Bucket.CmdReset;
 
 // 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
 // (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
@@ -50,10 +50,10 @@ GVL_IHM.Modes.AnyFaultActive :=
         OR PRG_03_Safety.instSafetyWinchM2.Error
         OR PRG_06_WinchControl.instWinchM2.Error
     ))
-    OR PRG_03_Safety.instSafetyChariotM3.Error
+    OR PRG_03_Safety.instSafetyTranslationM3.Error
     OR PRG_06_WinchControl.instWinchSync.Error
-    OR PRG_06_WinchControl.instGrappin.Error
-    OR PRG_07_ChariotControl.instChariotM3.Error
+    OR PRG_06_WinchControl.instBucket.Error
+    OR PRG_07_TranslationControl.instTranslationM3.Error
     OR PRG_10_Outputs.RedundancyTestFailed
     OR PRG_10_Outputs.EmergencyArmingFailed;
 
@@ -62,14 +62,14 @@ GVL_IHM.Modes.AnyFaultActive :=
 // l'inversion de polarité). On relit directement les .PowerCutOff sources, pas la sortie physique.
 GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                                  OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                                 OR PRG_03_Safety.instSafetyChariotM3.PowerCutOff
+                                 OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff
                                  OR GVL_IHM.Modes.CmdEmergencyCutOff;
 
 // 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 — signal UNIQUE (1 seul fil, pas de sens à
 // le dupliquer par axe), remonté une seule fois au niveau global GVL_IHM (même principe que
-// TopPositionSensorActive ci-dessus, PAS dans WinchM1/WinchM2/Chariot).
-GVL_IHM.Common.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
-GVL_IHM.Common.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
+// TopPositionSensorActive ci-dessus, PAS dans WinchM1/WinchM2/Translation).
+GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
+GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
 
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
@@ -85,7 +85,7 @@ GVL_IHM.Modes.RedundancyTestFailed := PRG_10_Outputs.RedundancyTestFailed;
 GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 // 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
-// homer qu'un seul treuil à la fois). GVL_IHM.WinchM1/M2.CmdHome sont désormais câblés
+// homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.CmdHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
 // ℹ️ Calibrate joystick : lu directement depuis GVL_IHM.JoystickJOY1.Calibrate dans PRG_01_Diagnostics (ligne 48)
@@ -93,42 +93,42 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
-IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.WinchM1.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM1_M;
-    GVL_IHM.WinchM1.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.WinchM1.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
-    GVL_IHM.WinchM1.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
-    GVL_IHM.WinchM1.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
-    GVL_IHM.WinchM1.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M;
-    GVL_IHM.WinchM1.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM1_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.WinchM1.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
-    GVL_IHM.WinchM1.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
+IF GVL_IHM.M1TreuilRetenue.TopSensorPositionM = 0.0 THEN
+    GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM1_M;
+    GVL_IHM.M1TreuilRetenue.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M1TreuilRetenue.RampAccelRate       := GVL_PERSISTENT.WinchM1RampAccelRate_Pct;
+    GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
+    GVL_IHM.M1TreuilRetenue.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
+    GVL_IHM.M1TreuilRetenue.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M;
+    GVL_IHM.M1TreuilRetenue.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM1_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M1TreuilRetenue.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
+    GVL_IHM.M1TreuilRetenue.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
 
-IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.WinchM2.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM2_M;
-    GVL_IHM.WinchM2.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.WinchM2.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
-    GVL_IHM.WinchM2.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
-    GVL_IHM.WinchM2.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
-    GVL_IHM.WinchM2.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M;
-    GVL_IHM.WinchM2.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM2_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.WinchM2.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
-    GVL_IHM.WinchM2.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
+IF GVL_IHM.M2TreuilBucket.TopSensorPositionM = 0.0 THEN
+    GVL_IHM.M2TreuilBucket.TopSensorPositionM  := GVL_PERSISTENT.HomingTargetM2_M;
+    GVL_IHM.M2TreuilBucket.MaxStepDescente     := GVL_PERSISTENT.WinchMaxStepDescente; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M2TreuilBucket.RampAccelRate       := GVL_PERSISTENT.WinchM2RampAccelRate_Pct;
+    GVL_IHM.M2TreuilBucket.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
+    GVL_IHM.M2TreuilBucket.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
+    GVL_IHM.M2TreuilBucket.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M;
+    GVL_IHM.M2TreuilBucket.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM2_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M2TreuilBucket.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
+    GVL_IHM.M2TreuilBucket.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
 
 IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
     GVL_IHM.Sync.SyncToleranceM         := GVL_PERSISTENT.WinchSyncTolerance_M;
 END_IF;
 
-IF GVL_IHM.Grappin.Config.OffsetOpenM = 0.0 AND GVL_IHM.Grappin.Config.OffsetCloseM = 0.0 THEN
-    GVL_IHM.Grappin.Config := GVL_PERSISTENT.GrappinConfig;
-    GVL_IHM.Grappin.TimeoutDuration := T#30s;
+IF GVL_IHM.Bucket.Config.OffsetOpenM = 0.0 AND GVL_IHM.Bucket.Config.OffsetCloseM = 0.0 THEN
+    GVL_IHM.Bucket.Config := GVL_PERSISTENT.BucketConfig;
+    GVL_IHM.Bucket.TimeoutDuration := T#30s;
 END_IF;
 
-IF GVL_IHM.Common.LimitLegalDepthMinAllowed = 0.0 THEN
-    GVL_IHM.Common.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
-    GVL_IHM.Common.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
+IF GVL_IHM.Commun.LimitLegalDepthMinAllowed = 0.0 THEN
+    GVL_IHM.Commun.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
+    GVL_IHM.Commun.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
 END_IF;
 
 // 🆕 REX 2026-07-15 (10) — BUG CORRIGÉ (retour terrain) : WinchMaxStepFwd/Rev (essais progressifs
@@ -153,17 +153,17 @@ END_IF;
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-GVL_PERSISTENT.HomingTargetM1_M           := GVL_IHM.WinchM1.TopSensorPositionM;
-GVL_PERSISTENT.HomingTargetM2_M           := GVL_IHM.WinchM2.TopSensorPositionM;
+GVL_PERSISTENT.HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
+GVL_PERSISTENT.HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
 // 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
 // ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
 // propagation à sens unique séparée par treuil ici.
-GVL_PERSISTENT.WinchM1RampAccelRate_Pct   := GVL_IHM.WinchM1.RampAccelRate;
-GVL_PERSISTENT.WinchM1RampDecelNormal_Pct := GVL_IHM.WinchM1.RampDecelNormalRate;
-GVL_PERSISTENT.WinchM1RampDecelFast_Pct   := GVL_IHM.WinchM1.RampDecelFastRate;
-GVL_PERSISTENT.WinchM2RampAccelRate_Pct   := GVL_IHM.WinchM2.RampAccelRate;
-GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.WinchM2.RampDecelNormalRate;
-GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.WinchM2.RampDecelFastRate;
+GVL_PERSISTENT.WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.RampAccelRate;
+GVL_PERSISTENT.WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.RampDecelNormalRate;
+GVL_PERSISTENT.WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.RampDecelFastRate;
+GVL_PERSISTENT.WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBucket.RampAccelRate;
+GVL_PERSISTENT.WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBucket.RampDecelNormalRate;
+GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBucket.RampDecelFastRate;
 // ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit : cette ligne
 // écrase GVL_PERSISTENT.WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
 // Si on change UNIQUEMENT la valeur par défaut dans GVL_PERSISTENT.st (ou ST_SyncHMI.st), ça ne
@@ -171,184 +171,184 @@ GVL_PERSISTENT.WinchM2RampDecelFast_Pct   := GVL_IHM.WinchM2.RampDecelFastRate;
 // que si le RETAIN IHM est à 0.0 (premier démarrage) — sinon l'ancienne valeur IHM re-propage ici
 // et écrase silencieusement toute nouvelle valeur par défaut au scan suivant.
 GVL_PERSISTENT.WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
-GVL_PERSISTENT.GrappinConfig              := GVL_IHM.Grappin.Config;
+GVL_PERSISTENT.BucketConfig              := GVL_IHM.Bucket.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : MaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescentM ci-dessous.
-IF GVL_IHM.WinchM1.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
-    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.WinchM1.MaxStepDescente;
-ELSIF GVL_IHM.WinchM2.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
-    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.WinchM2.MaxStepDescente;
+IF GVL_IHM.M1TreuilRetenue.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
+    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.M1TreuilRetenue.MaxStepDescente;
+ELSIF GVL_IHM.M2TreuilBucket.MaxStepDescente <> GVL_PERSISTENT.WinchMaxStepDescente THEN
+    GVL_PERSISTENT.WinchMaxStepDescente := GVL_IHM.M2TreuilBucket.MaxStepDescente;
 END_IF;
-GVL_IHM.WinchM1.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
-GVL_IHM.WinchM2.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
+GVL_IHM.M1TreuilRetenue.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
+GVL_IHM.M2TreuilBucket.MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente;
 
-IF GVL_IHM.WinchM1.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM1_M THEN
-    GVL_PERSISTENT.CableLimitDescentM1_M := GVL_IHM.WinchM1.CableLimitDescentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM1_M THEN
+    GVL_PERSISTENT.CableLimitDescentM1_M := GVL_IHM.M1TreuilRetenue.CableLimitDescentM;
 END_IF;
-GVL_IHM.WinchM1.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM1_M;
+GVL_IHM.M1TreuilRetenue.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM1_M;
 
-IF GVL_IHM.WinchM2.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM2_M THEN
-    GVL_PERSISTENT.CableLimitDescentM2_M := GVL_IHM.WinchM2.CableLimitDescentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM2_M THEN
+    GVL_PERSISTENT.CableLimitDescentM2_M := GVL_IHM.M2TreuilBucket.CableLimitDescentM;
 END_IF;
-GVL_IHM.WinchM2.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM2_M;
+GVL_IHM.M2TreuilBucket.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM2_M;
 
 // 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescentM ci-dessus.
-IF GVL_IHM.WinchM1.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM1_M THEN
-    GVL_PERSISTENT.CableLimitAscentM1_M := GVL_IHM.WinchM1.CableLimitAscentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM1_M THEN
+    GVL_PERSISTENT.CableLimitAscentM1_M := GVL_IHM.M1TreuilRetenue.CableLimitAscentM;
 END_IF;
-GVL_IHM.WinchM1.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM1_M;
+GVL_IHM.M1TreuilRetenue.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM1_M;
 
-IF GVL_IHM.WinchM2.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM2_M THEN
-    GVL_PERSISTENT.CableLimitAscentM2_M := GVL_IHM.WinchM2.CableLimitAscentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM2_M THEN
+    GVL_PERSISTENT.CableLimitAscentM2_M := GVL_IHM.M2TreuilBucket.CableLimitAscentM;
 END_IF;
-GVL_IHM.WinchM2.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM2_M;
+GVL_IHM.M2TreuilBucket.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM2_M;
 
-IF GVL_IHM.WinchM1.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
-    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM1.SlowdownDistanceM;
-ELSIF GVL_IHM.WinchM2.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
-    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM2.SlowdownDistanceM;
+IF GVL_IHM.M1TreuilRetenue.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
+    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistanceM;
+ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
+    GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistanceM;
 END_IF;
-GVL_IHM.WinchM1.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
-GVL_IHM.WinchM2.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
+GVL_IHM.M1TreuilRetenue.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
+GVL_IHM.M2TreuilBucket.SlowdownDistanceM := GVL_PERSISTENT.WinchSlowdownDistance_M;
 
-IF GVL_IHM.WinchM1.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
-    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.WinchM1.SlowSpeedPct;
-ELSIF GVL_IHM.WinchM2.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
-    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.WinchM2.SlowSpeedPct;
+IF GVL_IHM.M1TreuilRetenue.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
+    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.M1TreuilRetenue.SlowSpeedPct;
+ELSIF GVL_IHM.M2TreuilBucket.SlowSpeedPct <> GVL_PERSISTENT.WinchSlowSpeedPct THEN
+    GVL_PERSISTENT.WinchSlowSpeedPct := GVL_IHM.M2TreuilBucket.SlowSpeedPct;
 END_IF;
-GVL_IHM.WinchM1.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
-GVL_IHM.WinchM2.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
+GVL_IHM.M1TreuilRetenue.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
+GVL_IHM.M2TreuilBucket.SlowSpeedPct := GVL_PERSISTENT.WinchSlowSpeedPct;
 
-GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.Common.LimitLegalDepthMinAllowed;
-GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.Common.LimitLegalEnabled;
+GVL_PERSISTENT.LimitLegalDepthMinAllowed := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+GVL_PERSISTENT.LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
-GVL_IHM.Common.LimitLegalReached         := GVL_PERSISTENT.LimitLegalEnabled
+GVL_IHM.Commun.LimitLegalReached         := GVL_PERSISTENT.LimitLegalEnabled
                                             AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed))
                                                  OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed)));
 
-GVL_IHM.Common.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
+GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir AF_Partie13) ──────
-GVL_IHM.WinchM1.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
-GVL_IHM.WinchM2.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal;
-GVL_IHM.ChariotM3.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
-GVL_IHM.WinchM1.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
-GVL_IHM.WinchM2.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
-GVL_IHM.WinchM1.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
-GVL_IHM.WinchM2.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
+GVL_IHM.M1TreuilRetenue.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
+GVL_IHM.M2TreuilBucket.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal;
+GVL_IHM.TranslationM3.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
+GVL_IHM.M1TreuilRetenue.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
+GVL_IHM.M2TreuilBucket.BypassSlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal;
+GVL_IHM.M1TreuilRetenue.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
+GVL_IHM.M2TreuilBucket.BypassTopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal;
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
-GVL_IHM.WinchM1.PositionM                := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
-GVL_IHM.WinchM1.SpeedRefPct              := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
-GVL_IHM.WinchM1.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
-GVL_IHM.WinchM1.FBState                  := PRG_06_WinchControl.instWinchM1.State;
-GVL_IHM.WinchM1.Ready                    := PRG_06_WinchControl.instWinchM1.Ready;
-GVL_IHM.WinchM1.Busy                     := PRG_06_WinchControl.instWinchM1.Busy;
-GVL_IHM.WinchM1.Done                     := PRG_06_WinchControl.instWinchM1.Done;
-GVL_IHM.WinchM1.Error                    := PRG_06_WinchControl.instWinchM1.Error;
-GVL_IHM.WinchM1.ErrorId                  := PRG_06_WinchControl.instWinchM1.ErrorId;
-GVL_IHM.WinchM1.RelayFwd                 := PRG_06_WinchControl.instWinchM1.RelayFwd;
-GVL_IHM.WinchM1.RelayRev                 := PRG_06_WinchControl.instWinchM1.RelayRev;
-GVL_IHM.WinchM1.Contactor1               := PRG_06_WinchControl.instWinchM1.Contactor1;
-GVL_IHM.WinchM1.Contactor2               := PRG_06_WinchControl.instWinchM1.Contactor2;
-GVL_IHM.WinchM1.Contactor3               := PRG_06_WinchControl.instWinchM1.Contactor3;
-GVL_IHM.WinchM1.Contactor4               := PRG_06_WinchControl.instWinchM1.Contactor4;
-GVL_IHM.WinchM1.BrakeCmd                 := PRG_06_WinchControl.instWinchM1.BrakeCmd;
-GVL_IHM.WinchM1.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
-GVL_IHM.WinchM1.SafeStopActive           := PRG_03_Safety.instSafetyWinchM1.SafeStop;
-GVL_IHM.WinchM1.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM1_Active;
-GVL_IHM.WinchM1.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
-GVL_IHM.WinchM1.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
-GVL_IHM.WinchM1.ThermalFault             := NOT PRG_00_Inputs.M1ThermalFeedback;
-GVL_IHM.WinchM1.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
-GVL_IHM.WinchM1.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
-GVL_IHM.WinchM1.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM1Reached; // 🆕 REX 2026-07-15 (8)
-GVL_IHM.WinchM1.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
-GVL_IHM.WinchM1.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM1.BrakeContactorCheck;
+GVL_IHM.M1TreuilRetenue.PositionM                := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.M1TreuilRetenue.SpeedRefPct              := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
+GVL_IHM.M1TreuilRetenue.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
+GVL_IHM.M1TreuilRetenue.FBState                  := PRG_06_WinchControl.instWinchM1.State;
+GVL_IHM.M1TreuilRetenue.Ready                    := PRG_06_WinchControl.instWinchM1.Ready;
+GVL_IHM.M1TreuilRetenue.Busy                     := PRG_06_WinchControl.instWinchM1.Busy;
+GVL_IHM.M1TreuilRetenue.Done                     := PRG_06_WinchControl.instWinchM1.Done;
+GVL_IHM.M1TreuilRetenue.Error                    := PRG_06_WinchControl.instWinchM1.Error;
+GVL_IHM.M1TreuilRetenue.ErrorId                  := PRG_06_WinchControl.instWinchM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.RelayFwd                 := PRG_06_WinchControl.instWinchM1.RelayFwd;
+GVL_IHM.M1TreuilRetenue.RelayRev                 := PRG_06_WinchControl.instWinchM1.RelayRev;
+GVL_IHM.M1TreuilRetenue.Contactor1               := PRG_06_WinchControl.instWinchM1.Contactor1;
+GVL_IHM.M1TreuilRetenue.Contactor2               := PRG_06_WinchControl.instWinchM1.Contactor2;
+GVL_IHM.M1TreuilRetenue.Contactor3               := PRG_06_WinchControl.instWinchM1.Contactor3;
+GVL_IHM.M1TreuilRetenue.Contactor4               := PRG_06_WinchControl.instWinchM1.Contactor4;
+GVL_IHM.M1TreuilRetenue.BrakeCmd                 := PRG_06_WinchControl.instWinchM1.BrakeCmd;
+GVL_IHM.M1TreuilRetenue.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
+GVL_IHM.M1TreuilRetenue.SafeStopActive           := PRG_03_Safety.instSafetyWinchM1.SafeStop;
+GVL_IHM.M1TreuilRetenue.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM1_Active;
+GVL_IHM.M1TreuilRetenue.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+GVL_IHM.M1TreuilRetenue.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
+GVL_IHM.M1TreuilRetenue.ThermalFault             := NOT PRG_00_Inputs.M1ThermalFeedback;
+GVL_IHM.M1TreuilRetenue.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.M1TreuilRetenue.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
+GVL_IHM.M1TreuilRetenue.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM1Reached; // 🆕 REX 2026-07-15 (8)
+GVL_IHM.M1TreuilRetenue.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
+GVL_IHM.M1TreuilRetenue.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM1.BrakeContactorCheck;
 
-GVL_IHM.WinchM1.Encoder.RawPos           := PRG_02_Encoders.instEncoderAbsM1.RawPos;
-GVL_IHM.WinchM1.Encoder.Alarms           := PRG_02_Encoders.instEncoderAbsM1.AlarmsIn;
-GVL_IHM.WinchM1.Encoder.Warnings         := PRG_02_Encoders.instEncoderAbsM1.WarningsIn;
-GVL_IHM.WinchM1.Encoder.SlaveOperational := PRG_02_Encoders.instEncoderAbsM1.SlaveOperational;
-GVL_IHM.WinchM1.Encoder.PresetTriggerCmd := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd;
-GVL_IHM.WinchM1.Encoder.PresetValueOut   := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut;
-GVL_IHM.WinchM1.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM1.Error;
-GVL_IHM.WinchM1.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM1.ErrorId;
-GVL_IHM.WinchM1.SafetyError              := PRG_03_Safety.instSafetyWinchM1.Error;
-GVL_IHM.WinchM1.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM1.ErrorId;
-GVL_IHM.WinchM1.MecaADriftM              := PRG_03_Safety.instSafetyWinchM1.MecaADriftM;      // 🆕 REX 2026-07-08
-GVL_IHM.WinchM1.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM1.MecaCDriftM;      // 🆕 REX 2026-07-08
-GVL_IHM.WinchM1.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM1.MecaBElapsedTime; // 🆕 REX 2026-07-08
-GVL_IHM.WinchM1.InhibitActive            := PRG_04_Modes.instModes.InhibitM1; // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.Encoder.RawPos           := PRG_02_Encoders.instEncoderAbsM1.RawPos;
+GVL_IHM.M1TreuilRetenue.Encoder.Alarms           := PRG_02_Encoders.instEncoderAbsM1.AlarmsIn;
+GVL_IHM.M1TreuilRetenue.Encoder.Warnings         := PRG_02_Encoders.instEncoderAbsM1.WarningsIn;
+GVL_IHM.M1TreuilRetenue.Encoder.SlaveOperational := PRG_02_Encoders.instEncoderAbsM1.SlaveOperational;
+GVL_IHM.M1TreuilRetenue.Encoder.PresetTriggerCmd := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd;
+GVL_IHM.M1TreuilRetenue.Encoder.PresetValueOut   := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut;
+GVL_IHM.M1TreuilRetenue.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM1.Error;
+GVL_IHM.M1TreuilRetenue.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.SafetyError              := PRG_03_Safety.instSafetyWinchM1.Error;
+GVL_IHM.M1TreuilRetenue.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.MecaADriftM              := PRG_03_Safety.instSafetyWinchM1.MecaADriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM1.MecaCDriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM1.MecaBElapsedTime; // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.InhibitActive            := PRG_04_Modes.instModes.InhibitM1; // 🆕 REX 2026-07-08
 
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
-GVL_IHM.WinchM2.PositionM                := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.WinchM2.SpeedRefPct              := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
-GVL_IHM.WinchM2.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
-GVL_IHM.WinchM2.FBState                  := PRG_06_WinchControl.instWinchM2.State;
-GVL_IHM.WinchM2.Ready                    := PRG_06_WinchControl.instWinchM2.Ready;
-GVL_IHM.WinchM2.Busy                     := PRG_06_WinchControl.instWinchM2.Busy;
-GVL_IHM.WinchM2.Done                     := PRG_06_WinchControl.instWinchM2.Done;
-GVL_IHM.WinchM2.Error                    := PRG_06_WinchControl.instWinchM2.Error;
-GVL_IHM.WinchM2.ErrorId                  := PRG_06_WinchControl.instWinchM2.ErrorId;
-GVL_IHM.WinchM2.RelayFwd                 := PRG_06_WinchControl.instWinchM2.RelayFwd;
-GVL_IHM.WinchM2.RelayRev                 := PRG_06_WinchControl.instWinchM2.RelayRev;
-GVL_IHM.WinchM2.Contactor1               := PRG_06_WinchControl.instWinchM2.Contactor1;
-GVL_IHM.WinchM2.Contactor2               := PRG_06_WinchControl.instWinchM2.Contactor2;
-GVL_IHM.WinchM2.Contactor3               := PRG_06_WinchControl.instWinchM2.Contactor3;
-GVL_IHM.WinchM2.Contactor4               := PRG_06_WinchControl.instWinchM2.Contactor4;
-GVL_IHM.WinchM2.BrakeCmd                 := PRG_06_WinchControl.instWinchM2.BrakeCmd;
-GVL_IHM.WinchM2.Homed                    := PRG_02_Encoders.instHomingM2.Homed;
-GVL_IHM.WinchM2.SafeStopActive           := PRG_03_Safety.instSafetyWinchM2.SafeStop;
-GVL_IHM.WinchM2.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM2_Active;
-GVL_IHM.WinchM2.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
-GVL_IHM.WinchM2.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
-GVL_IHM.WinchM2.ThermalFault             := NOT PRG_00_Inputs.M2ThermalFeedback;
-GVL_IHM.WinchM2.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
-GVL_IHM.WinchM2.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
-GVL_IHM.WinchM2.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM2Reached; // 🆕 REX 2026-07-15 (8)
-GVL_IHM.WinchM2.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07
-GVL_IHM.WinchM2.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM2.BrakeContactorCheck;
+GVL_IHM.M2TreuilBucket.PositionM                := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.M2TreuilBucket.SpeedRefPct              := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
+GVL_IHM.M2TreuilBucket.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
+GVL_IHM.M2TreuilBucket.FBState                  := PRG_06_WinchControl.instWinchM2.State;
+GVL_IHM.M2TreuilBucket.Ready                    := PRG_06_WinchControl.instWinchM2.Ready;
+GVL_IHM.M2TreuilBucket.Busy                     := PRG_06_WinchControl.instWinchM2.Busy;
+GVL_IHM.M2TreuilBucket.Done                     := PRG_06_WinchControl.instWinchM2.Done;
+GVL_IHM.M2TreuilBucket.Error                    := PRG_06_WinchControl.instWinchM2.Error;
+GVL_IHM.M2TreuilBucket.ErrorId                  := PRG_06_WinchControl.instWinchM2.ErrorId;
+GVL_IHM.M2TreuilBucket.RelayFwd                 := PRG_06_WinchControl.instWinchM2.RelayFwd;
+GVL_IHM.M2TreuilBucket.RelayRev                 := PRG_06_WinchControl.instWinchM2.RelayRev;
+GVL_IHM.M2TreuilBucket.Contactor1               := PRG_06_WinchControl.instWinchM2.Contactor1;
+GVL_IHM.M2TreuilBucket.Contactor2               := PRG_06_WinchControl.instWinchM2.Contactor2;
+GVL_IHM.M2TreuilBucket.Contactor3               := PRG_06_WinchControl.instWinchM2.Contactor3;
+GVL_IHM.M2TreuilBucket.Contactor4               := PRG_06_WinchControl.instWinchM2.Contactor4;
+GVL_IHM.M2TreuilBucket.BrakeCmd                 := PRG_06_WinchControl.instWinchM2.BrakeCmd;
+GVL_IHM.M2TreuilBucket.Homed                    := PRG_02_Encoders.instHomingM2.Homed;
+GVL_IHM.M2TreuilBucket.SafeStopActive           := PRG_03_Safety.instSafetyWinchM2.SafeStop;
+GVL_IHM.M2TreuilBucket.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM2_Active;
+GVL_IHM.M2TreuilBucket.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+GVL_IHM.M2TreuilBucket.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
+GVL_IHM.M2TreuilBucket.ThermalFault             := NOT PRG_00_Inputs.M2ThermalFeedback;
+GVL_IHM.M2TreuilBucket.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.M2TreuilBucket.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
+GVL_IHM.M2TreuilBucket.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM2Reached; // 🆕 REX 2026-07-15 (8)
+GVL_IHM.M2TreuilBucket.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07
+GVL_IHM.M2TreuilBucket.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM2.BrakeContactorCheck;
 
-GVL_IHM.WinchM2.Encoder.RawPos           := PRG_02_Encoders.instEncoderAbsM2.RawPos;
-GVL_IHM.WinchM2.Encoder.Alarms           := PRG_02_Encoders.instEncoderAbsM2.AlarmsIn;
-GVL_IHM.WinchM2.Encoder.Warnings         := PRG_02_Encoders.instEncoderAbsM2.WarningsIn;
-GVL_IHM.WinchM2.Encoder.SlaveOperational := PRG_02_Encoders.instEncoderAbsM2.SlaveOperational;
-GVL_IHM.WinchM2.Encoder.PresetTriggerCmd := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd;
-GVL_IHM.WinchM2.Encoder.PresetValueOut   := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut;
-GVL_IHM.WinchM2.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM2.Error;
-GVL_IHM.WinchM2.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM2.ErrorId;
-GVL_IHM.WinchM2.SafetyError              := PRG_03_Safety.instSafetyWinchM2.Error;
-GVL_IHM.WinchM2.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM2.ErrorId;
-GVL_IHM.WinchM2.MecaADriftM              := PRG_03_Safety.instSafetyWinchM2.MecaADriftM;      // 🆕 REX 2026-07-08
-GVL_IHM.WinchM2.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM2.MecaCDriftM;      // 🆕 REX 2026-07-08
-GVL_IHM.WinchM2.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM2.MecaBElapsedTime; // 🆕 REX 2026-07-08
-GVL_IHM.WinchM2.InhibitActive            := PRG_04_Modes.instModes.InhibitM2; // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBucket.Encoder.RawPos           := PRG_02_Encoders.instEncoderAbsM2.RawPos;
+GVL_IHM.M2TreuilBucket.Encoder.Alarms           := PRG_02_Encoders.instEncoderAbsM2.AlarmsIn;
+GVL_IHM.M2TreuilBucket.Encoder.Warnings         := PRG_02_Encoders.instEncoderAbsM2.WarningsIn;
+GVL_IHM.M2TreuilBucket.Encoder.SlaveOperational := PRG_02_Encoders.instEncoderAbsM2.SlaveOperational;
+GVL_IHM.M2TreuilBucket.Encoder.PresetTriggerCmd := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd;
+GVL_IHM.M2TreuilBucket.Encoder.PresetValueOut   := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut;
+GVL_IHM.M2TreuilBucket.Encoder.Error            := PRG_02_Encoders.instEncoderAbsM2.Error;
+GVL_IHM.M2TreuilBucket.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM2.ErrorId;
+GVL_IHM.M2TreuilBucket.SafetyError              := PRG_03_Safety.instSafetyWinchM2.Error;
+GVL_IHM.M2TreuilBucket.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM2.ErrorId;
+GVL_IHM.M2TreuilBucket.MecaADriftM              := PRG_03_Safety.instSafetyWinchM2.MecaADriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBucket.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM2.MecaCDriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBucket.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM2.MecaBElapsedTime; // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBucket.InhibitActive            := PRG_04_Modes.instModes.InhibitM2; // 🆕 REX 2026-07-08
 
 
-// ── 7. MAPPING ÉTATS GRAPPIN → IHM ───────────────────────────────────────
-GVL_IHM.Grappin.FBState          := PRG_06_WinchControl.instGrappin.State;
-GVL_IHM.Grappin.ActiveOffsetM    := PRG_06_WinchControl.instGrappin.ActiveOffsetM;
-GVL_IHM.Grappin.M2StartStop      := PRG_06_WinchControl.instGrappin.M2_StartStop;
-GVL_IHM.Grappin.M2Direction      := PRG_06_WinchControl.instGrappin.M2_Direction;
-GVL_IHM.Grappin.M2ForceSlowSpeed := PRG_06_WinchControl.instGrappin.M2_ForceSlowSpeed;
-GVL_IHM.Grappin.Ready            := PRG_06_WinchControl.instGrappin.Ready;
-GVL_IHM.Grappin.Busy             := PRG_06_WinchControl.instGrappin.Busy;
-GVL_IHM.Grappin.Done             := PRG_06_WinchControl.instGrappin.Done;
-GVL_IHM.Grappin.Error            := PRG_06_WinchControl.instGrappin.Error;
-GVL_IHM.Grappin.ErrorId          := PRG_06_WinchControl.instGrappin.ErrorId;
-GVL_IHM.Grappin.RemainingTravelM := PRG_06_WinchControl.instGrappin.RemainingTravelM; // 🔧 REX 2026-07-07
-GVL_IHM.Grappin.CloseReq         := PRG_06_WinchControl.instGrappin.CloseReq; // 🆕 REX 2026-07-08
-GVL_IHM.Grappin.OpenReq          := PRG_06_WinchControl.instGrappin.OpenReq;  // 🆕 REX 2026-07-08
+// ── 7. MAPPING ÉTATS BENNE → IHM ───────────────────────────────────────
+GVL_IHM.Bucket.FBState          := PRG_06_WinchControl.instBucket.State;
+GVL_IHM.Bucket.ActiveOffsetM    := PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.Bucket.M2StartStop      := PRG_06_WinchControl.instBucket.M2_StartStop;
+GVL_IHM.Bucket.M2Direction      := PRG_06_WinchControl.instBucket.M2_Direction;
+GVL_IHM.Bucket.M2ForceSlowSpeed := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
+GVL_IHM.Bucket.Ready            := PRG_06_WinchControl.instBucket.Ready;
+GVL_IHM.Bucket.Busy             := PRG_06_WinchControl.instBucket.Busy;
+GVL_IHM.Bucket.Done             := PRG_06_WinchControl.instBucket.Done;
+GVL_IHM.Bucket.Error            := PRG_06_WinchControl.instBucket.Error;
+GVL_IHM.Bucket.ErrorId          := PRG_06_WinchControl.instBucket.ErrorId;
+GVL_IHM.Bucket.RemainingTravelM := PRG_06_WinchControl.instBucket.RemainingTravelM; // 🔧 REX 2026-07-07
+GVL_IHM.Bucket.CloseReq         := PRG_06_WinchControl.instBucket.CloseReq; // 🆕 REX 2026-07-08
+GVL_IHM.Bucket.OpenReq          := PRG_06_WinchControl.instBucket.OpenReq;  // 🆕 REX 2026-07-08
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
-// doit être égale à GVL_IHM.WinchM1.PositionM quand tout est nominal (voir bandeau ST_GrappinHMI).
-GVL_IHM.Grappin.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM;
-GVL_IHM.Grappin.State            := GVL_PERSISTENT.GrappinState;
+// doit être égale à GVL_IHM.M1TreuilRetenue.PositionM quand tout est nominal (voir bandeau ST_BucketHMI).
+GVL_IHM.Bucket.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.Bucket.State            := GVL_PERSISTENT.BucketState;
 
 
 // ── 8. MAPPING ÉTATS SYNCHRONISATION → IHM ─────────────────────────────────
@@ -361,23 +361,23 @@ GVL_IHM.Sync.ErrorId    := PRG_06_WinchControl.instWinchSync.ErrorId;
 GVL_IHM.Sync.State      := PRG_06_WinchControl.instWinchSync.State;
 
 
-// ── 9. MAPPING ÉTATS CHARIOT M3 → IHM ────────────────────────────────────
-GVL_IHM.ChariotM3.FBState              := PRG_07_ChariotControl.instChariotM3.State;
-GVL_IHM.ChariotM3.Ready                := PRG_07_ChariotControl.instChariotM3.Ready;
-GVL_IHM.ChariotM3.Busy                 := PRG_07_ChariotControl.instChariotM3.Busy;
-GVL_IHM.ChariotM3.Done                 := PRG_07_ChariotControl.instChariotM3.Done;
-GVL_IHM.ChariotM3.Error                := PRG_07_ChariotControl.instChariotM3.Error;
-GVL_IHM.ChariotM3.ErrorId              := PRG_07_ChariotControl.instChariotM3.ErrorId;
-GVL_IHM.ChariotM3.BrakeCmd             := PRG_07_ChariotControl.instChariotM3.BrakeCmd;
-GVL_IHM.ChariotM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
-GVL_IHM.ChariotM3.PositionSensorTarget := PRG_07_ChariotControl.M3_PositionSensorTarget;
+// ── 9. MAPPING ÉTATS TRANSLATION M3 → IHM ────────────────────────────────────
+GVL_IHM.TranslationM3.FBState              := PRG_07_TranslationControl.instTranslationM3.State;
+GVL_IHM.TranslationM3.Ready                := PRG_07_TranslationControl.instTranslationM3.Ready;
+GVL_IHM.TranslationM3.Busy                 := PRG_07_TranslationControl.instTranslationM3.Busy;
+GVL_IHM.TranslationM3.Done                 := PRG_07_TranslationControl.instTranslationM3.Done;
+GVL_IHM.TranslationM3.Error                := PRG_07_TranslationControl.instTranslationM3.Error;
+GVL_IHM.TranslationM3.ErrorId              := PRG_07_TranslationControl.instTranslationM3.ErrorId;
+GVL_IHM.TranslationM3.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
+GVL_IHM.TranslationM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
+GVL_IHM.TranslationM3.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
 // 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
-GVL_IHM.ChariotM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.ChariotM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.TranslationM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
-GVL_IHM.ChariotM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
-GVL_IHM.ChariotM3.SafetyError          := PRG_03_Safety.instSafetyChariotM3.Error;
-GVL_IHM.ChariotM3.SafetyErrorId        := PRG_03_Safety.instSafetyChariotM3.ErrorId;
+GVL_IHM.TranslationM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
+GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
@@ -386,8 +386,8 @@ GVL_IHM.JoystickJOY1.RawY       := JoyYRaw_ANA2;
 GVL_IHM.JoystickJOY1.RawButton  := JoyBtnRaw;
 GVL_IHM.JoystickJOY1.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
 GVL_IHM.JoystickJOY1.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.JoystickJOY1.Online     := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online;
-GVL_IHM.JoystickJOY1.Operational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational;
+GVL_IHM.JoystickJOY1.Online     := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JoystickJOY1.Operational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
 GVL_IHM.JoystickJOY1.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
 GVL_IHM.JoystickJOY1.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
@@ -398,14 +398,14 @@ GVL_IHM.Modes.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
 
 
 // ── 12. MAPPING DIAGNOSTICS BUS → IHM ────────────────────────────────────
-GVL_IHM.Network.BusCanOpen  := PRG_01_Diagnostics.instDiagCanOpen.busCanOpen;
-GVL_IHM.Network.Joystick    := PRG_01_Diagnostics.instDiagCanOpen.Joystick;
+GVL_IHM.Network.BusCanOpen  := PRG_01_Diagnostics.instDiagCanOpen.DeviceCanOpenMaster;
+GVL_IHM.Network.Joystick    := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick;
 GVL_IHM.Network.CanError    := PRG_01_Diagnostics.instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := PRG_01_Diagnostics.instDiagCanOpen.ErrorId;
 
-GVL_IHM.Network.BusEthercat := PRG_01_Diagnostics.instDiagEthercat.BusEthercat;
-GVL_IHM.Network.EncoderM1   := PRG_01_Diagnostics.instDiagEthercat.EncoderM1;
-GVL_IHM.Network.EncoderM2   := PRG_01_Diagnostics.instDiagEthercat.EncoderM2;
-GVL_IHM.Network.VariateurM3 := PRG_01_Diagnostics.instDiagEthercat.Variateur;
+GVL_IHM.Network.BusEthercat := PRG_01_Diagnostics.instDiagEthercat.DeviceEthercatMaster;
+GVL_IHM.Network.EncoderM1   := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1;
+GVL_IHM.Network.EncoderM2   := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2;
+GVL_IHM.Network.VariateurM3 := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur;
 GVL_IHM.Network.EcatError   := PRG_01_Diagnostics.instDiagEthercat.Error;
 GVL_IHM.Network.EcatErrorId := PRG_01_Diagnostics.instDiagEthercat.ErrorId;

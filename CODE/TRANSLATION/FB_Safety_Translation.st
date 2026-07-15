@@ -1,20 +1,20 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ FB_Safety_Chariot — Bloc Safety pour le Chariot M3 (EtherCAT)
+   🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.6.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
    ═══════════════════════════════════════════════════════════════ *)
 
-FUNCTION_BLOCK PUBLIC FB_Safety_Chariot
+FUNCTION_BLOCK PUBLIC FB_Safety_Translation
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
     EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK
     Mode                : E_Mode;      // Mode courant
-    JoystickOnline      : BOOL;        // instDiagCanOpen.Joystick.Online
-    JoystickOperational : BOOL;        // instDiagCanOpen.Joystick.Operational
+    JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
+    JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
     PhaseRotationOk     : BOOL;        // PRG_00_Inputs.PhaseRotationOk (TRUE = OK)
     BrakeThermalFeedback: BOOL;        // Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)
 
@@ -97,7 +97,7 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
-// Si le chariot est commandé à l'arrêt (Direction = 0 et frein appliqué) mais que le variateur 
+// Si le translation est commandé à l'arrêt (Direction = 0 et frein appliqué) mais que le variateur 
 // tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) > 3s
 IF (Direction = 0) AND NOT BrakeCmd THEN
     UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
@@ -114,7 +114,7 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
-// Si le chariot est commandé à l'arrêt, mais qu'une fréquence réelle est mesurée (> 0.5 Hz) pendant > 1s
+// Si le translation est commandé à l'arrêt, mais qu'une fréquence réelle est mesurée (> 0.5 Hz) pendant > 1s
 IF (Direction = 0) AND NOT BrakeCmd THEN
     UncommandedActiveA := ABS(DriveActualFreqHz) > 0.5;
 ELSE

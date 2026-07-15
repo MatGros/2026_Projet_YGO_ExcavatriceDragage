@@ -73,7 +73,8 @@
       "Bash(python push_server.py)",
       "Bash(echo \"EXIT_CODE_2e_INSTANCE=$?\")",
       "Bash(tasklist //FI \"IMAGENAME eq python.exe\")",
-      "Bash(grep -v \"\\\\.sample$\")"
+      "Bash(grep -v \"\\\\.sample$\")",
+      "Bash(xargs -0 sed -i -e s/FB_Benne/FB_Bucket/g -e s/ST_BenneConfig/ST_BucketConfig/g -e s/ST_BenneHMI/ST_BucketHMI/g -e s/ST_BenneState/ST_BucketState/g -e s/instBenne/instBucket/g -e s/BenneConfig/BucketConfig/g -e s/BenneState/BucketState/g -e s/CmdBenne_Open/CmdBucket_Open/g -e s/CmdBenne_Close/CmdBucket_Close/g -e s/CoupledFwdBenneOk/CoupledFwdBucketOk/g -e s/CoupledRevBenneOk/CoupledRevBucketOk/g -e s/FdcBenneCloseActive/FdcBucketCloseActive/g -e s/FdcBenneCloseEnable/FdcBucketCloseEnable/g -e s/FdcBenneOpenActive/FdcBucketOpenActive/g -e s/FdcBenneOpenEnable/FdcBucketOpenEnable/g -e s/FdcBenneClose/FdcBucketClose/g -e s/FdcBenneOpen/FdcBucketOpen/g -e s/FdcBenne/FdcBucket/g -e s/OverrideBenne/OverrideBucket/g -e s/M2TreuilBenne/M2TreuilBucket/g -e 's/GVL_IHM\\\\.Benne/GVL_IHM.Bucket/g' '{}' +)"
     ],
     "ask": [
       "Bash(git reset *)",

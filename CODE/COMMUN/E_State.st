@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🚦 E_State — Phase opérationnelle d'un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §2
+   📄 Doc métier : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §2
    ⚠️ Un seul état à la fois. Error / SafeStop / perte Enable sont
       ORTHOGONAUX à la phase (voir ErrorId, ne polluent pas State).
    🧩 Fondation manquante requise par le contrat FB (Partie3 §1).

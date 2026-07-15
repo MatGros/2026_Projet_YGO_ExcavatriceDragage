@@ -3,8 +3,8 @@
 > Contrat unique que **tout** `FB_*` **métier** respecte (voir §1bis pour les catégories).
 > Interface + machine d'état + gestion défauts/reset/AU.
 > Pas de code interne — règles et structure.
-> **v1.3** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Grappin,
-> Translation→Chariot dans les exemples (préfixe I/O physique M3 inchangé).
+> **v1.3** — Renommage terminologique (demande utilisateur, 2026-07-02) : Bucket→Benne,
+> Translation→Translation dans les exemples (préfixe I/O physique M3 inchangé).
 > **v1.2** — Suite audit documentaire : `CoupeEnable` retiré (n'a jamais existé comme variable) ;
 > modèle d'arrêt à 3 niveaux `Enable` > `SafeStop` > `StartStop` (§1, §1bis, §9) ; `SafetyOk`
 > renommé **`EmergencyStopOk`** ; `SafeStop` = **1 par bloc safety métier** (pas de signal global).
@@ -89,7 +89,7 @@ Avant d'écrire la moindre logique « brique » (scaling, rampe, filtre, hystér
 
 Le contrat ci-dessus (§1) est la base **commune**. Deux extensions/exceptions existent :
 
-### 🚗 FB de mouvement (`FB_Winch`, `FB_Chariot`)
+### 🚗 FB de mouvement (`FB_Winch`, `FB_Translation`)
 En plus de l'interface standard, ils portent **deux entrées supplémentaires** :
 
 | Nom | Type | Rôle |
@@ -106,7 +106,7 @@ En plus de l'interface standard, ils portent **deux entrées supplémentaires** 
 Ces briques bas niveau **n'ont pas** l'interface standard complète : **pas de `StartStop`**, pas
 nécessairement de `Mode`/`State`/`StateAtError`. Elles ont **leurs propres types de données**
 dédiés à leur rôle (voir Partie 6). Le contrat « tout FB » (§ Règles socle) s'entend donc pour
-les **FB métier** (Joystick, Winch, Chariot, Grappin, Modes, Cycle, Safety…) — pas pour ces
+les **FB métier** (Joystick, Winch, Translation, Benne, Modes, Cycle, Safety…) — pas pour ces
 briques de conditionnement/diagnostic.
 
 ---
@@ -123,7 +123,7 @@ briques de conditionnement/diagnostic.
 | 2 | `READY` | Prêt, attend ordre |
 | 3 | `BUSY` | Action en cours |
 | 4 | `DONE` | Action terminée |
-| 5 | `STOPPING` | Décél rampe avant arrêt *(`StartStop=FALSE` ou `SafeStop=TRUE` — Winch/Chariot)* |
+| 5 | `STOPPING` | Décél rampe avant arrêt *(`StartStop=FALSE` ou `SafeStop=TRUE` — Winch/Translation)* |
 
 ---
 
@@ -173,7 +173,7 @@ Pour chaque bit de ErrorId :
 
 📌 Acquittement IHM = **bouton général** → tente le reset de tous les FB.
 📌 Tant que `StateAtError` figé → on peut **retenter** des reset jusqu'à acquittement effectif.
-📌 Appliqué à **tous les FB métier** (cohérence maintenance), critique sur Winch / Brake / Chariot.
+📌 Appliqué à **tous les FB métier** (cohérence maintenance), critique sur Winch / Brake / Translation.
 
 ---
 
@@ -221,7 +221,7 @@ Règle pour chaque `FB_Safety_<Metier>` (détail fonctionnel en Partie 2) :
 - 🔍 Le bloc safety compare en continu **commande vs retour** (`ST_ContactorCheck`).
 - 🧨 Si l'API commande l'ouverture mais le contacteur **reste collé** (retour ≠ commande, persistant) ⇒ lever la **sortie de coupure puissance** (`PowerCutOff`) qui ouvre le **contacteur général amont** et coupe **électriquement** la puissance.
 - 🧭 Cette coupure est **indépendante** de `SafeStop` logiciel : c'est le dernier rempart matériel, **seul mécanisme brutal** avec l'AU physique.
-- 🗂️ **Granularité** : `SafeStop` est **propre à chaque métier** (un bloc safety par domaine : treuils, chariot, grappin…), car les surveillances ne portent pas sur les mêmes grandeurs. `PowerCutOff`, en revanche, agit sur le **contacteur général amont** (organe partagé).
+- 🗂️ **Granularité** : `SafeStop` est **propre à chaque métier** (un bloc safety par domaine : treuils, translation, benne…), car les surveillances ne portent pas sur les mêmes grandeurs. `PowerCutOff`, en revanche, agit sur le **contacteur général amont** (organe partagé).
 
 ---
 

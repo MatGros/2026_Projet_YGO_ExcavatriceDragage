@@ -1,5 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2
+      (base de temps utilisée par FB_FilterPT1, composé dans FB_Joystick)
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK FB_CycleTime
 VAR_INPUT

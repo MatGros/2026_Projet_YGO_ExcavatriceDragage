@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   ⚙️ ST_WinchHMI — Données d'échange IHM pour un treuil (M1/M2)
+   ⚙️ ST_WinchHMI — Données d'échange IHM pour un treuil (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des bargraphes, LEDs, mesures et réglages.
    ═══════════════════════════════════════════════════════════════ *)
@@ -74,7 +74,7 @@ STRUCT
     InhibitActive           : BOOL;             (* 🆕 REX 2026-07-08 : miroir lecture seule — confirme que
                                                     l'inhibition a bien été arbitrée (actif seulement si MAINT_N2) *)
     MecaADriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM *)
-    MecaCDriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca C (m, grappin M1) — réglage GrappinSlipToleranceM *)
+    MecaCDriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM *)
     MecaBElapsedTime        : TIME;             (* 🆕 REX 2026-07-08 : temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout *)
 END_STRUCT
 END_TYPE

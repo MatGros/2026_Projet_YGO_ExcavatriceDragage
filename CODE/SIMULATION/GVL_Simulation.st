@@ -22,7 +22,7 @@ VAR_GLOBAL
     SimulationModeActive       : BOOL := TRUE;  // 🔑 Bit maître — FALSE = tout redevient réel d'un coup
 
     // ── Devices bus de terrain (EtherCAT/CANopen) — 1:1 avec les devices réels ──
-    VariateurM3_IsReal         : BOOL := FALSE; // AC600 EtherCAT (chariot M3)
+    VariateurM3_IsReal         : BOOL := FALSE; // AC600 EtherCAT (translation M3)
     EncoderM1_IsReal           : BOOL := FALSE; // COD1 EtherCAT
     EncoderM2_IsReal           : BOOL := FALSE; // COD2 EtherCAT
     Joystick_IsReal            : BOOL := FALSE; // CANopen JOY1 — bus/nœud (CanOnline/CanOperational)
@@ -42,8 +42,8 @@ VAR_GLOBAL
     BrakeThermal_IsReal        : BOOL := FALSE; // 🆕 REX 2026-07-08 : thermique frein COMMUN M1/M2/M3 (1 seul fil)
     ContactorFeedbackM1_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M1
     ContactorFeedbackM2_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M2
-    ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) chariot M3
-    ChariotPosition_IsReal     : BOOL := FALSE; // Capteurs Fosse1/Fosse2/Maintenance/Trémie
+    ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) translation M3
+    TranslationPosition_IsReal     : BOOL := FALSE; // Capteurs Fosse1/Fosse2/Maintenance/Trémie
 
     // ── Utilitaires banc d'essai (sans préfixe DBG_) ───────────────────────────
     JoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)

@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 GVL_Chariot_M3_Stub — Variables STUB M3
+   🧪 GVL_Translation_M3_Stub — Variables STUB M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Chariot_v1.2.md §7
+   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.2.md §7
    🔧 CORRECTIF (2026-07-03) : réintégration de M3_RelayFwd/Rev/SpeedGv,
       M3_ContactorFeedbackFwd/Rev, M3_DriveFaultFeedback,
       M3_PositionSensorTarget — retirés par erreur le 2026-07-03
@@ -14,7 +14,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 
 VAR_GLOBAL
-    StubChariotPositionSelect_IHM : INT := 0;   // 🖥️ Sélecteur test maintenance (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)
+    StubTranslationPositionSelect_IHM : INT := 0;   // 🖥️ Sélecteur test maintenance (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)
 
     M3_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M3 (STUB, DEGRADED_IO)
     M3_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M3 (STUB, DEGRADED_IO)

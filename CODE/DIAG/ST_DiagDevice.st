@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
-   📡 ST_DeviceDiag — Structure diagnostic d'un esclave ou bus
+   📡 ST_DiagDevice — Structure diagnostic d'un esclave ou bus
    ═══════════════════════════════════════════════════════════════ *)
-TYPE ST_DeviceDiag :
+TYPE ST_DiagDevice :
 STRUCT
     Online         : BOOL;        (* Esclave visible sur le bus *)
     Operational    : BOOL;        (* Esclave en mode OP (opérationnel) *)

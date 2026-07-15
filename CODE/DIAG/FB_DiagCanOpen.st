@@ -5,8 +5,8 @@ FUNCTION_BLOCK PUBLIC FB_DiagCanOpen
 VAR_INPUT
     Enable          : BOOL;        (* Active la surveillance CAN *)
     Reset           : BOOL;        (* Front d'acquittement des défauts *)
-    CanOnline       : BOOL;        (* Trame joystick reçue (TRUE = OK) *)
-    CanOperational  : BOOL;        (* Joystick en mode opérationnel (TRUE = OK) *)
+    CANbusOnline    : BOOL;        (* État du bus CANopen (TRUE = OK) *)
+    DeviceJoystickOnline: BOOL;    (* Joystick en ligne / opérationnel (TRUE = OK) *)
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;        (* Logique de surveillance active *)
@@ -16,8 +16,8 @@ VAR_OUTPUT
     ErrorId         : WORD;        (* Code défaut global résumé *)
     State           : E_DiagState; (* Phase courante du cycle de diag *)
     StateAtError    : E_DiagState; (* Phase figée à l'apparition de l'erreur *)
-    busCanOpen      : ST_DeviceDiag;  (* Diagnostics bus CANopen *)
-    Joystick        : ST_DeviceDiag;  (* Diagnostics esclave Joystick *)
+    DeviceCanOpenMaster : ST_DiagDevice;  (* Diagnostics bus CANopen *)
+    DeviceJoystick  : ST_DiagDevice;  (* Diagnostics esclave Joystick *)
 END_VAR
 VAR
     ResetEdge       : R_TRIG;      (* Détecteur front de reset *)
@@ -27,11 +27,11 @@ END_VAR
 IF NOT Enable THEN
     Ready := FALSE;
     State := E_DiagState.DISABLED;
-    Joystick.State := E_DiagState.DISABLED;
-    Joystick.Online := FALSE;
-    Joystick.Operational := FALSE;
-    Joystick.Error := FALSE;
-    Joystick.ErrorId := 16#0000;
+    DeviceJoystick.State := E_DiagState.DISABLED;
+    DeviceJoystick.Online := FALSE;
+    DeviceJoystick.Operational := FALSE;
+    DeviceJoystick.Error := FALSE;
+    DeviceJoystick.ErrorId := 16#0000;
     Error := FALSE;
     ErrorId := 16#0000;
     RETURN;
@@ -42,56 +42,57 @@ Ready := TRUE;
 // 🔑 2. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    IF (CanOnline AND CanOperational) THEN
-        Joystick.ErrorId := 16#0000;
+    IF (CANbusOnline AND DeviceJoystickOnline) THEN
+        DeviceJoystick.ErrorId := 16#0000;
         StateAtError := E_DiagState.DISABLED;
     END_IF;
 END_IF;
 
 // 🔍 3. DIAGNOSTIC JOYSTICK
 // Bit 0 : Perte de communication CAN
-IF NOT CanOnline THEN
-    Joystick.ErrorId := 16#0001;  (* Perte liaison CAN joystick *)
-    Joystick.Online := FALSE;
+IF NOT CANbusOnline THEN
+    DeviceJoystick.ErrorId := 16#0001;  (* Perte liaison CAN joystick *)
+    DeviceJoystick.Online := FALSE;
 ELSE
-    Joystick.Online := TRUE;
+    DeviceJoystick.Online := TRUE;
     IF ResetEdge.Q THEN
-        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFE;
+        DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFE;
     END_IF;
 END_IF;
 
 // Bit 1 : Mode non-opérationnel (esclave CANopen en pré-op ou défaut)
-IF NOT CanOperational THEN
-    Joystick.ErrorId := Joystick.ErrorId OR 16#0002;  (* Joystick pas opérationnel *)
-    Joystick.Operational := FALSE;
+IF NOT DeviceJoystickOnline THEN
+    DeviceJoystick.ErrorId := DeviceJoystick.ErrorId OR 16#0002;  (* Joystick pas opérationnel *)
+    DeviceJoystick.Operational := FALSE;
 ELSE
-    Joystick.Operational := TRUE;
+    DeviceJoystick.Operational := TRUE;
     IF ResetEdge.Q THEN
-        Joystick.ErrorId := Joystick.ErrorId AND 16#FFFD;
+        DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFD;
     END_IF;
 END_IF;
 
 // 🚦 4. MACHINE D'ÉTAT JOYSTICK
-IF Joystick.ErrorId <> 0 THEN
-    Joystick.State := E_DiagState.ERROR;
+// REX 2026-07-08 : correction de la précédence d'affichage IHM des états d'erreur.
+IF DeviceJoystick.ErrorId <> 0 THEN
+    DeviceJoystick.State := E_DiagState.ERROR;
     IF StateAtError = E_DiagState.DISABLED THEN
         StateAtError := State;
     END_IF;
-ELSIF NOT (Joystick.Online AND Joystick.Operational) THEN
-    Joystick.State := E_DiagState.INIT;
-else
-    Joystick.State := E_DiagState.READY;
+ELSIF NOT (DeviceJoystick.Online AND DeviceJoystick.Operational) THEN
+    DeviceJoystick.State := E_DiagState.INIT;
+ELSE
+    DeviceJoystick.State := E_DiagState.READY;
 END_IF;
 
-State := Joystick.State;
+State := DeviceJoystick.State;
 
 // 📤 5. SORTIES GLOBALES
-Joystick.Error := (Joystick.ErrorId <> 0);
-Error := Joystick.Error;
-ErrorId := Joystick.ErrorId;
+DeviceJoystick.Error := (DeviceJoystick.ErrorId <> 0);
+Error := DeviceJoystick.Error;
+ErrorId := DeviceJoystick.ErrorId;
 
-busCanOpen.Operational := CanOnline;
-busCanOpen.Online := CanOnline;
+DeviceCanOpenMaster.Operational := CANbusOnline;
+DeviceCanOpenMaster.Online := CANbusOnline;
 
 // Briques génériques pour conformité standard
 Busy := FALSE;

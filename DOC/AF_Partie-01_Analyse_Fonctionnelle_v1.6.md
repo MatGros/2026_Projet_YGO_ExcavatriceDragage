@@ -21,8 +21,8 @@
 > le nommage précédent par lettre (utilisé jusqu'ici dans le code) est **abandonné comme
 > vocabulaire** — ni parlant, ni évolutif à l'arrivée d'autres cas futurs — voir encadré dédié
 > plus bas dans ce document.
-> **v1.4** — Renommage terminologique (demande utilisateur, 2026-07-02) : Godet→Grappin
-> (ouverture/fermeture, prévention gravats), Translation→Chariot (axe transversal M3, objet
+> **v1.4** — Renommage terminologique (demande utilisateur, 2026-07-02) : Godet→Benne
+> (ouverture/fermeture, prévention gravats), Translation→Translation (axe transversal M3, objet
 > métier qui se déplace) — préfixe I/O physique M3 inchangé.
 > **v1.3** — Retour terrain 2026-07-02 : le câble mécanique de position haute extrême a été
 > **retiré de la chaîne AU matérielle** — c'est désormais l'automate qui gère la coupure via
@@ -38,7 +38,7 @@
 
 ## 🎯 Le projet en bref
 Machine de **dragage en carrière noyée**.
-Un grappin descend sous l'eau, mord le fond, remonte plein, se déplace, vide.
+Un benne descend sous l'eau, mord le fond, remonte plein, se déplace, vide.
 Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 
 ---
@@ -49,7 +49,7 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 |-----|--------|-----------|-----|--------|
 | 🪝 Treuil 1 | **M1** | Moteur treuil levage 1 | — | **COD1** (codeur absolu tambour M1, EtherCAT) |
 | 🪝 Treuil 2 | **M2** | Moteur treuil levage 2 | — | **COD2** (codeur absolu tambour M2, EtherCAT) |
-| ↔️ Chariot | **M3** | Variateur **AC600** axe transversal | EtherCAT | — (consigne vitesse %) |
+| ↔️ Translation | **M3** | Variateur **AC600** axe transversal | EtherCAT | — (consigne vitesse %) |
 
 🧭 **Règle de lecture** : `COD1` ⇒ codeur du treuil **M1**, `COD2` ⇒ codeur du treuil **M2**, `AC600` ⇒ variateur de l'axe transversal **M3**.
 
@@ -62,8 +62,8 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 | 🪝 Plongée/Extraction | 2 treuils identiques (M1, M2) | 2 contacteurs sens + **2×4 contacteurs vitesse** (5 paliers, masque 4 bits/palier) |
 | 🛗 Position câble | 2 codeurs absolus tambour (COD1→M1, COD2→M2) | EtherCAT → déroulé en **mètres** |
 | 🛑 Maintien charge | 2 freins manque-courant | Logique levage (frein colle au repos) |
-| ↔️ Chariot | 1 moteur sur variateur AC600 (M3) | EtherCAT, commande **vitesse %** |
-| 🣣 Grappin | (= désynchro des 2 treuils) | Pas de moteur propre |
+| ↔️ Translation | 1 moteur sur variateur AC600 (M3) | EtherCAT, commande **vitesse %** |
+| 🣣 Benne | (= désynchro des 2 treuils) | Pas de moteur propre |
 | 🕹️ Commande | Joystick Hall → CANopen | 2 axes + bouton |
 | 📡 Capteurs | Fond touché, fdc haut/bas, positions travail/vidange/maintenance | TOR + position |
 | 🔌 Retour contacteurs | Contact auxiliaire par contacteur de puissance | TOR → surveillance collage |
@@ -86,8 +86,8 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 
 - 🕹️ **Joystick** → traduit le geste opérateur en consigne.
 - 🪝 **Treuil** ×2 → cœur métier : direction, vitesse, frein, position, limites.
-- ↔️ **Chariot** → amène le pont sur la bonne position.
-- 🣣 **Grappin** → ouvre/ferme via désynchro des treuils.
+- ↔️ **Translation** → amène le pont sur la bonne position.
+- 🣣 **Benne** → ouvre/ferme via désynchro des treuils.
 - 🔄 **Cycle** → enchaîne les étapes en semi-auto.
 - 🎚️ **Modes** → Manuel / Maint N1 / N2 / Semi-auto + autorisations.
 
@@ -109,7 +109,7 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 ## 🔗 Interactions (flux de données)
 
 ```
-Joystick ──consigne %──► Cycle/Modes ──StartStop──► Treuil + Chariot
+Joystick ──consigne %──► Cycle/Modes ──StartStop──► Treuil + Translation
 Codeur ──position m──► Treuil ──limite──► ralentit/arrête
 Treuil ──pilote──► Frein + Contacteurs
 Safety métier (par domaine) ──SafeStop──► FB de mouvement concerné ──► rampe décélération RAPIDE (Enable maintenu)
@@ -170,9 +170,9 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > - **Safety Mouvement — Pilotage sans commande opérateur** (`ErrorId` bit8) — le moteur reste
 >   piloté (contacteurs engagés) alors que l'opérateur n'envoie plus aucune commande (perte
 >   joystick ou manette au neutre) depuis un temps anormalement long.
-> - **Safety Mouvement — Glissement grappin** (`ErrorId` bit9) — pendant un mouvement grappin, le
+> - **Safety Mouvement — Glissement benne** (`ErrorId` bit9) — pendant un mouvement benne, le
 >   treuil censé rester immobile (M1) dérive de sa position au-delà d'un seuil, signe que la
->   synchronisation grappin/treuil ne tient plus.
+>   synchronisation benne/treuil ne tient plus.
 >
 > Tous sont des **défenses en profondeur** (cas rares, contacteurs/frein déjà censés être fiables)
 > — c'est précisément parce qu'ils ne devraient normalement jamais se déclencher que, s'ils le
@@ -182,21 +182,21 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > ℹ️ **`FB_Safety_Winch` n'est pas la seule source possible — mais la seule active aujourd'hui.**
 > `PowerCutOff_A_RQ` agrège en réalité **3 sources** (voir formule ci-dessous) : les 2 instances de
 > `FB_Safety_Winch` (M1 et M2, qui portent les 3 Safety Mouvement ci-dessus) **et**
-> `FB_Safety_Chariot` (M3). Ce 3ᵉ bloc participe déjà à la formule agrégée mais **ne câble
+> `FB_Safety_Translation` (M3). Ce 3ᵉ bloc participe déjà à la formule agrégée mais **ne câble
 > aujourd'hui aucun Safety Mouvement réel** : sa sortie `PowerCutOff` reste codée en dur à `FALSE`
-> (voir `CODE/CHARIOT/FB_Safety_Chariot.st`). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T12).
-> Tout Safety Mouvement futur pour le Chariot viendrait donc naturellement s'ajouter **côté
-> `FB_Safety_Chariot`**, pas forcément côté Winch.
+> (voir `CODE/TRANSLATION/FB_Safety_Translation.st`). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T12).
+> Tout Safety Mouvement futur pour le Translation viendrait donc naturellement s'ajouter **côté
+> `FB_Safety_Translation`**, pas forcément côté Winch.
 >
-> ℹ️ **Le Grappin n'a pas de bloc safety dédié — cohérent avec « pas de moteur propre » (voir
+> ℹ️ **Le Benne n'a pas de bloc safety dédié — cohérent avec « pas de moteur propre » (voir
 > §Fonctions principales ci-dessus).** Sa protection contre le glissement est répartie sur
-> **2 couches distinctes** : **couche 1** dans `FB_Grappin` lui-même (`M1SlipDetected`, tolérance
+> **2 couches distinctes** : **couche 1** dans `FB_Benne` lui-même (`M1SlipDetected`, tolérance
 > 1.0 m) → alimente `SafeStop` (pas `PowerCutOff`) ; **couche 2** = le Safety Mouvement
-> « Glissement grappin » ci-dessus, câblé **uniquement dans l'instance M1** de `FB_Safety_Winch`
-> (`GrappinHoldStillActive` sur `instGrappin.Busy`, toujours `FALSE` côté M2) → peut escalader
+> « Glissement benne » ci-dessus, câblé **uniquement dans l'instance M1** de `FB_Safety_Winch`
+> (`BenneHoldStillActive` sur `instBenne.Busy`, toujours `FALSE` côté M2) → peut escalader
 > jusqu'à `PowerCutOff` si la couche 1 n'a pas suffi. Donc **oui**, `FB_Safety_Winch` couvre bien
-> indirectement le Grappin (via son instance M1), mais il n'existe pas de `FB_Safety_Grappin`
-> séparé — voir `DOC/AF_Partie-12_Fonction_Grappin_v1.4.md` pour la couche 1 et Partie9 §4quinquies
+> indirectement le Benne (via son instance M1), mais il n'existe pas de `FB_Safety_Benne`
+> séparé — voir `DOC/AF_Partie-12_Fonction_Benne_v1.4.md` pour la couche 1 et Partie9 §4quinquies
 > pour la couche 2.
 >
 > ⚠️ **Remarque de nommage (retour utilisateur 2026-07-07, confirmé/renforcé en cours de
@@ -210,7 +210,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > `PRG_03_Safety.st`, `ST_WinchHMI.st`, ainsi que `AF_Partie-09_Fonction_Winch`) utilise encore en
 > interne l'ancien nom par lettre pour ces 3 cas — un renommage effectif en `CODE/` (identifiants,
 > commentaires), suggéré `SafetyMotion<Role>` (`SafetyMotionUncommandedMotion`,
-> `SafetyMotionUncommandedDrive`, `SafetyMotionGrappinSlip`), reste hors périmètre de cette révision
+> `SafetyMotionUncommandedDrive`, `SafetyMotionBenneSlip`), reste hors périmètre de cette révision
 > Partie 1 (documentaire uniquement). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T13).
 
 #### 🧨 Polarité fail-safe de `PowerCutOff_A_RQ` / `B_RQ`
@@ -238,7 +238,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > version : maintenant, l'absence de PLC = coupure, pas l'inverse.
 
 ```
-PowerCutOff_A_RQ := NOT (instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyChariotM3.PowerCutOff) AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
+PowerCutOff_A_RQ := NOT (instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyTranslationM3.PowerCutOff) AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
 PowerCutOff_B_RQ := PowerCutOff_A_RQ;
 ```
 (corps réel dans `CODE/MAIN/PRG_10_Outputs.st` — référencé ici, non recopié en détail).
@@ -307,9 +307,9 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 
 1. Machine en fonctionnement, `EmergencyChain = TRUE`, `EmergencyStopOk = TRUE`.
 2. Un des Safety Mouvement de `FB_Safety_Winch` se déclenche (mouvement non commandé, pilotage
-   sans commande opérateur, glissement grappin escaladé — détail en
+   sans commande opérateur, glissement benne escaladé — détail en
    `DOC/AF_Partie-09_Fonction_Winch_v1.5.md` §4quinquies) → `instSafetyWinchM1/M2.PowerCutOff` (ou
-   `instSafetyChariotM3.PowerCutOff`, aujourd'hui toujours `FALSE`, voir remarque ci-dessus) passe
+   `instSafetyTranslationM3.PowerCutOff`, aujourd'hui toujours `FALSE`, voir remarque ci-dessus) passe
    à `TRUE`.
 3. Le PLC **arrête volontairement** de maintenir `PowerCutOff_A_RQ`/`B_RQ` à `TRUE` (il les
    force à `FALSE` par le calcul même de la formule ci-dessus).
@@ -344,19 +344,19 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 | 12 | **Coupure d'urgence à distance IHM** | Appui sur le bouton HMI `CmdEmergencyCutOff` | Coupe immédiatement les deux canaux `PowerCutOff_A_RQ` / `PowerCutOff_B_RQ` | `CmdEmergencyCutOff=TRUE`, `EmergencyChain=FALSE`, `EmergencyStopOk=FALSE` | Relâcher le bouton HMI (repasse à `FALSE`) **puis** réarmer via IHM (scénario a/b) |
 
 > 🏷️ **Safety Mouvement** (cas 4 et 8 ci-dessus) = mouvement non commandé / pilotage sans commande
-> opérateur / glissement grappin — voir le rappel plain-langage juste au-dessus de « Polarité
+> opérateur / glissement benne — voir le rappel plain-langage juste au-dessus de « Polarité
 > fail-safe » pour le détail des 3, et Partie9 §4quinquies pour la technique complète.
 
 ---
 
 ## 🔄 Cycle type (semi-auto)
 
-1. ⬇️ Descente grappin ouvert → 🌊 capteur **fond touché**.
+1. ⬇️ Descente benne ouvert → 🌊 capteur **fond touché**.
 2. 🔧 Synchro 2 treuils + recalage (petite vitesse).
-3. ⬆️ Accélération → remontée grappin plein.
+3. ⬆️ Accélération → remontée benne plein.
 4. ⏱️ Temps d'égouttage en haut.
-5. ↔️ Chariot vers zone de vidange.
-6. ⬇️ Descente + 🪣 ouverture grappin (désynchro).
+5. ↔️ Translation vers zone de vidange.
+6. ⬇️ Descente + 🪣 ouverture benne (désynchro).
 7. 🔁 Retour position travail.
 
 ⚠️ Cycle = **indicatif**, pas figé.
@@ -364,7 +364,7 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 ---
 
 ## 🧭 Initialisation (référencement codeurs)
-1. Descente 2 treuils synchro, grappin ouvert.
+1. Descente 2 treuils synchro, benne ouvert.
 2. 🌊 Toucher l'eau = **plan 0**.
 3. Mode maintenance → preset codeurs à une **valeur positive** (offset brut choisi assez grand
    pour que la position mesurée ne devienne jamais négative en usage normal — c'est une valeur

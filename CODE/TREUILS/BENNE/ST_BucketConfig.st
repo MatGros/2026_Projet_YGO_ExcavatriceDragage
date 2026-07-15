@@ -1,10 +1,13 @@
 (* ═══════════════════════════════════════════════════════════════
-   🗑️ GVL_BUS — Obsolete / Archive
+   ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   Note : Suite à la décision d'architecture D2, la surveillance par
-   dégradation de bus (GVL_BusHealth / E_DegradationLevel) a été
-   supprimée. Ce fichier est conservé uniquement pour archive de structure.
+   📄 Doc métier : DOC/AF_Partie12_Fonction_Benne_v1.0.md §4.A
    ═══════════════════════════════════════════════════════════════ *)
-VAR_GLOBAL
-    // GVL obsolète - non référencé par PRG_MAIN
-END_VAR
+
+TYPE ST_BucketConfig :
+STRUCT
+    OffsetOpenM     : REAL;    (* Écart M1/M2 en mètres benne ouvert *)
+    OffsetCloseM    : REAL;    (* Écart M1/M2 en mètres benne fermé *)
+    CoherenceLimitM : REAL;    (* Seuil de détection d'incohérence au boot *)
+END_STRUCT
+END_TYPE

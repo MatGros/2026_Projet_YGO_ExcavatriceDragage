@@ -6,17 +6,17 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
-### `v0.4.12_ChariotHMI_Migration` — 2026-07-15
-- ST_ChariotHMI migre ReqFwd/ReqRev/FreqSetpointHz depuis IHM_MANU
+### `v0.4.12_TranslationHMI_Migration` — 2026-07-15
+- ST_TranslationHMI migre ReqFwd/ReqRev/FreqSetpointHz depuis IHM_MANU
 - + diag décodé DriveCommReady/DrivePowerReady (pas de WORD brut)
 - Pas l'état final : bypass ManuActive→M3_CommandWord reste
-- Fix FB_Sim_Chariot bloqué (relais morts ère DEGRADED_IO)
+- Fix FB_Sim_Translation bloqué (relais morts ère DEGRADED_IO)
 - → rebranché sur M3_CommandWord
 - BypassBrakeFeedback supprimé (fusion BypassContactorFeedback)
-- Rename Chariot/Joystick→ChariotM3/JoystickJOY1 (Grappin : GrappinM2 tenté puis annulé, stutter M2)
+- Rename Translation/Joystick→TranslationM3/JoystickJOY1 (Benne : BenneM2 tenté puis annulé, stutter M2)
 - ⚠️ pas encore réimporté/compilé dans CODESYS
 
-### `v0.4.11_Chariot_AC600_Safety` — 2026-07-15
+### `v0.4.11_Translation_AC600_Safety` — 2026-07-15
 - EtherCAT AC600 nominal M3 · fin définitive mode relais DEGRADED_IO
 - Sécurités Méca A (dérive vitesse à l'arrêt)
 - + Méca B (incohérence frein/variateur)
@@ -24,8 +24,8 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Diag com EtherCAT · simu StatusWord/ActualFrequency/frein
 - Doc STO ajoutée
 
-### `v0.4.10_FdcGrappin_Rename` — 2026-07-15
-- TASK-0002 : FdcGrappinOpen/Close→OpenEnable/CloseEnable
+### `v0.4.10_FdcBenne_Rename` — 2026-07-15
+- TASK-0002 : FdcBenneOpen/Close→OpenEnable/CloseEnable
 - (ST_IHM_MANU) — clarifie rôle config vs état
 - MAJ logique PRG_10_Outputs
 
@@ -45,8 +45,8 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - IHM_MANU pilote M1/M2 via FB_Winch (PRG_06, 3ᵉ source arbitrage)
 - Rampe/ralentissement natifs · doctrine "Conditional Bypass"
 - retirée FB_Safety_Winch (Enable inconditionnel, granularité _IsReal)
-- Fix latch FB_Safety_Chariot (Error pas remis à 0 si Enable=FALSE)
-- Fix Fdc grappin appliqué M1 individuel + couplé (pas que M2)
+- Fix latch FB_Safety_Translation (Error pas remis à 0 si Enable=FALSE)
+- Fix Fdc benne appliqué M1 individuel + couplé (pas que M2)
 - Fix compil PRG_02_Encoders (var supprimée)
 - Nouvelle limite CableLimitAscentM1/M2_M (12.0m, exploitation)
 - distincte HomingTarget (12.5m, réservé Homing)
@@ -61,9 +61,9 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ### `v0.4.6_IHM_MANU_JOY` — 2026-07-14
 - Joystick CANopen (X/Y) · décodage paliers K1-K4
-- Fdc virtuelles grappin (delta M1-M2)
+- Fdc virtuelles benne (delta M1-M2)
 - Commande auxiliaires hydrauliques · bornage vitesse paliers
-- Consigne fréquence chariot M3 réglable/clampée
+- Consigne fréquence translation M3 réglable/clampée
 
 ### `v0.4.5_IHM_MANU` — 2026-07-09
 - Fix lecture codeur réel forcée en mode Manu
@@ -88,5 +88,5 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Simu stable, pas de MES matérielle
 
 ### `v0.4.0_SimNoHardware` — 2026-07-08
-- Mouvements M1/M2 + grappin stables en simulation
+- Mouvements M1/M2 + benne stables en simulation
 - Aucune MES matérielle réelle

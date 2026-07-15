@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (squelette liaisons — pas de correction)
+   ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md §9
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
@@ -47,7 +47,7 @@ VAR_INPUT
     HomedM2         : BOOL;        // Sortie FB_Encoder_Homing M2
     SyncEnable      : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — Sortie FB_Modes, TRUE=synchro voulue
     SyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
-    ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: grappin fermé/ouvert)
+    ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: benne fermé/ouvert)
     
     // 🆕 Signaux de commande réels des treuils (pour contrôle de cohérence)
     RelayFwdM1      : BOOL;

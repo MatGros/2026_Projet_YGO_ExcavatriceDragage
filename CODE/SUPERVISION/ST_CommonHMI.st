@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🌐 ST_CommonHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
+   🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
    🆕 REX 2026-07-08 (demande utilisateur) : regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
@@ -9,7 +9,7 @@
    ⚠️ Ne pas y mettre HmiInitDone (indicateur interne de séquencement boot, pas une
    information machine destinée à l'opérateur) — reste seul dans GVL_IHM.
    ═══════════════════════════════════════════════════════════════ *)
-TYPE ST_CommonHMI :
+TYPE ST_CommunHMI :
 STRUCT
     TopPositionSensorActive   : BOOL; (* ⚠️ Capteur de position haute commun M1+M2 détecté *)
     BrakeThermalFault         : BOOL; (* 🌡️ Défaut/perte thermique frein — retour unique commun M1/M2/M3, escalade PowerCutOff *)

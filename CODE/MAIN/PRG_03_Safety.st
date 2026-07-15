@@ -8,7 +8,7 @@ PROGRAM PRG_03_Safety
 VAR
     instSafetyWinchM1   : FB_Safety_Winch;
     instSafetyWinchM2   : FB_Safety_Winch;
-    instSafetyChariotM3 : FB_Safety_Chariot;
+    instSafetyTranslationM3 : FB_Safety_Translation;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_03_Safety) ===
@@ -28,8 +28,8 @@ instSafetyWinchM1(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
-    JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online,
-    JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational,
+    JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
     ThermalFeedback     := NOT PRG_00_Inputs.M1ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
@@ -57,13 +57,13 @@ instSafetyWinchM1(
     JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1)
                               AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
                               AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
-    GrappinHoldStillActive := PRG_06_WinchControl.instGrappin.Busy, // Méca C — M1 doit rester immobile pendant le
-                                                                     // grappin ; 1 cycle de retard accepté (PRG_03
+    BenneHoldStillActive := PRG_06_WinchControl.instBucket.Busy, // Méca C — M1 doit rester immobile pendant le
+                                                                     // benne ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
-    // 🆕 REX 2026-07-08 (4) — Méca E : M2 corrigé de l'offset grappin actif (0 si grappin absent/ouvert),
-    // ramené dans le référentiel M1 — comparaison valable quel que soit l'état du grappin
-    ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instGrappin.ActiveOffsetM,
-    GrappinBusy            := PRG_06_WinchControl.instGrappin.Busy,
+    // 🆕 REX 2026-07-08 (4) — Méca E : M2 corrigé de l'offset benne actif (0 si benne absent/ouvert),
+    // ramené dans le référentiel M1 — comparaison valable quel que soit l'état du benne
+    ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM,
+    BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2 // 🆕 REX 2026-07-08 (7)
 );
@@ -76,8 +76,8 @@ instSafetyWinchM2(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
-    JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online,
-    JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational,
+    JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
@@ -92,41 +92,41 @@ instSafetyWinchM2(
     HomingSuspect       := PRG_02_Encoders.instHomingM2.HomingSuspect,
     TopLimitM           := GVL_PERSISTENT.HomingTargetM2_M,
     // 🔧 REX 2026-07-07 — Méca A/B (voir FB_Safety_Winch bandeau en-tête) — Méca C NON applicable
-    // à M2 (c'est M2 qui bouge pendant le grappin, GrappinHoldStillActive reste FALSE)
+    // à M2 (c'est M2 qui bouge pendant le benne, BenneHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
     // 🔧 REX 2026-07-15 (7) : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus).
     JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1)
                               AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
                               AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
-    GrappinHoldStillActive := FALSE,
+    BenneHoldStillActive := FALSE,
     // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
     // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2
     // à 0 au lieu de M1, déclenchement permanent dès que M2 > CriticalSyncToleranceM (2.0m)
-    // du zéro codeur. M1 corrigé de l'offset grappin actif, ramené dans le référentiel M2.
-    ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instGrappin.ActiveOffsetM,
-    GrappinBusy            := PRG_06_WinchControl.instGrappin.Busy,
+    // du zéro codeur. M1 corrigé de l'offset benne actif, ramené dans le référentiel M2.
+    ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instBucket.ActiveOffsetM,
+    BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := GVL_PERSISTENT.WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
 );
 
-// 3. Sécurité Chariot M3
-instSafetyChariotM3(
-    Enable              := NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.ChariotPosition_IsReal, // 🆕 REX 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
+// 3. Sécurité Translation M3
+instSafetyTranslationM3(
+    Enable              := NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.TranslationPosition_IsReal, // 🆕 REX 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
-    JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Online,
-    JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.Joystick.Operational,
+    JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     PhaseRotationOk     := PRG_00_Inputs.PhaseRotationOk,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
-    DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.Variateur.Online,
-    DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.Variateur.Operational,
+    DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Online,
+    DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Operational,
     DriveStatusWord     := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback       := PRG_00_Inputs.M3BrakeFeedback,
-    BrakeCmd            := PRG_07_ChariotControl.instChariotM3.BrakeCmd,
-    Direction           := PRG_07_ChariotControl.M3_Direction_Active,
-    LimitSwitchFwd      := PRG_00_Inputs.ChariotPosTremie,
-    LimitSwitchRev      := PRG_00_Inputs.ChariotPosFosse1
+    BrakeCmd            := PRG_07_TranslationControl.instTranslationM3.BrakeCmd,
+    Direction           := PRG_07_TranslationControl.M3_Direction_Active,
+    LimitSwitchFwd      := PRG_00_Inputs.TranslationPosTremie,
+    LimitSwitchRev      := PRG_00_Inputs.TranslationPosFosse1
 );

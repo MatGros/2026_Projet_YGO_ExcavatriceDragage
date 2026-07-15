@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
-                   (règles issues de DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md §4)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §3
+                   (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier > 0)
    📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
@@ -28,7 +28,7 @@ VAR_INPUT
     FeedbackTimeout     : TIME := T#1s;               // Délai max cohérence commande/retour frein
     BypassContactorCheck: BOOL;                       // 🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,
                                                        // voir GVL_Simulation.ContactorFeedbackMx_IsReal, passé
-                                                       // par l'appelant FB_Winch/FB_Chariot — TOUJOURS FALSE réel)
+                                                       // par l'appelant FB_Winch/FB_Translation — TOUJOURS FALSE réel)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;

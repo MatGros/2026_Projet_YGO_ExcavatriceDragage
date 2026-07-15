@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   ↔️ ST_ChariotHMI — Données d'échange IHM pour le Chariot M3
+   ↔️ ST_TranslationHMI — Données d'échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
-   🎨 Destiné à l'affichage des états, commandes et diagnostics du chariot.
+   🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Migration des champs manuels ex-ST_IHM_MANU (étape en cours, pas l'état final) —
-      doc métier : DOC/AF_Partie-11_Fonction_Chariot_v1.6.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.6.md
    ═══════════════════════════════════════════════════════════════ *)
-TYPE ST_ChariotHMI :
+TYPE ST_TranslationHMI :
 STRUCT
     (* 🎮 Commandes opérateur (manuel / maintenance) *)
     SelectedTargetNum       : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
@@ -13,12 +13,12 @@ STRUCT
     ReqRev                  : BOOL;    (* ↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
     FreqSetpointHz          : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs *)
 
-    (* 🚦 États & diagnostics FB_Chariot *)
-    FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Chariot) *)
-    Ready                   : BOOL;    (* 🟢 Chariot prêt à fonctionner *)
+    (* 🚦 États & diagnostics FB_Translation *)
+    FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Translation) *)
+    Ready                   : BOOL;    (* 🟢 Translation prêt à fonctionner *)
     Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
     Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
-    Error                   : BOOL;    (* 🔴 Chariot en défaut *)
+    Error                   : BOOL;    (* 🔴 Translation en défaut *)
     ErrorId                 : WORD;    (* ❌ Code du défaut actif *)
     BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein (lecture seule, TRUE = desserré) *)
     BrakeFeedback           : BOOL;    (* 🔌 Retour physique de l'état du frein *)
@@ -32,7 +32,7 @@ STRUCT
     (* 🐞 Bypass diag (banc de test — auto-calculé depuis GVL_Simulation) *)
     BypassContactorFeedback : BOOL;    (* 🔌 Activation du bypass des retours contacteurs (sens + frein) *)
 
-    (* 🛡️ Sécurité (FB_Safety_Chariot) *)
+    (* 🛡️ Sécurité (FB_Safety_Translation) *)
     SafetyError             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
     SafetyErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
 END_STRUCT

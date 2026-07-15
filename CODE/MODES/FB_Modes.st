@@ -13,9 +13,9 @@
       demande explicite de l'utilisateur — l'accès à `MAINT_N2` est désormais géré **uniquement**
       côté IHM (visibilité des actions selon niveau utilisateur), pas de filet de sécurité côté
       automate. `ModeRequest = MAINT_N2` est donc accepté sans condition supplémentaire.
-   🔴 HORS PÉRIMÈTRE CE LOT (Partie5 §2/§3, pas encore codé faute de FB_Cycle/FB_Grappin) :
-      `OverrideGrappin`, `OverrideLimit`/limite légale de dragage. À ajouter quand
-      `FB_Cycle`/`FB_Grappin` existeront — ne pas inventer un override sans consommateur.
+   🔴 HORS PÉRIMÈTRE CE LOT (Partie5 §2/§3, pas encore codé faute de FB_Cycle/FB_Bucket) :
+      `OverrideBucket`, `OverrideLimit`/limite légale de dragage. À ajouter quand
+      `FB_Cycle`/`FB_Bucket` existeront — ne pas inventer un override sans consommateur.
    🆕 REX 2026-07-08 : `InhibitM1`/`InhibitM2` (mise en service, demande utilisateur) — permet
       d'inhiber complètement un treuil (commande ET sa propre supervision safety) pour le tester
       seul, désynchronisation assumée. UNIQUEMENT actionnable en MAINT_N2 (plus restrictif
@@ -44,9 +44,9 @@ VAR_INPUT
     EmergencyStopOk     : BOOL;        // Standard
     ModeRequest         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
     SyncEnableRequest   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
-    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.WinchM1.CmdInhibit — bouton IHM inhibition M1
-    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.WinchM2.CmdInhibit — bouton IHM inhibition M2
-    HomingApproachEnableRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Common.HomingApproachEnableRequest — case IHM
+    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1TreuilRetenue.CmdInhibit — bouton IHM inhibition M1
+    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2TreuilBucket.CmdInhibit — bouton IHM inhibition M2
+    HomingApproachEnableRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.HomingApproachEnableRequest — case IHM
                                         // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
     JoystickWinchSelectRequest : INT;  // 🆕 TASK-0001 : 1=M1, 2=M2, 3=Couplé (brut IHM)
