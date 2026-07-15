@@ -387,7 +387,7 @@ opérationnel pendant que l'EtherCAT est en panne. Étapes (une fois validées) 
 
 ### 🆕 v1.3 — Thermique frein commun (2026-07-08)
 Tous les fichiers listés en §6 sont **déjà à jour dans `CODE/`** — réimport via bundle
-PLCopenXML (`TOOLS/generated/CODE_Bundle.xml`) ou recopie manuelle ST habituelle.
+PLCopenXML (`CODE/CODE_Bundle.xml`) ou recopie manuelle ST habituelle.
 **Reste à faire côté utilisateur** (même canal physique que Partie9 v1.6, un seul fil pour les
 3 axes — pas de mapping supplémentaire spécifique Chariot) :
 1. **I/O Mapping** : mapper `BrakeThermalFeedback_DI` (retour thermique frein, contact NC,

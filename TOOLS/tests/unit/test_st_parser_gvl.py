@@ -30,11 +30,11 @@ def test_synthetic_gvl_multiple_blocks_gets_info_diagnostic():
 def test_real_gvl_persistent_parses_retain_persistent_qualifiers_and_composite_init():
     from generator.ir import StructInitValue
 
-    path = CODE_DIR / "SYSTEM" / "GVL_PERSISTENT.st"
+    path = CODE_DIR / "GVL_PERSISTENT.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
     obj = parse_file(
-        source, folder="SYSTEM", stem="GVL_PERSISTENT", mtime=1.0, source_label="GVL_PERSISTENT.st",
+        source, folder="", stem="GVL_PERSISTENT", mtime=1.0, source_label="GVL_PERSISTENT.st",
         diagnostics=diag,
     )
     assert obj is not None

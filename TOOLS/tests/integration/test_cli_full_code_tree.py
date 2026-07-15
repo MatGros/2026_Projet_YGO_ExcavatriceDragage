@@ -52,7 +52,7 @@ def test_cli_mirrors_code_folder_structure(tmp_path):
     main(["--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)])
 
     assert (out_dir / "WINCH" / "FB_Winch.xml").is_file()
-    assert (out_dir / "SYSTEM" / "GVL_PERSISTENT.xml").is_file()
+    assert (out_dir / "GVL_PERSISTENT.xml").is_file()
     assert (out_dir / "CYCLE" / "E_CycleStep.xml").is_file()
 
 

@@ -11,7 +11,7 @@ from .xml_serializer import write_file
 
 _TOOLING_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CODE_DIR = _TOOLING_DIR.parent / "CODE"
-DEFAULT_OUT_DIR = _TOOLING_DIR / "generated"
+DEFAULT_OUT_DIR = DEFAULT_CODE_DIR
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
