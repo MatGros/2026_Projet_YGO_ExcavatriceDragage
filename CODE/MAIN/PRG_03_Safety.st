@@ -122,8 +122,8 @@ instSafetyChariotM3(
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.Variateur.Online,
     DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.Variateur.Operational,
-    DriveStatusWord     := M3_StatusWord,
-    DriveActualFreqHz   := UINT_TO_REAL(M3_ActualFrequencyHz) / 100.0,
+    DriveStatusWord     := PRG_00_Inputs.M3_StatusWord_Filtered,
+    DriveActualFreqHz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback       := PRG_00_Inputs.M3BrakeFeedback,
     BrakeCmd            := PRG_07_ChariotControl.instChariotM3.BrakeCmd,
     Direction           := PRG_07_ChariotControl.M3_Direction_Active,

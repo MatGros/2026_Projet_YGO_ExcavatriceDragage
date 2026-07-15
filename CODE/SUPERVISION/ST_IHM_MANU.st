@@ -58,6 +58,8 @@ STRUCT
     (* 📊 Fins de Course Virtuels Grappin (delta M1 - M2) *)
     FdcGrappinOpenEnable   : BOOL; (* 🎚️ Activer FDC Ouvert (stop M2 descente si delta >= 0.0m) *)
     FdcGrappinCloseEnable  : BOOL; (* 🎚️ Activer FDC Fermé (stop M2 montée si delta <= -10.0m) *)
+    FdcGrappinOpen          : BOOL; (* ⚠️ OBSOLÈTE (visu) — alias de FdcGrappinOpenEnable *)
+    FdcGrappinClose         : BOOL; (* ⚠️ OBSOLÈTE (visu) — alias de FdcGrappinCloseEnable *)
     GrappinDelta     : REAL; (* 📊 [m] Écart M1-M2 en temps réel *)
     FdcGrappinOpenActive  : BOOL; (* 🚨 Limite basse M2 atteinte (descente coupée) *)
     FdcGrappinCloseActive : BOOL; (* 🚨 Limite haute M2 atteinte (montée coupée) *)
