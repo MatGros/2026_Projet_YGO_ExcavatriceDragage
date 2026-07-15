@@ -36,84 +36,6 @@ VAR_OUTPUT
 
     // ── 🪝 TREUIL M2 (même logique que M1) ──────────────────────────────────────────────
     M2FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : idem M1, voir ci-dessus
-    M2ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M2 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴
-    M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴
-
-    // ── ↔️ CHARIOT M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
-    ChariotPosFosse1      : BOOL;  // 📍 Position fosse 1 (NO) : TRUE=chariot en fosse 1 ✅ | FALSE=absent
-    ChariotPosFosse2      : BOOL;  // 📍 Position fosse 2 (NO) : TRUE=chariot en fosse 2 ✅ | FALSE=absent
-    ChariotPosMaintenance : BOOL;  // 🔧 Position maintenance (NO) : TRUE=en position service ✅ | FALSE=absent
-    ChariotPosTremie      : BOOL;  // 🗑️ Position trémie vidange (NO) : TRUE=en position trémie ✅ | FALSE=absent
-    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein chariot M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
-END_VAR
-VAR
-    // Instances de filtrage
-    instEmergencyStopOk   : FB_Input;
-    instEmergencyChain    : FB_Input; // 🔧 REX 2026-07-07
-    instSlackCableSwitch  : FB_Input;
-    instTopPositionSensor : FB_Input;
-    instCtrlPhaseRotation : FB_Input;
-    instBrakeThermalFeedback : FB_Input; // 🆕 REX 2026-07-08
-
-    instM1FwdRevSpeedFeedbackOff : FB_Input; // 🔧 REX 2026-07-07 : remplace instM1ContactorFwd/Rev
-    instM1Thermal      : FB_Input;
-    instM1BrakeFeedback: FB_Input;
-
-    instM2FwdRevSpeedFeedbackOff : FB_Input; // 🔧 REX 2026-07-07 : remplace instM2ContactorFwd/Rev
-    instM2Thermal      : FB_Input;
-    instM2BrakeFeedback: FB_Input;
-
-    instChariotPosFosse1      : FB_Input;
-    instChariotPosFosse2      : FB_Input;
-    instChariotPosMaintenance : FB_Input;
-    instChariotPosTremie      : FB_Input;
-    instM3BrakeFeedback       : FB_Input;
-
-    // 🧪 Simulation dynamique du trajet chariot M3 (Lot 4, non prioritaire — voir AF_Partie13)
-    instSimChariot            : FB_Sim_Chariot;
-
-    // 🧪 Simulation de la chaîne de sécurité AU / réarmement (Lot 1, combler le trou d'intégration)
-    instSimSafety             : FB_Sim_Safety;
-
-    // 🧪 Simulation des retours contacteurs et freins M1/M2 (Lot 1)
-(* ═══════════════════════════════════════════════════════════════
-   📥 PRG_00_Inputs — Acquisition et conditionnement des ENTRÉES (PROGRAMME)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie6_IO_Conditioning_v1.2.md §5
-   ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
-   ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
-   ═══════════════════════════════════════════════════════════════ *)
-
-PROGRAM PRG_00_Inputs
-VAR_OUTPUT
-    // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
-    // 🔧 REX 2026-07-07 : précision terrain — EmergencyStopOk_DI (retour contact auxiliaire NO)
-    // est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
-    // PAS la boucle AU elle-même (ça, c'est EmergencyChainOK_DI, ci-dessous). Nom EmergencyStopOk
-    // conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
-    // maître du programme, car "puissance réellement présente" est la garantie la plus forte.
-    EmergencyStopOk      : BOOL;   // 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴
-    EmergencyChain       : BOOL;   // 🔗 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) : TRUE=saine ✅ | FALSE=AU appuyé ou PowerCutOff PLC actif 🔴 — précondition à l'armement, PAS le portail maître
-    TopPositionSensor    : BOOL;   // 🔝 Fin de course HAUT (NC) : TRUE=libre ✅ | FALSE=butée atteinte 🔴→ForbidAscent
-    SlackCableSwitch     : BOOL;   // 🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent
-    PhaseRotationOk      : BOOL;   // ⚡ Rotation phases élec. (NC) : TRUE=phases OK ✅ | FALSE=inversées/absentes 🔴→SafeStop
-    // 🆕 REX 2026-07-08 : retour thermique COMMUN aux 3 freins M1/M2/M3 (1 seul fil, impossible
-    // de savoir lequel des 3 est en cause) — demande utilisateur : la perte de ce retour peut
-    // signifier un frein qui colle instantanément (frein à manque de courant) → traité comme
-    // les autres défauts francs du domaine, escalade PowerCutOff côté FB_Safety_Winch/_Chariot
-    // (voir bit10/bit3 respectifs).
-    BrakeThermalFeedback : BOOL;   // 🌡️ Thermique frein M1/M2/M3 commun (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
-
-    // ── 🪝 TREUIL M1 (frein=NC ; feedback contacteurs=retour unique REX 2026-07-07) ─────
-    M1FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : retour unique "tous contacteurs (sens+vitesse)
-                                      // retombés" M1 — remplace M1ContactorFeedbackFwd/Rev (feedback
-                                      // individuel par sens supprimé côté matériel, plus jamais câblé).
-                                      // TRUE = tous retombés (sain, rien d'engagé)
-    M1ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M1 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴
-    M1BrakeFeedback        : BOOL; // 🔒 Retour frein M1 (NC) : TRUE=frein serré repos ✅ | FALSE=desserré/coupure 🔴
-
-    // ── 🪝 TREUIL M2 (même logique que M1) ──────────────────────────────────────────────
-    M2FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : idem M1, voir ci-dessus
     M2ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M2 (NC) : TRUE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
     M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴
 
@@ -123,8 +45,8 @@ VAR_OUTPUT
     ChariotPosMaintenance : BOOL;  // 🔧 Position maintenance (NO) : TRUE=en position service ✅ | FALSE=absent
     ChariotPosTremie      : BOOL;  // 🗑️ Position trémie vidange (NO) : TRUE=en position trémie ✅ | FALSE=absent
     M3BrakeFeedback       : BOOL;  // 🔒 Retour frein chariot M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
-    
-    // 🆕 Variables filtrées pour lecture globale
+
+    // 🆕 Variables intermédiaires filtrées/simulées pour contourner la lecture seule des PDO
     M3_StatusWord_Filtered        : WORD;
     M3_ActualFrequencyHz_Filtered : UINT;
 END_VAR
