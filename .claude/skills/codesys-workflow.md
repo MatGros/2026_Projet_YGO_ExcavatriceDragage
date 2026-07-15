@@ -165,6 +165,8 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 
 ⛔ **Règle d'or de cette section** : je ne fais PAS le travail moi-même, je le prépare pour Gemini.
 
+> 🔔 **Prérequis côté Gemini** : Gemini doit avoir lancé `PLCOPENXML_TOOLING/push_server.py` (port 9090) en début de session pour recevoir la notification push dès que `QUEUE.md` est commité. Procédure complète → `DOC/AGENT_HANDOFF/GEMINI_BRIEF.md` §Push Notifications. Si le hook git ne peut pas déclencher le push (ex. pas de commit immédiat), rappeler à l'utilisateur d'appeler manuellement `curl -s http://localhost:9090/wake` ou d'ouvrir `http://localhost:9090/wake` dans le navigateur.
+
 🔒 **Garde-fous automatiques (Hooks CLI)** : Un hook système global (`~/.gemini/config/hooks.json` → `PLCOPENXML_TOOLING/guardrails.py`) intercepte et valide automatiquement chaque action de Gemini si le workflow multi-agent est actif. Il bloque les commits directs de Gemini et les modifications de fichiers hors-scope.
 
 1. **Comprendre la demande** — si le scope n'est pas clair (quels fichiers, quel comportement attendu), demander avant de créer la tâche. Ne jamais deviner un scope flou dans une tâche qui partira vers un agent qui n'a pas le contexte de cette conversation.

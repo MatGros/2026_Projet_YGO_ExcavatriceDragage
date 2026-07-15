@@ -6,7 +6,7 @@
 
 | ID | Titre | Assigned | Status | Maj |
 |---|---|---|---|---|
-| [TASK-0001](tasks/TASK-0001-restrict-joystick-winch-select-n2.md) | Restreindre JoystickWinchSelect (M1/M2 seul) à MAINT_N2 | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0002](tasks/TASK-0002-rename-fdc-grappin-enable.md) | Renommer FdcGrappinOpen/Close en FdcGrappinOpenEnable/CloseEnable | Gemini | TODO | 2026-07-15 |
 
 ---
 
@@ -38,4 +38,4 @@ Les tâches `TODO`/`IN_PROGRESS`/`BLOCKED`/`REVIEW` ne sont **jamais** supprimé
 ### Archive (tâches terminées)
 | ID | Titre | Statut final | Date |
 |---|---|---|---|
-| _(vide pour l'instant)_ | | | |
+| TASK-0001 | Restreindre JoystickWinchSelect (M1/M2 seul) à MAINT_N2 | DONE | 2026-07-15 |
