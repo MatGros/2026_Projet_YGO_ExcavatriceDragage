@@ -77,9 +77,9 @@ excavatrice-dragage/
 ├── CODE/                     # 🔧 Fichiers ST à importer dans CODESYS
 │   ├── PRG_*.st              (fichiers ST à copier-coller ou via bundle PLCopenXML)
 │   ├── FB_*.st
-│   └── CODE_Bundle.xml       (bundle PLCopenXML généré, voir PLCOPENXML_TOOLING/)
+│   └── CODE_Bundle.xml       (bundle PLCopenXML généré, voir TOOLS/)
 │
-├── PLCOPENXML_TOOLING/       # 🔧 Génération bundle PLCopenXML (importation auto CODESYS)
+├── TOOLS/                     # 🔧 Génération bundle PLCopenXML (importation auto CODESYS)
 │   └── (outillage Python pour grouper modifs CODE/*.st → CODE_Bundle.xml)
 │
 ├── PRJ_CODESYS/              # 📦 Projet CODESYS
@@ -107,7 +107,7 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 ### 📦 **Chemin 2 : Bundle PLCopenXML** (pour modifs groupées)
 ```
 1. Générer code ST dans CODE/*.st
-2. Exécuter outillage PLCOPENXML_TOOLING (voir détail ci-dessous)
+2. Exécuter outillage TOOLS (voir détail ci-dessous)
    → génère CODE_Bundle.xml
 3. Dans CODESYS 3.5 : Project → Import PLCopenXML...
    → sélectionner CODE_Bundle.xml
@@ -116,7 +116,7 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 
 ### 🛠️ **Générer le bundle PLCopenXML**
 
-**Répertoire :** `PLCOPENXML_TOOLING/`
+**Répertoire :** `TOOLS/`
 
 **Commande exacte :**
 ```powershell
@@ -129,7 +129,7 @@ Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.3.2
 python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.3.26']))"
 ```
 
-Sortie → `PLCOPENXML_TOOLING/generated/CODE_Bundle.xml`
+Sortie → `TOOLS/generated/CODE_Bundle.xml`
 
 ---
 
@@ -162,6 +162,6 @@ Sortie → `PLCOPENXML_TOOLING/generated/CODE_Bundle.xml`
 
 - **Git** : branche `main`
 - **Langage** : CODESYS 3.5 (ST / Ladder / FBD)
-- **Outillage** : Skill `codesys-workflow` (`.claude/skills/codesys-workflow.md`) + PLCOPENXML_TOOLING
+- **Outillage** : Skill `codesys-workflow` (`.claude/skills/codesys-workflow.md`) + TOOLS
 - **Auteur** : Mathieu Gros
 - **Dernière mise à jour** : 2026-07-08

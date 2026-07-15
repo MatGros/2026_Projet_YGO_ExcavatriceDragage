@@ -72,7 +72,8 @@
       "Bash(command -v agy)",
       "Bash(python push_server.py)",
       "Bash(echo \"EXIT_CODE_2e_INSTANCE=$?\")",
-      "Bash(tasklist //FI \"IMAGENAME eq python.exe\")"
+      "Bash(tasklist //FI \"IMAGENAME eq python.exe\")",
+      "Bash(grep -v \"\\\\.sample$\")"
     ],
     "ask": [
       "Bash(git reset *)",
