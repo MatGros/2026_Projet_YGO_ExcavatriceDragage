@@ -100,6 +100,7 @@ IF GVL_IHM.WinchM1.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM1.RampDecelNormalRate := GVL_PERSISTENT.WinchM1RampDecelNormal_Pct;
     GVL_IHM.WinchM1.RampDecelFastRate   := GVL_PERSISTENT.WinchM1RampDecelFast_Pct;
     GVL_IHM.WinchM1.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM1_M;
+    GVL_IHM.WinchM1.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM1_M; // 🆕 REX 2026-07-15 (6)
     GVL_IHM.WinchM1.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
     GVL_IHM.WinchM1.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
@@ -111,6 +112,7 @@ IF GVL_IHM.WinchM2.TopSensorPositionM = 0.0 THEN
     GVL_IHM.WinchM2.RampDecelNormalRate := GVL_PERSISTENT.WinchM2RampDecelNormal_Pct;
     GVL_IHM.WinchM2.RampDecelFastRate   := GVL_PERSISTENT.WinchM2RampDecelFast_Pct;
     GVL_IHM.WinchM2.CableLimitDescentM  := GVL_PERSISTENT.CableLimitDescentM2_M;
+    GVL_IHM.WinchM2.CableLimitAscentM   := GVL_PERSISTENT.CableLimitAscentM2_M; // 🆕 REX 2026-07-15 (6)
     GVL_IHM.WinchM2.SlowdownDistanceM   := GVL_PERSISTENT.WinchSlowdownDistance_M;
     GVL_IHM.WinchM2.SlowSpeedPct        := GVL_PERSISTENT.WinchSlowSpeedPct;
 END_IF;
@@ -127,6 +129,22 @@ END_IF;
 IF GVL_IHM.Common.LimitLegalDepthMinAllowed = 0.0 THEN
     GVL_IHM.Common.LimitLegalDepthMinAllowed := GVL_PERSISTENT.LimitLegalDepthMinAllowed;
     GVL_IHM.Common.LimitLegalEnabled         := GVL_PERSISTENT.LimitLegalEnabled;
+END_IF;
+
+// 🆕 REX 2026-07-15 (10) — BUG CORRIGÉ (retour terrain) : WinchMaxStepFwd/Rev (essais progressifs
+// IHM_MANU, TEMPORAIRE) n'avaient jamais de boot-init, contrairement à tous les autres réglages
+// IHM ci-dessus — restaient à 0 (défaut INT) en permanence. Le bornage de PRG_06_WinchControl
+// traitait ce 0 comme "invalide" et le remplaçait SILENCIEUSEMENT par 5 (aucune restriction),
+// sans jamais corriger l'affichage IHM : l'opérateur voyait "0" (lu comme restrictif) alors que
+// la vitesse réellement appliquée était pleine échelle — d'où les contacteurs qui commutaient
+// normalement malgré un "0" à l'écran. GVL_IHM.IHM_MANU est déjà RETAIN (ST_IHM_MANU) — pas besoin
+// de miroir GVL_PERSISTENT (dérogation temporaire, pas un réglage machine permanent, voir
+// IHM_MANU_Journal_Modifications.md §10).
+IF GVL_IHM.IHM_MANU.WinchMaxStepFwd = 0 THEN
+    GVL_IHM.IHM_MANU.WinchMaxStepFwd := 5;
+END_IF;
+IF GVL_IHM.IHM_MANU.WinchMaxStepRev = 0 THEN
+    GVL_IHM.IHM_MANU.WinchMaxStepRev := 2;
 END_IF;
 
 IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
@@ -174,6 +192,17 @@ IF GVL_IHM.WinchM2.CableLimitDescentM <> GVL_PERSISTENT.CableLimitDescentM2_M TH
     GVL_PERSISTENT.CableLimitDescentM2_M := GVL_IHM.WinchM2.CableLimitDescentM;
 END_IF;
 GVL_IHM.WinchM2.CableLimitDescentM := GVL_PERSISTENT.CableLimitDescentM2_M;
+
+// 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescentM ci-dessus.
+IF GVL_IHM.WinchM1.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM1_M THEN
+    GVL_PERSISTENT.CableLimitAscentM1_M := GVL_IHM.WinchM1.CableLimitAscentM;
+END_IF;
+GVL_IHM.WinchM1.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM1_M;
+
+IF GVL_IHM.WinchM2.CableLimitAscentM <> GVL_PERSISTENT.CableLimitAscentM2_M THEN
+    GVL_PERSISTENT.CableLimitAscentM2_M := GVL_IHM.WinchM2.CableLimitAscentM;
+END_IF;
+GVL_IHM.WinchM2.CableLimitAscentM := GVL_PERSISTENT.CableLimitAscentM2_M;
 
 IF GVL_IHM.WinchM1.SlowdownDistanceM <> GVL_PERSISTENT.WinchSlowdownDistance_M THEN
     GVL_PERSISTENT.WinchSlowdownDistance_M := GVL_IHM.WinchM1.SlowdownDistanceM;
@@ -237,6 +266,7 @@ GVL_IHM.WinchM1.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.WinchM1.ThermalFault             := NOT PRG_00_Inputs.M1ThermalFeedback;
 GVL_IHM.WinchM1.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
 GVL_IHM.WinchM1.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
+GVL_IHM.WinchM1.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM1Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.WinchM1.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
 GVL_IHM.WinchM1.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM1.BrakeContactorCheck;
 
@@ -281,6 +311,7 @@ GVL_IHM.WinchM2.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.WinchM2.ThermalFault             := NOT PRG_00_Inputs.M2ThermalFeedback;
 GVL_IHM.WinchM2.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
 GVL_IHM.WinchM2.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
+GVL_IHM.WinchM2.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM2Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.WinchM2.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07
 GVL_IHM.WinchM2.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM2.BrakeContactorCheck;
 

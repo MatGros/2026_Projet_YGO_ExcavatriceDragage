@@ -32,6 +32,11 @@ VAR
     BottomLimitM2_Active    : REAL;
     ForbidDescentM1_Active  : BOOL;
     ForbidDescentM2_Active  : BOOL;
+    // 🆕 REX 2026-07-15 (8) — miroir IHM dédié CableLimitAscentM1/2_M (demande utilisateur, symétrique
+    // à CableLimitDescentReached) : indique PRÉCISÉMENT que la nouvelle limite haute d'exploitation
+    // normale est atteinte (hors capteur physique bit5, hors Homing) — voir §5 plus bas.
+    CableLimitAscentM1Reached : BOOL;
+    CableLimitAscentM2Reached : BOOL;
 
     // 🔧 REX 2026-07-07 : couplage croisé M1/M2 des arrêts, UNIQUEMENT si SyncActive (mouvement
     // coherent voulu). Hors synchro (Grappin.Busy ou SyncEnable=FALSE MAINT_N2) : chaque treuil réagit
@@ -60,6 +65,26 @@ VAR
     SyncMinorDeviationBlocksUp   : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la montée
     SyncMinorDeviationBlocksDown : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la descente
     M2_LimitShift                : REAL;   // 🆕 REX 2026-07-08 : décalage dynamique de la butée haute de M2
+
+    // 🆕 REX 2026-07-15 (3) — demande utilisateur : les fins de course virtuelles grappin
+    // (FdcGrappinOpen/CloseActive) doivent bloquer le mouvement AUSSI en pilotage COUPLÉ IHM_MANU
+    // (M1+M2 simultané), pas seulement en pilotage individuel M2 — sinon un opérateur qui pousse le
+    // couplage alors que le grappin est déjà en butée virtuelle n'est protégé que par la butée
+    // mécanique passive. Masque calculé UNE FOIS ici, consommé par M1 ET M2 (§1/§2 ci-dessous) pour
+    // que les deux treuils s'arrêtent ENSEMBLE (pas de désynchro M1/M2 en cas de blocage partiel).
+    CoupledFwdGrappinOk          : BOOL;   // Couplage montée autorisé (pas de butée fermeture grappin)
+    CoupledRevGrappinOk          : BOOL;   // Couplage descente autorisé (pas de butée ouverture grappin)
+
+    // 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (demande utilisateur,
+    // TEMPORAIRE tant que les vitesses définitives ne sont pas figées, à retirer ensuite) : commun
+    // aux 2 treuils (GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev, structure figée, un seul réglage pour M1
+    // ET M2). Actif UNIQUEMENT si ManuActive — Auto garde son comportement inchangé (5 en montée,
+    // WinchMaxStepDescente en descente). En Manu, le plafond descente est le MIN avec
+    // WinchMaxStepDescente (jamais moins protecteur qu'Auto, juste potentiellement plus prudent).
+    ManuMaxStepFwd            : INT;
+    ManuMaxStepRev            : INT;
+    EffectiveMaxStepAscent    : INT;
+    EffectiveMaxStepDescente  : INT;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
@@ -115,6 +140,25 @@ SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) <> 16#0000;
 SyncMinorDeviationBlocksUp   := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0);
 SyncMinorDeviationBlocksDown := GVL_PERSISTENT.SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
 
+// 🆕 REX 2026-07-15 (3) — voir déclaration VAR ci-dessus : couplé masqué par les mêmes fins de
+// course grappin que l'individuel M2, appliqué à M1 ET M2 (§1/§2) pour arrêter les DEUX treuils
+// ensemble plutôt que de désynchroniser M1/M2 en ne bloquant que la moitié du couplage.
+CoupledFwdGrappinOk := NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive;
+CoupledRevGrappinOk := NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive;
+
+// 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (voir déclaration VAR
+// ci-dessus). Bornage identique à l'ex-logique PRG_10_Outputs retirée lors du passage sur FB_Winch.
+ManuMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
+IF (ManuMaxStepFwd < 1) OR (ManuMaxStepFwd > 5) THEN
+    ManuMaxStepFwd := 5; // Pleine vitesse par défaut si non initialisé/invalide
+END_IF;
+ManuMaxStepRev := GVL_IHM.IHM_MANU.WinchMaxStepRev;
+IF (ManuMaxStepRev < 1) OR (ManuMaxStepRev > 5) THEN
+    ManuMaxStepRev := 2; // Palier 2 max par défaut en descente (conforme AF) si non initialisé/invalide
+END_IF;
+EffectiveMaxStepAscent   := SEL(PRG_10_Outputs.ManuActive, 5, ManuMaxStepFwd);
+EffectiveMaxStepDescente := SEL(PRG_10_Outputs.ManuActive, GVL_PERSISTENT.WinchMaxStepDescente, MIN(GVL_PERSISTENT.WinchMaxStepDescente, ManuMaxStepRev));
+
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche (bug trouvé en
@@ -125,6 +169,34 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
     M1_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
+ELSIF PRG_10_Outputs.ManuActive THEN
+    // 🆕 REX 2026-07-15 (2) — IHM_MANU pilote désormais M1 via FB_Winch (au lieu de l'ex-bypass
+    // direct dans PRG_10_Outputs) : récupère gratuitement la rampe accel/décel + le ralentissement
+    // en zone d'approche de bordure + le maintien du relais pendant la décél (mêmes paramètres
+    // persistants qu'en Auto, voir instWinchM1 plus bas §6). Demande (boutons IHM ou joystick, déjà
+    // arbitrée par PRG_10_Outputs : M1Fwd_Demand/M1Rev_Demand/CoupledFwd_Demand/CoupledRev_Demand)
+    // lue avec 1 scan de retard (~10ms, PRG_10 position 10 > PRG_06 position 6) — même principe
+    // déjà accepté ailleurs dans ce fichier (Grappin.Busy, SyncMinorDeviation).
+    // 🔧 REX 2026-07-15 (5) — trouvé en revue croisée (agent Haiku + relecture manuelle) : M1
+    // INDIVIDUEL (bouton M1_RelayFwd/Rev, indépendant de M2) n'était masqué par AUCUNE butée
+    // grappin — delta = CablePosM1 - CablePosM2, donc bouger M1 seul aggrave la MÊME sur-contrainte
+    // mécanique que le couplé (déjà corrigé ci-dessous) : M1 Fwd augmente le delta (aggrave
+    // FdcGrappinOpenActive, delta déjà >= 0) ; M1 Rev diminue le delta (aggrave
+    // FdcGrappinCloseActive, delta déjà <= -10). Sens INVERSÉ par rapport à M2 (M2Fwd↔Close,
+    // M2Rev↔Open) car M1 et M2 ont un effet opposé sur le même delta. Couplé masqué par
+    // CoupledFwdGrappinOk/CoupledRevGrappinOk (REX 2026-07-15 (3)) — M1 s'arrête EN MÊME TEMPS que
+    // M2 si le couplage OU son propre individuel violerait une butée grappin.
+    IF (PRG_10_Outputs.M1Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdGrappinOk) THEN
+        M1_Direction_Active := 1;
+    ELSIF (PRG_10_Outputs.M1Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevGrappinOk) THEN
+        M1_Direction_Active := -1;
+    ELSE
+        M1_Direction_Active := 0;
+    END_IF;
+    M1_StartStop_Active := (M1_Direction_Active <> 0);
+    // 🎯 Joystick = vitesse proportionnelle à la déflexion (comme en Auto) ; boutons HMI = cible 100%
+    // (FB_Winch rampe déjà en interne, plus besoin de la rampe HMI locale ex-PRG_10_Outputs).
+    M1_SpeedRef_Active  := SEL(GVL_IHM.IHM_MANU.JoystickSelect, 100.0, ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
 ELSE
     // 🔧 REX 2026-07-08 : + AND DeadmanArmed — NOT Busy seul insuffisant (rampe joystick met du
     // temps à redescendre à 0 après désarmement homme-mort ⇒ StartStop reste TRUE le temps de la
@@ -153,6 +225,20 @@ ELSE
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
+    ELSIF PRG_10_Outputs.ManuActive THEN
+        // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course grappin (FdcGrappin) appliquées
+        // au pilotage INDIVIDUEL **ET** COUPLÉ de M2 désormais (demande utilisateur — "que ce soit
+        // couplé ou pas couplé, il faut rester dans les butées"). Ex-comportement (couplé non
+        // masqué) retiré : c'était une incohérence, pas un choix voulu.
+        IF (PRG_10_Outputs.M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinCloseActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdGrappinOk) THEN
+            M2_Direction_Active := 1;
+        ELSIF (PRG_10_Outputs.M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcGrappinOpenActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevGrappinOk) THEN
+            M2_Direction_Active := -1;
+        ELSE
+            M2_Direction_Active := 0;
+        END_IF;
+        M2_StartStop_Active := (M2_Direction_Active <> 0);
+        M2_SpeedRef_Active  := SEL(GVL_IHM.IHM_MANU.JoystickSelect, 100.0, ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
     ELSE
         // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
         // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (gate directionnel)
@@ -302,41 +388,51 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
                        OR (GVL_PERSISTENT.LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= GVL_PERSISTENT.LimitLegalDepthMinAllowed));
 
-// 🔧 REX 2026-07-08 : arrêt réel encodeur en fonctionnement NORMAL, distinct du capteur physique
-// (bit5 côté FB_Safety_Winch). Seuil = HomingTargetMx_M - WinchTopStopMarginM (RELATIF à la
-// position haute de référence, pas une valeur absolue) : si HomingTargetMx_M est recalibrée sur
-// site, la position d'arrêt normal suit automatiquement, toujours à la même marge du capteur.
+// 🔧 REX 2026-07-15 (6) — demande utilisateur : arrêt réel encodeur en fonctionnement NORMAL,
+// distinct du capteur physique (bit5/Méca D côté FB_Safety_Winch). Seuil = CableLimitAscentMx_M,
+// limite ABSOLUE indépendante (même principe que CableLimitDescentM1/2_M côté descente) —
+// ex-calcul en MARGE sous HomingTargetMx_M (WinchTopStopMarginM) RETIRÉ : HomingTargetMx_M (12.5m)
+// est réservée à l'approche petite vitesse du capteur physique pendant un Homing explicite, PAS
+// à l'exploitation normale, qui doit s'arrêter proprement BIEN AVANT (12.0m par défaut) sans
+// jamais réveiller le capteur physique (bit5/Méca D traitent son activation hors référencement
+// comme une ANOMALIE — roue libre/contacteur collé — pas un fonctionnement normal).
 // Même principe que la limite légale de descente ci-dessus (condition LIVE, pas de bit
 // ErrorId/Reset dédié) — passe par ForbidAscentMx_Raw pour bénéficier DU MÊME couplage croisé
 // M1/M2 que le capteur physique (sinon un treuil qui atteint la limite une fraction de seconde
 // avant l'autre crée un écart RelayFwdM1<>RelayFwdM2 qui déclenche à tort le défaut FB_WinchSync
 // bit1 "incohérence de commande" — REX terrain 2026-07-08, testé et corrigé).
-// homing), sans qu'aucun bit dédié ne soit requis. Remplacé par `HomingApproachEnable` (FB_Modes,
-// même pattern que SyncEnable) : nécessite MAINT_N2 ET une case IHM activée consciemment.
+// Bypass en MAINT_N2 via `HomingApproachEnable` (FB_Modes, même pattern que SyncEnable) :
+// nécessite MAINT_N2 ET une case IHM activée consciemment pour dépasser CableLimitAscentMx_M
+// et aller chercher le capteur physique en petite vitesse (Homing).
+// 🆕 REX 2026-07-15 (8) : flag dédié — miroir IHM (GVL_IHM.WinchM1.CableLimitAscentReached, voir
+// PRG_09_Supervision), symétrique à CableLimitDescentReached. Réutilisé ci-dessous dans ForbidAscentM1_Raw.
+CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
+                             AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
+                             AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.CableLimitAscentM1_M)
+                             AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
+
 ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM1.Homed
                            AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= GVL_PERSISTENT.HomingTargetM1_M))
-                       OR (PRG_02_Encoders.instHomingM1.Homed
-                           AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >=
-                                (GVL_PERSISTENT.HomingTargetM1_M - GVL_PERSISTENT.WinchTopStopMarginM))
-                           AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
+                       OR CableLimitAscentM1Reached;
 // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
 // La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le grappin est fermé (IsClosed)
 // ou en cours de fermeture (CloseReq). Sinon (grappin ouvert/en cours d'ouverture), M2 doit
-// s'arrêter à la butée normale de 12.00m (HomingTargetM2_M - margin) pour s'arrêter proprement en même temps que M1.
+// s'arrêter à la butée normale (CableLimitAscentM2_M) pour s'arrêter proprement en même temps que M1.
 M2_LimitShift := SEL(GVL_PERSISTENT.GrappinState.IsClosed OR instGrappin.CloseReq, 0.0, GVL_PERSISTENT.GrappinConfig.OffsetCloseM);
+
+// 🆕 REX 2026-07-15 (8) : idem M1 (voir ci-dessus).
+CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
+                             AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
+                             AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (GVL_PERSISTENT.CableLimitAscentM2_M + M2_LimitShift))
+                             AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
 ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                        OR (PRG_02_Encoders.instHomingM2.Homed
                            AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift)))
-                       OR (PRG_02_Encoders.instHomingM2.Homed
-                           AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >=
-                                (GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift - GVL_PERSISTENT.WinchTopStopMarginM))
-                           AND NOT PRG_04_Modes.instModes.HomingApproachEnable);
+                       OR CableLimitAscentM2Reached;
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -358,7 +454,10 @@ instWinchM1(
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := GVL_PERSISTENT.WinchSpeedStepTable,
-    MaxStepDescente         := GVL_PERSISTENT.WinchMaxStepDescente, // 🔧 REX 2026-07-08 : commun M1/M2
+    // 🔧 REX 2026-07-15 (9) : EffectiveMaxStepDescente/Ascent (voir calcul plus haut) — Auto garde
+    // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
+    MaxStepDescente         := EffectiveMaxStepDescente,
+    MaxStepAscent           := EffectiveMaxStepAscent,
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
@@ -369,7 +468,10 @@ instWinchM1(
     Homed                   := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM1.HomingSuspect, // 🆕 Câblage de l'incertitude M1
     CablePosM               := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
-    TopLimitM               := GVL_PERSISTENT.HomingTargetM1_M,
+    // 🔧 REX 2026-07-15 (6) : CableLimitAscentM1_M (limite ABSOLUE d'exploitation normale, ex-
+    // HomingTargetM1_M) — la rampe/ralentissement de FB_Winch cible désormais la même limite que
+    // ForbidAscentM1_Raw ci-dessus, pas le capteur physique (réservé au Homing).
+    TopLimitM               := GVL_PERSISTENT.CableLimitAscentM1_M,
     BottomLimitM            := BottomLimitM1_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
     SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct
@@ -388,7 +490,9 @@ instWinchM2(
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
-    MaxStepDescente         := GVL_PERSISTENT.WinchMaxStepDescente, // 🔧 REX 2026-07-08 : commun M1/M2
+    // 🔧 REX 2026-07-15 (9) : idem M1 (voir §6 ci-dessus).
+    MaxStepDescente         := EffectiveMaxStepDescente,
+    MaxStepAscent           := EffectiveMaxStepAscent,
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
@@ -399,7 +503,8 @@ instWinchM2(
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    TopLimitM               := GVL_PERSISTENT.HomingTargetM2_M + M2_LimitShift,
+    // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage grappin fermé).
+    TopLimitM               := GVL_PERSISTENT.CableLimitAscentM2_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     SlowdownDistanceM       := GVL_PERSISTENT.WinchSlowdownDistance_M,
     SlowSpeedPct            := GVL_PERSISTENT.WinchSlowSpeedPct

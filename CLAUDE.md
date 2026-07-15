@@ -4,6 +4,9 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 📦 **Historique versions CODESYS ↔ DOC** : voir [DOC/VERSION_HISTORY.md](DOC/VERSION_HISTORY.md) — ajouter une ligne à chaque jalon significatif.
 
+🤝 **Travail multi-agents (Claude orchestrateur ↔ Gemini exécution)** : voir [DOC/AGENT_HANDOFF/](DOC/AGENT_HANDOFF/) — `GEMINI_BRIEF.md` (onboarding), `QUEUE.md` (tâches en cours), `tasks/TASK-00NN-*.md` (détail par tâche). Claude crée les tâches et seul à valider `REVIEW→DONE` ; jamais de commit sans validation utilisateur, même règle pour les 2 agents.
+⚠️ **OBLIGATOIRE** : dès que l'utilisateur demande de déléguer/confier/envoyer du travail à Gemini (formulation quelconque) → la skill `.claude/skills/codesys-workflow.md` (§ Aiguillage préalable) redirige vers la procédure de délégation **au lieu d'exécuter la tâche soi-même**. Ne s'applique pas à l'usage normal de l'outil `Agent` (subagents Claude), qui reste libre.
+
 ---
 
 ## 🎯 **Avant de coder : LIRE CECI**

@@ -78,6 +78,9 @@ VAR_INPUT
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
     MaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
+    MaxStepAscent           : INT := 5;    // 🆕 REX 2026-07-15 (9) : Plafond palier en montée (CommandedDirection=1) — 5 = pas de restriction
+                                             // (défaut Auto). Sert à brider en IHM_MANU pendant les essais progressifs
+                                             // (voir PRG_06_WinchControl, GVL_IHM.IHM_MANU.WinchMaxStepFwd) — temporaire.
     HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
     FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)
@@ -214,13 +217,16 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-// 🆕 Plafond dynamique de palier (MaxStepDescente en descente, Palier 1 si non référencé ou douteux, Palier 1 en approche homing)
+// 🆕 Plafond dynamique de palier (MaxStepDescente en descente, Palier 1 si non référencé ou douteux,
+// Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
 IF NOT Homed OR HomingSuspect THEN
     ActiveMaxStep := 1;
 ELSIF CommandedDirection = -1 THEN
     ActiveMaxStep := MaxStepDescente;
 ELSIF (CommandedDirection = 1) AND HomingApproachActive THEN
     ActiveMaxStep := 1;
+ELSIF CommandedDirection = 1 THEN
+    ActiveMaxStep := MaxStepAscent;
 ELSE
     ActiveMaxStep := 5;
 END_IF;

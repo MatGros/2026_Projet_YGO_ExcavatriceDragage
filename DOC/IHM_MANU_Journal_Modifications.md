@@ -13,6 +13,18 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 
 ---
 
+## 🆕 MISE À JOUR MAJEURE — SESSION 2026-07-15
+
+**Changement de doctrine pour M1/M2 (treuils) UNIQUEMENT.** Les sections **3** et **7** ci-dessous décrivent l'état **AVANT** cette session (bypass total, `Enable:=FALSE`) — **elles ne reflètent plus le code actuel pour M1/M2** et sont conservées à titre d'historique (barrées mentalement). Voir nouvelles sections **8, 9, 10, 11** pour l'état réel.
+
+**Résumé du changement :** IHM_MANU ne bypass plus `PRG_06_WinchControl`/`FB_Safety_Winch` pour M1/M2 — il devient une **3ᵉ source d'arbitrage** (à côté de SEMI_AUTO et joystick Auto), au même titre que les autres, pour bénéficier nativement de la rampe accel/décel, du ralentissement en zone d'approche de butée, et de la sécurité `FB_Safety_Winch` (désormais **toujours active**, plus de bypass conditionnel). **Motif** : arrêts violents constatés en simulation aux butées logicielles (pas de ralentissement, coupure relais instantanée) + confusions "Fault allumé mais je peux bouger" (butées logicielles traitées comme un vrai défaut machine).
+
+**Ce qui reste un VRAI bypass dérogatoire (inchangé, sections 3/4/5/6 toujours valables) :** Chariot M3, Auxiliaires Hydrauliques (Grille/Casque), homing direct simulé M1/M2 (`PRG_02_Encoders`), timer visuel `FB_Encoder_Abs`.
+
+**Nouveau point provisoire ajouté (section 10)** : plafond palier "essais progressifs" (`WinchMaxStepFwd/Rev`) — réactivé spécifiquement pour cette session, TEMPORAIRE, à retirer avec le reste (voir `PLAN_TASK_v1.0.md` T28).
+
+---
+
 ## 📋 FICHIERS MODIFIÉS — INVENTAIRE DÉTAILLÉ
 
 ### 1. **CODE/SUPERVISION/ST_IHM_MANU.st** — Nouveau type créé (complet, lignes 1–52)
@@ -56,6 +68,8 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 ---
 
 ### 3. **CODE/MAIN/PRG_10_Outputs.st** — Trois blocs balisés Début/Fin IHM_MANU
+
+> ⚠️ **PARTIELLEMENT PÉRIMÉ (session 2026-07-15)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 — remplacé par le pilotage `FB_Winch` (voir section 8). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcGrappin`) qui alimente désormais `PRG_06_WinchControl`, et la partie **M3/Auxiliaires qui reste un vrai bypass, inchangée**. Le "Bloc 3" (PowerCutOff) reste valable tel quel.
 
 #### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–90)
 
@@ -208,9 +222,69 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
 **À modifier au nettoyage :** Rétablir la transition immédiate sans `PresetTimerVisual` dans le Step 1, et supprimer la déclaration du timer dans `VAR`.
 
 ### 7. **CODE/MAIN/PRG_03_Safety.st** — Désactivation des sécurités logicielles métier en mode IHM_MANU
-Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyChariotM3` sont désactivées (`Enable := FALSE`) dès que `ManuActive` est actif.
 
-**À modifier au nettoyage :** Rétablir les entrées `Enable` d'origine (`Enable := NOT PRG_04_Modes.instModes.InhibitMx` pour les treuils, et `Enable := NOT PRG_10_Outputs.ManuActive` pour le chariot M3 doit être retiré pour redevenir `Enable := TRUE`).
+> ⚠️ **PÉRIMÉ POUR M1/M2 (session 2026-07-15) — INVERSÉ.** Cette section décrit l'état AVANT le
+> 2026-07-15 : `Enable := FALSE` quand `ManuActive` actif (bypass sécurité total pour éviter les
+> faux Méca B/E). **Ce n'est PLUS le cas** : `instSafetyWinchM1`/`instSafetyWinchM2.Enable` sont
+> désormais **inconditionnels** (`NOT InhibitM1`/`NOT InhibitM2`, comme en Auto — voir section 9).
+> La fausse alarme Méca B a été corrigée à la racine (voir section 9.3 : `JoystickYNeutral`
+> regarde aussi les boutons IHM, pas juste le joystick) plutôt que masquée par un bypass complet.
+> **`instSafetyChariotM3` reste inchangé** (toujours `Enable := NOT ManuActive OR ...`, bypass
+> conditionnel d'origine conservé — M3 reste hors scope, voir bandeau §2 en tête de document).
+
+Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyChariotM3` étaient désactivées (`Enable := FALSE`) dès que `ManuActive` était actif *(état pré-2026-07-15, M1/M2 uniquement)*.
+
+**À modifier au nettoyage :** ~~Rétablir les entrées `Enable` d'origine~~ **Déjà fait pour M1/M2** (2026-07-15). Reste à faire pour M3 : `Enable := NOT PRG_10_Outputs.ManuActive OR ...` (chariot) doit être retiré pour redevenir `Enable := TRUE` inconditionnel, une fois M3 sorti du bypass (dépend de la finalisation `FB_Chariot`, cf. `PLAN_TASK` T4/T12/T26).
+
+---
+
+### 8. **CODE/MAIN/PRG_06_WinchControl.st** — IHM_MANU comme 3ᵉ source d'arbitrage M1/M2 *(NOUVEAU 2026-07-15)*
+
+**Rôle :** Remplace le bypass direct des sections 3 (Bloc 2) — M1/M2 sont désormais pilotés par les MÊMES instances `instWinchM1`/`instWinchM2` (`FB_Winch`) qu'en Auto/SEMI_AUTO, avec une branche `ELSIF PRG_10_Outputs.ManuActive THEN` insérée entre la branche SEMI_AUTO et la branche joystick Auto (§1 pour M1, §2 pour M2).
+
+**Logique de la branche Manu (par treuil) :**
+- Lit `PRG_10_Outputs.M1Fwd_Demand`/`M1Rev_Demand`/`CoupledFwd_Demand`/`CoupledRev_Demand` (calculés dans `PRG_10_Outputs`, lus avec **1 scan de retard** ~10ms — PRG_10 en position 10, PRG_06 en position 6, même principe que `Grappin.Busy`/`SyncMinorDeviation` déjà accepté ailleurs dans ce fichier) pour déterminer `Direction`/`StartStop`.
+- `SpeedRefPct` = déflexion joystick brute (si `JoystickSelect=TRUE`, vitesse proportionnelle comme en Auto) ou `100.0` (si boutons HMI — `FB_Winch` rampe déjà en interne, plus besoin de rampe locale).
+- Fins de course grappin (`FdcGrappinOpen/CloseActive`) appliquées au pilotage **individuel M2 ET couplé** (M1+M2), et désormais **aussi à M1 individuel** (`CoupledFwdGrappinOk`/`CoupledRevGrappinOk`, calculés une fois, réutilisés M1+M2 pour un arrêt synchrone) — corrige un trou trouvé en revue (ex-code ne masquait QUE M2 individuel, jamais M1 seul ni le couplé).
+
+**Conséquence :** M1/M2 bénéficient nativement en Manu de : rampe accel/décel (`WinchM1/M2RampAccelRate/DecelNormal/DecelFast_Pct`), ralentissement en zone d'approche de butée (`WinchSlowdownDistance_M`/`WinchSlowSpeedPct`), maintien du relais de sens pendant la décélération (pas de coupure instantanée à pleine vitesse).
+
+**À modifier au nettoyage :** Rien à faire — cette branche `ELSIF ManuActive` est le code **définitif**, pas une dérogation à retirer (elle deviendra juste inatteignable si `ModeDisable` reste `TRUE` en permanence après qualification). Seul `PRG_10_Outputs.M1Fwd_Demand`/etc. (calcul amont, boutons/joystick) reste spécifique IHM_MANU.
+
+---
+
+### 9. **`GVL_PERSISTENT.st` / `PRG_06_WinchControl.st` / `ST_WinchHMI.st` / `PRG_09_Supervision.st` — Nouvelle limite `CableLimitAscentM1/2_M`** *(NOUVEAU 2026-07-15)*
+
+**Problème identifié :** `HomingTargetM1/2_M` (12.5m) servait à la fois de cible Homing (approche petite vitesse du capteur physique) ET de seuil d'arrêt normal en exploitation — l'exploitation normale finissait par réveiller le capteur physique hors référencement, que `FB_Safety_Winch` traite comme une anomalie (Méca D, bit11) → escalade `SafeStop`+`PowerCutOff` après 3s (`PostRampTimeout`), perçu comme un blocage/défaut en approchant 12m.
+
+**Fix :** Nouvelle variable persistante indépendante `CableLimitAscentM1_M`/`CableLimitAscentM2_M` (défaut **12.0m**, mirroir exact de `CableLimitDescentM1/2_M` côté descente) :
+- `HomingTargetM1/2_M` (12.5m) redevient **exclusivement** la cible du Homing.
+- `PRG_06_WinchControl` : `TopLimitM` (alimente la rampe `FB_Winch`) et le seuil `ForbidAscentMx_Raw` (arrêt normal, bypass en `HomingApproachEnable`) utilisent désormais `CableLimitAscentMx_M`.
+- Exposée IHM : `GVL_IHM.WinchM1/M2.CableLimitAscentM` (miroir bidirectionnel dans `PRG_09_Supervision`, même pattern que `CableLimitDescentM`) + `CableLimitAscentReached` (miroir lecture seule, symétrique `CableLimitDescentReached`).
+- `WinchTopStopMarginM` (ex-marge relative) **retiré** (obsolète, remplacé par la valeur absolue).
+
+**9.3 — Correctif Méca B (`SafetyErrorId=256`, bit8) :** `JoystickYNeutral` (entrée `FB_Safety_Winch`) ne regardait que le joystick CANopen — piloter M1/M2 via boutons HMI (IHM_MANU, `JoystickSelect=FALSE`) faisait croire à "aucune commande opérateur" en continu (joystick physiquement au neutre) → `SafeStop` après 3s de mouvement légitime aux boutons. **Fix** (`PRG_03_Safety.st`) : `JoystickYNeutral` regarde aussi les boutons IHM_MANU bruts (individuel M1/M2 + couplé), en plus du joystick — défense en profondeur conservée (lecture directe des boutons, indépendante de l'arbitrage `FB_Winch`/`PRG_06`).
+
+**9.4 — `FB_Safety_Chariot.st` :** correctif bug indépendant (pas spécifique Manu) — `Error`/`ErrorId` n'étaient pas remis à zéro quand `Enable=FALSE`, causant un défaut latché à vie (remontait comme faux défaut M3 en simulation). Aligné sur `FB_Safety_Winch`, qui le faisait déjà.
+
+**À modifier au nettoyage :** Rien — ce sont des corrections d'architecture définitives (limite haute + fix Méca B + fix latch Chariot), pas des dérogations IHM_MANU.
+
+---
+
+### 10. **`GVL_IHM.IHM_MANU.WinchMaxStepFwd`/`WinchMaxStepRev` — Réactivation TEMPORAIRE "essais progressifs"** *(NOUVEAU 2026-07-15 — ⚠️ VRAIE DÉROGATION, À RETIRER)*
+
+**Contexte :** Ces 2 champs existent depuis l'origine d'IHM_MANU (§1, section "Champs du struct") mais étaient devenus **orphelins** : leur seul consommateur (`instManuSpeedStep`/`ActiveMaxStepFwd/Rev` dans `PRG_10_Outputs`) a été supprimé en section 8 (M1/M2 pilotés par `FB_Winch`, qui n'avait qu'un plafond `MaxStepDescente`, pas de plafond montée).
+
+**Demande utilisateur explicite (2026-07-15) :** *"Je veux utiliser WinchMaxStepFwd et Rev, que ça s'applique en simu et en IHM_MANU tout le temps. C'est uniquement quand les essais auront été avancés et qu'on aura bien figé les vitesses, que ça disparaîtra plus tard."* → **dérogation VOLONTAIRE et TEMPORAIRE**, à retirer avec le reste d'IHM_MANU (ou avant, dès que les vitesses de croisière sont validées terrain).
+
+**Implémentation :**
+- `FB_Winch.st` : nouveau paramètre `MaxStepAscent : INT := 5` (mirroir de `MaxStepDescente`, appliqué quand `CommandedDirection=1` hors approche homing). Défaut 5 = **aucune restriction pour Auto**, qui ne branche jamais autre chose que 5.
+- `PRG_06_WinchControl.st` : `EffectiveMaxStepAscent`/`EffectiveMaxStepDescente` calculés une fois (communs M1/M2, comme le champ IHM) — `SEL(ManuActive, <valeur Auto>, <valeur Manu bornée 1..5>)`. **En descente, le plafond Manu (`WinchMaxStepRev`) est le MIN avec `WinchMaxStepDescente`** (jamais moins protecteur qu'Auto, seulement plus prudent possible) — **en montée (`WinchMaxStepFwd`), aucun plafond mécanique Auto n'existe, donc Manu applique directement sa valeur bornée 1..5.**
+
+**À supprimer au nettoyage (AVANT ou PENDANT le nettoyage général IHM_MANU, cf. `PLAN_TASK_v1.0.md` T28) :**
+- [ ] `FB_Winch.st` : retirer le paramètre `MaxStepAscent` (ou le laisser à son défaut 5 partout, inoffensif si plus rien ne le branche à autre chose)
+- [ ] `PRG_06_WinchControl.st` : retirer `ManuMaxStepFwd`/`ManuMaxStepRev`/`EffectiveMaxStepAscent`/`EffectiveMaxStepDescente`, rebrancher `MaxStepDescente := GVL_PERSISTENT.WinchMaxStepDescente` directement (comme avant), `MaxStepAscent` non branché (défaut 5)
+- [ ] `ST_IHM_MANU.st` : `WinchMaxStepFwd`/`WinchMaxStepRev` redeviennent orphelins (ou supprimés avec le reste du struct, section §1)
 
 ---
 
@@ -311,6 +385,8 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 | **Pas de vérification mode opérateur** | 🟡 MOYEN | Oui | À confirmer terrain si souhaitable |
 | **Pas de supervision redondance PowerCutOff** | 🟡 MOYEN | Oui | Envisager test périodique même en Manu |
 | **Fréquence M3 sans limites** | 🟡 MOYEN | Oui | À confirmer si limites variateur doivent s'appliquer |
+| ~~**M1/M2 : `FB_Safety_Winch` désactivée en Manu**~~ | ~~🔴 CRITIQUE~~ | **✅ RÉSOLU 2026-07-15** | Sécurité M1/M2 désormais toujours active (section 9), plus un bypass total |
+| **`WinchMaxStepFwd/Rev` réactivés (essais progressifs)** | 🟡 MOYEN | Oui (2026-07-15, VOLONTAIRE) | Temporaire assumé — bornage 1..5 + MIN avec plafond Auto en descente (jamais moins protecteur) ; à retirer (section 10) |
 
 ---
 
@@ -329,7 +405,8 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 | Date | Auteur | Action |
 |------|--------|--------|
 | **2026-07-09** | Mise en service urgence | Ajout fonctionnalité IHM_MANU provisoire (ST_IHM_MANU, blocs PR G_10/PRG_02) |
-| **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain |
+| **2026-07-15** | Session refonte sécurité | M1/M2 branchés sur `FB_Winch`/`PRG_06_WinchControl` (fin du bypass total, sections 8-9) ; nouvelle limite `CableLimitAscentM1/2_M` ; fix Méca B (bit8, boutons HMI) ; fix grappin couplé+M1 individuel ; fix latch `FB_Safety_Chariot` ; réactivation TEMPORAIRE `WinchMaxStepFwd/Rev` (section 10, **vraie dérogation restante**) |
+| **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain (M3/Auxiliaires + section 10 restent à retirer) |
 
 ---
 

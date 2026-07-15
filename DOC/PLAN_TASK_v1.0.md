@@ -10,6 +10,7 @@
 
 | Date | Jalon |
 |---|---|
+| 2026-07-15 | `v0.4.8` — IHM_MANU M1/M2 pilotés via `FB_Winch` (rampe/ralentissement natifs, retrait doctrine "Conditional Bypass"), nouvelle limite `CableLimitAscentM1/2_M`, correctifs Méca B (bit8) + grappin couplé + `FB_Safety_Chariot` (latch défaut) |
 | 2026-07-09 | Audit complet + ce `PLAN_TASK` |
 | 2026-07-09 | `PLAN_Finalisation_v1.1` (bloquants résolus + priorités actées) + `SAT_Protocole_Essais_v1.0` (protocole recette écrit) — ⚠️ pas encore commités |
 | 2026-07-08/09 | `v0.4.4`/`v0.4.5` **IHM_MANU** — mise en service d'urgence (dérogation active, voir §3 ⏸️) |
@@ -87,6 +88,7 @@ IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` e
 | T25 | Checklist validation Encoder/Homing non réalisée (flux nominal/unitaire, bornage, redémarrage, verrou transition) | Terrain | AF_Partie-10 §10 |
 | T26 | Checklist mise en service Chariot AC600 non réalisée (essai à vide, interlock sens, ETHERCAT, thermique frein) | Terrain | AF_Partie-11 §8 |
 | T27 | Grappin : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-12 §6 |
+| T28 | `GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev` (plafond palier "essais progressifs") : branchement **TEMPORAIRE** dans `FB_Winch`/`PRG_06_WinchControl` (`MaxStepAscent`) — à retirer une fois les vitesses définitives figées, cf. T7 (critère de retrait `IHM_MANU`) | Projet | Session 2026-07-15 |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 

@@ -15,13 +15,15 @@ END_VAR
 
 // 1. Sécurité Treuil M1
 instSafetyWinchM1(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM1
-                           AND (
-                               // Actif si composant réel en mode IHM_MANU (Conditional Bypass Doctrine)
-                               (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal)
-                               // 🆕 2026-07-15 : TOUJOURS actif si codeur M1 est simulé (pour calcul des butées logicielles en simulation)
-                               OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal)
-                           ), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
+    // 🔧 REX 2026-07-15 (2) — SIMPLIFICATION : IHM_MANU pilote désormais M1 via FB_Winch
+    // (PRG_06_WinchControl), qui a BESOIN d'un SafeStop/ForbidAscent/ForbidDescent réels pour
+    // rampé/ralentir proprement (ex-doctrine "Conditional Bypass" devenue obsolète et RETIRÉE
+    // ici : chaque capteur/retour a DÉJÀ sa propre granularité réel/simulé — GVL_Simulation.
+    // EncoderM1_IsReal, ContactorFeedbackM1_IsReal, ThermalM1_IsReal, TopPositionSensor_IsReal,
+    // SlackCableSwitch_IsReal — un composant simulé est déjà forcé "sain" en amont (PRG_00_Inputs/
+    // PRG_02_Encoders), donc Enable n'a plus besoin de bypasser tout le domaine : un vrai défaut
+    // sur un composant RÉEL protège, un composant SIMULÉ ne fait jamais défaut de lui-même).
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -44,7 +46,17 @@ instSafetyWinchM1(
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
-    JoystickYNeutral       := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1,
+    // 🔧 REX 2026-07-15 (7) — BUG CORRIGÉ (retour terrain, SafetyErrorId=256/bit8) : Méca B ne
+    // regardait QUE le joystick CANopen pour détecter "commande opérateur" — en IHM_MANU piloté
+    // par BOUTONS HMI (JoystickSelect=FALSE), le joystick reste au neutre en permanence, donc
+    // MecaB_NoOperatorCmd restait TRUE en continu même pendant un mouvement légitime aux boutons
+    // → SafeStop après PostRampTimeout (3s) dès qu'un mouvement HMI dépassait ce délai. Ajout des
+    // boutons IHM_MANU bruts (M1 individuel + Couplé) — reste indépendant de l'arbitrage
+    // PRG_06/FB_Winch (défense en profondeur intacte, lecture directe des boutons IHM comme le
+    // joystick l'était déjà).
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1)
+                              AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
+                              AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
     GrappinHoldStillActive := PRG_06_WinchControl.instGrappin.Busy, // Méca C — M1 doit rester immobile pendant le
                                                                      // grappin ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
@@ -58,13 +70,8 @@ instSafetyWinchM1(
 
 // 2. Sécurité Treuil M2
 instSafetyWinchM2(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM2
-                           AND (
-                               // Actif si composant réel en mode IHM_MANU (Conditional Bypass Doctrine)
-                               (NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal)
-                               // 🆕 2026-07-15 : TOUJOURS actif si codeur M2 est simulé (pour calcul des butées logicielles en simulation)
-                               OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal)
-                           ), // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) / 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
+    // 🔧 REX 2026-07-15 (2) — même simplification que M1 ci-dessus (voir bandeau instSafetyWinchM1).
+    Enable              := NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
@@ -88,7 +95,10 @@ instSafetyWinchM2(
     // à M2 (c'est M2 qui bouge pendant le grappin, GrappinHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
-    JoystickYNeutral       := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1,
+    // 🔧 REX 2026-07-15 (7) : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus).
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1)
+                              AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
+                              AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
     GrappinHoldStillActive := FALSE,
     // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
     // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2

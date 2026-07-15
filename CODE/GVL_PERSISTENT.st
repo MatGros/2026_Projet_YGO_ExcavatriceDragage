@@ -81,14 +81,19 @@ VAR_GLOBAL PERSISTENT RETAIN
     CableLimitDescentM2_M       : REAL := -20.0; // 💾 Limite basse physique de descente M2 (m, négatif)
     WinchSlowdownDistance_M     : REAL := 1.0;   // 💾 Distance de ralentissement commune (m)
     WinchSlowSpeedPct           : REAL := 15.0;  // 💾 Vitesse lente dans la zone de ralentissement commune (%)
-    // 🔧 REX 2026-07-08 : arrêt réel encodeur en fonctionnement NORMAL, distinct du capteur
-    // physique fin de course haut (HomingTargetM1/M2_M, 12.5m). EXPRIMÉ EN MARGE (pas en valeur
-    // absolue) : arrêt = HomingTargetMx_M - WinchTopStopMarginM, pour rester automatiquement
-    // cohérent avec la position haute de référence si celle-ci est recalibrée sur site (au lieu
-    // de devoir aussi corriger une 2e valeur absolue à la main). Commun aux 2 treuils (même
-    // ensemble mécanique hissé ensemble). Bypass en MAINT_N2 (référencement codeur) pour
-    // pouvoir remonter manuellement en petite vitesse au-delà, jusqu'au capteur physique.
-    WinchTopStopMarginM        : REAL := 0.20;   // 💾 Marge sous HomingTargetM1/M2_M pour l'arrêt normal (m) — 🔧 REX 2026-07-08 (7) : 0.5→0.20, demande utilisateur
+    // 🔧 REX 2026-07-15 (6) — demande utilisateur : ex-WinchTopStopMarginM (marge RELATIVE sous
+    // HomingTargetM1/M2_M) RETIRÉ, remplacé par une limite ABSOLUE indépendante — même principe
+    // que CableLimitDescentM1/M2_M (limite basse) mais côté montée. Nécessaire car HomingTargetMx_M
+    // (12.5m) sert UNIQUEMENT de cible pour le Homing (approche petite vitesse du capteur physique,
+    // hors exploitation normale) — l'exploitation normale doit s'arrêter proprement BIEN AVANT
+    // (ex. 12.0m), sans jamais réveiller le capteur physique/Méca D (bit5/bit11 FB_Safety_Winch,
+    // qui traitent l'arrivée au capteur hors référencement comme une ANOMALIE, pas un
+    // fonctionnement normal). CableLimitAscentMx_M alimente TopLimitM de FB_Winch (rampe +
+    // ralentissement bordure, même mécanisme que CableLimitDescentM) ET le seuil ForbidAscent
+    // "normal" dans PRG_06_WinchControl (bypass en MAINT_N2/HomingApproachEnable pour l'approche
+    // homing, comme avant).
+    CableLimitAscentM1_M        : REAL := 12.0;  // 💾 Limite haute d'exploitation normale M1 (m) — < HomingTargetM1_M (12.5m)
+    CableLimitAscentM2_M        : REAL := 12.0;  // 💾 Limite haute d'exploitation normale M2 (m) — < HomingTargetM2_M (12.5m)
 
     // 📏 LIMITE LÉGALE DE DRAGAGE (Nouveau 2026-07-03)
     LimitLegalDepthMinAllowed   : REAL := -15.0; // 💾 Cote min de dragage autorisée (m, négatif)
