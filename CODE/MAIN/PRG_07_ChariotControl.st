@@ -69,7 +69,7 @@ instChariotM3(
     LimitSwitchRev          := PRG_00_Inputs.ChariotPosFosse1,
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
-    BrakeFeedback           := SEL(GVL_IHM.Chariot.BypassBrakeFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd),
+    BrakeFeedback           := SEL(GVL_IHM.ChariotM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instChariotM3.BrakeCmd),
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
 );
 

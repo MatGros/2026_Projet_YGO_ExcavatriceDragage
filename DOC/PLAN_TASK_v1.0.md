@@ -48,7 +48,25 @@ Joystick · Winch/SpeedStep · Grappin · Encoder (pipeline) · Safety_Winch (14
 IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` existe).
 
 ### 🗑️ Nettoyage dû
-`GVL_BUS`, `GVL_Machine_Stub` (orphelins) · `ST_IHM_MANU` (post-qualification, v1.1 §4.3).
+`GVL_BUS`, `GVL_Machine_Stub` (orphelins) · `ST_IHM_MANU` (post-qualification, v1.1 §4.3) ·
+`GVL_Chariot_M3_Stub.M3_RelayFwd/Rev/RelaySpeedGv/ContactorFeedbackFwd/Rev` (100% orphelins
+depuis abandon DEGRADED_IO v0.4.11, confirmé 2026-07-15 — `M3_PositionSensorTarget`/
+`StubChariotPositionSelect_IHM` du même GVL restent utilisés, ne pas supprimer le fichier entier).
+
+### 🏷️ Nommage — chantier séparé (2026-07-15)
+Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), pilotée sur Chariot M3
+uniquement (`ST_ChariotHMI.ReqFwd/ReqRev`). Reste en préfixe `CmdX`, à auditer/migrer plus tard :
+`FB_Grappin`/`FB_Winch`/`ST_GrappinHMI`/`ST_WinchHMI` (`CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/
+`CmdInhibit`) et `FB_Cycle` (`CmdWinchM1_*`/`CmdChariotM3_*`/`CmdGrappin_*`) — blast radius plus
+large (interfaces FB largement utilisées), plan dédié à valider avant d'y toucher.
+
+🎯 **Cap long terme** (demande explicite utilisateur 2026-07-15) : généraliser le préfixe
+(rôle/type d'abord, ex. `Req`/`Cmd`/`Sensor`/`Position`) à TOUT le projet — objectif : recherche/
+autocomplete efficace, taper le rôle suffit à retrouver toutes les variables du même type peu
+importe le mécanisme. Concerne potentiellement `Ready`/`Busy`/`RelayFwd`/`SpeedRef`/`CablePosM`/
+`TopPositionSensor`... (usage massif, tout le projet) — **chantier majeur à planifier séparément**,
+jamais improvisé vu le volume et la criticité sécurité de certaines variables concernées
+(ex. `TopPositionSensor`, homing/safety Winch, déjà responsable d'un vrai bug de polarité passé).
 
 ### 📄 Doc à mettre à jour
 - Presque tous les `AF_PartieN` : en-tête "Dépend de Partie 2 vX.Y" obsolète → bumper vers `v2.10`

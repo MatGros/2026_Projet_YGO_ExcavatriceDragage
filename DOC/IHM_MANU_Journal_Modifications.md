@@ -19,9 +19,26 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 
 **Résumé du changement :** IHM_MANU ne bypass plus `PRG_06_WinchControl`/`FB_Safety_Winch` pour M1/M2 — il devient une **3ᵉ source d'arbitrage** (à côté de SEMI_AUTO et joystick Auto), au même titre que les autres, pour bénéficier nativement de la rampe accel/décel, du ralentissement en zone d'approche de butée, et de la sécurité `FB_Safety_Winch` (désormais **toujours active**, plus de bypass conditionnel). **Motif** : arrêts violents constatés en simulation aux butées logicielles (pas de ralentissement, coupure relais instantanée) + confusions "Fault allumé mais je peux bouger" (butées logicielles traitées comme un vrai défaut machine).
 
-**Ce qui reste un VRAI bypass dérogatoire (inchangé, sections 3/4/5/6 toujours valables) :** Chariot M3, Auxiliaires Hydrauliques (Grille/Casque), homing direct simulé M1/M2 (`PRG_02_Encoders`), timer visuel `FB_Encoder_Abs`.
+**Ce qui reste un VRAI bypass dérogatoire (inchangé, sections 3/4/5/6 toujours valables) :** Chariot M3 (logique de bypass — voir nuance section 11 ci-dessous), Auxiliaires Hydrauliques (Grille/Casque), homing direct simulé M1/M2 (`PRG_02_Encoders`), timer visuel `FB_Encoder_Abs`.
 
 **Nouveau point provisoire ajouté (section 10)** : plafond palier "essais progressifs" (`WinchMaxStepFwd/Rev`) — réactivé spécifiquement pour cette session, TEMPORAIRE, à retirer avec le reste (voir `PLAN_TASK_v1.0.md` T28).
+
+## 🆕 MISE À JOUR — SESSION 2026-07-15 (2), sortie Chariot M3 de `ST_IHM_MANU`
+
+**Ce qui a changé pour M3 :** Les champs de commande/diagnostic manuels M3 (`M3_RelayFwd/Rev`,
+`M3_FreqSetpoint/Actual`, `M3_CommandWordMonitor/StatusWordMonitor`, `M3_CommReady/PowerReady`)
+sont **retirés de `ST_IHM_MANU`** (struct provisoire) et migrés vers `ST_ChariotHMI`
+(`GVL_IHM.ChariotM3`, struct **définitif**), renommés sans préfixe `M3_` (`ReqFwd`/`ReqRev`/
+`FreqSetpointHz`) et avec le diag variateur décodé (`DriveCommReady`/`DrivePowerReady` au lieu
+d'un `WORD` brut). Voir section 11 pour le détail.
+
+**Ce qui n'a PAS changé (la vraie dérogation reste active) :** La logique de bypass elle-même
+— `PRG_10_Outputs` écrit toujours `M3_CommandWord`/`M3_SetpointFrequencyHz` directement quand
+`ManuActive=TRUE`, sans passer par `FB_Chariot`/`FB_Safety_Chariot` (sections 3/7 toujours
+valables sur le fond). Seule la **localisation des variables** change — objectif : permettre
+de développer/tester l'IHM (activation progressive bus EtherCAT → mouvements → freins/
+sécurité, via `GVL_Simulation.VariateurM3_IsReal`/`ContactorFeedbackM3_IsReal`/
+`ChariotPosition_IsReal`, déjà granulaires) sans dépendre du switch global `ModeDisable`.
 
 ---
 
@@ -44,14 +61,12 @@ La fonctionnalité **IHM_MANU** est un **dispositif DÉROGATOIRE et PROVISOIRE**
 - `HomingEncoder_M1/M2 : BOOL` — front = référencement codeur (OR avec CmdHome existant, **aucune dérogation sécurité**)
 - `M1_M2_RelayFwd/Rev : BOOL` — commandes couplées (mouvement simultané M1+M2)
 - `M1_M2_Contactor1-4 : BOOL` — contacteurs vitesse K1-K4 communs (un seul actif à la fois, interlock fail-safe)
-- `M3_RelayFwd/Rev : BOOL` — commandes chariot (sens via variateur EtherCAT)
-- `M3_FreqSetpoint/Actual : REAL` — consigne/retour fréquence variateur [Hz]
+- ~~`M3_RelayFwd/Rev`~~, ~~`M3_FreqSetpoint/Actual`~~, ~~`M3_CommandWordMonitor/StatusWordMonitor`~~, ~~`M3_CommReady/PowerReady`~~ — **retirés le 2026-07-15 (2)**, migrés vers `GVL_IHM.ChariotM3` (`ST_ChariotHMI`, struct définitif — voir section 11).
 - `GridOpenCmd/GridCloseCmd : BOOL` — commandes maintenues ouverture/fermeture grille.
 - `HelmetOpenCmd/HelmetCloseCmd : BOOL` — commandes maintenues ouverture/fermeture casque.
 - `FdcGrappinOpenEnable/CloseEnable : BOOL` — activation HMI des sécurités virtuelles grappin.
 - `GrappinDelta : REAL` — écart en mètres M1-M2 en temps réel.
 - `FdcGrappinOpenActive/CloseActive : BOOL` — états actifs de fin de course grappin (coupe les relais M2).
-- `M3_CommandWordMonitor/StatusWordMonitor : WORD` — diagnostics mot commande/état envoyés/reçus au variateur.
 - `WinchMaxStepFwd/WinchMaxStepRev : INT` — réglage dynamique des limites de vitesse manuelles (paliers max en montée/descente).
 
 **À supprimer au nettoyage :** Fichier entier.
@@ -288,6 +303,52 @@ Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilot
 
 ---
 
+### 11. **`ST_ChariotHMI.st` / `GVL_IHM.st` / `PRG_07/09/10` — Chariot M3 sort de `ST_IHM_MANU`** *(NOUVEAU 2026-07-15 (2))*
+
+**Rôle :** `ST_ChariotHMI` (`GVL_IHM.ChariotM3`, déjà existant mais partiel) devient la structure
+IHM pour M3 : migre les commandes manuelles ex-`ST_IHM_MANU`
+(`ReqFwd`/`ReqRev`/`FreqSetpointHz`, sans préfixe `M3_` — redondant sous `GVL_IHM.ChariotM3.xxx`),
+et décode le diagnostic variateur (`DriveCommReady`/`DrivePowerReady`, StatusWord bit7/bit0) au
+lieu d'exposer un `WORD` brut — objectif : simplifier le binding pour le développeur IHM (LED/
+checkbox direct, pas de bit-masking manuel côté visu).
+
+**Corrections faites au passage :**
+- `BypassBrakeFeedback` (`ST_ChariotHMI`) supprimé — n'était **jamais écrit** nulle part
+  (contrairement à `BypassContactorFeedback`, auto-calculé en `PRG_09` depuis
+  `GVL_Simulation.ContactorFeedbackM3_IsReal`, qui couvre déjà "sens + frein"). `PRG_07_ChariotControl`
+  utilise désormais `BypassContactorFeedback` pour le `SEL` de `BrakeFeedback` (champ mort corrigé).
+- `DriveActualFreqHz` : source unique `PRG_00_Inputs.M3_ActualFrequencyHz_Filtered`, écrite une
+  seule fois en `PRG_09` (Auto ET Manu) — supprime le doublon `IHM_MANU.M3_FreqActual` et la
+  lecture fragile de l'ex-`instChariotM3.DriveActualFreqHz` (qui lisait en réalité le `VAR_INPUT`
+  de l'instance, pas une sortie du FB).
+- **Bug corrigé (simulation position M3)** : `FB_Sim_Chariot` (`instSimChariot`, `PRG_00_Inputs`)
+  lisait `RelayFwd`/`RelayRev` depuis `GVL_Chariot_M3_Stub.M3_RelayFwd/Rev` — variables **jamais
+  écrites** depuis l'abandon du mode relais `DEGRADED_IO` (v0.4.11) : la simulation de trajet M3
+  (Fosse1/Fosse2/Maintenance/Trémie) restait bloquée en permanence. Rebranché sur `M3_CommandWord
+  = 1/2` (valeur EtherCAT réellement envoyée, Auto ET Manu). `GVL_Chariot_M3_Stub.M3_RelayFwd/
+  Rev/RelaySpeedGv/ContactorFeedbackFwd/Rev` sont maintenant des reliquats 100% orphelins de
+  l'ère `DEGRADED_IO` — candidats nettoyage (`PLAN_TASK_v1.0.md`, à ajouter §🗑️).
+
+**Rename `GVL_IHM` (portée plus large, hors IHM_MANU) :** `Chariot`→`ChariotM3`, `Grappin`→
+`Joystick`→`JoystickJOY1` (aligne sur `WinchM1`/`WinchM2` — le nom du membre porte son
+identifiant matériel). `Grappin` reste sans suffixe (⚠️ tentative `GrappinM2` faite puis
+**annulée** le même jour — répétait `M2` avec les champs internes du struct, ex.
+`M2PositionCorrected`/`M2StartStop`/`State.LastPosM2Close` : un seul grappin, pas de paire à
+distinguer comme M1/M2 treuils, donc pas besoin de suffixe axe). Ne concerne pas la dérogation
+IHM_MANU elle-même (Grappin/Joystick n'y ont jamais été).
+
+**Ce qui N'A PAS changé (dérogation toujours active) :** `PRG_10_Outputs` écrit toujours
+`M3_CommandWord`/`M3_SetpointFrequencyHz` en direct quand `ManuActive=TRUE`, sans passer par
+`FB_Chariot`/`FB_Safety_Chariot` — voir sections 3/7. Le passage de M3 sur le même modèle que
+M1/M2 (section 8, arbitrage natif `FB_Chariot`/`PRG_07` même en Manu) reste un chantier séparé
+(`PLAN_TASK_v1.0.md` T4/T12/T26).
+
+**À modifier au nettoyage :** Rien de spécifique à cette section — `GVL_IHM.ChariotM3` est
+définitif, seul le bypass `ManuActive` sur `M3_CommandWord` (sections 3/7) reste à retirer plus
+tard.
+
+---
+
 ## 🧹 CHECKLIST NETTOYAGE COMPLET
 
 ### Phase 1 : Vérifications préalables
@@ -363,7 +424,7 @@ Actuellement, il n'y a **pas de vérification du mode machine** (Mode N1/N2/N3/e
 
 ### 3. **Fréquence M3 — pas de bounds-check**
 
-`M3_FreqSetpoint` n'a pas de limite min/max applicative. L'écriture dans M3_SetpointFrequencyHz se fait à brut (×100) sans vérifier les limites du variateur (ex. 0–60 Hz nominalement).
+`GVL_IHM.ChariotM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est clampé à `GVL_PERSISTENT.ChariotMaxFreqHz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
 
 **À confirmer :** Les limites du variateur AC600 doivent-elles être respectées en mode Manu ou peut-on libérer complètement ?
 
@@ -406,7 +467,9 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 |------|--------|--------|
 | **2026-07-09** | Mise en service urgence | Ajout fonctionnalité IHM_MANU provisoire (ST_IHM_MANU, blocs PR G_10/PRG_02) |
 | **2026-07-15** | Session refonte sécurité | M1/M2 branchés sur `FB_Winch`/`PRG_06_WinchControl` (fin du bypass total, sections 8-9) ; nouvelle limite `CableLimitAscentM1/2_M` ; fix Méca B (bit8, boutons HMI) ; fix grappin couplé+M1 individuel ; fix latch `FB_Safety_Chariot` ; réactivation TEMPORAIRE `WinchMaxStepFwd/Rev` (section 10, **vraie dérogation restante**) |
-| **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain (M3/Auxiliaires + section 10 restent à retirer) |
+| **2026-07-15 (2)** | Refonte IHM Chariot M3 | Commandes/diag manuels M3 sortis de `ST_IHM_MANU` → `ST_ChariotHMI`/`GVL_IHM.ChariotM3` (définitif, section 11) ; diag variateur décodé ; fix `BypassBrakeFeedback` (fusionné `BypassContactorFeedback`) ; fix simulation position M3 (`FB_Sim_Chariot` rebranché, était bloquée) ; rename `GVL_IHM.Joystick` → `JoystickJOY1` (`Grappin` : tenté `GrappinM2` puis annulé, stutter
+avec champs internes M2) — **la dérogation bypass `ManuActive`→`M3_CommandWord` reste, elle, inchangée** |
+| **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain (M3/Auxiliaires bypass logique + section 10 restent à retirer) |
 
 ---
 

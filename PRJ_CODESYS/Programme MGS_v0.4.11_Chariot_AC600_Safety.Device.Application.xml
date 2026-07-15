@@ -105,6 +105,8 @@
       <UserDefElement iecname="HelmetCloseCmd" type="T_BOOL" byteoffset="39" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="FdcGrappinOpenEnable" type="T_BOOL" byteoffset="40" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="FdcGrappinCloseEnable" type="T_BOOL" byteoffset="41" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcGrappinOpen" type="T_BOOL" byteoffset="42" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcGrappinClose" type="T_BOOL" byteoffset="43" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="GrappinDelta" type="T_REAL" byteoffset="44" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="FdcGrappinOpenActive" type="T_BOOL" byteoffset="48" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="FdcGrappinCloseActive" type="T_BOOL" byteoffset="49" vartype="VAR" access="ReadWrite" />
