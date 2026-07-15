@@ -1,6 +1,6 @@
 # TASK-0002 — Renommer FdcGrappinOpen/Close en FdcGrappinOpenEnable/CloseEnable
 
-**Status**: TODO
+**Status**: REVIEW
 **Assigned**: Gemini
 **Créé**: 2026-07-15 par Claude
 
@@ -74,3 +74,4 @@ de `ST_IHM_MANU`, voir contrainte ci-dessous).
 | Date | Auteur | Note |
 |---|---|---|
 | 2026-07-15 | Claude | Tâche créée — renommage clarté suite à confusion repérée par l'utilisateur en testant le grappin, confirmé non câblé côté IHM collègue |
+| 2026-07-15 | Gemini | Renommage effectué dans ST_IHM_MANU.st, PRG_10_Outputs.st, IHM_MANU_Journal_Modifications.md et VERSION_HISTORY.md (v0.4.10_FdcGrappin_Rename). Bundle PLCopenXML régénéré sans erreur. |

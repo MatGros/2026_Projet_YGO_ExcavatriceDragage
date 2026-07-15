@@ -50,9 +50,19 @@ python PLCOPENXML_TOOLING/push_server.py
 
 **⚠️ Si le port est déjà occupé** (session précédente non terminée) → le serveur ne démarre pas, c'est OK : le process précédent est toujours actif.
 
-### 🔔 Comment le système fonctionne
-* **Git Hooks** : Des hooks `.git/hooks/post-commit` et `post-merge` appellent `curl http://localhost:9090/wake` dès que `QUEUE.md` est modifié dans Git → réveil immédiat.
-* **Appel manuel** : Si Claude ou l'utilisateur modifient `QUEUE.md` sans commiter :
+### 🔔 Comment le système fonctionne (REX 2026-07-15 — découplé du commit)
+* **Réveil direct par Claude** : dès que `QUEUE.md`/le fichier tâche est édité **et validé par
+  l'utilisateur**, Claude appelle directement `curl -s -X POST http://localhost:9090/wake` —
+  **pas besoin d'un commit** pour déclencher le réveil (l'ancien hook `post-commit` seul n'était
+  pas fiable/assez rapide). Le serveur répond `{"status": "received"}` en accusé de réception.
+* **Réveil effectif côté toi (Gemini)** : le serveur, en recevant `/wake`, relit `QUEUE.md` et
+  s'il trouve une tâche `Assigned: Gemini` + `Status: TODO`, il t'injecte le message via
+  `agy --continue --print "..."` (reprend automatiquement ta conversation la plus récente — plus
+  besoin d'un ID de conversation figé, qui devenait périmé à chaque nouvelle session).
+* **Git Hooks** (`post-commit`/`post-merge`) : toujours présents en filet de sécurité (si jamais
+  un commit passe avec `QUEUE.md` modifié sans être passé par l'appel direct), mais ce n'est plus
+  le mécanisme principal.
+* **Appel manuel de secours** :
   ```powershell
   curl -s http://localhost:9090/wake
   ```

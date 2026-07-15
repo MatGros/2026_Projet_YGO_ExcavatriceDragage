@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-04T06:07:15.208802" />
-  <contentHeader name="Programme MGS_v0.4.8_IHM_MANU_JOY.project" modificationDateTime="2026-07-04T06:07:15.208802">
+  <contentHeader name="MGS_v0.4.8.project" modificationDateTime="2026-07-04T06:07:15.208802">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Programme MGS_v0.4.8_IHM_MANU_JOY</property>
+          <property name="Project" type="string">MGS_v0.4.8</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1438,7 +1438,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🪖 Commande fermeture casque</xhtml>
               </documentation>
             </variable>
-            <variable name="FdcGrappinOpen">
+            <variable name="FdcGrappinOpenEnable">
               <type>
                 <BOOL />
               </type>
@@ -1447,7 +1447,7 @@
 🎚️ Activer FDC Ouvert (stop M2 descente si delta &gt;= 0.0m)</xhtml>
               </documentation>
             </variable>
-            <variable name="FdcGrappinClose">
+            <variable name="FdcGrappinCloseEnable">
               <type>
                 <BOOL />
               </type>
@@ -15293,8 +15293,8 @@ GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 
 // 📊 Calcul de l'écart grappin et des états de fin de course (delta = M1 - M2)
 GVL_IHM.IHM_MANU.GrappinDelta := GVL_IHM.IHM_MANU.PositionM_M1 - GVL_IHM.IHM_MANU.PositionM_M2;
-GVL_IHM.IHM_MANU.FdcGrappinOpenActive  := GVL_IHM.IHM_MANU.FdcGrappinOpen AND (GVL_IHM.IHM_MANU.GrappinDelta &gt;= 0.0);
-GVL_IHM.IHM_MANU.FdcGrappinCloseActive := GVL_IHM.IHM_MANU.FdcGrappinClose AND (GVL_IHM.IHM_MANU.GrappinDelta &lt;= -10.0);
+GVL_IHM.IHM_MANU.FdcGrappinOpenActive  := GVL_IHM.IHM_MANU.FdcGrappinOpenEnable AND (GVL_IHM.IHM_MANU.GrappinDelta &gt;= 0.0);
+GVL_IHM.IHM_MANU.FdcGrappinCloseActive := GVL_IHM.IHM_MANU.FdcGrappinCloseEnable AND (GVL_IHM.IHM_MANU.GrappinDelta &lt;= -10.0);
 
 IF ManuActive THEN
     // 1️⃣ Détection des nouveaux appuis sur boutons HMI (uniquement pour interlocks HMI)

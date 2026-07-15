@@ -63,7 +63,16 @@
       "Bash(echo \"exit:$?\")",
       "Bash(awk '/## 🚀 37\\\\./{f=1} f{print NR\": \"$0} /Fichiers impactés.*Sécurité électrique/{if\\(f\\)c++} c==1 && /^---$/{exit}' \"DOC/AUDIT_Coherence_Documentaire_v1.0.md\")",
       "Skill(artifact-design)",
-      "Artifact"
+      "Artifact",
+      "Bash(curl -s -w \"\\\\nHTTP_CODE:%{http_code}\\\\n\" http://localhost:9090/wake --max-time 3)",
+      "Bash(where agy *)",
+      "Bash(agy --help)",
+      "Bash(netstat -ano)",
+      "Bash(curl *)",
+      "Bash(command -v agy)",
+      "Bash(python push_server.py)",
+      "Bash(echo \"EXIT_CODE_2e_INSTANCE=$?\")",
+      "Bash(tasklist //FI \"IMAGENAME eq python.exe\")"
     ],
     "ask": [
       "Bash(git reset *)",

@@ -7,9 +7,15 @@
 
 | ID | Titre | Assigned | Status | Maj |
 |---|---|---|---|---|
-| [TASK-0002](tasks/TASK-0002-rename-fdc-grappin-enable.md) | Renommer FdcGrappinOpen/Close en FdcGrappinOpenEnable/CloseEnable | Gemini | TODO | 2026-07-15 |
+| [TASK-0002](tasks/TASK-0002-rename-fdc-grappin-enable.md) | Renommer FdcGrappinOpen/Close en FdcGrappinOpenEnable/CloseEnable | Gemini | REVIEW | 2026-07-15 |
 | [TASK-0003](tasks/TASK-0003-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
-| [TASK-0004](tasks/TASK-0004-test-pipeline-hook.md) | [TEST] Vérification pipeline queue/hook (motif factice) | Gemini | TODO | 2026-07-15 |
+| [TASK-0004](tasks/TASK-0004-test-pipeline-hook.md) | [TEST] Vérification pipeline queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0005](tasks/TASK-0005-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0006](tasks/TASK-0006-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0007](tasks/TASK-0007-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0008](tasks/TASK-0008-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0009](tasks/TASK-0009-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | REVIEW | 2026-07-15 |
+| [TASK-0010](tasks/TASK-0010-test-pipeline-hook.md) | [TEST PIPELINE] Vérification bout-en-bout queue/hook (motif factice) | Gemini | TODO | 2026-07-15 |
 
 ---
 
