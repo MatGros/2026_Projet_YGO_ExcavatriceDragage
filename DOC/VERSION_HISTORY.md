@@ -11,7 +11,7 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Déplacé/renommé vers EMERGENCY/FB_Safety_EmergencyManagement
 - Fix affectation Busy/Done dans le bloc parent composite
 - PRG_SafetyValidation : banc de test réglementaire automatisé de la boucle d'urgence
-- + AF_Partie-14_Tests_Validation v1.0 (CI/CD, exécution des tests)
+- + AF_Partie-14_PLC_Tests_Validation v1.0 (CI/CD, exécution des tests)
 - GVL_Global.BlinkClock (ex-BlinkClock1Hz) alimenté via Util.BLINK, asymétrique réglable
 - (GVL_PERSISTENT._BlinkTimeOn/_BlinkTimeOff, défaut 1s/800ms)
 - Config : HomingTarget par défaut 8.5m, limite haute normale 8.0m
