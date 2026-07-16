@@ -11,6 +11,20 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Issue double revue croisée experte (primitives ↔ archi données) + audit — pas de modif `CODE/`
 - Migration M1→M6 cadrée, à dérouler séparément (M1 = socle générique `FB_TestSequencer`)
 
+### `v0.4.15_PlcTestsFramework_TranslationSuite` — 2026-07-16 (TEST)
+- Framework PLC_TESTS migré vers AF_Partie-14 v1.2 (M1→M3+) : tables déclaratives
+- Moteur unique `FB_TestSequencer` + bricks (`FB_TestCheck/Stimulus/Stopwatch/EventOrder/EdgeCounter/Timeout`)
+- Réorganisé en sous-dossiers TYPES/(ENUMS·STRUCTS) · BRICKS · SUITE_SAFETY · SUITE_TRANSLATION
+- `FB_SafetyValidation` réécrit (remplace le CASE monolithique v1.0/1.1)
+- + nouvelle suite `FB_TranslationValidation` (TC-T1 Fdc extrême, TC-T2 Méca B, TC-T3 Méca A)
+- `FB_PLC_Tests_Management` orchestre multi-suites (CmdRunAll enchaîne Safety→Translation)
+- GVL_PLC_Tests : `Cmd`/`Status` + 1 variable nommée par suite (pas de tableau, demande utilisateur)
+- + `Cases[].Name` et `Report.FailureSummary` (lisibilité, évite de parcourir chaque case)
+- Fix générateur PLCopenXML (`TOOLS/`) : bornes de tableau symboliques (`GVL_Const.MaxX`) étaient silencieusement omises du bundle — corrigé, non vérifié en import réel
+- Fix ST : `FOR_END`→`END_FOR`, `VAR` imbriqué illégal (tous deux dans `FB_TestSequencer`)
+- ⚠️ Connu non résolu : bug lockout `EmergencyArmingLockoutActive` (posé aussi sur succès) pas encore corrigé dans `FB_Safety_EmergencyManagementLogic.st` ; step Trip TC-01 à corriger (vérifier `EmergencyStopOk`, pas `PowerCutOff_A/B_RQ`)
+- ⚠️ Version de test — pas encore réimportée/validée en CODESYS
+
 ### `v0.4.14_SafetyValidation_EmergencyChain` — 2026-07-16 (TEST)
 - FB_Safety_EmergencyChain : encapsule la boucle AU + sorties erreur individuelles Translation
 - Déplacé/renommé vers EMERGENCY/FB_Safety_EmergencyManagement

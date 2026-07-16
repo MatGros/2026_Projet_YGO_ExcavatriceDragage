@@ -10,6 +10,7 @@ STRUCT
     AnyFailed      : BOOL;             // Au moins un échec détecté ?
     Aborted        : BOOL;             // Suite abandonnée ?
     FailedTestCase : INT;              // Premier cas de test en échec (0 si aucun)
+    FailureSummary : STRING(255);      // 🏷️ TOUS les cas en échec en 1 ligne lisible (ex. 'TC-01 (step 15): FAIL_CHECK | TC-03 (step 30): FAIL_TIMEOUT') — évite de parcourir Cases[] un par un
     CurrentStepId  : INT;              // Étape en cours d'exécution
     CurrentCaseId  : INT;              // Cas de test en cours d'exécution
     Duration       : TIME;             // Durée totale du run de la suite

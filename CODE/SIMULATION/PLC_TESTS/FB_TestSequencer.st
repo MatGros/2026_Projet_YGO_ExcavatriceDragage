@@ -60,6 +60,10 @@ VAR
     CaseFailedStep      : INT;
     CaseDuration        : TIME;
     CaseFailReason      : E_TestFailReason;
+
+    // 🏷️ Construction de Report.FailureSummary (1 ligne lisible, tous les cas en échec)
+    ReasonText          : STRING(20);
+    EntryText           : STRING(80);
 END_VAR
 // === IMPLEMENTATION ===
 StartTrig(CLK := Start);
@@ -488,6 +492,7 @@ IF Busy AND CurrentStepId = 0 THEN
                 END_IF;
             END_WHILE;
             
+            Report.Cases[CaseIdx].Name := CaseTable[CaseIdx].Name; // 🏷️ Lisible directement en Watch, sans chercher l'index
             Report.Cases[CaseIdx].Executed := CaseExecuted;
             Report.Cases[CaseIdx].Ok := CaseExecuted AND CaseOk;
             Report.Cases[CaseIdx].FailedStepId := CaseFailedStep;
@@ -507,4 +512,33 @@ IF Busy AND CurrentStepId = 0 THEN
     Report.AnyFailed := NOT SuiteAllPassed;
     Report.FailedTestCase := FirstFailedCase;
     AnyFailed := NOT SuiteAllPassed;
+
+    // 🏷️ Résumé texte de TOUS les cas en échec (pas juste le premier) — évite de
+    // parcourir Cases[] un par un en Watch (demande utilisateur 2026-07-16)
+    Report.FailureSummary := '';
+    FOR CaseIdx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF Report.Cases[CaseIdx].Executed AND NOT Report.Cases[CaseIdx].Ok THEN
+            CASE Report.Cases[CaseIdx].FailReason OF
+                E_TestFailReason.FAIL_TIMEOUT:      ReasonText := 'FAIL_TIMEOUT';
+                E_TestFailReason.FAIL_CHECK:        ReasonText := 'FAIL_CHECK';
+                E_TestFailReason.FAIL_INVARIANT:    ReasonText := 'FAIL_INVARIANT';
+                E_TestFailReason.FAIL_WINDOW_EARLY: ReasonText := 'FAIL_WINDOW_EARLY';
+                E_TestFailReason.FAIL_ABORTED:      ReasonText := 'FAIL_ABORTED';
+            ELSE
+                ReasonText := 'FAIL_NONE';
+            END_CASE;
+
+            EntryText := CONCAT(Report.Cases[CaseIdx].Name, ' (step ');
+            EntryText := CONCAT(EntryText, INT_TO_STRING(Report.Cases[CaseIdx].FailedStepId));
+            EntryText := CONCAT(EntryText, '): ');
+            EntryText := CONCAT(EntryText, ReasonText);
+
+            IF Report.FailureSummary = '' THEN
+                Report.FailureSummary := EntryText;
+            ELSE
+                Report.FailureSummary := CONCAT(Report.FailureSummary, ' | ');
+                Report.FailureSummary := CONCAT(Report.FailureSummary, EntryText);
+            END_IF;
+        END_IF;
+    END_FOR;
 END_IF;
