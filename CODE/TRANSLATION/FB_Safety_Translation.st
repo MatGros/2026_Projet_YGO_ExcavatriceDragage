@@ -34,11 +34,18 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : perte joystick ; bit1 : perte com EtherCAT ; bit2 : rotation phases ; bit3 : thermique frein ; bit4 : Méca B (incohérence arrêt) ; bit5 : Méca A (mouvement non commandé) ; bit6 : Fdc extrême atteint
+    ErrorId             : WORD;        // bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Décélération rapide (PLC)
     PowerCutOff         : BOOL;        // 🧨 Coup de poing / coupure puissance amont
+    ErrorJoystick       : BOOL;        // 🎮 Perte joystick / CANopen (bit0)
+    ErrorDriveComm      : BOOL;        // 📡 Perte communication EtherCAT variateur (bit1)
+    ErrorPhaseRotation  : BOOL;        // ⚡ Mauvaise rotation de phases (bit2)
+    ErrorBrakeThermal   : BOOL;        // 🌡️ Surchauffe thermique frein commun (bit3)
+    ErrorMecaB          : BOOL;        // 🛑 Absence confirmation arrêt (Méca B - bit4)
+    ErrorMecaA          : BOOL;        // 🔄 Mouvement non commandé (Méca A - bit5)
+    ErrorLimitSwitch    : BOOL;        // 🚧 Limite extrême Translation atteinte (bit6)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -58,6 +65,13 @@ IF NOT Enable THEN
     ErrorId := 16#0000;
     SafeStop := FALSE;
     PowerCutOff := FALSE;
+    ErrorJoystick := FALSE;
+    ErrorDriveComm := FALSE;
+    ErrorPhaseRotation := FALSE;
+    ErrorBrakeThermal := FALSE;
+    ErrorMecaB := FALSE;
+    ErrorMecaA := FALSE;
+    ErrorLimitSwitch := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     State := E_State.DISABLED;
@@ -148,6 +162,15 @@ SafeStop := Error OR NOT EmergencyStopOk;
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), ou dépassement de fin de course (bit6)
 PowerCutOff := (ErrorId AND 16#0078) <> 16#0000;
+
+// Décapsulage du bitfield ErrorId pour l'IHM
+ErrorJoystick       := (ErrorId AND 16#0001) <> 16#0000;
+ErrorDriveComm      := (ErrorId AND 16#0002) <> 16#0000;
+ErrorPhaseRotation  := (ErrorId AND 16#0004) <> 16#0000;
+ErrorBrakeThermal   := (ErrorId AND 16#0008) <> 16#0000;
+ErrorMecaB          := (ErrorId AND 16#0010) <> 16#0000;
+ErrorMecaA          := (ErrorId AND 16#0020) <> 16#0000;
+ErrorLimitSwitch    := (ErrorId AND 16#0040) <> 16#0000;
 
 Busy := FALSE;
 Done := FALSE;

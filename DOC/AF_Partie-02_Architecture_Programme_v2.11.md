@@ -234,6 +234,25 @@ son domaine fonctionnel** :
 
 ---
 
+## 🛡️ 7. Tableau de synthèse des Gardes-fous Sécurité (Méca A à E)
+
+Afin d'assurer la défense en profondeur, l'automate implémente des surveillances de sécurité réparties par équipement :
+
+| **Mécanisme** | **Dénomination** | **Équipement** | **Condition d'armement** | **Condition de déclenchement** | **Conséquence** |
+|:---:|---|:---:|---|---|---|
+| **Méca A** | Mouvement non commandé | **Treuils M1/M2** | Contacteurs et frein fermés (repos) | Dérive $> 2.0\text{ m}$ ou vitesse $> 0.02\text{ m/s}$ | SafeStop + **PowerCutOff** |
+| | | **Translation M3** | Consigne neutre + frein serré | Vitesse réelle variateur $> 0.5\text{ Hz}$ pendant $> 1.0\text{ s}$ | SafeStop + **PowerCutOff** |
+| **Méca B** | Incohérence à l'arrêt / sans commande | **Treuils M1/M2** | Joystick au neutre ou com CAN perdue | Contacteurs ou frein restent actifs après $> 3.0\text{ s}$ | SafeStop + **PowerCutOff** |
+| | | **Translation M3** | Joystick au neutre | Variateur reste actif ou frein reste ouvert après $> 3.0\text{ s}$ | SafeStop + **PowerCutOff** |
+| **Méca C** | Glissement inter-axe | **Treuil M1** | Cycle benne actif (M1 censé rester immobile) | Dérive M1 $> 2.0\text{ m}$ (escalade couche 2) | SafeStop + **PowerCutOff** |
+| **Méca D** | Dépassement Fdc haut non maîtrisé | **Treuils M1/M2** | Butée haute atteinte (physique ou virtuelle) | Frein non fermé ou contacteurs collés après $> 3.0\text{ s}$ | SafeStop + **PowerCutOff** |
+| **Méca E** | Écart synchro critique | **Treuils M1/M2** | Mode synchro actif | Écart $M1 \leftrightarrow M2 > 2.0\text{ m}$ (immédiat ou non arrêté après $3.0\text{ s}$) | SafeStop (bit 12) + **PowerCutOff** (bit 13) |
+
+> [!NOTE]
+> La conséquence **PowerCutOff** déclenche la coupure physique immédiate de la puissance amont (ouverture de la boucle d'arrêt d'urgence) car la mécanique est en dérive ou les organes de commande locale ont échoué.
+
+---
+
 ## 📚 Documents liés
 - **Partie 1** — Présentation & équipements.
 - **Partie 3** — Contrat FB commun : interface (`Enable/Reset/EmergencyStopOk/Mode`, `StartStop`), état, ErrorId, reset, AU/PowerCutOff.

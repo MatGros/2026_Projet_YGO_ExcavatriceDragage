@@ -58,7 +58,7 @@ VAR_OUTPUT
     Busy            : BOOL;       // Traitement en cours
     Done            : BOOL;       // Données valides dispo
     Error           : BOOL;       // Présence anomalie
-    ErrorId         : WORD;       // Code d'erreur
+    ErrorId         : WORD;       // bit0: "Échec calibration Joystick" - Valeurs RawX/Y hors plage lors du recalage
     AxisCmdX        : ST_AxisCmd; // Sortie normalisée X
     AxisCmdY        : ST_AxisCmd; // Sortie normalisée Y
     Button          : BOOL;       // Bouton filtré

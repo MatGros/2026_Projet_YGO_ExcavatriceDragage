@@ -30,7 +30,7 @@ VAR_OUTPUT
     State       : BOOL;         // Vers la carte de sortie
     FeedbackOk      : BOOL;         // Retour cohérent avec la commande
     Error           : BOOL;
-    ErrorId         : WORD;         // bit0 : feedback incohérent ; bit1 : voie/carte HS
+    ErrorId         : WORD;         // bit0: "Feedback sortie incohérent" - feedback incohérent ; bit1: "Défaut matériel sortie (Carte HS)" - voie/carte HS
 END_VAR
 VAR
     BlinkTimer      : TON;

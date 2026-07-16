@@ -43,7 +43,7 @@ def test_real_gvl_persistent_parses_retain_persistent_qualifiers_and_composite_i
     assert len(obj.global_blocks) == 1
     assert obj.global_blocks[0].qualifiers == ["PERSISTENT", "RETAIN"]
     variables = {v.name: v for v in obj.global_blocks[0].variables}
-    assert isinstance(variables["GrappinConfig"].init, StructInitValue)
+    assert isinstance(variables["_BucketConfig"].init, StructInitValue)
     assert not diag.has_errors()
 
 

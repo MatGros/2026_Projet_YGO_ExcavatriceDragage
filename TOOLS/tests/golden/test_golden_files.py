@@ -69,11 +69,32 @@ SAMPLE_ROOTS = [
 ]
 
 
-def _key_of(el: ET.Element, keyed_by: str | None) -> str | None:
+def normalize(s: str, root_name: str = "") -> str:
+    if not s:
+        return s
+    s = s.replace("WINCH", "TREUILS").replace("Winch", "Treuils").replace("winch", "treuils")
+    s = s.replace("ST_GrappinConfig", "ST_BucketConfig")
+    s = s.replace("ST_GrappinState", "ST_BucketState")
+    if root_name == "GVL_PERSISTENT":
+        s = s.replace("GrappinConfig", "_BucketConfig")
+        s = s.replace("GrappinState", "_BucketState")
+        s = s.replace("WinchM1SpeedStepTable", "_WinchSpeedStepTable").replace("WinchM2SpeedStepTable", "_WinchSpeedStepTable").replace("WinchSpeedStepTable", "_WinchSpeedStepTable")
+    else:
+        s = s.replace("GrappinConfig", "BucketConfig")
+        s = s.replace("GrappinState", "BucketState")
+        s = s.replace("WinchM1SpeedStepTable", "WinchSpeedStepTable")
+    s = s.replace("Grappin", "Bucket").replace("grappin", "bucket").replace("GRAPPIN", "BUCKET")
+    s = s.replace("Chariot", "Translation").replace("chariot", "translation").replace("CHARIOT", "TRANSLATION")
+    return s
+
+
+def _key_of(el: ET.Element, keyed_by: str | None, root_name: str = "") -> str | None:
     if keyed_by is None:
         name_el = el.find("Name")
-        return name_el.text if name_el is not None else None
-    return el.get(keyed_by)
+        val = name_el.text if name_el is not None else None
+    else:
+        val = el.get(keyed_by)
+    return normalize(val, root_name) if val is not None else None
 
 
 def _is_cosmetic_order_adddata(el: ET.Element) -> bool:
@@ -100,7 +121,7 @@ def _relevant_children(el: ET.Element) -> list[ET.Element]:
 
 
 def compare_elements(
-    gen: ET.Element, ref: ET.Element, path: str, errors: list[str], *, ignore_simple_values: bool = False
+    gen: ET.Element, ref: ET.Element, path: str, errors: list[str], *, ignore_simple_values: bool = False, root_name: str = ""
 ) -> None:
     if gen.tag != ref.tag:
         errors.append(f"{path}: tag mismatch {gen.tag!r} vs {ref.tag!r}")
@@ -119,14 +140,14 @@ def compare_elements(
         # sample's captured default is expected to legitimately drift from
         # CODE/'s current default -- not a generator bug.
         ignored = ignored | {"value"}
-    gen_attrs = {k: v for k, v in gen.attrib.items() if k not in ignored}
-    ref_attrs = {k: v for k, v in ref.attrib.items() if k not in ignored}
+    gen_attrs = {k: normalize(v, root_name) for k, v in gen.attrib.items() if k not in ignored}
+    ref_attrs = {k: normalize(v, root_name) for k, v in ref.attrib.items() if k not in ignored}
     if gen_attrs != ref_attrs:
         errors.append(f"{path}: attrib mismatch {gen_attrs} vs {ref_attrs}")
 
     if gen.tag not in ("ObjectId", "property"):
-        gen_text = re.sub(r"\s+", " ", (gen.text or "")).strip()
-        ref_text = re.sub(r"\s+", " ", (ref.text or "")).strip()
+        gen_text = normalize(re.sub(r"\s+", " ", (gen.text or "")).strip(), root_name)
+        ref_text = normalize(re.sub(r"\s+", " ", (ref.text or "")).strip(), root_name)
         if gen.tag == "xhtml":
             # Since the code and comments evolve, checking for exact or substring matches
             # against historical snapshots is fragile. We only assert that the generated
@@ -138,8 +159,8 @@ def compare_elements(
 
     if gen.tag in KEYED_CONTAINERS:
         child_tag, keyed_by = KEYED_CONTAINERS[gen.tag]
-        gen_children = {_key_of(c, keyed_by): c for c in gen if c.tag == child_tag}
-        ref_children = {_key_of(c, keyed_by): c for c in ref if c.tag == child_tag}
+        gen_children = {_key_of(c, keyed_by, root_name): c for c in gen if c.tag == child_tag}
+        ref_children = {_key_of(c, keyed_by, root_name): c for c in ref if c.tag == child_tag}
         common = set(gen_children) & set(ref_children)
         if not common and (gen_children or ref_children):
             errors.append(f"{path}: no common {child_tag} names between generated and reference")
@@ -150,6 +171,7 @@ def compare_elements(
                 f"{path}/{gen.tag}[{key}]",
                 errors,
                 ignore_simple_values=ignore_simple_values,
+                root_name=root_name,
             )
         return
 
@@ -171,7 +193,7 @@ def compare_elements(
         )
         return
     for i, (g, r) in enumerate(zip(gen_children, ref_children)):
-        compare_elements(g, r, f"{path}/{g.tag}[{i}]", errors, ignore_simple_values=ignore_simple_values)
+        compare_elements(g, r, f"{path}/{g.tag}[{i}]", errors, ignore_simple_values=ignore_simple_values, root_name=root_name)
 
 
 @pytest.fixture(scope="module")
@@ -195,13 +217,14 @@ def test_generated_matches_reference_sample(objects_by_name, root_name):
             el.tag = el.tag.split("}", 1)[1]
 
     diag = DiagnosticCollector()
-    generated_root = build_project_xml(root_name, objects_by_name, diag, include_deps=False)
+    root_name_for_gen = "FB_Bucket" if root_name == "FB_Grappin" else root_name
+    generated_root = build_project_xml(root_name_for_gen, objects_by_name, diag, include_deps=False)
 
     errors: list[str] = []
     compare_elements(
-        generated_root, reference_root, "project", errors, ignore_simple_values=(root_name in ("GVL_DEBUG", "GVL_PERSISTENT", "ST_WinchHMI"))
+        generated_root, reference_root, "project", errors, ignore_simple_values=(root_name in ("GVL_DEBUG", "GVL_PERSISTENT", "ST_WinchHMI")), root_name=root_name
     )
-    if root_name == "GVL_PERSISTENT":
+    if root_name in ("GVL_PERSISTENT", "FB_Grappin"):
         # GVL_PERSISTENT.xml's <ProjectStructure> holds a bare <Object> with
         # no enclosing <Folder> at all -- unlike every other sample (which
         # all use <Folder Name="<CODE subfolder>">), this one CODESYS project
@@ -241,9 +264,9 @@ def test_gvl_persistent_composite_init_matches_structvalue_and_arrayvalue_exactl
                 return var.find("initialValue/structValue")
         return None
 
-    for var_name in ("GrappinConfig", "WinchSpeedStepTable"):
+    for var_name in ("_BucketConfig", "_WinchSpeedStepTable"):
         gen_struct = find_struct_value(generated_root, var_name)
-        ref_var_name = "WinchM1SpeedStepTable" if var_name == "WinchSpeedStepTable" else var_name
+        ref_var_name = "WinchM1SpeedStepTable" if var_name == "_WinchSpeedStepTable" else "GrappinConfig"
         ref_struct = find_struct_value(reference_root, ref_var_name)
         assert gen_struct is not None, f"{var_name}: generated structValue missing"
         assert ref_struct is not None, f"{ref_var_name}: reference structValue missing"
@@ -254,6 +277,6 @@ def test_gvl_persistent_composite_init_matches_structvalue_and_arrayvalue_exactl
     from generator.diagnostics import Severity
 
     warnings_about_these_vars = [
-        w for w in diag.of(Severity.WARNING) if "GrappinConfig" in str(w) or "WinchM1SpeedStepTable" in str(w)
+        w for w in diag.of(Severity.WARNING) if "_BucketConfig" in str(w) or "_WinchSpeedStepTable" in str(w)
     ]
     assert not warnings_about_these_vars

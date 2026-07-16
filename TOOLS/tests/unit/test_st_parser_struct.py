@@ -16,11 +16,11 @@ def test_synthetic_struct():
 
 
 def test_real_st_speedsteptable_parses_with_array_field():
-    path = CODE_DIR / "WINCH" / "ST_SpeedStepTable.st"
+    path = CODE_DIR / "TREUILS" / "ST_SpeedStepTable.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
     obj = parse_file(
-        source, folder="WINCH", stem="ST_SpeedStepTable", mtime=1.0, source_label="ST_SpeedStepTable.st",
+        source, folder="TREUILS", stem="ST_SpeedStepTable", mtime=1.0, source_label="ST_SpeedStepTable.st",
         diagnostics=diag,
     )
     assert obj is not None

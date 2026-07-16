@@ -24,7 +24,7 @@ END_VAR
 VAR_OUTPUT
     State : BOOL;         // Signal conditionné, prêt à l'emploi
     Error       : BOOL;         // Voie en défaut (ChannelOk faux)
-    ErrorId     : WORD;         // bit0 : voie/carte HS
+    ErrorId     : WORD;         // bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS
 END_VAR
 VAR
     FilterTon   : TON;

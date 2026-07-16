@@ -35,7 +35,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;          // bit0 : incohérence commande/retour frein (collage ou non-relâche)
+    ErrorId             : WORD;          // bit0: "Défaut engagement frein" - incohérence commande/retour frein (collage ou non-relâche)
     State               : E_State;
     StateAtError        : E_State;
     BrakeCmd            : BOOL;          // Commande sortie bobine frein : TRUE = relâché

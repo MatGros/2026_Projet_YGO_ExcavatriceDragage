@@ -110,7 +110,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;
+    ErrorId             : WORD; // bit0: "Défaut frein Treuil" - Brake.Error ; bit1: "Contacteur(s) Treuil collé(s)" - ContactorsCheck.StuckClosed
     State               : E_State;
     StateAtError        : E_State;
     RelayFwd            : BOOL;
