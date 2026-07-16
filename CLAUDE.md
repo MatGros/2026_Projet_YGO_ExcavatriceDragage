@@ -133,12 +133,13 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie-11_Fonction_Translation_v1.6.md](DOC/AF_Partie-11_Fonction_Translation_v1.6.md) — Fonction Translation (M3, ex-Translation)
 - [AF_Partie-12_Fonction_Benne_v1.4.md](DOC/AF_Partie-12_Fonction_Benne_v1.4.md) — Fonction Benne (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
 - [AF_Partie-13_Fonction_Simulation_v1.2.md](DOC/AF_Partie-13_Fonction_Simulation_v1.2.md) — Fonction Simulation (flags bits maître + granularité par device)
+- [AF_Partie-14_PLC_Tests_Validation_v1.1.md](DOC/AF_Partie-14_PLC_Tests_Validation_v1.1.md) — Tests de validation sécurité (TC-01/02/03), cadrage socle réutilisable §7 (pas encore implémenté), limites CI/CD réelles
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 - [PLAN_TASK_v1.0.md](DOC/PLAN_TASK_v1.0.md) — 🗂️ **Pilotage projet, PAS une spec** : jalons connus de l'affaire, état des tâches/features (fait/priorisé/partiel/différé/manquant), reliquats/TBD/questions client. Toute info organisationnelle trouvée dans une `AF_PartieN` doit y renvoyer (`📌 Suivi : PLAN_TASK.md §3`) au lieu d'y rester — garde les `AF_PartieN` focalisées sur la spec fonctionnelle pure.
 - [IHM_MANU_Journal_Modifications.md](DOC/IHM_MANU_Journal_Modifications.md) — Journal de traçabilité du dispositif dérogatoire IHM_MANU (provisoire, mise en service urgence)
 
 ### 📐 Plan de numérotation
-- **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…).
+- **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…) · **14** = hors-série, tests/validation (pas un métier FB).
 
 ### ✍️ Style rédaction — docs de pilotage
 Toujours **concis, direct, TDAH-friendly, emoji, tokens minimaux** pour :
