@@ -58,8 +58,8 @@ Output(
 
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
 Ready := Enable;
-Busy  := Logic.Busy;
-Done  := Logic.Done;
+Busy  := (Logic.ArmingSeqStep <> 0);
+Done  := EmergencyStopOk;
 Error := Logic.Error;
 ErrorId := Logic.ErrorId;
 
