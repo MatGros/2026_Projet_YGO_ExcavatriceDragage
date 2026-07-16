@@ -222,6 +222,7 @@ IF Busy THEN
         RETURN;
     END_IF;
     
+    IF CurrentStepId > 0 THEN
     CurrentCaseId := StepTable[CurrentStepId].CaseId;
     ActiveStimulusId := StepTable[CurrentStepId].StimulusId;
     Report.CurrentStepId := CurrentStepId;
@@ -442,6 +443,7 @@ IF Busy THEN
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Checks[Jdx](Evaluate := FALSE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
         END_FOR;
+    END_IF;
     END_IF;
 END_IF;
 
