@@ -148,7 +148,7 @@ TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2s);
 IF ArmingSeqStep = 6 THEN
     IF EmergencyStopOk THEN
         ArmingSeqStep := 0;
-        EmergencyArmingLockoutActive := TRUE;
+        EmergencyArmingLockoutActive := FALSE;
     ELSIF TonArmingConfirm.Q THEN
         EmergencyArmingFailed := TRUE;
         ArmingSeqStep := 0;
