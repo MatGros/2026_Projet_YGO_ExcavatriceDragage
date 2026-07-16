@@ -223,12 +223,12 @@ END_IF;
 instTestsManagement();
 
 // Surcharges (overrides) demandées par le banc de tests automatique
-IF instTestsManagement.OverrideChainTrue THEN
+IF GVL_Simulation.OverrideChainTrue THEN
     EmergencyChain := TRUE;
 END_IF;
-IF instTestsManagement.OverrideChainFalse THEN
+IF GVL_Simulation.OverrideChainFalse THEN
     EmergencyChain := FALSE;
 END_IF;
-IF instTestsManagement.OverrideContactorFalse THEN
+IF GVL_Simulation.OverrideContactorFalse THEN
     EmergencyStopOk := FALSE;
 END_IF;

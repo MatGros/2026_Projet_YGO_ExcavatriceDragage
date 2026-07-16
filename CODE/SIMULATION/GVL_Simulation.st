@@ -66,5 +66,17 @@ VAR_GLOBAL
                                                   // (2.0) pour tester Méca E
     
     // 🧪 Intégration Tests de validation
-    CmdRunTests                : BOOL := FALSE; // 🔑 Lancement des tests de validation automate (PRG_SafetyValidation)
+    CmdRunTests                : BOOL := FALSE; // 🔑 Lancement des tests de validation automate (FB_PLC_Tests_Management)
+    TestInProgress             : BOOL;          // Test en cours d'exécution
+    AllTestsPassed             : BOOL;          // Succès global : tous les scénarios validés 🟢
+    TestFailed                 : BOOL;          // Échec détecté 🔴
+    TC01_NominalArming_Ok      : BOOL;          // Statut TC-01 (Armement nominal & AU)
+    TC02_RedundancyFault_Ok    : BOOL;          // Statut TC-02 (Contacteur collé)
+    TC03_Lockout_Ok            : BOOL;          // Statut TC-03 (Lockout 5s)
+    FailedTestCase             : INT;           // Index du scénario en échec
+    
+    // Signaux de surcharge internes (pilotés par le validateur de test)
+    OverrideChainTrue          : BOOL;          // Force la boucle AU à TRUE
+    OverrideChainFalse         : BOOL;          // Force la boucle AU à FALSE
+    OverrideContactorFalse     : BOOL;          // Force le retour contacteur à FALSE
 END_VAR
