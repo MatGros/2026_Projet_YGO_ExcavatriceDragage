@@ -56,7 +56,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : SEMI_AUTO refusé (défaut codeur)
+    ErrorId             : WORD;        // bit0: "Mode Semi-Auto refusé (Défaut Codeur)" - SEMI_AUTO refusé (défaut codeur)
     State               : E_State;
     StateAtError        : E_State;
     Mode                : E_Mode;      // 🎯 Mode ARBITRÉ — diffusé à TOUS les FB métier (remplace E_Mode.MAINT_N1 codé en dur)

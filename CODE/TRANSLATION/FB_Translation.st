@@ -52,7 +52,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0: Brake.Error ; bit3: défaut variateur (DriveStatusWord.4) ; bit6: Fdc extrême atteint
+    ErrorId             : WORD;        // bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint
     State               : E_State;
     StateAtError        : E_State;
     TargetReached        : BOOL;       // Capteur position cible

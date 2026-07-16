@@ -68,7 +68,7 @@ VAR_OUTPUT
     Busy            : BOOL;
     Done            : BOOL;
     Error           : BOOL;
-    ErrorId         : WORD;        // bit0 : écart hors tolérance (SyncActive uniquement) ; bit1 : incohérence de commande (sens/paliers différents)
+    ErrorId         : WORD;        // bit0: "Écart synchronisme trop important" - écart hors tolérance (SyncActive uniquement) ; bit1: "Incohérence commande synchro" - incohérence de commande (sens/paliers différents)
     State           : E_State;
     StateAtError    : E_State;
     DeltaPosM       : REAL;        // |CablePosM1 - CablePosM2|, 0.0 si pas les 2 homés

@@ -51,7 +51,7 @@ def test_cli_mirrors_code_folder_structure(tmp_path):
     out_dir = tmp_path / "generated"
     main(["--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)])
 
-    assert (out_dir / "WINCH" / "FB_Winch.xml").is_file()
+    assert (out_dir / "TREUILS" / "FB_Winch.xml").is_file()
     assert (out_dir / "GVL_PERSISTENT.xml").is_file()
     assert (out_dir / "CYCLE" / "E_CycleStep.xml").is_file()
 
@@ -64,7 +64,7 @@ def test_cli_single_object_with_deps_embeds_dependency_closure(tmp_path):
     generated_files = list(out_dir.rglob("*.xml"))
     assert len(generated_files) == 1  # one file, dependencies embedded inside it, not as separate files
 
-    root = _parse_unprefixed((out_dir / "WINCH" / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
+    root = _parse_unprefixed((out_dir / "TREUILS" / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
     data_type_names = {dt.get("name") for dt in root.findall(".//dataType")}
     pou_names = {p.get("name") for p in root.findall(".//pou")}
     assert "ST_SpeedStepTable" in data_type_names
@@ -75,7 +75,7 @@ def test_cli_no_deps_flag_excludes_dependencies(tmp_path):
     out_dir = tmp_path / "generated"
     main(["FB_Winch", "--no-deps", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)])
 
-    root = _parse_unprefixed((out_dir / "WINCH" / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
+    root = _parse_unprefixed((out_dir / "TREUILS" / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
     assert root.findall(".//dataType") == []
     pous = root.findall(".//pou")
     assert [p.get("name") for p in pous] == ["FB_Winch"]

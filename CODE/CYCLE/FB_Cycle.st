@@ -46,7 +46,7 @@ VAR_OUTPUT
     Busy                : BOOL;         // Cycle automatique actif
     Done                : BOOL;         // Cycle automatique complété
     Error               : BOOL;         // Défaut cycle
-    ErrorId             : WORD;         // Code défaut (ex: 1=Timeout, 2=Incohérence)
+    ErrorId             : WORD;         // bit0: "Timeout cycle de dragage" - Timeout, bit1: "Incohérence étape cycle" - Incohérence
 
     // Commandes Winch M1 (Enrouleur)
     CmdWinchM1_StartStop : BOOL;

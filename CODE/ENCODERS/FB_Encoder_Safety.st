@@ -35,7 +35,7 @@ VAR_OUTPUT
     Busy             : BOOL;
     Done             : BOOL;
     Error            : BOOL;
-    ErrorId          : WORD;        // bit0 : position hors plage physique ; bit1 : incohérence redémarrage (miroir HomingSuspect)
+    ErrorId          : WORD;        // bit0: "Position câble hors plage" - position hors plage physique ; bit1: "Incohérence position boot" - incohérence redémarrage (miroir HomingSuspect)
     State            : E_State;
     StateAtError     : E_State;
     CablePosMSafe    : REAL;        // CablePosM gelée sur dernière valeur plausible si hors plage

@@ -61,7 +61,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0 : alarme/bus codeur ; bit1 : preset refusé/timeout
+    ErrorId             : WORD;        // bit0: "Défaut communication codeur" - alarme/bus codeur ; bit1: "Erreur référencement (timeout)" - preset refusé/timeout
     State               : E_State;
     StateAtError        : E_State;
     RawPos              : UDINT;       // Position brute — GELÉE si EncoderAvailable=FALSE

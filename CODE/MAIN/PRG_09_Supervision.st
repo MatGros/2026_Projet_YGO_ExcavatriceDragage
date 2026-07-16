@@ -398,6 +398,13 @@ GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filter
 GVL_IHM.TranslationM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
 GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
+GVL_IHM.TranslationM3.SafetyErrorJoystick     := PRG_03_Safety.instSafetyTranslationM3.ErrorJoystick;
+GVL_IHM.TranslationM3.SafetyErrorDriveComm    := PRG_03_Safety.instSafetyTranslationM3.ErrorDriveComm;
+GVL_IHM.TranslationM3.SafetyErrorPhaseRotation:= PRG_03_Safety.instSafetyTranslationM3.ErrorPhaseRotation;
+GVL_IHM.TranslationM3.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTranslationM3.ErrorBrakeThermal;
+GVL_IHM.TranslationM3.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaB;
+GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
+GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────

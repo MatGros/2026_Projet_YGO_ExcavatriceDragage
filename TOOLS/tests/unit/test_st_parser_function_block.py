@@ -54,10 +54,10 @@ def test_malformed_file_returns_none_and_records_error():
 
 
 def test_real_fb_winch_parses_end_to_end():
-    path = CODE_DIR / "WINCH" / "FB_Winch.st"
+    path = CODE_DIR / "TREUILS" / "FB_Winch.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
-    obj = parse_file(source, folder="WINCH", stem="FB_Winch", mtime=1.0, source_label="FB_Winch.st", diagnostics=diag)
+    obj = parse_file(source, folder="TREUILS", stem="FB_Winch", mtime=1.0, source_label="FB_Winch.st", diagnostics=diag)
     assert obj is not None
     assert obj.kind == "function_block"
     assert obj.name == "FB_Winch"

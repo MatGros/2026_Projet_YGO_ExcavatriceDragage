@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-15T20:01:12.631307" />
-  <contentHeader name="MGS_v0.4.13_GlobalRename_GVL_Persistent.project" modificationDateTime="2026-07-15T20:01:12.631307">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-15T20:01:12.631307">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.13_GlobalRename_GVL_Persistent</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -2046,6 +2046,62 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
               </documentation>
             </variable>
+            <variable name="SafetyErrorJoystick">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte joystick CANopen (bit0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyErrorDriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Perte communication EtherCAT variateur (bit1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases électriques (bit2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun (bit3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt (Méca B - bit4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé (Méca A - bit5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyErrorLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2719,7 +2775,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : incohérence commande/retour frein (collage ou non-relâche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut engagement frein" - incohérence commande/retour frein (collage ou non-relâche)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -3106,7 +3162,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s), bit4: Glissement M1 pendant Busy</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Timeout mouvement benne" - Timeout mouvement, bit1: "Incohérence position benne" - Incohérence boot, bit2: "Limites placement benne dépassées" - Limites dépassées, bit3: "Codeur(s) benne non référencé(s)" - Codeur(s) M1/M2 non référencé(s), bit4: "Glissement M1 détecté" - Glissement M1 pendant Busy</xhtml>
               </documentation>
             </variable>
             <variable name="M1SlipDetected">
@@ -3954,7 +4010,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut (ex: 1=Timeout, 2=Incohérence)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Timeout cycle de dragage" - Timeout, bit1: "Incohérence étape cycle" - Incohérence</xhtml>
               </documentation>
             </variable>
             <variable name="CmdWinchM1_StartStop">
@@ -5340,7 +5396,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : alarme/bus codeur ; bit1 : preset refusé/timeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut communication codeur" - alarme/bus codeur ; bit1: "Erreur référencement (timeout)" - preset refusé/timeout</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -6181,7 +6237,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : position hors plage physique ; bit1 : incohérence redémarrage (miroir HomingSuspect)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Position câble hors plage" - position hors plage physique ; bit1: "Incohérence position boot" - incohérence redémarrage (miroir HomingSuspect)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -6562,7 +6618,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : voie/carte HS</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -6831,7 +6887,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Échec calibration Joystick" - Valeurs RawX/Y hors plage lors du recalage</xhtml>
               </documentation>
             </variable>
             <variable name="AxisCmdX">
@@ -7365,7 +7421,7 @@ Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : SEMI_AUTO refusé (défaut codeur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Mode Semi-Auto refusé (Défaut Codeur)" - SEMI_AUTO refusé (défaut codeur)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -7663,7 +7719,7 @@ Done := FALSE;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : feedback incohérent ; bit1 : voie/carte HS</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Feedback sortie incohérent" - feedback incohérent ; bit1: "Défaut matériel sortie (Carte HS)" - voie/carte HS</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -7876,6 +7932,375 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_Safety_EmergencyChain" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (CmdEmergencyArming)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChain">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure des blocs safety métiers (M1/M2/M3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdEmergencyCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal A (maintenu à TRUE, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal B (maintenu à TRUE, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion réarmement physique (1s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B resté collé/shunté détecté à l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de puissance n'a pas confirmé l'armement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingLockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ArmReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ForceTestA">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ForceTestB">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TonTestA">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonRestoreA">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonTestB">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonRestoreB">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonArmingPulse">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonArmingConfirm">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonArmingLockout">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ FB_Safety_EmergencyChain — Bloc de sécurité de la boucle d'urgence
+   ───────────────────────────────────────────────────────────────
+   📄 Rôle : Séquence d'auto-test de redondance et réarmement de la 
+      boucle d'arrêt d'urgence de la machine.
+   ⚙️ Encapsule la double coupure A/B et le contrôle de collage contacteur.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🛑 1. GATE — neutralisation si désactivé
+IF NOT Enable THEN
+    Error := FALSE;
+    ErrorId := 16#0000;
+    PowerCutOff_A_RQ := FALSE;
+    PowerCutOff_B_RQ := FALSE;
+    EmergencyArming_RQ := FALSE;
+    ArmingSeqStep := 0;
+    RedundancyTestFailed := FALSE;
+    EmergencyArmingFailed := FALSE;
+    EmergencyArmingLockoutActive := FALSE;
+    ForceTestA := FALSE;
+    ForceTestB := FALSE;
+    TonTestA(IN := FALSE);
+    TonRestoreA(IN := FALSE);
+    TonTestB(IN := FALSE);
+    TonRestoreB(IN := FALSE);
+    TonArmingPulse(IN := FALSE);
+    TonArmingConfirm(IN := FALSE);
+    TonArmingLockout(IN := FALSE);
+    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+ResetEdge(CLK := Reset);
+ArmReqEdge(CLK := ArmRequest);
+
+// 🔍 2. ACQUITTEMENT DES DÉFAUTS
+IF ResetEdge.Q THEN
+    RedundancyTestFailed := FALSE; // Défaut matériel : reset inconditionnel sur front
+    IF EmergencyStopOk THEN
+        EmergencyArmingFailed := FALSE; // Cause disparue (contacteur collé) + reset
+    END_IF;
+END_IF;
+
+// 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE RÉARMEMENT
+IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChain 
+   AND NOT EmergencyArmingLockoutActive 
+   AND NOT EmergencyStopOk THEN // Ignoré si déjà armé
+    ArmingSeqStep := 1;
+END_IF;
+
+// ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
+TonTestA(IN := (ArmingSeqStep = 1), PT := T#200ms);
+IF ArmingSeqStep = 1 THEN
+    ForceTestA := TRUE;
+    IF TonTestA.Q THEN
+        ForceTestA := FALSE;
+        IF EmergencyChain THEN
+            // La boucle n'est pas tombée -&gt; défaut de redondance
+            RedundancyTestFailed := TRUE;
+            ArmingSeqStep := 0;
+        ELSE
+            ArmingSeqStep := 2;
+        END_IF;
+    END_IF;
+ELSE
+    ForceTestA := FALSE;
+END_IF;
+
+// ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
+TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200ms);
+IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
+    IF EmergencyChain THEN
+        ArmingSeqStep := 3;
+    ELSE
+        ArmingSeqStep := 0; // Boucle non restaurée
+    END_IF;
+END_IF;
+
+// ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
+TonTestB(IN := (ArmingSeqStep = 3), PT := T#200ms);
+IF ArmingSeqStep = 3 THEN
+    ForceTestB := TRUE;
+    IF TonTestB.Q THEN
+        ForceTestB := FALSE;
+        IF EmergencyChain THEN
+            RedundancyTestFailed := TRUE;
+            ArmingSeqStep := 0;
+        ELSE
+            ArmingSeqStep := 4;
+        END_IF;
+    END_IF;
+ELSE
+    ForceTestB := FALSE;
+END_IF;
+
+// ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
+TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200ms);
+IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
+    IF EmergencyChain THEN
+        ArmingSeqStep := 5;
+    ELSE
+        ArmingSeqStep := 0;
+    END_IF;
+END_IF;
+
+// ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
+TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1s);
+EmergencyArming_RQ := (ArmingSeqStep = 5);
+IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
+    ArmingSeqStep := 6;
+END_IF;
+
+// ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
+TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2s);
+IF ArmingSeqStep = 6 THEN
+    IF EmergencyStopOk THEN
+        ArmingSeqStep := 0;
+        EmergencyArmingLockoutActive := TRUE;
+    ELSIF TonArmingConfirm.Q THEN
+        EmergencyArmingFailed := TRUE;
+        ArmingSeqStep := 0;
+        EmergencyArmingLockoutActive := TRUE;
+    END_IF;
+END_IF;
+
+// ⏱️ Séquence de verrouillage temporel (5s de sécurité après essai)
+TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5s);
+IF TonArmingLockout.Q THEN
+    EmergencyArmingLockoutActive := FALSE;
+END_IF;
+
+// 📤 4. GESTION DES COMMANDES DE COUPURE FAIL-SAFE
+// Si défaut de redondance ou d'armement détecté -&gt; on force l'ouverture en sécurité
+PowerCutOff_A_RQ := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+PowerCutOff_B_RQ := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+
+// 📤 5. SYNTHÈSE DES ERREURS POUR LE CONTRAT FB
+ErrorId := 16#0000;
+IF RedundancyTestFailed THEN
+    ErrorId := ErrorId OR 16#0001;
+END_IF;
+IF EmergencyArmingFailed THEN
+    ErrorId := ErrorId OR 16#0002;
+END_IF;
+
+Error := (ErrorId &lt;&gt; 16#0000);
+Busy  := (ArmingSeqStep &lt;&gt; 0);
+Done  := EmergencyStopOk AND NOT Error;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>0b8c2c51-e54c-582c-8b0e-8a675cc7bcea</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Safety_Translation" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -8043,7 +8468,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : perte joystick ; bit1 : perte com EtherCAT ; bit2 : rotation phases ; bit3 : thermique frein ; bit4 : Méca B (incohérence arrêt) ; bit5 : Méca A (mouvement non commandé) ; bit6 : Fdc extrême atteint</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -8070,6 +8495,62 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coup de poing / coupure puissance amont</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorJoystick">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte joystick / CANopen (bit0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorDriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Perte communication EtherCAT variateur (bit1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases (bit2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun (bit3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt (Méca B - bit4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé (Méca A - bit5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -8142,6 +8623,13 @@ IF NOT Enable THEN
     ErrorId := 16#0000;
     SafeStop := FALSE;
     PowerCutOff := FALSE;
+    ErrorJoystick := FALSE;
+    ErrorDriveComm := FALSE;
+    ErrorPhaseRotation := FALSE;
+    ErrorBrakeThermal := FALSE;
+    ErrorMecaB := FALSE;
+    ErrorMecaA := FALSE;
+    ErrorLimitSwitch := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     State := E_State.DISABLED;
@@ -8232,6 +8720,15 @@ SafeStop := Error OR NOT EmergencyStopOk;
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), ou dépassement de fin de course (bit6)
 PowerCutOff := (ErrorId AND 16#0078) &lt;&gt; 16#0000;
+
+// Décapsulage du bitfield ErrorId pour l'IHM
+ErrorJoystick       := (ErrorId AND 16#0001) &lt;&gt; 16#0000;
+ErrorDriveComm      := (ErrorId AND 16#0002) &lt;&gt; 16#0000;
+ErrorPhaseRotation  := (ErrorId AND 16#0004) &lt;&gt; 16#0000;
+ErrorBrakeThermal   := (ErrorId AND 16#0008) &lt;&gt; 16#0000;
+ErrorMecaB          := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
+ErrorMecaA          := (ErrorId AND 16#0020) &lt;&gt; 16#0000;
+ErrorLimitSwitch    := (ErrorId AND 16#0040) &lt;&gt; 16#0000;
 
 Busy := FALSE;
 Done := FALSE;
@@ -8559,7 +9056,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0:joystick/CAN perdu ; bit1:codeur perdu ; bit2:surchauffe moteur (SafeStop+PowerCutOff) ; bit3:mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4:phases élec. ; bit5:fin course haut ; bit6:longueur max câble ; bit7:Méca A mouvement non commandé ; bit8:Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9:Méca C glissement M1/benne (escalade) ; bit10:surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11:Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12:Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13:Méca E escalade non confirmé (SafeStop+PowerCutOff)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte Joystick / CAN" - joystick/CAN perdu ; bit1: "Défaut Codeur" - codeur perdu ; bit2: "Surchauffe Moteur" - surchauffe moteur (SafeStop+PowerCutOff) ; bit3: "Mou de câble détecté" - mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4: "Défaut Rotation Phases" - phases élec. ; bit5: "Fin de course haut atteint" - fin course haut ; bit6: "Limite profondeur max atteinte" - longueur max câble ; bit7: "Mouvement non commandé (Méca A)" - Méca A mouvement non commandé ; bit8: "Absence confirmation arrêt (Méca B)" - Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9: "Glissement benne critique (Méca C)" - Méca C glissement M1/benne (escalade) ; bit10: "Défaut Thermique Freins" - surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11: "Défaut arrêt capteur haut (Méca D)" - Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12: "Écart synchro critique (Méca E)" - Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13: "Absence confirmation synchro (Méca E)" - Méca E escalade non confirmé (SafeStop+PowerCutOff)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -10254,7 +10751,7 @@ Filtrage capteur de position cible</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Brake.Error ; bit3: défaut variateur (DriveStatusWord.4) ; bit6: Fdc extrême atteint</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -10884,6 +11381,9 @@ END_IF;
               <type>
                 <WORD />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut frein Treuil" - Brake.Error ; bit1: "Contacteur(s) Treuil collé(s)" - ContactorsCheck.StuckClosed</xhtml>
+              </documentation>
             </variable>
             <variable name="State">
               <type>
@@ -11477,7 +11977,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : écart hors tolérance (SyncActive uniquement) ; bit1 : incohérence de commande (sens/paliers différents)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Écart synchronisme trop important" - écart hors tolérance (SyncActive uniquement) ; bit1: "Incohérence commande synchro" - incohérence de commande (sens/paliers différents)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -14422,6 +14922,13 @@ GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filter
 GVL_IHM.TranslationM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
 GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
+GVL_IHM.TranslationM3.SafetyErrorJoystick     := PRG_03_Safety.instSafetyTranslationM3.ErrorJoystick;
+GVL_IHM.TranslationM3.SafetyErrorDriveComm    := PRG_03_Safety.instSafetyTranslationM3.ErrorDriveComm;
+GVL_IHM.TranslationM3.SafetyErrorPhaseRotation:= PRG_03_Safety.instSafetyTranslationM3.ErrorPhaseRotation;
+GVL_IHM.TranslationM3.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTranslationM3.ErrorBrakeThermal;
+GVL_IHM.TranslationM3.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaB;
+GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
+GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
@@ -14711,90 +15218,15 @@ Pulse 1s en cours</xhtml>
                 <derived name="FB_Output" />
               </type>
             </variable>
-            <variable name="ArmReqEdge">
+            <variable name="instSafetyEmergencyChain">
               <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — séquence réarmement AU + auto-test redondance A/B (voir §🚨 en bas de fichier)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
+                <derived name="FB_Safety_EmergencyChain" />
               </type>
             </variable>
-            <variable name="ForceTestA">
+            <variable name="PowerCutOffReq">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">force PowerCutOff_A_RQ bas pendant l'auto-test canal A</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ForceTestB">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">force PowerCutOff_B_RQ bas pendant l'auto-test canal B</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonTestA">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">200ms — coupe A seul, vérifie EmergencyChain tombe</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRestoreA">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">200ms — restaure A, attend le retour de la boucle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonTestB">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">200ms — coupe B seul, vérifie EmergencyChain tombe</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRestoreB">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">200ms — restaure B, attend le retour de la boucle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonArmingPulse">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1s — durée de l'impulsion réarmement (mécanisme à ressort)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonArmingConfirm">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">2s — attente confirmation contacteur après le pulse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonArmingLockout">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">5s — verrouillage avant nouvelle tentative possible</xhtml>
-              </documentation>
             </variable>
             <variable name="ManuActive">
               <type>
@@ -15371,144 +15803,34 @@ M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
 
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
-// 🔴🔧 REX 2026-07-07 : ARCHITECTURE À COMMANDE MAINTENUE (fail-safe) — retour terrain.
-// PowerCutOff_A_RQ/B_RQ doivent être MAINTENUS à TRUE tant que tout va bien ; le circuit AU
-// s'ouvre (coupe le contacteur de puissance) dès que le PLC ARRÊTE de les maintenir — que ce
-// soit volontairement (défaut Méca A/B/C détecté) OU accidentellement (PLC tombe/coupure
-// automate). Polarité INVERSÉE par rapport à la 1ère version (qui mettait TRUE = "coupe",
-// erreur de conception : en cas de défaut réel, ça aurait MAINTENU la puissance au lieu de
-// la couper — pire cas de figure).
-// 🔧 REX 2026-07-07 (2) : ForceTestA/ForceTestB permettent à l'auto-test de redondance
-// (ci-dessous) de forcer UN SEUL canal bas à la fois, sans dépendre d'un vrai défaut Méca A/B/C.
-// ─────────  Début modification IHM_MANU  ─────────
-// 🆕 REX 2026-07-09 — MODE IHM_MANU : demande explicite utilisateur — en Manu, RQ_A/B = TRUE
-// FIXE dès que l'automate tourne, SANS EXCEPTION (ni Méca A/B/C, ni auto-test ForceTestA/B, ni
-// bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
-// Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
-IF ManuActive THEN
-    PowerCutOff_A_RQ := NOT PowerCutOffActive_Eff AND NOT ForceTestA;
-    PowerCutOff_B_RQ := NOT PowerCutOffActive_Eff AND NOT ForceTestB;
-    // ─────────  Fin modification IHM_MANU  ─────────
-ELSE
-PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                         OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                         OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff)
-                    AND NOT ForceTestA
-                    AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
+// Calcul du besoin de coupure amont (intégrant le bypass en mode IHM_MANU)
+PowerCutOffReq := (ManuActive AND PowerCutOffActive_Eff) 
+                  OR (NOT ManuActive AND (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                                       OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                                       OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff));
 
-PowerCutOff_B_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                         OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                         OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff)
-                    AND NOT ForceTestB
-                    AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
-END_IF;
+// Appel du bloc Safety global pour la boucle d'urgence
+instSafetyEmergencyChain(
+    Enable := TRUE,
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    ArmRequest := GVL_IHM.Modes.CmdEmergencyArming,
+    EmergencyChain := PRG_00_Inputs.EmergencyChain,
+    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerCutOffRequest := PowerCutOffReq,
+    CmdEmergencyCutOff := NOT ManuActive AND GVL_IHM.Modes.CmdEmergencyCutOff
+);
 
-// ─── 🚨 SÉQUENCE RÉARMEMENT CONTACTEUR PUISSANCE (REX 2026-07-07) ──────────────────────
-// Commande IHM (front, PAS de réarmement automatique) →
-//   1) auto-test canal A seul (200ms, coupe A/vérifie EmergencyChain tombe) puis restaure (200ms)
-//   2) auto-test canal B seul (200ms) puis restaure (200ms)
-//   3) si les 2 canaux sont validés : impulsion 1s sur EmergencyArming_RQ (mécanisme à ressort)
-//   4) attente confirmation contacteur (EmergencyStopOk) sous 2s
-//   5) verrouillage 5s avant nouvelle tentative possible, succès ou échec
-// Si un canal échoue l'auto-test → RedundancyTestFailed, tout est bloqué (on ne peut pas démarrer
-// avec un seul contact de sécurité réellement fonctionnel).
-ResetEdge(CLK := PRG_09_Supervision.FaultMachineReset_IHM);
+// Affectation des sorties physiques et logiques de coupure/réarmement
+PowerCutOff_A_RQ := instSafetyEmergencyChain.PowerCutOff_A_RQ;
+PowerCutOff_B_RQ := instSafetyEmergencyChain.PowerCutOff_B_RQ;
+EmergencyArming_RQ := instSafetyEmergencyChain.EmergencyArming_RQ;
 
-ArmReqEdge(CLK := GVL_IHM.Modes.CmdEmergencyArming);
-IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND PRG_00_Inputs.EmergencyChain
-   AND NOT EmergencyArmingLockoutActive
-   AND NOT PRG_00_Inputs.EmergencyStopOk THEN // 🆕 REX 2026-07-08 : Ignoré si déjà armé pour éviter une coupure intempestive lors de l'auto-test
-    ArmingSeqStep := 1;
-END_IF;
-
-// Étape 1 : coupe canal A seul, vérifie que la boucle tombe
-TonTestA(IN := (ArmingSeqStep = 1), PT := T#200MS);
-IF ArmingSeqStep = 1 THEN
-    ForceTestA := TRUE;
-    IF TonTestA.Q THEN
-        ForceTestA := FALSE;
-        IF PRG_00_Inputs.EmergencyChain THEN
-            // La boucle n'est PAS tombée alors qu'on a coupé A seul → canal A shunté/défaillant
-            RedundancyTestFailed := TRUE;
-            ArmingSeqStep := 0;
-        ELSE
-            ArmingSeqStep := 2;
-        END_IF;
-    END_IF;
-ELSE
-    ForceTestA := FALSE;
-END_IF;
-
-// Étape 2 : restaure A, attend le retour de la boucle
-TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200MS);
-IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
-    IF PRG_00_Inputs.EmergencyChain THEN
-        ArmingSeqStep := 3;
-    ELSE
-        ArmingSeqStep := 0; // boucle pas revenue saine (AU pressé entre-temps ?) — pas d'alarme dédiée, l'opérateur relance
-    END_IF;
-END_IF;
-
-// Étape 3 : coupe canal B seul, vérifie que la boucle tombe
-TonTestB(IN := (ArmingSeqStep = 3), PT := T#200MS);
-IF ArmingSeqStep = 3 THEN
-    ForceTestB := TRUE;
-    IF TonTestB.Q THEN
-        ForceTestB := FALSE;
-        IF PRG_00_Inputs.EmergencyChain THEN
-            RedundancyTestFailed := TRUE;
-            ArmingSeqStep := 0;
-        ELSE
-            ArmingSeqStep := 4;
-        END_IF;
-    END_IF;
-ELSE
-    ForceTestB := FALSE;
-END_IF;
-
-// Étape 4 : restaure B, attend le retour de la boucle
-TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200MS);
-IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
-    IF PRG_00_Inputs.EmergencyChain THEN
-        ArmingSeqStep := 5;
-    ELSE
-        ArmingSeqStep := 0;
-    END_IF;
-END_IF;
-
-// Étape 5 : les 2 canaux validés → impulsion réarmement 1s
-EmergencyArmingPulseActive := (ArmingSeqStep = 5);
-TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1S);
-IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
-    ArmingSeqStep := 6;
-END_IF;
-
-// Étape 6 : attente confirmation contacteur (2s max)
-TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2S);
-IF ArmingSeqStep = 6 THEN
-    IF PRG_00_Inputs.EmergencyStopOk THEN
-        ArmingSeqStep := 0;
-        EmergencyArmingLockoutActive := TRUE;
-    ELSIF TonArmingConfirm.Q THEN
-        EmergencyArmingFailed := TRUE;
-        ArmingSeqStep := 0;
-        EmergencyArmingLockoutActive := TRUE;
-    END_IF;
-END_IF;
-
-TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5S);
-IF TonArmingLockout.Q THEN
-    EmergencyArmingLockoutActive := FALSE;
-END_IF;
-
-EmergencyArming_RQ := EmergencyArmingPulseActive;
-
-IF ResetEdge.Q THEN
-    RedundancyTestFailed := FALSE; // défaut câblage : pas de "cause disparue" détectable, front seul suffit
-    IF PRG_00_Inputs.EmergencyStopOk THEN
-        EmergencyArmingFailed := FALSE; // cause disparue (contacteur confirmé) + front reset
-    END_IF;
-END_IF;
+// Copie des états de diagnostic vers la supervision IHM
+EmergencyArmingPulseActive   := instSafetyEmergencyChain.EmergencyArming_RQ;
+EmergencyArmingLockoutActive := instSafetyEmergencyChain.EmergencyArmingLockoutActive;
+ArmingSeqStep                := instSafetyEmergencyChain.ArmingSeqStep;
+RedundancyTestFailed         := instSafetyEmergencyChain.RedundancyTestFailed;
+EmergencyArmingFailed        := instSafetyEmergencyChain.EmergencyArmingFailed;
 </xhtml>
           </ST>
         </body>
@@ -16162,6 +16484,7 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
           <Object Name="FB_Output" ObjectId="b60dd37c-0508-57b7-805e-ba43b1805814" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
+          <Object Name="FB_Safety_EmergencyChain" ObjectId="0b8c2c51-e54c-582c-8b0e-8a675cc7bcea" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
         </Folder>
         <Folder Name="JOYSTICK">

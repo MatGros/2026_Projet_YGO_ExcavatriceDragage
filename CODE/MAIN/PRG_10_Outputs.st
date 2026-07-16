@@ -56,19 +56,8 @@ VAR
     instM2BrakeCmd        : FB_Output;
 
     instTranslationBrakeCmd   : FB_Output;
-
-    // 🔧 REX 2026-07-07 — séquence réarmement AU + auto-test redondance A/B (voir §🚨 en bas de fichier)
-    ArmReqEdge            : R_TRIG;
-    ResetEdge             : R_TRIG;
-    ForceTestA            : BOOL; // force PowerCutOff_A_RQ bas pendant l'auto-test canal A
-    ForceTestB            : BOOL; // force PowerCutOff_B_RQ bas pendant l'auto-test canal B
-    TonTestA              : TON;  // 200ms — coupe A seul, vérifie EmergencyChain tombe
-    TonRestoreA           : TON;  // 200ms — restaure A, attend le retour de la boucle
-    TonTestB              : TON;  // 200ms — coupe B seul, vérifie EmergencyChain tombe
-    TonRestoreB           : TON;  // 200ms — restaure B, attend le retour de la boucle
-    TonArmingPulse        : TON;  // 1s — durée de l'impulsion réarmement (mécanisme à ressort)
-    TonArmingConfirm      : TON;  // 2s — attente confirmation contacteur après le pulse
-    TonArmingLockout      : TON;  // 5s — verrouillage avant nouvelle tentative possible
+    instSafetyEmergencyChain  : FB_Safety_EmergencyChain;
+    PowerCutOffReq            : BOOL;
 
     // ─────────  Début modification IHM_MANU  ─────────
     // 🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
@@ -458,141 +447,31 @@ M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
 
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
-// 🔴🔧 REX 2026-07-07 : ARCHITECTURE À COMMANDE MAINTENUE (fail-safe) — retour terrain.
-// PowerCutOff_A_RQ/B_RQ doivent être MAINTENUS à TRUE tant que tout va bien ; le circuit AU
-// s'ouvre (coupe le contacteur de puissance) dès que le PLC ARRÊTE de les maintenir — que ce
-// soit volontairement (défaut Méca A/B/C détecté) OU accidentellement (PLC tombe/coupure
-// automate). Polarité INVERSÉE par rapport à la 1ère version (qui mettait TRUE = "coupe",
-// erreur de conception : en cas de défaut réel, ça aurait MAINTENU la puissance au lieu de
-// la couper — pire cas de figure).
-// 🔧 REX 2026-07-07 (2) : ForceTestA/ForceTestB permettent à l'auto-test de redondance
-// (ci-dessous) de forcer UN SEUL canal bas à la fois, sans dépendre d'un vrai défaut Méca A/B/C.
-// ─────────  Début modification IHM_MANU  ─────────
-// 🆕 REX 2026-07-09 — MODE IHM_MANU : demande explicite utilisateur — en Manu, RQ_A/B = TRUE
-// FIXE dès que l'automate tourne, SANS EXCEPTION (ni Méca A/B/C, ni auto-test ForceTestA/B, ni
-// bouton IHM CmdEmergencyCutOff — ce dernier n'a donc plus d'effet tant que ModeDisable=FALSE).
-// Seul l'AU physique (chaîne matérielle indépendante) protège encore en Manu.
-IF ManuActive THEN
-    PowerCutOff_A_RQ := NOT PowerCutOffActive_Eff AND NOT ForceTestA;
-    PowerCutOff_B_RQ := NOT PowerCutOffActive_Eff AND NOT ForceTestB;
-    // ─────────  Fin modification IHM_MANU  ─────────
-ELSE
-PowerCutOff_A_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                         OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                         OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff)
-                    AND NOT ForceTestA
-                    AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
+// Calcul du besoin de coupure amont (intégrant le bypass en mode IHM_MANU)
+PowerCutOffReq := (ManuActive AND PowerCutOffActive_Eff) 
+                  OR (NOT ManuActive AND (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                                       OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                                       OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff));
 
-PowerCutOff_B_RQ := NOT (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                         OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                         OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff)
-                    AND NOT ForceTestB
-                    AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
-END_IF;
+// Appel du bloc Safety global pour la boucle d'urgence
+instSafetyEmergencyChain(
+    Enable := TRUE,
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    ArmRequest := GVL_IHM.Modes.CmdEmergencyArming,
+    EmergencyChain := PRG_00_Inputs.EmergencyChain,
+    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerCutOffRequest := PowerCutOffReq,
+    CmdEmergencyCutOff := NOT ManuActive AND GVL_IHM.Modes.CmdEmergencyCutOff
+);
 
-// ─── 🚨 SÉQUENCE RÉARMEMENT CONTACTEUR PUISSANCE (REX 2026-07-07) ──────────────────────
-// Commande IHM (front, PAS de réarmement automatique) →
-//   1) auto-test canal A seul (200ms, coupe A/vérifie EmergencyChain tombe) puis restaure (200ms)
-//   2) auto-test canal B seul (200ms) puis restaure (200ms)
-//   3) si les 2 canaux sont validés : impulsion 1s sur EmergencyArming_RQ (mécanisme à ressort)
-//   4) attente confirmation contacteur (EmergencyStopOk) sous 2s
-//   5) verrouillage 5s avant nouvelle tentative possible, succès ou échec
-// Si un canal échoue l'auto-test → RedundancyTestFailed, tout est bloqué (on ne peut pas démarrer
-// avec un seul contact de sécurité réellement fonctionnel).
-ResetEdge(CLK := PRG_09_Supervision.FaultMachineReset_IHM);
+// Affectation des sorties physiques et logiques de coupure/réarmement
+PowerCutOff_A_RQ := instSafetyEmergencyChain.PowerCutOff_A_RQ;
+PowerCutOff_B_RQ := instSafetyEmergencyChain.PowerCutOff_B_RQ;
+EmergencyArming_RQ := instSafetyEmergencyChain.EmergencyArming_RQ;
 
-ArmReqEdge(CLK := GVL_IHM.Modes.CmdEmergencyArming);
-IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND PRG_00_Inputs.EmergencyChain
-   AND NOT EmergencyArmingLockoutActive
-   AND NOT PRG_00_Inputs.EmergencyStopOk THEN // 🆕 REX 2026-07-08 : Ignoré si déjà armé pour éviter une coupure intempestive lors de l'auto-test
-    ArmingSeqStep := 1;
-END_IF;
-
-// Étape 1 : coupe canal A seul, vérifie que la boucle tombe
-TonTestA(IN := (ArmingSeqStep = 1), PT := T#200MS);
-IF ArmingSeqStep = 1 THEN
-    ForceTestA := TRUE;
-    IF TonTestA.Q THEN
-        ForceTestA := FALSE;
-        IF PRG_00_Inputs.EmergencyChain THEN
-            // La boucle n'est PAS tombée alors qu'on a coupé A seul → canal A shunté/défaillant
-            RedundancyTestFailed := TRUE;
-            ArmingSeqStep := 0;
-        ELSE
-            ArmingSeqStep := 2;
-        END_IF;
-    END_IF;
-ELSE
-    ForceTestA := FALSE;
-END_IF;
-
-// Étape 2 : restaure A, attend le retour de la boucle
-TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200MS);
-IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
-    IF PRG_00_Inputs.EmergencyChain THEN
-        ArmingSeqStep := 3;
-    ELSE
-        ArmingSeqStep := 0; // boucle pas revenue saine (AU pressé entre-temps ?) — pas d'alarme dédiée, l'opérateur relance
-    END_IF;
-END_IF;
-
-// Étape 3 : coupe canal B seul, vérifie que la boucle tombe
-TonTestB(IN := (ArmingSeqStep = 3), PT := T#200MS);
-IF ArmingSeqStep = 3 THEN
-    ForceTestB := TRUE;
-    IF TonTestB.Q THEN
-        ForceTestB := FALSE;
-        IF PRG_00_Inputs.EmergencyChain THEN
-            RedundancyTestFailed := TRUE;
-            ArmingSeqStep := 0;
-        ELSE
-            ArmingSeqStep := 4;
-        END_IF;
-    END_IF;
-ELSE
-    ForceTestB := FALSE;
-END_IF;
-
-// Étape 4 : restaure B, attend le retour de la boucle
-TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200MS);
-IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
-    IF PRG_00_Inputs.EmergencyChain THEN
-        ArmingSeqStep := 5;
-    ELSE
-        ArmingSeqStep := 0;
-    END_IF;
-END_IF;
-
-// Étape 5 : les 2 canaux validés → impulsion réarmement 1s
-EmergencyArmingPulseActive := (ArmingSeqStep = 5);
-TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1S);
-IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
-    ArmingSeqStep := 6;
-END_IF;
-
-// Étape 6 : attente confirmation contacteur (2s max)
-TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2S);
-IF ArmingSeqStep = 6 THEN
-    IF PRG_00_Inputs.EmergencyStopOk THEN
-        ArmingSeqStep := 0;
-        EmergencyArmingLockoutActive := TRUE;
-    ELSIF TonArmingConfirm.Q THEN
-        EmergencyArmingFailed := TRUE;
-        ArmingSeqStep := 0;
-        EmergencyArmingLockoutActive := TRUE;
-    END_IF;
-END_IF;
-
-TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5S);
-IF TonArmingLockout.Q THEN
-    EmergencyArmingLockoutActive := FALSE;
-END_IF;
-
-EmergencyArming_RQ := EmergencyArmingPulseActive;
-
-IF ResetEdge.Q THEN
-    RedundancyTestFailed := FALSE; // défaut câblage : pas de "cause disparue" détectable, front seul suffit
-    IF PRG_00_Inputs.EmergencyStopOk THEN
-        EmergencyArmingFailed := FALSE; // cause disparue (contacteur confirmé) + front reset
-    END_IF;
-END_IF;
+// Copie des états de diagnostic vers la supervision IHM
+EmergencyArmingPulseActive   := instSafetyEmergencyChain.EmergencyArming_RQ;
+EmergencyArmingLockoutActive := instSafetyEmergencyChain.EmergencyArmingLockoutActive;
+ArmingSeqStep                := instSafetyEmergencyChain.ArmingSeqStep;
+RedundancyTestFailed         := instSafetyEmergencyChain.RedundancyTestFailed;
+EmergencyArmingFailed        := instSafetyEmergencyChain.EmergencyArmingFailed;

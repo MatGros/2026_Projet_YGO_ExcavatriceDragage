@@ -181,7 +181,7 @@
       <UserDefElement iecname="State" type="T_E_State" byteoffset="14" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="SyncEnableRequest" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_TranslationHMI" size="30" nativesize="32" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_TranslationHMI">
+    <TypeUserDef name="T_ST_TranslationHMI" size="37" nativesize="40" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_TranslationHMI">
       <UserDefElement iecname="SelectedTargetNum" type="T_INT" byteoffset="0" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="ReqFwd" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="ReqRev" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
@@ -201,6 +201,13 @@
       <UserDefElement iecname="BypassContactorFeedback" type="T_BOOL" byteoffset="26" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="SafetyError" type="T_BOOL" byteoffset="27" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="SafetyErrorId" type="T_WORD" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorJoystick" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorDriveComm" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorPhaseRotation" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorBrakeThermal" type="T_BOOL" byteoffset="33" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorMecaB" type="T_BOOL" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorMecaA" type="T_BOOL" byteoffset="35" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyErrorLimitSwitch" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_WinchHMI" size="124" nativesize="124" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchHMI">
       <UserDefElement iecname="TopSensorPositionM" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
