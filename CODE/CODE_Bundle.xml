@@ -7883,7 +7883,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe, configure et orchestre toutes les instances
       de tests de validation automate (banc de test global).
-      Met à jour directement GVL_Simulation pour affichage unifié.
+      Met à jour directement GVL_PLC_Tests pour affichage unifié.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -7893,9 +7893,9 @@ Error := (ErrorId &lt;&gt; 16#0000);
 
 // === IMPLEMENTATION ===
 
-// 1. Détection du bit de déclenchement global dans GVL_Simulation
-IF GVL_Simulation.CmdRunTests THEN
-    GVL_Simulation.CmdRunTests := FALSE;
+// 1. Détection du bit de déclenchement global dans GVL_PLC_Tests
+IF GVL_PLC_Tests.CmdRunTests THEN
+    GVL_PLC_Tests.CmdRunTests := FALSE;
     TriggerSafetyTests := TRUE;
 ELSE
     TriggerSafetyTests := FALSE;
@@ -7904,19 +7904,19 @@ END_IF;
 // 2. Appel de l'instance de test pour la sécurité d'urgence
 instSafetyValidation(StartTests := TriggerSafetyTests);
 
-// 3. Centralisation directe des résultats dans GVL_Simulation
-GVL_Simulation.TestInProgress          := instSafetyValidation.TestInProgress;
-GVL_Simulation.AllTestsPassed          := instSafetyValidation.AllTestsPassed;
-GVL_Simulation.TestFailed              := instSafetyValidation.TestFailed;
-GVL_Simulation.TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
-GVL_Simulation.TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
-GVL_Simulation.TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
-GVL_Simulation.FailedTestCase          := instSafetyValidation.FailedTestCase;
+// 3. Centralisation directe des résultats dans GVL_PLC_Tests
+GVL_PLC_Tests.TestInProgress          := instSafetyValidation.TestInProgress;
+GVL_PLC_Tests.AllTestsPassed          := instSafetyValidation.AllTestsPassed;
+GVL_PLC_Tests.TestFailed              := instSafetyValidation.TestFailed;
+GVL_PLC_Tests.TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
+GVL_PLC_Tests.TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
+GVL_PLC_Tests.TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
+GVL_PLC_Tests.FailedTestCase          := instSafetyValidation.FailedTestCase;
 
 // 4. Centralisation directe des surcharges de simulation (overrides)
-GVL_Simulation.OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
-GVL_Simulation.OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
-GVL_Simulation.OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
+GVL_PLC_Tests.OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
+GVL_PLC_Tests.OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
+GVL_PLC_Tests.OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
 </xhtml>
           </ST>
         </body>
@@ -13395,13 +13395,13 @@ END_IF;
 instTestsManagement();
 
 // Surcharges (overrides) demandées par le banc de tests automatique
-IF GVL_Simulation.OverrideChainTrue THEN
+IF GVL_PLC_Tests.OverrideChainTrue THEN
     EmergencyChain := TRUE;
 END_IF;
-IF GVL_Simulation.OverrideChainFalse THEN
+IF GVL_PLC_Tests.OverrideChainFalse THEN
     EmergencyChain := FALSE;
 END_IF;
-IF GVL_Simulation.OverrideContactorFalse THEN
+IF GVL_PLC_Tests.OverrideContactorFalse THEN
     EmergencyStopOk := FALSE;
 END_IF;
 </xhtml>
@@ -16806,6 +16806,120 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_PLC_Tests">
+        <variable name="CmdRunTests">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Lancement des tests de validation (bouton IHM/Simu)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TestInProgress">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Test en cours d'exécution</xhtml>
+          </documentation>
+        </variable>
+        <variable name="AllTestsPassed">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Succès global : tous les scénarios validés 🟢</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TestFailed">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Échec détecté 🔴</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TC01_NominalArming_Ok">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-01 (Armement nominal &amp; AU)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TC02_RedundancyFault_Ok">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-02 (Contacteur collé)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TC03_Lockout_Ok">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-03 (Lockout 5s)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="FailedTestCase">
+          <type>
+            <INT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Index du scénario en échec</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideChainTrue">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Signaux de surcharge internes (pilotés par le validateur de test)
+Force la boucle AU à TRUE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideChainFalse">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force la boucle AU à FALSE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideContactorFalse">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à FALSE</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>075e3c4c-ec9c-57a1-9ae5-eb94d89b5791</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 GVL_PLC_Tests — Variables globales du banc de validation
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe toutes les commandes et retours d'états
+      du banc de tests automatique in-PLC.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Simulation">
         <variable name="SimulationModeActive">
           <type>
@@ -17074,101 +17188,6 @@ Front montant = applique le saut sur M1</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Amplitude du saut (m) — &gt; WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)</xhtml>
           </documentation>
         </variable>
-        <variable name="CmdRunTests">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">pour tester Concept 1 ; &gt; WinchCriticalSyncTolerance_M
-(2.0) pour tester Méca E
-🧪 Intégration Tests de validation
-🔑 Lancement des tests de validation automate (FB_PLC_Tests_Management)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TestInProgress">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Test en cours d'exécution</xhtml>
-          </documentation>
-        </variable>
-        <variable name="AllTestsPassed">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Succès global : tous les scénarios validés 🟢</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TestFailed">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Échec détecté 🔴</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TC01_NominalArming_Ok">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-01 (Armement nominal &amp; AU)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TC02_RedundancyFault_Ok">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-02 (Contacteur collé)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TC03_Lockout_Ok">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-03 (Lockout 5s)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="FailedTestCase">
-          <type>
-            <INT />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Index du scénario en échec</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideChainTrue">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Signaux de surcharge internes (pilotés par le validateur de test)
-Force la boucle AU à TRUE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideChainFalse">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force la boucle AU à FALSE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideContactorFalse">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à FALSE</xhtml>
-          </documentation>
-        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
@@ -17352,6 +17371,7 @@ Force la boucle AU à TRUE</xhtml>
           <Folder Name="PLC_TESTS">
             <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
             <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
+            <Object Name="GVL_PLC_Tests" ObjectId="075e3c4c-ec9c-57a1-9ae5-eb94d89b5791" />
           </Folder>
           <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
