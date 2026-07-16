@@ -6,6 +6,15 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### `v0.4.15_IHM_MANU_TranslationHoming` — 2026-07-16 (TEST)
+- Translation M3 alignée sur Winch : IHM_MANU = 3ᵉ source d'arbitrage (PRG_07 §1bis)
+- Fin bypass M3_CommandWord · instSafetyTranslationM3.Enable inconditionnel (débloque TC-T1/2/3)
+- Vitesse Manu boutons/joystick conservée via FreqSetpointHz (diffère du Winch, décision produit)
+- Retrait bypass Homing (HomingEncoder_M1/M2) — PRG_02_Encoders/ST_IHM_MANU
+- + AF_Partie-11_Fonction_Translation v1.7
+- Aux Hydrauliques + WinchMaxStepFwd/Rev restent hors périmètre (différés)
+- ⚠️ Version de test — pas encore réimportée/validée en CODESYS
+
 ### `v0.4.14_SafetyValidation_EmergencyChain` — 2026-07-16 (TEST)
 - FB_Safety_EmergencyChain : encapsule la boucle AU + sorties erreur individuelles Translation
 - Déplacé/renommé vers EMERGENCY/FB_Safety_EmergencyManagement
