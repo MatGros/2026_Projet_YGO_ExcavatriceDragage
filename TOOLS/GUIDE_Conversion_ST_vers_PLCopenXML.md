@@ -260,6 +260,7 @@ END_IF;
 | `E_Mode`, `FB_SpeedStep`, `ST_SpeedStepTable` (type/FB du projet) | `<derived name="..."/>` |
 | `STRING(n)` | **Confirmé** sur `FB_Cycle.xml` (`CycleStateStr`) : `<string length="80" />` — attribut `length`, pas d'élément enfant. |
 | `ARRAY[a..b] OF T` | **Confirmé** sur `ST_SpeedStepTable.xml` (`StepThreshold_Pct : ARRAY[1..5] OF REAL`) : `<array><dimension lower="1" upper="5" /><baseType><REAL /></baseType></array>` — une `<dimension>` par dimension (tableau multi-dim = plusieurs `<dimension>` successives, non vérifié mais cohérent avec le schéma TC6). |
+| `ARRAY[1..CONST] OF T` (borne symbolique, ex. `GVL_PLC_Tests_Const.MaxSteps`) | ⚠️ **NON VÉRIFIÉ** — ajouté 2026-07-16 (framework PLC_TESTS) : le générateur émet `<dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />` (texte brut de l'expression, pas résolu en entier). Avant cette version, ces champs étaient **silencieusement omis** du bundle (`unsupported type expression`, `continue` sans les ajouter aux déclarations) — bug corrigé mais le format de sortie pour une borne symbolique reste à confirmer par un import CODESYS réel. |
 | Valeur par défaut | `<initialValue><simpleValue value="..."/></initialValue>` (texte litéral, y compris préfixe `TIME#`) |
 
 ---
