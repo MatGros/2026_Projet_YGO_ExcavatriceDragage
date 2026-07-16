@@ -105,7 +105,8 @@ instSimSafety(
     Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal,
     PowerCutOff_A   := PowerCutOff_A_RQ,
     PowerCutOff_B   := PowerCutOff_B_RQ,
-    EmergencyArming := EmergencyArming_RQ
+    EmergencyArming := EmergencyArming_RQ,
+    BtnEmergencyStop := GVL_PLC_Tests.OverrideChainFalse
 );
 
 instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR instSimSafety.SimContactorOk, FilterTime := T#20MS);

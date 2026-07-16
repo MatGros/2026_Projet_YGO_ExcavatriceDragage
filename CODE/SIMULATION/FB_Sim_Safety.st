@@ -21,6 +21,7 @@ VAR_INPUT
     PowerCutOff_A   : BOOL; // Commande coupure canal A (TRUE = OK/fermé)
     PowerCutOff_B   : BOOL; // Commande coupure canal B (TRUE = OK/fermé)
     EmergencyArming : BOOL; // Impulsion de réarmement (TRUE = pulse)
+    BtnEmergencyStop : BOOL; // Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)
 END_VAR
 VAR_OUTPUT
     SimChainOk      : BOOL; // Boucle AU simulée saine
@@ -39,8 +40,8 @@ IF NOT Enable THEN
 END_IF;
 
 // 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
-// (on simule que les boutons AU physiques coup-de-poing sont toujours au repos/relâchés)
-SimChainOk := PowerCutOff_A AND PowerCutOff_B;
+// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
+SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
 
 // 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure
 IF NOT SimChainOk THEN

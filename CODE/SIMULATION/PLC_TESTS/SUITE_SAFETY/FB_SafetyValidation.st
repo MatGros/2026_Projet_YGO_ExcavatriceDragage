@@ -288,7 +288,7 @@ IF NOT TableReady THEN
     StepTable[StepTc02Redundancy].CheckIdx[3] := 11; // Durée dans [180ms, 260ms]
     StepTable[StepTc02Redundancy].CheckIdx[4] := 12; // Pas d'erreur parasite
     StepTable[StepTc02Redundancy].TimeoutPT := T#10s;
-    StepTable[StepTc02Redundancy].NextOnPass := StepTc03Setup;
+    StepTable[StepTc02Redundancy].NextOnPass := StepTc02Teardown;
     StepTable[StepTc02Redundancy].NextOnFail := StepTc02Teardown;
     StepTable[StepTc02Redundancy].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
@@ -358,7 +358,7 @@ ProbeBool[SigHealthyIdle] := NOT PRG_10_Outputs.instSafetyEmergencyManagement.Re
 
 ProbeBool[SigEmergencyStopOk] := PRG_00_Inputs.EmergencyStopOk;
 ProbeDint[SigArmingSeqStep] := PRG_10_Outputs.instSafetyEmergencyManagement.ArmingSeqStep;
-ProbeBool[SigPowerCutOffAny] := NOT PowerCutOff_A_RQ AND NOT PowerCutOff_B_RQ;
+ProbeBool[SigPowerCutOffAny] := NOT PRG_00_Inputs.EmergencyStopOk;
 ProbeBool[SigRedundancyFailed] := PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed;
 ProbeBool[SigEmergencyArmingFailed] := PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingFailed;
 ProbeBool[SigEmergencyArmingLockoutActive] := PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
