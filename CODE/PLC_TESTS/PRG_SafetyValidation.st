@@ -40,6 +40,12 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     RETURN;
 END_IF;
 
+// Lancement automatique sur front de la commande globale de simulation
+IF GVL_Simulation.CmdRunTests THEN
+    GVL_Simulation.CmdRunTests := FALSE;
+    StartTests := TRUE;
+END_IF;
+
 // ⏱️ Timer général d'étape
 TestTimer(IN := (TestSeqStep <> 0), PT := T#10s);
 

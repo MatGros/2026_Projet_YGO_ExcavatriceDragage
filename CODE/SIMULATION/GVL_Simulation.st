@@ -64,4 +64,7 @@ VAR_GLOBAL
     SyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)
                                                   // pour tester Concept 1 ; > WinchCriticalSyncTolerance_M
                                                   // (2.0) pour tester Méca E
+    
+    // 🧪 Intégration Tests de validation
+    CmdRunTests                : BOOL := FALSE; // 🔑 Lancement des tests de validation automate (PRG_SafetyValidation)
 END_VAR

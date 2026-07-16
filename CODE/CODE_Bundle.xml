@@ -16319,6 +16319,12 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     RETURN;
 END_IF;
 
+// Lancement automatique sur front de la commande globale de simulation
+IF GVL_Simulation.CmdRunTests THEN
+    GVL_Simulation.CmdRunTests := FALSE;
+    StartTests := TRUE;
+END_IF;
+
 // ⏱️ Timer général d'étape
 TestTimer(IN := (TestSeqStep &lt;&gt; 0), PT := T#10s);
 
@@ -16989,6 +16995,20 @@ Front montant = applique le saut sur M1</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Amplitude du saut (m) — &gt; WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CmdRunTests">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">pour tester Concept 1 ; &gt; WinchCriticalSyncTolerance_M
+(2.0) pour tester Méca E
+🧪 Intégration Tests de validation
+🔑 Lancement des tests de validation automate (PRG_SafetyValidation)</xhtml>
           </documentation>
         </variable>
         <addData>
