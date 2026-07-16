@@ -28,5 +28,8 @@ STRUCT
 
     // 📊 Dernier run (Rapports par suite)
     Suites           : ARRAY[1..GVL_PLC_Tests_Const.MaxSuites] OF ST_TestSuiteReport;
+
+    // 💓 Clignotant d'activité (Heartbeat actif en cours de run)
+    Heartbeat        : BOOL;
 END_STRUCT
 END_TYPE
