@@ -17284,7 +17284,7 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
           <Object Name="ST_AxisCmd" ObjectId="0e745763-905d-50f6-aa26-5f4cd95f438a" />
         </Folder>
-        <Folder Name="BENNE">
+        <Folder Name="TREUILS\BENNE">
           <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
           <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
           <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
@@ -17304,7 +17304,7 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
-        <Folder Name="PLC_TESTS">
+        <Folder Name="SIMULATION\PLC_TESTS">
           <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
           <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
         </Folder>

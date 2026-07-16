@@ -65,9 +65,10 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
             continue
         source = f.read_text(encoding="utf-8")
         rel = f.relative_to(code_dir).as_posix()
+        rel_parent = f.parent.relative_to(code_dir)
         obj = parse_file(
             source,
-            folder="" if f.parent == code_dir else f.parent.name,
+            folder="" if rel_parent == Path(".") else rel_parent.as_posix().replace('/', '\\'),
             stem=f.stem,
             mtime=f.stat().st_mtime,
             source_label=rel,
