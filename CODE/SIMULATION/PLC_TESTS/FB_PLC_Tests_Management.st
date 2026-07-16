@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 FB_PLC_Tests_Suite — Suite Globale des Tests de Validation Automatisés
+   🧪 FB_PLC_Tests_Management — Gestion Globale des Tests de Validation Automatisés
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe, configure et orchestre toutes les instances
       de tests de validation automate (banc de test global).
    ═══════════════════════════════════════════════════════════════ *)
 
-FUNCTION_BLOCK PUBLIC FB_PLC_Tests_Suite
+FUNCTION_BLOCK PUBLIC FB_PLC_Tests_Management
 VAR_OUTPUT
     // Statuts de synthèse globaux
     TestInProgress             : BOOL;

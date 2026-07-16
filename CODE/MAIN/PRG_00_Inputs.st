@@ -90,7 +90,7 @@ VAR
     SimTopSensorTriggered                : BOOL;
     
     // 🧪 Suite de tests de validation (exécutée uniquement en simulation)
-    instTestsSuite                       : FB_PLC_Tests_Suite;
+    instTestsManagement                  : FB_PLC_Tests_Management;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
@@ -220,4 +220,4 @@ ELSE
 END_IF;
 
 // 🧪 Appel de la suite globale de tests de validation automate
-instTestsSuite();
+instTestsManagement();

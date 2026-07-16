@@ -7855,7 +7855,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
           </data>
         </addData>
       </pou>
-      <pou name="FB_PLC_Tests_Suite" pouType="functionBlock">
+      <pou name="FB_PLC_Tests_Management" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -7921,7 +7921,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_PLC_Tests_Suite — Suite Globale des Tests de Validation Automatisés
+   🧪 FB_PLC_Tests_Management — Gestion Globale des Tests de Validation Automatisés
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe, configure et orchestre toutes les instances
       de tests de validation automate (banc de test global).
@@ -7958,7 +7958,7 @@ FailedTestCase          := instSafetyValidation.FailedTestCase;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>347bb326-79b9-5bdd-a5e9-5f6a23a77a16</ObjectId>
+            <ObjectId>4f9edc6d-f5f9-594b-bef8-0d282881abd3</ObjectId>
           </data>
         </addData>
       </pou>
@@ -13290,9 +13290,9 @@ TRUE = tous retombés (sain, rien d'engagé)
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)</xhtml>
               </documentation>
             </variable>
-            <variable name="instTestsSuite">
+            <variable name="instTestsManagement">
               <type>
-                <derived name="FB_PLC_Tests_Suite" />
+                <derived name="FB_PLC_Tests_Management" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Suite de tests de validation (exécutée uniquement en simulation)</xhtml>
@@ -13440,7 +13440,7 @@ ELSE
 END_IF;
 
 // 🧪 Appel de la suite globale de tests de validation automate
-instTestsSuite();
+instTestsManagement();
 </xhtml>
           </ST>
         </body>
@@ -17305,7 +17305,7 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
         <Folder Name="PLC_TESTS">
-          <Object Name="FB_PLC_Tests_Suite" ObjectId="347bb326-79b9-5bdd-a5e9-5f6a23a77a16" />
+          <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
           <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
         </Folder>
         <Folder Name="EMERGENCY">
