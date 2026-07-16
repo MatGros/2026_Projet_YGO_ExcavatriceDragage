@@ -13290,6 +13290,14 @@ TRUE = tous retombés (sain, rien d'engagé)
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)</xhtml>
               </documentation>
             </variable>
+            <variable name="instTestsSuite">
+              <type>
+                <derived name="FB_PLC_Tests_Suite" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Suite de tests de validation (exécutée uniquement en simulation)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -13430,6 +13438,9 @@ ELSE
     M3_ActualFrequencyHz_Filtered := M3_ActualFrequencyHz;
     M3_StatusWord_Filtered        := M3_StatusWord;
 END_IF;
+
+// 🧪 Appel de la suite globale de tests de validation automate
+instTestsSuite();
 </xhtml>
           </ST>
         </body>
@@ -16634,46 +16645,6 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
           </data>
         </addData>
       </pou>
-      <pou name="PRG_PLC_Tests" pouType="program">
-        <interface>
-          <inputVars />
-          <outputVars />
-          <localVars>
-            <variable name="instTestsSuite">
-              <type>
-                <derived name="FB_PLC_Tests_Suite" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 L'instance globale hébergeant la suite de tests</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 PRG_PLC_Tests — Programme d'exécution de la suite de tests
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Programme d'accueil unique destiné à être appelé dans le
-      gestionnaire de tâches CODESYS. Instancie et appelle le bloc suite.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION ===
-
-// Appel unique de la suite de tests
-instTestsSuite();
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>bd930c33-7263-54f9-b075-a71599e74a80</ObjectId>
-          </data>
-        </addData>
-      </pou>
     </pous>
   </types>
   <instances>
@@ -17333,10 +17304,15 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
-        <Folder Name="PLC_TESTS">
+        <Folder Name="SIMULATION">
           <Object Name="FB_PLC_Tests_Suite" ObjectId="347bb326-79b9-5bdd-a5e9-5f6a23a77a16" />
           <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
-          <Object Name="PRG_PLC_Tests" ObjectId="bd930c33-7263-54f9-b075-a71599e74a80" />
+          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
         <Folder Name="EMERGENCY">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
@@ -17348,14 +17324,6 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
-        </Folder>
-        <Folder Name="SIMULATION">
-          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
-          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
-          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
         <Folder Name="MAIN">
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />

@@ -88,6 +88,9 @@ VAR
  
     // 🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)
     SimTopSensorTriggered                : BOOL;
+    
+    // 🧪 Suite de tests de validation (exécutée uniquement en simulation)
+    instTestsSuite                       : FB_PLC_Tests_Suite;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
@@ -215,3 +218,6 @@ ELSE
     M3_ActualFrequencyHz_Filtered := M3_ActualFrequencyHz;
     M3_StatusWord_Filtered        := M3_StatusWord;
 END_IF;
+
+// 🧪 Appel de la suite globale de tests de validation automate
+instTestsSuite();
