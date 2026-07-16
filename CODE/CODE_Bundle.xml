@@ -9013,6 +9013,22 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Gestion du clignotant HMI</xhtml>
               </documentation>
             </variable>
+            <variable name="PulseCounter">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="CycleCounter">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
           </localVars>
         </interface>
         <body>
@@ -9161,17 +9177,38 @@ GVL_PLC_Tests.Hmi.CasesTotal := TotalCount;
 GVL_PLC_Tests.Hmi.CasesPassed := PassedCount;
 GVL_PLC_Tests.Hmi.CasesFailed := FailedCount;
 
-// 💓 Logique du Clignotant visuel d'activité (Heartbeat)
+// 💓 Logique du Clignotant visuel d'activité (Heartbeat — Triple clignotement réactif)
 IF GVL_PLC_Tests.Hmi.RunState = E_TestRunState.TESTRUN_RUNNING THEN
-    // Le clignotant bascule UNIQUEMENT lors des transitions réelles d'étapes
-    IF GVL_PLC_Tests.Hmi.ActiveStepId &lt;&gt; LastStepId THEN
-        GVL_PLC_Tests.Hmi.Heartbeat := NOT GVL_PLC_Tests.Hmi.Heartbeat;
+    // 1. Détection d'un changement de step réel -&gt; Armement du triple clignotement
+    IF GVL_PLC_Tests.Hmi.ActiveStepId &lt;&gt; LastStepId AND PulseCounter = 0 THEN
+        PulseCounter := 1;
+        CycleCounter := 0;
+        GVL_PLC_Tests.Hmi.Heartbeat := TRUE;
         LastStepId := GVL_PLC_Tests.Hmi.ActiveStepId;
+    END_IF;
+
+    // 2. Gestion du cycle de clignotement (100ms ON / 100ms OFF x3)
+    IF PulseCounter &gt; 0 THEN
+        CycleCounter := CycleCounter + 1;
+        IF CycleCounter &gt;= 10 THEN
+            CycleCounter := 0;
+            PulseCounter := PulseCounter + 1;
+            IF PulseCounter &lt;= 6 THEN
+                // Impulsions impaires = TRUE, paires = FALSE
+                GVL_PLC_Tests.Hmi.Heartbeat := (PulseCounter MOD 2 &lt;&gt; 0);
+            ELSE
+                // Fin du triple clignotement -&gt; retour à l'état éteint
+                PulseCounter := 0;
+                GVL_PLC_Tests.Hmi.Heartbeat := FALSE;
+            END_IF;
+        END_IF;
     END_IF;
 ELSE
     // Forcer à FALSE quand le runner est au repos
     GVL_PLC_Tests.Hmi.Heartbeat := FALSE;
     LastStepId := 0;
+    PulseCounter := 0;
+    CycleCounter := 0;
 END_IF;
 </xhtml>
           </ST>
