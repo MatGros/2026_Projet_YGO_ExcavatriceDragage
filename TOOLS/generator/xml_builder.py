@@ -409,11 +409,29 @@ def build_project_xml(
     project_structure_data.set("name", "http://www.3s-software.com/plcopenxml/projectstructure")
     project_structure_data.set("handleUnknown", "discard")
     project_structure = ET.SubElement(project_structure_data, "ProjectStructure")
-    for folder_name, entries in folders.items():
-        folder_el = ET.SubElement(project_structure, "Folder")
-        folder_el.set("Name", folder_name)
+    folder_elements: dict[tuple[str, ...], ET.Element] = {}
+    for folder_path_str, entries in folders.items():
+        if not folder_path_str:
+            folder_el = ET.SubElement(project_structure, "Folder")
+            folder_el.set("Name", "")
+            for object_name, guid in entries:
+                object_el = ET.SubElement(folder_el, "Object")
+                object_el.set("Name", object_name)
+                object_el.set("ObjectId", guid)
+            continue
+
+        parts = tuple(folder_path_str.split('\\'))
+        parent_el = project_structure
+        for i in range(len(parts)):
+            subpath = parts[:i+1]
+            if subpath not in folder_elements:
+                folder_el = ET.SubElement(parent_el, "Folder")
+                folder_el.set("Name", parts[i])
+                folder_elements[subpath] = folder_el
+            parent_el = folder_elements[subpath]
+
         for object_name, guid in entries:
-            object_el = ET.SubElement(folder_el, "Object")
+            object_el = ET.SubElement(parent_el, "Object")
             object_el.set("Name", object_name)
             object_el.set("ObjectId", guid)
 
