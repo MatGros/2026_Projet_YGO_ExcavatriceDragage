@@ -3,26 +3,10 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe, configure et orchestre toutes les instances
       de tests de validation automate (banc de test global).
+      Met à jour directement GVL_Simulation pour affichage unifié.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_PLC_Tests_Management
-VAR_OUTPUT
-    // Statuts de synthèse globaux
-    TestInProgress             : BOOL;
-    AllTestsPassed             : BOOL;
-    TestFailed                 : BOOL;
-    
-    // Accès aux résultats détaillés pour la supervision
-    TC01_NominalArming_Ok      : BOOL;
-    TC02_RedundancyFault_Ok    : BOOL;
-    TC03_Lockout_Ok            : BOOL;
-    FailedTestCase             : INT;
-    
-    // Propagation des demandes de surcharge (overrides)
-    OverrideChainTrue          : BOOL;
-    OverrideChainFalse         : BOOL;
-    OverrideContactorFalse     : BOOL;
-END_VAR
 VAR
     // 🧱 Instances de tests individuels hébergées
     instSafetyValidation       : FB_SafetyValidation;
@@ -44,14 +28,16 @@ END_IF;
 // 2. Appel de l'instance de test pour la sécurité d'urgence
 instSafetyValidation(StartTests := TriggerSafetyTests);
 
-// 3. Propagation de la synthèse de statut et des résultats détaillés
-TestInProgress          := instSafetyValidation.TestInProgress;
-AllTestsPassed          := instSafetyValidation.AllTestsPassed;
-TestFailed              := instSafetyValidation.TestFailed;
-TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
-TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
-TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
-FailedTestCase          := instSafetyValidation.FailedTestCase;
-OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
-OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
-OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
+// 3. Centralisation directe des résultats dans GVL_Simulation
+GVL_Simulation.TestInProgress          := instSafetyValidation.TestInProgress;
+GVL_Simulation.AllTestsPassed          := instSafetyValidation.AllTestsPassed;
+GVL_Simulation.TestFailed              := instSafetyValidation.TestFailed;
+GVL_Simulation.TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
+GVL_Simulation.TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
+GVL_Simulation.TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
+GVL_Simulation.FailedTestCase          := instSafetyValidation.FailedTestCase;
+
+// 4. Centralisation directe des surcharges de simulation (overrides)
+GVL_Simulation.OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
+GVL_Simulation.OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
+GVL_Simulation.OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;

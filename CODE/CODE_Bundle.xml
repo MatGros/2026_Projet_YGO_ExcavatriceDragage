@@ -7858,67 +7858,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
       <pou name="FB_PLC_Tests_Management" pouType="functionBlock">
         <interface>
           <inputVars />
-          <outputVars>
-            <variable name="TestInProgress">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Statuts de synthèse globaux</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AllTestsPassed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TestFailed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TC01_NominalArming_Ok">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accès aux résultats détaillés pour la supervision</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TC02_RedundancyFault_Ok">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TC03_Lockout_Ok">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FailedTestCase">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="OverrideChainTrue">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Propagation des demandes de surcharge (overrides)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OverrideChainFalse">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="OverrideContactorFalse">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </outputVars>
+          <outputVars />
           <localVars>
             <variable name="instSafetyValidation">
               <type>
@@ -7943,6 +7883,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe, configure et orchestre toutes les instances
       de tests de validation automate (banc de test global).
+      Met à jour directement GVL_Simulation pour affichage unifié.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -7963,17 +7904,19 @@ END_IF;
 // 2. Appel de l'instance de test pour la sécurité d'urgence
 instSafetyValidation(StartTests := TriggerSafetyTests);
 
-// 3. Propagation de la synthèse de statut et des résultats détaillés
-TestInProgress          := instSafetyValidation.TestInProgress;
-AllTestsPassed          := instSafetyValidation.AllTestsPassed;
-TestFailed              := instSafetyValidation.TestFailed;
-TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
-TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
-TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
-FailedTestCase          := instSafetyValidation.FailedTestCase;
-OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
-OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
-OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
+// 3. Centralisation directe des résultats dans GVL_Simulation
+GVL_Simulation.TestInProgress          := instSafetyValidation.TestInProgress;
+GVL_Simulation.AllTestsPassed          := instSafetyValidation.AllTestsPassed;
+GVL_Simulation.TestFailed              := instSafetyValidation.TestFailed;
+GVL_Simulation.TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
+GVL_Simulation.TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
+GVL_Simulation.TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
+GVL_Simulation.FailedTestCase          := instSafetyValidation.FailedTestCase;
+
+// 4. Centralisation directe des surcharges de simulation (overrides)
+GVL_Simulation.OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
+GVL_Simulation.OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
+GVL_Simulation.OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
 </xhtml>
           </ST>
         </body>
@@ -13446,13 +13389,13 @@ END_IF;
 instTestsManagement();
 
 // Surcharges (overrides) demandées par le banc de tests automatique
-IF instTestsManagement.OverrideChainTrue THEN
+IF GVL_Simulation.OverrideChainTrue THEN
     EmergencyChain := TRUE;
 END_IF;
-IF instTestsManagement.OverrideChainFalse THEN
+IF GVL_Simulation.OverrideChainFalse THEN
     EmergencyChain := FALSE;
 END_IF;
-IF instTestsManagement.OverrideContactorFalse THEN
+IF GVL_Simulation.OverrideContactorFalse THEN
     EmergencyStopOk := FALSE;
 END_IF;
 </xhtml>
@@ -17136,7 +17079,88 @@ Front montant = applique le saut sur M1</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">pour tester Concept 1 ; &gt; WinchCriticalSyncTolerance_M
 (2.0) pour tester Méca E
 🧪 Intégration Tests de validation
-🔑 Lancement des tests de validation automate (PRG_SafetyValidation)</xhtml>
+🔑 Lancement des tests de validation automate (FB_PLC_Tests_Management)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TestInProgress">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Test en cours d'exécution</xhtml>
+          </documentation>
+        </variable>
+        <variable name="AllTestsPassed">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Succès global : tous les scénarios validés 🟢</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TestFailed">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Échec détecté 🔴</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TC01_NominalArming_Ok">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-01 (Armement nominal &amp; AU)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TC02_RedundancyFault_Ok">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-02 (Contacteur collé)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TC03_Lockout_Ok">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut TC-03 (Lockout 5s)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="FailedTestCase">
+          <type>
+            <INT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Index du scénario en échec</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideChainTrue">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Signaux de surcharge internes (pilotés par le validateur de test)
+Force la boucle AU à TRUE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideChainFalse">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force la boucle AU à FALSE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideContactorFalse">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à FALSE</xhtml>
           </documentation>
         </variable>
         <addData>
