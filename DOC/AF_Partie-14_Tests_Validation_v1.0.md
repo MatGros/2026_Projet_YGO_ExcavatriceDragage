@@ -20,7 +20,30 @@ La fonction d'arrêt d'urgence et la coupure de puissance associée sur l'excava
 
 ---
 
-## 🧩 2. Architecture du validateur automatique dans l'API
+## 🔁 2. Concept de Validation Continue (CI/CD) appliqué à l'Automatisme
+
+### 💡 Qu'est-ce que le CI/CD en Automatisme ?
+Le **CI/CD (Continuous Integration / Continuous Deployment)** désigne des pratiques de développement visant à automatiser l'intégration du code et sa validation :
+* **Intégration Continue (CI) :** Chaque modification de code est automatiquement compilée, testée syntaxiquement et validée par une suite de tests unitaires (ici, via `pytest` exécuté dans VS Code et potentiellement dans un pipeline GitHub/GitLab).
+* **Validation Continue (In-PLC Testing) :** Dans le cadre industriel, cela consiste à exécuter un programme de test autonome (`PRG_SafetyValidation.st`) directement au cœur du processeur de l'automate (ou de son simulateur) pour simuler des scénarios de pannes et certifier dynamiquement que les sécurités réagissent conformément aux normes.
+
+### ⚙️ Comment lancer les tests de validation pendant qu'on code ?
+Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé est le suivant :
+
+1. **Validation syntaxique (Terminal VS Code) :**
+   * Lance la commande suivante pour s'assurer que le générateur et le parser CODESYS acceptent le code ST :
+     ```powershell
+     python -m pytest
+     ```
+2. **Validation comportementale (CODESYS Simulator) :**
+   * Connecte-toi à l'automate en mode Simulation.
+   * Force `GVL_Simulation.SimulationModeActive := TRUE`.
+   * Passe la variable `PRG_SafetyValidation.StartTests := TRUE` à `TRUE`.
+   * Le programme déroule tous les cas de tests en moins de 10 secondes et fournit le statut via `PRG_SafetyValidation.AllTestsPassed`.
+
+---
+
+## 🧩 3. Architecture du validateur automatique dans l'API
 
 Afin de valider ces exigences sans matériel physique connecté, le système intègre un programme de test automatique : `PRG_SafetyValidation.st` (situé dans `CODE/TESTS/`).
 
@@ -49,7 +72,7 @@ flowchart TD
 
 ---
 
-## 🧪 3. Fiches techniques des cas de tests (TC)
+## 🧪 4. Fiches techniques des cas de tests (TC)
 
 Le validateur automatique déroule séquentiellement les trois scénarios réglementaires décrits ci-dessous.
 
@@ -84,7 +107,7 @@ Le validateur automatique déroule séquentiellement les trois scénarios régle
 
 ---
 
-## 📊 4. Variables de diagnostic et indicateurs IHM
+## 📊 5. Variables de diagnostic et indicateurs IHM
 
 Le bloc `FB_Safety_EmergencyManagement` expose les variables suivantes pour le diagnostic machine et l'affichage IHM :
 
@@ -99,7 +122,7 @@ Le bloc `FB_Safety_EmergencyManagement` expose les variables suivantes pour le d
 
 ---
 
-## 📈 5. Matrice des critères d'acceptation de sécurité
+## 📈 6. Matrice des critères d'acceptation de sécurité
 
 | ID du Test | Fonction de Sécurité Validée | Paramètre Critique | Critère d'Acceptation (Attendu) |
 | :---: | :--- | :---: | :--- |
