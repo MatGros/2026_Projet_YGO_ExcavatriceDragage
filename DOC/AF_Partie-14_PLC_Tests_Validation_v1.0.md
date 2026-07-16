@@ -25,7 +25,7 @@ La fonction d'arrêt d'urgence et la coupure de puissance associée sur l'excava
 ### 💡 Qu'est-ce que le CI/CD en Automatisme ?
 Le **CI/CD (Continuous Integration / Continuous Deployment)** désigne des pratiques de développement visant à automatiser l'intégration du code et sa validation :
 * **Intégration Continue (CI) :** Chaque modification de code est automatiquement compilée, testée syntaxiquement et validée par une suite de tests unitaires (ici, via `pytest` exécuté dans VS Code et potentiellement dans un pipeline GitHub/GitLab).
-* **Validation Continue (In-PLC Testing) :** Dans le cadre industriel, cela consiste à exécuter un programme de test autonome (`PRG_SafetyValidation.st`) directement au cœur du processeur de l'automate (ou de son simulateur) pour simuler des scénarios de pannes et certifier dynamiquement que les sécurités réagissent conformément aux normes.
+* **Validation Continue (In-PLC Testing) :** Dans le cadre industriel, cela consiste à exécuter un programme de test unique (`PRG_PLC_Tests.st`) appelant une suite de blocs fonctionnels (`FB_PLC_Tests_Suite.st` et ses sous-blocs comme `FB_SafetyValidation.st`) directement au cœur du processeur de l'automate pour simuler des scénarios de pannes et certifier dynamiquement que les sécurités réagissent conformément aux normes.
 
 ### ⚙️ Comment lancer les tests de validation pendant qu'on code ?
 Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé est le suivant :
@@ -38,17 +38,20 @@ Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé 
 2. **Validation comportementale (CODESYS Simulator) :**
    * Connecte-toi à l'automate en mode Simulation.
    * Force `GVL_Simulation.SimulationModeActive := TRUE`.
-   * Passe la variable `PRG_SafetyValidation.StartTests := TRUE` à `TRUE`.
-   * Le programme déroule tous les cas de tests en moins de 10 secondes et fournit le statut via `PRG_SafetyValidation.AllTestsPassed`.
+   * Active la variable de commande globale `GVL_Simulation.CmdRunTests := TRUE`.
+   * La suite de tests déroule tous les cas de tests en moins de 10 secondes et fournit la synthèse via `PRG_PLC_Tests.instTestsSuite.AllTestsPassed`.
 
 ---
 
 ## 🧩 3. Architecture du validateur automatique dans l'API
 
-Afin de valider ces exigences sans matériel physique connecté, le système intègre un programme de test automatique : `PRG_SafetyValidation.st` (situé dans `CODE/PLC_TESTS/`).
+Afin de valider ces exigences sans matériel physique connecté, le système intègre une suite de tests par composition de blocs fonctionnels dans `CODE/PLC_TESTS/` :
+* **`PRG_PLC_Tests.st` :** Programme d'accueil unique appelé dans le gestionnaire de tâches.
+* **`FB_PLC_Tests_Suite.st` :** Bloc fonctionnel parent qui orchestre toutes les instances de tests et écoute la GVL simulation.
+* **`FB_SafetyValidation.st` :** Sous-bloc fonctionnel contenant la logique et le séquencement des tests d'arrêt d'urgence.
 
 ### ⚙️ Conditions de fonctionnement
-Le validateur ne s'exécute que si la simulation est active :
+Chaque bloc de test individuel vérifie que la simulation est active :
 ```pascal
 IF NOT GVL_Simulation.SimulationModeActive THEN
     TestSeqStep := 0;
@@ -58,7 +61,7 @@ END_IF;
 ```
 
 ### 🔀 Surcharges dynamiques (Overrides)
-Comme `PRG_SafetyValidation.st` s'exécute **après** `PRG_00_Inputs.st` dans la tâche automate, il applique des surcharges (overrides) sur les variables de retour physique pour injecter des stimuli ou simuler des pannes :
+Comme le programme `PRG_PLC_Tests` s'exécute **après** `PRG_00_Inputs.st` dans la tâche automate, les sous-blocs de tests appliquent des surcharges (overrides) sur les variables de retour physique pour injecter des stimuli ou simuler des pannes :
 * `OverrideChainTrue` : Force `PRG_00_Inputs.EmergencyChain` à `TRUE` (boucle saine).
 * `OverrideChainFalse` : Force `PRG_00_Inputs.EmergencyChain` à `FALSE` (boucle ouverte).
 * `OverrideContactorFalse` : Force `PRG_00_Inputs.EmergencyStopOk` à `FALSE` (défaut retour contacteur).
@@ -66,7 +69,7 @@ Comme `PRG_SafetyValidation.st` s'exécute **après** `PRG_00_Inputs.st` dans la
 ```mermaid
 flowchart TD
     Inputs[PRG_00_Inputs] --> SafetyFB[FB_Safety_EmergencyManagement]
-    SafetyFB --> Validation[PRG_SafetyValidation]
+    SafetyFB --> Validation[PRG_PLC_Tests / FB_PLC_Tests_Suite]
     Validation -. Surcharges/Overrides .-> Inputs
 ```
 
