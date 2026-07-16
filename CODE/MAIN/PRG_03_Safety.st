@@ -112,7 +112,12 @@ instSafetyWinchM2(
 
 // 3. Sécurité Translation M3
 instSafetyTranslationM3(
-    Enable              := NOT PRG_10_Outputs.ManuActive OR NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.TranslationPosition_IsReal, // 🆕 REX 2026-07-14 : ManuActive (Conditional Bypass Doctrine)
+    // 🔧 REX 2026-07-16 — SIMPLIFICATION : IHM_MANU pilote désormais M3 via FB_Translation
+    // (PRG_07_TranslationControl), qui a BESOIN d'un SafeStop réel pour rampé/arrêter proprement
+    // (ex-"Conditional Bypass Doctrine" RETIRÉE ici, même traitement que instSafetyWinchM1/M2 —
+    // voir REX 2026-07-15 (2) plus haut). Pas d'InhibitM3 dans FB_Modes (contrairement à
+    // InhibitM1/M2) : Enable inconditionnel, comme en Auto.
+    Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
