@@ -146,7 +146,11 @@ DrumPos           → position tambour codeur
 ### Sorties d'état / feedback
 ```
 Ready, Done, Busy, Moving
-Error, ErrorId    → ErrorId = bitfield WORD (bit n = défaut n), Error = miroir (ErrorId <> 0)
+Error, ErrorId    → ErrorId = bitfield WORD (bit n = défaut n)
+                   Règle documentation ErrorId : 
+                   - Chaque bit doit être documenté dans la déclaration du FB.
+                   - Format : `bitN: "MESSAGE IHM" - Description technique`
+                   - Le texte entre guillemets est le message exact attendu sur l'IHM (à copier-coller).
 ```
  
 ### Sorties physiques / actionneurs

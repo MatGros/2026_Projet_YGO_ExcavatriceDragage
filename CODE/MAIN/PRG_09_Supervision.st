@@ -15,8 +15,28 @@ PROGRAM PRG_09_Supervision
 VAR_OUTPUT
     FaultMachineReset_IHM : BOOL; // 🔔 Acquittement défauts domaine sécurité/métier (OR des boutons HMI) — jamais Modes/Cycle
 END_VAR
+VAR
+    instBlink1Hz : BLINK; // 🧩 Réutilisation lib Util (Partie3 §0) — horloge clignotement système
+END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_09_Supervision) ===
+
+// ── 0. HORLOGE CLIGNOTEMENT SYSTÈME (GVL_Global.BlinkClock) ───────────────
+// 🧩 Réutilisation lib Util (Partie3 §0) : bloc standard BLINK, pas de TON maison —
+// gère nativement un rythme allumé/éteint ASYMÉTRIQUE (TimeHigh ≠ TimeLow), contrairement
+// au motif TON manuel de FB_Output.st (symétrique 500/500, propre à l'option relais).
+// 🔧 REX 2026-07-16 : durées réglables sans recompiler (GVL_PERSISTENT._BlinkTimeOn/_BlinkTimeOff,
+// défaut 1s allumé / 800ms éteint) — un seul rythme partagé pour tous les voyants IHM/diag qui
+// clignotent pareil.
+// 💡 Un voyant a besoin d'un AUTRE rythme ? Instancier son propre BLINK localement (Util) avec
+// ses propres TimeHigh/TimeLow — ne pas détourner ce bit partagé pour un rythme différent.
+instBlink1Hz(
+    ENABLE   := TRUE,
+    TIMEHIGH := _BlinkTimeOn,
+    TIMELOW  := _BlinkTimeOff
+);
+GVL_Global.BlinkClock := instBlink1Hz.OUT;
+
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;

@@ -6,7 +6,7 @@
 TYPE ST_WinchHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
-    TopSensorPositionM      : REAL := 12.5;     (* 📐 Position cible du capteur haut (m) *)
+    TopSensorPositionM      : REAL := 8.5;      (* 📐 Position cible du capteur haut (m) *)
     MaxStepDescente         : INT := 3;         (* 🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
                                                     commun M1/M2 (même profil de déplacement), miroir bidirectionnel
                                                     _WinchMaxStepDescent (voir PRG_09_Supervision),
@@ -15,8 +15,8 @@ STRUCT
     RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     RampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
     CableLimitDescentM      : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
-    CableLimitAscentM       : REAL := 12.0;     (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) —
-                                                    distincte de TopSensorPositionM (12.5m, réservé au Homing) *)
+    CableLimitAscentM       : REAL := 8.0;      (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) —
+                                                    distincte de TopSensorPositionM (8.5m, réservé au Homing) *)
     SlowdownDistanceM       : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
     SlowSpeedPct            : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
 

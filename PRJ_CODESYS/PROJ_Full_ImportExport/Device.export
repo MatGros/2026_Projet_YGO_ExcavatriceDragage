@@ -12236,7 +12236,7 @@
                               <Single Name="Default" Type="string">Length</Single>
                             </Single>
                             <Single Name="Identifier" Type="string">length</Single>
-                            <Single Name="Value" Type="string">12</Single>
+                            <Single Name="Value" Type="string">8</Single>
                             <Single Name="Type" Type="string">UINT</Single>
                             <Single Name="Default" Type="string">0</Single>
                           </Single>
@@ -12611,7 +12611,7 @@
                               <Single Name="Default" Type="string">Length</Single>
                             </Single>
                             <Single Name="Identifier" Type="string">length</Single>
-                            <Single Name="Value" Type="string">12</Single>
+                            <Single Name="Value" Type="string">8</Single>
                             <Single Name="Type" Type="string">UINT</Single>
                             <Single Name="Default" Type="string">0</Single>
                           </Single>
@@ -32411,7 +32411,7 @@
                               <Single Name="Default" Type="string">Length</Single>
                             </Single>
                             <Single Name="Identifier" Type="string">length</Single>
-                            <Single Name="Value" Type="string">12</Single>
+                            <Single Name="Value" Type="string">8</Single>
                             <Single Name="Type" Type="string">UINT</Single>
                             <Single Name="Default" Type="string">0</Single>
                           </Single>
@@ -32786,7 +32786,7 @@
                               <Single Name="Default" Type="string">Length</Single>
                             </Single>
                             <Single Name="Identifier" Type="string">length</Single>
-                            <Single Name="Value" Type="string">12</Single>
+                            <Single Name="Value" Type="string">8</Single>
                             <Single Name="Type" Type="string">UINT</Single>
                             <Single Name="Default" Type="string">0</Single>
                           </Single>
@@ -126646,7 +126646,7 @@ VAR_INPUT
 	///IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
 	///voir PRG_MAIN.st
 	///Cible homing nominal (RETAIN site, voir Partie10 §7bis)
-	TopSensorPositionM: REAL := 12.5;
+	TopSensorPositionM: REAL := 8.5;
 	///🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
 	FwdRevSpeedFeedbackOff: BOOL;
 	///retombés" CE TREUIL — arrêt confirmé (remplace ContactorFeedbackFwd/Rev)
@@ -128575,7 +128575,7 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
         IF NOT M1_IsReal THEN
             IF instEncoderAbsM1.PresetAck THEN
-                _CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM1.HomingRefRaw := 16742400; // 16777216 - (8.5 * 8192 / 2.0)
                 _CalibM1.Homed := TRUE;
                 _CalibM1.HomingSuspect := FALSE;
                 _CalibM1.LastKnownRawPos := 16777216;
@@ -128595,7 +128595,7 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
         IF NOT M2_IsReal THEN
             IF instEncoderAbsM2.PresetAck THEN
-                _CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM2.HomingRefRaw := 16742400; // 16777216 - (8.5 * 8192 / 2.0)
                 _CalibM2.Homed := TRUE;
                 _CalibM2.HomingSuspect := FALSE;
                 _CalibM2.LastKnownRawPos := 16777216;
@@ -133662,7 +133662,7 @@ TYPE ST_WinchHMI :
 STRUCT
 	///⚙️ Paramètres / Calibration (Lecture/Écriture)
 	///📐 Position cible du capteur haut (m)
-	TopSensorPositionM: REAL := 12.5;
+	TopSensorPositionM: REAL := 8.5;
 	///🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
 	MaxStepDescente: INT := 3;
 	///📈 Rampe d'accélération (%/s)
@@ -135961,7 +135961,7 @@ VAR_INPUT
 	///🆕 Position actuelle du câble en mètres
 	CablePosM: REAL;
 	///🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
-	TopLimitM: REAL := 12.5;
+	TopLimitM: REAL := 8.5;
 	///🆕 Position limite basse active (m)
 	BottomLimitM: REAL := -20;
 	///🆕 Distance d'approche avant limite pour ralentir (m)

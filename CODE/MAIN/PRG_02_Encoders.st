@@ -237,7 +237,7 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
         IF NOT M1_IsReal THEN
             IF instEncoderAbsM1.PresetAck THEN
-                _CalibM1.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM1.HomingRefRaw := 16742400; // 16777216 - (8.5 * 8192 / 2.0)
                 _CalibM1.Homed := TRUE;
                 _CalibM1.HomingSuspect := FALSE;
                 _CalibM1.LastKnownRawPos := 16777216;
@@ -257,7 +257,7 @@ IF PRG_10_Outputs.ManuActive THEN
     IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
         IF NOT M2_IsReal THEN
             IF instEncoderAbsM2.PresetAck THEN
-                _CalibM2.HomingRefRaw := 16726016; // 16777216 - (12.5 * 8192 / 2.0)
+                _CalibM2.HomingRefRaw := 16742400; // 16777216 - (8.5 * 8192 / 2.0)
                 _CalibM2.Homed := TRUE;
                 _CalibM2.HomingSuspect := FALSE;
                 _CalibM2.LastKnownRawPos := 16777216;

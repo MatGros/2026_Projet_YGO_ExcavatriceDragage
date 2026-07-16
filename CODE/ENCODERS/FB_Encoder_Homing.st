@@ -43,7 +43,7 @@ VAR_INPUT
                                          // (les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
                                          // IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
                                          // voir PRG_MAIN.st
-    TopSensorPositionM   : REAL := 12.5;  // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
+    TopSensorPositionM   : REAL := 8.5;   // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
     FwdRevSpeedFeedbackOff : BOOL;      // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                          // retombés" CE TREUIL — arrêt confirmé (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)

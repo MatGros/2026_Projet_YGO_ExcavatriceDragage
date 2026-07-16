@@ -10,8 +10,8 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🏗️ TREUILS (M1, M2)
     _CalibM1 : ST_EncoderCalib; // Calibration treuil M1
     _CalibM2 : ST_EncoderCalib; // Calibration treuil M2
-    _HomingTargetM1_M : REAL := 12.5; // Hauteur cible homing M1 (m)
-    _HomingTargetM2_M : REAL := 12.5; // Hauteur cible homing M2 (m)
+    _HomingTargetM1_M : REAL := 8.5; // Hauteur cible homing M1 (m)
+    _HomingTargetM2_M : REAL := 8.5; // Hauteur cible homing M2 (m)
 
     _WinchSpeedStepTable : ST_SpeedStepTable := (
         P1R1 := FALSE, P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
@@ -32,8 +32,8 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     _CableLimitM1Descent_M       : REAL := -20.0; // Limite basse physique M1 (m)
     _CableLimitM2Descent_M       : REAL := -20.0; // Limite basse physique M2 (m)
-    _CableLimitM1Ascent_M        : REAL := 12.0;  // Limite haute exploitation M1 (m) < HomingTarget (12.5)
-    _CableLimitM2Ascent_M        : REAL := 12.0;  // Limite haute exploitation M2 (m) < HomingTarget (12.5)
+    _CableLimitM1Ascent_M        : REAL := 8.0;  // Limite haute exploitation M1 (m) < HomingTarget (8.5)
+    _CableLimitM2Ascent_M        : REAL := 8.0;  // Limite haute exploitation M2 (m) < HomingTarget (8.5)
     _WinchSlowdownDistance_M     : REAL := 1.0;   // Distance ralentissement commune (m)
     _WinchSlowSpeed_Pct           : REAL := 15.0;  // Vitesse lente zone ralentissement (%)
 
@@ -60,6 +60,10 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 📏 RÉGLEMENTATION / LÉGAL
     _LimitLegalDepthMinAllowed_M   : REAL := -15.0; // Cote min dragage autorisée (m)
     _LimitLegalEnabled           : BOOL := TRUE;  // Activation limite légale
+
+    // 🚦 SYSTÈME / IHM
+    _BlinkTimeOn  : TIME := T#1s;    // Durée allumé horloge clignotement système (voyants IHM/diag)
+    _BlinkTimeOff : TIME := T#800ms; // Durée éteint — asymétrique par défaut (REX 2026-07-16)
 
     // 🧪 SIMULATION (Banc de test uniquement)
     _SimEncoderRawPosM1 : UDINT := 1000000; // Simulation : survit au reset froid

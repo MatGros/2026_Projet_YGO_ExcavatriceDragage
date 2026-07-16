@@ -6,6 +6,15 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### `v0.4.13_GlobalRename_GVL_Persistent` — 2026-07-16
+- Renommage global Chariot→Translation, Grappin→Benne, _COMMON→COMMUN
+- SYSTEM/ scindé en DIAG/ · nettoyage GVL_BUS/GVL_Machine_Stub morts
+- GVL_PERSISTENT réorganisée par métier (Winch/Benne/Translation…)
+- + décorateur `_` obligatoire et suffixes unité (`_Ms`, `_M`…) partout
+- T30 : fréquence translation std 30Hz / max 60Hz, persistée
+- Fix visu Device.export (remplacement sûr des balises value)
+- + erreurs de compilation restantes
+
 ### `v0.4.12_TranslationHMI_Migration` — 2026-07-15
 - ST_TranslationHMI migre ReqFwd/ReqRev/FreqSetpointHz depuis IHM_MANU
 - + diag décodé DriveCommReady/DrivePowerReady (pas de WORD brut)
