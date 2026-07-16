@@ -109,7 +109,7 @@ IF NOT TableReady THEN
     CaseTable[2].Name := 'TC-T2 Meca B incoherence arret';
     CaseTable[2].FirstStep := StepTc02Setup;
 
-    CaseTable[3].Name := 'TC-T3 Meca A mouvement non commande';
+    CaseTable[3].Name := 'TC-T3 Meca A mvt non commande';
     CaseTable[3].FirstStep := StepTc03Setup;
 
     // ─────────────────────────────────────────────────────────────

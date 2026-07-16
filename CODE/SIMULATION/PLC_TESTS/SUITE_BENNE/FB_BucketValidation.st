@@ -124,7 +124,7 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
 END_IF;
 
 // Gate spécifique Bucket : refuse si M1 ou M2 sont en simulation réelle (Sûreté)
-SimGateOk := NOT GVL_Simulation.CablePosM1_IsReal AND NOT GVL_Simulation.CablePosM2_IsReal;
+SimGateOk := NOT GVL_Simulation.EncoderM1_IsReal AND NOT GVL_Simulation.EncoderM2_IsReal;
 
 // 2. 📋 TABLES
 IF NOT TableReady THEN
@@ -319,10 +319,9 @@ IF NOT TableReady THEN
     StepTable[StepB1Slip].CaseId := 1;
     StepTable[StepB1Slip].StimulusId := 3;
     StepTable[StepB1Slip].CheckIdx[1] := 3;
-    StepTable[StepB1Slip].CheckIdx[2] := 4;
-    StepTable[StepB1Slip].CheckIdx[3] := 5;
-    StepTable[StepB1Slip].CheckIdx[4] := 6;
-    StepTable[StepB1Slip].CheckIdx[5] := 7;
+    StepTable[StepB1Slip].CheckIdx[2] := 5;
+    StepTable[StepB1Slip].CheckIdx[3] := 6;
+    StepTable[StepB1Slip].CheckIdx[4] := 7;
     StepTable[StepB1Slip].TimeoutPT := T#2s;
     StepTable[StepB1Slip].NextOnPass := StepB1Teardown;
     StepTable[StepB1Slip].NextOnFail := StepB1Teardown;
@@ -563,7 +562,7 @@ END_IF;
 
 // 3. 📥 ACQUIRE
 ProbeBool[SigHealthyIdle] := NOT PRG_06_WinchControl.instBucket.Error
-                             AND NOT PRG_06_WinchControl.instBucket.BucketState.StateIncoherent;
+                             AND NOT _BucketState.StateIncoherent;
 
 ProbeBool[SigBucketBusy]   := PRG_06_WinchControl.instBucket.Busy;
 ProbeBool[SigBucketDone]    := PRG_06_WinchControl.instBucket.Done;
