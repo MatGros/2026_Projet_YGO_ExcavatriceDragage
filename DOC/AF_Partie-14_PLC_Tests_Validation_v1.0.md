@@ -45,8 +45,8 @@ Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé 
 
 ## 🧩 3. Architecture du validateur automatique dans l'API
 
-Afin de valider ces exigences sans matériel physique connecté, le système intègre une suite de tests par composition de blocs fonctionnels dans `CODE/PLC_TESTS/` :
-* **`PRG_PLC_Tests.st` :** Programme d'accueil unique appelé dans le gestionnaire de tâches.
+Afin de valider ces exigences sans matériel physique connecté, le système intègre une suite de tests par composition de blocs fonctionnels dans `CODE/SIMULATION/PLC_TESTS/` :
+* **`PRG_00_Inputs.st` :** Programme d'acquisition des entrées qui héberge et appelle l'instance globale de tests.
 * **`FB_PLC_Tests_Suite.st` :** Bloc fonctionnel parent qui orchestre toutes les instances de tests et écoute la GVL simulation.
 * **`FB_SafetyValidation.st` :** Sous-bloc fonctionnel contenant la logique et le séquencement des tests d'arrêt d'urgence.
 

@@ -17304,15 +17304,9 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
-        <Folder Name="SIMULATION">
+        <Folder Name="PLC_TESTS">
           <Object Name="FB_PLC_Tests_Suite" ObjectId="347bb326-79b9-5bdd-a5e9-5f6a23a77a16" />
           <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
-          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
-          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
-          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
         <Folder Name="EMERGENCY">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
@@ -17324,6 +17318,14 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
+        </Folder>
+        <Folder Name="SIMULATION">
+          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
         <Folder Name="MAIN">
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
