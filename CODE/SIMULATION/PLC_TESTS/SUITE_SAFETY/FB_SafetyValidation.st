@@ -24,6 +24,8 @@ VAR CONSTANT
     SigEmergencyArmingLockoutActive : INT := 7;
     SigStopwatchMs                  : INT := 8;
     SigErrorId                      : INT := 9;
+    SigOrderABOk                    : INT := 10; // ✅ Chk gagné #3 (§7.4.2) : canal A coupé avant canal B
+    SigEdgeCountOk                  : INT := 11; // ✅ Chk gagné #4 (§7.4.2) : exactement 2 chutes EmergencyChain
 
     // 🪜 Index des étapes
     StepTc01Setup                   : INT := 10;
@@ -64,6 +66,8 @@ VAR
 
     // 🛠️ Instruments de mesure
     instStopwatch              : FB_TestStopwatch;
+    instOrderAB                : FB_TestEventOrder;  // ✅ Chk gagné #3 : canal A avant canal B
+    instEdgeCountChain         : FB_TestEdgeCounter;  // ✅ Chk gagné #4 : exactement 2 chutes
 
     // ⚡ Commandes de stimuli affectées dans le CASE
     ArmRequest                 : BOOL;
@@ -91,6 +95,8 @@ SimGateOk := NOT GVL_Simulation.EmergencyStopChain_IsReal;
 
 // 2. 📋 TABLES (Remplissage déclaratif unique)
 IF NOT TableReady THEN
+    Report.Name := 'Safety Validation'; // 🏷️ Identifie la suite (SuiteSafetyValidation) sans ambiguïté
+
     // Cas de tests
     CaseTable[1].Name := 'TC-01 Armement nominal';
     CaseTable[1].FirstStep := StepTc01Setup;
@@ -100,6 +106,19 @@ IF NOT TableReady THEN
 
     CaseTable[3].Name := 'TC-03 Lockout temporel';
     CaseTable[3].FirstStep := StepTc03Setup;
+
+    // ─────────────────────────────────────────────────────────────
+    // 🛡️ INVARIANT DE NON-RÉGRESSION (§7.5.4) — verrouille le correctif du défaut connu
+    // (EmergencyArmingLockoutActive posé aussi sur la branche succès). Armé DÈS la
+    // confirmation d'armement TC-01, désarmé à l'entrée de TC-02 (portée = le case TC-01
+    // uniquement — TC-03 active volontairement le lockout, il ne doit pas être vu comme
+    // une violation, d'où le désarmement avant d'y arriver).
+    // ─────────────────────────────────────────────────────────────
+    InvariantTable[1].Check.Kind := E_TestCheckKind.BOOL_EQUAL;
+    InvariantTable[1].Check.ProbeIdx := SigEmergencyArmingLockoutActive;
+    InvariantTable[1].Check.ExpectedBool := FALSE;
+    InvariantTable[1].ArmAtStepId := StepTc01Confirm;
+    InvariantTable[1].DisarmAtStepId := StepTc02Setup;
 
     // ─────────────────────────────────────────────────────────────
     // CONFIGURATION DES CHECKS (CheckTable)
@@ -201,6 +220,18 @@ IF NOT TableReady THEN
     CheckTable[16].ProbeIdx := SigEmergencyArmingLockoutActive;
     CheckTable[16].ExpectedBool := FALSE;
 
+    // Chk 17: ✅ Chk gagné #3 (§7.4.2) — canal A coupé AVANT canal B pendant l'auto-test
+    CheckTable[17].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[17].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[17].ProbeIdx := SigOrderABOk;
+    CheckTable[17].ExpectedBool := TRUE;
+
+    // Chk 18: ✅ Chk gagné #4 (§7.4.2) — exactement 2 chutes d'EmergencyChain (1 par canal testé)
+    CheckTable[18].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[18].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[18].ProbeIdx := SigEdgeCountOk;
+    CheckTable[18].ExpectedBool := TRUE;
+
     // ─────────────────────────────────────────────────────────────
     // CONFIGURATION DES ÉTAPES (StepTable)
     // ─────────────────────────────────────────────────────────────
@@ -219,6 +250,8 @@ IF NOT TableReady THEN
     StepTable[StepTc01Arm].StimulusId := 2; // ArmRequest := TRUE
     StepTable[StepTc01Arm].CheckIdx[1] := 2;
     StepTable[StepTc01Arm].CheckIdx[2] := 3;
+    StepTable[StepTc01Arm].CheckIdx[3] := 17; // ✅ Chk gagné #3 : ordre A avant B
+    StepTable[StepTc01Arm].CheckIdx[4] := 18; // ✅ Chk gagné #4 : exactement 2 chutes
     StepTable[StepTc01Arm].TimeoutPT := T#10s;
     StepTable[StepTc01Arm].NextOnPass := StepTc01Confirm;
     StepTable[StepTc01Arm].NextOnFail := StepTc01Teardown;
@@ -364,6 +397,8 @@ ProbeBool[SigEmergencyArmingFailed] := PRG_10_Outputs.instSafetyEmergencyManagem
 ProbeBool[SigEmergencyArmingLockoutActive] := PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
 ProbeReal[SigStopwatchMs] := DINT_TO_REAL(instStopwatch.ElapsedMs);
 ProbeDint[SigErrorId] := WORD_TO_DINT(PRG_10_Outputs.instSafetyEmergencyManagement.ErrorId);
+ProbeBool[SigOrderABOk] := instOrderAB.OrderOk;
+ProbeBool[SigEdgeCountOk] := instEdgeCountChain.InRange;
 
 // Liaison des instruments de mesure
 instStopwatch(
@@ -372,6 +407,26 @@ instStopwatch(
     StopEvent := PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed,
     ExpectedMinMs := 180,
     ExpectedMaxMs := 260
+);
+
+// ✅ Chk gagné #3 : canal A coupé avant canal B (armé pendant tout l'auto-test TC-01,
+// stimulus 2 = demande d'armement). EventA/B = front montant de "NOT PowerCutOff_X_RQ",
+// c'est-à-dire le moment où le canal RETOMBE (auto-test ForceTestA/B de la Logic).
+instOrderAB(
+    Arm := (Sequencer.ActiveStimulusId = 2),
+    EventA := NOT PowerCutOff_A_RQ,
+    EventB := NOT PowerCutOff_B_RQ,
+    TimeoutPT := T#10s
+);
+
+// ✅ Chk gagné #4 : exactement 2 chutes d'EmergencyChain pendant le même auto-test
+// (1 pour le test canal A, 1 pour le test canal B — 3 = rebond, 1 = canal non testé)
+instEdgeCountChain(
+    Arm := (Sequencer.ActiveStimulusId = 2),
+    Signal := PRG_00_Inputs.EmergencyChain,
+    CountRising := FALSE,
+    ExpectedMin := 2,
+    ExpectedMax := 2
 );
 
 // 4. ⚙️ MOTEUR

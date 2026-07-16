@@ -233,3 +233,14 @@ END_IF;
 IF GVL_PLC_Tests.OverrideContactorFalse THEN
     EmergencyStopOk := FALSE;
 END_IF;
+
+// Surcharges (overrides) du banc de tests — Translation M3 (niveau capteur amont uniquement)
+IF GVL_PLC_Tests.OverrideM3AtTremie THEN
+    TranslationPosTremie := TRUE; // 🧪 Simule le Fdc extrême avant sans attendre le trajet simulé complet
+END_IF;
+IF GVL_PLC_Tests.OverrideM3BrakeStuckOpen THEN
+    M3BrakeFeedback := TRUE; // 🧪 Simule Méca B : retour frein resté desserré malgré commande fermée
+END_IF;
+IF GVL_PLC_Tests.OverrideM3PhantomFreq THEN
+    M3_ActualFrequencyHz_Filtered := 100; // 🧪 Simule Méca A : 1.00Hz mesuré malgré arrêt commandé (seuil 0.5Hz)
+END_IF;
