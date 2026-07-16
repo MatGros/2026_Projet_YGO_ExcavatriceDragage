@@ -874,6 +874,49 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_EmergencyManagementCmd">
+        <baseType>
+          <struct>
+            <variable name="PowerCutOff_A_Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique coupure canal A (TRUE = OK/Maintien, FALSE = Coupure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_B_Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique coupure canal B (TRUE = OK/Maintien, FALSE = Coupure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming_Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique d'impulsion de réarmement</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ae2c6921-7efc-58d4-8776-856ce456136e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_EmergencyChainCmd — Structure de communication interne
+   ───────────────────────────────────────────────────────────────
+   📄 Transporte les ordres logiques entre le bloc de décision
+      et le bloc de commande de la boucle d'urgence.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_EncoderCalib">
         <baseType>
           <struct>
@@ -7932,7 +7975,7 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Safety_EmergencyChain" pouType="functionBlock">
+      <pou name="FB_Safety_EmergencyManagement" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -7980,7 +8023,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure des blocs safety métiers (M1/M2/M3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
               </documentation>
             </variable>
             <variable name="CmdEmergencyCutOff">
@@ -8079,6 +8122,192 @@ END_IF;
             </variable>
           </outputVars>
           <localVars>
+            <variable name="Logic">
+              <type>
+                <derived name="FB_Safety_EmergencyManagementLogic" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Composition interne des sous-blocs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Output">
+              <type>
+                <derived name="FB_Safety_EmergencyManagementOutput" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ FB_Safety_EmergencyManagement — Bloc Safety Composite (Parent)
+   ───────────────────────────────────────────────────────────────
+   📄 Rôle : Bloc de sécurité principal de la boucle d'arrêt d'urgence.
+   🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le 
+      Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🛑 1. Appels des instances internes
+Logic(
+    Enable := Enable,
+    Reset := Reset,
+    ArmRequest := ArmRequest,
+    EmergencyChain := EmergencyChain,
+    EmergencyStopOk := EmergencyStopOk,
+    PowerCutOffRequest := PowerCutOffRequest,
+    CmdEmergencyCutOff := CmdEmergencyCutOff
+);
+
+Output(
+    Enable := Enable,
+    Cmd := Logic.Cmd
+);
+
+// 📤 2. Propagation des signaux vers les sorties du bloc parent
+Ready := Enable;
+Busy  := Logic.Busy;
+Done  := Logic.Done;
+Error := Logic.Error;
+ErrorId := Logic.ErrorId;
+
+PowerCutOff_A_RQ   := Output.PowerCutOff_A_RQ;
+PowerCutOff_B_RQ   := Output.PowerCutOff_B_RQ;
+EmergencyArming_RQ := Output.EmergencyArming_RQ;
+
+ArmingSeqStep                := Logic.ArmingSeqStep;
+RedundancyTestFailed         := Logic.RedundancyTestFailed;
+EmergencyArmingFailed        := Logic.EmergencyArmingFailed;
+EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fec28e54-c2e9-52ff-aa9e-cdc3b3341d91</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Safety_EmergencyManagementLogic" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (CmdEmergencyArming)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChain">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdEmergencyCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_EmergencyManagementCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Structure de commande logique produite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B resté collé/shunté détecté à l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de puissance n'a pas confirmé l'armement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingLockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -8137,11 +8366,10 @@ END_IF;
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ FB_Safety_EmergencyChain — Bloc de sécurité de la boucle d'urgence
+   🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement
    ───────────────────────────────────────────────────────────────
-   📄 Rôle : Séquence d'auto-test de redondance et réarmement de la 
-      boucle d'arrêt d'urgence de la machine.
-   ⚙️ Encapsule la double coupure A/B et le contrôle de collage contacteur.
+   📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
+      la boucle d'arrêt d'urgence. Produit les consignes logiques.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -8155,9 +8383,9 @@ END_IF;
 IF NOT Enable THEN
     Error := FALSE;
     ErrorId := 16#0000;
-    PowerCutOff_A_RQ := FALSE;
-    PowerCutOff_B_RQ := FALSE;
-    EmergencyArming_RQ := FALSE;
+    Cmd.PowerCutOff_A_Cmd := FALSE;
+    Cmd.PowerCutOff_B_Cmd := FALSE;
+    Cmd.EmergencyArming_Cmd := FALSE;
     ArmingSeqStep := 0;
     RedundancyTestFailed := FALSE;
     EmergencyArmingFailed := FALSE;
@@ -8171,26 +8399,24 @@ IF NOT Enable THEN
     TonArmingPulse(IN := FALSE);
     TonArmingConfirm(IN := FALSE);
     TonArmingLockout(IN := FALSE);
-    Busy := FALSE; Done := FALSE; Ready := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
 ResetEdge(CLK := Reset);
 ArmReqEdge(CLK := ArmRequest);
 
 // 🔍 2. ACQUITTEMENT DES DÉFAUTS
 IF ResetEdge.Q THEN
-    RedundancyTestFailed := FALSE; // Défaut matériel : reset inconditionnel sur front
+    RedundancyTestFailed := FALSE;
     IF EmergencyStopOk THEN
-        EmergencyArmingFailed := FALSE; // Cause disparue (contacteur collé) + reset
+        EmergencyArmingFailed := FALSE;
     END_IF;
 END_IF;
 
-// 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE RÉARMEMENT
+// 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChain 
    AND NOT EmergencyArmingLockoutActive 
-   AND NOT EmergencyStopOk THEN // Ignoré si déjà armé
+   AND NOT EmergencyStopOk THEN
     ArmingSeqStep := 1;
 END_IF;
 
@@ -8201,7 +8427,6 @@ IF ArmingSeqStep = 1 THEN
     IF TonTestA.Q THEN
         ForceTestA := FALSE;
         IF EmergencyChain THEN
-            // La boucle n'est pas tombée -&gt; défaut de redondance
             RedundancyTestFailed := TRUE;
             ArmingSeqStep := 0;
         ELSE
@@ -8218,7 +8443,7 @@ IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
     IF EmergencyChain THEN
         ArmingSeqStep := 3;
     ELSE
-        ArmingSeqStep := 0; // Boucle non restaurée
+        ArmingSeqStep := 0;
     END_IF;
 END_IF;
 
@@ -8251,7 +8476,7 @@ END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
 TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1s);
-EmergencyArming_RQ := (ArmingSeqStep = 5);
+Cmd.EmergencyArming_Cmd := (ArmingSeqStep = 5);
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
@@ -8269,18 +8494,17 @@ IF ArmingSeqStep = 6 THEN
     END_IF;
 END_IF;
 
-// ⏱️ Séquence de verrouillage temporel (5s de sécurité après essai)
+// ⏱️ Séquence de verrouillage temporel (5s)
 TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5s);
 IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
 
-// 📤 4. GESTION DES COMMANDES DE COUPURE FAIL-SAFE
-// Si défaut de redondance ou d'armement détecté -&gt; on force l'ouverture en sécurité
-PowerCutOff_A_RQ := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
-PowerCutOff_B_RQ := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+// 📤 4. GÉNÉRATION DES CONSIGNES LOGIQUES
+Cmd.PowerCutOff_A_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+Cmd.PowerCutOff_B_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
 
-// 📤 5. SYNTHÈSE DES ERREURS POUR LE CONTRAT FB
+// 📤 5. SYNTHÈSE DES ERREURS
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
     ErrorId := ErrorId OR 16#0001;
@@ -8290,14 +8514,93 @@ IF EmergencyArmingFailed THEN
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
-Busy  := (ArmingSeqStep &lt;&gt; 0);
-Done  := EmergencyStopOk AND NOT Error;
 </xhtml>
           </ST>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>0b8c2c51-e54c-582c-8b0e-8a675cc7bcea</ObjectId>
+            <ObjectId>caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Safety_EmergencyManagementOutput" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le pilote</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_EmergencyManagementCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordres logiques reçus du bloc logique</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PowerCutOff_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers le relais de coupure physique A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers le relais de coupure physique B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers le contacteur d'impulsion de réarmement</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📤 FB_Safety_EmergencyOutput — Pilote Physique de Sécurité
+   ───────────────────────────────────────────────────────────────
+   📄 Rôle : Transmet les ordres de sécurité logiques vers les 
+      sorties physiques de l'automate (relais d'AU A/B/Impulsion).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    PowerCutOff_A_RQ   := FALSE;
+    PowerCutOff_B_RQ   := FALSE;
+    EmergencyArming_RQ := FALSE;
+    RETURN;
+END_IF;
+
+// Écriture directe des signaux logiques sur les sorties physiques (fail-safe)
+PowerCutOff_A_RQ   := Cmd.PowerCutOff_A_Cmd;
+PowerCutOff_B_RQ   := Cmd.PowerCutOff_B_Cmd;
+EmergencyArming_RQ := Cmd.EmergencyArming_Cmd;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d3f89721-8269-5526-aac8-48009a2f16a2</ObjectId>
           </data>
         </addData>
       </pou>
@@ -15218,9 +15521,9 @@ Pulse 1s en cours</xhtml>
                 <derived name="FB_Output" />
               </type>
             </variable>
-            <variable name="instSafetyEmergencyChain">
+            <variable name="instSafetyEmergencyManagement">
               <type>
-                <derived name="FB_Safety_EmergencyChain" />
+                <derived name="FB_Safety_EmergencyManagement" />
               </type>
             </variable>
             <variable name="PowerCutOffReq">
@@ -15810,7 +16113,7 @@ PowerCutOffReq := (ManuActive AND PowerCutOffActive_Eff)
                                        OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff));
 
 // Appel du bloc Safety global pour la boucle d'urgence
-instSafetyEmergencyChain(
+instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     ArmRequest := GVL_IHM.Modes.CmdEmergencyArming,
@@ -15821,16 +16124,16 @@ instSafetyEmergencyChain(
 );
 
 // Affectation des sorties physiques et logiques de coupure/réarmement
-PowerCutOff_A_RQ := instSafetyEmergencyChain.PowerCutOff_A_RQ;
-PowerCutOff_B_RQ := instSafetyEmergencyChain.PowerCutOff_B_RQ;
-EmergencyArming_RQ := instSafetyEmergencyChain.EmergencyArming_RQ;
+PowerCutOff_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
+PowerCutOff_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
+EmergencyArming_RQ := instSafetyEmergencyManagement.EmergencyArming_RQ;
 
 // Copie des états de diagnostic vers la supervision IHM
-EmergencyArmingPulseActive   := instSafetyEmergencyChain.EmergencyArming_RQ;
-EmergencyArmingLockoutActive := instSafetyEmergencyChain.EmergencyArmingLockoutActive;
-ArmingSeqStep                := instSafetyEmergencyChain.ArmingSeqStep;
-RedundancyTestFailed         := instSafetyEmergencyChain.RedundancyTestFailed;
-EmergencyArmingFailed        := instSafetyEmergencyChain.EmergencyArmingFailed;
+EmergencyArmingPulseActive   := instSafetyEmergencyManagement.EmergencyArming_RQ;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
+ArmingSeqStep                := instSafetyEmergencyManagement.ArmingSeqStep;
+RedundancyTestFailed         := instSafetyEmergencyManagement.RedundancyTestFailed;
+EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFailed;
 </xhtml>
           </ST>
         </body>
@@ -16484,7 +16787,6 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
           <Object Name="FB_Output" ObjectId="b60dd37c-0508-57b7-805e-ba43b1805814" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
-          <Object Name="FB_Safety_EmergencyChain" ObjectId="0b8c2c51-e54c-582c-8b0e-8a675cc7bcea" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
         </Folder>
         <Folder Name="JOYSTICK">
@@ -16512,6 +16814,12 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
+        </Folder>
+        <Folder Name="EMERGENCY">
+          <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
+          <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
+          <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
+          <Object Name="ST_EmergencyManagementCmd" ObjectId="ae2c6921-7efc-58d4-8776-856ce456136e" />
         </Folder>
         <Folder Name="TRANSLATION">
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />

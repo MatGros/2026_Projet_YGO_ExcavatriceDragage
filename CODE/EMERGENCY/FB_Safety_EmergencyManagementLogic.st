@@ -1,31 +1,24 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ FB_Safety_EmergencyChain — Bloc de sécurité de la boucle d'urgence
+   🛡️ FB_Safety_EmergencyManagementLogic — Décision & Séquencement
    ───────────────────────────────────────────────────────────────
-   📄 Rôle : Séquence d'auto-test de redondance et réarmement de la 
-      boucle d'arrêt d'urgence de la machine.
-   ⚙️ Encapsule la double coupure A/B et le contrôle de collage contacteur.
+   📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
+      la boucle d'arrêt d'urgence. Produit les consignes logiques.
    ═══════════════════════════════════════════════════════════════ *)
 
-FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyChain
+FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
     ArmRequest          : BOOL;        // Demande de réarmement (CmdEmergencyArming)
     EmergencyChain      : BOOL;        // Retour physique boucle d'urgence amont contacteur
     EmergencyStopOk     : BOOL;        // Confirmation contacteur de puissance principal
-    PowerCutOffRequest  : BOOL;        // Requête de coupure des blocs safety métiers (M1/M2/M3)
+    PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
     CmdEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
     Error               : BOOL;
     ErrorId             : WORD;        // bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed
-    
-    PowerCutOff_A_RQ    : BOOL;        // Sortie de pilotage canal A (maintenu à TRUE, fail-safe)
-    PowerCutOff_B_RQ    : BOOL;        // Sortie de pilotage canal B (maintenu à TRUE, fail-safe)
-    EmergencyArming_RQ  : BOOL;        // Impulsion réarmement physique (1s)
+    Cmd                 : ST_EmergencyManagementCmd; // Structure de commande logique produite
     
     ArmingSeqStep       : INT;         // Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
     RedundancyTestFailed: BOOL;        // Canal A ou B resté collé/shunté détecté à l'auto-test
@@ -52,9 +45,9 @@ END_VAR
 IF NOT Enable THEN
     Error := FALSE;
     ErrorId := 16#0000;
-    PowerCutOff_A_RQ := FALSE;
-    PowerCutOff_B_RQ := FALSE;
-    EmergencyArming_RQ := FALSE;
+    Cmd.PowerCutOff_A_Cmd := FALSE;
+    Cmd.PowerCutOff_B_Cmd := FALSE;
+    Cmd.EmergencyArming_Cmd := FALSE;
     ArmingSeqStep := 0;
     RedundancyTestFailed := FALSE;
     EmergencyArmingFailed := FALSE;
@@ -68,26 +61,24 @@ IF NOT Enable THEN
     TonArmingPulse(IN := FALSE);
     TonArmingConfirm(IN := FALSE);
     TonArmingLockout(IN := FALSE);
-    Busy := FALSE; Done := FALSE; Ready := FALSE;
     RETURN;
 END_IF;
 
-Ready := TRUE;
 ResetEdge(CLK := Reset);
 ArmReqEdge(CLK := ArmRequest);
 
 // 🔍 2. ACQUITTEMENT DES DÉFAUTS
 IF ResetEdge.Q THEN
-    RedundancyTestFailed := FALSE; // Défaut matériel : reset inconditionnel sur front
+    RedundancyTestFailed := FALSE;
     IF EmergencyStopOk THEN
-        EmergencyArmingFailed := FALSE; // Cause disparue (contacteur collé) + reset
+        EmergencyArmingFailed := FALSE;
     END_IF;
 END_IF;
 
-// 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE RÉARMEMENT
+// 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChain 
    AND NOT EmergencyArmingLockoutActive 
-   AND NOT EmergencyStopOk THEN // Ignoré si déjà armé
+   AND NOT EmergencyStopOk THEN
     ArmingSeqStep := 1;
 END_IF;
 
@@ -98,7 +89,6 @@ IF ArmingSeqStep = 1 THEN
     IF TonTestA.Q THEN
         ForceTestA := FALSE;
         IF EmergencyChain THEN
-            // La boucle n'est pas tombée -> défaut de redondance
             RedundancyTestFailed := TRUE;
             ArmingSeqStep := 0;
         ELSE
@@ -115,7 +105,7 @@ IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
     IF EmergencyChain THEN
         ArmingSeqStep := 3;
     ELSE
-        ArmingSeqStep := 0; // Boucle non restaurée
+        ArmingSeqStep := 0;
     END_IF;
 END_IF;
 
@@ -148,7 +138,7 @@ END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -> impulsion réarmement physique (1s)
 TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1s);
-EmergencyArming_RQ := (ArmingSeqStep = 5);
+Cmd.EmergencyArming_Cmd := (ArmingSeqStep = 5);
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
@@ -166,18 +156,17 @@ IF ArmingSeqStep = 6 THEN
     END_IF;
 END_IF;
 
-// ⏱️ Séquence de verrouillage temporel (5s de sécurité après essai)
+// ⏱️ Séquence de verrouillage temporel (5s)
 TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5s);
 IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
 
-// 📤 4. GESTION DES COMMANDES DE COUPURE FAIL-SAFE
-// Si défaut de redondance ou d'armement détecté -> on force l'ouverture en sécurité
-PowerCutOff_A_RQ := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
-PowerCutOff_B_RQ := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+// 📤 4. GÉNÉRATION DES CONSIGNES LOGIQUES
+Cmd.PowerCutOff_A_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+Cmd.PowerCutOff_B_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
 
-// 📤 5. SYNTHÈSE DES ERREURS POUR LE CONTRAT FB
+// 📤 5. SYNTHÈSE DES ERREURS
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
     ErrorId := ErrorId OR 16#0001;
@@ -187,5 +176,3 @@ IF EmergencyArmingFailed THEN
 END_IF;
 
 Error := (ErrorId <> 16#0000);
-Busy  := (ArmingSeqStep <> 0);
-Done  := EmergencyStopOk AND NOT Error;

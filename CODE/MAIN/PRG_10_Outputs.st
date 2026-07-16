@@ -56,7 +56,7 @@ VAR
     instM2BrakeCmd        : FB_Output;
 
     instTranslationBrakeCmd   : FB_Output;
-    instSafetyEmergencyChain  : FB_Safety_EmergencyChain;
+    instSafetyEmergencyManagement  : FB_Safety_EmergencyManagement;
     PowerCutOffReq            : BOOL;
 
     // ─────────  Début modification IHM_MANU  ─────────
@@ -454,7 +454,7 @@ PowerCutOffReq := (ManuActive AND PowerCutOffActive_Eff)
                                        OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff));
 
 // Appel du bloc Safety global pour la boucle d'urgence
-instSafetyEmergencyChain(
+instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     ArmRequest := GVL_IHM.Modes.CmdEmergencyArming,
@@ -465,13 +465,13 @@ instSafetyEmergencyChain(
 );
 
 // Affectation des sorties physiques et logiques de coupure/réarmement
-PowerCutOff_A_RQ := instSafetyEmergencyChain.PowerCutOff_A_RQ;
-PowerCutOff_B_RQ := instSafetyEmergencyChain.PowerCutOff_B_RQ;
-EmergencyArming_RQ := instSafetyEmergencyChain.EmergencyArming_RQ;
+PowerCutOff_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
+PowerCutOff_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
+EmergencyArming_RQ := instSafetyEmergencyManagement.EmergencyArming_RQ;
 
 // Copie des états de diagnostic vers la supervision IHM
-EmergencyArmingPulseActive   := instSafetyEmergencyChain.EmergencyArming_RQ;
-EmergencyArmingLockoutActive := instSafetyEmergencyChain.EmergencyArmingLockoutActive;
-ArmingSeqStep                := instSafetyEmergencyChain.ArmingSeqStep;
-RedundancyTestFailed         := instSafetyEmergencyChain.RedundancyTestFailed;
-EmergencyArmingFailed        := instSafetyEmergencyChain.EmergencyArmingFailed;
+EmergencyArmingPulseActive   := instSafetyEmergencyManagement.EmergencyArming_RQ;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
+ArmingSeqStep                := instSafetyEmergencyManagement.ArmingSeqStep;
+RedundancyTestFailed         := instSafetyEmergencyManagement.RedundancyTestFailed;
+EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFailed;
