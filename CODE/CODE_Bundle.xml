@@ -20139,7 +20139,7 @@ Force la boucle AU à TRUE</xhtml>
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_PLC_Tests_Const">
+      <globalVars name="GVL_PLC_Tests_Const" constant="true">
         <variable name="MaxSuites">
           <type>
             <INT />
