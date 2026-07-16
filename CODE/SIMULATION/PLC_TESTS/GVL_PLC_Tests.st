@@ -7,7 +7,9 @@
 
 {attribute 'qualified_only'}
 VAR_GLOBAL
-    Hmi                        : ST_PlcTestsHMI;      // 🖥️ Page IHM banc de test
+    Cmd                        : ST_PlcTestsCmd;      // 🎮 Commandes de pilotage des tests
+    Status                     : ST_PlcTestsStatus;   // 🚦 Progression et statut des tests
+    Suites                     : ARRAY[1..GVL_PLC_Tests_Const.MaxSuites] OF ST_TestSuiteReport; // 📊 Rapports par suite
     SafetyValidation           : ST_TestSuiteReport;  // Rapport de la suite Safety
     
     // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs
