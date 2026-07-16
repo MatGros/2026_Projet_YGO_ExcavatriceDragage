@@ -3,6 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Séquenceur de test sous forme de bloc fonctionnel (FB).
       Exécute les cas de tests réglementaires de la boucle d'urgence.
+      En cas d'échec sur un test, passe au suivant pour tout valider.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_SafetyValidation
@@ -17,7 +18,7 @@ VAR_OUTPUT
     TC03_Lockout_Ok            : BOOL;
     AllTestsPassed             : BOOL;
     TestFailed                 : BOOL;
-    FailedTestCase             : INT;         // Numéro du scénario en échec
+    FailedTestCase             : INT;         // Index du scénario ayant échoué
     
     // Demandes de surcharge (overrides) vers le programme de simulation
     OverrideChainTrue          : BOOL;        // Force l'entrée boucle d'urgence à TRUE
@@ -27,7 +28,8 @@ END_VAR
 VAR
     StartTestEdge              : R_TRIG;
     TestSeqStep                : INT := 0;    // Séquenceur de test
-    TestTimer                  : TON;         // Timer d'attente d'étapes
+    LastStep                   : INT := 0;    // Mémoire de l'étape précédente
+    TestTimer                  : TON;         // Timer d'attente d'étapes (timeout)
     
     // Signaux locaux pour stimuler le bloc sous test
     ArmRequest                 : BOOL;
@@ -49,8 +51,38 @@ END_IF;
 
 StartTestEdge(CLK := StartTests);
 
-// ⏱️ Timer général d'étape
+// 🔄 Réinitialisation du timer d'étape si changement d'étape détecté
+IF TestSeqStep <> LastStep THEN
+    TestTimer(IN := FALSE);
+    LastStep := TestSeqStep;
+END_IF;
+
+// ⏱️ Timer général d'étape (timeout de 10s maximum par étape)
 TestTimer(IN := (TestSeqStep <> 0), PT := T#10s);
+
+// 🚨 Échec automatique si le timer d'étape expire (sécurité anti-blocage)
+IF TestTimer.Q AND TestSeqStep <> 0 AND TestSeqStep <> 999 THEN
+    TestFailed := TRUE;
+    
+    // Si timeout dans TC-01 (étapes 10 à 17), on passe au TC-02 (étape 20)
+    IF TestSeqStep >= 10 AND TestSeqStep <= 17 THEN
+        OverrideChainFalse := FALSE;
+        FailedTestCase := 1;
+        TestSeqStep := 20;
+        
+    // Si timeout dans TC-02 (étapes 20 à 22), on passe au TC-03 (étape 30)
+    ELSIF TestSeqStep >= 20 AND TestSeqStep <= 22 THEN
+        OverrideChainTrue := FALSE;
+        FailedTestCase := 2;
+        TestSeqStep := 30;
+        
+    // Si timeout dans TC-03 (étapes 30 à 36), fin de séquence (étape 999)
+    ELSE
+        OverrideContactorFalse := FALSE;
+        FailedTestCase := 3;
+        TestSeqStep := 999;
+    END_IF;
+END_IF;
 
 // 🔀 Séquenceur de Test Automatique
 CASE TestSeqStep OF
@@ -120,7 +152,7 @@ CASE TestSeqStep OF
         ELSE
             TestFailed := TRUE;
             FailedTestCase := 1;
-            TestSeqStep := 999;
+            TestSeqStep := 20; // continue au test suivant
         END_IF;
 
     // ─────────────────────────────────────────────────────────────────
@@ -149,12 +181,6 @@ CASE TestSeqStep OF
             OverrideChainTrue := FALSE;
             TC02_RedundancyFault_Ok := TRUE;
             TestSeqStep := 30; // Passer au test de Lockout
-        ELSIF TestTimer.Q THEN
-            // Timeout -> Échec du test de redondance
-            OverrideChainTrue := FALSE;
-            TestFailed := TRUE;
-            FailedTestCase := 2;
-            TestSeqStep := 999;
         END_IF;
 
     // ─────────────────────────────────────────────────────────────────
@@ -211,19 +237,15 @@ CASE TestSeqStep OF
         ArmRequest := FALSE;
         IF PRG_00_Inputs.EmergencyStopOk THEN
             TC03_Lockout_Ok := TRUE;
-            AllTestsPassed := TRUE;
+            AllTestsPassed := NOT TestFailed; // Succès global si aucun échec intermédiaire
             TestSeqStep := 100; // Succès global !
-        ELSIF TestTimer.Q THEN
-            TestFailed := TRUE;
-            FailedTestCase := 4;
-            TestSeqStep := 999;
         END_IF;
 
-    100: // SUCCÈS GLOBAL
+    100: // FIN DE CYCLE DE TEST (SUCCÈS OU ÉCHEC PARTIEL)
         TestInProgress := FALSE;
         TestSeqStep := 0;
 
-    999: // ÉCHEC
+    999: // ÉCHEC CRITIQUE / ABANDON
         TestInProgress := FALSE;
         TestSeqStep := 0;
 
