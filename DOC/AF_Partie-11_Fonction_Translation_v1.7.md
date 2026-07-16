@@ -1,10 +1,33 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.6)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.7)
 
+> 🆕 **v1.7 (2026-07-16) — IHM_MANU aligné sur le modèle M1/M2 (fin du bypass `M3_CommandWord`)** :
+> * `PRG_07_TranslationControl.st` : nouvelle branche `ELSIF PRG_10_Outputs.ManuActive THEN` (§1bis),
+>   mirroir de `PRG_06_WinchControl` — M3 est désormais piloté par la **même instance**
+>   `instTranslationM3` (`FB_Translation`) qu'en Auto/SEMI_AUTO, qu'on soit en Manu ou pas.
+>   `Direction`/`StartStop` dérivés de `PRG_10_Outputs.M3Fwd_Demand`/`M3Rev_Demand` (boutons HMI ou
+>   joystick, déjà arbitrés en amont).
+> * `instSafetyTranslationM3.Enable` (`PRG_03_Safety.st`) passe à `TRUE` **inconditionnel** —
+>   l'ex-"Conditional Bypass Doctrine" (`NOT ManuActive OR ...`) est retirée. `FB_Safety_Translation`
+>   est désormais **toujours active**, y compris en Manu (Méca A/B, thermique, rotation phase,
+>   perte com EtherCAT/joystick). Ceci débloque `FB_TranslationValidation` (TC-T1/T2/T3, voir
+>   `AF_Partie-14`), dont l'exécution était impossible tant que `Enable=FALSE` masquait tout défaut.
+> * **Vitesse en Manu — diffère volontairement du Winch** : `GVL_IHM.TranslationM3.FreqSetpointHz`
+>   (consigne Hz réglable opérateur, clampée par `PRG_10_Outputs` à `_TranslationMaxFreq_Hz`) reste
+>   la référence pleine échelle pour boutons HMI **et** joystick — reproduit le comportement exact
+>   de l'ex-bypass. Le Winch utilise `100.0` fixe en boutons HMI (paliers discrets de contacteurs,
+>   pas de notion de fréquence réglable) ; Translation pilote une fréquence continue, donc conserve
+>   ce réglage fin plutôt que de le perdre en mirorant le Winch à l'identique.
+> * `PRG_10_Outputs.st` : écriture directe `M3_CommandWord`/`M3_SetpointFrequencyHz` supprimée
+>   (`M3Fwd_Eff`/`M3Rev_Eff`/`M3_ActiveFreqCmd`/`M3_DriveIsReal` orphelins, retirés) — ces sorties
+>   viennent désormais uniquement de `instTranslationM3.DriveControlWord`/`DriveFreqRefHz`, pour
+>   Auto ET Manu (même modèle que M1/M2). `TranslationBrakeCmd` n'est plus écrasé en Manu, déjà
+>   écrit par `PRG_07_TranslationControl` (position 7 < 10 dans l'ordre de tâche).
+> * Détail complet : `DOC/IHM_MANU_Journal_Modifications.md` §12.
+>
 > 🆕 **v1.6 (2026-07-15) — Finalisation IHM (`ST_TranslationHMI`)** :
 > * `ST_TranslationHMI` (`GVL_IHM.TranslationM3`) reprend les commandes manuelles ex-`ST_IHM_MANU`
 >   (`ReqFwd`/`ReqRev`/`FreqSetpointHz`, sans préfixe `M3_` — redondant une fois scopé sous
->   `GVL_IHM.TranslationM3.xxx`) — étape de migration, **pas l'état final** : le bypass
->   `ManuActive`→`M3_CommandWord` reste, M3 n'est pas encore aligné sur le modèle M1/M2.
+>   `GVL_IHM.TranslationM3.xxx`).
 > * Diagnostic variateur **décodé** : `DriveCommReady`/`DrivePowerReady` (booléens, StatusWord
 >   bit7/bit0) remplacent le `WORD` brut `DriveStatusWord` — binding visu direct (LED/checkbox),
 >   pas de bit-masking côté développeur IHM. Le défaut variateur (bit4) reste couvert par
@@ -23,10 +46,6 @@
 >   M3 (`FB_Sim_Translation`) lisait `RelayFwd`/`RelayRev` depuis `GVL_Translation_M3_Stub.M3_RelayFwd/Rev`
 >   — variables jamais écrites depuis l'abandon du mode relais `DEGRADED_IO` (v0.4.11) : la
 >   progression de trajet restait bloquée en permanence. Rebranché sur `M3_CommandWord = 1/2`.
-> * ⚠️ **Ce qui n'a pas changé** : en mode `IHM_MANU` (dérogatoire, voir
->   `DOC/IHM_MANU_Journal_Modifications.md`), `PRG_10_Outputs` écrit toujours `M3_CommandWord`
->   directement, sans passer par `FB_Translation`/`FB_Safety_Translation`. Le passage de M3 sur le même
->   modèle que M1/M2 (arbitrage natif même en Manu) reste un chantier séparé.
 >
 > **v1.5 (2026-07-15) — Intégration nominale EtherCAT & Sécurités** :
 > * **Abandon du mode dégradé par relais (`DEGRADED_IO`)** : La vraie machine n'étant équipée d'aucun I/O digital physique pour la commande de sens/vitesse du variateur, le pilotage s'effectue exclusivement par le bus de terrain EtherCAT. Si une défaillance de com ou du variateur est détectée, la sécurité PLC déclenche l'arrêt et coupe le circuit d'urgence (AU/PowerCutOff) pour coller le frein par manque de courant.
@@ -47,7 +66,7 @@
 
 Traduire la consigne d'axe du joystick (axe X, translation) en commande numérique du variateur AC600 (M3) via le réseau EtherCAT, dans le respect strict de la précédence `Enable` > `SafeStop` > `StartStop` (Partie3 §1bis).
 
-Toutes les sécurités (Homme-mort, arrêt sur capteur cible, fins de course extrêmes et surveillances de cohérence à l'arrêt) sont actives pour protéger la mécanique contre les chocs et dérives de charge.
+Toutes les sécurités (Homme-mort, arrêt sur capteur cible, fins de course extrêmes et surveillances de cohérence à l'arrêt) sont actives pour protéger la mécanique contre les chocs et dérives de charge — **y compris en mode `IHM_MANU`** depuis v1.7 (plus de bypass conditionnel).
 
 ---
 
@@ -120,7 +139,7 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 **📥 Entrées**
 | Entrée | Type | Rôle |
 |--------|------|------|
-| `Enable` / `Reset` / `EmergencyStopOk` / `Mode` | — | Standard (Partie3 §1) |
+| `Enable` / `Reset` / `EmergencyStopOk` / `Mode` | — | Standard (Partie3 §1) — `Enable` inconditionnel depuis v1.7 (`PRG_03_Safety.st`), Auto ET Manu |
 | `JoystickOnline` / `JoystickOperational` | BOOL | Diagnostics du joystick CANopen |
 | `PhaseRotationOk` | BOOL | Diagnostic de présence et ordre des phases électriques |
 | `BrakeThermalFeedback` | BOOL | Retour thermique commun aux freins M1/M2/M3 |
@@ -191,15 +210,16 @@ Les variables physiques suivantes doivent être configurées dans l'I/O Mapping 
 
 ## 🖥️ 6. Interface IHM (`ST_TranslationHMI`, `GVL_IHM.TranslationM3`)
 
-Structure d'échange IHM (migration depuis `ST_IHM_MANU`, provisoire, pour les
-champs listés ci-dessous — mais le pilotage M3 en mode Manu reste un vrai bypass au niveau
-logique, voir `DOC/IHM_MANU_Journal_Modifications.md` §11).
+Structure d'échange IHM (migration depuis `ST_IHM_MANU`, **définitive**). Depuis v1.7, le pilotage
+M3 en mode Manu (`ManuActive`) n'est **plus un bypass** : `ReqFwd`/`ReqRev`/`FreqSetpointHz`
+alimentent l'arbitrage `PRG_07_TranslationControl` §1bis, qui pilote la même instance
+`FB_Translation` qu'en Auto (voir `DOC/IHM_MANU_Journal_Modifications.md` §12).
 
 | Champ | Type | Sens | Rôle |
 |-------|------|------|------|
 | `SelectedTargetNum` | INT | IHM→PLC | Cible position 1-4 (Fosse1/Fosse2/Maintenance/Trémie) |
 | `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) |
-| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `_TranslationMaxFreq_Hz` |
+| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `_TranslationMaxFreq_Hz` — référence de vitesse pleine échelle en Manu (boutons ET joystick, voir bandeau v1.7) |
 | `FBState` | E_State | PLC→IHM | État interne `FB_Translation` (diagnostic) |
 | `Ready/Busy/Done/Error/ErrorId` | — | PLC→IHM | Statuts standards `FB_Translation` |
 | `BrakeCmd` | BOOL | PLC→IHM | Miroir lecture seule (TRUE = desserré) — pas de forçage inconditionnel : le déblocage en MAINT passe par `ReqFwd`/`ReqRev` (mouvement), qui desserre le frein nativement via `FB_Brake` (même doctrine que `ST_WinchHMI`) |

@@ -30,15 +30,13 @@ VAR
 
     M1_SimSpeedPct      : REAL;
     M2_SimSpeedPct      : REAL;
-    M1_IsReal           : BOOL;         // ⚡ Indique si le treuil M1 est configuré comme réel
-    M2_IsReal           : BOOL;         // ⚡ Indique si le treuil M2 est configuré comme réel
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
-// 🆕 Détermination de la réalité des treuils (Conditional Bypass Doctrine)
-M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
-M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
+// 🔧 REX 2026-07-16 : ex-M1_IsReal/M2_IsReal ("Conditional Bypass Doctrine") RETIRÉS — plus
+// aucun consommateur une fois le bypass Homing IHM_MANU supprimé (voir fin de fichier, ex-bloc
+// IF PRG_10_Outputs.ManuActive THEN ... HomingEncoder_M1/M2 ... END_IF).
 
 // 🔧 REX 2026-07-15 (4) — CORRECTIF COMPILATION : ex-SEL(ManuActive, ...) référençait
 // PRG_10_Outputs.SpeedRefPct, supprimé lors du passage de Manu sur FB_Winch (REX 2026-07-15 (2)).
@@ -115,8 +113,8 @@ instEncoderAbsM1(
     AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational OR instSimEncoderM1.Enable,
-    PresetRequest       := instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1),
-    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M1_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M1, instHomingM1.PresetValue, 16777216)
+    PresetRequest       := instHomingM1.PresetRequest,
+    PresetValue         := instHomingM1.PresetValue
 );
 COD1_PresettTrigCmd := instEncoderAbsM1.PresetTriggerCmd;
 COD1_CodeSeqTrigCmd := instEncoderAbsM1.CodeSeqTriggerCmd;
@@ -128,11 +126,7 @@ instHomingM1(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    // ─────────  Début modification IHM_MANU  ─────────
-    // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M1 (mise en service urgence) — même FB, mêmes
-    // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
-    Home                 := GVL_IHM.M1TreuilRetenue.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M1, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
-    // ─────────  Fin modification IHM_MANU  ─────────
+    Home                 := GVL_IHM.M1TreuilRetenue.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := _HomingTargetM1_M,
@@ -164,8 +158,8 @@ instEncoderAbsM2(
     AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
     WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational OR instSimEncoderM2.Enable,
-    PresetRequest       := instHomingM2.PresetRequest OR (PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2),
-    PresetValue         := SEL(PRG_10_Outputs.ManuActive AND NOT M2_IsReal AND GVL_IHM.IHM_MANU.HomingEncoder_M2, instHomingM2.PresetValue, 16777216)
+    PresetRequest       := instHomingM2.PresetRequest,
+    PresetValue         := instHomingM2.PresetValue
 );
 COD2_PresettTrigCmd := instEncoderAbsM2.PresetTriggerCmd;
 COD2_CodeSeqTrigCmd := instEncoderAbsM2.CodeSeqTriggerCmd;
@@ -177,11 +171,7 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    // ─────────  Début modification IHM_MANU  ─────────
-    // 🆕 REX 2026-07-09 : OR avec HomingEncoder_M2 (mise en service urgence) — même FB, mêmes
-    // conditions de sécurité (Mode MAINT_N1/N2, arrêt confirmé), aucune nouvelle dérogation.
-    Home                 := GVL_IHM.M2TreuilBucket.CmdHome OR GVL_IHM.IHM_MANU.HomingEncoder_M2, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
-    // ─────────  Fin modification IHM_MANU  ─────────
+    Home                 := GVL_IHM.M2TreuilBucket.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := _HomingTargetM2_M,
@@ -229,49 +219,3 @@ instEncoderSafetyM2(
 EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 
 EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
-
-// ─────────  Début modification IHM_MANU  ─────────
-// 🎯 Référencement direct (bypass sécurité et modes) si HomingEncoder_M1/M2 activés en Manu (uniquement si SIMULÉ)
-// Sinon, si les treuils sont réels, on utilise le homing normal sécurisé, et on réinitialise le bouton HMI dès que homing ok/erreur.
-IF PRG_10_Outputs.ManuActive THEN
-    IF GVL_IHM.IHM_MANU.HomingEncoder_M1 THEN
-        IF NOT M1_IsReal THEN
-            IF instEncoderAbsM1.PresetAck THEN
-                _CalibM1.HomingRefRaw := 16742400; // 16777216 - (8.5 * 8192 / 2.0)
-                _CalibM1.Homed := TRUE;
-                _CalibM1.HomingSuspect := FALSE;
-                _CalibM1.LastKnownRawPos := 16777216;
-                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE; // Reset bouton HMI
-            ELSIF instEncoderAbsM1.PresetNak THEN
-                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
-            END_IF;
-        ELSE
-            IF instEncoderAbsM1.PresetAck OR instHomingM1.Homed THEN
-                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
-            ELSIF instEncoderAbsM1.PresetNak OR instHomingM1.Error THEN
-                GVL_IHM.IHM_MANU.HomingEncoder_M1 := FALSE;
-            END_IF;
-        END_IF;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.HomingEncoder_M2 THEN
-        IF NOT M2_IsReal THEN
-            IF instEncoderAbsM2.PresetAck THEN
-                _CalibM2.HomingRefRaw := 16742400; // 16777216 - (8.5 * 8192 / 2.0)
-                _CalibM2.Homed := TRUE;
-                _CalibM2.HomingSuspect := FALSE;
-                _CalibM2.LastKnownRawPos := 16777216;
-                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE; // Reset bouton HMI
-            ELSIF instEncoderAbsM2.PresetNak THEN
-                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
-            END_IF;
-        ELSE
-            IF instEncoderAbsM2.PresetAck OR instHomingM2.Homed THEN
-                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
-            ELSIF instEncoderAbsM2.PresetNak OR instHomingM2.Error THEN
-                GVL_IHM.IHM_MANU.HomingEncoder_M2 := FALSE;
-            END_IF;
-        END_IF;
-    END_IF;
-END_IF;
-// ─────────  Fin modification IHM_MANU  ─────────

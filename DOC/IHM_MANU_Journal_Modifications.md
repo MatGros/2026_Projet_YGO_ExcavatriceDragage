@@ -40,6 +40,42 @@ de développer/tester l'IHM (activation progressive bus EtherCAT → mouvements 
 sécurité, via `GVL_Simulation.VariateurM3_IsReal`/`ContactorFeedbackM3_IsReal`/
 `TranslationPosition_IsReal`, déjà granulaires) sans dépendre du switch global `ModeDisable`.
 
+## 🆕 MISE À JOUR — SESSION 2026-07-16 : Translation M3 alignée sur M1/M2 + retrait bypass Homing
+
+**Changement de doctrine pour Translation M3 (même traitement que le Winch en 2026-07-15).**
+Les sections **3** (Bloc 2, mot `M3_CommandWord`) et **7** (Enable `FB_Safety_Translation`)
+ci-dessous décrivent l'état **AVANT** cette session pour M3 — **elles ne reflètent plus le code
+actuel**. `ManuActive` devient une 3ᵉ source d'arbitrage dans `PRG_07_TranslationControl.st`
+(branche `ELSIF ManuActive THEN`, mirroir de `PRG_06_WinchControl` §1/§2), alimentant la **même
+instance `instTranslationM3`** (`FB_Translation`) qu'en Auto — rampe accel/décel et interlock
+changement de sens natifs, `FB_Safety_Translation.Enable` désormais **inconditionnel** (`TRUE`,
+plus de "Conditional Bypass Doctrine"). `PRG_10_Outputs` n'écrit plus `M3_CommandWord`/
+`M3_SetpointFrequencyHz` directement : ces sorties viennent désormais uniquement de
+`instTranslationM3.DriveControlWord`/`DriveFreqRefHz`, pour Auto ET Manu (`M3Fwd_Eff`/`M3Rev_Eff`/
+`M3_ActiveFreqCmd`/`M3_DriveIsReal` retirés, orphelins).
+
+**Décision produit sur la vitesse en Manu** : contrairement au Winch (boutons HMI = 100% fixe, la
+vitesse est discrète par paliers de contacteurs), Translation conserve
+`GVL_IHM.TranslationM3.FreqSetpointHz` (consigne Hz réglable opérateur, clampée par
+`PRG_10_Outputs`) comme référence pleine échelle — pour les boutons HMI **et** le joystick,
+reproduisant exactement le comportement de l'ex-bypass. Sans cette conservation, l'opérateur
+aurait perdu la possibilité de régler une vitesse de translation précise en mode Manu boutons
+(mirroir Winch strict = toujours 60Hz plein). Formule : `FreqPct := FreqSetpointHz /
+_TranslationMaxFreq_Hz * 100.0`, puis `SpeedRefPct := SEL(JoystickSelect, FreqPct, (joystick
+déflexion %) * FreqPct)`.
+
+**Homing bypass retiré (`PRG_02_Encoders.st`)** : `PresetRequest`/`PresetValue`
+(`instEncoderAbsM1`/`M2`) et l'entrée `Home` (`instHomingM1`/`M2`) reviennent au flux normal
+(plus de `OR HomingEncoder_M1/M2`) ; le bloc de fin de fichier qui écrivait directement
+`_CalibM1/M2.HomingRefRaw/Homed/HomingSuspect/LastKnownRawPos` en cas d'activation du bouton HMI
+en Manu simulé est supprimé. Champs `HomingEncoder_M1`/`HomingEncoder_M2` retirés de
+`ST_IHM_MANU.st` (plus aucun consommateur).
+
+**Ce qui reste explicitement différé (hors périmètre de cette session) :** Auxiliaires
+Hydrauliques (Grille/Casque — `PRG_08_AuxiliaryControl.st` reste un stub vide, aucune
+implémentation Auto à laquelle arbitrer, voir `PLAN_TASK_v1.0.md` T6) et `WinchMaxStepFwd/Rev`
+(plafond palier "essais progressifs", propre au Winch — section 10, toujours valable).
+
 ---
 
 ## 📋 FICHIERS MODIFIÉS — INVENTAIRE DÉTAILLÉ
@@ -84,7 +120,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ### 3. **CODE/MAIN/PRG_10_Outputs.st** — Trois blocs balisés Début/Fin IHM_MANU
 
-> ⚠️ **PARTIELLEMENT PÉRIMÉ (session 2026-07-15)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 — remplacé par le pilotage `FB_Winch` (voir section 8). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBenne`) qui alimente désormais `PRG_06_WinchControl`, et la partie **M3/Auxiliaires qui reste un vrai bypass, inchangée**. Le "Bloc 3" (PowerCutOff) reste valable tel quel.
+> ⚠️ **PARTIELLEMENT PÉRIMÉ (sessions 2026-07-15 et 2026-07-16)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 (2026-07-15) — remplacé par le pilotage `FB_Winch` (voir section 8). Idem pour M3 (2026-07-16) : `M3Fwd_Eff`/`M3Rev_Eff`/`M3_ActiveFreqCmd`/`M3_DriveIsReal` et l'écriture directe `M3_CommandWord`/`M3_SetpointFrequencyHz` supprimés — remplacés par le pilotage `FB_Translation` (voir section 12). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBenne`, clamp `FreqSetpointHz`) qui alimente désormais `PRG_06_WinchControl`/`PRG_07_TranslationControl`, et la partie **Auxiliaires qui reste un vrai bypass, inchangée** (hors périmètre, `PRG_08_AuxiliaryControl` = stub vide). Le "Bloc 3" (PowerCutOff) reste valable tel quel.
 
 #### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–90)
 
@@ -201,22 +237,27 @@ END_IF;
 
 ### 4. **CODE/MAIN/PRG_02_Encoders.st** — Override direct et bypass sécurité homing
 
-#### 🔶 **Bloc 1 : M1 et M2 - PresetRequest/Value direct (Bypass de instHoming)**
+> ✅ **RÉSOLU (session 2026-07-16)** — Les Blocs 1 et 2 ci-dessous décrivent l'état **AVANT**
+> cette session : `HomingEncoder_M1`/`HomingEncoder_M2` sont **retirés** (bypass complètement
+> supprimé, retour au flux `FB_Encoder_Homing` normal). Conservés à titre d'historique. Le
+> Bloc 3 (aiguillage codeur réel/simulé) reste inchangé, sans rapport avec le bypass Homing.
+
+#### 🔶 **Bloc 1 : M1 et M2 - PresetRequest/Value direct (Bypass de instHoming)** *(historique, retiré 2026-07-16)*
 Si `ManuActive` est activé, les commandes `HomingEncoder_M1/M2` pilotent directement le bloc `instEncoderAbsM1/M2` :
 *   `PresetRequest` = `instHomingM1.PresetRequest OR (PRG_10_Outputs.ManuActive AND GVL_IHM.IHM_MANU.HomingEncoder_M1)`
 *   `PresetValue` = `16777216` (milieu de plage)
 
 **Rôle :** Permet d'envoyer l'écriture dans les mots physiques sans aucune condition de mode (MAINT_N1/N2 non requis) ni de sécurité (contacteur sens/frein non vérifiés).
 
-#### 🔶 **Bloc 2 : Enregistrement manuel de calibration et reset bouton HMI**
+#### 🔶 **Bloc 2 : Enregistrement manuel de calibration et reset bouton HMI** *(historique, retiré 2026-07-16)*
 Code ajouté tout à la fin du POU `PRG_02_Encoders` pour détecter le succès (`PresetAck`) ou le timeout (`PresetNak`) afin d'écrire directement l'offset de position dans la mémoire persistante pour faire `12.5` mètres (Offset = `16726016`), puis de désactiver le bouton HMI.
 
 #### 🔶 **Bloc 3 : Aiguillage codeur réel / simulé (Restauration logique propre)**
 L'aiguillage d'entrée des codeurs (lignes 68-78) a été nettoyé de la condition `AND NOT PRG_10_Outputs.ManuActive` afin de permettre au simulateur de codeur `instSimEncoderM1/M2` de fonctionner correctement sur PC même lorsque `ManuActive = TRUE`. Pour basculer sur les codeurs réels, il suffit de configurer `EncoderM1_IsReal` et `EncoderM2_IsReal` à `TRUE` dans `GVL_Simulation` (ou désactiver `SimulationModeActive`).
 
-**À modifier au nettoyage :** 
-*   Rétablir les entrées `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur `instEncoderAbsM1` et `instEncoderAbsM2`.
-*   Retirer le bloc de code conditionnel `IF PRG_10_Outputs.ManuActive THEN ... END_IF` tout à la fin du fichier.
+**À modifier au nettoyage :** ~~Rétablir les entrées `PresetRequest`/`PresetValue`~~ **Déjà fait**
+(2026-07-16, Blocs 1 et 2). Reste : rien pour ce fichier — Bloc 3 (aiguillage réel/simulé) n'est
+pas une dérogation IHM_MANU à retirer.
 
 ---
 
@@ -238,18 +279,20 @@ Un timer `PresetTimerVisual : TON` a été ajouté au bloc d'acquisition. Une fo
 
 ### 7. **CODE/MAIN/PRG_03_Safety.st** — Désactivation des sécurités logicielles métier en mode IHM_MANU
 
-> ⚠️ **PÉRIMÉ POUR M1/M2 (session 2026-07-15) — INVERSÉ.** Cette section décrit l'état AVANT le
-> 2026-07-15 : `Enable := FALSE` quand `ManuActive` actif (bypass sécurité total pour éviter les
-> faux Méca B/E). **Ce n'est PLUS le cas** : `instSafetyWinchM1`/`instSafetyWinchM2.Enable` sont
-> désormais **inconditionnels** (`NOT InhibitM1`/`NOT InhibitM2`, comme en Auto — voir section 9).
-> La fausse alarme Méca B a été corrigée à la racine (voir section 9.3 : `JoystickYNeutral`
-> regarde aussi les boutons IHM, pas juste le joystick) plutôt que masquée par un bypass complet.
-> **`instSafetyTranslationM3` reste inchangé** (toujours `Enable := NOT ManuActive OR ...`, bypass
-> conditionnel d'origine conservé — M3 reste hors scope, voir bandeau §2 en tête de document).
+> ⚠️ **PÉRIMÉ POUR M1/M2/M3 (sessions 2026-07-15 et 2026-07-16) — INVERSÉ.** Cette section décrit
+> l'état AVANT le 2026-07-15/16 : `Enable := FALSE` (ou bypass conditionnel) quand `ManuActive`
+> actif (pour éviter les faux Méca B/E). **Ce n'est PLUS le cas pour aucun des 3 axes** :
+> `instSafetyWinchM1`/`instSafetyWinchM2.Enable` sont **inconditionnels** (`NOT InhibitM1`/
+> `NOT InhibitM2`, comme en Auto — voir section 9) depuis 2026-07-15 ;
+> `instSafetyTranslationM3.Enable` est **`TRUE` inconditionnel** (voir section 12) depuis
+> 2026-07-16. La fausse alarme Méca B (Winch) a été corrigée à la racine (section 9.3) ; côté
+> Translation, `FB_Safety_Translation` n'avait pas d'équivalent à corriger (son Méca B détecte un
+> mouvement résiduel non commandé après arrêt, pas une absence de commande opérateur).
 
-Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyTranslationM3` étaient désactivées (`Enable := FALSE`) dès que `ManuActive` était actif *(état pré-2026-07-15, M1/M2 uniquement)*.
+Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilotage sans commande opérateur en raison du joystick inutilisé, ou Méca E) lorsque l'opérateur utilise les commandes HMI boutons en mode Manu, les instances `instSafetyWinchM1`, `instSafetyWinchM2` et `instSafetyTranslationM3` étaient désactivées (`Enable := FALSE`) dès que `ManuActive` était actif *(état pré-2026-07-15, M1/M2 uniquement — M3 était sur un bypass conditionnel distinct, retiré en 2026-07-16)*.
 
-**À modifier au nettoyage :** ~~Rétablir les entrées `Enable` d'origine~~ **Déjà fait pour M1/M2** (2026-07-15). Reste à faire pour M3 : `Enable := NOT PRG_10_Outputs.ManuActive OR ...` (translation) doit être retiré pour redevenir `Enable := TRUE` inconditionnel, une fois M3 sorti du bypass (dépend de la finalisation `FB_Translation`, cf. `PLAN_TASK` T4/T12/T26).
+**À modifier au nettoyage :** ~~Rétablir les entrées `Enable` d'origine~~ **Déjà fait pour M1/M2**
+(2026-07-15) **et pour M3** (2026-07-16, section 12). Rien ne reste à faire pour ce fichier.
 
 ---
 
@@ -337,15 +380,59 @@ identifiant matériel). `Benne` reste sans suffixe (⚠️ tentative `BenneM2` f
 distinguer comme M1/M2 treuils, donc pas besoin de suffixe axe). Ne concerne pas la dérogation
 IHM_MANU elle-même (Benne/Joystick n'y ont jamais été).
 
-**Ce qui N'A PAS changé (dérogation toujours active) :** `PRG_10_Outputs` écrit toujours
+> ✅ **RÉSOLU (session 2026-07-16)** — Le paragraphe suivant ("Ce qui N'A PAS changé") décrivait
+> l'état avant cette session. Le passage de M3 sur le même modèle que M1/M2 (arbitrage natif
+> `FB_Translation`/`PRG_07` même en Manu) est **fait**, voir section 12.
+
+~~**Ce qui N'A PAS changé (dérogation toujours active) :** `PRG_10_Outputs` écrit toujours
 `M3_CommandWord`/`M3_SetpointFrequencyHz` en direct quand `ManuActive=TRUE`, sans passer par
 `FB_Translation`/`FB_Safety_Translation` — voir sections 3/7. Le passage de M3 sur le même modèle que
 M1/M2 (section 8, arbitrage natif `FB_Translation`/`PRG_07` même en Manu) reste un chantier séparé
-(`PLAN_TASK_v1.0.md` T4/T12/T26).
+(`PLAN_TASK_v1.0.md` T4/T12/T26).~~
 
 **À modifier au nettoyage :** Rien de spécifique à cette section — `GVL_IHM.TranslationM3` est
-définitif, seul le bypass `ManuActive` sur `M3_CommandWord` (sections 3/7) reste à retirer plus
-tard.
+définitif.
+
+---
+
+### 12. **CODE/MAIN/PRG_07_TranslationControl.st** — IHM_MANU comme 3ᵉ source d'arbitrage M3 *(NOUVEAU 2026-07-16)*
+
+**Rôle :** Remplace le bypass direct des sections 3/7 — M3 est désormais piloté par la MÊME
+instance `instTranslationM3` (`FB_Translation`) qu'en Auto/SEMI_AUTO, avec une branche
+`ELSIF PRG_10_Outputs.ManuActive THEN` insérée entre la branche SEMI_AUTO et la branche joystick
+Auto (§1bis), mirroir exact de `PRG_06_WinchControl` §1/§2 (section 8).
+
+**Logique de la branche Manu :**
+- Lit `PRG_10_Outputs.M3Fwd_Demand`/`M3Rev_Demand` (calculés dans `PRG_10_Outputs`, lus avec
+  **1 scan de retard** ~10ms — PRG_10 en position 10, PRG_07 en position 7, même principe que
+  `PRG_06_WinchControl` avec `M1Fwd_Demand`) pour déterminer `Direction`/`StartStop`.
+- `SpeedRefPct` — **diffère du Winch délibérément** (décision utilisateur) : conserve
+  `GVL_IHM.TranslationM3.FreqSetpointHz` (consigne Hz réglable opérateur, clampée par
+  `PRG_10_Outputs` à `_TranslationMaxFreq_Hz`) comme cible pleine échelle, pour boutons HMI **et**
+  joystick — reproduit exactement le comportement de l'ex-bypass (`FreqSetpointHz` = 100%,
+  déflexion joystick = % de cette cible), au lieu du `100.0` fixe utilisé par le Winch (qui pilote
+  des paliers discrets, pas une fréquence continue). Formule : `FreqPct := FreqSetpointHz /
+  _TranslationMaxFreq_Hz * 100.0` puis `SpeedRefPct := SEL(JoystickSelect, FreqPct, (déflexion
+  joystick %) * FreqPct)`.
+- `instSafetyTranslationM3.Enable` (section 7/`PRG_03_Safety.st`) passe à `TRUE` inconditionnel
+  (pas d'`InhibitM3` dans `FB_Modes`, contrairement à `InhibitM1`/`InhibitM2`).
+
+**Conséquence :** M3 bénéficie nativement en Manu de : rampe accel/décel
+(`RampAccelRate`/`RampDecelNormalRate`/`RampDecelFastRate`), interlock changement de sens
+(`DirectionInterlockDelay`), arrêt exact sur capteur cible (`ArrivalLock`), et surveillance
+`FB_Safety_Translation` réelle (Méca A/B, thermique, rotation phase, EtherCAT — plus de
+`Enable=FALSE` masquant tout défaut). Ceci débloque `FB_TranslationValidation` (TC-T1/T2/T3, cf.
+`AF_Partie-14`), bloqué depuis leur création par `Enable=FALSE` en simulation.
+
+**Nettoyage associé (`PRG_10_Outputs.st`) :** `M3Fwd_Eff`/`M3Rev_Eff`/`M3_ActiveFreqCmd`/
+`M3_DriveIsReal` retirés (orphelins, plus consommés que par le bypass supprimé) ; écriture directe
+`M3_CommandWord`/`M3_SetpointFrequencyHz` remplacée par lecture inconditionnelle de
+`instTranslationM3.DriveControlWord`/`DriveFreqRefHz` (même modèle que M1/M2, section 8) ;
+`TranslationBrakeCmd` n'est plus écrasé en Manu (déjà écrit par `PRG_07`, position 7 < 10).
+
+**À modifier au nettoyage :** Rien à faire — cette branche `ELSIF ManuActive` est le code
+**définitif**, pas une dérogation à retirer. Seul `PRG_10_Outputs.M3Fwd_Demand`/`M3Rev_Demand`/
+clamp `FreqSetpointHz` (calcul amont, boutons/joystick) reste spécifique IHM_MANU.
 
 ---
 
@@ -377,16 +464,16 @@ tard.
     PowerCutOff_A_RQ := NOT (...) AND ...
     PowerCutOff_B_RQ := NOT (...) AND ...
     ```
-- [ ] **PRG_02_Encoders.st** :
-  - [ ] Retirer la condition `AND NOT PRG_10_Outputs.ManuActive` de l'aiguillage simulation/réel (lignes 68-78) pour rétablir la logique nominale.
-  - [ ] Restaurer `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur les appels de `instEncoderAbsM1` et `instEncoderAbsM2` (lignes 97-98 et 146-147).
-  - [ ] Retirer le bit de forçage dérogatoire sur l'entrée `Home` des blocs `instHomingM1` et `instHomingM2` (lignes 113 et 162).
-  - [ ] Supprimer entièrement le bloc conditionnel de fin de fichier (lignes 214-239).
+- [x] **PRG_02_Encoders.st** *(fait 2026-07-16)* :
+  - [x] ~~Retirer la condition `AND NOT PRG_10_Outputs.ManuActive` de l'aiguillage simulation/réel~~ — n'a jamais existé pour l'aiguillage réel/simulé lui-même (Bloc 3, toujours valable, hors périmètre bypass Homing) : rien à faire ici.
+  - [x] Restaurer `PresetRequest := instHomingM1.PresetRequest` et `PresetValue := instHomingM1.PresetValue` sur les appels de `instEncoderAbsM1` et `instEncoderAbsM2`.
+  - [x] Retirer le bit de forçage dérogatoire sur l'entrée `Home` des blocs `instHomingM1` et `instHomingM2`.
+  - [x] Supprimer entièrement le bloc conditionnel de fin de fichier (référencement direct `HomingEncoder_M1/M2`).
 - [ ] **PRG_08_AuxiliaryControl.st** :
   - [ ] Rétablir le bloc de variables locales en `VAR` au lieu de `VAR_INPUT`.
-- [ ] **PRG_03_Safety.st** :
-  - [ ] Rétablir les entrées `Enable` d'origine sur `instSafetyWinchM1` et `instSafetyWinchM2` (supprimer `AND NOT PRG_10_Outputs.ManuActive`).
-  - [ ] Rétablir `Enable := TRUE` sur `instSafetyTranslationM3` (supprimer `NOT PRG_10_Outputs.ManuActive`).
+- [x] **PRG_03_Safety.st** :
+  - [x] Rétablir les entrées `Enable` d'origine sur `instSafetyWinchM1` et `instSafetyWinchM2` *(fait 2026-07-15)*.
+  - [x] Rétablir `Enable := TRUE` sur `instSafetyTranslationM3` *(fait 2026-07-16, section 12)*.
 
 ### Phase 3 : Tests de validation
 - [ ] Compiler le projet CODESYS sans erreur
@@ -414,7 +501,11 @@ tard.
 **Actions requises :**
 - Avant usage prolongé, forcer le mot de commande depuis CODESYS (instance PRG_10_Outputs.M3_CommandWord) et observer le comportement du variateur à moteur à vide
 - **Risque identifié :** Les valeurs réelles du registre 0x3101 côté carte EtherCAT pourraient différer de la recette fournisseur initiale ou avoir des significations alternatives (ex. bits de flags). Corriger immédiatement si comportement anormal (moteur tourne à l'inverse, ignore la fréquence, etc.)
-- **Remédiation :** Mettre à jour les lignes 165/168 (M3_CommandWord := 1/2) si la recette change
+- **Remédiation :** 🔧 REX 2026-07-16 — l'écriture de `M3_CommandWord` (1=avant/2=arrière/7=reset)
+  vit désormais dans `FB_Translation.st` (§5bis, ex-`CODE/TRANSLATION/FB_Translation.st`), plus
+  dans `PRG_10_Outputs.st` (qui ne fait plus que recopier `instTranslationM3.DriveControlWord`).
+  Mettre à jour ce bloc si la recette change (toujours non vérifiée sur banc, indépendant de la
+  migration IHM_MANU).
 
 ### 2. **Absence de vérification mode opérateur en IHM_MANU**
 
@@ -447,6 +538,7 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 | **Pas de supervision redondance PowerCutOff** | 🟡 MOYEN | Oui | Envisager test périodique même en Manu |
 | **Fréquence M3 sans limites** | 🟡 MOYEN | Oui | À confirmer si limites variateur doivent s'appliquer |
 | ~~**M1/M2 : `FB_Safety_Winch` désactivée en Manu**~~ | ~~🔴 CRITIQUE~~ | **✅ RÉSOLU 2026-07-15** | Sécurité M1/M2 désormais toujours active (section 9), plus un bypass total |
+| ~~**M3 : bypass `M3_CommandWord` direct, `FB_Safety_Translation` conditionnelle**~~ | ~~🟠 ÉLEVÉ~~ | **✅ RÉSOLU 2026-07-16** | M3 piloté nativement par `FB_Translation`, `Enable` toujours actif (section 12), plus de bypass |
 | **`WinchMaxStepFwd/Rev` réactivés (essais progressifs)** | 🟡 MOYEN | Oui (2026-07-15, VOLONTAIRE) | Temporaire assumé — bornage 1..5 + MIN avec plafond Auto en descente (jamais moins protecteur) ; à retirer (section 10) |
 
 ---
@@ -469,7 +561,8 @@ En mode Manu, PowerCutOff_A/B_RQ sont maintenues TRUE indéfiniment **sans surve
 | **2026-07-15** | Session refonte sécurité | M1/M2 branchés sur `FB_Winch`/`PRG_06_WinchControl` (fin du bypass total, sections 8-9) ; nouvelle limite `CableLimitAscentM1/2_M` ; fix Méca B (bit8, boutons HMI) ; fix benne couplé+M1 individuel ; fix latch `FB_Safety_Translation` ; réactivation TEMPORAIRE `WinchMaxStepFwd/Rev` (section 10, **vraie dérogation restante**) |
 | **2026-07-15 (2)** | Refonte IHM Translation M3 | Commandes/diag manuels M3 sortis de `ST_IHM_MANU` → `ST_TranslationHMI`/`GVL_IHM.TranslationM3` (définitif, section 11) ; diag variateur décodé ; fix `BypassBrakeFeedback` (fusionné `BypassContactorFeedback`) ; fix simulation position M3 (`FB_Sim_Translation` rebranché, était bloquée) ; rename `GVL_IHM.Joystick` → `JoystickJOY1` (`Benne` : tenté `BenneM2` puis annulé, stutter
 avec champs internes M2) — **la dérogation bypass `ManuActive`→`M3_CommandWord` reste, elle, inchangée** |
-| **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain (M3/Auxiliaires bypass logique + section 10 restent à retirer) |
+| **2026-07-16** | Alignement Translation M3 sur Winch + retrait Homing | M3 branché sur `FB_Translation`/`PRG_07_TranslationControl` (fin du bypass `M3_CommandWord`, section 12) ; `instSafetyTranslationM3.Enable` inconditionnel (débloque TC-T1/T2/T3) ; vitesse Manu boutons/joystick conservée via `FreqSetpointHz` (décision produit, différent du Winch) ; bypass Homing (`HomingEncoder_M1/M2`) retiré de `PRG_02_Encoders.st`/`ST_IHM_MANU.st` ; Auxiliaires et `WinchMaxStepFwd/Rev` explicitement différés (hors périmètre) |
+| **À définir** | Nettoyage | Suppression IHM_MANU après validation terrain (Auxiliaires bypass logique + section 10 restent à retirer) |
 
 ---
 

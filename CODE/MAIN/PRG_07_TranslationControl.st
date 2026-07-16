@@ -8,15 +8,18 @@
 PROGRAM PRG_07_TranslationControl
 VAR
     instTranslationM3           : FB_Translation;
- 
+
     // Commandes arbitrées après sélection Manuel/Auto
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
     M3_SpeedRef_Active      : REAL;
     M3_PositionSensorTarget : BOOL;
-    
+
     // Target active (HMI en manuel, instCycle en auto)
     SelectedTargetNum       : INT;
+
+    // 🆕 REX 2026-07-16 : IHM_MANU comme 3ᵉ source d'arbitrage (voir §1bis ci-dessous)
+    FreqPct                 : REAL; // Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
@@ -27,7 +30,7 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     SelectedTargetNum    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
     M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start;
     M3_SpeedRef_Active   := 40.0; // Vitesse de translation automatique nominale (40%)
-    
+
     // Détermination automatique du sens de marche selon la cible :
     // - Trémie (cible 4) = Marche Avant (Direction := 1)
     // - Fosses (cible 1 et 2) = Marche Arrière (Direction := -1)
@@ -36,6 +39,36 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     ELSE
         M3_Direction_Active := -1;
     END_IF;
+// ── 1bis. IHM_MANU — 3ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
+// 🆕 REX 2026-07-16 : remplace l'ex-bypass direct M3_CommandWord dans PRG_10_Outputs — M3 est
+// désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
+// rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
+// FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
+ELSIF PRG_10_Outputs.ManuActive THEN
+    // Pas de sélecteur de cible dédié en Manu — comportement actuel inchangé (StubTranslationPositionSelect_IHM).
+    SelectedTargetNum := StubTranslationPositionSelect_IHM;
+
+    // Demande (boutons IHM ou joystick, déjà arbitrée par PRG_10_Outputs : M3Fwd_Demand/M3Rev_Demand)
+    // lue avec 1 scan de retard (~10ms, PRG_10 position 10 > PRG_07 position 7) — même principe
+    // déjà accepté côté PRG_06_WinchControl pour M1Fwd_Demand/M2Fwd_Demand.
+    IF PRG_10_Outputs.M3Fwd_Demand THEN
+        M3_Direction_Active := 1;
+    ELSIF PRG_10_Outputs.M3Rev_Demand THEN
+        M3_Direction_Active := -1;
+    ELSE
+        M3_Direction_Active := 0;
+    END_IF;
+    M3_StartStop_Active := (M3_Direction_Active <> 0);
+
+    // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.FreqSetpointHz (consigne Hz réglable opérateur,
+    // clampée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
+    // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
+    // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
+    // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
+    FreqPct := (GVL_IHM.TranslationM3.FreqSetpointHz / _TranslationMaxFreq_Hz) * 100.0;
+    M3_SpeedRef_Active := SEL(GVL_IHM.IHM_MANU.JoystickSelect,
+                              FreqPct,
+                              (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
     // Mode Manuel/Maintenance : Consignes issues du Joystick et sélecteur HMI
     SelectedTargetNum    := StubTranslationPositionSelect_IHM;
