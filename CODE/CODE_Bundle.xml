@@ -8188,6 +8188,7 @@ Force l'entrée boucle d'urgence à TRUE</xhtml>
    🎯 Rôle : Séquenceur de test sous forme de bloc fonctionnel (FB).
       Exécute les cas de tests réglementaires de la boucle d'urgence.
       En cas d'échec sur un test, passe au suivant pour tout valider.
+      Résistant aux verrouillages temporels (Lockout 5s) entre tests.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -8263,21 +8264,19 @@ CASE TestSeqStep OF
     // ─────────────────────────────────────────────────────────────────
     // 🧪 SCÉNARIO 1 : Séquence Nominale (TC-01)
     // ─────────────────────────────────────────────────────────────────
-    10: // Phase 1.1 : Initialisation saine
+    10: // Phase 1.1 : Initialisation saine (attente fin du verrouillage de sécurité précédent)
         ResetFaults := TRUE;
         IF NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed AND 
-           NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingFailed THEN
+           NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingFailed AND
+           NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive THEN
             ResetFaults := FALSE;
+            ArmRequest := TRUE; // Maintient la demande jusqu'au démarrage réel
             TestSeqStep := 11;
         END_IF;
 
-    11: // Phase 1.2 : Envoi demande réarmement
-        ArmRequest := TRUE;
-        TestSeqStep := 12;
-
-    12: // Phase 1.3 : Vérification début d'auto-test
-        ArmRequest := FALSE;
+    11: // Phase 1.2 : Envoi demande réarmement et attente début auto-test
         IF PRG_10_Outputs.instSafetyEmergencyManagement.ArmingSeqStep = 1 THEN
+            ArmRequest := FALSE; // Relâche la demande
             TestSeqStep := 13;
         END_IF;
 
@@ -8316,17 +8315,18 @@ CASE TestSeqStep OF
     // ─────────────────────────────────────────────────────────────────
     // 🧪 SCÉNARIO 2 : Défaut de Redondance (TC-02)
     // ─────────────────────────────────────────────────────────────────
-    20: // Phase 2.1 : Acquitter le défaut précédent et relancer l'armement
+    20: // Phase 2.1 : Acquitter le défaut précédent et attendre la fin du verrouillage de sécurité
         ResetFaults := TRUE;
-        IF NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed THEN
+        IF NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed AND
+           NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive THEN
             ResetFaults := FALSE;
-            ArmRequest := TRUE;
+            ArmRequest := TRUE; // Maintient la demande
             TestSeqStep := 21;
         END_IF;
 
     21: // Phase 2.2 : Attente de l'auto-test canal A
-        ArmRequest := FALSE;
         IF PRG_10_Outputs.instSafetyEmergencyManagement.ArmingSeqStep = 1 THEN
+            ArmRequest := FALSE; // Relâche la demande
             // Simuler contacteur A soudé
             OverrideChainTrue := TRUE;
             TestSeqStep := 22;
@@ -8344,18 +8344,21 @@ CASE TestSeqStep OF
     // ─────────────────────────────────────────────────────────────────
     // 🧪 SCÉNARIO 3 : Verrouillage temporel (TC-03)
     // ─────────────────────────────────────────────────────────────────
-    30: // Phase 3.1 : Acquitter et lancer un armement condamné à échouer
+    30: // Phase 3.1 : Acquitter et attendre la fin du verrouillage précédent
         ResetFaults := TRUE;
-        IF NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed THEN
+        IF NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed AND
+           NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive THEN
             ResetFaults := FALSE;
-            ArmRequest := TRUE;
+            ArmRequest := TRUE; // Maintient la demande
             // Bloquer le contacteur de puissance à FALSE
             OverrideContactorFalse := TRUE;
             TestSeqStep := 31;
         END_IF;
 
-    31: // Phase 3.2 : Attente de l'échec de confirmation d'armement (Step 6 -&gt; Lockout)
-        ArmRequest := FALSE;
+    31: // Phase 3.2 : Attente du début d'auto-test pour relâcher le bouton
+        IF PRG_10_Outputs.instSafetyEmergencyManagement.ArmingSeqStep = 1 THEN
+            ArmRequest := FALSE;
+        END_IF;
         IF PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingFailed AND 
            PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive THEN
             TestSeqStep := 32;
@@ -8392,7 +8395,9 @@ CASE TestSeqStep OF
         TestSeqStep := 36;
 
     36: // Phase 3.7 : Confirmation finale de l'armement après lockout
-        ArmRequest := FALSE;
+        IF PRG_10_Outputs.instSafetyEmergencyManagement.ArmingSeqStep = 1 THEN
+            ArmRequest := FALSE;
+        END_IF;
         IF PRG_00_Inputs.EmergencyStopOk THEN
             TC03_Lockout_Ok := TRUE;
             AllTestsPassed := NOT TestFailed; // Succès global si aucun échec intermédiaire
