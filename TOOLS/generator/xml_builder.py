@@ -289,6 +289,8 @@ def _build_globalvars_data(
         global_vars.set("retain", "true")
     if "PERSISTENT" in block.qualifiers:
         global_vars.set("persistent", "true")
+    if "CONSTANT" in block.qualifiers:
+        global_vars.set("constant", "true")
 
     for var in block.variables:
         global_vars.append(_variable_element(var, objects_by_name, diagnostics, obj.name))
