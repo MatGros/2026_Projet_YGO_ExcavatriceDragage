@@ -7900,6 +7900,24 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <INT />
               </type>
             </variable>
+            <variable name="OverrideChainTrue">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Propagation des demandes de surcharge (overrides)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OverrideChainFalse">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="OverrideContactorFalse">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="instSafetyValidation">
@@ -7953,6 +7971,9 @@ TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
 TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
 TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
 FailedTestCase          := instSafetyValidation.FailedTestCase;
+OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
+OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
+OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
 </xhtml>
           </ST>
         </body>
@@ -8136,6 +8157,31 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Numéro du scénario en échec</xhtml>
               </documentation>
             </variable>
+            <variable name="OverrideChainTrue">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demandes de surcharge (overrides) vers le programme de simulation
+Force l'entrée boucle d'urgence à TRUE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OverrideChainFalse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'entrée boucle d'urgence à FALSE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OverrideContactorFalse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'entrée contacteur à FALSE</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="StartTestEdge">
@@ -8160,39 +8206,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Timer d'attente d'étapes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OverrideChainTrue">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'entrée boucle d'urgence à TRUE</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OverrideChainFalse">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'entrée boucle d'urgence à FALSE</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OverrideContactorFalse">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'entrée contacteur à FALSE</xhtml>
               </documentation>
             </variable>
             <variable name="ArmRequest">
@@ -8233,6 +8246,9 @@ END_IF;
 IF NOT GVL_Simulation.SimulationModeActive THEN
     TestSeqStep := 0;
     TestInProgress := FALSE;
+    OverrideChainTrue := FALSE;
+    OverrideChainFalse := FALSE;
+    OverrideContactorFalse := FALSE;
     RETURN;
 END_IF;
 
@@ -8296,14 +8312,14 @@ CASE TestSeqStep OF
         TestSeqStep := 16;
 
     16: // Phase 1.7 : Vérification coupure instantanée
-        IF NOT PRG_10_Outputs.PowerCutOff_A_RQ AND NOT PRG_10_Outputs.PowerCutOff_B_RQ AND NOT PRG_00_Inputs.EmergencyStopOk THEN
+        IF NOT PowerCutOff_A_RQ AND NOT PowerCutOff_B_RQ AND NOT PRG_00_Inputs.EmergencyStopOk THEN
             // Coupure validée, on relâche le bouton d'urgence (doit rester coupé)
             OverrideChainFalse := FALSE;
             TestSeqStep := 17;
         END_IF;
 
     17: // Phase 1.8 : Vérification de l'auto-maintien (Latch)
-        IF NOT PRG_10_Outputs.PowerCutOff_A_RQ AND NOT PRG_10_Outputs.PowerCutOff_B_RQ THEN
+        IF NOT PowerCutOff_A_RQ AND NOT PowerCutOff_B_RQ THEN
             TC01_NominalArming_Ok := TRUE;
             TestSeqStep := 20; // Passer au test de redondance
         ELSE
@@ -8417,19 +8433,6 @@ CASE TestSeqStep OF
         TestSeqStep := 0;
 
 END_CASE;
-
-// === SURCHARGE DES SIGNALS DE SIMULATION (OVERRIDE INTERNE) ===
-IF OverrideChainTrue THEN
-    PRG_00_Inputs.EmergencyChain := TRUE;
-END_IF;
-
-IF OverrideChainFalse THEN
-    PRG_00_Inputs.EmergencyChain := FALSE;
-END_IF;
-
-IF OverrideContactorFalse THEN
-    PRG_00_Inputs.EmergencyStopOk := FALSE;
-END_IF;
 </xhtml>
           </ST>
         </body>
@@ -13441,6 +13444,17 @@ END_IF;
 
 // 🧪 Appel de la suite globale de tests de validation automate
 instTestsManagement();
+
+// Surcharges (overrides) demandées par le banc de tests automatique
+IF instTestsManagement.OverrideChainTrue THEN
+    EmergencyChain := TRUE;
+END_IF;
+IF instTestsManagement.OverrideChainFalse THEN
+    EmergencyChain := FALSE;
+END_IF;
+IF instTestsManagement.OverrideContactorFalse THEN
+    EmergencyStopOk := FALSE;
+END_IF;
 </xhtml>
           </ST>
         </body>
