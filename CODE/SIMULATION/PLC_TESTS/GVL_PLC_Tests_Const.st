@@ -20,4 +20,5 @@ VAR_GLOBAL CONSTANT
     TaskCycleMs      : INT := 10;   // MainTask — base des mesures en cycles
     SuiteSafety      : INT := 1;    // index de suite (Cmd.RunSuite)
     SuiteTranslation : INT := 2;    // index de suite Translation M3 (Cmd.RunSuite)
+    SuiteBucket      : INT := 3;    // index de suite Bucket (Cmd.RunSuite)
 END_VAR

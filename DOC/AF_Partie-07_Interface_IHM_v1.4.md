@@ -92,19 +92,19 @@ END_STRUCT
 END_TYPE
 ```
 
-### B. Mécanisme Benne (`ST_BenneHMI`)
+### B. Mécanisme Benne (`ST_BucketHMI`)
 Permet de manipuler la configuration de l'ouverture et de la fermeture du benne et de surveiller l'état cinématique.
 
 ```pascal
-TYPE ST_BenneHMI :
+TYPE ST_BucketHMI :
 STRUCT
     (* ⚙️ Configurations & Paramètres (Lecture/Écriture RETAIN) *)
-    Config              : ST_BenneConfig; (* Offsets Open/Close/Coherence *)
+    Config              : ST_BucketConfig; (* Offsets Open/Close/Coherence *)
     TimeoutDuration     : TIME := T#30s;    (* Temps max pour l'ouverture/fermeture *)
 
     (* 🚦 États & Retours (Lecture seule) *)
-    State               : ST_BenneState;  (* État mémorisé (IsOpen, IsClosed, etc.) *)
-    FBState             : E_State;          (* État de l'automate interne (FB_Benne) *)
+    State               : ST_BucketState;  (* État mémorisé (IsOpen, IsClosed, etc.) *)
+    FBState             : E_State;          (* État de l'automate interne (FB_Bucket) *)
     ActiveOffsetM       : REAL;             (* Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* Commande Start/Stop forcée vers M2 *)
     M2Direction         : INT;              (* Commande direction forcée vers M2 *)
@@ -275,7 +275,7 @@ END_TYPE
 VAR_GLOBAL RETAIN
     WinchM1 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Principal M1 *)
     WinchM2 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Auxiliaire M2 *)
-    Benne : ST_BenneHMI;(* Variables d'échange IHM Mécanisme Benne *)
+    Benne : ST_BucketHMI;(* Variables d'échange IHM Mécanisme Benne *)
     Sync    : ST_SyncHMI;   (* Variables d'échange IHM Surveillance de synchro *)
     JoystickJOY1 : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
     Modes   : ST_ModesHMI;  (* Variables d'échange IHM Modes de marche *)
@@ -305,7 +305,7 @@ Le mapping bidirectionnel est divisé en deux parties dans `PRG_MAIN.st` :
 ## 🔌 5. Note d'application CODESYS 3.5
 
 1. **Création des types de données** :
-   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_BenneHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_BenneHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_EncoderHMI.st), [ST_TranslationHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_TranslationHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_NetworkDiagHMI.st).
+   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_BucketHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_BucketHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_EncoderHMI.st), [ST_TranslationHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_TranslationHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_NetworkDiagHMI.st).
 
 2. **Déclaration de la GVL** :
    Créer une GVL nommée `GVL_IHM` et y copier le contenu de [GVL_IHM.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/GVL_IHM.st). S'assurer de la cocher en **Retain** si requis par votre configuration automate (la directive `VAR_GLOBAL RETAIN` assure la persistance des données au niveau du compilateur).

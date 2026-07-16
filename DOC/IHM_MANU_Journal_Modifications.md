@@ -64,9 +64,9 @@ sécurité, via `GVL_Simulation.VariateurM3_IsReal`/`ContactorFeedbackM3_IsReal`
 - ~~`M3_RelayFwd/Rev`~~, ~~`M3_FreqSetpoint/Actual`~~, ~~`M3_CommandWordMonitor/StatusWordMonitor`~~, ~~`M3_CommReady/PowerReady`~~ — **retirés le 2026-07-15 (2)**, migrés vers `GVL_IHM.TranslationM3` (`ST_TranslationHMI`, struct définitif — voir section 11).
 - `GridOpenCmd/GridCloseCmd : BOOL` — commandes maintenues ouverture/fermeture grille.
 - `HelmetOpenCmd/HelmetCloseCmd : BOOL` — commandes maintenues ouverture/fermeture casque.
-- `FdcBenneOpenEnable/CloseEnable : BOOL` — activation HMI des sécurités virtuelles benne.
+- `FdcBucketOpenEnable/CloseEnable : BOOL` — activation HMI des sécurités virtuelles benne.
 - `BenneDelta : REAL` — écart en mètres M1-M2 en temps réel.
-- `FdcBenneOpenActive/CloseActive : BOOL` — états actifs de fin de course benne (coupe les relais M2).
+- `FdcBucketOpenActive/CloseActive : BOOL` — états actifs de fin de course benne (coupe les relais M2).
 - `WinchMaxStepFwd/WinchMaxStepRev : INT` — réglage dynamique des limites de vitesse manuelles (paliers max en montée/descente).
 
 **À supprimer au nettoyage :** Fichier entier.
@@ -84,7 +84,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ### 3. **CODE/MAIN/PRG_10_Outputs.st** — Trois blocs balisés Début/Fin IHM_MANU
 
-> ⚠️ **PARTIELLEMENT PÉRIMÉ (session 2026-07-15)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 — remplacé par le pilotage `FB_Winch` (voir section 8). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBenne`) qui alimente désormais `PRG_06_WinchControl`, et la partie **M3/Auxiliaires qui reste un vrai bypass, inchangée**. Le "Bloc 3" (PowerCutOff) reste valable tel quel.
+> ⚠️ **PARTIELLEMENT PÉRIMÉ (session 2026-07-15)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 — remplacé par le pilotage `FB_Winch` (voir section 8). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBucket`) qui alimente désormais `PRG_06_WinchControl`, et la partie **M3/Auxiliaires qui reste un vrai bypass, inchangée**. Le "Bloc 3" (PowerCutOff) reste valable tel quel.
 
 #### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–90)
 
@@ -159,10 +159,10 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 **Logique :**
 1. Calcul `ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable` (logique inversée)
 2. Affichage position codeurs M1/M2 et calcul de l'écart `BenneDelta` (M1 - M2).
-3. Évaluation des sécurités actives : `FdcBenneOpenActive` (si `FdcBenneOpen` est coché et `delta >= 0.0`) et `FdcBenneCloseActive` (si `FdcBenneClose` est coché et `delta <= -10.0`).
+3. Évaluation des sécurités actives : `FdcBucketOpenActive` (si `FdcBucketOpen` est coché et `delta >= 0.0`) et `FdcBucketCloseActive` (si `FdcBucketClose` est coché et `delta <= -10.0`).
 4. **IF ManuActive THEN :**
    - **Aiguillage Source** : Si `JoystickSelect` = TRUE, les commandes `Demand` viennent du Joystick CANopen (Y -> Winch sélectionné par `JoystickWinchSelect`, X -> Translation M3 avec consigne fréquence calculée `SpeedRef * 0.5`). Sinon (mode HMI bouton), les commandes sont automatiquement maintenues pendant la décélération de la rampe HMI pour un arrêt progressif et sécurisé, et les demandes antagonistes sont verrouillées croisées.
-   - **Contrôle Winch M2** : Sécurité FDC Benne active applique le blocage individuel de M2 (`FdcBenneOpenActive` coupe la descente, `FdcBenneCloseActive` coupe la montée). Les commandes couplées contournent cette limite pour éviter la divergence.
+   - **Contrôle Winch M2** : Sécurité FDC Benne active applique le blocage individuel de M2 (`FdcBucketOpenActive` coupe la descente, `FdcBucketCloseActive` coupe la montée). Les commandes couplées contournent cette limite pour éviter la divergence.
    - **Vitesse Winch** : Si Joystick, utilisation de `FB_SpeedStep` pour décoder K1-K4 sur la vitesse du joystick (avec limitation en descente). Si HMI bouton, utilisation de la même fonction `FB_SpeedStep` connectée à la rampe de vitesse `instHmiSpeedRamp` (démarrage à 0%, montée progressive à 100% tant que le bouton est maintenu, décélération progressive vers 0% au relâchement, avec limitation en descente).
    - **Auxiliaires Hydrauliques** : Mappage des commandes Grille / Casque action maintenue, avec interlock logique, et forçage automatique de `PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := TRUE` en mouvement.
    - **Verrouillage de sécurité global** : Toutes les commandes effectives (treuils, translation, auxiliaires) sont filtrées par `PRG_00_Inputs.EmergencyStopOk` afin de couper immédiatement tout mouvement (et arrêter la simulation des codeurs sur PC) en cas d'arrêt d'urgence actif ou de défaut critique.
@@ -260,7 +260,7 @@ Pour éviter les fausses alarmes de sécurité logicielle (comme Méca B - pilot
 **Logique de la branche Manu (par treuil) :**
 - Lit `PRG_10_Outputs.M1Fwd_Demand`/`M1Rev_Demand`/`CoupledFwd_Demand`/`CoupledRev_Demand` (calculés dans `PRG_10_Outputs`, lus avec **1 scan de retard** ~10ms — PRG_10 en position 10, PRG_06 en position 6, même principe que `Benne.Busy`/`SyncMinorDeviation` déjà accepté ailleurs dans ce fichier) pour déterminer `Direction`/`StartStop`.
 - `SpeedRefPct` = déflexion joystick brute (si `JoystickSelect=TRUE`, vitesse proportionnelle comme en Auto) ou `100.0` (si boutons HMI — `FB_Winch` rampe déjà en interne, plus besoin de rampe locale).
-- Fins de course benne (`FdcBenneOpen/CloseActive`) appliquées au pilotage **individuel M2 ET couplé** (M1+M2), et désormais **aussi à M1 individuel** (`CoupledFwdBenneOk`/`CoupledRevBenneOk`, calculés une fois, réutilisés M1+M2 pour un arrêt synchrone) — corrige un trou trouvé en revue (ex-code ne masquait QUE M2 individuel, jamais M1 seul ni le couplé).
+- Fins de course benne (`FdcBucketOpen/CloseActive`) appliquées au pilotage **individuel M2 ET couplé** (M1+M2), et désormais **aussi à M1 individuel** (`CoupledFwdBucketOk`/`CoupledRevBucketOk`, calculés une fois, réutilisés M1+M2 pour un arrêt synchrone) — corrige un trou trouvé en revue (ex-code ne masquait QUE M2 individuel, jamais M1 seul ni le couplé).
 
 **Conséquence :** M1/M2 bénéficient nativement en Manu de : rampe accel/décel (`WinchM1/M2RampAccelRate/DecelNormal/DecelFast_Pct`), ralentissement en zone d'approche de butée (`WinchSlowdownDistance_M`/`WinchSlowSpeedPct`), maintien du relais de sens pendant la décélération (pas de coupure instantanée à pleine vitesse).
 

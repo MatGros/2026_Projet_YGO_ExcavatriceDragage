@@ -15,6 +15,7 @@ VAR_GLOBAL
     // (ex. SuiteWinchValidation à venir), jamais un index à retenir.
     SuiteSafetyValidation      : ST_TestSuiteReport;  // Rapport de la suite Safety
     SuiteTranslationValidation : ST_TestSuiteReport;  // Rapport de la suite Translation M3
+    SuiteBucketValidation      : ST_TestSuiteReport;  // Rapport de la suite Bucket
 
     // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — chaîne Safety AU
     OverrideChainTrue          : BOOL;                // Force la boucle AU à TRUE
@@ -27,4 +28,10 @@ VAR_GLOBAL
     OverrideM3AtTremie         : BOOL;                // Force TranslationPosTremie (Fdc extrême avant) à TRUE
     OverrideM3BrakeStuckOpen   : BOOL;                // Force M3BrakeFeedback (retour bobine) à TRUE (desserré) — simule Méca B
     OverrideM3PhantomFreq      : BOOL;                // Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A
+
+    // ⚡ Surcharges (overrides) physiques — Bucket
+    OverrideM1Slip           : BOOL;                // Simule glissement modéré M1 (1.5m)
+    OverrideM1SlipCritical   : BOOL;                // Simule glissement critique M1 (2.5m)
+    OverrideM2Stuck          : BOOL;                // Simule blocage mécanique M2 (position figée)
+    OverrideM2BootDrift      : BOOL;                // Simule dérive position M2 au démarrage (Boot)
 END_VAR

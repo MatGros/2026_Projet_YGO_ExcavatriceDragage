@@ -475,7 +475,11 @@ CASE ActiveStimulusId OF
     3: // TC-01 : Coupure franche (AU pressé)
         GVL_PLC_Tests.OverrideChainTrue := FALSE;
         GVL_PLC_Tests.OverrideChainFalse := TRUE;
-        GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+        // 🔧 REX 2026-07-16 : OverrideChainFalse seul a 1 scan de retard (instSimSafety lu
+        // AVANT instTestsManagement() dans PRG_00_Inputs.st) — incompatible avec le check 6
+        // en CHECK_INSTANT. OverrideContactorFalse force EmergencyStopOk directement et
+        // tardivement (après instTestsManagement()) → effet le même scan.
+        GVL_PLC_Tests.OverrideContactorFalse := TRUE;
         ArmRequest := FALSE;
         ResetFaults := FALSE;
 
