@@ -213,11 +213,12 @@ IF Busy THEN
     // Incrément de la durée globale du run
     Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
     
-    // Vérification des bornes de l'étape courante
-    IF CurrentStepId < 1 OR CurrentStepId > GVL_PLC_Tests_Const.MaxSteps THEN
+    // Vérification des bornes de l'étape courante (0 est valide et désigne la fin)
+    IF CurrentStepId <> 0 AND (CurrentStepId < 1 OR CurrentStepId > GVL_PLC_Tests_Const.MaxSteps) THEN
         Busy := FALSE;
         Done := TRUE;
         ActiveStimulusId := 0;
+        Report.InProgress := FALSE;
         RETURN;
     END_IF;
     
