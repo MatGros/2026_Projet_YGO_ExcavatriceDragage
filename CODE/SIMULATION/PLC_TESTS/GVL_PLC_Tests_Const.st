@@ -13,9 +13,9 @@ VAR_GLOBAL CONSTANT
     MaxChecks        : INT := 64;   // CheckTable par suite
     MaxChecksPerStep : INT := 4;
     MaxInvariants    : INT := 4;    // actifs en parallèle
-    MaxProbeBool     : INT := 16;
-    MaxProbeDint     : INT := 8;    // INT/WORD/étapes séquenceur → conversion au câblage (WORD_TO_DINT)
-    MaxProbeReal     : INT := 8;    // analogiques + TIME → REAL ms
+    MaxProbeBool     : INT := 32;
+    MaxProbeDint     : INT := 16;    // INT/WORD/étapes séquenceur → conversion au câblage (WORD_TO_DINT)
+    MaxProbeReal     : INT := 16;    // analogiques + TIME → REAL ms
     MaxAnalogStims   : INT := 4;    // instances FB_TestStimulus par suite
     MaxSeqValues     : INT := 8;    // plus gros poste mémoire par stim
     TaskCycleMs      : INT := 10;   // MainTask — base des mesures en cycles

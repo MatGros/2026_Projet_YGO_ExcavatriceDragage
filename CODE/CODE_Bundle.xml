@@ -20237,7 +20237,7 @@ Force la boucle AU à TRUE</xhtml>
             <INT />
           </type>
           <initialValue>
-            <simpleValue value="16" />
+            <simpleValue value="32" />
           </initialValue>
         </variable>
         <variable name="MaxProbeDint">
@@ -20245,7 +20245,7 @@ Force la boucle AU à TRUE</xhtml>
             <INT />
           </type>
           <initialValue>
-            <simpleValue value="8" />
+            <simpleValue value="16" />
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">INT/WORD/étapes séquenceur → conversion au câblage (WORD_TO_DINT)</xhtml>
@@ -20256,7 +20256,7 @@ Force la boucle AU à TRUE</xhtml>
             <INT />
           </type>
           <initialValue>
-            <simpleValue value="8" />
+            <simpleValue value="16" />
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">analogiques + TIME → REAL ms</xhtml>
