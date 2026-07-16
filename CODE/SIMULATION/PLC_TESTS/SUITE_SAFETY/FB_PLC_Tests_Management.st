@@ -20,7 +20,6 @@ VAR
     TotalCount           : INT;
 
     // 💓 Gestion du clignotant HMI
-    CycleCounter         : INT := 0;
     LastStepId           : INT := 0;
 END_VAR
 // === IMPLEMENTATION ===
@@ -168,22 +167,13 @@ GVL_PLC_Tests.Hmi.CasesFailed := FailedCount;
 
 // 💓 Logique du Clignotant visuel d'activité (Heartbeat)
 IF GVL_PLC_Tests.Hmi.RunState = E_TestRunState.TESTRUN_RUNNING THEN
-    // 1. Clignotement automatique toutes les 250ms (25 scans de 10ms)
-    CycleCounter := CycleCounter + 1;
-    IF CycleCounter >= 25 THEN
-        GVL_PLC_Tests.Hmi.Heartbeat := NOT GVL_PLC_Tests.Hmi.Heartbeat;
-        CycleCounter := 0;
-    END_IF;
-
-    // 2. Toggling immédiat pour réactivité instantanée à chaque transition d'étape
+    // Le clignotant bascule UNIQUEMENT lors des transitions réelles d'étapes
     IF GVL_PLC_Tests.Hmi.ActiveStepId <> LastStepId THEN
         GVL_PLC_Tests.Hmi.Heartbeat := NOT GVL_PLC_Tests.Hmi.Heartbeat;
         LastStepId := GVL_PLC_Tests.Hmi.ActiveStepId;
-        CycleCounter := 0;
     END_IF;
 ELSE
-    // Forcer à FALSE quand le runner est inactif
+    // Forcer à FALSE quand le runner est au repos
     GVL_PLC_Tests.Hmi.Heartbeat := FALSE;
-    CycleCounter := 0;
     LastStepId := 0;
 END_IF;
