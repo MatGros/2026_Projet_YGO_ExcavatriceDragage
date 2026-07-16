@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_PLC_Tests_Management — Orchestrateur global du banc de test
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK PUBLIC FB_PLC_Tests_Management
 VAR
     // 🧱 Instance de test Safety
@@ -23,16 +19,17 @@ VAR
     FailedCount          : INT;
     TotalCount           : INT;
 END_VAR
-
+// === IMPLEMENTATION ===
 // 1. Détection des commandes HMI
 RunAllTrig(CLK := GVL_PLC_Tests.Hmi.CmdRunAll);
 AbortTrig(CLK := GVL_PLC_Tests.Hmi.CmdAbort);
 ClearReportTrig(CLK := GVL_PLC_Tests.Hmi.CmdClearReport);
 
 // Remise à zéro des boutons poussoirs HMI
-IF GVL_PLC_Tests.Hmi.CmdRunAll THEN
-    GVL_PLC_Tests.Hmi.CmdRunAll := FALSE;
-END_IF;
+// 🔧 REX 2026-07-16 (demande utilisateur) : CmdRunAll n'est PAS remis à FALSE ici (contrairement
+// à l'ancien CmdRunTests, pulse consommé au scan suivant) — il reste TRUE tout le temps du run,
+// pratique pour observer en Watch/forçage CODESYS, et ne retombe qu'au Done (cf. CASE ci-dessous).
+// R_TRIG garantit qu'un niveau maintenu ne redéclenche pas un 2e run.
 IF GVL_PLC_Tests.Hmi.CmdAbort THEN
     GVL_PLC_Tests.Hmi.CmdAbort := FALSE;
 END_IF;
@@ -105,6 +102,8 @@ CASE GVL_PLC_Tests.Hmi.RunState OF
         END_IF;
 
     E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
+        // 🔧 REX 2026-07-16 : c'est ICI que CmdRunAll retombe à FALSE (Done atteint), pas au démarrage
+        GVL_PLC_Tests.Hmi.CmdRunAll := FALSE;
         // Retour automatique à l'état IDLE après un cycle pour libérer l'IHM
         GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_IDLE;
 
@@ -162,5 +161,3 @@ END_FOR;
 GVL_PLC_Tests.Hmi.CasesTotal := TotalCount;
 GVL_PLC_Tests.Hmi.CasesPassed := PassedCount;
 GVL_PLC_Tests.Hmi.CasesFailed := FailedCount;
-
-END_FUNCTION_BLOCK

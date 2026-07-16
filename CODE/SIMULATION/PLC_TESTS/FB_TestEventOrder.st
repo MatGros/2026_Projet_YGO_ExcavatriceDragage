@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_TestEventOrder — Vérifie l'ordre chronologique de 2 events
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_TestEventOrder
 VAR_INPUT
     Arm       : BOOL;
@@ -19,7 +15,7 @@ VAR
     Timer     : TON;
     HasA      : BOOL;
 END_VAR
-
+// === IMPLEMENTATION ===
 TrigA(CLK := EventA);
 TrigB(CLK := EventB);
 
@@ -54,5 +50,3 @@ END_IF;
 IF HasA AND TrigB.Q AND NOT Failed THEN
     OrderOk := TRUE;
 END_IF;
-
-END_FUNCTION_BLOCK

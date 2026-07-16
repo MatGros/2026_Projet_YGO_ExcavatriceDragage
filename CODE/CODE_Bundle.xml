@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-15T20:01:12.631307" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-15T20:01:12.631307">
+  <contentHeader name="MGS_v0.4.14_SafetyValidation_EmergencyChain.project" modificationDateTime="2026-07-15T20:01:12.631307">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">MGS_v0.4.14_SafetyValidation_EmergencyChain</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -8936,25 +8936,21 @@ Error := (ErrorId &lt;&gt; 16#0000);
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_PLC_Tests_Management — Orchestrateur global du banc de test
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 // 1. Détection des commandes HMI
 RunAllTrig(CLK := GVL_PLC_Tests.Hmi.CmdRunAll);
 AbortTrig(CLK := GVL_PLC_Tests.Hmi.CmdAbort);
 ClearReportTrig(CLK := GVL_PLC_Tests.Hmi.CmdClearReport);
 
 // Remise à zéro des boutons poussoirs HMI
-IF GVL_PLC_Tests.Hmi.CmdRunAll THEN
-    GVL_PLC_Tests.Hmi.CmdRunAll := FALSE;
-END_IF;
+// 🔧 REX 2026-07-16 (demande utilisateur) : CmdRunAll n'est PAS remis à FALSE ici (contrairement
+// à l'ancien CmdRunTests, pulse consommé au scan suivant) — il reste TRUE tout le temps du run,
+// pratique pour observer en Watch/forçage CODESYS, et ne retombe qu'au Done (cf. CASE ci-dessous).
+// R_TRIG garantit qu'un niveau maintenu ne redéclenche pas un 2e run.
 IF GVL_PLC_Tests.Hmi.CmdAbort THEN
     GVL_PLC_Tests.Hmi.CmdAbort := FALSE;
 END_IF;
@@ -9027,6 +9023,8 @@ CASE GVL_PLC_Tests.Hmi.RunState OF
         END_IF;
 
     E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
+        // 🔧 REX 2026-07-16 : c'est ICI que CmdRunAll retombe à FALSE (Done atteint), pas au démarrage
+        GVL_PLC_Tests.Hmi.CmdRunAll := FALSE;
         // Retour automatique à l'état IDLE après un cycle pour libérer l'IHM
         GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_IDLE;
 
@@ -9084,8 +9082,6 @@ END_FOR;
 GVL_PLC_Tests.Hmi.CasesTotal := TotalCount;
 GVL_PLC_Tests.Hmi.CasesPassed := PassedCount;
 GVL_PLC_Tests.Hmi.CasesFailed := FailedCount;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -9283,75 +9279,252 @@ END_IF;
               </type>
             </variable>
           </outputVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_SafetyValidation — Séquenceur de Test Safety
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
+          <localVars>
+            <variable name="SigHealthyIdle">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ Index des sondes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SigEmergencyStopOk">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="SigArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+            </variable>
+            <variable name="SigPowerCutOffAny">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+            </variable>
+            <variable name="SigRedundancyFailed">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="SigEmergencyArmingFailed">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+            </variable>
+            <variable name="SigEmergencyArmingLockoutActive">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="7" />
+              </initialValue>
+            </variable>
+            <variable name="SigStopwatchMs">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+            </variable>
+            <variable name="SigErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="9" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc01Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Index des étapes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc01Arm">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="11" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc01Confirm">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="14" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc01Trip">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc01Instant">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="16" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc01Latch">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="17" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc01Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="19" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc02Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc02Redundancy">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="21" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc02Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="29" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc03Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="30" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc03LockoutWindow">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="32" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc03LockoutEnd">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="34" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc03PostReArm">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="35" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc03Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="39" />
+              </initialValue>
+            </variable>
+            <variable name="Sequencer">
+              <type>
+                <derived name="FB_TestSequencer" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Moteur unique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TableReady">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ Configuration initialisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instStopwatch">
+              <type>
+                <derived name="FB_TestStopwatch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ Instruments de mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Commandes de stimuli affectées dans le CASE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetFaults">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-VAR_CONSTANT
-    // 🏷️ Index des sondes
-    SigHealthyIdle                  : INT := 1;
-    SigEmergencyStopOk              : INT := 2;
-    SigArmingSeqStep                : INT := 3;
-    SigPowerCutOffAny               : INT := 4;
-    SigRedundancyFailed             : INT := 5;
-    SigEmergencyArmingFailed        : INT := 6;
-    SigEmergencyArmingLockoutActive : INT := 7;
-    SigStopwatchMs                  : INT := 8;
-    SigErrorId                      : INT := 9;
-
-    // 🪜 Index des étapes
-    StepTc01Setup                   : INT := 10;
-    StepTc01Arm                     : INT := 11;
-    StepTc01Confirm                 : INT := 14;
-    StepTc01Trip                    : INT := 15;
-    StepTc01Instant                 : INT := 16;
-    StepTc01Latch                   : INT := 17;
-    StepTc01Teardown                : INT := 19;
-
-    StepTc02Setup                   : INT := 20;
-    StepTc02Redundancy              : INT := 21;
-    StepTc02Teardown                : INT := 29;
-
-    StepTc03Setup                   : INT := 30;
-    StepTc03LockoutWindow           : INT := 32;
-    StepTc03LockoutEnd              : INT := 34;
-    StepTc03PostReArm               : INT := 35;
-    StepTc03Teardown                : INT := 39;
-END_VAR
-VAR
-    // ⚙️ Moteur unique
-    Sequencer                  : FB_TestSequencer;
-
-    // 📋 Tables de configuration
-    StepTable                  : ARRAY[1..GVL_PLC_Tests_Const.MaxSteps]      OF ST_TestStepConfig;
-    CheckTable                 : ARRAY[1..GVL_PLC_Tests_Const.MaxChecks]     OF ST_TestCheckConfig;
-    CaseTable                  : ARRAY[1..GVL_PLC_Tests_Const.MaxTestCases]  OF ST_TestCaseConfig;
-    InvariantTable             : ARRAY[1..GVL_PLC_Tests_Const.MaxInvariants] OF ST_TestInvariantConfig;
-
-    // 📥 Banque de sondes
-    ProbeBool                  : ARRAY[1..GVL_PLC_Tests_Const.MaxProbeBool]  OF BOOL;
-    ProbeDint                  : ARRAY[1..GVL_PLC_Tests_Const.MaxProbeDint]  OF DINT;
-    ProbeReal                  : ARRAY[1..GVL_PLC_Tests_Const.MaxProbeReal]  OF REAL;
-
-    // 🛠️ Configuration initialisée
-    TableReady                 : BOOL := FALSE;
-
-    // 🛠️ Instruments de mesure
-    instStopwatch              : FB_TestStopwatch;
-
-    // ⚡ Commandes de stimuli affectées dans le CASE
-    ArmRequest                 : BOOL;
-    ResetFaults                : BOOL;
-END_VAR
-
-// ─────────────────────────────────────────────────────────────────
+// === IMPLEMENTATION ===
 // 1. 🛡️ GATE
-// ─────────────────────────────────────────────────────────────────
 IF NOT GVL_Simulation.SimulationModeActive THEN
     // Abort interne immédiat
     Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
@@ -9370,9 +9543,7 @@ END_IF;
 // La chaîne d'urgence physique ne doit pas être en mode simulation réelle active (sécurité matérielle)
 SimGateOk := NOT GVL_Simulation.EmergencyStopChain_IsReal;
 
-// ─────────────────────────────────────────────────────────────────
 // 2. 📋 TABLES (Remplissage déclaratif unique)
-// ─────────────────────────────────────────────────────────────────
 IF NOT TableReady THEN
     // Cas de tests
     CaseTable[1].Name := 'TC-01 Armement nominal';
@@ -9634,9 +9805,7 @@ IF NOT TableReady THEN
     TableReady := TRUE;
 END_IF;
 
-// ─────────────────────────────────────────────────────────────────
 // 3. 📥 ACQUIRE
-// ─────────────────────────────────────────────────────────────────
 ProbeBool[SigHealthyIdle] := NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed AND 
                              NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingFailed AND
                              NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
@@ -9659,9 +9828,7 @@ instStopwatch(
     ExpectedMaxMs := 260
 );
 
-// ─────────────────────────────────────────────────────────────────
 // 4. ⚙️ MOTEUR
-// ─────────────────────────────────────────────────────────────────
 Sequencer(
     Start := Start,
     Abort := Abort,
@@ -9681,9 +9848,7 @@ Sequencer(
     StepElapsed =&gt; StepElapsed
 );
 
-// ─────────────────────────────────────────────────────────────────
 // 5. ⚡ STIMULI
-// ─────────────────────────────────────────────────────────────────
 CASE ActiveStimulusId OF
     0: // 🔓 Neutre (tout relâché)
         GVL_PLC_Tests.OverrideChainTrue := FALSE;
@@ -9754,8 +9919,6 @@ IF Busy THEN
     GVL_IHM.Modes.CmdEmergencyArming := ArmRequest;
     GVL_IHM.Modes.FaultMachineReset  := ResetFaults;
 END_IF;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -12636,16 +12799,11 @@ END_CASE;
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_TestCheck — Évalue un check de test (10 types x 4 modes)
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 // Toujours mettre à jour les triggers des sondes TOR pour ne pas rater de transition
 IF Config.ProbeIdx &gt;= 1 AND Config.ProbeIdx &lt;= GVL_PLC_Tests_Const.MaxProbeBool THEN
     RisingTrig(CLK := ProbeBool[Config.ProbeIdx]);
@@ -12799,8 +12957,6 @@ ELSE
     Pending := FALSE;
     StableTimer(IN := FALSE);
 END_IF;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -12866,16 +13022,11 @@ END_FUNCTION_BLOCK
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_TestEdgeCounter — Comptage de fronts sur un signal
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 TrigRising(CLK := Signal);
 TrigFalling(CLK := Signal);
 
@@ -12892,8 +13043,6 @@ ELSIF NOT CountRising AND TrigFalling.Q THEN
 END_IF;
 
 InRange := (Count &gt;= ExpectedMin AND Count &lt;= ExpectedMax);
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -12961,16 +13110,11 @@ END_FUNCTION_BLOCK
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_TestEventOrder — Vérifie l'ordre chronologique de 2 events
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 TrigA(CLK := EventA);
 TrigB(CLK := EventB);
 
@@ -13005,8 +13149,6 @@ END_IF;
 IF HasA AND TrigB.Q AND NOT Failed THEN
     OrderOk := TRUE;
 END_IF;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -13156,17 +13298,105 @@ END_FUNCTION_BLOCK
                 <BOOL />
               </type>
             </variable>
+            <variable name="AllChecksPassed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX : locaux remontés depuis des blocs VAR imbriqués dans le corps</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AnyCheckFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FailedCheckIdxLocal">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="FailReasonLocal">
+              <type>
+                <derived name="E_TestFailReason" />
+              </type>
+            </variable>
+            <variable name="ObsBoolLocal">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ObsDintLocal">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+            <variable name="ObsRealLocal">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="NeverDuringPassed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SuiteAllPassed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstFailedCase">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseStartStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CaseExecuted">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CaseFailedStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseDuration">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="CaseFailReason">
+              <type>
+                <derived name="E_TestFailReason" />
+              </type>
+            </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_TestSequencer — Moteur d'exécution séquentiel des tests
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 StartTrig(CLK := Start);
 
 // 1. Validation de la configuration sur front de Start
@@ -13227,9 +13457,9 @@ IF StartTrig.Q THEN
                         END_CASE;
                     END_IF;
                 END_IF;
-            FOR_END;
+            END_FOR;
         END_IF;
-    FOR_END;
+    END_FOR;
     
     // Si erreur de config, on bloque le démarrage
     IF ConfigError THEN
@@ -13297,7 +13527,7 @@ IF StartTrig.Q AND NOT ConfigError THEN
         Report.Steps[Idx].FailedCheckIdx := 0;
         Report.Steps[Idx].FailedInvariantId := 0;
         Report.Steps[Idx].Duration := T#0s;
-    FOR_END;
+    END_FOR;
     
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
         Report.Cases[Idx].Executed := FALSE;
@@ -13305,12 +13535,12 @@ IF StartTrig.Q AND NOT ConfigError THEN
         Report.Cases[Idx].FailedStepId := 0;
         Report.Cases[Idx].FailReason := E_TestFailReason.FAIL_NONE;
         Report.Cases[Idx].Duration := T#0s;
-    FOR_END;
+    END_FOR;
     
     // RAZ Invariants
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxInvariants DO
         InvArmed[Idx] := FALSE;
-    FOR_END;
+    END_FOR;
 END_IF;
 
 // 4. Moteur d'exécution principal
@@ -13345,7 +13575,7 @@ IF Busy THEN
             IF InvariantTable[Idx].DisarmAtStepId = CurrentStepId THEN
                 InvArmed[Idx] := FALSE;
             END_IF;
-        FOR_END;
+        END_FOR;
     END_IF;
     
     // Incrément de la durée de l'étape courante
@@ -13382,7 +13612,7 @@ IF Busy THEN
                 RETURN;
             END_IF;
         END_IF;
-    FOR_END;
+    END_FOR;
     
     // 4.2 Gestion de la temporisation de Dwell
     DwellTimer(IN := TRUE, PT := StepTable[CurrentStepId].DwellPT);
@@ -13390,21 +13620,19 @@ IF Busy THEN
         // En attente du Dwell, pas d'évaluation des checks d'étape
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Checks[Jdx](Evaluate := FALSE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
-        FOR_END;
+        END_FOR;
         RETURN;
     END_IF;
     
     // 4.3 Évaluation des checks d'étape
-    VAR
-        AllChecksPassed   : BOOL := TRUE;
-        AnyCheckFailed     : BOOL := FALSE;
-        FailedCheckIdxLocal: INT := 0;
-        FailReasonLocal    : E_TestFailReason := E_TestFailReason.FAIL_NONE;
-        ObsBoolLocal       : BOOL;
-        ObsDintLocal       : DINT;
-        ObsRealLocal       : REAL;
-    END_VAR
-    
+    AllChecksPassed     := TRUE;
+    AnyCheckFailed      := FALSE;
+    FailedCheckIdxLocal := 0;
+    FailReasonLocal     := E_TestFailReason.FAIL_NONE;
+    ObsBoolLocal        := FALSE;
+    ObsDintLocal        := 0;
+    ObsRealLocal        := 0.0;
+
     FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
         Kdx := StepTable[CurrentStepId].CheckIdx[Jdx];
         IF Kdx &gt; 0 THEN
@@ -13421,7 +13649,7 @@ IF Busy THEN
                 AllChecksPassed := FALSE;
             END_IF;
         END_IF;
-    FOR_END;
+    END_FOR;
     
     // 4.4 Prise de verdict
     IF AnyCheckFailed THEN
@@ -13438,7 +13666,7 @@ IF Busy THEN
         // Reset checks
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Checks[Jdx](Evaluate := FALSE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
-        FOR_END;
+        END_FOR;
         
         IF StepTable[CurrentStepId].FailAction = E_TestFailAction.FAIL_ABORT_SUITE THEN
             Busy := FALSE;
@@ -13466,7 +13694,7 @@ IF Busy THEN
             // Reset checks
             FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
                 Checks[Jdx](Evaluate := FALSE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
-            FOR_END;
+            END_FOR;
             
             IF StepTable[CurrentStepId].FailAction = E_TestFailAction.FAIL_ABORT_SUITE THEN
                 Busy := FALSE;
@@ -13493,7 +13721,7 @@ IF Busy THEN
             // Reset checks
             FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
                 Checks[Jdx](Evaluate := FALSE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
-            FOR_END;
+            END_FOR;
             
             CurrentStepId := StepTable[CurrentStepId].NextOnPass;
             StepStarted := FALSE;
@@ -13504,9 +13732,7 @@ IF Busy THEN
     // Gestion du timeout d'étape
     IF StepTimer.Q THEN
         // Si timeout expiré, vérifions si des checks NEVER_DURING sont en attente
-        VAR
-            NeverDuringPassed : BOOL := TRUE;
-        END_VAR
+        NeverDuringPassed := TRUE;
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Kdx := StepTable[CurrentStepId].CheckIdx[Jdx];
             IF Kdx &gt; 0 THEN
@@ -13518,7 +13744,7 @@ IF Busy THEN
                     NeverDuringPassed := FALSE;
                 END_IF;
             END_IF;
-        FOR_END;
+        END_FOR;
         
         IF NeverDuringPassed THEN
             // Succès par non-violation
@@ -13549,7 +13775,7 @@ IF Busy THEN
         // Reset checks
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Checks[Jdx](Evaluate := FALSE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
-        FOR_END;
+        END_FOR;
     END_IF;
 END_IF;
 
@@ -13561,20 +13787,9 @@ IF Busy AND CurrentStepId = 0 THEN
     Report.InProgress := FALSE;
     
     // Agrégation des cas de test
-    VAR
-        SuiteAllPassed : BOOL := TRUE;
-        FirstFailedCase : INT := 0;
-        CaseIdx : INT;
-        StepIdx : INT;
-        CaseStartStep : INT;
-        CaseStep : INT;
-        CaseOk : BOOL;
-        CaseExecuted : BOOL;
-        CaseFailedStep : INT;
-        CaseDuration : TIME;
-        CaseFailReason : E_TestFailReason;
-    END_VAR
-    
+    SuiteAllPassed  := TRUE;
+    FirstFailedCase := 0;
+
     FOR CaseIdx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
         CaseStartStep := CaseTable[CaseIdx].FirstStep;
         IF CaseStartStep &gt; 0 THEN
@@ -13618,15 +13833,13 @@ IF Busy AND CurrentStepId = 0 THEN
                 END_IF;
             END_IF;
         END_IF;
-    FOR_END;
+    END_FOR;
     
     Report.AllPassed := SuiteAllPassed;
     Report.AnyFailed := NOT SuiteAllPassed;
     Report.FailedTestCase := FirstFailedCase;
     AnyFailed := NOT SuiteAllPassed;
 END_IF;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -13714,16 +13927,11 @@ END_FUNCTION_BLOCK
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_TestStimulus — Générateur de profils de stimulus
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 StartTrig(CLK := Start);
 
 // Gestion de l'arrêt ou de l'inactivité
@@ -13816,8 +14024,6 @@ IF Running THEN
             END_IF;
     END_CASE;
 END_IF;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -13895,16 +14101,11 @@ END_FUNCTION_BLOCK
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_TestStopwatch — Mesure déterministe en cycles automate
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 StartTrig(CLK := StartEvent);
 StopTrig(CLK := StopEvent);
 
@@ -13933,8 +14134,6 @@ IF Running THEN
         InWindow := (ElapsedMs &gt;= ExpectedMinMs AND ElapsedMs &lt;= ExpectedMaxMs);
     END_IF;
 END_IF;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>
@@ -13972,20 +14171,13 @@ END_FUNCTION_BLOCK
               </type>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 FB_Timeout — Compositions TON pour la gestion des délais
-═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
+// === IMPLEMENTATION ===
 Timer(IN := Active, PT := PT);
 Elapsed := Timer.Q;
-
-END_FUNCTION_BLOCK
 </xhtml>
           </ST>
         </body>

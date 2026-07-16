@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_TestSequencer — Moteur d'exécution séquentiel des tests
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_TestSequencer
 VAR_INPUT
     Start       : BOOL;              // Front : lance à FirstStepId
@@ -44,8 +40,28 @@ VAR
     Jdx                 : INT;
     Kdx                 : INT;
     Valid               : BOOL;
-END_VAR
 
+    // 🔧 REX : locaux remontés depuis des blocs VAR imbriqués dans le corps
+    AllChecksPassed     : BOOL;
+    AnyCheckFailed      : BOOL;
+    FailedCheckIdxLocal : INT;
+    FailReasonLocal     : E_TestFailReason;
+    ObsBoolLocal        : BOOL;
+    ObsDintLocal        : DINT;
+    ObsRealLocal        : REAL;
+    NeverDuringPassed   : BOOL;
+    SuiteAllPassed      : BOOL;
+    FirstFailedCase     : INT;
+    CaseIdx             : INT;
+    CaseStartStep       : INT;
+    CaseStep            : INT;
+    CaseOk              : BOOL;
+    CaseExecuted        : BOOL;
+    CaseFailedStep      : INT;
+    CaseDuration        : TIME;
+    CaseFailReason      : E_TestFailReason;
+END_VAR
+// === IMPLEMENTATION ===
 StartTrig(CLK := Start);
 
 // 1. Validation de la configuration sur front de Start
@@ -274,16 +290,14 @@ IF Busy THEN
     END_IF;
     
     // 4.3 Évaluation des checks d'étape
-    VAR
-        AllChecksPassed   : BOOL := TRUE;
-        AnyCheckFailed     : BOOL := FALSE;
-        FailedCheckIdxLocal: INT := 0;
-        FailReasonLocal    : E_TestFailReason := E_TestFailReason.FAIL_NONE;
-        ObsBoolLocal       : BOOL;
-        ObsDintLocal       : DINT;
-        ObsRealLocal       : REAL;
-    END_VAR
-    
+    AllChecksPassed     := TRUE;
+    AnyCheckFailed      := FALSE;
+    FailedCheckIdxLocal := 0;
+    FailReasonLocal     := E_TestFailReason.FAIL_NONE;
+    ObsBoolLocal        := FALSE;
+    ObsDintLocal        := 0;
+    ObsRealLocal        := 0.0;
+
     FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
         Kdx := StepTable[CurrentStepId].CheckIdx[Jdx];
         IF Kdx > 0 THEN
@@ -383,9 +397,7 @@ IF Busy THEN
     // Gestion du timeout d'étape
     IF StepTimer.Q THEN
         // Si timeout expiré, vérifions si des checks NEVER_DURING sont en attente
-        VAR
-            NeverDuringPassed : BOOL := TRUE;
-        END_VAR
+        NeverDuringPassed := TRUE;
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Kdx := StepTable[CurrentStepId].CheckIdx[Jdx];
             IF Kdx > 0 THEN
@@ -440,20 +452,9 @@ IF Busy AND CurrentStepId = 0 THEN
     Report.InProgress := FALSE;
     
     // Agrégation des cas de test
-    VAR
-        SuiteAllPassed : BOOL := TRUE;
-        FirstFailedCase : INT := 0;
-        CaseIdx : INT;
-        StepIdx : INT;
-        CaseStartStep : INT;
-        CaseStep : INT;
-        CaseOk : BOOL;
-        CaseExecuted : BOOL;
-        CaseFailedStep : INT;
-        CaseDuration : TIME;
-        CaseFailReason : E_TestFailReason;
-    END_VAR
-    
+    SuiteAllPassed  := TRUE;
+    FirstFailedCase := 0;
+
     FOR CaseIdx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
         CaseStartStep := CaseTable[CaseIdx].FirstStep;
         IF CaseStartStep > 0 THEN
@@ -504,5 +505,3 @@ IF Busy AND CurrentStepId = 0 THEN
     Report.FailedTestCase := FirstFailedCase;
     AnyFailed := NOT SuiteAllPassed;
 END_IF;
-
-END_FUNCTION_BLOCK
