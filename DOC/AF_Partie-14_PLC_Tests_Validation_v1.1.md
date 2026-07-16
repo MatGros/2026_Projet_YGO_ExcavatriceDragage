@@ -1,0 +1,202 @@
+# 📋 Analyse Fonctionnelle — Partie 14 : Tests de Validation de la Sécurité (v1.1)
+
+> **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
+> **Rôle** : Définition et architecture des tests de validation automatisés de la chaîne de sécurité (Arrêt d'Urgence et commande des contacteurs de puissance).
+> **Version** : v1.1 (2026-07-16) — Ajout §7 : cadrage architecture du framework de test (socle réutilisable, suites pluggables, limites CI/CD réelles). Base v1.0 inchangée.
+> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P13 Simulation v1.2](AF_Partie-13_Fonction_Simulation_v1.2.md).
+
+---
+
+## 🎯 1. Cadre réglementaire et objectifs
+
+La fonction d'arrêt d'urgence et la coupure de puissance associée sur l'excavatrice de dragage YGO sont conçues selon les normes et directives européennes et françaises :
+
+* **Directive Machines 2006/42/CE (Annexe I, § 1.2.4.3)** : Priorité absolue de la fonction d'arrêt d'urgence sur tous les modes opérationnels.
+* **EN ISO 13849-1 PL-d Catégorie 3** :
+  * *Tolérance aux pannes* : Un seul défaut dans l'une des parties liées à la sécurité ne doit pas conduire à la perte de la fonction de sécurité.
+  * *Couverture Diagnostic (DC)* : Obligation d'effectuer un auto-test périodique (à chaque réarmement) afin de détecter les défauts accumulés avant qu'ils ne provoquent une situation dangereuse (ex. contacteur soudé/collé).
+* **EN IEC 60204-1 (§ 9.2.2 & 9.2.5.4)** : Arrêt de catégorie 0 (coupure immédiate de l'alimentation). Le réarmement ne doit pas entraîner de redémarrage automatique ; il doit uniquement réautoriser l'activation des mouvements via un organe de commande distinct (réarmement manuel).
+* **INRS ED 6112** : Principes généraux de conception de sécurité applicables aux équipements de travail.
+
+---
+
+## 🔁 2. Concept de Validation Continue (CI/CD) appliqué à l'Automatisme
+
+### 💡 Qu'est-ce que le CI/CD en Automatisme ?
+Le **CI/CD (Continuous Integration / Continuous Deployment)** désigne des pratiques de développement visant à automatiser l'intégration du code et sa validation :
+* **Intégration Continue (CI) :** Chaque modification de code est automatiquement compilée, testée syntaxiquement et validée par une suite de tests unitaires (ici, via `pytest` exécuté dans VS Code et potentiellement dans un pipeline GitHub/GitLab).
+* **Validation Continue (In-PLC Testing) :** Dans le cadre industriel, cela consiste à exécuter un programme de test autonome directement au cœur du processeur de l'automate (ou de son simulateur) pour simuler des scénarios de pannes et certifier dynamiquement que les sécurités réagissent conformément aux normes.
+
+### ⚙️ Comment lancer les tests de validation pendant qu'on code ?
+Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé est le suivant :
+
+1. **Validation syntaxique (Terminal VS Code) :**
+   * Lance la commande suivante pour s'assurer que le générateur et le parser CODESYS acceptent le code ST :
+     ```powershell
+     python -m pytest
+     ```
+2. **Validation comportementale (CODESYS Simulator) :**
+   * Connecte-toi à l'automate en mode Simulation.
+   * Force `GVL_Simulation.SimulationModeActive := TRUE`.
+   * Déclenche la suite de tests voulue via `GVL_PLC_Tests.CmdRunTests := TRUE`.
+   * Le programme déroule tous les cas de tests en moins de 10 secondes par étape et fournit le statut via le rapport structuré (§7.3).
+
+⚠️ **Limite actuelle (voir §7.4)** : ces deux étapes restent **déclenchées manuellement**. Aucune orchestration n'existe aujourd'hui pour les lancer automatiquement à chaque `git push` — voir §7.4 pour le périmètre exact.
+
+---
+
+## 🧩 3. Architecture du validateur automatique dans l'API (état v1.0 — voir §7 pour la cible)
+
+Afin de valider ces exigences sans matériel physique connecté, le système intègre un programme de test automatique : `FB_SafetyValidation` (situé dans `CODE/SIMULATION/PLC_TESTS/`), orchestré par `FB_PLC_Tests_Management`.
+
+### ⚙️ Conditions de fonctionnement
+Le validateur ne s'exécute que si la simulation est active :
+```pascal
+IF NOT GVL_Simulation.SimulationModeActive THEN
+    TestSeqStep := 0;
+    TestInProgress := FALSE;
+    RETURN;
+END_IF;
+```
+
+### 🔀 Surcharges dynamiques (Overrides)
+Comme la suite de tests s'exécute **après** `PRG_00_Inputs.st` dans la tâche automate (appelée depuis celui-ci), elle applique des surcharges (overrides) sur les variables de retour physique pour injecter des stimuli ou simuler des pannes :
+* `OverrideChainTrue` : Force `PRG_00_Inputs.EmergencyChain` à `TRUE` (boucle saine).
+* `OverrideChainFalse` : Force `PRG_00_Inputs.EmergencyChain` à `FALSE` (boucle ouverte).
+* `OverrideContactorFalse` : Force `PRG_00_Inputs.EmergencyStopOk` à `FALSE` (défaut retour contacteur).
+
+```mermaid
+flowchart TD
+    Inputs[PRG_00_Inputs] --> SafetyFB[FB_Safety_EmergencyManagement]
+    SafetyFB --> Validation[FB_SafetyValidation via FB_PLC_Tests_Management]
+    Validation -. Surcharges/Overrides .-> Inputs
+```
+
+---
+
+## 🧪 4. Fiches techniques des cas de tests (TC)
+
+Le validateur automatique déroule séquentiellement les trois scénarios réglementaires décrits ci-dessous.
+
+### 🧪 TC-01 : Séquence Nominale d'Arrêt d'Urgence et Auto-Maintien
+* **Objectif** : Valider la coupure instantanée, le maintien en sécurité (latch) et la séquence de réarmement avec auto-test des canaux A et B.
+* **Séquence d'exécution** :
+  1. **Phase 1.1** : Initialisation saine (acquittement des défauts).
+  2. **Phase 1.2 & 1.3** : Envoi de l'impulsion `ArmRequest` pour passer en étape d'auto-test `ArmingSeqStep = 1`.
+  3. **Phase 1.4** : Attente de l'auto-test du canal A (coupure de `PowerCutOff_A_RQ`, détection de l'ouverture de la boucle en moins de 200 ms, puis rétablissement).
+  4. **Phase 1.5** : Attente de l'auto-test du canal B (`PowerCutOff_B_RQ` coupe à son tour, détection de l'ouverture en moins de 200 ms, puis rétablissement).
+  5. **Phase 1.6** : Passage à l'étape 5 (`ArmingSeqStep = 5`) : génération de l'impulsion physique de réarmement `EmergencyArming_RQ` pendant 1s.
+  6. **Phase 1.7** : Confirmation du retour d'armement (`EmergencyStopOk := TRUE`). Le système passe à l'étape `0` (actif).
+  7. **Trip & Latch** : Forçage de `EmergencyChain := FALSE` (coupure franche), vérification de la retombée immédiate (< 1 cycle) des relais de puissance. Relâchement du bouton d'urgence ; vérification que les relais restent coupés tant qu'un réarmement manuel n'a pas été initié.
+
+### 🧪 TC-02 : Détection de Redondance (Contacteur soudé/collé)
+* **Objectif** : Vérifier que si un canal ne s'ouvre pas lors de la phase d'auto-test, le système se verrouille en sécurité et lève un défaut.
+* **Séquence d'exécution** :
+  1. Déclenchement d'un réarmement (`ArmRequest := TRUE`).
+  2. À l'étape `ArmingSeqStep = 1` (ordre de coupure du relais A), le validateur maintient artificiellement `EmergencyChain := TRUE` (simulant un contact soudé du relais A).
+  3. Au bout de la temporisation de diagnostic de 200 ms (`TonTestA`), le FB doit détecter le défaut :
+     * Blocage immédiat de la séquence et retour à l'étape `0`.
+     * Levée du défaut de redondance : `RedundancyTestFailed := TRUE`.
+     * Sorties de puissance maintenues à `FALSE`.
+
+### 🧪 TC-03 : Verrouillage Temporel (Safety Lockout)
+* **Objectif** : Empêcher les tentatives répétées et intempestives de réarmement thermique des contacteurs en cas d'échec ou de défaut cyclique.
+* **Séquence d'exécution** :
+  1. Lancer un armement mais simuler l'absence de retour du contacteur principal (`EmergencyStopOk` reste à `FALSE` à l'étape 6).
+  2. Après 2s, le FB détecte l'échec de réarmement : `EmergencyArmingFailed := TRUE` et `EmergencyArmingLockoutActive := TRUE`.
+  3. Pendant la durée stricte de 5 secondes du verrouillage temporel, toute impulsion `ArmRequest` doit être ignorée et la séquence doit rester bloquée à l'étape `0`.
+  4. À l'expiration du verrouillage (5s), la variable `EmergencyArmingLockoutActive` repasse à `FALSE` et une nouvelle demande de réarmement redevient fonctionnelle.
+* ⚠️ **Défaut connu (2026-07-16)** : `EmergencyArmingLockoutActive` est actuellement posé à `TRUE` aussi sur la branche **succès** de la confirmation d'armement (pas seulement sur l'échec) dans `FB_Safety_EmergencyManagementLogic.st`. Corrige-le lors de la migration vers le socle §7 — ne pas dupliquer le correctif ailleurs entre-temps.
+
+---
+
+## 📊 5. Variables de diagnostic et indicateurs IHM
+
+Le bloc `FB_Safety_EmergencyManagement` expose les variables suivantes pour le diagnostic machine et l'affichage IHM :
+
+| Variable API (dans `PRG_10_Outputs.instSafetyEmergencyManagement`) | Type | Rôle fonctionnel |
+| :--- | :---: | :--- |
+| `RedundancyTestFailed` | `BOOL` | Actif si un canal a échoué à l'auto-test de coupure périodique (contact collé). Bloquant. |
+| `EmergencyArmingFailed` | `BOOL` | Actif si le contacteur principal n'a pas confirmé sa fermeture dans la fenêtre de 2s. |
+| `EmergencyArmingLockoutActive` | `BOOL` | Actif pendant les 5s de verrouillage de sécurité suivant un échec de réarmement. |
+| `ArmingSeqStep` | `INT` | Étape courante de la séquence (0: Idle, 1: Test A, 2: Restore A, 3: Test B, 4: Restore B, 5: Pulse, 6: Confirmation). |
+| `Error` | `BOOL` | Signal de défaut général de la fonction de sécurité. |
+| `ErrorId` | `WORD` | Code d'erreur structuré (ex: `16#0001` = Défaut de redondance). |
+
+---
+
+## 📈 6. Matrice des critères d'acceptation de sécurité
+
+| ID du Test | Fonction de Sécurité Validée | Paramètre Critique | Critère d'Acceptation (Attendu) |
+| :---: | :--- | :---: | :--- |
+| **TC-01** | Coupure d'urgence instantanée | Temps de cycle API | Coupure immédiate des commandes `PowerCutOff_A/B_RQ` |
+| **TC-01** | Mémorisation de l'arrêt (Latch) | Persistance d'état | Pas de réarmement automatique au rétablissement de la chaîne |
+| **TC-02** | Auto-test Redondance Canal A | Filtrage = 200 ms | Détection d'un contact collé A, levée de `RedundancyTestFailed` |
+| **TC-02** | Auto-test Redondance Canal B | Filtrage = 200 ms | Détection d'un contact collé B, levée de `RedundancyTestFailed` |
+| **TC-03** | Temporisation de confirmation | Fenêtre = 2000 ms | Tolère l'inertie du contacteur principal dans la limite de 2s |
+| **TC-03** | Verrouillage temporel (Lockout) | Durée = 5000 ms | Blocage strict de toute tentative d'armement pendant 5s |
+| **TC-04** | Priorité absolue de sécurité | Mode Manuel actif | Coupure de sécurité prioritaire et non-outrepassable |
+
+> [!IMPORTANT]
+> Tout échec du validateur automatique (`TestFailed = TRUE`) sur le banc de simulation ou d'intégration bloque immédiatement le processus d'homologation et de mise en service de l'excavatrice de dragage YGO.
+
+---
+
+## 🏗️ 7. Architecture du framework de test (cadrage v1.1)
+
+> 📌 Cette section **cadre la cible** à implémenter. L'état actuel (`FB_SafetyValidation` en `CASE` monolithique, résultats en bools à plat dans `GVL_PLC_Tests`) n'est **pas encore migré** dessus — voir §7.5. Aucune modification de code n'accompagne cette version du document (décision explicite du 2026-07-16 : cadrer d'abord, coder ensuite).
+
+### 🎯 7.1 Constat
+Aujourd'hui, chaque cas de test (TC-01/02/03) est une étape de `CASE` écrite à la main dans `FB_SafetyValidation`, avec sa propre gestion de timeout dupliquée (`TestTimer`/`LastStep`). Une future suite de tests (Winch, Sync, Translation…) recopierait ce même motif à la main — donc le même risque de bug à chaque fois (cf. défaut §4/TC-03 : logique de lockout mal posée, trouvé en lisant le code, pas en le testant).
+
+### 🧱 7.2 Socle commun réutilisable
+
+**`FB_Timeout`** — brique générique (composant `TON` en interne, Partie3 §0 : réutilisation obligatoire), **pas spécifique aux tests**, potentiellement réutilisable ailleurs dans le projet partout où un motif "delai écoulé depuis le début d'un état" est nécessaire.
+| I/O | Nom | Type | Rôle |
+|---|---|---|---|
+| IN | `Active` | BOOL | Etat surveillé |
+| IN | `PT` | TIME | Délai autorisé |
+| OUT | `Elapsed` | BOOL | Délai dépassé depuis qu'`Active` est monté |
+
+**`FB_TestSequencer`** — séquenceur générique **piloté par table**, un seul exemplaire pour tout le projet. Remplace le `CASE` codé en dur par une table de données parcourue par un moteur unique.
+| I/O | Nom | Type | Rôle |
+|---|---|---|---|
+| IN | `CurrentStepId` | INT | Étape en cours (pilotée par le domaine appelant) |
+| IN | `Conditions` | `ARRAY[1..N] OF BOOL` | Comparatif de CHAQUE étape, déjà évalué par le domaine (seuil, front, état FB...) — seule partie non générique, car spécifique au métier testé |
+| IN | `StepTable` | `ARRAY[1..N] OF ST_TestStepConfig` | Config déclarative de chaque étape |
+| OUT | `NextStepId` | INT | Étape suivante (selon pass/fail) |
+| OUT | `Passed` / `TimedOut` | BOOL | Résultat de l'étape courante |
+
+`ST_TestStepConfig = { TimeoutPT : TIME; NextOnPass : INT; NextOnFail : INT; }`
+
+Compose `FB_Timeout` en interne. Aucune logique de timeout/transition ne doit plus être réécrite à la main dans un `FB_XxxValidation`.
+
+### 🧩 7.3 Suites de tests pluggables
+
+Chaque domaine testé (`FB_SafetyValidation` aujourd'hui ; `FB_WinchSyncValidation`, `FB_TranslationValidation`... demain) devient un module **autonome** :
+- Sa propre `StepTable` (données déclaratives des étapes).
+- Son propre calcul des `Conditions[i]` (seule logique spécifique — le "quoi tester").
+- Son propre rapport structuré `ST_XxxValidationReport` (remplace les bools à plat) :
+  ```pascal
+  ST_TestCaseResult = { Ok : BOOL; };
+  ST_SafetyValidationReport = {
+      TC01, TC02, TC03 : ST_TestCaseResult;
+      TestInProgress, AllTestsPassed, TestFailed : BOOL;
+      FailedTestCase : INT;
+  };
+  ```
+- Câblé dans `GVL_PLC_Tests` comme **une seule variable structurée** (`GVL_PLC_Tests.SafetyValidation : ST_SafetyValidationReport;`) au lieu d'être mélangé à plat avec les futures suites.
+
+`FB_PLC_Tests_Management` reste l'unique orchestrateur : il instancie chaque `FB_XxxValidation` et centralise son rapport. Ajouter/retirer une suite ne touche jamais les autres.
+
+### ⚠️ 7.4 Ce que ce socle NE couvre PAS (périmètre réel du "CI/CD")
+
+- **Pas de déclenchement automatique.** Ce framework tourne *dans* CODESYS (simulateur/automate). Rien aujourd'hui ne le lance automatiquement à chaque `git push` — il faudrait une orchestration externe (CODESYS headless, téléchargement du programme, forçage `GVL_PLC_Tests.CmdRunTests`, lecture des résultats, gate de build) : projet d'infra séparé, non couvert ici.
+- **Pas de génération automatique de scénarios.** Le socle standardise l'écriture d'un cas de test (mêmes garanties timeout/pass/fail pour tous), il n'invente pas les cas de test eux-mêmes — chaque `StepTable`/`Conditions[i]` reste écrite par quelqu'un qui connaît le métier.
+- **Le `pytest` existant (`TOOLS/`) reste la seule validation syntaxique** (compile/parse OK) — complémentaire, pas remplacée par ce socle qui ne couvre que le comportemental en simulation.
+
+### 🔜 7.5 Migration (non faite dans cette version)
+1. Créer `FB_Timeout`, `FB_TestSequencer`, `ST_TestStepConfig`, `ST_TestCaseResult`, `ST_SafetyValidationReport`.
+2. Réécrire `FB_SafetyValidation` sur ce socle (corrige au passage le défaut lockout §4/TC-03).
+3. Restructurer `GVL_PLC_Tests` en variables structurées par suite.
+4. Mettre à jour cette section si l'architecture réelle dévie du cadrage ci-dessus pendant l'implémentation.
