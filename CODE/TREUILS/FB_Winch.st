@@ -100,7 +100,7 @@ VAR_INPUT
     Homed                   : BOOL;             // 🆕 État de référencement du treuil
     HomingSuspect           : BOOL;             // 🆕 REX 2026-07-08 : Incertitude/doute sur le référencement (§3.7)
     CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
-    TopLimitM               : REAL := 12.5;     // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
+    TopLimitM               : REAL := 8.5;      // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
     SlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
     SlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)

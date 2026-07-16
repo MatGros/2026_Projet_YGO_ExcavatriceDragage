@@ -67,7 +67,7 @@ VAR_OUTPUT
     Busy                : BOOL;             // Mouvement en cours
     Done                : BOOL;             // Mouvement terminé avec succès
     Error               : BOOL;             // Présence d'un défaut
-    ErrorId             : WORD;             // bit0: Timeout mouvement, bit1: Incohérence boot, bit2: Limites dépassées, bit3: Codeur(s) M1/M2 non référencé(s), bit4: Glissement M1 pendant Busy
+    ErrorId             : WORD;             // bit0: "Timeout mouvement benne" - Timeout mouvement, bit1: "Incohérence position benne" - Incohérence boot, bit2: "Limites placement benne dépassées" - Limites dépassées, bit3: "Codeur(s) benne non référencé(s)" - Codeur(s) M1/M2 non référencé(s), bit4: "Glissement M1 détecté" - Glissement M1 pendant Busy
     M1SlipDetected      : BOOL;             // 🔧 REX 2026-07-07 : à consommer côté PRG_06_WinchControl (force SafeStop M1)
     CloseReq            : BOOL;             // 🆕 REX 2026-07-08 : demande de fermeture mémorisée — image IHM (FALSE = pas de demande active
                                              // ou objectif atteint/retour position départ ; TRUE = demande armée ou mouvement en cours)

@@ -63,7 +63,7 @@ Mon périmètre : **automatisme + analyse fonctionnelle** (IHM hors scope).
 | 🛗 Position câble | 2 codeurs absolus tambour (COD1→M1, COD2→M2) | EtherCAT → déroulé en **mètres** |
 | 🛑 Maintien charge | 2 freins manque-courant | Logique levage (frein colle au repos) |
 | ↔️ Translation | 1 moteur sur variateur AC600 (M3) | EtherCAT, commande **vitesse %** |
-| 🣣 Benne | (= désynchro des 2 treuils) | Pas de moteur propre |
+| 🪣 Benne | (= désynchro des 2 treuils) | Pas de moteur propre |
 | 🕹️ Commande | Joystick Hall → CANopen | 2 axes + bouton |
 | 📡 Capteurs | Fond touché, fdc haut/bas, positions travail/vidange/maintenance | TOR + position |
 | 🔌 Retour contacteurs | Contact auxiliaire par contacteur de puissance | TOR → surveillance collage |
@@ -87,7 +87,7 @@ Chaque treuil dispose de **4 contacteurs de vitesse**. La vitesse se construit e
 - 🕹️ **Joystick** → traduit le geste opérateur en consigne.
 - 🪝 **Treuil** ×2 → cœur métier : direction, vitesse, frein, position, limites.
 - ↔️ **Translation** → amène le pont sur la bonne position.
-- 🣣 **Benne** → ouvre/ferme via désynchro des treuils.
+- 🪣 **Benne** → ouvre/ferme via désynchro des treuils.
 - 🔄 **Cycle** → enchaîne les étapes en semi-auto.
 - 🎚️ **Modes** → Manuel / Maint N1 / N2 / Semi-auto + autorisations.
 
