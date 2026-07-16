@@ -63,8 +63,8 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Diag com EtherCAT · simu StatusWord/ActualFrequency/frein
 - Doc STO ajoutée
 
-### `v0.4.10_FdcBenne_Rename` — 2026-07-15
-- TASK-0002 : FdcBenneOpen/Close→OpenEnable/CloseEnable
+### `v0.4.10_FdcBucket_Rename` — 2026-07-15
+- TASK-0002 : FdcBucketOpen/Close→OpenEnable/CloseEnable
 - (ST_IHM_MANU) — clarifie rôle config vs état
 - MAJ logique PRG_10_Outputs
 

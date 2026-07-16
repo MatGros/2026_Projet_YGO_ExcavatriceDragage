@@ -190,10 +190,10 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 >
 > ℹ️ **Le Benne n'a pas de bloc safety dédié — cohérent avec « pas de moteur propre » (voir
 > §Fonctions principales ci-dessus).** Sa protection contre le glissement est répartie sur
-> **2 couches distinctes** : **couche 1** dans `FB_Benne` lui-même (`M1SlipDetected`, tolérance
+> **2 couches distinctes** : **couche 1** dans `FB_Bucket` lui-même (`M1SlipDetected`, tolérance
 > 1.0 m) → alimente `SafeStop` (pas `PowerCutOff`) ; **couche 2** = le Safety Mouvement
 > « Glissement benne » ci-dessus, câblé **uniquement dans l'instance M1** de `FB_Safety_Winch`
-> (`BenneHoldStillActive` sur `instBenne.Busy`, toujours `FALSE` côté M2) → peut escalader
+> (`BenneHoldStillActive` sur `instBucket.Busy`, toujours `FALSE` côté M2) → peut escalader
 > jusqu'à `PowerCutOff` si la couche 1 n'a pas suffi. Donc **oui**, `FB_Safety_Winch` couvre bien
 > indirectement le Benne (via son instance M1), mais il n'existe pas de `FB_Safety_Benne`
 > séparé — voir `DOC/AF_Partie-12_Fonction_Benne_v1.4.md` pour la couche 1 et Partie9 §4quinquies

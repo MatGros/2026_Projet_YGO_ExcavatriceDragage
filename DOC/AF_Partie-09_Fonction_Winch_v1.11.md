@@ -48,7 +48,7 @@
 > alors que tout est confirmé physiquement coupé (contacteurs + frein) ; **Méca B** — pilotage
 > actif constaté malgré absence de commande opérateur (perte CAN ou joystick au neutre) ;
 > **Méca C (couche 2, escalade)** — glissement M1 pendant un mouvement Benne, au-delà de ce que
-> la couche 1 (`FB_Benne`, voir Partie12 v1.2) a pu contenir. `PowerCutOff` devient **réel**
+> la couche 1 (`FB_Bucket`, voir Partie12 v1.2) a pu contenir. `PowerCutOff` devient **réel**
 > (`FALSE` codé en dur jusqu'ici) pour ces 3 cas — les contacteurs étant déjà confirmés coupés,
 > `SafeStop` seul ne suffit pas. Détail complet en §4quinquies ci-dessous ; interface
 > `FB_Safety_Winch` et tableau `ErrorId` mis à jour en §3.
@@ -195,7 +195,7 @@ En mode `MAINT_N2`, l'opérateur a la possibilité d'inhiber individuellement un
 - **Isolation complète de la sécurité et des défauts** :
   - **Remise à zéro des erreurs** : Lorsque l'entrée `Enable` de `FB_Winch` et `FB_Safety_Winch` passe à `FALSE`, leurs sorties `Error` et `ErrorId` (16#0000) sont explicitement réinitialisées. Les surveillances associées au treuil inhibé (dérive DriftGuard Méca A/C, surveillance thermique moteur/frein, glissement, retour d'état des contacteurs) sont totalement désactivées et ne peuvent plus générer d'alarme active.
   - **Filtrage supervision/IHM** : Dans la logique de supervision globale (`PRG_09_Supervision.st`), l'acquisition du signal d'alarme global `GVL_IHM.Modes.AnyFaultActive` filtre dynamiquement et ignore les défauts spécifiques du treuil inhibé (ce qui inclut l'encodeur absolu, le homing, la sécurité codeur, la sécurité générale du treuil et le bloc de contrôle de mouvement).
-- **Comportement sur la synchronisation et le benne** : L'inhibition de l'un ou l'autre treuil désactive automatiquement `FB_WinchSync` (`Enable := FALSE`), ce qui efface ses défauts et empêche le déclenchement de l'alarme d'incohérence de commande (bit 1, 16#0002). De plus, l'inhibition du treuil M2 (fermeture) désactive également le bloc benne `FB_Benne` (`Enable := FALSE`), empêchant toute ouverture ou fermeture. En revanche, si seul M1 (retenue) est inhibé, le benne peut toujours être manœuvré (M2 tourne seul pour ouvrir/fermer, M1 restant verrouillé au frein) à condition que les deux codeurs M1 et M2 soient disponibles, valides (sains) et référencés (homed). Si le codeur de M1 ou M2 est en défaut ou non référencé, le benne est automatiquement bloqué. Cela permet de faire fonctionner le treuil restant seul en toute sécurité pour des tests de mise en service.
+- **Comportement sur la synchronisation et le benne** : L'inhibition de l'un ou l'autre treuil désactive automatiquement `FB_WinchSync` (`Enable := FALSE`), ce qui efface ses défauts et empêche le déclenchement de l'alarme d'incohérence de commande (bit 1, 16#0002). De plus, l'inhibition du treuil M2 (fermeture) désactive également le bloc benne `FB_Bucket` (`Enable := FALSE`), empêchant toute ouverture ou fermeture. En revanche, si seul M1 (retenue) est inhibé, le benne peut toujours être manœuvré (M2 tourne seul pour ouvrir/fermer, M1 restant verrouillé au frein) à condition que les deux codeurs M1 et M2 soient disponibles, valides (sains) et référencés (homed). Si le codeur de M1 ou M2 est en défaut ou non référencé, le benne est automatiquement bloqué. Cela permet de faire fonctionner le treuil restant seul en toute sécurité pour des tests de mise en service.
 
 ### 🆕 4octies. Autorisation dépassement arrêt normal (HomingApproachEnable), limites logicielles et dissociation des limites de descente
 
@@ -242,7 +242,7 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 |---|---|---|---|---|---|---|
 | **A** | Mouvement non commandé (roue libre) | bit7 (16#0080) | Contacteurs + frein confirmés coupés, hors homing | Dérive > 2.0m OU vitesse > 0.02 m/s | SafeStop + **PowerCutOff** | `UncommandedDriftToleranceM` (2.0m), `UncommandedSpeedThresholdMps` (0.02 m/s) |
 | **B** | Pilotage sans commande opérateur | bit8 (16#0100) | Perte CAN ou joystick au neutre | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
-| **C** | Glissement M1 pendant benne | bit9 (16#0200) | Benne en mouvement (M1 seul) | Dérive M1 > 2.0m (escalade au-delà de `FB_Benne`) | SafeStop + **PowerCutOff** | `BenneSlipToleranceM` (2.0m) |
+| **C** | Glissement M1 pendant benne | bit9 (16#0200) | Benne en mouvement (M1 seul) | Dérive M1 > 2.0m (escalade au-delà de `FB_Bucket`) | SafeStop + **PowerCutOff** | `BenneSlipToleranceM` (2.0m) |
 | **D** | Capteur haut non confirmé arrêté | bit11 (16#0800) | Capteur physique atteint OU limite logicielle dépassée, hors homing | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
 | **E** | Écart synchro M1/M2 critique | bit12 (16#1000) + bit13 (16#2000) | Synchro activée, hors benne/homing | Écart > 2.0m → **bit12 immédiat** ; pas confirmé arrêté → **bit13 escalade** | Bit12 : SafeStop seul ; Bit13 : SafeStop + **PowerCutOff** | `CriticalSyncToleranceM` (2.0m), `PostRampTimeout` (3s) |
 
@@ -311,17 +311,17 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 
 #### Méca C — Glissement M1 pendant benne (Bit9 — Escalade)
 
-**Rôle** : Détecter l'**escalade d'un glissement partiel du treuil M1** qui avait déjà été en partie contenu par la couche 1 (`FB_Benne`, tolérance 1.0 m). Si même avec le `SafeStop` du benne M1 ne suffit pas à l'arrêter, cela signifie un problème mécanique grave (roue libre augmentée, surcharge).
+**Rôle** : Détecter l'**escalade d'un glissement partiel du treuil M1** qui avait déjà été en partie contenu par la couche 1 (`FB_Bucket`, tolérance 1.0 m). Si même avec le `SafeStop` du benne M1 ne suffit pas à l'arrêter, cela signifie un problème mécanique grave (roue libre augmentée, surcharge).
 
 **Armement** :
 - Condition : `BenneHoldStillActive`
-  - Variable câblée sur `instBenne.Busy` pour l'instance M1 **seulement**
+  - Variable câblée sur `instBucket.Busy` pour l'instance M1 **seulement**
   - Toujours `FALSE` côté M2 (qui doit continuer son mouvement normalement pendant que le benne s'ouvre/ferme)
   - → Surveillance active uniquement pendant le cycle du benne, sur M1
 
 **Déclenchement** :
 - Brique `FB_DriftGuard` : capture position de référence à l'armement ; chaque scan, calcule dérive absolue
-- Si dérive M1 > 2.0 m (seuil > 1.0 m de `FB_Benne`) → `DriftGuardC.Violation := TRUE` → bit9 levé
+- Si dérive M1 > 2.0 m (seuil > 1.0 m de `FB_Bucket`) → `DriftGuardC.Violation := TRUE` → bit9 levé
 - Littéralement : M1 a dévié de plus de 2 mètres **malgré** l'arrêt de sécurité du benne
 
 **Conséquence** :
@@ -329,11 +329,11 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 - **Escalade immédiate** : aussi dans le masque **`PowerCutOff`** → coupure puissance amont
 
 **Paramètres réglables** :
-- `BenneSlipToleranceM` (défaut 2.0 m) — Tolérance d'escalade (> au seuil de `FB_Benne` 1.0 m)
+- `BenneSlipToleranceM` (défaut 2.0 m) — Tolérance d'escalade (> au seuil de `FB_Bucket` 1.0 m)
 
 **Subtilités** :
 - **Armé UNIQUEMENT côté M1** — M2 n'est jamais surveillé pour cela, car il doit tourner pendant le benne.
-- Le benne (`FB_Benne`) implémente déjà un niveau 1 de surveillance (arrêt M1 si glissement > 1.0 m) — Méca C est une couche 2 (si même ce premier niveau échoue).
+- Le benne (`FB_Bucket`) implémente déjà un niveau 1 de surveillance (arrêt M1 si glissement > 1.0 m) — Méca C est une couche 2 (si même ce premier niveau échoue).
 - Sortie diagnostic : `MecaCDriftM` (dérive mesurée) — affichée à l'IHM pour mise en service et réglage du seuil.
 
 ---

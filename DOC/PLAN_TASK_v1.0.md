@@ -56,8 +56,8 @@ depuis abandon DEGRADED_IO v0.4.11, confirmé 2026-07-15 — `M3_PositionSensorT
 ### 🏷️ Nommage — chantier séparé (2026-07-15)
 Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), pilotée sur Translation M3
 uniquement (`ST_TranslationHMI.ReqFwd/ReqRev`). Reste en préfixe `CmdX`, à auditer/migrer plus tard :
-`FB_Benne`/`FB_Winch`/`ST_BenneHMI`/`ST_WinchHMI` (`CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/
-`CmdInhibit`) et `FB_Cycle` (`CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBenne_*`) — blast radius plus
+`FB_Bucket`/`FB_Winch`/`ST_BucketHMI`/`ST_WinchHMI` (`CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/
+`CmdInhibit`) et `FB_Cycle` (`CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBucket_*`) — blast radius plus
 large (interfaces FB largement utilisées), plan dédié à valider avant d'y toucher.
 
 📌 **Décisions client (2026-07-15)** :

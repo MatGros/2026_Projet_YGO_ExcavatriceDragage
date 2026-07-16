@@ -36,12 +36,12 @@
 >
 > **Fichiers impactés** (code déjà corrigé, validé utilisateur — voir `CODE/` pour le détail,
 > pas de recopie ici) :
-> - [`CODE/BENNE/FB_Benne.st`](../CODE/BENNE/FB_Benne.st) — validation joystick homme-mort
+> - [`CODE/BENNE/FB_Bucket.st`](../CODE/BENNE/FB_Bucket.st) — validation joystick homme-mort
 >   (`CloseReq`/`OpenReq`), commande `M2_Direction` en état BUSY, conditions d'arrêt automatique
 >   (comparaisons `CablePosM2` vs `CablePosM1 + Offset...M`) — tout inversé en cohérence avec le
 >   nouveau modèle physique.
 > - [`CODE/SYSTEM/GVL_PERSISTENT.st`](../CODE/SYSTEM/GVL_PERSISTENT.st) — signe de
->   `BenneConfig.OffsetCloseM` inversé (`-1.5` → `+10.0`), **et amplitude corrigée** : la course
+>   `BucketConfig.OffsetCloseM` inversé (`-1.5` → `+10.0`), **et amplitude corrigée** : la course
 >   réelle de fermeture est bien plus grande que l'estimation initiale, environ **10 m** (au lieu
 >   de 1.5 m). `OffsetOpenM` reste `0.0` (référence neutre, M2 = M1).
 >
@@ -120,9 +120,9 @@ Le bloc `FB_WinchSync` doit recevoir l'offset courant à appliquer (`ActiveOffse
 
 ## 🗂️ 4. Interface des blocs et types de données
 
-### A. Structure de Configuration (`ST_BenneConfig`)
+### A. Structure de Configuration (`ST_BucketConfig`)
 ```pascal
-TYPE ST_BenneConfig :
+TYPE ST_BucketConfig :
 STRUCT
     OffsetOpenM     : REAL;    (* Écart M1/M2 en mètres benne ouvert — référence neutre (M2 = M1) *)
     OffsetCloseM    : REAL;    (* Écart M1/M2 en mètres benne fermé — POSITIF : M2 plus enroulé/plus haut que M1
@@ -133,11 +133,11 @@ END_TYPE
 ```
 
 *(Interface inchangée vs v1.0 — pas de nouveau champ, seule la description de `OffsetCloseM`
-est mise à jour. Corps complet à jour dans [`CODE/BENNE/ST_BenneConfig.st`](../CODE/BENNE/ST_BenneConfig.st).)*
+est mise à jour. Corps complet à jour dans [`CODE/BENNE/ST_BucketConfig.st`](../CODE/BENNE/ST_BucketConfig.st).)*
 
-### B. Structure d'État (`ST_BenneState`)
+### B. Structure d'État (`ST_BucketState`)
 ```pascal
-TYPE ST_BenneState :
+TYPE ST_BucketState :
 STRUCT
     IsOpen          : BOOL;    (* TRUE = Benne ouvert mémorisé *)
     IsClosed        : BOOL;    (* TRUE = Benne fermé mémorisé *)
@@ -148,9 +148,9 @@ END_STRUCT
 END_TYPE
 ```
 
-*(Inchangée vs v1.0 — voir [`CODE/BENNE/ST_BenneState.st`](../CODE/BENNE/ST_BenneState.st).)*
+*(Inchangée vs v1.0 — voir [`CODE/BENNE/ST_BucketState.st`](../CODE/BENNE/ST_BucketState.st).)*
 
-### C. Interface du bloc Benne (`FB_Benne`)
+### C. Interface du bloc Benne (`FB_Bucket`)
 ```pascal
 (* Entrées *)
 Enable              : BOOL;        // Standard
@@ -165,12 +165,12 @@ CablePosM1          : REAL;        // Position réelle M1
 CablePosM2          : REAL;        // Position réelle M2
 HomedM1             : BOOL;        // 🆕 v1.2 (déjà codé, non documenté jusqu'ici) — Codeur M1 référencé (instHomingM1.Homed)
 HomedM2             : BOOL;        // 🆕 v1.2 (idem) — Codeur M2 référencé (instHomingM2.Homed)
-Config              : ST_BenneConfig; // Configuration RETAIN
+Config              : ST_BucketConfig; // Configuration RETAIN
 TimeoutDuration     : TIME := T#30s;    // 🆕 v1.2 (déjà codé) — Timeout de mouvement configurable
 M1SlipToleranceM    : REAL := 1.0;      // 🆕 v1.2 — tolérance glissement M1 pendant Busy (m), voir §4bis
 
 (* Entrées/Sorties (VAR_IN_OUT) *)
-BenneState        : ST_BenneState;  // État mémorisé (RETAIN)
+BucketState        : ST_BucketState;  // État mémorisé (RETAIN)
 
 (* Sorties *)
 Ready               : BOOL;
@@ -194,7 +194,7 @@ dans `CODE/` avant ce lot (garde-fou homing, jauge IHM) mais n'avaient jamais é
 seuls `M1SlipToleranceM`/`M1SlipDetected` sont réellement nouveaux dans le code (Méca C couche 1,
 voir §4bis). Sémantique interne de `Direction` en Fermeture/Ouverture inversée depuis v1.1, voir
 bandeau REX. Corps ST complet et à jour dans
-[`CODE/BENNE/FB_Benne.st`](../CODE/BENNE/FB_Benne.st) — pas de recopie ici, règle
+[`CODE/BENNE/FB_Bucket.st`](../CODE/BENNE/FB_Bucket.st) — pas de recopie ici, règle
 anti-doublon.)*
 
 ### 🆕 D. Méca C couche 1 — Glissement M1 pendant mouvement Benne (v1.2, 2026-07-07)
@@ -205,7 +205,7 @@ défaut) pendant que `Busy` reste actif → bit4 `ErrorId` → `SevereError` (co
 comme les autres causes graves de ce FB : timeout, limites, codeur non référencé) + sortie dédiée
 **`M1SlipDetected`**.
 
-`FB_Benne` ne pilote pas M1 directement (seul `FB_Winch` instance M1 le fait) — `M1SlipDetected`
+`FB_Bucket` ne pilote pas M1 directement (seul `FB_Winch` instance M1 le fait) — `M1SlipDetected`
 est donc **consommée côté `PRG_06_WinchControl.st`**, OR'ée dans `SafeStopM1_Raw` pour forcer un
 `SafeStop` sur M1 spécifiquement (le couplage croisé M1/M2 existant, actif seulement si
 `SyncActive`, ne suffit pas ici puisque le benne désactive volontairement la synchro).
@@ -213,7 +213,7 @@ est donc **consommée côté `PRG_06_WinchControl.st`**, OR'ée dans `SafeStopM1
 **Couche de secours (défense en profondeur)** : si cette couche 1 ne suffit pas (dérive continue
 au-delà de 1.0 m), une **couche 2** existe côté `FB_Safety_Winch` (bit9, tolérance
 `BenneSlipToleranceM` = 2.0 m, armée uniquement via `BenneHoldStillActive` câblée sur
-`instBenne.Busy` pour l'instance M1 seule) qui escalade jusqu'à `PowerCutOff` — voir
+`instBucket.Busy` pour l'instance M1 seule) qui escalade jusqu'à `PowerCutOff` — voir
 **Partie9 v1.5 §4quinquies** pour le détail complet de cette couche 2, hors périmètre de ce
 document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Benne).
 
@@ -221,15 +221,15 @@ document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Ben
 
 ## 🔌 5. Note d'application CODESYS 3.5
 
-1. **Persistance** : L'instance de `ST_BenneState` et `ST_BenneConfig` doivent être déclarées en variables persistantes (`VAR RETAIN`) dans `PRG_MAIN` pour conserver la mémoire mécanique du benne après coupure de tension.
+1. **Persistance** : L'instance de `ST_BucketState` et `ST_BucketConfig` doivent être déclarées en variables persistantes (`VAR RETAIN`) dans `PRG_MAIN` pour conserver la mémoire mécanique du benne après coupure de tension.
 2. **Couplage Winch M2** : La commande de vitesse lente forcée (`M2_ForceSlowSpeed`) doit masquer la table de paliers ou forcer `MaxStepNumber := 0` ou un paramètre dédié sur le décodeur de paliers pour n'autoriser aucun contacteur de vitesse.
 3. **Calcul de cohérence au boot** : Au premier cycle API, comparer `CablePosM2` avec `LastPosM2Open` ou `LastPosM2Close` (selon le dernier état mémorisé). Si l'écart dépasse `CoherenceLimitM`, forcer la sortie `StateIncoherent := TRUE` et exiger un référencement manuel.
-4. 🔧 **REX 2026-07-07** : Le code `CODE/BENNE/FB_Benne.st` et `CODE/SYSTEM/GVL_PERSISTENT.st`
+4. 🔧 **REX 2026-07-07** : Le code `CODE/BENNE/FB_Bucket.st` et `CODE/SYSTEM/GVL_PERSISTENT.st`
    sont **déjà à jour** avec le nouveau modèle (voir bandeau REX en tête de document) — aucune
    nouvelle recopie manuelle requise au-delà de ce qui a déjà été appliqué en session, sauf si
    une réimportation complète depuis `CODE/` est nécessaire suite à un nouvel export CODESYS.
 5. 🆕 **v1.2 (2026-07-07, Méca C couche 1)** : Méca C couche 1 (bit4, `M1SlipDetected`) est **déjà codé et
-   validé** dans `CODE/BENNE/FB_Benne.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
+   validé** dans `CODE/BENNE/FB_Bucket.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
    également aucune nouvelle recopie manuelle requise ce lot.
 6. 🆕 **v1.3 (2026-07-08, Inhibition)** : Le bloc benne est activé si le treuil M2 n'est pas inhibé, et que les deux codeurs de position M1 et M2 sont disponibles / en bonne santé (`Enable := NOT InhibitM2 AND EncoderAbsM1.EncoderAvailable AND EncoderAbsM2.EncoderAvailable` dans `PRG_06_WinchControl.st`). Si seul M1 (retenue) est inhibé, le benne reste manœuvrable puisque seul M2 se déplace pour ouvrir ou fermer (M1 restant verrouillé au frein). Cependant, le codeur M1 doit obligatoirement être disponible et référencé (`HomedM1 = TRUE`) pour permettre le calcul de fin de course du benne ; dans le cas contraire, le benne est bloqué en sécurité. De plus, si M1 est inhibé, la surveillance de glissement de M1 pendant le mouvement (`M1SlipDetected`, bit 4 de `ErrorId`) est automatiquement désactivée pour éviter tout déclenchement intempestif dû à des fluctuations ou une isolation de l'axe M1.
 7. 🆕 **v1.3 (2026-07-08, Référencement)** : Deux boutons de référencement manuel sont prévus pour la mise en service du benne à l'arrêt. Pour simplifier les essais, ces commandes sont autorisées même si les codeurs de treuils M1/M2 ne sont pas encore référencés (`HomedM1/M2 = FALSE`) :
@@ -239,14 +239,14 @@ document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Ben
    *(Note : si les treuils ne sont pas homés, le défaut permanent bit 3 `16#0008` reviendra au scan suivant, mais la réinitialisation des variables persistantes de calibrage de boot aura bien été effectuée).*
 8. 🆕 **v1.4 (2026-07-08, Offset dynamique et Butées dynamiques M2)** :
    * **Offset dynamique (`ActiveOffsetM`)** : Durant le mouvement (`State = E_State.BUSY`), `ActiveOffsetM` est calculé dynamiquement comme la différence réelle de câble (`CablePosM2 - CablePosM1`). Cela garantit que la position corrigée de M2 (`M2PositionCorrected := CablePosM2 - ActiveOffsetM` dans `PRG_09_Supervision.st`) reste parfaitement stable et égale à la position de M1 (la hauteur de charge réelle) pendant toute la manœuvre de fermeture ou d'ouverture. La jauge/bargraphe IHM reste stable, et la différence n'apparaît que sur la valeur brute de M2 qui reflète l'enroulement physique. À la fin du cycle, `ActiveOffsetM` reprend sa valeur fixe de configuration (`OffsetCloseM` ou `OffsetOpenM`) de manière transparente et sans saut d'affichage.
-   * **Butée logicielle haute dynamique de M2** : Pour éviter que M2 ne soit bloqué prématurément par sa butée logicielle haute solo lors des cycles de fermeture à haute altitude, sa limite haute absolue (`TopLimitM` de `instWinchM2` et seuils de `ForbidAscentM2_Raw`) est décalée dynamiquement de la valeur de l'offset de fermeture (`OffsetCloseM`). Ce décalage n'est activé **que si le benne est fermé ou en cours de fermeture** (`BenneState.IsClosed` ou `CloseReq` actif). Si le benne est ouvert, la butée de M2 est ramenée à sa valeur standard (`HomingTargetM2_M`, soit 12.00m de butée virtuelle avec marge), assurant un arrêt propre et synchrone de M1 et M2 à 12m lors de la remontée normale.
+   * **Butée logicielle haute dynamique de M2** : Pour éviter que M2 ne soit bloqué prématurément par sa butée logicielle haute solo lors des cycles de fermeture à haute altitude, sa limite haute absolue (`TopLimitM` de `instWinchM2` et seuils de `ForbidAscentM2_Raw`) est décalée dynamiquement de la valeur de l'offset de fermeture (`OffsetCloseM`). Ce décalage n'est activé **que si le benne est fermé ou en cours de fermeture** (`BucketState.IsClosed` ou `CloseReq` actif). Si le benne est ouvert, la butée de M2 est ramenée à sa valeur standard (`HomingTargetM2_M`, soit 12.00m de butée virtuelle avec marge), assurant un arrêt propre et synchrone de M1 et M2 à 12m lors de la remontée normale.
 
 ---
 
 ## 🔁 6. Retour d'expérience
 
 - [x] **2026-07-07** — Constat terrain : sens moteur M2 inversé vis-à-vis du benne (relabeling
-      `%Q0.0`/`%Q0.3`) — code corrigé (`FB_Benne.st`, `GVL_PERSISTENT.st`), documentation
+      `%Q0.0`/`%Q0.3`) — code corrigé (`FB_Bucket.st`, `GVL_PERSISTENT.st`), documentation
       révisée (ce document).
 
 📌 Suivi (essais de mise en service restants — cinématique enroulage/déroulage, amplitude des
@@ -256,7 +256,7 @@ offsets, ressenti joystick homme-mort, Méca C couches 1/2) : voir `DOC/PLAN_TAS
 ---
 
 ## 📚 Documents liés
-- **Partie 2 v2.7** — Architecture (mapping M1/M2, `FB_Benne` dans l'arborescence `BENNE`).
+- **Partie 2 v2.7** — Architecture (mapping M1/M2, `FB_Bucket` dans l'arborescence `BENNE`).
 - **Partie 3 v1.3** — Contrat FB (interface standard, `ErrorId`, reset).
 - **Partie 4 v1.2** §6 — Cycle (intégration du benne dans la séquence de dragage).
 - **Partie 9 v1.5** 🔧 v1.2 §9/§4quinquies — Fonction Winch (M2, dépendance directe :

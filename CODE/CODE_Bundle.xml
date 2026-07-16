@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-15T20:01:12.631307" />
-  <contentHeader name="MGS_v0.4.15.project" modificationDateTime="2026-07-15T20:01:12.631307">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-16T15:49:00.286717" />
+  <contentHeader name="MGS_v0.4.15_PlcTestsFramework_TranslationSuite.project" modificationDateTime="2026-07-16T15:49:00.286717">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.15</property>
+          <property name="Project" type="string">MGS_v0.4.15_PlcTestsFramework_TranslationSuite</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -2147,6 +2147,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant d'activité (3 pulses sur transition)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FailureSummary">
+              <type>
+                <string length="255" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ Détail des défauts du dernier run, TOUTES suites confondues (remonte Report.FailureSummary de chaque suite exécutée) — lisible sans creuser Suite*Validation</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4948,6 +4956,1207 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>82efa9a6-05fa-5372-9d4c-1316f7f70a0b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_BucketValidation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Start">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande de démarrage des tests</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Abort">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'abandon</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FirstStepId">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Première étape à exécuter</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AnyFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimGateOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Indique si la simulation est autorisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveStimulusId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="Report">
+              <type>
+                <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="SigHealthyIdle">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ Index des sondes (Sémantique AF P14 §7.2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SigBucketBusy">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="SigBucketDone">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+            </variable>
+            <variable name="SigBucketError">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+            </variable>
+            <variable name="SigM1SlipDetected">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="SigM1SafeStop">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+            </variable>
+            <variable name="SigM1PowerCutOff">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="7" />
+              </initialValue>
+            </variable>
+            <variable name="SigBucketIsOpen">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+            </variable>
+            <variable name="SigBucketIsClosed">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="9" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2StartStop">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2ForceSlowSpeed">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="11" />
+              </initialValue>
+            </variable>
+            <variable name="SigBucketErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2Direction">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="SigSafetyM1ErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+            </variable>
+            <variable name="SigActiveOffsetM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="SigRemainingTravelM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2CablePos">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2TopLimit">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+            </variable>
+            <variable name="StepB1Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Index des étapes (Séquenceur)
+TC-B1 : Glissement Modéré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepB1Trigger">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="11" />
+              </initialValue>
+            </variable>
+            <variable name="StepB1Slip">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="12" />
+              </initialValue>
+            </variable>
+            <variable name="StepB1Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="19" />
+              </initialValue>
+            </variable>
+            <variable name="StepB2Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TC-B2 : Glissement Critique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepB2Trigger">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="21" />
+              </initialValue>
+            </variable>
+            <variable name="StepB2CriticalSlip">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="22" />
+              </initialValue>
+            </variable>
+            <variable name="StepB2Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="29" />
+              </initialValue>
+            </variable>
+            <variable name="StepB3Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="30" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TC-B3 : Butée Haute Dynamique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepB3CheckOpenLimit">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="31" />
+              </initialValue>
+            </variable>
+            <variable name="StepB3CloseAction">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="32" />
+              </initialValue>
+            </variable>
+            <variable name="StepB3CheckClosedLimit">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="33" />
+              </initialValue>
+            </variable>
+            <variable name="StepB3Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="39" />
+              </initialValue>
+            </variable>
+            <variable name="StepB4Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="40" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TC-B4 : Cohérence Boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepB4BootIncoherent">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="41" />
+              </initialValue>
+            </variable>
+            <variable name="StepB4Recalage">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="42" />
+              </initialValue>
+            </variable>
+            <variable name="StepB4Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="49" />
+              </initialValue>
+            </variable>
+            <variable name="StepB5Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TC-B5 : Homing &amp; Inhibition</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepB5LostHoming">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="51" />
+              </initialValue>
+            </variable>
+            <variable name="StepB5RestoreHoming">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="52" />
+              </initialValue>
+            </variable>
+            <variable name="StepB5InhibitM1">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="53" />
+              </initialValue>
+            </variable>
+            <variable name="StepB5Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="59" />
+              </initialValue>
+            </variable>
+            <variable name="StepB6Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="60" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TC-B6 : Homme-Mort &amp; Recul</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepB6StartMove">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="61" />
+              </initialValue>
+            </variable>
+            <variable name="StepB6ReleaseJoy">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="62" />
+              </initialValue>
+            </variable>
+            <variable name="StepB6ReverseJoy">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="63" />
+              </initialValue>
+            </variable>
+            <variable name="StepB6Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="69" />
+              </initialValue>
+            </variable>
+            <variable name="Sequencer">
+              <type>
+                <derived name="FB_TestSequencer" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Moteur unique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />
+                  <baseType>
+                    <derived name="ST_TestStepConfig" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📋 Tables de configuration</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CheckTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxChecks" />
+                  <baseType>
+                    <derived name="ST_TestCheckConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="CaseTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestCases" />
+                  <baseType>
+                    <derived name="ST_TestCaseConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="InvariantTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxInvariants" />
+                  <baseType>
+                    <derived name="ST_TestInvariantConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeBool">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeBool" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 Banque de sondes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProbeDint">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeDint" />
+                  <baseType>
+                    <DINT />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeReal">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeReal" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="TableReady">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ Configuration initialisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdOpen_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Commandes de stimuli internes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdClose_IHM">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="JoystickY_StartStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="JoystickY_Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfirmOpenPosition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomedM1">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_BucketValidation — Suite de test Bucket (Séquenceur)
+   ───────────────────────────────────────────────────────────────
+   🎯 Valide la sécurité mécanique (Méca C), les timeouts et le
+      référencement du bucket selon AF Partie 12 &amp; 14.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 1. 🛡️ GATE
+IF NOT GVL_Simulation.SimulationModeActive THEN
+    Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
+              StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
+              ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report);
+
+    SimGateOk := FALSE;
+    RETURN;
+END_IF;
+
+// Gate spécifique Bucket : refuse si M1 ou M2 sont en simulation réelle (Sûreté)
+SimGateOk := NOT GVL_Simulation.CablePosM1_IsReal AND NOT GVL_Simulation.CablePosM2_IsReal;
+
+// 2. 📋 TABLES
+IF NOT TableReady THEN
+    Report.Name := 'Bucket Validation';
+
+    // Cas de tests
+    CaseTable[1].Name := 'TC-B1 Glissement Modéré';
+    CaseTable[1].FirstStep := StepB1Setup;
+
+    CaseTable[2].Name := 'TC-B2 Glissement Critique';
+    CaseTable[2].FirstStep := StepB2Setup;
+
+    CaseTable[3].Name := 'TC-B3 Butée Haute Dynamique';
+    CaseTable[3].FirstStep := StepB3Setup;
+
+    CaseTable[4].Name := 'TC-B4 Cohérence Boot';
+    CaseTable[4].FirstStep := StepB4Setup;
+
+    CaseTable[5].Name := 'TC-B5 Homing &amp; Inhibition';
+    CaseTable[5].FirstStep := StepB5Setup;
+
+    CaseTable[6].Name := 'TC-B6 Homme-Mort &amp; Recul';
+    CaseTable[6].FirstStep := StepB6Setup;
+
+    // ─────────────────────────────────────────────────────────────
+    // CONFIGURATION DES CHECKS
+    // ─────────────────────────────────────────────────────────────
+    // Chk 1: Attente état sain
+    CheckTable[1].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[1].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[1].ProbeIdx := SigHealthyIdle;
+    CheckTable[1].ExpectedBool := TRUE;
+
+    // Chk 2: Bucket Busy
+    CheckTable[2].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[2].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[2].ProbeIdx := SigBucketBusy;
+    CheckTable[2].ExpectedBool := TRUE;
+
+    // Chk 3: Glissement M1 détecté
+    CheckTable[3].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[3].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[3].ProbeIdx := SigM1SlipDetected;
+    CheckTable[3].ExpectedBool := TRUE;
+
+    // Chk 4: Bit ErrorId 4 levé (16#0010)
+    CheckTable[4].Kind := E_TestCheckKind.WORD_MASK_ALL;
+    CheckTable[4].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[4].ProbeIdx := SigBucketErrorId;
+    CheckTable[4].Mask := 16#0010;
+
+    // Chk 5: Coupure immédiate M2
+    CheckTable[5].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[5].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[5].ProbeIdx := SigM2StartStop;
+    CheckTable[5].ExpectedBool := FALSE;
+
+    // Chk 6: SafeStop M1 activé
+    CheckTable[6].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[6].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[6].ProbeIdx := SigM1SafeStop;
+    CheckTable[6].ExpectedBool := TRUE;
+
+    // Chk 7: PowerCutOff M1 NON activé (Couche 1 seulement)
+    CheckTable[7].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[7].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[7].ProbeIdx := SigM1PowerCutOff;
+    CheckTable[7].ExpectedBool := FALSE;
+
+    // Chk 8: PowerCutOff M1 activé (Couche 2)
+    CheckTable[8].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[8].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[8].ProbeIdx := SigM1PowerCutOff;
+    CheckTable[8].ExpectedBool := TRUE;
+
+    // Chk 9: Défaut Safety M1 Bit 9 (16#0200)
+    CheckTable[9].Kind := E_TestCheckKind.WORD_MASK_ALL;
+    CheckTable[9].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[9].ProbeIdx := SigSafetyM1ErrorId;
+    CheckTable[9].Mask := 16#0200;
+
+    // Chk 10: Limite haute standard (12m)
+    CheckTable[10].Kind := E_TestCheckKind.REAL_IN_RANGE;
+    CheckTable[10].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[10].ProbeIdx := SigM2TopLimit;
+    CheckTable[10].RealMin := 12.0;
+    CheckTable[10].RealMax := 12.1;
+
+    // Chk 11: Bucket fermé mémorisé
+    CheckTable[11].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[11].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[11].ProbeIdx := SigBucketIsClosed;
+    CheckTable[11].ExpectedBool := TRUE;
+
+    // Chk 12: Limite haute décalée (+10m -&gt; 22m)
+    CheckTable[12].Kind := E_TestCheckKind.REAL_IN_RANGE;
+    CheckTable[12].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[12].ProbeIdx := SigM2TopLimit;
+    CheckTable[12].RealMin := 22.0;
+    CheckTable[12].RealMax := 22.1;
+
+    // Chk 13: Erreur Bucket active
+    CheckTable[13].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[13].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[13].ProbeIdx := SigBucketError;
+    CheckTable[13].ExpectedBool := TRUE;
+
+    // Chk 14: Bit ErrorId 1 levé (Incohérence boot)
+    CheckTable[14].Kind := E_TestCheckKind.WORD_MASK_ALL;
+    CheckTable[14].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[14].ProbeIdx := SigBucketErrorId;
+    CheckTable[14].Mask := 16#0002;
+
+    // Chk 15: États mémorisés forcés à FALSE
+    CheckTable[15].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[15].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[15].ProbeIdx := SigBucketIsOpen;
+    CheckTable[15].ExpectedBool := FALSE;
+
+    // Chk 16: Idem pour IsClosed
+    CheckTable[16].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[16].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[16].ProbeIdx := SigBucketIsClosed;
+    CheckTable[16].ExpectedBool := FALSE;
+
+    // Chk 17: Bucket ouvert mémorisé après recalage
+    CheckTable[17].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[17].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[17].ProbeIdx := SigBucketIsOpen;
+    CheckTable[17].ExpectedBool := TRUE;
+
+    // Chk 18: Bit ErrorId 3 levé (Non référencé)
+    CheckTable[18].Kind := E_TestCheckKind.WORD_MASK_ALL;
+    CheckTable[18].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[18].ProbeIdx := SigBucketErrorId;
+    CheckTable[18].Mask := 16#0008;
+
+    // Chk 19: Bucket non opérationnel
+    CheckTable[19].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[19].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[19].ProbeIdx := SigHealthyIdle;
+    CheckTable[19].ExpectedBool := FALSE;
+
+    // Chk 20: Glissement M1 ignoré pendant inhibition
+    CheckTable[20].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[20].Mode := E_TestCheckMode.CHECK_NEVER_DURING;
+    CheckTable[20].ProbeIdx := SigM1SlipDetected;
+    CheckTable[20].ExpectedBool := TRUE;
+
+    // Chk 21: Mouvement terminé
+    CheckTable[21].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[21].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[21].ProbeIdx := SigBucketDone;
+    CheckTable[21].ExpectedBool := TRUE;
+
+    // Chk 22: Direction M2 = -1 (Déroulage)
+    CheckTable[22].Kind := E_TestCheckKind.DINT_EQUAL;
+    CheckTable[22].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[22].ProbeIdx := SigM2Direction;
+    CheckTable[22].ExpectedDint := -1;
+
+    // Chk 23: M2 ne dépasse pas la position de départ (Sonde Real)
+    CheckTable[23].Kind := E_TestCheckKind.REAL_IN_RANGE;
+    CheckTable[23].Mode := E_TestCheckMode.CHECK_NEVER_DURING;
+    CheckTable[23].ProbeIdx := SigM2CablePos;
+    CheckTable[23].RealMin := 0.0; // Valeur relative simulée ici
+    CheckTable[23].RealMax := 0.1;
+
+    // ─────────────────────────────────────────────────────────────
+    // CONFIGURATION DES ÉTAPES (StepTable)
+    // ─────────────────────────────────────────────────────────────
+    // TC-B1 : Glissement Modéré
+    StepTable[StepB1Setup].Name := 'Tcb1 Setup saine';
+    StepTable[StepB1Setup].CaseId := 1;
+    StepTable[StepB1Setup].StimulusId := 1;
+    StepTable[StepB1Setup].CheckIdx[1] := 1;
+    StepTable[StepB1Setup].TimeoutPT := T#12s;
+    StepTable[StepB1Setup].NextOnPass := StepB1Trigger;
+    StepTable[StepB1Setup].NextOnFail := StepB1Teardown;
+    StepTable[StepB1Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB1Trigger].Name := 'Tcb1 Trigger fermeture';
+    StepTable[StepB1Trigger].CaseId := 1;
+    StepTable[StepB1Trigger].StimulusId := 2;
+    StepTable[StepB1Trigger].CheckIdx[1] := 2;
+    StepTable[StepB1Trigger].TimeoutPT := T#5s;
+    StepTable[StepB1Trigger].NextOnPass := StepB1Slip;
+    StepTable[StepB1Trigger].NextOnFail := StepB1Teardown;
+    StepTable[StepB1Trigger].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB1Slip].Name := 'Tcb1 Detection glissement';
+    StepTable[StepB1Slip].CaseId := 1;
+    StepTable[StepB1Slip].StimulusId := 3;
+    StepTable[StepB1Slip].CheckIdx[1] := 3;
+    StepTable[StepB1Slip].CheckIdx[2] := 4;
+    StepTable[StepB1Slip].CheckIdx[3] := 5;
+    StepTable[StepB1Slip].CheckIdx[4] := 6;
+    StepTable[StepB1Slip].CheckIdx[5] := 7;
+    StepTable[StepB1Slip].TimeoutPT := T#2s;
+    StepTable[StepB1Slip].NextOnPass := StepB1Teardown;
+    StepTable[StepB1Slip].NextOnFail := StepB1Teardown;
+    StepTable[StepB1Slip].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB1Teardown].Name := 'Tcb1 Teardown';
+    StepTable[StepB1Teardown].CaseId := 1;
+    StepTable[StepB1Teardown].StimulusId := 1;
+    StepTable[StepB1Teardown].CheckIdx[1] := 1;
+    StepTable[StepB1Teardown].TimeoutPT := T#12s;
+    StepTable[StepB1Teardown].NextOnPass := StepB2Setup;
+    StepTable[StepB1Teardown].NextOnFail := StepB2Setup;
+    StepTable[StepB1Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // TC-B2 : Glissement Critique
+    StepTable[StepB2Setup].Name := 'Tcb2 Setup saine';
+    StepTable[StepB2Setup].CaseId := 2;
+    StepTable[StepB2Setup].StimulusId := 1;
+    StepTable[StepB2Setup].CheckIdx[1] := 1;
+    StepTable[StepB2Setup].TimeoutPT := T#12s;
+    StepTable[StepB2Setup].NextOnPass := StepB2Trigger;
+    StepTable[StepB2Setup].NextOnFail := StepB2Teardown;
+    StepTable[StepB2Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB2Trigger].Name := 'Tcb2 Trigger fermeture';
+    StepTable[StepB2Trigger].CaseId := 2;
+    StepTable[StepB2Trigger].StimulusId := 2;
+    StepTable[StepB2Trigger].CheckIdx[1] := 2;
+    StepTable[StepB2Trigger].TimeoutPT := T#5s;
+    StepTable[StepB2Trigger].NextOnPass := StepB2CriticalSlip;
+    StepTable[StepB2Trigger].NextOnFail := StepB2Teardown;
+    StepTable[StepB2Trigger].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB2CriticalSlip].Name := 'Tcb2 Escalade PowerCutOff';
+    StepTable[StepB2CriticalSlip].CaseId := 2;
+    StepTable[StepB2CriticalSlip].StimulusId := 4;
+    StepTable[StepB2CriticalSlip].CheckIdx[1] := 3;
+    StepTable[StepB2CriticalSlip].CheckIdx[2] := 8;
+    StepTable[StepB2CriticalSlip].CheckIdx[3] := 9;
+    StepTable[StepB2CriticalSlip].TimeoutPT := T#2s;
+    StepTable[StepB2CriticalSlip].NextOnPass := StepB2Teardown;
+    StepTable[StepB2CriticalSlip].NextOnFail := StepB2Teardown;
+    StepTable[StepB2CriticalSlip].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB2Teardown].Name := 'Tcb2 Teardown';
+    StepTable[StepB2Teardown].CaseId := 2;
+    StepTable[StepB2Teardown].StimulusId := 1;
+    StepTable[StepB2Teardown].CheckIdx[1] := 1;
+    StepTable[StepB2Teardown].TimeoutPT := T#12s;
+    StepTable[StepB2Teardown].NextOnPass := StepB3Setup;
+    StepTable[StepB2Teardown].NextOnFail := StepB3Setup;
+    StepTable[StepB2Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // TC-B3 : Butée Haute Dynamique
+    StepTable[StepB3Setup].Name := 'Tcb3 Setup saine';
+    StepTable[StepB3Setup].CaseId := 3;
+    StepTable[StepB3Setup].StimulusId := 1;
+    StepTable[StepB3Setup].CheckIdx[1] := 1;
+    StepTable[StepB3Setup].TimeoutPT := T#12s;
+    StepTable[StepB3Setup].NextOnPass := StepB3CheckOpenLimit;
+    StepTable[StepB3Setup].NextOnFail := StepB3Teardown;
+    StepTable[StepB3Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB3CheckOpenLimit].Name := 'Tcb3 Verif Limite Standard';
+    StepTable[StepB3CheckOpenLimit].CaseId := 3;
+    StepTable[StepB3CheckOpenLimit].StimulusId := 0;
+    StepTable[StepB3CheckOpenLimit].CheckIdx[1] := 10;
+    StepTable[StepB3CheckOpenLimit].TimeoutPT := T#1s;
+    StepTable[StepB3CheckOpenLimit].NextOnPass := StepB3CloseAction;
+    StepTable[StepB3CheckOpenLimit].NextOnFail := StepB3Teardown;
+    StepTable[StepB3CheckOpenLimit].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB3CloseAction].Name := 'Tcb3 Mouvement Fermeture';
+    StepTable[StepB3CloseAction].CaseId := 3;
+    StepTable[StepB3CloseAction].StimulusId := 5;
+    StepTable[StepB3CloseAction].CheckIdx[1] := 11;
+    StepTable[StepB3CloseAction].TimeoutPT := T#15s;
+    StepTable[StepB3CloseAction].NextOnPass := StepB3CheckClosedLimit;
+    StepTable[StepB3CloseAction].NextOnFail := StepB3Teardown;
+    StepTable[StepB3CloseAction].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB3CheckClosedLimit].Name := 'Tcb3 Verif Limite Decalee';
+    StepTable[StepB3CheckClosedLimit].CaseId := 3;
+    StepTable[StepB3CheckClosedLimit].StimulusId := 0;
+    StepTable[StepB3CheckClosedLimit].CheckIdx[1] := 12;
+    StepTable[StepB3CheckClosedLimit].TimeoutPT := T#1s;
+    StepTable[StepB3CheckClosedLimit].NextOnPass := StepB3Teardown;
+    StepTable[StepB3CheckClosedLimit].NextOnFail := StepB3Teardown;
+    StepTable[StepB3CheckClosedLimit].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB3Teardown].Name := 'Tcb3 Teardown';
+    StepTable[StepB3Teardown].CaseId := 3;
+    StepTable[StepB3Teardown].StimulusId := 1;
+    StepTable[StepB3Teardown].CheckIdx[1] := 1;
+    StepTable[StepB3Teardown].TimeoutPT := T#12s;
+    StepTable[StepB3Teardown].NextOnPass := StepB4Setup;
+    StepTable[StepB3Teardown].NextOnFail := StepB4Setup;
+    StepTable[StepB3Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // TC-B4 : Cohérence Boot
+    StepTable[StepB4Setup].Name := 'Tcb4 Setup saine';
+    StepTable[StepB4Setup].CaseId := 4;
+    StepTable[StepB4Setup].StimulusId := 1;
+    StepTable[StepB4Setup].CheckIdx[1] := 1;
+    StepTable[StepB4Setup].TimeoutPT := T#12s;
+    StepTable[StepB4Setup].NextOnPass := StepB4BootIncoherent;
+    StepTable[StepB4Setup].NextOnFail := StepB4Teardown;
+    StepTable[StepB4Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB4BootIncoherent].Name := 'Tcb4 Injection Drift Boot';
+    StepTable[StepB4BootIncoherent].CaseId := 4;
+    StepTable[StepB4BootIncoherent].StimulusId := 6;
+    StepTable[StepB4BootIncoherent].CheckIdx[1] := 13;
+    StepTable[StepB4BootIncoherent].CheckIdx[2] := 14;
+    StepTable[StepB4BootIncoherent].CheckIdx[3] := 15;
+    StepTable[StepB4BootIncoherent].CheckIdx[4] := 16;
+    StepTable[StepB4BootIncoherent].TimeoutPT := T#2s;
+    StepTable[StepB4BootIncoherent].NextOnPass := StepB4Recalage;
+    StepTable[StepB4BootIncoherent].NextOnFail := StepB4Teardown;
+    StepTable[StepB4BootIncoherent].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB4Recalage].Name := 'Tcb4 Recalage Manuel';
+    StepTable[StepB4Recalage].CaseId := 4;
+    StepTable[StepB4Recalage].StimulusId := 7;
+    StepTable[StepB4Recalage].CheckIdx[1] := 17;
+    StepTable[StepB4Recalage].CheckIdx[2] := 1;
+    StepTable[StepB4Recalage].TimeoutPT := T#2s;
+    StepTable[StepB4Recalage].NextOnPass := StepB4Teardown;
+    StepTable[StepB4Recalage].NextOnFail := StepB4Teardown;
+    StepTable[StepB4Recalage].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB4Teardown].Name := 'Tcb4 Teardown';
+    StepTable[StepB4Teardown].CaseId := 4;
+    StepTable[StepB4Teardown].StimulusId := 1;
+    StepTable[StepB4Teardown].CheckIdx[1] := 1;
+    StepTable[StepB4Teardown].TimeoutPT := T#12s;
+    StepTable[StepB4Teardown].NextOnPass := StepB5Setup;
+    StepTable[StepB4Teardown].NextOnFail := StepB5Setup;
+    StepTable[StepB4Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // TC-B5 : Homing &amp; Inhibition
+    StepTable[StepB5Setup].Name := 'Tcb5 Setup saine';
+    StepTable[StepB5Setup].CaseId := 5;
+    StepTable[StepB5Setup].StimulusId := 1;
+    StepTable[StepB5Setup].CheckIdx[1] := 1;
+    StepTable[StepB5Setup].TimeoutPT := T#12s;
+    StepTable[StepB5Setup].NextOnPass := StepB5LostHoming;
+    StepTable[StepB5Setup].NextOnFail := StepB5Teardown;
+    StepTable[StepB5Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB5LostHoming].Name := 'Tcb5 Perte Homing';
+    StepTable[StepB5LostHoming].CaseId := 5;
+    StepTable[StepB5LostHoming].StimulusId := 8;
+    StepTable[StepB5LostHoming].CheckIdx[1] := 18;
+    StepTable[StepB5LostHoming].CheckIdx[2] := 19;
+    StepTable[StepB5LostHoming].TimeoutPT := T#2s;
+    StepTable[StepB5LostHoming].NextOnPass := StepB5RestoreHoming;
+    StepTable[StepB5LostHoming].NextOnFail := StepB5Teardown;
+    StepTable[StepB5LostHoming].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB5RestoreHoming].Name := 'Tcb5 Rétablissement Homing';
+    StepTable[StepB5RestoreHoming].CaseId := 5;
+    StepTable[StepB5RestoreHoming].StimulusId := 1; // (Force HomedM1 := TRUE via Reset/Saine)
+    StepTable[StepB5RestoreHoming].CheckIdx[1] := 1;
+    StepTable[StepB5RestoreHoming].TimeoutPT := T#12s;
+    StepTable[StepB5RestoreHoming].NextOnPass := StepB5InhibitM1;
+    StepTable[StepB5RestoreHoming].NextOnFail := StepB5Teardown;
+    StepTable[StepB5RestoreHoming].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB5InhibitM1].Name := 'Tcb5 Inhibition M1';
+    StepTable[StepB5InhibitM1].CaseId := 5;
+    StepTable[StepB5InhibitM1].StimulusId := 9;
+    StepTable[StepB5InhibitM1].CheckIdx[1] := 20;
+    StepTable[StepB5InhibitM1].CheckIdx[2] := 21;
+    StepTable[StepB5InhibitM1].TimeoutPT := T#15s;
+    StepTable[StepB5InhibitM1].NextOnPass := StepB5Teardown;
+    StepTable[StepB5InhibitM1].NextOnFail := StepB5Teardown;
+    StepTable[StepB5InhibitM1].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB5Teardown].Name := 'Tcb5 Teardown';
+    StepTable[StepB5Teardown].CaseId := 5;
+    StepTable[StepB5Teardown].StimulusId := 1;
+    StepTable[StepB5Teardown].CheckIdx[1] := 1;
+    StepTable[StepB5Teardown].TimeoutPT := T#12s;
+    StepTable[StepB5Teardown].NextOnPass := StepB6Setup;
+    StepTable[StepB5Teardown].NextOnFail := StepB6Setup;
+    StepTable[StepB5Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // TC-B6 : Homme-Mort &amp; Recul
+    StepTable[StepB6Setup].Name := 'Tcb6 Setup saine';
+    StepTable[StepB6Setup].CaseId := 6;
+    StepTable[StepB6Setup].StimulusId := 1;
+    StepTable[StepB6Setup].CheckIdx[1] := 1;
+    StepTable[StepB6Setup].TimeoutPT := T#12s;
+    StepTable[StepB6Setup].NextOnPass := StepB6StartMove;
+    StepTable[StepB6Setup].NextOnFail := StepB6Teardown;
+    StepTable[StepB6Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB6StartMove].Name := 'Tcb6 Lancement Mouvement';
+    StepTable[StepB6StartMove].CaseId := 6;
+    StepTable[StepB6StartMove].StimulusId := 2;
+    StepTable[StepB6StartMove].CheckIdx[1] := 2;
+    StepTable[StepB6StartMove].TimeoutPT := T#5s;
+    StepTable[StepB6StartMove].NextOnPass := StepB6ReleaseJoy;
+    StepTable[StepB6StartMove].NextOnFail := StepB6Teardown;
+    StepTable[StepB6StartMove].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB6ReleaseJoy].Name := 'Tcb6 Relâchement Homme-Mort';
+    StepTable[StepB6ReleaseJoy].CaseId := 6;
+    StepTable[StepB6ReleaseJoy].StimulusId := 10;
+    StepTable[StepB6ReleaseJoy].CheckIdx[1] := 5;
+    StepTable[StepB6ReleaseJoy].TimeoutPT := T#1s;
+    StepTable[StepB6ReleaseJoy].NextOnPass := StepB6ReverseJoy;
+    StepTable[StepB6ReleaseJoy].NextOnFail := StepB6Teardown;
+    StepTable[StepB6ReleaseJoy].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB6ReverseJoy].Name := 'Tcb6 Commande Opposée';
+    StepTable[StepB6ReverseJoy].CaseId := 6;
+    StepTable[StepB6ReverseJoy].StimulusId := 11;
+    StepTable[StepB6ReverseJoy].CheckIdx[1] := 22;
+    StepTable[StepB6ReverseJoy].CheckIdx[2] := 23;
+    StepTable[StepB6ReverseJoy].TimeoutPT := T#5s;
+    StepTable[StepB6ReverseJoy].NextOnPass := StepB6Teardown;
+    StepTable[StepB6ReverseJoy].NextOnFail := StepB6Teardown;
+    StepTable[StepB6ReverseJoy].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepB6Teardown].Name := 'Tcb6 Teardown';
+    StepTable[StepB6Teardown].CaseId := 6;
+    StepTable[StepB6Teardown].StimulusId := 1;
+    StepTable[StepB6Teardown].CheckIdx[1] := 1;
+    StepTable[StepB6Teardown].TimeoutPT := T#12s;
+    StepTable[StepB6Teardown].NextOnPass := 0;
+    StepTable[StepB6Teardown].NextOnFail := 0;
+    StepTable[StepB6Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    TableReady := TRUE;
+END_IF;
+
+// 3. 📥 ACQUIRE
+ProbeBool[SigHealthyIdle] := NOT PRG_06_WinchControl.instBucket.Error
+                             AND NOT PRG_06_WinchControl.instBucket.BucketState.StateIncoherent;
+
+ProbeBool[SigBucketBusy]   := PRG_06_WinchControl.instBucket.Busy;
+ProbeBool[SigBucketDone]    := PRG_06_WinchControl.instBucket.Done;
+ProbeBool[SigBucketError]   := PRG_06_WinchControl.instBucket.Error;
+ProbeBool[SigM1SlipDetected] := PRG_06_WinchControl.instBucket.M1SlipDetected;
+ProbeBool[SigM1SafeStop]    := PRG_03_Safety.instSafetyWinchM1.SafeStop;
+ProbeBool[SigM1PowerCutOff] := PRG_03_Safety.instSafetyWinchM1.PowerCutOff;
+ProbeBool[SigBucketIsOpen]  := _BucketState.IsOpen;
+ProbeBool[SigBucketIsClosed] := _BucketState.IsClosed;
+ProbeBool[SigM2StartStop]   := PRG_06_WinchControl.instBucket.M2_StartStop;
+ProbeBool[SigM2ForceSlowSpeed] := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
+
+ProbeDint[SigBucketErrorId] := WORD_TO_DINT(PRG_06_WinchControl.instBucket.ErrorId);
+ProbeDint[SigM2Direction]   := INT_TO_DINT(PRG_06_WinchControl.instBucket.M2_Direction);
+ProbeDint[SigSafetyM1ErrorId] := WORD_TO_DINT(PRG_03_Safety.instSafetyWinchM1.ErrorId);
+
+ProbeReal[SigActiveOffsetM]   := PRG_06_WinchControl.instBucket.ActiveOffsetM;
+ProbeReal[SigRemainingTravelM] := PRG_06_WinchControl.instBucket.RemainingTravelM;
+ProbeReal[SigM2CablePos]      := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+ProbeReal[SigM2TopLimit]       := PRG_06_WinchControl.instWinchM2.TopLimitM;
+
+// 4. ⚙️ MOTEUR
+Sequencer(
+    Start := Start,
+    Abort := Abort,
+    FirstStepId := FirstStepId,
+    StepTable := StepTable,
+    CheckTable := CheckTable,
+    CaseTable := CaseTable,
+    InvariantTable := InvariantTable,
+    ProbeBool := ProbeBool,
+    ProbeDint := ProbeDint,
+    ProbeReal := ProbeReal,
+    Report := Report,
+    Busy =&gt; Busy,
+    Done =&gt; Done,
+    AnyFailed =&gt; AnyFailed,
+    ActiveStimulusId =&gt; ActiveStimulusId,
+    StepElapsed =&gt; StepElapsed
+);
+
+// 5. ⚡ STIMULI
+CASE ActiveStimulusId OF
+    0: // 🔓 Neutre
+        CmdOpen_IHM := FALSE;
+        CmdClose_IHM := FALSE;
+        JoystickY_StartStop := FALSE;
+        JoystickY_Direction := 0;
+        ConfirmOpenPosition := FALSE;
+        HomedM1 := TRUE;
+        InhibitM1 := FALSE;
+        GVL_PLC_Tests.OverrideM1Slip := FALSE;
+        GVL_PLC_Tests.OverrideM1SlipCritical := FALSE;
+        GVL_PLC_Tests.OverrideM2Stuck := FALSE;
+        GVL_PLC_Tests.OverrideM2BootDrift := FALSE;
+
+    1: // Reset &amp; Saine
+        CmdOpen_IHM := FALSE;
+        CmdClose_IHM := FALSE;
+        JoystickY_StartStop := FALSE;
+        ConfirmOpenPosition := TRUE; // Forcer état sain
+        HomedM1 := TRUE;
+        InhibitM1 := FALSE;
+        GVL_PLC_Tests.OverrideM1Slip := FALSE;
+        GVL_PLC_Tests.OverrideM1SlipCritical := FALSE;
+        GVL_PLC_Tests.OverrideM2Stuck := FALSE;
+        GVL_PLC_Tests.OverrideM2BootDrift := FALSE;
+
+    2: // Fermeture Nominale
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := TRUE;
+        JoystickY_Direction := 1;
+        ConfirmOpenPosition := FALSE;
+        HomedM1 := TRUE;
+
+    3: // Glissement Modéré M1
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := TRUE;
+        JoystickY_Direction := 1;
+        GVL_PLC_Tests.OverrideM1Slip := TRUE;
+
+    4: // Glissement Critique M1
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := TRUE;
+        JoystickY_Direction := 1;
+        GVL_PLC_Tests.OverrideM1SlipCritical := TRUE;
+
+    5: // Fermeture nominale (TC-B3)
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := TRUE;
+        JoystickY_Direction := 1;
+        ConfirmOpenPosition := FALSE;
+
+    6: // Boot Incohérent
+        GVL_PLC_Tests.OverrideM2BootDrift := TRUE;
+        CmdOpen_IHM := FALSE;
+        CmdClose_IHM := FALSE;
+        JoystickY_StartStop := FALSE;
+
+    7: // Recalage manuel
+        ConfirmOpenPosition := TRUE;
+        CmdOpen_IHM := FALSE;
+        CmdClose_IHM := FALSE;
+        JoystickY_StartStop := FALSE;
+
+    8: // Perte Homing
+        HomedM1 := FALSE;
+        CmdClose_IHM := FALSE;
+        CmdOpen_IHM := FALSE;
+
+    9: // Inhibition M1 + Mouvement
+        InhibitM1 := TRUE;
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := TRUE;
+        JoystickY_Direction := 1;
+        GVL_PLC_Tests.OverrideM1Slip := TRUE;
+
+    10: // Relâchement Homme-Mort
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := FALSE;
+        JoystickY_Direction := 1;
+
+    11: // Commande opposée
+        CmdClose_IHM := TRUE;
+        JoystickY_StartStop := TRUE;
+        JoystickY_Direction := -1;
+END_CASE;
+
+// Liaison IHM / Métier
+IF Busy THEN
+    PRG_06_WinchControl.instBucket.CmdOpen_IHM := CmdOpen_IHM;
+    PRG_06_WinchControl.instBucket.CmdClose_IHM := CmdClose_IHM;
+    PRG_06_WinchControl.instBucket.JoystickY_StartStop := JoystickY_StartStop;
+    PRG_06_WinchControl.instBucket.JoystickY_Direction := JoystickY_Direction;
+    PRG_06_WinchControl.instBucket.ConfirmOpenPosition := ConfirmOpenPosition;
+    PRG_06_WinchControl.instBucket.HomedM1 := HomedM1;
+    PRG_06_WinchControl.instBucket.InhibitM1 := InhibitM1;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>65362a36-93ab-553f-a406-fd0621b8464e</ObjectId>
           </data>
         </addData>
       </pou>
@@ -8995,6 +10204,11 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <derived name="FB_TranslationValidation" />
               </type>
             </variable>
+            <variable name="instBucketValidation">
+              <type>
+                <derived name="FB_BucketValidation" />
+              </type>
+            </variable>
             <variable name="RunAllTrig">
               <type>
                 <derived name="R_TRIG" />
@@ -9046,13 +10260,28 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <INT />
               </type>
             </variable>
+            <variable name="StartBucket">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AbortBucket">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepBucket">
+              <type>
+                <INT />
+              </type>
+            </variable>
             <variable name="ChainMode">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Enchaînement multi-suites (CmdRunAll) — 2026-07-16 : ajout Translation
-TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Enchaînement multi-suites (CmdRunAll) — 2026-07-16 : ajout Translation puis Bucket
+TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket</xhtml>
               </documentation>
             </variable>
             <variable name="CurrentSuiteIdx">
@@ -9060,7 +10289,7 @@ TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Suite active/dernière active (GVL_PLC_Tests_Const.SuiteSafety/SuiteTranslation)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Suite active/dernière active (GVL_PLC_Tests_Const.SuiteSafety/SuiteTranslation/SuiteBucket)</xhtml>
               </documentation>
             </variable>
             <variable name="FinalAborted">
@@ -9149,19 +10378,26 @@ END_IF;
 // 2. Machine d'états principale
 CASE GVL_PLC_Tests.Status.RunState OF
 
-    E_TestRunState.TESTRUN_IDLE:
+    // 🔧 REX 2026-07-16 (demande utilisateur) : PASSED/FAILED/ABORTED sont FIGÉS ici (pattern
+    // StateAtError, P3 §4) — sans ça, l'état ne durait qu'1 scan (10ms) avant de retomber tout
+    // seul à IDLE, invisible en Watch CODESYS. On ne quitte cet état que sur nouveau Start
+    // (relance direct un run) ou CmdClearReport (acquittement explicite → retour IDLE).
+    E_TestRunState.TESTRUN_IDLE, E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
         StartSafety := FALSE;
         AbortSafety := FALSE;
         StartTranslation := FALSE;
         AbortTranslation := FALSE;
+        StartBucket := FALSE;
+        AbortBucket := FALSE;
 
-        // Démarrage par bouton global RunAll — enchaîne Safety PUIS Translation
+        // Démarrage par bouton global RunAll — enchaîne Safety PUIS Translation PUIS Bucket
         IF RunAllTrig.Q THEN
             IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
                 ChainMode := TRUE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSafety;
                 StartSafety := TRUE;
                 FirstStepSafety := 10; // TC-01 SETUP
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
 
@@ -9180,6 +10416,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ELSE
                     FirstStepSafety := 10; // Par défaut TC-01
                 END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
@@ -9200,44 +10437,86 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ELSE
                     FirstStepTranslation := 10; // Par défaut TC-T1
                 END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage d'une suite ciblée (Bucket)
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteBucket THEN
+            IF GVL_Simulation.SimulationModeActive AND instBucketValidation.SimGateOk THEN
+                ChainMode := FALSE;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
+                StartBucket := TRUE;
+                IF GVL_PLC_Tests.Cmd.RunCase = 1 THEN
+                    FirstStepBucket := 10;
+                ELSIF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
+                    FirstStepBucket := 20;
+                ELSIF GVL_PLC_Tests.Cmd.RunCase = 3 THEN
+                    FirstStepBucket := 30;
+                ELSE
+                    FirstStepBucket := 10; // Par défaut TC-B1
+                END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
-        // Commande d'effacement du rapport
+        // Commande d'effacement du rapport — acquittement explicite, retour à IDLE
         IF ClearReportTrig.Q THEN
-            // La réinitialisation est gérée par le moteur au démarrage du run suivant,
-            // mais on peut forcer la remise à zéro des états actuels de l'IHM
+            // La réinitialisation des rapports Steps[]/Cases[] est gérée par le moteur
+            // au démarrage du run suivant ; ici on remet juste les compteurs IHM et on
+            // libère l'état figé PASSED/FAILED/ABORTED.
             GVL_PLC_Tests.Status.CasesTotal := 0;
             GVL_PLC_Tests.Status.CasesPassed := 0;
             GVL_PLC_Tests.Status.CasesFailed := 0;
+            GVL_PLC_Tests.Status.FailureSummary := '';
+            GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_IDLE;
         END_IF;
 
     E_TestRunState.TESTRUN_RUNNING:
         // Annulation des impulsions de départ
         StartSafety := FALSE;
         StartTranslation := FALSE;
+        StartBucket := FALSE;
 
         // Abandon propre ou perte du mode Simulation — coupe la suite active
         IF AbortTrig.Q OR NOT GVL_Simulation.SimulationModeActive THEN
             AbortSafety := TRUE;
             AbortTranslation := TRUE;
+            AbortBucket := TRUE;
         END_IF;
 
         // Surveillance de la fin d'exécution — Safety d'abord
         IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSafety AND instSafetyValidation.Done THEN
             AbortSafety := FALSE;
-            IF ChainMode AND NOT instSafetyValidation.Report.Aborted THEN
+            IF ChainMode AND NOT instSafetyValidation.Report.Aborted AND instTranslationValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Translation (continue même si Safety a échoué — logique
                 // FAIL_CONTINUE déjà appliquée au niveau des cases/steps, voir §7.3.4)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
                 StartTranslation := TRUE;
                 FirstStepTranslation := 10;
+            ELSIF ChainMode AND NOT instSafetyValidation.Report.Aborted AND NOT instTranslationValidation.SimGateOk THEN
+                // 🔧 REX 2026-07-16 : bug trouvé — le chaînage sautait la vérification SimGateOk
+                // (le démarrage ciblé Cmd.RunSuite=2 la faisait, pas celui-ci). Sans ce garde-fou,
+                // Translation démarrait quand même avec FB_Safety_Translation.Enable=FALSE
+                // (ManuActive actif) → 3 timeouts silencieux, aucun défaut jamais détectable.
+                GVL_PLC_Tests.Cmd.RunAll := FALSE;
+                ChainMode := FALSE; // 🔒 Évite d'agréger un rapport Translation périmé (suite jamais lancée ce run)
+                IF instSafetyValidation.Report.FailureSummary = '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := 'Translation NON TESTEE (SimGateOk=FALSE — verifier ManuActive/IHM_MANU ou capteur recable reel)';
+                ELSE
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, ' || Translation NON TESTEE (SimGateOk=FALSE — verifier ManuActive/IHM_MANU ou capteur recable reel)');
+                END_IF;
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSE
                 FinalAborted := instSafetyValidation.Report.Aborted;
                 FinalAnyFailed := instSafetyValidation.AnyFailed;
+                GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
+                GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
                 IF FinalAborted THEN
                     GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
                 ELSIF FinalAnyFailed THEN
@@ -9250,13 +10529,82 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Translation (ciblée ou enchaînée après Safety)
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation AND instTranslationValidation.Done THEN
             AbortTranslation := FALSE;
-            IF ChainMode THEN
-                FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted;
-                FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed;
+            IF ChainMode AND NOT instTranslationValidation.Report.Aborted AND instBucketValidation.SimGateOk THEN
+                // 🔗 Enchaîne vers Bucket (2026-07-16 : 3e maillon Safety→Translation→Bucket)
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
+                StartBucket := TRUE;
+                FirstStepBucket := 10;
+            ELSIF ChainMode AND NOT instTranslationValidation.Report.Aborted AND NOT instBucketValidation.SimGateOk THEN
+                // Même garde-fou que Safety→Translation : Bucket ne doit jamais démarrer sans son
+                // SimGateOk (refuse si M1/M2 en simulation réelle, voir FB_BucketValidation §1).
+                GVL_PLC_Tests.Cmd.RunAll := FALSE;
+                ChainMode := FALSE; // 🔒 Évite d'agréger un rapport Bucket périmé (suite jamais lancée ce run)
+                IF instSafetyValidation.Report.FailureSummary = '' AND instTranslationValidation.Report.FailureSummary = '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := 'Bucket NON TESTEE (SimGateOk=FALSE — verifier simulation reelle M1/M2)';
+                ELSIF instTranslationValidation.Report.FailureSummary = '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, ' || Bucket NON TESTEE (SimGateOk=FALSE — verifier simulation reelle M1/M2)');
+                ELSE
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instTranslationValidation.Report.FailureSummary, ' || Bucket NON TESTEE (SimGateOk=FALSE — verifier simulation reelle M1/M2)');
+                END_IF;
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSE
-                FinalAborted := instTranslationValidation.Report.Aborted;
-                FinalAnyFailed := instTranslationValidation.AnyFailed;
+                // Soit run ciblé (pas de chaînage), soit chaînage interrompu (Translation.Aborted)
+                IF ChainMode THEN
+                    FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted;
+                    FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed;
+                    IF instSafetyValidation.Report.FailureSummary &lt;&gt; '' AND instTranslationValidation.Report.FailureSummary &lt;&gt; '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, CONCAT(' || ', instTranslationValidation.Report.FailureSummary));
+                    ELSIF instSafetyValidation.Report.FailureSummary &lt;&gt; '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instTranslationValidation.Report.FailureSummary;
+                    END_IF;
+                ELSE
+                    FinalAborted := instTranslationValidation.Report.Aborted;
+                    FinalAnyFailed := instTranslationValidation.AnyFailed;
+                    GVL_PLC_Tests.Status.FailureSummary := instTranslationValidation.Report.FailureSummary;
+                END_IF;
+                GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
+                IF FinalAborted THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+                ELSIF FinalAnyFailed THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+                ELSE
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+                END_IF;
             END_IF;
+
+        // Surveillance de la fin d'exécution — Bucket (ciblée, ou dernier maillon de la chaîne)
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket AND instBucketValidation.Done THEN
+            AbortBucket := FALSE;
+            IF ChainMode THEN
+                FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted OR instBucketValidation.Report.Aborted;
+                FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed OR instBucketValidation.AnyFailed;
+                // 🏷️ Combine jusqu'à 3 résumés (Safety, Translation, Bucket — seul cas où les 3 ont tourné)
+                GVL_PLC_Tests.Status.FailureSummary := '';
+                IF instSafetyValidation.Report.FailureSummary &lt;&gt; '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
+                END_IF;
+                IF instTranslationValidation.Report.FailureSummary &lt;&gt; '' THEN
+                    IF GVL_PLC_Tests.Status.FailureSummary &lt;&gt; '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instTranslationValidation.Report.FailureSummary));
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instTranslationValidation.Report.FailureSummary;
+                    END_IF;
+                END_IF;
+                IF instBucketValidation.Report.FailureSummary &lt;&gt; '' THEN
+                    IF GVL_PLC_Tests.Status.FailureSummary &lt;&gt; '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instBucketValidation.Report.FailureSummary));
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instBucketValidation.Report.FailureSummary;
+                    END_IF;
+                END_IF;
+            ELSE
+                FinalAborted := instBucketValidation.Report.Aborted;
+                FinalAnyFailed := instBucketValidation.AnyFailed;
+                GVL_PLC_Tests.Status.FailureSummary := instBucketValidation.Report.FailureSummary;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
             IF FinalAborted THEN
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSIF FinalAnyFailed THEN
@@ -9266,22 +10614,18 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
         END_IF;
 
-    E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
-        // 🔧 REX 2026-07-16 : c'est ICI que CmdRunAll retombe à FALSE (Done atteint), pas au démarrage
-        GVL_PLC_Tests.Cmd.RunAll := FALSE;
-        // Retour automatique à l'état IDLE après un cycle pour libérer l'IHM
-        GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_IDLE;
-
 END_CASE;
 
 // 3. Appel des instances de suites
 instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
 instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, FirstStepId := FirstStepTranslation);
+instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
 GVL_PLC_Tests.SuiteSafetyValidation := instSafetyValidation.Report;
 GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
+GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
 
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
@@ -9291,6 +10635,11 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.ActiveCaseId := instTranslationValidation.Report.CurrentCaseId;
         GVL_PLC_Tests.Status.ActiveStepId := instTranslationValidation.Report.CurrentStepId;
         GVL_PLC_Tests.Status.StepElapsed := instTranslationValidation.StepElapsed;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instBucketValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instBucketValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instBucketValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instBucketValidation.StepElapsed;
     ELSE
         GVL_PLC_Tests.Status.ActiveSuiteName := instSafetyValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instSafetyValidation.Report.CurrentCaseId;
@@ -9333,6 +10682,19 @@ IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation THEN
         IF instTranslationValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
             IF instTranslationValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instBucketValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instBucketValidation.Report.Cases[Idx].Ok THEN
                 PassedCount := PassedCount + 1;
             ELSE
                 FailedCount := FailedCount + 1;
@@ -10335,7 +11697,11 @@ CASE ActiveStimulusId OF
     3: // TC-01 : Coupure franche (AU pressé)
         GVL_PLC_Tests.OverrideChainTrue := FALSE;
         GVL_PLC_Tests.OverrideChainFalse := TRUE;
-        GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+        // 🔧 REX 2026-07-16 : OverrideChainFalse seul a 1 scan de retard (instSimSafety lu
+        // AVANT instTestsManagement() dans PRG_00_Inputs.st) — incompatible avec le check 6
+        // en CHECK_INSTANT. OverrideContactorFalse force EmergencyStopOk directement et
+        // tardivement (après instTestsManagement()) → effet le même scan.
+        GVL_PLC_Tests.OverrideContactorFalse := TRUE;
         ArmRequest := FALSE;
         ResetFaults := FALSE;
 
@@ -21104,6 +22470,14 @@ Rapport de la suite Safety</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Translation M3</xhtml>
           </documentation>
         </variable>
+        <variable name="SuiteBucketValidation">
+          <type>
+            <derived name="ST_TestSuiteReport" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Bucket</xhtml>
+          </documentation>
+        </variable>
         <variable name="OverrideChainTrue">
           <type>
             <BOOL />
@@ -21154,6 +22528,39 @@ Force TranslationPosTremie (Fdc extrême avant) à TRUE</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM1Slip">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Surcharges (overrides) physiques — Bucket
+Simule glissement modéré M1 (1.5m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM1SlipCritical">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule glissement critique M1 (2.5m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM2Stuck">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule blocage mécanique M2 (position figée)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM2BootDrift">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule dérive position M2 au démarrage (Boot)</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -21313,6 +22720,17 @@ Force TranslationPosTremie (Fdc extrême avant) à TRUE</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Translation M3 (Cmd.RunSuite)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SuiteBucket">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="3" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Bucket (Cmd.RunSuite)</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -21781,6 +23199,9 @@ Front montant = applique le saut sur M1</xhtml>
                 <Object Name="ST_TestSuiteReport" ObjectId="b6ce4c74-704f-559b-8bc7-c06d80a4bda4" />
               </Folder>
             </Folder>
+            <Folder Name="SUITE_BENNE">
+              <Object Name="FB_BucketValidation" ObjectId="65362a36-93ab-553f-a406-fd0621b8464e" />
+            </Folder>
             <Folder Name="SUITE_SAFETY">
               <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
               <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
@@ -21826,14 +23247,14 @@ Front montant = applique le saut sur M1</xhtml>
           <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
           <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
         </Folder>
-        <Folder Name="ENCODERS">
+        <Folder Name="CODEURS">
           <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
           <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
           <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
-        <Folder Name="EMERGENCY">
+        <Folder Name="AU">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
           <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />

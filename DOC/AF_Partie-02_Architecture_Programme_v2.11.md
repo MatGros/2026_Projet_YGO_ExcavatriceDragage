@@ -96,7 +96,7 @@ MainTask (10 ms)
  3.  PRG_3_Safety           — CODE/SAFETY/        — FB_Safety_Winch ×2 (M1/M2), FB_Safety_Translation → SafeStop/ForbidX/PowerCutOff par domaine
  4.  PRG_4_Modes            — CODE/MODES/         — FB_Modes : arbitrage Mode + SyncEnable
  5.  PRG_5_Cycle            — CODE/CYCLE/         — FB_Cycle : séquenceur E_CycleStep (13 étapes)
- 6.  PRG_6_WinchControl     — CODE/CONTROL/       — FB_Winch M1/M2, FB_WinchSync, FB_Benne ; arbitrage manuel/auto
+ 6.  PRG_6_WinchControl     — CODE/CONTROL/       — FB_Winch M1/M2, FB_WinchSync, FB_Bucket ; arbitrage manuel/auto
  7.  PRG_7_TranslationControl   — CODE/CONTROL/       — FB_Translation (M3) ; arbitrage manuel/auto, sélection cible
  8.  PRG_8_AuxiliaryControl — CODE/CONTROL/       — Auxiliaires hors-axe (hydraulique, crible…) — stubs neutres à ce jour
  9.  PRG_9_Supervision      — CODE/SUPERVISION/   — Mapping bidirectionnel GVL_IHM ↔ GVL_PERSISTENT, boot init, MachineReset_IHM
@@ -146,12 +146,12 @@ défaut codeur, refuse `MAINT_N2` sans mot de passe, calcule `SyncEnable` (MAINT
 ### `PRG_5_Cycle` (position 5)
 `FB_Cycle` : séquenceur `E_CycleStep` (13 étapes, Partie4). Émet des commandes discrètes
 (`CmdWinchM1/M2_StartStop/Direction/SpeedPct`, `CmdTranslationM3_Start/Target`,
-`CmdBenne_Open/Close`) consommées par `PRG_6_WinchControl`/`PRG_7_TranslationControl` **en
+`CmdBucket_Open/Close`) consommées par `PRG_6_WinchControl`/`PRG_7_TranslationControl` **en
 mode SEMI_AUTO uniquement** (arbitrage dans les programmes de contrôle, pas ici).
 
 ### `PRG_6_WinchControl` (position 6)
 Arbitre la source de commande (Joystick en manuel, `PRG_5_Cycle` en semi-auto/auto) pour M1/M2,
-instancie `FB_WinchSync` (surveillance écart + cohérence de commande), `FB_Benne` (désynchro
+instancie `FB_WinchSync` (surveillance écart + cohérence de commande), `FB_Bucket` (désynchro
 M2), et les 2 instances `FB_Winch`. Calcule les limites de descente actives (limite légale +
 limite physique) et le `ForbidDescent`/`ForbidAscent` effectifs par treuil.
 
@@ -186,7 +186,7 @@ interne machine brut** (E/S) ont disparu. Distinction stricte à conserver :
 
 | GVL | Rôle | Statut |
 |-----|------|--------|
-| `GVL_IHM` (`SUPERVISION`) | Échange bidirectionnel IHM (mesures, commandes, RETAIN) — **1 struct par objet métier** (`ST_WinchHMI`, `ST_BenneHMI`…), voir Partie 7 | ✅ Conservée — usage IHM, pas état interne |
+| `GVL_IHM` (`SUPERVISION`) | Échange bidirectionnel IHM (mesures, commandes, RETAIN) — **1 struct par objet métier** (`ST_WinchHMI`, `ST_BucketHMI`…), voir Partie 7 | ✅ Conservée — usage IHM, pas état interne |
 | `GVL_PERSISTENT` (racine `CODE/`) | Paramètres/calibrations survivant coupure secteur + Download (`PERSISTENT RETAIN`) | ✅ Conservée — rôle distinct, jamais lue par un autre FB comme bus d'état cyclique |
 | `GVL_Simulation` (`MAIN`) | Bit maître `SimulationModeActive` + granularité par device (`<Device>_IsReal`) — voir Partie 13 | ✅ Conservée — remplace `GVL_DEBUG` (supprimée), mise en service uniquement |
 | `GVL_Modes_Stub` (`MODES`) | Stub sélecteur mode/mot de passe (pas de vrai IHM câblé ce lot) | ✅ Conservée — temporaire, à terme absorbée par `GVL_IHM` |
@@ -225,7 +225,7 @@ son domaine fonctionnel** :
 | `ST_ContactorCheck` | `COMMUN` | Diag commande/retour contacteur |
 | `ST_SpeedStepTable` | `WINCH` | 5 paliers masque 4 bits |
 | `ST_EncoderCalib` | `ENCODERS` | RETAIN homing (Homed, HomingRefRaw, LastKnownRawPos) |
-| `ST_BenneConfig` / `ST_BenneState` | `BENNE` | Offsets + mémoire mécanique |
+| `ST_BucketConfig` / `ST_BucketState` | `BENNE` | Offsets + mémoire mécanique |
 | `ST_DiagDevice` | `DIAG` | Diag esclave bus générique |
 | `ST_*HMI` (Winch/Benne/Sync/Joystick/Modes/Encoder/Translation/NetworkDiag) | `SUPERVISION` | Structs d'échange `GVL_IHM`, voir Partie 7 |
 

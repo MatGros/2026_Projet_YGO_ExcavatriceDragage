@@ -18,5 +18,6 @@ STRUCT
     CasesPassed      : INT;        // Nombre de cas réussis
     CasesFailed      : INT;        // Nombre de cas en échec
     Heartbeat        : BOOL;       // Clignotant d'activité (3 pulses sur transition)
+    FailureSummary   : STRING(255); // 🏷️ Détail des défauts du dernier run, TOUTES suites confondues (remonte Report.FailureSummary de chaque suite exécutée) — lisible sans creuser Suite*Validation
 END_STRUCT
 END_TYPE

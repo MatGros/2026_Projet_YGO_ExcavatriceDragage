@@ -190,14 +190,14 @@ part**, jamais en improvisé. Voir `PLAN_TASK.md` §🏷️ Nommage.
 seuls champs `Req`/`Cmd` créés cette session). Tout le reste de l'existant garde sa forme
 d'origine, **non touché, pas une nouvelle incohérence accidentelle** — audit/rename à part si
 un jour voulu (voir `PLAN_TASK.md`) :
-- `CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/`CmdInhibit` (`FB_Benne`/`FB_Winch`/`ST_BenneHMI`/
+- `CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/`CmdInhibit` (`FB_Bucket`/`FB_Winch`/`ST_BucketHMI`/
   `ST_WinchHMI`) — déjà en préfixe, cohérent avec la règle, mais catégorie `Cmd` utilisée ici pour
   une **requête** (pas un signal final) : à harmoniser vers `Req` dans ce chantier séparé.
-- `CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBenne_*` (`FB_Cycle`) — idem, préfixe déjà correct,
+- `CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBucket_*` (`FB_Cycle`) — idem, préfixe déjà correct,
   catégorie à revoir.
 - `BrakeCmd` (`FB_Brake`/`FB_Translation`/`FB_Safety_Translation`/`ST_WinchHMI`/`ST_TranslationHMI`) — en
   **suffixe**, contredit la règle ci-dessus mais établi dans 5 fichiers : laissé tel quel.
-- `ST_BenneHMI.OpenReq`/`CloseReq` — en **suffixe** également (ancien usage qui a inspiré la
+- `ST_BucketHMI.OpenReq`/`CloseReq` — en **suffixe** également (ancien usage qui a inspiré la
   distinction `Req`/`Cmd`, avant qu'on tranche pour le préfixe) : laissé tel quel.
 
 ### Paramètre → Mesure → État atteint → État actif (fin de course logiciel, seuils)
@@ -215,10 +215,10 @@ production côté Winch (`ST_WinchHMI`), pris comme référence :
 Différence 3 vs 4 : `CableLimitAscentReached` dit juste "on est arrivé au seuil" (info) ;
 `ForbidAscentActive` dit "en conséquence, la montée est interdite maintenant" (action). Les deux
 existent souvent en paire, mais pas toujours 1:1 — un même "actif" peut agréger plusieurs
-"atteint"/conditions (ex. `FdcBenneOpenActive` dépend d'un seuil ET d'un `Enable` de config).
+"atteint"/conditions (ex. `FdcBucketOpenActive` dépend d'un seuil ET d'un `Enable` de config).
 
 **Paramètres/réglages (Config)** vs **Consignes (`Ref`)** : un paramètre change rarement (RETAIN,
-réglage banc/mise en service — `RampAccelRate`, `TopSensorPositionM`, `Config : ST_BenneConfig`) ;
+réglage banc/mise en service — `RampAccelRate`, `TopSensorPositionM`, `Config : ST_BucketConfig`) ;
 une consigne (`Ref`) est recalculée à chaque cycle par la logique (`SpeedRef`, `CablePosRef`).
 Les deux peuvent partager un suffixe d'unité (`M`, `Pct`) mais ne sont pas la même catégorie —
 un paramètre ne doit pas s'appeler `XxxRef`, une consigne calculée ne doit pas ressembler à un
@@ -272,7 +272,7 @@ construit toujours en 2 étapes distinctes, chacune avec sa propre règle.
 
 ### Niveau 1 — Instance (membre `GVL_IHM`, instance de FB)
 `<Mécanisme>[<Repère>]`
-- **Mécanisme** : nom métier court (`Winch`, `Translation`, `Benne`, `Joystick`, `Sync`, `Modes`)
+- **Mécanisme** : nom métier court (`Winch`, `Translation`, `Bucket`, `Joystick`, `Sync`, `Modes`)
 - **Repère** : identifiant matériel (`M1`/`M2`/`M3`/`JOY1`...) — **uniquement si plusieurs
   instances du même mécanisme existent**, pour les distinguer. Un mécanisme unique n'a pas de repère.
 
@@ -281,7 +281,7 @@ construit toujours en 2 étapes distinctes, chacune avec sa propre règle.
 | `WinchM1`, `WinchM2` | Oui | 2 treuils physiques, il faut distinguer lequel |
 | `TranslationM3` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
 | `JoystickJOY1` | Oui | Repère = ID noeud CANopen physique |
-| `Benne` | **Non** | Un seul benne sur la machine — un repère (`BenneM2`) répéterait le `M2` déjà présent dans ses propres champs (`M2PositionCorrected`, `LastPosM2Close`...) : tenté puis annulé le 2026-07-15, stutter |
+| `Bucket` | **Non** | Un seul benne sur la machine — un repère (`BucketM2`) répéterait le `M2` déjà présent dans ses propres champs (`M2PositionCorrected`, `LastPosM2Close`...) : tenté puis annulé le 2026-07-15, stutter |
 
 ### Niveau 2 — Champ à l'intérieur du struct
 `<Rôle><Fonction>` — **uniquement pour les catégories réellement ambiguës** (commande vs

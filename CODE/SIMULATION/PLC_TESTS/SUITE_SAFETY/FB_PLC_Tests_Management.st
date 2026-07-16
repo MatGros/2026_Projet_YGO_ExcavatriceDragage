@@ -4,6 +4,8 @@ VAR
     // voir AF_Partie-14 §7.3.4)
     instSafetyValidation      : FB_SafetyValidation;
     instTranslationValidation : FB_TranslationValidation;
+    instBucketValidation      : FB_BucketValidation;
+
 
     // Triggers pour IHM tactiles
     RunAllTrig           : R_TRIG;
@@ -17,10 +19,13 @@ VAR
     StartTranslation     : BOOL;
     AbortTranslation     : BOOL;
     FirstStepTranslation : INT;
+    StartBucket           : BOOL;
+    AbortBucket           : BOOL;
+    FirstStepBucket       : INT;
 
-    // 🔗 Enchaînement multi-suites (CmdRunAll) — 2026-07-16 : ajout Translation
-    ChainMode            : BOOL;  // TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation
-    CurrentSuiteIdx      : INT;   // Suite active/dernière active (GVL_PLC_Tests_Const.SuiteSafety/SuiteTranslation)
+    // 🔗 Enchaînement multi-suites (CmdRunAll) — 2026-07-16 : ajout Translation puis Bucket
+    ChainMode            : BOOL;  // TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket
+    CurrentSuiteIdx      : INT;   // Suite active/dernière active (GVL_PLC_Tests_Const.SuiteSafety/SuiteTranslation/SuiteBucket)
     FinalAborted         : BOOL;
     FinalAnyFailed       : BOOL;
 
@@ -56,19 +61,26 @@ END_IF;
 // 2. Machine d'états principale
 CASE GVL_PLC_Tests.Status.RunState OF
 
-    E_TestRunState.TESTRUN_IDLE:
+    // 🔧 REX 2026-07-16 (demande utilisateur) : PASSED/FAILED/ABORTED sont FIGÉS ici (pattern
+    // StateAtError, P3 §4) — sans ça, l'état ne durait qu'1 scan (10ms) avant de retomber tout
+    // seul à IDLE, invisible en Watch CODESYS. On ne quitte cet état que sur nouveau Start
+    // (relance direct un run) ou CmdClearReport (acquittement explicite → retour IDLE).
+    E_TestRunState.TESTRUN_IDLE, E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
         StartSafety := FALSE;
         AbortSafety := FALSE;
         StartTranslation := FALSE;
         AbortTranslation := FALSE;
+        StartBucket := FALSE;
+        AbortBucket := FALSE;
 
-        // Démarrage par bouton global RunAll — enchaîne Safety PUIS Translation
+        // Démarrage par bouton global RunAll — enchaîne Safety PUIS Translation PUIS Bucket
         IF RunAllTrig.Q THEN
             IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
                 ChainMode := TRUE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSafety;
                 StartSafety := TRUE;
                 FirstStepSafety := 10; // TC-01 SETUP
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
 
@@ -87,6 +99,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ELSE
                     FirstStepSafety := 10; // Par défaut TC-01
                 END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
@@ -107,44 +120,86 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ELSE
                     FirstStepTranslation := 10; // Par défaut TC-T1
                 END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage d'une suite ciblée (Bucket)
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteBucket THEN
+            IF GVL_Simulation.SimulationModeActive AND instBucketValidation.SimGateOk THEN
+                ChainMode := FALSE;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
+                StartBucket := TRUE;
+                IF GVL_PLC_Tests.Cmd.RunCase = 1 THEN
+                    FirstStepBucket := 10;
+                ELSIF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
+                    FirstStepBucket := 20;
+                ELSIF GVL_PLC_Tests.Cmd.RunCase = 3 THEN
+                    FirstStepBucket := 30;
+                ELSE
+                    FirstStepBucket := 10; // Par défaut TC-B1
+                END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
-        // Commande d'effacement du rapport
+        // Commande d'effacement du rapport — acquittement explicite, retour à IDLE
         IF ClearReportTrig.Q THEN
-            // La réinitialisation est gérée par le moteur au démarrage du run suivant,
-            // mais on peut forcer la remise à zéro des états actuels de l'IHM
+            // La réinitialisation des rapports Steps[]/Cases[] est gérée par le moteur
+            // au démarrage du run suivant ; ici on remet juste les compteurs IHM et on
+            // libère l'état figé PASSED/FAILED/ABORTED.
             GVL_PLC_Tests.Status.CasesTotal := 0;
             GVL_PLC_Tests.Status.CasesPassed := 0;
             GVL_PLC_Tests.Status.CasesFailed := 0;
+            GVL_PLC_Tests.Status.FailureSummary := '';
+            GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_IDLE;
         END_IF;
 
     E_TestRunState.TESTRUN_RUNNING:
         // Annulation des impulsions de départ
         StartSafety := FALSE;
         StartTranslation := FALSE;
+        StartBucket := FALSE;
 
         // Abandon propre ou perte du mode Simulation — coupe la suite active
         IF AbortTrig.Q OR NOT GVL_Simulation.SimulationModeActive THEN
             AbortSafety := TRUE;
             AbortTranslation := TRUE;
+            AbortBucket := TRUE;
         END_IF;
 
         // Surveillance de la fin d'exécution — Safety d'abord
         IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSafety AND instSafetyValidation.Done THEN
             AbortSafety := FALSE;
-            IF ChainMode AND NOT instSafetyValidation.Report.Aborted THEN
+            IF ChainMode AND NOT instSafetyValidation.Report.Aborted AND instTranslationValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Translation (continue même si Safety a échoué — logique
                 // FAIL_CONTINUE déjà appliquée au niveau des cases/steps, voir §7.3.4)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
                 StartTranslation := TRUE;
                 FirstStepTranslation := 10;
+            ELSIF ChainMode AND NOT instSafetyValidation.Report.Aborted AND NOT instTranslationValidation.SimGateOk THEN
+                // 🔧 REX 2026-07-16 : bug trouvé — le chaînage sautait la vérification SimGateOk
+                // (le démarrage ciblé Cmd.RunSuite=2 la faisait, pas celui-ci). Sans ce garde-fou,
+                // Translation démarrait quand même avec FB_Safety_Translation.Enable=FALSE
+                // (ManuActive actif) → 3 timeouts silencieux, aucun défaut jamais détectable.
+                GVL_PLC_Tests.Cmd.RunAll := FALSE;
+                ChainMode := FALSE; // 🔒 Évite d'agréger un rapport Translation périmé (suite jamais lancée ce run)
+                IF instSafetyValidation.Report.FailureSummary = '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := 'Translation NON TESTEE (SimGateOk=FALSE — verifier ManuActive/IHM_MANU ou capteur recable reel)';
+                ELSE
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, ' || Translation NON TESTEE (SimGateOk=FALSE — verifier ManuActive/IHM_MANU ou capteur recable reel)');
+                END_IF;
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSE
                 FinalAborted := instSafetyValidation.Report.Aborted;
                 FinalAnyFailed := instSafetyValidation.AnyFailed;
+                GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
+                GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
                 IF FinalAborted THEN
                     GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
                 ELSIF FinalAnyFailed THEN
@@ -157,13 +212,82 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Translation (ciblée ou enchaînée après Safety)
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation AND instTranslationValidation.Done THEN
             AbortTranslation := FALSE;
-            IF ChainMode THEN
-                FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted;
-                FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed;
+            IF ChainMode AND NOT instTranslationValidation.Report.Aborted AND instBucketValidation.SimGateOk THEN
+                // 🔗 Enchaîne vers Bucket (2026-07-16 : 3e maillon Safety→Translation→Bucket)
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
+                StartBucket := TRUE;
+                FirstStepBucket := 10;
+            ELSIF ChainMode AND NOT instTranslationValidation.Report.Aborted AND NOT instBucketValidation.SimGateOk THEN
+                // Même garde-fou que Safety→Translation : Bucket ne doit jamais démarrer sans son
+                // SimGateOk (refuse si M1/M2 en simulation réelle, voir FB_BucketValidation §1).
+                GVL_PLC_Tests.Cmd.RunAll := FALSE;
+                ChainMode := FALSE; // 🔒 Évite d'agréger un rapport Bucket périmé (suite jamais lancée ce run)
+                IF instSafetyValidation.Report.FailureSummary = '' AND instTranslationValidation.Report.FailureSummary = '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := 'Bucket NON TESTEE (SimGateOk=FALSE — verifier simulation reelle M1/M2)';
+                ELSIF instTranslationValidation.Report.FailureSummary = '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, ' || Bucket NON TESTEE (SimGateOk=FALSE — verifier simulation reelle M1/M2)');
+                ELSE
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instTranslationValidation.Report.FailureSummary, ' || Bucket NON TESTEE (SimGateOk=FALSE — verifier simulation reelle M1/M2)');
+                END_IF;
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSE
-                FinalAborted := instTranslationValidation.Report.Aborted;
-                FinalAnyFailed := instTranslationValidation.AnyFailed;
+                // Soit run ciblé (pas de chaînage), soit chaînage interrompu (Translation.Aborted)
+                IF ChainMode THEN
+                    FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted;
+                    FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed;
+                    IF instSafetyValidation.Report.FailureSummary <> '' AND instTranslationValidation.Report.FailureSummary <> '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, CONCAT(' || ', instTranslationValidation.Report.FailureSummary));
+                    ELSIF instSafetyValidation.Report.FailureSummary <> '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instTranslationValidation.Report.FailureSummary;
+                    END_IF;
+                ELSE
+                    FinalAborted := instTranslationValidation.Report.Aborted;
+                    FinalAnyFailed := instTranslationValidation.AnyFailed;
+                    GVL_PLC_Tests.Status.FailureSummary := instTranslationValidation.Report.FailureSummary;
+                END_IF;
+                GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
+                IF FinalAborted THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+                ELSIF FinalAnyFailed THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+                ELSE
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+                END_IF;
             END_IF;
+
+        // Surveillance de la fin d'exécution — Bucket (ciblée, ou dernier maillon de la chaîne)
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket AND instBucketValidation.Done THEN
+            AbortBucket := FALSE;
+            IF ChainMode THEN
+                FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted OR instBucketValidation.Report.Aborted;
+                FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed OR instBucketValidation.AnyFailed;
+                // 🏷️ Combine jusqu'à 3 résumés (Safety, Translation, Bucket — seul cas où les 3 ont tourné)
+                GVL_PLC_Tests.Status.FailureSummary := '';
+                IF instSafetyValidation.Report.FailureSummary <> '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
+                END_IF;
+                IF instTranslationValidation.Report.FailureSummary <> '' THEN
+                    IF GVL_PLC_Tests.Status.FailureSummary <> '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instTranslationValidation.Report.FailureSummary));
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instTranslationValidation.Report.FailureSummary;
+                    END_IF;
+                END_IF;
+                IF instBucketValidation.Report.FailureSummary <> '' THEN
+                    IF GVL_PLC_Tests.Status.FailureSummary <> '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instBucketValidation.Report.FailureSummary));
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instBucketValidation.Report.FailureSummary;
+                    END_IF;
+                END_IF;
+            ELSE
+                FinalAborted := instBucketValidation.Report.Aborted;
+                FinalAnyFailed := instBucketValidation.AnyFailed;
+                GVL_PLC_Tests.Status.FailureSummary := instBucketValidation.Report.FailureSummary;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
             IF FinalAborted THEN
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSIF FinalAnyFailed THEN
@@ -173,22 +297,18 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
         END_IF;
 
-    E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
-        // 🔧 REX 2026-07-16 : c'est ICI que CmdRunAll retombe à FALSE (Done atteint), pas au démarrage
-        GVL_PLC_Tests.Cmd.RunAll := FALSE;
-        // Retour automatique à l'état IDLE après un cycle pour libérer l'IHM
-        GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_IDLE;
-
 END_CASE;
 
 // 3. Appel des instances de suites
 instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
 instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, FirstStepId := FirstStepTranslation);
+instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
 GVL_PLC_Tests.SuiteSafetyValidation := instSafetyValidation.Report;
 GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
+GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
 
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
@@ -198,6 +318,11 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.ActiveCaseId := instTranslationValidation.Report.CurrentCaseId;
         GVL_PLC_Tests.Status.ActiveStepId := instTranslationValidation.Report.CurrentStepId;
         GVL_PLC_Tests.Status.StepElapsed := instTranslationValidation.StepElapsed;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instBucketValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instBucketValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instBucketValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instBucketValidation.StepElapsed;
     ELSE
         GVL_PLC_Tests.Status.ActiveSuiteName := instSafetyValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instSafetyValidation.Report.CurrentCaseId;
@@ -240,6 +365,19 @@ IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation THEN
         IF instTranslationValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
             IF instTranslationValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instBucketValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instBucketValidation.Report.Cases[Idx].Ok THEN
                 PassedCount := PassedCount + 1;
             ELSE
                 FailedCount := FailedCount + 1;

@@ -85,7 +85,7 @@ INIT — sous-états :
   1. Vérifier Translation en position d'init
        → capteur BOOL dédié (pas besoin de codeur)
        → si absent : commande petite vitesse pour l'atteindre (validation joystick)
-  2. Vérifier état benne : FB_Benne retourne une info SÛRE et vérifiée (ouvert attendu)
+  2. Vérifier état benne : FB_Bucket retourne une info SÛRE et vérifiée (ouvert attendu)
        → si incohérent (mémoire RETAIN vs codeurs) : blocage + demande maintenance
   3. Vérifier position treuils M1/M2 (position haute attendue, benne ouvert)
        → info fournie par des FB qui CONTRÔLENT et VALIDENT (pas une lecture brute)
@@ -234,7 +234,7 @@ Exemple : opérateur a choisi "position 2" à l'IHM, puis avance au joystick.
 
 ---
 
-## 🪣 6. Cinématique benne (`FB_Benne`)
+## 🪣 6. Cinématique benne (`FB_Bucket`)
 
 Le benne n'a **pas de moteur propre** : il s'ouvre/ferme par **désynchronisation de M2**
 (décalage de position relatif à M1, **M1 immobile** — voir §3bis).
@@ -257,7 +257,7 @@ Les offsets sont des **paramètres accessibles en Maintenance N2** (réglés à 
 
 ### Mémoire & contrôle au boot
 ```
-RETAIN : ST_BenneState (IsOpen, LastPosM2_Open, LastPosM2_Close)
+RETAIN : ST_BucketState (IsOpen, LastPosM2_Open, LastPosM2_Close)
 
 Au démarrage :
   comparer position M2 réelle vs mémoire
