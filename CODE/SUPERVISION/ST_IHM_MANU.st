@@ -23,13 +23,11 @@ STRUCT
     PositionM_M1     : REAL; (* 📊 [m] Position brute codeur M1 *)
     M1_RelayFwd      : BOOL; (* 🛗 Commande montée M1 + frein *)
     M1_RelayRev      : BOOL; (* 🛗 Commande descente M1 + frein *)
-    HomingEncoder_M1 : BOOL; (* 🎯 Front = référencement codeur M1 (OR avec GVL_IHM.M1TreuilRetenue.CmdHome existant) *)
 
     (* 🪝 Treuil M2 *)
     PositionM_M2     : REAL; (* 📊 [m] Position brute codeur M2 *)
     M2_RelayFwd      : BOOL; (* 🛗 Commande montée M2 + frein *)
     M2_RelayRev      : BOOL; (* 🛗 Commande descente M2 + frein *)
-    HomingEncoder_M2 : BOOL; (* 🎯 Front = référencement codeur M2 (OR avec GVL_IHM.M2TreuilBucket.CmdHome existant) *)
 
     (* 🔗 Commande couplée M1+M2 *)
     M1_M2_RelayFwd   : BOOL; (* 🔗 Commande montée M1 et M2 + frein *)

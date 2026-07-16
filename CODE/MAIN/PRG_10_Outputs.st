@@ -91,18 +91,13 @@ VAR
     M3Fwd_Demand          : BOOL;
     M3Rev_Demand          : BOOL;
 
-    // États effectifs calculés (après interlocks) — M3 uniquement : M1/M2 pilotés désormais via
-    // FB_Winch (PRG_06_WinchControl §1/§2, REX 2026-07-15 (2)) — ex-M1Fwd_Eff/M1Rev_Eff/M2Fwd_Eff/
-    // M2Rev_Eff/K1-4_Eff/SimM1Fwd_Eff/SimM1Rev_Eff/SimM2Fwd_Eff/SimM2Rev_Eff RETIRÉS (obsolètes,
-    // FB_Winch gère nativement rampe+paliers+ralentissement bordure+relais tenu pendant décél).
-    M3Fwd_Eff             : BOOL;
-    M3Rev_Eff             : BOOL;
-
     // 🔧 REX 2026-07-15 (2) : rampe HMI locale (CycleTimeCalc/instHmiSpeedRamp/SpeedRefPct) et
     // décodage paliers (instManuSpeedStep/ActiveMaxStepFwd/Rev) RETIRÉS avec M1Fwd_Eff ci-dessus.
+    // 🔧 REX 2026-07-16 : ex-M3Fwd_Eff/M3Rev_Eff/M3_ActiveFreqCmd/M3_DriveIsReal RETIRÉS — M3
+    // piloté désormais par FB_Translation (PRG_07_TranslationControl §1bis), même principe que
+    // M1/M2 (REX 2026-07-15 (2) ci-dessus) : plus besoin d'états effectifs locaux pour le bypass
+    // M3_CommandWord (supprimé, voir fin de fichier).
     WinchMoving           : BOOL;         // 🚨 Au moins une commande de treuil HMI active (verrouillage aiguillage)
-    M3_ActiveFreqCmd      : REAL;         // ⚡ Consigne active fréquence Translation M3 au cycle courant (Hz)
-    M3_DriveIsReal        : BOOL;         // ⚡ Indique si le variateur Translation M3 est configuré comme réel
     M1_IsReal             : BOOL;         // ⚡ Indique si le treuil M1 est configuré comme réel
     M2_IsReal             : BOOL;         // ⚡ Indique si le treuil M2 est configuré comme réel
     M3_IsReal             : BOOL;         // ⚡ Indique si le translation M3 est configuré comme réel
@@ -218,8 +213,6 @@ IF ManuActive THEN
     END_IF;
 
     // 4️⃣ Aiguillage de la commande de mouvement (HMI vs Joystick CANopen)
-    M3_DriveIsReal := (NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal)
-                      AND (NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.TranslationPosition_IsReal);
     M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
     M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
     M3_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.TranslationPosition_IsReal;
@@ -246,9 +239,6 @@ IF ManuActive THEN
         
         M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
         M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
-
-        // Consigne active Translation M3 (0..FreqSetpointHz Hz) via déflexion X (la consigne HMI est prise pour 100%)
-        M3_ActiveFreqCmd := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * GVL_IHM.TranslationM3.FreqSetpointHz;
     ELSE
         // 💡 Détection de mouvement en cours (pour verrouillage croisé)
         WinchMoving := M1Fwd_Demand OR M1Rev_Demand OR M2Fwd_Demand OR M2Rev_Demand OR CoupledFwd_Demand OR CoupledRev_Demand;
@@ -267,9 +257,6 @@ IF ManuActive THEN
 
         M3Fwd_Demand := GVL_IHM.TranslationM3.ReqFwd;
         M3Rev_Demand := GVL_IHM.TranslationM3.ReqRev;
-
-        // En mode HMI boutons / Simulation, la consigne active envoyée est directement FreqSetpointHz
-        M3_ActiveFreqCmd := GVL_IHM.TranslationM3.FreqSetpointHz;
     END_IF;
 
     // 🔒 Sécurité démarrage : exige que toutes les commandes HMI et Joystick soient au repos (neutre) au démarrage
@@ -302,16 +289,11 @@ IF ManuActive THEN
     // même fichier PRG_06 — AVANT que ce PRG_10_Outputs ne s'exécute (position 6 < 10). Plus besoin
     // de "Recopie vers les VAR_INPUT" ci-dessous pour M1/M2 (voir fin de fichier).
 
-    // 7️⃣ Commandes effectives Translation M3 (interlockées avec l'AU, et avec la disponibilité variateur SEULEMENT s'il est configuré Réel)
-    M3Fwd_Eff := M3Fwd_Demand AND PRG_00_Inputs.EmergencyStopOk 
-                 AND (M3_StatusWord.7 OR NOT M3_DriveIsReal) 
-                 AND (M3_StatusWord.0 OR NOT M3_DriveIsReal)
-                 AND (NOT M3_IsReal OR NOT PRG_03_Safety.instSafetyTranslationM3.SafeStop);
-
-    M3Rev_Eff := M3Rev_Demand AND PRG_00_Inputs.EmergencyStopOk 
-                 AND (M3_StatusWord.7 OR NOT M3_DriveIsReal) 
-                 AND (M3_StatusWord.0 OR NOT M3_DriveIsReal)
-                 AND (NOT M3_IsReal OR NOT PRG_03_Safety.instSafetyTranslationM3.SafeStop);
+    // 🔧 REX 2026-07-16 : ex-§7️⃣ (M3Fwd_Eff/M3Rev_Eff, interlock local avec M3_StatusWord.7/.0 et
+    // SafeStop) RETIRÉ — M3 piloté désormais par instTranslationM3 (PRG_07_TranslationControl
+    // §1bis), qui gère nativement SafeStop (Enable réel désormais, voir PRG_03_Safety) et sa
+    // propre state machine. Plus besoin d'interlock local ici (même principe que M1/M2, REX
+    // 2026-07-15 (2) ci-dessus).
 
     // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
     IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
@@ -346,7 +328,9 @@ IF ManuActive THEN
     // 🔧 REX 2026-07-15 (2) : plus de recopie M1/M2 ici — déjà écrites par PRG_06_WinchControl §8
     // (instWinchM1/instWinchM2.RelayFwd/RelayRev/Contactor1-4/BrakeCmd), AVANT ce PRG_10_Outputs
     // dans l'ordre de tâche (position 6 < 10), pour Auto ET Manu désormais.
-    TranslationBrakeCmd   := M3Fwd_Eff OR M3Rev_Eff;
+    // 🔧 REX 2026-07-16 : idem pour TranslationBrakeCmd — plus de recopie ici, déjà écrite par
+    // PRG_07_TranslationControl (instTranslationM3.BrakeCmd), AVANT ce PRG_10_Outputs (position
+    // 7 < 10), pour Auto ET Manu désormais (voir fin de fichier).
 ELSE
     // Nettoyage en cas de désactivation du mode Manu
     GridUp_RQ := FALSE;
@@ -356,28 +340,11 @@ ELSE
 END_IF;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
-// 🔧 REX 2026-07-09 : recette fournisseur pour LE REGISTRE 0x3101 Command (carte EtherCAT,
-// PAS le 0x3001 natif du variateur — sémantique différente) : 0=arrêt, 1=marche avant,
-// 2=marche arrière. ⚠️ Non vérifié sur banc au moment du codage — à confirmer par
-// l'opérateur (Force CODESYS sur M3_CommandWord, moteur à vide si possible) avant un
-// usage prolongé. Rien d'autre n'écrit ces PDO aujourd'hui (FB_Translation encore stubbé,
-// DriveStatusWord/ActualFreqHz à 0 en dur) — pas de conflit avec le mode normal.
-IF ManuActive THEN
-    IF M3Fwd_Eff THEN
-        M3_CommandWord         := 1;
-        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, _TranslationMaxFreq_Hz) * 100.0);
-    ELSIF M3Rev_Eff THEN
-        M3_CommandWord         := 2;
-        M3_SetpointFrequencyHz := REAL_TO_UINT(MIN(M3_ActiveFreqCmd, _TranslationMaxFreq_Hz) * 100.0);
-    ELSE
-        M3_CommandWord         := 0;
-        M3_SetpointFrequencyHz := 0;
-    END_IF;
-ELSE
-    // Mode normal (Auto / Semi-Auto) : piloté par le bloc instTranslationM3
-    M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
-    M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
-END_IF;
+// 🔧 REX 2026-07-16 : ex-bypass ManuActive (écriture directe M3_CommandWord=1/2) RETIRÉ — M3
+// piloté désormais par instTranslationM3 (PRG_07_TranslationControl §1bis), pour Auto ET Manu,
+// même principe que M1/M2 (PRG_06_WinchControl §8, REX 2026-07-15 (2)).
+M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
 // 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
 // PRG_09_Supervision (GVL_IHM.TranslationM3), valables Auto ET Manu — ex-doublons IHM_MANU
 // M3_FreqActual/M3_CommandWordMonitor/M3_StatusWordMonitor/M3_CommReady/M3_PowerReady retirés.

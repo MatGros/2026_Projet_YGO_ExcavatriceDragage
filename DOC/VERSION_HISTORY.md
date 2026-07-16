@@ -17,12 +17,25 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Réorganisé en sous-dossiers TYPES/(ENUMS·STRUCTS) · BRICKS · SUITE_SAFETY · SUITE_TRANSLATION
 - `FB_SafetyValidation` réécrit (remplace le CASE monolithique v1.0/1.1)
 - + nouvelle suite `FB_TranslationValidation` (TC-T1 Fdc extrême, TC-T2 Méca B, TC-T3 Méca A)
-- `FB_PLC_Tests_Management` orchestre multi-suites (CmdRunAll enchaîne Safety→Translation)
+- `FB_PLC_Tests_Management` orchestre multi-suites (CmdRunAll enchaîne Safety→Translation→Bucket)
 - GVL_PLC_Tests : `Cmd`/`Status` + 1 variable nommée par suite (pas de tableau, demande utilisateur)
 - + `Cases[].Name` et `Report.FailureSummary` (lisibilité, évite de parcourir chaque case)
 - Fix générateur PLCopenXML (`TOOLS/`) : bornes de tableau symboliques (`GVL_Const.MaxX`) étaient silencieusement omises du bundle — corrigé, non vérifié en import réel
 - Fix ST : `FOR_END`→`END_FOR`, `VAR` imbriqué illégal (tous deux dans `FB_TestSequencer`)
 - ⚠️ Connu non résolu : bug lockout `EmergencyArmingLockoutActive` (posé aussi sur succès) pas encore corrigé dans `FB_Safety_EmergencyManagementLogic.st` ; step Trip TC-01 à corriger (vérifier `EmergencyStopOk`, pas `PowerCutOff_A/B_RQ`)
+
+### `v0.4.15_IHM_MANU_TranslationHoming` — 2026-07-16 (TEST)
+- Translation M3 alignée sur Winch : IHM_MANU = 3ᵉ source d'arbitrage (PRG_07 §1bis)
+- Fin bypass M3_CommandWord · instSafetyTranslationM3.Enable inconditionnel (débloque TC-T1/2/3)
+- Vitesse Manu boutons/joystick conservée via FreqSetpointHz (diffère du Winch, décision produit)
+- Retrait bypass Homing (HomingEncoder_M1/M2) — PRG_02_Encoders/ST_IHM_MANU
+- + AF_Partie-11_Fonction_Translation v1.7
+- Aux Hydrauliques + WinchMaxStepFwd/Rev restent hors périmètre (différés)
+
+### Corrections nommage + intégration — 2026-07-16 (TEST)
+- Renommage `FB_Benne→FB_Bucket` (défait accidentellement par un script de retour arrière buggé, sans commit) restauré depuis `HEAD`
+- Suite `FB_BucketValidation` (ex-`FB_BenneValidation`) intégrée dans `FB_PLC_Tests_Management` (3e maillon de chaîne)
+- Dossiers racine `EMERGENCY→AU`, `ENCODERS→CODEURS`
 - ⚠️ Version de test — pas encore réimportée/validée en CODESYS
 
 ### `v0.4.14_SafetyValidation_EmergencyChain` — 2026-07-16 (TEST)
