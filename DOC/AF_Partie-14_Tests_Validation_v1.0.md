@@ -45,7 +45,7 @@ Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé 
 
 ## 🧩 3. Architecture du validateur automatique dans l'API
 
-Afin de valider ces exigences sans matériel physique connecté, le système intègre un programme de test automatique : `PRG_SafetyValidation.st` (situé dans `CODE/TESTS/`).
+Afin de valider ces exigences sans matériel physique connecté, le système intègre un programme de test automatique : `PRG_SafetyValidation.st` (situé dans `CODE/PLC_TESTS/`).
 
 ### ⚙️ Conditions de fonctionnement
 Le validateur ne s'exécute que si la simulation est active :
