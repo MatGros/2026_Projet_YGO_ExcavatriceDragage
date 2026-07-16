@@ -1,43 +1,166 @@
-(* ═══════════════════════════════════════════════════════════════
-   🧪 FB_PLC_Tests_Management — Gestion Globale des Tests de Validation Automatisés
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupe, configure et orchestre toutes les instances
-      de tests de validation automate (banc de test global).
-      Met à jour directement GVL_PLC_Tests pour affichage unifié.
-   ═══════════════════════════════════════════════════════════════ *)
+// ═══════════════════════════════════════════════════════════════
+// 🧪 FB_PLC_Tests_Management — Orchestrateur global du banc de test
+// ═══════════════════════════════════════════════════════════════
 
 FUNCTION_BLOCK PUBLIC FB_PLC_Tests_Management
 VAR
-    // 🧱 Instances de tests individuels hébergées
-    instSafetyValidation       : FB_SafetyValidation;
+    // 🧱 Instance de test Safety
+    instSafetyValidation : FB_SafetyValidation;
+
+    // Triggers pour IHM tactiles
+    RunAllTrig           : R_TRIG;
+    AbortTrig            : R_TRIG;
+    ClearReportTrig      : R_TRIG;
+
+    // Variables de commande internes
+    StartSafety          : BOOL;
+    AbortSafety          : BOOL;
+    FirstStepSafety      : INT;
     
-    // Flag de déclenchement interne
-    TriggerSafetyTests         : BOOL;
+    // Compteurs pour progression IHM
+    Idx                  : INT;
+    PassedCount          : INT;
+    FailedCount          : INT;
+    TotalCount           : INT;
 END_VAR
 
-// === IMPLEMENTATION ===
+// 1. Détection des commandes HMI
+RunAllTrig(CLK := GVL_PLC_Tests.Hmi.CmdRunAll);
+AbortTrig(CLK := GVL_PLC_Tests.Hmi.CmdAbort);
+ClearReportTrig(CLK := GVL_PLC_Tests.Hmi.CmdClearReport);
 
-// 1. Détection du bit de déclenchement global dans GVL_PLC_Tests
-IF GVL_PLC_Tests.CmdRunTests THEN
-    GVL_PLC_Tests.CmdRunTests := FALSE;
-    TriggerSafetyTests := TRUE;
-ELSE
-    TriggerSafetyTests := FALSE;
+// Remise à zéro des boutons poussoirs HMI
+IF GVL_PLC_Tests.Hmi.CmdRunAll THEN
+    GVL_PLC_Tests.Hmi.CmdRunAll := FALSE;
+END_IF;
+IF GVL_PLC_Tests.Hmi.CmdAbort THEN
+    GVL_PLC_Tests.Hmi.CmdAbort := FALSE;
+END_IF;
+IF GVL_PLC_Tests.Hmi.CmdClearReport THEN
+    GVL_PLC_Tests.Hmi.CmdClearReport := FALSE;
 END_IF;
 
-// 2. Appel de l'instance de test pour la sécurité d'urgence
-instSafetyValidation(StartTests := TriggerSafetyTests);
+// 2. Machine d'états principale
+CASE GVL_PLC_Tests.Hmi.RunState OF
 
-// 3. Centralisation directe des résultats dans GVL_PLC_Tests
-GVL_PLC_Tests.TestInProgress          := instSafetyValidation.TestInProgress;
-GVL_PLC_Tests.AllTestsPassed          := instSafetyValidation.AllTestsPassed;
-GVL_PLC_Tests.TestFailed              := instSafetyValidation.TestFailed;
-GVL_PLC_Tests.TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
-GVL_PLC_Tests.TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
-GVL_PLC_Tests.TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
-GVL_PLC_Tests.FailedTestCase          := instSafetyValidation.FailedTestCase;
+    E_TestRunState.TESTRUN_IDLE:
+        StartSafety := FALSE;
+        AbortSafety := FALSE;
+        
+        // Démarrage par bouton global RunAll
+        IF RunAllTrig.Q THEN
+            IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
+                StartSafety := TRUE;
+                FirstStepSafety := 10; // TC-01 SETUP
+                GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            
+        // Démarrage d'une suite ciblée
+        ELSIF GVL_PLC_Tests.Hmi.CmdRunSuite = GVL_PLC_Tests_Const.SuiteSafety THEN
+            IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
+                StartSafety := TRUE;
+                IF GVL_PLC_Tests.Hmi.CmdRunCase = 1 THEN
+                    FirstStepSafety := 10;
+                ELSIF GVL_PLC_Tests.Hmi.CmdRunCase = 2 THEN
+                    FirstStepSafety := 20;
+                ELSIF GVL_PLC_Tests.Hmi.CmdRunCase = 3 THEN
+                    FirstStepSafety := 30;
+                ELSE
+                    FirstStepSafety := 10; // Par défaut TC-01
+                END_IF;
+                GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Hmi.CmdRunSuite := 0;
+            GVL_PLC_Tests.Hmi.CmdRunCase := 0;
+        END_IF;
 
-// 4. Centralisation directe des surcharges de simulation (overrides)
-GVL_PLC_Tests.OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
-GVL_PLC_Tests.OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
-GVL_PLC_Tests.OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;
+        // Commande d'effacement du rapport
+        IF ClearReportTrig.Q THEN
+            // La réinitialisation est gérée par le moteur au démarrage du run suivant,
+            // mais on peut forcer la remise à zéro des états actuels de l'IHM
+            GVL_PLC_Tests.Hmi.CasesTotal := 0;
+            GVL_PLC_Tests.Hmi.CasesPassed := 0;
+            GVL_PLC_Tests.Hmi.CasesFailed := 0;
+        END_IF;
+
+    E_TestRunState.TESTRUN_RUNNING:
+        // Annulation de l'impulsion de départ
+        StartSafety := FALSE;
+        
+        // Abandon propre ou perte du mode Simulation
+        IF AbortTrig.Q OR NOT GVL_Simulation.SimulationModeActive THEN
+            AbortSafety := TRUE;
+        END_IF;
+
+        // Surveillance de la fin d'exécution de la suite Safety
+        IF instSafetyValidation.Done THEN
+            AbortSafety := FALSE;
+            IF instSafetyValidation.Report.Aborted THEN
+                GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_ABORTED;
+            ELSIF instSafetyValidation.AnyFailed THEN
+                GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_FAILED;
+            ELSE
+                GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
+        END_IF;
+
+    E_TestRunState.TESTRUN_PASSED, E_TestRunState.TESTRUN_FAILED, E_TestRunState.TESTRUN_ABORTED:
+        // Retour automatique à l'état IDLE après un cycle pour libérer l'IHM
+        GVL_PLC_Tests.Hmi.RunState := E_TestRunState.TESTRUN_IDLE;
+
+END_CASE;
+
+// 3. Appel de l'instance Safety Validation
+instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
+
+// 4. Centralisation et recopie vers GVL_PLC_Tests
+GVL_PLC_Tests.Hmi.SimulationActive := GVL_Simulation.SimulationModeActive;
+GVL_PLC_Tests.SafetyValidation := instSafetyValidation.Report;
+GVL_PLC_Tests.Hmi.Suites[GVL_PLC_Tests_Const.SuiteSafety] := instSafetyValidation.Report;
+
+// 5. Mise à jour des indicateurs de progression IHM
+IF GVL_PLC_Tests.Hmi.RunState = E_TestRunState.TESTRUN_RUNNING THEN
+    GVL_PLC_Tests.Hmi.ActiveSuiteId := GVL_PLC_Tests_Const.SuiteSafety;
+    GVL_PLC_Tests.Hmi.ActiveSuiteName := instSafetyValidation.Report.Name;
+    GVL_PLC_Tests.Hmi.ActiveCaseId := instSafetyValidation.Report.CurrentCaseId;
+    GVL_PLC_Tests.Hmi.ActiveStepId := instSafetyValidation.Report.CurrentStepId;
+    GVL_PLC_Tests.Hmi.StepElapsed := instSafetyValidation.StepElapsed;
+    
+    // Détermination dynamique des noms et du timeout de l'étape active
+    IF GVL_PLC_Tests.Hmi.ActiveStepId >= 1 AND GVL_PLC_Tests.Hmi.ActiveStepId <= GVL_PLC_Tests_Const.MaxSteps THEN
+        // Le nom de l'étape et son timeout
+        // (Ces valeurs sont copiées depuis la configuration locale interne de instSafetyValidation)
+        // Mais pour simplifier, on peut les extraire directement si elles sont disponibles
+    END_IF;
+ELSE
+    GVL_PLC_Tests.Hmi.ActiveSuiteId := 0;
+    GVL_PLC_Tests.Hmi.ActiveSuiteName := '';
+    GVL_PLC_Tests.Hmi.ActiveCaseId := 0;
+    GVL_PLC_Tests.Hmi.ActiveCaseName := '';
+    GVL_PLC_Tests.Hmi.ActiveStepId := 0;
+    GVL_PLC_Tests.Hmi.ActiveStepName := '';
+    GVL_PLC_Tests.Hmi.StepElapsed := T#0s;
+    GVL_PLC_Tests.Hmi.StepTimeoutPT := T#0s;
+END_IF;
+
+// Agrégation globale des compteurs de cas de tests
+PassedCount := 0;
+FailedCount := 0;
+TotalCount := 0;
+
+FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+    IF instSafetyValidation.Report.Cases[Idx].Executed THEN
+        TotalCount := TotalCount + 1;
+        IF instSafetyValidation.Report.Cases[Idx].Ok THEN
+            PassedCount := PassedCount + 1;
+        ELSE
+            FailedCount := FailedCount + 1;
+        END_IF;
+    END_IF;
+END_FOR;
+
+GVL_PLC_Tests.Hmi.CasesTotal := TotalCount;
+GVL_PLC_Tests.Hmi.CasesPassed := PassedCount;
+GVL_PLC_Tests.Hmi.CasesFailed := FailedCount;
+
+END_FUNCTION_BLOCK
