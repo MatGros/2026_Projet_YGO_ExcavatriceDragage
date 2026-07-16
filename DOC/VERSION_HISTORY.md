@@ -6,6 +6,11 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### 📄 Doc seule — 2026-07-16
+- AF_Partie-14 v1.1 → **v1.2** : §7 réécrit intégralement (spec finale framework test in-PLC piloté par tables)
+- Issue double revue croisée experte (primitives ↔ archi données) + audit — pas de modif `CODE/`
+- Migration M1→M6 cadrée, à dérouler séparément (M1 = socle générique `FB_TestSequencer`)
+
 ### `v0.4.14_SafetyValidation_EmergencyChain` — 2026-07-16 (TEST)
 - FB_Safety_EmergencyChain : encapsule la boucle AU + sorties erreur individuelles Translation
 - Déplacé/renommé vers EMERGENCY/FB_Safety_EmergencyManagement
