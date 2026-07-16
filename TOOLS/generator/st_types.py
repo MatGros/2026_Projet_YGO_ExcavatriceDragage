@@ -24,7 +24,10 @@ BASE_TYPES = {
 
 _IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _STRING_RE = re.compile(r"^STRING\s*\(\s*(\d+)\s*\)$")
-_ARRAY_RE = re.compile(r"^ARRAY\s*\[\s*(-?\d+)\s*\.\.\s*(-?\d+)\s*\]\s*OF\s+(.+)$", re.IGNORECASE | re.DOTALL)
+# 🔧 Borne = littéral entier OU constante (qualifiée ou non), ex. GVL_PLC_Tests_Const.MaxSteps
+# (ARRAY[1..N] OF T avec N symbolique — voir GUIDE_Conversion §"array" note "non vérifié").
+_BOUND = r"(-?\d+|[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)"
+_ARRAY_RE = re.compile(rf"^ARRAY\s*\[\s*{_BOUND}\s*\.\.\s*{_BOUND}\s*\]\s*OF\s+(.+)$", re.IGNORECASE | re.DOTALL)
 
 
 @dataclass(frozen=True)
@@ -44,12 +47,19 @@ class DerivedType:
 
 @dataclass(frozen=True)
 class ArrayType:
-    lower: int
-    upper: int
+    lower: int | str  # str = borne symbolique (ex. constante GVL), passée telle quelle en sortie XML
+    upper: int | str
     base: "TypeRef"
 
 
 TypeRef = Union[BaseType, StringType, DerivedType, ArrayType]
+
+
+def _parse_bound(text: str) -> int | str:
+    """Borne de tableau : int si littéral, sinon expression symbolique passée telle quelle."""
+    if re.fullmatch(r"-?\d+", text):
+        return int(text)
+    return text
 
 
 def parse_type(text: str) -> TypeRef:
@@ -60,7 +70,7 @@ def parse_type(text: str) -> TypeRef:
     array_match = _ARRAY_RE.match(text)
     if array_match:
         lower_text, upper_text, base_text = array_match.groups()
-        return ArrayType(int(lower_text), int(upper_text), parse_type(base_text))
+        return ArrayType(_parse_bound(lower_text), _parse_bound(upper_text), parse_type(base_text))
 
     string_match = _STRING_RE.match(text)
     if string_match:

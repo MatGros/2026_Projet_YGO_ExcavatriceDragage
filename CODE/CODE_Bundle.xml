@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-15T20:01:12.631307" />
-  <contentHeader name="MGS_v0.4.14_SafetyValidation_EmergencyChain.project" modificationDateTime="2026-07-15T20:01:12.631307">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-15T20:01:12.631307">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.14_SafetyValidation_EmergencyChain</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -2098,6 +2098,19 @@
                 <INT />
               </type>
             </variable>
+            <variable name="Suites">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSuites" />
+                  <baseType>
+                    <derived name="ST_TestSuiteReport" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Dernier run (Rapports par suite)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2620,6 +2633,19 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Id du stimulus appliqué (0 = neutre)</xhtml>
               </documentation>
             </variable>
+            <variable name="CheckIdx">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxChecksPerStep" />
+                  <baseType>
+                    <INT />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index des checks (0 = vide)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DwellPT">
               <type>
                 <TIME />
@@ -2812,6 +2838,19 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée de transition de la rampe</xhtml>
               </documentation>
             </variable>
+            <variable name="SeqValues">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSeqValues" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeurs de la séquence</xhtml>
+              </documentation>
+            </variable>
             <variable name="SeqCount">
               <type>
                 <INT />
@@ -2923,6 +2962,26 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de runs depuis le démarrage</xhtml>
               </documentation>
+            </variable>
+            <variable name="Steps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />
+                  <baseType>
+                    <derived name="ST_TestStepResult" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="Cases">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestCases" />
+                  <baseType>
+                    <derived name="ST_TestCaseResult" />
+                  </baseType>
+                </array>
+              </type>
             </variable>
           </struct>
         </baseType>
@@ -9486,6 +9545,82 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Moteur unique</xhtml>
               </documentation>
             </variable>
+            <variable name="StepTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />
+                  <baseType>
+                    <derived name="ST_TestStepConfig" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📋 Tables de configuration</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CheckTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxChecks" />
+                  <baseType>
+                    <derived name="ST_TestCheckConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="CaseTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestCases" />
+                  <baseType>
+                    <derived name="ST_TestCaseConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="InvariantTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxInvariants" />
+                  <baseType>
+                    <derived name="ST_TestInvariantConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeBool">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeBool" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 Banque de sondes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProbeDint">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeDint" />
+                  <baseType>
+                    <DINT />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeReal">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeReal" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
             <variable name="TableReady">
               <type>
                 <BOOL />
@@ -12772,6 +12907,38 @@ END_CASE;
               </type>
             </variable>
           </outputVars>
+          <inOutVars>
+            <variable name="ProbeBool">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeBool" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeDint">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeDint" />
+                  <baseType>
+                    <DINT />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeReal">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeReal" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+          </inOutVars>
           <localVars>
             <variable name="RisingTrig">
               <type>
@@ -13243,6 +13410,76 @@ END_IF;
             </variable>
           </outputVars>
           <inOutVars>
+            <variable name="StepTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />
+                  <baseType>
+                    <derived name="ST_TestStepConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="CheckTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxChecks" />
+                  <baseType>
+                    <derived name="ST_TestCheckConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="CaseTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestCases" />
+                  <baseType>
+                    <derived name="ST_TestCaseConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="InvariantTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxInvariants" />
+                  <baseType>
+                    <derived name="ST_TestInvariantConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeBool">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeBool" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeDint">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeDint" />
+                  <baseType>
+                    <DINT />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeReal">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeReal" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
             <variable name="Report">
               <type>
                 <derived name="ST_TestSuiteReport" />
@@ -13263,6 +13500,36 @@ END_IF;
             <variable name="DwellTimer">
               <type>
                 <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="Checks">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxChecksPerStep" />
+                  <baseType>
+                    <derived name="FB_TestCheck" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="InvChecks">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxInvariants" />
+                  <baseType>
+                    <derived name="FB_TestCheck" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="InvArmed">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxInvariants" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
               </type>
             </variable>
             <variable name="StepStarted">
@@ -20451,32 +20718,44 @@ Front montant = applique le saut sur M1</xhtml>
         </Folder>
         <Folder Name="SIMULATION">
           <Folder Name="PLC_TESTS">
-            <Object Name="E_TestCheckKind" ObjectId="379e0f88-7094-5362-8e25-95becba599db" />
-            <Object Name="E_TestCheckMode" ObjectId="e7624c6e-3fdb-57ec-bd16-eb3e45d2ff38" />
-            <Object Name="E_TestFailAction" ObjectId="67f1527f-2aba-5aba-93f8-cc354c549464" />
-            <Object Name="E_TestFailReason" ObjectId="ced6b8c3-cd7a-5052-bb93-74508d4d7454" />
-            <Object Name="E_TestRunState" ObjectId="c04b435a-42f8-5555-8d99-eef46382e52c" />
-            <Object Name="E_TestStimKind" ObjectId="6fd96dd9-eed5-59f0-952a-689dccea86b1" />
-            <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
-            <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
-            <Object Name="FB_TestCheck" ObjectId="96c0e8a5-037a-59f8-8d24-0b688cef585a" />
-            <Object Name="FB_TestEdgeCounter" ObjectId="5ebd83f5-0c0c-540c-8fec-7861b784b871" />
-            <Object Name="FB_TestEventOrder" ObjectId="7b57ad34-6596-5b41-9af3-d2ae4344d644" />
-            <Object Name="FB_TestSequencer" ObjectId="a3ed8ee9-017d-53da-9b6f-08a5ee02e1c8" />
-            <Object Name="FB_TestStimulus" ObjectId="36e84b15-4171-5dc4-8ebb-16e48bc4ce65" />
-            <Object Name="FB_TestStopwatch" ObjectId="f3883651-9fd9-59d4-a797-bc70dc58b2cf" />
-            <Object Name="FB_Timeout" ObjectId="88769460-02b2-542c-8ba0-2d359d2f1f7c" />
+            <Folder Name="TYPES">
+              <Folder Name="ENUMS">
+                <Object Name="E_TestCheckKind" ObjectId="379e0f88-7094-5362-8e25-95becba599db" />
+                <Object Name="E_TestCheckMode" ObjectId="e7624c6e-3fdb-57ec-bd16-eb3e45d2ff38" />
+                <Object Name="E_TestFailAction" ObjectId="67f1527f-2aba-5aba-93f8-cc354c549464" />
+                <Object Name="E_TestFailReason" ObjectId="ced6b8c3-cd7a-5052-bb93-74508d4d7454" />
+                <Object Name="E_TestRunState" ObjectId="c04b435a-42f8-5555-8d99-eef46382e52c" />
+                <Object Name="E_TestStimKind" ObjectId="6fd96dd9-eed5-59f0-952a-689dccea86b1" />
+              </Folder>
+              <Folder Name="STRUCTS">
+                <Object Name="ST_PlcTestsHMI" ObjectId="f59e0011-9a30-5f6e-a60e-7f0256e92952" />
+                <Object Name="ST_TestCaseConfig" ObjectId="cc34543d-edce-50cc-a9f4-294f05062bd2" />
+                <Object Name="ST_TestCaseResult" ObjectId="a01b149c-7761-584d-90ca-9ff79721e9da" />
+                <Object Name="ST_TestCheckConfig" ObjectId="0ae918c9-e56d-5e2b-b392-c135d1bd6824" />
+                <Object Name="ST_TestInvariantConfig" ObjectId="2f7e2c7c-6b9b-5717-b447-5022b43d67f5" />
+                <Object Name="ST_TestStepConfig" ObjectId="90aaaf06-fc7d-54be-9ca1-0ea1d5f8848f" />
+                <Object Name="ST_TestStepResult" ObjectId="cc65da0a-d694-5a33-a326-289e3481abdb" />
+                <Object Name="ST_TestStimAnalogConfig" ObjectId="072a11b5-d1ef-5ee3-9f13-21065e62129a" />
+                <Object Name="ST_TestSuiteReport" ObjectId="b6ce4c74-704f-559b-8bc7-c06d80a4bda4" />
+              </Folder>
+            </Folder>
+            <Folder Name="SUITE_SAFETY">
+              <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
+              <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
+            </Folder>
+            <Folder Name="BRICKS">
+              <Object Name="FB_TestCheck" ObjectId="96c0e8a5-037a-59f8-8d24-0b688cef585a" />
+              <Object Name="FB_TestEdgeCounter" ObjectId="5ebd83f5-0c0c-540c-8fec-7861b784b871" />
+              <Object Name="FB_TestEventOrder" ObjectId="7b57ad34-6596-5b41-9af3-d2ae4344d644" />
+              <Object Name="FB_TestStimulus" ObjectId="36e84b15-4171-5dc4-8ebb-16e48bc4ce65" />
+              <Object Name="FB_TestStopwatch" ObjectId="f3883651-9fd9-59d4-a797-bc70dc58b2cf" />
+              <Object Name="FB_Timeout" ObjectId="88769460-02b2-542c-8ba0-2d359d2f1f7c" />
+            </Folder>
+            <Folder Name="CORE">
+              <Object Name="FB_TestSequencer" ObjectId="a3ed8ee9-017d-53da-9b6f-08a5ee02e1c8" />
+              <Object Name="GVL_PLC_Tests_Const" ObjectId="da9df60c-4ce8-5d19-b222-9ace41b88863" />
+            </Folder>
             <Object Name="GVL_PLC_Tests" ObjectId="075e3c4c-ec9c-57a1-9ae5-eb94d89b5791" />
-            <Object Name="GVL_PLC_Tests_Const" ObjectId="da9df60c-4ce8-5d19-b222-9ace41b88863" />
-            <Object Name="ST_PlcTestsHMI" ObjectId="f59e0011-9a30-5f6e-a60e-7f0256e92952" />
-            <Object Name="ST_TestCaseConfig" ObjectId="cc34543d-edce-50cc-a9f4-294f05062bd2" />
-            <Object Name="ST_TestCaseResult" ObjectId="a01b149c-7761-584d-90ca-9ff79721e9da" />
-            <Object Name="ST_TestCheckConfig" ObjectId="0ae918c9-e56d-5e2b-b392-c135d1bd6824" />
-            <Object Name="ST_TestInvariantConfig" ObjectId="2f7e2c7c-6b9b-5717-b447-5022b43d67f5" />
-            <Object Name="ST_TestStepConfig" ObjectId="90aaaf06-fc7d-54be-9ca1-0ea1d5f8848f" />
-            <Object Name="ST_TestStepResult" ObjectId="cc65da0a-d694-5a33-a326-289e3481abdb" />
-            <Object Name="ST_TestStimAnalogConfig" ObjectId="072a11b5-d1ef-5ee3-9f13-21065e62129a" />
-            <Object Name="ST_TestSuiteReport" ObjectId="b6ce4c74-704f-559b-8bc7-c06d80a4bda4" />
           </Folder>
           <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
