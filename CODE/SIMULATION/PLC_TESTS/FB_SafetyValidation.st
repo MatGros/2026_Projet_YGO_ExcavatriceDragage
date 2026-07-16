@@ -228,3 +228,9 @@ CASE TestSeqStep OF
         TestSeqStep := 0;
 
 END_CASE;
+
+// === LIAISON DES ESTIMULI AUX VARIABLES D'ÉCHANGE GLOBALES ===
+IF TestInProgress THEN
+    GVL_IHM.Modes.CmdEmergencyArming := ArmRequest;
+    GVL_IHM.Modes.FaultMachineReset  := ResetFaults;
+END_IF;
