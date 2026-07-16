@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_TestStopwatch — Mesure déterministe en cycles automate
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_TestStopwatch
 VAR_INPUT
     Arm             : BOOL;
@@ -21,7 +17,7 @@ VAR
     Running         : BOOL;
     CycleCount      : UDINT;
 END_VAR
-
+// === IMPLEMENTATION ===
 StartTrig(CLK := StartEvent);
 StopTrig(CLK := StopEvent);
 
@@ -50,5 +46,3 @@ IF Running THEN
         InWindow := (ElapsedMs >= ExpectedMinMs AND ElapsedMs <= ExpectedMaxMs);
     END_IF;
 END_IF;
-
-END_FUNCTION_BLOCK

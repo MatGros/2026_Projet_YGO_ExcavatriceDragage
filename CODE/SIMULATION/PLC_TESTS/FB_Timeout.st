@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_Timeout — Compositions TON pour la gestion des délais
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_Timeout
 VAR_INPUT
     Active : BOOL;
@@ -13,8 +9,6 @@ END_VAR
 VAR
     Timer : TON;
 END_VAR
-
+// === IMPLEMENTATION ===
 Timer(IN := Active, PT := PT);
 Elapsed := Timer.Q;
-
-END_FUNCTION_BLOCK

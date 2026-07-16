@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_TestCheck — Évalue un check de test (10 types x 4 modes)
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_TestCheck
 VAR_INPUT
     Config      : ST_TestCheckConfig;
@@ -28,7 +24,7 @@ VAR
     EvaluateTrig : R_TRIG;
     Cond         : BOOL;
 END_VAR
-
+// === IMPLEMENTATION ===
 // Toujours mettre à jour les triggers des sondes TOR pour ne pas rater de transition
 IF Config.ProbeIdx >= 1 AND Config.ProbeIdx <= GVL_PLC_Tests_Const.MaxProbeBool THEN
     RisingTrig(CLK := ProbeBool[Config.ProbeIdx]);
@@ -182,5 +178,3 @@ ELSE
     Pending := FALSE;
     StableTimer(IN := FALSE);
 END_IF;
-
-END_FUNCTION_BLOCK

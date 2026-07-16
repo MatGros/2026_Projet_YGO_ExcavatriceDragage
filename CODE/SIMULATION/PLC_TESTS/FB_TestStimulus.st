@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_TestStimulus — Générateur de profils de stimulus
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_TestStimulus
 VAR_INPUT
     Config     : ST_TestStimAnalogConfig;
@@ -23,7 +19,7 @@ VAR
     Running     : BOOL;
     Rate        : REAL;
 END_VAR
-
+// === IMPLEMENTATION ===
 StartTrig(CLK := Start);
 
 // Gestion de l'arrêt ou de l'inactivité
@@ -116,5 +112,3 @@ IF Running THEN
             END_IF;
     END_CASE;
 END_IF;
-
-END_FUNCTION_BLOCK

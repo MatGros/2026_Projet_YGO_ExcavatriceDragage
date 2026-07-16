@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_SafetyValidation — Séquenceur de Test Safety
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK PUBLIC FB_SafetyValidation
 VAR_INPUT
     Start                      : BOOL;        // Commande de démarrage des tests
@@ -17,7 +13,7 @@ VAR_OUTPUT
     StepElapsed                : TIME;
     Report                     : ST_TestSuiteReport;
 END_VAR
-VAR_CONSTANT
+VAR CONSTANT
     // 🏷️ Index des sondes
     SigHealthyIdle                  : INT := 1;
     SigEmergencyStopOk              : INT := 2;
@@ -73,10 +69,8 @@ VAR
     ArmRequest                 : BOOL;
     ResetFaults                : BOOL;
 END_VAR
-
-// ─────────────────────────────────────────────────────────────────
+// === IMPLEMENTATION ===
 // 1. 🛡️ GATE
-// ─────────────────────────────────────────────────────────────────
 IF NOT GVL_Simulation.SimulationModeActive THEN
     // Abort interne immédiat
     Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
@@ -95,9 +89,7 @@ END_IF;
 // La chaîne d'urgence physique ne doit pas être en mode simulation réelle active (sécurité matérielle)
 SimGateOk := NOT GVL_Simulation.EmergencyStopChain_IsReal;
 
-// ─────────────────────────────────────────────────────────────────
 // 2. 📋 TABLES (Remplissage déclaratif unique)
-// ─────────────────────────────────────────────────────────────────
 IF NOT TableReady THEN
     // Cas de tests
     CaseTable[1].Name := 'TC-01 Armement nominal';
@@ -359,9 +351,7 @@ IF NOT TableReady THEN
     TableReady := TRUE;
 END_IF;
 
-// ─────────────────────────────────────────────────────────────────
 // 3. 📥 ACQUIRE
-// ─────────────────────────────────────────────────────────────────
 ProbeBool[SigHealthyIdle] := NOT PRG_10_Outputs.instSafetyEmergencyManagement.RedundancyTestFailed AND 
                              NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingFailed AND
                              NOT PRG_10_Outputs.instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
@@ -384,9 +374,7 @@ instStopwatch(
     ExpectedMaxMs := 260
 );
 
-// ─────────────────────────────────────────────────────────────────
 // 4. ⚙️ MOTEUR
-// ─────────────────────────────────────────────────────────────────
 Sequencer(
     Start := Start,
     Abort := Abort,
@@ -406,9 +394,7 @@ Sequencer(
     StepElapsed => StepElapsed
 );
 
-// ─────────────────────────────────────────────────────────────────
 // 5. ⚡ STIMULI
-// ─────────────────────────────────────────────────────────────────
 CASE ActiveStimulusId OF
     0: // 🔓 Neutre (tout relâché)
         GVL_PLC_Tests.OverrideChainTrue := FALSE;
@@ -479,5 +465,3 @@ IF Busy THEN
     GVL_IHM.Modes.CmdEmergencyArming := ArmRequest;
     GVL_IHM.Modes.FaultMachineReset  := ResetFaults;
 END_IF;
-
-END_FUNCTION_BLOCK

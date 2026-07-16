@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-// 🧪 FB_TestEdgeCounter — Comptage de fronts sur un signal
-// ═══════════════════════════════════════════════════════════════
-
 FUNCTION_BLOCK FB_TestEdgeCounter
 VAR_INPUT
     Arm         : BOOL;
@@ -18,7 +14,7 @@ VAR
     TrigRising  : R_TRIG;
     TrigFalling : F_TRIG;
 END_VAR
-
+// === IMPLEMENTATION ===
 TrigRising(CLK := Signal);
 TrigFalling(CLK := Signal);
 
@@ -35,5 +31,3 @@ ELSIF NOT CountRising AND TrigFalling.Q THEN
 END_IF;
 
 InRange := (Count >= ExpectedMin AND Count <= ExpectedMax);
-
-END_FUNCTION_BLOCK
