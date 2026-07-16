@@ -18,14 +18,16 @@ VAR_OUTPUT
     AllTestsPassed             : BOOL;
     TestFailed                 : BOOL;
     FailedTestCase             : INT;         // Numéro du scénario en échec
+    
+    // Demandes de surcharge (overrides) vers le programme de simulation
+    OverrideChainTrue          : BOOL;        // Force l'entrée boucle d'urgence à TRUE
+    OverrideChainFalse         : BOOL;        // Force l'entrée boucle d'urgence à FALSE
+    OverrideContactorFalse     : BOOL;        // Force l'entrée contacteur à FALSE
 END_VAR
 VAR
     StartTestEdge              : R_TRIG;
     TestSeqStep                : INT := 0;    // Séquenceur de test
     TestTimer                  : TON;         // Timer d'attente d'étapes
-    OverrideChainTrue          : BOOL := FALSE; // Force l'entrée boucle d'urgence à TRUE
-    OverrideChainFalse         : BOOL := FALSE; // Force l'entrée boucle d'urgence à FALSE
-    OverrideContactorFalse     : BOOL := FALSE; // Force l'entrée contacteur à FALSE
     
     // Signaux locaux pour stimuler le bloc sous test
     ArmRequest                 : BOOL;
@@ -39,6 +41,9 @@ END_VAR
 IF NOT GVL_Simulation.SimulationModeActive THEN
     TestSeqStep := 0;
     TestInProgress := FALSE;
+    OverrideChainTrue := FALSE;
+    OverrideChainFalse := FALSE;
+    OverrideContactorFalse := FALSE;
     RETURN;
 END_IF;
 
@@ -102,14 +107,14 @@ CASE TestSeqStep OF
         TestSeqStep := 16;
 
     16: // Phase 1.7 : Vérification coupure instantanée
-        IF NOT PRG_10_Outputs.PowerCutOff_A_RQ AND NOT PRG_10_Outputs.PowerCutOff_B_RQ AND NOT PRG_00_Inputs.EmergencyStopOk THEN
+        IF NOT PowerCutOff_A_RQ AND NOT PowerCutOff_B_RQ AND NOT PRG_00_Inputs.EmergencyStopOk THEN
             // Coupure validée, on relâche le bouton d'urgence (doit rester coupé)
             OverrideChainFalse := FALSE;
             TestSeqStep := 17;
         END_IF;
 
     17: // Phase 1.8 : Vérification de l'auto-maintien (Latch)
-        IF NOT PRG_10_Outputs.PowerCutOff_A_RQ AND NOT PRG_10_Outputs.PowerCutOff_B_RQ THEN
+        IF NOT PowerCutOff_A_RQ AND NOT PowerCutOff_B_RQ THEN
             TC01_NominalArming_Ok := TRUE;
             TestSeqStep := 20; // Passer au test de redondance
         ELSE
@@ -223,16 +228,3 @@ CASE TestSeqStep OF
         TestSeqStep := 0;
 
 END_CASE;
-
-// === SURCHARGE DES SIGNALS DE SIMULATION (OVERRIDE INTERNE) ===
-IF OverrideChainTrue THEN
-    PRG_00_Inputs.EmergencyChain := TRUE;
-END_IF;
-
-IF OverrideChainFalse THEN
-    PRG_00_Inputs.EmergencyChain := FALSE;
-END_IF;
-
-IF OverrideContactorFalse THEN
-    PRG_00_Inputs.EmergencyStopOk := FALSE;
-END_IF;

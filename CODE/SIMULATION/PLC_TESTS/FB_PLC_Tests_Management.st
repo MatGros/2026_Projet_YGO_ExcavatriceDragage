@@ -17,6 +17,11 @@ VAR_OUTPUT
     TC02_RedundancyFault_Ok    : BOOL;
     TC03_Lockout_Ok            : BOOL;
     FailedTestCase             : INT;
+    
+    // Propagation des demandes de surcharge (overrides)
+    OverrideChainTrue          : BOOL;
+    OverrideChainFalse         : BOOL;
+    OverrideContactorFalse     : BOOL;
 END_VAR
 VAR
     // 🧱 Instances de tests individuels hébergées
@@ -47,3 +52,6 @@ TC01_NominalArming_Ok   := instSafetyValidation.TC01_NominalArming_Ok;
 TC02_RedundancyFault_Ok := instSafetyValidation.TC02_RedundancyFault_Ok;
 TC03_Lockout_Ok         := instSafetyValidation.TC03_Lockout_Ok;
 FailedTestCase          := instSafetyValidation.FailedTestCase;
+OverrideChainTrue       := instSafetyValidation.OverrideChainTrue;
+OverrideChainFalse      := instSafetyValidation.OverrideChainFalse;
+OverrideContactorFalse  := instSafetyValidation.OverrideContactorFalse;

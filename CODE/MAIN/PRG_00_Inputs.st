@@ -221,3 +221,14 @@ END_IF;
 
 // 🧪 Appel de la suite globale de tests de validation automate
 instTestsManagement();
+
+// Surcharges (overrides) demandées par le banc de tests automatique
+IF instTestsManagement.OverrideChainTrue THEN
+    EmergencyChain := TRUE;
+END_IF;
+IF instTestsManagement.OverrideChainFalse THEN
+    EmergencyChain := FALSE;
+END_IF;
+IF instTestsManagement.OverrideContactorFalse THEN
+    EmergencyStopOk := FALSE;
+END_IF;
