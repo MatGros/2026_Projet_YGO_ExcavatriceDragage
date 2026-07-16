@@ -9,7 +9,7 @@
 VAR_GLOBAL CONSTANT
     MaxSuites        : INT := 4;
     MaxTestCases     : INT := 8;    // par suite
-    MaxSteps         : INT := 32;   // par suite, table PLATE
+    MaxSteps         : INT := 64;   // par suite, table PLATE
     MaxChecks        : INT := 64;   // CheckTable par suite
     MaxChecksPerStep : INT := 4;
     MaxInvariants    : INT := 4;    // actifs en parallèle
