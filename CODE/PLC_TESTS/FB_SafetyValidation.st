@@ -1,14 +1,16 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 PRG_SafetyValidation — Validateur Automatique de Sécurité (CI/CD)
+   🧪 FB_SafetyValidation — Validateur Automatique de Sécurité
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Exécute une suite de scénarios de tests réglementaires
-      (NF EN ISO 13849-1) sur le bloc FB_Safety_EmergencyManagement.
-   ⚙️ S'exécute uniquement si GVL_Simulation.SimulationModeActive est actif.
+   🎯 Rôle : Séquenceur de test sous forme de bloc fonctionnel (FB).
+      Exécute les cas de tests réglementaires de la boucle d'urgence.
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_SafetyValidation
+FUNCTION_BLOCK PUBLIC FB_SafetyValidation
+VAR_INPUT
+    StartTests                 : BOOL;        // Commande de démarrage des tests
+END_VAR
 VAR_OUTPUT
-    // Rapport de test (CI/CD)
+    // Rapport de test
     TestInProgress             : BOOL;
     TC01_NominalArming_Ok      : BOOL;
     TC02_RedundancyFault_Ok    : BOOL;
@@ -18,7 +20,7 @@ VAR_OUTPUT
     FailedTestCase             : INT;         // Numéro du scénario en échec
 END_VAR
 VAR
-    StartTests                 : BOOL;        // Commande de démarrage des tests
+    StartTestEdge              : R_TRIG;
     TestSeqStep                : INT := 0;    // Séquenceur de test
     TestTimer                  : TON;         // Timer d'attente d'étapes
     OverrideChainTrue          : BOOL := FALSE; // Force l'entrée boucle d'urgence à TRUE
@@ -40,11 +42,7 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     RETURN;
 END_IF;
 
-// Lancement automatique sur front de la commande globale de simulation
-IF GVL_Simulation.CmdRunTests THEN
-    GVL_Simulation.CmdRunTests := FALSE;
-    StartTests := TRUE;
-END_IF;
+StartTestEdge(CLK := StartTests);
 
 // ⏱️ Timer général d'étape
 TestTimer(IN := (TestSeqStep <> 0), PT := T#10s);
@@ -53,8 +51,7 @@ TestTimer(IN := (TestSeqStep <> 0), PT := T#10s);
 CASE TestSeqStep OF
 
     0: // IDLE — En attente du départ de test
-        IF StartTests THEN
-            StartTests := FALSE;
+        IF StartTestEdge.Q THEN
             TestInProgress := TRUE;
             TC01_NominalArming_Ok := FALSE;
             TC02_RedundancyFault_Ok := FALSE;
@@ -135,8 +132,7 @@ CASE TestSeqStep OF
     21: // Phase 2.2 : Attente de l'auto-test canal A
         ArmRequest := FALSE;
         IF PRG_10_Outputs.instSafetyEmergencyManagement.ArmingSeqStep = 1 THEN
-            // Simuler contacteur A soudé : la chaîne d'urgence reste fermée (TRUE) 
-            // malgré l'ordre de coupure du canal A.
+            // Simuler contacteur A soudé
             OverrideChainTrue := TRUE;
             TestSeqStep := 22;
         END_IF;
@@ -229,9 +225,6 @@ CASE TestSeqStep OF
 END_CASE;
 
 // === SURCHARGE DES SIGNALS DE SIMULATION (OVERRIDE INTERNE) ===
-// Puisque PRG_SafetyValidation tourne APRÈS PRG_00_Inputs, nous surchargeons les
-// variables d'entrées physiques pour injecter nos défauts de tests contrôlés.
-
 IF OverrideChainTrue THEN
     PRG_00_Inputs.EmergencyChain := TRUE;
 END_IF;
