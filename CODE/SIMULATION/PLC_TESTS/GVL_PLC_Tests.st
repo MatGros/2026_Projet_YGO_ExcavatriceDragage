@@ -9,6 +9,10 @@
 VAR_GLOBAL
     Cmd                        : ST_PlcTestsCmd;      // 🎮 Commandes de pilotage des tests
     Status                     : ST_PlcTestsStatus;   // 🚦 Progression et statut des tests
+    EventLog                   : ARRAY[1..GVL_PLC_Tests_Const.MaxTestEvents] OF ST_TestEvent;
+    EventCount                 : INT;
+    EventSequence              : UDINT;
+    EventOverflow              : BOOL;
 
     // 📊 Rapports par suite — 1 variable NOMMÉE par suite (pas de tableau générique,
     // choix utilisateur 2026-07-16) : chaque nouvelle suite ajoute SA variable ici
@@ -28,6 +32,11 @@ VAR_GLOBAL
     OverrideM3AtTremie         : BOOL;                // Force TranslationPosTremie (Fdc extrême avant) à TRUE
     OverrideM3BrakeStuckOpen   : BOOL;                // Force M3BrakeFeedback (retour bobine) à TRUE (desserré) — simule Méca B
     OverrideM3PhantomFreq      : BOOL;                // Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A
+    // 🆕 REX 2026-07-18 : force directement les 5 capteurs position M3 depuis un mot de test —
+    // seul moyen de tester les 6 mots valides ET les combinaisons incohérentes indépendamment
+    // du temps de trajet simulé (FB_Sim_Translation). bit4=Trémie,bit3=PV,bit2=P2,bit1=P1,bit0=Maintenance.
+    OverrideM3SensorsWordActive : BOOL;                // TRUE = force les 5 capteurs depuis OverrideM3SensorsWord
+    OverrideM3SensorsWord       : BYTE;                // Mot de test (voir FB_Translation_PositionDecoder)
 
     // ⚡ Surcharges (overrides) physiques — Bucket
     OverrideM1Slip           : BOOL;                // Simule glissement modéré M1 (1.5m)

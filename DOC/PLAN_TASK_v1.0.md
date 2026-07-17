@@ -36,13 +36,13 @@ Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 b
 | Brique | Manque |
 |---|---|
 | `FB_WinchSync` | Surveillance seule (assumé), pas de correction active |
-| `FB_Translation` | Mot de commande AC600 jamais câblé, `LIN_TRAFO` non vérifié, arrêt exact sur capteur non validé |
-| `FB_Safety_Translation` | 4 bits seulement (vs 14 côté Winch) |
+| `FB_Translation` | Nouvelle cinématique M3 à intégrer : cinq capteurs codés Trémie/PV/P2/P1/Maintenance, décodage position et ralentissement PV |
+| `FB_Safety_Translation` | Adapter les deux limites safety aux extrêmes Trémie/Maintenance et ajouter le diagnostic d'incohérence du mot capteurs |
 | `FB_Cycle` | **Trouvé à l'audit, absent de v1.1** : `Error`/`ErrorId`/`StateAtError` jamais assignés, `ResetEdge` mort |
 | `FB_Input`/`FB_Output` (COMMUN) | Existent mais pas intégrés dans Winch/Translation (logique contacteur dupliquée) |
 
 ### ⏸️ Différé assumé (pas un trou béant)
-`PRG_08_AuxiliaryControl` (crible/hydraulique/grille/casque) — code prêt (`ST_AuxiliaryHMI`), en attente validation client des specs fonctionnelles.
+`PRG_08_AuxiliaryControl` — les commandes casque, grille et centrale hydraulique sont retirées du périmètre PLC ; seul le retour thermique de la centrale reste à remonter en diagnostic.
 
 ### ❌ Manquant
 IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` existe).
@@ -66,6 +66,15 @@ large (interfaces FB largement utilisées), plan dédié à valider avant d'y to
 - **M2** devient le **moteur Benne** (le terme "Benne" disparaît au profit de "**Benne**").
 - Le "**Translation**" devient "**Translation**" (terme abrégé cible à définir : `Trans`, `Translat` ?).
 
+📌 **Nouvelles décisions client — Translation / auxiliaires / cycle semi-auto (2026-07-17)** :
+- M3 possède cinq capteurs croisés dans l'ordre `Trémie | PV | P2 | P1 | Maintenance`.
+- Codes valides : `11111 → 01111 → 00111 → 00011 → 00001 → 00000` ; toute autre combinaison est incohérente.
+- `Trémie` est l'extrême gauche safety ; `Maintenance` est l'extrême droite safety et reste réservée à `MAINT_N2`.
+- `PV` est le point de ralentissement avant l'arrêt répétable sur Trémie.
+- Le PLC ne commande plus casque, grille ni centrale hydraulique ; seul le thermique centrale remonte en diagnostic.
+- Le détecteur de fond Kobold est commandé par un contacteur de puissance à définir et fournit un retour contact fond.
+- Le cycle semi-auto est reprenable par homme-mort : relâchement joystick = pause sur étape ; nouvelle commande valide = reprise.
+
 🎯 **Cap long terme** (demande explicite utilisateur 2026-07-15) : généraliser le préfixe
 (rôle/type d'abord, ex. `Req`/`Cmd`/`Sensor`/`Position`) à TOUT le projet — objectif : recherche/
 autocomplete efficace, taper le rôle suffit à retrouver toutes les variables du même type peu
@@ -75,7 +84,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 (ex. `TopPositionSensor`, homing/safety Winch, déjà responsable d'un vrai bug de polarité passé).
 
 ### 📄 Doc à mettre à jour
-- Presque tous les `AF_PartieN` : en-tête "Dépend de Partie 2 vX.Y" obsolète → bumper vers `v2.10`
+- Presque tous les `AF_PartieN` : en-tête "Dépend de Partie 2 vX.Y" obsolète → aligner sur l'architecture courante
 - `AF_Partie-07` (Interface IHM) : le plus en retard, référence encore `PRG_MAIN.st` (n'existe plus)
 - `AF_Partie-07`/`AF_Partie-12` : titre interne ≠ nom de fichier
 - `CLAUDE.md` : arborescence encore sur le modèle `PLC_PRG_MAIN` abandonné
@@ -117,6 +126,11 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T30 | Configurer le variateur de translation : fonctionnement classique à 30 Hz, max 60 Hz | Projet | Point client 2026-07-15 |
 | T31 | Calculer la vitesse codeur en m/s et la diviser en 5 paliers par rapport à la vitesse maximale | Projet | Point client 2026-07-15 |
 | T32 | Estimer la charge benne en % via un tableau 2D (état contacteurs vitesse montée × 5 paliers vitesse codeur) réglable manuellement | Projet | Point client 2026-07-15 |
+| T33 | Définir et implémenter le décodage cinq capteurs M3 (`Trémie/PV/P2/P1/Maintenance`) et le diagnostic des combinaisons incohérentes | Projet | Décision client 2026-07-17 |
+| T34 | 🔴 **BLOQUANT** — Définir les E/S réelles du contacteur Kobold et de son retour contact fond | Projet / Électricité | Décision client 2026-07-17 — aucun réemploi du capteur mou de câble autorisé |
+| T35 | 🟠 En cours — Définir la stratégie de descente semi-auto : limite légale, détection Kobold, remontée synchronisée au-dessus de la limite, puis fermeture benne | Projet | Décision client 2026-07-17 — structure cycle existante, raccordement Kobold à finaliser |
+| T36 | 🟠 À spécifier — Définir la phase de stabilisation après fermeture benne : vitesse lente, tolérance codeurs, blocage/obstacle/câble mou et reprise | Projet | Décision client 2026-07-17 |
+| T37 | Retirer les commandes PLC casque/grille/centrale et conserver uniquement le diagnostic thermique centrale | Projet | Décision client 2026-07-17 |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 
@@ -155,7 +169,7 @@ organisationnel trouvé). Détail fichier par fichier :
 | Fichier | Ancien nom | Nouveau nom | Renvois ajoutés | Txx référencées |
 |---|---|---|---|---|
 | Partie 1 | `..._v1.5.md` | `..._v1.6.md` | 2 | T12, T13 |
-| Partie 2 | `..._v2.10.md` | `..._v2.11.md` | 1 | T5 |
+| Partie 2 | `..._v2.11.md` | `..._v2.12.md` | 1 | T5 |
 | Partie 3 | — | — (inchangé) | 0 | — |
 | Partie 4 | `..._v1.2.md` | `..._v1.3.md` | 1 | T1 |
 | Partie 5 | `..._v1.3.md` | `..._v1.5.md` | 1 | T18 |

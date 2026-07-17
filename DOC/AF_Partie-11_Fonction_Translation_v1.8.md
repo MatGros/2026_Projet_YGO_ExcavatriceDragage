@@ -1,4 +1,9 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.7)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.8)
+
+> 🆕 **v1.8 (2026-07-18) — Mise en conformité M3 avec le codage cinq capteurs** : ajout du
+> décodage `Trémie|PV|P2|P1|Maintenance`, remplacement du ralentissement temporisé par le
+> capteur PV, ajout du diagnostic d’incohérence bit7 et alignement de la simulation sur les
+> six mots valides.
 
 > 🆕 **v1.7 (2026-07-16) — IHM_MANU aligné sur le modèle M1/M2 (fin du bypass `M3_CommandWord`)** :
 > * `PRG_07_TranslationControl.st` : nouvelle branche `ELSIF PRG_10_Outputs.ManuActive THEN` (§1bis),
@@ -98,6 +103,7 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 | `Direction` | INT | Consigne de sens -1 (arrière), 0 (neutre), +1 (avant) |
 | `SpeedRefPct` | REAL | Magnitude de la consigne de vitesse (0..100 %) |
 | `PositionSensorTarget` | BOOL | Capteur de position cible courante atteint (débounced) |
+| `SlowdownSensor` | BOOL | Capteur PV : réduction à `ApproachSpeedPct` uniquement vers la Trémie |
 | `LimitSwitchFwd` | BOOL | Fin de course extrême avant (bloque la marche avant) |
 | `LimitSwitchRev` | BOOL | Fin de course extrême arrière (bloque la marche arrière) |
 | `DriveStatusWord` | WORD | Mot d'état variateur AC600 lu par EtherCAT |
@@ -112,7 +118,6 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 | `RampDecelNormalRate` | REAL | Taux de décélération normale (%/s) |
 | `RampDecelFastRate` | REAL | Taux de décélération rapide/d'urgence (%/s) |
 | `DirectionInterlockDelay` | TIME | Délai d'interdiction d'inversion directe de sens |
-| `ApproachTime` | TIME | Durée de translation normale avant le ralentissement auto |
 | `ApproachSpeedPct` | REAL | Vitesse maximale d'approche lente de la cible (%) |
 | `DriveFreqScaleMaxHz` | REAL | Échelle maximale du variateur (défaut 50.0 Hz) |
 | `CaptorDebounce` | TIME | Tempo anti-rebond pour le capteur de position cible |
@@ -131,6 +136,27 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 * `bit0` : Défaut frein (incohérence commande/retour)
 * `bit3` : Défaut variateur (remonté par le bit4 du Status Word variateur)
 * `bit6` : Fin de course extrême atteint
+* `bit7` : Mot des cinq capteurs de position incohérent
+
+### 🧩 3bis. Décodage des capteurs de position M3
+
+`FB_Translation_PositionDecoder` reçoit les cinq entrées dans l'ordre
+`Trémie | PV | P2 | P1 | Maintenance` et accepte uniquement les mots monotones suivants :
+
+| Mot | Zone | Effet |
+|---|---|---|
+| `11111` | Extrême gauche / Trémie | Limite `Fwd` |
+| `01111` | Entre Trémie et PV | Approche rapide |
+| `00111` | P2 | Position de travail |
+| `00011` | P1 | Position de travail |
+| `00001` | Entre P1 et Maintenance | Approche Maintenance |
+| `00000` | Extrême droite / Maintenance | Limite `Rev`, accès `MAINT_N2` uniquement |
+
+Toute autre combinaison déclenche `Incoherent`, transmis à `FB_Safety_Translation` via
+`SensorWordIncoherent`. Ce défaut provoque `SafeStop` et `PowerCutOff`.
+
+Le capteur `PV` est uniquement un point de ralentissement avant la Trémie. Il ne constitue
+jamais une cible d'arrêt.
 
 ---
 
@@ -151,6 +177,7 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 | `Direction` | INT | Sens commandé |
 | `LimitSwitchFwd` | BOOL | Fin de course extrême avant |
 | `LimitSwitchRev` | BOOL | Fin de course extrême arrière |
+| `SensorWordIncoherent` | BOOL | Incohérence du mot cinq capteurs |
 
 **📤 Sorties**
 | Sortie | Type | Rôle |
@@ -164,6 +191,7 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 * `bit4` : Méca B (Incohérence à l'arrêt : frein non serré ou variateur en marche)
 * `bit5` : Méca A (Mouvement non commandé détecté à l'arrêt)
 * `bit6` : Fin de course extrême physique franchi
+* `bit7` : Mot capteurs incohérent — `SafeStop` + `PowerCutOff`
 | `SafeStop` | BOOL | Demande d'arrêt rapide par décélération PLC |
 | `PowerCutOff` | BOOL | Coupure immédiate de la puissance amont (AU) |
 
@@ -217,7 +245,7 @@ alimentent l'arbitrage `PRG_07_TranslationControl` §1bis, qui pilote la même i
 
 | Champ | Type | Sens | Rôle |
 |-------|------|------|------|
-| `SelectedTargetNum` | INT | IHM→PLC | Cible position 1-4 (Fosse1/Fosse2/Maintenance/Trémie) |
+| `SelectedTargetNum` | INT | IHM→PLC | Cible : `1=Trémie`, `2=P2`, `3=P1`, `4=Maintenance` ; PV n'est pas une cible |
 | `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) |
 | `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `_TranslationMaxFreq_Hz` — référence de vitesse pleine échelle en Manu (boutons ET joystick, voir bandeau v1.7) |
 | `FBState` | E_State | PLC→IHM | État interne `FB_Translation` (diagnostic) |
@@ -230,3 +258,4 @@ alimentent l'arbitrage `PRG_07_TranslationControl` §1bis, qui pilote la même i
 | `DrivePowerReady` | BOOL | PLC→IHM | StatusWord bit0 (puissance prête) — décodé |
 | `BypassContactorFeedback` | BOOL | PLC→IHM | Diag banc de test, auto-calculé (`GVL_Simulation.ContactorFeedbackM3_IsReal`) — couvre sens + frein |
 | `SafetyError` / `SafetyErrorId` | — | PLC→IHM | Statuts `FB_Safety_Translation` |
+| `SafetyErrorSensorIncoherent` | BOOL | PLC→IHM | Incohérence du mot capteurs M3 (bit7) |

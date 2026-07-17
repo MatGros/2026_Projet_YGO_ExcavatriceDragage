@@ -6,6 +6,23 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### `v0.4.17_SemiAuto_CycleSafety` — 2026-07-18
+- Homme-mort obligatoire pendant les mouvements semi-auto M1/M2/M3
+- Relâchement joystick = arrêt ; nouvelle sollicitation = reprise de l'étape
+- Cycle Kobold cadré ; E/S réelles encore TBD (PLAN_TASK T34)
+- Tests PLC anti-blocage : états terminaux, watchdog et journal d'événements
+
+### `v0.4.16_ReferenceToFix_BucketRun` — 2026-07-18 (M3)
+- M3 conforme au codage cinq capteurs `Trémie|PV|P2|P1|Maintenance`
+- Nouveau `FB_Translation_PositionDecoder` : mots valides et incohérences
+- Ralentissement PV câblé, limites extrêmes Trémie/Maintenance alignées
+- Bit7 safety incohérence remonté à l'IHM ; simulation des mots corrigée
+- AF Partie 11 publiée en v1.8 et architecture en v2.12
+
+### `v0.4.16_ReferenceToFix_BucketRun` — 2026-07-18 (PLC_TESTS)
+- Séquenceur anti-blocage : erreurs terminales, watchdog suite et journal d'événements
+- Correction `StepTc06Teardown` hors table (`69` → `63`)
+
 ### `v0.4.16_ReferenceToFix_BucketRun` — 2026-07-17
 - Fix générateur PLCopenXML (`TOOLS/`) : `REFERENCE TO` sérialisait en `<pointer>` au lieu de `<derived name="REFERENCE TO X">` — confirmé sur échantillon réel (`FB_TestReference.xml`)
 - `FB_BucketValidation` : garde `__ISVALIDREF()` avant déréférencement `instBucket`/`instWinchM2` (protège le 1ᵉʳ scan, avant assignation par `PRG_06_WinchControl`)

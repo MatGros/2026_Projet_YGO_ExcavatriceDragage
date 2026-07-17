@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.7.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -19,6 +19,7 @@ VAR_INPUT
     Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
     SpeedRefPct                 : REAL;        // Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // Capteur position cible courante
+    SlowdownSensor              : BOOL;        // 🆕 REX 2026-07-18 : capteur PV — ralentissement avant Trémie (remplace ApproachTime)
     LimitSwitchFwd              : BOOL;        // Fin de course extrême avant
     LimitSwitchRev              : BOOL;        // Fin de course extrême arrière
 
@@ -36,8 +37,7 @@ VAR_INPUT
     DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt
 
     // Réglages ETHERCAT uniquement (RETAIN)
-    ApproachTime                 : TIME := T#5s;    // Temps estimé avant ralentissement auto
-    ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (PV)
+    ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (piloté par SlowdownSensor/PV)
     DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → 0..60Hz (T30: Max 60Hz, fonctionnement standard/nominal 30Hz à 50% de consigne)
 
     // Réglages communs
@@ -70,7 +70,6 @@ VAR
     DirectionChangeDelay : TON;            // Interlock changement de sens
     CommandedDirection   : INT;            // Sens réellement appliqué
     RampTargetPct        : REAL;
-    ApproachTimer         : TON;           // Déclenche le ralentissement auto
     CaptorDebounceTon     : TON;
     ArrivalEdge            : R_TRIG;
     DirectionAtArrival     : INT;
@@ -92,7 +91,6 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
 
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    ApproachTimer(IN := FALSE, PT := ApproachTime);
     SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
 
     ArrivalLock := FALSE;
@@ -123,9 +121,12 @@ IF NOT SafeStop AND StartStop THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE
-ApproachTimer(IN := (StartStop AND NOT SafeStop), PT := ApproachTime);
-IF ApproachTimer.Q THEN
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur PV, remplace le timer)
+// 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
+// capteur dédié (SlowdownSensor = PV) qui ne déclenche le ralentissement QU'à l'approche de
+// Trémie (Direction=1) — décision client (AF_Partie-02 v2.12 §3bis) : PV n'assure le
+// ralentissement qu'avant Trémie, jamais dans le sens Maintenance.
+IF (Direction = 1) AND SlowdownSensor THEN
     RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
 END_IF;
 

@@ -9,6 +9,9 @@ STRUCT
     AllPassed      : BOOL;             // Tous les tests de la suite ont réussi ?
     AnyFailed      : BOOL;             // Au moins un échec détecté ?
     Aborted        : BOOL;             // Suite abandonnée ?
+    TerminalState  : E_TestTerminalState; // 🛡️ Fin explicite, aucune attente implicite sur Done
+    ErrorCode      : INT;              // Code d'erreur de configuration/exécution
+    ErrorMessage   : STRING(160);      // Diagnostic court exploitable IHM/log
     FailedTestCase : INT;              // Premier cas de test en échec (0 si aucun)
     FailureSummary : STRING(255);      // 🏷️ TOUS les cas en échec en 1 ligne lisible (ex. 'TC-01 (step 15): FAIL_CHECK | TC-03 (step 30): FAIL_TIMEOUT') — évite de parcourir Cases[] un par un
     CurrentStepId  : INT;              // Étape en cours d'exécution

@@ -8,10 +8,10 @@
 > titre affichait v1.1, le champ "Version" ci-dessus était déjà en v1.2) + renvois croisés mis à
 > jour vers les dernières versions des autres `AF_PartieN`. Aucun changement de contenu fonctionnel.
 > **Version 1.1** (Revue et mise en œuvre du plan d'action — 2026-07-07)
-> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md),
+> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
 > [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md),
-> [P11 Translation v1.2](AF_Partie-11_Fonction_Translation_v1.7.md) §7/§9bis.
+> [P11 Translation v1.8](AF_Partie-11_Fonction_Translation_v1.8.md) §3bis/§7/§9bis.
 > ⚙️ **Changements v1.1** : 
 > - Déplacement de [GVL_Simulation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st) vers `CODE/SIMULATION/` pour regrouper la GVL avec ses FB de simulation.
 > - Extraction de la variable `BlinkClock1Hz` vers une nouvelle GVL système globale [GVL_Global.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/GVL_Global.st) dans `CODE/MAIN/`.
@@ -62,7 +62,7 @@ SimulationModeActive AND NOT <Device>_IsReal
 | `PhaseRotationOk_IsReal` | Contrôle rotation phases |
 | `ThermalM1_IsReal` / `ThermalM2_IsReal` | Thermique moteur M1/M2 |
 | `ContactorFeedbackM1/M2/M3_IsReal` | Retours contacteurs (sens + frein) par axe |
-| `TranslationPosition_IsReal` | Capteurs Fosse1/Fosse2/Maintenance/Trémie |
+| `TranslationPosition_IsReal` | Capteurs Trémie/PV/P2/P1/Maintenance |
 
 `JoystickForceNeutralRaw`, `JoystickForceMaxRaw` et `EncoderSimSpeedFactor` restent dans la [GVL_Simulation](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st). L'horloge utilitaire générique `BlinkClock1Hz` est déplacée dans [GVL_Global.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/GVL_Global.st).
 
@@ -119,11 +119,14 @@ CANopen (`CanOnline`/`CanOperational`) est forcé de la même façon.
 
 ### `FB_Sim_Translation` (M3, non prioritaire)
 Simulation de trajet M3 par temps de parcours — remplace le forçage manuel du capteur de
-position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie-11_Fonction_Translation_v1.7.md)).
+position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie-11_Fonction_Translation_v1.8.md)).
 * Fichier associé : [FB_Sim_Translation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/FB_Sim_Translation.st)
 
-Sorties `PosFosse1/PosFosse2/PosMaintenance/PosTremie` (BOOL), OR'ées sur `InputRaw` des
+Sorties `PosTremie/PosPV/PosP2/PosP1/PosMaintenance` (BOOL), OR'ées sur `InputRaw` des
 capteurs réels correspondants dans [PRG_00_Inputs.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/PRG_00_Inputs.st).
+La simulation respecte le codage croisé monotone : `11111` (Trémie), `01111` (PV),
+`00111` (P2), `00011` (P1), `00001` (approche Maintenance), `00000` (Maintenance).
+Aucun état intermédiaire incohérent ne doit être généré par le banc de test.
 
 ### `FB_Sim_DigitalMirror` (brique générique, utilisée pour M3, non prioritaire)
 Miroir commande→retour temporisé (délai mécanique simulé) réutilisant `TON`.

@@ -37,12 +37,6 @@ STRUCT
     M1_M2_Contactor3 : BOOL; (* ⚡ Vitesse M1 et M2 *)
     M1_M2_Contactor4 : BOOL; (* ⚡ Vitesse M1 et M2 *)
 
-    (* 🌾 Auxiliaires Hydrauliques (HMI maintained action) *)
-    GridOpenCmd      : BOOL; (* 🌾 Commande ouverture grille *)
-    GridCloseCmd     : BOOL; (* 🌾 Commande fermeture grille *)
-    HelmetOpenCmd    : BOOL; (* 🪖 Commande ouverture casque *)
-    HelmetCloseCmd   : BOOL; (* 🪖 Commande fermeture casque *)
-
     (* 📊 Fins de Course Virtuels Benne (delta M1 - M2) *)
     FdcBucketOpenEnable   : BOOL; (* 🎚️ Activer FDC Ouvert (stop M2 descente si delta >= 0.0m) *)
     FdcBucketCloseEnable  : BOOL; (* 🎚️ Activer FDC Fermé (stop M2 montée si delta <= -10.0m) *)

@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Bit maître + granularité par device (remplace GVL_DEBUG)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🎯 Rôle : le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'étant
       pas disponible pour les essais, toute la machine doit pouvoir tourner en
       simulation CODESYS. Modèle hiérarchique :
@@ -43,7 +43,8 @@ VAR_GLOBAL
     ContactorFeedbackM1_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M1
     ContactorFeedbackM2_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M2
     ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) translation M3
-    TranslationPosition_IsReal     : BOOL := FALSE; // Capteurs Fosse1/Fosse2/Maintenance/Trémie
+    TranslationPosition_IsReal     : BOOL := FALSE; // Capteurs Trémie/PV/P2/P1/Maintenance
+    HydraulicThermal_IsReal        : BOOL := FALSE; // 🆕 REX 2026-07-18 : thermique centrale hydraulique (PRG_08_AuxiliaryControl)
 
     // ── Utilitaires banc d'essai (sans préfixe DBG_) ───────────────────────────
     JoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)

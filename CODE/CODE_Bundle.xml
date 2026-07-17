@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-16T15:49:00.286717" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-16T15:49:00.286717">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-18T00:00:00.000000" />
+  <contentHeader name="MGS_v0.4.17_SemiAuto_CycleSafety.project" modificationDateTime="2026-07-18T00:00:00.000000">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">MGS_v0.4.17_SemiAuto_CycleSafety</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -455,6 +455,28 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="E_TestEventSeverity">
+        <baseType>
+          <enum>
+            <values>
+              <value name="TEST_EVENT_INFO" value="0" />
+              <value name="TEST_EVENT_WARNING" value="1" />
+              <value name="TEST_EVENT_ERROR" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>41e588d1-1ea8-5d99-aa81-d6d6b07b9c32</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_TestFailAction">
         <baseType>
           <enum>
@@ -616,6 +638,31 @@
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6fd96dd9-eed5-59f0-952a-689dccea86b1</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_TestTerminalState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="TEST_TERMINAL_NONE" value="0" />
+              <value name="TEST_TERMINAL_DONE" value="1" />
+              <value name="TEST_TERMINAL_FAILED" value="2" />
+              <value name="TEST_TERMINAL_ABORTED" value="3" />
+              <value name="TEST_TERMINAL_CONFIG_ERROR" value="4" />
+              <value name="TEST_TERMINAL_WATCHDOG_TIMEOUT" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c2e17c82-2f21-52c7-a77f-c922755f7e25</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -1042,6 +1089,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser</xhtml>
               </documentation>
             </variable>
+            <variable name="HydraulicThermalFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1109,7 +1164,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.11.md §5,
+   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §5,
                    DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §7bis
    Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
    détecter un collage / une absence de fermeture d'un contacteur de
@@ -1498,39 +1553,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GridOpenCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌾 Auxiliaires Hydrauliques (HMI maintained action)
-🌾 Commande ouverture grille</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GridCloseCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌾 Commande fermeture grille</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HelmetOpenCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪖 Commande ouverture casque</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HelmetCloseCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪖 Commande fermeture casque</xhtml>
               </documentation>
             </variable>
             <variable name="FdcBucketOpenEnable">
@@ -2141,6 +2163,31 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ Détail des défauts du dernier run, TOUTES suites confondues (remonte Report.FailureSummary de chaque suite exécutée) — lisible sans creuser Suite*Validation</xhtml>
               </documentation>
             </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
+            <variable name="SuiteElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="SuiteWatchdogExpired">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2604,6 +2651,55 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_TestEvent">
+        <baseType>
+          <struct>
+            <variable name="Sequence">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="Severity">
+              <type>
+                <derived name="E_TestEventSeverity" />
+              </type>
+            </variable>
+            <variable name="SuiteId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="Code">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="Message">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>97ecb186-f8f9-5b20-8b2f-6ebd348d8ada</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Événement journalisé par le banc de test</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_TestInvariantConfig">
         <baseType>
           <struct>
@@ -2961,6 +3057,30 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Suite abandonnée ?</xhtml>
               </documentation>
             </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin explicite, aucune attente implicite sur Done</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur de configuration/exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic court exploitable IHM/log</xhtml>
+              </documentation>
+            </variable>
             <variable name="FailedTestCase">
               <type>
                 <INT />
@@ -3258,6 +3378,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
               </documentation>
             </variable>
+            <variable name="SafetyErrorSensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Mot capteurs M3 incohérent (bit7)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -3271,7 +3399,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Migration des champs manuels ex-ST_IHM_MANU (étape en cours, pas l'état final) —
-      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.7.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4002,7 +4130,7 @@ END_IF;
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §3
-                   (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md §4)
+                   (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
    📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
@@ -5024,6 +5152,36 @@ END_IF;
             <variable name="Report">
               <type>
                 <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfigErrorCheckIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
               </type>
             </variable>
           </outputVars>
@@ -6059,6 +6217,12 @@ Sequencer(
     Busy =&gt; Busy,
     Done =&gt; Done,
     AnyFailed =&gt; AnyFailed,
+    TerminalState =&gt; TerminalState,
+    ConfigError =&gt; ConfigError,
+    ConfigErrorStepId =&gt; ConfigErrorStepId,
+    ConfigErrorCheckIdx =&gt; ConfigErrorCheckIdx,
+    ErrorCode =&gt; ErrorCode,
+    ErrorMessage =&gt; ErrorMessage,
     ActiveStimulusId =&gt; ActiveStimulusId,
     StepElapsed =&gt; StepElapsed
 );
@@ -6243,7 +6407,7 @@ Profondeur de consigne (négative)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible sélectionnée (1=Fosse1, 2=Fosse2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible sélectionnée (2=P2, 3=P1 — 🆕 REX 2026-07-18, ex-1=Fosse1/2=Fosse2, voir AF_Partie-02 v2.12 §3bis)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomTouched">
@@ -6271,21 +6435,21 @@ Capteur mou de câble / fond touché</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble treuil M2 (recalée)</xhtml>
               </documentation>
             </variable>
-            <variable name="Translation_At_Fosse1">
+            <variable name="Translation_At_P1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Feedbacks Translation M3
-Capteur fin de course fosse 1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Feedbacks Translation M3 — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
+Capteur position P1 (ex-Fosse1)</xhtml>
               </documentation>
             </variable>
-            <variable name="Translation_At_Fosse2">
+            <variable name="Translation_At_P2">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur fin de course fosse 2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2 (ex-Fosse2)</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_At_Maintenance">
@@ -6560,7 +6724,7 @@ Position M1 mémorisée lors du contact fond</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de travail mémorisée pour le retour (1 ou 2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de travail mémorisée pour le retour (2=P2 ou 3=P1 — 🆕 REX 2026-07-18)</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentDistM">
@@ -6674,15 +6838,16 @@ CASE State OF
         CycleStateStr := 'SÉLECTION POSITION TRAVAIL (FOSSE 1 / 2)';
         Busy := TRUE;
 
-        // Choix cible
-        IF SelectedTargetNum_IHM = 1 OR SelectedTargetNum_IHM = 2 THEN
+        // Choix cible — 🆕 REX 2026-07-18 : zone de travail = P2/P1 (cibles 2/3), ex-Fosse1/Fosse2
+        // (cibles 1/2), suite au remap 5 positions Trémie(1)/P2(2)/P1(3)/Maintenance(4)
+        IF SelectedTargetNum_IHM = 2 OR SelectedTargetNum_IHM = 3 THEN
             SelectedWorkTarget := SelectedTargetNum_IHM;
             CmdTranslationM3_Target := SelectedWorkTarget;
             CmdTranslationM3_Start := TRUE;
-            
+
             // Attente positionnement translation
-            IF (SelectedWorkTarget = 1 AND Translation_At_Fosse1) 
-               OR (SelectedWorkTarget = 2 AND Translation_At_Fosse2) THEN
+            IF (SelectedWorkTarget = 2 AND Translation_At_P2)
+               OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
                 CmdTranslationM3_Start := FALSE;
                 State := E_CycleStep.DESCENDING_OPEN;
             END_IF;
@@ -6788,7 +6953,7 @@ CASE State OF
         CycleStep := E_CycleStep.TRANSLATION_MOVE;
         CycleStateStr := 'DÉPLACEMENT VERS TRÉMIE DE VIDANGE';
 
-        CmdTranslationM3_Target := 4; // Trémie
+        CmdTranslationM3_Target := 1; // Trémie — 🆕 REX 2026-07-18 : ex-4, remap 5 positions (AF_Partie-02 v2.12 §3bis)
         CmdTranslationM3_Start := TRUE;
 
         // Transition si translation arrivé à la trémie
@@ -6817,9 +6982,9 @@ CASE State OF
         CmdTranslationM3_Target := SelectedWorkTarget;
         CmdTranslationM3_Start := TRUE;
 
-        // Transition si translation de retour sur sa fosse
-        IF (SelectedWorkTarget = 1 AND Translation_At_Fosse1) 
-           OR (SelectedWorkTarget = 2 AND Translation_At_Fosse2) THEN
+        // Transition si translation de retour sur sa position de travail
+        IF (SelectedWorkTarget = 2 AND Translation_At_P2)
+           OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
             CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.READY;
         END_IF;
@@ -9864,6 +10029,14 @@ Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TASK-0001 : arbitré, forcé à 3 (Couplé) hors MAINT_N2</xhtml>
               </documentation>
             </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : TRUE seulement si Mode=MAINT_N2 — autorise</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -9932,6 +10105,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     InhibitM2 := FALSE;
     HomingApproachEnable := FALSE;
     JoystickWinchSelectArbitrated := 3; // Par défaut couplé
+    MaintenanceM3TargetEnable := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -9989,6 +10163,12 @@ IF Mode = E_Mode.MAINT_N2 THEN
 ELSE
     JoystickWinchSelectArbitrated := 3; // Couplé forcé
 END_IF;
+
+// 📤 5quinquies. CIBLE TRANSLATION "MAINTENANCE" — mise en service, décision client 2026-07-17
+// (AF_Partie-02 v2.12 §3bis) : bloquée en MAINT_N1 et SEMI_AUTO, autorisée UNIQUEMENT en MAINT_N2.
+// Centralisé ICI (même doctrine que InhibitM1/M2, HomingApproachEnable) : aucun autre fichier ne
+// doit re-tester Mode=MAINT_N2 pour ce besoin — PRG_07_TranslationControl consomme ce bit.
+MaintenanceM3TargetEnable := (Mode = E_Mode.MAINT_N2);
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -10328,6 +10508,36 @@ TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket
                 <BOOL />
               </type>
             </variable>
+            <variable name="SuiteElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="SuiteWatchdogExpired">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LastLoggedSafetyRun">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="LastLoggedTranslationRun">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="LastLoggedBucketRun">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="EventIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
             <variable name="Idx">
               <type>
                 <INT />
@@ -10415,6 +10625,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
         AbortTranslation := FALSE;
         StartBucket := FALSE;
         AbortBucket := FALSE;
+        SuiteElapsed := T#0s;
+        SuiteWatchdogExpired := FALSE;
 
         // Démarrage par bouton global RunAll — enchaîne Safety PUIS Translation PUIS Bucket
         IF RunAllTrig.Q THEN
@@ -10500,6 +10712,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
             GVL_PLC_Tests.Status.CasesPassed := 0;
             GVL_PLC_Tests.Status.CasesFailed := 0;
             GVL_PLC_Tests.Status.FailureSummary := '';
+            GVL_PLC_Tests.EventCount := 0;
+            GVL_PLC_Tests.EventSequence := 0;
+            GVL_PLC_Tests.EventOverflow := FALSE;
             GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_IDLE;
         END_IF;
 
@@ -10508,6 +10723,21 @@ CASE GVL_PLC_Tests.Status.RunState OF
         StartSafety := FALSE;
         StartTranslation := FALSE;
         StartBucket := FALSE;
+
+        // 🛡️ Aucun orchestrateur ne doit attendre Done indéfiniment.
+        SuiteElapsed := SuiteElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+        GVL_PLC_Tests.Status.SuiteElapsed := SuiteElapsed;
+        IF SuiteElapsed &gt;= DINT_TO_TIME(GVL_PLC_Tests_Const.MaxSuiteDurationMs) THEN
+            SuiteWatchdogExpired := TRUE;
+            GVL_PLC_Tests.Status.SuiteWatchdogExpired := TRUE;
+            IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSafety THEN
+                AbortSafety := TRUE;
+            ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation THEN
+                AbortTranslation := TRUE;
+            ELSE
+                AbortBucket := TRUE;
+            END_IF;
+        END_IF;
 
         // Abandon propre ou perte du mode Simulation — coupe la suite active
         IF AbortTrig.Q OR NOT GVL_Simulation.SimulationModeActive THEN
@@ -10519,7 +10749,34 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Safety d'abord
         IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSafety AND instSafetyValidation.Done THEN
             AbortSafety := FALSE;
-            IF ChainMode AND NOT instSafetyValidation.Report.Aborted AND instTranslationValidation.SimGateOk THEN
+            IF SuiteWatchdogExpired THEN
+                instSafetyValidation.ErrorCode := 2001;
+                instSafetyValidation.ErrorMessage := 'Watchdog suite Safety expire';
+            END_IF;
+            IF instSafetyValidation.TerminalState &lt;&gt; E_TestTerminalState.TEST_TERMINAL_DONE AND instSafetyValidation.Report.RunCounter &lt;&gt; LastLoggedSafetyRun THEN
+                LastLoggedSafetyRun := instSafetyValidation.Report.RunCounter;
+                GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
+                IF GVL_PLC_Tests.EventCount &lt; GVL_PLC_Tests_Const.MaxTestEvents THEN
+                    GVL_PLC_Tests.EventCount := GVL_PLC_Tests.EventCount + 1;
+                ELSE
+                    GVL_PLC_Tests.EventOverflow := TRUE;
+                END_IF;
+                EventIdx := UDINT_TO_INT(GVL_PLC_Tests.EventSequence MOD INT_TO_UDINT(GVL_PLC_Tests_Const.MaxTestEvents)) + 1;
+                GVL_PLC_Tests.EventLog[EventIdx].Sequence := GVL_PLC_Tests.EventSequence;
+                GVL_PLC_Tests.EventLog[EventIdx].Severity := E_TestEventSeverity.TEST_EVENT_ERROR;
+                GVL_PLC_Tests.EventLog[EventIdx].SuiteId := GVL_PLC_Tests_Const.SuiteSafety;
+                GVL_PLC_Tests.EventLog[EventIdx].CaseId := instSafetyValidation.Report.CurrentCaseId;
+                GVL_PLC_Tests.EventLog[EventIdx].StepId := instSafetyValidation.Report.CurrentStepId;
+                GVL_PLC_Tests.EventLog[EventIdx].Code := instSafetyValidation.ErrorCode;
+                GVL_PLC_Tests.EventLog[EventIdx].Message := instSafetyValidation.ErrorMessage;
+            END_IF;
+            IF SuiteWatchdogExpired THEN
+                instSafetyValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+                instSafetyValidation.Report.ErrorCode := 2001;
+                instSafetyValidation.Report.ErrorMessage := 'Watchdog suite Safety expire';
+                instSafetyValidation.Report.FailureSummary := instSafetyValidation.Report.ErrorMessage;
+            END_IF;
+            IF ChainMode AND (NOT instSafetyValidation.Report.Aborted OR SuiteWatchdogExpired) AND instTranslationValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Translation (continue même si Safety a échoué — logique
                 // FAIL_CONTINUE déjà appliquée au niveau des cases/steps, voir §7.3.4)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
@@ -10533,9 +10790,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 GVL_PLC_Tests.Cmd.RunAll := FALSE;
                 ChainMode := FALSE; // 🔒 Évite d'agréger un rapport Translation périmé (suite jamais lancée ce run)
                 IF instSafetyValidation.Report.FailureSummary = '' THEN
-                    GVL_PLC_Tests.Status.FailureSummary := 'Translation NON TESTEE (SimGateOk=FALSE — verifier ManuActive/IHM_MANU ou capteur recable reel)';
+                    GVL_PLC_Tests.Status.FailureSummary := 'Translation NON TESTEE (SimGateOk=FALSE — vérifier SimulationModeActive et les E/S M3 non réelles)';
                 ELSE
-                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, ' || Translation NON TESTEE (SimGateOk=FALSE — verifier ManuActive/IHM_MANU ou capteur recable reel)');
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(instSafetyValidation.Report.FailureSummary, ' || Translation NON TESTEE (SimGateOk=FALSE — vérifier SimulationModeActive et les E/S M3 non réelles)');
                 END_IF;
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSE
@@ -10555,7 +10812,34 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Translation (ciblée ou enchaînée après Safety)
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation AND instTranslationValidation.Done THEN
             AbortTranslation := FALSE;
-            IF ChainMode AND NOT instTranslationValidation.Report.Aborted AND instBucketValidation.SimGateOk THEN
+            IF SuiteWatchdogExpired THEN
+                instTranslationValidation.ErrorCode := 2002;
+                instTranslationValidation.ErrorMessage := 'Watchdog suite Translation expire';
+            END_IF;
+            IF instTranslationValidation.TerminalState &lt;&gt; E_TestTerminalState.TEST_TERMINAL_DONE AND instTranslationValidation.Report.RunCounter &lt;&gt; LastLoggedTranslationRun THEN
+                LastLoggedTranslationRun := instTranslationValidation.Report.RunCounter;
+                GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
+                IF GVL_PLC_Tests.EventCount &lt; GVL_PLC_Tests_Const.MaxTestEvents THEN
+                    GVL_PLC_Tests.EventCount := GVL_PLC_Tests.EventCount + 1;
+                ELSE
+                    GVL_PLC_Tests.EventOverflow := TRUE;
+                END_IF;
+                EventIdx := UDINT_TO_INT(GVL_PLC_Tests.EventSequence MOD INT_TO_UDINT(GVL_PLC_Tests_Const.MaxTestEvents)) + 1;
+                GVL_PLC_Tests.EventLog[EventIdx].Sequence := GVL_PLC_Tests.EventSequence;
+                GVL_PLC_Tests.EventLog[EventIdx].Severity := E_TestEventSeverity.TEST_EVENT_ERROR;
+                GVL_PLC_Tests.EventLog[EventIdx].SuiteId := GVL_PLC_Tests_Const.SuiteTranslation;
+                GVL_PLC_Tests.EventLog[EventIdx].CaseId := instTranslationValidation.Report.CurrentCaseId;
+                GVL_PLC_Tests.EventLog[EventIdx].StepId := instTranslationValidation.Report.CurrentStepId;
+                GVL_PLC_Tests.EventLog[EventIdx].Code := instTranslationValidation.ErrorCode;
+                GVL_PLC_Tests.EventLog[EventIdx].Message := instTranslationValidation.ErrorMessage;
+            END_IF;
+            IF SuiteWatchdogExpired THEN
+                instTranslationValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+                instTranslationValidation.Report.ErrorCode := 2002;
+                instTranslationValidation.Report.ErrorMessage := 'Watchdog suite Translation expire';
+                instTranslationValidation.Report.FailureSummary := instTranslationValidation.Report.ErrorMessage;
+            END_IF;
+            IF ChainMode AND (NOT instTranslationValidation.Report.Aborted OR SuiteWatchdogExpired) AND instBucketValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Bucket (2026-07-16 : 3e maillon Safety→Translation→Bucket)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
                 StartBucket := TRUE;
@@ -10603,6 +10887,33 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Bucket (ciblée, ou dernier maillon de la chaîne)
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket AND instBucketValidation.Done THEN
             AbortBucket := FALSE;
+            IF SuiteWatchdogExpired THEN
+                instBucketValidation.ErrorCode := 2003;
+                instBucketValidation.ErrorMessage := 'Watchdog suite Bucket expire';
+            END_IF;
+            IF instBucketValidation.TerminalState &lt;&gt; E_TestTerminalState.TEST_TERMINAL_DONE AND instBucketValidation.Report.RunCounter &lt;&gt; LastLoggedBucketRun THEN
+                LastLoggedBucketRun := instBucketValidation.Report.RunCounter;
+                GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
+                IF GVL_PLC_Tests.EventCount &lt; GVL_PLC_Tests_Const.MaxTestEvents THEN
+                    GVL_PLC_Tests.EventCount := GVL_PLC_Tests.EventCount + 1;
+                ELSE
+                    GVL_PLC_Tests.EventOverflow := TRUE;
+                END_IF;
+                EventIdx := UDINT_TO_INT(GVL_PLC_Tests.EventSequence MOD INT_TO_UDINT(GVL_PLC_Tests_Const.MaxTestEvents)) + 1;
+                GVL_PLC_Tests.EventLog[EventIdx].Sequence := GVL_PLC_Tests.EventSequence;
+                GVL_PLC_Tests.EventLog[EventIdx].Severity := E_TestEventSeverity.TEST_EVENT_ERROR;
+                GVL_PLC_Tests.EventLog[EventIdx].SuiteId := GVL_PLC_Tests_Const.SuiteBucket;
+                GVL_PLC_Tests.EventLog[EventIdx].CaseId := instBucketValidation.Report.CurrentCaseId;
+                GVL_PLC_Tests.EventLog[EventIdx].StepId := instBucketValidation.Report.CurrentStepId;
+                GVL_PLC_Tests.EventLog[EventIdx].Code := instBucketValidation.ErrorCode;
+                GVL_PLC_Tests.EventLog[EventIdx].Message := instBucketValidation.ErrorMessage;
+            END_IF;
+            IF SuiteWatchdogExpired THEN
+                instBucketValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+                instBucketValidation.Report.ErrorCode := 2003;
+                instBucketValidation.Report.ErrorMessage := 'Watchdog suite Bucket expire';
+                instBucketValidation.Report.FailureSummary := instBucketValidation.Report.ErrorMessage;
+            END_IF;
             IF ChainMode THEN
                 FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted OR instBucketValidation.Report.Aborted;
                 FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed OR instBucketValidation.AnyFailed;
@@ -10649,6 +10960,7 @@ instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := 
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
+GVL_PLC_Tests.Status.SuiteWatchdogExpired := SuiteWatchdogExpired;
 GVL_PLC_Tests.SuiteSafetyValidation := instSafetyValidation.Report;
 GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
 GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
@@ -10661,16 +10973,25 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.ActiveCaseId := instTranslationValidation.Report.CurrentCaseId;
         GVL_PLC_Tests.Status.ActiveStepId := instTranslationValidation.Report.CurrentStepId;
         GVL_PLC_Tests.Status.StepElapsed := instTranslationValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instTranslationValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instTranslationValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instTranslationValidation.ErrorMessage;
     ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
         GVL_PLC_Tests.Status.ActiveSuiteName := instBucketValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instBucketValidation.Report.CurrentCaseId;
         GVL_PLC_Tests.Status.ActiveStepId := instBucketValidation.Report.CurrentStepId;
         GVL_PLC_Tests.Status.StepElapsed := instBucketValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instBucketValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instBucketValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instBucketValidation.ErrorMessage;
     ELSE
         GVL_PLC_Tests.Status.ActiveSuiteName := instSafetyValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instSafetyValidation.Report.CurrentCaseId;
         GVL_PLC_Tests.Status.ActiveStepId := instSafetyValidation.Report.CurrentStepId;
         GVL_PLC_Tests.Status.StepElapsed := instSafetyValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instSafetyValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instSafetyValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instSafetyValidation.ErrorMessage;
     END_IF;
 ELSE
     GVL_PLC_Tests.Status.ActiveSuiteId := 0;
@@ -10960,6 +11281,36 @@ END_IF;
             <variable name="Report">
               <type>
                 <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfigErrorCheckIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
               </type>
             </variable>
           </outputVars>
@@ -11401,8 +11752,13 @@ IF NOT TableReady THEN
     CheckTable[5].ExpectedBool := TRUE;
 
     // Chk 6: Coupure franche (PowerCutOff = TRUE)
+    // 🔧 REX 2026-07-17 : CHECK_INSTANT n'évalue qu'une fois, au front montant d'Evaluate
+    // (voir FB_TestCheck.st) -- soit le tout 1er scan de l'étape Trip, AVANT que PRG_00_Inputs
+    // applique le override OverrideContactorFalse (appliqué APRÈS l'appel instTestsManagement()
+    // dans PRG_00_Inputs.st). Le check voyait donc systématiquement la valeur d'avant le trigger.
+    // CHECK_WAIT_UNTIL retente chaque scan -&gt; tolère ce décalage d'1 scan structurel.
     CheckTable[6].Kind := E_TestCheckKind.BOOL_EQUAL;
-    CheckTable[6].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[6].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
     CheckTable[6].ProbeIdx := SigPowerCutOffAny;
     CheckTable[6].ExpectedBool := TRUE;
 
@@ -11693,6 +12049,12 @@ Sequencer(
     Busy =&gt; Busy,
     Done =&gt; Done,
     AnyFailed =&gt; AnyFailed,
+    TerminalState =&gt; TerminalState,
+    ConfigError =&gt; ConfigError,
+    ConfigErrorStepId =&gt; ConfigErrorStepId,
+    ConfigErrorCheckIdx =&gt; ConfigErrorCheckIdx,
+    ErrorCode =&gt; ErrorCode,
+    ErrorMessage =&gt; ErrorMessage,
     ActiveStimulusId =&gt; ActiveStimulusId,
     StepElapsed =&gt; StepElapsed
 );
@@ -12550,6 +12912,14 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême arrière</xhtml>
               </documentation>
             </variable>
+            <variable name="SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -12577,7 +12947,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -12662,6 +13032,14 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
               </documentation>
             </variable>
+            <variable name="ErrorSensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Incohérence mot capteurs position (bit7)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -12713,7 +13091,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.7.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -12739,6 +13117,7 @@ IF NOT Enable THEN
     ErrorMecaB := FALSE;
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
+    ErrorSensorIncoherent := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     State := E_State.DISABLED;
@@ -12817,6 +13196,17 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
+// 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
+// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — toute combinaison des 5
+// capteurs Trémie/PV/P2/P1/Maintenance hors des 6 mots valides (progression monotone) signale
+// un capteur collé/HS ou un défaut mécanique : escalade SafeStop + PowerCutOff, même traitement
+// que Méca A/B (défense en profondeur, décision utilisateur).
+IF SensorWordIncoherent THEN
+    ErrorId := ErrorId OR 16#0080;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FF7F;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -12827,8 +13217,9 @@ END_IF;
 SafeStop := Error OR NOT EmergencyStopOk;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
-// mouvement non commandé (bit5), ou dépassement de fin de course (bit6)
-PowerCutOff := (ErrorId AND 16#0078) &lt;&gt; 16#0000;
+// mouvement non commandé (bit5), dépassement de fin de course (bit6),
+// ou incohérence mot capteurs position (bit7)
+PowerCutOff := (ErrorId AND 16#00F8) &lt;&gt; 16#0000;
 
 // Décapsulage du bitfield ErrorId pour l'IHM
 ErrorJoystick       := (ErrorId AND 16#0001) &lt;&gt; 16#0000;
@@ -12838,6 +13229,7 @@ ErrorBrakeThermal   := (ErrorId AND 16#0008) &lt;&gt; 16#0000;
 ErrorMecaB          := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
 ErrorMecaA          := (ErrorId AND 16#0020) &lt;&gt; 16#0000;
 ErrorLimitSwitch    := (ErrorId AND 16#0040) &lt;&gt; 16#0000;
+ErrorSensorIncoherent := (ErrorId AND 16#0080) &lt;&gt; 16#0000;
 
 Busy := FALSE;
 Done := FALSE;
@@ -13746,7 +14138,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_DigitalMirror — Miroir commande→retour temporisé (contacteur simulé)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🧩 Brique réduite (Partie3 §1bis), générique et réutilisable — outil de banc.
    🎯 Rôle : simule un retour de contacteur réaliste (délai mécanique de
       fermeture/ouverture), au lieu d'un miroir "idéal" instantané. Utilisée pour
@@ -13892,7 +14284,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -14028,7 +14420,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -14236,24 +14628,37 @@ SimContactorOk := ContactorLatch;
                 <simpleValue value="8" />
               </initialValue>
             </variable>
+            <variable name="PVLeadTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
           </inputVars>
           <outputVars>
-            <variable name="PosFosse1">
+            <variable name="PosTremie">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="PosFosse2">
+            <variable name="PosPV">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosP2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosP1">
               <type>
                 <BOOL />
               </type>
             </variable>
             <variable name="PosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PosTremie">
               <type>
                 <BOOL />
               </type>
@@ -14293,7 +14698,7 @@ SimContactorOk := ContactorLatch;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
       instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
@@ -14302,13 +14707,17 @@ SimContactorOk := ContactorLatch;
       continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
       (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
    📥 Enable      : simulation active (SimulationModeActive AND NOT TranslationPosition_IsReal)
-   📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)
+   📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
                     — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
+                    — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
+                    ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
    📥 RelayFwd/RelayRev : sens commandé (sorties du translation, DEGRADED_IO)
    📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
                     utilisateur, pas de donnée réelle pour calibrer plus précisément)
-   📤 PosFosse1/PosFosse2/PosMaintenance/PosTremie : TRUE quand la cible correspondante
-      est atteinte — à OR'er sur le `InputRaw` du capteur réel correspondant (PRG_00_Inputs.st)
+   📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
+   📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
+      ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
+      réel correspondant (PRG_00_Inputs.st)
    ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
       Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
    ═══════════════════════════════════════════════════════════════
@@ -14324,7 +14733,7 @@ SimContactorOk := ContactorLatch;
 IF NOT Enable THEN
     ElapsedS := 0.0;
     LastTargetNum := TargetNum;
-    PosFosse1 := FALSE; PosFosse2 := FALSE; PosMaintenance := FALSE; PosTremie := FALSE;
+    PosTremie := FALSE; PosPV := FALSE; PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
     RETURN;
 END_IF;
 
@@ -14348,10 +14757,42 @@ END_IF;
 
 Reached := (ElapsedS &gt;= TravelTimeS);
 
-PosFosse1      := Reached AND (TargetNum = 1);
-PosFosse2      := Reached AND (TargetNum = 2);
-PosMaintenance := Reached AND (TargetNum = 3);
-PosTremie      := Reached AND (TargetNum = 4);
+// 🆕 REX 2026-07-18 : les capteurs sont codés par progression monotone.
+// La simulation doit donc produire un mot valide à chaque instant, et non
+// uniquement activer le capteur de la cible. Le mot est :
+//   11111 Trémie | 01111 PV | 00111 P2 | 00011 P1 | 00001 approche Maintenance | 00000 Maintenance.
+// Tant qu'une cible n'est pas atteinte, la position virtuelle reste à droite (00000),
+// sauf lors de l'approche Trémie où le PV (01111) est activé.
+PosTremie := FALSE;
+PosPV := FALSE;
+PosP2 := FALSE;
+PosP1 := FALSE;
+PosMaintenance := FALSE; // état de repos simulé : mot valide 00000
+
+IF TargetNum = 1 THEN
+    // Trajet vers Trémie : PV puis Trémie, avec les trois capteurs de droite actifs.
+    IF ElapsedS &gt;= (TravelTimeS - PVLeadTimeS) THEN
+        PosPV := TRUE;
+        PosP2 := TRUE;
+        PosP1 := TRUE;
+        PosMaintenance := TRUE;
+    END_IF;
+    IF Reached THEN
+        PosTremie := TRUE;
+    END_IF;
+ELSIF TargetNum = 2 AND Reached THEN
+    // P2 = 00111
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 3 AND Reached THEN
+    // P1 = 00011
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 4 AND Reached THEN
+    // Maintenance = 00000 : PosMaintenance reste FALSE pour respecter le codage.
+    PosMaintenance := FALSE;
+END_IF;
 </xhtml>
           </ST>
         </body>
@@ -15113,6 +15554,21 @@ END_IF;
                 <INT />
               </type>
             </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
             <variable name="CurrentStepId">
               <type>
                 <INT />
@@ -15410,6 +15866,17 @@ IF StartTrig.Q THEN
     ConfigError := FALSE;
     ConfigErrorStepId := 0;
     ConfigErrorCheckIdx := 0;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    ErrorCode := 0;
+    ErrorMessage := '';
+
+    // 🛡️ Un démarrage invalide est terminal, jamais silencieux.
+    IF FirstStepId &lt; 1 OR FirstStepId &gt; GVL_PLC_Tests_Const.MaxSteps THEN
+        ConfigError := TRUE;
+        ConfigErrorStepId := FirstStepId;
+        ErrorCode := 1001;
+        ErrorMessage := 'FirstStepId hors limites';
+    END_IF;
     
     // Validation des étapes
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
@@ -15467,8 +15934,28 @@ IF StartTrig.Q THEN
         END_IF;
     END_FOR;
     
-    // Si erreur de config, on bloque le démarrage
+    // 🛡️ ConfigError doit toujours produire Done + un état terminal.
     IF ConfigError THEN
+        Busy := FALSE;
+        Done := TRUE;
+        AnyFailed := TRUE;
+        ActiveStimulusId := 0;
+        CurrentStepId := 0;
+        StepElapsed := T#0s;
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+        Report.InProgress := FALSE;
+        Report.RunCounter := Report.RunCounter + 1;
+        Report.AllPassed := FALSE;
+        Report.AnyFailed := TRUE;
+        Report.Aborted := FALSE;
+        Report.TerminalState := TerminalState;
+        IF ErrorCode = 0 THEN
+            ErrorCode := 1002;
+            ErrorMessage := 'Table de test invalide';
+        END_IF;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        Report.FailureSummary := CONCAT('CONFIG_ERROR step ', INT_TO_STRING(ConfigErrorStepId));
         RETURN;
     END_IF;
 END_IF;
@@ -15497,6 +15984,8 @@ IF Abort THEN
         Busy := FALSE;
         Done := TRUE;
         AnyFailed := TRUE;
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+        Report.TerminalState := TerminalState;
     END_IF;
     ActiveStimulusId := 0;
     StepStarted := FALSE;
@@ -15516,6 +16005,9 @@ IF StartTrig.Q AND NOT ConfigError THEN
     Report.AllPassed := FALSE;
     Report.AnyFailed := FALSE;
     Report.Aborted := FALSE;
+    Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    Report.ErrorCode := 0;
+    Report.ErrorMessage := '';
     Report.FailedTestCase := 0;
     Report.CurrentStepId := FirstStepId;
     IF CurrentStepId &gt;= 1 AND CurrentStepId &lt;= GVL_PLC_Tests_Const.MaxSteps THEN
@@ -15558,8 +16050,19 @@ IF Busy THEN
     IF CurrentStepId &lt;&gt; 0 AND (CurrentStepId &lt; 1 OR CurrentStepId &gt; GVL_PLC_Tests_Const.MaxSteps) THEN
         Busy := FALSE;
         Done := TRUE;
+        AnyFailed := TRUE;
         ActiveStimulusId := 0;
+        ConfigError := TRUE;
+        ConfigErrorStepId := CurrentStepId;
+        ErrorCode := 1003;
+        ErrorMessage := 'Etape courante hors limites';
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
         Report.InProgress := FALSE;
+        Report.AnyFailed := TRUE;
+        Report.TerminalState := TerminalState;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        Report.FailureSummary := ErrorMessage;
         RETURN;
     END_IF;
     
@@ -15849,6 +16352,14 @@ IF Busy AND CurrentStepId = 0 THEN
     Report.AnyFailed := NOT SuiteAllPassed;
     Report.FailedTestCase := FirstFailedCase;
     AnyFailed := NOT SuiteAllPassed;
+    IF SuiteAllPassed THEN
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_DONE;
+    ELSE
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_FAILED;
+    END_IF;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := ErrorCode;
+    Report.ErrorMessage := ErrorMessage;
 
     // 🏷️ Résumé texte de TOUS les cas en échec (pas juste le premier) — évite de
     // parcourir Cases[] un par un en Watch (demande utilisateur 2026-07-16)
@@ -16301,6 +16812,14 @@ Elapsed := Timer.Q;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position cible courante</xhtml>
               </documentation>
             </variable>
+            <variable name="SlowdownSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : capteur PV — ralentissement avant Trémie (remplace ApproachTime)</xhtml>
+              </documentation>
+            </variable>
             <variable name="LimitSwitchFwd">
               <type>
                 <BOOL />
@@ -16395,18 +16914,6 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai avant d'autoriser un changement de sens à l'arrêt</xhtml>
               </documentation>
             </variable>
-            <variable name="ApproachTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#5s0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT uniquement (RETAIN)
-Temps estimé avant ralentissement auto</xhtml>
-              </documentation>
-            </variable>
             <variable name="ApproachSpeedPct">
               <type>
                 <REAL />
@@ -16415,7 +16922,8 @@ Temps estimé avant ralentissement auto</xhtml>
                 <simpleValue value="20" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réduite d'approche (PV)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT uniquement (RETAIN)
+Vitesse réduite d'approche (piloté par SlowdownSensor/PV)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqScaleMaxHz">
@@ -16619,14 +17127,6 @@ Filtrage capteur de position cible</xhtml>
                 <REAL />
               </type>
             </variable>
-            <variable name="ApproachTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déclenche le ralentissement auto</xhtml>
-              </documentation>
-            </variable>
             <variable name="CaptorDebounceTon">
               <type>
                 <derived name="TON" />
@@ -16663,7 +17163,7 @@ Filtrage capteur de position cible</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.7.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -16689,7 +17189,6 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
 
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    ApproachTimer(IN := FALSE, PT := ApproachTime);
     SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
 
     ArrivalLock := FALSE;
@@ -16720,9 +17219,12 @@ IF NOT SafeStop AND StartStop THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE
-ApproachTimer(IN := (StartStop AND NOT SafeStop), PT := ApproachTime);
-IF ApproachTimer.Q THEN
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur PV, remplace le timer)
+// 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
+// capteur dédié (SlowdownSensor = PV) qui ne déclenche le ralentissement QU'à l'approche de
+// Trémie (Direction=1) — décision client (AF_Partie-02 v2.12 §3bis) : PV n'assure le
+// ralentissement qu'avant Trémie, jamais dans le sens Maintenance.
+IF (Direction = 1) AND SlowdownSensor THEN
     RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
 END_IF;
 
@@ -16918,6 +17420,36 @@ END_IF;
                 <derived name="ST_TestSuiteReport" />
               </type>
             </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfigErrorCheckIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="SigHealthyIdle">
@@ -16986,6 +17518,63 @@ END_IF;
               <initialValue>
                 <simpleValue value="8" />
               </initialValue>
+            </variable>
+            <variable name="SigDecoderIncoherent">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="9" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : sondes TC-T4/T5/T6 (5 capteurs position, AF_Partie-02 v2.12 §3bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SigLimitFwd">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+            </variable>
+            <variable name="SigLimitRev">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="11" />
+              </initialValue>
+            </variable>
+            <variable name="SigSensorIncoherentErr">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="12" />
+              </initialValue>
+            </variable>
+            <variable name="SigErrorIdT5NoParasite">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="13" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">DINT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SigSlowdownFreqHz">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="14" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">REAL</xhtml>
+              </documentation>
             </variable>
             <variable name="StepTc01Setup">
               <type>
@@ -17060,6 +17649,153 @@ END_IF;
               </type>
               <initialValue>
                 <simpleValue value="39" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc04Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="40" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TC-T4 : les 6 mots valides + limites extrêmes (AF_Partie-02 v2.12 §3bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Word1Tremie">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="41" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">11111</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Word2">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="42" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">01111</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Word3">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="43" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">00111</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Word4">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="44" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">00011</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Word5">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="45" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">00001</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Word6Maintenance">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="46" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">00000</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc04Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="49" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc05Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TC-T5 : combinaison incohérente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc05Trigger">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="51" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc05Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="59" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc06Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="60" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TC-T6 : ralentissement PV (instance isolée FB_Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTc06FullSpeed">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="61" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc06Slowdown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="62" />
+              </initialValue>
+            </variable>
+            <variable name="StepTc06Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="63" />
               </initialValue>
             </variable>
             <variable name="Sequencer">
@@ -17165,16 +17901,44 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Commande de stimulus affectée dans le CASE</xhtml>
               </documentation>
             </variable>
+            <variable name="instTranslationUnderTest">
+              <type>
+                <derived name="FB_Translation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : TC-T6 — instance ISOLÉE de FB_Translation (pas l'instance machine réelle
+instTranslationM3) pour tester le ralentissement PV en pilotant Direction/StartStop/SpeedRefPct
+directement, sans dépendre de l'arbitrage Mode/ManuActive de PRG_07_TranslationControl.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UnderTestDirection">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="UnderTestStartStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="UnderTestSlowdownSensor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
 🧪 FB_TranslationValidation — Suite de test Translation M3
 ───────────────────────────────────────────────────────────────
-📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.6.md
+📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
 🎯 Valide les surveillances de sécurité de FB_Safety_Translation :
 TC-T1 Fin de course extrême, TC-T2 Méca B (incohérence à l'arrêt),
 TC-T3 Méca A (mouvement non commandé). Même moteur générique
 FB_TestSequencer que FB_SafetyValidation (AF_Partie-14 §7).
+🆕 REX 2026-07-18 (AF_Partie-02 v2.12 §3bis, 5 capteurs Trémie/PV/P2/P1/Maintenance) :
+TC-T4 les 6 mots valides + limites extrêmes, TC-T5 incohérence mot capteurs
+(SafeStop+PowerCutOff), TC-T6 ralentissement PV (instance FB_Translation isolée).
 ⚠️ Hors périmètre (non testé ici, nécessiterait des overrides
 supplémentaires sur les diagnostics bus) : bit0 (perte Joystick
 CANopen), bit1 (perte com EtherCAT variateur), bit2 (rotation
@@ -17202,14 +17966,12 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     RETURN;
 END_IF;
 
-// 🔒 Refuse si un des capteurs simulés est déjà recâblé réel, ou si le bypass
-// IHM_MANU neutralise FB_Safety_Translation (Enable forcé FALSE dans ce cas —
-// voir PRG_03_Safety.st "Conditional Bypass Doctrine" REX 2026-07-14) : le test
-// tournerait "à vide" (aucun défaut jamais détectable) sans le signaler.
+// 🔒 Refuse si un des équipements M3 est déjà recâblé réel.
+// IHM_MANU ne bloque plus la suite : FB_Safety_Translation est active
+// indépendamment du mode, conformément à la migration IHM_MANU.
 SimGateOk := NOT GVL_Simulation.TranslationPosition_IsReal
          AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
-         AND NOT GVL_Simulation.VariateurM3_IsReal
-         AND NOT PRG_10_Outputs.ManuActive;
+         AND NOT GVL_Simulation.VariateurM3_IsReal;
 
 // 2. 📋 TABLES (Remplissage déclaratif unique)
 IF NOT TableReady THEN
@@ -17224,6 +17986,16 @@ IF NOT TableReady THEN
 
     CaseTable[3].Name := 'TC-T3 Meca A mvt non commande';
     CaseTable[3].FirstStep := StepTc03Setup;
+
+    // 🆕 REX 2026-07-18 (AF_Partie-02 v2.12 §3bis)
+    CaseTable[4].Name := 'TC-T4 Mots valides + limites';
+    CaseTable[4].FirstStep := StepTc04Setup;
+
+    CaseTable[5].Name := 'TC-T5 Incoherence mot capteurs';
+    CaseTable[5].FirstStep := StepTc05Setup;
+
+    CaseTable[6].Name := 'TC-T6 Ralentissement PV';
+    CaseTable[6].FirstStep := StepTc06Setup;
 
     // ─────────────────────────────────────────────────────────────
     // CONFIGURATION DES CHECKS (CheckTable)
@@ -17275,6 +18047,83 @@ IF NOT TableReady THEN
     CheckTable[8].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
     CheckTable[8].ProbeIdx := SigErrorIdT3NoParasite;
     CheckTable[8].Mask := NOT 16#0020;
+
+    // 🆕 REX 2026-07-18 — TC-T4/T5/T6 (AF_Partie-02 v2.12 §3bis)
+    // Chk 9: TC-T4 — mot capteurs valide (utilisé sur les 6 mots)
+    CheckTable[9].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[9].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[9].ProbeIdx := SigDecoderIncoherent;
+    CheckTable[9].ExpectedBool := FALSE;
+
+    // Chk 10: TC-T4 — limite extrême Trémie confirmée (mot 11111 uniquement)
+    CheckTable[10].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[10].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[10].ProbeIdx := SigLimitFwd;
+    CheckTable[10].ExpectedBool := TRUE;
+
+    // Chk 11: TC-T4 — pas de limite Rev simultanée (mot 11111)
+    // 🔧 REX 2026-07-18 : CHECK_WAIT_UNTIL (pas CHECK_INSTANT) — même bug de décalage d'1 scan
+    // que TC-01 (FB_SafetyValidation.st Chk6) : le override du mot de test s'applique APRÈS
+    // instTestsManagement() dans PRG_00_Inputs.st, donc invisible au scan d'entrée de l'étape.
+    CheckTable[11].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[11].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[11].ProbeIdx := SigLimitRev;
+    CheckTable[11].ExpectedBool := FALSE;
+
+    // Chk 12: TC-T4 — limite extrême Maintenance confirmée (mot 00000 uniquement)
+    CheckTable[12].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[12].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[12].ProbeIdx := SigLimitRev;
+    CheckTable[12].ExpectedBool := TRUE;
+
+    // Chk 13: TC-T4 — pas de limite Fwd simultanée (mot 00000)
+    CheckTable[13].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[13].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[13].ProbeIdx := SigLimitFwd;
+    CheckTable[13].ExpectedBool := FALSE;
+
+    // Chk 14/15: TC-T4 — mot intermédiaire (00111) : ni l'une ni l'autre limite
+    CheckTable[14].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[14].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[14].ProbeIdx := SigLimitFwd;
+    CheckTable[14].ExpectedBool := FALSE;
+
+    CheckTable[15].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[15].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[15].ProbeIdx := SigLimitRev;
+    CheckTable[15].ExpectedBool := FALSE;
+
+    // Chk 16: TC-T5 — mot incohérent détecté par le décodeur
+    CheckTable[16].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[16].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[16].ProbeIdx := SigDecoderIncoherent;
+    CheckTable[16].ExpectedBool := TRUE;
+
+    // Chk 17: TC-T5 — défaut safety (bit7) remonté
+    CheckTable[17].Kind := E_TestCheckKind.BOOL_EQUAL;
+    CheckTable[17].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[17].ProbeIdx := SigSensorIncoherentErr;
+    CheckTable[17].ExpectedBool := TRUE;
+
+    // Chk 18: TC-T5 — aucun bit parasite (seul bit7 attendu)
+    CheckTable[18].Kind := E_TestCheckKind.WORD_MASK_NONE;
+    CheckTable[18].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[18].ProbeIdx := SigErrorIdT5NoParasite;
+    CheckTable[18].Mask := NOT 16#0080;
+
+    // Chk 19: TC-T6 — pleine vitesse atteinte sans PV (proche de DriveFreqScaleMaxHz=60Hz)
+    CheckTable[19].Kind := E_TestCheckKind.REAL_IN_RANGE;
+    CheckTable[19].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[19].ProbeIdx := SigSlowdownFreqHz;
+    CheckTable[19].RealMin := 30.0;
+    CheckTable[19].RealMax := 60.0;
+
+    // Chk 20: TC-T6 — vitesse clampée par PV (ApproachSpeedPct=20% de 60Hz = 12Hz)
+    CheckTable[20].Kind := E_TestCheckKind.REAL_IN_RANGE;
+    CheckTable[20].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[20].ProbeIdx := SigSlowdownFreqHz;
+    CheckTable[20].RealMin := 8.0;
+    CheckTable[20].RealMax := 14.0;
 
     // ─────────────────────────────────────────────────────────────
     // CONFIGURATION DES ÉTAPES (StepTable)
@@ -17365,9 +18214,156 @@ IF NOT TableReady THEN
     StepTable[StepTc03Teardown].StimulusId := 1;
     StepTable[StepTc03Teardown].CheckIdx[1] := 1;
     StepTable[StepTc03Teardown].TimeoutPT := T#12s;
-    StepTable[StepTc03Teardown].NextOnPass := 0;
-    StepTable[StepTc03Teardown].NextOnFail := 0;
+    StepTable[StepTc03Teardown].NextOnPass := StepTc04Setup;
+    StepTable[StepTc03Teardown].NextOnFail := StepTc04Setup;
     StepTable[StepTc03Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // --- TC-T4 : Les 6 mots valides + limites extrêmes (AF_Partie-02 v2.12 §3bis) ---
+    StepTable[StepTc04Setup].Name := 'TCT4 Setup saine';
+    StepTable[StepTc04Setup].CaseId := 4;
+    StepTable[StepTc04Setup].StimulusId := 1;
+    StepTable[StepTc04Setup].CheckIdx[1] := 1;
+    StepTable[StepTc04Setup].TimeoutPT := T#12s;
+    StepTable[StepTc04Setup].NextOnPass := StepTc04Word1Tremie;
+    StepTable[StepTc04Setup].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Word1Tremie].Name := 'TCT4 Mot 11111 Tremie';
+    StepTable[StepTc04Word1Tremie].CaseId := 4;
+    StepTable[StepTc04Word1Tremie].StimulusId := 5;
+    StepTable[StepTc04Word1Tremie].CheckIdx[1] := 9;
+    StepTable[StepTc04Word1Tremie].CheckIdx[2] := 10;
+    StepTable[StepTc04Word1Tremie].CheckIdx[3] := 11;
+    StepTable[StepTc04Word1Tremie].TimeoutPT := T#3s;
+    StepTable[StepTc04Word1Tremie].NextOnPass := StepTc04Word2;
+    StepTable[StepTc04Word1Tremie].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Word1Tremie].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Word2].Name := 'TCT4 Mot 01111';
+    StepTable[StepTc04Word2].CaseId := 4;
+    StepTable[StepTc04Word2].StimulusId := 6;
+    StepTable[StepTc04Word2].CheckIdx[1] := 9;
+    StepTable[StepTc04Word2].TimeoutPT := T#3s;
+    StepTable[StepTc04Word2].NextOnPass := StepTc04Word3;
+    StepTable[StepTc04Word2].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Word2].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Word3].Name := 'TCT4 Mot 00111';
+    StepTable[StepTc04Word3].CaseId := 4;
+    StepTable[StepTc04Word3].StimulusId := 7;
+    StepTable[StepTc04Word3].CheckIdx[1] := 9;
+    StepTable[StepTc04Word3].CheckIdx[2] := 14;
+    StepTable[StepTc04Word3].CheckIdx[3] := 15;
+    StepTable[StepTc04Word3].TimeoutPT := T#3s;
+    StepTable[StepTc04Word3].NextOnPass := StepTc04Word4;
+    StepTable[StepTc04Word3].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Word3].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Word4].Name := 'TCT4 Mot 00011';
+    StepTable[StepTc04Word4].CaseId := 4;
+    StepTable[StepTc04Word4].StimulusId := 8;
+    StepTable[StepTc04Word4].CheckIdx[1] := 9;
+    StepTable[StepTc04Word4].TimeoutPT := T#3s;
+    StepTable[StepTc04Word4].NextOnPass := StepTc04Word5;
+    StepTable[StepTc04Word4].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Word4].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Word5].Name := 'TCT4 Mot 00001';
+    StepTable[StepTc04Word5].CaseId := 4;
+    StepTable[StepTc04Word5].StimulusId := 9;
+    StepTable[StepTc04Word5].CheckIdx[1] := 9;
+    StepTable[StepTc04Word5].TimeoutPT := T#3s;
+    StepTable[StepTc04Word5].NextOnPass := StepTc04Word6Maintenance;
+    StepTable[StepTc04Word5].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Word5].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Word6Maintenance].Name := 'TCT4 Mot 00000 Maintenance';
+    StepTable[StepTc04Word6Maintenance].CaseId := 4;
+    StepTable[StepTc04Word6Maintenance].StimulusId := 10;
+    StepTable[StepTc04Word6Maintenance].CheckIdx[1] := 9;
+    StepTable[StepTc04Word6Maintenance].CheckIdx[2] := 12;
+    StepTable[StepTc04Word6Maintenance].CheckIdx[3] := 13;
+    StepTable[StepTc04Word6Maintenance].TimeoutPT := T#3s;
+    StepTable[StepTc04Word6Maintenance].NextOnPass := StepTc04Teardown;
+    StepTable[StepTc04Word6Maintenance].NextOnFail := StepTc04Teardown;
+    StepTable[StepTc04Word6Maintenance].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc04Teardown].Name := 'TCT4 Teardown';
+    StepTable[StepTc04Teardown].CaseId := 4;
+    StepTable[StepTc04Teardown].StimulusId := 1;
+    StepTable[StepTc04Teardown].CheckIdx[1] := 1;
+    StepTable[StepTc04Teardown].TimeoutPT := T#12s;
+    StepTable[StepTc04Teardown].NextOnPass := StepTc05Setup;
+    StepTable[StepTc04Teardown].NextOnFail := StepTc05Setup;
+    StepTable[StepTc04Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // --- TC-T5 : Combinaison incohérente (capteur collé/HS) ---
+    StepTable[StepTc05Setup].Name := 'TCT5 Setup saine';
+    StepTable[StepTc05Setup].CaseId := 5;
+    StepTable[StepTc05Setup].StimulusId := 1;
+    StepTable[StepTc05Setup].CheckIdx[1] := 1;
+    StepTable[StepTc05Setup].TimeoutPT := T#12s;
+    StepTable[StepTc05Setup].NextOnPass := StepTc05Trigger;
+    StepTable[StepTc05Setup].NextOnFail := StepTc05Teardown;
+    StepTable[StepTc05Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc05Trigger].Name := 'TCT5 Mot incoherent force';
+    StepTable[StepTc05Trigger].CaseId := 5;
+    StepTable[StepTc05Trigger].StimulusId := 11; // Mot 10101 (progression non monotone)
+    StepTable[StepTc05Trigger].CheckIdx[1] := 3;  // PowerCutOff (sonde partagée T1/T2/T3)
+    StepTable[StepTc05Trigger].CheckIdx[2] := 16;
+    StepTable[StepTc05Trigger].CheckIdx[3] := 17;
+    StepTable[StepTc05Trigger].CheckIdx[4] := 18;
+    StepTable[StepTc05Trigger].TimeoutPT := T#5s;
+    StepTable[StepTc05Trigger].NextOnPass := StepTc05Teardown;
+    StepTable[StepTc05Trigger].NextOnFail := StepTc05Teardown;
+    StepTable[StepTc05Trigger].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc05Teardown].Name := 'TCT5 Teardown';
+    StepTable[StepTc05Teardown].CaseId := 5;
+    StepTable[StepTc05Teardown].StimulusId := 1;
+    StepTable[StepTc05Teardown].CheckIdx[1] := 1;
+    StepTable[StepTc05Teardown].TimeoutPT := T#12s;
+    StepTable[StepTc05Teardown].NextOnPass := StepTc06Setup;
+    StepTable[StepTc05Teardown].NextOnFail := StepTc06Setup;
+    StepTable[StepTc05Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    // --- TC-T6 : Ralentissement PV (instance isolée FB_Translation) ---
+    StepTable[StepTc06Setup].Name := 'TCT6 Setup saine';
+    StepTable[StepTc06Setup].CaseId := 6;
+    StepTable[StepTc06Setup].StimulusId := 1;
+    StepTable[StepTc06Setup].CheckIdx[1] := 1;
+    StepTable[StepTc06Setup].TimeoutPT := T#12s;
+    StepTable[StepTc06Setup].NextOnPass := StepTc06FullSpeed;
+    StepTable[StepTc06Setup].NextOnFail := StepTc06Teardown;
+    StepTable[StepTc06Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc06FullSpeed].Name := 'TCT6 Pleine vitesse sans PV';
+    StepTable[StepTc06FullSpeed].CaseId := 6;
+    StepTable[StepTc06FullSpeed].StimulusId := 12;
+    StepTable[StepTc06FullSpeed].CheckIdx[1] := 19;
+    StepTable[StepTc06FullSpeed].TimeoutPT := T#8s;
+    StepTable[StepTc06FullSpeed].NextOnPass := StepTc06Slowdown;
+    StepTable[StepTc06FullSpeed].NextOnFail := StepTc06Teardown;
+    StepTable[StepTc06FullSpeed].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc06Slowdown].Name := 'TCT6 Ralenti PV actif';
+    StepTable[StepTc06Slowdown].CaseId := 6;
+    StepTable[StepTc06Slowdown].StimulusId := 13;
+    StepTable[StepTc06Slowdown].CheckIdx[1] := 20;
+    StepTable[StepTc06Slowdown].TimeoutPT := T#8s;
+    StepTable[StepTc06Slowdown].NextOnPass := StepTc06Teardown;
+    StepTable[StepTc06Slowdown].NextOnFail := StepTc06Teardown;
+    StepTable[StepTc06Slowdown].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc06Teardown].Name := 'TCT6 Teardown';
+    StepTable[StepTc06Teardown].CaseId := 6;
+    StepTable[StepTc06Teardown].StimulusId := 1;
+    StepTable[StepTc06Teardown].CheckIdx[1] := 1;
+    StepTable[StepTc06Teardown].TimeoutPT := T#12s;
+    StepTable[StepTc06Teardown].NextOnPass := 0;
+    StepTable[StepTc06Teardown].NextOnFail := 0;
+    StepTable[StepTc06Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
     TableReady := TRUE;
 END_IF;
@@ -17381,6 +18377,26 @@ ProbeBool[SigMecaBError]       := PRG_03_Safety.instSafetyTranslationM3.ErrorMec
 ProbeDint[SigErrorIdT2NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
 ProbeBool[SigMecaAError]       := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
 ProbeDint[SigErrorIdT3NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
+
+// 🆕 REX 2026-07-18 : sondes TC-T4/T5 (décodeur réel, via PRG_07_TranslationControl)
+ProbeBool[SigDecoderIncoherent]   := PRG_07_TranslationControl.instPositionDecoder.Incoherent;
+ProbeBool[SigLimitFwd]            := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
+ProbeBool[SigLimitRev]            := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+ProbeBool[SigSensorIncoherentErr] := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
+ProbeDint[SigErrorIdT5NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
+
+// 🆕 REX 2026-07-18 : TC-T6 — instance isolée pilotée directement par les stimuli (voir §5 CASE),
+// jamais l'instance machine réelle instTranslationM3 (évite de perturber le pilotage arbitré).
+instTranslationUnderTest(
+    Enable := TRUE, Reset := ResetFaults, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    StartStop := UnderTestStartStop, SafeStop := FALSE,
+    Direction := UnderTestDirection, SpeedRefPct := 100.0,
+    PositionSensorTarget := FALSE, SlowdownSensor := UnderTestSlowdownSensor,
+    LimitSwitchFwd := FALSE, LimitSwitchRev := FALSE,
+    DriveStatusWord := 0, DriveActualFreqHz := 0.0,
+    BypassContactorCheck := TRUE, BrakeFeedback := FALSE
+);
+ProbeReal[SigSlowdownFreqHz] := instTranslationUnderTest.DriveFreqRefHz;
 
 // 4. ⚙️ MOTEUR
 Sequencer(
@@ -17398,6 +18414,12 @@ Sequencer(
     Busy =&gt; Busy,
     Done =&gt; Done,
     AnyFailed =&gt; AnyFailed,
+    TerminalState =&gt; TerminalState,
+    ConfigError =&gt; ConfigError,
+    ConfigErrorStepId =&gt; ConfigErrorStepId,
+    ConfigErrorCheckIdx =&gt; ConfigErrorCheckIdx,
+    ErrorCode =&gt; ErrorCode,
+    ErrorMessage =&gt; ErrorMessage,
     ActiveStimulusId =&gt; ActiveStimulusId,
     StepElapsed =&gt; StepElapsed
 );
@@ -17408,12 +18430,20 @@ CASE ActiveStimulusId OF
         GVL_PLC_Tests.OverrideM3AtTremie := FALSE;
         GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
         GVL_PLC_Tests.OverrideM3PhantomFreq := FALSE;
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
+        UnderTestStartStop := FALSE;
+        UnderTestDirection := 0;
+        UnderTestSlowdownSensor := FALSE;
         ResetFaults := FALSE;
 
     1: // Reset défauts, attente saine (Setup &amp; Teardown)
         GVL_PLC_Tests.OverrideM3AtTremie := FALSE;
         GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
         GVL_PLC_Tests.OverrideM3PhantomFreq := FALSE;
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
+        UnderTestStartStop := FALSE;
+        UnderTestDirection := 0;
+        UnderTestSlowdownSensor := FALSE;
         ResetFaults := TRUE;
 
     2: // TC-T1 : Force le capteur Fdc extrême Trémie
@@ -17433,6 +18463,41 @@ CASE ActiveStimulusId OF
         GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
         GVL_PLC_Tests.OverrideM3PhantomFreq := TRUE;
         ResetFaults := FALSE;
+
+    // 🆕 REX 2026-07-18 — TC-T4 : les 6 mots valides (AF_Partie-02 v2.12 §3bis)
+    5: // Mot 11111 (extrême Trémie)
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#11111;
+    6: // Mot 01111
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#01111;
+    7: // Mot 00111
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#00111;
+    8: // Mot 00011
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#00011;
+    9: // Mot 00001
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#00001;
+    10: // Mot 00000 (extrême Maintenance)
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#00000;
+
+    // 🆕 TC-T5 : mot incohérent (progression non monotone — capteur collé/HS simulé)
+    11:
+        GVL_PLC_Tests.OverrideM3SensorsWordActive := TRUE;
+        GVL_PLC_Tests.OverrideM3SensorsWord := 2#10101;
+
+    // 🆕 TC-T6 : ralentissement PV (instance isolée, voir §3 ACQUIRE)
+    12: // Pleine vitesse, sans PV
+        UnderTestDirection := 1;
+        UnderTestStartStop := TRUE;
+        UnderTestSlowdownSensor := FALSE;
+    13: // Même mouvement, PV actif -&gt; vitesse clampée
+        UnderTestDirection := 1;
+        UnderTestStartStop := TRUE;
+        UnderTestSlowdownSensor := TRUE;
 END_CASE;
 
 // Recopie IHM/métier — reset partagé avec la suite Safety (même domaine
@@ -17448,6 +18513,133 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>576e53eb-cb3b-5c02-b599-2da98940d323</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Translation_PositionDecoder" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="SensorTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur extrême gauche (Trémie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur pré-ralentissement avant Trémie (Point de Vitesse)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur zone de travail P2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur zone de travail P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur extrême droite (Maintenance, accès MAINT_N2 uniquement)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="LimitSwitchFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Extrême Trémie confirmé (mot = 11111)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitSwitchRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Extrême Maintenance confirmé (mot = 00000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Incoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot hors des 6 combinaisons valides -&gt; défaut sécurité (SafeStop+PowerCutOff, voir FB_Safety_Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorsWord">
+              <type>
+                <BYTE />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ↔️ FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §3bis
+   🧩 Brique réduite (Partie3 §1bis) : pure logique combinatoire, pas de
+      StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
+      Maintenance) en mot de progression, dérive les 2 limites extrêmes et
+      détecte toute combinaison incohérente (défense en profondeur M3).
+   🎯 Mot valide : progression monotone de 11111 (extrême Trémie) à 00000
+      (extrême Maintenance) : 11111→01111→00111→00011→00001→00000.
+      Tout autre mot = incohérence câblage/mécanique (capteur collé/HS).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🧾 Assemblage du mot (bit4=Trémie ... bit0=Maintenance, ordre doc AF_Partie-02 §3bis)
+SensorsWord := 0;
+IF SensorTremie      THEN SensorsWord := SensorsWord OR 16#10; END_IF;
+IF SensorPV          THEN SensorsWord := SensorsWord OR 16#08; END_IF;
+IF SensorP2          THEN SensorsWord := SensorsWord OR 16#04; END_IF;
+IF SensorP1          THEN SensorsWord := SensorsWord OR 16#02; END_IF;
+IF SensorMaintenance THEN SensorsWord := SensorsWord OR 16#01; END_IF;
+
+// 🎯 Les 6 combinaisons valides (progression monotone décroissante Trémie→Maintenance)
+CASE SensorsWord OF
+    2#11111, 2#01111, 2#00111, 2#00011, 2#00001, 2#00000:
+        Incoherent := FALSE;
+    ELSE
+        Incoherent := TRUE;
+END_CASE;
+
+// 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
+LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
+LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3</ObjectId>
           </data>
         </addData>
       </pou>
@@ -18676,21 +19868,41 @@ TRUE = tous retombés (sain, rien d'engagé)
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationPosFosse1">
+            <variable name="TranslationPosTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">── ↔️ TRANSLATION M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
-📍 Position fosse 1 (NO) : TRUE=translation en fosse 1 ✅ | FALSE=absent</xhtml>
+🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
+Maintenance (ex-Fosse1/Fosse2/Maintenance/Trémie, 4 capteurs). PV=pré-ralentissement avant
+Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translation_PositionDecoder
+(PRG_07_TranslationControl).
+🗑️ Position trémie vidange (NO), extrême gauche : TRUE=en position trémie ✅ | FALSE=absent</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationPosFosse2">
+            <variable name="TranslationPosPV">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Position fosse 2 (NO) : TRUE=translation en fosse 2 ✅ | FALSE=absent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Pré-ralentissement (Point de Vitesse) avant Trémie (NO) : TRUE=zone PV atteinte ✅ | FALSE=absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Position P2 (NO, ex-Fosse2) : TRUE=translation en P2 ✅ | FALSE=absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Position P1 (NO, ex-Fosse1) : TRUE=translation en P1 ✅ | FALSE=absent</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosMaintenance">
@@ -18698,15 +19910,7 @@ TRUE = tous retombés (sain, rien d'engagé)
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Position maintenance (NO) : TRUE=en position service ✅ | FALSE=absent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🗑️ Position trémie vidange (NO) : TRUE=en position trémie ✅ | FALSE=absent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Position maintenance (NO), extrême droite, accès MAINT_N2 uniquement : TRUE=en position service ✅ | FALSE=absent</xhtml>
               </documentation>
             </variable>
             <variable name="M3BrakeFeedback">
@@ -18807,22 +20011,27 @@ TRUE = tous retombés (sain, rien d'engagé)
                 <derived name="FB_Input" />
               </type>
             </variable>
-            <variable name="instTranslationPosFosse1">
+            <variable name="instTranslationPosTremie">
               <type>
                 <derived name="FB_Input" />
               </type>
             </variable>
-            <variable name="instTranslationPosFosse2">
+            <variable name="instTranslationPosPV">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosP2">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosP1">
               <type>
                 <derived name="FB_Input" />
               </type>
             </variable>
             <variable name="instTranslationPosMaintenance">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTranslationPosTremie">
               <type>
                 <derived name="FB_Input" />
               </type>
@@ -19000,17 +20209,20 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosFosse1(InputRaw := PosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
-TranslationPosFosse1 := instTranslationPosFosse1.State;
+instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosFosse2(InputRaw := PosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
-TranslationPosFosse2 := instTranslationPosFosse2.State;
+instTranslationPosPV(InputRaw := GVL_Translation_M3_Stub.PosPV_DI OR instSimTranslation.PosPV, FilterTime := T#20MS);
+TranslationPosPV := instTranslationPosPV.State;
+
+instTranslationPosP2(InputRaw := PosFosse2_DI OR instSimTranslation.PosP2, FilterTime := T#20MS);
+TranslationPosP2 := instTranslationPosP2.State;
+
+instTranslationPosP1(InputRaw := PosFosse1_DI OR instSimTranslation.PosP1, FilterTime := T#20MS);
+TranslationPosP1 := instTranslationPosP1.State;
 
 instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
-
-instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
-TranslationPosTremie := instTranslationPosTremie.State;
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
 M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
@@ -19051,6 +20263,15 @@ END_IF;
 // Surcharges (overrides) du banc de tests — Translation M3 (niveau capteur amont uniquement)
 IF GVL_PLC_Tests.OverrideM3AtTremie THEN
     TranslationPosTremie := TRUE; // 🧪 Simule le Fdc extrême avant sans attendre le trajet simulé complet
+END_IF;
+// 🆕 REX 2026-07-18 : force les 5 capteurs position depuis un mot de test (indépendant du temps
+// de trajet simulé) — seul moyen de tester les 6 mots valides ET les combinaisons incohérentes.
+IF GVL_PLC_Tests.OverrideM3SensorsWordActive THEN
+    TranslationPosTremie      := GVL_PLC_Tests.OverrideM3SensorsWord.4;
+    TranslationPosPV          := GVL_PLC_Tests.OverrideM3SensorsWord.3;
+    TranslationPosP2          := GVL_PLC_Tests.OverrideM3SensorsWord.2;
+    TranslationPosP1          := GVL_PLC_Tests.OverrideM3SensorsWord.1;
+    TranslationPosMaintenance := GVL_PLC_Tests.OverrideM3SensorsWord.0;
 END_IF;
 IF GVL_PLC_Tests.OverrideM3BrakeStuckOpen THEN
     M3BrakeFeedback := TRUE; // 🧪 Simule Méca B : retour frein resté desserré malgré commande fermée
@@ -19661,8 +20882,11 @@ instSafetyTranslationM3(
     BrakeFeedback       := PRG_00_Inputs.M3BrakeFeedback,
     BrakeCmd            := PRG_07_TranslationControl.instTranslationM3.BrakeCmd,
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
-    LimitSwitchFwd      := PRG_00_Inputs.TranslationPosTremie,
-    LimitSwitchRev      := PRG_00_Inputs.TranslationPosFosse1
+    // 🆕 REX 2026-07-18 : limites extrêmes dérivées du décodage 5 capteurs (mot valide), plus
+    // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
+    LimitSwitchFwd      := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd,
+    LimitSwitchRev      := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev,
+    SensorWordIncoherent := PRG_07_TranslationControl.instPositionDecoder.Incoherent
 );
 </xhtml>
           </ST>
@@ -19866,9 +21090,9 @@ instCycle(
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
 
-    // Position translation
-    Translation_At_Fosse1   := PRG_00_Inputs.TranslationPosFosse1,
-    Translation_At_Fosse2   := PRG_00_Inputs.TranslationPosFosse2,
+    // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
+    Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,
+    Translation_At_P2       := PRG_00_Inputs.TranslationPosP2,
     Translation_At_Maintenance := PRG_00_Inputs.TranslationPosMaintenance,
     Translation_At_Tremie   := PRG_00_Inputs.TranslationPosTremie,
     Translation_Busy        := PRG_07_TranslationControl.instTranslationM3.Busy,
@@ -20249,10 +21473,15 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // review code), le cycle auto pouvait aggraver un écart mineur sans aucune protection quand
     // SyncSoftStopEnable=TRUE. Ajouté ici, symétrique à la branche manuelle ci-dessous.
     M1_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM1_Direction;
+    // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
+    // nouvelle sollicitation valide = reprise à l'étape courante.
     M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop
+                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
-    M1_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
+    M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
+                               ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
 ELSIF PRG_10_Outputs.ManuActive THEN
     // 🆕 REX 2026-07-15 (2) — IHM_MANU pilote désormais M1 via FB_Winch (au lieu de l'ex-bypass
     // direct dans PRG_10_Outputs) : récupère gratuitement la rampe accel/décel + le ralentissement
@@ -20305,10 +21534,15 @@ ELSE
         // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche, ajouté
         // symétrique à la branche manuelle ci-dessous (signe M2, voir note ci-dessous).
         M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
+        // 🛡️ Même garde homme-mort que M1 : le cycle ne poursuit jamais un mouvement
+        // après relâchement du joystick.
         M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop
+                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
-        M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
+        M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
+                                   ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
     ELSIF PRG_10_Outputs.ManuActive THEN
         // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course benne (FdcBucket) appliquées
         // au pilotage INDIVIDUEL **ET** COUPLÉ de M2 désormais (demande utilisateur — "que ce soit
@@ -20640,6 +21874,14 @@ GVL_Simulation.refWinchM2  REF= instWinchM2;
                 <derived name="FB_Translation" />
               </type>
             </variable>
+            <variable name="instPositionDecoder">
+              <type>
+                <derived name="FB_Translation_PositionDecoder" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : décodage mot 5 capteurs (AF_Partie-02 v2.12 §3bis)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3_StartStop_Active">
               <type>
                 <BOOL />
@@ -20668,7 +21910,8 @@ GVL_Simulation.refWinchM2  REF= instWinchM2;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Target active (HMI en manuel, instCycle en auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Target active (HMI en manuel, instCycle en auto) — 0=Aucun, 1=Trémie, 2=P2, 3=P1,
+4=Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).</xhtml>
               </documentation>
             </variable>
             <variable name="FreqPct">
@@ -20696,17 +21939,34 @@ Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct</xhtml>
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
 
+// ── 0. DÉCODAGE MOT CAPTEURS (5 positions, indépendant du mode/de la cible) ─
+// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — remplace le câblage direct
+// des anciens capteurs Fosse1/Tremie sur LimitSwitchFwd/Rev par un décodage complet du mot
+// 5 bits (Trémie|PV|P2|P1|Maintenance), avec détection d'incohérence (capteur collé/HS).
+instPositionDecoder(
+    SensorTremie      := PRG_00_Inputs.TranslationPosTremie,
+    SensorPV          := PRG_00_Inputs.TranslationPosPV,
+    SensorP2          := PRG_00_Inputs.TranslationPosP2,
+    SensorP1          := PRG_00_Inputs.TranslationPosP1,
+    SensorMaintenance := PRG_00_Inputs.TranslationPosMaintenance
+);
+
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
     SelectedTargetNum    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
-    M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start;
-    M3_SpeedRef_Active   := 40.0; // Vitesse de translation automatique nominale (40%)
+    // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
+    // nouvelle sollicitation valide = reprise à l'étape courante.
+    M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
+                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
+    M3_SpeedRef_Active   := MIN(40.0,
+                                ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef));
 
     // Détermination automatique du sens de marche selon la cible :
-    // - Trémie (cible 4) = Marche Avant (Direction := 1)
-    // - Fosses (cible 1 et 2) = Marche Arrière (Direction := -1)
-    IF SelectedTargetNum = 4 THEN
+    // - Trémie (cible 1) = Marche Avant (Direction := 1)
+    // - P2/P1/Maintenance (cibles 2/3/4) = Marche Arrière (Direction := -1)
+    IF SelectedTargetNum = 1 THEN
         M3_Direction_Active := 1;
     ELSE
         M3_Direction_Active := -1;
@@ -20749,12 +22009,18 @@ ELSE
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
 END_IF;
 
-// Câblage du capteur de butée de la cible sélectionnée
+// 🆕 REX 2026-07-18 : cible Maintenance (4) bloquée hors MAINT_N2 (AF_Partie-02 v2.12 §3bis) —
+// arbitrage centralisé dans FB_Modes (aucun re-test de Mode ici), refuse toute cible si interdite.
+IF (SelectedTargetNum = 4) AND NOT PRG_04_Modes.instModes.MaintenanceM3TargetEnable THEN
+    SelectedTargetNum := 0;
+END_IF;
+
+// Câblage du capteur de butée de la cible sélectionnée (PV exclu : jamais une cible d'arrêt)
 CASE SelectedTargetNum OF
-    1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosFosse1;
-    2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosFosse2;
-    3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosMaintenance;
-    4: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
+    1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
+    2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP2;
+    3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP1;
+    4: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosMaintenance;
 ELSE
     M3_PositionSensorTarget := FALSE;   // Aucun capteur visé
 END_CASE;
@@ -20770,8 +22036,9 @@ instTranslationM3(
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    LimitSwitchFwd          := PRG_00_Inputs.TranslationPosTremie,
-    LimitSwitchRev          := PRG_00_Inputs.TranslationPosFosse1,
+    SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
+    LimitSwitchFwd          := instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
+    LimitSwitchRev          := instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
@@ -20791,66 +22058,28 @@ PRG_10_Outputs.TranslationBrakeCmd := instTranslationM3.BrakeCmd;
       </pou>
       <pou name="PRG_08_AuxiliaryControl" pouType="program">
         <interface>
-          <inputVars>
-            <variable name="HydraulicPumpRunCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Groupe Hydraulique
-Commande démarrage centrale hydraulique</xhtml>
-              </documentation>
-            </variable>
+          <inputVars />
+          <outputVars>
             <variable name="HydraulicFaultOk">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour défaut groupe hydraulique (NC)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Diagnostic thermique centrale hydraulique (NC) : TRUE=sain ✅ | FALSE=surchauffe/coupure 🔴 → IHM</xhtml>
               </documentation>
             </variable>
-            <variable name="SifterRunCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌾 Crible (Sifter / Sieve)
-Commande marche crible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SifterFaultOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour défaut électrique crible (NC)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="GridOpenCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Divers
-Commande ouverture grille</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HelmetCloseCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande fermeture casque</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars />
+          </outputVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚡ PRG_08_AuxiliaryControl — Gestion des Auxiliaires (Hydraulique, Crible...)
+   ⚡ PRG_08_AuxiliaryControl — Diagnostic Auxiliaires (Centrale Hydraulique)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 8.
-   ✅ Regroupe toutes les commandes et logiques hors-axes.
+   🔧 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 "Rôle de chaque
+      programme" §PRG_08) — le PLC ne commande plus casque, grille ni
+      centrale hydraulique (retiré, ex-§8 PRG_10_Outputs + ex-champs
+      GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd de ST_IHM_MANU).
+      Seul le retour thermique centrale hydraulique est conservé, remonté
+      en diagnostic IHM (aucune commande, aucun auto-démarrage).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -20860,14 +22089,9 @@ Commande ouverture grille</xhtml>
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
-// --- STUBS LOGIQUES TEMPORAIRES (comportement passif / neutre) ---
-// HydraulicPumpRunCmd := FALSE; // Commenté pour permettre le pilotage externe (ex: PRG_10_Outputs)
-// SifterRunCmd        := FALSE;
-// GridOpenCmd         := FALSE;
-// HelmetCloseCmd      := FALSE;
-
-HydraulicFaultOk    := TRUE; // Par défaut sain (NC)
-SifterFaultOk       := TRUE; // Par défaut sain (NC)
+// 🌡️ Retour thermique brut (NC) — entrée physique ThermHydraulique_DI ;
+// tant que non câblé, ce point lira FALSE côté image process réelle si absent, d'où l'OR simulation.
+HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.HydraulicThermal_IsReal);
 </xhtml>
           </ST>
         </body>
@@ -20990,6 +22214,7 @@ GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
 // TopPositionSensorActive ci-dessus, PAS dans WinchM1/WinchM2/Translation).
 GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
 GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
+GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_08_AuxiliaryControl.HydraulicFaultOk; // 🆕 REX 2026-07-18 — diagnostic seul, aucune commande PLC
 
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
@@ -21305,6 +22530,7 @@ GVL_IHM.TranslationM3.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTransla
 GVL_IHM.TranslationM3.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaB;
 GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
 GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
+GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
@@ -22004,48 +23230,19 @@ IF ManuActive THEN
     // propre state machine. Plus besoin d'interlock local ici (même principe que M1/M2, REX
     // 2026-07-15 (2) ci-dessus).
 
-    // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
-    IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := TRUE;
-        GridDown_RQ := FALSE;
-    ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := FALSE;
-        GridDown_RQ := TRUE;
-    ELSE
-        GridUp_RQ := FALSE;
-        GridDown_RQ := FALSE;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := TRUE;
-        HelmetClose_RQ := FALSE;
-    ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := TRUE;
-    ELSE
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := FALSE;
-    END_IF;
-
-    // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé et AU armé
-    PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := (GVL_IHM.IHM_MANU.GridOpenCmd 
-                                                 OR GVL_IHM.IHM_MANU.GridCloseCmd 
-                                                 OR GVL_IHM.IHM_MANU.HelmetOpenCmd 
-                                                 OR GVL_IHM.IHM_MANU.HelmetCloseCmd)
-                                                 AND PRG_00_Inputs.EmergencyStopOk;
-
     // 🔧 REX 2026-07-15 (2) : plus de recopie M1/M2 ici — déjà écrites par PRG_06_WinchControl §8
     // (instWinchM1/instWinchM2.RelayFwd/RelayRev/Contactor1-4/BrakeCmd), AVANT ce PRG_10_Outputs
     // dans l'ordre de tâche (position 6 &lt; 10), pour Auto ET Manu désormais.
     // 🔧 REX 2026-07-16 : idem pour TranslationBrakeCmd — plus de recopie ici, déjà écrite par
     // PRG_07_TranslationControl (instTranslationM3.BrakeCmd), AVANT ce PRG_10_Outputs (position
     // 7 &lt; 10), pour Auto ET Manu désormais (voir fin de fichier).
-ELSE
-    // Nettoyage en cas de désactivation du mode Manu
-    GridUp_RQ := FALSE;
-    GridDown_RQ := FALSE;
-    HelmetOpen_RQ := FALSE;
-    HelmetClose_RQ := FALSE;
+
+    // 🔧 REX 2026-07-18 : ex-§8️⃣ Auxiliaires Hydrauliques (GridUp_RQ/GridDown_RQ/HelmetOpen_RQ/
+    // HelmetClose_RQ/HydraulicPumpRunCmd) RETIRÉ — décision client (AF_Partie-02 v2.12 "Rôle de
+    // chaque programme" §PRG_08) : le PLC ne pilote plus casque/grille/centrale hydraulique.
+    // GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd retirés de ST_IHM_MANU. Les sorties
+    // physiques GridUp_RQ/GridDown_RQ/HelmetOpen_RQ/HelmetClose_RQ ne sont plus écrites nulle part
+    // (restent FALSE) — aucune commande automate ne pilote plus ces équipements.
 END_IF;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
@@ -22402,6 +23599,31 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Progression et statut des tests</xhtml>
           </documentation>
         </variable>
+        <variable name="EventLog">
+          <type>
+            <array>
+              <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestEvents" />
+              <baseType>
+                <derived name="ST_TestEvent" />
+              </baseType>
+            </array>
+          </type>
+        </variable>
+        <variable name="EventCount">
+          <type>
+            <INT />
+          </type>
+        </variable>
+        <variable name="EventSequence">
+          <type>
+            <UDINT />
+          </type>
+        </variable>
+        <variable name="EventOverflow">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
         <variable name="SuiteSafetyValidation">
           <type>
             <derived name="ST_TestSuiteReport" />
@@ -22481,6 +23703,25 @@ Force TranslationPosTremie (Fdc extrême avant) à TRUE</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A</xhtml>
           </documentation>
         </variable>
+        <variable name="OverrideM3SensorsWordActive">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : force directement les 5 capteurs position M3 depuis un mot de test —
+seul moyen de tester les 6 mots valides ET les combinaisons incohérentes indépendamment
+du temps de trajet simulé (FB_Sim_Translation). bit4=Trémie,bit3=PV,bit2=P2,bit1=P1,bit0=Maintenance.
+TRUE = force les 5 capteurs depuis OverrideM3SensorsWord</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM3SensorsWord">
+          <type>
+            <BYTE />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de test (voir FB_Translation_PositionDecoder)</xhtml>
+          </documentation>
+        </variable>
         <variable name="OverrideM1Slip">
           <type>
             <BOOL />
@@ -22555,7 +23796,7 @@ Simule glissement modéré M1 (1.5m)</xhtml>
             <simpleValue value="64" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">par suite, table PLATE</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">par suite, table PLATE ; tous les StepId doivent rester &lt;= 64</xhtml>
           </documentation>
         </variable>
         <variable name="MaxChecks">
@@ -22649,6 +23890,28 @@ Simule glissement modéré M1 (1.5m)</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">MainTask — base des mesures en cycles</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MaxSuiteDurationMs">
+          <type>
+            <DINT />
+          </type>
+          <initialValue>
+            <simpleValue value="180000" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ garde-fou orchestrateur : 3 min maximum par suite</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MaxTestEvents">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="32" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">journal circulaire des événements</xhtml>
           </documentation>
         </variable>
         <variable name="SuiteSafety">
@@ -22896,7 +24159,18 @@ Chaîne AU câblée (EmergencyStopOk_DI)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteurs Fosse1/Fosse2/Maintenance/Trémie</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteurs Trémie/PV/P2/P1/Maintenance</xhtml>
+          </documentation>
+        </variable>
+        <variable name="HydraulicThermal_IsReal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : thermique centrale hydraulique (PRG_08_AuxiliaryControl)</xhtml>
           </documentation>
         </variable>
         <variable name="JoystickForceNeutralRaw">
@@ -23006,7 +24280,7 @@ Front montant = applique le saut sur M1</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Bit maître + granularité par device (remplace GVL_DEBUG)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🎯 Rôle : le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'étant
       pas disponible pour les essais, toute la machine doit pouvoir tourner en
       simulation CODESYS. Modèle hiérarchique :
@@ -23026,6 +24300,14 @@ Front montant = applique le saut sur M1</xhtml>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Translation_M3_Stub">
+        <variable name="PosPV_DI">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Nouvelle entrée physique PV à mapper dans CODESYS.</xhtml>
+          </documentation>
+        </variable>
         <variable name="StubTranslationPositionSelect_IHM">
           <type>
             <INT />
@@ -23034,7 +24316,9 @@ Front montant = applique le saut sur M1</xhtml>
             <simpleValue value="0" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Sélecteur test maintenance (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
+Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).
+🖥️ Sélecteur test maintenance (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
           </documentation>
         </variable>
         <variable name="M3_RelayFwd">
@@ -23105,7 +24389,7 @@ Front montant = applique le saut sur M1</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Translation_M3_Stub — Variables STUB M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.2.md §7
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md §7
    🔧 CORRECTIF (2026-07-03) : réintégration de M3_RelayFwd/Rev/SpeedGv,
       M3_ContactorFeedbackFwd/Rev, M3_DriveFaultFeedback,
       M3_PositionSensorTarget — retirés par erreur le 2026-07-03
@@ -23151,10 +24435,12 @@ Front montant = applique le saut sur M1</xhtml>
               <Folder Name="ENUMS">
                 <Object Name="E_TestCheckKind" ObjectId="379e0f88-7094-5362-8e25-95becba599db" />
                 <Object Name="E_TestCheckMode" ObjectId="e7624c6e-3fdb-57ec-bd16-eb3e45d2ff38" />
+                <Object Name="E_TestEventSeverity" ObjectId="41e588d1-1ea8-5d99-aa81-d6d6b07b9c32" />
                 <Object Name="E_TestFailAction" ObjectId="67f1527f-2aba-5aba-93f8-cc354c549464" />
                 <Object Name="E_TestFailReason" ObjectId="ced6b8c3-cd7a-5052-bb93-74508d4d7454" />
                 <Object Name="E_TestRunState" ObjectId="c04b435a-42f8-5555-8d99-eef46382e52c" />
                 <Object Name="E_TestStimKind" ObjectId="6fd96dd9-eed5-59f0-952a-689dccea86b1" />
+                <Object Name="E_TestTerminalState" ObjectId="c2e17c82-2f21-52c7-a77f-c922755f7e25" />
               </Folder>
               <Folder Name="STRUCTS">
                 <Object Name="ST_PlcTestsCmd" ObjectId="0a56ece7-0d70-5b73-ae46-e2234b14f129" />
@@ -23162,6 +24448,7 @@ Front montant = applique le saut sur M1</xhtml>
                 <Object Name="ST_TestCaseConfig" ObjectId="cc34543d-edce-50cc-a9f4-294f05062bd2" />
                 <Object Name="ST_TestCaseResult" ObjectId="a01b149c-7761-584d-90ca-9ff79721e9da" />
                 <Object Name="ST_TestCheckConfig" ObjectId="0ae918c9-e56d-5e2b-b392-c135d1bd6824" />
+                <Object Name="ST_TestEvent" ObjectId="97ecb186-f8f9-5b20-8b2f-6ebd348d8ada" />
                 <Object Name="ST_TestInvariantConfig" ObjectId="2f7e2c7c-6b9b-5717-b447-5022b43d67f5" />
                 <Object Name="ST_TestStepConfig" ObjectId="90aaaf06-fc7d-54be-9ca1-0ea1d5f8848f" />
                 <Object Name="ST_TestStepResult" ObjectId="cc65da0a-d694-5a33-a326-289e3481abdb" />
@@ -23233,6 +24520,7 @@ Front montant = applique le saut sur M1</xhtml>
         <Folder Name="TRANSLATION">
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
+          <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
         </Folder>
         <Folder Name="MAIN">

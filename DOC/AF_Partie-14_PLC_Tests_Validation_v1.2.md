@@ -3,7 +3,7 @@
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Définition et architecture des tests de validation automatisés de la chaîne de sécurité (Arrêt d'Urgence et commande des contacteurs de puissance).
 > **Version** : v1.2 (2026-07-16) — §7 **réécrit intégralement** : spécification finale du framework de test in-PLC (architecture de données, moteur d'exécution, catalogue de primitives, IHM de pilotage, preuve de couverture TC-01/02/03, plan de migration), issue d'une double revue croisée entre deux analyses expertes indépendantes (primitives de test ↔ architecture de données/IHM) + audit final. **Remplace entièrement** le cadrage v1.1 §7. Base §1-6 **inchangée**. ⚠️ **Aucune modification de `CODE/` n'accompagne cette version** — cadrage uniquement ; migration à dérouler séparément (§7.6).
-> 🔗 **Dépend de** : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P13 Simulation v1.2](AF_Partie-13_Fonction_Simulation_v1.2.md), [P3 Template FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) (contrat FB, profils §1bis), [P7 Interface IHM v1.4](AF_Partie-07_Interface_IHM_v1.4.md) (pattern `ST_*HMI`), [NAMING_CONVENTION.md](NAMING_CONVENTION.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P13 Simulation v1.2](AF_Partie-13_Fonction_Simulation_v1.2.md), [P3 Template FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) (contrat FB, profils §1bis), [P7 Interface IHM v1.4](AF_Partie-07_Interface_IHM_v1.4.md) (pattern `ST_*HMI`), [NAMING_CONVENTION.md](NAMING_CONVENTION.md).
 
 ---
 
@@ -749,4 +749,18 @@ Compat migration : `CmdRunTests` → `Hmi.CmdRunAll` ; `TC01_NominalArming_Ok` �
 | 5 | Conformité projet — PascalCase, profil « brique réduite » P3 §1bis (aucun `StartStop`/`SafeStop`), aucun `CoupeEnable`/`FB_Watchdog` réintroduit | OK |
 
 **Verdict** : 🟢 **GO** — cadrage validé pour démarrer la migration M1.
+
+### 🛡️ 7.9 Fiabilisation anti-blocage — implémentation 2026-07-18
+
+Le moteur et l'orchestrateur appliquent désormais les garde-fous suivants :
+
+- `ConfigError`, étape/check invalide et étape hors limites produisent toujours `Done = TRUE` + un état terminal.
+- États terminaux : `DONE`, `FAILED`, `ABORTED`, `CONFIG_ERROR`, `WATCHDOG_TIMEOUT`.
+- Le séquenceur expose `ErrorCode` et `ErrorMessage` au niveau de chaque suite.
+- Un watchdog de suite de 180 s interdit toute attente infinie sur `Done`.
+- `GVL_PLC_Tests.EventLog[]` conserve les erreurs d'orchestration avec compteur et indicateur de débordement.
+- Une erreur de suite n'empêche pas l'enchaînement `RunAll` vers la suite suivante ; seul un abandon opérateur/gate arrête volontairement la campagne.
+- Correction de cohérence : `StepTc06Teardown = 63` respecte `MaxSteps = 64`.
+
+⚠️ La compilation finale doit être confirmée dans CODESYS après réimport du bundle. Les tests Python valident le contrat statique et la génération PLCopenXML, pas l'exécution temps réel de l'automate.
 

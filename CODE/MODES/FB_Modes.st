@@ -65,6 +65,9 @@ VAR_OUTPUT
     InhibitM2           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM2Request
     HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND HomingApproachEnableRequest
     JoystickWinchSelectArbitrated : INT; // 🆕 TASK-0001 : arbitré, forcé à 3 (Couplé) hors MAINT_N2
+    MaintenanceM3TargetEnable : BOOL;    // 🆕 REX 2026-07-18 : TRUE seulement si Mode=MAINT_N2 — autorise
+                                          // la cible Translation "Maintenance" (AF_Partie-02 v2.12 §3bis :
+                                          // "Maintenance est accessible uniquement en MAINT_N2")
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -82,6 +85,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     InhibitM2 := FALSE;
     HomingApproachEnable := FALSE;
     JoystickWinchSelectArbitrated := 3; // Par défaut couplé
+    MaintenanceM3TargetEnable := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     RETURN;
@@ -139,6 +143,12 @@ IF Mode = E_Mode.MAINT_N2 THEN
 ELSE
     JoystickWinchSelectArbitrated := 3; // Couplé forcé
 END_IF;
+
+// 📤 5quinquies. CIBLE TRANSLATION "MAINTENANCE" — mise en service, décision client 2026-07-17
+// (AF_Partie-02 v2.12 §3bis) : bloquée en MAINT_N1 et SEMI_AUTO, autorisée UNIQUEMENT en MAINT_N2.
+// Centralisé ICI (même doctrine que InhibitM1/M2, HomingApproachEnable) : aucun autre fichier ne
+// doit re-tester Mode=MAINT_N2 pour ce besoin — PRG_07_TranslationControl consomme ce bit.
+MaintenanceM3TargetEnable := (Mode = E_Mode.MAINT_N2);
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);
