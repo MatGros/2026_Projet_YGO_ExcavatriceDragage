@@ -28,6 +28,7 @@ _STRING_RE = re.compile(r"^STRING\s*\(\s*(\d+)\s*\)$")
 # (ARRAY[1..N] OF T avec N symbolique — voir GUIDE_Conversion §"array" note "non vérifié").
 _BOUND = r"(-?\d+|[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)"
 _ARRAY_RE = re.compile(rf"^ARRAY\s*\[\s*{_BOUND}\s*\.\.\s*{_BOUND}\s*\]\s*OF\s+(.+)$", re.IGNORECASE | re.DOTALL)
+_REFERENCE_RE = re.compile(r"^REFERENCE\s+TO\s+(.+)$", re.IGNORECASE | re.DOTALL)
 
 
 @dataclass(frozen=True)
@@ -52,7 +53,12 @@ class ArrayType:
     base: "TypeRef"
 
 
-TypeRef = Union[BaseType, StringType, DerivedType, ArrayType]
+@dataclass(frozen=True)
+class ReferenceType:
+    base: "TypeRef"
+
+
+TypeRef = Union[BaseType, StringType, DerivedType, ArrayType, ReferenceType]
 
 
 def _parse_bound(text: str) -> int | str:
@@ -66,6 +72,11 @@ def parse_type(text: str) -> TypeRef:
     text = text.strip()
     if not text:
         raise ValueError("empty type expression")
+
+    reference_match = _REFERENCE_RE.match(text)
+    if reference_match:
+        base_text = reference_match.group(1).strip()
+        return ReferenceType(parse_type(base_text))
 
     array_match = _ARRAY_RE.match(text)
     if array_match:
@@ -90,5 +101,7 @@ def referenced_type_names(type_ref: TypeRef) -> set[str]:
     if isinstance(type_ref, DerivedType):
         return {type_ref.name}
     if isinstance(type_ref, ArrayType):
+        return referenced_type_names(type_ref.base)
+    if isinstance(type_ref, ReferenceType):
         return referenced_type_names(type_ref.base)
     return set()

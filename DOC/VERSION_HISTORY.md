@@ -6,6 +6,12 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### `v0.4.16_ReferenceToFix_BucketRun` — 2026-07-17
+- Fix générateur PLCopenXML (`TOOLS/`) : `REFERENCE TO` sérialisait en `<pointer>` au lieu de `<derived name="REFERENCE TO X">` — confirmé sur échantillon réel (`FB_TestReference.xml`)
+- `FB_BucketValidation` : garde `__ISVALIDREF()` avant déréférencement `instBucket`/`instWinchM2` (protège le 1ᵉʳ scan, avant assignation par `PRG_06_WinchControl`)
+- `PRG_06_WinchControl` : `:=` → `REF=` pour rebind `GVL_Simulation.refBucket/refWinchM2` (`:=` faisait une copie de valeur à travers une réf non liée → access violation runtime CODESYS)
+- ✅ RUN confirmé OK en simulation CODESYS (`FB_PLC_Tests_Management` + suite Bucket)
+
 ### 📄 Doc seule — 2026-07-16
 - AF_Partie-14 v1.1 → **v1.2** : §7 réécrit intégralement (spec finale framework test in-PLC piloté par tables)
 - Issue double revue croisée experte (primitives ↔ archi données) + audit — pas de modif `CODE/`

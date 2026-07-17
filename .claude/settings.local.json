@@ -74,8 +74,10 @@
       "Bash(echo \"EXIT_CODE_2e_INSTANCE=$?\")",
       "Bash(tasklist //FI \"IMAGENAME eq python.exe\")",
       "Bash(grep -v \"\\\\.sample$\")",
-      "Bash(xargs -0 sed -i -e s/FB_Benne/FB_Bucket/g -e s/ST_BenneConfig/ST_BucketConfig/g -e s/ST_BenneHMI/ST_BucketHMI/g -e s/ST_BenneState/ST_BucketState/g -e s/instBenne/instBucket/g -e s/BenneConfig/BucketConfig/g -e s/BenneState/BucketState/g -e s/CmdBenne_Open/CmdBucket_Open/g -e s/CmdBenne_Close/CmdBucket_Close/g -e s/CoupledFwdBenneOk/CoupledFwdBucketOk/g -e s/CoupledRevBenneOk/CoupledRevBucketOk/g -e s/FdcBenneCloseActive/FdcBucketCloseActive/g -e s/FdcBenneCloseEnable/FdcBucketCloseEnable/g -e s/FdcBenneOpenActive/FdcBucketOpenActive/g -e s/FdcBenneOpenEnable/FdcBucketOpenEnable/g -e s/FdcBenneClose/FdcBucketClose/g -e s/FdcBenneOpen/FdcBucketOpen/g -e s/FdcBenne/FdcBucket/g -e s/OverrideBenne/OverrideBucket/g -e s/M2TreuilBenne/M2TreuilBucket/g -e 's/GVL_IHM\\\\.Benne/GVL_IHM.Bucket/g' '{}' +)",
-      "Bash(python3 -m TOOLS.generator.cli --help)"
+      "Bash(xargs -0 sed -i -e s/FB_Benne/FB_Benne/g -e s/ST_BenneConfig/ST_BenneConfig/g -e s/ST_BenneHMI/ST_BenneHMI/g -e s/ST_BenneState/ST_BenneState/g -e s/instBenne/instBenne/g -e s/BenneConfig/BenneConfig/g -e s/BenneState/BenneState/g -e s/CmdBenne_Open/CmdBenne_Open/g -e s/CmdBenne_Close/CmdBenne_Close/g -e s/CoupledFwdBenneOk/CoupledFwdBenneOk/g -e s/CoupledRevBenneOk/CoupledRevBenneOk/g -e s/FdcBenneCloseActive/FdcBenneCloseActive/g -e s/FdcBenneCloseEnable/FdcBenneCloseEnable/g -e s/FdcBenneOpenActive/FdcBenneOpenActive/g -e s/FdcBenneOpenEnable/FdcBenneOpenEnable/g -e s/FdcBenneClose/FdcBenneClose/g -e s/FdcBenneOpen/FdcBenneOpen/g -e s/FdcBenne/FdcBenne/g -e s/OverrideBenne/OverrideBenne/g -e s/M2TreuilBenne/M2TreuilBenne/g -e 's/GVL_IHM\\\\.Benne/GVL_IHM.Benne/g' '{}' +)",
+      "Bash(python3 -m TOOLS.generator.cli --help)",
+      "Skill(antigravity:delegate)",
+      "Bash(xargs sed -i 's/Benne/Benne/g')"
     ],
     "ask": [
       "Bash(git reset *)",

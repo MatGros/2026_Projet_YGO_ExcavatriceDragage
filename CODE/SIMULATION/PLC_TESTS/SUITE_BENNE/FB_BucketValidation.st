@@ -10,6 +10,8 @@ VAR_INPUT
     Start                      : BOOL;        // Commande de démarrage des tests
     Abort                      : BOOL;        // Commande d'abandon
     FirstStepId                : INT;         // Première étape à exécuter
+    instBucket                 : REFERENCE TO FB_Bucket;    // 🆕 Instance benne à tester
+    instWinchM2                : REFERENCE TO FB_Winch;     // 🆕 Instance treuil M2 à tester
 END_VAR
 VAR_OUTPUT
     Busy                       : BOOL;
@@ -125,6 +127,16 @@ END_IF;
 
 // Gate spécifique Bucket : refuse si M1 ou M2 sont en simulation réelle (Sûreté)
 SimGateOk := NOT GVL_Simulation.EncoderM1_IsReal AND NOT GVL_Simulation.EncoderM2_IsReal;
+
+// 🔧 REX 2026-07-17 : garde-fou REFERENCE TO — PRG_00_Inputs (qui appelle cette suite via
+// FB_PLC_Tests_Management) s'exécute AVANT PRG_06_WinchControl dans l'ordre du scan (00 avant 06).
+// GVL_Simulation.refBucket/refWinchM2 ne sont assignés qu'en fin de PRG_06_WinchControl -> au tout
+// premier scan, ces références sont encore invalides. Déréférencer instBucket.xxx sans ce garde
+// provoquait une EXCEPTION RUNTIME CODESYS (accès référence invalide) au démarrage de la simulation.
+IF NOT __ISVALIDREF(instBucket) OR NOT __ISVALIDREF(instWinchM2) THEN
+    Busy := FALSE;
+    RETURN;
+END_IF;
 
 // 2. 📋 TABLES
 IF NOT TableReady THEN
@@ -561,28 +573,28 @@ IF NOT TableReady THEN
 END_IF;
 
 // 3. 📥 ACQUIRE
-ProbeBool[SigHealthyIdle] := NOT PRG_06_WinchControl.instBucket.Error
+ProbeBool[SigHealthyIdle] := NOT instBucket.Error
                              AND NOT _BucketState.StateIncoherent;
 
-ProbeBool[SigBucketBusy]   := PRG_06_WinchControl.instBucket.Busy;
-ProbeBool[SigBucketDone]    := PRG_06_WinchControl.instBucket.Done;
-ProbeBool[SigBucketError]   := PRG_06_WinchControl.instBucket.Error;
-ProbeBool[SigM1SlipDetected] := PRG_06_WinchControl.instBucket.M1SlipDetected;
+ProbeBool[SigBucketBusy]   := instBucket.Busy;
+ProbeBool[SigBucketDone]    := instBucket.Done;
+ProbeBool[SigBucketError]   := instBucket.Error;
+ProbeBool[SigM1SlipDetected] := instBucket.M1SlipDetected;
 ProbeBool[SigM1SafeStop]    := PRG_03_Safety.instSafetyWinchM1.SafeStop;
 ProbeBool[SigM1PowerCutOff] := PRG_03_Safety.instSafetyWinchM1.PowerCutOff;
 ProbeBool[SigBucketIsOpen]  := _BucketState.IsOpen;
 ProbeBool[SigBucketIsClosed] := _BucketState.IsClosed;
-ProbeBool[SigM2StartStop]   := PRG_06_WinchControl.instBucket.M2_StartStop;
-ProbeBool[SigM2ForceSlowSpeed] := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
+ProbeBool[SigM2StartStop]   := instBucket.M2_StartStop;
+ProbeBool[SigM2ForceSlowSpeed] := instBucket.M2_ForceSlowSpeed;
 
-ProbeDint[SigBucketErrorId] := WORD_TO_DINT(PRG_06_WinchControl.instBucket.ErrorId);
-ProbeDint[SigM2Direction]   := INT_TO_DINT(PRG_06_WinchControl.instBucket.M2_Direction);
+ProbeDint[SigBucketErrorId] := WORD_TO_DINT(instBucket.ErrorId);
+ProbeDint[SigM2Direction]   := INT_TO_DINT(instBucket.M2_Direction);
 ProbeDint[SigSafetyM1ErrorId] := WORD_TO_DINT(PRG_03_Safety.instSafetyWinchM1.ErrorId);
 
-ProbeReal[SigActiveOffsetM]   := PRG_06_WinchControl.instBucket.ActiveOffsetM;
-ProbeReal[SigRemainingTravelM] := PRG_06_WinchControl.instBucket.RemainingTravelM;
+ProbeReal[SigActiveOffsetM]   := instBucket.ActiveOffsetM;
+ProbeReal[SigRemainingTravelM] := instBucket.RemainingTravelM;
 ProbeReal[SigM2CablePos]      := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-ProbeReal[SigM2TopLimit]       := PRG_06_WinchControl.instWinchM2.TopLimitM;
+ProbeReal[SigM2TopLimit]       := instWinchM2.TopLimitM;
 
 // 4. ⚙️ MOTEUR
 Sequencer(
@@ -693,11 +705,11 @@ END_CASE;
 
 // Liaison IHM / Métier
 IF Busy THEN
-    PRG_06_WinchControl.instBucket.CmdOpen_IHM := CmdOpen_IHM;
-    PRG_06_WinchControl.instBucket.CmdClose_IHM := CmdClose_IHM;
-    PRG_06_WinchControl.instBucket.JoystickY_StartStop := JoystickY_StartStop;
-    PRG_06_WinchControl.instBucket.JoystickY_Direction := JoystickY_Direction;
-    PRG_06_WinchControl.instBucket.ConfirmOpenPosition := ConfirmOpenPosition;
-    PRG_06_WinchControl.instBucket.HomedM1 := HomedM1;
-    PRG_06_WinchControl.instBucket.InhibitM1 := InhibitM1;
+    instBucket.CmdOpen_IHM := CmdOpen_IHM;
+    instBucket.CmdClose_IHM := CmdClose_IHM;
+    instBucket.JoystickY_StartStop := JoystickY_StartStop;
+    instBucket.JoystickY_Direction := JoystickY_Direction;
+    instBucket.ConfirmOpenPosition := ConfirmOpenPosition;
+    instBucket.HomedM1 := HomedM1;
+    instBucket.InhibitM1 := InhibitM1;
 END_IF;

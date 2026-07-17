@@ -180,6 +180,65 @@ flowchart LR
 
 **Frontière en une phrase** : le moteur ne connaît que des nombres et des booléens ; le métier ne connaît que comment les remplir. Contact unique entre les deux = `VAR_IN_OUT`.
 
+### 📋 7.2bis — Nomenclature TC et Traçabilité (Cloisonnement par Suite)
+
+**Format de nom TC unifié** — tracabilité Méca/Sécurité/Perf en un coup d'œil :
+
+```
+TC-[SUITE]-[NUM]_[TYPE]_[DOMAIN[_DOMAIN...]]
+```
+
+| Composant | Exemple | Rôle |
+|-----------|---------|------|
+| `SUITE` | BUCKET, WINCH, SAFETY, TRANSLATION | Domaine métier propriétaire |
+| `NUM` | 01, 02, 03 | Ordre d'exécution dans la suite (1-indexé) |
+| `TYPE` | MECA, SAFETY, PERF, COMPLIANCE | Catégorie validée |
+| `DOMAIN` | C, E, A_B, REDUNDANCY, LOCKOUT | Référence précise (Méca A/B/C/D/E, fonction sécurité, ou métrique) |
+
+**Exemples** :
+```
+TC-BUCKET-01_MECA_C              → Glissement benne → valide Méca C (détection slip)
+TC-BUCKET-02_MECA_C_E            → Glissement critique → Méca C + E (écart synchro aggravé)
+TC-BUCKET-03_MECA_D              → Capteur haut → Méca D (limite ascension)
+
+TC-WINCH-01_MECA_A_B             → Roue libre + pilotage sans cmd → Méca A/B
+TC-WINCH-02_MECA_E               → Écart synchro critique → Méca E (2.0m seuil)
+
+TC-SAFETY-01_SAFETY_EMERGENCY     → Coupure d'urgence instantanée
+TC-SAFETY-02_SAFETY_REDUNDANCY    → Auto-test redondance canaux
+TC-SAFETY-03_SAFETY_LOCKOUT       → Verrouillage temporel 5s
+
+TC-TRANSLATION-01_PERF_LATENCY    → Réactivité variateur AC600
+```
+
+**Matrice centralisée (à remplir au fur à mesure)** :
+
+| Suite | TC | Type | Domain | Description | Statut |
+|-------|----|----|--------|-------------|--------|
+| BUCKET | TC-BUCKET-01 | MECA | C | Glissement modéré M1 | 🟡 TBD |
+| BUCKET | TC-BUCKET-02 | MECA | C,E | Glissement critique | 🟡 TBD |
+| BUCKET | TC-BUCKET-03 | MECA | D | Capteur haut | 🟡 TBD |
+| WINCH | TC-WINCH-01 | MECA | A,B | Roue libre + pilotage | 🟡 TBD |
+| WINCH | TC-WINCH-02 | MECA | E | Écart synchro critique | 🟡 TBD |
+| SAFETY | TC-SAFETY-01 | SAFETY | EMERGENCY | Coupure urgence | 🟡 TBD |
+| SAFETY | TC-SAFETY-02 | SAFETY | REDUNDANCY | Redondance canaux | 🟡 TBD |
+| SAFETY | TC-SAFETY-03 | SAFETY | LOCKOUT | Verrouillage 5s | 🟡 TBD |
+| TRANSLATION | TC-TRANSLATION-01 | PERF | LATENCY | Réactivité AC600 | 🟡 TBD |
+
+**Avantages** :
+- ✅ Single source of truth = nom TC
+- ✅ Cloisonnement : chaque suite = propriétaire ses TC + domaines validés
+- ✅ Vue d'ensemble : `grep TC-*_MECA_E` = tous les TC validant Méca E
+- ✅ Extensible : TYPE peut être MECA, SAFETY, PERF, COMPLIANCE, etc.
+
+**Règles** :
+- Domaines alphabétiques (A_B_C, jamais C_A_B)
+- Séparateur `_` (jamais `-` au sein de DOMAIN)
+- Chaque suite = responsable ses TC (pas de cross-suite)
+- Matrice = source de vérité ; changer nom TC = MAJ matrice
+
+---
+
 ### 🧱 7.2 Socle générique (candidat bibliothèque CODESYS)
 
 Compile **sans le projet** : aucune référence à `GVL_Simulation`, `GVL_IHM`, `PRG_*`. Bornes par Parameter List côté bibliothèque (redimensionnables au Library Manager) ou `ARRAY[*]` en `VAR_IN_OUT` (à valider une fois sur la version compilateur cible ; repli sans douleur = bornes `GVL_PLC_Tests_Const`).

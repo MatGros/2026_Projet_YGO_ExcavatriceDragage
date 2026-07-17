@@ -221,7 +221,7 @@ ELSE
 END_IF;
 
 // 🧪 Appel de la suite globale de tests de validation automate
-instTestsManagement();
+instTestsManagement(instBucket := GVL_Simulation.refBucket, instWinchM2 := GVL_Simulation.refWinchM2);
 
 // Surcharges (overrides) demandées par le banc de tests automatique
 IF GVL_PLC_Tests.OverrideChainTrue THEN

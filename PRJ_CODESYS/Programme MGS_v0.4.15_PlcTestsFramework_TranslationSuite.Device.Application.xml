@@ -77,37 +77,35 @@
       <UserDefElement iecname="Error" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="18" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
-    <TypeUserDef name="T_ST_IHM_MANU" size="46" nativesize="48" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_IHM_MANU">
+    <TypeUserDef name="T_ST_IHM_MANU" size="42" nativesize="44" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_IHM_MANU">
       <UserDefElement iecname="ModeDisable" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="JoystickSelect" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="JoystickWinchSelect" type="T_INT" byteoffset="2" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="PositionM_M1" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="M1_RelayFwd" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="M1_RelayRev" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="HomingEncoder_M1" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="PositionM_M2" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="M2_RelayFwd" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
       <UserDefElement iecname="M2_RelayRev" type="T_BOOL" byteoffset="17" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="HomingEncoder_M2" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_RelayFwd" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_RelayRev" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor1" type="T_BOOL" byteoffset="21" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor2" type="T_BOOL" byteoffset="22" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor3" type="T_BOOL" byteoffset="23" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="M1_M2_Contactor4" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="GridOpenCmd" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="GridCloseCmd" type="T_BOOL" byteoffset="26" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="HelmetOpenCmd" type="T_BOOL" byteoffset="27" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="HelmetCloseCmd" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="FdcBucketOpenEnable" type="T_BOOL" byteoffset="29" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="FdcBucketCloseEnable" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="FdcBucketOpen" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="FdcBucketClose" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="BenneDelta" type="T_REAL" byteoffset="36" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="FdcBucketOpenActive" type="T_BOOL" byteoffset="40" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="FdcBucketCloseActive" type="T_BOOL" byteoffset="41" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="WinchMaxStepFwd" type="T_INT" byteoffset="42" vartype="VAR" access="ReadWrite" />
-      <UserDefElement iecname="WinchMaxStepRev" type="T_INT" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_RelayFwd" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_RelayRev" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor1" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor2" type="T_BOOL" byteoffset="21" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor3" type="T_BOOL" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_Contactor4" type="T_BOOL" byteoffset="23" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="GridOpenCmd" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="GridCloseCmd" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HelmetOpenCmd" type="T_BOOL" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HelmetCloseCmd" type="T_BOOL" byteoffset="27" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcBucketOpenEnable" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcBucketCloseEnable" type="T_BOOL" byteoffset="29" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcBucketOpen" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcBucketClose" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BenneDelta" type="T_REAL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcBucketOpenActive" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FdcBucketCloseActive" type="T_BOOL" byteoffset="37" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchMaxStepFwd" type="T_INT" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchMaxStepRev" type="T_INT" byteoffset="40" vartype="VAR" access="ReadWrite" />
     </TypeUserDef>
     <TypeUserDef name="T_ST_BucketHMI" size="65" nativesize="72" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketHMI">
       <UserDefElement iecname="Config" type="T_ST_BucketConfig" byteoffset="0" vartype="VAR" access="ReadWrite" />

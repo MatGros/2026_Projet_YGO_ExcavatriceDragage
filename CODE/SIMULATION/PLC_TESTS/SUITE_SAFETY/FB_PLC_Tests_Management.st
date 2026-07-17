@@ -1,4 +1,8 @@
 FUNCTION_BLOCK PUBLIC FB_PLC_Tests_Management
+VAR_INPUT
+    instBucket                : REFERENCE TO FB_Bucket;     // 🆕 Instance benne (pour FB_BucketValidation)
+    instWinchM2               : REFERENCE TO FB_Winch;      // 🆕 Instance treuil M2 (pour FB_BucketValidation)
+END_VAR
 VAR
     // 🧱 Instances de test (1 par suite — ajouter une suite = 1 instance + 1 branche CASE,
     // voir AF_Partie-14 §7.3.4)
@@ -302,7 +306,7 @@ END_CASE;
 // 3. Appel des instances de suites
 instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
 instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, FirstStepId := FirstStepTranslation);
-instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket);
+instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
