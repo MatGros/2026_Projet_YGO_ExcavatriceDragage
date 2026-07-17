@@ -19,7 +19,7 @@
 > relais de sens et de vitesse, avec séquence frein. Premier lot testable en **Maintenance N1**,
 > treuil **M1 seul**, **sans dépendance codeur**.
 > **Cible** : CODESYS 3.5 — application **manuelle** par l'utilisateur.
-> 🔗 Dépend de : [P2 Architecture v2.11](AF_Partie-02_Architecture_Programme_v2.11.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.3](AF_Partie-04_Cycle_Sequenceur_v1.3.md) §3bis/§4, [P5 Modes v1.6](AF_Partie-05_Modes_Maintenance_v1.6.md), [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md).
+> 🔗 Dépend de : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.4](AF_Partie-04_Cycle_Sequenceur_v1.4.md) §3bis/§4, [P5 Modes v1.6](AF_Partie-05_Modes_Maintenance_v1.6.md), [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md).
 >
 > 🆕 **v1.8 (2026-07-08)** — Lot #9-18 : Alignment and clarifications on independent cable limit descent (M1 and M2 cable limits are fully independent, using dedicated GVL_PERSISTENT and HMI variables).
 > 🆕 **v1.7 (2026-07-08)** — Lot #9-17 : Inhibition treuils, HomingApproachEnable, Méca B étendu, Méca D et refactoring Méca A/C :

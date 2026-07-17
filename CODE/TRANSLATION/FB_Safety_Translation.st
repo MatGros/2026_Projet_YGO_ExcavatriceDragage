@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.7.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -28,13 +28,14 @@ VAR_INPUT
     Direction           : INT;         // Direction commandée
     LimitSwitchFwd      : BOOL;        // Fin de course extrême avant
     LimitSwitchRev      : BOOL;        // Fin de course extrême arrière
+    SensorWordIncoherent: BOOL;        // 🆕 REX 2026-07-18 : mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint
+    ErrorId             : WORD;        // bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Décélération rapide (PLC)
@@ -46,6 +47,7 @@ VAR_OUTPUT
     ErrorMecaB          : BOOL;        // 🛑 Absence confirmation arrêt (Méca B - bit4)
     ErrorMecaA          : BOOL;        // 🔄 Mouvement non commandé (Méca A - bit5)
     ErrorLimitSwitch    : BOOL;        // 🚧 Limite extrême Translation atteinte (bit6)
+    ErrorSensorIncoherent: BOOL;       // 🧭 Incohérence mot capteurs position (bit7)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -72,6 +74,7 @@ IF NOT Enable THEN
     ErrorMecaB := FALSE;
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
+    ErrorSensorIncoherent := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     State := E_State.DISABLED;
@@ -150,6 +153,17 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
+// 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
+// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — toute combinaison des 5
+// capteurs Trémie/PV/P2/P1/Maintenance hors des 6 mots valides (progression monotone) signale
+// un capteur collé/HS ou un défaut mécanique : escalade SafeStop + PowerCutOff, même traitement
+// que Méca A/B (défense en profondeur, décision utilisateur).
+IF SensorWordIncoherent THEN
+    ErrorId := ErrorId OR 16#0080;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FF7F;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
@@ -160,8 +174,9 @@ END_IF;
 SafeStop := Error OR NOT EmergencyStopOk;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
-// mouvement non commandé (bit5), ou dépassement de fin de course (bit6)
-PowerCutOff := (ErrorId AND 16#0078) <> 16#0000;
+// mouvement non commandé (bit5), dépassement de fin de course (bit6),
+// ou incohérence mot capteurs position (bit7)
+PowerCutOff := (ErrorId AND 16#00F8) <> 16#0000;
 
 // Décapsulage du bitfield ErrorId pour l'IHM
 ErrorJoystick       := (ErrorId AND 16#0001) <> 16#0000;
@@ -171,6 +186,7 @@ ErrorBrakeThermal   := (ErrorId AND 16#0008) <> 16#0000;
 ErrorMecaB          := (ErrorId AND 16#0010) <> 16#0000;
 ErrorMecaA          := (ErrorId AND 16#0020) <> 16#0000;
 ErrorLimitSwitch    := (ErrorId AND 16#0040) <> 16#0000;
+ErrorSensorIncoherent := (ErrorId AND 16#0080) <> 16#0000;
 
 Busy := FALSE;
 Done := FALSE;

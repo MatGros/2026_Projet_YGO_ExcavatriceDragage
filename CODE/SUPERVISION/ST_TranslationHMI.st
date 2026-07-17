@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Migration des champs manuels ex-ST_IHM_MANU (étape en cours, pas l'état final) —
-      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.7.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationHMI :
 STRUCT
@@ -42,5 +42,6 @@ STRUCT
     SafetyErrorMecaB        : BOOL;    (* 🛑 Absence confirmation arrêt (Méca B - bit4) *)
     SafetyErrorMecaA        : BOOL;    (* 🔄 Mouvement non commandé (Méca A - bit5) *)
     SafetyErrorLimitSwitch  : BOOL;    (* 🚧 Limite extrême Translation atteinte (bit6) *)
+    SafetyErrorSensorIncoherent : BOOL; (* 🧭 Mot capteurs M3 incohérent (bit7) *)
 END_STRUCT
 END_TYPE

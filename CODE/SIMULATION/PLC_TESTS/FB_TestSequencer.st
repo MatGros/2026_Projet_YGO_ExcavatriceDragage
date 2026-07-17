@@ -21,6 +21,9 @@ VAR_OUTPUT
     ConfigError         : BOOL;      // 🔒 Table invalide -> refus de lancer
     ConfigErrorStepId   : INT;
     ConfigErrorCheckIdx : INT;
+    TerminalState       : E_TestTerminalState;
+    ErrorCode           : INT;
+    ErrorMessage        : STRING(160);
     CurrentStepId       : INT;
     ActiveStimulusId    : INT;       // ⚡ consommé par le domaine
     StepElapsed         : TIME;      // Pour l'IHM
@@ -73,6 +76,17 @@ IF StartTrig.Q THEN
     ConfigError := FALSE;
     ConfigErrorStepId := 0;
     ConfigErrorCheckIdx := 0;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    ErrorCode := 0;
+    ErrorMessage := '';
+
+    // 🛡️ Un démarrage invalide est terminal, jamais silencieux.
+    IF FirstStepId < 1 OR FirstStepId > GVL_PLC_Tests_Const.MaxSteps THEN
+        ConfigError := TRUE;
+        ConfigErrorStepId := FirstStepId;
+        ErrorCode := 1001;
+        ErrorMessage := 'FirstStepId hors limites';
+    END_IF;
     
     // Validation des étapes
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
@@ -130,8 +144,28 @@ IF StartTrig.Q THEN
         END_IF;
     END_FOR;
     
-    // Si erreur de config, on bloque le démarrage
+    // 🛡️ ConfigError doit toujours produire Done + un état terminal.
     IF ConfigError THEN
+        Busy := FALSE;
+        Done := TRUE;
+        AnyFailed := TRUE;
+        ActiveStimulusId := 0;
+        CurrentStepId := 0;
+        StepElapsed := T#0s;
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+        Report.InProgress := FALSE;
+        Report.RunCounter := Report.RunCounter + 1;
+        Report.AllPassed := FALSE;
+        Report.AnyFailed := TRUE;
+        Report.Aborted := FALSE;
+        Report.TerminalState := TerminalState;
+        IF ErrorCode = 0 THEN
+            ErrorCode := 1002;
+            ErrorMessage := 'Table de test invalide';
+        END_IF;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        Report.FailureSummary := CONCAT('CONFIG_ERROR step ', INT_TO_STRING(ConfigErrorStepId));
         RETURN;
     END_IF;
 END_IF;
@@ -160,6 +194,8 @@ IF Abort THEN
         Busy := FALSE;
         Done := TRUE;
         AnyFailed := TRUE;
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+        Report.TerminalState := TerminalState;
     END_IF;
     ActiveStimulusId := 0;
     StepStarted := FALSE;
@@ -179,6 +215,9 @@ IF StartTrig.Q AND NOT ConfigError THEN
     Report.AllPassed := FALSE;
     Report.AnyFailed := FALSE;
     Report.Aborted := FALSE;
+    Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    Report.ErrorCode := 0;
+    Report.ErrorMessage := '';
     Report.FailedTestCase := 0;
     Report.CurrentStepId := FirstStepId;
     IF CurrentStepId >= 1 AND CurrentStepId <= GVL_PLC_Tests_Const.MaxSteps THEN
@@ -221,8 +260,19 @@ IF Busy THEN
     IF CurrentStepId <> 0 AND (CurrentStepId < 1 OR CurrentStepId > GVL_PLC_Tests_Const.MaxSteps) THEN
         Busy := FALSE;
         Done := TRUE;
+        AnyFailed := TRUE;
         ActiveStimulusId := 0;
+        ConfigError := TRUE;
+        ConfigErrorStepId := CurrentStepId;
+        ErrorCode := 1003;
+        ErrorMessage := 'Etape courante hors limites';
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
         Report.InProgress := FALSE;
+        Report.AnyFailed := TRUE;
+        Report.TerminalState := TerminalState;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        Report.FailureSummary := ErrorMessage;
         RETURN;
     END_IF;
     
@@ -512,6 +562,14 @@ IF Busy AND CurrentStepId = 0 THEN
     Report.AnyFailed := NOT SuiteAllPassed;
     Report.FailedTestCase := FirstFailedCase;
     AnyFailed := NOT SuiteAllPassed;
+    IF SuiteAllPassed THEN
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_DONE;
+    ELSE
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_FAILED;
+    END_IF;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := ErrorCode;
+    Report.ErrorMessage := ErrorMessage;
 
     // 🏷️ Résumé texte de TOUS les cas en échec (pas juste le premier) — évite de
     // parcourir Cases[] un par un en Watch (demande utilisateur 2026-07-16)

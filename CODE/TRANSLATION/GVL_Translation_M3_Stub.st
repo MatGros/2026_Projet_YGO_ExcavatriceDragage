@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Translation_M3_Stub — Variables STUB M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie11_Fonction_Translation_v1.2.md §7
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md §7
    🔧 CORRECTIF (2026-07-03) : réintégration de M3_RelayFwd/Rev/SpeedGv,
       M3_ContactorFeedbackFwd/Rev, M3_DriveFaultFeedback,
       M3_PositionSensorTarget — retirés par erreur le 2026-07-03
@@ -14,7 +14,12 @@
    ═══════════════════════════════════════════════════════════════ *)
 
 VAR_GLOBAL
-    StubTranslationPositionSelect_IHM : INT := 0;   // 🖥️ Sélecteur test maintenance (0=Aucun, 1=Fosse1, 2=Fosse2, 3=Maintenance, 4=Trémie)
+    // 🔌 Nouvelle entrée physique PV à mapper dans CODESYS.
+    PosPV_DI : BOOL;
+
+    // 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
+    // Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).
+    StubTranslationPositionSelect_IHM : INT := 0;   // 🖥️ Sélecteur test maintenance (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
 
     M3_RelayFwd              : BOOL;   // 🔌 Sortie — contacteur sens avant M3 (STUB, DEGRADED_IO)
     M3_RelayRev              : BOOL;   // 🔌 Sortie — contacteur sens arrière M3 (STUB, DEGRADED_IO)

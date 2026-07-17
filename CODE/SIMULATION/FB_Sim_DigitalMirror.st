@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_DigitalMirror — Miroir commande→retour temporisé (contacteur simulé)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie13_Fonction_Simulation_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
    🧩 Brique réduite (Partie3 §1bis), générique et réutilisable — outil de banc.
    🎯 Rôle : simule un retour de contacteur réaliste (délai mécanique de
       fermeture/ouverture), au lieu d'un miroir "idéal" instantané. Utilisée pour

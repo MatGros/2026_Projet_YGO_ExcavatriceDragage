@@ -21,6 +21,12 @@ VAR_OUTPUT
     ActiveStimulusId           : INT;
     StepElapsed                : TIME;
     Report                     : ST_TestSuiteReport;
+    TerminalState              : E_TestTerminalState;
+    ConfigError                : BOOL;
+    ConfigErrorStepId          : INT;
+    ConfigErrorCheckIdx        : INT;
+    ErrorCode                  : INT;
+    ErrorMessage               : STRING(160);
 END_VAR
 VAR CONSTANT
     // 🏷️ Index des sondes (Sémantique AF P14 §7.2)
@@ -612,6 +618,12 @@ Sequencer(
     Busy => Busy,
     Done => Done,
     AnyFailed => AnyFailed,
+    TerminalState => TerminalState,
+    ConfigError => ConfigError,
+    ConfigErrorStepId => ConfigErrorStepId,
+    ConfigErrorCheckIdx => ConfigErrorCheckIdx,
+    ErrorCode => ErrorCode,
+    ErrorMessage => ErrorMessage,
     ActiveStimulusId => ActiveStimulusId,
     StepElapsed => StepElapsed
 );

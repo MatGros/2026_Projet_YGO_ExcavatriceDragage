@@ -165,10 +165,15 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // review code), le cycle auto pouvait aggraver un écart mineur sans aucune protection quand
     // SyncSoftStopEnable=TRUE. Ajouté ici, symétrique à la branche manuelle ci-dessous.
     M1_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM1_Direction;
+    // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
+    // nouvelle sollicitation valide = reprise à l'étape courante.
     M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop
+                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
-    M1_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
+    M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
+                               ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
 ELSIF PRG_10_Outputs.ManuActive THEN
     // 🆕 REX 2026-07-15 (2) — IHM_MANU pilote désormais M1 via FB_Winch (au lieu de l'ex-bypass
     // direct dans PRG_10_Outputs) : récupère gratuitement la rampe accel/décel + le ralentissement
@@ -221,10 +226,15 @@ ELSE
         // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche, ajouté
         // symétrique à la branche manuelle ci-dessous (signe M2, voir note ci-dessous).
         M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
+        // 🛡️ Même garde homme-mort que M1 : le cycle ne poursuit jamais un mouvement
+        // après relâchement du joystick.
         M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop
+                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
-        M2_SpeedRef_Active  := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
+        M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
+                                   ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
     ELSIF PRG_10_Outputs.ManuActive THEN
         // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course benne (FdcBucket) appliquées
         // au pilotage INDIVIDUEL **ET** COUPLÉ de M2 désormais (demande utilisateur — "que ce soit

@@ -8,7 +8,7 @@
 {attribute 'qualified_only'}
 VAR_GLOBAL CONSTANT
     MaxTestCases     : INT := 8;    // par suite
-    MaxSteps         : INT := 64;   // par suite, table PLATE
+    MaxSteps         : INT := 64;   // par suite, table PLATE ; tous les StepId doivent rester <= 64
     MaxChecks        : INT := 64;   // CheckTable par suite
     MaxChecksPerStep : INT := 4;
     MaxInvariants    : INT := 4;    // actifs en parallèle
@@ -18,6 +18,8 @@ VAR_GLOBAL CONSTANT
     MaxAnalogStims   : INT := 4;    // instances FB_TestStimulus par suite
     MaxSeqValues     : INT := 8;    // plus gros poste mémoire par stim
     TaskCycleMs      : INT := 10;   // MainTask — base des mesures en cycles
+    MaxSuiteDurationMs : DINT := 180000; // 🛡️ garde-fou orchestrateur : 3 min maximum par suite
+    MaxTestEvents    : INT := 32;   // journal circulaire des événements
     SuiteSafety      : INT := 1;    // index de suite (Cmd.RunSuite)
     SuiteTranslation : INT := 2;    // index de suite Translation M3 (Cmd.RunSuite)
     SuiteBucket      : INT := 3;    // index de suite Bucket (Cmd.RunSuite)

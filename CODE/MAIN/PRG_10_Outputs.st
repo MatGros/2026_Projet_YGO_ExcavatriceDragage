@@ -295,48 +295,19 @@ IF ManuActive THEN
     // propre state machine. Plus besoin d'interlock local ici (même principe que M1/M2, REX
     // 2026-07-15 (2) ci-dessus).
 
-    // 8️⃣ Auxiliaires Hydrauliques (action maintenue IHM + interlock logique d'exclusion mutuelle)
-    IF GVL_IHM.IHM_MANU.GridOpenCmd AND NOT GVL_IHM.IHM_MANU.GridCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := TRUE;
-        GridDown_RQ := FALSE;
-    ELSIF GVL_IHM.IHM_MANU.GridCloseCmd AND NOT GVL_IHM.IHM_MANU.GridOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        GridUp_RQ := FALSE;
-        GridDown_RQ := TRUE;
-    ELSE
-        GridUp_RQ := FALSE;
-        GridDown_RQ := FALSE;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.HelmetOpenCmd AND NOT GVL_IHM.IHM_MANU.HelmetCloseCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := TRUE;
-        HelmetClose_RQ := FALSE;
-    ELSIF GVL_IHM.IHM_MANU.HelmetCloseCmd AND NOT GVL_IHM.IHM_MANU.HelmetOpenCmd AND PRG_00_Inputs.EmergencyStopOk THEN
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := TRUE;
-    ELSE
-        HelmetOpen_RQ := FALSE;
-        HelmetClose_RQ := FALSE;
-    END_IF;
-
-    // Démarrage automatique du groupe hydraulique si un mouvement auxiliaire est demandé et AU armé
-    PRG_08_AuxiliaryControl.HydraulicPumpRunCmd := (GVL_IHM.IHM_MANU.GridOpenCmd 
-                                                 OR GVL_IHM.IHM_MANU.GridCloseCmd 
-                                                 OR GVL_IHM.IHM_MANU.HelmetOpenCmd 
-                                                 OR GVL_IHM.IHM_MANU.HelmetCloseCmd)
-                                                 AND PRG_00_Inputs.EmergencyStopOk;
-
     // 🔧 REX 2026-07-15 (2) : plus de recopie M1/M2 ici — déjà écrites par PRG_06_WinchControl §8
     // (instWinchM1/instWinchM2.RelayFwd/RelayRev/Contactor1-4/BrakeCmd), AVANT ce PRG_10_Outputs
     // dans l'ordre de tâche (position 6 < 10), pour Auto ET Manu désormais.
     // 🔧 REX 2026-07-16 : idem pour TranslationBrakeCmd — plus de recopie ici, déjà écrite par
     // PRG_07_TranslationControl (instTranslationM3.BrakeCmd), AVANT ce PRG_10_Outputs (position
     // 7 < 10), pour Auto ET Manu désormais (voir fin de fichier).
-ELSE
-    // Nettoyage en cas de désactivation du mode Manu
-    GridUp_RQ := FALSE;
-    GridDown_RQ := FALSE;
-    HelmetOpen_RQ := FALSE;
-    HelmetClose_RQ := FALSE;
+
+    // 🔧 REX 2026-07-18 : ex-§8️⃣ Auxiliaires Hydrauliques (GridUp_RQ/GridDown_RQ/HelmetOpen_RQ/
+    // HelmetClose_RQ/HydraulicPumpRunCmd) RETIRÉ — décision client (AF_Partie-02 v2.12 "Rôle de
+    // chaque programme" §PRG_08) : le PLC ne pilote plus casque/grille/centrale hydraulique.
+    // GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd retirés de ST_IHM_MANU. Les sorties
+    // physiques GridUp_RQ/GridDown_RQ/HelmetOpen_RQ/HelmetClose_RQ ne sont plus écrites nulle part
+    // (restent FALSE) — aucune commande automate ne pilote plus ces équipements.
 END_IF;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──

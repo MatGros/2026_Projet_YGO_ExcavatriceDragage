@@ -19,16 +19,16 @@ VAR_INPUT
     // Cibles et paramètres
     TargetDepthM        : REAL;         // Profondeur de consigne (négative)
     TargetOffsetM       : REAL;         // Écart de fermeture benne cible
-    SelectedTargetNum_IHM : INT;        // Cible sélectionnée (1=Fosse1, 2=Fosse2)
+    SelectedTargetNum_IHM : INT;        // Cible sélectionnée (2=P2, 3=P1 — 🆕 REX 2026-07-18, ex-1=Fosse1/2=Fosse2, voir AF_Partie-02 v2.12 §3bis)
 
     // Feedbacks physique & matériel
     BottomTouched       : BOOL;         // Capteur mou de câble / fond touché
     M1_CablePosM        : REAL;         // Position câble treuil M1 (recalée)
     M2_CablePosM        : REAL;         // Position câble treuil M2 (recalée)
 
-    // Feedbacks Translation M3
-    Translation_At_Fosse1   : BOOL;         // Capteur fin de course fosse 1
-    Translation_At_Fosse2   : BOOL;         // Capteur fin de course fosse 2
+    // Feedbacks Translation M3 — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
+    Translation_At_P1       : BOOL;         // Capteur position P1 (ex-Fosse1)
+    Translation_At_P2       : BOOL;         // Capteur position P2 (ex-Fosse2)
     Translation_At_Maintenance : BOOL;      // Capteur fin de course maintenance
     Translation_At_Tremie   : BOOL;         // Capteur fin de course trémie
     Translation_Busy        : BOOL;         // Mouvement translation en cours
@@ -86,7 +86,7 @@ VAR
     TouchPositionM      : REAL;         // Position M1 mémorisée lors du contact fond
     RaiseTargetM        : REAL;         // Profondeur de remontée mémorisée
     DrainingTimer       : TON;          // Temporisateur de vidage (égouttage)
-    SelectedWorkTarget  : INT;          // Cible de travail mémorisée pour le retour (1 ou 2)
+    SelectedWorkTarget  : INT;          // Cible de travail mémorisée pour le retour (2=P2 ou 3=P1 — 🆕 REX 2026-07-18)
     
     // Paramètres internes
     CtrlAscentDistM     : REAL := 2.0;  // Distance de remontée lente de contrôle
@@ -167,15 +167,16 @@ CASE State OF
         CycleStateStr := 'SÉLECTION POSITION TRAVAIL (FOSSE 1 / 2)';
         Busy := TRUE;
 
-        // Choix cible
-        IF SelectedTargetNum_IHM = 1 OR SelectedTargetNum_IHM = 2 THEN
+        // Choix cible — 🆕 REX 2026-07-18 : zone de travail = P2/P1 (cibles 2/3), ex-Fosse1/Fosse2
+        // (cibles 1/2), suite au remap 5 positions Trémie(1)/P2(2)/P1(3)/Maintenance(4)
+        IF SelectedTargetNum_IHM = 2 OR SelectedTargetNum_IHM = 3 THEN
             SelectedWorkTarget := SelectedTargetNum_IHM;
             CmdTranslationM3_Target := SelectedWorkTarget;
             CmdTranslationM3_Start := TRUE;
-            
+
             // Attente positionnement translation
-            IF (SelectedWorkTarget = 1 AND Translation_At_Fosse1) 
-               OR (SelectedWorkTarget = 2 AND Translation_At_Fosse2) THEN
+            IF (SelectedWorkTarget = 2 AND Translation_At_P2)
+               OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
                 CmdTranslationM3_Start := FALSE;
                 State := E_CycleStep.DESCENDING_OPEN;
             END_IF;
@@ -281,7 +282,7 @@ CASE State OF
         CycleStep := E_CycleStep.TRANSLATION_MOVE;
         CycleStateStr := 'DÉPLACEMENT VERS TRÉMIE DE VIDANGE';
 
-        CmdTranslationM3_Target := 4; // Trémie
+        CmdTranslationM3_Target := 1; // Trémie — 🆕 REX 2026-07-18 : ex-4, remap 5 positions (AF_Partie-02 v2.12 §3bis)
         CmdTranslationM3_Start := TRUE;
 
         // Transition si translation arrivé à la trémie
@@ -310,9 +311,9 @@ CASE State OF
         CmdTranslationM3_Target := SelectedWorkTarget;
         CmdTranslationM3_Start := TRUE;
 
-        // Transition si translation de retour sur sa fosse
-        IF (SelectedWorkTarget = 1 AND Translation_At_Fosse1) 
-           OR (SelectedWorkTarget = 2 AND Translation_At_Fosse2) THEN
+        // Transition si translation de retour sur sa position de travail
+        IF (SelectedWorkTarget = 2 AND Translation_At_P2)
+           OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
             CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.READY;
         END_IF;

@@ -21,5 +21,7 @@ STRUCT
     HomingApproachEnableRequest    : BOOL; (* 🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser
                                           l'arrêt normal haut pour approcher le capteur physique (préparation
                                           homing) — voir FB_Modes.HomingApproachEnable, commun M1/M2 *)
+    HydraulicThermalFault     : BOOL; (* 🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique
+                                          (PRG_08_AuxiliaryControl, diagnostic seul — aucune commande PLC) *)
 END_STRUCT
 END_TYPE

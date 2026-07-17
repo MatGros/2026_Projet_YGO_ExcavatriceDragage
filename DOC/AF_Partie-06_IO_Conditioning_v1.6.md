@@ -15,7 +15,7 @@
 > autre changement vs v1.3.
 >
 > 📌 **v1.3 (2026-07-04)** — Alignement sur le modèle « Programmes ST Autonomes »
-> ([Partie2 v2.11](AF_Partie-02_Architecture_Programme_v2.11.md)) : `GVL_IN`/`GVL_OUT` et les FB
+> ([Partie2 v2.12](AF_Partie-02_Architecture_Programme_v2.12.md)) : `GVL_IN`/`GVL_OUT` et les FB
 > composites `FB_InputsMachine`/`FB_OutputsMachine` **ont disparu**, remplacés par deux
 > `PROGRAM` numérotés — `PRG_0_Inputs` (position 0, `VAR_OUTPUT`) et `PRG_10_Outputs`
 > (position 10, `VAR_INPUT`). Le principe de brique (`FB_Input`/`FB_Output`) et leur
@@ -29,7 +29,7 @@
 > physique M3 inchangé). Historique GVL_IN/GVL_OUT/FB_InputsMachine/FB_OutputsMachine
 > (2026-07-03 et antérieur) **périmé** — voir Archives.
 >
-> 🔗 Dépend de : [Partie 2 v2.11](AF_Partie-02_Architecture_Programme_v2.11.md) (architecture), Partie 3 v1.3 (contrat FB, §1bis interface réduite).
+> 🔗 Dépend de : [Partie 2 v2.12](AF_Partie-02_Architecture_Programme_v2.12.md) (architecture), Partie 3 v1.3 (contrat FB, §1bis interface réduite).
 
 ---
 

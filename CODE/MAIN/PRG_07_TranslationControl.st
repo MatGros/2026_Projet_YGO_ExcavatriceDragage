@@ -8,6 +8,7 @@
 PROGRAM PRG_07_TranslationControl
 VAR
     instTranslationM3           : FB_Translation;
+    instPositionDecoder         : FB_Translation_PositionDecoder; // 🆕 REX 2026-07-18 : décodage mot 5 capteurs (AF_Partie-02 v2.12 §3bis)
 
     // Commandes arbitrées après sélection Manuel/Auto
     M3_StartStop_Active     : BOOL;
@@ -15,7 +16,8 @@ VAR
     M3_SpeedRef_Active      : REAL;
     M3_PositionSensorTarget : BOOL;
 
-    // Target active (HMI en manuel, instCycle en auto)
+    // Target active (HMI en manuel, instCycle en auto) — 0=Aucun, 1=Trémie, 2=P2, 3=P1,
+    // 4=Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).
     SelectedTargetNum       : INT;
 
     // 🆕 REX 2026-07-16 : IHM_MANU comme 3ᵉ source d'arbitrage (voir §1bis ci-dessous)
@@ -24,17 +26,34 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
 
+// ── 0. DÉCODAGE MOT CAPTEURS (5 positions, indépendant du mode/de la cible) ─
+// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — remplace le câblage direct
+// des anciens capteurs Fosse1/Tremie sur LimitSwitchFwd/Rev par un décodage complet du mot
+// 5 bits (Trémie|PV|P2|P1|Maintenance), avec détection d'incohérence (capteur collé/HS).
+instPositionDecoder(
+    SensorTremie      := PRG_00_Inputs.TranslationPosTremie,
+    SensorPV          := PRG_00_Inputs.TranslationPosPV,
+    SensorP2          := PRG_00_Inputs.TranslationPosP2,
+    SensorP1          := PRG_00_Inputs.TranslationPosP1,
+    SensorMaintenance := PRG_00_Inputs.TranslationPosMaintenance
+);
+
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
     SelectedTargetNum    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
-    M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start;
-    M3_SpeedRef_Active   := 40.0; // Vitesse de translation automatique nominale (40%)
+    // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
+    // nouvelle sollicitation valide = reprise à l'étape courante.
+    M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
+                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
+    M3_SpeedRef_Active   := MIN(40.0,
+                                ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef));
 
     // Détermination automatique du sens de marche selon la cible :
-    // - Trémie (cible 4) = Marche Avant (Direction := 1)
-    // - Fosses (cible 1 et 2) = Marche Arrière (Direction := -1)
-    IF SelectedTargetNum = 4 THEN
+    // - Trémie (cible 1) = Marche Avant (Direction := 1)
+    // - P2/P1/Maintenance (cibles 2/3/4) = Marche Arrière (Direction := -1)
+    IF SelectedTargetNum = 1 THEN
         M3_Direction_Active := 1;
     ELSE
         M3_Direction_Active := -1;
@@ -77,12 +96,18 @@ ELSE
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
 END_IF;
 
-// Câblage du capteur de butée de la cible sélectionnée
+// 🆕 REX 2026-07-18 : cible Maintenance (4) bloquée hors MAINT_N2 (AF_Partie-02 v2.12 §3bis) —
+// arbitrage centralisé dans FB_Modes (aucun re-test de Mode ici), refuse toute cible si interdite.
+IF (SelectedTargetNum = 4) AND NOT PRG_04_Modes.instModes.MaintenanceM3TargetEnable THEN
+    SelectedTargetNum := 0;
+END_IF;
+
+// Câblage du capteur de butée de la cible sélectionnée (PV exclu : jamais une cible d'arrêt)
 CASE SelectedTargetNum OF
-    1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosFosse1;
-    2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosFosse2;
-    3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosMaintenance;
-    4: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
+    1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
+    2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP2;
+    3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP1;
+    4: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosMaintenance;
 ELSE
     M3_PositionSensorTarget := FALSE;   // Aucun capteur visé
 END_CASE;
@@ -98,8 +123,9 @@ instTranslationM3(
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    LimitSwitchFwd          := PRG_00_Inputs.TranslationPosTremie,
-    LimitSwitchRev          := PRG_00_Inputs.TranslationPosFosse1,
+    SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
+    LimitSwitchFwd          := instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
+    LimitSwitchRev          := instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),

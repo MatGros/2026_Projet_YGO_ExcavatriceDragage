@@ -12,6 +12,12 @@ VAR_OUTPUT
     ActiveStimulusId           : INT;
     StepElapsed                : TIME;
     Report                     : ST_TestSuiteReport;
+    TerminalState              : E_TestTerminalState;
+    ConfigError                : BOOL;
+    ConfigErrorStepId          : INT;
+    ConfigErrorCheckIdx        : INT;
+    ErrorCode                  : INT;
+    ErrorMessage               : STRING(160);
 END_VAR
 VAR CONSTANT
     // 🏷️ Index des sondes
@@ -153,8 +159,13 @@ IF NOT TableReady THEN
     CheckTable[5].ExpectedBool := TRUE;
 
     // Chk 6: Coupure franche (PowerCutOff = TRUE)
+    // 🔧 REX 2026-07-17 : CHECK_INSTANT n'évalue qu'une fois, au front montant d'Evaluate
+    // (voir FB_TestCheck.st) -- soit le tout 1er scan de l'étape Trip, AVANT que PRG_00_Inputs
+    // applique le override OverrideContactorFalse (appliqué APRÈS l'appel instTestsManagement()
+    // dans PRG_00_Inputs.st). Le check voyait donc systématiquement la valeur d'avant le trigger.
+    // CHECK_WAIT_UNTIL retente chaque scan -> tolère ce décalage d'1 scan structurel.
     CheckTable[6].Kind := E_TestCheckKind.BOOL_EQUAL;
-    CheckTable[6].Mode := E_TestCheckMode.CHECK_INSTANT;
+    CheckTable[6].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
     CheckTable[6].ProbeIdx := SigPowerCutOffAny;
     CheckTable[6].ExpectedBool := TRUE;
 
@@ -445,6 +456,12 @@ Sequencer(
     Busy => Busy,
     Done => Done,
     AnyFailed => AnyFailed,
+    TerminalState => TerminalState,
+    ConfigError => ConfigError,
+    ConfigErrorStepId => ConfigErrorStepId,
+    ConfigErrorCheckIdx => ConfigErrorCheckIdx,
+    ErrorCode => ErrorCode,
+    ErrorMessage => ErrorMessage,
     ActiveStimulusId => ActiveStimulusId,
     StepElapsed => StepElapsed
 );

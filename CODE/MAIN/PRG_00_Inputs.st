@@ -40,10 +40,15 @@ VAR_OUTPUT
     M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴
 
     // ── ↔️ TRANSLATION M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
-    TranslationPosFosse1      : BOOL;  // 📍 Position fosse 1 (NO) : TRUE=translation en fosse 1 ✅ | FALSE=absent
-    TranslationPosFosse2      : BOOL;  // 📍 Position fosse 2 (NO) : TRUE=translation en fosse 2 ✅ | FALSE=absent
-    TranslationPosMaintenance : BOOL;  // 🔧 Position maintenance (NO) : TRUE=en position service ✅ | FALSE=absent
-    TranslationPosTremie      : BOOL;  // 🗑️ Position trémie vidange (NO) : TRUE=en position trémie ✅ | FALSE=absent
+    // 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
+    // Maintenance (ex-Fosse1/Fosse2/Maintenance/Trémie, 4 capteurs). PV=pré-ralentissement avant
+    // Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translation_PositionDecoder
+    // (PRG_07_TranslationControl).
+    TranslationPosTremie      : BOOL;  // 🗑️ Position trémie vidange (NO), extrême gauche : TRUE=en position trémie ✅ | FALSE=absent
+    TranslationPosPV          : BOOL;  // 🐢 Pré-ralentissement (Point de Vitesse) avant Trémie (NO) : TRUE=zone PV atteinte ✅ | FALSE=absent
+    TranslationPosP2          : BOOL;  // 📍 Position P2 (NO, ex-Fosse2) : TRUE=translation en P2 ✅ | FALSE=absent
+    TranslationPosP1          : BOOL;  // 📍 Position P1 (NO, ex-Fosse1) : TRUE=translation en P1 ✅ | FALSE=absent
+    TranslationPosMaintenance : BOOL;  // 🔧 Position maintenance (NO), extrême droite, accès MAINT_N2 uniquement : TRUE=en position service ✅ | FALSE=absent
     M3BrakeFeedback       : BOOL;  // 🔒 Retour frein translation M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
 
     // 🆕 Variables intermédiaires filtrées/simulées pour contourner la lecture seule des PDO
@@ -67,10 +72,11 @@ VAR
     instM2Thermal      : FB_Input;
     instM2BrakeFeedback: FB_Input;
 
-    instTranslationPosFosse1      : FB_Input;
-    instTranslationPosFosse2      : FB_Input;
-    instTranslationPosMaintenance : FB_Input;
     instTranslationPosTremie      : FB_Input;
+    instTranslationPosPV          : FB_Input;
+    instTranslationPosP2          : FB_Input;
+    instTranslationPosP1          : FB_Input;
+    instTranslationPosMaintenance : FB_Input;
     instM3BrakeFeedback       : FB_Input;
 
     // 🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir AF_Partie13)
@@ -186,17 +192,20 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosFosse1(InputRaw := PosFosse1_DI OR instSimTranslation.PosFosse1, FilterTime := T#20MS);
-TranslationPosFosse1 := instTranslationPosFosse1.State;
+instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosFosse2(InputRaw := PosFosse2_DI OR instSimTranslation.PosFosse2, FilterTime := T#20MS);
-TranslationPosFosse2 := instTranslationPosFosse2.State;
+instTranslationPosPV(InputRaw := GVL_Translation_M3_Stub.PosPV_DI OR instSimTranslation.PosPV, FilterTime := T#20MS);
+TranslationPosPV := instTranslationPosPV.State;
+
+instTranslationPosP2(InputRaw := PosFosse2_DI OR instSimTranslation.PosP2, FilterTime := T#20MS);
+TranslationPosP2 := instTranslationPosP2.State;
+
+instTranslationPosP1(InputRaw := PosFosse1_DI OR instSimTranslation.PosP1, FilterTime := T#20MS);
+TranslationPosP1 := instTranslationPosP1.State;
 
 instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
-
-instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
-TranslationPosTremie := instTranslationPosTremie.State;
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
 M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
@@ -237,6 +246,15 @@ END_IF;
 // Surcharges (overrides) du banc de tests — Translation M3 (niveau capteur amont uniquement)
 IF GVL_PLC_Tests.OverrideM3AtTremie THEN
     TranslationPosTremie := TRUE; // 🧪 Simule le Fdc extrême avant sans attendre le trajet simulé complet
+END_IF;
+// 🆕 REX 2026-07-18 : force les 5 capteurs position depuis un mot de test (indépendant du temps
+// de trajet simulé) — seul moyen de tester les 6 mots valides ET les combinaisons incohérentes.
+IF GVL_PLC_Tests.OverrideM3SensorsWordActive THEN
+    TranslationPosTremie      := GVL_PLC_Tests.OverrideM3SensorsWord.4;
+    TranslationPosPV          := GVL_PLC_Tests.OverrideM3SensorsWord.3;
+    TranslationPosP2          := GVL_PLC_Tests.OverrideM3SensorsWord.2;
+    TranslationPosP1          := GVL_PLC_Tests.OverrideM3SensorsWord.1;
+    TranslationPosMaintenance := GVL_PLC_Tests.OverrideM3SensorsWord.0;
 END_IF;
 IF GVL_PLC_Tests.OverrideM3BrakeStuckOpen THEN
     M3BrakeFeedback := TRUE; // 🧪 Simule Méca B : retour frein resté desserré malgré commande fermée
