@@ -530,3 +530,10 @@ PRG_10_Outputs.M2SpeedContactor2 := instWinchM2.Contactor2;
 PRG_10_Outputs.M2SpeedContactor3 := instWinchM2.Contactor3;
 PRG_10_Outputs.M2SpeedContactor4 := instWinchM2.Contactor4;
 PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;
+
+// 🧪 Références pour tests PLC (fenêtre de passage GVL_Simulation)
+// 🔧 REX 2026-07-17 : ":=" sur une REFERENCE TO fait une COPIE DE VALEUR (écrit à travers la
+// référence), PAS un rebind -- sur une référence pas encore liée (1er scan), ça écrit à une
+// adresse invalide -> ACCESS VIOLATION runtime CODESYS. "REF=" est l'opérateur dédié au rebind.
+GVL_Simulation.refBucket   REF= instBucket;
+GVL_Simulation.refWinchM2  REF= instWinchM2;

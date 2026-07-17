@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 
 from generator.diagnostics import DiagnosticCollector, Severity
 from generator.ir import SimpleInitValue, SourceObject, StructInitValue, VariableDecl, GlobalVarBlock, ArrayInitValue
-from generator.st_types import ArrayType, BaseType, DerivedType, StringType
+from generator.st_types import ArrayType, BaseType, DerivedType, ReferenceType, StringType
 from generator.xml_builder import PLCOPEN_NS, build_project_xml
 
 NS = {"p": PLCOPEN_NS}
@@ -87,6 +87,23 @@ def test_string_and_array_type_rendering():
     assert dim.get("lower") == "1"
     assert dim.get("upper") == "5"
     assert array_type.find("baseType/REAL") is not None
+
+
+def test_reference_to_type_renders_as_derived_with_literal_prefix():
+    """Confirmé sur échantillon réel CODESYS (FB_TestReference.xml, 2026-07-17) :
+    REFERENCE TO FB_Winch -> <derived name="REFERENCE TO FB_Winch" />, PAS un <pointer>."""
+    obj = _fb(
+        "FB_Demo",
+        input_vars=[VariableDecl("refTest", ReferenceType(DerivedType("FB_Winch")))],
+        body_text="",
+    )
+    diag = DiagnosticCollector()
+    root = build_project_xml("FB_Demo", {"FB_Demo": obj}, diag, include_deps=False)
+    variable = root.find("types/pous/pou/interface/inputVars/variable")
+    derived = variable.find("type/derived")
+    assert derived is not None
+    assert derived.get("name") == "REFERENCE TO FB_Winch"
+    assert variable.find("type/pointer") is None
 
 
 def test_struct_datatype_and_field_documentation():

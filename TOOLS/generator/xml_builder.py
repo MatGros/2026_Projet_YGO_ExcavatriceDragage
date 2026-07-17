@@ -17,7 +17,7 @@ from .ir import (
     format_iec_real,
     format_iec_time,
 )
-from .st_types import ArrayType, BaseType, DerivedType, StringType, TypeRef
+from .st_types import ArrayType, BaseType, DerivedType, ReferenceType, StringType, TypeRef
 
 PLCOPEN_NS = "http://www.plcopen.org/xml/tc6_0200"
 XHTML_NS = "http://www.w3.org/1999/xhtml"
@@ -64,6 +64,20 @@ def _type_inner(type_ref: TypeRef) -> ET.Element:
     if isinstance(type_ref, DerivedType):
         el = ET.Element("derived")
         el.set("name", type_ref.name)
+        return el
+    if isinstance(type_ref, ReferenceType):
+        # 🔧 Confirmé sur échantillon réel CODESYS (FB_TestReference.xml, 2026-07-17) :
+        # REFERENCE TO n'est PAS un <pointer> (ça, c'est POINTER TO) mais un <derived>
+        # dont le name est le texte littéral "REFERENCE TO <Type>". Import CODESYS
+        # avait précédemment réimporté en POINTER TO -> erreurs C0032 (assignation directe
+        # d'instance incompatible avec POINTER TO qui exige ADR()).
+        if not isinstance(type_ref.base, DerivedType):
+            raise ValueError(
+                f"REFERENCE TO d'un type non-derived non confirmé contre un échantillon réel "
+                f"(seul REFERENCE TO <FB/type projet> est validé) : {type_ref.base!r}"
+            )
+        el = ET.Element("derived")
+        el.set("name", f"REFERENCE TO {type_ref.base.name}")
         return el
     if isinstance(type_ref, ArrayType):
         el = ET.Element("array")

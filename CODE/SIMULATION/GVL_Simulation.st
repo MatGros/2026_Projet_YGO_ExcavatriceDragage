@@ -64,4 +64,8 @@ VAR_GLOBAL
     SyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)
                                                   // pour tester Concept 1 ; > WinchCriticalSyncTolerance_M
                                                   // (2.0) pour tester Méca E
+
+    // 🧪 Références instances métier — fenêtre de passage pour tests PLC UNIQUEMENT
+    refBucket      : REFERENCE TO FB_Bucket;     // 🆕 Instance benne (PRG_06_WinchControl)
+    refWinchM2     : REFERENCE TO FB_Winch;      // 🆕 Instance treuil M2 (PRG_06_WinchControl) — pour FB_BucketValidation
 END_VAR
