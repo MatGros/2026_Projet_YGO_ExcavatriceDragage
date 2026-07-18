@@ -23,6 +23,10 @@ VAR_INPUT
 
     // Feedbacks physique & matériel
     KoboldContactFond   : BOOL;         // Retour dédié Kobold : TRUE = contact fond détecté
+    LimitLegalReached   : BOOL;         // Limite légale atteinte (descente interdite)
+    LimitLegalDepthM    : REAL;         // Profondeur légale minimale autorisée
+    WinchSyncError      : BOOL;         // Désynchronisme bloquant M1/M2
+    WinchSyncDeltaM     : REAL;         // Écart codeurs M1/M2 pour diagnostic
     M1_CablePosM        : REAL;         // Position câble treuil M1 (recalée)
     M2_CablePosM        : REAL;         // Position câble treuil M2 (recalée)
 
@@ -128,6 +132,21 @@ StartEdge(CLK := StartCycle);
 PauseEdge(CLK := PauseCycle);
 AbortEdge(CLK := AbortCycle);
 
+IF ResetEdge.Q THEN
+    Error := FALSE;
+    ErrorId := 16#0000;
+    IF State = E_CycleStep.ERROR_HOLD THEN
+        State := E_CycleStep.INIT;
+    END_IF;
+END_IF;
+
+// Défaut de synchronisme : arrêt sûr et acquittement obligatoire.
+IF WinchSyncError AND State <> E_CycleStep.ERROR_HOLD THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0002;
+    State := E_CycleStep.ERROR_HOLD;
+END_IF;
+
 // Gestion de la Pause
 IF PauseEdge.Q AND Busy AND NOT IsPaused THEN
     IsPaused := TRUE;
@@ -205,18 +224,38 @@ CASE State OF
             CmdWinchM2_StartStop := FALSE;
             KoboldContactorCmd := FALSE;
             TouchPositionM := M1_CablePosM; // Mémorisation position contact
+            IF LimitLegalDepthM < -0.01 THEN
+                RaiseTargetM := MAX(TouchPositionM + 0.5, LimitLegalDepthM + 0.5);
+            ELSE
+                RaiseTargetM := TouchPositionM + 0.5;
+            END_IF;
             State := E_CycleStep.BOTTOM_TOUCH_WAIT;
+        ELSIF LimitLegalReached THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0001;
+            CmdWinchM1_StartStop := FALSE;
+            CmdWinchM2_StartStop := FALSE;
+            KoboldContactorCmd := FALSE;
+            State := E_CycleStep.ERROR_HOLD;
         END_IF;
 
     E_CycleStep.BOTTOM_TOUCH_WAIT: // ⏳ ÉTAPE 3 : Temporisation contact fond
         CycleStep := E_CycleStep.BOTTOM_TOUCH_WAIT;
-        CycleStateStr := 'ATTENTE DÉPOSE FOND';
+        CycleStateStr := 'REMONTÉE SÉCURISÉE APRÈS CONTACT FOND';
 
-        CmdWinchM1_StartStop := FALSE;
-        CmdWinchM2_StartStop := FALSE;
+        CmdWinchM1_StartStop := TRUE;
+        CmdWinchM1_Direction := 1;
+        CmdWinchM1_SpeedPct := 20.0;
+        CmdWinchM2_StartStop := TRUE;
+        CmdWinchM2_Direction := 1;
+        CmdWinchM2_SpeedPct := 20.0;
 
-        // Transition après pose confirmée (ici instantanée, prête pour tempo)
-        State := E_CycleStep.SYNCHRO_ADJUST;
+        // Les deux treuils restent synchronisés jusqu'au-dessus de la limite légale.
+        IF (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
+            CmdWinchM1_StartStop := FALSE;
+            CmdWinchM2_StartStop := FALSE;
+            State := E_CycleStep.SYNCHRO_ADJUST;
+        END_IF;
 
     E_CycleStep.SYNCHRO_ADJUST: // 🪣 ÉTAPE 4 : Fermeture du benne (Excavation)
         CycleStep := E_CycleStep.SYNCHRO_ADJUST;

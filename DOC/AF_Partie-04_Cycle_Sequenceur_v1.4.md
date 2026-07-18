@@ -173,6 +173,15 @@ M1+M2 : `CTRL_ASCENDING`, `RETURN_WORK_POS`, etc.).
 
 ---
 
+## 🪨 3ter. Contact Kobold et remontée de sécurité
+
+Pendant `DESCENDING_OPEN`, `KoboldContactorCmd` commande le contacteur dédié. Le cycle attend
+`KoboldContactFond` ; le capteur de mou de câble n'est pas utilisé comme substitut.
+
+Après détection, M1 et M2 remontent ensemble à petite vitesse jusqu'à une position supérieure
+à `LimitLegalDepthM` avec une marge de 0,5 m. Si la limite légale est atteinte avant le contact
+Kobold, le cycle passe en `ERROR_HOLD`. Toute erreur de synchronisation provoque le même repli.
+
 ## 🛑 4. Séquence frein (`FB_Brake`)
 
 Le frein est à **manque de courant** (colle au repos = maintien charge). Le séquencement
