@@ -19,13 +19,26 @@ VAR
     // Paramètres cibles réglés par l'opérateur
     TargetDepthM        : REAL := -12.5; // Profondeur de dragage cible (mètres, négative)
     TargetOffsetM       : REAL := 1.5;  // Décalage cible de fermeture du benne (mètres)
+    CycleMotionPermit    : BOOL;        // Homme-mort + axe Y actif
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
 
+// 🕹️ Interface unique de commande cycle depuis GVL_IHM.
+CmdStartCycle_IHM := GVL_IHM.Cycle.CmdStart;
+CmdPauseCycle_IHM := GVL_IHM.Cycle.CmdPause;
+CmdAbortCycle_IHM := GVL_IHM.Cycle.CmdAbort;
+CmdResetCycle_IHM := GVL_IHM.Cycle.CmdReset;
+TargetDepthM      := GVL_IHM.Cycle.TargetDepthM;
+TargetOffsetM     := GVL_IHM.Cycle.TargetOffsetM;
+GVL_Simulation.KoboldContactFond_Simulated := GVL_IHM.Cycle.SimKoboldContactFond;
+CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                     AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
     Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND NOT PRG_10_Outputs.ManuActive,
+    CycleMotionPermit   := CycleMotionPermit,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     
@@ -60,3 +73,9 @@ instCycle(
     Benne_IsOpen      := _BucketState.IsOpen,
     Benne_IsClosed    := _BucketState.IsClosed
 );
+
+// 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
+GVL_IHM.Cycle.CmdStart := FALSE;
+GVL_IHM.Cycle.CmdPause := FALSE;
+GVL_IHM.Cycle.CmdAbort := FALSE;
+GVL_IHM.Cycle.CmdReset := FALSE;

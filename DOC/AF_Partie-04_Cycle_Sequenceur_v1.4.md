@@ -317,6 +317,23 @@ par le mode/l'étape**. Appuyer à fond en mode « petite vitesse » ne donne qu
 
 ---
 
+## 🖥️ 8. Interface IHM de test et d'exploitation
+
+La source unique de commande et de diagnostic du cycle est `GVL_IHM.Cycle`.
+Les commandes `CmdStart`, `CmdPause`, `CmdAbort` et `CmdReset` sont des impulsions
+acquittées automatiquement par le PLC, même si la GVL est déclarée `RETAIN`.
+
+La cible de travail reste portée par `GVL_IHM.TranslationM3.SelectedTargetNum` :
+`2=P2` ou `3=P1`. Toute autre valeur au démarrage est refusée avec `ErrorId` bit 2.
+
+Le mouvement du cycle est conditionné par `GVL_IHM.Cycle.MotionPermit`, issu de
+l'homme-mort et du joystick Y. Au relâchement, les commandes treuil, translation,
+benne et contacteur Kobold sont supprimées, tandis que l'étape est conservée.
+
+Pour le banc de simulation, `GVL_IHM.Cycle.SimKoboldContactFond` pilote le retour
+simulé ; en réel, le retour physique est `KoboldContactFond_DI` (%IX0.5) et la
+commande contacteur est `KoboldContactor_DQ` (%QX0.6).
+
 ## 📚 Documents liés
 - **Partie 2 v2.7** — Architecture (orchestration, `FB_WinchSync`, `SafeStop`/`StartStop`, IO).
 - **Partie 3 v1.3** — Contrat FB (`E_State`, `ErrorId`, reset, `StartStop`/`SafeStop`).

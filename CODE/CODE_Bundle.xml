@@ -1173,6 +1173,157 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_CycleHMI">
+        <baseType>
+          <struct>
+            <variable name="CmdStart">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CmdPause">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CmdAbort">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CmdReset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TargetDepthM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-12.5" />
+              </initialValue>
+            </variable>
+            <variable name="TargetOffsetM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+            </variable>
+            <variable name="CycleStateStr">
+              <type>
+                <string length="80" />
+              </type>
+            </variable>
+            <variable name="SelectedTargetNum">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="KoboldContactFond">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LimitLegalDepthM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchSyncDeltaM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M1PositionM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M2PositionM">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="JoystickMotionActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MotionPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimKoboldContactFond">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>313e1a80-c1fe-5852-823a-20d942e4c852</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Interface IHM du cycle semi-automatique.
+   Les commandes Cmd* sont des impulsions acquittées par le PLC.</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_DiagDevice">
         <baseType>
           <struct>
@@ -6360,6 +6511,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne de sécurité OK</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleMotionPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort + joystick actif</xhtml>
+              </documentation>
+            </variable>
             <variable name="StartCycle">
               <type>
                 <BOOL />
@@ -6841,6 +7000,8 @@ AbortEdge(CLK := AbortCycle);
 IF ResetEdge.Q THEN
     Error := FALSE;
     ErrorId := 16#0000;
+    IsPaused := FALSE;
+    SavedState := E_CycleStep.INIT;
     IF State = E_CycleStep.ERROR_HOLD THEN
         State := E_CycleStep.INIT;
     END_IF;
@@ -6897,14 +7058,18 @@ CASE State OF
 
         // Choix cible — 🆕 REX 2026-07-18 : zone de travail = P2/P1 (cibles 2/3), ex-Fosse1/Fosse2
         // (cibles 1/2), suite au remap 5 positions Trémie(1)/P2(2)/P1(3)/Maintenance(4)
-        IF SelectedTargetNum_IHM = 2 OR SelectedTargetNum_IHM = 3 THEN
+        IF (SelectedTargetNum_IHM &lt;&gt; 2) AND (SelectedTargetNum_IHM &lt;&gt; 3) THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0004; // cible de travail invalide
+            State := E_CycleStep.ERROR_HOLD;
+        ELSIF SelectedTargetNum_IHM = 2 OR SelectedTargetNum_IHM = 3 THEN
             SelectedWorkTarget := SelectedTargetNum_IHM;
             CmdTranslationM3_Target := SelectedWorkTarget;
-            CmdTranslationM3_Start := TRUE;
+            CmdTranslationM3_Start := CycleMotionPermit;
 
             // Attente positionnement translation
-            IF (SelectedWorkTarget = 2 AND Translation_At_P2)
-               OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
+            IF CycleMotionPermit AND ((SelectedWorkTarget = 2 AND Translation_At_P2)
+               OR (SelectedWorkTarget = 3 AND Translation_At_P1)) THEN
                 CmdTranslationM3_Start := FALSE;
                 State := E_CycleStep.DESCENDING_OPEN;
             END_IF;
@@ -6925,7 +7090,7 @@ CASE State OF
         KoboldContactorCmd   := TRUE;
 
         // Transition uniquement sur le retour dédié Kobold.
-        IF KoboldContactFond THEN
+        IF CycleMotionPermit AND KoboldContactFond THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             KoboldContactorCmd := FALSE;
@@ -6957,7 +7122,7 @@ CASE State OF
         CmdWinchM2_SpeedPct := 20.0;
 
         // Les deux treuils restent synchronisés jusqu'au-dessus de la limite légale.
-        IF (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
+        IF CycleMotionPermit AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.SYNCHRO_ADJUST;
@@ -6973,7 +7138,7 @@ CASE State OF
         CmdBucket_Close := TRUE;
 
         // Transition si benne fermé avec succès
-        IF Benne_Done AND Benne_IsClosed THEN
+        IF CycleMotionPermit AND Benne_Done AND Benne_IsClosed THEN
             CmdBucket_Close := FALSE;
             State := E_CycleStep.CTRL_ASCENDING;
         END_IF;
@@ -6992,7 +7157,7 @@ CASE State OF
         CmdWinchM2_SpeedPct  := 20.0;
 
         // Transition après remontée de contrôle de 2.0 mètres
-        IF M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM) THEN
+        IF CycleMotionPermit AND M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM) THEN
             State := E_CycleStep.ASCENDING_LOADED;
         END_IF;
 
@@ -7009,7 +7174,7 @@ CASE State OF
         CmdWinchM2_SpeedPct  := 70.0;
 
         // Transition si position haute (butée haute virtuelle) atteinte
-        IF M1_CablePosM &gt;= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
+        IF CycleMotionPermit AND M1_CablePosM &gt;= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.DRAINING_PAUSE;
@@ -7023,7 +7188,7 @@ CASE State OF
         CmdWinchM2_StartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        IF DrainingTimer.Q THEN
+        IF CycleMotionPermit AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.TRANSLATION_MOVE;
         END_IF;
@@ -7036,7 +7201,7 @@ CASE State OF
         CmdTranslationM3_Start := TRUE;
 
         // Transition si translation arrivé à la trémie
-        IF Translation_At_Tremie THEN
+        IF CycleMotionPermit AND Translation_At_Tremie THEN
             CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.DESCENDING_OPEN_DUMP;
         END_IF;
@@ -7049,7 +7214,7 @@ CASE State OF
         CmdBucket_Open := TRUE;
 
         // Transition si benne ouvert avec succès
-        IF Benne_Done AND Benne_IsOpen THEN
+        IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
             CmdBucket_Open := FALSE;
             State := E_CycleStep.RETURN_WORK_POS;
         END_IF;
@@ -7062,8 +7227,8 @@ CASE State OF
         CmdTranslationM3_Start := TRUE;
 
         // Transition si translation de retour sur sa position de travail
-        IF (SelectedWorkTarget = 2 AND Translation_At_P2)
-           OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
+        IF CycleMotionPermit AND ((SelectedWorkTarget = 2 AND Translation_At_P2)
+           OR (SelectedWorkTarget = 3 AND Translation_At_P1)) THEN
             CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.READY;
         END_IF;
@@ -7096,6 +7261,17 @@ CASE State OF
         CmdBucket_Open := FALSE;
         CmdBucket_Close := FALSE;
 END_CASE;
+
+// 🛑 Relâchement homme-mort : aucune demande d'actionneur ne reste active.
+// L'étape est mémorisée et reprend au prochain appui valide.
+IF Busy AND NOT CycleMotionPermit THEN
+    CmdWinchM1_StartStop := FALSE;
+    CmdWinchM2_StartStop := FALSE;
+    CmdTranslationM3_Start := FALSE;
+    CmdBucket_Open := FALSE;
+    CmdBucket_Close := FALSE;
+    KoboldContactorCmd := FALSE;
+END_IF;
 </xhtml>
           </ST>
         </body>
@@ -21157,6 +21333,14 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Décalage cible de fermeture du benne (mètres)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleMotionPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort + axe Y actif</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -21173,9 +21357,21 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
 
+// 🕹️ Interface unique de commande cycle depuis GVL_IHM.
+CmdStartCycle_IHM := GVL_IHM.Cycle.CmdStart;
+CmdPauseCycle_IHM := GVL_IHM.Cycle.CmdPause;
+CmdAbortCycle_IHM := GVL_IHM.Cycle.CmdAbort;
+CmdResetCycle_IHM := GVL_IHM.Cycle.CmdReset;
+TargetDepthM      := GVL_IHM.Cycle.TargetDepthM;
+TargetOffsetM     := GVL_IHM.Cycle.TargetOffsetM;
+GVL_Simulation.KoboldContactFond_Simulated := GVL_IHM.Cycle.SimKoboldContactFond;
+CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                     AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
     Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND NOT PRG_10_Outputs.ManuActive,
+    CycleMotionPermit   := CycleMotionPermit,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     
@@ -21210,6 +21406,12 @@ instCycle(
     Benne_IsOpen      := _BucketState.IsOpen,
     Benne_IsClosed    := _BucketState.IsClosed
 );
+
+// 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
+GVL_IHM.Cycle.CmdStart := FALSE;
+GVL_IHM.Cycle.CmdPause := FALSE;
+GVL_IHM.Cycle.CmdAbort := FALSE;
+GVL_IHM.Cycle.CmdReset := FALSE;
 </xhtml>
           </ST>
         </body>
@@ -22639,6 +22841,27 @@ GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTransla
 GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
 GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 
+// ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
+GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;
+GVL_IHM.Cycle.Busy                 := PRG_05_Cycle.instCycle.Busy;
+GVL_IHM.Cycle.Done                 := PRG_05_Cycle.instCycle.Done;
+GVL_IHM.Cycle.Error                := PRG_05_Cycle.instCycle.Error;
+GVL_IHM.Cycle.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
+GVL_IHM.Cycle.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
+GVL_IHM.Cycle.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
+GVL_IHM.Cycle.SelectedTargetNum    := GVL_IHM.TranslationM3.SelectedTargetNum;
+GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
+GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.Cycle.LimitLegalDepthM     := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
+GVL_IHM.Cycle.WinchSyncDeltaM      := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.Cycle.M1PositionM          := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Cycle.M2PositionM          := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.Cycle.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.Cycle.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
+
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
 GVL_IHM.JoystickJOY1.RawX       := JoyXRaw_ANA1;
@@ -23605,6 +23828,14 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Variables d'échange IHM Translation M3</xhtml>
+          </documentation>
+        </variable>
+        <variable name="Cycle">
+          <type>
+            <derived name="ST_CycleHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Commandes, états et diagnostic cycle semi-automatique</xhtml>
           </documentation>
         </variable>
         <variable name="Network">
@@ -24685,6 +24916,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
           <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
           <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
+          <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
           <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
           <Object Name="ST_IHM_MANU" ObjectId="aa605808-33c6-5f61-aa7b-b33b5fd12b1b" />
           <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
