@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-18T00:00:00.000000" />
-  <contentHeader name="MGS_v0.4.17_TranslationHMI.project" modificationDateTime="2026-07-18T00:00:00.000000">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-18T00:05:50.012560" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-18T00:05:50.012560">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.17_TranslationHMI</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1579,227 +1579,6 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_IHM_MANU">
-        <baseType>
-          <struct>
-            <variable name="ModeDisable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Activation — logique INVERSÉE volontaire (REX 2026-07-09)
-🔴 FALSE (défaut, y compris à CHAQUE démarrage/download automate,</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickSelect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 TRUE = Joystick CANopen | FALSE = Boutons IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelect">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 1 = M1, 2 = M2, 3 = Couplé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionM_M1">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M1
-📊 [m] Position brute codeur M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M1 + frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M1 + frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionM_M2">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Treuil M2
-📊 [m] Position brute codeur M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée M2 + frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente M2 + frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_M2_RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande couplée M1+M2
-🔗 Commande montée M1 et M2 + frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_M2_RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Commande descente M1 et M2 + frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_M2_Contactor1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_M2_Contactor2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_M2_Contactor3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_M2_Contactor4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Vitesse M1 et M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FdcBucketOpenEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Fins de Course Virtuels Benne (delta M1 - M2)
-🎚️ Activer FDC Ouvert (stop M2 descente si delta &gt;= 0.0m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FdcBucketCloseEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ Activer FDC Fermé (stop M2 montée si delta &lt;= -10.0m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FdcBucketOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ OBSOLÈTE (visu) — alias de FdcBucketOpenEnable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FdcBucketClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ OBSOLÈTE (visu) — alias de FdcBucketCloseEnable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BenneDelta">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 [m] Écart M1-M2 en temps réel</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FdcBucketOpenActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Limite basse M2 atteinte (descente coupée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FdcBucketCloseActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Limite haute M2 atteinte (montée coupée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchMaxStepFwd">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Réglages dynamiques des limites de vitesse (paliers max)
-⚡ Palier max en montée (1..5, défaut 5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchMaxStepRev">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Palier max en descente (1..5, défaut 2)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>aa605808-33c6-5f61-aa7b-b33b5fd12b1b</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚨 ST_IHM_MANU — Table d'échange IHM provisoire (mise en service URGENCE)
-   ───────────────────────────────────────────────────────────────
-   🎨 Pilotage manuel DIRECT des sorties physiques (relais, contacteurs
-      vitesse, freins) — programme fonctionnel normal bypassé en sortie
-      (PRG_10_Outputs uniquement), aucune sécurité logicielle métier active.
-   ⚠️ DANGER : seuls les interlocks Fwd/Rev (couplé/individuel mutuellement
-      exclusifs, voir PRG_10_Outputs) protègent, plus la chaîne AU/PowerCutOff
-      (toujours active, non bypassée). Pas de limites logicielles, pas de synchro.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_JoystickHMI">
         <baseType>
           <struct>
@@ -2023,6 +1802,16 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelect">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
+sélection treuil au joystick, arbitrée par FB_Modes (MAINT_N2 uniquement, forcé à 3=Couplé sinon)
+🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir FB_Modes.JoystickWinchSelectArbitrated</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3694,7 +3483,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ↔️ ST_TranslationHMI — Données d'échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
-   📄 Migration des champs manuels ex-ST_IHM_MANU (étape en cours, pas l'état final) —
+   📄 Migration des champs manuels ex-ST_IHM_MANU terminée (2026-07-19, suppression IHM_MANU) —
       doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -3941,6 +3730,70 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 🎯 Prise d'origine (Homing) validée</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Référencement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Pulse de référencement réussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut de référencement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Bitfield défaut homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingState">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État FB_Encoder_Homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingStateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 État lors du défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Référence à confirmer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Référence brute appliquée</xhtml>
+              </documentation>
+            </variable>
             <variable name="SafeStopActive">
               <type>
                 <BOOL />
@@ -4036,7 +3889,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes Opérateur (Boutons tactiles)
-🔑 Acquittement défauts spécifique treuil</xhtml>
+🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé</xhtml>
               </documentation>
             </variable>
             <variable name="CmdHome">
@@ -6892,7 +6745,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Timeout cycle de dragage" - Timeout, bit1: "Incohérence étape cycle" - Incohérence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible</xhtml>
               </documentation>
             </variable>
             <variable name="CmdWinchM1_StartStop">
@@ -7063,6 +6916,14 @@ Position M1 mémorisée lors du contact fond</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisateur de vidage (égouttage)</xhtml>
               </documentation>
             </variable>
+            <variable name="StabilizationTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation maximale de remontée lente après fermeture</xhtml>
+              </documentation>
+            </variable>
             <variable name="SelectedWorkTarget">
               <type>
                 <INT />
@@ -7081,6 +6942,28 @@ Position M1 mémorisée lors du contact fond</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Paramètres internes
 Distance de remontée lente de contrôle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentToleranceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.25" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart maximal admis entre les deux codeurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#30s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps maximal pour atteindre la zone de stabilisation</xhtml>
               </documentation>
             </variable>
             <variable name="DrainingTime">
@@ -7141,6 +7024,10 @@ ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 PauseEdge(CLK := PauseCycle);
 AbortEdge(CLK := AbortCycle);
+
+// ⏱️ T36 — surveillance indépendante de la remontée lente : un codeur bloqué
+// ne doit jamais laisser le cycle attendre indéfiniment.
+StabilizationTimer(IN := (State = E_CycleStep.CTRL_ASCENDING), PT := CtrlAscentTimeout);
 
 IF ResetEdge.Q THEN
     Error := FALSE;
@@ -7301,9 +7188,23 @@ CASE State OF
         CmdWinchM2_Direction := 1;
         CmdWinchM2_SpeedPct  := 20.0;
 
-        // Transition après remontée de contrôle de 2.0 mètres
-        IF CycleMotionPermit AND M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM) THEN
+        // 🛡️ Contrôle des deux codeurs : la benne chargée doit remonter avec
+        // M1 et M2. Un seul codeur arrivé ne suffit pas.
+        IF WinchSyncError OR (ABS(M1_CablePosM - M2_CablePosM) &gt; CtrlAscentToleranceM) THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0008; // stabilisation/désynchronisme après fermeture
+            State := E_CycleStep.ERROR_HOLD;
+        // Transition uniquement lorsque les deux treuils sont au-dessus de la
+        // zone de contrôle et restent synchronisés.
+        ELSIF CycleMotionPermit
+           AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
+           AND (M2_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
+           AND (ABS(M1_CablePosM - M2_CablePosM) &lt;= CtrlAscentToleranceM) THEN
             State := E_CycleStep.ASCENDING_LOADED;
+        ELSIF StabilizationTimer.Q THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0008; // un treuil n'a pas atteint la zone de contrôle
+            State := E_CycleStep.ERROR_HOLD;
         END_IF;
 
     E_CycleStep.ASCENDING_LOADED: // 🚀 ÉTAPE 6 : Remontée pleine vitesse
@@ -8203,6 +8104,393 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_EncoderValidation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Start">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Abort">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AnyFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimGateOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ActiveStimulusId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="Report">
+              <type>
+                <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfigErrorCheckIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="StartPrev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ResetIssued">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepStarted">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="StepLimit">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="StepFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepPassed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1HomePulse">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2HomePulse">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">============================================================================
+   🧪 FB_EncoderValidation — Suite PLC Encoder/Homing nominale
+   ============================================================================
+   T25 : validation du flux nominal M1/M2 en simulation.
+   Le Homing unitaire MAINT_N2 reste volontairement hors périmètre.
+
+   Cette suite est ciblée par Cmd.RunSuite = SuiteEncoder. Elle n'est pas
+   ajoutée à RunAll tant que le flux Homing unitaire n'est pas spécifié.
+   Chaque étape possède une limite de temps locale ; aucune attente implicite.
+   ============================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// Gate simulation : une suite non exécutable se termine explicitement.
+SimGateOk := GVL_Simulation.SimulationModeActive
+          AND NOT GVL_Simulation.EncoderM1_IsReal
+          AND NOT GVL_Simulation.EncoderM2_IsReal;
+
+// Valeurs par défaut de commande : aucun front ne reste actif hors étape dédiée.
+M1HomePulse := FALSE;
+M2HomePulse := FALSE;
+ActiveStimulusId := 0;
+
+IF Abort THEN
+    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+    Busy := FALSE;
+    Done := TRUE;
+    AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+    Report.Aborted := TRUE;
+    Report.AnyFailed := TRUE;
+    Report.TerminalState := TerminalState;
+    Report.FailureSummary := 'Encoder/Homing : ABORTED';
+    RETURN;
+END_IF;
+
+// Démarrage sur front : rapport réinitialisé et mode de maintenance demandé.
+IF Start AND NOT StartPrev AND NOT Busy THEN
+    StartPrev := TRUE;
+    Busy := TRUE;
+    Done := FALSE;
+    AnyFailed := FALSE;
+    ConfigError := FALSE;
+    ErrorCode := 0;
+    ErrorMessage := '';
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    Step := FirstStepId;
+    IF (Step &lt;&gt; 10) AND (Step &lt;&gt; 20) THEN Step := 10; END_IF;
+    Report.Name := 'Encoder/Homing Validation';
+    Report.InProgress := TRUE;
+    Report.AllPassed := FALSE;
+    Report.AnyFailed := FALSE;
+    Report.Aborted := FALSE;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := 0;
+    Report.ErrorMessage := '';
+    Report.FailureSummary := '';
+    Report.CurrentStepId := Step;
+    Report.CurrentCaseId := SEL(Step = 20, 1, 2);
+    Report.Duration := T#0s;
+    Report.RunCounter := Report.RunCounter + 1;
+    FOR Index := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
+        Report.Steps[Index].Executed := FALSE;
+        Report.Steps[Index].Passed := FALSE;
+        Report.Steps[Index].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Steps[Index].Duration := T#0s;
+    END_FOR;
+    FOR Index := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        Report.Cases[Index].Executed := FALSE;
+        Report.Cases[Index].Ok := FALSE;
+        Report.Cases[Index].FailedStepId := 0;
+        Report.Cases[Index].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Cases[Index].Duration := T#0s;
+    END_FOR;
+    StepStarted := FALSE;
+    ResetIssued := FALSE;
+ELSIF NOT Start THEN
+    StartPrev := FALSE;
+END_IF;
+
+IF NOT Busy THEN
+    RETURN;
+END_IF;
+
+StepElapsed := StepElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+Report.CurrentStepId := Step;
+CaseId := SEL(Step &gt;= 20, 1, 2);
+Report.CurrentCaseId := CaseId;
+
+IF NOT StepStarted THEN
+    StepStarted := TRUE;
+    StepElapsed := T#0s;
+    CASE Step OF
+        10: StepLimit := T#2s;
+        11: StepLimit := T#2s;
+        20: StepLimit := T#2s;
+        21: StepLimit := T#2s;
+        22: StepLimit := T#10s;
+    ELSE
+        ConfigError := TRUE;
+        ConfigErrorStepId := Step;
+        ErrorCode := 3001;
+        ErrorMessage := 'Encoder/Homing étape inconnue';
+        StepLimit := T#0s;
+    END_CASE;
+END_IF;
+
+StepTimer(IN := TRUE, PT := StepLimit);
+
+CASE Step OF
+    // TC-E1 : gate et interface IHM nominale accessibles.
+    10:
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        IF SimGateOk AND NOT GVL_IHM.M1TreuilRetenue.HomingError
+           AND NOT GVL_IHM.M2TreuilBucket.HomingError THEN
+            StepPassed := TRUE;
+            Step := 11;
+            StepStarted := FALSE;
+        END_IF;
+
+    // TC-E1 : vérifier que le rapport IHM des deux treuils existe avant commande.
+    11:
+        IF (GVL_IHM.M1TreuilRetenue.HomingState &gt;= E_State.DISABLED)
+           AND (GVL_IHM.M2TreuilBucket.HomingState &gt;= E_State.DISABLED) THEN
+            StepPassed := TRUE;
+            Step := 0;
+        END_IF;
+
+    // TC-E2 : fronts CmdHome indépendants, envoyés simultanément.
+    20:
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        IF SimGateOk THEN
+            StepPassed := TRUE;
+            Step := 21;
+            StepStarted := FALSE;
+        END_IF;
+
+    21:
+        M1HomePulse := TRUE;
+        M2HomePulse := TRUE;
+        GVL_IHM.M1TreuilRetenue.CmdHome := M1HomePulse;
+        GVL_IHM.M2TreuilBucket.CmdHome := M2HomePulse;
+        StepPassed := TRUE;
+        Step := 22;
+        StepStarted := FALSE;
+
+    // TC-E2 : aucune attente infinie : les deux instances doivent finir ou déclarer une erreur.
+    22:
+        GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
+        GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+        IF (GVL_IHM.M1TreuilRetenue.HomingDone OR GVL_IHM.M1TreuilRetenue.Homed)
+           AND (GVL_IHM.M2TreuilBucket.HomingDone OR GVL_IHM.M2TreuilBucket.Homed) THEN
+            StepPassed := TRUE;
+            Step := 0;
+        ELSIF GVL_IHM.M1TreuilRetenue.HomingError OR GVL_IHM.M2TreuilBucket.HomingError THEN
+            StepFailed := TRUE;
+        END_IF;
+END_CASE;
+
+// Verdict local de l'étape : PASS, FAIL ou TIMEOUT contrôlé.
+IF StepPassed OR StepFailed OR StepTimer.Q THEN
+    IF StepPassed THEN
+        Report.Steps[Report.CurrentStepId].Passed := TRUE;
+        Report.Steps[Report.CurrentStepId].FailReason := E_TestFailReason.FAIL_NONE;
+    ELSE
+        Report.Steps[Report.CurrentStepId].Passed := FALSE;
+        Report.Steps[Report.CurrentStepId].FailReason := SEL(StepFailed, E_TestFailReason.FAIL_TIMEOUT, E_TestFailReason.FAIL_CHECK);
+        AnyFailed := TRUE;
+    END_IF;
+    Report.Steps[Report.CurrentStepId].Executed := TRUE;
+    Report.Steps[Report.CurrentStepId].Duration := StepElapsed;
+    // Un échec ou un timeout termine immédiatement la suite : aucune étape
+    // suivante ne doit laisser le banc attendre un signal devenu impossible.
+    IF NOT StepPassed THEN
+        Step := 0;
+    END_IF;
+    StepPassed := FALSE;
+    StepFailed := FALSE;
+    StepTimer(IN := FALSE, PT := StepLimit);
+    StepElapsed := T#0s;
+    IF Step = 0 THEN
+        Busy := FALSE;
+        Done := TRUE;
+        Report.InProgress := FALSE;
+        Report.AnyFailed := AnyFailed;
+        Report.AllPassed := NOT AnyFailed;
+        Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
+        TerminalState := Report.TerminalState;
+        IF CaseId = 1 THEN
+            Report.Cases[CaseId].Name := 'TC-E1 Interface Homing nominale';
+        ELSE
+            Report.Cases[CaseId].Name := 'TC-E2 Commandes Home M1/M2';
+        END_IF;
+        Report.Cases[CaseId].Executed := TRUE;
+        Report.Cases[CaseId].Ok := NOT AnyFailed;
+        Report.Cases[CaseId].FailedStepId := 0;
+        Report.Cases[CaseId].FailReason := E_TestFailReason.FAIL_NONE;
+        IF AnyFailed THEN
+            Report.Cases[CaseId].FailedStepId := Report.CurrentStepId;
+            Report.Cases[CaseId].FailReason := E_TestFailReason.FAIL_CHECK;
+        END_IF;
+        Report.Cases[CaseId].Duration := Report.Duration;
+        IF AnyFailed THEN Report.FailureSummary := 'Encoder/Homing : échec ou timeout'; END_IF;
+    ELSE
+        StepStarted := FALSE;
+    END_IF;
+END_IF;
+
+// Limite globale de sécurité de la suite : 30 s maximum.
+IF Report.Duration &gt;= T#30s AND Busy THEN
+    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+    Busy := FALSE;
+    Done := TRUE;
+    AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+    Report.InProgress := FALSE;
+    Report.AnyFailed := TRUE;
+    Report.AllPassed := FALSE;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := 3002;
+    Report.ErrorMessage := 'Watchdog Encoder/Homing expire';
+    Report.FailureSummary := Report.ErrorMessage;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>619e8bc6-54ae-5f02-aebe-115a30065e45</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Encoder_Abs" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -8286,7 +8574,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front — piloté par FB_Encoder_Homing (stub FALSE ce lot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front — piloté par FB_Encoder_Homing via PRG_02_Encoders</xhtml>
               </documentation>
             </variable>
             <variable name="PresetValue">
@@ -10588,6 +10876,491 @@ Done := FALSE;
           </data>
         </addData>
       </pou>
+      <pou name="FB_ModesValidation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Start">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Abort">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AnyFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimGateOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ActiveStimulusId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="Report">
+              <type>
+                <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfigErrorCheckIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="StartPrev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CaseId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepStarted">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="StepLimit">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="StepFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepPassed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="NeutralHoldTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tient le neutre &gt;1s avant un nouvel appui (reprise), voir FB_Joystick §NeutralHoldTime</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">============================================================================
+   🧪 FB_ModesValidation — Suite PLC Modes / Homme-mort (post-suppression IHM_MANU)
+   ============================================================================
+   🎯 Rôle : valide que le pilotage manuel passe désormais EXCLUSIVEMENT par
+      MAINT_N1/MAINT_N2 + joystick homme-mort (plus de bypass IHM_MANU), et que
+      les sécurités/l'autorisation de mode restent actives dans tous les cas.
+   📄 Couvre (mission suppression IHM_MANU, 2026-07-19) :
+      TC-M1 : MAINT_N1 + homme-mort → mouvement M1 autorisé
+      TC-M2 : MAINT_N2 + homme-mort → mouvement M1 autorisé
+              (+ relâchement=arrêt, + reprise sur nouvelle sollicitation valide,
+              testés dans TC-M1/TC-M2 eux-mêmes, pas des cas séparés)
+      TC-M3 : SEMI_AUTO atteignable sans dépendance IHM_MANU
+      TC-M4 : Simulation fonctionnelle sans dépendance IHM_MANU
+      TC-M5 : Sécurité active + aucun mouvement sans autorisation de mode
+              (perte EmergencyStopOk → Mode=DISABLE + FB_Winch neutralisé,
+              quel que soit le mode précédent)
+      TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais — une tentative réelle de
+              démarrage (`GVL_IHM.Cycle.CmdStart`) hors SEMI_AUTO reste sans effet
+              (Busy reste FALSE) au lieu d'attendre indéfiniment
+      🔎 Homing nominal sans IHM_MANU : déjà couvert par SUITE_ENCODER (TC-E1/E2).
+   🧩 Même moteur allégé (CASE direct) que FB_EncoderValidation — pas le cadre
+      StepTable/CheckTable déclaratif (inutile ici, peu d'étapes par cas).
+   ============================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// Gate simulation : nécessite le joystick simulé (override programmatique) et M1 simulé.
+SimGateOk := GVL_Simulation.SimulationModeActive
+          AND NOT GVL_Simulation.JoystickSignal_IsReal
+          AND NOT GVL_Simulation.EncoderM1_IsReal
+          AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
+
+ActiveStimulusId := 0;
+
+IF Abort THEN
+    GVL_PLC_Tests.OverrideJoystickActive := FALSE;
+    GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Cycle.CmdStart := FALSE;
+    Busy := FALSE;
+    Done := TRUE;
+    AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+    Report.Aborted := TRUE;
+    Report.AnyFailed := TRUE;
+    Report.TerminalState := TerminalState;
+    Report.FailureSummary := 'Modes/Homme-mort : ABORTED';
+    RETURN;
+END_IF;
+
+IF Start AND NOT StartPrev AND NOT Busy THEN
+    StartPrev := TRUE;
+    Busy := TRUE;
+    Done := FALSE;
+    AnyFailed := FALSE;
+    ConfigError := FALSE;
+    ErrorCode := 0;
+    ErrorMessage := '';
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    Step := FirstStepId;
+    IF (Step &lt;&gt; 10) AND (Step &lt;&gt; 20) AND (Step &lt;&gt; 30) AND (Step &lt;&gt; 40) AND (Step &lt;&gt; 50) AND (Step &lt;&gt; 60) THEN
+        Step := 10;
+    END_IF;
+    Report.Name := 'Modes / Homme-mort Validation';
+    Report.InProgress := TRUE;
+    Report.AllPassed := FALSE;
+    Report.AnyFailed := FALSE;
+    Report.Aborted := FALSE;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := 0;
+    Report.ErrorMessage := '';
+    Report.FailureSummary := '';
+    Report.CurrentStepId := Step;
+    Report.Duration := T#0s;
+    Report.RunCounter := Report.RunCounter + 1;
+    FOR Index := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
+        Report.Steps[Index].Executed := FALSE;
+        Report.Steps[Index].Passed := FALSE;
+        Report.Steps[Index].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Steps[Index].Duration := T#0s;
+    END_FOR;
+    FOR Index := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        Report.Cases[Index].Executed := FALSE;
+        Report.Cases[Index].Ok := FALSE;
+        Report.Cases[Index].FailedStepId := 0;
+        Report.Cases[Index].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Cases[Index].Duration := T#0s;
+    END_FOR;
+    StepStarted := FALSE;
+    GVL_PLC_Tests.OverrideJoystickActive := TRUE;
+    GVL_PLC_Tests.OverrideJoystickRawX := 5000;
+    GVL_PLC_Tests.OverrideJoystickRawY := 5000;
+    GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
+ELSIF NOT Start THEN
+    StartPrev := FALSE;
+END_IF;
+
+IF NOT Busy THEN
+    RETURN;
+END_IF;
+
+StepElapsed := StepElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+Report.CurrentStepId := Step;
+CaseId := (Step / 10);
+Report.CurrentCaseId := CaseId;
+
+IF NOT StepStarted THEN
+    StepStarted := TRUE;
+    StepElapsed := T#0s;
+    CASE Step OF
+        10, 20: StepLimit := T#3s;   // Mode appliqué + neutre initial
+        11, 21: StepLimit := T#5s;   // Armement + départ mouvement
+        12: StepLimit := T#5s;       // TC-M1 uniquement : relâchement → arrêt
+        13: StepLimit := T#3s;       // TC-M1 uniquement : neutre tenu &gt;1s (NeutralHoldTime)
+        14: StepLimit := T#5s;       // TC-M1 uniquement : reprise → mouvement repart
+        30: StepLimit := T#5s;       // SEMI_AUTO atteint
+        40: StepLimit := T#3s;       // Simulation OK sans IHM_MANU
+        50: StepLimit := T#3s;       // Perte EmergencyStopOk → Mode DISABLE
+        51: StepLimit := T#3s;       // FB_Winch neutralisé (State DISABLED)
+        52: StepLimit := T#5s;       // Récupération après restauration EmergencyStopOk
+        60: StepLimit := T#3s;       // Tentative réelle de démarrage hors SEMI_AUTO (pas de blocage)
+    ELSE
+        ConfigError := TRUE;
+        ConfigErrorStepId := Step;
+        ErrorCode := 4001;
+        ErrorMessage := 'Modes/Homme-mort étape inconnue';
+        StepLimit := T#0s;
+    END_CASE;
+END_IF;
+
+StepTimer(IN := TRUE, PT := StepLimit);
+NeutralHoldTimer(IN := (Step = 13) AND (ABS(GVL_PLC_Tests.OverrideJoystickRawY - 5000) &lt; 500), PT := T#1200MS);
+
+CASE Step OF
+    // ─────────── TC-M1 : MAINT_N1 + homme-mort (+ arrêt + reprise) ───────────
+    10:
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+        GVL_PLC_Tests.OverrideJoystickRawY := 5000; // neutre
+        GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
+        IF SimGateOk AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) THEN
+            StepPassed := TRUE;
+            Step := 11;
+            StepStarted := FALSE;
+        END_IF;
+
+    11:
+        // Armement (bouton pressé AU NEUTRE) puis débattement Fwd — homme-mort réel de FB_Joystick.
+        GVL_PLC_Tests.OverrideJoystickRawButton := TRUE;
+        GVL_PLC_Tests.OverrideJoystickRawY := 10000; // plein débattement montée
+        IF PRG_06_WinchControl.instWinchM1.RelayFwd THEN
+            StepPassed := TRUE;
+            Step := 12;
+            StepStarted := FALSE;
+        END_IF;
+
+    12:
+        // Relâchement du bouton homme-mort → le mouvement doit s'arrêter (item "relâchement=arrêt").
+        GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
+        IF NOT PRG_06_WinchControl.instWinchM1.RelayFwd THEN
+            StepPassed := TRUE;
+            Step := 13;
+            StepStarted := FALSE;
+        END_IF;
+
+    13:
+        // Retour + maintien au neutre &gt;NeutralHoldTime (1s en simulation) pour un réarmement propre.
+        GVL_PLC_Tests.OverrideJoystickRawY := 5000;
+        IF NeutralHoldTimer.Q THEN
+            StepPassed := TRUE;
+            Step := 14;
+            StepStarted := FALSE;
+        END_IF;
+
+    14:
+        // Reprise : nouvel appui AU NEUTRE puis débattement → mouvement doit repartir.
+        GVL_PLC_Tests.OverrideJoystickRawButton := TRUE;
+        GVL_PLC_Tests.OverrideJoystickRawY := 10000;
+        IF PRG_06_WinchControl.instWinchM1.RelayFwd THEN
+            StepPassed := TRUE;
+            Step := 20; // Enchaîne directement sur TC-M2 (teardown commun ci-dessous)
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M2 : MAINT_N2 + homme-mort ───────────
+    20:
+        GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
+        GVL_PLC_Tests.OverrideJoystickRawY := 5000;
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        IF SimGateOk AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
+            StepPassed := TRUE;
+            Step := 21;
+            StepStarted := FALSE;
+        END_IF;
+
+    21:
+        GVL_PLC_Tests.OverrideJoystickRawButton := TRUE;
+        GVL_PLC_Tests.OverrideJoystickRawY := 10000;
+        IF PRG_06_WinchControl.instWinchM1.RelayFwd THEN
+            StepPassed := TRUE;
+            Step := 30;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M3 : SEMI_AUTO atteignable sans IHM_MANU ───────────
+    30:
+        GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
+        GVL_PLC_Tests.OverrideJoystickRawY := 5000;
+        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+            StepPassed := TRUE;
+            Step := 40;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M4 : Simulation fonctionnelle sans IHM_MANU ───────────
+    40:
+        IF GVL_Simulation.SimulationModeActive AND SimGateOk THEN
+            StepPassed := TRUE;
+            Step := 50;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M5 : Sécurité active + aucun mouvement sans autorisation de mode ───────────
+    50:
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+        GVL_PLC_Tests.OverrideContactorFalse := TRUE; // Force EmergencyStopOk := FALSE (voir PRG_00_Inputs)
+        IF PRG_04_Modes.instModes.Mode = E_Mode.DISABLE THEN
+            StepPassed := TRUE;
+            Step := 51;
+            StepStarted := FALSE;
+        END_IF;
+
+    51:
+        IF PRG_06_WinchControl.instWinchM1.State = E_State.DISABLED
+           AND NOT PRG_06_WinchControl.instWinchM1.Ready THEN
+            StepPassed := TRUE;
+            Step := 52;
+            StepStarted := FALSE;
+        END_IF;
+
+    52:
+        GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+        GVL_IHM.Modes.FaultMachineReset := TRUE;
+        IF PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE THEN
+            GVL_IHM.Modes.FaultMachineReset := FALSE;
+            StepPassed := TRUE;
+            Step := 60;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais ───────────
+    60:
+        // 🔧 REX 2026-07-19 (revue mission IHM_MANU, finding B) : tentative RÉELLE de
+        // démarrage (GVL_IHM.Cycle.CmdStart, ré-assertée chaque scan pour couvrir l'ordre
+        // des tâches) pendant &gt;200 ms hors SEMI_AUTO — instCycle.Enable=FALSE doit la rendre
+        // sans effet (Busy reste FALSE), pas un simple instantané qui ne prouverait rien.
+        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+        GVL_IHM.Cycle.CmdStart := TRUE;
+        IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) AND (StepElapsed &gt;= T#200MS) THEN
+            GVL_IHM.Cycle.CmdStart := FALSE;
+            IF NOT PRG_05_Cycle.instCycle.Busy THEN
+                StepPassed := TRUE;
+            ELSE
+                StepFailed := TRUE;
+            END_IF;
+            Step := 0;
+        END_IF;
+END_CASE;
+
+// Verdict local de l'étape : PASS, FAIL ou TIMEOUT contrôlé.
+IF StepPassed OR StepFailed OR StepTimer.Q THEN
+    IF StepPassed THEN
+        Report.Steps[Report.CurrentStepId].Passed := TRUE;
+        Report.Steps[Report.CurrentStepId].FailReason := E_TestFailReason.FAIL_NONE;
+    ELSE
+        Report.Steps[Report.CurrentStepId].Passed := FALSE;
+        Report.Steps[Report.CurrentStepId].FailReason := SEL(StepFailed, E_TestFailReason.FAIL_TIMEOUT, E_TestFailReason.FAIL_CHECK);
+        AnyFailed := TRUE;
+    END_IF;
+    Report.Steps[Report.CurrentStepId].Executed := TRUE;
+    Report.Steps[Report.CurrentStepId].Duration := StepElapsed;
+    IF NOT StepPassed THEN
+        Step := 0; // Échec ou timeout = fin immédiate, pas d'attente supplémentaire.
+    END_IF;
+    StepPassed := FALSE;
+    StepFailed := FALSE;
+    StepTimer(IN := FALSE, PT := StepLimit);
+    StepElapsed := T#0s;
+    IF Step = 0 THEN
+        GVL_PLC_Tests.OverrideJoystickActive := FALSE;
+        GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+        Busy := FALSE;
+        Done := TRUE;
+        Report.InProgress := FALSE;
+        Report.AnyFailed := AnyFailed;
+        Report.AllPassed := NOT AnyFailed;
+        Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
+        TerminalState := Report.TerminalState;
+        Report.Cases[1].Name := 'TC-M1/M2/M3/M4/M5/M6 Modes+Homme-mort (suite unique)';
+        Report.Cases[1].Executed := TRUE;
+        Report.Cases[1].Ok := NOT AnyFailed;
+        Report.Cases[1].FailedStepId := 0;
+        Report.Cases[1].FailReason := E_TestFailReason.FAIL_NONE;
+        IF AnyFailed THEN
+            Report.Cases[1].FailedStepId := Report.CurrentStepId;
+            Report.Cases[1].FailReason := E_TestFailReason.FAIL_CHECK;
+            Report.FailureSummary := CONCAT('Modes/Homme-mort : échec étape ', INT_TO_STRING(Report.CurrentStepId));
+        END_IF;
+        Report.Cases[1].Duration := Report.Duration;
+    ELSE
+        StepStarted := FALSE;
+    END_IF;
+END_IF;
+
+// Limite globale de sécurité de la suite : 60 s maximum.
+IF Report.Duration &gt;= T#60s AND Busy THEN
+    GVL_PLC_Tests.OverrideJoystickActive := FALSE;
+    GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+    Busy := FALSE;
+    Done := TRUE;
+    AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+    Report.InProgress := FALSE;
+    Report.AnyFailed := TRUE;
+    Report.AllPassed := FALSE;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := 4002;
+    Report.ErrorMessage := 'Watchdog Modes/Homme-mort expire';
+    Report.FailureSummary := Report.ErrorMessage;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>382b521c-76df-5610-b353-42f0bb0338c2</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Output" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -10815,6 +11588,16 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <derived name="FB_BucketValidation" />
               </type>
             </variable>
+            <variable name="instEncoderValidation">
+              <type>
+                <derived name="FB_EncoderValidation" />
+              </type>
+            </variable>
+            <variable name="instModesValidation">
+              <type>
+                <derived name="FB_ModesValidation" />
+              </type>
+            </variable>
             <variable name="RunAllTrig">
               <type>
                 <derived name="R_TRIG" />
@@ -10877,6 +11660,36 @@ voir AF_Partie-14 §7.3.4)</xhtml>
               </type>
             </variable>
             <variable name="FirstStepBucket">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StartEncoder">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AbortEncoder">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepEncoder">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StartModes">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AbortModes">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepModes">
               <type>
                 <INT />
               </type>
@@ -11025,6 +11838,10 @@ CASE GVL_PLC_Tests.Status.RunState OF
         AbortTranslation := FALSE;
         StartBucket := FALSE;
         AbortBucket := FALSE;
+        StartEncoder := FALSE;
+        AbortEncoder := FALSE;
+        StartModes := FALSE;
+        AbortModes := FALSE;
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
 
@@ -11101,6 +11918,36 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage d'une suite ciblée (Codeurs/Homing nominal)
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteEncoder THEN
+            IF GVL_Simulation.SimulationModeActive AND instEncoderValidation.SimGateOk THEN
+                ChainMode := FALSE;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteEncoder;
+                StartEncoder := TRUE;
+                IF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
+                    FirstStepEncoder := 20;
+                ELSE
+                    FirstStepEncoder := 10;
+                END_IF;
+                GVL_PLC_Tests.Status.FailureSummary := '';
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage d'une suite ciblée (Modes/Homme-mort, post-suppression IHM_MANU)
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteModes THEN
+            IF GVL_Simulation.SimulationModeActive AND instModesValidation.SimGateOk THEN
+                ChainMode := FALSE;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteModes;
+                StartModes := TRUE;
+                FirstStepModes := 10;
+                GVL_PLC_Tests.Status.FailureSummary := '';
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
         // Commande d'effacement du rapport — acquittement explicite, retour à IDLE
@@ -11134,6 +11981,10 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 AbortSafety := TRUE;
             ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation THEN
                 AbortTranslation := TRUE;
+            ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder THEN
+                AbortEncoder := TRUE;
+            ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
+                AbortModes := TRUE;
             ELSE
                 AbortBucket := TRUE;
             END_IF;
@@ -11341,7 +12192,47 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 FinalAnyFailed := instBucketValidation.AnyFailed;
                 GVL_PLC_Tests.Status.FailureSummary := instBucketValidation.Report.FailureSummary;
             END_IF;
-            GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
+        GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
+            IF FinalAborted THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+            ELSIF FinalAnyFailed THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+            ELSE
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder AND instEncoderValidation.Done THEN
+            AbortEncoder := FALSE;
+            FinalAborted := instEncoderValidation.Report.Aborted;
+            FinalAnyFailed := instEncoderValidation.AnyFailed;
+            GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.FailureSummary;
+            IF SuiteWatchdogExpired THEN
+                instEncoderValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+                instEncoderValidation.Report.ErrorCode := 2004;
+                instEncoderValidation.Report.ErrorMessage := 'Watchdog suite Encoder/Homing expire';
+                GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.ErrorMessage;
+                FinalAborted := FALSE;
+                FinalAnyFailed := TRUE;
+            END_IF;
+            IF FinalAborted THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+            ELSIF FinalAnyFailed THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+            ELSE
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes AND instModesValidation.Done THEN
+            AbortModes := FALSE;
+            FinalAborted := instModesValidation.Report.Aborted;
+            FinalAnyFailed := instModesValidation.AnyFailed;
+            GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.FailureSummary;
+            IF SuiteWatchdogExpired THEN
+                instModesValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+                instModesValidation.Report.ErrorCode := 2005;
+                instModesValidation.Report.ErrorMessage := 'Watchdog suite Modes/Homme-mort expire';
+                GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.ErrorMessage;
+                FinalAborted := FALSE;
+                FinalAnyFailed := TRUE;
+            END_IF;
             IF FinalAborted THEN
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSIF FinalAnyFailed THEN
@@ -11357,6 +12248,8 @@ END_CASE;
 instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
 instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, FirstStepId := FirstStepTranslation);
 instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
+instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, FirstStepId := FirstStepEncoder);
+instModesValidation(Start := StartModes, Abort := AbortModes, FirstStepId := FirstStepModes);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
@@ -11364,6 +12257,8 @@ GVL_PLC_Tests.Status.SuiteWatchdogExpired := SuiteWatchdogExpired;
 GVL_PLC_Tests.SuiteSafetyValidation := instSafetyValidation.Report;
 GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
 GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
+GVL_PLC_Tests.SuiteEncoderValidation := instEncoderValidation.Report;
+GVL_PLC_Tests.SuiteModesValidation := instModesValidation.Report;
 
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
@@ -11384,6 +12279,22 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.TerminalState := instBucketValidation.TerminalState;
         GVL_PLC_Tests.Status.ErrorCode := instBucketValidation.ErrorCode;
         GVL_PLC_Tests.Status.ErrorMessage := instBucketValidation.ErrorMessage;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instEncoderValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instEncoderValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instEncoderValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instEncoderValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instEncoderValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instEncoderValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instEncoderValidation.ErrorMessage;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instModesValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instModesValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instModesValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instModesValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instModesValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instModesValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instModesValidation.ErrorMessage;
     ELSE
         GVL_PLC_Tests.Status.ActiveSuiteName := instSafetyValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instSafetyValidation.Report.CurrentCaseId;
@@ -11442,6 +12353,32 @@ IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
         IF instBucketValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
             IF instBucketValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instEncoderValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instEncoderValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instModesValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instModesValidation.Report.Cases[Idx].Ok THEN
                 PassedCount := PassedCount + 1;
             ELSE
                 FailedCount := FailedCount + 1;
@@ -14779,6 +15716,29 @@ RawPosOut := RawPos;
                 <simpleValue value="10000" />
               </initialValue>
             </variable>
+            <variable name="TestOverrideActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TRUE = RawX/Y/Button pilotés par TestOverrideRaw* (suite PLC_TESTS)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOverrideRawX">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="TestOverrideRawY">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="TestOverrideRawButton">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawX">
@@ -14838,6 +15798,10 @@ RawPosOut := RawPos;
    💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
       valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
       l'appui homme-mort — exactement comme on forcerait le vrai capteur.
+   🆕 REX 2026-07-19 : `TestOverrideActive` — pilotage programmatique par la suite PLC_TESTS
+      (GVL_PLC_Tests), en complément du forçage manuel en instance CODESYS ci-dessus (les deux
+      mécanismes coexistent, le Force IDE restant prioritaire de toute façon s'il est posé).
+      Nécessaire car un Force CODESYS ne peut pas être déclenché depuis du code ST.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
           </documentation>
@@ -14856,7 +15820,14 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-IF FirstCycle THEN
+IF TestOverrideActive THEN
+    // 🆕 REX 2026-07-19 : suite PLC_TESTS — écriture CYCLIQUE volontaire (pas de FirstCycle),
+    // contrairement au forçage manuel, pour permettre un pilotage dynamique scan par scan.
+    RawX := TestOverrideRawX;
+    RawY := TestOverrideRawY;
+    RawButton := TestOverrideRawButton;
+    FirstCycle := FALSE;
+ELSIF FirstCycle THEN
     RawX := NeutralRaw;
     RawY := NeutralRaw;
     RawButton := FALSE;
@@ -18308,7 +19279,7 @@ END_IF;
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : TC-T6 — instance ISOLÉE de FB_Translation (pas l'instance machine réelle
 instTranslationM3) pour tester le ralentissement PV en pilotant Direction/StartStop/SpeedRefPct
-directement, sans dépendre de l'arbitrage Mode/ManuActive de PRG_07_TranslationControl.</xhtml>
+directement, sans dépendre de l'arbitrage Mode de PRG_07_TranslationControl.</xhtml>
               </documentation>
             </variable>
             <variable name="UnderTestDirection">
@@ -19128,8 +20099,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(défaut Auto). Sert à brider en IHM_MANU pendant les essais progressifs
-(voir PRG_06_WinchControl, GVL_IHM.IHM_MANU.WinchMaxStepFwd) — temporaire.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(valeur fixe Auto ET Manuel, voir PRG_06_WinchControl).
 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)</xhtml>
               </documentation>
             </variable>
@@ -20774,7 +21744,12 @@ END_IF;
 instSimJoystick(
     Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.JoystickSignal_IsReal,
     NeutralRaw      := GVL_Simulation.JoystickForceNeutralRaw,
-    MaxRaw          := GVL_Simulation.JoystickForceMaxRaw
+    MaxRaw          := GVL_Simulation.JoystickForceMaxRaw,
+    // 🆕 REX 2026-07-19 : pilotage programmatique par la suite PLC_TESTS (SUITE_MODES)
+    TestOverrideActive    := GVL_PLC_Tests.OverrideJoystickActive,
+    TestOverrideRawX      := GVL_PLC_Tests.OverrideJoystickRawX,
+    TestOverrideRawY      := GVL_PLC_Tests.OverrideJoystickRawY,
+    TestOverrideRawButton := GVL_PLC_Tests.OverrideJoystickRawButton
 );
 
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par Joystick_IsReal UNIQUEMENT (bus/nœud),
@@ -21219,17 +22194,10 @@ instSafetyWinchM1(
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
-    // 🔧 REX 2026-07-15 (7) — BUG CORRIGÉ (retour terrain, SafetyErrorId=256/bit8) : Méca B ne
-    // regardait QUE le joystick CANopen pour détecter "commande opérateur" — en IHM_MANU piloté
-    // par BOUTONS HMI (JoystickSelect=FALSE), le joystick reste au neutre en permanence, donc
-    // MecaB_NoOperatorCmd restait TRUE en continu même pendant un mouvement légitime aux boutons
-    // → SafeStop après PostRampTimeout (3s) dès qu'un mouvement HMI dépassait ce délai. Ajout des
-    // boutons IHM_MANU bruts (M1 individuel + Couplé) — reste indépendant de l'arbitrage
-    // PRG_06/FB_Winch (défense en profondeur intacte, lecture directe des boutons IHM comme le
-    // joystick l'était déjà).
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 0.1)
-                              AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
-                              AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
+    // 🔧 REX 2026-07-19 : suppression IHM_MANU — le joystick est désormais la SEULE source de
+    // mouvement manuel (plus de boutons HMI bruts en parallèle) : le check bouton ajouté en
+    // 2026-07-15 (7) pour compenser ce 2ᵉ chemin de commande est devenu sans objet, retiré.
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 0.1),
     BenneHoldStillActive := PRG_06_WinchControl.instBucket.Busy, // Méca C — M1 doit rester immobile pendant le
                                                                      // benne ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
@@ -21268,10 +22236,8 @@ instSafetyWinchM2(
     // à M2 (c'est M2 qui bouge pendant le benne, BenneHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
-    // 🔧 REX 2026-07-15 (7) : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus).
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 0.1)
-                              AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
-                              AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
+    // 🔧 REX 2026-07-19 : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus) — suppression IHM_MANU.
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 0.1),
     BenneHoldStillActive := FALSE,
     // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
     // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2
@@ -21398,7 +22364,7 @@ instModes(
     InhibitM2Request    := GVL_IHM.M2TreuilBucket.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     HomingApproachEnableRequest := GVL_IHM.Commun.HomingApproachEnableRequest, // 🆕 REX 2026-07-08 (2)
     EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
-    JoystickWinchSelectRequest := GVL_IHM.IHM_MANU.JoystickWinchSelect // 🆕 TASK-0001
+    JoystickWinchSelectRequest := GVL_IHM.Modes.JoystickWinchSelect // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
 );
 </xhtml>
           </ST>
@@ -21515,7 +22481,9 @@ CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
 
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
-    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND NOT PRG_10_Outputs.ManuActive,
+    // 🔧 REX 2026-07-19 : suppression IHM_MANU — Mode=SEMI_AUTO suffit seul (les modes
+    // sont mutuellement exclusifs dans FB_Modes, plus besoin d'un flag ManuActive séparé).
+    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
     CycleMotionPermit   := CycleMotionPermit,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
@@ -21784,50 +22752,15 @@ par à-coup (même raisonnement que M1_Busy/M2_Busy sur instBucket, voir §0).</
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : décalage dynamique de la butée haute de M2</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledFwdBucketOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-15 (3) — demande utilisateur : les fins de course virtuelles benne
-(FdcBucketOpen/CloseActive) doivent bloquer le mouvement AUSSI en pilotage COUPLÉ IHM_MANU
-(M1+M2 simultané), pas seulement en pilotage individuel M2 — sinon un opérateur qui pousse le
-couplage alors que le benne est déjà en butée virtuelle n'est protégé que par la butée
-mécanique passive. Masque calculé UNE FOIS ici, consommé par M1 ET M2 (§1/§2 ci-dessous) pour
-que les deux treuils s'arrêtent ENSEMBLE (pas de désynchro M1/M2 en cas de blocage partiel).
-Couplage montée autorisé (pas de butée fermeture benne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoupledRevBucketOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage descente autorisé (pas de butée ouverture benne)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ManuMaxStepFwd">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (demande utilisateur,
-TEMPORAIRE tant que les vitesses définitives ne sont pas figées, à retirer ensuite) : commun
-aux 2 treuils (GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev, structure figée, un seul réglage pour M1
-ET M2). Actif UNIQUEMENT si ManuActive — Auto garde son comportement inchangé (5 en montée,
-WinchMaxStepDescente en descente). En Manu, le plafond descente est le MIN avec
-WinchMaxStepDescente (jamais moins protecteur qu'Auto, juste potentiellement plus prudent).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ManuMaxStepRev">
-              <type>
-                <INT />
-              </type>
-            </variable>
             <variable name="EffectiveMaxStepAscent">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-19 : palier max Ascension/Descente — même valeur en Auto ET Manuel
+(ex-plafond IHM_MANU "essais progressifs" retiré avec la suppression d'IHM_MANU, voir
+DOC/IHM_MANU_Journal_Modifications.md).</xhtml>
+              </documentation>
             </variable>
             <variable name="EffectiveMaxStepDescente">
               <type>
@@ -21901,24 +22834,10 @@ SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
 SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &lt; 0.0);
 
-// 🆕 REX 2026-07-15 (3) — voir déclaration VAR ci-dessus : couplé masqué par les mêmes fins de
-// course benne que l'individuel M2, appliqué à M1 ET M2 (§1/§2) pour arrêter les DEUX treuils
-// ensemble plutôt que de désynchroniser M1/M2 en ne bloquant que la moitié du couplage.
-CoupledFwdBucketOk := NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive;
-CoupledRevBucketOk := NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive;
-
-// 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (voir déclaration VAR
-// ci-dessus). Bornage identique à l'ex-logique PRG_10_Outputs retirée lors du passage sur FB_Winch.
-ManuMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
-IF (ManuMaxStepFwd &lt; 1) OR (ManuMaxStepFwd &gt; 5) THEN
-    ManuMaxStepFwd := 5; // Pleine vitesse par défaut si non initialisé/invalide
-END_IF;
-ManuMaxStepRev := GVL_IHM.IHM_MANU.WinchMaxStepRev;
-IF (ManuMaxStepRev &lt; 1) OR (ManuMaxStepRev &gt; 5) THEN
-    ManuMaxStepRev := 2; // Palier 2 max par défaut en descente (conforme AF) si non initialisé/invalide
-END_IF;
-EffectiveMaxStepAscent   := SEL(PRG_10_Outputs.ManuActive, 5, ManuMaxStepFwd);
-EffectiveMaxStepDescente := SEL(PRG_10_Outputs.ManuActive, _WinchMaxStepDescent, MIN(_WinchMaxStepDescent, ManuMaxStepRev));
+// 🔧 REX 2026-07-19 : palier max — même valeur Auto ET Manuel depuis la suppression d'IHM_MANU
+// (ex-plafond "essais progressifs" IHM_MANU, explicitement marqué TEMPORAIRE, retiré).
+EffectiveMaxStepAscent   := 5;
+EffectiveMaxStepDescente := _WinchMaxStepDescent;
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -21935,35 +22854,12 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
     M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
                                ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
-ELSIF PRG_10_Outputs.ManuActive THEN
-    // 🆕 REX 2026-07-15 (2) — IHM_MANU pilote désormais M1 via FB_Winch (au lieu de l'ex-bypass
-    // direct dans PRG_10_Outputs) : récupère gratuitement la rampe accel/décel + le ralentissement
-    // en zone d'approche de bordure + le maintien du relais pendant la décél (mêmes paramètres
-    // persistants qu'en Auto, voir instWinchM1 plus bas §6). Demande (boutons IHM ou joystick, déjà
-    // arbitrée par PRG_10_Outputs : M1Fwd_Demand/M1Rev_Demand/CoupledFwd_Demand/CoupledRev_Demand)
-    // lue avec 1 scan de retard (~10ms, PRG_10 position 10 &gt; PRG_06 position 6) — même principe
-    // déjà accepté ailleurs dans ce fichier (Benne.Busy, SyncMinorDeviation).
-    // 🔧 REX 2026-07-15 (5) — trouvé en revue croisée (agent Haiku + relecture manuelle) : M1
-    // INDIVIDUEL (bouton M1_RelayFwd/Rev, indépendant de M2) n'était masqué par AUCUNE butée
-    // benne — delta = CablePosM1 - CablePosM2, donc bouger M1 seul aggrave la MÊME sur-contrainte
-    // mécanique que le couplé (déjà corrigé ci-dessous) : M1 Fwd augmente le delta (aggrave
-    // FdcBucketOpenActive, delta déjà &gt;= 0) ; M1 Rev diminue le delta (aggrave
-    // FdcBucketCloseActive, delta déjà &lt;= -10). Sens INVERSÉ par rapport à M2 (M2Fwd↔Close,
-    // M2Rev↔Open) car M1 et M2 ont un effet opposé sur le même delta. Couplé masqué par
-    // CoupledFwdBucketOk/CoupledRevBucketOk (REX 2026-07-15 (3)) — M1 s'arrête EN MÊME TEMPS que
-    // M2 si le couplage OU son propre individuel violerait une butée benne.
-    IF (PRG_10_Outputs.M1Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdBucketOk) THEN
-        M1_Direction_Active := 1;
-    ELSIF (PRG_10_Outputs.M1Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevBucketOk) THEN
-        M1_Direction_Active := -1;
-    ELSE
-        M1_Direction_Active := 0;
-    END_IF;
-    M1_StartStop_Active := (M1_Direction_Active &lt;&gt; 0);
-    // 🎯 Joystick = vitesse proportionnelle à la déflexion (comme en Auto) ; boutons HMI = cible 100%
-    // (FB_Winch rampe déjà en interne, plus besoin de la rampe HMI locale ex-PRG_10_Outputs).
-    M1_SpeedRef_Active  := SEL(GVL_IHM.IHM_MANU.JoystickSelect, 100.0, ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
 ELSE
+    // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2, pilotage exclusif par le
+    // joystick homme-mort (plus de bypass boutons HMI directs). Seule source de mouvement manuel.
+    // 🆕 Sélection treuil (TASK-0001, MAINT_N2 uniquement, voir FB_Modes.JoystickWinchSelectArbitrated) :
+    // 1=M1 seul, 2=M2 seul, 3=Couplé — forcé à 3 (Couplé) hors MAINT_N2, donc comportement
+    // inchangé en MAINT_N1 (M1 et M2 répondent toujours ensemble au joystick).
     // 🔧 REX 2026-07-08 : + AND DeadmanArmed — NOT Busy seul insuffisant (rampe joystick met du
     // temps à redescendre à 0 après désarmement homme-mort ⇒ StartStop reste TRUE le temps de la
     // décél, M1 bougeait/frein décollait à la fin d'un cycle benne). DeadmanArmed reste FALSE
@@ -21972,6 +22868,8 @@ ELSE
     M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
     M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instBucket.Busy
                             AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
+                                 OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
     M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
@@ -21996,21 +22894,10 @@ ELSE
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
                                    ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
-    ELSIF PRG_10_Outputs.ManuActive THEN
-        // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course benne (FdcBucket) appliquées
-        // au pilotage INDIVIDUEL **ET** COUPLÉ de M2 désormais (demande utilisateur — "que ce soit
-        // couplé ou pas couplé, il faut rester dans les butées"). Ex-comportement (couplé non
-        // masqué) retiré : c'était une incohérence, pas un choix voulu.
-        IF (PRG_10_Outputs.M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdBucketOk) THEN
-            M2_Direction_Active := 1;
-        ELSIF (PRG_10_Outputs.M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevBucketOk) THEN
-            M2_Direction_Active := -1;
-        ELSE
-            M2_Direction_Active := 0;
-        END_IF;
-        M2_StartStop_Active := (M2_Direction_Active &lt;&gt; 0);
-        M2_SpeedRef_Active  := SEL(GVL_IHM.IHM_MANU.JoystickSelect, 100.0, ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
     ELSE
+        // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2, pilotage exclusif par le
+        // joystick homme-mort. Sélection treuil (TASK-0001, MAINT_N2 uniquement) : 2=M2 seul,
+        // 3=Couplé — forcé à 3 hors MAINT_N2 (comportement inchangé en MAINT_N1).
         // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
         // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (gate directionnel)
         // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (review code) : signe inversé pour M2. SignedDeltaPosM
@@ -22022,6 +22909,8 @@ ELSE
         M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
         M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                                 AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
+                                     OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1))); // 🔧 REX 2026-07-08 (7)
         M2_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
@@ -22426,7 +23315,9 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     ELSE
         M3_Direction_Active := -1;
     END_IF;
-// ── 1bis. IHM_MANU — 3ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
+// ── 1bis. MAINT_N1/N2 — 2ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
+// 🔧 REX 2026-07-19 : ex-libellé "IHM_MANU" (bypass supprimé) — cette branche est désormais
+// gatée par Mode (MAINT_N1/N2), pas par un flag ManuActive séparé.
 // 🆕 REX 2026-07-16 : remplace l'ex-bypass direct M3_CommandWord dans PRG_10_Outputs — M3 est
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
@@ -22443,7 +23334,11 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     ELSE
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     END_IF;
+    // 🛡️ REX 2026-07-19 (revue mission IHM_MANU) : DeadmanArmed exigé même en pilotage boutons
+    // IHM (ReqFwd/ReqRev), pas seulement en pilotage joystick — sinon les boutons IHM
+    // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
+                           AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                            AND (NOT GVL_IHM.TranslationM3.JoystickSelect
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
@@ -22746,21 +23641,9 @@ IF GVL_IHM.Commun.LimitLegalDepthMinAllowed = 0.0 THEN
     GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
-// 🆕 REX 2026-07-15 (10) — BUG CORRIGÉ (retour terrain) : WinchMaxStepFwd/Rev (essais progressifs
-// IHM_MANU, TEMPORAIRE) n'avaient jamais de boot-init, contrairement à tous les autres réglages
-// IHM ci-dessus — restaient à 0 (défaut INT) en permanence. Le bornage de PRG_06_WinchControl
-// traitait ce 0 comme "invalide" et le remplaçait SILENCIEUSEMENT par 5 (aucune restriction),
-// sans jamais corriger l'affichage IHM : l'opérateur voyait "0" (lu comme restrictif) alors que
-// la vitesse réellement appliquée était pleine échelle — d'où les contacteurs qui commutaient
-// normalement malgré un "0" à l'écran. GVL_IHM.IHM_MANU est déjà RETAIN (ST_IHM_MANU) — pas besoin
-// de miroir GVL_PERSISTENT (dérogation temporaire, pas un réglage machine permanent, voir
-// IHM_MANU_Journal_Modifications.md §10).
-IF GVL_IHM.IHM_MANU.WinchMaxStepFwd = 0 THEN
-    GVL_IHM.IHM_MANU.WinchMaxStepFwd := 5;
-END_IF;
-IF GVL_IHM.IHM_MANU.WinchMaxStepRev = 0 THEN
-    GVL_IHM.IHM_MANU.WinchMaxStepRev := 2;
-END_IF;
+// 🔧 REX 2026-07-19 : ex-boot-init WinchMaxStepFwd/Rev (essais progressifs IHM_MANU, TEMPORAIRE)
+// retiré avec IHM_MANU — PRG_06_WinchControl applique désormais un plafond fixe (5 montée /
+// _WinchMaxStepDescent descente), identique Auto et Manuel, plus de réglage IHM à initialiser.
 
 IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
     GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
@@ -22874,6 +23757,14 @@ GVL_IHM.M1TreuilRetenue.Contactor3               := PRG_06_WinchControl.instWinc
 GVL_IHM.M1TreuilRetenue.Contactor4               := PRG_06_WinchControl.instWinchM1.Contactor4;
 GVL_IHM.M1TreuilRetenue.BrakeCmd                 := PRG_06_WinchControl.instWinchM1.BrakeCmd;
 GVL_IHM.M1TreuilRetenue.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
+GVL_IHM.M1TreuilRetenue.HomingBusy              := PRG_02_Encoders.instHomingM1.Busy;
+GVL_IHM.M1TreuilRetenue.HomingDone              := PRG_02_Encoders.instHomingM1.Done;
+GVL_IHM.M1TreuilRetenue.HomingError             := PRG_02_Encoders.instHomingM1.Error;
+GVL_IHM.M1TreuilRetenue.HomingErrorId           := PRG_02_Encoders.instHomingM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.HomingState             := PRG_02_Encoders.instHomingM1.State;
+GVL_IHM.M1TreuilRetenue.HomingStateAtError      := PRG_02_Encoders.instHomingM1.StateAtError;
+GVL_IHM.M1TreuilRetenue.HomingSuspect            := PRG_02_Encoders.instHomingM1.HomingSuspect;
+GVL_IHM.M1TreuilRetenue.HomingRefRaw             := PRG_02_Encoders.instHomingM1.HomingRefRaw;
 GVL_IHM.M1TreuilRetenue.SafeStopActive           := PRG_03_Safety.instSafetyWinchM1.SafeStop;
 GVL_IHM.M1TreuilRetenue.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM1_Active;
 GVL_IHM.M1TreuilRetenue.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
@@ -22919,6 +23810,14 @@ GVL_IHM.M2TreuilBucket.Contactor3               := PRG_06_WinchControl.instWinch
 GVL_IHM.M2TreuilBucket.Contactor4               := PRG_06_WinchControl.instWinchM2.Contactor4;
 GVL_IHM.M2TreuilBucket.BrakeCmd                 := PRG_06_WinchControl.instWinchM2.BrakeCmd;
 GVL_IHM.M2TreuilBucket.Homed                    := PRG_02_Encoders.instHomingM2.Homed;
+GVL_IHM.M2TreuilBucket.HomingBusy              := PRG_02_Encoders.instHomingM2.Busy;
+GVL_IHM.M2TreuilBucket.HomingDone              := PRG_02_Encoders.instHomingM2.Done;
+GVL_IHM.M2TreuilBucket.HomingError             := PRG_02_Encoders.instHomingM2.Error;
+GVL_IHM.M2TreuilBucket.HomingErrorId           := PRG_02_Encoders.instHomingM2.ErrorId;
+GVL_IHM.M2TreuilBucket.HomingState             := PRG_02_Encoders.instHomingM2.State;
+GVL_IHM.M2TreuilBucket.HomingStateAtError      := PRG_02_Encoders.instHomingM2.StateAtError;
+GVL_IHM.M2TreuilBucket.HomingSuspect            := PRG_02_Encoders.instHomingM2.HomingSuspect;
+GVL_IHM.M2TreuilBucket.HomingRefRaw             := PRG_02_Encoders.instHomingM2.HomingRefRaw;
 GVL_IHM.M2TreuilBucket.SafeStopActive           := PRG_03_Safety.instSafetyWinchM2.SafeStop;
 GVL_IHM.M2TreuilBucket.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM2_Active;
 GVL_IHM.M2TreuilBucket.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
@@ -23346,202 +24245,6 @@ Pulse 1s en cours</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="ManuActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">─────────  Début modification IHM_MANU  ─────────
-🆕 REX 2026-07-09 — Mode IHM_MANU (mise en service urgence, override direct sorties)
-NOT GVL_IHM.IHM_MANU.ModeDisable (logique inversée, voir ST_IHM_MANU)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TrigM1Fwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détection de fronts montants pour priorité temporelle (Boutons HMI uniquement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TrigM1Rev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TrigM2Fwd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TrigM2Rev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TrigCoupledFwd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TrigCoupledRev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TrigM3Fwd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TrigM3Rev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastM1Fwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">États au scan précédent (Boutons HMI uniquement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastM1Rev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastM2Fwd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastM2Rev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastCoupledFwd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastCoupledRev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastM3Fwd">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="LastM3Rev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1Fwd_Demand">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes brutes demandées (après aiguillage HMI / Joystick)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1Rev_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2Fwd_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2Rev_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="CoupledFwd_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="CoupledRev_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M3Fwd_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M3Rev_Demand">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="WinchMoving">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-15 (2) : rampe HMI locale (CycleTimeCalc/instHmiSpeedRamp/SpeedRefPct) et
-décodage paliers (instManuSpeedStep/ActiveMaxStepFwd/Rev) RETIRÉS avec M1Fwd_Eff ci-dessus.
-🔧 REX 2026-07-16 : ex-M3Fwd_Eff/M3Rev_Eff/M3_ActiveFreqCmd/M3_DriveIsReal RETIRÉS — M3
-piloté désormais par FB_Translation (PRG_07_TranslationControl §1bis), même principe que
-M1/M2 (REX 2026-07-15 (2) ci-dessus) : plus besoin d'états effectifs locaux pour le bypass
-M3_CommandWord (supprimé, voir fin de fichier).
-🚨 Au moins une commande de treuil HMI active (verrouillage aiguillage)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_IsReal">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le treuil M1 est configuré comme réel</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2_IsReal">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le treuil M2 est configuré comme réel</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_IsReal">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si le translation M3 est configuré comme réel</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerCutOffActive_Eff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Indique si une coupure de puissance est active sur un équipement réel</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartupNeutralOk">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Sécurité démarrage : exige le retour au neutre initial</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -23550,6 +24253,12 @@ M3_CommandWord (supprimé, voir fin de fichier).
    📄 Doc : DOC/AF_Partie6_IO_Conditioning_v1.2.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
+   🔧 REX 2026-07-19 : suppression définitive du mode IHM_MANU (override direct des sorties,
+      mise en service urgence 2026-07-09) — voir DOC/IHM_MANU_Journal_Modifications.md pour
+      l'historique complet. Le pilotage manuel passe désormais EXCLUSIVEMENT par MAINT_N1/N2
+      + joystick homme-mort (PRG_06_WinchControl/PRG_07_TranslationControl), sous supervision
+      réelle des sécurités métier (SafeStop/ForbidAscent/ForbidDescent/PowerCutOff toujours
+      actifs, plus aucun bypass conditionnel).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -23558,233 +24267,6 @@ M3_CommandWord (supprimé, voir fin de fichier).
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_10_Outputs) ===
-
-// ─────────  Début modification IHM_MANU  ─────────
-// ═══════════════════════════════════════════════════════════════════════════
-// 🚨 MODE IHM_MANU — override direct des sorties (mise en service urgence)
-// ───────────────────────────────────────────────────────────────────────────
-// 🆕 REX 2026-07-09 : logique inversée VOLONTAIRE — GVL_IHM.IHM_MANU.ModeDisable
-// est non-RETAIN, donc FALSE à CHAQUE démarrage/download automate = mode Manu
-// ACTIF d'origine, sans action opérateur. Il faut explicitement passer
-// ModeDisable=TRUE pour rendre la main au programme fonctionnel normal
-// (PRG_06_WinchControl/PRG_07_TranslationControl/PRG_03_Safety, intouchés).
-// ⚠️ Aucune sécurité logicielle métier active en Manu (safety M1/M2/M3, synchro,
-// limites logicielles, homing) — seuls les interlocks Fwd/Rev, K1-K4 ci-dessous,
-// les fins de course benne, et la chaîne AU/PowerCutOff (§ plus bas, TOUJOURS
-// active, non bypassée), protègent la machine et les personnes.
-// 📍 Placé en tête de PRG_10_Outputs (position tâche 10, la plus en aval) : écrase
-// les VAR_INPUT juste avant leur écriture réelle, APRÈS que PRG_06/07 (positions
-// 6/7) les aient déjà remplis — le programme normal tourne dans le vide, ignoré.
-ManuActive := NOT GVL_IHM.IHM_MANU.ModeDisable;
-
-// Affichage position — utile même hors Manu pour vérifier le câblage codeur en direct
-GVL_IHM.IHM_MANU.PositionM_M1 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
-GVL_IHM.IHM_MANU.PositionM_M2 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-
-// 📊 Calcul de l'écart benne et des états de fin de course (delta = M1 - M2)
-GVL_IHM.IHM_MANU.FdcBucketOpenEnable := GVL_IHM.IHM_MANU.FdcBucketOpen;
-GVL_IHM.IHM_MANU.FdcBucketCloseEnable := GVL_IHM.IHM_MANU.FdcBucketClose;
-GVL_IHM.IHM_MANU.BenneDelta := GVL_IHM.IHM_MANU.PositionM_M1 - GVL_IHM.IHM_MANU.PositionM_M2;
-GVL_IHM.IHM_MANU.FdcBucketOpenActive  := GVL_IHM.IHM_MANU.FdcBucketOpenEnable AND (GVL_IHM.IHM_MANU.BenneDelta &gt;= 0.0);
-GVL_IHM.IHM_MANU.FdcBucketCloseActive := GVL_IHM.IHM_MANU.FdcBucketCloseEnable AND (GVL_IHM.IHM_MANU.BenneDelta &lt;= -10.0);
-
-IF ManuActive THEN
-    // 1️⃣ Détection des nouveaux appuis sur boutons HMI (uniquement pour interlocks HMI)
-    TrigM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT LastM1Fwd;
-    TrigM1Rev      := GVL_IHM.IHM_MANU.M1_RelayRev AND NOT LastM1Rev;
-    TrigM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT LastM2Fwd;
-    TrigM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev AND NOT LastM2Rev;
-    TrigCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT LastCoupledFwd;
-    TrigCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND NOT LastCoupledRev;
-    TrigM3Fwd      := GVL_IHM.TranslationM3.ReqFwd AND NOT LastM3Fwd;
-    TrigM3Rev      := GVL_IHM.TranslationM3.ReqRev AND NOT LastM3Rev;
-
-    // 2️⃣ Interlocks de sécurité sur boutons HMI (Montée vs Descente)
-    IF GVL_IHM.IHM_MANU.M1_RelayFwd AND GVL_IHM.IHM_MANU.M1_RelayRev THEN
-        IF TrigM1Rev THEN
-            GVL_IHM.IHM_MANU.M1_RelayRev := FALSE; (* Rejet Rev *)
-        ELSIF TrigM1Fwd THEN
-            GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE; (* Rejet Fwd *)
-        ELSE
-            GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE;
-            GVL_IHM.IHM_MANU.M1_RelayRev := FALSE;
-        END_IF;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.M2_RelayFwd AND GVL_IHM.IHM_MANU.M2_RelayRev THEN
-        IF TrigM2Rev THEN
-            GVL_IHM.IHM_MANU.M2_RelayRev := FALSE;
-        ELSIF TrigM2Fwd THEN
-            GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE;
-        ELSE
-            GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE;
-            GVL_IHM.IHM_MANU.M2_RelayRev := FALSE;
-        END_IF;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
-        IF TrigCoupledRev THEN
-            GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
-        ELSIF TrigCoupledFwd THEN
-            GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
-        ELSE
-            GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
-            GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
-        END_IF;
-    END_IF;
-
-    IF GVL_IHM.TranslationM3.ReqFwd AND GVL_IHM.TranslationM3.ReqRev THEN
-        IF TrigM3Rev THEN
-            GVL_IHM.TranslationM3.ReqRev := FALSE;
-        ELSIF TrigM3Fwd THEN
-            GVL_IHM.TranslationM3.ReqFwd := FALSE;
-        ELSE
-            GVL_IHM.TranslationM3.ReqFwd := FALSE;
-            GVL_IHM.TranslationM3.ReqRev := FALSE;
-        END_IF;
-    END_IF;
-
-    // 3️⃣ Conflits boutons HMI entre mouvements Individuels et Couplés
-    IF GVL_IHM.IHM_MANU.M1_M2_RelayFwd THEN
-        IF GVL_IHM.IHM_MANU.M1_RelayRev THEN GVL_IHM.IHM_MANU.M1_RelayRev := FALSE; END_IF;
-        IF GVL_IHM.IHM_MANU.M2_RelayRev THEN GVL_IHM.IHM_MANU.M2_RelayRev := FALSE; END_IF;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
-        IF GVL_IHM.IHM_MANU.M1_RelayFwd THEN GVL_IHM.IHM_MANU.M1_RelayFwd := FALSE; END_IF;
-        IF GVL_IHM.IHM_MANU.M2_RelayFwd THEN GVL_IHM.IHM_MANU.M2_RelayFwd := FALSE; END_IF;
-    END_IF;
-
-    IF (GVL_IHM.IHM_MANU.M1_RelayRev OR GVL_IHM.IHM_MANU.M2_RelayRev) AND GVL_IHM.IHM_MANU.M1_M2_RelayFwd THEN
-        GVL_IHM.IHM_MANU.M1_M2_RelayFwd := FALSE;
-    END_IF;
-
-    IF (GVL_IHM.IHM_MANU.M1_RelayFwd OR GVL_IHM.IHM_MANU.M2_RelayFwd) AND GVL_IHM.IHM_MANU.M1_M2_RelayRev THEN
-        GVL_IHM.IHM_MANU.M1_M2_RelayRev := FALSE;
-    END_IF;
-
-    // 4️⃣ Aiguillage de la commande de mouvement (HMI vs Joystick CANopen)
-    M1_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM1_IsReal OR GVL_Simulation.ContactorFeedbackM1_IsReal OR GVL_Simulation.ThermalM1_IsReal;
-    M2_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.EncoderM2_IsReal OR GVL_Simulation.ContactorFeedbackM2_IsReal OR GVL_Simulation.ThermalM2_IsReal;
-    M3_IsReal := NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.VariateurM3_IsReal OR GVL_Simulation.ContactorFeedbackM3_IsReal OR GVL_Simulation.TranslationPosition_IsReal;
-    PowerCutOffActive_Eff := (M1_IsReal AND PRG_03_Safety.instSafetyWinchM1.PowerCutOff)
-                             OR (M2_IsReal AND PRG_03_Safety.instSafetyWinchM2.PowerCutOff)
-                             OR (M3_IsReal AND PRG_03_Safety.instSafetyTranslationM3.PowerCutOff);
-    // ⚡ Clamp de sécurité sur la consigne saisie par l'opérateur (limité par le plafond absolu persistant)
-    IF GVL_IHM.TranslationM3.FreqSetpointHz &gt; _TranslationMaxFreq_Hz THEN
-        GVL_IHM.TranslationM3.FreqSetpointHz := _TranslationMaxFreq_Hz;
-    ELSIF GVL_IHM.TranslationM3.FreqSetpointHz &lt; 0.0 THEN
-        GVL_IHM.TranslationM3.FreqSetpointHz := 0.0;
-    END_IF;
-
-    IF GVL_IHM.IHM_MANU.JoystickSelect THEN
-        // Commandes via le Joystick CANopen (arbitrées selon le mode de sécurité de FB_Modes, cf. TASK-0001)
-        M1Fwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        M1Rev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
-        
-        M2Fwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        M2Rev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
-        
-        CoupledFwd_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = 1);
-        CoupledRev_Demand := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3) AND (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction = -1);
-        
-        M3Fwd_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = 1);
-        M3Rev_Demand := (PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction = -1);
-    ELSE
-        // 💡 Détection de mouvement en cours (pour verrouillage croisé)
-        WinchMoving := M1Fwd_Demand OR M1Rev_Demand OR M2Fwd_Demand OR M2Rev_Demand OR CoupledFwd_Demand OR CoupledRev_Demand;
-
-        // 🔒 Verrouillage d'aiguillage HMI : on ne démarre un mouvement que si aucun autre n'est en cours
-        // 🔧 REX 2026-07-15 (2) : ex-tenue "AND SpeedRefPct &gt; 0.1" retirée — rampe HMI locale
-        // supprimée (M1/M2 pilotés via FB_Winch, PRG_06_WinchControl), qui gère désormais SEUL la
-        // rampe et l'interlock de changement de sens (DirectionChangePending/DirectionChangeDelay,
-        // voir FB_Winch.st) : plus besoin de tenir la demande le temps d'une décél locale ici.
-        M1Fwd_Demand := GVL_IHM.IHM_MANU.M1_RelayFwd AND (NOT WinchMoving OR M1Fwd_Demand);
-        M1Rev_Demand := GVL_IHM.IHM_MANU.M1_RelayRev AND (NOT WinchMoving OR M1Rev_Demand);
-        M2Fwd_Demand := GVL_IHM.IHM_MANU.M2_RelayFwd AND (NOT WinchMoving OR M2Fwd_Demand);
-        M2Rev_Demand := GVL_IHM.IHM_MANU.M2_RelayRev AND (NOT WinchMoving OR M2Rev_Demand);
-        CoupledFwd_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND (NOT WinchMoving OR CoupledFwd_Demand);
-        CoupledRev_Demand := GVL_IHM.IHM_MANU.M1_M2_RelayRev AND (NOT WinchMoving OR CoupledRev_Demand);
-
-        M3Fwd_Demand := GVL_IHM.TranslationM3.ReqFwd;
-        M3Rev_Demand := GVL_IHM.TranslationM3.ReqRev;
-    END_IF;
-
-    // 🔒 Sécurité démarrage : exige que toutes les commandes HMI et Joystick soient au repos (neutre) au démarrage
-    IF NOT StartupNeutralOk THEN
-        IF NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
-           AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
-           AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev
-           AND NOT GVL_IHM.TranslationM3.ReqFwd AND NOT GVL_IHM.TranslationM3.ReqRev
-           AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) &lt; 1.0
-           AND ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 1.0 THEN
-            StartupNeutralOk := TRUE;
-        END_IF;
-    END_IF;
-
-    IF NOT StartupNeutralOk THEN
-        M1Fwd_Demand := FALSE;
-        M1Rev_Demand := FALSE;
-        M2Fwd_Demand := FALSE;
-        M2Rev_Demand := FALSE;
-        CoupledFwd_Demand := FALSE;
-        CoupledRev_Demand := FALSE;
-        M3Fwd_Demand := FALSE;
-        M3Rev_Demand := FALSE;
-    END_IF;
-
-    // 🔧 REX 2026-07-15 (2) : ex-§5️⃣/§5bis/§6️⃣ (M1Fwd_Eff/M1Rev_Eff/M2Fwd_Eff/M2Rev_Eff/
-    // SimM1Fwd_Eff.../décodage K1-K4 via instManuSpeedStep) RETIRÉS — M1/M2 pilotés désormais par
-    // instWinchM1/instWinchM2 (PRG_06_WinchControl §1/§2/§6/§7), qui écrivent directement
-    // PRG_10_Outputs.M1RelayFwd/M1RelayRev/M1SpeedContactor1-4/M1BrakeCmd (et M2) via §8 de ce
-    // même fichier PRG_06 — AVANT que ce PRG_10_Outputs ne s'exécute (position 6 &lt; 10). Plus besoin
-    // de "Recopie vers les VAR_INPUT" ci-dessous pour M1/M2 (voir fin de fichier).
-
-    // 🔧 REX 2026-07-16 : ex-§7️⃣ (M3Fwd_Eff/M3Rev_Eff, interlock local avec M3_StatusWord.7/.0 et
-    // SafeStop) RETIRÉ — M3 piloté désormais par instTranslationM3 (PRG_07_TranslationControl
-    // §1bis), qui gère nativement SafeStop (Enable réel désormais, voir PRG_03_Safety) et sa
-    // propre state machine. Plus besoin d'interlock local ici (même principe que M1/M2, REX
-    // 2026-07-15 (2) ci-dessus).
-
-    // 🔧 REX 2026-07-15 (2) : plus de recopie M1/M2 ici — déjà écrites par PRG_06_WinchControl §8
-    // (instWinchM1/instWinchM2.RelayFwd/RelayRev/Contactor1-4/BrakeCmd), AVANT ce PRG_10_Outputs
-    // dans l'ordre de tâche (position 6 &lt; 10), pour Auto ET Manu désormais.
-    // 🔧 REX 2026-07-16 : idem pour TranslationBrakeCmd — plus de recopie ici, déjà écrite par
-    // PRG_07_TranslationControl (instTranslationM3.BrakeCmd), AVANT ce PRG_10_Outputs (position
-    // 7 &lt; 10), pour Auto ET Manu désormais (voir fin de fichier).
-
-    // 🔧 REX 2026-07-18 : ex-§8️⃣ Auxiliaires Hydrauliques (GridUp_RQ/GridDown_RQ/HelmetOpen_RQ/
-    // HelmetClose_RQ/HydraulicPumpRunCmd) RETIRÉ — décision client (AF_Partie-02 v2.12 "Rôle de
-    // chaque programme" §PRG_08) : le PLC ne pilote plus casque/grille/centrale hydraulique.
-    // GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd retirés de ST_IHM_MANU. Les sorties
-    // physiques GridUp_RQ/GridDown_RQ/HelmetOpen_RQ/HelmetClose_RQ ne sont plus écrites nulle part
-    // (restent FALSE) — aucune commande automate ne pilote plus ces équipements.
-END_IF;
-
-// ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
-// 🔧 REX 2026-07-16 : ex-bypass ManuActive (écriture directe M3_CommandWord=1/2) RETIRÉ — M3
-// piloté désormais par instTranslationM3 (PRG_07_TranslationControl §1bis), pour Auto ET Manu,
-// même principe que M1/M2 (PRG_06_WinchControl §8, REX 2026-07-15 (2)).
-M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
-M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
-// 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
-// PRG_09_Supervision (GVL_IHM.TranslationM3), valables Auto ET Manu — ex-doublons IHM_MANU
-// M3_FreqActual/M3_CommandWordMonitor/M3_StatusWordMonitor/M3_CommReady/M3_PowerReady retirés.
-
-// Relais de direction M3 obsolètes forcés à FALSE
-M3_RelayFwd_DQ := FALSE;
-M3_RelayRev_DQ := FALSE;
-
-// 9️⃣ Enregistrement de l'état précédent (pour le cycle suivant)
-LastM1Fwd      := GVL_IHM.IHM_MANU.M1_RelayFwd;
-LastM1Rev      := GVL_IHM.IHM_MANU.M1_RelayRev;
-LastM2Fwd      := GVL_IHM.IHM_MANU.M2_RelayFwd;
-LastM2Rev      := GVL_IHM.IHM_MANU.M2_RelayRev;
-LastCoupledFwd := GVL_IHM.IHM_MANU.M1_M2_RelayFwd;
-LastCoupledRev := GVL_IHM.IHM_MANU.M1_M2_RelayRev;
-LastM3Fwd      := GVL_IHM.TranslationM3.ReqFwd;
-LastM3Rev      := GVL_IHM.TranslationM3.ReqRev;
-// ─────────  Fin modification IHM_MANU  ─────────
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
 instM1RelayFwd(Command := M1RelayFwd);
@@ -23831,7 +24313,7 @@ instM2BrakeCmd(Command := M2BrakeCmd);
 M2_BrakeCmd_RQ := instM2BrakeCmd.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-    instTranslationBrakeCmd(Command := TranslationBrakeCmd);
+instTranslationBrakeCmd(Command := TranslationBrakeCmd);
 M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
 
 // 🪨 Adresse terrain : KoboldContactor_DQ = %QX0.6.
@@ -23840,13 +24322,22 @@ KoboldContactor_DQ := KoboldContactorCmd
                       AND PRG_00_Inputs.EmergencyStopOk
                       AND PRG_00_Inputs.EmergencyChain;
 
+// ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
+M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
+// 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
+// PRG_09_Supervision (GVL_IHM.TranslationM3), valables dans tous les modes.
+
+// Relais de direction M3 obsolètes forcés à FALSE
+M3_RelayFwd_DQ := FALSE;
+M3_RelayRev_DQ := FALSE;
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
-// Calcul du besoin de coupure amont (intégrant le bypass en mode IHM_MANU)
-PowerCutOffReq := (ManuActive AND PowerCutOffActive_Eff) 
-                  OR (NOT ManuActive AND (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                                       OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                                       OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff));
+// 🔧 REX 2026-07-19 : suppression IHM_MANU — plus de bypass conditionnel, PowerCutOffReq
+// reflète TOUJOURS directement les 3 blocs safety métier, quel que soit le mode.
+PowerCutOffReq := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                  OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                  OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 
 // Appel du bloc Safety global pour la boucle d'urgence
 instSafetyEmergencyManagement(
@@ -23856,7 +24347,7 @@ instSafetyEmergencyManagement(
     EmergencyChain := PRG_00_Inputs.EmergencyChain,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     PowerCutOffRequest := PowerCutOffReq,
-    CmdEmergencyCutOff := NOT ManuActive AND GVL_IHM.Modes.CmdEmergencyCutOff
+    CmdEmergencyCutOff := GVL_IHM.Modes.CmdEmergencyCutOff
 );
 
 // Affectation des sorties physiques et logiques de coupure/réarmement
@@ -24032,20 +24523,15 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)</xhtml>
           </documentation>
         </variable>
-        <variable name="IHM_MANU">
-          <type>
-            <derived name="ST_IHM_MANU" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ Variables d'échange IHM provisoires pour pilotage manuel direct (Secours)</xhtml>
-          </documentation>
-        </variable>
         <variable name="HmiInitDone">
           <type>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire
+de mise en service urgence (2026-07-09), remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
+Historique complet : DOC/IHM_MANU_Journal_Modifications.md.
+🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -24181,6 +24667,22 @@ Rapport de la suite Safety</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Bucket</xhtml>
           </documentation>
         </variable>
+        <variable name="SuiteEncoderValidation">
+          <type>
+            <derived name="ST_TestSuiteReport" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Codeurs/Homing nominal</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SuiteModesValidation">
+          <type>
+            <derived name="ST_TestSuiteReport" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Modes/Homme-mort (post-IHM_MANU)</xhtml>
+          </documentation>
+        </variable>
         <variable name="OverrideChainTrue">
           <type>
             <BOOL />
@@ -24283,6 +24785,39 @@ Simule glissement modéré M1 (1.5m)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule dérive position M2 au démarrage (Boot)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideJoystickActive">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Surcharges (overrides) — Joystick (SUITE_MODES, 2026-07-19, voir FB_Sim_Joystick)
+TRUE = RawX/Y/Button pilotés par les 3 champs suivants</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideJoystickRawX">
+          <type>
+            <INT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Débattement axe X simulé (5000=neutre, 10000=fond)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideJoystickRawY">
+          <type>
+            <INT />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Débattement axe Y simulé (5000=neutre, 10000=fond)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideJoystickRawButton">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui homme-mort simulé</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -24475,6 +25010,28 @@ Simule glissement modéré M1 (1.5m)</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Bucket (Cmd.RunSuite)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SuiteEncoder">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="4" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Codeurs/Homing nominal (Cmd.RunSuite)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SuiteModes">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Modes/Homme-mort, post-suppression IHM_MANU (Cmd.RunSuite)</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -25011,6 +25568,12 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Folder Name="SUITE_BENNE">
               <Object Name="FB_BucketValidation" ObjectId="65362a36-93ab-553f-a406-fd0621b8464e" />
             </Folder>
+            <Folder Name="SUITE_ENCODER">
+              <Object Name="FB_EncoderValidation" ObjectId="619e8bc6-54ae-5f02-aebe-115a30065e45" />
+            </Folder>
+            <Folder Name="SUITE_MODES">
+              <Object Name="FB_ModesValidation" ObjectId="382b521c-76df-5610-b353-42f0bb0338c2" />
+            </Folder>
             <Folder Name="SUITE_SAFETY">
               <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
               <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
@@ -25096,7 +25659,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
           <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
           <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
-          <Object Name="ST_IHM_MANU" ObjectId="aa605808-33c6-5f61-aa7b-b33b5fd12b1b" />
           <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
           <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
           <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />

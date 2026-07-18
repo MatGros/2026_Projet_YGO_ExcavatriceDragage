@@ -25,7 +25,12 @@ END_VAR
 instSimJoystick(
     Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.JoystickSignal_IsReal,
     NeutralRaw      := GVL_Simulation.JoystickForceNeutralRaw,
-    MaxRaw          := GVL_Simulation.JoystickForceMaxRaw
+    MaxRaw          := GVL_Simulation.JoystickForceMaxRaw,
+    // 🆕 REX 2026-07-19 : pilotage programmatique par la suite PLC_TESTS (SUITE_MODES)
+    TestOverrideActive    := GVL_PLC_Tests.OverrideJoystickActive,
+    TestOverrideRawX      := GVL_PLC_Tests.OverrideJoystickRawX,
+    TestOverrideRawY      := GVL_PLC_Tests.OverrideJoystickRawY,
+    TestOverrideRawButton := GVL_PLC_Tests.OverrideJoystickRawButton
 );
 
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par Joystick_IsReal UNIQUEMENT (bus/nœud),

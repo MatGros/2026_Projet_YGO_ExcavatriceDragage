@@ -1,4 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.8)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.9)
+
+> 🆕 **v1.9 (2026-07-19) — Suppression définitive d'IHM_MANU** : le dispositif dérogatoire
+> IHM_MANU (mise en service urgence, v0.4.4) est retiré du code actif. Le pilotage manuel de
+> M3 passe désormais exclusivement par MAINT_N1/MAINT_N2 + joystick homme-mort, sous
+> `PRG_07_TranslationControl` §1bis (gatée par `Mode`, plus de flag `ManuActive` séparé). Les
+> mentions "mode IHM_MANU" et "`ManuActive`" ci-dessous (bandeau v1.7) sont historiques —
+> voir `DOC/IHM_MANU_Journal_Modifications.md` pour la trace complète de la migration.
 
 > 🆕 **v1.8 (2026-07-18) — Mise en conformité M3 avec le codage cinq capteurs** : ajout du
 > décodage `Trémie|PV|P2|P1|Maintenance`, remplacement du ralentissement temporisé par le
@@ -17,7 +24,7 @@
 >   perte com EtherCAT/joystick). Ceci débloque `FB_TranslationValidation` (TC-T1/T2/T3, voir
 >   `AF_Partie-14`), dont l'exécution était impossible tant que `Enable=FALSE` masquait tout défaut.
 > * **Vitesse en Manu — diffère volontairement du Winch** : `GVL_IHM.TranslationM3.FreqSetpointHz`
->   (consigne Hz réglable opérateur, clampée par `PRG_10_Outputs` à `_TranslationMaxFreq_Hz`) reste
+>   (consigne Hz réglable opérateur, limitée par `PRG_10_Outputs` à `_TranslationMaxFreq_Hz`) reste
 >   la référence pleine échelle pour boutons HMI **et** joystick — reproduit le comportement exact
 >   de l'ex-bypass. Le Winch utilise `100.0` fixe en boutons HMI (paliers discrets de contacteurs,
 >   pas de notion de fréquence réglable) ; Translation pilote une fréquence continue, donc conserve
@@ -71,7 +78,7 @@
 
 Traduire la consigne d'axe du joystick (axe X, translation) en commande numérique du variateur AC600 (M3) via le réseau EtherCAT, dans le respect strict de la précédence `Enable` > `SafeStop` > `StartStop` (Partie3 §1bis).
 
-Toutes les sécurités (Homme-mort, arrêt sur capteur cible, fins de course extrêmes et surveillances de cohérence à l'arrêt) sont actives pour protéger la mécanique contre les chocs et dérives de charge — **y compris en mode `IHM_MANU`** depuis v1.7 (plus de bypass conditionnel).
+Toutes les sécurités (Homme-mort, arrêt sur capteur cible, fins de course extrêmes et surveillances de cohérence à l'arrêt) sont actives pour protéger la mécanique contre les chocs et dérives de charge — **y compris en MAINT_N1/MAINT_N2** (plus de bypass conditionnel, IHM_MANU supprimé v1.9).
 
 ---
 
@@ -238,16 +245,16 @@ Les variables physiques suivantes doivent être configurées dans l'I/O Mapping 
 
 ## 🖥️ 6. Interface IHM (`ST_TranslationHMI`, `GVL_IHM.TranslationM3`)
 
-Structure d'échange IHM (migration depuis `ST_IHM_MANU`, **définitive**). Depuis v1.7, le pilotage
-M3 en mode Manu (`ManuActive`) n'est **plus un bypass** : `ReqFwd`/`ReqRev`/`FreqSetpointHz`
-alimentent l'arbitrage `PRG_07_TranslationControl` §1bis, qui pilote la même instance
-`FB_Translation` qu'en Auto (voir `DOC/IHM_MANU_Journal_Modifications.md` §12).
+Structure d'échange IHM (migration depuis l'ex-`ST_IHM_MANU`, **terminée et définitive**, v1.9 —
+IHM_MANU supprimé). En MAINT_N1/MAINT_N2, `ReqFwd`/`ReqRev`/`FreqSetpointHz` alimentent
+l'arbitrage `PRG_07_TranslationControl` §1bis (gatée par `Mode`), qui pilote la même instance
+`FB_Translation` qu'en Auto (historique de la migration : `DOC/IHM_MANU_Journal_Modifications.md` §12).
 
 | Champ | Type | Sens | Rôle |
 |-------|------|------|------|
 | `SelectedTargetNum` | INT | IHM→PLC | Cible : `1=Trémie`, `2=P2`, `3=P1`, `4=Maintenance` ; PV n'est pas une cible |
-| `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) |
-| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), clampée à `_TranslationMaxFreq_Hz` — référence de vitesse pleine échelle en Manu (boutons ET joystick, voir bandeau v1.7) |
+| `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) — n'entraîne un mouvement que si `DeadmanArmed` (homme-mort joystick) est actif, voir §6bis |
+| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), limitée à `_TranslationMaxFreq_Hz` — référence de vitesse pleine échelle en Manu (boutons ET joystick, voir bandeau v1.7) |
 | `FBState` | E_State | PLC→IHM | État interne `FB_Translation` (diagnostic) |
 | `Ready/Busy/Done/Error/ErrorId` | — | PLC→IHM | Statuts standards `FB_Translation` |
 | `BrakeCmd` | BOOL | PLC→IHM | Miroir lecture seule (TRUE = desserré) — pas de forçage inconditionnel : le déblocage en MAINT passe par `ReqFwd`/`ReqRev` (mouvement), qui desserre le frein nativement via `FB_Brake` (même doctrine que `ST_WinchHMI`) |
@@ -274,6 +281,18 @@ Les champs `PositionTremie`, `PositionPV`, `PositionP2`, `PositionP1`,
 En maintenance N1/N2, les commandes `ReqFwd`/`ReqRev` et `FreqSetpointHz` sont traitées
 par `PRG_07_TranslationControl` sans dépendre de `IHM_MANU`. En mode `SEMI_AUTO`, la
 commande vient du cycle et reste conditionnée par l'homme-mort et le joystick X.
+
+### 6bis. Homme-mort obligatoire, y compris en pilotage boutons IHM
+
+🆕 **v1.9 (2026-07-19, revue sécurité post-suppression IHM_MANU)** : `M3_StartStop_Active`
+exige désormais `PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed` **quel que soit** le mode de
+pilotage sélectionné (`JoystickSelect` TRUE ou FALSE). Auparavant, piloter M3 via les boutons
+`ReqFwd`/`ReqRev` (`JoystickSelect=FALSE`) ne testait aucune condition homme-mort — écart
+relevé lors de la revue de sécurité de la mission de suppression d'IHM_MANU (le bug préexistait
+à IHM_MANU, hérité de l'ex-bypass direct). Sens/vitesse restent pilotables via les boutons IHM ;
+seule la validation du mouvement (`StartStop`) exige en plus que l'opérateur maintienne le
+homme-mort du joystick, conformément au principe transverse « tout mouvement validé au joystick
+homme-mort » (voir `CLAUDE.md`).
 
 Les champs `Test*` de `GVL_IHM.TranslationM3` ne sont utilisables que sur le banc de
 simulation. Ils recopient les overrides Translation prévus dans `GVL_PLC_Tests` et ne

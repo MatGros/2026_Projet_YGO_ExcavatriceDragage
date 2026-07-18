@@ -26,17 +26,18 @@ Chaque Function Block **métier** doit respecter :
 - Jamais autoriser le redémarrage automatique après défaut
 - **Précédence `Enable` > `SafeStop` > `StartStop`** : `Enable=FALSE` → neutralisation (sorties coupées) ; `SafeStop=TRUE` → rampe rapide (`Enable` maintenu) ; `StartStop=FALSE` → rampe normale. **`CoupeEnable` n'existe pas** (jamais une variable — vocabulaire abandonné).
 
-### 3. **[Architecture](DOC/AF_Partie-02_Architecture_Programme_v2.11.md)** ← Pour comprendre
-Tâches, arborescence CODESYS, flux données. **v2.11 = référence** (modèle `SafeStop`/`StartStop`,
+### 3. **[Architecture](DOC/AF_Partie-02_Architecture_Programme_v2.12.md)** ← Pour comprendre
+Tâches, arborescence CODESYS, flux données. **v2.12 = référence** (modèle `SafeStop`/`StartStop`,
 `SafeStop` **par métier** — pas de signal global ; pas de `GVL_BusHealth`/`E_DegradationLevel`/
 `FB_Watchdog` [fonction système] ; conserve mapping M1/M2/M3, SpeedStep masque 4 bits, `PowerCutOff` ;
 câble mécanique de position haute retiré de la chaîne AU matérielle, géré par l'automate via
 `PowerCutOff` — voir Partie1 v1.6 §Sécurité électrique).
 
 ### 4. **Specs détaillées**
-- **[Partie 4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, benne, rampes).
-- **[Partie 5](DOC/AF_Partie-05_Modes_Maintenance_v1.5.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
+- **[Partie 4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, benne, rampes).
+- **[Partie 5](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
 - **[Partie 6](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
+- **[Partie 7](DOC/AF_Partie-07_Interface_IHM_v1.5.md)** — Interface supervision (`GVL_IHM`, structures HMI, Cycle et Translation M3).
 - **[Partie 8](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
@@ -72,17 +73,17 @@ Toute modif passe par la skill **[`codesys-workflow`](.claude/skills/codesys-wor
 ## 🏗️ **Arborescence CODESYS**
 
 ```
-PLC_PRG_MAIN (MainTask 10 ms — orchestration séquentielle : diag PUIS métier)
-├── COMMUN      (FB_FilterPT1, FB_Brake, FB_Input_Digital, FB_Output_Relay)
+PRG_00 → PRG_10 (MainTask 10 ms — orchestration séquentielle)
+├── COMMUN      (FB_FilterPT1, FB_Brake, FB_Input, FB_Output)
 ├── _TYPES       (ST_*, ST_SpeedStepTable, ST_ContactorCheck, ST_LimitLegal, E_Mode/State/CycleStep)
-├── _DIAG        (FB_DiagCanOpen, FB_DiagEthercat ×3 — appelés dans PLC_PRG_MAIN, pas de GVL)
+├── DIAG        (FB_DiagCanOpen, FB_DiagEthercat ×3 — appelés dans PRG_01_Diagnostics)
 ├── JOYSTICK     (FB_Joystick — compose FB_AxisScale/FB_FilterPT1/FB_Ramp/FB_CycleTime en interne)
 ├── WINCH        (FB_Winch M1/M2 — StartStop/SafeStop, FB_SpeedStep masque 4 bits, FB_WinchSync)
 ├── ENCODER      (FB_Encoder_Abs COD1/COD2 → Scale → Safety)
 ├── TRANSLATION      (FB_Translation — variateur AC600 / M3 — StartStop/SafeStop)
-├── BENNE      (FB_Benne)
+├── BENNE      (FB_Bucket)
 ├── SAFETY       (FB_Safety_<Metier> → SafeStop propre au métier + PowerCutOff)
-└── SEQUENCE     (FB_Modes — dont limite légale, FB_Cycle)
+└── MAIN        (PRG_00…PRG_10 : orchestration et supervision)
 ```
 👉 **Pas de `FB_Watchdog`** : périodicité des tâches surveillée par la fonction système CODESYS
 (config tâche, seuil 200 ms), pas un FB applicatif.
@@ -97,9 +98,9 @@ chaque FB lit directement la sortie du FB producteur (appel séquentiel).
 |-------|----------|---------|---------|
 | **EtherCatTask** | à définir | **4 ms** | Codeurs M1/M2 (COD1/COD2), variateur AC600 (M3) |
 | **CanTask** | à définir | **20 ms** | Joystick Hall |
-| **MainTask** | à définir | **10 ms** | `PLC_PRG_MAIN` : diag bus **puis** logique métier, cycle |
+| **MainTask** | à définir | **10 ms** | `PRG_00`→`PRG_10` : diag bus puis logique métier, cycle et supervision |
 
-👉 Tâches bus rafraîchissent l'image process → `PLC_PRG_MAIN` consomme. Traitement `FB_Joystick`
+👉 Tâches bus rafraîchissent l'image process → `PRG_00`/`PRG_01` consomment. Traitement `FB_Joystick`
 dans `MainTask` (10 ms), même si l'acquisition CAN est à 20 ms.
 ⏲️ Surveillance périodicité tâches : **fonction système CODESYS**, seuil **200 ms** (pas de FB
 dédié). Priorités **à définir** en config CODESYS (TBD).
@@ -121,12 +122,12 @@ dédié). Priorités **à définir** en config CODESYS (TBD).
 Tous les docs dans **`DOC/`** :
 - [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) — Nommage strict
 - [AF_Partie-01_Analyse_Fonctionnelle_v1.6.md](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md) — Équipements & fonctions (sécurité électrique : chaîne AU, `PowerCutOff` fail-safe, réarmement)
-- [AF_Partie-02_Architecture_Programme_v2.11.md](DOC/AF_Partie-02_Architecture_Programme_v2.11.md) — Architecture détaillée (**v2.11**)
+- [AF_Partie-02_Architecture_Programme_v2.12.md](DOC/AF_Partie-02_Architecture_Programme_v2.12.md) — Architecture détaillée (**v2.12**)
 - [AF_Partie-03_Template_FB_Commun_v1.3.md](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md) — Contrat FB & sécurité
-- [AF_Partie-04_Cycle_Sequenceur_v1.3.md](DOC/AF_Partie-04_Cycle_Sequenceur_v1.3.md) — Cycle, synchro, frein, benne, rampes
+- [AF_Partie-04_Cycle_Sequenceur_v1.4.md](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md) — Cycle, synchro, frein, benne, rampes
 - [AF_Partie-05_Modes_Maintenance_v1.6.md](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md) — Modes, maintenance N1/N2, AU, limite légale
 - [AF_Partie-06_IO_Conditioning_v1.6.md](DOC/AF_Partie-06_IO_Conditioning_v1.6.md) — Conditionnement E/S
-- [AF_Partie-07_Interface_IHM_v1.4.md](DOC/AF_Partie-07_Interface_IHM_v1.4.md) — Interface IHM (structures ST_*HMI, mapping GVL_IHM)
+- [AF_Partie-07_Interface_IHM_v1.5.md](DOC/AF_Partie-07_Interface_IHM_v1.5.md) — Interface IHM (structures ST_*HMI, mapping GVL_IHM)
 - [AF_Partie-08_Fonction_Joystick_v1.3.md](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md) — Fonction métier Joystick (8+ = métier par FB)
 - [AF_Partie-09_Fonction_Winch_v1.11.md](DOC/AF_Partie-09_Fonction_Winch_v1.11.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A–E : roue libre/pilotage sans commande/glissement benne/capteur haut/écart synchro critique)
 - [AF_Partie-10_Fonction_Encoder_Homing_v1.10.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md) — Codeur & Homing

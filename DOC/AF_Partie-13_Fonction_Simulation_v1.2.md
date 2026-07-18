@@ -10,8 +10,8 @@
 > **Version 1.1** (Revue et mise en œuvre du plan d'action — 2026-07-07)
 > 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
-> [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md),
-> [P11 Translation v1.8](AF_Partie-11_Fonction_Translation_v1.8.md) §3bis/§7/§9bis.
+> [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md),
+> [P11 Translation v1.8](AF_Partie-11_Fonction_Translation_v1.9.md) §3bis/§7/§9bis.
 > ⚙️ **Changements v1.1** : 
 > - Déplacement de [GVL_Simulation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/GVL_Simulation.st) vers `CODE/SIMULATION/` pour regrouper la GVL avec ses FB de simulation.
 > - Extraction de la variable `BlinkClock1Hz` vers une nouvelle GVL système globale [GVL_Global.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/MAIN/GVL_Global.st) dans `CODE/MAIN/`.
@@ -119,7 +119,7 @@ CANopen (`CanOnline`/`CanOperational`) est forcé de la même façon.
 
 ### `FB_Sim_Translation` (M3, non prioritaire)
 Simulation de trajet M3 par temps de parcours — remplace le forçage manuel du capteur de
-position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie-11_Fonction_Translation_v1.8.md)).
+position cible en vue instance CODESYS (doc [Partie11 §9bis](AF_Partie-11_Fonction_Translation_v1.9.md)).
 * Fichier associé : [FB_Sim_Translation.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SIMULATION/FB_Sim_Translation.st)
 
 Sorties `PosTremie/PosPV/PosP2/PosP1/PosMaintenance` (BOOL), OR'ées sur `InputRaw` des

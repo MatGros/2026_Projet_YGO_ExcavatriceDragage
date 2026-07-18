@@ -15,7 +15,9 @@ VAR_GLOBAL RETAIN
     Cycle   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
-    IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pilotage manuel direct (Secours) *)
+    // 🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire
+    // de mise en service urgence (2026-07-09), remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
+    // Historique complet : DOC/IHM_MANU_Journal_Modifications.md.
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
 END_VAR
 
@@ -53,15 +55,16 @@ END_VAR
       - Simuler l'activation du capteur de position haute commun :
         GVL_Simulation.TopPositionSensor_IsReal reste FALSE, puis forcer
         PRG_00_Inputs.M1_M2_TopPositionSensor_DI à TRUE (ou l'OR équivalent)
-      - Choisir le mode de référencement (ex. HomingMode_IHM := 3 pour M1+M2).
-      - Lancer le homing en basculant :
-        StubHomeButton_IHM := TRUE puis FALSE (front).
+       - Lancer le homing nominal en basculant indépendamment le bouton du treuil voulu :
+         GVL_IHM.M1TreuilRetenue.CmdHome ou GVL_IHM.M2TreuilBucket.CmdHome := TRUE puis FALSE (front).
+         Les deux fronts peuvent être envoyés simultanément ; aucun sélecteur HomingMode_IHM
+         ni bouton StubHomeButton_IHM n'est utilisé.
       - La simulation détectera le signal de preset (COD1_PresettTrigCmd /
         COD2_PresettTrigCmd) et écrira automatiquement la valeur du preset
         dans les registres bruts simulés.
       - Vérifier que instHomingM1.Homed et instHomingM2.Homed passent à TRUE.
       - La position calculée (CablePosM) doit se caler exactement à 12.5m
-        (ou la valeur définie par M1_TopSensorPositionM / M2_TopSensorPositionM).
+         (ou la valeur définie par TopSensorPositionM de chaque structure IHM).
 
    4. TEST DU BENNE (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
       - S'assurer que les treuils ont été préalablement référencés (Homed = TRUE sur M1 ET M2 —

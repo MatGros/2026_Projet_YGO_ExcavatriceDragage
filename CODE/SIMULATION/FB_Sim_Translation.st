@@ -14,7 +14,7 @@
                     — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
                     — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
                     ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
-   📥 RelayFwd/RelayRev : sens commandé (sorties du translation, DEGRADED_IO)
+   📥 RelayFwd/RelayRev : sens déduit du mot de commande EtherCAT M3
    📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
                     utilisateur, pas de donnée réelle pour calibrer plus précisément)
    📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)

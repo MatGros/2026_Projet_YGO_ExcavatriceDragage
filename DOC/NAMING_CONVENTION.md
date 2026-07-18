@@ -168,7 +168,7 @@ SoftStartRampActive          → gestion rampe soft-start
 
 | Préfixe | Sens | Où dans le pipeline |
 |---|---|---|
-| `ReqX` | Requête brute (bouton IHM / séquenceur), **pas encore arbitrée** | Entrée d'un arbitrage (interlocks, sélection Manu/Auto, clamp) |
+| `ReqX` | Requête brute (bouton IHM / séquenceur), **pas encore arbitrée** | Entrée d'un arbitrage (interlocks, sélection Manu/Auto, limitation) |
 | `CmdX` | Signal **final** vers l'actionneur/le bus, après arbitrage | Sortie FB ou variable écrite juste avant le matériel |
 
 Exemple de pipeline complet (Translation M3) :

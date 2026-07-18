@@ -20,6 +20,9 @@ VAR
     TargetDepthM        : REAL := -12.5; // Profondeur de dragage cible (mètres, négative)
     TargetOffsetM       : REAL := 1.5;  // Décalage cible de fermeture du benne (mètres)
     CycleMotionPermit    : BOOL;        // Homme-mort + axe Y actif
+    // 🧪 T43 — paramètres provisoirement désactivés ; à définir avec T45.
+    SpeedMismatchThresholdMps : REAL := 0.0;
+    SpeedMismatchTimeout      : TIME := T#0ms;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
@@ -37,7 +40,9 @@ CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
 
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
-    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO) AND NOT PRG_10_Outputs.ManuActive,
+    // 🔧 REX 2026-07-19 : suppression IHM_MANU — Mode=SEMI_AUTO suffit seul (les modes
+    // sont mutuellement exclusifs dans FB_Modes, plus besoin d'un flag ManuActive séparé).
+    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
     CycleMotionPermit   := CycleMotionPermit,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
@@ -58,6 +63,10 @@ instCycle(
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    M1_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps,
+    M2_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedMismatchThresholdMps := SpeedMismatchThresholdMps,
+    SpeedMismatchTimeout      := SpeedMismatchTimeout,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
     Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,
@@ -73,6 +82,10 @@ instCycle(
     Benne_IsOpen      := _BucketState.IsOpen,
     Benne_IsClosed    := _BucketState.IsClosed
 );
+
+GVL_IHM.Cycle.SpeedMismatchMps        := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
+GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 
 // 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
 GVL_IHM.Cycle.CmdStart := FALSE;

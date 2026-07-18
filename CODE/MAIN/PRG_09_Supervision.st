@@ -131,6 +131,7 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
 IF GVL_IHM.M1TreuilRetenue.TopSensorPositionM = 0.0 THEN
     GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := _HomingTargetM1_M;
+    GVL_IHM.M1TreuilRetenue.HomingTargetM       := _HomingUnitaryTargetM1_M;
     GVL_IHM.M1TreuilRetenue.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.M1TreuilRetenue.RampAccelRate       := _WinchM1RampAccelRate_Pct;
     GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
@@ -143,6 +144,7 @@ END_IF;
 
 IF GVL_IHM.M2TreuilBucket.TopSensorPositionM = 0.0 THEN
     GVL_IHM.M2TreuilBucket.TopSensorPositionM  := _HomingTargetM2_M;
+    GVL_IHM.M2TreuilBucket.HomingTargetM       := _HomingUnitaryTargetM2_M;
     GVL_IHM.M2TreuilBucket.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.M2TreuilBucket.RampAccelRate       := _WinchM2RampAccelRate_Pct;
     GVL_IHM.M2TreuilBucket.RampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
@@ -167,21 +169,9 @@ IF GVL_IHM.Commun.LimitLegalDepthMinAllowed = 0.0 THEN
     GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
-// 🆕 REX 2026-07-15 (10) — BUG CORRIGÉ (retour terrain) : WinchMaxStepFwd/Rev (essais progressifs
-// IHM_MANU, TEMPORAIRE) n'avaient jamais de boot-init, contrairement à tous les autres réglages
-// IHM ci-dessus — restaient à 0 (défaut INT) en permanence. Le bornage de PRG_06_WinchControl
-// traitait ce 0 comme "invalide" et le remplaçait SILENCIEUSEMENT par 5 (aucune restriction),
-// sans jamais corriger l'affichage IHM : l'opérateur voyait "0" (lu comme restrictif) alors que
-// la vitesse réellement appliquée était pleine échelle — d'où les contacteurs qui commutaient
-// normalement malgré un "0" à l'écran. GVL_IHM.IHM_MANU est déjà RETAIN (ST_IHM_MANU) — pas besoin
-// de miroir GVL_PERSISTENT (dérogation temporaire, pas un réglage machine permanent, voir
-// IHM_MANU_Journal_Modifications.md §10).
-IF GVL_IHM.IHM_MANU.WinchMaxStepFwd = 0 THEN
-    GVL_IHM.IHM_MANU.WinchMaxStepFwd := 5;
-END_IF;
-IF GVL_IHM.IHM_MANU.WinchMaxStepRev = 0 THEN
-    GVL_IHM.IHM_MANU.WinchMaxStepRev := 2;
-END_IF;
+// 🔧 REX 2026-07-19 : ex-boot-init WinchMaxStepFwd/Rev (essais progressifs IHM_MANU, TEMPORAIRE)
+// retiré avec IHM_MANU — PRG_06_WinchControl applique désormais un plafond fixe (5 montée /
+// _WinchMaxStepDescent descente), identique Auto et Manuel, plus de réglage IHM à initialiser.
 
 IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
     GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
@@ -191,6 +181,8 @@ END_IF;
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 _HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
 _HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
+_HomingUnitaryTargetM1_M    := GVL_IHM.M1TreuilRetenue.HomingTargetM;
+_HomingUnitaryTargetM2_M    := GVL_IHM.M2TreuilBucket.HomingTargetM;
 // 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
 // ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
 // propagation à sens unique séparée par treuil ici.
@@ -279,6 +271,16 @@ GVL_IHM.M2TreuilBucket.BypassTopPositionSensor := GVL_Simulation.SimulationModeA
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
 GVL_IHM.M1TreuilRetenue.PositionM                := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.M1TreuilRetenue.MeasuredSpeedMps         := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
+GVL_IHM.M1TreuilRetenue.SpeedDeltaMps            := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
+GVL_IHM.M1TreuilRetenue.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
+GVL_IHM.M1TreuilRetenue.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed;
+GVL_IHM.M1TreuilRetenue.SpeedStable             := PRG_03_Safety.instSpeedMonitorM1.SpeedStable;
+GVL_IHM.M1TreuilRetenue.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM1.Error;
+GVL_IHM.M1TreuilRetenue.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.EstimatedLoadPct         := PRG_03_Safety.instLoadEstimatorM1.EstimatedLoadPct;
+GVL_IHM.M1TreuilRetenue.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM1.Configured;
+GVL_IHM.M1TreuilRetenue.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM1.SpeedGuardLimited;
 GVL_IHM.M1TreuilRetenue.SpeedRefPct              := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 GVL_IHM.M1TreuilRetenue.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
 GVL_IHM.M1TreuilRetenue.FBState                  := PRG_06_WinchControl.instWinchM1.State;
@@ -295,6 +297,14 @@ GVL_IHM.M1TreuilRetenue.Contactor3               := PRG_06_WinchControl.instWinc
 GVL_IHM.M1TreuilRetenue.Contactor4               := PRG_06_WinchControl.instWinchM1.Contactor4;
 GVL_IHM.M1TreuilRetenue.BrakeCmd                 := PRG_06_WinchControl.instWinchM1.BrakeCmd;
 GVL_IHM.M1TreuilRetenue.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
+GVL_IHM.M1TreuilRetenue.HomingBusy              := PRG_02_Encoders.instHomingM1.Busy;
+GVL_IHM.M1TreuilRetenue.HomingDone              := PRG_02_Encoders.instHomingM1.Done;
+GVL_IHM.M1TreuilRetenue.HomingError             := PRG_02_Encoders.instHomingM1.Error;
+GVL_IHM.M1TreuilRetenue.HomingErrorId           := PRG_02_Encoders.instHomingM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.HomingState             := PRG_02_Encoders.instHomingM1.State;
+GVL_IHM.M1TreuilRetenue.HomingStateAtError      := PRG_02_Encoders.instHomingM1.StateAtError;
+GVL_IHM.M1TreuilRetenue.HomingSuspect            := PRG_02_Encoders.instHomingM1.HomingSuspect;
+GVL_IHM.M1TreuilRetenue.HomingRefRaw             := PRG_02_Encoders.instHomingM1.HomingRefRaw;
 GVL_IHM.M1TreuilRetenue.SafeStopActive           := PRG_03_Safety.instSafetyWinchM1.SafeStop;
 GVL_IHM.M1TreuilRetenue.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM1_Active;
 GVL_IHM.M1TreuilRetenue.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
@@ -324,6 +334,16 @@ GVL_IHM.M1TreuilRetenue.InhibitActive            := PRG_04_Modes.instModes.Inhib
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
 GVL_IHM.M2TreuilBucket.PositionM                := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.M2TreuilBucket.MeasuredSpeedMps         := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps;
+GVL_IHM.M2TreuilBucket.SpeedDeltaMps            := PRG_03_Safety.instSpeedMonitorM2.SpeedDeltaMps;
+GVL_IHM.M2TreuilBucket.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationDetected;
+GVL_IHM.M2TreuilBucket.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed;
+GVL_IHM.M2TreuilBucket.SpeedStable             := PRG_03_Safety.instSpeedMonitorM2.SpeedStable;
+GVL_IHM.M2TreuilBucket.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM2.Error;
+GVL_IHM.M2TreuilBucket.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM2.ErrorId;
+GVL_IHM.M2TreuilBucket.EstimatedLoadPct         := PRG_03_Safety.instLoadEstimatorM2.EstimatedLoadPct;
+GVL_IHM.M2TreuilBucket.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM2.Configured;
+GVL_IHM.M2TreuilBucket.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM2.SpeedGuardLimited;
 GVL_IHM.M2TreuilBucket.SpeedRefPct              := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 GVL_IHM.M2TreuilBucket.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
 GVL_IHM.M2TreuilBucket.FBState                  := PRG_06_WinchControl.instWinchM2.State;
@@ -340,6 +360,14 @@ GVL_IHM.M2TreuilBucket.Contactor3               := PRG_06_WinchControl.instWinch
 GVL_IHM.M2TreuilBucket.Contactor4               := PRG_06_WinchControl.instWinchM2.Contactor4;
 GVL_IHM.M2TreuilBucket.BrakeCmd                 := PRG_06_WinchControl.instWinchM2.BrakeCmd;
 GVL_IHM.M2TreuilBucket.Homed                    := PRG_02_Encoders.instHomingM2.Homed;
+GVL_IHM.M2TreuilBucket.HomingBusy              := PRG_02_Encoders.instHomingM2.Busy;
+GVL_IHM.M2TreuilBucket.HomingDone              := PRG_02_Encoders.instHomingM2.Done;
+GVL_IHM.M2TreuilBucket.HomingError             := PRG_02_Encoders.instHomingM2.Error;
+GVL_IHM.M2TreuilBucket.HomingErrorId           := PRG_02_Encoders.instHomingM2.ErrorId;
+GVL_IHM.M2TreuilBucket.HomingState             := PRG_02_Encoders.instHomingM2.State;
+GVL_IHM.M2TreuilBucket.HomingStateAtError      := PRG_02_Encoders.instHomingM2.StateAtError;
+GVL_IHM.M2TreuilBucket.HomingSuspect            := PRG_02_Encoders.instHomingM2.HomingSuspect;
+GVL_IHM.M2TreuilBucket.HomingRefRaw             := PRG_02_Encoders.instHomingM2.HomingRefRaw;
 GVL_IHM.M2TreuilBucket.SafeStopActive           := PRG_03_Safety.instSafetyWinchM2.SafeStop;
 GVL_IHM.M2TreuilBucket.ForbidDescentActive      := PRG_06_WinchControl.ForbidDescentM2_Active;
 GVL_IHM.M2TreuilBucket.ForbidAscentActive       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;

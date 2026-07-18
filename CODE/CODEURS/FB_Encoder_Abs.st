@@ -51,7 +51,7 @@ VAR_INPUT
     WarningsIn          : UINT;        // Brut EtherCAT (ex. COD1_Warnings) — informatif seulement
     SlaveOperational    : BOOL;        // FB_DiagEthercat — esclave EtherCAT opérationnel
     PointsPerRev        : UDINT := 8192;  // Résolution codeur confirmée (Partie10 §3.3)
-    PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing (stub FALSE ce lot)
+    PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing via PRG_02_Encoders
     PresetValue         : UDINT;       // Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)
     PresetTimeout       : TIME := T#2s;
     PresetTolerancePts  : UDINT := 10; // Tolérance relecture post-preset

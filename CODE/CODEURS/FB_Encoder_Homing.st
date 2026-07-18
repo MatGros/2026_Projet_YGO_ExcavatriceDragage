@@ -1,13 +1,10 @@
 (* ═══════════════════════════════════════════════════════════════
-   🎯 FB_Encoder_Homing — Référencement codeur, flux NOMINAL uniquement
+   🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §1/§5/§7bis
-   ⚠️ PÉRIMÈTRE DE CE LOT : flux **nominal** uniquement (capteur haut +
-      bouton IHM, référencement à `TopSensorPositionM`, 1 instance par
-      treuil, câblées sur le MÊME bouton IHM côté PRG_MAIN). Le flux
-      **unitaire** (`WinchSelect`, cible libre `HomingTargetM`,
-      `MAINT_N2`) n'est **pas** codé ici — dépend de `E_WinchSelect`/
-      `FB_Modes`, pas encore construits.
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §1/§5/§7bis
+   ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
+      unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
+      moteur n'est piloté ici.
    🔌 PAS un FB de mouvement (Partie3 §1bis) : il n'écrit qu'une valeur
       de calibration, le treuil étant déjà à l'arrêt confirmé. Pas de
       `StartStop`/`SafeStop`.
@@ -38,6 +35,9 @@ VAR_INPUT
     EmergencyStopOk      : BOOL;        // Standard
     Mode                 : E_Mode;      // MAINT_N1 requis pour le flux nominal
     Home                 : BOOL;        // Demande de référencement (front, bouton IHM UNIQUE)
+    UnitaryMode          : BOOL;        // TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)
+    WinchSelected        : BOOL;        // TRUE = cette instance est le treuil sélectionné
+    HomingTargetM        : REAL;        // Cible libre unitaire, limitée à [-99.0 ; +99.0] m
     ConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
     TopPositionSensor    : BOOL;        // 🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils
                                          // (les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
@@ -81,6 +81,7 @@ VAR
     ArretConfirme        : BOOL;
     PresetValueCalc      : UDINT;       // = HomingRefTargetNominal (constant tant que PointsPerRev/MultiTurnRevsMax fixes)
     TargetPoints         : DINT;        // Écart signé TopSensorPositionM → points, figé pendant la séquence
+    TargetPositionM      : REAL;        // Cible retenue : nominale ou unitaire
     RawDiffRestart       : DINT;        // Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)
 END_VAR
 
@@ -88,7 +89,7 @@ END_VAR
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-IF NOT Enable THEN
+IF NOT Enable OR NOT EmergencyStopOk THEN
     PresetRequest := FALSE;
     PresetValue := 0;
     State := E_State.DISABLED;
@@ -129,22 +130,32 @@ IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
 END_IF;
 
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
-// ⚠️ `TopSensorPositionM` n'est PAS revalidée contre le bornage [-99.00;+99.00] m (§3.6) dans ce
-// lot : c'est un paramètre RETAIN de mise en service (comme CableM_PerRev/PointsPerRev), pas une
-// saisie opérateur par requête — valeur indicative ≈12.50 m largement dans la plage.
+// 🛡️ Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
 ArretConfirme := FwdRevSpeedFeedbackOff AND BrakeFeedback;
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
+    IF UnitaryMode THEN
+        TargetPositionM := HomingTargetM;
+    ELSE
+        TargetPositionM := TopSensorPositionM;
+    END_IF;
+
     // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
     IF (Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
+    ELSIF UnitaryMode AND (Mode <> E_Mode.MAINT_N2) THEN
+        ErrorId := ErrorId OR 16#0001;
+    ELSIF UnitaryMode AND NOT WinchSelected THEN
+        ErrorId := ErrorId OR 16#0002;        // bit1 : mauvais treuil sélectionné
     ELSIF NOT EncoderAvailable THEN
         ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
     ELSIF NOT ArretConfirme THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
-    ELSIF (Mode <> E_Mode.MAINT_N2) AND TopPositionSensor THEN
+    ELSIF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
+        ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
+    ELSIF NOT UnitaryMode AND TopPositionSensor THEN
         // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
         // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
         // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
@@ -152,7 +163,7 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)
-        TargetPoints := REAL_TO_DINT(TopSensorPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         PresetValue := PresetValueCalc;
         PresetRequest := TRUE;                // Pulse 1 cycle — FB_Encoder_Abs détecte le front lui-même
         State := E_State.BUSY;
@@ -183,7 +194,7 @@ END_IF;
 // 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
 // à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFC2;   // efface bits 0,2,3,4,5 (garde bit9, levé seulement par ConfirmCoherence/Home)
+    ErrorId := ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par ConfirmCoherence/Home)
 END_IF;
 
 // 📤 8. SORTIES ÉTAT

@@ -7,6 +7,11 @@
 > exact de ces deux E/S est désormais défini : `KoboldContactFond_DI` (%IX0.5) et
 > `KoboldContactor_DQ` (%QX0.6). Aucun capteur existant, notamment le mou de câble, ne doit être
 > réutilisé comme équivalent Kobold.
+>
+> 🛡️ **T43 (2026-07-18)** : pendant `CTRL_ASCENDING`, `FB_Cycle` compare les vitesses
+> linéaires mesurées M1/M2. Un écart supérieur à `SpeedMismatchThresholdMps`, maintenu pendant
+> `SpeedMismatchTimeout`, pose le bit4 `ErrorId` et place le cycle en `ERROR_HOLD`. Les deux
+> paramètres valent zéro par défaut tant que les seuils métier ne sont pas définis (T45).
 
 > **Version 1.3** — Nettoyage documentaire (audit doc) : la note TBD sur le détail fin de la
 > séquence INIT (§2) était une remarque organisationnelle (décision D22 reportée) — remplacée par
@@ -181,6 +186,22 @@ Pendant `DESCENDING_OPEN`, `KoboldContactorCmd` commande le contacteur dédié. 
 Après détection, M1 et M2 remontent ensemble à petite vitesse jusqu'à une position supérieure
 à `LimitLegalDepthM` avec une marge de 0,5 m. Si la limite légale est atteinte avant le contact
 Kobold, le cycle passe en `ERROR_HOLD`. Toute erreur de synchronisation provoque le même repli.
+
+### 3quater. Stabilisation après fermeture de la benne (T36)
+
+Après `SYNCHRO_ADJUST`, `CTRL_ASCENDING` constitue une étape de contrôle obligatoire :
+
+- M1 et M2 remontent ensemble à petite vitesse (`20 %`) ;
+- les deux positions absolues doivent dépasser `TouchPositionM + CtrlAscentDistM` ;
+- l'écart entre codeurs doit rester inférieur ou égal à `CtrlAscentToleranceM` (`0,25 m` par défaut) ;
+- `WinchSyncError` ou un écart supérieur à la tolérance provoque `ERROR_HOLD` ;
+- un délai maximal `CtrlAscentTimeout` (`30 s` par défaut) évite toute attente infinie si un treuil,
+  un câble ou la benne est bloqué ;
+- la montée chargée (`ASCENDING_LOADED`) n'est autorisée qu'après validation simultanée des deux
+  codeurs et maintien de l'homme-mort.
+
+Le défaut de stabilisation est signalé par le bit 3 de `ErrorId`. Une reprise exige la disparition
+de la cause, un acquittement et un nouvel ordre opérateur.
 
 ## 🛑 4. Séquence frein (`FB_Brake`)
 

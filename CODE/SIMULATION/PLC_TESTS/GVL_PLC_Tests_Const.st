@@ -23,4 +23,6 @@ VAR_GLOBAL CONSTANT
     SuiteSafety      : INT := 1;    // index de suite (Cmd.RunSuite)
     SuiteTranslation : INT := 2;    // index de suite Translation M3 (Cmd.RunSuite)
     SuiteBucket      : INT := 3;    // index de suite Bucket (Cmd.RunSuite)
+    SuiteEncoder     : INT := 4;    // index de suite Codeurs/Homing nominal (Cmd.RunSuite)
+    SuiteModes       : INT := 5;    // index de suite Modes/Homme-mort, post-suppression IHM_MANU (Cmd.RunSuite)
 END_VAR

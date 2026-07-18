@@ -3,7 +3,7 @@
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Définition et architecture des tests de validation automatisés de la chaîne de sécurité (Arrêt d'Urgence et commande des contacteurs de puissance).
 > **Version** : v1.2 (2026-07-16) — §7 **réécrit intégralement** : spécification finale du framework de test in-PLC (architecture de données, moteur d'exécution, catalogue de primitives, IHM de pilotage, preuve de couverture TC-01/02/03, plan de migration), issue d'une double revue croisée entre deux analyses expertes indépendantes (primitives de test ↔ architecture de données/IHM) + audit final. **Remplace entièrement** le cadrage v1.1 §7. Base §1-6 **inchangée**. ⚠️ **Aucune modification de `CODE/` n'accompagne cette version** — cadrage uniquement ; migration à dérouler séparément (§7.6).
-> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P13 Simulation v1.2](AF_Partie-13_Fonction_Simulation_v1.2.md), [P3 Template FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) (contrat FB, profils §1bis), [P7 Interface IHM v1.4](AF_Partie-07_Interface_IHM_v1.4.md) (pattern `ST_*HMI`), [NAMING_CONVENTION.md](NAMING_CONVENTION.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P13 Simulation v1.2](AF_Partie-13_Fonction_Simulation_v1.2.md), [P3 Template FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) (contrat FB, profils §1bis), [P7 Interface IHM v1.5](AF_Partie-07_Interface_IHM_v1.5.md) (pattern `ST_*HMI`), [NAMING_CONVENTION.md](NAMING_CONVENTION.md).
 
 ---
 
@@ -224,6 +224,7 @@ TC-TRANSLATION-01_PERF_LATENCY    → Réactivité variateur AC600
 | SAFETY | TC-SAFETY-02 | SAFETY | REDUNDANCY | Redondance canaux | 🟡 TBD |
 | SAFETY | TC-SAFETY-03 | SAFETY | LOCKOUT | Verrouillage 5s | 🟡 TBD |
 | TRANSLATION | TC-TRANSLATION-01 | PERF | LATENCY | Réactivité AC600 | 🟡 TBD |
+| ENCODER | TC-ENCODER-01 | HOMING | NOMINAL | Interface Homing nominale M1/M2 + états IHM | 🟠 Implémenté, essai CODESYS restant |
 
 **Avantages** :
 - ✅ Single source of truth = nom TC
@@ -429,7 +430,11 @@ VAR_GLOBAL CONSTANT   // GVL_PLC_Tests_Const — côté projet ; en bibliothèqu
     MaxAnalogStims   : INT := 4;    // instances FB_TestStimulus par suite
     MaxSeqValues     : INT := 8;    // ⚠️ plus gros poste mémoire par stim — ne pas grossir sans besoin
     TaskCycleMs      : INT := 10;   // MainTask — base des mesures en cycles
-    SuiteSafety      : INT := 1;    // index de suite (WinchSync=2, Translation=3…)
+    SuiteSafety      : INT := 1;    // Safety
+    SuiteTranslation : INT := 2;    // Translation M3
+    SuiteBucket      : INT := 3;    // Benne
+    SuiteEncoder     : INT := 4;    // Codeurs/Homing nominal
+    SuiteModes       : INT := 5;    // 🆕 Modes/Homme-mort, post-suppression IHM_MANU (2026-07-19)
 END_VAR
 ```
 
@@ -675,7 +680,50 @@ Compat migration : `CmdRunTests` → `Hmi.CmdRunAll` ; `TC01_NominalArming_Ok` �
 
 ➕ **Non-régression lockout** (§7.5.4) : invariant `ST_TestInvariantConfig` « `SigLockoutActive` jamais TRUE » armé de la confirmation d'armement TC-01 à la fin du case — verrouille le correctif du défaut connu.
 
-#### 7.4.3 Deux suites métier futures (démonstration de généricité)
+#### 7.4.3 Suite Codeurs/Homing nominale et suites métier futures
+
+La suite ciblée `SuiteEncoder = 4` (`FB_EncoderValidation`) valide en simulation :
+
+- le gate de simulation et l'absence de défaut Homing initial ;
+- l'exposition des états Homing M1/M2 dans `GVL_IHM` ;
+- l'envoi simultané des fronts `CmdHome` M1/M2 ;
+- la terminaison explicite `PASS`, `FAIL`, `ABORTED` ou `WATCHDOG_TIMEOUT`.
+
+Le flux Homing unitaire `MAINT_N2` (sélecteur de treuil et cible libre) reste hors périmètre,
+conformément au plan projet.
+
+La suite ciblée `SuiteModes = 5` (`FB_ModesValidation`, 🆕 mission suppression IHM_MANU,
+2026-07-19) valide en simulation, via l'override programmatique `GVL_PLC_Tests.OverrideJoystick*`
+(joystick piloté par le test, sans Force CODESYS) :
+
+- MAINT_N1 et MAINT_N2 : mouvement M1 autorisé uniquement homme-mort armé (`DeadmanArmed`) ;
+- relâchement du homme-mort = arrêt immédiat, nouvelle sollicitation valide = reprise ;
+- `SEMI_AUTO` atteignable et simulation fonctionnelle, sans dépendance IHM_MANU ;
+- sécurité active et aucun mouvement possible sans autorisation de mode (perte
+  `EmergencyStopOk` → `Mode=DISABLE` + `FB_Winch` neutralisé, quel que soit le mode précédent) ;
+- le séquenceur (`FB_Cycle`) ne bloque jamais : une tentative réelle de démarrage
+  (`GVL_IHM.Cycle.CmdStart`) hors `SEMI_AUTO` reste sans effet (`Busy` reste `FALSE`).
+
+Le Homing nominal sans IHM_MANU reste couvert par `SuiteEncoder` (TC-E1/E2), pas dupliqué ici.
+
+#### 7.4.4 Validation vitesse câble / paliers / estimation charge (T48)
+
+Cette matrice complète les essais automatiques à créer dans une suite dédiée. Les valeurs
+de seuil restent celles configurées dans `GVL_PERSISTENT` et doivent être confirmées sur site.
+
+| Cas | Stimulus simulation | Résultat attendu |
+|---|---|---|
+| V1 — vitesse nominale | M1/M2 progressent avec vitesses proches | `MeasuredSpeedMps` cohérentes, `SpeedMismatchConfirmed=FALSE` |
+| V2 — variation brusque M1 | Injecter un saut de vitesse supérieur au seuil | `SpeedVariationDetected`, puis `SpeedVariationConfirmed` après temporisation |
+| V3 — écart vitesse remontée | M1 avance, M2 ralentit pendant `CTRL_ASCENDING` | `SpeedMismatchMps` dépasse le seuil, bit4 cycle, `ERROR_HOLD` après temporisation |
+| V4 — relâchement homme-mort | `CycleMotionPermit := FALSE` pendant une transition | arrêt/pause sans défaut vitesse parasite |
+| V5 — garde-fou palier | Demander P4/P5 avec bande vitesse inférieure | `SpeedGuardLimited=TRUE`, palier limité ; aucun `SafeStop` généré |
+| V6 — table non configurée | `LoadTable.IsConfigured := FALSE` | `EstimatedLoadPct=0`, `LoadEstimateConfigured=FALSE`, aucun mouvement modifié |
+| V7 — obstacle/treuil bloqué | Un codeur progresse, l'autre reste quasi fixe | diagnostic vitesse + désynchronisme ; réaction safety/cycle vérifiée séparément |
+
+⚠️ La validation simulation ne prouve pas la capacité mécanique réelle. Les cas V1, V3, V5
+et V7 doivent être rejoués sur machine à vide puis en charge, avec seuils et temporisations
+réglés à partir des mesures réelles. L'estimation `EstimatedLoadPct` reste non certifiée.
 
 | Suite | Sondes | Stimuli | Checks clés |
 |---|---|---|---|

@@ -112,7 +112,7 @@ VAR
 
     // 🆕 REX 2026-07-18 : TC-T6 — instance ISOLÉE de FB_Translation (pas l'instance machine réelle
     // instTranslationM3) pour tester le ralentissement PV en pilotant Direction/StartStop/SpeedRefPct
-    // directement, sans dépendre de l'arbitrage Mode/ManuActive de PRG_07_TranslationControl.
+    // directement, sans dépendre de l'arbitrage Mode de PRG_07_TranslationControl.
     instTranslationUnderTest   : FB_Translation;
     UnderTestDirection         : INT;
     UnderTestStartStop         : BOOL;
@@ -286,7 +286,7 @@ IF NOT TableReady THEN
     CheckTable[19].RealMin := 30.0;
     CheckTable[19].RealMax := 60.0;
 
-    // Chk 20: TC-T6 — vitesse clampée par PV (ApproachSpeedPct=20% de 60Hz = 12Hz)
+    // Chk 20: TC-T6 — vitesse limitée par PV (ApproachSpeedPct=20% de 60Hz = 12Hz)
     CheckTable[20].Kind := E_TestCheckKind.REAL_IN_RANGE;
     CheckTable[20].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
     CheckTable[20].ProbeIdx := SigSlowdownFreqHz;
@@ -662,7 +662,7 @@ CASE ActiveStimulusId OF
         UnderTestDirection := 1;
         UnderTestStartStop := TRUE;
         UnderTestSlowdownSensor := FALSE;
-    13: // Même mouvement, PV actif -> vitesse clampée
+    13: // Même mouvement, PV actif -> vitesse limitée
         UnderTestDirection := 1;
         UnderTestStartStop := TRUE;
         UnderTestSlowdownSensor := TRUE;

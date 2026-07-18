@@ -2,12 +2,33 @@
 
 > **v1.11 (2026-07-15)** — TASK-0001 : Mise à jour de la référence T20 (arbitrage du sélecteur JoystickWinchSelect déplacé dans FB_Modes, voir AF_Partie-05 v1.6).
 >
+> 🆕 **T41 (2026-07-18)** — `FB_Safety_Winch.MeasuredSpeedMps` expose la vitesse linéaire
+> absolue du câble, calculée à partir de `CablePosM` et du temps de cycle. La valeur est
+> mappée dans `GVL_IHM.M1TreuilRetenue.MeasuredSpeedMps` et
+> `GVL_IHM.M2TreuilBucket.MeasuredSpeedMps`. Aucun changement de comportement de sécurité.
+>
+> 🪜 **T45 (2026-07-18)** — `ST_WinchSpeedConfig` sépare la caractérisation de la vitesse
+> réelle des 5 paliers de la table de contacteurs. Valeurs provisoires : 2,0 m/s maximum et
+> plafonds 0,4 / 0,8 / 1,2 / 1,6 / 2,0 m/s ; à confirmer par mesures terrain.
+>
+> 📊 **T46 (2026-07-18)** — `ST_WinchLoadEstimateTable` et `FB_WinchLoadEstimator` fournissent
+> une estimation empirique par croisement palier commandé × bande de vitesse mesurée. La table
+> doit être explicitement validée (`IsConfigured`) ; sinon la sortie reste à 0 %. Cette valeur
+> est informative et ne participe à aucune sécurité ou commande.
+>
+> 🛡️ **T47 (2026-07-18)** — `FB_SpeedStep` peut plafonner le palier selon la bande de vitesse
+> réellement mesurée. Si les conditions de stabilité ne sont pas validées, le palier est limité
+> à 1. La fonction est désactivée par défaut (`SpeedGuardEnable=FALSE`) en attente de validation
+> des seuils et essais terrain ; elle ne remplace pas le `SafeStop`.
+> `SpeedGuardReady` dépend de la stabilité temporisée du moniteur vitesse et de l'absence
+> d'erreur de synchronisation.
+>
 > **v1.10** — Nettoyage documentaire (audit doc) : remarques organisationnelles (sélecteur treuil
 > IHM non codé, §4undecies montée en charge, checklist validation v1.7) remplacées par des renvois
 > courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T9/T20/T21). Aucun changement fonctionnel.
 > 🆕 **v1.9 (2026-07-09)** — Documentation exhaustive des 5 mécanismes de sécurité (Méca A–E, bits 7/8/9/11/12/13), extraits du code réel `FB_Safety_Winch.st` : comportement d'armement, seuils, conséquences, escalades PowerCutOff, et subtilités critiques (§4novies ci-dessous).
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_WinchSync` **codé et audité**
-> — `CODE/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
+> — `CODE/TREUILS/FB_WinchSync.st`, 1 instance. Calcule `DeltaPosM`/`SyncWarn` (IHM uniquement, PAS de
 > `SafeStop` pour l'écart de position), `SyncActive` selon Mode (imposé N1, configurable en N2 via `SyncEnable`
 > de `FB_Modes`).
 > **Contrôle de cohérence de commande intégré** : `ErrorId` bit 1 (16#0002) entraîne un `SafeStop` des deux treuils.
@@ -40,8 +61,8 @@
 > le moteur est encore en mouvement ; une simple rampe `SafeStop` ne protège pas la mécanique dans
 > ce cas, il faut couper la puissance immédiatement. **Même raisonnement appliqué à bit2 (surchauffe
 > moteur, déjà existant depuis v1.1)** : ajouté au masque `PowerCutOff` par cohérence/défense en
-> profondeur (demande explicite utilisateur). Nouveaux masques : `SafeStop = (ErrorId AND 16#0F9F)` /
-> `16#0F97` (si SyncEnable=FALSE), `PowerCutOff = (ErrorId AND 16#0F84)` (bits 2/7/8/9/10/11). Détail §3/§4sexies/§4nonies.
+> profondeur (demande explicite utilisateur). Masques actifs : `SafeStop = (ErrorId AND 16#FF9F)` /
+> `16#FF97` (si SyncEnable=FALSE), `PowerCutOff = (ErrorId AND 16#2F84)`. Détail §3/§4sexies/§4nonies.
 > 🔧 **v1.5 (2026-07-07)** — Implémentation du Cas B (« Mouvement non commandé / roue libre »,
 > §4quinquies-TBD ci-avant) et de 2 garde-fous supplémentaires en défense en profondeur, tous
 > câblés dans `FB_Safety_Winch` (nouveaux bits 7/8/9) : **Méca A** — mouvement/dérive détecté(e)
@@ -61,7 +82,7 @@
 > (`ST_ContactorCheck`) ; vérification **StuckClosed uniquement, à l'arrêt commandé** (bit1
 > `ErrorId`) ; `StuckOpen` n'a plus de sens avec ce signal (toujours `FALSE`, champ conservé pour
 > compatibilité de type) ; bit2 `ErrorId` (ex-`RevContactorCheck`) **libéré/inutilisé**. Détail
-> complet dans `CODE/WINCH/FB_Winch.st` (règle anti-doublon — pas de recopie ici) — voir §3/§5/§6
+> complet dans `CODE/TREUILS/FB_Winch.st` (règle anti-doublon — pas de recopie ici) — voir §3/§5/§6
 > ci-dessous pour l'interface et le mapping mis à jour. Hors périmètre : le Translation M3
 > (`FB_Translation.st`) garde ses retours individuels `ContactorFeedbackFwd`/`Rev` — ce changement
 > matériel ne concerne **que** les treuils M1/M2.
@@ -154,6 +175,9 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | `InReferencingMode` 🆕 v1.7 | BOOL | `TRUE` si le treuil est en cours de référencement (homing) |
 | `CablePosM` | REAL | Position câble **de ce treuil** en mètres (scalée) |
 | `CableLimitDescentM` | REAL | Limite basse physique descente (m, valeur négative) |
+| `Direction` / `MovementCommanded` | INT / BOOL | Sens commandé et confirmation qu'un relais de sens est réellement piloté |
+| `MovementSpeedThresholdMps` | REAL := 0.02 | Seuil de mouvement mesurable pour contrôle du sens et absence de mouvement |
+| `OppositeDirectionTimeout` / `NoMovementTimeout` | TIME | Confirmations respectives : 500 ms / 3 s |
 | `FwdRevSpeedFeedbackOff` | BOOL | Retour unique « tous contacteurs sens+vitesse retombés » |
 | `BrakeFeedback` | BOOL | Retour frein **de ce treuil** (I/O réel) : `TRUE` = serré |
 | `JoystickYNeutral` | BOOL | `TRUE` = joystick axe Y au neutre (magnitude `< 0.1`) |
@@ -167,19 +191,21 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | Sortie | Type | Rôle |
 |--------|------|------|
 | `Ready/Busy/Done/Error/State/StateAtError` | — | Contrat standard |
-| `ErrorId` | WORD | bit0 : perte joystick/CAN ; bit1 : perte codeur ; bit2 : surchauffe moteur ; bit3 : mou de câble ; bit4 : rotation de phase ; bit5 : fin de course haut ; bit6 : longueur max câble ; bit7 : Méca A (mouvement non commandé) ; bit8 : Méca B (pilotage sans commande opérateur, vérifie contacteurs + frein) ; bit9 : Méca C (glissement M1 benne) ; bit10 : surchauffe/perte thermique frein commun ; bit11 🆕 v1.7 : Méca D (capteur haut non confirmé arrêté hors homing, SafeStop+PowerCutOff) |
-| `SafeStop` | BOOL | `(ErrorId AND 16#0F9F) <> 0` si SyncEnable=TRUE (bits 0/1/2/3/4/7/8/9/10/11), `(ErrorId AND 16#0F97) <> 0` si SyncEnable=FALSE (bit3 exclu). |
+| `ErrorId` | WORD | bits0..13 : protections A–E existantes ; bit14 : sens réel opposé ; bit15 : absence de mouvement malgré commande |
+| `SafeStop` | BOOL | Inclut bits14/15 ; bit3 mou câble exclu uniquement lorsque `SyncEnable=FALSE`. |
 | `ForbidDescent` | BOOL | bit6 uniquement (limite basse câble) |
 | `ForbidAscent` | BOOL | bit5 (fin de course haut) OU bit3+SyncEnable=FALSE (récupération mou câble) |
-| `PowerCutOff` | BOOL | `(ErrorId AND 16#0F84) <> 0` — bits 2 (surchauffe moteur), 7/8/9 (Méca A/B/C), 10 (thermique frein), 11 (Méca D). |
+| `PowerCutOff` | BOOL | `(ErrorId AND 16#2F84) <> 0` — bits 2, 7/8/9, 10/11 et 13 ; bits14/15 restent en SafeStop seul. |
 | `MecaADriftM` 🆕 v1.7 | REAL | Dérive mesurée Méca A (m) via `FB_DriftGuard` |
+| `MeasuredSpeedMps` 🆕 T41 | REAL | Vitesse linéaire absolue mesurée du câble (m/s), calculée par différence de position |
+| `MeasuredSpeedSignedMps` 🆕 T10 | REAL | Vitesse signée : positive en montée, négative en descente |
 | `MecaCDriftM` 🆕 v1.7 | REAL | Dérive mesurée Méca C (m) via `FB_DriftGuard` |
 | `MecaBElapsedTime` 🆕 v1.7 | TIME | Temps écoulé confirmation Méca B/D |
 
 ### `FB_WinchSync` (1 instance unique, Partie3 §1bis)
 
 **📥 Entrées additionnelles 🆕 v1.7**
-- `InhibitM1` / `InhibitM2` : Si l'un des treuils est inhibé en Maintenance N2, le bloc est désactivé (`Enable := FALSE` dans `PRG_MAIN`), remettant ses erreurs à zéro.
+- `InhibitM1` / `InhibitM2` : Si l'un des treuils est inhibé en Maintenance N2, le bloc est désactivé (`Enable := FALSE` dans `PRG_06_WinchControl`), remettant ses erreurs à zéro.
 - **Déclenchement du SafeStop** : Toute erreur active du bloc (`Error = TRUE`, incluant l'écart de position hors tolérance bit 0 (16#0001) et l'incohérence des commandes bit 1 (16#0002)) déclenche immédiatement un `SafeStop` sur les deux treuils, entraînant une rampe de décélération rapide vers 0.
 
 ---
@@ -232,9 +258,9 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 📌 Suivi (validation terrain + réglages de temporisations différés après essais de charge) : voir
 `DOC/PLAN_TASK_v1.0.md` §3 (T9).
 
-### 🆕 4novies. Défense en profondeur : Les 5 mécanismes de sécurité (Méca A–E, v1.9)
+### 🆕 4novies. Défense en profondeur : mécanismes de sécurité A–G
 
-`FB_Safety_Winch` implémente **5 mécanismes de sécurité indépendants** en défense en profondeur contre les défauts de mouvement (roue libre), les défaillances de capteurs, et les écarts de synchronisation. Chaque mécanisme dispose d'un **bit `ErrorId` dédié**, d'une **condition d'armement**, d'une **condition de déclenchement**, et d'une **conséquence** (arrêt `SafeStop` classique, ou escalade `PowerCutOff` amont quand les contacteurs confirment déjà être coupés ou quand la protection du couple est en jeu).
+`FB_Safety_Winch` implémente **7 mécanismes de sécurité indépendants** en défense en profondeur contre les défauts de mouvement, les défaillances de capteurs et les écarts de synchronisation. Chaque mécanisme dispose d'un bit `ErrorId`, d'un armement, d'un déclenchement et d'une réaction définis.
 
 #### Tableau récapitulatif
 
@@ -245,6 +271,8 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 | **C** | Glissement M1 pendant benne | bit9 (16#0200) | Benne en mouvement (M1 seul) | Dérive M1 > 2.0m (escalade au-delà de `FB_Bucket`) | SafeStop + **PowerCutOff** | `BenneSlipToleranceM` (2.0m) |
 | **D** | Capteur haut non confirmé arrêté | bit11 (16#0800) | Capteur physique atteint OU limite logicielle dépassée, hors homing | Contacteurs/frein ne confirment pas arrêt après délai | SafeStop + **PowerCutOff** | `PostRampTimeout` (3s) |
 | **E** | Écart synchro M1/M2 critique | bit12 (16#1000) + bit13 (16#2000) | Synchro activée, hors benne/homing | Écart > 2.0m → **bit12 immédiat** ; pas confirmé arrêté → **bit13 escalade** | Bit12 : SafeStop seul ; Bit13 : SafeStop + **PowerCutOff** | `CriticalSyncToleranceM` (2.0m), `PostRampTimeout` (3s) |
+| **F** | Sens réel opposé | bit14 (16#4000) | Relais de sens commandé, hors homing | Signe vitesse opposé au sens demandé pendant 500 ms | SafeStop | `MovementSpeedThresholdMps`, `OppositeDirectionTimeout` |
+| **G** | Absence de mouvement | bit15 (16#8000) | Relais de sens commandé, hors homing | Vitesse sous seuil pendant 3 s | SafeStop | `MovementSpeedThresholdMps`, `NoMovementTimeout` |
 
 ---
 
@@ -439,9 +467,9 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 ## 💻 6. Implémentation (référence code)
 
 📂 **Code source à copier** — dossier `CODE/` :
-- [`CODE/WINCH/FB_DriftGuard.st`](../CODE/WINCH/FB_DriftGuard.st) 🆕 v1.7 — Brique de détection de dérive (Méca A/C)
-- [`CODE/WINCH/FB_Safety_Winch.st`](../CODE/WINCH/FB_Safety_Winch.st) — **Mise à jour v1.7** (Méca D, diagnostics IHM, Méca B étendu, refactoring DriftGuard, SafeStop/PowerCutOff)
-- [`CODE/WINCH/FB_WinchSync.st`](../CODE/WINCH/FB_WinchSync.st) — **Mise à jour v1.7** (Ajout entrées d'inhibition M1/M2)
+- [`CODE/TREUILS/FB_DriftGuard.st`](../CODE/TREUILS/FB_DriftGuard.st) 🆕 v1.7 — Brique de détection de dérive (Méca A/C)
+- [`CODE/TREUILS/FB_Safety_Winch.st`](../CODE/TREUILS/FB_Safety_Winch.st) — **Mise à jour v1.7** (Méca D, diagnostics IHM, Méca B étendu, refactoring DriftGuard, SafeStop/PowerCutOff)
+- [`CODE/TREUILS/FB_WinchSync.st`](../CODE/TREUILS/FB_WinchSync.st) — **Mise à jour v1.7** (Ajout entrées d'inhibition M1/M2)
 - [`CODE/MAIN/PRG_00_Inputs.st`](../CODE/MAIN/PRG_00_Inputs.st) — **Mise à jour v1.7** (SimTopSensorTriggered asservi, BrakeThermalFeedback commun, JoystickSignal_IsReal split)
 - [`CODE/MAIN/PRG_03_Safety.st`](../CODE/MAIN/PRG_03_Safety.st) — **Mise à jour v1.7** (Inhibition M1/M2 câblée vers Enable Safety)
 - [`CODE/MAIN/PRG_06_WinchControl.st`](../CODE/MAIN/PRG_06_WinchControl.st) — **Mise à jour v1.7** (InhibitM1/M2, HomingApproachEnable, désactivation de la synchro sur inhibition)
@@ -453,10 +481,10 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 
 ### Étape 0 — Importer la brique `FB_DriftGuard`
 1. Créer un nouveau bloc fonctionnel `FB_DriftGuard` dans le dossier `WINCH`.
-2. Y coller le code de [`CODE/WINCH/FB_DriftGuard.st`](../CODE/WINCH/FB_DriftGuard.st).
+2. Y coller le code de [`CODE/TREUILS/FB_DriftGuard.st`](../CODE/TREUILS/FB_DriftGuard.st).
 
 ### Étape 6bis — Mettre à jour `FB_Safety_Winch`
-1. Mettre à jour la déclaration et l'implémentation de `FB_Safety_Winch` à partir de [`CODE/WINCH/FB_Safety_Winch.st`](../CODE/WINCH/FB_Safety_Winch.st).
+1. Mettre à jour la déclaration et l'implémentation de `FB_Safety_Winch` à partir de [`CODE/TREUILS/FB_Safety_Winch.st`](../CODE/TREUILS/FB_Safety_Winch.st).
 2. Vérifier que les variables de diagnostics IHM (`MecaADriftM`, `MecaCDriftM`, `MecaBElapsedTime`) sont bien créées.
 
 ### Étape 7bis — Mettre à jour les programmes de commande

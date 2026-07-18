@@ -1,8 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.4)
+# 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.5)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
-> **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Benne, Synchro).  
-> **Version** : v1.4 (2026-07-15, ST_TranslationHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist)).  
+> **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Benne, Translation, Cycle, Synchro).  
+> **Version** : v1.5 (2026-07-18, alignement avec `PRG_00`→`PRG_10`, `GVL_IHM.Cycle` et l'interface complète `GVL_IHM.TranslationM3`).
+> 🆕 **T44 (2026-07-18)** : ajout des mesures vitesse câble M1/M2, variations vitesse et
+> état des moniteurs dans `ST_WinchHMI`, ainsi que de l'écart vitesse M1/M2 dans `ST_CycleHMI`.
+> **v1.5 (2026-07-18)** : `PRG_MAIN` supprimé des descriptions opératoires ; le mapping est porté par `PRG_09_Supervision`, les commandes sont consommées par les programmes métier concernés. Ajout des interfaces Cycle et Translation M3 complètes.  
 >
 > **v1.4 (2026-07-15)** : ST_TranslationHMI struct updated to reflect the AC600 EtherCAT drive integration (fields RelayFwd/RelayRev and BypassBrakeFeedback no longer exist).  
 > **v1.3 (2026-07-08)** : Lot #9-17 : Alignment on latest implementation. ST_WinchHMI updated with independent cable limits, inhibition commands, and Meca A/B/C/D diagnostics. ST_ModesHMI updated to match the actual code including full arming sequence outputs.  
@@ -73,7 +76,7 @@ STRUCT
     BrakeContactorCheck     : ST_ContactorCheck; (* Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
-    CmdReset                : BOOL;             (* Acquittement défauts spécifique treuil *)
+    CmdReset                : BOOL;             (* Demande reset par treuil, agrégée dans le reset domaine partagé *)
     CmdHome                 : BOOL;             (* Lancement de la prise d'origine *)
     ConfirmCoherence        : BOOL;             (* Confirmation de cohérence au démarrage *)
     CmdInhibit              : BOOL;             (* Bouton IHM inhibition treuil (MAINT_N2) *)
@@ -218,7 +221,7 @@ STRUCT
     SelectedTargetNum       : INT;     (* Numéro de la cible de position sélectionnée *)
     ReqFwd                  : BOOL;    (* Requête marche avant manuelle (bouton IHM, pas encore arbitrée) *)
     ReqRev                  : BOOL;    (* Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
-    FreqSetpointHz          : REAL;    (* Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs *)
+    FreqSetpointHz          : REAL;    (* Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs *)
 
     (* États & diagnostics FB_Translation *)
     FBState                 : E_State; (* État de l'automate interne (FB_Translation) *)
@@ -286,29 +289,36 @@ END_VAR
 
 ---
 
-## 🔄 4. Logique de Mapping (`PRG_MAIN.st`)
+## 🔄 4. Logique de Mapping (`PRG_09_Supervision.st`)
 
-Le mapping bidirectionnel est divisé en deux parties dans `PRG_MAIN.st` :
+Le mapping bidirectionnel est centralisé dans `PRG_09_Supervision.st` :
 
 1. **Au tout début de l'implémentation** :
-   Les commandes issues de l'IHM sont recopiées dans les variables globales de commande stub de l'application (compatibilité descendante).
-   * Les boutons tactiles `CmdHome` des deux treuils sont analysés pour positionner `HomingMode_IHM` (1, 2 ou 3) et générer l'impulsion `StubHomeButton_IHM`.
+   Les commandes issues de l'IHM sont recopiées vers les interfaces métier dédiées (`PRG_04_Modes`, `PRG_05_Cycle`, `PRG_07_TranslationControl`). Les anciens stubs ne sont conservés que lorsqu'ils sont encore nécessaires.
+   * Chaque structure treuil possède son propre `CmdHome`. Le front est consommé directement par
+     l'instance Homing correspondante dans `PRG_02_Encoders` ; aucun `HomingMode_IHM`, sélecteur
+     global ou `StubHomeButton_IHM` n'est utilisé. Les deux demandes peuvent être simultanées.
    * Les commandes de reset treuils et benne sont agrégées pour piloter l'acquittement machine transverse `MachineReset_IHM`.
 
-2. **À la toute fin de l'implémentation (avant le conditionnement des sorties physiques)** :
+2. **Dans les sections de miroir d'état de `PRG_09_Supervision`** :
    * Les mesures réelles, les sorties d'état automates et les sous-structures de diagnostic (`ContactorsCheck`, etc.) sont affectées à `GVL_IHM` pour alimenter les écrans de supervision.
    * Les paramètres de calibration modifiés à l'écran (`TopSensorPositionM`, `MaxStepDescente`, `RampAccelRate`, etc.) sont recopiés vers les registres de travail de l'automate.
-   * Une logique de synchronisation bidirectionnelle est mise en œuvre pour les bypasses de test (banc de simulation) afin que l'état sur l'écran d'un treuil soit cohérent avec l'état effectif de simulation **par device** (`GVL_Simulation`, voir Partie 13) — chaque axe (M1/M2/Translation) reflète son propre `<Device>_IsReal`, plus une copie unique du même bit global.
+   * Les overrides de test sont autorisés uniquement lorsque `GVL_Simulation.SimulationModeActive = TRUE`.
+
+Les commandes de cycle sont regroupées dans `GVL_IHM.Cycle` et acquittées par `PRG_05_Cycle`.
+Les commandes Translation M3 sont regroupées dans `GVL_IHM.TranslationM3` et consommées par
+`PRG_07_TranslationControl`. Les structures ST réelles du dossier `CODE/SUPERVISION` font foi.
 
 ---
 
 ## 🔌 5. Note d'application CODESYS 3.5
 
 1. **Création des types de données** :
-   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_WinchHMI.st), [ST_BucketHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_BucketHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_EncoderHMI.st), [ST_TranslationHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_TranslationHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/ST_NetworkDiagHMI.st).
+   Dans le dossier `_TYPES` du projet CODESYS, ajouter les fichiers de structure : [ST_WinchHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_WinchHMI.st), [ST_BucketHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_BucketHMI.st), [ST_SyncHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_SyncHMI.st), [ST_JoystickHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_JoystickHMI.st), [ST_ModesHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_ModesHMI.st), [ST_EncoderHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_EncoderHMI.st), [ST_TranslationHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_TranslationHMI.st), [ST_NetworkDiagHMI.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/ST_NetworkDiagHMI.st).
 
 2. **Déclaration de la GVL** :
-   Créer une GVL nommée `GVL_IHM` et y copier le contenu de [GVL_IHM.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/GVL_IHM.st). S'assurer de la cocher en **Retain** si requis par votre configuration automate (la directive `VAR_GLOBAL RETAIN` assure la persistance des données au niveau du compilateur).
+   Créer une GVL nommée `GVL_IHM` et y copier le contenu de [GVL_IHM.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/GVL_IHM.st). S'assurer de la cocher en **Retain** si requis par votre configuration automate (la directive `VAR_GLOBAL RETAIN` assure la persistance des données au niveau du compilateur).
 
-3. **Mise à jour de PRG_MAIN** :
-   Remplacer l'implémentation de `PRG_MAIN` en y collant le code mis à jour de [PRG_MAIN.st](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/PRG_MAIN.st).
+3. **Mise à jour du mapping** :
+   Vérifier `PRG_09_Supervision.st` et les raccordements métier `PRG_04_Modes`, `PRG_05_Cycle`,
+   `PRG_07_TranslationControl`. Il n'existe plus de POU racine `PRG_MAIN`.

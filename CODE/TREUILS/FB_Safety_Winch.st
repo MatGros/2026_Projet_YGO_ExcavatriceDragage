@@ -62,8 +62,8 @@
         `BenneSlipToleranceM` (2.0 m, > à la tolérance 1.0 m déjà surveillée côté
         `FB_Bucket` lui-même) dépassée → la couche Benne (`SafeStop` M1 seul, 1m)
         n'a pas suffi → escalade `PowerCutOff` (dernier recours).
-      Cas A (sens opposé) et Cas C original (absence de mouvement malgré commande)
-      restent TBD, non implémentés (sources encore manquantes : sens joystick brut).
+      - **Bit14** : sens codeur opposé au sens commandé, confirmé 500 ms → `SafeStop`.
+      - **Bit15** : absence de vitesse malgré relais de sens commandé, confirmée 3 s → `SafeStop`.
    🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
       - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT
         sur les 2 instances Winch + l'instance Translation — même principe que `SlackCableDetected`) :
@@ -135,6 +135,7 @@ VAR_INPUT
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
     CableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
     Direction           : INT;         // 🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)
+    MovementCommanded   : BOOL;        // TRUE si au moins un contacteur de sens est réellement commandé
     Homed               : BOOL;        // Indique si le treuil est référencé
     HomingSuspect       : BOOL;        // Indique si le référencement est suspect
     TopLimitM           : REAL;        // Position limite haute active (cible homing, m)
@@ -162,13 +163,16 @@ VAR_INPUT
     // sans borne pendant que M1 travaille seul normalement → faux Méca E. Croisé (M2 côté instance
     // M1, M1 côté instance M2), même principe que ExpectedOtherWinchPosM.
     OtherWinchInhibited     : BOOL;         // Inhibition de l'AUTRE treuil (mise en service N2)
+    MovementSpeedThresholdMps : REAL := 0.02; // Seuil mouvement mesurable pour contrôles sens/absence
+    OppositeDirectionTimeout  : TIME := T#500MS; // Confirmation sens réel opposé à la commande
+    NoMovementTimeout         : TIME := T#3S;    // Confirmation absence de mouvement malgré commande
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Perte Joystick / CAN" - joystick/CAN perdu ; bit1: "Défaut Codeur" - codeur perdu ; bit2: "Surchauffe Moteur" - surchauffe moteur (SafeStop+PowerCutOff) ; bit3: "Mou de câble détecté" - mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4: "Défaut Rotation Phases" - phases élec. ; bit5: "Fin de course haut atteint" - fin course haut ; bit6: "Limite profondeur max atteinte" - longueur max câble ; bit7: "Mouvement non commandé (Méca A)" - Méca A mouvement non commandé ; bit8: "Absence confirmation arrêt (Méca B)" - Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9: "Glissement benne critique (Méca C)" - Méca C glissement M1/benne (escalade) ; bit10: "Défaut Thermique Freins" - surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11: "Défaut arrêt capteur haut (Méca D)" - Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12: "Écart synchro critique (Méca E)" - Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13: "Absence confirmation synchro (Méca E)" - Méca E escalade non confirmé (SafeStop+PowerCutOff)
+    ErrorId             : WORD;        // bits0..13 : protections existantes ; bit14 : sens réel opposé ; bit15 : absence mouvement malgré commande
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)
@@ -181,6 +185,8 @@ VAR_OUTPUT
     MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
     MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM
     MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout
+    MeasuredSpeedMps    : REAL;        // Vitesse linéaire mesurée du câble (m/s), valeur absolue
+    MeasuredSpeedSignedMps : REAL;      // Vitesse signée : positive montée, négative descente
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
@@ -189,7 +195,7 @@ VAR
     // 🔧 REX 2026-07-07 — Méca A (bit7)
     CycleTimeCalc       : FB_CycleTime;
     LastCablePosM       : REAL;
-    MeasuredSpeedMps    : REAL;
+    SpeedInitialized    : BOOL;
     DriftGuardA         : FB_DriftGuard;   // 🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)
 
     // 🔧 REX 2026-07-07 — Méca B (bit8)
@@ -207,6 +213,9 @@ VAR
 
     // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13)
     TonMecaE               : TON;   // Confirmation arrêt après détection écart critique (escalade PowerCutOff)
+    TonOppositeDirection  : TON;
+    TonNoMovement         : TON;
+    OppositeDirectionActive : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
@@ -214,9 +223,13 @@ END_VAR
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
     SafeStop := TRUE;
     ForbidDescent := TRUE;
     PowerCutOff := FALSE;
+    MeasuredSpeedMps := 0.0;
+    MeasuredSpeedSignedMps := 0.0;
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
@@ -224,6 +237,12 @@ IF NOT Enable THEN
     // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
+    TonMecaB(IN := FALSE);
+    TonMecaD(IN := FALSE);
+    TonMecaE(IN := FALSE);
+    TonOppositeDirection(IN := FALSE);
+    TonNoMovement(IN := FALSE);
+    SpeedInitialized := FALSE;
     RETURN;
 END_IF;
 
@@ -244,6 +263,7 @@ IF NOT EmergencyStopOk THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
     LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
+    SpeedInitialized := FALSE;
 END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
@@ -312,7 +332,13 @@ END_IF;
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
 // 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé,
 // seul le check vitesse (MeasuredSpeedMps) reste géré ici (hors périmètre de la brique).
-MeasuredSpeedMps := ABS(CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
+IF NOT SpeedInitialized OR InReferencingMode THEN
+    MeasuredSpeedSignedMps := 0.0;
+    SpeedInitialized := TRUE;
+ELSE
+    MeasuredSpeedSignedMps := (CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
+END_IF;
+MeasuredSpeedMps := ABS(MeasuredSpeedSignedMps);
 LastCablePosM := CablePosM;
 
 DriftGuardA(
@@ -414,6 +440,33 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#DFFF;
 END_IF;
 
+// 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
+// Le signe de la vitesse câble est comparé à la direction commandée uniquement pendant un
+// mouvement effectivement demandé. La temporisation filtre bruit codeur et inversion transitoire.
+OppositeDirectionActive := MovementCommanded AND NOT InReferencingMode
+    AND (((Direction > 0) AND (MeasuredSpeedSignedMps < -MovementSpeedThresholdMps))
+      OR ((Direction < 0) AND (MeasuredSpeedSignedMps > MovementSpeedThresholdMps)));
+TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
+IF TonOppositeDirection.Q THEN
+    ErrorId := ErrorId OR 16#4000;
+ELSIF ResetEdge.Q AND NOT OppositeDirectionActive THEN
+    ErrorId := ErrorId AND 16#BFFF;
+END_IF;
+
+// ⏱️ 3quindecies — ABSENCE DE MOUVEMENT MALGRÉ COMMANDE (bit15)
+// Détecte charge coincée, contacteur inefficace ou chaîne mécanique non entraînée. SafeStop seul :
+// aucun retour ne justifie une coupure puissance brutale immédiate ; l'escalade reste matérielle.
+TonNoMovement(
+    IN := MovementCommanded AND NOT InReferencingMode
+          AND (ABS(MeasuredSpeedSignedMps) < MovementSpeedThresholdMps),
+    PT := NoMovementTimeout
+);
+IF TonNoMovement.Q THEN
+    ErrorId := ErrorId OR 16#8000;
+ELSIF ResetEdge.Q AND (NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) >= MovementSpeedThresholdMps)) THEN
+    ErrorId := ErrorId AND 16#7FFF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -427,9 +480,9 @@ END_IF;
 IF NOT EmergencyStopOk THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (ErrorId AND 16#3F97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (ErrorId AND 16#FF97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#3F9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (ErrorId AND 16#FF9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé

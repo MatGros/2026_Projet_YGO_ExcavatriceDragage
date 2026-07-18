@@ -19,6 +19,10 @@
    💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
       valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
       l'appui homme-mort — exactement comme on forcerait le vrai capteur.
+   🆕 REX 2026-07-19 : `TestOverrideActive` — pilotage programmatique par la suite PLC_TESTS
+      (GVL_PLC_Tests), en complément du forçage manuel en instance CODESYS ci-dessus (les deux
+      mécanismes coexistent, le Force IDE restant prioritaire de toute façon s'il est posé).
+      Nécessaire car un Force CODESYS ne peut pas être déclenché depuis du code ST.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===
@@ -28,6 +32,10 @@ VAR_INPUT
     Enable      : BOOL;
     NeutralRaw  : INT := 5000;
     MaxRaw      : INT := 10000;
+    TestOverrideActive   : BOOL; // 🆕 TRUE = RawX/Y/Button pilotés par TestOverrideRaw* (suite PLC_TESTS)
+    TestOverrideRawX     : INT;
+    TestOverrideRawY     : INT;
+    TestOverrideRawButton : BOOL;
 END_VAR
 VAR_OUTPUT
     RawX        : INT;   // 🔧 Forçable en instance CODESYS (repos = NeutralRaw)
@@ -48,7 +56,14 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-IF FirstCycle THEN
+IF TestOverrideActive THEN
+    // 🆕 REX 2026-07-19 : suite PLC_TESTS — écriture CYCLIQUE volontaire (pas de FirstCycle),
+    // contrairement au forçage manuel, pour permettre un pilotage dynamique scan par scan.
+    RawX := TestOverrideRawX;
+    RawY := TestOverrideRawY;
+    RawButton := TestOverrideRawButton;
+    FirstCycle := FALSE;
+ELSIF FirstCycle THEN
     RawX := NeutralRaw;
     RawY := NeutralRaw;
     RawButton := FALSE;

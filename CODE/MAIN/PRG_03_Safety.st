@@ -8,6 +8,10 @@ PROGRAM PRG_03_Safety
 VAR
     instSafetyWinchM1   : FB_Safety_Winch;
     instSafetyWinchM2   : FB_Safety_Winch;
+    instSpeedMonitorM1  : FB_Encoder_SpeedMonitor;
+    instSpeedMonitorM2  : FB_Encoder_SpeedMonitor;
+    instLoadEstimatorM1 : FB_WinchLoadEstimator;
+    instLoadEstimatorM2 : FB_WinchLoadEstimator;
     instSafetyTranslationM3 : FB_Safety_Translation;
 END_VAR
 
@@ -40,23 +44,17 @@ instSafetyWinchM1(
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CableLimitDescentM  := _CableLimitM1Descent_M,
     Direction           := PRG_06_WinchControl.M1_Direction_Active,
+    MovementCommanded   := PRG_06_WinchControl.instWinchM1.RelayFwd OR PRG_06_WinchControl.instWinchM1.RelayRev,
     Homed               := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM1.HomingSuspect,
     TopLimitM           := _HomingTargetM1_M,
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M1BrakeFeedback,
-    // 🔧 REX 2026-07-15 (7) — BUG CORRIGÉ (retour terrain, SafetyErrorId=256/bit8) : Méca B ne
-    // regardait QUE le joystick CANopen pour détecter "commande opérateur" — en IHM_MANU piloté
-    // par BOUTONS HMI (JoystickSelect=FALSE), le joystick reste au neutre en permanence, donc
-    // MecaB_NoOperatorCmd restait TRUE en continu même pendant un mouvement légitime aux boutons
-    // → SafeStop après PostRampTimeout (3s) dès qu'un mouvement HMI dépassait ce délai. Ajout des
-    // boutons IHM_MANU bruts (M1 individuel + Couplé) — reste indépendant de l'arbitrage
-    // PRG_06/FB_Winch (défense en profondeur intacte, lecture directe des boutons IHM comme le
-    // joystick l'était déjà).
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1)
-                              AND NOT GVL_IHM.IHM_MANU.M1_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_RelayRev
-                              AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
+    // 🔧 REX 2026-07-19 : suppression IHM_MANU — le joystick est désormais la SEULE source de
+    // mouvement manuel (plus de boutons HMI bruts en parallèle) : le check bouton ajouté en
+    // 2026-07-15 (7) pour compenser ce 2ᵉ chemin de commande est devenu sans objet, retiré.
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1),
     BenneHoldStillActive := PRG_06_WinchControl.instBucket.Busy, // Méca C — M1 doit rester immobile pendant le
                                                                      // benne ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
@@ -88,6 +86,7 @@ instSafetyWinchM2(
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     CableLimitDescentM  := _CableLimitM2Descent_M,
     Direction           := PRG_06_WinchControl.M2_Direction_Active,
+    MovementCommanded   := PRG_06_WinchControl.instWinchM2.RelayFwd OR PRG_06_WinchControl.instWinchM2.RelayRev,
     Homed               := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM2.HomingSuspect,
     TopLimitM           := _HomingTargetM2_M,
@@ -95,10 +94,8 @@ instSafetyWinchM2(
     // à M2 (c'est M2 qui bouge pendant le benne, BenneHoldStillActive reste FALSE)
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
-    // 🔧 REX 2026-07-15 (7) : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus).
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1)
-                              AND NOT GVL_IHM.IHM_MANU.M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M2_RelayRev
-                              AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayFwd AND NOT GVL_IHM.IHM_MANU.M1_M2_RelayRev,
+    // 🔧 REX 2026-07-19 : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus) — suppression IHM_MANU.
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1),
     BenneHoldStillActive := FALSE,
     // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
     // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2
@@ -108,6 +105,50 @@ instSafetyWinchM2(
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
+);
+
+// 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
+instSpeedMonitorM1(
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1,
+    Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    Mode                       := PRG_04_Modes.instModes.Mode,
+    SpeedMps                   := instSafetyWinchM1.MeasuredSpeedMps,
+    SpeedVariationThresholdMps := 0.0,
+    SpeedVariationTimeout      := T#0ms,
+    SpeedStabilityTimeout      := T#0ms
+);
+instSpeedMonitorM2(
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2,
+    Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    Mode                       := PRG_04_Modes.instModes.Mode,
+    SpeedMps                   := instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedVariationThresholdMps := 0.0,
+    SpeedVariationTimeout      := T#0ms,
+    SpeedStabilityTimeout      := T#0ms
+);
+
+// 2ter. Estimation charge — information empirique, jamais une fonction safety.
+instLoadEstimatorM1(
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM1,
+    Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    Mode             := PRG_04_Modes.instModes.Mode,
+    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM1.StepNumber,
+    MeasuredSpeedMps := instSafetyWinchM1.MeasuredSpeedMps,
+    SpeedConfig      := _WinchSpeedConfig,
+    LoadTable        := _WinchLoadEstimateTable
+);
+instLoadEstimatorM2(
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM2,
+    Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    Mode             := PRG_04_Modes.instModes.Mode,
+    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM2.StepNumber,
+    MeasuredSpeedMps := instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedConfig      := _WinchSpeedConfig,
+    LoadTable        := _WinchLoadEstimateTable
 );
 
 // 3. Sécurité Translation M3

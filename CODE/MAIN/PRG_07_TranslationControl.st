@@ -59,7 +59,9 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     ELSE
         M3_Direction_Active := -1;
     END_IF;
-// ── 1bis. IHM_MANU — 3ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
+// ── 1bis. MAINT_N1/N2 — 2ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
+// 🔧 REX 2026-07-19 : ex-libellé "IHM_MANU" (bypass supprimé) — cette branche est désormais
+// gatée par Mode (MAINT_N1/N2), pas par un flag ManuActive séparé.
 // 🆕 REX 2026-07-16 : remplace l'ex-bypass direct M3_CommandWord dans PRG_10_Outputs — M3 est
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
@@ -76,12 +78,16 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     ELSE
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     END_IF;
+    // 🛡️ REX 2026-07-19 (revue mission IHM_MANU) : DeadmanArmed exigé même en pilotage boutons
+    // IHM (ReqFwd/ReqRev), pas seulement en pilotage joystick — sinon les boutons IHM
+    // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
     M3_StartStop_Active := (M3_Direction_Active <> 0)
+                           AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                            AND (NOT GVL_IHM.TranslationM3.JoystickSelect
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.FreqSetpointHz (consigne Hz réglable opérateur,
-    // clampée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
+    // limitée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
@@ -96,6 +102,11 @@ ELSE
     M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
 END_IF;
+
+// 🛡️ Limitation finale M3 : toute source de commande (joystick, IHM ou cycle) arrive
+// au variateur dans la plage physique autorisée 0..100 %. Ce garde-fou complète
+// les limitations de FB_AxisScale/FB_Ramp et ne remplace pas la chaîne Safety.
+M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
 // 🆕 REX 2026-07-18 : cible Maintenance (4) bloquée hors MAINT_N2 (AF_Partie-02 v2.12 §3bis) —
 // arbitrage centralisé dans FB_Modes (aucun re-test de Mode ici), refuse toute cible si interdite.
