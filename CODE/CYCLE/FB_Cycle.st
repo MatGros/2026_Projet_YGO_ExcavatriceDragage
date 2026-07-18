@@ -10,6 +10,7 @@ VAR_INPUT
     Enable              : BOOL;         // Activation générale du séquenceur
     Reset               : BOOL;         // Acquittement défaut (front)
     EmergencyStopOk     : BOOL;         // Chaîne de sécurité OK
+    CycleMotionPermit   : BOOL;         // Homme-mort + joystick actif
 
     // Commandes opérateur
     StartCycle          : BOOL;         // Demande lancement / reprise cycle (IHM)
@@ -135,6 +136,8 @@ AbortEdge(CLK := AbortCycle);
 IF ResetEdge.Q THEN
     Error := FALSE;
     ErrorId := 16#0000;
+    IsPaused := FALSE;
+    SavedState := E_CycleStep.INIT;
     IF State = E_CycleStep.ERROR_HOLD THEN
         State := E_CycleStep.INIT;
     END_IF;
@@ -191,14 +194,18 @@ CASE State OF
 
         // Choix cible — 🆕 REX 2026-07-18 : zone de travail = P2/P1 (cibles 2/3), ex-Fosse1/Fosse2
         // (cibles 1/2), suite au remap 5 positions Trémie(1)/P2(2)/P1(3)/Maintenance(4)
-        IF SelectedTargetNum_IHM = 2 OR SelectedTargetNum_IHM = 3 THEN
+        IF (SelectedTargetNum_IHM <> 2) AND (SelectedTargetNum_IHM <> 3) THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0004; // cible de travail invalide
+            State := E_CycleStep.ERROR_HOLD;
+        ELSIF SelectedTargetNum_IHM = 2 OR SelectedTargetNum_IHM = 3 THEN
             SelectedWorkTarget := SelectedTargetNum_IHM;
             CmdTranslationM3_Target := SelectedWorkTarget;
-            CmdTranslationM3_Start := TRUE;
+            CmdTranslationM3_Start := CycleMotionPermit;
 
             // Attente positionnement translation
-            IF (SelectedWorkTarget = 2 AND Translation_At_P2)
-               OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
+            IF CycleMotionPermit AND ((SelectedWorkTarget = 2 AND Translation_At_P2)
+               OR (SelectedWorkTarget = 3 AND Translation_At_P1)) THEN
                 CmdTranslationM3_Start := FALSE;
                 State := E_CycleStep.DESCENDING_OPEN;
             END_IF;
@@ -219,7 +226,7 @@ CASE State OF
         KoboldContactorCmd   := TRUE;
 
         // Transition uniquement sur le retour dédié Kobold.
-        IF KoboldContactFond THEN
+        IF CycleMotionPermit AND KoboldContactFond THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             KoboldContactorCmd := FALSE;
@@ -251,7 +258,7 @@ CASE State OF
         CmdWinchM2_SpeedPct := 20.0;
 
         // Les deux treuils restent synchronisés jusqu'au-dessus de la limite légale.
-        IF (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
+        IF CycleMotionPermit AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.SYNCHRO_ADJUST;
@@ -267,7 +274,7 @@ CASE State OF
         CmdBucket_Close := TRUE;
 
         // Transition si benne fermé avec succès
-        IF Benne_Done AND Benne_IsClosed THEN
+        IF CycleMotionPermit AND Benne_Done AND Benne_IsClosed THEN
             CmdBucket_Close := FALSE;
             State := E_CycleStep.CTRL_ASCENDING;
         END_IF;
@@ -286,7 +293,7 @@ CASE State OF
         CmdWinchM2_SpeedPct  := 20.0;
 
         // Transition après remontée de contrôle de 2.0 mètres
-        IF M1_CablePosM >= (TouchPositionM + CtrlAscentDistM) THEN
+        IF CycleMotionPermit AND M1_CablePosM >= (TouchPositionM + CtrlAscentDistM) THEN
             State := E_CycleStep.ASCENDING_LOADED;
         END_IF;
 
@@ -303,7 +310,7 @@ CASE State OF
         CmdWinchM2_SpeedPct  := 70.0;
 
         // Transition si position haute (butée haute virtuelle) atteinte
-        IF M1_CablePosM >= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
+        IF CycleMotionPermit AND M1_CablePosM >= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.DRAINING_PAUSE;
@@ -317,7 +324,7 @@ CASE State OF
         CmdWinchM2_StartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        IF DrainingTimer.Q THEN
+        IF CycleMotionPermit AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.TRANSLATION_MOVE;
         END_IF;
@@ -330,7 +337,7 @@ CASE State OF
         CmdTranslationM3_Start := TRUE;
 
         // Transition si translation arrivé à la trémie
-        IF Translation_At_Tremie THEN
+        IF CycleMotionPermit AND Translation_At_Tremie THEN
             CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.DESCENDING_OPEN_DUMP;
         END_IF;
@@ -343,7 +350,7 @@ CASE State OF
         CmdBucket_Open := TRUE;
 
         // Transition si benne ouvert avec succès
-        IF Benne_Done AND Benne_IsOpen THEN
+        IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
             CmdBucket_Open := FALSE;
             State := E_CycleStep.RETURN_WORK_POS;
         END_IF;
@@ -356,8 +363,8 @@ CASE State OF
         CmdTranslationM3_Start := TRUE;
 
         // Transition si translation de retour sur sa position de travail
-        IF (SelectedWorkTarget = 2 AND Translation_At_P2)
-           OR (SelectedWorkTarget = 3 AND Translation_At_P1) THEN
+        IF CycleMotionPermit AND ((SelectedWorkTarget = 2 AND Translation_At_P2)
+           OR (SelectedWorkTarget = 3 AND Translation_At_P1)) THEN
             CmdTranslationM3_Start := FALSE;
             State := E_CycleStep.READY;
         END_IF;
@@ -390,3 +397,14 @@ CASE State OF
         CmdBucket_Open := FALSE;
         CmdBucket_Close := FALSE;
 END_CASE;
+
+// 🛑 Relâchement homme-mort : aucune demande d'actionneur ne reste active.
+// L'étape est mémorisée et reprend au prochain appui valide.
+IF Busy AND NOT CycleMotionPermit THEN
+    CmdWinchM1_StartStop := FALSE;
+    CmdWinchM2_StartStop := FALSE;
+    CmdTranslationM3_Start := FALSE;
+    CmdBucket_Open := FALSE;
+    CmdBucket_Close := FALSE;
+    KoboldContactorCmd := FALSE;
+END_IF;

@@ -408,6 +408,27 @@ GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTransla
 GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
 GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 
+// ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
+GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;
+GVL_IHM.Cycle.Busy                 := PRG_05_Cycle.instCycle.Busy;
+GVL_IHM.Cycle.Done                 := PRG_05_Cycle.instCycle.Done;
+GVL_IHM.Cycle.Error                := PRG_05_Cycle.instCycle.Error;
+GVL_IHM.Cycle.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
+GVL_IHM.Cycle.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
+GVL_IHM.Cycle.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
+GVL_IHM.Cycle.SelectedTargetNum    := GVL_IHM.TranslationM3.SelectedTargetNum;
+GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
+GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.Cycle.LimitLegalDepthM     := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
+GVL_IHM.Cycle.WinchSyncDeltaM      := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.Cycle.M1PositionM          := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Cycle.M2PositionM          := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.Cycle.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.Cycle.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
+
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
 GVL_IHM.JoystickJOY1.RawX       := JoyXRaw_ANA1;
