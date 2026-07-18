@@ -6,6 +6,12 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### `v0.4.18_DocSweep_IHMRetrait` — 2026-07-18
+- Méga passe documentaire : AF Partie 07 (v1.5) et Partie 11 (v1.9) republiées, PLAN_TASK et AUDIT synchronisés
+- Retrait définitif IHM_MANU (ST_IHM_MANU + AF Partie-07 v1.4 archivées) — pilotage manuel = MAINT_N1/N2 + joystick homme-mort
+- Nouvelles suites PLC_TESTS ENCODER/MODES + checklists mise en service Joystick/Translation
+- Commit `397cee0` — clôture plan logiciel initial (homing, safety, vitesse codeur/paliers)
+
 ### Plan logiciel initial — clôture implémentation — 2026-07-18
 - Homing unitaire M1/M2 MAINT_N2 : sélection, cible libre ±99 m, diagnostics
 - Safety Winch : sens opposé bit14, absence mouvement bit15, temporisations

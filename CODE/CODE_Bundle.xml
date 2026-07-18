@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-18T00:05:50.012560" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-18T00:05:50.012560">
+  <contentHeader name="MGS_v0.4.18_DocSweep_IHMRetrait.project" modificationDateTime="2026-07-18T00:05:50.012560">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">MGS_v0.4.18_DocSweep_IHMRetrait</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1280,6 +1280,21 @@
             <variable name="WinchSyncDeltaM">
               <type>
                 <REAL />
+              </type>
+            </variable>
+            <variable name="SpeedMismatchMps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SpeedMismatchConfirmed">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="M1PositionM">
@@ -3135,7 +3150,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickSelect">
@@ -3503,6 +3518,17 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 📐 Position cible du capteur haut (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingTargetM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+              </documentation>
+            </variable>
             <variable name="MaxStepDescente">
               <type>
                 <INT />
@@ -3598,6 +3624,86 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États &amp; Mesures (Lecture seule)
 📊 Position actuelle du câble (mètres)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedDeltaMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Variation de vitesse entre deux scans (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedVariationDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Seuil de variation dépassé sur le scan courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedVariationConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Variation confirmée pendant la durée paramétrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Vitesse stable pendant la durée paramétrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMonitorError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut mémorisé du moniteur vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMonitorErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Bitfield du moniteur vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EstimatedLoadPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Estimation empirique, non certifiée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadEstimateConfigured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Table charge validée pour lecture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardLimited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRefPct">
@@ -3897,7 +4003,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Lancement de la prise d'origine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmCoherence">
@@ -4004,6 +4110,102 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_WinchLoadEstimateTable">
+        <baseType>
+          <struct>
+            <variable name="IsConfigured">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LoadPctByStepAndSpeedBand">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <array>
+                      <dimension lower="1" upper="5" />
+                      <baseType>
+                        <REAL />
+                      </baseType>
+                    </array>
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/generator</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3ce84c87-ca73-5af4-aa58-4b48adcd8dc4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   📊 ST_WinchLoadEstimateTable — Table empirique charge estimée
+   ═══════════════════════════════════════════════════════════════════════════════
+   ⚠️ Valeur informative uniquement : ce tableau ne remplace pas une mesure de
+      charge certifiée et ne participe à aucune fonction de sécurité.
+   🧭 Index 1 : palier contacteurs commandé (1..5)
+   🧭 Index 2 : bande de vitesse câble mesurée (1..5)
+   📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
+   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_WinchSpeedConfig">
+        <baseType>
+          <struct>
+            <variable name="MaxMeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesurée de référence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandMaxMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond vitesse mesurée de chaque palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandHysteresisMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hystérésis de classement (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e42720b7-697f-5cd2-bd03-5cc46c6f51bc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   🪜 ST_WinchSpeedConfig — Plages de vitesse linéaire mesurée des 5 paliers
+   ═══════════════════════════════════════════════════════════════════════════════
+   🎯 Configuration de caractérisation, séparée de ST_SpeedStepTable :
+      - ST_SpeedStepTable = contacteurs commandés par palier (% vitesse)
+      - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
+   ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
+      Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
+   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="FB_AxisScale" pouType="functionBlock">
@@ -4085,6 +4287,11 @@ END_IF;
 IF ABS(OutPct) &lt;= Deadband THEN
     OutPct := 0.0;
 END_IF;
+
+// 🛡️ Limitation de plage : une valeur brute hors plage nominale ne doit jamais
+// produire une consigne supérieure à ±100 %. Ce garde-fou protège les
+// consommateurs en aval, notamment la translation M3.
+OutPct := LIMIT(-100.0, OutPct, 100.0);
 </xhtml>
           </ST>
         </body>
@@ -6624,6 +6831,38 @@ Retour dédié Kobold : TRUE = contact fond détecté</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble treuil M2 (recalée)</xhtml>
               </documentation>
             </variable>
+            <variable name="M1_MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire mesurée M1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire mesurée M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchThresholdMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil écart vitesse ; 0 = contrôle désactivé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée de confirmation ; 0 = contrôle désactivé</xhtml>
+              </documentation>
+            </variable>
             <variable name="Translation_At_P1">
               <type>
                 <BOOL />
@@ -6745,7 +6984,31 @@ Mouvement mâchoires benne en cours</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible, bit4: écart vitesse M1/M2 confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart absolu de vitesse M1/M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil vitesse dépassé sur le cycle courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant SpeedMismatchTimeout</xhtml>
               </documentation>
             </variable>
             <variable name="CmdWinchM1_StartStop">
@@ -6924,6 +7187,14 @@ Position M1 mémorisée lors du contact fond</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation maximale de remontée lente après fermeture</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedMismatchTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation temporelle écart de vitesse M1/M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="SelectedWorkTarget">
               <type>
                 <INT />
@@ -7029,6 +7300,17 @@ AbortEdge(CLK := AbortCycle);
 // ne doit jamais laisser le cycle attendre indéfiniment.
 StabilizationTimer(IN := (State = E_CycleStep.CTRL_ASCENDING), PT := CtrlAscentTimeout);
 
+// 📏 T43 — comparaison vitesse réelle M1/M2.
+// Le contrôle est volontairement désactivé tant que le seuil et la durée ne sont pas définis.
+SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
+SpeedMismatchActive := (State = E_CycleStep.CTRL_ASCENDING)
+                       AND CycleMotionPermit
+                       AND (SpeedMismatchThresholdMps &gt; 0.0)
+                       AND (SpeedMismatchTimeout &gt; T#0ms)
+                       AND (SpeedMismatchMps &gt; SpeedMismatchThresholdMps);
+SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
+SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
+
 IF ResetEdge.Q THEN
     Error := FALSE;
     ErrorId := 16#0000;
@@ -7043,6 +7325,14 @@ END_IF;
 IF WinchSyncError AND State &lt;&gt; E_CycleStep.ERROR_HOLD THEN
     Error := TRUE;
     ErrorId := ErrorId OR 16#0002;
+    State := E_CycleStep.ERROR_HOLD;
+END_IF;
+
+// 🛡️ T43 — écart de vitesse confirmé : arrêt du cycle et ERROR_HOLD.
+// La sortie SafeStop reste gérée par les blocs safety métier ; ce bit protège le séquenceur.
+IF SpeedMismatchConfirmed AND State &lt;&gt; E_CycleStep.ERROR_HOLD THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0010;
     State := E_CycleStep.ERROR_HOLD;
 END_IF;
 
@@ -7391,7 +7681,7 @@ END_IF;
    ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2
-      (base de temps utilisée par FB_FilterPT1, composé dans FB_Joystick)
+      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -8315,7 +8605,7 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     Report.ErrorMessage := '';
     Report.FailureSummary := '';
     Report.CurrentStepId := Step;
-    Report.CurrentCaseId := SEL(Step = 20, 1, 2);
+    Report.CurrentCaseId := SEL(Step &gt;= 20, 2, 1);
     Report.Duration := T#0s;
     Report.RunCounter := Report.RunCounter + 1;
     FOR Index := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
@@ -8344,7 +8634,8 @@ END_IF;
 StepElapsed := StepElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
 Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
 Report.CurrentStepId := Step;
-CaseId := SEL(Step &gt;= 20, 1, 2);
+// 🧭 Mapping rapport : étapes 10/11 = TC-E1 ; étapes 20/21/22 = TC-E2.
+CaseId := SEL(Step &gt;= 20, 2, 1);
 Report.CurrentCaseId := CaseId;
 
 IF NOT StepStarted THEN
@@ -8371,7 +8662,11 @@ CASE Step OF
     // TC-E1 : gate et interface IHM nominale accessibles.
     10:
         GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
-        IF SimGateOk AND NOT GVL_IHM.M1TreuilRetenue.HomingError
+        IF NOT SimGateOk THEN
+            StepFailed := TRUE;
+            ErrorCode := 3003;
+            ErrorMessage := 'Gate simulation codeurs inactif';
+        ELSIF NOT GVL_IHM.M1TreuilRetenue.HomingError
            AND NOT GVL_IHM.M2TreuilBucket.HomingError THEN
             StepPassed := TRUE;
             Step := 11;
@@ -8389,7 +8684,11 @@ CASE Step OF
     // TC-E2 : fronts CmdHome indépendants, envoyés simultanément.
     20:
         GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
-        IF SimGateOk THEN
+        IF NOT SimGateOk THEN
+            StepFailed := TRUE;
+            ErrorCode := 3003;
+            ErrorMessage := 'Gate simulation codeurs inactif';
+        ELSE
             StepPassed := TRUE;
             Step := 21;
             StepStarted := FALSE;
@@ -8429,6 +8728,8 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
     END_IF;
     Report.Steps[Report.CurrentStepId].Executed := TRUE;
     Report.Steps[Report.CurrentStepId].Duration := StepElapsed;
+    Report.ErrorCode := ErrorCode;
+    Report.ErrorMessage := ErrorMessage;
     // Un échec ou un timeout termine immédiatement la suite : aucune étape
     // suivante ne doit laisser le banc attendre un signal devenu impossible.
     IF NOT StepPassed THEN
@@ -8945,6 +9246,30 @@ Done := PresetAck;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de référencement (front, bouton IHM UNIQUE)</xhtml>
               </documentation>
             </variable>
+            <variable name="UnitaryMode">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = cette instance est le treuil sélectionné</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingTargetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre unitaire, limitée à [-99.0 ; +99.0] m</xhtml>
+              </documentation>
+            </variable>
             <variable name="ConfirmCoherence">
               <type>
                 <BOOL />
@@ -9201,6 +9526,14 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé TopSensorPositionM → points, figé pendant la séquence</xhtml>
               </documentation>
             </variable>
+            <variable name="TargetPositionM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible retenue : nominale ou unitaire</xhtml>
+              </documentation>
+            </variable>
             <variable name="RawDiffRestart">
               <type>
                 <DINT />
@@ -9212,15 +9545,12 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎯 FB_Encoder_Homing — Référencement codeur, flux NOMINAL uniquement
+   🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §1/§5/§7bis
-   ⚠️ PÉRIMÈTRE DE CE LOT : flux **nominal** uniquement (capteur haut +
-      bouton IHM, référencement à `TopSensorPositionM`, 1 instance par
-      treuil, câblées sur le MÊME bouton IHM côté PRG_MAIN). Le flux
-      **unitaire** (`WinchSelect`, cible libre `HomingTargetM`,
-      `MAINT_N2`) n'est **pas** codé ici — dépend de `E_WinchSelect`/
-      `FB_Modes`, pas encore construits.
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §1/§5/§7bis
+   ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
+      unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
+      moteur n'est piloté ici.
    🔌 PAS un FB de mouvement (Partie3 §1bis) : il n'écrit qu'une valeur
       de calibration, le treuil étant déjà à l'arrêt confirmé. Pas de
       `StartStop`/`SafeStop`.
@@ -9252,7 +9582,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-IF NOT Enable THEN
+IF NOT Enable OR NOT EmergencyStopOk THEN
     PresetRequest := FALSE;
     PresetValue := 0;
     State := E_State.DISABLED;
@@ -9293,22 +9623,32 @@ IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
 END_IF;
 
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
-// ⚠️ `TopSensorPositionM` n'est PAS revalidée contre le bornage [-99.00;+99.00] m (§3.6) dans ce
-// lot : c'est un paramètre RETAIN de mise en service (comme CableM_PerRev/PointsPerRev), pas une
-// saisie opérateur par requête — valeur indicative ≈12.50 m largement dans la plage.
+// 🛡️ Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
 ArretConfirme := FwdRevSpeedFeedbackOff AND BrakeFeedback;
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
+    IF UnitaryMode THEN
+        TargetPositionM := HomingTargetM;
+    ELSE
+        TargetPositionM := TopSensorPositionM;
+    END_IF;
+
     // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
     IF (Mode &lt;&gt; E_Mode.MAINT_N1) AND (Mode &lt;&gt; E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
+    ELSIF UnitaryMode AND (Mode &lt;&gt; E_Mode.MAINT_N2) THEN
+        ErrorId := ErrorId OR 16#0001;
+    ELSIF UnitaryMode AND NOT WinchSelected THEN
+        ErrorId := ErrorId OR 16#0002;        // bit1 : mauvais treuil sélectionné
     ELSIF NOT EncoderAvailable THEN
         ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
     ELSIF NOT ArretConfirme THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
-    ELSIF (Mode &lt;&gt; E_Mode.MAINT_N2) AND TopPositionSensor THEN
+    ELSIF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
+        ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
+    ELSIF NOT UnitaryMode AND TopPositionSensor THEN
         // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
         // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
         // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
@@ -9316,7 +9656,7 @@ IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)
-        TargetPoints := REAL_TO_DINT(TopSensorPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         PresetValue := PresetValueCalc;
         PresetRequest := TRUE;                // Pulse 1 cycle — FB_Encoder_Abs détecte le front lui-même
         State := E_State.BUSY;
@@ -9347,7 +9687,7 @@ END_IF;
 // 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
 // à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFC2;   // efface bits 0,2,3,4,5 (garde bit9, levé seulement par ConfirmCoherence/Home)
+    ErrorId := ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par ConfirmCoherence/Home)
 END_IF;
 
 // 📤 8. SORTIES ÉTAT
@@ -9707,6 +10047,270 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>ccb7d973-53c2-5255-9462-8b4a7dc68cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_SpeedMonitor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorise la surveillance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement par front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte sécurité global valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte de fonctionnement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire absolue mesurée (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedVariationThresholdMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Variation minimale à surveiller (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedVariationTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée minimale de confirmation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStabilityTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée sans variation avant vitesse stable</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : variation vitesse confirmée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="SpeedDeltaMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart absolu entre deux mesures (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedVariationDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil dépassé sur le cycle courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedVariationConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil dépassé pendant la durée requise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse stable pendant SpeedStabilityTimeout</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="VariationTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="StabilityTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="PreviousSpeedMps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="HasPreviousSpeed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="VariationActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   🔍 FB_Encoder_SpeedMonitor — Détection de variation brusque de vitesse câble
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Brique standard de diagnostic — aucun pilotage moteur, aucun SafeStop.
+   🎯 Compare deux mesures successives de vitesse linéaire câble en m/s.
+   🧩 Le seuil et la durée de confirmation sont fournis par l'appelant :
+      aucun réglage métier n'est figé dans cette brique.
+   🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
+      jusqu'à disparition de la cause et acquittement par front Reset.
+   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
+    Error := FALSE;
+    ErrorId := 16#0000;
+    State := E_State.DISABLED;
+    SpeedDeltaMps := 0.0;
+    SpeedVariationDetected := FALSE;
+    SpeedVariationConfirmed := FALSE;
+    SpeedStable := FALSE;
+    VariationActive := FALSE;
+    HasPreviousSpeed := FALSE;
+    VariationTimer(IN := FALSE, PT := SpeedVariationTimeout);
+    StabilityTimer(IN := FALSE, PT := SpeedStabilityTimeout);
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Busy := FALSE;
+Done := FALSE;
+State := E_State.READY;
+
+// 🔑 2. RESET FRONT — l'acquittement n'efface le défaut que si la cause a disparu.
+ResetEdge(CLK := Reset);
+
+// 📏 3. CALCUL DE L'ÉCART DE VITESSE — première mesure utilisée comme référence.
+IF NOT HasPreviousSpeed THEN
+    PreviousSpeedMps := SpeedMps;
+    HasPreviousSpeed := TRUE;
+    SpeedDeltaMps := 0.0;
+ELSE
+    SpeedDeltaMps := ABS(SpeedMps - PreviousSpeedMps);
+    PreviousSpeedMps := SpeedMps;
+END_IF;
+
+// 🔍 4. DÉTECTION BRUTE + FILTRE TEMPOREL — pas de déclenchement si la durée vaut zéro.
+VariationActive := HasPreviousSpeed
+                   AND (SpeedVariationThresholdMps &gt;= 0.0)
+                   AND (SpeedVariationTimeout &gt; T#0ms)
+                   AND (SpeedDeltaMps &gt; SpeedVariationThresholdMps);
+SpeedVariationDetected := VariationActive;
+
+VariationTimer(IN := VariationActive, PT := SpeedVariationTimeout);
+SpeedVariationConfirmed := VariationTimer.Q;
+StabilityTimer(IN := HasPreviousSpeed AND NOT VariationActive AND (SpeedStabilityTimeout &gt; T#0ms), PT := SpeedStabilityTimeout);
+SpeedStable := StabilityTimer.Q;
+
+IF SpeedVariationConfirmed THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSIF ResetEdge.Q AND NOT VariationActive THEN
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+// 📤 5. SORTIES D'ÉTAT — diagnostic standard, aucune commande mouvement.
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c1cd7624-9491-50e0-9332-6845d97ac927</ObjectId>
           </data>
         </addData>
       </pou>
@@ -11320,7 +11924,7 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
         Report.AllPassed := NOT AnyFailed;
         Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
         TerminalState := Report.TerminalState;
-        Report.Cases[1].Name := 'TC-M1/M2/M3/M4/M5/M6 Modes+Homme-mort (suite unique)';
+        Report.Cases[1].Name := 'TC-M1..M6 Modes+HommeMort'; // ✂️ Tronqué pour tenir dans STRING(32)
         Report.Cases[1].Executed := TRUE;
         Report.Cases[1].Ok := NOT AnyFailed;
         Report.Cases[1].FailedStepId := 0;
@@ -12485,6 +13089,11 @@ END_IF;
                 <REAL />
               </type>
             </variable>
+            <variable name="TargetLimited">
+              <type>
+                <REAL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -12530,20 +13139,27 @@ END_IF;
 // Détection du comportement (Accélération vs Décélération)
 // 🔧 CORRECTIF : classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut
 // de Target seul (l'ancienne version se trompait lors d'une traversée de zéro rapide).
-IF (Current &gt;= 0.0 AND Target &gt;= Current) OR (Current &lt;= 0.0 AND Target &lt;= Current) THEN
+// 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
+TargetLimited := LIMIT(-100.0, Target, 100.0);
+Current := LIMIT(-100.0, Current, 100.0);
+
+IF (Current &gt;= 0.0 AND TargetLimited &gt;= Current) OR (Current &lt;= 0.0 AND TargetLimited &lt;= Current) THEN
     StepX := AccelRate * CycleTimeS; // S'éloigne du zéro (reste du même côté, va plus loin)
 ELSE
     StepX := DecelRate * CycleTimeS; // Retourne vers zéro, ou le traverse vers l'autre signe
 END_IF;
 
 // Application de la rampe
-IF Current &lt; Target THEN
+IF Current &lt; TargetLimited THEN
     Current := Current + StepX;
-    IF Current &gt; Target THEN Current := Target; END_IF;
-ELSIF Current &gt; Target THEN
+    IF Current &gt; TargetLimited THEN Current := TargetLimited; END_IF;
+ELSIF Current &gt; TargetLimited THEN
     Current := Current - StepX;
-    IF Current &lt; Target THEN Current := Target; END_IF;
+    IF Current &lt; TargetLimited THEN Current := TargetLimited; END_IF;
 END_IF;
+
+// 🛡️ Limitation finale : même une valeur d'état déjà corrompue reste bornée.
+Current := LIMIT(-100.0, Current, 100.0);
 </xhtml>
           </ST>
         </body>
@@ -14722,6 +15338,14 @@ State := E_State.READY;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)</xhtml>
               </documentation>
             </variable>
+            <variable name="MovementCommanded">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si au moins un contacteur de sens est réellement commandé</xhtml>
+              </documentation>
+            </variable>
             <variable name="Homed">
               <type>
                 <BOOL />
@@ -14867,6 +15491,39 @@ M1, M1 côté instance M2), même principe que ExpectedOtherWinchPosM.
 Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
               </documentation>
             </variable>
+            <variable name="MovementSpeedThresholdMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil mouvement mesurable pour contrôles sens/absence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OppositeDirectionTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation sens réel opposé à la commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NoMovementTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#3S" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation absence de mouvement malgré commande</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -14894,7 +15551,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte Joystick / CAN" - joystick/CAN perdu ; bit1: "Défaut Codeur" - codeur perdu ; bit2: "Surchauffe Moteur" - surchauffe moteur (SafeStop+PowerCutOff) ; bit3: "Mou de câble détecté" - mou câble M2 (SafeStop ou ForbidAscent si NOT SyncEnable) ; bit4: "Défaut Rotation Phases" - phases élec. ; bit5: "Fin de course haut atteint" - fin course haut ; bit6: "Limite profondeur max atteinte" - longueur max câble ; bit7: "Mouvement non commandé (Méca A)" - Méca A mouvement non commandé ; bit8: "Absence confirmation arrêt (Méca B)" - Méca B pilotage sans commande opérateur — contacteurs ET frein doivent confirmer sous PostRampTimeout (🔧 REX 2026-07-08 : frein ajouté) ; bit9: "Glissement benne critique (Méca C)" - Méca C glissement M1/benne (escalade) ; bit10: "Défaut Thermique Freins" - surchauffe/perte thermique frein commun M1/M2/M3 (SafeStop+PowerCutOff) ; bit11: "Défaut arrêt capteur haut (Méca D)" - Méca D capteur haut non confirmé arrêté (SafeStop+PowerCutOff, 🆕 REX 2026-07-08 (3)) ; bit12: "Écart synchro critique (Méca E)" - Méca E écart synchro critique (SafeStop immédiat, 🆕 REX 2026-07-08 (4)) ; bit13: "Absence confirmation synchro (Méca E)" - Méca E escalade non confirmé (SafeStop+PowerCutOff)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bits0..13 : protections existantes ; bit14 : sens réel opposé ; bit15 : absence mouvement malgré commande</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -14965,6 +15622,22 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout</xhtml>
               </documentation>
             </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire mesurée du câble (m/s), valeur absolue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedSignedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive montée, négative descente</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -14990,9 +15663,9 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <REAL />
               </type>
             </variable>
-            <variable name="MeasuredSpeedMps">
+            <variable name="SpeedInitialized">
               <type>
-                <REAL />
+                <BOOL />
               </type>
             </variable>
             <variable name="DriftGuardA">
@@ -15050,6 +15723,21 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — Méca E (bits 12/13)
 Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xhtml>
               </documentation>
+            </variable>
+            <variable name="TonOppositeDirection">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonNoMovement">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="OppositeDirectionActive">
+              <type>
+                <BOOL />
+              </type>
             </variable>
           </localVars>
           <documentation>
@@ -15117,8 +15805,8 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
         `BenneSlipToleranceM` (2.0 m, &gt; à la tolérance 1.0 m déjà surveillée côté
         `FB_Bucket` lui-même) dépassée → la couche Benne (`SafeStop` M1 seul, 1m)
         n'a pas suffi → escalade `PowerCutOff` (dernier recours).
-      Cas A (sens opposé) et Cas C original (absence de mouvement malgré commande)
-      restent TBD, non implémentés (sources encore manquantes : sens joystick brut).
+      - **Bit14** : sens codeur opposé au sens commandé, confirmé 500 ms → `SafeStop`.
+      - **Bit15** : absence de vitesse malgré relais de sens commandé, confirmée 3 s → `SafeStop`.
    🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
       - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT
         sur les 2 instances Winch + l'instance Translation — même principe que `SlackCableDetected`) :
@@ -15180,9 +15868,13 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
     SafeStop := TRUE;
     ForbidDescent := TRUE;
     PowerCutOff := FALSE;
+    MeasuredSpeedMps := 0.0;
+    MeasuredSpeedSignedMps := 0.0;
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
@@ -15190,6 +15882,12 @@ IF NOT Enable THEN
     // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
+    TonMecaB(IN := FALSE);
+    TonMecaD(IN := FALSE);
+    TonMecaE(IN := FALSE);
+    TonOppositeDirection(IN := FALSE);
+    TonNoMovement(IN := FALSE);
+    SpeedInitialized := FALSE;
     RETURN;
 END_IF;
 
@@ -15210,6 +15908,7 @@ IF NOT EmergencyStopOk THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
     LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
+    SpeedInitialized := FALSE;
 END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
@@ -15278,7 +15977,13 @@ END_IF;
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
 // 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé,
 // seul le check vitesse (MeasuredSpeedMps) reste géré ici (hors périmètre de la brique).
-MeasuredSpeedMps := ABS(CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
+IF NOT SpeedInitialized OR InReferencingMode THEN
+    MeasuredSpeedSignedMps := 0.0;
+    SpeedInitialized := TRUE;
+ELSE
+    MeasuredSpeedSignedMps := (CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
+END_IF;
+MeasuredSpeedMps := ABS(MeasuredSpeedSignedMps);
 LastCablePosM := CablePosM;
 
 DriftGuardA(
@@ -15380,6 +16085,33 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#DFFF;
 END_IF;
 
+// 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
+// Le signe de la vitesse câble est comparé à la direction commandée uniquement pendant un
+// mouvement effectivement demandé. La temporisation filtre bruit codeur et inversion transitoire.
+OppositeDirectionActive := MovementCommanded AND NOT InReferencingMode
+    AND (((Direction &gt; 0) AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
+      OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps)));
+TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
+IF TonOppositeDirection.Q THEN
+    ErrorId := ErrorId OR 16#4000;
+ELSIF ResetEdge.Q AND NOT OppositeDirectionActive THEN
+    ErrorId := ErrorId AND 16#BFFF;
+END_IF;
+
+// ⏱️ 3quindecies — ABSENCE DE MOUVEMENT MALGRÉ COMMANDE (bit15)
+// Détecte charge coincée, contacteur inefficace ou chaîne mécanique non entraînée. SafeStop seul :
+// aucun retour ne justifie une coupure puissance brutale immédiate ; l'escalade reste matérielle.
+TonNoMovement(
+    IN := MovementCommanded AND NOT InReferencingMode
+          AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps),
+    PT := NoMovementTimeout
+);
+IF TonNoMovement.Q THEN
+    ErrorId := ErrorId OR 16#8000;
+ELSIF ResetEdge.Q AND (NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) &gt;= MovementSpeedThresholdMps)) THEN
+    ErrorId := ErrorId AND 16#7FFF;
+END_IF;
+
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -15393,9 +16125,9 @@ END_IF;
 IF NOT EmergencyStopOk THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (ErrorId AND 16#3F97) &lt;&gt; 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (ErrorId AND 16#FF97) &lt;&gt; 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#3F9F) &lt;&gt; 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (ErrorId AND 16#FF9F) &lt;&gt; 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
@@ -16082,7 +16814,7 @@ SimContactorOk := ContactorLatch;
                     — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
                     — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
                     ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
-   📥 RelayFwd/RelayRev : sens commandé (sorties du translation, DEGRADED_IO)
+   📥 RelayFwd/RelayRev : sens déduit du mot de commande EtherCAT M3
    📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
                     utilisateur, pas de donnée réelle pour calibrer plus précisément)
    📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
@@ -16222,6 +16954,39 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Plafond palier atteignable (1..5) — 5 = pas de restriction</xhtml>
               </documentation>
             </variable>
+            <variable name="MeasuredSpeedBand">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bande vitesse réelle validée (0 = inconnue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Garde-fou palier activable après validation terrain</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardReady">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Vitesse stable et conditions de passage validées</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Contactor1">
@@ -16262,6 +17027,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">N° palier courant (0 = arrêt, 1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardLimited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si le garde-fou a limité le palier demandé</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -16350,6 +17123,7 @@ END_IF;
 IF NOT Enable THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     StepNumber := 0;
+    SpeedGuardLimited := FALSE;
     RETURN;
 END_IF;
 
@@ -16375,6 +17149,21 @@ IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
 // mais ne dépassera jamais MaxStepNumber (ex. limitation couple en descente, voir FB_Winch)
 IF StepNumber &gt; MaxStepNumber THEN
     StepNumber := MaxStepNumber;
+END_IF;
+
+// 🛡️ 2ter. GARDE-FOU VITESSE RÉELLE — limite uniquement la consigne de palier.
+// Si la vitesse n'est pas validée stable, seul le palier 1 reste autorisé.
+SpeedGuardLimited := FALSE;
+IF SpeedGuardEnable THEN
+    IF NOT SpeedGuardReady THEN
+        IF StepNumber &gt; 1 THEN
+            StepNumber := 1;
+            SpeedGuardLimited := TRUE;
+        END_IF;
+    ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (StepNumber &gt; MeasuredSpeedBand) THEN
+        StepNumber := MeasuredSpeedBand;
+        SpeedGuardLimited := TRUE;
+    END_IF;
 END_IF;
 
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
@@ -19489,7 +20278,7 @@ IF NOT TableReady THEN
     CheckTable[19].RealMin := 30.0;
     CheckTable[19].RealMax := 60.0;
 
-    // Chk 20: TC-T6 — vitesse clampée par PV (ApproachSpeedPct=20% de 60Hz = 12Hz)
+    // Chk 20: TC-T6 — vitesse limitée par PV (ApproachSpeedPct=20% de 60Hz = 12Hz)
     CheckTable[20].Kind := E_TestCheckKind.REAL_IN_RANGE;
     CheckTable[20].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
     CheckTable[20].ProbeIdx := SigSlowdownFreqHz;
@@ -19865,7 +20654,7 @@ CASE ActiveStimulusId OF
         UnderTestDirection := 1;
         UnderTestStartStop := TRUE;
         UnderTestSlowdownSensor := FALSE;
-    13: // Même mouvement, PV actif -&gt; vitesse clampée
+    13: // Même mouvement, PV actif -&gt; vitesse limitée
         UnderTestDirection := 1;
         UnderTestStartStop := TRUE;
         UnderTestSlowdownSensor := TRUE;
@@ -20278,6 +21067,39 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Consigne de vitesse lente dans la zone de ralentissement (%)</xhtml>
               </documentation>
             </variable>
+            <variable name="MeasuredSpeedBand">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bande vitesse réelle validée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Activation garde-fou changement de palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardReady">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Conditions de stabilité validées</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -20351,6 +21173,11 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
             <variable name="StepNumber">
               <type>
                 <INT />
+              </type>
+            </variable>
+            <variable name="SpeedGuardLimited">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="BrakeCmd">
@@ -20620,8 +21447,12 @@ END_IF;
 
 SpeedStep(Enable := (ABS(SpeedRamp.Current) &gt; 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
-          MaxStepNumber := ActiveMaxStep);
+          MaxStepNumber := ActiveMaxStep,
+          MeasuredSpeedBand := MeasuredSpeedBand,
+          SpeedGuardEnable := SpeedGuardEnable,
+          SpeedGuardReady := SpeedGuardReady);
 StepNumber := SpeedStep.StepNumber;
+SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 Contactor1 := SpeedStep.Contactor1;
 Contactor2 := SpeedStep.Contactor2;
 Contactor3 := SpeedStep.Contactor3;
@@ -20710,6 +21541,251 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6f83143e-72ec-5e6b-80c8-39f828857ce4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_WinchLoadEstimator" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="ActiveSpeedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier commandé 0..5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble absolue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedConfig">
+              <type>
+                <derived name="ST_WinchSpeedConfig" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plages vitesse mesurée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadTable">
+              <type>
+                <derived name="ST_WinchLoadEstimateTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Table empirique 5x5</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : entrée/table invalide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="SpeedBand">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bande vitesse courante 0..5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EstimatedLoadPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Estimation informative 0..100 %</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Configured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si table explicitement validée</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="PreviousSpeedBand">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="HasPreviousBand">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SelectedLoadPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
+   ═══════════════════════════════════════════════════════════════════════════════
+   🧩 Brique de diagnostic/information, sans commande moteur et sans SafeStop.
+   🎯 Croise le palier commandé et la bande de vitesse mesurée pour lire une
+      estimation dans ST_WinchLoadEstimateTable.
+   ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
+      reste à 0 % et Configured reste FALSE.
+   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
+IF NOT Enable OR NOT EmergencyStopOk THEN
+    Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
+    Error := FALSE;
+    ErrorId := 16#0000;
+    State := E_State.DISABLED;
+    SpeedBand := 0;
+    EstimatedLoadPct := 0.0;
+    Configured := FALSE;
+    HasPreviousBand := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Busy := FALSE;
+Done := FALSE;
+State := E_State.READY;
+ResetEdge(CLK := Reset);
+Configured := LoadTable.IsConfigured;
+
+// 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
+IF (MeasuredSpeedMps &lt; 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps &lt;= 0.0) THEN
+    ErrorId := ErrorId OR 16#0001;
+    SpeedBand := 0;
+ELSIF NOT HasPreviousBand THEN
+    IF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[1] THEN
+        PreviousSpeedBand := 1;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[2] THEN
+        PreviousSpeedBand := 2;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[3] THEN
+        PreviousSpeedBand := 3;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[4] THEN
+        PreviousSpeedBand := 4;
+    ELSE
+        PreviousSpeedBand := 5;
+    END_IF;
+    HasPreviousBand := TRUE;
+    SpeedBand := PreviousSpeedBand;
+ELSE
+    IF (PreviousSpeedBand &lt; 5)
+       AND (MeasuredSpeedMps &gt; (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand] + SpeedConfig.SpeedBandHysteresisMps)) THEN
+        PreviousSpeedBand := PreviousSpeedBand + 1;
+    ELSIF (PreviousSpeedBand &gt; 1)
+       AND (MeasuredSpeedMps &lt; (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand - 1] - SpeedConfig.SpeedBandHysteresisMps)) THEN
+        PreviousSpeedBand := PreviousSpeedBand - 1;
+    END_IF;
+    SpeedBand := PreviousSpeedBand;
+END_IF;
+
+// 📊 3. LECTURE TABLE — estimation informative uniquement.
+IF Configured AND (ActiveSpeedStep &gt;= 1) AND (ActiveSpeedStep &lt;= 5) AND (SpeedBand &gt;= 1) AND (SpeedBand &lt;= 5) THEN
+    SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
+    IF (SelectedLoadPct &lt; 0.0) OR (SelectedLoadPct &gt; 100.0) THEN
+        ErrorId := ErrorId OR 16#0001;
+        EstimatedLoadPct := 0.0;
+    ELSE
+        EstimatedLoadPct := SelectedLoadPct;
+    END_IF;
+ELSE
+    EstimatedLoadPct := 0.0;
+END_IF;
+
+// 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
+IF ResetEdge.Q AND (ErrorId &lt;&gt; 16#0000) AND (MeasuredSpeedMps &gt;= 0.0) THEN
+    ErrorId := 16#0000;
+END_IF;
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1ca57a3d-7abe-5417-80b9-b0b83cdad590</ObjectId>
           </data>
         </addData>
       </pou>
@@ -21588,11 +22664,9 @@ M2BrakeFeedback := instM2BrakeFeedback.State;
 // 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir AF_Partie13
 // §Translation). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
 // (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
-// 🔧 REX 2026-07-15 (3) : RelayFwd/RelayRev câblés sur M3_CommandWord (variable globale
-// mappée PDO EtherCAT, valeur réellement envoyée, Auto ET Manu confondus) — ex-
-// GVL_Translation_M3_Stub.M3_RelayFwd/Rev n'étaient plus jamais écrits depuis l'abandon du mode
-// relais DEGRADED_IO (v0.4.11), la simulation de trajet M3 restait bloquée en permanence
-// (relais toujours FALSE). Lecture décalée d'1 cycle (10ms, M3_CommandWord réécrit en position
+// 🔧 L'ancien mode relais DEGRADED_IO est supprimé. La simulation déduit directement le sens de
+// `M3_CommandWord`, variable PDO EtherCAT réellement envoyée en Auto comme en Manuel.
+// Lecture décalée d'1 cycle (10 ms, M3_CommandWord réécrit en position
 // 10 par PRG_10_Outputs après ce PRG_00) — négligeable devant TravelTimeS (8s).
 instSimTranslation(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal,
@@ -22025,6 +23099,10 @@ instHomingM1(
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+                            AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated &lt;&gt; 3),
+    WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1),
+    HomingTargetM        := _HomingUnitaryTargetM1_M,
     ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := _HomingTargetM1_M,
@@ -22070,6 +23148,10 @@ instHomingM2(
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M2TreuilBucket.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+                            AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated &lt;&gt; 3),
+    WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
+    HomingTargetM        := _HomingUnitaryTargetM2_M,
     ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := _HomingTargetM2_M,
@@ -22141,6 +23223,26 @@ EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
                 <derived name="FB_Safety_Winch" />
               </type>
             </variable>
+            <variable name="instSpeedMonitorM1">
+              <type>
+                <derived name="FB_Encoder_SpeedMonitor" />
+              </type>
+            </variable>
+            <variable name="instSpeedMonitorM2">
+              <type>
+                <derived name="FB_Encoder_SpeedMonitor" />
+              </type>
+            </variable>
+            <variable name="instLoadEstimatorM1">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
+              </type>
+            </variable>
+            <variable name="instLoadEstimatorM2">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
+              </type>
+            </variable>
             <variable name="instSafetyTranslationM3">
               <type>
                 <derived name="FB_Safety_Translation" />
@@ -22188,6 +23290,7 @@ instSafetyWinchM1(
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CableLimitDescentM  := _CableLimitM1Descent_M,
     Direction           := PRG_06_WinchControl.M1_Direction_Active,
+    MovementCommanded   := PRG_06_WinchControl.instWinchM1.RelayFwd OR PRG_06_WinchControl.instWinchM1.RelayRev,
     Homed               := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM1.HomingSuspect,
     TopLimitM           := _HomingTargetM1_M,
@@ -22229,6 +23332,7 @@ instSafetyWinchM2(
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     CableLimitDescentM  := _CableLimitM2Descent_M,
     Direction           := PRG_06_WinchControl.M2_Direction_Active,
+    MovementCommanded   := PRG_06_WinchControl.instWinchM2.RelayFwd OR PRG_06_WinchControl.instWinchM2.RelayRev,
     Homed               := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect       := PRG_02_Encoders.instHomingM2.HomingSuspect,
     TopLimitM           := _HomingTargetM2_M,
@@ -22247,6 +23351,50 @@ instSafetyWinchM2(
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
+);
+
+// 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
+instSpeedMonitorM1(
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1,
+    Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    Mode                       := PRG_04_Modes.instModes.Mode,
+    SpeedMps                   := instSafetyWinchM1.MeasuredSpeedMps,
+    SpeedVariationThresholdMps := 0.0,
+    SpeedVariationTimeout      := T#0ms,
+    SpeedStabilityTimeout      := T#0ms
+);
+instSpeedMonitorM2(
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2,
+    Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    Mode                       := PRG_04_Modes.instModes.Mode,
+    SpeedMps                   := instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedVariationThresholdMps := 0.0,
+    SpeedVariationTimeout      := T#0ms,
+    SpeedStabilityTimeout      := T#0ms
+);
+
+// 2ter. Estimation charge — information empirique, jamais une fonction safety.
+instLoadEstimatorM1(
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM1,
+    Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    Mode             := PRG_04_Modes.instModes.Mode,
+    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM1.StepNumber,
+    MeasuredSpeedMps := instSafetyWinchM1.MeasuredSpeedMps,
+    SpeedConfig      := _WinchSpeedConfig,
+    LoadTable        := _WinchLoadEstimateTable
+);
+instLoadEstimatorM2(
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM2,
+    Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    Mode             := PRG_04_Modes.instModes.Mode,
+    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM2.StepNumber,
+    MeasuredSpeedMps := instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedConfig      := _WinchSpeedConfig,
+    LoadTable        := _WinchLoadEstimateTable
 );
 
 // 3. Sécurité Translation M3
@@ -22452,6 +23600,25 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort + axe Y actif</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedMismatchThresholdMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 T43 — paramètres provisoirement désactivés ; à définir avec T45.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -22504,6 +23671,10 @@ instCycle(
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    M1_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps,
+    M2_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedMismatchThresholdMps := SpeedMismatchThresholdMps,
+    SpeedMismatchTimeout      := SpeedMismatchTimeout,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
     Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,
@@ -22519,6 +23690,10 @@ instCycle(
     Benne_IsOpen      := _BucketState.IsOpen,
     Benne_IsClosed    := _BucketState.IsClosed
 );
+
+GVL_IHM.Cycle.SpeedMismatchMps        := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
+GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 
 // 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
 GVL_IHM.Cycle.CmdStart := FALSE;
@@ -22613,6 +23788,25 @@ GVL_IHM.Cycle.CmdReset := FALSE;
               <type>
                 <derived name="ST_SpeedStepTable" />
               </type>
+            </variable>
+            <variable name="SpeedGuardEnableM1">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ T47 — désactivé jusqu'à validation des seuils et essais terrain.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardEnableM2">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
             </variable>
             <variable name="BottomLimitM1_Active">
               <type>
@@ -23118,6 +24312,11 @@ instWinchM1(
     // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
     MaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := EffectiveMaxStepAscent,
+    MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM1.SpeedBand,
+    SpeedGuardEnable        := SpeedGuardEnableM1,
+    SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM1.SpeedStable
+                               AND NOT PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed
+                               AND NOT instWinchSync.Error,
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
@@ -23153,6 +24352,11 @@ instWinchM2(
     // 🔧 REX 2026-07-15 (9) : idem M1 (voir §6 ci-dessus).
     MaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := EffectiveMaxStepAscent,
+    MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM2.SpeedBand,
+    SpeedGuardEnable        := SpeedGuardEnableM2,
+    SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM2.SpeedStable
+                               AND NOT PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed
+                               AND NOT instWinchSync.Error,
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
@@ -23343,7 +24547,7 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.FreqSetpointHz (consigne Hz réglable opérateur,
-    // clampée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
+    // limitée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
@@ -23358,6 +24562,11 @@ ELSE
     M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
 END_IF;
+
+// 🛡️ Limitation finale M3 : toute source de commande (joystick, IHM ou cycle) arrive
+// au variateur dans la plage physique autorisée 0..100 %. Ce garde-fou complète
+// les limitations de FB_AxisScale/FB_Ramp et ne remplace pas la chaîne Safety.
+M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
 // 🆕 REX 2026-07-18 : cible Maintenance (4) bloquée hors MAINT_N2 (AF_Partie-02 v2.12 §3bis) —
 // arbitrage centralisé dans FB_Modes (aucun re-test de Mode ici), refuse toute cible si interdite.
@@ -23605,6 +24814,7 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
 IF GVL_IHM.M1TreuilRetenue.TopSensorPositionM = 0.0 THEN
     GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := _HomingTargetM1_M;
+    GVL_IHM.M1TreuilRetenue.HomingTargetM       := _HomingUnitaryTargetM1_M;
     GVL_IHM.M1TreuilRetenue.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.M1TreuilRetenue.RampAccelRate       := _WinchM1RampAccelRate_Pct;
     GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
@@ -23617,6 +24827,7 @@ END_IF;
 
 IF GVL_IHM.M2TreuilBucket.TopSensorPositionM = 0.0 THEN
     GVL_IHM.M2TreuilBucket.TopSensorPositionM  := _HomingTargetM2_M;
+    GVL_IHM.M2TreuilBucket.HomingTargetM       := _HomingUnitaryTargetM2_M;
     GVL_IHM.M2TreuilBucket.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.M2TreuilBucket.RampAccelRate       := _WinchM2RampAccelRate_Pct;
     GVL_IHM.M2TreuilBucket.RampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
@@ -23653,6 +24864,8 @@ END_IF;
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 _HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
 _HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
+_HomingUnitaryTargetM1_M    := GVL_IHM.M1TreuilRetenue.HomingTargetM;
+_HomingUnitaryTargetM2_M    := GVL_IHM.M2TreuilBucket.HomingTargetM;
 // 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
 // ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
 // propagation à sens unique séparée par treuil ici.
@@ -23741,6 +24954,16 @@ GVL_IHM.M2TreuilBucket.BypassTopPositionSensor := GVL_Simulation.SimulationModeA
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
 GVL_IHM.M1TreuilRetenue.PositionM                := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.M1TreuilRetenue.MeasuredSpeedMps         := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
+GVL_IHM.M1TreuilRetenue.SpeedDeltaMps            := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
+GVL_IHM.M1TreuilRetenue.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
+GVL_IHM.M1TreuilRetenue.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed;
+GVL_IHM.M1TreuilRetenue.SpeedStable             := PRG_03_Safety.instSpeedMonitorM1.SpeedStable;
+GVL_IHM.M1TreuilRetenue.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM1.Error;
+GVL_IHM.M1TreuilRetenue.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM1.ErrorId;
+GVL_IHM.M1TreuilRetenue.EstimatedLoadPct         := PRG_03_Safety.instLoadEstimatorM1.EstimatedLoadPct;
+GVL_IHM.M1TreuilRetenue.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM1.Configured;
+GVL_IHM.M1TreuilRetenue.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM1.SpeedGuardLimited;
 GVL_IHM.M1TreuilRetenue.SpeedRefPct              := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 GVL_IHM.M1TreuilRetenue.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
 GVL_IHM.M1TreuilRetenue.FBState                  := PRG_06_WinchControl.instWinchM1.State;
@@ -23794,6 +25017,16 @@ GVL_IHM.M1TreuilRetenue.InhibitActive            := PRG_04_Modes.instModes.Inhib
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
 GVL_IHM.M2TreuilBucket.PositionM                := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.M2TreuilBucket.MeasuredSpeedMps         := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps;
+GVL_IHM.M2TreuilBucket.SpeedDeltaMps            := PRG_03_Safety.instSpeedMonitorM2.SpeedDeltaMps;
+GVL_IHM.M2TreuilBucket.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationDetected;
+GVL_IHM.M2TreuilBucket.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed;
+GVL_IHM.M2TreuilBucket.SpeedStable             := PRG_03_Safety.instSpeedMonitorM2.SpeedStable;
+GVL_IHM.M2TreuilBucket.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM2.Error;
+GVL_IHM.M2TreuilBucket.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM2.ErrorId;
+GVL_IHM.M2TreuilBucket.EstimatedLoadPct         := PRG_03_Safety.instLoadEstimatorM2.EstimatedLoadPct;
+GVL_IHM.M2TreuilBucket.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM2.Configured;
+GVL_IHM.M2TreuilBucket.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM2.SpeedGuardLimited;
 GVL_IHM.M2TreuilBucket.SpeedRefPct              := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 GVL_IHM.M2TreuilBucket.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
 GVL_IHM.M2TreuilBucket.FBState                  := PRG_06_WinchControl.instWinchM2.State;
@@ -25430,65 +26663,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
 🖥️ Sélecteur test maintenance (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
           </documentation>
         </variable>
-        <variable name="M3_RelayFwd">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Sortie — contacteur sens avant M3 (STUB, DEGRADED_IO)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M3_RelayRev">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Sortie — contacteur sens arrière M3 (STUB, DEGRADED_IO)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M3_RelaySpeedGv">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Sortie — présélection GV M3 (STUB, DEGRADED_IO)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M3_ContactorFeedbackFwd">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Mirés activement par PRG_MAIN.st (bloc 🧪 SIMULATION) sur les commandes ci-dessus (contacteur "idéal")
-🔌 Entrée — retour contacteur sens avant M3 (STUB, miroir de M3_RelayFwd)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M3_ContactorFeedbackRev">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Entrée — retour contacteur sens arrière M3 (STUB, miroir de M3_RelayRev)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M3_PositionSensorTarget">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Capteur position cible (PAS de miroir automatique — forcer manuellement en instance CODESYS, Partie11 §9bis)
-🔌 Entrée — capteur position cible M3 (STUB, arbitré par sélecteur ci-dessus)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M3_DriveFaultFeedback">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Retour défaut variateur — PAS de miroir, reste FALSE tant que non câblé
-🔌 Entrée — défaut variateur TOR M3 (STUB, toujours FALSE)</xhtml>
-          </documentation>
-        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>3a0fdbba-89c2-56ba-b2ac-52cf47b5119c</ObjectId>
@@ -25496,18 +26670,12 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 GVL_Translation_M3_Stub — Variables STUB M3
+   🧪 GVL_Translation_M3_Stub — Entrées de simulation M3 restantes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md §7
-   🔧 CORRECTIF (2026-07-03) : réintégration de M3_RelayFwd/Rev/SpeedGv,
-      M3_ContactorFeedbackFwd/Rev, M3_DriveFaultFeedback,
-      M3_PositionSensorTarget — retirés par erreur le 2026-07-03
-      (câblage I/O réel pas encore fait, PRG_MAIN.st en dépend toujours
-      → 31 erreurs de compilation). Seul `M3_BrakeCmd` est réel (I/O
-      Mapping Device.export, 2026-07-02) — il ne revient PAS ici.
-   🔧 CORRECTIF (2026-07-03quattuordecies) : `M3_BrakeFeedback` RETIRÉ — retour
-      frein M3 désormais réel (`M3_BrakeContactorFeedback_DI`, conditionné dans
-      `FB_InputsMachine`), plus de miroir logiciel nécessaire.
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md §7
+   🧹 REX 2026-07-18 : ancien mode relais `DEGRADED_IO` retiré. Les sorties relais,
+      retours contacteurs, défaut TOR et cible générique sans consommateur sont supprimés.
+      Restent uniquement PV (entrée réelle à mapper) et le sélecteur de trajet simulé.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
@@ -25616,14 +26784,18 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Safety_Winch" ObjectId="afbb4ccb-2339-5f22-9bee-0ed046924779" />
           <Object Name="FB_SpeedStep" ObjectId="12afad9c-c87d-50d6-b33c-dd7c6f83a8e4" />
           <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
+          <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
           <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
           <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+          <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
+          <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
         </Folder>
         <Folder Name="CODEURS">
           <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
           <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
           <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
+          <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
         <Folder Name="AU">

@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(head -30)"
+      "PowerShell(head -30)",
+      "Bash(cd \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS\" && python -c \"from generator.cli import main; import sys;*)"
     ]
   },
   "enabledPlugins": {

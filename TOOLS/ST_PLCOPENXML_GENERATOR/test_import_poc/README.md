@@ -6,7 +6,7 @@
 ## Contenu de `POC_ImportTest.xml`
 
 Un fichier PLCopenXML minimal, conforme au schéma confirmé dans
-`GUIDE_Conversion_ST_vers_PLCopenXML.md`, contenant 2 objets **tout neufs** :
+`../docs/PLCOPENXML_FORMAT.md`, contenant 2 objets **tout neufs** :
 
 - `ST_POC_ImportTest` (STRUCT, 3 membres : `Counter : INT`, `Label : STRING(20)`, `Ready : BOOL`)
 - `FB_POC_ImportTest` (FUNCTION_BLOCK, utilise `ST_POC_ImportTest` en `VAR_IN_OUT`, logique

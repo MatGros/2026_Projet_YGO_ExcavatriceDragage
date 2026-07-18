@@ -229,7 +229,7 @@ def test_generated_matches_reference_sample(objects_by_name, root_name):
         # no enclosing <Folder> at all -- unlike every other sample (which
         # all use <Folder Name="<CODE subfolder>">), this one CODESYS project
         # apparently keeps GVL_PERSISTENT at the project root. The
-        # GUIDE_Conversion_ST_vers_PLCopenXML.md itself flags folder
+        # docs/PLCOPENXML_FORMAT.md itself flags folder
         # placement behavior as unconfirmed (section 7, "TBD"), and one
         # sample isn't enough to justify a rule change (e.g. "all PERSISTENT
         # GVLs go to root") -- that would be guessing in the other direction.

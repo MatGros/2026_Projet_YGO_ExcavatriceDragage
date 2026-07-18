@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "requiredServer": true,
+  "defaultMode": "read-only-review",
+  "allowedModes": ["read-only-review", "parallel-analysis"],
+  "forbiddenModes": ["autonomous-safety-change", "autonomous-commit"],
+  "criticality": {
+    "C0": "unused",
+    "C1": "optional",
+    "C2": "targeted-review",
+    "C3": "recommended-review",
+    "C4": "consultative-only"
+  },
+  "ponyTail": {
+    "safety": "forbidden",
+    "nonSafety": "optional"
+  }
+}

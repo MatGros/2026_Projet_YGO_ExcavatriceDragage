@@ -77,7 +77,9 @@
       "Bash(xargs -0 sed -i -e s/FB_Benne/FB_Benne/g -e s/ST_BenneConfig/ST_BenneConfig/g -e s/ST_BenneHMI/ST_BenneHMI/g -e s/ST_BenneState/ST_BenneState/g -e s/instBenne/instBenne/g -e s/BenneConfig/BenneConfig/g -e s/BenneState/BenneState/g -e s/CmdBenne_Open/CmdBenne_Open/g -e s/CmdBenne_Close/CmdBenne_Close/g -e s/CoupledFwdBenneOk/CoupledFwdBenneOk/g -e s/CoupledRevBenneOk/CoupledRevBenneOk/g -e s/FdcBenneCloseActive/FdcBenneCloseActive/g -e s/FdcBenneCloseEnable/FdcBenneCloseEnable/g -e s/FdcBenneOpenActive/FdcBenneOpenActive/g -e s/FdcBenneOpenEnable/FdcBenneOpenEnable/g -e s/FdcBenneClose/FdcBenneClose/g -e s/FdcBenneOpen/FdcBenneOpen/g -e s/FdcBenne/FdcBenne/g -e s/OverrideBenne/OverrideBenne/g -e s/M2TreuilBenne/M2TreuilBenne/g -e 's/GVL_IHM\\\\.Benne/GVL_IHM.Benne/g' '{}' +)",
       "Bash(python3 -m TOOLS.generator.cli --help)",
       "Skill(antigravity:delegate)",
-      "Bash(xargs sed -i 's/Benne/Benne/g')"
+      "Bash(xargs sed -i 's/Benne/Benne/g')",
+      "Bash(sort -t. -k3 -n -u)",
+      "Skill(codex:rescue)"
     ],
     "ask": [
       "Bash(git reset *)",
