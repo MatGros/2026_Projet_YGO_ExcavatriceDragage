@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HerdrReviewReport",
+  "type": "object",
+  "required": ["scope", "criticality", "findings", "tests", "conclusion"],
+  "properties": {
+    "scope": { "type": "array", "items": { "type": "string" } },
+    "criticality": { "enum": ["C0", "C1", "C2", "C3", "C4"] },
+    "findings": { "type": "array", "items": { "type": "string" } },
+    "tests": { "type": "array", "items": { "type": "string" } },
+    "conclusion": { "type": "string" },
+    "humanValidationRequired": { "type": "boolean" }
+  }
+}

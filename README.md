@@ -116,16 +116,18 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 
 ### 🛠️ **Générer le bundle PLCopenXML**
 
-**Répertoire :** `TOOLS/`
+**Répertoire :** `TOOLS/ST_PLCOPENXML_GENERATOR/`
 
 **Commande exacte :**
 ```powershell
+cd TOOLS/ST_PLCOPENXML_GENERATOR
 python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', '<version>']))"
 ```
 Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.3.26` d'après `PRJ_CODESYS/Programme_MGS_v0.3.26_*.project`).
 
 **Exemple :**
 ```powershell
+cd TOOLS/ST_PLCOPENXML_GENERATOR
 python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.3.26']))"
 ```
 

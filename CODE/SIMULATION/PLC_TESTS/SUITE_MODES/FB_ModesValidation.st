@@ -329,7 +329,7 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
         Report.AllPassed := NOT AnyFailed;
         Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
         TerminalState := Report.TerminalState;
-        Report.Cases[1].Name := 'TC-M1/M2/M3/M4/M5/M6 Modes+Homme-mort (suite unique)';
+        Report.Cases[1].Name := 'TC-M1..M6 Modes+HommeMort'; // ✂️ Tronqué pour tenir dans STRING(32)
         Report.Cases[1].Executed := TRUE;
         Report.Cases[1].Ok := NOT AnyFailed;
         Report.Cases[1].FailedStepId := 0;

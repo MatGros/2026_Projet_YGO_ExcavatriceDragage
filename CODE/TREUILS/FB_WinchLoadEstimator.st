@@ -92,7 +92,7 @@ END_IF;
 
 // 📊 3. LECTURE TABLE — estimation informative uniquement.
 IF Configured AND (ActiveSpeedStep >= 1) AND (ActiveSpeedStep <= 5) AND (SpeedBand >= 1) AND (SpeedBand <= 5) THEN
-    SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep, SpeedBand];
+    SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
     IF (SelectedLoadPct < 0.0) OR (SelectedLoadPct > 100.0) THEN
         ErrorId := ErrorId OR 16#0001;
         EstimatedLoadPct := 0.0;

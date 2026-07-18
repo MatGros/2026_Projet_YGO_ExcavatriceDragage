@@ -9,8 +9,10 @@ from .file_discovery import discover_objects
 from .xml_builder import build_project_xml
 from .xml_serializer import write_file
 
+# Racine du projet : TOOLS/ST_PLCOPENXML_GENERATOR/generator/cli.py
 _TOOLING_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_CODE_DIR = _TOOLING_DIR.parent / "CODE"
+_PROJECT_ROOT = _TOOLING_DIR.parent.parent
+DEFAULT_CODE_DIR = _PROJECT_ROOT / "CODE"
 DEFAULT_OUT_DIR = DEFAULT_CODE_DIR
 
 

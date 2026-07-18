@@ -25,7 +25,7 @@ BASE_TYPES = {
 _IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _STRING_RE = re.compile(r"^STRING\s*\(\s*(\d+)\s*\)$")
 # 🔧 Borne = littéral entier OU constante (qualifiée ou non), ex. GVL_PLC_Tests_Const.MaxSteps
-# (ARRAY[1..N] OF T avec N symbolique — voir GUIDE_Conversion §"array" note "non vérifié").
+# (ARRAY[1..N] OF T avec N symbolique — voir docs/PLCOPENXML_FORMAT.md, note "non vérifié").
 _BOUND = r"(-?\d+|[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)"
 _ARRAY_RE = re.compile(rf"^ARRAY\s*\[\s*{_BOUND}\s*\.\.\s*{_BOUND}\s*\]\s*OF\s+(.+)$", re.IGNORECASE | re.DOTALL)
 _REFERENCE_RE = re.compile(r"^REFERENCE\s+TO\s+(.+)$", re.IGNORECASE | re.DOTALL)
