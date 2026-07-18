@@ -539,6 +539,7 @@ PRG_10_Outputs.M2SpeedContactor1 := instWinchM2.Contactor1;
 PRG_10_Outputs.M2SpeedContactor2 := instWinchM2.Contactor2;
 PRG_10_Outputs.M2SpeedContactor3 := instWinchM2.Contactor3;
 PRG_10_Outputs.M2SpeedContactor4 := instWinchM2.Contactor4;
+PRG_10_Outputs.KoboldContactorCmd := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;
 
 // 🧪 Références pour tests PLC (fenêtre de passage GVL_Simulation)

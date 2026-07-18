@@ -6410,13 +6410,13 @@ Profondeur de consigne (négative)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible sélectionnée (2=P2, 3=P1 — 🆕 REX 2026-07-18, ex-1=Fosse1/2=Fosse2, voir AF_Partie-02 v2.12 §3bis)</xhtml>
               </documentation>
             </variable>
-            <variable name="BottomTouched">
+            <variable name="KoboldContactFond">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Feedbacks physique &amp; matériel
-Capteur mou de câble / fond touché</xhtml>
+Retour dédié Kobold : TRUE = contact fond détecté</xhtml>
               </documentation>
             </variable>
             <variable name="M1_CablePosM">
@@ -6621,6 +6621,14 @@ Mouvement mâchoires benne en cours</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande contacteur puissance Kobold (recherche fond)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleStep">
               <type>
                 <derived name="E_CycleStep" />
@@ -6780,6 +6788,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     CmdTranslationM3_Target  := 0;
     CmdBucket_Open      := FALSE;
     CmdBucket_Close     := FALSE;
+    KoboldContactorCmd  := FALSE;
 
     State                := E_CycleStep.INIT;
     CycleStep            := E_CycleStep.INIT;
@@ -6825,6 +6834,7 @@ CASE State OF
         CmdTranslationM3_Start   := FALSE;
         CmdBucket_Open      := FALSE;
         CmdBucket_Close     := FALSE;
+        KoboldContactorCmd  := FALSE;
         Busy                 := FALSE;
         Done                 := FALSE;
 
@@ -6865,11 +6875,13 @@ CASE State OF
         CmdWinchM2_StartStop := TRUE;
         CmdWinchM2_Direction := -1;
         CmdWinchM2_SpeedPct  := 50.0;
+        KoboldContactorCmd   := TRUE;
 
-        // Transition si fond touché (mou de câble détecté)
-        IF BottomTouched THEN
+        // Transition uniquement sur le retour dédié Kobold.
+        IF KoboldContactFond THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
+            KoboldContactorCmd := FALSE;
             TouchPositionM := M1_CablePosM; // Mémorisation position contact
             State := E_CycleStep.BOTTOM_TOUCH_WAIT;
         END_IF;
@@ -19794,6 +19806,14 @@ maître du programme, car "puissance réellement présente" est la garantie la p
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent</xhtml>
               </documentation>
             </variable>
+            <variable name="KoboldContactFond">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Retour détecteur fond Kobold (NO) : TRUE=contact fond détecté ✅</xhtml>
+              </documentation>
+            </variable>
             <variable name="PhaseRotationOk">
               <type>
                 <BOOL />
@@ -19953,6 +19973,11 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
               </documentation>
             </variable>
             <variable name="instSlackCableSwitch">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instKoboldContactFond">
               <type>
                 <derived name="FB_Input" />
               </type>
@@ -20144,6 +20169,16 @@ EmergencyChain := instEmergencyChain.State;
 // uniquement sur le tambour M2, le préfixe M1_M2_ ne reflétait pas la réalité du câblage)
 instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal), FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
+
+// 🪨 Kobold : entrée dédiée, distincte du mou de câble.
+// Adresse terrain : KoboldContactFond_DI = %IX0.5.
+instKoboldContactFond(
+    InputRaw := KoboldContactFond_DI
+                OR (GVL_Simulation.SimulationModeActive
+                    AND NOT GVL_Simulation.KoboldContactFond_IsReal
+                    AND GVL_Simulation.KoboldContactFond_Simulated),
+    FilterTime := T#20MS);
+KoboldContactFond := instKoboldContactFond.State;
 
 // 🆕 REX 2026-07-08 (4) : cohérence simulation (demande utilisateur) — l'ancien câblage forçait
 // TopPositionSensor à TOUJOURS TRUE (sain) en simulation, quelle que soit la position codeur :
@@ -21085,8 +21120,8 @@ instCycle(
     TargetOffsetM       := TargetOffsetM,
     SelectedTargetNum_IHM := GVL_IHM.TranslationM3.SelectedTargetNum,
 
-    // Capteur fond touché détecté par le mou de câble physique (sécurité positive)
-    BottomTouched       := NOT PRG_00_Inputs.SlackCableSwitch,
+    // Retour dédié Kobold — distinct du mou de câble.
+    KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
 
@@ -21847,6 +21882,7 @@ PRG_10_Outputs.M2SpeedContactor1 := instWinchM2.Contactor1;
 PRG_10_Outputs.M2SpeedContactor2 := instWinchM2.Contactor2;
 PRG_10_Outputs.M2SpeedContactor3 := instWinchM2.Contactor3;
 PRG_10_Outputs.M2SpeedContactor4 := instWinchM2.Contactor4;
+PRG_10_Outputs.KoboldContactorCmd := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;
 
 // 🧪 Références pour tests PLC (fenêtre de passage GVL_Simulation)
@@ -22697,6 +22733,14 @@ GVL_IHM.Network.EcatErrorId := PRG_01_Diagnostics.instDiagEthercat.ErrorId;
 🔓 Frein M3 ⚠️INVERSÉ : TRUE=desserré/mouvement | FALSE=SERRÉ sécurité ✅</xhtml>
               </documentation>
             </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Commande contacteur puissance Kobold</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="EmergencyArmingPulseActive">
@@ -23315,8 +23359,14 @@ instM2BrakeCmd(Command := M2BrakeCmd);
 M2_BrakeCmd_RQ := instM2BrakeCmd.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-instTranslationBrakeCmd(Command := TranslationBrakeCmd);
+    instTranslationBrakeCmd(Command := TranslationBrakeCmd);
 M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
+
+// 🪨 Adresse terrain : KoboldContactor_DQ = %QX0.6.
+// Coupure prioritaire si la puissance ou la chaîne AU n'est plus validée.
+KoboldContactor_DQ := KoboldContactorCmd
+                      AND PRG_00_Inputs.EmergencyStopOk
+                      AND PRG_00_Inputs.EmergencyChain;
 
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
@@ -24162,6 +24212,17 @@ Chaîne AU câblée (EmergencyStopOk_DI)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteurs Trémie/PV/P2/P1/Maintenance</xhtml>
           </documentation>
         </variable>
+        <variable name="KoboldContactFond_IsReal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contact fond Kobold (%IX0.5)</xhtml>
+          </documentation>
+        </variable>
         <variable name="HydraulicThermal_IsReal">
           <type>
             <BOOL />
@@ -24194,6 +24255,17 @@ Simule le retour au centre (RawX/RawY)</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule une consigne à fond</xhtml>
+          </documentation>
+        </variable>
+        <variable name="KoboldContactFond_Simulated">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation du contact fond Kobold</xhtml>
           </documentation>
         </variable>
         <variable name="EncoderSimSpeedFactor">

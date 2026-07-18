@@ -127,7 +127,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T31 | Calculer la vitesse codeur en m/s et la diviser en 5 paliers par rapport à la vitesse maximale | Projet | Point client 2026-07-15 |
 | T32 | Estimer la charge benne en % via un tableau 2D (état contacteurs vitesse montée × 5 paliers vitesse codeur) réglable manuellement | Projet | Point client 2026-07-15 |
 | T33 | Définir et implémenter le décodage cinq capteurs M3 (`Trémie/PV/P2/P1/Maintenance`) et le diagnostic des combinaisons incohérentes | Projet | Décision client 2026-07-17 |
-| T34 | 🔴 **BLOQUANT** — Définir les E/S réelles du contacteur Kobold et de son retour contact fond | Projet / Électricité | Décision client 2026-07-17 — aucun réemploi du capteur mou de câble autorisé |
+| T34 | ✅ Définir les E/S réelles du contacteur Kobold et de son retour contact fond | Projet / Électricité | `KoboldContactFond_DI`=%IX0.5 · `KoboldContactor_DQ`=%QX0.6 — aucun réemploi du capteur mou de câble |
 | T35 | 🟠 En cours — Définir la stratégie de descente semi-auto : limite légale, détection Kobold, remontée synchronisée au-dessus de la limite, puis fermeture benne | Projet | Décision client 2026-07-17 — structure cycle existante, raccordement Kobold à finaliser |
 | T36 | 🟠 À spécifier — Définir la phase de stabilisation après fermeture benne : vitesse lente, tolérance codeurs, blocage/obstacle/câble mou et reprise | Projet | Décision client 2026-07-17 |
 | T37 | Retirer les commandes PLC casque/grille/centrale et conserver uniquement le diagnostic thermique centrale | Projet | Décision client 2026-07-17 |

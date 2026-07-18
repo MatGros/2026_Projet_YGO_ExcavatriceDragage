@@ -9,7 +9,8 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 ### `v0.4.17_SemiAuto_CycleSafety` — 2026-07-18
 - Homme-mort obligatoire pendant les mouvements semi-auto M1/M2/M3
 - Relâchement joystick = arrêt ; nouvelle sollicitation = reprise de l'étape
-- Cycle Kobold cadré ; E/S réelles encore TBD (PLAN_TASK T34)
+- Cycle Kobold raccordé au cycle semi-auto ; arrêt sûr sur perte de puissance/AU
+- E/S Kobold raccordées : `KoboldContactFond_DI`=%IX0.5 et `KoboldContactor_DQ`=%QX0.6
 - Tests PLC anti-blocage : états terminaux, watchdog et journal d'événements
 
 ### `v0.4.16_ReferenceToFix_BucketRun` — 2026-07-18 (M3)
