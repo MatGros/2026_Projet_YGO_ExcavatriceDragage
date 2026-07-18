@@ -20,7 +20,8 @@ VAR
     // 4=Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).
     SelectedTargetNum       : INT;
 
-    // 🆕 REX 2026-07-16 : IHM_MANU comme 3ᵉ source d'arbitrage (voir §1bis ci-dessous)
+// 🆕 Commande maintenance depuis ST_TranslationHMI (GVL_IHM.TranslationM3).
+// L'objet Translation ne dépend plus de IHM_MANU pour ses commandes M3.
     FreqPct                 : REAL; // Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct
 END_VAR
 
@@ -63,21 +64,21 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
 // FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
-ELSIF PRG_10_Outputs.ManuActive THEN
-    // Pas de sélecteur de cible dédié en Manu — comportement actuel inchangé (StubTranslationPositionSelect_IHM).
+ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
+   OR (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
+    // 🛠️ Maintenance N1/N2 : commandes dédiées TranslationM3 ou joystick.
     SelectedTargetNum := StubTranslationPositionSelect_IHM;
 
-    // Demande (boutons IHM ou joystick, déjà arbitrée par PRG_10_Outputs : M3Fwd_Demand/M3Rev_Demand)
-    // lue avec 1 scan de retard (~10ms, PRG_10 position 10 > PRG_07 position 7) — même principe
-    // déjà accepté côté PRG_06_WinchControl pour M1Fwd_Demand/M2Fwd_Demand.
-    IF PRG_10_Outputs.M3Fwd_Demand THEN
+    IF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqFwd THEN
         M3_Direction_Active := 1;
-    ELSIF PRG_10_Outputs.M3Rev_Demand THEN
+    ELSIF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqRev THEN
         M3_Direction_Active := -1;
     ELSE
-        M3_Direction_Active := 0;
+        M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     END_IF;
-    M3_StartStop_Active := (M3_Direction_Active <> 0);
+    M3_StartStop_Active := (M3_Direction_Active <> 0)
+                           AND (NOT GVL_IHM.TranslationM3.JoystickSelect
+                                OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.FreqSetpointHz (consigne Hz réglable opérateur,
     // clampée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
@@ -85,7 +86,7 @@ ELSIF PRG_10_Outputs.ManuActive THEN
     // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
     FreqPct := (GVL_IHM.TranslationM3.FreqSetpointHz / _TranslationMaxFreq_Hz) * 100.0;
-    M3_SpeedRef_Active := SEL(GVL_IHM.IHM_MANU.JoystickSelect,
+    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.JoystickSelect,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
