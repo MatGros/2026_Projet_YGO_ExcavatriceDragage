@@ -43,6 +43,21 @@ GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SyncEnableRequest; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.SelectedTargetNum;
 
+// 🧪 Commandes de test Translation depuis la supervision.
+// Verrouillage obligatoire : aucune surcharge IHM ne peut être active hors simulation.
+IF GVL_Simulation.SimulationModeActive THEN
+    GVL_PLC_Tests.OverrideM3SensorsWordActive := GVL_IHM.TranslationM3.TestSensorsWordActive;
+    GVL_PLC_Tests.OverrideM3SensorsWord       := GVL_IHM.TranslationM3.TestSensorsWord;
+    GVL_PLC_Tests.OverrideM3AtTremie          := GVL_IHM.TranslationM3.TestAtTremie;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := GVL_IHM.TranslationM3.TestBrakeStuckOpen;
+    GVL_PLC_Tests.OverrideM3PhantomFreq       := GVL_IHM.TranslationM3.TestPhantomFreq;
+ELSE
+    GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
+    GVL_PLC_Tests.OverrideM3AtTremie          := FALSE;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := FALSE;
+    GVL_PLC_Tests.OverrideM3PhantomFreq       := FALSE;
+END_IF;
+
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
                     OR GVL_IHM.M1TreuilRetenue.CmdReset
@@ -392,6 +407,17 @@ GVL_IHM.TranslationM3.ErrorId              := PRG_07_TranslationControl.instTran
 GVL_IHM.TranslationM3.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
 GVL_IHM.TranslationM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
 GVL_IHM.TranslationM3.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
+GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
+GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
+GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
+GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
+GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+GVL_IHM.TranslationM3.SensorsWord         := PRG_07_TranslationControl.instPositionDecoder.SensorsWord;
+GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_07_TranslationControl.instPositionDecoder.Incoherent;
+GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
+GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+GVL_IHM.TranslationM3.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
+GVL_IHM.TranslationM3.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
 GVL_IHM.TranslationM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
 GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
@@ -407,6 +433,12 @@ GVL_IHM.TranslationM3.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTransla
 GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
 GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
 GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
+GVL_IHM.TranslationM3.SafetySafeStop       := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+GVL_IHM.TranslationM3.SafetyPowerCutOff    := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+GVL_IHM.TranslationM3.DriveControlWord     := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+GVL_IHM.TranslationM3.DriveFreqRefHz       := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
+GVL_IHM.TranslationM3.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
+GVL_IHM.TranslationM3.ActiveSpeedRefPct    := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
 // ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
 GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;

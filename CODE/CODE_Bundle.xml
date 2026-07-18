@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-18T00:00:00.000000" />
-  <contentHeader name="MGS_v0.4.17_SemiAuto_CycleSafety.project" modificationDateTime="2026-07-18T00:00:00.000000">
+  <contentHeader name="MGS_v0.4.17_TranslationHMI.project" modificationDateTime="2026-07-18T00:00:00.000000">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.17_SemiAuto_CycleSafety</property>
+          <property name="Project" type="string">MGS_v0.4.17_TranslationHMI</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -3349,6 +3349,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickSelect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ TRUE = joystick, FALSE = boutons ReqFwd/ReqRev</xhtml>
+              </documentation>
+            </variable>
             <variable name="FBState">
               <type>
                 <derived name="E_State" />
@@ -3430,6 +3438,38 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Fréquence de sortie réelle du variateur (Hz)</xhtml>
               </documentation>
             </variable>
+            <variable name="DriveControlWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mot de commande AC600 réellement appliqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveFreqRefHz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence réellement appliquée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveSpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Consigne active après arbitrage</xhtml>
+              </documentation>
+            </variable>
             <variable name="DriveCommReady">
               <type>
                 <BOOL />
@@ -3455,6 +3495,95 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐞 Bypass diag (banc de test — auto-calculé depuis GVL_Simulation)
 🔌 Activation du bypass des retours contacteurs (sens + frein)</xhtml>
               </documentation>
+            </variable>
+            <variable name="PositionTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Mot capteurs et positions Translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionPV">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PositionP2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PositionP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PositionMaintenance">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SensorsWord">
+              <type>
+                <BYTE />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LimitSwitchFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LimitSwitchRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MaintenanceTargetEnable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TestSensorsWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Commandes de test Translation, actives uniquement sur banc</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestSensorsWord">
+              <type>
+                <BYTE />
+              </type>
+            </variable>
+            <variable name="TestAtTremie">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TestBrakeStuckOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TestPhantomFreq">
+              <type>
+                <BOOL />
+              </type>
             </variable>
             <variable name="SafetyError">
               <type>
@@ -3535,6 +3664,22 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Mot capteurs M3 incohérent (bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetySafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Décélération de sécurité demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyPowerCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -22228,7 +22373,8 @@ GVL_Simulation.refWinchM2  REF= instWinchM2;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-16 : IHM_MANU comme 3ᵉ source d'arbitrage (voir §1bis ci-dessous)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Commande maintenance depuis ST_TranslationHMI (GVL_IHM.TranslationM3).
+L'objet Translation ne dépend plus de IHM_MANU pour ses commandes M3.
 Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct</xhtml>
               </documentation>
             </variable>
@@ -22285,21 +22431,21 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
 // FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
-ELSIF PRG_10_Outputs.ManuActive THEN
-    // Pas de sélecteur de cible dédié en Manu — comportement actuel inchangé (StubTranslationPositionSelect_IHM).
+ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
+   OR (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
+    // 🛠️ Maintenance N1/N2 : commandes dédiées TranslationM3 ou joystick.
     SelectedTargetNum := StubTranslationPositionSelect_IHM;
 
-    // Demande (boutons IHM ou joystick, déjà arbitrée par PRG_10_Outputs : M3Fwd_Demand/M3Rev_Demand)
-    // lue avec 1 scan de retard (~10ms, PRG_10 position 10 &gt; PRG_07 position 7) — même principe
-    // déjà accepté côté PRG_06_WinchControl pour M1Fwd_Demand/M2Fwd_Demand.
-    IF PRG_10_Outputs.M3Fwd_Demand THEN
+    IF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqFwd THEN
         M3_Direction_Active := 1;
-    ELSIF PRG_10_Outputs.M3Rev_Demand THEN
+    ELSIF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqRev THEN
         M3_Direction_Active := -1;
     ELSE
-        M3_Direction_Active := 0;
+        M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     END_IF;
-    M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0);
+    M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
+                           AND (NOT GVL_IHM.TranslationM3.JoystickSelect
+                                OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.FreqSetpointHz (consigne Hz réglable opérateur,
     // clampée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
@@ -22307,7 +22453,7 @@ ELSIF PRG_10_Outputs.ManuActive THEN
     // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
     FreqPct := (GVL_IHM.TranslationM3.FreqSetpointHz / _TranslationMaxFreq_Hz) * 100.0;
-    M3_SpeedRef_Active := SEL(GVL_IHM.IHM_MANU.JoystickSelect,
+    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.JoystickSelect,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
@@ -22475,6 +22621,21 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.ModeRequest;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SyncEnableRequest; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.SelectedTargetNum;
+
+// 🧪 Commandes de test Translation depuis la supervision.
+// Verrouillage obligatoire : aucune surcharge IHM ne peut être active hors simulation.
+IF GVL_Simulation.SimulationModeActive THEN
+    GVL_PLC_Tests.OverrideM3SensorsWordActive := GVL_IHM.TranslationM3.TestSensorsWordActive;
+    GVL_PLC_Tests.OverrideM3SensorsWord       := GVL_IHM.TranslationM3.TestSensorsWord;
+    GVL_PLC_Tests.OverrideM3AtTremie          := GVL_IHM.TranslationM3.TestAtTremie;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := GVL_IHM.TranslationM3.TestBrakeStuckOpen;
+    GVL_PLC_Tests.OverrideM3PhantomFreq       := GVL_IHM.TranslationM3.TestPhantomFreq;
+ELSE
+    GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
+    GVL_PLC_Tests.OverrideM3AtTremie          := FALSE;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := FALSE;
+    GVL_PLC_Tests.OverrideM3PhantomFreq       := FALSE;
+END_IF;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.FaultMachineReset
@@ -22825,6 +22986,17 @@ GVL_IHM.TranslationM3.ErrorId              := PRG_07_TranslationControl.instTran
 GVL_IHM.TranslationM3.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
 GVL_IHM.TranslationM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
 GVL_IHM.TranslationM3.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
+GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
+GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
+GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
+GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
+GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+GVL_IHM.TranslationM3.SensorsWord         := PRG_07_TranslationControl.instPositionDecoder.SensorsWord;
+GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_07_TranslationControl.instPositionDecoder.Incoherent;
+GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
+GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+GVL_IHM.TranslationM3.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
+GVL_IHM.TranslationM3.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
 GVL_IHM.TranslationM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
 GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
@@ -22840,6 +23012,12 @@ GVL_IHM.TranslationM3.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTransla
 GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
 GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
 GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
+GVL_IHM.TranslationM3.SafetySafeStop       := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+GVL_IHM.TranslationM3.SafetyPowerCutOff    := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+GVL_IHM.TranslationM3.DriveControlWord     := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+GVL_IHM.TranslationM3.DriveFreqRefHz       := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
+GVL_IHM.TranslationM3.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
+GVL_IHM.TranslationM3.ActiveSpeedRefPct    := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
 // ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
 GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;

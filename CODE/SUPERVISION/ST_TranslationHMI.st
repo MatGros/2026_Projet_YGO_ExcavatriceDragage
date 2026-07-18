@@ -12,6 +12,7 @@ STRUCT
     ReqFwd                  : BOOL;    (* ↔️ Requête marche avant manuelle (bouton IHM, pas encore arbitrée) *)
     ReqRev                  : BOOL;    (* ↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
     FreqSetpointHz          : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], clampée par PRG_10_Outputs *)
+    JoystickSelect          : BOOL;    (* 🕹️ TRUE = joystick, FALSE = boutons ReqFwd/ReqRev *)
 
     (* 🚦 États & diagnostics FB_Translation *)
     FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Translation) *)
@@ -24,6 +25,10 @@ STRUCT
     BrakeFeedback           : BOOL;    (* 🔌 Retour physique de l'état du frein *)
     PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
     DriveActualFreqHz       : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
+    DriveControlWord        : WORD;    (* ⚙️ Mot de commande AC600 réellement appliqué *)
+    DriveFreqRefHz          : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
+    ActiveDirection          : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
+    ActiveSpeedRefPct        : REAL;    (* 📊 Consigne active après arbitrage *)
 
     (* 🔌 Diagnostic variateur EtherCAT (décodé — pas de bit-masking côté IHM) *)
     DriveCommReady          : BOOL;    (* 📡 Variateur M3 : communication prête (StatusWord bit7) *)
@@ -31,6 +36,26 @@ STRUCT
 
     (* 🐞 Bypass diag (banc de test — auto-calculé depuis GVL_Simulation) *)
     BypassContactorFeedback : BOOL;    (* 🔌 Activation du bypass des retours contacteurs (sens + frein) *)
+
+    (* 📍 Mot capteurs et positions Translation M3 *)
+    PositionTremie          : BOOL;
+    PositionPV              : BOOL;
+    PositionP2              : BOOL;
+    PositionP1              : BOOL;
+    PositionMaintenance     : BOOL;
+    SensorsWord              : BYTE;   (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
+    SensorWordIncoherent    : BOOL;
+    LimitSwitchFwd          : BOOL;
+    LimitSwitchRev          : BOOL;
+    MaintenanceTargetEnable : BOOL;
+    SimulationModeActive    : BOOL;
+
+    (* 🧪 Commandes de test Translation, actives uniquement sur banc *)
+    TestSensorsWordActive   : BOOL;
+    TestSensorsWord         : BYTE;
+    TestAtTremie             : BOOL;
+    TestBrakeStuckOpen       : BOOL;
+    TestPhantomFreq         : BOOL;
 
     (* 🛡️ Sécurité (FB_Safety_Translation) *)
     SafetyError             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
@@ -43,5 +68,7 @@ STRUCT
     SafetyErrorMecaA        : BOOL;    (* 🔄 Mouvement non commandé (Méca A - bit5) *)
     SafetyErrorLimitSwitch  : BOOL;    (* 🚧 Limite extrême Translation atteinte (bit6) *)
     SafetyErrorSensorIncoherent : BOOL; (* 🧭 Mot capteurs M3 incohérent (bit7) *)
+    SafetySafeStop         : BOOL;    (* 🛡️ Décélération de sécurité demandée *)
+    SafetyPowerCutOff      : BOOL;    (* 🧨 Coupure puissance demandée *)
 END_STRUCT
 END_TYPE

@@ -259,3 +259,22 @@ alimentent l'arbitrage `PRG_07_TranslationControl` §1bis, qui pilote la même i
 | `BypassContactorFeedback` | BOOL | PLC→IHM | Diag banc de test, auto-calculé (`GVL_Simulation.ContactorFeedbackM3_IsReal`) — couvre sens + frein |
 | `SafetyError` / `SafetyErrorId` | — | PLC→IHM | Statuts `FB_Safety_Translation` |
 | `SafetyErrorSensorIncoherent` | BOOL | PLC→IHM | Incohérence du mot capteurs M3 (bit7) |
+
+### Interface complète de supervision et de test
+
+`GVL_IHM.TranslationM3` constitue l'interface unique de supervision de l'objet métier
+Translation M3. Elle expose également le mot de progression des cinq capteurs :
+`bit4=Trémie`, `bit3=PV`, `bit2=P2`, `bit1=P1`, `bit0=Maintenance`.
+
+Les champs `PositionTremie`, `PositionPV`, `PositionP2`, `PositionP1`,
+`PositionMaintenance`, `SensorsWord`, `SensorWordIncoherent`, `LimitSwitchFwd` et
+`LimitSwitchRev` permettent de diagnostiquer directement le câblage et la position estimée.
+`SafetySafeStop` et `SafetyPowerCutOff` indiquent la réaction de sécurité effective.
+
+En maintenance N1/N2, les commandes `ReqFwd`/`ReqRev` et `FreqSetpointHz` sont traitées
+par `PRG_07_TranslationControl` sans dépendre de `IHM_MANU`. En mode `SEMI_AUTO`, la
+commande vient du cycle et reste conditionnée par l'homme-mort et le joystick X.
+
+Les champs `Test*` de `GVL_IHM.TranslationM3` ne sont utilisables que sur le banc de
+simulation. Ils recopient les overrides Translation prévus dans `GVL_PLC_Tests` et ne
+créent aucune commande physique supplémentaire.
