@@ -26,6 +26,9 @@ VAR
     M2_Direction_Active     : INT;
     M2_SpeedRef_Active      : REAL;
     M2_SpeedStepTableActive : ST_SpeedStepTable;
+    // 🛡️ T47 — désactivé jusqu'à validation des seuils et essais terrain.
+    SpeedGuardEnableM1 : BOOL := FALSE;
+    SpeedGuardEnableM2 : BOOL := FALSE;
 
     // Bornage et limites
     BottomLimitM1_Active    : REAL;
@@ -66,23 +69,9 @@ VAR
     SyncMinorDeviationBlocksDown : BOOL;   // 🆕 REX 2026-07-08 (5) : bit0 latché ET écart actuel aggravé par la descente
     M2_LimitShift                : REAL;   // 🆕 REX 2026-07-08 : décalage dynamique de la butée haute de M2
 
-    // 🆕 REX 2026-07-15 (3) — demande utilisateur : les fins de course virtuelles benne
-    // (FdcBucketOpen/CloseActive) doivent bloquer le mouvement AUSSI en pilotage COUPLÉ IHM_MANU
-    // (M1+M2 simultané), pas seulement en pilotage individuel M2 — sinon un opérateur qui pousse le
-    // couplage alors que le benne est déjà en butée virtuelle n'est protégé que par la butée
-    // mécanique passive. Masque calculé UNE FOIS ici, consommé par M1 ET M2 (§1/§2 ci-dessous) pour
-    // que les deux treuils s'arrêtent ENSEMBLE (pas de désynchro M1/M2 en cas de blocage partiel).
-    CoupledFwdBucketOk          : BOOL;   // Couplage montée autorisé (pas de butée fermeture benne)
-    CoupledRevBucketOk          : BOOL;   // Couplage descente autorisé (pas de butée ouverture benne)
-
-    // 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (demande utilisateur,
-    // TEMPORAIRE tant que les vitesses définitives ne sont pas figées, à retirer ensuite) : commun
-    // aux 2 treuils (GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev, structure figée, un seul réglage pour M1
-    // ET M2). Actif UNIQUEMENT si ManuActive — Auto garde son comportement inchangé (5 en montée,
-    // WinchMaxStepDescente en descente). En Manu, le plafond descente est le MIN avec
-    // WinchMaxStepDescente (jamais moins protecteur qu'Auto, juste potentiellement plus prudent).
-    ManuMaxStepFwd            : INT;
-    ManuMaxStepRev            : INT;
+    // 🆕 REX 2026-07-19 : palier max Ascension/Descente — même valeur en Auto ET Manuel
+    // (ex-plafond IHM_MANU "essais progressifs" retiré avec la suppression d'IHM_MANU, voir
+    // DOC/IHM_MANU_Journal_Modifications.md).
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescente  : INT;
 END_VAR
@@ -140,24 +129,10 @@ SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) <> 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0);
 SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
 
-// 🆕 REX 2026-07-15 (3) — voir déclaration VAR ci-dessus : couplé masqué par les mêmes fins de
-// course benne que l'individuel M2, appliqué à M1 ET M2 (§1/§2) pour arrêter les DEUX treuils
-// ensemble plutôt que de désynchroniser M1/M2 en ne bloquant que la moitié du couplage.
-CoupledFwdBucketOk := NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive;
-CoupledRevBucketOk := NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive;
-
-// 🆕 REX 2026-07-15 (9) — plafond palier IHM_MANU "essais progressifs" (voir déclaration VAR
-// ci-dessus). Bornage identique à l'ex-logique PRG_10_Outputs retirée lors du passage sur FB_Winch.
-ManuMaxStepFwd := GVL_IHM.IHM_MANU.WinchMaxStepFwd;
-IF (ManuMaxStepFwd < 1) OR (ManuMaxStepFwd > 5) THEN
-    ManuMaxStepFwd := 5; // Pleine vitesse par défaut si non initialisé/invalide
-END_IF;
-ManuMaxStepRev := GVL_IHM.IHM_MANU.WinchMaxStepRev;
-IF (ManuMaxStepRev < 1) OR (ManuMaxStepRev > 5) THEN
-    ManuMaxStepRev := 2; // Palier 2 max par défaut en descente (conforme AF) si non initialisé/invalide
-END_IF;
-EffectiveMaxStepAscent   := SEL(PRG_10_Outputs.ManuActive, 5, ManuMaxStepFwd);
-EffectiveMaxStepDescente := SEL(PRG_10_Outputs.ManuActive, _WinchMaxStepDescent, MIN(_WinchMaxStepDescent, ManuMaxStepRev));
+// 🔧 REX 2026-07-19 : palier max — même valeur Auto ET Manuel depuis la suppression d'IHM_MANU
+// (ex-plafond "essais progressifs" IHM_MANU, explicitement marqué TEMPORAIRE, retiré).
+EffectiveMaxStepAscent   := 5;
+EffectiveMaxStepDescente := _WinchMaxStepDescent;
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -174,35 +149,12 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
     M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
                                ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
-ELSIF PRG_10_Outputs.ManuActive THEN
-    // 🆕 REX 2026-07-15 (2) — IHM_MANU pilote désormais M1 via FB_Winch (au lieu de l'ex-bypass
-    // direct dans PRG_10_Outputs) : récupère gratuitement la rampe accel/décel + le ralentissement
-    // en zone d'approche de bordure + le maintien du relais pendant la décél (mêmes paramètres
-    // persistants qu'en Auto, voir instWinchM1 plus bas §6). Demande (boutons IHM ou joystick, déjà
-    // arbitrée par PRG_10_Outputs : M1Fwd_Demand/M1Rev_Demand/CoupledFwd_Demand/CoupledRev_Demand)
-    // lue avec 1 scan de retard (~10ms, PRG_10 position 10 > PRG_06 position 6) — même principe
-    // déjà accepté ailleurs dans ce fichier (Benne.Busy, SyncMinorDeviation).
-    // 🔧 REX 2026-07-15 (5) — trouvé en revue croisée (agent Haiku + relecture manuelle) : M1
-    // INDIVIDUEL (bouton M1_RelayFwd/Rev, indépendant de M2) n'était masqué par AUCUNE butée
-    // benne — delta = CablePosM1 - CablePosM2, donc bouger M1 seul aggrave la MÊME sur-contrainte
-    // mécanique que le couplé (déjà corrigé ci-dessous) : M1 Fwd augmente le delta (aggrave
-    // FdcBucketOpenActive, delta déjà >= 0) ; M1 Rev diminue le delta (aggrave
-    // FdcBucketCloseActive, delta déjà <= -10). Sens INVERSÉ par rapport à M2 (M2Fwd↔Close,
-    // M2Rev↔Open) car M1 et M2 ont un effet opposé sur le même delta. Couplé masqué par
-    // CoupledFwdBucketOk/CoupledRevBucketOk (REX 2026-07-15 (3)) — M1 s'arrête EN MÊME TEMPS que
-    // M2 si le couplage OU son propre individuel violerait une butée benne.
-    IF (PRG_10_Outputs.M1Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdBucketOk) THEN
-        M1_Direction_Active := 1;
-    ELSIF (PRG_10_Outputs.M1Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevBucketOk) THEN
-        M1_Direction_Active := -1;
-    ELSE
-        M1_Direction_Active := 0;
-    END_IF;
-    M1_StartStop_Active := (M1_Direction_Active <> 0);
-    // 🎯 Joystick = vitesse proportionnelle à la déflexion (comme en Auto) ; boutons HMI = cible 100%
-    // (FB_Winch rampe déjà en interne, plus besoin de la rampe HMI locale ex-PRG_10_Outputs).
-    M1_SpeedRef_Active  := SEL(GVL_IHM.IHM_MANU.JoystickSelect, 100.0, ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
 ELSE
+    // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2, pilotage exclusif par le
+    // joystick homme-mort (plus de bypass boutons HMI directs). Seule source de mouvement manuel.
+    // 🆕 Sélection treuil (TASK-0001, MAINT_N2 uniquement, voir FB_Modes.JoystickWinchSelectArbitrated) :
+    // 1=M1 seul, 2=M2 seul, 3=Couplé — forcé à 3 (Couplé) hors MAINT_N2, donc comportement
+    // inchangé en MAINT_N1 (M1 et M2 répondent toujours ensemble au joystick).
     // 🔧 REX 2026-07-08 : + AND DeadmanArmed — NOT Busy seul insuffisant (rampe joystick met du
     // temps à redescendre à 0 après désarmement homme-mort ⇒ StartStop reste TRUE le temps de la
     // décél, M1 bougeait/frein décollait à la fin d'un cycle benne). DeadmanArmed reste FALSE
@@ -211,6 +163,8 @@ ELSE
     M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
     M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instBucket.Busy
                             AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                            AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
+                                 OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
     M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
@@ -235,21 +189,10 @@ ELSE
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
                                    ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
-    ELSIF PRG_10_Outputs.ManuActive THEN
-        // 🔧 REX 2026-07-15 (3) — idem M1 (voir §1) : Fins de course benne (FdcBucket) appliquées
-        // au pilotage INDIVIDUEL **ET** COUPLÉ de M2 désormais (demande utilisateur — "que ce soit
-        // couplé ou pas couplé, il faut rester dans les butées"). Ex-comportement (couplé non
-        // masqué) retiré : c'était une incohérence, pas un choix voulu.
-        IF (PRG_10_Outputs.M2Fwd_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketCloseActive) OR (PRG_10_Outputs.CoupledFwd_Demand AND CoupledFwdBucketOk) THEN
-            M2_Direction_Active := 1;
-        ELSIF (PRG_10_Outputs.M2Rev_Demand AND NOT GVL_IHM.IHM_MANU.FdcBucketOpenActive) OR (PRG_10_Outputs.CoupledRev_Demand AND CoupledRevBucketOk) THEN
-            M2_Direction_Active := -1;
-        ELSE
-            M2_Direction_Active := 0;
-        END_IF;
-        M2_StartStop_Active := (M2_Direction_Active <> 0);
-        M2_SpeedRef_Active  := SEL(GVL_IHM.IHM_MANU.JoystickSelect, 100.0, ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
     ELSE
+        // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2, pilotage exclusif par le
+        // joystick homme-mort. Sélection treuil (TASK-0001, MAINT_N2 uniquement) : 2=M2 seul,
+        // 3=Couplé — forcé à 3 hors MAINT_N2 (comportement inchangé en MAINT_N1).
         // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
         // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (gate directionnel)
         // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (review code) : signe inversé pour M2. SignedDeltaPosM
@@ -261,6 +204,8 @@ ELSE
         M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
         M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                                 AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
+                                     OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1))); // 🔧 REX 2026-07-08 (7)
         M2_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
@@ -468,6 +413,11 @@ instWinchM1(
     // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
     MaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := EffectiveMaxStepAscent,
+    MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM1.SpeedBand,
+    SpeedGuardEnable        := SpeedGuardEnableM1,
+    SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM1.SpeedStable
+                               AND NOT PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed
+                               AND NOT instWinchSync.Error,
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
@@ -503,6 +453,11 @@ instWinchM2(
     // 🔧 REX 2026-07-15 (9) : idem M1 (voir §6 ci-dessus).
     MaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := EffectiveMaxStepAscent,
+    MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM2.SpeedBand,
+    SpeedGuardEnable        := SpeedGuardEnableM2,
+    SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM2.SpeedStable
+                               AND NOT PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed
+                               AND NOT instWinchSync.Error,
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,

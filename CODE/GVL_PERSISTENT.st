@@ -12,6 +12,8 @@ VAR_GLOBAL PERSISTENT RETAIN
     _CalibM2 : ST_EncoderCalib; // Calibration treuil M2
     _HomingTargetM1_M : REAL := 8.5; // Hauteur cible homing M1 (m)
     _HomingTargetM2_M : REAL := 8.5; // Hauteur cible homing M2 (m)
+    _HomingUnitaryTargetM1_M : REAL := 0.0; // Cible libre homing unitaire M1 (MAINT_N2)
+    _HomingUnitaryTargetM2_M : REAL := 0.0; // Cible libre homing unitaire M2 (MAINT_N2)
 
     _WinchSpeedStepTable : ST_SpeedStepTable := (
         P1R1 := FALSE, P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
@@ -22,6 +24,13 @@ VAR_GLOBAL PERSISTENT RETAIN
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     ); // Table paliers commune (REX 2026-07-08 : fusion M1/M2)
     _WinchMaxStepDescent : INT := 3; // Palier max descente commun M1/M2
+    // 🪜 T45 — caractérisation vitesse réelle ; valeurs initiales provisoires à mesurer.
+    _WinchSpeedConfig : ST_WinchSpeedConfig := (
+        MaxMeasuredSpeedMps    := 2.0,
+        SpeedBandMaxMps        := [0.4, 0.8, 1.2, 1.6, 2.0],
+        SpeedBandHysteresisMps := 0.05
+    );
+    _WinchLoadEstimateTable : ST_WinchLoadEstimateTable;
 
     _WinchM1RampAccelRate_Pct    : REAL := 50.0;
     _WinchM1RampDecelNormal_Pct  : REAL := 150.0;

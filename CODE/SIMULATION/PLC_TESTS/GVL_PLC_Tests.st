@@ -20,6 +20,8 @@ VAR_GLOBAL
     SuiteSafetyValidation      : ST_TestSuiteReport;  // Rapport de la suite Safety
     SuiteTranslationValidation : ST_TestSuiteReport;  // Rapport de la suite Translation M3
     SuiteBucketValidation      : ST_TestSuiteReport;  // Rapport de la suite Bucket
+    SuiteEncoderValidation     : ST_TestSuiteReport;  // Rapport de la suite Codeurs/Homing nominal
+    SuiteModesValidation       : ST_TestSuiteReport;  // Rapport de la suite Modes/Homme-mort (post-IHM_MANU)
 
     // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — chaîne Safety AU
     OverrideChainTrue          : BOOL;                // Force la boucle AU à TRUE
@@ -43,4 +45,10 @@ VAR_GLOBAL
     OverrideM1SlipCritical   : BOOL;                // Simule glissement critique M1 (2.5m)
     OverrideM2Stuck          : BOOL;                // Simule blocage mécanique M2 (position figée)
     OverrideM2BootDrift      : BOOL;                // Simule dérive position M2 au démarrage (Boot)
+
+    // ⚡ Surcharges (overrides) — Joystick (SUITE_MODES, 2026-07-19, voir FB_Sim_Joystick)
+    OverrideJoystickActive     : BOOL;              // TRUE = RawX/Y/Button pilotés par les 3 champs suivants
+    OverrideJoystickRawX       : INT;                // Débattement axe X simulé (5000=neutre, 10000=fond)
+    OverrideJoystickRawY       : INT;                // Débattement axe Y simulé (5000=neutre, 10000=fond)
+    OverrideJoystickRawButton  : BOOL;               // Appui homme-mort simulé
 END_VAR

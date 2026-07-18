@@ -37,6 +37,9 @@ VAR_INPUT
     Table         : ST_SpeedStepTable;   // Table des 5 paliers (contacteurs + seuils), propre à CE treuil
     HystMargin    : REAL := 2.0;         // Marge anti-battement (%) autour de chaque seuil
     MaxStepNumber : INT := 5;            // 🆕 Plafond palier atteignable (1..5) — 5 = pas de restriction
+    MeasuredSpeedBand : INT := 0;        // Bande vitesse réelle validée (0 = inconnue)
+    SpeedGuardEnable  : BOOL := FALSE;   // 🛡️ Garde-fou palier activable après validation terrain
+    SpeedGuardReady   : BOOL := FALSE;   // 🟢 Vitesse stable et conditions de passage validées
 END_VAR
 VAR_OUTPUT
     Contactor1  : BOOL;   // Contacteur de vitesse 1 pour le palier courant
@@ -44,6 +47,7 @@ VAR_OUTPUT
     Contactor3  : BOOL;   // Contacteur de vitesse 3 pour le palier courant
     Contactor4  : BOOL;   // Contacteur de vitesse 4 pour le palier courant
     StepNumber  : INT;    // N° palier courant (0 = arrêt, 1..5)
+    SpeedGuardLimited : BOOL; // TRUE si le garde-fou a limité le palier demandé
 END_VAR
 VAR
     SpeedRefInt : INT;          // Consigne convertie en INT (interface HYSTERESIS)
@@ -59,6 +63,7 @@ END_VAR
 IF NOT Enable THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     StepNumber := 0;
+    SpeedGuardLimited := FALSE;
     RETURN;
 END_IF;
 
@@ -84,6 +89,21 @@ IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
 // mais ne dépassera jamais MaxStepNumber (ex. limitation couple en descente, voir FB_Winch)
 IF StepNumber > MaxStepNumber THEN
     StepNumber := MaxStepNumber;
+END_IF;
+
+// 🛡️ 2ter. GARDE-FOU VITESSE RÉELLE — limite uniquement la consigne de palier.
+// Si la vitesse n'est pas validée stable, seul le palier 1 reste autorisé.
+SpeedGuardLimited := FALSE;
+IF SpeedGuardEnable THEN
+    IF NOT SpeedGuardReady THEN
+        IF StepNumber > 1 THEN
+            StepNumber := 1;
+            SpeedGuardLimited := TRUE;
+        END_IF;
+    ELSIF (MeasuredSpeedBand >= 1) AND (MeasuredSpeedBand <= 5) AND (StepNumber > MeasuredSpeedBand) THEN
+        StepNumber := MeasuredSpeedBand;
+        SpeedGuardLimited := TRUE;
+    END_IF;
 END_IF;
 
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)

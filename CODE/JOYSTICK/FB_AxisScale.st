@@ -43,3 +43,8 @@ END_IF;
 IF ABS(OutPct) <= Deadband THEN
     OutPct := 0.0;
 END_IF;
+
+// 🛡️ Limitation de plage : une valeur brute hors plage nominale ne doit jamais
+// produire une consigne supérieure à ±100 %. Ce garde-fou protège les
+// consommateurs en aval, notamment la translation M3.
+OutPct := LIMIT(-100.0, OutPct, 100.0);

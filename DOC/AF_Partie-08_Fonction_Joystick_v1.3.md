@@ -6,13 +6,13 @@
 > fonctionnel.
 >
 > 📌 **État d'implémentation (2026-07-03septdecies, AUDIT D69)** : `SafeStop` enfin RETIRÉ du
-> code (`CODE/FB_Joystick.st`) — la spec v1.1 le demandait depuis longtemps, mais le vestige
+> code (`CODE/JOYSTICK/FB_Joystick.st`) — la spec v1.1 le demandait depuis longtemps, mais le vestige
 > (entrée `SafeStop` câblée sur un stub `GVL_DEBUG.DBG_False`, agissant comme un second `Enable`
 > dans le GATE) n'avait jamais été nettoyé côté implémentation. Fermé : plus de `SafeStop` ni en
-> `VAR_INPUT` ni dans le GATE, `PRG_MAIN.st` ne câble plus rien dessus.
+> `VAR_INPUT` ni dans le GATE, `PRG_01_Diagnostics.st` ne câble plus rien dessus.
 >
 > 📌 **État d'implémentation (2026-07-03duodecies, AUDIT D49/D51/D54-D57)** : bouton homme-mort
-> anti-calage câblé (`CODE/FB_Joystick.st`). `RawButton` était acquis (`Button`) mais sans effet —
+> anti-calage câblé (`CODE/JOYSTICK/FB_Joystick.st`). `RawButton` était acquis (`Button`) mais sans effet —
 > désormais : le geste doit être ARMÉ par un appui bouton pendant que le manche est AU NEUTRE.
 > Une fois armé et en mouvement, le bouton doit être MAINTENU ou RÉAPPUYÉ (les deux comptent)
 > au moins une fois toutes les `DeadmanRearmTimeout` (**10 s**, ajusté suite retour terrain —
@@ -27,9 +27,9 @@
 > — ce FB **n'est pas un FB de mouvement** (Partie 3 v1.3 §1bis), il n'a donc pas `StartStop`/
 > `SafeStop` ; sa neutralisation passe uniquement par `Enable`. `SafetyOk`/`EStopOk` fusionnés en
 > **`EmergencyStopOk`** (plus de composition `NOT SafeStop AND EStopOk`). `FB_Filter_PT1` renommé
-> **`FB_FilterPT1`**. Lien mort vers l'ancienne Partie 4 corrigé. Cadencement clarifié : traitement
+> **`FB_Filter_PT1`**. Lien mort vers l'ancienne Partie 4 corrigé. Cadencement clarifié : traitement
 > dans `MainTask` (10 ms), la tâche CAN (20 ms) ne fait que rafraîchir l'image process.
-> Terminologie `PRG_JOY1` : voir note §6bis (1 seul POU `PLC_PRG_MAIN`, Partie 2 §0).
+> Terminologie `PRG_JOY1` : voir note §6bis ; le programme effectif est `PRG_01_Diagnostics`.
 >
 > 🔢 Renumérotée **Partie 4 → Partie 8** : les docs de **fonctions métier par FB** sont numérotées **8+**
 > (les Parties 4–6 sont réservées aux specs transverses Cycle/Modes/E-S).
@@ -53,22 +53,24 @@ Traduire le **geste opérateur** (2 axes + bouton) en une **consigne normalisée
 ## ⚙️ 2. Chaîne de traitement (pipeline)
 
 ```
-RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──► ST_AxisCmd (SpeedRef %, Direction)
+RawX/Y ──► FB_AxisScale ──► FB_Filter_PT1 ──► FB_Ramp ──► ST_AxisCmd (SpeedRef %, Direction)
            calib + deadband   filtre PT1       accel/decel
 ```
 
 | Étape | Bloc | Rôle métier |
 |-------|------|-------------|
 | 🎯 Calibration | `FB_AxisScale` | Recale le neutre, applique la zone morte, sort en % signé (-100..+100) |
-| 〰️ Filtrage | `FB_FilterPT1` | Lisse le bruit du signal Hall (filtre 1er ordre), cadencé via `FB_CycleTime` |
+| 〰️ Filtrage | `FB_Filter_PT1` | Lisse le bruit du signal Hall (filtre 1er ordre), cadencé via `FB_CycleTime` |
 | 📈 Rampe | `FB_Ramp` | Accel/décel anti-à-coups (retour zéro plus rapide) |
 | 📤 Normalisation | `ST_AxisCmd` | SpeedRef (%) + Direction |
 
 > ♻️ **Réutilisation** : tous ces blocs **existent déjà** dans le projet — aucune brique réinventée (conforme P3 §0).
-> 🧩 **Composition** (POO partielle, Partie 3 §Règles socle) : `FB_AxisScale`, `FB_FilterPT1`,
+> 🧩 **Composition** (POO partielle, Partie 3 §Règles socle) : `FB_AxisScale`, `FB_Filter_PT1`,
 > `FB_Ramp` et `FB_CycleTime` sont des **instances composées à l'intérieur** de `FB_Joystick`
 > (pas des FB de premier niveau appelés séparément dans l'arborescence — voir Partie 2 §3).
-> `FB_CycleTime` fournit la base de temps utilisée par `FB_FilterPT1` pour son filtrage.
+> `FB_CycleTime` fournit la base de temps utilisée par `FB_Filter_PT1` pour son filtrage.
+> 🛡️ Les sorties de `FB_AxisScale` et `FB_Ramp` sont bornées à ±100 %. Une protection
+> complémentaire borne la consigne finale avant `FB_Translation` à 0..100 %.
 > ⚠️ `FB_Joystick` **n'a pas** de `StartStop`/`SafeStop` : ce n'est **pas** un FB de mouvement
 > (Partie 3 v1.2 §1bis) — il produit une consigne, il ne pilote pas directement un actionneur.
 
@@ -127,12 +129,12 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 | `CanOnline` | `diagCAN.IsOnline` | ✅ |
 | `CanOperational` | `diagCAN.IsOperational` | ✅ |
 | `Enable` | `GVL_DEBUG.DBG_True` | ⚠️ debug |
-| `EmergencyStopOk` | `GVL_DEBUG.DBG_True` | ⚠️ debug |
+| `EmergencyStopOk` | `PRG_00_Inputs.EmergencyStopOk` | ✅ réel, simulation explicitement conditionnée |
 | `Reset` | (non câblé) | ⚠️ |
 | `Calibrate` | (non câblé) | ⚠️ |
 
 > 🗑️ **Retiré (v1.1)** : la ligne `SafeStop := GVL_DEBUG.DBG_False` n'a plus lieu d'être —
-> `FB_Joystick` n'a pas cette entrée (voir §3). Le code source `CODE/PRG_JOY1.st` actuel câble
+> `FB_Joystick` n'a pas cette entrée (voir §3). Le code source `CODE/JOYSTICK/FB_Joystick.st` actuel câble
 > encore `SafeStop` : il devra être mis à jour lors d'une prochaine itération code (hors périmètre
 > du présent audit documentaire, qui ne modifie pas `CODE/`).
 
@@ -140,34 +142,29 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 
 ## 💻 6. Implémentation (référence code)
 
-📂 **Code source à copier (unique)** : 👉 [`CODE/PRG_JOY1.st`](../CODE/PRG_JOY1.st)
+📂 **Code source à copier (unique)** : 👉 [`CODE/JOYSTICK/FB_Joystick.st`](../CODE/JOYSTICK/FB_Joystick.st)
 *(Pas de recopie ici — voir le fichier `CODE/` pour le corps ST complet, conformément à la règle anti-doublon.)*
 
-**Câblage appliqué dans `CODE/PRG_JOY1.st`** (résumé, état actuel — voir §6bis pour les écarts) :
+**Câblage appliqué dans `CODE/JOYSTICK/FB_Joystick.st`** (résumé, état actuel — voir §6bis pour les écarts) :
 - Entrées physiques mappées selon §5 (CAN, RawX/Y, bouton).
 - Entrées sécurité en **forçage debug** (à sécuriser, voir §7).
 - Paramètres : deadband 5 %, filtre 100 ms, accel 50 %/s, décel 150 %/s.
 
 **Sorties exposées** : `AxisCmdX/Y.SpeedRef` (%), `AxisCmdX/Y.Direction` (-1/0/+1), `Button`, `NeutralXAct/YAct`, `Ready/Busy/Done/Error/ErrorId`.
 
-### 6bis. Écarts connus entre ce document (v1.1) et le code actuel
+### 6bis. Écarts historiques — fermés
 
-⚠️ Écarts historiques (1 et 2 ci-dessous FERMÉS le 2026-07-03septdecies, AUDIT D69 —
-`CODE/FB_Joystick.st`/`PRG_MAIN.st` à jour ; 3 et 4 restent ouverts) :
+Les anciens écarts sont fermés :
 1. ✅ **FERMÉ** : câblage `SafeStop := GVL_DEBUG.DBG_False` retiré (entrée supprimée du contrat).
 2. ✅ **FERMÉ** : `EmergencyStopOk` (déjà renommé, câblé sur I/O réel via `GVL_IN`).
-3. Le nom de programme `PRG_JOY1` reste un **vestige** de nommage historique, ainsi que le
-   commentaire d'en-tête du fichier `.st` qui référence l'ancien nom de doc
-   (`AF_Partie-04_Fonction_Joystick_v1.0.md`). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T16).
+3. ✅ **FERMÉ** : le programme effectif est `PRG_01_Diagnostics`; `PRG_JOY1` n'existe plus dans `CODE/`.
 
 ---
 
 ## 📝 7. Note d'application CODESYS 3.5 (manuel)
 
 ### 🔧 Intégration
-1. Le corps ST de `FB_Joystick` (déjà correct, inchangé) est appelé — **cible cible à terme** :
-   directement dans `PLC_PRG_MAIN` (MainTask, 10 ms). Le nom historique `PRG_JOY1` (§6bis point 3)
-   est à faire disparaître dans une prochaine itération code.
+1. Le corps ST de `FB_Joystick` est appelé dans `PRG_01_Diagnostics` (`MainTask`, 10 ms).
 2. **Vérifier** que l'appel s'exécute bien dans **MainTask (10 ms)**, pas dans `CanTask` (20 ms) :
    `CanTask` ne fait que rafraîchir l'image process CANopen (Partie 2 v2.5 §2).
 
@@ -175,13 +172,13 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 - `JoyXRaw_ANA1`, `JoyYRaw_ANA2`, `JoyBtnRaw`
 - `diagCAN` (`.IsOnline`, `.IsOperational`)
 - `GVL_DEBUG.DBG_True`, `GVL_DEBUG.DBG_False`
-- Type `ST_AxisCmd` ; FB `FB_CycleTime`, `FB_AxisScale`, `FB_FilterPT1`, `FB_Ramp`
+- Type `ST_AxisCmd` ; FB `FB_CycleTime`, `FB_AxisScale`, `FB_Filter_PT1`, `FB_Ramp`
 
 ### 🔒 À sécuriser après remise en service
 | Entrée debug | Remplacer par |
 |--------------|---------------|
 | `Enable := GVL_DEBUG.DBG_True` | autorisation réelle (`FB_Modes`) |
-| `EmergencyStopOk := GVL_DEBUG.DBG_True` | chaîne AU réarmée — 📌 Suivi (source exacte) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T15) |
+| `EmergencyStopOk := GVL_DEBUG.DBG_True` | remplacer par `PRG_00_Inputs.EmergencyStopOk` — la validation du câblage contacteur reste T15 |
 | `Reset := FALSE` | bit acquittement IHM |
 | `Calibrate := FALSE` | bouton calibration IHM (front) |
 
@@ -191,5 +188,5 @@ RawX/Y ──► FB_AxisScale ──► FB_FilterPT1 ──► FB_Ramp ──►
 
 - [x] Suppression effective de `SafeStop` et renommage `EmergencyStopOk` — fait 2026-07-03septdecies (§6bis).
 
-📌 Suivi (checklist de mise en service restante — calibration, deadband, coupure CAN) : voir
-`DOC/PLAN_TASK_v1.0.md` §3 (T17).
+✅ Checklist de mise en service (calibration, neutre, deadband, homme-mort, coupure CAN, valeurs
+incohérentes) réalisée : voir `DOC/CHECKLIST_MiseEnService_Joystick_v1.0.md` (T17, 2026-07-19).

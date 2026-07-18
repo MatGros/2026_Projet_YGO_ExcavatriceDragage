@@ -38,7 +38,7 @@ Restent des **incohérences réelles** à répercuter, désormais **tranchées**
 | D7 | **Cadencement joystick** | Communication CAN **20 ms** ; **code de traitement dans MainTask 10 ms**. |
 | D8 | **Architecture POU** | **1 seul POU `main`** exécute les FB **séquentiellement**. **Plus de `PRG_*`** séparés (`PRG_MODES`, `PRG_IO`, `PRG_JOY1` à retirer du vocabulaire des specs). |
 | D9 | **`ErrorId`** | **`WORD`** partout (set de bits). |
-| D10 | **Filtre PT1** | Nom standard unique : **`FB_FilterPT1`** (sans underscore). |
+| D10 | **Filtre PT1** | Décision historique supplantée par le code réel : nom actif **`FB_Filter_PT1`**. |
 | D11 | **Blocs joystick** | `FB_CycleTime` = base de temps pour filtrage ; `FB_Joystick` **obligatoire**, appelé dans le **POU main**. |
 | D12 | **Interface FB & modèle d'arrêt** | **Tous les FB** ont l'interface standard de base, dont **`Enable`**. `Enable = FALSE` = **FB désactivé = coupure de toutes ses sorties** (neutralisation dure). Pour les **FB de mouvement** : entrée **`StartStop`** (BOOL) → `TRUE` = **rampe d'accélération** vers consigne, `FALSE` = **rampe de décélération normale** (arrêt) ; **`SafeStop`** (entrée, issue du bloc safety) = **rampe de décélération rapide** (FB reste `Enable`). |
 | D13 | **Guardrail « arrêt sûr » (CLAUDE.md)** | Le guardrail « arrêt sûr = retrait de l'`Enable` » est **remplacé** : arrêt sûr = **`SafeStop` → rampe rapide** (Enable maintenu) ; `Enable` off = **coupure des sorties** (neutralisation, cas distinct). |
@@ -82,7 +82,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | Réf | Localisation | Constat | Statut |
 |-----|--------------|---------|--------|
 | m1 | `NAMING_CONVENTION.md:121` (`ST_WinchIO`) | `ErrorId : INT` | ✅ **D9** : `WORD`. |
-| m2 | `AF_Partie-02` (COMMUN) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ **D10** : `FB_FilterPT1`. |
+| m2 | `AF_Partie-02` (COMMUN) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ Nom final confirmé par code/export : `FB_Filter_PT1`. |
 | m3 | `AF_Partie-08` §2/§7 vs `AF_Partie-02` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
 | m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie-02_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
 | m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
@@ -391,7 +391,7 @@ terminologie standard de ce canal — cohérent avec l'intention d'origine du FB
 
 | # | Sujet | Décision |
 |---|-------|----------|
-| D49 | **Bouton homme-mort joystick (anti-calage)** | `RawButton` était capturé (`Button`) mais jamais exploité — aucun effet sur la commande (trouvé en répondant à la demande utilisateur). Nouveau comportement `FB_Joystick` : le geste doit être ARMÉ par appui bouton PENDANT que le manche est au neutre (`ScaleX/Y.OutPct=0.0`, comparaison exacte sûre — valeur clampée en dur dans `FB_AxisScale`, pas un calcul flottant). Relâcher le bouton en cours de mouvement ne désarme PAS (retour utilisateur : rappel mécanique du manche fait foi de présence). Le retour au neutre désarme (nouveau geste = nouvel appui requis). Empêche de caler le manche en déflexion sans être jamais passé par un appui au neutre. `DeadmanArmed` exposé en sortie. |
+| D49 | **Bouton homme-mort joystick (anti-calage)** | `RawButton` était capturé (`Button`) mais jamais exploité — aucun effet sur la commande (trouvé en répondant à la demande utilisateur). Nouveau comportement `FB_Joystick` : le geste doit être ARMÉ par appui bouton PENDANT que le manche est au neutre (`ScaleX/Y.OutPct=0.0`, comparaison exacte sûre — valeur limitée en dur dans `FB_AxisScale`, pas un calcul flottant). Relâcher le bouton en cours de mouvement ne désarme PAS (retour utilisateur : rappel mécanique du manche fait foi de présence). Le retour au neutre désarme (nouveau geste = nouvel appui requis). Empêche de caler le manche en déflexion sans être jamais passé par un appui au neutre. `DeadmanArmed` exposé en sortie. |
 | D50 | **Retrait `.xError`/`.wState` non garantis (revient sur D46/D47)** | Confirmé `EnableDiagnosis=False` sur les 3 esclaves EtherCAT + devices CAN dans `Device.export` → retour aux littéraux TODO sûrs. Directive utilisateur : préférer une chaîne de sécurité RÉELLEMENT fonctionnelle (quitte à forcer/débloquer ponctuellement en CODESYS) plutôt qu'un stub qui la masque en permanence — procédure d'activation officielle documentée ci-dessus (§16) pour y arriver correctement, pas d'approximation sur des noms de propriété non confirmés. |
 
 ### Fichiers impactés (2026-07-03octies)

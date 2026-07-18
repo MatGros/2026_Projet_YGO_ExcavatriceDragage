@@ -56,7 +56,7 @@ plus de "Conditional Bypass Doctrine"). `PRG_10_Outputs` n'écrit plus `M3_Comma
 
 **Décision produit sur la vitesse en Manu** : contrairement au Winch (boutons HMI = 100% fixe, la
 vitesse est discrète par paliers de contacteurs), Translation conserve
-`GVL_IHM.TranslationM3.FreqSetpointHz` (consigne Hz réglable opérateur, clampée par
+`GVL_IHM.TranslationM3.FreqSetpointHz` (consigne Hz réglable opérateur, limitée par
 `PRG_10_Outputs`) comme référence pleine échelle — pour les boutons HMI **et** le joystick,
 reproduisant exactement le comportement de l'ex-bypass. Sans cette conservation, l'opérateur
 aurait perdu la possibilité de régler une vitesse de translation précise en mode Manu boutons
@@ -120,7 +120,7 @@ IHM_MANU : ST_IHM_MANU; (* 🛠️ Variables d'échange IHM provisoires pour pil
 
 ### 3. **CODE/MAIN/PRG_10_Outputs.st** — Trois blocs balisés Début/Fin IHM_MANU
 
-> ⚠️ **PARTIELLEMENT PÉRIMÉ (sessions 2026-07-15 et 2026-07-16)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 (2026-07-15) — remplacé par le pilotage `FB_Winch` (voir section 8). Idem pour M3 (2026-07-16) : `M3Fwd_Eff`/`M3Rev_Eff`/`M3_ActiveFreqCmd`/`M3_DriveIsReal` et l'écriture directe `M3_CommandWord`/`M3_SetpointFrequencyHz` supprimés — remplacés par le pilotage `FB_Translation` (voir section 12). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBucket`, clamp `FreqSetpointHz`) qui alimente désormais `PRG_06_WinchControl`/`PRG_07_TranslationControl`, et la partie **Auxiliaires qui reste un vrai bypass, inchangée** (hors périmètre, `PRG_08_AuxiliaryControl` = stub vide). Le "Bloc 3" (PowerCutOff) reste valable tel quel.
+> ⚠️ **PARTIELLEMENT PÉRIMÉ (sessions 2026-07-15 et 2026-07-16)** — Le "Bloc 2" ci-dessous (états effectifs `M1Fwd_Eff`/`M1Rev_Eff`/`M2Fwd_Eff`/`M2Rev_Eff`, décodage K1-K4 via `instManuSpeedStep`, rampe locale `instHmiSpeedRamp`) a été **entièrement supprimé** pour M1/M2 (2026-07-15) — remplacé par le pilotage `FB_Winch` (voir section 8). Idem pour M3 (2026-07-16) : `M3Fwd_Eff`/`M3Rev_Eff`/`M3_ActiveFreqCmd`/`M3_DriveIsReal` et l'écriture directe `M3_CommandWord`/`M3_SetpointFrequencyHz` supprimés — remplacés par le pilotage `FB_Translation` (voir section 12). Ne reste dans ce fichier que le calcul des "Demand" (boutons/joystick, interlocks, `StartupNeutralOk`, `FdcBucket`, limitation `FreqSetpointHz`) qui alimente désormais `PRG_06_WinchControl`/`PRG_07_TranslationControl`, et la partie **Auxiliaires qui reste un vrai bypass, inchangée** (hors périmètre, `PRG_08_AuxiliaryControl` = stub vide). Le "Bloc 3" (PowerCutOff) reste valable tel quel.
 
 #### 🔶 **Bloc 1 : Déclarations VAR** (lignes 73–90)
 
@@ -407,7 +407,7 @@ Auto (§1bis), mirroir exact de `PRG_06_WinchControl` §1/§2 (section 8).
   **1 scan de retard** ~10ms — PRG_10 en position 10, PRG_07 en position 7, même principe que
   `PRG_06_WinchControl` avec `M1Fwd_Demand`) pour déterminer `Direction`/`StartStop`.
 - `SpeedRefPct` — **diffère du Winch délibérément** (décision utilisateur) : conserve
-  `GVL_IHM.TranslationM3.FreqSetpointHz` (consigne Hz réglable opérateur, clampée par
+  `GVL_IHM.TranslationM3.FreqSetpointHz` (consigne Hz réglable opérateur, limitée par
   `PRG_10_Outputs` à `_TranslationMaxFreq_Hz`) comme cible pleine échelle, pour boutons HMI **et**
   joystick — reproduit exactement le comportement de l'ex-bypass (`FreqSetpointHz` = 100%,
   déflexion joystick = % de cette cible), au lieu du `100.0` fixe utilisé par le Winch (qui pilote
@@ -432,7 +432,7 @@ Auto (§1bis), mirroir exact de `PRG_06_WinchControl` §1/§2 (section 8).
 
 **À modifier au nettoyage :** Rien à faire — cette branche `ELSIF ManuActive` est le code
 **définitif**, pas une dérogation à retirer. Seul `PRG_10_Outputs.M3Fwd_Demand`/`M3Rev_Demand`/
-clamp `FreqSetpointHz` (calcul amont, boutons/joystick) reste spécifique IHM_MANU.
+la limitation `FreqSetpointHz` (calcul amont, boutons/joystick) reste spécifique IHM_MANU.
 
 ---
 
@@ -515,7 +515,7 @@ Actuellement, il n'y a **pas de vérification du mode machine** (Mode N1/N2/N3/e
 
 ### 3. **Fréquence M3 — pas de bounds-check**
 
-`GVL_IHM.TranslationM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est clampé à `_TranslationMaxFreq_Hz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
+`GVL_IHM.TranslationM3.FreqSetpointHz` (ex-`IHM_MANU.M3_FreqSetpoint`) est limité à `_TranslationMaxFreq_Hz` dans `PRG_10_Outputs` mais cette limite elle-même n'est pas garantie alignée sur les bornes réelles du variateur (ex. 0–60 Hz nominalement).
 
 **À confirmer :** Les limites du variateur AC600 doivent-elles être respectées en mode Manu ou peut-on libérer complètement ?
 

@@ -127,6 +127,10 @@ instHomingM1(
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+                            AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
+    WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1),
+    HomingTargetM        := _HomingUnitaryTargetM1_M,
     ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := _HomingTargetM1_M,
@@ -172,6 +176,10 @@ instHomingM2(
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M2TreuilBucket.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+                            AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
+    WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
+    HomingTargetM        := _HomingUnitaryTargetM2_M,
     ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     TopSensorPositionM   := _HomingTargetM2_M,

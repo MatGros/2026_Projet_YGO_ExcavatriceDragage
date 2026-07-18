@@ -12,7 +12,7 @@
 > `PRG_00_Inputs.M1ContactorFeedbackFwd` (retour individuel par sens) est mis à jour — ce signal
 > est **supprimé côté câblage réel** pour les treuils M1/M2, remplacé par un retour unique par
 > treuil `M1FwdRevSpeedFeedbackOff`. Aucun autre changement vs v2.9. Détail complet :
-> `DOC/AF_Partie-09_Fonction_Winch_v1.10.md`.
+> `DOC/AF_Partie-09_Fonction_Winch_v1.11.md`.
 >
 > **v2.9** — Correctif documentaire (voir Partie 13) : `GVL_DEBUG` (§2bis) a été supprimé et
 > remplacé par `GVL_Simulation` (bit maître `SimulationModeActive` + granularité par device
@@ -85,12 +85,11 @@ cascade) rendait l'ordre d'exécution **invisible** sans lire le corps du POU ra
 
 | Tâche | Priorité | Cadence | Contenu & Rôle |
 | --- | --- | --- | --- |
-| ⚡ **EtherCatTask** | à définir¹ | **4 ms** | Rafraîchit images process EtherCAT : codeurs M1/M2 (COD1/COD2), variateur AC600 (M3) |
-| 🔌 **CanTask** | à définir¹ | **20 ms** | Rafraîchit **uniquement** l'image process CANopen (joystick Hall). Le **traitement** (`FB_Joystick` dans `PRG_01_Diagnostics`) s'exécute dans `MainTask` (10 ms) |
-| 🧠 **MainTask** | à définir¹ | **10 ms** | Exécute **séquentiellement** `PRG_00_Inputs` → `PRG_10_Outputs` (liste d'appel §3) |
+| ⚡ **EtherCAT_Task** | **1** | **4 ms** | Rafraîchit images process EtherCAT : codeurs M1/M2 (COD1/COD2), variateur AC600 (M3) |
+| 🔌 **CAN** | **16** | **20 ms** | Rafraîchit **uniquement** l'image process CANopen (joystick Hall). Le **traitement** (`FB_Joystick` dans `PRG_01_Diagnostics`) s'exécute dans `MainTask` (10 ms) |
+| 🧠 **MainTask** | **10** | **10 ms** | Exécute **séquentiellement** `PRG_00_Inputs` → `PRG_10_Outputs` (liste d'appel §3) |
 
-> ¹ **Priorités** en configuration CODESYS — critère : les tâches bus rafraîchissent l'image
-> process **avant** que `MainTask` ne la consomme. 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T5).
+> 🔎 Valeurs confirmées dans `Device.export`. Les trois tâches ont un watchdog système de **200 ms**.
 
 ⏲️ **Surveillance périodicité des tâches** : fonction système CODESYS (seuil **200 ms**), **pas de programme applicatif dédié**.
 
@@ -113,8 +112,8 @@ MainTask (10 ms)
 10.  PRG_10_Outputs              — CODE/MAIN/         — Écriture E/S physiques et PowerCutOff redondant A/B
 ```
 
-`PRG_IP` (`CODE/MAIN/PRG_IP.st`) est un programme annexe actuellement stub/commenté,
-hors séquence principale. Les programmes de validation PLC sont regroupés sous
+`PRG_IP` (`CODE/MAIN/PRG_IP.st`) existe dans l'application mais n'est appelé dans aucune tâche ;
+il est donc inactif. Les programmes de validation PLC sont regroupés sous
 `CODE/SIMULATION/PLC_TESTS/` et ne font pas partie du flux machine nominal.
 
 ### 3bis. Translation M3 — codage des positions
@@ -187,7 +186,7 @@ limite physique) et le `ForbidDescent`/`ForbidAscent` effectifs par treuil.
 ### `PRG_07_TranslationControl` (position 7)
 Arbitre la source de commande pour M3 (Joystick vs `PRG_05_Cycle`), sélectionne la cible
 (`Trémie`, `PV`, `P2`, `P1`, `Maintenance`) et son code capteurs, puis instancie `FB_Translation`
-(`CommMode` figé `DEGRADED_IO` à ce jour — voir Partie11 §7).
+(pilotage EtherCAT exclusif ; l'ancien mode relais `DEGRADED_IO` est retiré — voir Partie11 §7).
 
 ### `PRG_08_AuxiliaryControl` (position 8)
 Ne commande plus le casque, la grille ni la centrale hydraulique. Conserve uniquement le
@@ -221,7 +220,7 @@ interne machine brut** (E/S) ont disparu. Distinction stricte à conserver :
 | `GVL_Simulation` (`SIMULATION`) | Bit maître `SimulationModeActive` + granularité par device (`<Device>_IsReal`) — voir Partie 13 | ✅ Conservée — remplace `GVL_DEBUG` (supprimée), mise en service uniquement |
 | `GVL_Modes_Stub` (`MODES`) | Stub sélecteur mode/mot de passe (pas de vrai IHM câblé ce lot) | ✅ Conservée — temporaire, à terme absorbée par `GVL_IHM` |
 | `GVL_Encoder_Stub` | Ancien stub homing/codeur | ❌ Absent du code actuel — ne pas référencer comme GVL active |
-| `GVL_Translation_M3_Stub` (`TRANSLATION`) | Stub sélecteur position test et reliquats M3 | ⚠️ Conservée temporairement — à réduire après migration du décodage cinq capteurs |
+| `GVL_Translation_M3_Stub` (`TRANSLATION`) | Entrée PV à mapper + sélecteur de trajet simulé | ✅ Réduite aux deux variables encore consommées |
 | `GVL_PLC_Tests` / `GVL_PLC_Tests_Const` (`SIMULATION/PLC_TESTS`) | Commandes, états et constantes du framework de validation PLC | ✅ Conservées — uniquement simulation/tests |
 | ~~`GVL_IN`~~ / ~~`GVL_OUT`~~ | Ancien bus d'E/S brutes partagé | ❌ **Supprimées** — remplacées par `PRG_00_Inputs`(`VAR_OUTPUT`)/`PRG_10_Outputs`(`VAR_INPUT`) |
 | ~~`GVL_BUS`~~ (`SYSTEM`) | Ancien `GVL_BusHealth`/`E_DegradationLevel` | ❌ **Supprimé (2026-07-15)** — fichier vide, jamais référencé |
@@ -250,7 +249,6 @@ son domaine fonctionnel** :
 | `E_Mode` | `MODES` | Modes de marche |
 | `E_State` | `COMMUN` | Machine d'état standard (Partie3 §2) |
 | `E_CycleStep` | `CYCLE` | 13 étapes du séquenceur |
-| `E_TranslationCommMode` | `TRANSLATION` | `ETHERCAT`/`DEGRADED_IO` |
 | `E_DiagState` | `DIAG` | États diagnostic bus |
 | `ST_AxisCmd` | `JOYSTICK` | Consigne Enable/StartStop/SpeedRef/Direction |
 | `ST_ContactorCheck` | `COMMUN` | Diag commande/retour contacteur |

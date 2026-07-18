@@ -26,7 +26,7 @@
 ### ✅ Fait
 Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 bits) · Modes · Diag CanOpen/EtherCAT · Brake/Ramp · GVL_Simulation
 
-### 🎯 Priorisé (v1.1 §2 — sécurité, à coder en premier)
+### ✅ Priorités sécurité v1.1 — réalisées
 | # | Sujet |
 |---|---|
 | 2.A | Homme-mort joystick absent en `SEMI_AUTO` → asservir `StartStop` M1/M2/M3 à `DeadmanArmed` + déflexion |
@@ -36,10 +36,28 @@ Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 b
 | Brique | Manque |
 |---|---|
 | `FB_WinchSync` | Surveillance seule (assumé), pas de correction active |
-| `FB_Translation` | Nouvelle cinématique M3 à intégrer : cinq capteurs codés Trémie/PV/P2/P1/Maintenance, décodage position et ralentissement PV |
-| `FB_Safety_Translation` | Adapter les deux limites safety aux extrêmes Trémie/Maintenance et ajouter le diagnostic d'incohérence du mot capteurs |
-| `FB_Cycle` | **Trouvé à l'audit, absent de v1.1** : `Error`/`ErrorId`/`StateAtError` jamais assignés, `ResetEdge` mort |
+| `FB_Translation` | ✅ Cinématique M3, cinq capteurs, décodage position et ralentissement PV intégrés ; essais terrain restant à réaliser |
+| `FB_Safety_Translation` | ✅ Limites Trémie/Maintenance et incohérence capteurs intégrées ; validation banc restant à réaliser |
+| `FB_Cycle` | ✅ `Error`/`ErrorId`, `ResetEdge`, `ERROR_HOLD` et stabilisation double codeur intégrés ; essais terrain restant à réaliser |
 | `FB_Input`/`FB_Output` (COMMUN) | Existent mais pas intégrés dans Winch/Translation (logique contacteur dupliquée) |
+
+> ℹ️ Cette table conserve les briques historiquement partielles pour assurer la traçabilité. Pour l'état
+> courant, la section « État réel du plan » et les lignes T33 à T39 font foi.
+
+### 🔄 État réel du plan — mise à jour 2026-07-18
+
+| Domaine | État actuel | Suite prévue |
+|---|---|---|
+| Translation M3 / cinq capteurs | ✅ Implémenté et exposé dans `GVL_IHM.TranslationM3` | Essais CODESYS puis terrain |
+| Translation M3 / sécurité | ✅ Limites Trémie/Maintenance + incohérence capteurs + SafeStop/PowerCutOff | Vérifier les réactions sur banc |
+| Cycle semi-auto / Kobold | ✅ Contact, remontée synchronisée et reprise homme-mort raccordés | Finaliser la stabilisation et les cas d'obstacle |
+| IHM cycle et Translation | ✅ GVL de commande, état, diagnostic et simulation | Étendre aux Codeurs/Homing et aux tests opérateur |
+| Vitesse réelle des codeurs | ✅ Calcul m/s, surveillance et exposition IHM réalisés | Valider les seuils sur site |
+| Remontée cycle / contrôle dynamique | 🟠 Comparaison vitesse M1/M2 raccordée ; seuil/tempo à 0 donc inactive | Définir puis activer les paramètres après essais terrain |
+| Paliers / charge estimée | ✅ 5 plages, tableau 2D et garde-fou implémentés | Calibrer et activer progressivement sur site |
+| IHM_MANU | ✅ Supprimé définitivement (2026-07-19) — pilotage manuel exclusivement MAINT_N1/N2 + joystick homme-mort | Rien — historique dans `IHM_MANU_Journal_Modifications.md` |
+| Documentation architecture | ✅ Réalignée avec l'orchestration `PRG_00`→`PRG_10` | Contrôle des liens et chemins réalisé ; en-têtes historiques à traiter séparément si nécessaire |
+| Visu graphique | ❌ Hors périmètre livré, GVL disponible | À traiter séparément avec l'IHM supervision |
 
 ### ⏸️ Différé assumé (pas un trou béant)
 `PRG_08_AuxiliaryControl` — les commandes casque, grille et centrale hydraulique sont retirées du périmètre PLC ; seul le retour thermique de la centrale reste à remonter en diagnostic.
@@ -48,10 +66,10 @@ Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 b
 IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` existe).
 
 ### 🗑️ Nettoyage dû
-`GVL_BUS`/`GVL_Machine_Stub` ✅ supprimés (2026-07-15, orphelins confirmés) · `ST_IHM_MANU` (post-qualification, v1.1 §4.3) ·
-`GVL_Translation_M3_Stub.M3_RelayFwd/Rev/RelaySpeedGv/ContactorFeedbackFwd/Rev` (100% orphelins
-depuis abandon DEGRADED_IO v0.4.11, confirmé 2026-07-15 — `M3_PositionSensorTarget`/
-`StubTranslationPositionSelect_IHM` du même GVL restent utilisés, ne pas supprimer le fichier entier).
+`GVL_BUS`/`GVL_Machine_Stub` ✅ supprimés (2026-07-15, orphelins confirmés) · `ST_IHM_MANU` ✅ supprimé (2026-07-19) ·
+Anciens champs `GVL_Translation_M3_Stub` liés à `DEGRADED_IO` ✅ supprimés après confirmation
+d'absence de consommateur. `PosPV_DI` et `StubTranslationPositionSelect_IHM` restent consommés :
+ne pas supprimer le GVL entier.
 
 ### 🏷️ Nommage — chantier séparé (2026-07-15)
 Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), pilotée sur Translation M3
@@ -85,9 +103,9 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 ### 📄 Doc à mettre à jour
 - Presque tous les `AF_PartieN` : en-tête "Dépend de Partie 2 vX.Y" obsolète → aligner sur l'architecture courante
-- `AF_Partie-07` (Interface IHM) : le plus en retard, référence encore `PRG_MAIN.st` (n'existe plus)
-- `AF_Partie-07`/`AF_Partie-12` : titre interne ≠ nom de fichier
-- `CLAUDE.md` : arborescence encore sur le modèle `PLC_PRG_MAIN` abandonné
+- `AF_Partie-07` (Interface IHM) : réalignée sur `PRG_09_Supervision` et renommée v1.5
+- `AF_Partie-12` : titre et version alignés v1.4 ; chemins Benne/PERSISTENT corrigés
+- `CLAUDE.md` : arborescence réalignée sur `PRG_00`→`PRG_10`
 
 ---
 
@@ -96,41 +114,52 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | # | Sujet | Qui tranche | Source |
 |---|---|---|---|
 | T1 | Détail séquence `INIT` (sous-vérifications position/cohérence) | Projet | AF_Partie-04 §2, D22 |
-| T2 | Statut `PRG_IP.st` dans la liste de tâches CODESYS | Projet (vérif config) | v1.0 §3.3 |
-| T3 | Nom exact `FB_Filter_PT1` vs `FB_FilterPT1` | Vérif prochain export CODESYS | v1.0 §3.4 |
+| T2 | ✅ `PRG_IP` existe mais n'est appelé dans aucune tâche CODESYS : programme inactif | Projet | `Device.export`, AF_Partie-02 §3 |
+| T3 | ✅ Nom confirmé dans le code et l'export : `FB_Filter_PT1` | Projet | `FB_Joystick`, `Device.export` |
 | T4 | Protocole registre AC600 (`DriveControlWord`/`StatusWord`) | **Constructeur variateur** | Translation/Safety_Translation |
-| T5 | Priorités des tâches CODESYS (EtherCAT/CAN/Main) | Projet | AF_Partie-02 §Q7 |
+| T5 | ✅ Priorités confirmées par export : EtherCAT=1, Main=10, CAN=16 ; watchdogs 200 ms | Projet | `Device.export`, AF_Partie-02 §2 |
 | T6 | Périmètre `PRG_08` Auxiliaire | **Client** (en cours, différé assumé) | v1.1 §3 |
-| T7 | Critère explicite de "machine qualifiée" pour retirer `IHM_MANU` | Projet | v1.1 §4.3 |
+| T7 | ✅ `IHM_MANU` retiré définitivement (2026-07-19), sans attendre de critère de qualification — décision projet | Projet | `IHM_MANU_Journal_Modifications.md` |
 | T8 | Rôle de `CodeSeqTriggerCmd` (codeurs) | À vérifier terrain | AF_Partie-10 |
 | T9 | Comportement frein en montée chargée | Différé après essais terrain | AF_Partie-09 §4undecies |
-| T10 | `Safety_Winch` : cas sens opposé + absence de mouvement malgré commande | Projet | v1.0 |
+| T10 | ✅ `Safety_Winch` : sens réel opposé (bit14) + absence de mouvement malgré commande (bit15), temporisés et câblés M1/M2 | Projet | AF_Partie-09 v1.11 |
 | T11 | `EmergencyStopOk` : pas de confirmation temporisée post-réarmement, redondance A/B logicielle seulement | Projet | AUDIT D93 |
-| T12 | `FB_Safety_Translation`/domaine Translation : pas de `ST_ContactorCheck` de puissance câblé pour M3, `PowerCutOff` des autres bits reste figé `FALSE` | Projet | AF_Partie-01, AF_Partie-11 |
-| T13 | Renommage identifiants CODE Safety Mouvement (lettres A/B/C → `SafetyMotion<Role>`) | Projet | AF_Partie-01 |
-| T15 | Source exacte de `EmergencyStopOk` selon métier (AU réarmé vs retour contacteur) à sécuriser en remise en service | Projet | AF_Partie-03 §1, AF_Partie-08 §7 |
-| T16 | Vestige `PRG_JOY1` (nommage historique + header `.st`) à nettoyer, architecture pré `PRG_00-10` | Projet | AF_Partie-08 §6bis |
-| T17 | Checklist mise en service Joystick non réalisée (calibration, deadband, coupure CAN) | Terrain | AF_Partie-08 §8 |
-| T18 | GVL d'échange IHM à créer ou non (mapping paramètres/mesures) | Projet | AF_Partie-05 §6 |
+| T12 | ✅ Safety Translation conforme au matériel : aucun contacteur puissance M3 dédié ; surveillance par état/fréquence AC600 + retour frein M3. `PowerCutOff` actif sur bits3–7 | Projet | AF_Partie-01, AF_Partie-11 v1.9 |
+| T13 | ✅ Aucun identifiant Safety Mouvement A/B/C actif. Les suffixes `PowerCutOff_A/B` sont conservés : canaux physiques redondants, pas rôles métier | Projet | AF_Partie-01, CODE/AU |
+| T15 | 🔎 Source logicielle clarifiée : `PRG_00_Inputs.EmergencyStopOk` vient de `EmergencyStopOk_DI` (retour contacteur de puissance) ; simulation et override tests restent explicitement séparés. Validation du câblage réel et du comportement post-réarmement à réaliser | Projet / Terrain | AF_Partie-01 §Sécurité électrique, AF_Partie-03 §1, `PRG_00_Inputs` |
+| T16 | ✅ Vestige `PRG_JOY1` retiré des instructions actives ; programme réel `PRG_01_Diagnostics`, filtre `FB_Filter_PT1` | Projet | AF_Partie-08 §6bis |
+| T17 | ✅ Checklist mise en service Joystick réalisée + limitation de robustesse ajoutée sur `FB_AxisScale`, `FB_Ramp` et la consigne finale M3 | Projet / Terrain | `CHECKLIST_MiseEnService_Joystick_v1.0.md`, AF_Partie-08 §8 |
+| T18 | ✅ GVL d'échange IHM créée et structurée par métier (modes, Translation M3, cycle, diagnostics) | Projet | `GVL_IHM` + Partie 7 v1.5 |
 | T19 | Mapping `ChannelOk` carte/voie E-S (diagnostic carte non exploité) à définir si besoin confirmé | Projet | AF_Partie-06 §4 |
-| T20 | Sélecteur treuil IHM (visu/physique) + Prise de main IHM (l'arbitrage MAINT_N2 est fait, cf. AF_Partie-05 v1.6) | Projet | AF_Partie-05 §2, AF_Partie-09 §1 |
+| T20 | Sélecteur treuil IHM (visu/physique) — variable rapatriée dans `GVL_IHM.Modes.JoystickWinchSelect` (2026-07-19, ex-`GVL_IHM.IHM_MANU`) ; widget visu physique restant à faire. Arbitrage MAINT_N2 fait, cf. AF_Partie-05 v1.6 | Projet | AF_Partie-05 §2, AF_Partie-09 §1 |
 | T21 | Checklist validation Winch v1.7 non réalisée (inhibition, HomingApproachEnable, Méca B/D, diagnostics IHM, simulation) | Terrain | AF_Partie-09 §8 |
 | T22 | Tolérance de calibration `TopSensorPositionM` (contrôle visuel) à fixer sur site | Terrain | AF_Partie-10 §7bis |
-| T23 | Mapping IHM Encoder/Homing restant non codé (`WinchSelect_IHM`, `HomingTargetM_IHM`, voyants) | Projet | AF_Partie-10 §8 |
-| T24 | `FB_Encoder_Safety` (survitesse) orphelin depuis réécriture `FB_Encoder_Abs` — à retrancher/réintégrer | Projet | AF_Partie-10 §9bis |
-| T25 | Checklist validation Encoder/Homing non réalisée (flux nominal/unitaire, bornage, redémarrage, verrou transition) | Terrain | AF_Partie-10 §10 |
-| T26 | Checklist mise en service Translation AC600 non réalisée (essai à vide, interlock sens, ETHERCAT, thermique frein) | Terrain | AF_Partie-11 §8 |
+| T23 | ✅ Homing nominal et unitaire MAINT_N2 raccordés : sélection M1/M2, cible libre par treuil, limite ±99 m et diagnostics bits0/1/4 | Projet | `FB_Encoder_Homing`, `PRG_02_Encoders`, `ST_WinchHMI` |
+| T24 | ✅ `FB_Encoder_Safety` intégré (instances M1/M2, inhibition `SEMI_AUTO`, diagnostic IHM) | Projet | AF_Partie-10 §9bis |
+| T25 | 🟠 Suite automatisée nominale Encoder/Homing renforcée : gate simulation explicite, watchdog local, rapports TC-E1/TC-E2 corrigés ; essais CODESYS et scénarios unitaire/bornage/redémarrage restant | Projet / Terrain | `SuiteEncoder = 4`, AF_Partie-10 §10 |
+| T26 | ✅ Checklist mise en service Translation AC600 réalisée (EtherCAT, mot de commande, fréquence, marche avant/arrière, interlock sens, arrêt normal/SafeStop/AU, PV, 5 capteurs, Fdc extrêmes, thermique, diagnostics non couverts par TC-T1→T6) — clarification périmètre thermique (frein commun M3 ≠ centrale hydraulique, non liée) | Terrain | `CHECKLIST_MiseEnService_Translation_v1.0.md`, AF_Partie-11 §8 |
 | T27 | Benne : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-12 §6 |
-| T28 | `GVL_IHM.IHM_MANU.WinchMaxStepFwd/Rev` (plafond palier "essais progressifs") : branchement **TEMPORAIRE** dans `FB_Winch`/`PRG_06_WinchControl` (`MaxStepAscent`) — à retirer une fois les vitesses définitives figées, cf. T7 (critère de retrait `IHM_MANU`) | Projet | Session 2026-07-15 |
-| T29 | Renommer "Translation" en "Translation" (terme abrégé à valider) et "Benne" en "Benne" (M1=Retenue, M2=Benne) | Projet | Point client 2026-07-15 |
-| T30 | Configurer le variateur de translation : fonctionnement classique à 30 Hz, max 60 Hz | Projet | Point client 2026-07-15 |
-| T31 | Calculer la vitesse codeur en m/s et la diviser en 5 paliers par rapport à la vitesse maximale | Projet | Point client 2026-07-15 |
-| T32 | Estimer la charge benne en % via un tableau 2D (état contacteurs vitesse montée × 5 paliers vitesse codeur) réglable manuellement | Projet | Point client 2026-07-15 |
-| T33 | Définir et implémenter le décodage cinq capteurs M3 (`Trémie/PV/P2/P1/Maintenance`) et le diagnostic des combinaisons incohérentes | Projet | Décision client 2026-07-17 |
+| T28 | ✅ Plafond palier "essais progressifs" (`WinchMaxStepFwd/Rev`) retiré avec IHM_MANU (2026-07-19) — `PRG_06_WinchControl` applique désormais un plafond fixe (5/`_WinchMaxStepDescent`), identique Auto et Manuel | Projet | Session 2026-07-19 |
+| T29 | ✅ Terminologie active alignée : Translation M3, M1 Retenue, M2 Benne | Projet | CODE + AF métiers |
+| T30 | ✅ Translation configurée sur échelle max 60 Hz ; nominal 30 Hz à 50 % | Projet | `FB_Translation.DriveFreqScaleMaxHz` |
+| T31 | ✅ Vitesse câble calculée en m/s et répartie sur 5 plages paramétrables | Projet | T41/T45 |
+| T32 | ✅ Estimation charge par tableau 2D palier contacteurs × plage vitesse, réglable et informative | Projet | T46 |
+| T33 | ✅ Définir et implémenter le décodage cinq capteurs M3 (`Trémie/PV/P2/P1/Maintenance`) et le diagnostic des combinaisons incohérentes | Projet | Implémenté : `FB_Translation_PositionDecoder` |
 | T34 | ✅ Définir les E/S réelles du contacteur Kobold et de son retour contact fond | Projet / Électricité | `KoboldContactFond_DI`=%IX0.5 · `KoboldContactor_DQ`=%QX0.6 — aucun réemploi du capteur mou de câble |
-| T35 | 🟠 En cours — Définir la stratégie de descente semi-auto : limite légale, détection Kobold, remontée synchronisée au-dessus de la limite, puis fermeture benne | Projet | Décision client 2026-07-17 — structure cycle existante, raccordement Kobold à finaliser |
-| T36 | 🟠 À spécifier — Définir la phase de stabilisation après fermeture benne : vitesse lente, tolérance codeurs, blocage/obstacle/câble mou et reprise | Projet | Décision client 2026-07-17 |
-| T37 | Retirer les commandes PLC casque/grille/centrale et conserver uniquement le diagnostic thermique centrale | Projet | Décision client 2026-07-17 |
+| T35 | ✅ Définir la stratégie de descente semi-auto : limite légale, détection Kobold, remontée synchronisée au-dessus de la limite, puis fermeture benne | Projet | Implémenté et raccordé au cycle v0.4.17 |
+| T36 | ✅ Finaliser la stabilisation après fermeture benne : vitesse lente, tolérance codeurs, blocage/obstacle/câble mou et reprise | Projet | Double contrôle codeurs + timeout + `ERROR_HOLD` implémentés ; essais terrain restant |
+| T37 | ✅ Retirer les commandes PLC casque/grille/centrale et conserver uniquement le diagnostic thermique centrale | Projet | Implémenté selon décision client 2026-07-17 |
+| T38 | ✅ Réaliser la passe documentaire architecture : remplacer les références `PLC_PRG_MAIN`/anciens chemins et vérifier les liens | Projet | AF Partie 2/5/7/8/10/14 — liens locaux validés |
+| T39 | 🟠 Interfaces Homing nominale et unitaire réalisées ; essais opérateur CODESYS restant | Projet / Terrain | T23/T25, AF_Partie-10 |
+| T40 | ✅ Suppression définitive d'IHM_MANU (dispositif dérogatoire mise en service urgence, v0.4.4) : plus aucune dépendance opérationnelle en code actif ; pilotage manuel exclusivement MAINT_N1/MAINT_N2 + joystick homme-mort ; nouvelle suite de tests `SUITE_MODES` (TC-M1→M6, couvrant les 10 items obligatoires de la revue) ; revue de sécurité post-mission : homme-mort ajouté sur boutons IHM Translation M3 (écart préexistant relevé, cf. AF_Partie-11 v1.9 §6bis) | Projet | AF_Partie-11 v1.9, `IHM_MANU_Journal_Modifications.md` (historique), REX 2026-07-19 |
+| T41 | ✅ Exposer la vitesse linéaire réelle de chaque câble en m/s à partir de la position codeur et d'un temps de cycle fiable | Projet | AF_Partie-10/09, `FB_Encoder_Scale`, `FB_Safety_Winch` — `MeasuredSpeedMps` exposé IHM |
+| T42 | ✅ Créer la surveillance générique de vitesse codeur : variation brusque paramétrable, durée de confirmation, état et `ErrorId` | Projet | `FB_Encoder_SpeedMonitor.st` — diagnostic seul, intégration cycle reportée |
+| T43 | 🟠 Raccorder les vitesses M1/M2 au cycle de remontée : comparaison, désynchronisme de vitesse, temporisation, pause/défaut sans attente infinie | Projet / Client | AF_Partie-04 §3quater, `FB_Cycle` — bit4 `ErrorId` câblé ; `SpeedMismatchThresholdMps` et `SpeedMismatchTimeout` restent à `0` (contrôle inactif) tant que les valeurs métier ne sont pas définies |
+| T44 | ✅ Exposer dans `GVL_IHM` les vitesses mesurées, écarts, variations, paliers commandés et états de surveillance | Projet | AF_Partie-07, `ST_WinchHMI`, `ST_CycleHMI`, `PRG_03_Safety`, `PRG_09_Supervision` |
+| T45 | ✅ Définir les 5 plages de vitesse réelle à partir de `VitesseMaxMps` (valeur provisoire 2,0 m/s), avec seuils paramétrables et hystérésis | Projet / Client | `ST_WinchSpeedConfig`, AF_Partie-09 — valeurs à confirmer terrain |
+| T46 | ✅ Créer le tableau 2D empirique `palier contacteurs × vitesse mesurée → charge estimée %` ; valeur informative non certifiée, réglable en mise en service | Projet / Terrain | `ST_WinchSpeedConfig`, `ST_WinchLoadEstimateTable`, `FB_WinchLoadEstimator` |
+| T47 | ✅ Ajouter le garde-fou de passage de palier : vitesse minimale atteinte + stabilité temporelle + absence de désynchronisme/variation anormale | Projet / Sécurité | `FB_SpeedStep`, `FB_Winch`, `FB_Encoder_SpeedMonitor` — activation terrain restant à valider |
+| T48 | 🟠 Valider les réactions et seuils par simulation puis essais terrain : démarrage en charge, treuil freiné, câble mou, effort asymétrique, perte codeur | Projet / Terrain | Matrice V1–V7 ajoutée AF_Partie-14 §7.4.4 ; exécution CODESYS/terrain restante |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 

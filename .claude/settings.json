@@ -3,5 +3,8 @@
     "allow": [
       "PowerShell(head -30)"
     ]
+  },
+  "enabledPlugins": {
+    "codex@openai-codex": true
   }
 }

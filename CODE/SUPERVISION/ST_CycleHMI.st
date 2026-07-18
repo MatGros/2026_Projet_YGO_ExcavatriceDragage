@@ -22,6 +22,9 @@ STRUCT
     LimitLegalDepthM     : REAL;
     WinchSyncError       : BOOL;
     WinchSyncDeltaM      : REAL;
+    SpeedMismatchMps     : REAL;
+    SpeedMismatchActive  : BOOL;
+    SpeedMismatchConfirmed : BOOL;
     M1PositionM          : REAL;
     M2PositionM          : REAL;
     DeadmanArmed         : BOOL;

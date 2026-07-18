@@ -44,6 +44,7 @@ VAR_OUTPUT
 END_VAR
 VAR
     StepX       : REAL;
+    TargetLimited : REAL;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Ramp) ===
@@ -51,17 +52,24 @@ END_VAR
 // Détection du comportement (Accélération vs Décélération)
 // 🔧 CORRECTIF : classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut
 // de Target seul (l'ancienne version se trompait lors d'une traversée de zéro rapide).
-IF (Current >= 0.0 AND Target >= Current) OR (Current <= 0.0 AND Target <= Current) THEN
+// 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
+TargetLimited := LIMIT(-100.0, Target, 100.0);
+Current := LIMIT(-100.0, Current, 100.0);
+
+IF (Current >= 0.0 AND TargetLimited >= Current) OR (Current <= 0.0 AND TargetLimited <= Current) THEN
     StepX := AccelRate * CycleTimeS; // S'éloigne du zéro (reste du même côté, va plus loin)
 ELSE
     StepX := DecelRate * CycleTimeS; // Retourne vers zéro, ou le traverse vers l'autre signe
 END_IF;
 
 // Application de la rampe
-IF Current < Target THEN
+IF Current < TargetLimited THEN
     Current := Current + StepX;
-    IF Current > Target THEN Current := Target; END_IF;
-ELSIF Current > Target THEN
+    IF Current > TargetLimited THEN Current := TargetLimited; END_IF;
+ELSIF Current > TargetLimited THEN
     Current := Current - StepX;
-    IF Current < Target THEN Current := Target; END_IF;
+    IF Current < TargetLimited THEN Current := TargetLimited; END_IF;
 END_IF;
+
+// 🛡️ Limitation finale : même une valeur d'état déjà corrompue reste bornée.
+Current := LIMIT(-100.0, Current, 100.0);

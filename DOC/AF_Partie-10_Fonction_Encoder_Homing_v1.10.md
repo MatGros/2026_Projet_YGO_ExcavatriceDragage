@@ -1,10 +1,25 @@
 # 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.10)
 
+> 🔄 **Mise à jour supervision 2026-07-18** : les états Homing M1/M2 sont désormais exposés
+> dans `GVL_IHM.M1TreuilRetenue` et `GVL_IHM.M2TreuilBucket` (`HomingBusy`, `HomingDone`,
+> `HomingError`, `HomingErrorId`, `HomingState`, `HomingStateAtError`, `HomingSuspect`,
+> `HomingRefRaw`). Les structures IHM et le mapping `PRG_09_Supervision` font foi.
+>
+> 🔍 **T42 (2026-07-18)** : `FB_Encoder_SpeedMonitor` est créé dans
+> `CODE/CODEURS/FB_Encoder_SpeedMonitor.st`. Il détecte une variation brusque de vitesse
+> câble avec seuil et durée paramétrables. Cette brique fournit un diagnostic acquittable
+> mais ne génère pas de `SafeStop` et ne modifie pas le cycle ; l'intégration M1/M2 et la
+> réaction machine sont traitées dans les tâches suivantes du plan.
+
 > **v1.10** — 🧮 Documente le **calcul pratique** `PresetValue`/`HomingRefRaw` pour une cible de
 > homing **≠ 0** (§2), jusqu'ici seulement implémenté en code (`FB_Encoder_Homing.st`), absent de
 > la doc. Corrige aussi le § Machine d'état qui montrait encore l'ancienne hypothèse
 > `HomingRefRaw:=PresetValue` (valable uniquement cible 0.00 m — obsolète depuis passage à
 > `TopSensorPositionM ≈ 12.50 m`).
+>
+> 🛡️ **REX 2026-07-18** — Le bornage codeur `[-99 ; +99] m` s'applique désormais aux deux
+> flux : cible libre unitaire et `TopSensorPositionM` nominale. Toute cible hors domaine est
+> rejetée au front `Home` par `ErrorId` bit4, sans génération de preset.
 >
 > **v1.9** — Nettoyage documentaire (audit doc) : harmonisation titre/nom de fichier (le titre
 > affichait encore v1.7 alors que le contenu interne était déjà en v1.8) + remarques
@@ -14,22 +29,22 @@
 > fonctionnel.
 >
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Encoder_Safety` **implémenté and raccordé**
-> (§3.6/§3.7) — `CODE/ENCODERS/FB_Encoder_Safety.st`, 1 instance par treuil. Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7) → `EncoderIncoherent`, bloquant le mode `SEMI_AUTO` sans provoquer de `SafeStop` direct. Le ralentissement et l'arrêt avant capteur haut (§7bis) ainsi que `HomingApproachEnable` sont désormais codés et intégrés.
+> (§3.6/§3.7) — `CODE/CODEURS/FB_Encoder_Safety.st`, 1 instance par treuil. Bornage physique `[-99;+99]` m (§3.6) + relais `HomingSuspect` (§3.7) → `EncoderIncoherent`, bloquant le mode `SEMI_AUTO` sans provoquer de `SafeStop` direct. Le ralentissement et l'arrêt avant capteur haut (§7bis) ainsi que `HomingApproachEnable` sont désormais codés et intégrés.
 >
 > **v1.8 (2026-07-08)** — Lot #9-18 : Consolidation de la documentation. Intégration de la logique de ralentissement d'arrêt normal virtuel haut, d'inhibition des treuils, et de validation des étapes du plan d'avancement.
 > **v1.7 (2026-07-07)** — REX terrain : retour contacteur individuel par sens
 > (`ContactorFeedbackFwd`/`Rev`) supprimé côté câblage réel des treuils M1/M2, remplacé par un
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
-> `BrakeFeedback` — voir `CODE/ENCODERS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
-> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.10.md` (doc principale
+> `BrakeFeedback` — voir `CODE/CODEURS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
+> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.11.md` (doc principale
 > treuil). Hors périmètre : Translation M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
 > contacteur puissance/AU, résout AUDIT Q11 pour le pipeline codeur — §7). `Reset` des FB
 > codeur/homing câblé (`M1/M2_Reset_IHM`, n'était câblé nulle part avant). Nouveau
-> `CODE/GVL_Encoder_Stub.st` : centralise Reset/ConfirmCoherence/Home/TopSensorPositionM
-> (déplacés depuis `PRG_MAIN`) — voir §8.
+> L'ancien GVL de raccordement codeur centralisait Reset/ConfirmCoherence/Home/TopSensorPositionM
+> ; ces signaux sont désormais raccordés dans `CODE/MAIN/PRG_02_Encoders.st` — voir §8.
 >
 > **v1.5** — Retour terrain 2026-07-03 : `InvertDirection` **retiré** de `FB_Encoder_Abs` — le
 > sens de comptage codeur se règle côté device (objet CoE `6000h`, Startup Parameter CODESYS),
@@ -39,7 +54,7 @@
 > **v1.4** — Nouvel export `Device.export` (2026-07-02) : le capteur de position haute est
 > désormais câblé en **I/O Mapping réel**, sous le nom **`M1_M2_TopPositionSensor`** — cela
 > répond à la clarification terminologique laissée ouverte en v1.3 (« nom neutre, terminologie
-> exacte en cours de clarification »). `CODE/GVL_Homing_Stub.st` est **supprimé** (conflit de nom
+> exacte en cours de clarification »). L'ancien GVL Homing est **supprimé** (conflit de nom
 > avec la variable réelle sinon) ; le port d'entrée `FB_Encoder_Homing.TopPositionSensor`
 > **reste nommé ainsi** côté FB (seule la variable globale qui l'alimente dans `PRG_MAIN.st`
 > change de nom). Renommage métier Translation→Translation répercuté dans les renvois croisés
@@ -51,7 +66,7 @@
 >   capteur unique. L'implémentation précédente (`CODE/`) avait divergé : 2 variables séparées
 >   (`M1_TopPositionSensor`/`M2_TopPositionSensor`, une par GVL stub Winch) et le commentaire
 >   d'entrée `FB_Encoder_Homing.TopPositionSensor` disait à tort « CE TREUIL ». Corrigé :
->   `CODE/GVL_Homing_Stub.st` (nouveau à l'époque, variable unique `TopPositionSensor` — nom
+>   l'ancien GVL Homing (nouveau à l'époque, variable unique `TopPositionSensor` — nom
 >   **neutre**, sans préfixe métier, terminologie exacte de l'ensemble mécanique en cours de
 >   clarification — voir note v1.4 ci-dessus, clarification arrivée),
 >   câblée IDENTIQUEMENT sur `instHomingM1` ET `instHomingM2` dans `PRG_MAIN.st`. Voir §5/§7bis/§9
@@ -81,7 +96,7 @@
 >   ralentir/s'arrêter **avant** la position extrême du capteur haut (qui reste une protection
 >   ultime, pas une butée courante) — voir §7bis, mécanisme exact à concevoir.
 > - ✅ **Confirmé terrain** : `PresettTrigCmd := 2` (valeur, pas un masque de bits) déclenche le
->   référencement. `CodeSeqTrigCmd` reste de rôle inconnu (voir §9bis/`CODE/FB_Encoder_Abs.st`).
+>   référencement. `CodeSeqTrigCmd` reste de rôle inconnu (voir §9bis/`CODE/CODEURS/FB_Encoder_Abs.st`).
 >
 > **v1.1** — Suite retour terrain (opérateur/mainteneur) et revue technique automatisme :
 > - 🔢 Résolution codeur **confirmée** (8192 pts/tour × 4096 tours, plage totale 33 554 432 pts) —
@@ -117,7 +132,8 @@
 > variable ni à un **saut brutal** de valeur codeur (rollover 0 ↔ max points).
 > **Cible** : CODESYS 3.5 — acquisition + mise à l'échelle codées depuis le 2026-07-02
 > (`FB_Encoder_Abs`/`FB_Encoder_Scale`/`ST_EncoderCalib`), homing (`FB_Encoder_Homing`) et
-> sélection treuil (`E_WinchSelect`) restent conception seule (voir §9 pour le détail exact).
+> sélection treuil sont implémentés : homing nominal couplé, ou unitaire M1/M2 en `MAINT_N2`
+> via `GVL_IHM.Modes.JoystickWinchSelect` et une cible libre par treuil bornée à ±99 m.
 > 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie-01_Analyse_Fonctionnelle_v1.6.md) §Initialisation,
 > [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md) (dossier `ENCODER`),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (profils FB),
@@ -292,8 +308,8 @@ sauts par plausibilité de vitesse :
 
 SI ΔRawPos_Cycle > ΔRawPos_Max × MargeBruit(ex. ×3)
    PENDANT 3 CYCLES CONSÉCUTIFS (12 ms) ALORS
-    → ErrorId bit « saut codeur incohérent »
-    → SafeStop_Winch<Mx> (instance du treuil concerné, §7)
+    → [À IMPLÉMENTER] ErrorId bit « saut codeur incohérent »
+    → [À DÉFINIR] réaction machine associée (aucun SafeStop n'est généré par `FB_Encoder_Safety`)
     → RawPos/CablePosAct FIGÉS sur la dernière valeur plausible (pas de mise à jour de sortie —
       voir §6, principe « geler sur doute »)
     → Obligation de repasser par MAINT_N2 + re-homing (ou confirmation §3.7 selon le cas)
@@ -315,8 +331,10 @@ SI CablePosM_calculé < -99.00 OU CablePosM_calculé > +99.00 ALORS
     → ErrorId bit « position hors plage physique »
 ```
 
-Ce même bornage s'applique en entrée à `HomingTargetM` (§5) : impossible de paramétrer une cible
-de homing hors `[-99.00 ; +99.00]` m, y compris en `MAINT_N2`.
+Le même bornage s'applique, au front `Home`, aux deux cibles de référencement :
+`TopSensorPositionM` (flux nominal) et `HomingTargetM` (flux unitaire `MAINT_N2`). Une cible
+hors `[-99.00 ; +99.00]` m est rejetée par `FB_Encoder_Homing` avec `ErrorId` bit4, sans
+génération de preset.
 
 ### 3.7 Cohérence au redémarrage (nouveau — démontage masqué / rotation hors tension)
 
@@ -406,8 +424,8 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `Mode` | `E_Mode` | `MAINT_N1` autorise le flux **nominal** (cible `TopSensorPositionM`) ; `MAINT_N2` requis pour le flux **unitaire** (cible `HomingTargetM` libre) |
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
-| `M1_M2_TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis), désormais **I/O Mapping réel** (`GVL_Homing_Stub` supprimé). Câblé IDENTIQUEMENT sur les 2 instances. Flux nominal : `Home` n'est accepté que si `TopPositionSensor = FALSE` (contact ouvert, position haute atteinte — logique fail-safe NC, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
-| `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `M1_M2_TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis) |
+| `TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis), issu de l'I/O Mapping réel (`GVL_Homing_Stub` supprimé). Câblé identiquement sur les 2 instances. Flux nominal : `Home` n'est accepté que si `TopPositionSensor = FALSE` (contact ouvert, position haute atteinte — logique fail-safe NC, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
+| `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis), bornée **[-99.00 ; +99.00]** m au front `Home` |
 | `HomingTargetM` | REAL | Cible de position à imposer **en flux unitaire uniquement** (`MAINT_N2`), bornée **[-99.00 ; +99.00]** m (§3.6) — remplace l'ancien usage "flux nominal verrouillé à 0.00" (le flux nominal utilise désormais `TopSensorPositionM`, pas ce champ) |
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
 | `RawPos` | `UDINT` | Valeur brute codeur courante (sortie `FB_Encoder_Abs`) |
@@ -432,7 +450,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | 1 | `WinchSelect` ne correspond pas à ce treuil (flux unitaire) |
 | 2 | Arrêt non confirmé (contacteurs sens actifs ou frein non collé) |
 | 3 | `EncoderAvailable = FALSE` |
-| 4 | `HomingTargetM` hors bornage `[-99.00 ; +99.00]` m (flux unitaire) ; ou flux nominal demandé sans `TopPositionSensor = FALSE` (confirmation physique de position haute atteinte manquante) |
+| 4 | Cible hors bornage `[-99.00 ; +99.00]` m (`HomingTargetM` unitaire ou `TopSensorPositionM` nominal) ; ou flux nominal demandé sans `TopPositionSensor = FALSE` (confirmation physique de position haute atteinte manquante) |
 | 5 | Écriture preset refusée par le bus (`PresetAck` jamais reçu, timeout) |
 | 6 | Relecture post-preset incohérente (`RawPos ≠ PresetValue` au-delà d'une tolérance) |
 | 7 | Position hors bornage absolu pendant fonctionnement (§3.6, remontée depuis `FB_Encoder_Safety`) |
@@ -648,11 +666,14 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 | Affichage position | `CablePosM1_Display` / `CablePosM2_Display` | ← `FB_Encoder_Scale`, format `xx.xx` m signé |
 | Affichage maintenance (angle/tours) | `AngleRawM1_Display` / `TurnCountM1_Display` (+ M2) | ← `FB_Encoder_Abs`, informatif seulement |
 
-> ✅ **Implémenté (2026-07-03)**, `CODE/GVL_Encoder_Stub.st` — noms réels différents des
+> ✅ **Implémenté (2026-07-03)** dans `CODE/MAIN/PRG_02_Encoders.st` — noms réels différents des
 > exemples ci-dessus (écrits avant codage) : `M1/M2_Reset_IHM` (acquittement, remplace le
 > `Reset := FALSE` figé qui empêchait tout acquittement), `M1/M2_ConfirmCoherence_IHM`,
-> `StubHomeButton_IHM` (partagé M1+M2, inchangé), `M1/M2_TopSensorPositionM` (RETAIN, déplacé
-> depuis `PRG_MAIN` pour visibilité). Tout regroupé dans **un seul GVL** dédié au pipeline
+> `CmdHome` dans chaque structure `GVL_IHM.M1TreuilRetenue` / `GVL_IHM.M2TreuilBucket`,
+> `TopSensorPositionM` par treuil et les états Homing (Busy/Done/Error/RefRaw) sont exposés
+> directement par `PRG_09_Supervision`. Le flux nominal peut être lancé séparément ou simultanément ;
+> le flux unitaire MAINT_N2 est implémenté : le sélecteur arbitré M1/M2 choisit l'instance,
+> `HomingTargetM` fournit la cible libre et le FB refuse toute valeur hors `[-99 ; +99] m`.
 > codeur. 📌 Suivi (mapping IHM restant non codé — `WinchSelect_IHM`, `HomingTargetM_IHM`,
 > voyants/affichages) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T23).
 
@@ -661,22 +682,23 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie-09_Fonction_Winch_v1.10.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie-09_Fonction_Winch_v1.11.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`
       (`VAR RETAIN Calib`), plus par des instances séparées dans `PRG_MAIN` (`M1_EncoderCalib`/
       `M2_EncoderCalib` retirées, redondantes désormais).
-- [x] Créer `FB_Encoder_Homing` (dossier `ENCODER`), 2 instances (M1/M2) — ✅ 2026-07-02, **flux
-      NOMINAL uniquement** (capteur haut + bouton IHM). Flux unitaire (`WinchSelect`) toujours
-      différé. `HomingRefRaw` ajouté en sortie explicite (extension vs interface §5 d'origine,
-      nécessaire pour une cible non nulle — voir en-tête `CODE/FB_Encoder_Homing.st`).
+- [x] Créer `FB_Encoder_Homing` (dossier `ENCODER`), 2 instances (M1/M2) — flux nominal et
+      unitaire MAINT_N2 implémentés. `HomingRefRaw` ajouté en sortie explicite (extension vs interface §5 d'origine,
+      nécessaire pour une cible non nulle — voir en-tête `CODE/CODEURS/FB_Encoder_Homing.st`).
 - [x] Étendre `FB_Encoder_Abs` : `PresetRequest`/`PresetValue`/`PresetAck`/`PresetNak`,
       `AngleRaw`/`TurnCount` informatifs, principe « geler sur doute » (§6) — **✅ `PresetTriggerCmd
       := 2` confirmé terrain 2026-07-02** (déclenche le référencement) ; `CodeSeqTriggerCmd`
       reste à `0`, rôle non identifié — 📌 voir `DOC/PLAN_TASK_v1.0.md` §3 (T8)
-- [x] Étendre `FB_Encoder_Safety` : détection saut incohérent 3 cycles (§3.5), bornage absolu
-      `[-99.00;+99.00]` m (§3.6) → `SafeStop_Winch<Mx>` — ✅ Codé (2026-07-03quater)
+- [ ] Étendre `FB_Encoder_Safety` : détection saut incohérent 3 cycles (§3.5) — non implémenté
+      (la réaction machine devra être définie avec la sécurité). ✅ Bornage absolu
+      `[-99.00;+99.00]` m (§3.6), relais `HomingSuspect` (§3.7), défaut IHM et inhibition du mode
+      `SEMI_AUTO` via `FB_Modes` codés (2026-07-03quater)
 - [x] Scinder `FB_Safety_Winch` en instances `FB_Safety_WinchM1`/`FB_Safety_WinchM2` (§7) — **1
       seul TYPE FB `FB_Safety_Winch`, 2 INSTANCES** (`instSafetyWinchM1`/`instSafetyWinchM2`),
       chacune câblée sur l'`EncoderAvailable` de son treuil (composition, pas duplication de
@@ -709,22 +731,22 @@ bougent ensemble sans régulation d'écart. Canaux `COD2_*` (I/O Mapping) **mapp
 
 ## 📝 9bis. Note d'application CODESYS 3.5 (lot acquisition + mise à l'échelle, 2026-07-02)
 
-> Référence code : `CODE/ST_EncoderCalib.st`, `CODE/FB_Encoder_Abs.st`, `CODE/FB_Encoder_Scale.st`,
-> `CODE/FB_Safety_Winch.st` (mis à jour), `CODE/FB_Winch.st`/`CODE/GVL_Winch_M2_Stub.st` (M2),
-> `CODE/PRG_MAIN.st` (mis à jour).
+> Référence code : `CODE/CODEURS/ST_EncoderCalib.st`, `CODE/CODEURS/FB_Encoder_Abs.st`, `CODE/CODEURS/FB_Encoder_Scale.st`,
+> `CODE/TREUILS/FB_Safety_Winch.st` (mis à jour), `CODE/TREUILS/FB_Winch.st` et `CODE/MAIN/PRG_06_WinchControl.st` (M2),
+> `CODE/MAIN/PRG_02_Encoders.st` (mis à jour).
 
 1. **`ST_EncoderCalib`** : DUT Structure (racine `Application`, comme `ST_SpeedStepTable`).
 2. **`FB_Encoder_Abs`** : POU **existant** (dossier `CODEUR`) — remplacer ENTIÈREMENT déclaration
-   + implémentation par `CODE/FB_Encoder_Abs.st` (réécriture complète, pas un ajout).
+    + implémentation par `CODE/CODEURS/FB_Encoder_Abs.st` (réécriture complète, pas un ajout).
 3. **`FB_Encoder_Scale`** : POU **existant** (dossier `CODEUR`) — remplacer ENTIÈREMENT, même
-   principe.
+    principe, dans `CODE/CODEURS/FB_Encoder_Scale.st`.
 4. **`FB_Safety_Winch`** : POU **existant** (dossier `SAFETY`) — mettre à jour (ajout entrée
    `EncoderAvailable` + logique bit1), ne pas recréer.
 5. **`FB_Winch`** : aucun changement de code pour M2 (même TYPE, juste une 2ᵉ instance dans
    `PRG_MAIN`) — rien à recoller ici si déjà à jour.
-6. **`GVL_Winch_M2_Stub`** : nouveau GVL, même procédure que `GVL_Winch_M1_Stub` (Partie9 §7
-   Étape 9bis).
-7. **`PRG_MAIN`** : remplacer déclaration + implémentation par `CODE/PRG_MAIN.st`.
+6. **Raccordement M2** : réalisé dans `CODE/MAIN/PRG_06_WinchControl.st` ; aucun GVL stub
+    supplémentaire n'est requis.
+7. **`PRG_02_Encoders`** : remplacer déclaration + implémentation par `CODE/MAIN/PRG_02_Encoders.st`.
 8. **🔴 `PRG_COD1`** : POU legacy orphelin (dossier `CODEUR`) — **supprimer manuellement**
    (clic droit → Delete). Sa logique est remplacée par les instances directes dans `PRG_MAIN`.
 9. **✅ I/O Mapping COD2 fait (2026-07-02)** : les canaux `COD2_PosValue`/`COD2_Alarms`/
@@ -747,7 +769,7 @@ cas (même principe que `GVL_Winch_M1_Stub`/`GVL_Winch_M2_Stub`, Partie9 §7 Ét
 
 ### 9quater. Note d'application — `FB_Encoder_Homing` (lot Homing, 2026-07-02, mis à jour v1.4)
 
-Référence code : `CODE/FB_Encoder_Homing.st`, `CODE/PRG_MAIN.st` — `M1_M2_TopPositionSensor`
+Référence code : `CODE/CODEURS/FB_Encoder_Homing.st`, `CODE/MAIN/PRG_02_Encoders.st` — `M1_M2_TopPositionSensor`
 est désormais **I/O Mapping réel** (plus de GVL à créer pour ce signal).
 
 1. **`FB_Encoder_Homing`** : POU dossier `ENCODER` (comme `FB_Encoder_Abs`/`Scale`).
@@ -758,7 +780,7 @@ est désormais **I/O Mapping réel** (plus de GVL à créer pour ce signal).
    Mapping (conflit de nom sinon). Vérifier dans l'onglet I/O Mapping du canal physique
    concerné que la colonne **Variable** contient bien `M1_M2_TopPositionSensor`.
 3. **`PRG_MAIN`** : remplacer déclaration + implémentation en entier (câblage
-   `TopPositionSensor := M1_M2_TopPositionSensor` sur `instHomingM1` ET `instHomingM2`).
+    `TopPositionSensor := M1_M2_TopPositionSensor` sur `instHomingM1` ET `instHomingM2` dans `PRG_02_Encoders`).
 4. **Rebuild.**
 
 ### 🧪 Procédure de test (COD1/COD2 réels, capteur position haute désormais réel)
@@ -772,7 +794,8 @@ est désormais **I/O Mapping réel** (plus de GVL à créer pour ce signal).
 2. Actionner physiquement le capteur position haute (ou forcer M1_M2_TopPositionSensor := TRUE
    en vue instance CODESYS si le matériel n'est pas encore accessible) — capteur UNIQUE, un seul
    forçage/actionnement suffit pour les 2 instances M1/M2.
-3. Basculer StubHomeButton_IHM : FALSE → TRUE → FALSE (simule l'appui bouton IHM, front).
+3. Basculer `GVL_IHM.M1TreuilRetenue.CmdHome` ou `GVL_IHM.M2TreuilBucket.CmdHome` :
+   FALSE → TRUE → FALSE (front ; les deux peuvent être envoyés simultanément).
 4. Observer instHomingM1 : Busy doit passer TRUE brièvement, puis Done pulse à TRUE,
    Homed := TRUE, ErrorId reste à 0.
 5. Observer instEncoderScaleM1.CablePosM : doit afficher ≈ M1_TopSensorPositionM (12.50 m par
@@ -788,23 +811,26 @@ rejeté** (`ErrorId` bit4) — c'est le comportement voulu, pas une erreur.
 
 ### 🔒 Points bloquants avant tout essai réel (pas des bugs, des TODO explicites)
 - **Séquence preset** : `PresetTriggerCmd := 2` **confirmé terrain** (déclenche le
-  référencement à `PresetValueOut`). `PresetRequest` est de toute façon figé `FALSE` dans
-  `PRG_MAIN` pour l'instant (aucun risque immédiat, la séquence ne se déclenche jamais tant que
-  `FB_Encoder_Homing` ne pilote pas `PresetRequest`). 📌 Rôle de `CodeSeqTriggerCmd` : voir
+  référencement à `PresetValueOut`). `PresetRequest` est actuellement piloté par chaque instance
+  `FB_Encoder_Homing` dans `PRG_02_Encoders` et transmis à l'instance `FB_Encoder_Abs` correspondante.
+  📌 Rôle de `CodeSeqTriggerCmd` : voir
   `DOC/PLAN_TASK_v1.0.md` §3 (T8).
 - **M1 et M2 bougent ensemble sans synchro** (voir Partie9 §9) — vigilance visuelle requise
   pendant tout essai avec les deux treuils actifs.
 
-📌 Suivi (`FB_Encoder_Safety` orphelin depuis la réécriture de `FB_Encoder_Abs`) : voir
-`DOC/PLAN_TASK_v1.0.md` §3 (T24).
+✅ `FB_Encoder_Safety` est intégré : instances M1/M2 dans `PRG_02_Encoders`, défaut remonté
+à `PRG_04_Modes` et diagnostics exposés dans `GVL_IHM`. Le suivi d'intégration T24 est clôturé.
 
 ---
 
 ## 🔁 10. Retour d'expérience
 
-📌 Suivi (checklist de validation non réalisée — flux nominal/unitaire, calibration, bornage,
+📌 Suivi (checklist de validation terrain non réalisée — flux nominal/unitaire, calibration, bornage,
 détection de saut, incohérence au redémarrage, verrou de transition de mode) : voir
 `DOC/PLAN_TASK_v1.0.md` §3 (T25).
+
+🧪 La suite `SuiteEncoder = 4` échoue désormais immédiatement avec un diagnostic explicite
+si le gate de simulation codeurs est inactif ; chaque étape conserve son watchdog local.
 
 ---
 

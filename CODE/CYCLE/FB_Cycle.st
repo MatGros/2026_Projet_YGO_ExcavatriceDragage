@@ -30,6 +30,10 @@ VAR_INPUT
     WinchSyncDeltaM     : REAL;         // Écart codeurs M1/M2 pour diagnostic
     M1_CablePosM        : REAL;         // Position câble treuil M1 (recalée)
     M2_CablePosM        : REAL;         // Position câble treuil M2 (recalée)
+    M1_MeasuredSpeedMps : REAL;         // Vitesse linéaire mesurée M1 (m/s)
+    M2_MeasuredSpeedMps : REAL;         // Vitesse linéaire mesurée M2 (m/s)
+    SpeedMismatchThresholdMps : REAL;   // Seuil écart vitesse ; 0 = contrôle désactivé
+    SpeedMismatchTimeout      : TIME;   // Durée de confirmation ; 0 = contrôle désactivé
 
     // Feedbacks Translation M3 — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
     Translation_At_P1       : BOOL;         // Capteur position P1 (ex-Fosse1)
@@ -51,7 +55,10 @@ VAR_OUTPUT
     Busy                : BOOL;         // Cycle automatique actif
     Done                : BOOL;         // Cycle automatique complété
     Error               : BOOL;         // Défaut cycle
-    ErrorId             : WORD;         // bit0: "Timeout cycle de dragage" - Timeout, bit1: "Incohérence étape cycle" - Incohérence
+    ErrorId             : WORD;         // bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible, bit4: écart vitesse M1/M2 confirmé
+    SpeedMismatchMps    : REAL;         // Écart absolu de vitesse M1/M2 (m/s)
+    SpeedMismatchActive : BOOL;         // Seuil vitesse dépassé sur le cycle courant
+    SpeedMismatchConfirmed : BOOL;      // Écart vitesse confirmé pendant SpeedMismatchTimeout
 
     // Commandes Winch M1 (Enrouleur)
     CmdWinchM1_StartStop : BOOL;
@@ -92,10 +99,14 @@ VAR
     TouchPositionM      : REAL;         // Position M1 mémorisée lors du contact fond
     RaiseTargetM        : REAL;         // Profondeur de remontée mémorisée
     DrainingTimer       : TON;          // Temporisateur de vidage (égouttage)
+    StabilizationTimer  : TON;          // Temporisation maximale de remontée lente après fermeture
+    SpeedMismatchTimer  : TON;          // Confirmation temporelle écart de vitesse M1/M2
     SelectedWorkTarget  : INT;          // Cible de travail mémorisée pour le retour (2=P2 ou 3=P1 — 🆕 REX 2026-07-18)
     
     // Paramètres internes
     CtrlAscentDistM     : REAL := 2.0;  // Distance de remontée lente de contrôle
+    CtrlAscentToleranceM : REAL := 0.25; // Écart maximal admis entre les deux codeurs
+    CtrlAscentTimeout    : TIME := T#30s; // Temps maximal pour atteindre la zone de stabilisation
     DrainingTime        : TIME := T#5s; // Temps d'égouttage par défaut
 END_VAR
 
@@ -133,6 +144,21 @@ StartEdge(CLK := StartCycle);
 PauseEdge(CLK := PauseCycle);
 AbortEdge(CLK := AbortCycle);
 
+// ⏱️ T36 — surveillance indépendante de la remontée lente : un codeur bloqué
+// ne doit jamais laisser le cycle attendre indéfiniment.
+StabilizationTimer(IN := (State = E_CycleStep.CTRL_ASCENDING), PT := CtrlAscentTimeout);
+
+// 📏 T43 — comparaison vitesse réelle M1/M2.
+// Le contrôle est volontairement désactivé tant que le seuil et la durée ne sont pas définis.
+SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
+SpeedMismatchActive := (State = E_CycleStep.CTRL_ASCENDING)
+                       AND CycleMotionPermit
+                       AND (SpeedMismatchThresholdMps > 0.0)
+                       AND (SpeedMismatchTimeout > T#0ms)
+                       AND (SpeedMismatchMps > SpeedMismatchThresholdMps);
+SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
+SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
+
 IF ResetEdge.Q THEN
     Error := FALSE;
     ErrorId := 16#0000;
@@ -147,6 +173,14 @@ END_IF;
 IF WinchSyncError AND State <> E_CycleStep.ERROR_HOLD THEN
     Error := TRUE;
     ErrorId := ErrorId OR 16#0002;
+    State := E_CycleStep.ERROR_HOLD;
+END_IF;
+
+// 🛡️ T43 — écart de vitesse confirmé : arrêt du cycle et ERROR_HOLD.
+// La sortie SafeStop reste gérée par les blocs safety métier ; ce bit protège le séquenceur.
+IF SpeedMismatchConfirmed AND State <> E_CycleStep.ERROR_HOLD THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0010;
     State := E_CycleStep.ERROR_HOLD;
 END_IF;
 
@@ -292,9 +326,23 @@ CASE State OF
         CmdWinchM2_Direction := 1;
         CmdWinchM2_SpeedPct  := 20.0;
 
-        // Transition après remontée de contrôle de 2.0 mètres
-        IF CycleMotionPermit AND M1_CablePosM >= (TouchPositionM + CtrlAscentDistM) THEN
+        // 🛡️ Contrôle des deux codeurs : la benne chargée doit remonter avec
+        // M1 et M2. Un seul codeur arrivé ne suffit pas.
+        IF WinchSyncError OR (ABS(M1_CablePosM - M2_CablePosM) > CtrlAscentToleranceM) THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0008; // stabilisation/désynchronisme après fermeture
+            State := E_CycleStep.ERROR_HOLD;
+        // Transition uniquement lorsque les deux treuils sont au-dessus de la
+        // zone de contrôle et restent synchronisés.
+        ELSIF CycleMotionPermit
+           AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
+           AND (M2_CablePosM >= (TouchPositionM + CtrlAscentDistM))
+           AND (ABS(M1_CablePosM - M2_CablePosM) <= CtrlAscentToleranceM) THEN
             State := E_CycleStep.ASCENDING_LOADED;
+        ELSIF StabilizationTimer.Q THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0008; // un treuil n'a pas atteint la zone de contrôle
+            State := E_CycleStep.ERROR_HOLD;
         END_IF;
 
     E_CycleStep.ASCENDING_LOADED: // 🚀 ÉTAPE 6 : Remontée pleine vitesse

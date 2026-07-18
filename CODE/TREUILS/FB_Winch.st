@@ -79,8 +79,7 @@ VAR_INPUT
     SpeedStepTable          : ST_SpeedStepTable;
     MaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
     MaxStepAscent           : INT := 5;    // 🆕 REX 2026-07-15 (9) : Plafond palier en montée (CommandedDirection=1) — 5 = pas de restriction
-                                             // (défaut Auto). Sert à brider en IHM_MANU pendant les essais progressifs
-                                             // (voir PRG_06_WinchControl, GVL_IHM.IHM_MANU.WinchMaxStepFwd) — temporaire.
+                                             // (valeur fixe Auto ET Manuel, voir PRG_06_WinchControl).
     HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
     FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)
@@ -104,6 +103,9 @@ VAR_INPUT
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
     SlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
     SlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)
+    MeasuredSpeedBand       : INT := 0;         // 🛡️ Bande vitesse réelle validée
+    SpeedGuardEnable        : BOOL := FALSE;   // 🛡️ Activation garde-fou changement de palier
+    SpeedGuardReady         : BOOL := FALSE;   // 🟢 Conditions de stabilité validées
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -120,6 +122,7 @@ VAR_OUTPUT
     Contactor3          : BOOL;
     Contactor4          : BOOL;
     StepNumber          : INT;
+    SpeedGuardLimited   : BOOL;
     BrakeCmd            : BOOL;
     ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
     BrakeContactorCheck : ST_ContactorCheck;
@@ -233,8 +236,12 @@ END_IF;
 
 SpeedStep(Enable := (ABS(SpeedRamp.Current) > 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
-          MaxStepNumber := ActiveMaxStep);
+          MaxStepNumber := ActiveMaxStep,
+          MeasuredSpeedBand := MeasuredSpeedBand,
+          SpeedGuardEnable := SpeedGuardEnable,
+          SpeedGuardReady := SpeedGuardReady);
 StepNumber := SpeedStep.StepNumber;
+SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 Contactor1 := SpeedStep.Contactor1;
 Contactor2 := SpeedStep.Contactor2;
 Contactor3 := SpeedStep.Contactor3;

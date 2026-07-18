@@ -56,7 +56,7 @@ Avant d'écrire la moindre logique « brique » (scaling, rampe, filtre, hystér
 **🛡️ VAR_INPUT — Sécurité / contexte**
 | Nom | Type | Rôle |
 |-----|------|------|
-| `EmergencyStopOk` | BOOL | Chaîne de sécurité **AU** réarmée + conditions globales OK (ou retour contacteur de puissance — source exacte à définir par métier). `FALSE` → le FB se neutralise. |
+| `EmergencyStopOk` | BOOL | Retour conditionné du contacteur de puissance (`PRG_00_Inputs.EmergencyStopOk`) ; `TRUE` = puissance confirmée engagée, `FALSE` → le FB se neutralise. La boucle AU physique séparée est `EmergencyChain`. |
 | `Mode` | `E_Mode` | Mode courant (autorisations) |
 
 > 🧭 **Renommage v1.2** : `SafetyOk` devient **`EmergencyStopOk`**, pour éviter toute confusion

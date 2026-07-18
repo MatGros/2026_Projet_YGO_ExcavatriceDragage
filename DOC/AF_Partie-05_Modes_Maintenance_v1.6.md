@@ -9,7 +9,7 @@
 > ci-dessous).
 > 📌 **État d'implémentation (2026-07-08, AUDIT)** : `FB_Modes` **codé et enrichi** —
 > `CODE/MODES/FB_Modes.st` + `GVL_Modes_Stub.st`. Diffuse `Mode` (remplace les 10 `E_Mode.MAINT_N1`
-> codés en dur dans `PRG_MAIN`), refuse `SEMI_AUTO` si défaut codeur (`FB_Encoder_Safety`),
+> codés dans les programmes métier dédiés), refuse `SEMI_AUTO` si défaut codeur (`FB_Encoder_Safety`),
 > refuse `MAINT_N2` sans mot de passe (stub), sort `SyncEnable` (→ `FB_WinchSync`).
 > **v1.4 (2026-07-08)** — Lot #9-17 : Intégration de l'inhibition unitaire des treuils (M1 ou M2) en `MAINT_N2` avec isolation complète de la sécurité (blocs de commande et de sécurité désactivés, erreurs effacées), exclusion mutuelle, filtrage supervision de `AnyFaultActive` et désactivation forcée de `SyncEnable`.
 > **Version 1.3 (2026-07-08)** — D_SYNCEN : Polarité inversée de `OverrideSync` → `SyncEnable` ; `TRUE` = synchro active (logique positive), défaut démande IHM devenu `TRUE`; pseudo-codes et descriptions mises à jour en conséquence.
@@ -40,7 +40,7 @@ END_ENUM
 END_TYPE
 ```
 
-`FB_Modes` (appelé dans `PLC_PRG_MAIN`) :
+`FB_Modes` (appelé dans `PRG_04_Modes`) :
 - sélectionne la **source de commande légitime** (joystick en Manuel/Maint, `FB_Cycle` en SemiAuto) ;
 - calcule les **autorisations / interlocks** par bloc métier ;
 - porte les **overrides** de Maintenance N2 ;

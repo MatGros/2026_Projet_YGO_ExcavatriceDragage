@@ -6,6 +6,16 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ---
 
+### Plan logiciel initial — clôture implémentation — 2026-07-18
+- Homing unitaire M1/M2 MAINT_N2 : sélection, cible libre ±99 m, diagnostics
+- Safety Winch : sens opposé bit14, absence mouvement bit15, temporisations
+- Safety Translation alignée matériel AC600 + frein ; T26 checklist terrain livrée
+- Reliquats restants limités aux décisions constructeur/client et essais terrain
+
+### Doc plan vitesse codeur / paliers — 2026-07-18
+- T41 à T48 ajoutées au plan : vitesse câble m/s, surveillance M1/M2
+- 5 paliers mesurés, estimation charge et garde-fou de changement de palier
+
 ### `v0.4.17_SemiAuto_CycleSafety` — 2026-07-18
 - Homme-mort obligatoire pendant les mouvements semi-auto M1/M2/M3
 - Relâchement joystick = arrêt ; nouvelle sollicitation = reprise de l'étape
@@ -139,7 +149,7 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - Joystick CANopen (X/Y) · décodage paliers K1-K4
 - Fdc virtuelles benne (delta M1-M2)
 - Commande auxiliaires hydrauliques · bornage vitesse paliers
-- Consigne fréquence translation M3 réglable/clampée
+- Consigne fréquence translation M3 réglable/limitée
 
 ### `v0.4.5_IHM_MANU` — 2026-07-09
 - Fix lecture codeur réel forcée en mode Manu

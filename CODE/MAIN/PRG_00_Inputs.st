@@ -190,11 +190,9 @@ M2BrakeFeedback := instM2BrakeFeedback.State;
 // 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir AF_Partie13
 // §Translation). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
 // (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
-// 🔧 REX 2026-07-15 (3) : RelayFwd/RelayRev câblés sur M3_CommandWord (variable globale
-// mappée PDO EtherCAT, valeur réellement envoyée, Auto ET Manu confondus) — ex-
-// GVL_Translation_M3_Stub.M3_RelayFwd/Rev n'étaient plus jamais écrits depuis l'abandon du mode
-// relais DEGRADED_IO (v0.4.11), la simulation de trajet M3 restait bloquée en permanence
-// (relais toujours FALSE). Lecture décalée d'1 cycle (10ms, M3_CommandWord réécrit en position
+// 🔧 L'ancien mode relais DEGRADED_IO est supprimé. La simulation déduit directement le sens de
+// `M3_CommandWord`, variable PDO EtherCAT réellement envoyée en Auto comme en Manuel.
+// Lecture décalée d'1 cycle (10 ms, M3_CommandWord réécrit en position
 // 10 par PRG_10_Outputs après ce PRG_00) — négligeable devant TravelTimeS (8s).
 instSimTranslation(
     Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal,

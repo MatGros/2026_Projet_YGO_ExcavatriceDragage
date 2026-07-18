@@ -7,6 +7,7 @@ TYPE ST_WinchHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
     TopSensorPositionM      : REAL := 8.5;      (* 📐 Position cible du capteur haut (m) *)
+    HomingTargetM           : REAL := 0.0;      (* 🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m] *)
     MaxStepDescente         : INT := 3;         (* 🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
                                                     commun M1/M2 (même profil de déplacement), miroir bidirectionnel
                                                     _WinchMaxStepDescent (voir PRG_09_Supervision),
@@ -22,6 +23,16 @@ STRUCT
 
     (* 🚦 États & Mesures (Lecture seule) *)
     PositionM               : REAL;             (* 📊 Position actuelle du câble (mètres) *)
+    MeasuredSpeedMps        : REAL;             (* 📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue *)
+    SpeedDeltaMps            : REAL;             (* 🔍 Variation de vitesse entre deux scans (m/s) *)
+    SpeedVariationDetected   : BOOL;            (* 🔍 Seuil de variation dépassé sur le scan courant *)
+    SpeedVariationConfirmed  : BOOL;            (* 🛡️ Variation confirmée pendant la durée paramétrée *)
+    SpeedStable               : BOOL;            (* 🟢 Vitesse stable pendant la durée paramétrée *)
+    SpeedMonitorError        : BOOL;             (* 🔴 Défaut mémorisé du moniteur vitesse *)
+    SpeedMonitorErrorId      : WORD;             (* ❌ Bitfield du moniteur vitesse *)
+    EstimatedLoadPct         : REAL;             (* 📊 Estimation empirique, non certifiée *)
+    LoadEstimateConfigured    : BOOL;             (* 🟢 Table charge validée pour lecture *)
+    SpeedGuardLimited         : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
     SpeedRefPct             : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l'automate interne (FB_Winch) *)
@@ -42,6 +53,14 @@ STRUCT
     
     (* 🛡️ Sécurités & Diagnostics *)
     Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
+    HomingBusy              : BOOL;             (* ⏳ Référencement en cours *)
+    HomingDone              : BOOL;             (* ✅ Pulse de référencement réussi *)
+    HomingError             : BOOL;             (* 🔴 Défaut de référencement *)
+    HomingErrorId           : WORD;             (* ❌ Bitfield défaut homing *)
+    HomingState             : E_State;          (* 🤖 État FB_Encoder_Homing *)
+    HomingStateAtError      : E_State;          (* 🧭 État lors du défaut *)
+    HomingSuspect            : BOOL;             (* ⚠️ Référence à confirmer *)
+    HomingRefRaw             : UDINT;            (* 📐 Référence brute appliquée *)
     SafeStopActive          : BOOL;             (* 🟧 Arrêt rapide activé par la sécurité *)
     ForbidDescentActive     : BOOL;             (* 🚯 Descente interdite (détecteur mou de câble / limites) *)
     ForbidAscentActive      : BOOL;             (* 🚯 Montée interdite (fin de course haut) *)
@@ -59,8 +78,8 @@ STRUCT
     BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
-    CmdReset                : BOOL;             (* 🔑 Acquittement défauts spécifique treuil *)
-    CmdHome                 : BOOL;             (* 🎯 Lancement de la prise d'origine *)
+    CmdReset                : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
+    CmdHome                 : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
     ConfirmCoherence        : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
     CmdInhibit              : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)

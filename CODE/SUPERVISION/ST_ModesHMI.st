@@ -30,5 +30,9 @@ STRUCT
     EmergencyArmingBusy: BOOL;   (* ⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée *)
     RedundancyTestFailed  : BOOL; (* 🔴 Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis) *)
     EmergencyArmingFailed : BOOL; (* 🔴 Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis) *)
+
+    // 🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
+    // sélection treuil au joystick, arbitrée par FB_Modes (MAINT_N2 uniquement, forcé à 3=Couplé sinon)
+    JoystickWinchSelect : INT; (* 🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir FB_Modes.JoystickWinchSelectArbitrated *)
 END_STRUCT
 END_TYPE

@@ -7,7 +7,7 @@
 > titre affichait v1.2, le champ "Version" v1.3, alors que le contenu interne (§4 point 8)
 > introduisait déjà une v1.4) + checklist de mise en service (§6) remplacée par un renvoi court
 > vers `DOC/PLAN_TASK_v1.0.md` §3 (T27). Aucun changement de contenu fonctionnel.
-> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.4](AF_Partie-04_Cycle_Sequenceur_v1.4.md) §6, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.10.md) §9/§4quinquies.
+> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.4](AF_Partie-04_Cycle_Sequenceur_v1.4.md) §6, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md) §9/§4quinquies.
 >
 > 🆕 **v1.3 (2026-07-08)** — Alignement sur la sécurité d'inhibition et ajout du référencement fermé : le benne est désactivé (`Enable := FALSE`) si le treuil M2 (fermeture) est inhibé en Maintenance N2, OU si l'un des deux codeurs de position M1 ou M2 est en défaut ou non référencé. Si seul M1 (retenue) est inhibé, le benne reste manœuvrable. Ajout de deux commandes de référencement manuel IHM à l'arrêt (`CmdConfirmOpenPosition` et `CmdConfirmClosePosition`) qui initialisent l'état mécanique (ouvert/fermé) et recalent de manière cohérente les positions mémorisées de boot en éliminant toutes les erreurs actives.
 > 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement benne (Méca C
@@ -36,11 +36,11 @@
 >
 > **Fichiers impactés** (code déjà corrigé, validé utilisateur — voir `CODE/` pour le détail,
 > pas de recopie ici) :
-> - [`CODE/BENNE/FB_Bucket.st`](../CODE/BENNE/FB_Bucket.st) — validation joystick homme-mort
+> - [`CODE/TREUILS/BENNE/FB_Bucket.st`](../CODE/TREUILS/BENNE/FB_Bucket.st) — validation joystick homme-mort
 >   (`CloseReq`/`OpenReq`), commande `M2_Direction` en état BUSY, conditions d'arrêt automatique
 >   (comparaisons `CablePosM2` vs `CablePosM1 + Offset...M`) — tout inversé en cohérence avec le
 >   nouveau modèle physique.
-> - [`CODE/SYSTEM/GVL_PERSISTENT.st`](../CODE/SYSTEM/GVL_PERSISTENT.st) — signe de
+> - [`CODE/GVL_PERSISTENT.st`](../CODE/GVL_PERSISTENT.st) — signe de
 >   `BucketConfig.OffsetCloseM` inversé (`-1.5` → `+10.0`), **et amplitude corrigée** : la course
 >   réelle de fermeture est bien plus grande que l'estimation initiale, environ **10 m** (au lieu
 >   de 1.5 m). `OffsetOpenM` reste `0.0` (référence neutre, M2 = M1).
@@ -133,7 +133,7 @@ END_TYPE
 ```
 
 *(Interface inchangée vs v1.0 — pas de nouveau champ, seule la description de `OffsetCloseM`
-est mise à jour. Corps complet à jour dans [`CODE/BENNE/ST_BucketConfig.st`](../CODE/BENNE/ST_BucketConfig.st).)*
+est mise à jour. Corps complet à jour dans [`CODE/TREUILS/BENNE/ST_BucketConfig.st`](../CODE/TREUILS/BENNE/ST_BucketConfig.st).)*
 
 ### B. Structure d'État (`ST_BucketState`)
 ```pascal
@@ -148,7 +148,7 @@ END_STRUCT
 END_TYPE
 ```
 
-*(Inchangée vs v1.0 — voir [`CODE/BENNE/ST_BucketState.st`](../CODE/BENNE/ST_BucketState.st).)*
+*(Inchangée vs v1.0 — voir [`CODE/TREUILS/BENNE/ST_BucketState.st`](../CODE/TREUILS/BENNE/ST_BucketState.st).)*
 
 ### C. Interface du bloc Benne (`FB_Bucket`)
 ```pascal
@@ -194,7 +194,7 @@ dans `CODE/` avant ce lot (garde-fou homing, jauge IHM) mais n'avaient jamais é
 seuls `M1SlipToleranceM`/`M1SlipDetected` sont réellement nouveaux dans le code (Méca C couche 1,
 voir §4bis). Sémantique interne de `Direction` en Fermeture/Ouverture inversée depuis v1.1, voir
 bandeau REX. Corps ST complet et à jour dans
-[`CODE/BENNE/FB_Bucket.st`](../CODE/BENNE/FB_Bucket.st) — pas de recopie ici, règle
+[`CODE/TREUILS/BENNE/FB_Bucket.st`](../CODE/TREUILS/BENNE/FB_Bucket.st) — pas de recopie ici, règle
 anti-doublon.)*
 
 ### 🆕 D. Méca C couche 1 — Glissement M1 pendant mouvement Benne (v1.2, 2026-07-07)
@@ -221,15 +221,15 @@ document (règle anti-doublon : la couche 2 appartient au domaine Winch, pas Ben
 
 ## 🔌 5. Note d'application CODESYS 3.5
 
-1. **Persistance** : L'instance de `ST_BucketState` et `ST_BucketConfig` doivent être déclarées en variables persistantes (`VAR RETAIN`) dans `PRG_MAIN` pour conserver la mémoire mécanique du benne après coupure de tension.
+1. **Persistance** : L'instance de `ST_BucketState` et `ST_BucketConfig` doivent être déclarées en variables persistantes (`VAR RETAIN`) dans `CODE/GVL_PERSISTENT.st` pour conserver la mémoire mécanique du benne après coupure de tension.
 2. **Couplage Winch M2** : La commande de vitesse lente forcée (`M2_ForceSlowSpeed`) doit masquer la table de paliers ou forcer `MaxStepNumber := 0` ou un paramètre dédié sur le décodeur de paliers pour n'autoriser aucun contacteur de vitesse.
 3. **Calcul de cohérence au boot** : Au premier cycle API, comparer `CablePosM2` avec `LastPosM2Open` ou `LastPosM2Close` (selon le dernier état mémorisé). Si l'écart dépasse `CoherenceLimitM`, forcer la sortie `StateIncoherent := TRUE` et exiger un référencement manuel.
-4. 🔧 **REX 2026-07-07** : Le code `CODE/BENNE/FB_Bucket.st` et `CODE/SYSTEM/GVL_PERSISTENT.st`
+4. 🔧 **REX 2026-07-07** : Le code `CODE/TREUILS/BENNE/FB_Bucket.st` et `CODE/GVL_PERSISTENT.st`
    sont **déjà à jour** avec le nouveau modèle (voir bandeau REX en tête de document) — aucune
    nouvelle recopie manuelle requise au-delà de ce qui a déjà été appliqué en session, sauf si
    une réimportation complète depuis `CODE/` est nécessaire suite à un nouvel export CODESYS.
 5. 🆕 **v1.2 (2026-07-07, Méca C couche 1)** : Méca C couche 1 (bit4, `M1SlipDetected`) est **déjà codé et
-   validé** dans `CODE/BENNE/FB_Bucket.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
+   validé** dans `CODE/TREUILS/BENNE/FB_Bucket.st` et `CODE/MAIN/PRG_06_WinchControl.st` (voir §4.D) —
    également aucune nouvelle recopie manuelle requise ce lot.
 6. 🆕 **v1.3 (2026-07-08, Inhibition)** : Le bloc benne est activé si le treuil M2 n'est pas inhibé, et que les deux codeurs de position M1 et M2 sont disponibles / en bonne santé (`Enable := NOT InhibitM2 AND EncoderAbsM1.EncoderAvailable AND EncoderAbsM2.EncoderAvailable` dans `PRG_06_WinchControl.st`). Si seul M1 (retenue) est inhibé, le benne reste manœuvrable puisque seul M2 se déplace pour ouvrir ou fermer (M1 restant verrouillé au frein). Cependant, le codeur M1 doit obligatoirement être disponible et référencé (`HomedM1 = TRUE`) pour permettre le calcul de fin de course du benne ; dans le cas contraire, le benne est bloqué en sécurité. De plus, si M1 est inhibé, la surveillance de glissement de M1 pendant le mouvement (`M1SlipDetected`, bit 4 de `ErrorId`) est automatiquement désactivée pour éviter tout déclenchement intempestif dû à des fluctuations ou une isolation de l'axe M1.
 7. 🆕 **v1.3 (2026-07-08, Référencement)** : Deux boutons de référencement manuel sont prévus pour la mise en service du benne à l'arrêt. Pour simplifier les essais, ces commandes sont autorisées même si les codeurs de treuils M1/M2 ne sont pas encore référencés (`HomedM1/M2 = FALSE`) :
