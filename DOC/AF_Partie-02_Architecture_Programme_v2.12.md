@@ -105,7 +105,7 @@ MainTask (10 ms)
  2.  PRG_02_Encoders            — CODE/MAIN/         — FB_Encoder_Abs → Scale → Homing → Safety (COD1/M1, COD2/M2)
  3.  PRG_03_Safety              — CODE/MAIN/         — FB_Safety_Winch ×2, FB_Safety_Translation → SafeStop/PowerCutOff
  4.  PRG_04_Modes               — CODE/MAIN/         — FB_Modes : arbitrage des modes et autorisations
-5.  PRG_05_Cycle               — CODE/MAIN/         — FB_Cycle : séquenceur semi-auto en cours ; E/S Kobold TBD (PLAN_TASK T34)
+5.  PRG_05_Cycle               — CODE/MAIN/         — FB_Cycle : séquenceur semi-auto ; E/S Kobold dédiées (%IX0.5/%QX0.6)
  6.  PRG_06_WinchControl        — CODE/MAIN/         — FB_Winch M1/M2, FB_WinchSync, FB_Bucket
  7.  PRG_07_TranslationControl  — CODE/MAIN/         — FB_Translation M3 et arbitrage des cibles
  8.  PRG_08_AuxiliaryControl    — CODE/MAIN/         — Diagnostic thermique hydraulique uniquement ; aucune commande auxiliaire

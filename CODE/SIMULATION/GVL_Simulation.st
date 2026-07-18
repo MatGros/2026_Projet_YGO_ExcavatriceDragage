@@ -44,11 +44,13 @@ VAR_GLOBAL
     ContactorFeedbackM2_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M2
     ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) translation M3
     TranslationPosition_IsReal     : BOOL := FALSE; // Capteurs Trémie/PV/P2/P1/Maintenance
+    KoboldContactFond_IsReal       : BOOL := FALSE; // Retour contact fond Kobold (%IX0.5)
     HydraulicThermal_IsReal        : BOOL := FALSE; // 🆕 REX 2026-07-18 : thermique centrale hydraulique (PRG_08_AuxiliaryControl)
 
     // ── Utilitaires banc d'essai (sans préfixe DBG_) ───────────────────────────
     JoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)
     JoystickForceMaxRaw        : INT := 10000;  // Simule une consigne à fond
+    KoboldContactFond_Simulated : BOOL := FALSE; // Simulation du contact fond Kobold
 
     // 🔧 REX 2026-07-07 : confort de test banc — accélère le déplacement des codeurs simulés
     // (FB_Sim_Encoder). 1.0 = comportement d'origine. Réglable à chaud, sans recompiler.

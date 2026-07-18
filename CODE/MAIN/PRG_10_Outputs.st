@@ -28,6 +28,7 @@ VAR_INPUT
 
     // ── ↔️ TRANSLATION M3 (sens/vitesse via variateur EtherCAT, TOR=frein uniquement) ────────
     TranslationBrakeCmd   : BOOL;  // 🔓 Frein M3 ⚠️INVERSÉ : TRUE=desserré/mouvement | FALSE=SERRÉ sécurité ✅
+    KoboldContactorCmd    : BOOL;  // 🪨 Commande contacteur puissance Kobold
 END_VAR
 VAR_OUTPUT
     // 🔧 REX 2026-07-07 — état séquence réarmement AU, exposé pour affichage IHM (PRG_09_Supervision)
@@ -380,8 +381,14 @@ instM2BrakeCmd(Command := M2BrakeCmd);
 M2_BrakeCmd_RQ := instM2BrakeCmd.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-instTranslationBrakeCmd(Command := TranslationBrakeCmd);
+    instTranslationBrakeCmd(Command := TranslationBrakeCmd);
 M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
+
+// 🪨 Adresse terrain : KoboldContactor_DQ = %QX0.6.
+// Coupure prioritaire si la puissance ou la chaîne AU n'est plus validée.
+KoboldContactor_DQ := KoboldContactorCmd
+                      AND PRG_00_Inputs.EmergencyStopOk
+                      AND PRG_00_Inputs.EmergencyChain;
 
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────

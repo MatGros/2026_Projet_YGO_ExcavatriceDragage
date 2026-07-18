@@ -37,8 +37,8 @@ instCycle(
     TargetOffsetM       := TargetOffsetM,
     SelectedTargetNum_IHM := GVL_IHM.TranslationM3.SelectedTargetNum,
 
-    // Capteur fond touché détecté par le mou de câble physique (sécurité positive)
-    BottomTouched       := NOT PRG_00_Inputs.SlackCableSwitch,
+    // Retour dédié Kobold — distinct du mou de câble.
+    KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
 

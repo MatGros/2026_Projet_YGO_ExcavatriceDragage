@@ -4,8 +4,9 @@
 > conditionnée par l'homme-mort joystick ; le relâchement met le cycle en attente sur son étape,
 > puis une sollicitation valide reprend cette étape. La descente de recherche utilise le retour
 > dédié du détecteur de fond Kobold, commandé par un contacteur de puissance dédié. Le mapping
-> exact de ces deux E/S reste **TBD** (PLAN_TASK T34) : aucun capteur existant, notamment le
-> mou de câble, ne doit être réutilisé comme équivalent Kobold.
+> exact de ces deux E/S est désormais défini : `KoboldContactFond_DI` (%IX0.5) et
+> `KoboldContactor_DQ` (%QX0.6). Aucun capteur existant, notamment le mou de câble, ne doit être
+> réutilisé comme équivalent Kobold.
 
 > **Version 1.3** — Nettoyage documentaire (audit doc) : la note TBD sur le détail fin de la
 > séquence INIT (§2) était une remarque organisationnelle (décision D22 reportée) — remplacée par

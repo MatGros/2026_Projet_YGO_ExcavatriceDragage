@@ -22,7 +22,7 @@ VAR_INPUT
     SelectedTargetNum_IHM : INT;        // Cible sélectionnée (2=P2, 3=P1 — 🆕 REX 2026-07-18, ex-1=Fosse1/2=Fosse2, voir AF_Partie-02 v2.12 §3bis)
 
     // Feedbacks physique & matériel
-    BottomTouched       : BOOL;         // Capteur mou de câble / fond touché
+    KoboldContactFond   : BOOL;         // Retour dédié Kobold : TRUE = contact fond détecté
     M1_CablePosM        : REAL;         // Position câble treuil M1 (recalée)
     M2_CablePosM        : REAL;         // Position câble treuil M2 (recalée)
 
@@ -65,6 +65,7 @@ VAR_OUTPUT
     // Commandes FB_Bucket
     CmdBucket_Open      : BOOL;
     CmdBucket_Close     : BOOL;
+    KoboldContactorCmd  : BOOL;         // Commande contacteur puissance Kobold (recherche fond)
 
     // Métadonnées d'affichage IHM
     CycleStep           : E_CycleStep;  // Étape active du Grafcet
@@ -109,6 +110,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     CmdTranslationM3_Target  := 0;
     CmdBucket_Open      := FALSE;
     CmdBucket_Close     := FALSE;
+    KoboldContactorCmd  := FALSE;
 
     State                := E_CycleStep.INIT;
     CycleStep            := E_CycleStep.INIT;
@@ -154,6 +156,7 @@ CASE State OF
         CmdTranslationM3_Start   := FALSE;
         CmdBucket_Open      := FALSE;
         CmdBucket_Close     := FALSE;
+        KoboldContactorCmd  := FALSE;
         Busy                 := FALSE;
         Done                 := FALSE;
 
@@ -194,11 +197,13 @@ CASE State OF
         CmdWinchM2_StartStop := TRUE;
         CmdWinchM2_Direction := -1;
         CmdWinchM2_SpeedPct  := 50.0;
+        KoboldContactorCmd   := TRUE;
 
-        // Transition si fond touché (mou de câble détecté)
-        IF BottomTouched THEN
+        // Transition uniquement sur le retour dédié Kobold.
+        IF KoboldContactFond THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
+            KoboldContactorCmd := FALSE;
             TouchPositionM := M1_CablePosM; // Mémorisation position contact
             State := E_CycleStep.BOTTOM_TOUCH_WAIT;
         END_IF;

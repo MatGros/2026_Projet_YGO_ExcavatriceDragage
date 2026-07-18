@@ -18,6 +18,7 @@ VAR_OUTPUT
     EmergencyChain       : BOOL;   // 🔗 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) : TRUE=saine ✅ | FALSE=AU appuyé ou PowerCutOff PLC actif 🔴 — précondition à l'armement, PAS le portail maître
     TopPositionSensor    : BOOL;   // 🔝 Fin de course HAUT (NC) : TRUE=libre ✅ | FALSE=butée atteinte 🔴→ForbidAscent
     SlackCableSwitch     : BOOL;   // 🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent
+    KoboldContactFond    : BOOL;   // 🪨 Retour détecteur fond Kobold (NO) : TRUE=contact fond détecté ✅
     PhaseRotationOk      : BOOL;   // ⚡ Rotation phases élec. (NC) : TRUE=phases OK ✅ | FALSE=inversées/absentes 🔴→SafeStop
     // 🆕 REX 2026-07-08 : retour thermique COMMUN aux 3 freins M1/M2/M3 (1 seul fil, impossible
     // de savoir lequel des 3 est en cause) — demande utilisateur : la perte de ce retour peut
@@ -60,6 +61,7 @@ VAR
     instEmergencyStopOk   : FB_Input;
     instEmergencyChain    : FB_Input; // 🔧 REX 2026-07-07
     instSlackCableSwitch  : FB_Input;
+    instKoboldContactFond : FB_Input;
     instTopPositionSensor : FB_Input;
     instCtrlPhaseRotation : FB_Input;
     instBrakeThermalFeedback : FB_Input; // 🆕 REX 2026-07-08
@@ -127,6 +129,16 @@ EmergencyChain := instEmergencyChain.State;
 // uniquement sur le tambour M2, le préfixe M1_M2_ ne reflétait pas la réalité du câblage)
 instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal), FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
+
+// 🪨 Kobold : entrée dédiée, distincte du mou de câble.
+// Adresse terrain : KoboldContactFond_DI = %IX0.5.
+instKoboldContactFond(
+    InputRaw := KoboldContactFond_DI
+                OR (GVL_Simulation.SimulationModeActive
+                    AND NOT GVL_Simulation.KoboldContactFond_IsReal
+                    AND GVL_Simulation.KoboldContactFond_Simulated),
+    FilterTime := T#20MS);
+KoboldContactFond := instKoboldContactFond.State;
 
 // 🆕 REX 2026-07-08 (4) : cohérence simulation (demande utilisateur) — l'ancien câblage forçait
 // TopPositionSensor à TOUJOURS TRUE (sain) en simulation, quelle que soit la position codeur :
