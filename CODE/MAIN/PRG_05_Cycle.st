@@ -39,6 +39,10 @@ instCycle(
 
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
+    LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
+    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed,
+    WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,
+    WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
 
