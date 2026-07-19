@@ -1,6 +1,6 @@
 # TOOLS — Outils du projet
 
-Ce dossier contient **deux outils indépendants** :
+Ce dossier contient **deux outils indépendants** + **utilitaires de workspace** :
 
 ```
 TOOLS/
@@ -12,13 +12,14 @@ TOOLS/
 │   ├── templates/        # Templates ST & DOC
 │   ├── prompts/          # Prompts agents
 │   └── config/           # herdr_policy.json
-│
-└── ST_PLCOPENXML_GENERATOR/  # Convertisseur ST → PLCopenXML (autonome)
+├── ST_PLCOPENXML_GENERATOR/  # Convertisseur ST → PLCopenXML (autonome)
     ├── generator/        # Code Python du générateur
     ├── tests/            # Unitaires, intégration, golden files (306 tests)
     ├── samples_reference_codesys/
     ├── test_import_poc/
     └── docs/
+├── launch_workspace.py   # Lanceur workspace unifié (Windows Terminal / tmux)
+└── visualize_workflow.py # Générateur graphique Mermaid du workflow
 ```
 
 ## Utilisation rapide
@@ -42,6 +43,25 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys
 
 # Gates + validation compilation CODESYS (après build manuel)
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --codesys-log build.log --strict
+```
+
+### Lancer le workspace complet (Pi + Gates + Herdr + Graphs)
+
+```powershell
+# Windows Terminal (natif)
+python TOOLS/launch_workspace.py
+
+# tmux (via tmuxinator, dans WSL)
+tmuxinator mgs
+```
+
+### Visualiser le workflow (Mermaid)
+
+```powershell
+# Générer diagramme Mermaid
+python TOOLS/visualize_workflow.py > workflow.mmd
+
+# Voir dans VS Code (Markdown preview) ou Mermaid Live Editor
 ```
 
 ### Skills Pi Coding Agent
