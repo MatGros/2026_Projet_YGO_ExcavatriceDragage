@@ -6,7 +6,9 @@
       - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
    ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
       Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
-   ═══════════════════════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
+*)
 
 TYPE ST_WinchSpeedConfig :
 STRUCT

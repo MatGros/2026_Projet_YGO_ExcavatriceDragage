@@ -6,7 +6,9 @@
    🧭 Index 1 : palier contacteurs commandé (1..5)
    🧭 Index 2 : bande de vitesse câble mesurée (1..5)
    📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
-   ═══════════════════════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
+*)
 
 TYPE ST_WinchLoadEstimateTable :
 STRUCT

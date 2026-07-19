@@ -2,7 +2,9 @@
    🎚️ PRG_04_Modes — Gestion et Arbitrage du Mode Machine
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 4.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md
+*)
 
 PROGRAM PRG_04_Modes
 VAR

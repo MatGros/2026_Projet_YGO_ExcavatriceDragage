@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
+*)
 
 PROGRAM PRG_02_Encoders
 VAR_OUTPUT
@@ -45,7 +47,7 @@ END_VAR
 M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 
-// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
+// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md)
 // 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(

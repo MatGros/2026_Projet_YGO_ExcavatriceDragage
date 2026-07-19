@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🔄 E_CycleStep — Étapes de la machine d'état du cycle automatique
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md §1
+   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md §1
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE E_CycleStep :

@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
       la boucle d'arrêt d'urgence. Produit les consignes logiques.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md
+*)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic
 VAR_INPUT

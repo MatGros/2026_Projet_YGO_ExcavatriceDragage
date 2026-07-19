@@ -712,7 +712,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ ST_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie2_Architecture_Programme_v2.6.md §8
+   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §8
    ⚠️ MISE EN CONFORMITÉ (remplace la version actuelle du projet) :
       - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
         TRUE = rampe accélération, FALSE = rampe décélération normale)
@@ -769,7 +769,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie12_Fonction_Benne_v1.0.md §4.A
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md §4.A
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1026,7 +1026,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie12_Fonction_Benne_v1.0.md §4.B
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md §4.B
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1443,7 +1443,8 @@
    ───────────────────────────────────────────────────────────────
    📄 Transporte les ordres logiques entre le bloc de décision
       et le bloc de commande de la boucle d'urgence.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderCalib">
@@ -1503,7 +1504,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §9
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §9
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
       modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
@@ -1759,7 +1760,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
               </documentation>
             </variable>
@@ -2299,7 +2300,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
    🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
    ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
       packé de la 1ère version) : chaque contacteur de vitesse de
@@ -3499,7 +3500,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Migration des champs manuels ex-ST_IHM_MANU terminée (2026-07-19, suppression IHM_MANU) —
-      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4133,7 +4134,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/generator</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/ST_PLCOPENXML_GENERATOR</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4152,7 +4153,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🧭 Index 1 : palier contacteurs commandé (1..5)
    🧭 Index 2 : bande de vitesse câble mesurée (1..5)
    📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
-   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchSpeedConfig">
@@ -4203,7 +4205,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
       - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
    ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
       Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
-   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -4261,7 +4264,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🎯 Normalise une valeur brute (0..10000) par rapport au neutre calibré
       et applique une zone morte en %.
    Sortie : OutPct ∈ [-100.0 .. +100.0] (0.0 si dans la deadband)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -5018,12 +5022,12 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪣 FB_Bucket — Commande d'ouverture/fermeture du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie12_Fonction_Benne_v1.1.md
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
       (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
       FERME désormais le benne, DEROULAGE M2 (Direction=-1) l'OUVRE
-      (c'était l'inverse avant). Voir Partie12 v1.1 §REX.
+      (c'était l'inverse avant). Voir DOC/AF_Partie-12_Fonction_Benne_v1.4.md §REX.
    ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
       ne sont fiables que si les codeurs absolus sont référencés (Partie10).
       Sans ça, une position aberrante (codeur non homé) pourrait faire
@@ -5040,7 +5044,7 @@ END_IF;
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie10_Fonction_Encoder_Homing_v1.7.md "flux nominal, benne ouvert").
+        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un CmdOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `ConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
@@ -7253,7 +7257,7 @@ Distance de remontée lente de contrôle</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔄 FB_Cycle — Séquenceur du Cycle Automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie4_Cycle_Sequenceur_v1.2.md
+   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
@@ -7844,7 +7848,8 @@ TimeLast := TimeCurrent;
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📡 FB_DiagCanOpen — Diagnostic de communication bus CANopen / Joystick
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -8108,7 +8113,8 @@ Encodeur M2 en ligne (TRUE = OK)</xhtml>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📡 FB_DiagEthercat — Diagnostic de communication bus EtherCAT (3 esclaves)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -8347,7 +8353,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📐 FB_DriftGuard — Détection de dérive de position pendant armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.6.md §4quinquies (Méca A/C)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §4quinquies (Méca A/C)
    🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
       Méca C de FB_Safety_Winch (armement + capture position référence + calcul
       dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
@@ -9062,7 +9068,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §3/§6
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
@@ -9863,7 +9869,7 @@ HomingRefRaw := Calib.HomingRefRaw;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §3.6/§3.7
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §3.6/§3.7
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
       - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur
@@ -10009,7 +10015,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §2/§3.1
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §2/§3.1
    ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
       `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
       — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
@@ -10237,7 +10243,8 @@ END_IF;
       aucun réglage métier n'est figé dans cette brique.
    🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
       jusqu'à disparition de la cause et acquittement par front Reset.
-   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -10372,7 +10379,8 @@ END_IF;
    🎯 Filtre exponentiel discret : y[k] = α·x[k] + (1-α)·y[k-1]
       où α = CycleTimeS / (T + CycleTimeS), T = TimeConst en secondes.
    ⚠️ Si TimeConst = 0 ou CycleTimeS = 0, sortie = entrée (pass-through).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -10932,9 +10940,9 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ FB_Joystick — Acquisition + traitement Hall (bouton = homme-mort EN 574/ISO 13850)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie8_Fonction_Joystick_v1.1.md (historique détaillé des
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md (historique détaillé des
       correctifs : AUDIT D34/D35/D49/D51/D53-D59)
-   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — Partie8 v1.1 §3
+   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §3
       l'interdit (`FB_Joystick` n'est pas un FB de mouvement, Partie3 §1bis). Agissait de
       plus comme un second `Enable` dans le GATE (coupure immédiate), pas comme la rampe
       rapide attendue d'un `SafeStop` — confusion précisément visée par la règle.
@@ -10947,7 +10955,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
         rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
         désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
       Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔧 RETRAIT BYPASS (AF_Partie13, migration simulation) : l'ancien bypass
+   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v1.2.md, migration simulation) : l'ancien bypass
       `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
       supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
       CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/
@@ -11346,7 +11354,7 @@ Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ FB_Modes — Arbitrage du mode machine (MVP — diffusion, pas encore overrides complets)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.2.md §1/§2
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md §1/§2
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 RÔLE CE LOT : sélectionner/arbitrer `Mode` (source unique diffusée à TOUS les FB
       métier) + garde-fous minimaux :
@@ -14264,7 +14272,8 @@ END_IF;
    📄 Rôle : Bloc de sécurité principal de la boucle d'arrêt d'urgence.
    🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le 
       Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -14491,7 +14500,8 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
       la boucle d'arrêt d'urgence. Produit les consignes logiques.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -14696,7 +14706,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Transmet les ordres de sécurité logiques vers les 
       sorties physiques de l'automate (relais d'AU A/B/Impulsion).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -15044,7 +15055,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -15744,9 +15755,9 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.9.md,
-                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §7
-                   (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md,
+                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §7
+                   (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
    📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
@@ -16663,7 +16674,8 @@ END_IF;
       - Le contacteur s'engage (SimContactorOk) lors d'une impulsion de réarmement (EmergencyArming) 
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -17084,7 +17096,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
    📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
    📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
                        (M1 et M2 ont chacune la leur — pas de table globale)
@@ -19323,7 +19335,7 @@ Filtrage capteur de position cible</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -20091,7 +20103,7 @@ directement, sans dépendre de l'arbitrage Mode de PRG_07_TranslationControl.</x
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
 🧪 FB_TranslationValidation — Suite de test Translation M3
 ───────────────────────────────────────────────────────────────
-📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
+📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
 🎯 Valide les surveillances de sécurité de FB_Safety_Translation :
 TC-T1 Fin de course extrême, TC-T2 Méca B (incohérence à l'arrêt),
 TC-T3 Méca A (mouvement non commandé). Même moteur générique
@@ -21287,7 +21299,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -21319,7 +21331,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie9 §4ter pour le contexte
+      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.11.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `MaxStepDescente` (défaut 2). En descente
@@ -21700,7 +21712,8 @@ END_IF;
       estimation dans ST_WinchLoadEstimateTable.
    ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
       reste à 0 % et Configured reste FALSE.
-   ═══════════════════════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -22070,7 +22083,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.1.md §9
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §9
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
       1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
    🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :
@@ -22505,7 +22518,7 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <derived name="FB_Sim_Translation" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir AF_Partie13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md)</xhtml>
               </documentation>
             </variable>
             <variable name="instSimSafety">
@@ -22565,7 +22578,7 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📥 PRG_00_Inputs — Acquisition et conditionnement des ENTRÉES (PROGRAMME)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie6_IO_Conditioning_v1.2.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -22580,7 +22593,7 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
 // 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
 // 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille
 // sécurité, TRUE=OK) quand SimulationModeActive ET que ce capteur précis n'est
-// pas encore câblé réellement (GVL_Simulation.*_IsReal). Voir AF_Partie13.
+// pas encore câblé réellement (GVL_Simulation.*_IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md.
 
 // Simulation de la chaîne de sécurité AU / réarmement (Lot 1)
 instSimSafety(
@@ -22661,7 +22674,7 @@ instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT 
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir AF_Partie13
+// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
 // §Translation). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
 // (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
 // 🔧 L'ancien mode relais DEGRADED_IO est supprimé. La simulation déduit directement le sens de
@@ -22798,7 +22811,8 @@ END_IF;
    📡 PRG_01_Diagnostics — États bus de terrain et Joystick (PROGRAMME)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md ; DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -22997,7 +23011,8 @@ FB_Joystick_0(
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23017,7 +23032,7 @@ FB_Joystick_0(
 M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 
-// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir AF_Partie13)
+// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md)
 // 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
@@ -23254,7 +23269,8 @@ EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
    🛡️ PRG_03_Safety — Centralisation des surveillances et blocs Safety
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 3.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23469,7 +23485,8 @@ instSafetyTranslationM3(
    🎚️ PRG_04_Modes — Gestion et Arbitrage du Mode Machine
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 4.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23626,7 +23643,8 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5.
    ✅ Gère la machine d'état principale de dragage (FB_Cycle).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23953,7 +23971,7 @@ par à-coup (même raisonnement que M1_Busy/M2_Busy sur instBucket, voir §0).</
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-19 : palier max Ascension/Descente — même valeur en Auto ET Manuel
 (ex-plafond IHM_MANU "essais progressifs" retiré avec la suppression d'IHM_MANU, voir
-DOC/IHM_MANU_Journal_Modifications.md).</xhtml>
+ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).</xhtml>
               </documentation>
             </variable>
             <variable name="EffectiveMaxStepDescente">
@@ -23968,6 +23986,7 @@ DOC/IHM_MANU_Journal_Modifications.md).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -24478,7 +24497,8 @@ Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v1.9.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -24639,7 +24659,8 @@ PRG_10_Outputs.TranslationBrakeCmd := instTranslationM3.BrakeCmd;
       GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd de ST_IHM_MANU).
       Seul le retour thermique centrale hydraulique est conservé, remonté
       en diagnostic IHM (aucune commande, aucun auto-démarrage).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -24695,7 +24716,8 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
       domaine sécurité/métier (Winch, Safety, Encodeurs, Benne, Joystick, Translation) ;
       FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.ModeReset côté
       PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v1.5.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -24790,7 +24812,7 @@ GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
 GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
 GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_08_AuxiliaryControl.HydraulicFaultOk; // 🆕 REX 2026-07-18 — diagnostic seul, aucune commande PLC
 
-// 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie1 v1.5 §Sécurité électrique)
+// 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
 // pas seulement le pulse — ArmingSeqStep&lt;&gt;0 englobe déjà tout sauf le verrouillage final.
 GVL_IHM.Modes.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
@@ -24942,7 +24964,7 @@ GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
-// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir AF_Partie13) ──────
+// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md) ──────
 GVL_IHM.M1TreuilRetenue.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
 GVL_IHM.M2TreuilBucket.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal;
 GVL_IHM.TranslationM3.BypassContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
@@ -25483,11 +25505,11 @@ Pulse 1s en cours</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 PRG_10_Outputs — Écriture des SORTIES physiques (PROGRAMME)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie6_IO_Conditioning_v1.2.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
    🔧 REX 2026-07-19 : suppression définitive du mode IHM_MANU (override direct des sorties,
-      mise en service urgence 2026-07-09) — voir DOC/IHM_MANU_Journal_Modifications.md pour
+      mise en service urgence 2026-07-09) — voir ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md pour
       l'historique complet. Le pilotage manuel passe désormais EXCLUSIVEMENT par MAINT_N1/N2
       + joystick homme-mort (PRG_06_WinchControl/PRG_07_TranslationControl), sous supervision
       réelle des sécurités métier (SafeStop/ForbidAscent/ForbidDescent/PowerCutOff toujours
@@ -25613,7 +25635,8 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
    ───────────────────────────────────────────────────────────────
    Note : Programme exécuté en tâche de fond ou asynchrone.
    Le bloc de configuration de l'IP est actuellement stubbé / commenté.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -25670,7 +25693,8 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
    💡 Besoin d'un AUTRE rythme pour un voyant particulier (pas celui-ci) ?
       Instancier son propre `BLINK` (lib Util) localement plutôt que de détourner
       ce bit partagé — voir Partie3 §0 (réutilisation obligatoire des libs).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
         </documentation>
       </globalVars>
     </data>
@@ -25763,7 +25787,7 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire
 de mise en service urgence (2026-07-09), remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
-Historique complet : DOC/IHM_MANU_Journal_Modifications.md.
+Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
 🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>
         </variable>
@@ -25816,7 +25840,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ GVL_Modes_Stub — Variables IHM pour FB_Modes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie5_Modes_Maintenance_v1.2.md §1/§2
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md §1/§2
    🎯 Sélecteur de mode machine forceable : un seul endroit à consulter/forcer
       en mise en service pour piloter le mode.
    🔧 REX 2026-07-07 (1) : GVL_Encoder_Stub (même principe, codeurs) a été fusionné

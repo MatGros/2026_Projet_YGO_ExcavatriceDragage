@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Migration des champs manuels ex-ST_IHM_MANU terminée (2026-07-19, suppression IHM_MANU) —
-      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationHMI :
 STRUCT

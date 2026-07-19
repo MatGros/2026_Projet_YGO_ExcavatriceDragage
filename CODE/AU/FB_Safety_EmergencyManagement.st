@@ -4,7 +4,9 @@
    📄 Rôle : Bloc de sécurité principal de la boucle d'arrêt d'urgence.
    🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le 
       Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md
+*)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement
 VAR_INPUT

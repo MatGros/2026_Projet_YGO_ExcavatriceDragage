@@ -17,7 +17,7 @@ VAR_GLOBAL RETAIN
     Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     // 🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire
     // de mise en service urgence (2026-07-09), remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
-    // Historique complet : DOC/IHM_MANU_Journal_Modifications.md.
+    // Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
 END_VAR
 

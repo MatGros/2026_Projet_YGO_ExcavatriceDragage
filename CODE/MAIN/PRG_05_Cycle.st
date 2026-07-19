@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5.
    ✅ Gère la machine d'état principale de dragage (FB_Cycle).
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md
+*)
 
 PROGRAM PRG_05_Cycle
 VAR

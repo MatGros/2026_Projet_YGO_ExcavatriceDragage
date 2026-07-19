@@ -1,9 +1,9 @@
 (* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.9.md,
-                   DOC/AF_Partie10_Fonction_Encoder_Homing_v1.6.md §7
-                   (contrat : DOC/AF_Partie3_Template_FB_Commun_v1.2.md §1/§7bis)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md,
+                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §7
+                   (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
    📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch

@@ -1,9 +1,9 @@
 (* ═══════════════════════════════════════════════════════════════
    🕹️ FB_Joystick — Acquisition + traitement Hall (bouton = homme-mort EN 574/ISO 13850)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie8_Fonction_Joystick_v1.1.md (historique détaillé des
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md (historique détaillé des
       correctifs : AUDIT D34/D35/D49/D51/D53-D59)
-   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — Partie8 v1.1 §3
+   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §3
       l'interdit (`FB_Joystick` n'est pas un FB de mouvement, Partie3 §1bis). Agissait de
       plus comme un second `Enable` dans le GATE (coupure immédiate), pas comme la rampe
       rapide attendue d'un `SafeStop` — confusion précisément visée par la règle.
@@ -16,7 +16,7 @@
         rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
         désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
       Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔧 RETRAIT BYPASS (AF_Partie13, migration simulation) : l'ancien bypass
+   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v1.2.md, migration simulation) : l'ancien bypass
       `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
       supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
       CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/

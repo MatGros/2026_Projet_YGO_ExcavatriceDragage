@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    📄 Transporte les ordres logiques entre le bloc de décision
       et le bloc de commande de la boucle d'urgence.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md
+*)
 
 TYPE ST_EmergencyManagementCmd :
 STRUCT

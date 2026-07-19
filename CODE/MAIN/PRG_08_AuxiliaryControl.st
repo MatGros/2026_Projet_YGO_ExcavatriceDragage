@@ -8,7 +8,9 @@
       GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd de ST_IHM_MANU).
       Seul le retour thermique centrale hydraulique est conservé, remonté
       en diagnostic IHM (aucune commande, aucun auto-démarrage).
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md
+*)
 
 PROGRAM PRG_08_AuxiliaryControl
 VAR_OUTPUT

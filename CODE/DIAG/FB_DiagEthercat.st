@@ -1,6 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 FB_DiagEthercat — Diagnostic de communication bus EtherCAT (3 esclaves)
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+*)
 FUNCTION_BLOCK PUBLIC FB_DiagEthercat
 VAR_INPUT
     Enable              : BOOL;        (* Active la surveillance EtherCAT *)
