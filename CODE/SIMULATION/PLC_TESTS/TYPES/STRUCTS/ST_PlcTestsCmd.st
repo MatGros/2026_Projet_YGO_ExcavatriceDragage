@@ -4,9 +4,15 @@
 
 TYPE ST_PlcTestsCmd :
 STRUCT
-    RunAll        : BOOL;   // Lance tous les tests
-    RunSuite      : INT;    // >0 : lance uniquement la suite N
-    RunCase       : INT;    // >0 (avec RunSuite) : lance le cas N
+    // Commandes unitaires : une seule suite manuelle à la fois.
+    RunSafety     : BOOL;   // Lance la suite Safety
+    RunTranslation: BOOL;   // Lance la suite Translation
+    RunBucket     : BOOL;   // Lance la suite Benne
+    RunEncoder    : BOOL;   // Lance la suite Codeurs/Homing
+    RunModes      : BOOL;   // Lance la suite Modes/Homme-mort
+    RunAll        : BOOL;   // Déprécié : ignoré, aucune campagne automatique
+    RunSuite      : INT;    // Compatibilité : >0 lance une suite manuelle
+    RunCase       : INT;    // Cas de la commande unitaire sélectionnée
     Abort         : BOOL;   // Abandonne le test en cours
     ClearReport   : BOOL;   // Efface les rapports de tests
 END_STRUCT

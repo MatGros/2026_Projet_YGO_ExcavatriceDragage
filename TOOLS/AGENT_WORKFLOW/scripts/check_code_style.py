@@ -10,6 +10,37 @@ from pathlib import Path
 
 FORBIDDEN = ("CoupeEnable", "FB_Watchdog")
 DOC_REF = re.compile(r"DOC/[A-Za-z0-9_./-]+\.md")
+# Détecte instFB.VarOutput :=  (écriture sur VAR_OUTPUT d'une instance)
+VAR_OUTPUT_WRITE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\.(Ready|Busy|Done|Error|ErrorId|State|StateAtError)\s*:=")
+
+# Baseline des violations VAR_OUTPUT connues (dette technique préexistante)
+# Clé = chemin relatif SANS prefixe CODE/
+# Toute NOUVELLE occurrence non listée ici = ERROR
+KNOWN_VAR_OUTPUT_VIOLATIONS = {
+    "DIAG/FB_DiagCanOpen.st": {
+        "DeviceJoystick.State", "DeviceJoystick.Error", "DeviceJoystick.ErrorId"
+    },
+    "DIAG/FB_DiagEthercat.st": {
+        "DeviceVariateur.State", "DeviceEncoderM1.State", "DeviceEncoderM2.State",
+        "DeviceVariateur.Error", "DeviceEncoderM1.Error", "DeviceEncoderM2.Error",
+        "DeviceVariateur.ErrorId", "DeviceEncoderM1.ErrorId", "DeviceEncoderM2.ErrorId"
+    },
+    "MAIN/PRG_09_Supervision.st": {
+        "M1TreuilRetenue.Ready", "M1TreuilRetenue.Busy", "M1TreuilRetenue.Done",
+        "M1TreuilRetenue.Error", "M1TreuilRetenue.ErrorId",
+        "Encoder.Error", "Encoder.ErrorId",
+        "M2TreuilBucket.Ready", "M2TreuilBucket.Busy", "M2TreuilBucket.Done",
+        "M2TreuilBucket.Error", "M2TreuilBucket.ErrorId",
+        "Bucket.Ready", "Bucket.Busy", "Bucket.Done", "Bucket.Error", "Bucket.ErrorId",
+        "Bucket.State",
+        "Sync.Ready", "Sync.Error", "Sync.ErrorId", "Sync.State",
+        "TranslationM3.Ready", "TranslationM3.Busy", "TranslationM3.Done",
+        "TranslationM3.Error", "TranslationM3.ErrorId",
+        "Cycle.Ready", "Cycle.Busy", "Cycle.Done", "Cycle.Error", "Cycle.ErrorId",
+        "JoystickJOY1.Error", "JoystickJOY1.ErrorId"
+    }
+}
+
 
 
 def requires_doc_reference(path: Path) -> bool:
@@ -35,6 +66,21 @@ def main() -> int:
         for token in FORBIDDEN:
             if token in text:
                 print(f"[ERROR] {path}: forbidden token {token}", file=sys.stderr)
+                errors += 1
+        # VAR_OUTPUT write detection
+        for m in VAR_OUTPUT_WRITE.finditer(text):
+            inst_name = m.group(1)
+            var_name = m.group(2)
+            key = f"{inst_name}.{var_name}"
+            rel_path = path.as_posix()
+            if rel_path.startswith("CODE/"):
+                rel_path = rel_path[5:]
+            known = KNOWN_VAR_OUTPUT_VIOLATIONS.get(rel_path, set())
+            if key in known:
+                print(f"[WARN] {path}: known VAR_OUTPUT write debt: {key}", file=sys.stderr)
+                warnings += 1
+            else:
+                print(f"[ERROR] {path}:{m.start()}: NEW illegal write to VAR_OUTPUT {key}", file=sys.stderr)
                 errors += 1
         header = text[:4000]
         required = requires_doc_reference(path)

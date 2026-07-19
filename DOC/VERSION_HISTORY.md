@@ -4,6 +4,13 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.18_PlcTests_ManualSuites` — 2026-07-19
+- Suites PLC_TESTS séparées : `RunSafety`, `RunTranslation`, `RunBucket`, `RunEncoder`, `RunModes`
+- `RunAll` déprécié/ignoré : aucun lancement automatique au chargement
+- Manager en lecture seule des sorties FB ; correction des erreurs CODESYS C0037
+- Watchdog : arrêt + rapport de la suite active, sans blocage des autres suites
+- AF Partie 14 complétée par l'addendum suites manuelles indépendantes
+
 ---
 
 ### `v0.4.18_DocSweep_IHMRetrait` — 2026-07-18
