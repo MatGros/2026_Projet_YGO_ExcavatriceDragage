@@ -7,6 +7,22 @@
 
 ---
 
+## 🆕 Addendum v1.3 — suites manuelles indépendantes (2026-07-19)
+
+Cet addendum prévaut sur toute mention antérieure de `CmdRunAll` ou d'enchaînement automatique.
+
+- 🧪 Une seule suite de test est exécutée à la fois, sur commande opérateur explicite.
+- 🎛️ Commandes unitaires : `RunSafety`, `RunTranslation`, `RunBucket`, `RunEncoder`, `RunModes`.
+- 🚫 `RunAll` est déprécié et ignoré ; aucun test ne démarre au chargement de l'application.
+- 📋 Chaque suite conserve son propre `ST_TestSuiteReport`, état terminal, code et message d'erreur.
+- ⏱️ Un watchdog arrête la suite active et journalise la cause ; il ne bloque pas les autres suites.
+- 🔁 Une suite terminée (`PASSED`, `FAILED`, `ABORTED`, `TIMEOUT`) doit être acquittée ou remplacée par une nouvelle commande explicite.
+- 🛡️ Une perte de simulation ou un défaut Safety arrête la suite concernée ; les suites dépendantes sont `SKIPPED`, jamais exécutées en conditions non sûres.
+- 🚫 `FB_PLC_Tests_Management` lit les sorties des suites et ne les écrit jamais.
+
+Ce mode est choisi car les essais sont occasionnels et manuels : le résultat doit répondre immédiatement à
+« quelle suite, quel cas, quelle étape, pourquoi l'arrêt ? ».
+
 ## 🎯 1. Cadre réglementaire et objectifs
 
 La fonction d'arrêt d'urgence et la coupure de puissance associée sur l'excavatrice de dragage YGO sont conçues selon les normes et directives européennes et françaises :
@@ -28,6 +44,9 @@ Le **CI/CD (Continuous Integration / Continuous Deployment)** désigne des prati
 * **Validation Continue (In-PLC Testing) :** Dans le cadre industriel, cela consiste à exécuter un programme de test autonome directement au cœur du processeur de l'automate (ou de son simulateur) pour simuler des scénarios de pannes et certifier dynamiquement que les sécurités réagissent conformément aux normes.
 
 ### ⚙️ Comment lancer les tests de validation pendant qu'on code ?
+
+📌 En exploitation, le lancement est manuel et ponctuel : une seule suite est sélectionnée dans l'IHM.
+Il n'existe plus de campagne automatique au chargement ni d'enchaînement `RunAll`.
 Pendant le codage ou le refactoring de blocs de sécurité, le flux recommandé est le suivant :
 
 1. **Validation syntaxique (Terminal VS Code) :**
@@ -582,16 +601,16 @@ flowchart TD
 |---|---|---|
 | 1 | Suite (section GATE) | `NOT GVL_Simulation.SimulationModeActive` → abort interne + RETURN (comportement actuel conservé) |
 | 2 | Suite (SimGateOk) | Chaque suite déclare ses `_IsReal` **incompatibles** (P13 §2). Suite Safety : `SimGateOk := NOT GVL_Simulation.EmergencyStopChain_IsReal` — un override sur une chaîne AU réellement câblée serait un forçage de sécurité réelle |
-| 3 | `FB_PLC_Tests_Management` | Refuse le `Start` si `NOT SimGateOk` ; front descendant de `SimulationModeActive` en cours de run → `Abort` propagé, `TESTRUN_ABORTED` seulement après `NOT Busy` ET vecteur d'overrides lu neutre |
+| 3 | `FB_PLC_Tests_Management` | Une seule suite manuelle active ; refuse le `Start` si `NOT SimGateOk` ; front descendant de `SimulationModeActive` → `Abort` de la suite active et rapport final explicite |
 
 📌 Le **moteur générique ne référence JAMAIS `GVL_Simulation`** (frontière bibliothèque) : les gates sont côté projet.
 
-#### 7.3.4 `FB_PLC_Tests_Management` — unique orchestrateur
+#### 7.3.4 `FB_PLC_Tests_Management` — superviseur des suites indépendantes
 
 ```mermaid
 stateDiagram-v2
     [*] --> IDLE
-    IDLE --> RUNNING : CmdRunAll / CmdRunSuite [+CmdRunCase]
+    IDLE --> RUNNING : Run<Suite> / CmdRunSuite [+CmdRunCase]
     RUNNING --> RUNNING : Done suite k → suite k+1
     RUNNING --> PASSED : toutes suites OK
     RUNNING --> FAILED : 1+ suite en échec
@@ -807,7 +826,7 @@ Le moteur et l'orchestrateur appliquent désormais les garde-fous suivants :
 - Le séquenceur expose `ErrorCode` et `ErrorMessage` au niveau de chaque suite.
 - Un watchdog de suite de 180 s interdit toute attente infinie sur `Done`.
 - `GVL_PLC_Tests.EventLog[]` conserve les erreurs d'orchestration avec compteur et indicateur de débordement.
-- Une erreur de suite n'empêche pas l'enchaînement `RunAll` vers la suite suivante ; seul un abandon opérateur/gate arrête volontairement la campagne.
+- Une erreur de suite clôt la suite concernée avec sa cause ; aucune autre suite ne démarre automatiquement. Une nouvelle suite exige une commande opérateur explicite.
 - Correction de cohérence : `StepTc06Teardown = 63` respecte `MaxSteps = 64`.
 
 ⚠️ La compilation finale doit être confirmée dans CODESYS après réimport du bundle. Les tests Python valident le contrat statique et la génération PLCopenXML, pas l'exécution temps réel de l'automate.

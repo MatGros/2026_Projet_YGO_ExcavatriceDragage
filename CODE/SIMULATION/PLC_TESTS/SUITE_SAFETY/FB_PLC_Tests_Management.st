@@ -97,19 +97,29 @@ CASE GVL_PLC_Tests.Status.RunState OF
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
 
-        // Démarrage par bouton global RunAll — enchaîne Safety PUIS Translation PUIS Bucket
-        IF RunAllTrig.Q THEN
-            IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
-                ChainMode := TRUE;
-                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSafety;
-                StartSafety := TRUE;
-                FirstStepSafety := 10; // TC-01 SETUP
-                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
-            END_IF;
+        // Normalisation des commandes unitaires vers l'interface historique RunSuite.
+        // Une seule commande est consommée ; RunAll reste volontairement ignoré.
+        IF GVL_PLC_Tests.Cmd.RunSafety THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteSafety;
+            GVL_PLC_Tests.Cmd.RunSafety := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunTranslation THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteTranslation;
+            GVL_PLC_Tests.Cmd.RunTranslation := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunBucket THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteBucket;
+            GVL_PLC_Tests.Cmd.RunBucket := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunEncoder THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteEncoder;
+            GVL_PLC_Tests.Cmd.RunEncoder := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunModes THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteModes;
+            GVL_PLC_Tests.Cmd.RunModes := FALSE;
+        END_IF;
+        GVL_PLC_Tests.Cmd.RunAll := FALSE;
 
+        // RunAll est désactivé : chaque suite est lancée manuellement.
         // Démarrage d'une suite ciblée (Safety)
-        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteSafety THEN
+        IF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteSafety THEN
             IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
                 ChainMode := FALSE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSafety;
@@ -252,10 +262,6 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Safety d'abord
         IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSafety AND instSafetyValidation.Done THEN
             AbortSafety := FALSE;
-            IF SuiteWatchdogExpired THEN
-                instSafetyValidation.ErrorCode := 2001;
-                instSafetyValidation.ErrorMessage := 'Watchdog suite Safety expire';
-            END_IF;
             IF instSafetyValidation.TerminalState <> E_TestTerminalState.TEST_TERMINAL_DONE AND instSafetyValidation.Report.RunCounter <> LastLoggedSafetyRun THEN
                 LastLoggedSafetyRun := instSafetyValidation.Report.RunCounter;
                 GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
@@ -272,12 +278,6 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 GVL_PLC_Tests.EventLog[EventIdx].StepId := instSafetyValidation.Report.CurrentStepId;
                 GVL_PLC_Tests.EventLog[EventIdx].Code := instSafetyValidation.ErrorCode;
                 GVL_PLC_Tests.EventLog[EventIdx].Message := instSafetyValidation.ErrorMessage;
-            END_IF;
-            IF SuiteWatchdogExpired THEN
-                instSafetyValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
-                instSafetyValidation.Report.ErrorCode := 2001;
-                instSafetyValidation.Report.ErrorMessage := 'Watchdog suite Safety expire';
-                instSafetyValidation.Report.FailureSummary := instSafetyValidation.Report.ErrorMessage;
             END_IF;
             IF ChainMode AND (NOT instSafetyValidation.Report.Aborted OR SuiteWatchdogExpired) AND instTranslationValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Translation (continue même si Safety a échoué — logique
@@ -315,10 +315,6 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Translation (ciblée ou enchaînée après Safety)
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation AND instTranslationValidation.Done THEN
             AbortTranslation := FALSE;
-            IF SuiteWatchdogExpired THEN
-                instTranslationValidation.ErrorCode := 2002;
-                instTranslationValidation.ErrorMessage := 'Watchdog suite Translation expire';
-            END_IF;
             IF instTranslationValidation.TerminalState <> E_TestTerminalState.TEST_TERMINAL_DONE AND instTranslationValidation.Report.RunCounter <> LastLoggedTranslationRun THEN
                 LastLoggedTranslationRun := instTranslationValidation.Report.RunCounter;
                 GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
@@ -335,12 +331,6 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 GVL_PLC_Tests.EventLog[EventIdx].StepId := instTranslationValidation.Report.CurrentStepId;
                 GVL_PLC_Tests.EventLog[EventIdx].Code := instTranslationValidation.ErrorCode;
                 GVL_PLC_Tests.EventLog[EventIdx].Message := instTranslationValidation.ErrorMessage;
-            END_IF;
-            IF SuiteWatchdogExpired THEN
-                instTranslationValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
-                instTranslationValidation.Report.ErrorCode := 2002;
-                instTranslationValidation.Report.ErrorMessage := 'Watchdog suite Translation expire';
-                instTranslationValidation.Report.FailureSummary := instTranslationValidation.Report.ErrorMessage;
             END_IF;
             IF ChainMode AND (NOT instTranslationValidation.Report.Aborted OR SuiteWatchdogExpired) AND instBucketValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Bucket (2026-07-16 : 3e maillon Safety→Translation→Bucket)
@@ -390,10 +380,6 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Surveillance de la fin d'exécution — Bucket (ciblée, ou dernier maillon de la chaîne)
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket AND instBucketValidation.Done THEN
             AbortBucket := FALSE;
-            IF SuiteWatchdogExpired THEN
-                instBucketValidation.ErrorCode := 2003;
-                instBucketValidation.ErrorMessage := 'Watchdog suite Bucket expire';
-            END_IF;
             IF instBucketValidation.TerminalState <> E_TestTerminalState.TEST_TERMINAL_DONE AND instBucketValidation.Report.RunCounter <> LastLoggedBucketRun THEN
                 LastLoggedBucketRun := instBucketValidation.Report.RunCounter;
                 GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
@@ -410,12 +396,6 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 GVL_PLC_Tests.EventLog[EventIdx].StepId := instBucketValidation.Report.CurrentStepId;
                 GVL_PLC_Tests.EventLog[EventIdx].Code := instBucketValidation.ErrorCode;
                 GVL_PLC_Tests.EventLog[EventIdx].Message := instBucketValidation.ErrorMessage;
-            END_IF;
-            IF SuiteWatchdogExpired THEN
-                instBucketValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
-                instBucketValidation.Report.ErrorCode := 2003;
-                instBucketValidation.Report.ErrorMessage := 'Watchdog suite Bucket expire';
-                instBucketValidation.Report.FailureSummary := instBucketValidation.Report.ErrorMessage;
             END_IF;
             IF ChainMode THEN
                 FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted OR instBucketValidation.Report.Aborted;
@@ -458,10 +438,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
             FinalAnyFailed := instEncoderValidation.AnyFailed;
             GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.FailureSummary;
             IF SuiteWatchdogExpired THEN
-                instEncoderValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
-                instEncoderValidation.Report.ErrorCode := 2004;
-                instEncoderValidation.Report.ErrorMessage := 'Watchdog suite Encoder/Homing expire';
-                GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.ErrorMessage;
+                GVL_PLC_Tests.Status.FailureSummary := 'Watchdog suite Encoder/Homing expire';
                 FinalAborted := FALSE;
                 FinalAnyFailed := TRUE;
             END_IF;
@@ -478,10 +455,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
             FinalAnyFailed := instModesValidation.AnyFailed;
             GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.FailureSummary;
             IF SuiteWatchdogExpired THEN
-                instModesValidation.Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
-                instModesValidation.Report.ErrorCode := 2005;
-                instModesValidation.Report.ErrorMessage := 'Watchdog suite Modes/Homme-mort expire';
-                GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.ErrorMessage;
+                GVL_PLC_Tests.Status.FailureSummary := 'Watchdog suite Modes/Homme-mort expire';
                 FinalAborted := FALSE;
                 FinalAnyFailed := TRUE;
             END_IF;
