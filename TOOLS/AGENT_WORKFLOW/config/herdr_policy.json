@@ -1,7 +1,8 @@
 {
   "enabled": true,
-  "requiredServer": true,
+  "requiredServer": false,
   "defaultMode": "read-only-review",
+  "humanValidationRequired": true,
   "allowedModes": ["read-only-review", "parallel-analysis"],
   "forbiddenModes": ["autonomous-safety-change", "autonomous-commit"],
   "criticality": {

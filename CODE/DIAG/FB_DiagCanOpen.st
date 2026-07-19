@@ -1,6 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 FB_DiagCanOpen — Diagnostic de communication bus CANopen / Joystick
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+*)
 FUNCTION_BLOCK PUBLIC FB_DiagCanOpen
 VAR_INPUT
     Enable          : BOOL;        (* Active la surveillance CAN *)

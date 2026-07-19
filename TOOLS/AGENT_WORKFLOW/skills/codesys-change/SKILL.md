@@ -5,8 +5,8 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
 
 # Modification CODESYS
 
-1. Lire `TASK_CONTEXT` et les specs actives pertinentes.
-2. Vérifier le scope avec les outils déterministes.
+1. Lire `TASK_CONTEXT`, `DOC_WRITING_POLICY.md` et les specs actives pertinentes.
+2. Vérifier le scope avec `check_structure.py` et `check_code_style.py`.
 3. Présenter un plan court si le besoin n'est pas déjà validé.
 4. Modifier uniquement les fichiers autorisés.
 5. Lancer les gates et signaler les limites.

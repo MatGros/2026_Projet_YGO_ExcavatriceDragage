@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Transmet les ordres de sécurité logiques vers les 
       sorties physiques de l'automate (relais d'AU A/B/Impulsion).
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md
+*)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput
 VAR_INPUT

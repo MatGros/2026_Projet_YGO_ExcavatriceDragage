@@ -2,7 +2,9 @@
    🛡️ PRG_03_Safety — Centralisation des surveillances et blocs Safety
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 3.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md
+*)
 
 PROGRAM PRG_03_Safety
 VAR

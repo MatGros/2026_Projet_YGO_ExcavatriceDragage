@@ -5,7 +5,9 @@
    🎯 Filtre exponentiel discret : y[k] = α·x[k] + (1-α)·y[k-1]
       où α = CycleTimeS / (T + CycleTimeS), T = TimeConst en secondes.
    ⚠️ Si TimeConst = 0 ou CycleTimeS = 0, sortie = entrée (pass-through).
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md
+*)
 
 FUNCTION_BLOCK FB_Filter_PT1
 VAR_INPUT

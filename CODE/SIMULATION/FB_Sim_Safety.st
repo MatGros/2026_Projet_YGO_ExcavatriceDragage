@@ -14,7 +14,9 @@
       - Le contacteur s'engage (SimContactorOk) lors d'une impulsion de réarmement (EmergencyArming) 
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
+*)
 FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT
     Enable          : BOOL; // Activation de la simulation

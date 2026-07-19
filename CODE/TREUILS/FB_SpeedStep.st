@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie9_Fonction_Winch_v1.0.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
    📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
    📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
                        (M1 et M2 ont chacune la leur — pas de table globale)

@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 PLC = ROOT / "CODE" / "SIMULATION" / "PLC_TESTS"
 
 
@@ -162,7 +162,7 @@ def test_load_estimator_is_explicitly_non_safety_and_table_gated():
     table = (ROOT / "CODE" / "TREUILS" / "ST_WinchLoadEstimateTable.st").read_text(encoding="utf-8")
     safety = (ROOT / "CODE" / "MAIN" / "PRG_03_Safety.st").read_text(encoding="utf-8")
     assert "FUNCTION_BLOCK PUBLIC FB_WinchLoadEstimator" in estimator
-    assert "LoadPctByStepAndSpeedBand     : ARRAY[1..5, 1..5] OF REAL" in table
+    assert "LoadPctByStepAndSpeedBand     : ARRAY[1..5] OF ARRAY[1..5] OF REAL" in table
     assert "IF Configured AND (ActiveSpeedStep >= 1)" in estimator
     assert "EstimatedLoadPct := 0.0;" in estimator
     assert "instLoadEstimatorM1" in safety and "instLoadEstimatorM2" in safety

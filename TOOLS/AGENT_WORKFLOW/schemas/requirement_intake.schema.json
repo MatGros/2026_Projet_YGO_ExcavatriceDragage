@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RequirementIntake",
+  "type": "object",
+  "required": ["id", "receivedAt", "source", "rawInformation", "status", "questions", "unknowns", "impacts", "humanDecisionRequired"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^REQ-[0-9]{4}$" },
+    "receivedAt": { "type": "string" },
+    "source": { "enum": ["client", "meeting", "site", "test", "user", "other"] },
+    "author": { "type": "string" },
+    "rawInformation": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["raw", "to-clarify", "clarified", "decision-required", "decided", "to-implement", "implemented", "validated", "closed"] },
+    "questions": { "type": "array", "items": { "type": "string" } },
+    "unknowns": { "type": "array", "items": { "type": "string" } },
+    "impacts": { "type": "array", "items": { "type": "string" } },
+    "humanDecisionRequired": { "const": true }
+  }
+}

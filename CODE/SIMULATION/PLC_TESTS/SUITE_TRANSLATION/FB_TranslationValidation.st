@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // 🧪 FB_TranslationValidation — Suite de test Translation M3
 // ───────────────────────────────────────────────────────────────
-// 📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.8.md
+// 📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
 // 🎯 Valide les surveillances de sécurité de FB_Safety_Translation :
 //    TC-T1 Fin de course extrême, TC-T2 Méca B (incohérence à l'arrêt),
 //    TC-T3 Méca A (mouvement non commandé). Même moteur générique

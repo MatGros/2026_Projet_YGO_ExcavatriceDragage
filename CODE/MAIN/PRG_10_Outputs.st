@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_10_Outputs — Écriture des SORTIES physiques (PROGRAMME)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie6_IO_Conditioning_v1.2.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
    🔧 REX 2026-07-19 : suppression définitive du mode IHM_MANU (override direct des sorties,
-      mise en service urgence 2026-07-09) — voir DOC/IHM_MANU_Journal_Modifications.md pour
+      mise en service urgence 2026-07-09) — voir ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md pour
       l'historique complet. Le pilotage manuel passe désormais EXCLUSIVEMENT par MAINT_N1/N2
       + joystick homme-mort (PRG_06_WinchControl/PRG_07_TranslationControl), sous supervision
       réelle des sécurités métier (SafeStop/ForbidAscent/ForbidDescent/PowerCutOff toujours

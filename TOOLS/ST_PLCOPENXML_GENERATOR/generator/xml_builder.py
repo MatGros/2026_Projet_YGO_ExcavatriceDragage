@@ -279,7 +279,7 @@ def _build_enum_datatype(obj: SourceObject, guid: str, diagnostics: DiagnosticCo
     if obj.header_comment:
         diagnostics.info(
             f"{obj.name}: header comment has no confirmed schema slot for ENUM dataType in "
-            "PLCopenXML -- dropped (see GUIDE section 4)",
+            "PLCopenXML -- dropped (see docs/PLCOPENXML_FORMAT.md §4)",
             obj.name,
         )
 

@@ -2,7 +2,9 @@
    📡 PRG_01_Diagnostics — États bus de terrain et Joystick (PROGRAMME)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1.
-   ═══════════════════════════════════════════════════════════════ *)
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md ; DOC/AF_Partie-08_Fonction_Joystick_v1.3.md
+*)
 
 PROGRAM PRG_01_Diagnostics
 VAR

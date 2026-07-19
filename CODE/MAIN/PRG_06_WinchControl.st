@@ -3,6 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_06_WinchControl
@@ -71,7 +72,7 @@ VAR
 
     // 🆕 REX 2026-07-19 : palier max Ascension/Descente — même valeur en Auto ET Manuel
     // (ex-plafond IHM_MANU "essais progressifs" retiré avec la suppression d'IHM_MANU, voir
-    // DOC/IHM_MANU_Journal_Modifications.md).
+    // ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescente  : INT;
 END_VAR
