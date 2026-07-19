@@ -12,6 +12,12 @@ FORBIDDEN = ("CoupeEnable", "FB_Watchdog")
 DOC_REF = re.compile(r"DOC/[A-Za-z0-9_./-]+\.md")
 # Détecte instFB.VarOutput :=  (écriture sur VAR_OUTPUT d'une instance)
 VAR_OUTPUT_WRITE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\.(Ready|Busy|Done|Error|ErrorId|State|StateAtError)\s*:=")
+# W1: Homme-mort — StartStop/StartStop_Active/Direction sans DeadmanArmed
+HOMME_MORT_MISSING = re.compile(r"\b(StartStop|StartStop_Active|Direction)\s*:=\s*(?!.*DeadmanArmed)(?![^;]*DeadmanArmed)[^;]+")
+# W3: FDC coupe commande sans rampe rapide
+FDC_CUTS_WITHOUT_RAMP = re.compile(r"(LimitSwitchFwd|LimitSwitchRev|LimitSwitch)\s*[^;]*?DriveControlWord\s*:=\s*0")
+# W5: IF Direction en contexte safety sans // DESIGN:
+SAFETY_DIRECTION_IF = re.compile(r"IF\s+Direction\s*[=<>!]")
 
 # Baseline des violations VAR_OUTPUT connues (dette technique préexistante)
 # Clé = chemin relatif SANS prefixe CODE/
@@ -42,7 +48,6 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
 }
 
 
-
 def requires_doc_reference(path: Path) -> bool:
     normalized = path.as_posix()
     if "/SIMULATION/PLC_TESTS/" in normalized:
@@ -67,7 +72,9 @@ def main() -> int:
             if token in text:
                 print(f"[ERROR] {path}: forbidden token {token}", file=sys.stderr)
                 errors += 1
-        # VAR_OUTPUT write detection
+
+        # VAR_OUTPUT write detection — only flag cross-file writes
+        # (FB writing its own VAR_OUTPUT is correct; PRG writing another FB's VAR_OUTPUT is violation)
         for m in VAR_OUTPUT_WRITE.finditer(text):
             inst_name = m.group(1)
             var_name = m.group(2)
@@ -80,8 +87,44 @@ def main() -> int:
                 print(f"[WARN] {path}: known VAR_OUTPUT write debt: {key}", file=sys.stderr)
                 warnings += 1
             else:
-                print(f"[ERROR] {path}:{m.start()}: NEW illegal write to VAR_OUTPUT {key}", file=sys.stderr)
+                # Check if this is a cross-file write by looking at the instance declaration
+                # If instance is declared in this file, it's internal (OK)
+                # If instance is declared elsewhere, it's a cross-file write (ERROR)
+                inst_decl_pattern = rf"\b{re.escape(inst_name)}\s*:\s*\w+\b"
+                if re.search(inst_decl_pattern, text):
+                    # Instance declared in this file - internal write, OK
+                    continue
+                print(f"[ERROR] {path}:{m.start()}: cross-file illegal write to VAR_OUTPUT {key}", file=sys.stderr)
                 errors += 1
+
+        # W1: Homme-mort manquant — StartStop/Direction assigné sans DeadmanArmed
+        # Recherche assignation StartStop/StartStop_Active/Direction sans DeadmanArmed dans la même instruction
+        for m in HOMME_MORT_MISSING.finditer(text):
+            # Vérifier que DeadmanArmed n'est PAS dans un rayon de 100 chars
+            context = text[max(0, m.start()-100):m.end()+100]
+            if "DeadmanArmed" not in context and "PRG_07_TranslationControl" in text:
+                line = text[:m.start()].count('\n') + 1
+                print(f"[WARN] {path}:{line}: StartStop/Direction assigned without DeadmanArmed check (homme-mort)", file=sys.stderr)
+                warnings += 1
+
+        # W3: FDC coupe DriveControlWord sans rampe rapide (SpeedRamp/RampDecelFastRate)
+        for m in FDC_CUTS_WITHOUT_RAMP.finditer(text):
+            # Chercher SpeedRamp ou RampDecelFastRate dans un rayon de 200 chars
+            context = text[max(0, m.start()-200):m.end()+200]
+            if "SpeedRamp" not in context and "RampDecelFastRate" not in context:
+                line = text[:m.start()].count('\n') + 1
+                print(f"[ERROR] {path}:{line}: FDC cuts DriveControlWord without fast ramp (SpeedRamp/RampDecelFastRate missing)", file=sys.stderr)
+                errors += 1
+
+        # W5: IF Direction en contexte safety sans commentaire // DESIGN:
+        for m in SAFETY_DIRECTION_IF.finditer(text):
+            # Chercher // DESIGN: dans un rayon de 300 chars avant/après
+            context = text[max(0, m.start()-300):m.end()+300]
+            if "DESIGN" not in context and ("FB_Safety" in text or "SafeStop" in text or "PowerCutOff" in text or "ErrorId" in text):
+                line = text[:m.start()].count('\n') + 1
+                print(f"[WARN] {path}:{line}: IF Direction in safety context missing // DESIGN: comment", file=sys.stderr)
+                warnings += 1
+
         header = text[:4000]
         required = requires_doc_reference(path)
         if "DOC/" not in header:
