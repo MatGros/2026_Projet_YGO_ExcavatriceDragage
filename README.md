@@ -15,12 +15,12 @@ Tous les documents sont dans le dossier **`DOC/`** :
 - Booléens : entrée = verbe (`Start`), sortie = état (`Ready`)
 - Exemples complets pour structures et instances
 
-### 2️⃣ **[Analyse Fonctionnelle — Partie 1 (v1.5)](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.5.md)**
+### 2️⃣ **[Analyse Fonctionnelle — Partie 1 (v1.6)](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md)**
 Le projet en bref : équipements pilotés, fonctions principales, interactions, sécurité électrique.
 
-### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.10)](DOC/AF_Partie-02_Architecture_Programme_v2.10.md)**
+### 3️⃣ **[Analyse Fonctionnelle — Partie 2 (v2.12)](DOC/AF_Partie-02_Architecture_Programme_v2.12.md)**
 Architecture détaillée : cadencement (EtherCAT 4 / CANopen 20 / Main 10 ms), orchestration
-séquentielle `PLC_PRG_MAIN`, mapping M1/M2/M3, modèle d'arrêt `SafeStop`/`StartStop`, `PowerCutOff`. **Référence projet.**
+séquentielle `PRG_00`→`PRG_10`, mapping M1/M2/M3, modèle d'arrêt `SafeStop`/`StartStop`, `PowerCutOff`. **Référence projet.**
 
 ### 4️⃣ **[Analyse Fonctionnelle — Partie 3 (v1.3)](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md)**
 Contrat standard que **tout FB métier respecte** :
@@ -32,18 +32,19 @@ Contrat standard que **tout FB métier respecte** :
 - Précédence `Enable` > `SafeStop` > `StartStop` ; AU matériel (seul arrêt brutal) + `PowerCutOff`
 
 ### 5️⃣ **Specs détaillées — Transverses & Sécurité**
-- **[Partie 4 (v1.2)](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md)** — Cycle & séquenceur (`E_CycleStep`, synchro, frein, chariot, grappin, rampes).
-- **[Partie 5 (v1.3)](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
-- **[Partie 6 (v1.5)](DOC/AF_Partie-06_IO_Conditioning_v1.5.md)** — Conditionnement E/S.
-- **[Partie 7 (v1.2)](DOC/AF_Partie-07_Interface_IHM_v1.2.md)** — Interface HMI.
+- **[Partie 4 (v1.4)](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md)** — Cycle & séquenceur (`E_CycleStep`, synchro, frein, translation, benne, rampes).
+- **[Partie 5 (v1.6)](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
+- **[Partie 6 (v1.6)](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)** — Conditionnement E/S.
+- **[Partie 7 (v1.5)](DOC/AF_Partie-07_Interface_IHM_v1.5.md)** — Interface HMI.
 
 ### 6️⃣ **Fonctions Métier (Partie 8+)**
-- **[Partie 8 (v1.2)](DOC/AF_Partie-08_Fonction_Joystick_v1.2.md)** — Fonction Joystick.
-- **[Partie 9 (v1.7)](DOC/AF_Partie-09_Fonction_Winch_v1.7.md)** — Fonction Winch (M1/M2, safety mou câble/thermique, garde-fous roue libre).
+- **[Partie 8 (v1.3)](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md)** — Fonction Joystick.
+- **[Partie 9 (v1.11)](DOC/AF_Partie-09_Fonction_Winch_v1.11.md)** — Fonction Winch (M1/M2, safety mou câble/thermique, garde-fous roue libre).
 - **[Partie 10 (v1.10)](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md)** — Fonction Encoder & Homing.
-- **[Partie 11 (v1.3)](DOC/AF_Partie-11_Fonction_Chariot_v1.3.md)** — Fonction Chariot (M3 variateur AC600).
-- **[Partie 12 (v1.2)](DOC/AF_Partie-12_Fonction_Grappin_v1.2.md)** — Fonction Grappin (M2, désynchronisation, garde-fou glissement).
-- **[Partie 13 (v1.1)](DOC/AF_Partie-13_Fonction_Simulation_v1.1.md)** — Fonction Simulation.
+- **[Partie 11 (v1.9)](DOC/AF_Partie-11_Fonction_Translation_v1.9.md)** — Fonction Translation (M3 variateur AC600).
+- **[Partie 12 (v1.4)](DOC/AF_Partie-12_Fonction_Benne_v1.4.md)** — Fonction Benne (M2, désynchronisation, garde-fou glissement).
+- **[Partie 13 (v1.2)](DOC/AF_Partie-13_Fonction_Simulation_v1.2.md)** — Fonction Simulation.
+- **[Partie 14 (v1.2)](DOC/AF_Partie-14_PLC_Tests_Validation_v1.2.md)** — Tests de validation sécurité (TC-01/02/03), framework de test in-PLC.
 - **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
 ### 7️⃣ **[PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md)** 🗂️ **Pilotage projet — pas une spec**
@@ -58,29 +59,40 @@ excavatrice-dragage/
 ├── DOC/                      # 📖 Documentation (ICI COMMENCE)
 │   ├── NAMING_CONVENTION.md
 │   ├── VERSION_HISTORY.md    (versions CODESYS testées/validées)
-│   ├── AF_Partie-01_Analyse_Fonctionnelle_v1.5.md
-│   ├── AF_Partie-02_Architecture_Programme_v2.10.md   (référence)
+│   ├── AF_Partie-01_Analyse_Fonctionnelle_v1.6.md
+│   ├── AF_Partie-02_Architecture_Programme_v2.12.md   (référence)
 │   ├── AF_Partie-03_Template_FB_Commun_v1.3.md
-│   ├── AF_Partie-04_Cycle_Sequenceur_v1.2.md
-│   ├── AF_Partie-05_Modes_Maintenance_v1.3.md
-│   ├── AF_Partie-06_IO_Conditioning_v1.5.md
-│   ├── AF_Partie-07_Interface_IHM_v1.2.md
-│   ├── AF_Partie-08_Fonction_Joystick_v1.2.md
-│   ├── AF_Partie-09_Fonction_Winch_v1.7.md
+│   ├── AF_Partie-04_Cycle_Sequenceur_v1.4.md
+│   ├── AF_Partie-05_Modes_Maintenance_v1.6.md
+│   ├── AF_Partie-06_IO_Conditioning_v1.6.md
+│   ├── AF_Partie-07_Interface_IHM_v1.5.md
+│   ├── AF_Partie-08_Fonction_Joystick_v1.3.md
+│   ├── AF_Partie-09_Fonction_Winch_v1.11.md
 │   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
-│   ├── AF_Partie-11_Fonction_Chariot_v1.3.md
-│   ├── AF_Partie-12_Fonction_Grappin_v1.2.md
-│   ├── AF_Partie-13_Fonction_Simulation_v1.1.md
+│   ├── AF_Partie-11_Fonction_Translation_v1.9.md
+│   ├── AF_Partie-12_Fonction_Benne_v1.4.md
+│   ├── AF_Partie-13_Fonction_Simulation_v1.2.md
+│   ├── AF_Partie-14_PLC_Tests_Validation_v1.2.md
 │   ├── AUDIT_Coherence_Documentaire_v1.0.md
 │   └── PLAN_TASK_v1.0.md     (pilotage : jalons, tâches, TBD/questions client)
 │
-├── CODE/                     # 🔧 Fichiers ST à importer dans CODESYS
-│   ├── PRG_*.st              (fichiers ST à copier-coller ou via bundle PLCopenXML)
-│   ├── FB_*.st
-│   └── CODE_Bundle.xml       (bundle PLCopenXML généré, voir TOOLS/)
+├── CODE/                     # 🔧 Fichiers ST à importer dans CODESYS (MainTask 10 ms, PRG_00→PRG_10)
+│   ├── MAIN/                 # PRG_00…PRG_10 : orchestration et supervision
+│   ├── AU/                   # Chaîne arrêt d'urgence / EmergencyManagement
+│   ├── CODEURS/               # FB_Encoder_Abs/Safety/Scale/SpeedMonitor (COD1/COD2)
+│   ├── CYCLE/                 # E_CycleStep, FB_Cycle (séquenceur semi-auto)
+│   ├── DIAG/                  # FB_DiagCanOpen, FB_DiagEthercat
+│   ├── JOYSTICK/               # FB_Joystick et briques associées
+│   ├── MODES/                  # FB_Modes (N1/N2, limite légale)
+│   ├── SIMULATION/             # FB_Sim_*, PLC_TESTS/ (suites de test in-PLC)
+│   ├── SUPERVISION/            # Structures HMI (GVL_IHM, ST_*HMI)
+│   ├── TRANSLATION/            # FB_Translation, FB_Safety_Translation (M3, AC600)
+│   ├── TREUILS/                # FB_Winch M1/M2, BENNE/ (FB_Bucket)
+│   └── CODE_Bundle.xml        # bundle PLCopenXML généré, voir TOOLS/
 │
-├── TOOLS/                     # 🔧 Génération bundle PLCopenXML (importation auto CODESYS)
-│   └── (outillage Python pour grouper modifs CODE/*.st → CODE_Bundle.xml)
+├── TOOLS/                     # 🔧 Outillage
+│   ├── ST_PLCOPENXML_GENERATOR/  # Python : groupe modifs CODE/*.st → CODE_Bundle.xml
+│   └── AGENT_WORKFLOW/           # Skills/docs/scripts pour la délégation multi-modèle (antigravity)
 │
 ├── PRJ_CODESYS/              # 📦 Projet CODESYS
 │   ├── PROJ_Full_ImportExport/Device.export  (export analyse architecture)
@@ -94,6 +106,7 @@ excavatrice-dragage/
 ## 🔄 **Workflow Édition**
 
 **⚠️ Important :** Voir [`CLAUDE.md`](CLAUDE.md) (racine) pour le workflow complet avec guardrails, règles DOC et skill `codesys-workflow`.
+🤖 Délégation multi-modèle (Claude/Codex ↔ Gemini 3.5) : plugin **antigravity** — voir `CLAUDE.md` §en-tête pour les skills (`antigravity:delegate`, `antigravity:review`, …).
 
 Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 
@@ -123,12 +136,12 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 cd TOOLS/ST_PLCOPENXML_GENERATOR
 python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', '<version>']))"
 ```
-Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.3.26` d'après `PRJ_CODESYS/Programme_MGS_v0.3.26_*.project`).
+Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.4.18_DocSweep_IHMRetrait` d'après `PRJ_CODESYS/Programme MGS_v0.4.18_DocSweep_IHMRetrait.project`).
 
 **Exemple :**
 ```powershell
 cd TOOLS/ST_PLCOPENXML_GENERATOR
-python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.3.26']))"
+python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.4.18_DocSweep_IHMRetrait']))"
 ```
 
 Sortie → `CODE/CODE_Bundle.xml`
@@ -143,17 +156,17 @@ Sortie → `CODE/CODE_Bundle.xml`
 | **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; surveillance périodicité = fonction système CODESYS (200 ms) |
 | **FB Standard** | Tous les FB métier respectent le contrat [Partie 3 (v1.3)](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md) (profils selon catégorie, §1bis) |
 | **Sécurité** | `Enable` > `SafeStop` (par métier, rampe rapide) > `StartStop` (rampe normale) ; AU matériel = seul arrêt brutal + `PowerCutOff` ; Reset = front |
-| **Cycle** | Semi-auto : `E_CycleStep` ([Partie 4 v1.2](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md)) |
+| **Cycle** | Semi-auto : `E_CycleStep` ([Partie 4 v1.4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md)) |
 
 ---
 
 ## 🚀 **Commencer**
 
 1. **Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)** ← commence ici
-2. Consulter [AF_Partie-01 (v1.5)](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.5.md) pour le contexte métier
-3. Étudier [AF_Partie-02 (v2.10)](DOC/AF_Partie-02_Architecture_Programme_v2.10.md) pour l'architecture **[RÉFÉRENCE]**
+2. Consulter [AF_Partie-01 (v1.6)](DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md) pour le contexte métier
+3. Étudier [AF_Partie-02 (v2.12)](DOC/AF_Partie-02_Architecture_Programme_v2.12.md) pour l'architecture **[RÉFÉRENCE]**
 4. Comprendre [AF_Partie-03 (v1.3)](DOC/AF_Partie-03_Template_FB_Commun_v1.3.md) avant de coder un FB
-5. Approfondir [Partie 4 (v1.2)](DOC/AF_Partie-04_Cycle_Sequenceur_v1.2.md) / [5 (v1.3)](DOC/AF_Partie-05_Modes_Maintenance_v1.3.md) / [6 (v1.5)](DOC/AF_Partie-06_IO_Conditioning_v1.5.md)
+5. Approfondir [Partie 4 (v1.4)](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md) / [5 (v1.6)](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md) / [6 (v1.6)](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)
 6. Consulter [l'audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md) pour l'historique des décisions de conception
 7. Consulter [VERSION_HISTORY.md](DOC/VERSION_HISTORY.md) pour les versions CODESYS testées
 8. Consulter [PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md) pour savoir ce qu'il reste à faire, trancher ou demander au client
@@ -166,4 +179,4 @@ Sortie → `CODE/CODE_Bundle.xml`
 - **Langage** : CODESYS 3.5 (ST / Ladder / FBD)
 - **Outillage** : Skill `codesys-workflow` (`.claude/skills/codesys-workflow.md`) + TOOLS
 - **Auteur** : Mathieu Gros
-- **Dernière mise à jour** : 2026-07-08
+- **Dernière mise à jour** : 2026-07-19
