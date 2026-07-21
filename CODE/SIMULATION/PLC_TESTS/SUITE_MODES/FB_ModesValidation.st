@@ -117,10 +117,10 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     ErrorMessage := '';
     TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
     Step := FirstStepId;
-    IF (Step <> 10) AND (Step <> 20) AND (Step <> 30) AND (Step <> 40)
+    IF (Step <> 5) AND (Step <> 10) AND (Step <> 20) AND (Step <> 30) AND (Step <> 40)
        AND (Step <> 50) AND (Step <> 60) AND (Step <> 65) AND (Step <> 70)
        AND (Step <> 80) AND (Step <> 90) AND (Step <> 100) AND (Step <> 110) THEN
-        Step := 10;
+        Step := 5;
     END_IF;
     Report.Name := 'Modes / Homme-mort Validation';
     Report.InProgress := TRUE;
@@ -170,6 +170,7 @@ IF NOT StepStarted THEN
     StepStarted := TRUE;
     StepElapsed := T#0s;
     CASE Step OF
+        5: StepLimit := T#3s;         // Préambule : armement contacteur simulé
         10, 20: StepLimit := T#3s;   // Mode appliqué + neutre initial
         11, 21: StepLimit := T#5s;   // Armement + départ mouvement
         12: StepLimit := T#5s;       // TC-M1 uniquement : relâchement → arrêt
@@ -200,6 +201,16 @@ StepTimer(IN := TRUE, PT := StepLimit);
 NeutralHoldTimer(IN := (Step = 13) AND (ABS(GVL_PLC_Tests.OverrideJoystickRawY - 5000) < 500), PT := T#1200MS);
 
 CASE Step OF
+    // ─────────── Préambule : armement contacteur simulé (requis sans hardware) ───────────
+    5:
+        GVL_IHM.Modes.CmdEmergencyArming := TRUE; // pulse réarmement → SimContactorOk → EmergencyStopOk
+        IF PRG_00_Inputs.EmergencyStopOk THEN
+            GVL_IHM.Modes.CmdEmergencyArming := FALSE;
+            StepPassed := TRUE;
+            Step := 10;
+            StepStarted := FALSE;
+        END_IF;
+
     // ─────────── TC-M1 : MAINT_N1 + homme-mort (+ arrêt + reprise) ───────────
     10:
         GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
