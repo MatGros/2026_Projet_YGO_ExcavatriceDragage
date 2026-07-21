@@ -224,12 +224,12 @@ IF NOT TableReady THEN
     CheckTable[9].ProbeIdx := SigSafetyM1ErrorId;
     CheckTable[9].Mask := 16#0200;
 
-    // Chk 10: Limite haute standard (12m)
+    // Chk 10: limite haute d'exploitation standard (8,0 m)
     CheckTable[10].Kind := E_TestCheckKind.REAL_IN_RANGE;
     CheckTable[10].Mode := E_TestCheckMode.CHECK_INSTANT;
     CheckTable[10].ProbeIdx := SigM2TopLimit;
-    CheckTable[10].RealMin := 12.0;
-    CheckTable[10].RealMax := 12.1;
+    CheckTable[10].RealMin := 8.0;
+    CheckTable[10].RealMax := 8.1;
 
     // Chk 11: Bucket fermé mémorisé
     CheckTable[11].Kind := E_TestCheckKind.BOOL_EQUAL;
@@ -237,12 +237,12 @@ IF NOT TableReady THEN
     CheckTable[11].ProbeIdx := SigBucketIsClosed;
     CheckTable[11].ExpectedBool := TRUE;
 
-    // Chk 12: Limite haute décalée (+10m -> 22m)
+    // Chk 12: limite haute décalée par la benne fermée (+10 m → 18 m)
     CheckTable[12].Kind := E_TestCheckKind.REAL_IN_RANGE;
     CheckTable[12].Mode := E_TestCheckMode.CHECK_INSTANT;
     CheckTable[12].ProbeIdx := SigM2TopLimit;
-    CheckTable[12].RealMin := 22.0;
-    CheckTable[12].RealMax := 22.1;
+    CheckTable[12].RealMin := 18.0;
+    CheckTable[12].RealMax := 18.1;
 
     // Chk 13: Erreur Bucket active
     CheckTable[13].Kind := E_TestCheckKind.BOOL_EQUAL;

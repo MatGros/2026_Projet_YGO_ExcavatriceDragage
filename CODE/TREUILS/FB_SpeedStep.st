@@ -35,7 +35,7 @@
    🛡️ CORRECTIF P0.2 (2026-07-21) :
       - Bornage `MaxStepNumber` ∈ [1..5] dès l'entrée
       - Validation table : seuils croissants 0..100 %, hystérésis > 0,
-        contacteurs cohérents (au moins 1 par palier si palier ≤ MaxStepNumber)
+        contacteurs cohérents (au moins 1 par palier 2..MaxStepNumber ; palier 1 tout FALSE autorisé)
       - Sortie `ConfigError` / `ConfigErrorId` (bit0 = table invalide)
       - Forçage sorties sûres (contacteurs FALSE, StepNumber=0) si erreur config
       - Reset sur front (R_TRIG) + cause disparue (conforme Partie 3 §5)
@@ -103,8 +103,9 @@ END_IF;
 // 1. Seuils croissants stricts : StepThreshold_Pct[1] < [2] < [3] < [4] < [5]
 // 2. Seuils dans [0..100] %
 // 3. HystMargin > 0
-// 4. Pour chaque palier 1.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
-//    (On ne valide PAS les paliers > _MaxStepClamped — ils ne seront jamais atteints)
+// 4. Pour chaque palier 2.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
+//    Le palier 1 peut légitimement avoir les 4 contacteurs FALSE : résistances rotoriques
+//    toutes insérées = vitesse minimale. On ne valide pas les paliers jamais atteignables.
 _ConfigValid := TRUE;
 _ConfigErrorIdInt := 16#0000;
 
@@ -131,14 +132,7 @@ END_IF;
 
 // Critère 4 : cohérence contacteurs par palier (seulement jusqu'au plafond actif)
 IF _ConfigValid THEN
-    // Helper local inline : teste si au moins 1 contacteur TRUE pour un palier
-    // Palier 1
-    IF _MaxStepClamped >= 1 THEN
-        IF NOT (Table.P1R1 OR Table.P1R2 OR Table.P1R3 OR Table.P1R4) THEN
-            _ConfigValid := FALSE;
-            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-        END_IF;
-    END_IF;
+    // Palier 1 : les 4 sorties FALSE sont une configuration valide de vitesse minimale.
     // Palier 2
     IF _MaxStepClamped >= 2 THEN
         IF NOT (Table.P2R1 OR Table.P2R2 OR Table.P2R3 OR Table.P2R4) THEN

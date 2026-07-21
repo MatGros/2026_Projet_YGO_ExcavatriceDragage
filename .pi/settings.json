@@ -1,5 +1,18 @@
 {
   "packages": [
     "..\\TOOLS\\AGENT_WORKFLOW"
-  ]
+  ],
+  "providers": {
+    "omni": {
+      "baseUrl": "http://localhost:20128/v1",
+      "api": "anthropic-messages",
+      "apiKey": "sk-165df7a334245d53-bbbfe5-721d1f65",
+      "models": [
+        {
+          "id": "CheapFix",
+          "name": "CheapFix"
+        }
+      ]
+    }
+  }
 }

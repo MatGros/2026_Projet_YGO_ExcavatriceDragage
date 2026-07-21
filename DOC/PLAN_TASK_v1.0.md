@@ -161,16 +161,20 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T46 | ✅ Créer le tableau 2D empirique `palier contacteurs × vitesse mesurée → charge estimée %` ; valeur informative non certifiée, réglable en mise en service | Projet / Terrain | `ST_WinchSpeedConfig`, `ST_WinchLoadEstimateTable`, `FB_WinchLoadEstimator` |
 | T47 | ✅ Ajouter le garde-fou de passage de palier : vitesse minimale atteinte + stabilité temporelle + absence de désynchronisme/variation anormale | Projet / Sécurité | `FB_SpeedStep`, `FB_Winch`, `FB_Encoder_SpeedMonitor` — activation terrain restant à valider |
 | T48 | 🟠 Valider les réactions et seuils par simulation puis essais terrain : démarrage en charge, treuil freiné, câble mou, effort asymétrique, perte codeur | Projet / Terrain | Matrice V1–V7 ajoutée AF_Partie-14 §7.4.4 ; exécution CODESYS/terrain restante |
-| T49 | 🔴 Unifier les hauteurs/limites treuil M1/M2 — incohérence 8,0 / 8,5 / 12,0 / 12,5 m entre code, P9, P7 (P0.1 audit Winch) | Projet + Mécanique | `AUDIT_Winch_v1.0.md` §2.1, `GVL_PERSISTENT` vs `AF_Partie-09` vs `AF_Partie-07` |
-| T50 | 🔴 Corriger `FB_SpeedStep` : `MaxStepNumber` non borné → défaut config si ≤0 ou >5, forcer contacteurs FALSE (P0.2 audit Winch) | Projet | `AUDIT_Winch_v1.0.md` §2.2, `CODE/TREUILS/FB_SpeedStep.st:87-92` |
+| T49 | ✅ Hauteurs unifiées : 8,0 m limite exploitation ; 8,5 m capteur/homing. Références 12,0/12,5 purgées du code et des specs actives | Projet + Mécanique | WINCH-CORE-01, `GVL_PERSISTENT`, P4/P7/P9/P10 |
+| T50 | ✅ `FB_SpeedStep` borné/validé ; ConfigError remonté dans `FB_Winch.ErrorId` bit2, sorties sûres. Palier 1 tout FALSE autorisé (résistances insérées) | Projet | WINCH-CORE-01, `AUDIT_Winch_v1.0.md` §2.2 |
 | T52 | 🔴 Valider chaîne `PowerCutOff` physique : câblage sorties A/B, contacteur puissance, retour confirmation, temps coupure réel (P0.3 audit Winch) | Électricité + Projet | `AUDIT_Winch_v1.0.md` §2.3, `PRG_10_Outputs.st:136-156` |
-| T53 | 🟠 Lever contradiction « sans codeur » / implémentation réelle : choix explicite (safety stricte OU mode maintenance limité + analyse risques) (P1.1) | Projet | `AUDIT_Winch_v1.0.md` §3.1, `AF_Partie-09:39-41` vs `PRG_03_Safety:40,83` |
+| T53 | ✅ Choix implémenté : safety stricte par défaut ; bypass individuel maintenu uniquement en MAINT_N2 + Reset, sans masquer les autres défauts | Projet | WINCH-CORE-01, `FB_Safety_Winch`, P9 |
 | T54 | 🟠 Documenter latence PRG_03→PRG_06→PRG_10 (~10 ms) et l'intégrer au calcul temps d'arrêt (P1.2) | Projet | `AUDIT_Winch_v1.0.md` §3.2 |
 | T55 | 🟠 Définir stratégie synchronisme unique (info / mineur / majeur / critique) et aligner DOC/CODE/IHM (P1.3) | Projet | `AUDIT_Winch_v1.0.md` §3.3, `FB_WinchSync`, `PRG_06:329-338` |
 | T56 | 🟠 Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ms, 500 ms) avec charge/vide/frein chaud (P1.4) | Projet / Terrain | `AUDIT_Winch_v1.0.md` §3.4, `FB_Safety_Winch:149-169` |
 | T57 | 🟠 Unifier limite haute M2 selon offset benne : une seule limite active distribuée à Winch/Safety/IHM (P1.5) | Projet | `AUDIT_Winch_v1.0.md` §3.5, `PRG_06:379` vs `PRG_03:53,96` |
-| T58 | 🟡 Séparer `GVL_IHM` : Config (RETAIN) / Commands / Status / Alarms — invalider commandes au boot (P5.2) | Projet + IHM | `AUDIT_Winch_v1.0.md` §5.2, `GVL_IHM.st:7` |
+| T58 | 🟠 Purge boot des commandes RETAIN réalisée dans PRG_00 ; séparation Config/Commands/Status/Alarms différée jusqu'à maquette IHM validée | Projet + IHM | WINCH-CORE-01, `AUDIT_Winch_v1.0.md` §5.2 |
 | T59 | 🟡 IHM afficher arrêt croisé effectif (ForbidAscentM1_Active) pas seulement safety local (P5.3) | IHM | `AUDIT_Winch_v1.0.md` §5.3, `PRG_09:319,382` vs `PRG_06:393-398` |
+| T60 | ✅ `E_Mode.DISABLE` neutralise explicitement FB_Winch M1/M2 et FB_Translation M3 | Projet | WINCH-CORE-01, suite TC-M7 |
+| T61 | ✅ Estimateur de charge actif uniquement pour vitesse signée positive (montée) | Projet | WINCH-CORE-01, suite TC-M10 |
+| T62 | ✅ Fin `ASCENDING_LOADED` alignée sur `_CableLimitM1Ascent_M` (8,0 m) | Projet | WINCH-CORE-01, suite TC-M11 |
+| T63 | ⏸️ Persistance flags simulation + split `GVL_SimulationBench` reportés : bindings visualisation à maquetter avant import | Projet + IHM | REX session revertée, hors scope WINCH-CORE-01 |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 
@@ -182,7 +186,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 ⚠️ **NO-GO mouvement** (diag EtherCAT + câblage CAN joystick, AUDIT D47) à lever formellement avant de dérouler ce protocole.
 
-**Prérequis** : Homing M1/M2 fait (12.5m, `Homed=TRUE`) · Joystick calibré (deadband 10%) · `GVL_Simulation.SimulationModeActive = FALSE`.
+**Prérequis** : Homing M1/M2 fait (8,5 m, `Homed=TRUE`) · Joystick calibré (deadband 10%) · `GVL_Simulation.SimulationModeActive = FALSE`.
 
 | # | Test | Résultat attendu |
 |---|---|---|

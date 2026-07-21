@@ -38,6 +38,7 @@ instSafetyWinchM1(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
+    EncoderFaultBypass  := GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass,
     ThermalFeedback     := NOT PRG_00_Inputs.M1ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -81,6 +82,7 @@ instSafetyWinchM2(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
+    EncoderFaultBypass  := GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -139,8 +141,9 @@ instLoadEstimatorM1(
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
-    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM1.StepNumber,
-    MeasuredSpeedMps := instSafetyWinchM1.MeasuredSpeedMps,
+    ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
+    MeasuredSpeedMps      := instSafetyWinchM1.MeasuredSpeedMps,
+    MeasuredSpeedSignedMps:= instSafetyWinchM1.MeasuredSpeedSignedMps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );
@@ -149,8 +152,9 @@ instLoadEstimatorM2(
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
-    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM2.StepNumber,
-    MeasuredSpeedMps := instSafetyWinchM2.MeasuredSpeedMps,
+    ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
+    MeasuredSpeedMps      := instSafetyWinchM2.MeasuredSpeedMps,
+    MeasuredSpeedSignedMps:= instSafetyWinchM2.MeasuredSpeedSignedMps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );

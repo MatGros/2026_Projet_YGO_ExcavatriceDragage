@@ -112,7 +112,7 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD; // bit0: "Défaut frein Treuil" - Brake.Error ; bit1: "Contacteur(s) Treuil collé(s)" - ContactorsCheck.StuckClosed
+    ErrorId             : WORD; // bit0: frein ; bit1: contacteur(s) collé(s) ; bit2: configuration FB_SpeedStep invalide
     State               : E_State;
     StateAtError        : E_State;
     RelayFwd            : BOOL;
@@ -299,6 +299,15 @@ IF NOT BypassContactorCheck THEN
     END_IF;
 ELSE
     ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
+END_IF;
+
+// 🪜 WINCH-CORE-01 : remonte le défaut de configuration interne de FB_SpeedStep.
+// Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
+// sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
+IF SpeedStep.ConfigError THEN
+    ErrorId := ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
 END_IF;
 
 Error := (ErrorId <> 16#0000);

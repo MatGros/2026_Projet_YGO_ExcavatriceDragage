@@ -35,6 +35,7 @@ VAR_INPUT
     M2_MeasuredSpeedMps : REAL;         // Vitesse linéaire mesurée M2 (m/s)
     SpeedMismatchThresholdMps : REAL;   // Seuil écart vitesse ; 0 = contrôle désactivé
     SpeedMismatchTimeout      : TIME;   // Durée de confirmation ; 0 = contrôle désactivé
+    CableLimitM1AscentM       : REAL;   // Limite haute d'exploitation M1 ; seuil de fin ASCENDING_LOADED
 
     // Feedbacks Translation M3 — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
     Translation_At_P1       : BOOL;         // Capteur position P1 (ex-Fosse1)
@@ -365,8 +366,10 @@ CASE State OF
         CmdWinchM2_Direction := 1;
         CmdWinchM2_SpeedPct  := 70.0;
 
-        // Transition si position haute (butée haute virtuelle) atteinte
-        IF CycleMotionPermit AND M1_CablePosM >= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
+        // 🔧 WINCH-CORE-01 : transition alignée sur la limite haute d'exploitation
+        // réellement utilisée par FB_Winch. Aucun seuil dérivé de la cible homing :
+        // 8,0 m = exploitation ; 8,5 m = capteur haut/homing uniquement.
+        IF CycleMotionPermit AND M1_CablePosM >= CableLimitM1AscentM THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.DRAINING_PAUSE;

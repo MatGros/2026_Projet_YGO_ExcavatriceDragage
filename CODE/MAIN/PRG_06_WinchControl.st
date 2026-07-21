@@ -231,7 +231,7 @@ END_IF;
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
     // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain, simulation) : écart transitoire (~0.27m)
-    // constaté UNIQUEMENT à l'approche d'une butée (haute 12m ici), pas pendant le pilotage normal
+    // constaté UNIQUEMENT à l'approche d'une butée (haute 8,0 m ici), pas pendant le pilotage normal
     // (précision <0.001m confirmée par l'opérateur). Cause : ForbidAscent/ForbidDescent coupent
     // M1/M2 au même scan (couplage croisé), mais leur arrêt PHYSIQUE (rampe de décél, même en
     // simulation) n'est jamais parfaitement simultané à la position exacte — écart normal et non
@@ -347,9 +347,9 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // 🔧 REX 2026-07-15 (6) — demande utilisateur : arrêt réel encodeur en fonctionnement NORMAL,
 // distinct du capteur physique (bit5/Méca D côté FB_Safety_Winch). Seuil = CableLimitAscentMx_M,
 // limite ABSOLUE indépendante (même principe que CableLimitDescentM1/2_M côté descente) —
-// ex-calcul en MARGE sous HomingTargetMx_M (WinchTopStopMarginM) RETIRÉ : HomingTargetMx_M (12.5m)
+// ex-calcul en MARGE sous HomingTargetMx_M retiré : HomingTargetMx_M (8,5 m)
 // est réservée à l'approche petite vitesse du capteur physique pendant un Homing explicite, PAS
-// à l'exploitation normale, qui doit s'arrêter proprement BIEN AVANT (12.0m par défaut) sans
+// à l'exploitation normale, qui doit s'arrêter proprement à 8,0 m sans
 // jamais réveiller le capteur physique (bit5/Méca D traitent son activation hors référencement
 // comme une ANOMALIE — roue libre/contacteur collé — pas un fonctionnement normal).
 // Même principe que la limite légale de descente ci-dessus (condition LIVE, pas de bit
@@ -399,7 +399,9 @@ ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND F
 
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
-    Enable                  := StubMachineEnableN1 AND NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
+    Enable                  := StubMachineEnableN1
+                               AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE)
+                               AND NOT PRG_04_Modes.instModes.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
@@ -440,7 +442,9 @@ instWinchM1(
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
 instWinchM2(
-    Enable                  := StubMachineEnableN1 AND NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08
+    Enable                  := StubMachineEnableN1
+                               AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE)
+                               AND NOT PRG_04_Modes.instModes.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,

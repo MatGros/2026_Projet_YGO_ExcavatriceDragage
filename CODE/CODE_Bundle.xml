@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-19T00:13:00.676490" />
-  <contentHeader name="MGS_v0.4.19_CommissioningPrep.project" modificationDateTime="2026-07-19T00:13:00.676490">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-21T10:05:06.429861" />
+  <contentHeader name="MGS_v0.4.19_CommissioningPrep.project" modificationDateTime="2026-07-21T10:05:06.429861">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -4039,6 +4039,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Perte de liaison ou incohérence codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="EncoderFaultBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
+              </documentation>
+            </variable>
             <variable name="CableLimitDescentReached">
               <type>
                 <BOOL />
@@ -4095,6 +4103,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdEncoderFaultBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Autorisation maintenue de manœuvre sans codeur, effective uniquement MAINT_N2</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmCoherence">
@@ -6273,12 +6289,12 @@ IF NOT TableReady THEN
     CheckTable[9].ProbeIdx := SigSafetyM1ErrorId;
     CheckTable[9].Mask := 16#0200;
 
-    // Chk 10: Limite haute standard (12m)
+    // Chk 10: limite haute d'exploitation standard (8,0 m)
     CheckTable[10].Kind := E_TestCheckKind.REAL_IN_RANGE;
     CheckTable[10].Mode := E_TestCheckMode.CHECK_INSTANT;
     CheckTable[10].ProbeIdx := SigM2TopLimit;
-    CheckTable[10].RealMin := 12.0;
-    CheckTable[10].RealMax := 12.1;
+    CheckTable[10].RealMin := 8.0;
+    CheckTable[10].RealMax := 8.1;
 
     // Chk 11: Bucket fermé mémorisé
     CheckTable[11].Kind := E_TestCheckKind.BOOL_EQUAL;
@@ -6286,12 +6302,12 @@ IF NOT TableReady THEN
     CheckTable[11].ProbeIdx := SigBucketIsClosed;
     CheckTable[11].ExpectedBool := TRUE;
 
-    // Chk 12: Limite haute décalée (+10m -&gt; 22m)
+    // Chk 12: limite haute décalée par la benne fermée (+10 m → 18 m)
     CheckTable[12].Kind := E_TestCheckKind.REAL_IN_RANGE;
     CheckTable[12].Mode := E_TestCheckMode.CHECK_INSTANT;
     CheckTable[12].ProbeIdx := SigM2TopLimit;
-    CheckTable[12].RealMin := 22.0;
-    CheckTable[12].RealMax := 22.1;
+    CheckTable[12].RealMin := 18.0;
+    CheckTable[12].RealMax := 18.1;
 
     // Chk 13: Erreur Bucket active
     CheckTable[13].Kind := E_TestCheckKind.BOOL_EQUAL;
@@ -6965,6 +6981,14 @@ Retour dédié Kobold : TRUE = contact fond détecté</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée de confirmation ; 0 = contrôle désactivé</xhtml>
               </documentation>
             </variable>
+            <variable name="CableLimitM1AscentM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite haute d'exploitation M1 ; seuil de fin ASCENDING_LOADED</xhtml>
+              </documentation>
+            </variable>
             <variable name="Translation_At_P1">
               <type>
                 <BOOL />
@@ -7618,8 +7642,10 @@ CASE State OF
         CmdWinchM2_Direction := 1;
         CmdWinchM2_SpeedPct  := 70.0;
 
-        // Transition si position haute (butée haute virtuelle) atteinte
-        IF CycleMotionPermit AND M1_CablePosM &gt;= _HomingTargetM1_M - 2.0 THEN // -2m de la butée haute
+        // 🔧 WINCH-CORE-01 : transition alignée sur la limite haute d'exploitation
+        // réellement utilisée par FB_Winch. Aucun seuil dérivé de la cible homing :
+        // 8,0 m = exploitation ; 8,5 m = capteur haut/homing uniquement.
+        IF CycleMotionPermit AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
             CmdWinchM1_StartStop := FALSE;
             CmdWinchM2_StartStop := FALSE;
             State := E_CycleStep.DRAINING_PAUSE;
@@ -9672,7 +9698,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
         (ainsi `CablePosM` = `TopSensorPositionM` exactement au moment du homing)
       ⚠️ ÉVOLUTION vs interface §5 d'origine : `HomingRefRaw` est ajouté en sortie explicite
       (le document original supposait implicitement `HomingRefRaw := PresetValue`, valable
-      uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈12.50 m).
+      uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈8.50 m).
    🧊 `ST_EncoderCalib` géré en interne (`VAR RETAIN`) — expose `Homed`/`HomingSuspect`/
       `HomingRefRaw` en sortie pour les consommateurs (`FB_Encoder_Scale`).
    🔴 SIMPLIFICATIONS assumées pour ce lot (à documenter/lever plus tard si besoin) :
@@ -11056,7 +11082,7 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     StartPrev := TRUE;
     Busy := TRUE; Done := FALSE; AnyFailed := FALSE; ConfigError := FALSE;
     ErrorCode := 0; ErrorMessage := '';
-    Step := 10; StepElapsed := T#0s;
+    StepElapsed := T#0s;
     StimModeRequest := GVL_IHM.Modes.ModeRequest;
 
     Report.Name := 'Heartbeat Validation';
@@ -11166,13 +11192,13 @@ IF NOT TableReady THEN
     StepTable[StepTcH1Setup].TimeoutPT := T#5s; StepTable[StepTcH1Setup].NextOnPass := StepTcH1WaitToggle;
     StepTable[StepTcH1Setup].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH1WaitToggle].Name := 'H1 Attente premier front post-boot';
+    StepTable[StepTcH1WaitToggle].Name := 'H1 Attente 1er front post-boot';
     StepTable[StepTcH1WaitToggle].CaseId := 1; StepTable[StepTcH1WaitToggle].StimulusId := 1;
     StepTable[StepTcH1WaitToggle].CheckIdx[1] := 1;
     StepTable[StepTcH1WaitToggle].TimeoutPT := T#4s; StepTable[StepTcH1WaitToggle].NextOnPass := StepTcH1Assert;
     StepTable[StepTcH1WaitToggle].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1WaitToggle].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH1Assert].Name := 'H1 Assert bit0=0 Safety + bit5=0 Cycle';
+    StepTable[StepTcH1Assert].Name := 'H1 Assert bit0=0 &amp; bit5=0';
     StepTable[StepTcH1Assert].CaseId := 1; StepTable[StepTcH1Assert].StimulusId := 1;
     StepTable[StepTcH1Assert].CheckIdx[1] := 2; StepTable[StepTcH1Assert].CheckIdx[2] := 3;
     StepTable[StepTcH1Assert].CheckIdx[3] := 4; StepTable[StepTcH1Assert].CheckIdx[4] := 5;
@@ -11195,7 +11221,7 @@ IF NOT TableReady THEN
     StepTable[StepTcH2Freeze].TimeoutPT := T#3s; StepTable[StepTcH2Freeze].NextOnPass := StepTcH2Assert;
     StepTable[StepTcH2Freeze].NextOnFail := StepTcH2Teardown; StepTable[StepTcH2Freeze].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH2Assert].Name := 'H2 Assert bit0=1 Safety + bit5=1 Cycle + SafeStop';
+    StepTable[StepTcH2Assert].Name := 'H2 Assert bit0=1 &amp; SafeStop';
     StepTable[StepTcH2Assert].CaseId := 2; StepTable[StepTcH2Assert].StimulusId := 2;
     StepTable[StepTcH2Assert].CheckIdx[1] := 6;  StepTable[StepTcH2Assert].CheckIdx[2] := 7;
     StepTable[StepTcH2Assert].CheckIdx[3] := 8;  StepTable[StepTcH2Assert].CheckIdx[4] := 9;
@@ -11221,7 +11247,7 @@ IF NOT TableReady THEN
     StepTable[StepTcH3Resume].TimeoutPT := T#3s; StepTable[StepTcH3Resume].NextOnPass := StepTcH3Assert;
     StepTable[StepTcH3Resume].NextOnFail := StepTcH3Teardown; StepTable[StepTcH3Resume].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH3Assert].Name := 'H3 Assert bit0=1 mem + bit5=1 mem';
+    StepTable[StepTcH3Assert].Name := 'H3 Assert bit0=1 &amp; bit5=1';
     StepTable[StepTcH3Assert].CaseId := 3; StepTable[StepTcH3Assert].StimulusId := 3;
     StepTable[StepTcH3Assert].CheckIdx[1] := 15; StepTable[StepTcH3Assert].CheckIdx[2] := 16;
     StepTable[StepTcH3Assert].CheckIdx[3] := 17; StepTable[StepTcH3Assert].CheckIdx[4] := 18;
@@ -11240,12 +11266,12 @@ IF NOT TableReady THEN
     StepTable[StepTcH4Setup].TimeoutPT := T#1s; StepTable[StepTcH4Setup].NextOnPass := StepTcH4Reset;
     StepTable[StepTcH4Setup].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH4Reset].Name := 'H4 Pulse FaultMachineReset + CmdReset';
+    StepTable[StepTcH4Reset].Name := 'H4 Pulse Reset IHM &amp; Cycle';
     StepTable[StepTcH4Reset].CaseId := 4; StepTable[StepTcH4Reset].StimulusId := 4;
     StepTable[StepTcH4Reset].TimeoutPT := T#2s; StepTable[StepTcH4Reset].NextOnPass := StepTcH4Assert;
     StepTable[StepTcH4Reset].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Reset].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH4Assert].Name := 'H4 Assert bit0=0 Safety + bit5=0 Cycle';
+    StepTable[StepTcH4Assert].Name := 'H4 Assert bit0=0 &amp; bit5=0';
     StepTable[StepTcH4Assert].CaseId := 4; StepTable[StepTcH4Assert].StimulusId := 1; // retour toggle sain
     StepTable[StepTcH4Assert].CheckIdx[1] := 20; StepTable[StepTcH4Assert].CheckIdx[2] := 21;
     StepTable[StepTcH4Assert].CheckIdx[3] := 22; StepTable[StepTcH4Assert].CheckIdx[4] := 23;
@@ -11258,12 +11284,12 @@ IF NOT TableReady THEN
     StepTable[StepTcH4Teardown].NextOnPass := 0; StepTable[StepTcH4Teardown].NextOnFail := 0;
 
     // TC-H5
-    StepTable[StepTcH5Setup].Name := 'H5 Setup Méca B M3 frein desserré';
+    StepTable[StepTcH5Setup].Name := 'H5 Setup Meca B M3 frein open';
     StepTable[StepTcH5Setup].CaseId := 5; StepTable[StepTcH5Setup].StimulusId := 5;
     StepTable[StepTcH5Setup].TimeoutPT := T#1s; StepTable[StepTcH5Setup].NextOnPass := StepTcH5MecaB;
     StepTable[StepTcH5Setup].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH5MecaB].Name := 'H5 Perte IHM + frein M3 desserré &gt; 3s';
+    StepTable[StepTcH5MecaB].Name := 'H5 Perte IHM + M3 open &gt; 3s';
     StepTable[StepTcH5MecaB].CaseId := 5; StepTable[StepTcH5MecaB].StimulusId := 5;
     StepTable[StepTcH5MecaB].TimeoutPT := T#7s; StepTable[StepTcH5MecaB].NextOnPass := StepTcH5Assert;
     StepTable[StepTcH5MecaB].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5MecaB].FailAction := E_TestFailAction.FAIL_CONTINUE;
@@ -12785,6 +12811,156 @@ Done := FALSE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Tient le neutre &gt;1s avant un nouvel appui (reprise), voir FB_Joystick §NeutralHoldTime</xhtml>
               </documentation>
             </variable>
+            <variable name="TestSafetyWinch">
+              <type>
+                <derived name="FB_Safety_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔬 WINCH-CORE-01 — instances locales : tests déterministes sans forcer les sorties calculées.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestWinch">
+              <type>
+                <derived name="FB_Winch" />
+              </type>
+            </variable>
+            <variable name="TestLoadEstimator">
+              <type>
+                <derived name="FB_WinchLoadEstimator" />
+              </type>
+            </variable>
+            <variable name="TestCycle">
+              <type>
+                <derived name="FB_Cycle" />
+              </type>
+            </variable>
+            <variable name="TestSpeedTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="P1R1">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P1R2">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P1R3">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P1R4">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P2R1">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P2R2">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P2R3">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P2R4">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P3R1">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P3R2">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P3R3">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P3R4">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P4R1">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P4R2">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P4R3">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P4R4">
+                    <simpleValue value="FALSE" />
+                  </value>
+                  <value member="P5R1">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P5R2">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P5R3">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="P5R4">
+                    <simpleValue value="TRUE" />
+                  </value>
+                  <value member="StepThreshold_Pct">
+                    <arrayValue>
+                      <value>
+                        <simpleValue value="20" />
+                      </value>
+                      <value>
+                        <simpleValue value="40" />
+                      </value>
+                      <value>
+                        <simpleValue value="60" />
+                      </value>
+                      <value>
+                        <simpleValue value="80" />
+                      </value>
+                      <value>
+                        <simpleValue value="100" />
+                      </value>
+                    </arrayValue>
+                  </value>
+                </structValue>
+              </initialValue>
+            </variable>
+            <variable name="TestSpeedConfig">
+              <type>
+                <derived name="ST_WinchSpeedConfig" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="MaxMeasuredSpeedMps">
+                    <simpleValue value="2" />
+                  </value>
+                  <value member="SpeedBandMaxMps">
+                    <arrayValue>
+                      <value>
+                        <simpleValue value="0.4" />
+                      </value>
+                      <value>
+                        <simpleValue value="0.8" />
+                      </value>
+                      <value>
+                        <simpleValue value="1.2" />
+                      </value>
+                      <value>
+                        <simpleValue value="1.6" />
+                      </value>
+                      <value>
+                        <simpleValue value="2" />
+                      </value>
+                    </arrayValue>
+                  </value>
+                  <value member="SpeedBandHysteresisMps">
+                    <simpleValue value="0.05" />
+                  </value>
+                </structValue>
+              </initialValue>
+            </variable>
+            <variable name="TestLoadTable">
+              <type>
+                <derived name="ST_WinchLoadEstimateTable" />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">============================================================================
@@ -12804,8 +12980,13 @@ Done := FALSE;
               (perte EmergencyStopOk → Mode=DISABLE + FB_Winch neutralisé,
               quel que soit le mode précédent)
       TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais — une tentative réelle de
-              démarrage (`GVL_IHM.Cycle.CmdStart`) hors SEMI_AUTO reste sans effet
-              (Busy reste FALSE) au lieu d'attendre indéfiniment
+              démarrage (`GVL_IHM.Cycle.CmdStart`) hors SEMI_AUTO reste sans effet.
+      TC-M7 : DISABLE explicite neutralise M1/M2/M3.
+      TC-M8 : bypass codeur refusé hors MAINT_N2, accepté en MAINT_N2 après Reset.
+      TC-M9 : ConfigError FB_SpeedStep remonte au bit2 de FB_Winch, sorties sûres.
+      TC-M10 : estimation charge nulle en descente, active en montée.
+      TC-M11 : ASCENDING_LOADED utilise la limite d'exploitation 8,0 m.
+      TC-M12 : commandes IHM RETAIN purgées avant consommation.
       🔎 Homing nominal sans IHM_MANU : déjà couvert par SUITE_ENCODER (TC-E1/E2).
    🧩 Même moteur allégé (CASE direct) que FB_EncoderValidation — pas le cadre
       StepTable/CheckTable déclaratif (inutile ici, peu d'étapes par cas).
@@ -12829,6 +13010,8 @@ IF Abort THEN
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
     GVL_IHM.Modes.FaultMachineReset := FALSE;
     GVL_IHM.Cycle.CmdStart := FALSE;
+    GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
+    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;
@@ -12850,7 +13033,9 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     ErrorMessage := '';
     TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
     Step := FirstStepId;
-    IF (Step &lt;&gt; 10) AND (Step &lt;&gt; 20) AND (Step &lt;&gt; 30) AND (Step &lt;&gt; 40) AND (Step &lt;&gt; 50) AND (Step &lt;&gt; 60) THEN
+    IF (Step &lt;&gt; 10) AND (Step &lt;&gt; 20) AND (Step &lt;&gt; 30) AND (Step &lt;&gt; 40)
+       AND (Step &lt;&gt; 50) AND (Step &lt;&gt; 60) AND (Step &lt;&gt; 65) AND (Step &lt;&gt; 70)
+       AND (Step &lt;&gt; 80) AND (Step &lt;&gt; 90) AND (Step &lt;&gt; 100) AND (Step &lt;&gt; 110) THEN
         Step := 10;
     END_IF;
     Report.Name := 'Modes / Homme-mort Validation';
@@ -12912,6 +13097,12 @@ IF NOT StepStarted THEN
         51: StepLimit := T#3s;       // FB_Winch neutralisé (State DISABLED)
         52: StepLimit := T#5s;       // Récupération après restauration EmergencyStopOk
         60: StepLimit := T#3s;       // Tentative réelle de démarrage hors SEMI_AUTO (pas de blocage)
+        65, 66: StepLimit := T#3s;   // DISABLE explicite + neutralisation des 3 axes
+        70, 71: StepLimit := T#2s;   // Bypass codeur hors/dans MAINT_N2
+        80: StepLimit := T#2s;       // ConfigError SpeedStep → FB_Winch bit2
+        90, 91: StepLimit := T#2s;   // Estimateur descente/montée
+        100, 101, 102: StepLimit := T#2s; // Seuil ASCENDING_LOADED
+        110, 111: StepLimit := T#2s; // Purge commandes RETAIN
     ELSE
         ConfigError := TRUE;
         ConfigErrorStepId := Step;
@@ -13053,9 +13244,188 @@ CASE Step OF
             GVL_IHM.Cycle.CmdStart := FALSE;
             IF NOT PRG_05_Cycle.instCycle.Busy THEN
                 StepPassed := TRUE;
+                Step := 65;
             ELSE
                 StepFailed := TRUE;
+                Step := 0;
             END_IF;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M7 : DISABLE explicite neutralise M1/M2/M3 ───────────
+    65:
+        GVL_IHM.Modes.ModeRequest := E_Mode.DISABLE;
+        IF PRG_04_Modes.instModes.Mode = E_Mode.DISABLE THEN
+            StepPassed := TRUE;
+            Step := 66;
+            StepStarted := FALSE;
+        END_IF;
+
+    66:
+        IF (PRG_06_WinchControl.instWinchM1.State = E_State.DISABLED)
+           AND (PRG_06_WinchControl.instWinchM2.State = E_State.DISABLED)
+           AND (PRG_07_TranslationControl.instTranslationM3.State = E_State.DISABLED)
+           AND NOT PRG_06_WinchControl.instWinchM1.RelayFwd
+           AND NOT PRG_06_WinchControl.instWinchM2.RelayFwd
+           AND (PRG_07_TranslationControl.instTranslationM3.DriveControlWord = 0) THEN
+            StepPassed := TRUE;
+            Step := 70;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M8 : bypass codeur individuel et limité à MAINT_N2 ───────────
+    70:
+        TestSafetyWinch(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+            SyncEnable := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+            HeartbeatIhmOk := TRUE, EncoderAvailable := FALSE, EncoderFaultBypass := TRUE,
+            ThermalFeedback := FALSE, BrakeThermalFeedback := FALSE, SlackCableDetected := FALSE,
+            PhaseRotationOk := TRUE, TopPositionSensor := TRUE, InReferencingMode := FALSE,
+            CablePosM := 0.0, CableLimitDescentM := -20.0, Direction := 0,
+            MovementCommanded := FALSE, Homed := FALSE, HomingSuspect := FALSE, TopLimitM := 8.5,
+            FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE, JoystickYNeutral := FALSE,
+            BenneHoldStillActive := FALSE, ExpectedOtherWinchPosM := 0.0, BenneBusy := FALSE,
+            OtherWinchInhibited := TRUE
+        );
+        IF ((TestSafetyWinch.ErrorId AND 16#0002) &lt;&gt; 0) AND TestSafetyWinch.SafeStop THEN
+            StepPassed := TRUE;
+            Step := 71;
+            StepStarted := FALSE;
+        END_IF;
+
+    71:
+        TestSafetyWinch(
+            Enable := TRUE, Reset := TRUE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N2,
+            SyncEnable := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+            HeartbeatIhmOk := TRUE, EncoderAvailable := FALSE, EncoderFaultBypass := TRUE,
+            ThermalFeedback := FALSE, BrakeThermalFeedback := FALSE, SlackCableDetected := FALSE,
+            PhaseRotationOk := TRUE, TopPositionSensor := TRUE, InReferencingMode := FALSE,
+            CablePosM := 0.0, CableLimitDescentM := -20.0, Direction := 0,
+            MovementCommanded := FALSE, Homed := FALSE, HomingSuspect := FALSE, TopLimitM := 8.5,
+            FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE, JoystickYNeutral := FALSE,
+            BenneHoldStillActive := FALSE, ExpectedOtherWinchPosM := 0.0, BenneBusy := FALSE,
+            OtherWinchInhibited := TRUE
+        );
+        IF ((TestSafetyWinch.ErrorId AND 16#0002) = 0) AND NOT TestSafetyWinch.SafeStop THEN
+            StepPassed := TRUE;
+            Step := 80;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M9 : ConfigError interne remonte dans FB_Winch bit2 ───────────
+    80:
+        TestWinch(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+            StartStop := TRUE, SafeStop := FALSE, ForbidDescent := FALSE, ForbidAscent := FALSE,
+            Direction := 1, SpeedRefPct := 50.0, SpeedStepTable := TestSpeedTable,
+            MaxStepDescente := 3, MaxStepAscent := 5, HomingApproachActive := FALSE,
+            FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE, BypassContactorCheck := TRUE,
+            SpeedStepHystMargin := 0.0, Homed := TRUE, HomingSuspect := FALSE,
+            CablePosM := 0.0, TopLimitM := 8.0, BottomLimitM := -20.0,
+            SlowdownDistanceM := 1.0, SlowSpeedPct := 15.0
+        );
+        IF ((TestWinch.ErrorId AND 16#0004) &lt;&gt; 0)
+           AND NOT TestWinch.RelayFwd AND NOT TestWinch.RelayRev
+           AND NOT TestWinch.Contactor1 AND NOT TestWinch.Contactor2
+           AND NOT TestWinch.Contactor3 AND NOT TestWinch.Contactor4 THEN
+            StepPassed := TRUE;
+            Step := 90;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M10 : charge calculée uniquement en montée ───────────
+    90:
+        TestLoadTable.IsConfigured := TRUE;
+        TestLoadTable.LoadPctByStepAndSpeedBand[1][1] := 42.0;
+        TestLoadEstimator(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+            ActiveSpeedStep := 1, MeasuredSpeedMps := 0.1, MeasuredSpeedSignedMps := -0.1,
+            SpeedConfig := TestSpeedConfig, LoadTable := TestLoadTable
+        );
+        IF (TestLoadEstimator.EstimatedLoadPct = 0.0) AND NOT TestLoadEstimator.Ascending THEN
+            StepPassed := TRUE;
+            Step := 91;
+            StepStarted := FALSE;
+        END_IF;
+
+    91:
+        TestLoadEstimator(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+            ActiveSpeedStep := 1, MeasuredSpeedMps := 0.1, MeasuredSpeedSignedMps := 0.1,
+            SpeedConfig := TestSpeedConfig, LoadTable := TestLoadTable
+        );
+        IF (TestLoadEstimator.EstimatedLoadPct = 42.0) AND TestLoadEstimator.Ascending THEN
+            StepPassed := TRUE;
+            Step := 100;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M11 : seuil ASCENDING_LOADED = limite exploitation ───────────
+    100:
+        TestCycle(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, CycleMotionPermit := TRUE,
+            HeartbeatIhmOk := TRUE, M1_CablePosM := 7.9, M2_CablePosM := 7.9,
+            CableLimitM1AscentM := 8.0
+        );
+        // FB démarre en INIT ; on ne force pas l'état interne (pas d'accès VAR).
+        // Vérifie seulement que la condition de transition est évaluée correctement :
+        // tant que M1_CablePosM &lt; CableLimitM1AscentM, les sorties StartStop restent TRUE
+        IF TestCycle.CmdWinchM1_StartStop AND TestCycle.CmdWinchM2_StartStop THEN
+            StepPassed := TRUE;
+            Step := 101;
+            StepStarted := FALSE;
+        END_IF;
+
+    101:
+        TestCycle(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, CycleMotionPermit := TRUE,
+            HeartbeatIhmOk := TRUE, M1_CablePosM := 8.0, M2_CablePosM := 8.0,
+            CableLimitM1AscentM := 8.0
+        );
+        // M1_CablePosM &gt;= CableLimitM1AscentM : la logique de transition demande l'arrêt
+        IF NOT TestCycle.CmdWinchM1_StartStop AND NOT TestCycle.CmdWinchM2_StartStop THEN
+            StepPassed := TRUE;
+            Step := 102;
+            StepStarted := FALSE;
+        END_IF;
+
+    102:
+        TestCycle(
+            Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, CycleMotionPermit := TRUE,
+            HeartbeatIhmOk := TRUE, M1_CablePosM := 8.0, M2_CablePosM := 8.0,
+            CableLimitM1AscentM := 8.0
+        );
+        // L'état interne devrait passer à DRAINING_PAUSE, mais on ne peut pas
+        // forcer l'état. On vérifie que les sorties restent à l'arrêt.
+        IF NOT TestCycle.CmdWinchM1_StartStop AND NOT TestCycle.CmdWinchM2_StartStop THEN
+            StepPassed := TRUE;
+            Step := 110;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-M12 : purge commandes RETAIN avant consommation ───────────
+    110:
+        GVL_IHM.M1TreuilRetenue.CmdHome := TRUE;
+        GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := TRUE;
+        GVL_IHM.M2TreuilBucket.CmdReset := TRUE;
+        GVL_IHM.Bucket.CmdClose := TRUE;
+        GVL_IHM.Cycle.CmdStart := TRUE;
+        GVL_IHM.TranslationM3.ReqFwd := TRUE;
+        GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
+        StepPassed := TRUE;
+        Step := 111;
+        StepStarted := FALSE;
+
+    111:
+        IF NOT GVL_IHM.M1TreuilRetenue.CmdHome
+           AND NOT GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass
+           AND NOT GVL_IHM.M2TreuilBucket.CmdReset
+           AND NOT GVL_IHM.Bucket.CmdClose
+           AND NOT GVL_IHM.Cycle.CmdStart
+           AND NOT GVL_IHM.TranslationM3.ReqFwd
+           AND GVL_IHM.HmiInitDone THEN
+            GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
+            StepPassed := TRUE;
             Step := 0;
         END_IF;
 END_CASE;
@@ -13082,6 +13452,8 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
     IF Step = 0 THEN
         GVL_PLC_Tests.OverrideJoystickActive := FALSE;
         GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+        GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
+        GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
         Busy := FALSE;
         Done := TRUE;
         Report.InProgress := FALSE;
@@ -13089,7 +13461,7 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
         Report.AllPassed := NOT AnyFailed;
         Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
         TerminalState := Report.TerminalState;
-        Report.Cases[1].Name := 'TC-M1..M6 Modes+HommeMort'; // ✂️ Tronqué pour tenir dans STRING(32)
+        Report.Cases[1].Name := 'TC-M1..M12 Modes+WinchCore';
         Report.Cases[1].Executed := TRUE;
         Report.Cases[1].Ok := NOT AnyFailed;
         Report.Cases[1].FailedStepId := 0;
@@ -13105,10 +13477,12 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
     END_IF;
 END_IF;
 
-// Limite globale de sécurité de la suite : 60 s maximum.
-IF Report.Duration &gt;= T#60s AND Busy THEN
+// Limite globale de sécurité de la suite : 90 s maximum.
+IF Report.Duration &gt;= T#90s AND Busy THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+    GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
+    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;
@@ -16513,6 +16887,14 @@ State := E_State.READY;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance</xhtml>
               </documentation>
             </variable>
+            <variable name="EncoderFaultBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Autorisation maintenance sans codeur ; effective uniquement en MAINT_N2</xhtml>
+              </documentation>
+            </variable>
             <variable name="ThermalFeedback">
               <type>
                 <BOOL />
@@ -16986,6 +17368,14 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
                 <BOOL />
               </type>
             </variable>
+            <variable name="EncoderAvailableEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur valide OU bypass individuel autorisé en MAINT_N2</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -17169,7 +17559,12 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
-IF NOT EncoderAvailable THEN
+// 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
+// Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
+// Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
+EncoderAvailableEffective := EncoderAvailable
+                             OR (EncoderFaultBypass AND (Mode = E_Mode.MAINT_N2));
+IF NOT EncoderAvailableEffective THEN
     ErrorId := ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
@@ -18424,7 +18819,7 @@ Résultat validation table + MaxStepNumber</xhtml>
    🛡️ CORRECTIF P0.2 (2026-07-21) :
       - Bornage `MaxStepNumber` ∈ [1..5] dès l'entrée
       - Validation table : seuils croissants 0..100 %, hystérésis &gt; 0,
-        contacteurs cohérents (au moins 1 par palier si palier ≤ MaxStepNumber)
+        contacteurs cohérents (au moins 1 par palier 2..MaxStepNumber ; palier 1 tout FALSE autorisé)
       - Sortie `ConfigError` / `ConfigErrorId` (bit0 = table invalide)
       - Forçage sorties sûres (contacteurs FALSE, StepNumber=0) si erreur config
       - Reset sur front (R_TRIG) + cause disparue (conforme Partie 3 §5)
@@ -18456,8 +18851,9 @@ END_IF;
 // 1. Seuils croissants stricts : StepThreshold_Pct[1] &lt; [2] &lt; [3] &lt; [4] &lt; [5]
 // 2. Seuils dans [0..100] %
 // 3. HystMargin &gt; 0
-// 4. Pour chaque palier 1.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
-//    (On ne valide PAS les paliers &gt; _MaxStepClamped — ils ne seront jamais atteints)
+// 4. Pour chaque palier 2.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
+//    Le palier 1 peut légitimement avoir les 4 contacteurs FALSE : résistances rotoriques
+//    toutes insérées = vitesse minimale. On ne valide pas les paliers jamais atteignables.
 _ConfigValid := TRUE;
 _ConfigErrorIdInt := 16#0000;
 
@@ -18484,14 +18880,7 @@ END_IF;
 
 // Critère 4 : cohérence contacteurs par palier (seulement jusqu'au plafond actif)
 IF _ConfigValid THEN
-    // Helper local inline : teste si au moins 1 contacteur TRUE pour un palier
-    // Palier 1
-    IF _MaxStepClamped &gt;= 1 THEN
-        IF NOT (Table.P1R1 OR Table.P1R2 OR Table.P1R3 OR Table.P1R4) THEN
-            _ConfigValid := FALSE;
-            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
-        END_IF;
-    END_IF;
+    // Palier 1 : les 4 sorties FALSE sont une configuration valide de vitesse minimale.
     // Palier 2
     IF _MaxStepClamped &gt;= 2 THEN
         IF NOT (Table.P2R1 OR Table.P2R2 OR Table.P2R3 OR Table.P2R4) THEN
@@ -22580,7 +22969,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut frein Treuil" - Brake.Error ; bit1: "Contacteur(s) Treuil collé(s)" - ContactorsCheck.StuckClosed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: frein ; bit1: contacteur(s) collé(s) ; bit2: configuration FB_SpeedStep invalide</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -22965,6 +23354,15 @@ ELSE
     ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
 END_IF;
 
+// 🪜 WINCH-CORE-01 : remonte le défaut de configuration interne de FB_SpeedStep.
+// Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
+// sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
+IF SpeedStep.ConfigError THEN
+    ErrorId := ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
+
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
@@ -23034,6 +23432,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble absolue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedSignedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive = montée, négative = descente</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedConfig">
@@ -23116,6 +23522,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si table explicitement validée</xhtml>
               </documentation>
             </variable>
+            <variable name="Ascending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE uniquement pendant une montée mesurée</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -23172,6 +23586,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     SpeedBand := 0;
     EstimatedLoadPct := 0.0;
     Configured := FALSE;
+    Ascending := FALSE;
     HasPreviousBand := FALSE;
     RETURN;
 END_IF;
@@ -23182,6 +23597,10 @@ Done := FALSE;
 State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
+// 📈 WINCH-CORE-01 : l'estimation de charge n'a de sens qu'en montée.
+// La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
+// mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
+Ascending := (MeasuredSpeedSignedMps &gt; 0.0);
 
 // 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps &lt; 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps &lt;= 0.0) THEN
@@ -23213,7 +23632,9 @@ ELSE
 END_IF;
 
 // 📊 3. LECTURE TABLE — estimation informative uniquement.
-IF Configured AND (ActiveSpeedStep &gt;= 1) AND (ActiveSpeedStep &lt;= 5) AND (SpeedBand &gt;= 1) AND (SpeedBand &lt;= 5) THEN
+IF Configured AND Ascending
+   AND (ActiveSpeedStep &gt;= 1) AND (ActiveSpeedStep &lt;= 5)
+   AND (SpeedBand &gt;= 1) AND (SpeedBand &lt;= 5) THEN
     SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
     IF (SelectedLoadPct &lt; 0.0) OR (SelectedLoadPct &gt; 100.0) THEN
         ErrorId := ErrorId OR 16#0001;
@@ -24014,6 +24435,14 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Suite de tests de validation (exécutée uniquement en simulation)</xhtml>
               </documentation>
             </variable>
+            <variable name="HmiCommandsInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -24030,6 +24459,47 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
+
+// 🧹 WINCH-CORE-01 — PURGE COMMANDES IHM RETAIN AU BOOT
+// PRG_00 est exécuté avant PRG_01..PRG_10 : aucune commande mémorisée ne peut donc
+// produire un front ou un mouvement pendant le premier scan. Les états sûrs maintenus
+// (`CmdEmergencyCutOff`, inhibitions) ne sont volontairement pas effacés.
+// L'override permet uniquement à la suite PLC de rejouer ce scénario en simulation.
+IF NOT HmiCommandsInitialized
+   OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
+    GVL_IHM.HmiInitDone := FALSE;
+
+    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Modes.ModeReset := FALSE;
+    GVL_IHM.Modes.CmdEmergencyArming := FALSE;
+
+    GVL_IHM.M1TreuilRetenue.CmdReset := FALSE;
+    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
+    GVL_IHM.M1TreuilRetenue.ConfirmCoherence := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdReset := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass := FALSE;
+    GVL_IHM.M2TreuilBucket.ConfirmCoherence := FALSE;
+
+    GVL_IHM.Bucket.CmdOpen := FALSE;
+    GVL_IHM.Bucket.CmdClose := FALSE;
+    GVL_IHM.Bucket.CmdReset := FALSE;
+    GVL_IHM.Bucket.CmdConfirmOpenPosition := FALSE;
+    GVL_IHM.Bucket.CmdConfirmClosePosition := FALSE;
+
+    GVL_IHM.Cycle.CmdStart := FALSE;
+    GVL_IHM.Cycle.CmdPause := FALSE;
+    GVL_IHM.Cycle.CmdAbort := FALSE;
+    GVL_IHM.Cycle.CmdReset := FALSE;
+
+    GVL_IHM.TranslationM3.ReqFwd := FALSE;
+    GVL_IHM.TranslationM3.ReqRev := FALSE;
+    GVL_IHM.JoystickJOY1.Calibrate := FALSE;
+
+    HmiCommandsInitialized := TRUE;
+    GVL_IHM.HmiInitDone := TRUE;
+END_IF;
 
 // 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
 // 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille
@@ -24775,6 +25245,7 @@ instSafetyWinchM1(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
+    EncoderFaultBypass  := GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass,
     ThermalFeedback     := NOT PRG_00_Inputs.M1ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -24818,6 +25289,7 @@ instSafetyWinchM2(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
+    EncoderFaultBypass  := GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -24876,8 +25348,9 @@ instLoadEstimatorM1(
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
-    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM1.StepNumber,
-    MeasuredSpeedMps := instSafetyWinchM1.MeasuredSpeedMps,
+    ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
+    MeasuredSpeedMps      := instSafetyWinchM1.MeasuredSpeedMps,
+    MeasuredSpeedSignedMps:= instSafetyWinchM1.MeasuredSpeedSignedMps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );
@@ -24886,8 +25359,9 @@ instLoadEstimatorM2(
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
-    ActiveSpeedStep  := PRG_06_WinchControl.instWinchM2.StepNumber,
-    MeasuredSpeedMps := instSafetyWinchM2.MeasuredSpeedMps,
+    ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
+    MeasuredSpeedMps      := instSafetyWinchM2.MeasuredSpeedMps,
+    MeasuredSpeedSignedMps:= instSafetyWinchM2.MeasuredSpeedSignedMps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );
@@ -25174,6 +25648,7 @@ instCycle(
     M2_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps,
     SpeedMismatchThresholdMps := SpeedMismatchThresholdMps,
     SpeedMismatchTimeout      := SpeedMismatchTimeout,
+    CableLimitM1AscentM       := _CableLimitM1Ascent_M,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
     Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,
@@ -25629,7 +26104,7 @@ END_IF;
 // ── 3. SURVEILLANCE ÉCART DE SYNCHRONISATION ────────────────────────────
 instWinchSync(
     // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain, simulation) : écart transitoire (~0.27m)
-    // constaté UNIQUEMENT à l'approche d'une butée (haute 12m ici), pas pendant le pilotage normal
+    // constaté UNIQUEMENT à l'approche d'une butée (haute 8,0 m ici), pas pendant le pilotage normal
     // (précision &lt;0.001m confirmée par l'opérateur). Cause : ForbidAscent/ForbidDescent coupent
     // M1/M2 au même scan (couplage croisé), mais leur arrêt PHYSIQUE (rampe de décél, même en
     // simulation) n'est jamais parfaitement simultané à la position exacte — écart normal et non
@@ -25745,9 +26220,9 @@ ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
 // 🔧 REX 2026-07-15 (6) — demande utilisateur : arrêt réel encodeur en fonctionnement NORMAL,
 // distinct du capteur physique (bit5/Méca D côté FB_Safety_Winch). Seuil = CableLimitAscentMx_M,
 // limite ABSOLUE indépendante (même principe que CableLimitDescentM1/2_M côté descente) —
-// ex-calcul en MARGE sous HomingTargetMx_M (WinchTopStopMarginM) RETIRÉ : HomingTargetMx_M (12.5m)
+// ex-calcul en MARGE sous HomingTargetMx_M retiré : HomingTargetMx_M (8,5 m)
 // est réservée à l'approche petite vitesse du capteur physique pendant un Homing explicite, PAS
-// à l'exploitation normale, qui doit s'arrêter proprement BIEN AVANT (12.0m par défaut) sans
+// à l'exploitation normale, qui doit s'arrêter proprement à 8,0 m sans
 // jamais réveiller le capteur physique (bit5/Méca D traitent son activation hors référencement
 // comme une ANOMALIE — roue libre/contacteur collé — pas un fonctionnement normal).
 // Même principe que la limite légale de descente ci-dessus (condition LIVE, pas de bit
@@ -25797,7 +26272,9 @@ ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND F
 
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
-    Enable                  := StubMachineEnableN1 AND NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
+    Enable                  := StubMachineEnableN1
+                               AND (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE)
+                               AND NOT PRG_04_Modes.instModes.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
@@ -25838,7 +26315,9 @@ instWinchM1(
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
 instWinchM2(
-    Enable                  := StubMachineEnableN1 AND NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08
+    Enable                  := StubMachineEnableN1
+                               AND (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE)
+                               AND NOT PRG_04_Modes.instModes.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
@@ -26087,7 +26566,8 @@ END_CASE;
 
 // ── 2. EXÉCUTION DU PILOTAGE DU TRANSLATION M3 ──────────────────────────────
 instTranslationM3(
-    Enable                  := PRG_06_WinchControl.StubMachineEnableN1,
+    Enable                  := PRG_06_WinchControl.StubMachineEnableN1
+                               AND (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,
@@ -26366,9 +26846,9 @@ END_IF;
 // retiré avec IHM_MANU — PRG_06_WinchControl applique désormais un plafond fixe (5 montée /
 // _WinchMaxStepDescent descente), identique Auto et Manuel, plus de réglage IHM à initialiser.
 
-IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
-    GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
-END_IF;
+// 🔧 WINCH-CORE-01 : DISABLE est un mode opérateur valide et ne doit jamais être
+// remplacé automatiquement par MAINT_N1. La sortie de DISABLE exige une nouvelle
+// demande explicite ; M1/M2/M3 restent neutralisés tant que le mode est actif.
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
@@ -26504,6 +26984,8 @@ GVL_IHM.M1TreuilRetenue.ForbidAscentActive       := PRG_03_Safety.instSafetyWinc
 GVL_IHM.M1TreuilRetenue.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M1TreuilRetenue.ThermalFault             := NOT PRG_00_Inputs.M1ThermalFeedback;
 GVL_IHM.M1TreuilRetenue.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.M1TreuilRetenue.EncoderFaultBypassActive := GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass
+                                                     AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) &lt;&gt; 16#0000;
 GVL_IHM.M1TreuilRetenue.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM1Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.M1TreuilRetenue.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
@@ -26567,6 +27049,8 @@ GVL_IHM.M2TreuilBucket.ForbidAscentActive       := PRG_03_Safety.instSafetyWinch
 GVL_IHM.M2TreuilBucket.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M2TreuilBucket.ThermalFault             := NOT PRG_00_Inputs.M2ThermalFeedback;
 GVL_IHM.M2TreuilBucket.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.M2TreuilBucket.EncoderFaultBypassActive := GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass
+                                                   AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M2TreuilBucket.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) &lt;&gt; 16#0000;
 GVL_IHM.M2TreuilBucket.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM2Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.M2TreuilBucket.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07
@@ -27624,6 +28108,15 @@ TRUE = contacteurs retombés (sain)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein serré (sain)</xhtml>
           </documentation>
         </variable>
+        <variable name="OverrideHmiCommandPurge">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 WINCH-CORE-01 — rejoue la purge boot uniquement en simulation pour le test PLC.
+TRUE = purge commandes RETAIN dans PRG_00</xhtml>
+          </documentation>
+        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
@@ -27662,10 +28155,10 @@ TRUE = contacteurs retombés (sain)</xhtml>
             <INT />
           </type>
           <initialValue>
-            <simpleValue value="64" />
+            <simpleValue value="128" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">par suite, table PLATE ; tous les StepId doivent rester &lt;= 64</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">par suite, table PLATE ; WINCH-CORE-01 ajoute les étapes 65..111</xhtml>
           </documentation>
         </variable>
         <variable name="MaxChecks">
@@ -27684,7 +28177,7 @@ TRUE = contacteurs retombés (sain)</xhtml>
             <INT />
           </type>
           <initialValue>
-            <simpleValue value="4" />
+            <simpleValue value="10" />
           </initialValue>
         </variable>
         <variable name="MaxInvariants">

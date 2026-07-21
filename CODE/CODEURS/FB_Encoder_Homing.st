@@ -15,7 +15,7 @@
         (ainsi `CablePosM` = `TopSensorPositionM` exactement au moment du homing)
       ⚠️ ÉVOLUTION vs interface §5 d'origine : `HomingRefRaw` est ajouté en sortie explicite
       (le document original supposait implicitement `HomingRefRaw := PresetValue`, valable
-      uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈12.50 m).
+      uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈8.50 m).
    🧊 `ST_EncoderCalib` géré en interne (`VAR RETAIN`) — expose `Homed`/`HomingSuspect`/
       `HomingRefRaw` en sortie pour les consommateurs (`FB_Encoder_Scale`).
    🔴 SIMPLIFICATIONS assumées pour ce lot (à documenter/lever plus tard si besoin) :
