@@ -454,13 +454,13 @@ IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
     GVL_IHM.TranslationM3.PositionPV          := FALSE;
     GVL_IHM.TranslationM3.PositionP2          := FALSE;
     GVL_IHM.TranslationM3.PositionP1          := FALSE;
-    GVL_IHM.TranslationM3.Position_Maintenance := FALSE;
+    GVL_IHM.TranslationM3.PositionMaintenance := FALSE;
 ELSE
     GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
     GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
     GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
     GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-    GVL_IHM.TranslationM3.Position_Maintenance := PRG_00_Inputs.TranslationPosMaintenance;
+    GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
 END_IF;
 GVL_IHM.TranslationM3.SensorsWord         := PRG_00_Inputs.instPositionDecoder.SensorsWord;
 GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_00_Inputs.instPositionDecoder.Incoherent;

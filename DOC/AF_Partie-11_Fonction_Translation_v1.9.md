@@ -118,16 +118,25 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 | `BrakeFeedback` | BOOL | Retour d'état câblé bobine frein (NC conditionné) |
 | `BypassContactorCheck` | BOOL | Désactivation des diagnostics frein (simulation) |
 
-**Réglages (RETAIN)**
+**Réglages (RETAIN)** — paramètres câblés depuis `GVL_PERSISTENT` par `PRG_07_TranslationControl` (🔧 v1.9 REX 2026-07-22 : auparavant hardcodés dans FB_Translation, désormais paramétrables par personnel qualifié sans recompilation)
 | Paramètre | Type | Rôle |
 |-----------|------|------|
-| `RampAccelRate` | REAL | Taux d'accélération (%/s) |
-| `RampDecelNormalRate` | REAL | Taux de décélération normale (%/s) |
-| `RampDecelFastRate` | REAL | Taux de décélération rapide/d'urgence (%/s) |
+| `RampAccelRate` | REAL | Taux d'accélération (%/s) — source `_TranslationRampAccelRate_Pct` |
+| `RampDecelNormalRate` | REAL | Taux de décélération normale (%/s) — source `_TranslationRampDecelNormal_Pct` |
+| `RampDecelFastRate` | REAL | Taux de décélération rapide/d'urgence (%/s) — source `_TranslationRampDecelFast_Pct` |
 | `DirectionInterlockDelay` | TIME | Délai d'interdiction d'inversion directe de sens |
 | `ApproachSpeedPct` | REAL | Vitesse maximale d'approche lente de la cible (%) |
-| `DriveFreqScaleMaxHz` | REAL | Échelle maximale du variateur (défaut 50.0 Hz) |
+| `DriveFreqScaleMaxHz` | REAL | Échelle maximale du variateur (val. usine **60.0 Hz** 🔧 REX 2026-07-21 — évolué de 50.0 Hz suite demande terrain. **Source unique** = `GVL_PERSISTENT._TranslationMaxFreq_Hz`. Plus de valeur par défaut interne) |
 | `CaptorDebounce` | TIME | Tempo anti-rebond pour le capteur de position cible |
+
+**PERSISTENT `GVL_PERSISTENT` (Translation M3)** — 🔧 REX 2026-07-22 : nouveau bloc, unifie la source des paramètres machine (rampes, plafond auto, fréquence max)
+| Variable | Type | Défaut | Rôle |
+|----------|------|--------|------|
+| `_TranslationMaxFreq_Hz` | `REAL` | 60.0 | Fréquence max absolue M3 (Hz) — source unique pour `DriveFreqScaleMaxHz` de `FB_Translation` |
+| `_TranslationRampAccelRate_Pct` | `REAL` | 20.0 | Accélération translation (%/s) |
+| `_TranslationRampDecelNormal_Pct` | `REAL` | 40.0 | Décélération normale (%/s) |
+| `_TranslationRampDecelFast_Pct` | `REAL` | 100.0 | Décélération rapide SafeStop (%/s) |
+| `_TranslationAutoSpeedCap_Pct` | `REAL` | 40.0 | Plafond vitesse en mode SEMI_AUTO (% de la consigne, auparavant hardcodé 40.0 dans `PRG_07`) |
 
 **📤 Sorties**
 | Sortie | Type | Rôle |

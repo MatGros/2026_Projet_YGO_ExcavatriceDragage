@@ -38,7 +38,7 @@ VAR_INPUT
 
     // Réglages ETHERCAT uniquement (RETAIN)
     ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (piloté par SlowdownSensor/PV)
-    DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → 0..60Hz (T30: Max 60Hz, fonctionnement standard/nominal 30Hz à 50% de consigne)
+    DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)
 
     // Réglages communs
     CaptorDebounce                : TIME := T#100ms; // Filtrage capteur de position cible
