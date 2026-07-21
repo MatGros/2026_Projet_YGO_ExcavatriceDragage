@@ -4,6 +4,24 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.23_TranslationM3_PersistentRamp` — 2026-07-22
+- 🔴 BUG : `ST_TranslationHMI.PositionMaintenance` vs PRG_09 `Position_Maintenance` (nom divergents, erreur compilation) — aligné sur struct (`PositionMaintenance`)
+- 🟡 Translation ramp rates → PERSISTENT : `_TranslationRampAccelRate_Pct`(20)·`_TranslationRampDecelNormal_Pct`(40)·`_TranslationRampDecelFast_Pct`(100) dans GVL_PERSISTENT + câblage PRG_07 (auparavant hardcodés dans FB_Translation)
+- 🟡 Speed cap 40% → PERSISTENT `_TranslationAutoSpeedCap_Pct` (remplace `MIN(40.0,..)` hardcodé dans PRG_07)
+- 🟠 Unification source fréquence max : `DriveFreqScaleMaxHz` câblé depuis `_TranslationMaxFreq_Hz` par PRG_07 (plus de double source)
+- DOC AF_Partie-11 : nouveau tableau PERSISTENT Translation M3 + note source unique
+
+---
+
+### `v0.4.22_IHM_Joystick_Supervision` — 2026-07-22
+- Renommage masse SUPERVISION (~50 champs suffixe `_M`/`_Pct`/`_Hz`/`_Mps`)
+- `ST_JoystickHMI`·`PRG_09` : +DeadmanArmed·NeutralX/YAct·AxisCmdX/Y · RawX/Y/Button→FB_Joystick
+- `GVL_PERSISTENT` : params joystick (deadband·filter·accel/decel·invert) + `_BucketState`
+- DOC AF_Partie-11 : `DriveFreqScaleMaxHz` défaut 50→60 Hz + note qualifié
+- DOC AF_Partie-12 : §9 `_BucketState` mémoire longueur câble désynchro
+
+---
+
 ### `v0.4.21_SimM3BootFix` — 2026-07-21
 - Correction polarité frein Méca B dans `FB_Safety_Translation` (`NOT BrakeFeedback`)
 - Position neutre P2 (00111) au boot sans cible dans `FB_Sim_Translation`

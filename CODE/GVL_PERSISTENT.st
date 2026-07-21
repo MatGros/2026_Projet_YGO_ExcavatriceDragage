@@ -62,7 +62,11 @@ VAR_GLOBAL PERSISTENT RETAIN
     _BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
 
     // ↔️ TRANSLATION (M3)
-    _TranslationMaxFreq_Hz : REAL := 60.0; // Fréquence max absolue M3 (Hz)
+    _TranslationMaxFreq_Hz        : REAL := 60.0; // Fréquence max absolue M3 (Hz) — source unique
+    _TranslationRampAccelRate_Pct   : REAL := 20.0;  // Accélération translation (%/s)
+    _TranslationRampDecelNormal_Pct : REAL := 40.0;  // Décélération normale (%/s)
+    _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
+    _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
 
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)

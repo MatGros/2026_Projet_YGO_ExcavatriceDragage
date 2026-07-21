@@ -39,7 +39,7 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
                             AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                             AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
-    M3_SpeedRef_Active   := MIN(40.0,
+    M3_SpeedRef_Active   := MIN(_TranslationAutoSpeedCap_Pct,
                                 ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef));
 
     // Détermination automatique du sens de marche selon la cible :
@@ -132,6 +132,10 @@ instTranslationM3(
     LimitSwitchRev          := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
+    RampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
+    RampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
+    RampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
+    DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
 );
