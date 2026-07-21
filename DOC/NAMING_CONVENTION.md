@@ -35,7 +35,7 @@ complet) : retirées de la liste "autorisée", déplacées en "à éviter" ci-de
 | `Trig` | Détection de front (variable de travail interne) | `TrigM1Fwd`, `TrigM3Rev` |
 | `Fwd` / `Rev` | Avant / Arrière (forward/reverse) | `RelayFwd`, `LimitSwitchFwd`, `ReqFwd` |
 | `Min` / `Max` | Limite basse / haute | `MaxStepDescente`, `LimitLegalDepthMinAllowed` |
-| `Pos` | Position — coexiste avec la forme complète (les deux existent dans le code, pas de règle stricte) | `CablePosM`, `TranslationPosFosse1` **et** `PositionM`, `PositionSensorTarget` |
+| `Pos` | Position — coexiste avec la forme complète (les deux existent dans le code, pas de règle stricte) | `CablePos_M`, `TranslationPosFosse1` **et** `Position_M`, `PositionSensorTarget` |
 
 ### ⚠️ Dans l'ancien doc mais PAS utilisées dans le code — préférer le mot complet
 | Abrév. (à éviter) | Toujours écrire |
@@ -206,9 +206,9 @@ Chaîne à 4 maillons pour tout seuil logiciel (limite, ralentissement, zone) �
 production côté Winch (`ST_WinchHMI`), pris comme référence :
 
 | Maillon | Rôle | Nom (suffixe unité) | Exemple réel |
-|---|---|---|---|
-| 1. Paramètre / seuil | Réglage (souvent RETAIN, modifiable IHM) | `<Nom><UnitéM/Pct/Ms>` | `CableLimitAscentM := 12.0` |
-| 2. Mesure / info | Valeur mesurée ou calculée en temps réel | `<Nom><Unité>`, pas de suffixe rôle particulier | `PositionM` (position câble actuelle) |
+|---|---|---|---|---|
+| 1. Paramètre / seuil | Réglage (souvent RETAIN, modifiable IHM) | `<Nom>_<Unité>` | `CableLimitAscent_M := 12.0` |
+| 2. Mesure / info | Valeur mesurée ou calculée en temps réel | `<Nom>_<Unité>`, pas de suffixe rôle particulier | `Position_M` (position câble actuelle) |
 | 3. État atteint | **Fait pur** : mesure vs seuil, aucune conséquence | `<Nom>Reached` | `CableLimitAscentReached` |
 | 4. État actif | **Conséquence comportementale** — famille "sortie de commande" (polarité `TRUE` = déclenche, voir tableau plus haut) | `<Verbe><Nom>Active` | `ForbidAscentActive` (bloque la montée) |
 
@@ -218,7 +218,7 @@ existent souvent en paire, mais pas toujours 1:1 — un même "actif" peut agré
 "atteint"/conditions (ex. `FdcBucketOpenActive` dépend d'un seuil ET d'un `Enable` de config).
 
 **Paramètres/réglages (Config)** vs **Consignes (`Ref`)** : un paramètre change rarement (RETAIN,
-réglage banc/mise en service — `RampAccelRate`, `TopSensorPositionM`, `Config : ST_BucketConfig`) ;
+réglage banc/mise en service — `RampAccelRate`, `TopSensorPosition_M`, `Config : ST_BucketConfig`) ;
 une consigne (`Ref`) est recalculée à chaque cycle par la logique (`SpeedRef`, `CablePosRef`).
 Les deux peuvent partager un suffixe d'unité (`M`, `Pct`) mais ne sont pas la même catégorie —
 un paramètre ne doit pas s'appeler `XxxRef`, une consigne calculée ne doit pas ressembler à un
@@ -239,15 +239,17 @@ SafeStop            → sortie d'un bloc safety métier (état, pas une commande
  
 ---
  
-## Suffixes d'unité (exceptions tolérées)
-Utilisé si l'unité lève une ambiguïté métier ou pour précision :
+## Suffixes d'unité (règle stricte)
+Toujours précédés d'un underscore `_` pour lisibilité immédiate (évite la confusion `CablePosM` vs `CablePos_M`) :
 ```
-CablePosM         → position en mètres (2 déc)
-SpeedPct          → vitesse en % nominal
-RampTimeMs        → temps de rampe en ms
-DrumRevs          → rotations tambour
+CablePos_M       → position en mètres (2 déc)
+Speed_Pct        → vitesse en % nominal
+RampTime_Ms      → temps de rampe en ms
+Freq_Hz          → fréquence en Hz
+Speed_Mps        → vitesse linéaire en m/s
 ```
-*Note* : Pour les variables locales et d'IHM, le suffixe d'unité est collé directement sans underscore (ex. `CablePosM`). Pour les variables persistantes de configuration globale, l'unité est séparée par un underscore (ex. `_M`, `_Pct`, `_Hz`) comme détaillé ci-dessous.
+*Exception* : les suffixes `_DI`/`_DQ`/`_RQ` (I/O physique, voir §suffixes hardware) et `_Pct`/`_M`/`_Hz`/`_Ms`/`_Mps` (unités physiques) gardent l'underscore systématique.
+Les variables PERSISTENT ajoutent en plus le préfixe `_` global (ex. `_CableLimitM1Descent_M`).
 
 ---
 

@@ -813,7 +813,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_Bucket)</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveOffsetM">
+            <variable name="ActiveOffset_M">
               <type>
                 <REAL />
               </type>
@@ -885,7 +885,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut benne</xhtml>
               </documentation>
             </variable>
-            <variable name="RemainingTravelM">
+            <variable name="RemainingTravel_M">
               <type>
                 <REAL />
               </type>
@@ -914,7 +914,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffsetM —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffset_M —</xhtml>
               </documentation>
             </variable>
             <variable name="CmdOpen">
@@ -1057,7 +1057,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitLegalDepthMinAllowed">
+            <variable name="LimitLegalDepthMinAllowed_M">
               <type>
                 <REAL />
               </type>
@@ -1237,7 +1237,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="TargetDepthM">
+            <variable name="TargetDepth_M">
               <type>
                 <REAL />
               </type>
@@ -1245,7 +1245,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <simpleValue value="-12.5" />
               </initialValue>
             </variable>
-            <variable name="TargetOffsetM">
+            <variable name="TargetOffset_M">
               <type>
                 <REAL />
               </type>
@@ -1308,7 +1308,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="LimitLegalDepthM">
+            <variable name="LimitLegalDepth_M">
               <type>
                 <REAL />
               </type>
@@ -1318,12 +1318,12 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="WinchSyncDeltaM">
+            <variable name="WinchSyncDelta_M">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="SpeedMismatchMps">
+            <variable name="SpeedMismatch_Mps">
               <type>
                 <REAL />
               </type>
@@ -1338,12 +1338,12 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="M1PositionM">
+            <variable name="M1Position_M">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="M2PositionM">
+            <variable name="M2Position_M">
               <type>
                 <REAL />
               </type>
@@ -1663,20 +1663,44 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔘 Bouton homme-mort brut</xhtml>
               </documentation>
             </variable>
-            <variable name="CmdX">
+            <variable name="AxisCmdX">
               <type>
                 <derived name="ST_AxisCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe X normalisée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe X normalisée (sortie FB_Joystick)</xhtml>
               </documentation>
             </variable>
-            <variable name="CmdY">
+            <variable name="AxisCmdY">
               <type>
                 <derived name="ST_AxisCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe Y normalisée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe Y normalisée (sortie FB_Joystick)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Neutre X calibré actuel (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Neutre Y calibré actuel (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Geste homme-mort armé (FB_Joystick.DeadmanArmed)</xhtml>
               </documentation>
             </variable>
             <variable name="Online">
@@ -2407,7 +2431,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
       <dataType name="ST_SyncHMI">
         <baseType>
           <struct>
-            <variable name="SyncToleranceM">
+            <variable name="SyncTolerance_M">
               <type>
                 <REAL />
               </type>
@@ -2419,7 +2443,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M</xhtml>
               </documentation>
             </variable>
-            <variable name="DeltaPosM">
+            <variable name="DeltaPos_M">
               <type>
                 <REAL />
               </type>
@@ -3236,7 +3260,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée)</xhtml>
               </documentation>
             </variable>
-            <variable name="FreqSetpointHz">
+            <variable name="FreqSetpoint_Hz">
               <type>
                 <REAL />
               </type>
@@ -3325,7 +3349,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Capteur de détection de la position cible atteint</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveActualFreqHz">
+            <variable name="DriveActualFreq_Hz">
               <type>
                 <REAL />
               </type>
@@ -3341,7 +3365,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Mot de commande AC600 réellement appliqué</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveFreqRefHz">
+            <variable name="DriveFreqRef_Hz">
               <type>
                 <REAL />
               </type>
@@ -3357,7 +3381,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveSpeedRefPct">
+            <variable name="ActiveSpeedRef_Pct">
               <type>
                 <REAL />
               </type>
@@ -3597,7 +3621,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
       <dataType name="ST_WinchHMI">
         <baseType>
           <struct>
-            <variable name="TopSensorPositionM">
+            <variable name="TopSensorPosition_M">
               <type>
                 <REAL />
               </type>
@@ -3609,7 +3633,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 📐 Position cible du capteur haut (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingTargetM">
+            <variable name="HomingTarget_M">
               <type>
                 <REAL />
               </type>
@@ -3664,7 +3688,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rampe de décélération rapide / SafeStop (%/s)</xhtml>
               </documentation>
             </variable>
-            <variable name="CableLimitDescentM">
+            <variable name="CableLimitDescent_M">
               <type>
                 <REAL />
               </type>
@@ -3675,7 +3699,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
               </documentation>
             </variable>
-            <variable name="CableLimitAscentM">
+            <variable name="CableLimitAscent_M">
               <type>
                 <REAL />
               </type>
@@ -3686,7 +3710,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) —</xhtml>
               </documentation>
             </variable>
-            <variable name="SlowdownDistanceM">
+            <variable name="SlowdownDistance_M">
               <type>
                 <REAL />
               </type>
@@ -3697,7 +3721,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite pour enclencher le ralentissement (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="SlowSpeedPct">
+            <variable name="SlowSpeed_Pct">
               <type>
                 <REAL />
               </type>
@@ -3708,7 +3732,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Vitesse de consigne lente dans la zone de ralentissement (%)</xhtml>
               </documentation>
             </variable>
-            <variable name="PositionM">
+            <variable name="Position_M">
               <type>
                 <REAL />
               </type>
@@ -3717,7 +3741,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 📊 Position actuelle du câble (mètres)</xhtml>
               </documentation>
             </variable>
-            <variable name="MeasuredSpeedMps">
+            <variable name="MeasuredSpeed_Mps">
               <type>
                 <REAL />
               </type>
@@ -3725,7 +3749,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedDeltaMps">
+            <variable name="SpeedDelta_Mps">
               <type>
                 <REAL />
               </type>
@@ -3773,7 +3797,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Bitfield du moniteur vitesse</xhtml>
               </documentation>
             </variable>
-            <variable name="EstimatedLoadPct">
+            <variable name="EstimatedLoad_Pct">
               <type>
                 <REAL />
               </type>
@@ -3797,7 +3821,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Palier limité par vitesse réelle</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="SpeedRef_Pct">
               <type>
                 <REAL />
               </type>
@@ -4060,7 +4084,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscentM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscent_M)</xhtml>
               </documentation>
             </variable>
             <variable name="Encoder">
@@ -4178,7 +4202,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : miroir lecture seule — confirme que</xhtml>
               </documentation>
             </variable>
-            <variable name="MecaADriftM">
+            <variable name="MecaADrift_M">
               <type>
                 <REAL />
               </type>
@@ -4186,7 +4210,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
               </documentation>
             </variable>
-            <variable name="MecaCDriftM">
+            <variable name="MecaCDrift_M">
               <type>
                 <REAL />
               </type>
@@ -24929,12 +24953,12 @@ FB_Joystick_0(
     RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
     RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
     Calibrate           := GVL_IHM.JoystickJOY1.Calibrate,
-    InvertX             := FALSE,
-    InvertY             := FALSE,
-    Deadband            := 10.0,
-    FilterTime          := TIME#100ms,
-    AccelRate           := 50.0,
-    DecelRate           := 150.0,
+    InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
+    InvertY             := _JoystickInvertY,       // 🔧 idem
+    Deadband            := _JoystickDeadband_Pct,  // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
+    FilterTime          := _JoystickFilterTime,    // 🔧 idem
+    AccelRate           := _JoystickAccelRate_Pct, // 🔧 idem
+    DecelRate           := _JoystickDecelRate_Pct, // 🔧 idem
     // 🛡️ Délais de sécurité Homme-Mort : temporisations courtes (10s/500ms) si joystick réel, longues (5min/1s) si simulé
     DeadmanRearmTimeout := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#5M, T#10S),
     NeutralHoldTime     := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#1S, T#500MS)
@@ -25709,8 +25733,8 @@ CmdStartCycle_IHM := GVL_IHM.Cycle.CmdStart;
 CmdPauseCycle_IHM := GVL_IHM.Cycle.CmdPause;
 CmdAbortCycle_IHM := GVL_IHM.Cycle.CmdAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.CmdReset;
-TargetDepthM      := GVL_IHM.Cycle.TargetDepthM;
-TargetOffsetM     := GVL_IHM.Cycle.TargetOffsetM;
+TargetDepthM      := GVL_IHM.Cycle.TargetDepth_M;
+TargetOffsetM     := GVL_IHM.Cycle.TargetOffset_M;
 GVL_Simulation.KoboldContactFond_Simulated := GVL_IHM.Cycle.SimKoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
@@ -25736,7 +25760,7 @@ instCycle(
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
-    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed,
+    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M,
     WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -25762,7 +25786,7 @@ instCycle(
     Benne_IsClosed    := _BucketState.IsClosed
 );
 
-GVL_IHM.Cycle.SpeedMismatchMps        := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.SpeedMismatch_Mps        := instCycle.SpeedMismatchMps;
 GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
 GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 
@@ -26610,7 +26634,7 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
-    FreqPct := (GVL_IHM.TranslationM3.FreqSetpointHz / _TranslationMaxFreq_Hz) * 100.0;
+    FreqPct := (GVL_IHM.TranslationM3.FreqSetpoint_Hz / _TranslationMaxFreq_Hz) * 100.0;
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.JoystickSelect,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
@@ -26881,34 +26905,34 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
-IF GVL_IHM.M1TreuilRetenue.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.M1TreuilRetenue.TopSensorPositionM  := _HomingTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.HomingTargetM       := _HomingUnitaryTargetM1_M;
+IF GVL_IHM.M1TreuilRetenue.TopSensorPosition_M = 0.0 THEN
+    GVL_IHM.M1TreuilRetenue.TopSensorPosition_M  := _HomingTarget_M1_M;
+    GVL_IHM.M1TreuilRetenue.HomingTarget_M       := _HomingUnitaryTargetM1_M;
     GVL_IHM.M1TreuilRetenue.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.M1TreuilRetenue.RampAccelRate       := _WinchM1RampAccelRate_Pct;
     GVL_IHM.M1TreuilRetenue.RampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
     GVL_IHM.M1TreuilRetenue.RampDecelFastRate   := _WinchM1RampDecelFast_Pct;
-    GVL_IHM.M1TreuilRetenue.CableLimitDescentM  := _CableLimitM1Descent_M;
-    GVL_IHM.M1TreuilRetenue.CableLimitAscentM   := _CableLimitM1Ascent_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.M1TreuilRetenue.SlowdownDistanceM   := _WinchSlowdownDistance_M;
-    GVL_IHM.M1TreuilRetenue.SlowSpeedPct        := _WinchSlowSpeed_Pct;
+    GVL_IHM.M1TreuilRetenue.CableLimitDescent_M  := _CableLimitM1Descent_M;
+    GVL_IHM.M1TreuilRetenue.CableLimitAscent_M   := _CableLimitM1Ascent_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M1TreuilRetenue.SlowdownDistance_M   := _WinchSlowdownDistance_M;
+    GVL_IHM.M1TreuilRetenue.SlowSpeed_Pct        := _WinchSlowSpeed_Pct;
 END_IF;
 
-IF GVL_IHM.M2TreuilBucket.TopSensorPositionM = 0.0 THEN
-    GVL_IHM.M2TreuilBucket.TopSensorPositionM  := _HomingTargetM2_M;
-    GVL_IHM.M2TreuilBucket.HomingTargetM       := _HomingUnitaryTargetM2_M;
+IF GVL_IHM.M2TreuilBucket.TopSensorPosition_M = 0.0 THEN
+    GVL_IHM.M2TreuilBucket.TopSensorPosition_M  := _HomingTarget_M2_M;
+    GVL_IHM.M2TreuilBucket.HomingTarget_M       := _HomingUnitaryTargetM2_M;
     GVL_IHM.M2TreuilBucket.MaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
     GVL_IHM.M2TreuilBucket.RampAccelRate       := _WinchM2RampAccelRate_Pct;
     GVL_IHM.M2TreuilBucket.RampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
     GVL_IHM.M2TreuilBucket.RampDecelFastRate   := _WinchM2RampDecelFast_Pct;
-    GVL_IHM.M2TreuilBucket.CableLimitDescentM  := _CableLimitM2Descent_M;
-    GVL_IHM.M2TreuilBucket.CableLimitAscentM   := _CableLimitM2Ascent_M; // 🆕 REX 2026-07-15 (6)
-    GVL_IHM.M2TreuilBucket.SlowdownDistanceM   := _WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBucket.SlowSpeedPct        := _WinchSlowSpeed_Pct;
+    GVL_IHM.M2TreuilBucket.CableLimitDescent_M  := _CableLimitM2Descent_M;
+    GVL_IHM.M2TreuilBucket.CableLimitAscent_M   := _CableLimitM2Ascent_M; // 🆕 REX 2026-07-15 (6)
+    GVL_IHM.M2TreuilBucket.SlowdownDistance_M   := _WinchSlowdownDistance_M;
+    GVL_IHM.M2TreuilBucket.SlowSpeed_Pct        := _WinchSlowSpeed_Pct;
 END_IF;
 
-IF GVL_IHM.Sync.SyncToleranceM = 0.0 THEN
-    GVL_IHM.Sync.SyncToleranceM         := _WinchSyncTolerance_M;
+IF GVL_IHM.Sync.SyncTolerance_M = 0.0 THEN
+    GVL_IHM.Sync.SyncTolerance_M         := _WinchSyncTolerance_M;
 END_IF;
 
 IF GVL_IHM.Bucket.Config.OffsetOpenM = 0.0 AND GVL_IHM.Bucket.Config.OffsetCloseM = 0.0 THEN
@@ -26916,8 +26940,8 @@ IF GVL_IHM.Bucket.Config.OffsetOpenM = 0.0 AND GVL_IHM.Bucket.Config.OffsetClose
     GVL_IHM.Bucket.TimeoutDuration := T#30s;
 END_IF;
 
-IF GVL_IHM.Commun.LimitLegalDepthMinAllowed = 0.0 THEN
-    GVL_IHM.Commun.LimitLegalDepthMinAllowed := _LimitLegalDepthMinAllowed_M;
+IF GVL_IHM.Commun.LimitLegalDepthMinAllowed_M = 0.0 THEN
+    GVL_IHM.Commun.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
     GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
@@ -26931,12 +26955,12 @@ END_IF;
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-_HomingTargetM1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPositionM;
-_HomingTargetM2_M           := GVL_IHM.M2TreuilBucket.TopSensorPositionM;
-_HomingUnitaryTargetM1_M    := GVL_IHM.M1TreuilRetenue.HomingTargetM;
-_HomingUnitaryTargetM2_M    := GVL_IHM.M2TreuilBucket.HomingTargetM;
+_HomingTarget_M1_M           := GVL_IHM.M1TreuilRetenue.TopSensorPosition_M;
+_HomingTarget_M2_M           := GVL_IHM.M2TreuilBucket.TopSensorPosition_M;
+_HomingUnitaryTargetM1_M    := GVL_IHM.M1TreuilRetenue.HomingTarget_M;
+_HomingUnitaryTargetM2_M    := GVL_IHM.M2TreuilBucket.HomingTarget_M;
 // 🔧 REX 2026-07-08 : MaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
-// ci-dessous (même pattern que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct), plus de
+// ci-dessous (même pattern que CableLimitDescent_M/SlowdownDistance_M/SlowSpeed_Pct), plus de
 // propagation à sens unique séparée par treuil ici.
 _WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.RampAccelRate;
 _WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.RampDecelNormalRate;
@@ -26945,16 +26969,16 @@ _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBucket.RampAccelRate;
 _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBucket.RampDecelNormalRate;
 _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBucket.RampDecelFastRate;
 // ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit : cette ligne
-// écrase _WinchSyncTolerance_M avec GVL_IHM.Sync.SyncToleranceM À CHAQUE SCAN.
+// écrase _WinchSyncTolerance_M avec GVL_IHM.Sync.SyncTolerance_M À CHAQUE SCAN.
 // Si on change UNIQUEMENT la valeur par défaut dans GVL_PERSISTENT.st (ou ST_SyncHMI.st), ça ne
 // suffit pas : la valeur restaurée au boot (bloc §2 ci-dessus, `IF ... = 0.0 THEN`) ne s'applique
 // que si le RETAIN IHM est à 0.0 (premier démarrage) — sinon l'ancienne valeur IHM re-propage ici
 // et écrase silencieusement toute nouvelle valeur par défaut au scan suivant.
-_WinchSyncTolerance_M       := GVL_IHM.Sync.SyncToleranceM;
+_WinchSyncTolerance_M       := GVL_IHM.Sync.SyncTolerance_M;
 _BucketConfig              := GVL_IHM.Bucket.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : MaxStepDescente commun M1/M2 — même profil de
-// déplacement des 2 treuils, même pattern miroir que CableLimitDescentM ci-dessous.
+// déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
 IF GVL_IHM.M1TreuilRetenue.MaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
     _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.MaxStepDescente;
 ELSIF GVL_IHM.M2TreuilBucket.MaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
@@ -26963,44 +26987,44 @@ END_IF;
 GVL_IHM.M1TreuilRetenue.MaxStepDescente := _WinchMaxStepDescent;
 GVL_IHM.M2TreuilBucket.MaxStepDescente := _WinchMaxStepDescent;
 
-IF GVL_IHM.M1TreuilRetenue.CableLimitDescentM &lt;&gt; _CableLimitM1Descent_M THEN
-    _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.CableLimitDescentM;
+IF GVL_IHM.M1TreuilRetenue.CableLimitDescent_M &lt;&gt; _CableLimitM1Descent_M THEN
+    _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.CableLimitDescent_M;
 END_IF;
-GVL_IHM.M1TreuilRetenue.CableLimitDescentM := _CableLimitM1Descent_M;
+GVL_IHM.M1TreuilRetenue.CableLimitDescent_M := _CableLimitM1Descent_M;
 
-IF GVL_IHM.M2TreuilBucket.CableLimitDescentM &lt;&gt; _CableLimitM2Descent_M THEN
-    _CableLimitM2Descent_M := GVL_IHM.M2TreuilBucket.CableLimitDescentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitDescent_M &lt;&gt; _CableLimitM2Descent_M THEN
+    _CableLimitM2Descent_M := GVL_IHM.M2TreuilBucket.CableLimitDescent_M;
 END_IF;
-GVL_IHM.M2TreuilBucket.CableLimitDescentM := _CableLimitM2Descent_M;
+GVL_IHM.M2TreuilBucket.CableLimitDescent_M := _CableLimitM2Descent_M;
 
-// 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescentM ci-dessus.
-IF GVL_IHM.M1TreuilRetenue.CableLimitAscentM &lt;&gt; _CableLimitM1Ascent_M THEN
-    _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.CableLimitAscentM;
+// 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescent_M ci-dessus.
+IF GVL_IHM.M1TreuilRetenue.CableLimitAscent_M &lt;&gt; _CableLimitM1Ascent_M THEN
+    _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.CableLimitAscent_M;
 END_IF;
-GVL_IHM.M1TreuilRetenue.CableLimitAscentM := _CableLimitM1Ascent_M;
+GVL_IHM.M1TreuilRetenue.CableLimitAscent_M := _CableLimitM1Ascent_M;
 
-IF GVL_IHM.M2TreuilBucket.CableLimitAscentM &lt;&gt; _CableLimitM2Ascent_M THEN
-    _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBucket.CableLimitAscentM;
+IF GVL_IHM.M2TreuilBucket.CableLimitAscent_M &lt;&gt; _CableLimitM2Ascent_M THEN
+    _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBucket.CableLimitAscent_M;
 END_IF;
-GVL_IHM.M2TreuilBucket.CableLimitAscentM := _CableLimitM2Ascent_M;
+GVL_IHM.M2TreuilBucket.CableLimitAscent_M := _CableLimitM2Ascent_M;
 
-IF GVL_IHM.M1TreuilRetenue.SlowdownDistanceM &lt;&gt; _WinchSlowdownDistance_M THEN
-    _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistanceM;
-ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistanceM &lt;&gt; _WinchSlowdownDistance_M THEN
-    _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistanceM;
+IF GVL_IHM.M1TreuilRetenue.SlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
+    _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.SlowdownDistance_M;
+ELSIF GVL_IHM.M2TreuilBucket.SlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
+    _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBucket.SlowdownDistance_M;
 END_IF;
-GVL_IHM.M1TreuilRetenue.SlowdownDistanceM := _WinchSlowdownDistance_M;
-GVL_IHM.M2TreuilBucket.SlowdownDistanceM := _WinchSlowdownDistance_M;
+GVL_IHM.M1TreuilRetenue.SlowdownDistance_M := _WinchSlowdownDistance_M;
+GVL_IHM.M2TreuilBucket.SlowdownDistance_M := _WinchSlowdownDistance_M;
 
-IF GVL_IHM.M1TreuilRetenue.SlowSpeedPct &lt;&gt; _WinchSlowSpeed_Pct THEN
-    _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.SlowSpeedPct;
-ELSIF GVL_IHM.M2TreuilBucket.SlowSpeedPct &lt;&gt; _WinchSlowSpeed_Pct THEN
-    _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBucket.SlowSpeedPct;
+IF GVL_IHM.M1TreuilRetenue.SlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
+    _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.SlowSpeed_Pct;
+ELSIF GVL_IHM.M2TreuilBucket.SlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
+    _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBucket.SlowSpeed_Pct;
 END_IF;
-GVL_IHM.M1TreuilRetenue.SlowSpeedPct := _WinchSlowSpeed_Pct;
-GVL_IHM.M2TreuilBucket.SlowSpeedPct := _WinchSlowSpeed_Pct;
+GVL_IHM.M1TreuilRetenue.SlowSpeed_Pct := _WinchSlowSpeed_Pct;
+GVL_IHM.M2TreuilBucket.SlowSpeed_Pct := _WinchSlowSpeed_Pct;
 
-_LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+_LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
 _LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
@@ -27022,18 +27046,18 @@ GVL_IHM.M2TreuilBucket.BypassTopPositionSensor := GVL_Simulation.SimulationModeA
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
-GVL_IHM.M1TreuilRetenue.PositionM                := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
-GVL_IHM.M1TreuilRetenue.MeasuredSpeedMps         := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
-GVL_IHM.M1TreuilRetenue.SpeedDeltaMps            := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
+GVL_IHM.M1TreuilRetenue.Position_M                := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.M1TreuilRetenue.MeasuredSpeed_Mps         := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
+GVL_IHM.M1TreuilRetenue.SpeedDelta_Mps            := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
 GVL_IHM.M1TreuilRetenue.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
 GVL_IHM.M1TreuilRetenue.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed;
 GVL_IHM.M1TreuilRetenue.SpeedStable             := PRG_03_Safety.instSpeedMonitorM1.SpeedStable;
 GVL_IHM.M1TreuilRetenue.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM1.Error;
 GVL_IHM.M1TreuilRetenue.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM1.ErrorId;
-GVL_IHM.M1TreuilRetenue.EstimatedLoadPct         := PRG_03_Safety.instLoadEstimatorM1.EstimatedLoadPct;
+GVL_IHM.M1TreuilRetenue.EstimatedLoad_Pct         := PRG_03_Safety.instLoadEstimatorM1.EstimatedLoadPct;
 GVL_IHM.M1TreuilRetenue.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM1.Configured;
 GVL_IHM.M1TreuilRetenue.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM1.SpeedGuardLimited;
-GVL_IHM.M1TreuilRetenue.SpeedRefPct              := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
+GVL_IHM.M1TreuilRetenue.SpeedRef_Pct              := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 GVL_IHM.M1TreuilRetenue.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
 GVL_IHM.M1TreuilRetenue.FBState                  := PRG_06_WinchControl.instWinchM1.State;
 GVL_IHM.M1TreuilRetenue.Ready                    := PRG_06_WinchControl.instWinchM1.Ready;
@@ -27066,7 +27090,7 @@ GVL_IHM.M1TreuilRetenue.EncoderFault             := NOT PRG_02_Encoders.instEnco
 GVL_IHM.M1TreuilRetenue.EncoderFaultBypassActive := GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass
                                                      AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) &lt;&gt; 16#0000;
-GVL_IHM.M1TreuilRetenue.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM1Reached; // 🆕 REX 2026-07-15 (8)
+GVL_IHM.M1TreuilRetenue.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscent_M1Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.M1TreuilRetenue.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
 GVL_IHM.M1TreuilRetenue.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM1.BrakeContactorCheck;
 
@@ -27080,25 +27104,25 @@ GVL_IHM.M1TreuilRetenue.Encoder.Error            := PRG_02_Encoders.instEncoderA
 GVL_IHM.M1TreuilRetenue.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM1.ErrorId;
 GVL_IHM.M1TreuilRetenue.SafetyError              := PRG_03_Safety.instSafetyWinchM1.Error;
 GVL_IHM.M1TreuilRetenue.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM1.ErrorId;
-GVL_IHM.M1TreuilRetenue.MecaADriftM              := PRG_03_Safety.instSafetyWinchM1.MecaADriftM;      // 🆕 REX 2026-07-08
-GVL_IHM.M1TreuilRetenue.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM1.MecaCDriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.MecaADrift_M              := PRG_03_Safety.instSafetyWinchM1.MecaADrift_M;      // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.MecaCDrift_M              := PRG_03_Safety.instSafetyWinchM1.MecaCDrift_M;      // 🆕 REX 2026-07-08
 GVL_IHM.M1TreuilRetenue.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM1.MecaBElapsedTime; // 🆕 REX 2026-07-08
 GVL_IHM.M1TreuilRetenue.InhibitActive            := PRG_04_Modes.instModes.InhibitM1; // 🆕 REX 2026-07-08
 
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
-GVL_IHM.M2TreuilBucket.PositionM                := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.M2TreuilBucket.MeasuredSpeedMps         := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps;
-GVL_IHM.M2TreuilBucket.SpeedDeltaMps            := PRG_03_Safety.instSpeedMonitorM2.SpeedDeltaMps;
+GVL_IHM.M2TreuilBucket.Position_M                := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.M2TreuilBucket.MeasuredSpeed_Mps         := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps;
+GVL_IHM.M2TreuilBucket.SpeedDelta_Mps            := PRG_03_Safety.instSpeedMonitorM2.SpeedDeltaMps;
 GVL_IHM.M2TreuilBucket.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationDetected;
 GVL_IHM.M2TreuilBucket.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed;
 GVL_IHM.M2TreuilBucket.SpeedStable             := PRG_03_Safety.instSpeedMonitorM2.SpeedStable;
 GVL_IHM.M2TreuilBucket.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM2.Error;
 GVL_IHM.M2TreuilBucket.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM2.ErrorId;
-GVL_IHM.M2TreuilBucket.EstimatedLoadPct         := PRG_03_Safety.instLoadEstimatorM2.EstimatedLoadPct;
+GVL_IHM.M2TreuilBucket.EstimatedLoad_Pct         := PRG_03_Safety.instLoadEstimatorM2.EstimatedLoadPct;
 GVL_IHM.M2TreuilBucket.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM2.Configured;
 GVL_IHM.M2TreuilBucket.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM2.SpeedGuardLimited;
-GVL_IHM.M2TreuilBucket.SpeedRefPct              := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
+GVL_IHM.M2TreuilBucket.SpeedRef_Pct              := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 GVL_IHM.M2TreuilBucket.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
 GVL_IHM.M2TreuilBucket.FBState                  := PRG_06_WinchControl.instWinchM2.State;
 GVL_IHM.M2TreuilBucket.Ready                    := PRG_06_WinchControl.instWinchM2.Ready;
@@ -27131,7 +27155,7 @@ GVL_IHM.M2TreuilBucket.EncoderFault             := NOT PRG_02_Encoders.instEncod
 GVL_IHM.M2TreuilBucket.EncoderFaultBypassActive := GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass
                                                    AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M2TreuilBucket.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) &lt;&gt; 16#0000;
-GVL_IHM.M2TreuilBucket.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM2Reached; // 🆕 REX 2026-07-15 (8)
+GVL_IHM.M2TreuilBucket.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscent_M2Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.M2TreuilBucket.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07
 GVL_IHM.M2TreuilBucket.BrakeContactorCheck      := PRG_06_WinchControl.instWinchM2.BrakeContactorCheck;
 
@@ -27145,15 +27169,15 @@ GVL_IHM.M2TreuilBucket.Encoder.Error            := PRG_02_Encoders.instEncoderAb
 GVL_IHM.M2TreuilBucket.Encoder.ErrorId          := PRG_02_Encoders.instEncoderAbsM2.ErrorId;
 GVL_IHM.M2TreuilBucket.SafetyError              := PRG_03_Safety.instSafetyWinchM2.Error;
 GVL_IHM.M2TreuilBucket.SafetyErrorId            := PRG_03_Safety.instSafetyWinchM2.ErrorId;
-GVL_IHM.M2TreuilBucket.MecaADriftM              := PRG_03_Safety.instSafetyWinchM2.MecaADriftM;      // 🆕 REX 2026-07-08
-GVL_IHM.M2TreuilBucket.MecaCDriftM              := PRG_03_Safety.instSafetyWinchM2.MecaCDriftM;      // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBucket.MecaADrift_M              := PRG_03_Safety.instSafetyWinchM2.MecaADrift_M;      // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBucket.MecaCDrift_M              := PRG_03_Safety.instSafetyWinchM2.MecaCDrift_M;      // 🆕 REX 2026-07-08
 GVL_IHM.M2TreuilBucket.MecaBElapsedTime         := PRG_03_Safety.instSafetyWinchM2.MecaBElapsedTime; // 🆕 REX 2026-07-08
 GVL_IHM.M2TreuilBucket.InhibitActive            := PRG_04_Modes.instModes.InhibitM2; // 🆕 REX 2026-07-08
 
 
 // ── 7. MAPPING ÉTATS BENNE → IHM ───────────────────────────────────────
 GVL_IHM.Bucket.FBState          := PRG_06_WinchControl.instBucket.State;
-GVL_IHM.Bucket.ActiveOffsetM    := PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.Bucket.ActiveOffset_M    := PRG_06_WinchControl.instBucket.ActiveOffsetM;
 GVL_IHM.Bucket.M2StartStop      := PRG_06_WinchControl.instBucket.M2_StartStop;
 GVL_IHM.Bucket.M2Direction      := PRG_06_WinchControl.instBucket.M2_Direction;
 GVL_IHM.Bucket.M2ForceSlowSpeed := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
@@ -27162,17 +27186,17 @@ GVL_IHM.Bucket.Busy             := PRG_06_WinchControl.instBucket.Busy;
 GVL_IHM.Bucket.Done             := PRG_06_WinchControl.instBucket.Done;
 GVL_IHM.Bucket.Error            := PRG_06_WinchControl.instBucket.Error;
 GVL_IHM.Bucket.ErrorId          := PRG_06_WinchControl.instBucket.ErrorId;
-GVL_IHM.Bucket.RemainingTravelM := PRG_06_WinchControl.instBucket.RemainingTravelM; // 🔧 REX 2026-07-07
+GVL_IHM.Bucket.RemainingTravel_M := PRG_06_WinchControl.instBucket.RemainingTravelM; // 🔧 REX 2026-07-07
 GVL_IHM.Bucket.CloseReq         := PRG_06_WinchControl.instBucket.CloseReq; // 🆕 REX 2026-07-08
 GVL_IHM.Bucket.OpenReq          := PRG_06_WinchControl.instBucket.OpenReq;  // 🆕 REX 2026-07-08
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
-// doit être égale à GVL_IHM.M1TreuilRetenue.PositionM quand tout est nominal (voir bandeau ST_BucketHMI).
+// doit être égale à GVL_IHM.M1TreuilRetenue.Position_M quand tout est nominal (voir bandeau ST_BucketHMI).
 GVL_IHM.Bucket.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
 GVL_IHM.Bucket.State            := _BucketState;
 
 
 // ── 8. MAPPING ÉTATS SYNCHRONISATION → IHM ─────────────────────────────────
-GVL_IHM.Sync.DeltaPosM  := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.Sync.DeltaPos_M  := PRG_06_WinchControl.instWinchSync.DeltaPosM;
 GVL_IHM.Sync.SyncActive := PRG_06_WinchControl.instWinchSync.SyncActive;
 GVL_IHM.Sync.SyncWarn   := PRG_06_WinchControl.instWinchSync.SyncWarn;
 GVL_IHM.Sync.Ready      := PRG_06_WinchControl.instWinchSync.Ready;
@@ -27197,13 +27221,13 @@ IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
     GVL_IHM.TranslationM3.PositionPV          := FALSE;
     GVL_IHM.TranslationM3.PositionP2          := FALSE;
     GVL_IHM.TranslationM3.PositionP1          := FALSE;
-    GVL_IHM.TranslationM3.PositionMaintenance := FALSE;
+    GVL_IHM.TranslationM3.Position_Maintenance := FALSE;
 ELSE
     GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
     GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
     GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
     GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-    GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+    GVL_IHM.TranslationM3.Position_Maintenance := PRG_00_Inputs.TranslationPosMaintenance;
 END_IF;
 GVL_IHM.TranslationM3.SensorsWord         := PRG_00_Inputs.instPositionDecoder.SensorsWord;
 GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_00_Inputs.instPositionDecoder.Incoherent;
@@ -27215,7 +27239,7 @@ GVL_IHM.TranslationM3.SimulationModeActive := GVL_Simulation.SimulationModeActiv
 GVL_IHM.TranslationM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
 GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
-GVL_IHM.TranslationM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.TranslationM3.DriveActualFreq_Hz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
 GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
 GVL_IHM.TranslationM3.SafetyErrorOperatorComm := PRG_03_Safety.instSafetyTranslationM3.ErrorOperatorComm;
@@ -27229,9 +27253,9 @@ GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTra
 GVL_IHM.TranslationM3.SafetySafeStop       := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.SafetyPowerCutOff    := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 GVL_IHM.TranslationM3.DriveControlWord     := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
-GVL_IHM.TranslationM3.DriveFreqRefHz       := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
+GVL_IHM.TranslationM3.DriveFreqRef_Hz       := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
 GVL_IHM.TranslationM3.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
-GVL_IHM.TranslationM3.ActiveSpeedRefPct    := PRG_07_TranslationControl.M3_SpeedRef_Active;
+GVL_IHM.TranslationM3.ActiveSpeedRef_Pct    := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
 // ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
 GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;
@@ -27245,22 +27269,25 @@ GVL_IHM.Cycle.SelectedTargetNum    := GVL_IHM.TranslationM3.SelectedTargetNum;
 GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
 GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.LimitLegalDepthM     := GVL_IHM.Commun.LimitLegalDepthMinAllowed;
+GVL_IHM.Cycle.LimitLegalDepth_M     := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
 GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
-GVL_IHM.Cycle.WinchSyncDeltaM      := PRG_06_WinchControl.instWinchSync.DeltaPosM;
-GVL_IHM.Cycle.M1PositionM          := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
-GVL_IHM.Cycle.M2PositionM          := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.Cycle.WinchSyncDelta_M      := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.Cycle.M1Position_M          := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Cycle.M2Position_M          := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 GVL_IHM.Cycle.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
 GVL_IHM.Cycle.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
 GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.JoystickJOY1.RawX       := JoyXRaw_ANA1;
-GVL_IHM.JoystickJOY1.RawY       := JoyYRaw_ANA2;
-GVL_IHM.JoystickJOY1.RawButton  := JoyBtnRaw;
-GVL_IHM.JoystickJOY1.CmdX       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.JoystickJOY1.CmdY       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JoystickJOY1.RawX       := PRG_01_Diagnostics.FB_Joystick_0.RawX;   // 🔧 REX 2026-07-21 : depuis FB (pas JoyXRaw_ANA1 direct) — cohérent simulation
+GVL_IHM.JoystickJOY1.RawY       := PRG_01_Diagnostics.FB_Joystick_0.RawY;   // idem
+GVL_IHM.JoystickJOY1.RawButton  := PRG_01_Diagnostics.FB_Joystick_0.RawButton; // idem
+GVL_IHM.JoystickJOY1.AxisCmdX    := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
+GVL_IHM.JoystickJOY1.AxisCmdY    := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JoystickJOY1.NeutralXAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct; // 🆕 REX 2026-07-21 : neutre calibré
+GVL_IHM.JoystickJOY1.NeutralYAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct; // 🆕 idem
+GVL_IHM.JoystickJOY1.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed; // 🆕 REX 2026-07-21 : visu IHM homme-mort
 GVL_IHM.JoystickJOY1.Online     := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JoystickJOY1.Operational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
 GVL_IHM.JoystickJOY1.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;

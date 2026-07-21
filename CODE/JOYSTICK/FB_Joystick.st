@@ -36,7 +36,7 @@ VAR_INPUT
     Reset           : BOOL;       // Acquittement défaut
     EmergencyStopOk : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
     Mode            : E_Mode;     // 🆕 REX 2026-07-08 — changement de mode désarme le homme-mort (voir §4ter)
-    BenneBusy     : BOOL;       // 🆕 REX 2026-07-08 — fin de cycle benne (front descendant) désarme le homme-mort (voir §4ter)
+    BenneBusy       : BOOL;       // 🆕 REX 2026-07-08 — fin de cycle benne (front descendant) désarme le homme-mort (voir §4ter)
     BusCanOpenOP    : ST_DiagDevice;       // État présence nœud CAN
     JoystickOP      : ST_DiagDevice;       // Mode esclave CANopen actif
     RawX            : INT;        // Valeur brute axe X

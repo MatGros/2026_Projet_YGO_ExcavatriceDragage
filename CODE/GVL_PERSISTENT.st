@@ -67,6 +67,12 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
     _JoystickNeutralY : INT := 5000; // Point neutre axe Y (0..10000)
+    _JoystickDeadband_Pct : REAL := 10.0; // Zone morte joystick (%) — REX 2026-07-02 : 5.0→10.0
+    _JoystickFilterTime : TIME := T#100ms; // Constante de temps filtre PT1
+    _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
+    _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)
+    _JoystickInvertX : BOOL := FALSE; // Inversion axe X
+    _JoystickInvertY : BOOL := FALSE; // Inversion axe Y
 
     // 📏 RÉGLEMENTATION / LÉGAL
     _LimitLegalDepthMinAllowed_M   : REAL := -15.0; // Cote min dragage autorisée (m)

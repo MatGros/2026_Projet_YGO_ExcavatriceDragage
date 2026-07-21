@@ -12,7 +12,7 @@ STRUCT
     (* 🚦 États & Retours (Lecture seule) *)
     State               : ST_BucketState;  (* 🚥 État mémorisé (IsOpen, IsClosed, etc.) *)
     FBState             : E_State;          (* 🤖 État de l'automate interne (FB_Bucket) *)
-    ActiveOffsetM       : REAL;             (* 📐 Offset actif injecté dans la synchro *)
+    ActiveOffset_M       : REAL;             (* 📐 Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* 🛗 Commande Start/Stop forcée vers M2 *)
     M2Direction         : INT;              (* 🛗 Commande direction forcée vers M2 *)
     M2ForceSlowSpeed    : BOOL;             (* 🐢 Blocage vitesse rapide de M2 *)
@@ -21,12 +21,12 @@ STRUCT
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
     Error               : BOOL;             (* 🔴 Benne en défaut *)
     ErrorId             : WORD;             (* ❌ Code bitfield du défaut benne *)
-    RemainingTravelM    : REAL;             (* 📏 REX 2026-07-07 : distance restante avant cible (m),
+    RemainingTravel_M    : REAL;             (* 📏 REX 2026-07-07 : distance restante avant cible (m),
                                                 pour jauge/aiguille IHM — 0.0 hors mouvement *)
     CloseReq            : BOOL;             (* 🆕 REX 2026-07-08 : demande de fermeture active (image FB_Bucket) —
                                                 FALSE dès la cible atteinte OU le retour à la position de départ *)
     OpenReq             : BOOL;             (* 🆕 REX 2026-07-08 : demande d'ouverture active (image FB_Bucket), même principe *)
-    M2PositionCorrected : REAL;             (* 📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffsetM —
+    M2PositionCorrected : REAL;             (* 📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffset_M —
                                                 pure valeur d'AFFICHAGE (bargraphe), égale à WinchM1.PositionM
                                                 quand tout est nominal ; ne remplace PAS DeltaPosM (Sync),
                                                 qui reste la valeur de sécurité/surveillance de référence *)
