@@ -25,4 +25,5 @@ VAR_GLOBAL CONSTANT
     SuiteBucket      : INT := 3;    // index de suite Bucket (Cmd.RunSuite)
     SuiteEncoder     : INT := 4;    // index de suite Codeurs/Homing nominal (Cmd.RunSuite)
     SuiteModes       : INT := 5;    // index de suite Modes/Homme-mort, post-suppression IHM_MANU (Cmd.RunSuite)
+    SuiteHeartbeat   : INT := 6;    // index de suite Heartbeat IHM↔PLC (Cmd.RunSuite)
 END_VAR

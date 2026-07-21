@@ -136,12 +136,11 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 cd TOOLS/ST_PLCOPENXML_GENERATOR
 python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', '<version>']))"
 ```
-Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.4.18_DocSweep_IHMRetrait` d'après `PRJ_CODESYS/Programme MGS_v0.4.18_DocSweep_IHMRetrait.project`).
+Remplacer `<version>` par la version actuelle du projet CODESYS (ex. `MGS_v0.4.19_CommissioningPrep` d'après `PRJ_CODESYS/Programme MGS_v0.4.19_CommissioningPrep.project`).
 
 **Exemple :**
 ```powershell
-cd TOOLS/ST_PLCOPENXML_GENERATOR
-python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.4.18_DocSweep_IHMRetrait']))"
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . --project-name "MGS_v0.4.19_CommissioningPrep"
 ```
 
 Sortie → `CODE/CODE_Bundle.xml`

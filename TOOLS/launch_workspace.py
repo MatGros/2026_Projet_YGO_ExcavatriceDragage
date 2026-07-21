@@ -44,6 +44,9 @@ def run_windows_terminal(root: Path) -> int:
 
     cmds = [
         ("Pi", ["pi"]),
+        ("Claude Ollama", ["ollama", "launch", "claude", "--model", "gemma4:e4b"]),
+        ("OpenCode", ["opencode", "--agent", "orchestrateur"]),
+        ("OpenCode Ollama", ["ollama", "launch", "opencode", "--model", "gemma4:e4b"]),
         ("Gates", [sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py", "--skip-codesys", "--watch"]),
         ("Herdr", ["herdr", "start-agent", "claude"]),
         ("Graphs", [sys.executable, "TOOLS/visualize_workflow.py"]),
@@ -75,6 +78,9 @@ def run_tmux_direct(root: Path) -> int:
 
     cmds = [
         "pi",
+        "ollama launch claude --model gemma4:e4b",
+        "opencode --agent orchestrateur",
+        "ollama launch opencode --model gemma4:e4b",
         f"python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys --watch",
         "herdr start-agent claude",
         f"python TOOLS/visualize_workflow.py",

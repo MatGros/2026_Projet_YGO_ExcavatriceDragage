@@ -1,6 +1,6 @@
 # TOOLS — Outils du projet
 
-Ce dossier contient **deux outils indépendants** + **utilitaires de workspace** :
+Ce dossier contient **deux outils indépendants** + **documentation/configuration workspace** :
 
 ```
 TOOLS/
@@ -18,8 +18,11 @@ TOOLS/
     ├── samples_reference_codesys/
     ├── test_import_poc/
     └── docs/
-├── launch_workspace.py   # Lanceur workspace unifié (Windows Terminal / tmux)
-└── visualize_workflow.py # Générateur graphique Mermaid du workflow
+├── PROJECT_WORKSPACE/       # Environnement de travail du projet (Pi, AGY, Claude, Gates, Herdr, Graph)
+│   ├── README.md             # Documentation et guide
+│   └── terminals.json        # Fichier de configuration modèle
+├── DIAGRAM_GENERATORS/      # Générateurs spécialisés de diagrammes Mermaid
+└── visualize_workflow.py    # Compatibilité et moteur commun Mermaid
 ```
 
 ## Utilisation rapide
@@ -45,21 +48,23 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --codesys-log build.log --strict
 ```
 
-### Lancer le workspace complet (Pi + Gates + Herdr + Graphs)
+### Lancer les terminaux VS Code (Pi + Gates + Herdr + Graph)
 
-```powershell
-# Windows Terminal (natif)
-python TOOLS/launch_workspace.py
+L’extension **Terminals Manager** ouvre les quatre onglets dans le terminal intégré :
 
-# tmux (via tmuxinator, dans WSL)
-tmuxinator mgs
+```text
+Ctrl+Shift+P → Terminals: Run
 ```
+
+Configuration et procédure : `TOOLS/PROJECT_WORKSPACE/README.md`.
+
+Le lancement est volontairement manuel : rien ne démarre à l’ouverture de VS Code.
 
 ### Visualiser le workflow (Mermaid)
 
 ```powershell
 # Générer diagramme Mermaid
-python TOOLS/visualize_workflow.py > workflow.mmd
+python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header
 
 # Voir dans VS Code (Markdown preview) ou Mermaid Live Editor
 ```

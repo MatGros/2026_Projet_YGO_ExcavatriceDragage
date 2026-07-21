@@ -109,6 +109,13 @@ GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
 GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
 GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_08_AuxiliaryControl.HydraulicFaultOk; // 🆕 REX 2026-07-18 — diagnostic seul, aucune commande PLC
 
+// 💓 Heartbeat IHM↔PLC — le toggle IHM est lu directement en PRG_01 ; ici, on publie
+// les diagnostics calculés au même scan pour l'affichage et l'historisation IHM.
+GVL_IHM.Commun.HeartbeatPlcToggle  := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatPlcToggle;
+GVL_IHM.Commun.HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk;
+GVL_IHM.Commun.HeartbeatIhmTimeout := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmTimeout;
+GVL_IHM.Commun.HeartbeatIhmElapsed := PRG_01_Diagnostics.instIhmHeartbeat.TimeSinceIhmEdge;
+
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
 // pas seulement le pulse — ArmingSeqStep<>0 englobe déjà tout sauf le verrouillage final.
@@ -455,7 +462,7 @@ GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filter
 GVL_IHM.TranslationM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
 GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
-GVL_IHM.TranslationM3.SafetyErrorJoystick     := PRG_03_Safety.instSafetyTranslationM3.ErrorJoystick;
+GVL_IHM.TranslationM3.SafetyErrorOperatorComm := PRG_03_Safety.instSafetyTranslationM3.ErrorOperatorComm;
 GVL_IHM.TranslationM3.SafetyErrorDriveComm    := PRG_03_Safety.instSafetyTranslationM3.ErrorDriveComm;
 GVL_IHM.TranslationM3.SafetyErrorPhaseRotation:= PRG_03_Safety.instSafetyTranslationM3.ErrorPhaseRotation;
 GVL_IHM.TranslationM3.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTranslationM3.ErrorBrakeThermal;

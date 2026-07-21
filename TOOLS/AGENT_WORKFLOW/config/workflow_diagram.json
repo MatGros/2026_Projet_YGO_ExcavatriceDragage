@@ -1,0 +1,49 @@
+{
+  "direction": "BT",
+  "groups": [
+    {"id": "INPUT", "label": "📥 ENTRÉES", "class": "input"},
+    {"id": "REFINEMENT", "label": "🧠 REFINEMENT, PLANNING ET FUSION", "class": "refinement"},
+    {"id": "GATES", "label": "🟢 GATES DÉTERMINISTES", "class": "gate"},
+    {"id": "VALIDATION", "label": "✅ VALIDATION HUMAINE ET AGENTS", "class": "validation"},
+    {"id": "TRACEABILITY", "label": "📚 TRAÇABILITÉ", "class": "trace"}
+  ],
+  "nodes": [
+    {"id": "A1", "label": "CODE_CHANGE\nModification programme ou bug", "group": "INPUT"},
+    {"id": "A2", "label": "NEW_INFORMATION\nClient, chantier ou essai", "group": "INPUT"},
+    {"id": "B1", "label": "Pre-edit Gate\npre_edit_gate.py\nSpecs DOC lues ?", "group": "REFINEMENT"},
+    {"id": "B2", "label": "Requirement Intake\nrequirement-intake skill\nInformation qualifiée", "group": "REFINEMENT"},
+    {"id": "B3", "label": "Scope et criticité\nC0-C4 et politique Ponytail", "group": "REFINEMENT"},
+    {"id": "B3_F", "label": "Analyse Multi-Modèle\nFusion Harness\n/opinion et /fusion", "group": "REFINEMENT"},
+    {"id": "B4", "label": "Plan d’action\nFix et Guard", "group": "REFINEMENT"},
+    {"id": "B5", "label": "Exécution Claude Code\nOuvrier High Effort\nAbonnement Pro", "group": "REFINEMENT"},
+    {"id": "C1", "label": "Gate 1 : Structure\ncheck_structure.py", "group": "GATES"},
+    {"id": "C2", "label": "Gate 2 : Code Style\ncheck_code_style.py\nTokens, VAR_OUTPUT, W1, W3, W5", "group": "GATES"},
+    {"id": "C3", "label": "Gate 3 : Bundle Freshness\ncheck_bundle_freshness.py", "group": "GATES"},
+    {"id": "C4", "label": "Gate 4 : PyTest\n306 tests générateur et intégration", "group": "GATES"},
+    {"id": "C5", "label": "Gate 5 : Compilation CODESYS\ncheck_codesys_compile.py", "group": "GATES"},
+    {"id": "D1", "label": "Revue Herdr\nRead-only, advisory-only", "group": "VALIDATION"},
+    {"id": "D2", "label": "Compilation CODESYS\nImport bundle et Build", "group": "VALIDATION"},
+    {"id": "D3", "label": "Essais Simulation\nBanc PLC_TESTS", "group": "VALIDATION"},
+    {"id": "D4", "label": "Validation Terrain\nFAT et SAT", "group": "VALIDATION"},
+    {"id": "E1", "label": "fix : correction locale", "group": "TRACEABILITY"},
+    {"id": "E2", "label": "guard : gate, template ou script", "group": "TRACEABILITY"},
+    {"id": "E3", "label": "WORKFLOW.md\nDouble boucle", "group": "TRACEABILITY"},
+    {"id": "E4", "label": "VERSION_HISTORY.md", "group": "TRACEABILITY"},
+    {"id": "E5", "label": "PLAN_TASK.md", "group": "TRACEABILITY"}
+  ],
+  "edges": [
+    ["A1", "B1"], ["A2", "B2"], ["B1", "B3"], ["B2", "B3"], ["B3", "B3_F"], ["B3_F", "B4"], ["B4", "B5"], ["B5", "C1"],
+    ["C1", "C2"], ["C2", "C3"], ["C3", "C4"], ["C4", "C5"], ["C5", "D1"],
+    ["C5", "D2", "Si log disponible"], ["D1", "D2"], ["D2", "D3"], ["D3", "D4"],
+    ["D4", "E1"], ["D4", "E2"], ["E1", "E3"], ["E2", "E3"], ["E3", "E4"], ["E3", "E5"],
+    ["C2", "B4", "ERROR", "dotted"], ["C4", "B4", "FAIL", "dotted"],
+    ["C5", "B4", "Erreur Cxxxx", "dotted"], ["D2", "B4", "Erreur build", "dotted"]
+  ],
+  "classes": {
+    "input": "fill:#1565c0,color:#ffffff,stroke:#0d47a1,stroke-width:2px",
+    "refinement": "fill:#ef6c00,color:#ffffff,stroke:#e65100,stroke-width:2px",
+    "gate": "fill:#2e7d32,color:#ffffff,stroke:#1b5e20,stroke-width:2px",
+    "validation": "fill:#c2185b,color:#ffffff,stroke:#880e4f,stroke-width:2px",
+    "trace": "fill:#7b1fa2,color:#ffffff,stroke:#4a148c,stroke-width:2px"
+  }
+}

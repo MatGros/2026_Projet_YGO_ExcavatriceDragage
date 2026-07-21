@@ -72,6 +72,17 @@ But : se préparer à une modif **chirurgicale**, sans casser le reste.
 
 ---
 
+## 🧪 Étape 3bis — Contrat de test obligatoire (C3/C4 / safety)
+
+Pour tout sujet `SafeStop`, `PowerCutOff`, AU, frein, contacteur, interlock, limite physique ou criticité C3/C4 :
+
+1. Le `TASK_CONTEXT` doit déclarer `tests_automated_required: true`, les fichiers PLC de test prévus et les critères testables.
+2. Exécuter `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>` avant de coder.
+3. Inclure l'artefact de test dans le même lot que la fonction. Un test manuel Watch/forçage complète la validation mais ne remplace pas le test PLC automatique.
+4. Avant restitution : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT> --release`. Sans statut `implemented` et preuve d'exécution, annoncer explicitement « lot incomplet ».
+
+---
+
 ## 💻 Étape 4 — Génération code ST + note d'application
 
 Après validation du plan :
@@ -114,35 +125,27 @@ Style commentaires :
 
 ---
 
-## 📦 Étape 4bis — Génération du bundle PLCopenXML (Optionnelle)
+## 📦 Étape 4bis — Génération obligatoire du bundle PLCopenXML
 
-À la fin de l'écriture du code (Étape 4) et avant que l'utilisateur ne procède à l'intégration, lui **demander explicitement** s'il souhaite générer le bundle PLCopenXML (`CODE_Bundle.xml`) regroupant toutes les modifications pour un import automatique dans CODESYS.
+Dès qu'un fichier `CODE/**/*.st` est créé ou modifié, générer **avant toute restitution** le bundle complet importable. Ne jamais demander une confirmation intermédiaire et ne jamais prescrire un import fichier-par-fichier.
 
-### ❓ Quand exécuter cette étape ?
-- À la fin de toute modification/création de fichiers `.st` dans le dossier `CODE/`.
-- Uniquement si l'utilisateur valide l'action (poser la question).
+### 🛠️ Commande obligatoire
 
-### 🛠️ Comment exécuter la génération ?
-Si l'utilisateur accepte, exécuter la commande Python suivante.
-
-* **Répertoire de travail (Cwd) obligatoire :** `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS`
-* **Commande exacte :**
+* **Cwd :** racine du projet.
+* **Commande unique :**
   ```powershell
-  python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', '<version>']))"
+  python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
   ```
-  *(Remplacer `<version>` par la version actuelle du projet CODESYS présente dans le nom du fichier `.project` actif du dossier `PRJ_CODESYS/`, par exemple `Programme MGS_v0.3.11` ou `MGS_v0.3.11`)*
+  Elle génère `CODE/CODE_Bundle.xml` puis contrôle sa fraîcheur.
 
-### 🔍 Exemple concret avec la version `MGS_v0.3.11` :
-```powershell
-python -c "from generator.cli import main; import sys; sys.exit(main(['--bundle', 'CODE_Bundle', '--project-name', 'MGS_v0.3.11']))"
-```
+Un échec de génération ou de fraîcheur est **bloquant** : ne pas fournir de procédure d'import ni annoncer le lot prêt. La restitution doit toujours indiquer le chemin exact : `CODE/CODE_Bundle.xml`.
 
-### 📥 Méthode d'import dans CODESYS :
-Une fois le fichier généré dans `TOOLS/generated/CODE_Bundle.xml` :
-1. Dans l'arbre du projet CODESYS 3.5, sélectionner le nœud parent cible (généralement `Application`).
-2. Cliquer sur **Project** ➔ **Import PLCopenXML...**.
-3. Sélectionner `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\generated\CODE_Bundle.xml`.
-4. Cocher les éléments voulus et valider (l'arborescence définie dans `ProjectStructure` sera recréée relativement au nœud parent sélectionné).
+### 📥 Méthode d'import dans CODESYS
+
+1. Dans l'arbre CODESYS 3.5, sélectionner le nœud parent cible (`Application`).
+2. **Project → Import PLCopenXML...**
+3. Sélectionner `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\CODE_Bundle.xml`.
+4. Valider l'import des objets proposés.
 
 ---
 
@@ -183,6 +186,7 @@ Attendre le **nouvel export** utilisateur (Device.export régénéré depuis COD
 - [ ] Existant analysé (variables/PRG/FB)
 - [ ] Plan groupé par concept **validé**
 - [ ] Code ST à copier commenté FR + emoji **écrit dans `CODE/*.st`**
-- [ ] Proposition de génération du bundle PLCopenXML faite et exécutée si demandée
+- [ ] Si C3/C4/safety : tests PLC automatiques implémentés + exécutés, contrat tests = PASS (bloquant)
+- [ ] Si `CODE/` a changé : `CODE/CODE_Bundle.xml` généré + `check_bundle_freshness.py` = PASS (bloquant)
 - [ ] Doc métier + note d'application CODESYS 3.5 **dans `DOC/AF_PartieN_Fonction_*`**
 - [ ] REX + specs versionnées `vX.X`

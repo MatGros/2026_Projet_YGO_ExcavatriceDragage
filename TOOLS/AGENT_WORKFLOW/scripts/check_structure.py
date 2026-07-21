@@ -67,9 +67,11 @@ def check_doc(root: Path, errors: list[str], warnings: list[str]) -> None:
         errors.append(f"missing directory: {doc}")
         return
 
+    allowed_doc_dirs = {"AUDITS", "CHECKLISTS", "DIAGRAMS"}
     for entry in doc.iterdir():
         if entry.is_dir():
-            errors.append(f"unexpected DOC subdirectory: {entry.name}")
+            if entry.name not in allowed_doc_dirs:
+                errors.append(f"unexpected DOC subdirectory: {entry.name}")
             continue
         if entry.suffix.lower() != ".md":
             errors.append(f"unexpected DOC file type: {entry.name}")

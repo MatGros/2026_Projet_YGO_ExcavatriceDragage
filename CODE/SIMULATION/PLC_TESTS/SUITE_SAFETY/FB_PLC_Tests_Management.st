@@ -11,6 +11,7 @@ VAR
     instBucketValidation      : FB_BucketValidation;
     instEncoderValidation     : FB_EncoderValidation;
     instModesValidation       : FB_ModesValidation;
+    instHeartbeatValidation   : FB_HeartbeatValidation;
 
 
     // Triggers pour IHM tactiles
@@ -34,6 +35,9 @@ VAR
     StartModes            : BOOL;
     AbortModes            : BOOL;
     FirstStepModes        : INT;
+    StartHeartbeat        : BOOL;
+    AbortHeartbeat        : BOOL;
+    FirstStepHeartbeat    : INT;
 
     // 🔗 Enchaînement multi-suites (CmdRunAll) — 2026-07-16 : ajout Translation puis Bucket
     ChainMode            : BOOL;  // TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket
@@ -45,6 +49,7 @@ VAR
     LastLoggedSafetyRun  : UDINT;
     LastLoggedTranslationRun : UDINT;
     LastLoggedBucketRun  : UDINT;
+    LastLoggedHeartbeatRun : UDINT;
     EventIdx             : INT;
 
     // Compteurs pour progression IHM
@@ -94,6 +99,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
         AbortEncoder := FALSE;
         StartModes := FALSE;
         AbortModes := FALSE;
+        StartHeartbeat := FALSE;
+        AbortHeartbeat := FALSE;
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
 
@@ -114,6 +121,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
         ELSIF GVL_PLC_Tests.Cmd.RunModes THEN
             GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteModes;
             GVL_PLC_Tests.Cmd.RunModes := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunHeartbeat THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteHeartbeat;
+            GVL_PLC_Tests.Cmd.RunHeartbeat := FALSE;
         END_IF;
         GVL_PLC_Tests.Cmd.RunAll := FALSE;
 
@@ -210,6 +220,21 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage suite Heartbeat IHM↔PLC.
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+            IF GVL_Simulation.SimulationModeActive
+               AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal
+               AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal THEN
+                ChainMode := FALSE;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteHeartbeat;
+                StartHeartbeat := TRUE;
+                FirstStepHeartbeat := 10;
+                GVL_PLC_Tests.Status.FailureSummary := '';
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
         // Commande d'effacement du rapport — acquittement explicite, retour à IDLE
@@ -232,6 +257,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
         StartSafety := FALSE;
         StartTranslation := FALSE;
         StartBucket := FALSE;
+        StartHeartbeat := FALSE;
 
         // 🛡️ Aucun orchestrateur ne doit attendre Done indéfiniment.
         SuiteElapsed := SuiteElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
@@ -247,6 +273,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 AbortEncoder := TRUE;
             ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
                 AbortModes := TRUE;
+            ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+                AbortHeartbeat := TRUE;
             ELSE
                 AbortBucket := TRUE;
             END_IF;
@@ -257,6 +285,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
             AbortSafety := TRUE;
             AbortTranslation := TRUE;
             AbortBucket := TRUE;
+            AbortHeartbeat := TRUE;
         END_IF;
 
         // Surveillance de la fin d'exécution — Safety d'abord
@@ -432,6 +461,18 @@ CASE GVL_PLC_Tests.Status.RunState OF
             ELSE
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
             END_IF;
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat AND instHeartbeatValidation.Done THEN
+            AbortHeartbeat := FALSE;
+            FinalAborted := instHeartbeatValidation.Report.Aborted;
+            FinalAnyFailed := instHeartbeatValidation.AnyFailed;
+            GVL_PLC_Tests.Status.FailureSummary := instHeartbeatValidation.Report.FailureSummary;
+            IF FinalAborted THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+            ELSIF FinalAnyFailed THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+            ELSE
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder AND instEncoderValidation.Done THEN
             AbortEncoder := FALSE;
             FinalAborted := instEncoderValidation.Report.Aborted;
@@ -476,6 +517,7 @@ instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, 
 instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
 instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, FirstStepId := FirstStepEncoder);
 instModesValidation(Start := StartModes, Abort := AbortModes, FirstStepId := FirstStepModes);
+instHeartbeatValidation(Start := StartHeartbeat, Abort := AbortHeartbeat, FirstStepId := FirstStepHeartbeat);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
@@ -485,6 +527,7 @@ GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
 GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
 GVL_PLC_Tests.SuiteEncoderValidation := instEncoderValidation.Report;
 GVL_PLC_Tests.SuiteModesValidation := instModesValidation.Report;
+GVL_PLC_Tests.SuiteHeartbeatValidation := instHeartbeatValidation.Report;
 
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
@@ -513,6 +556,14 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.TerminalState := instEncoderValidation.TerminalState;
         GVL_PLC_Tests.Status.ErrorCode := instEncoderValidation.ErrorCode;
         GVL_PLC_Tests.Status.ErrorMessage := instEncoderValidation.ErrorMessage;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instHeartbeatValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instHeartbeatValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instHeartbeatValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instHeartbeatValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instHeartbeatValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instHeartbeatValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instHeartbeatValidation.ErrorMessage;
     ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
         GVL_PLC_Tests.Status.ActiveSuiteName := instModesValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instModesValidation.Report.CurrentCaseId;
@@ -605,6 +656,19 @@ IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
         IF instModesValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
             IF instModesValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instHeartbeatValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instHeartbeatValidation.Report.Cases[Idx].Ok THEN
                 PassedCount := PassedCount + 1;
             ELSE
                 FailedCount := FailedCount + 1;

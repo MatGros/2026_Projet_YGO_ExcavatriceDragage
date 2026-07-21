@@ -23,5 +23,12 @@ STRUCT
                                           homing) — voir FB_Modes.HomingApproachEnable, commun M1/M2 *)
     HydraulicThermalFault     : BOOL; (* 🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique
                                           (PRG_08_AuxiliaryControl, diagnostic seul — aucune commande PLC) *)
+
+    (* 💓 Heartbeat IHM↔PLC — IHM inverse HeartbeatIhmToggle toutes les 500 ms. *)
+    HeartbeatIhmToggle        : BOOL; (* IHM→PLC : toggle périodique, jamais valeur constante *)
+    HeartbeatPlcToggle        : BOOL; (* PLC→IHM : clignotant activité PLC *)
+    HeartbeatIhmOk            : BOOL; (* PLC→IHM : front IHM post-boot reçu et timeout absent *)
+    HeartbeatIhmTimeout       : BOOL; (* PLC→IHM : aucun front IHM depuis 2 s *)
+    HeartbeatIhmElapsed       : TIME; (* PLC→IHM : temps depuis dernier front IHM *)
 END_STRUCT
 END_TYPE

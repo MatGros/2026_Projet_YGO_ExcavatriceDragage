@@ -125,6 +125,7 @@ VAR_INPUT
     SyncEnable          : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — FALSE (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (récupération manuelle)
     JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
+    HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_00_Inputs.M1/M2ThermalFeedback)
     BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_00_Inputs.BrakeThermalFeedback)
@@ -270,8 +271,8 @@ END_IF;
 ResetEdge(CLK := Reset);
 
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL
-IF NOT JoystickOnline OR NOT JoystickOperational THEN
-    ErrorId := ErrorId OR 16#0001;       // Perte joystick/CAN : pas de commande opérateur valide
+IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
+    ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
@@ -360,7 +361,8 @@ END_IF;
 // 🔧 REX 2026-07-08 (demande utilisateur) : BrakeFeedback ajouté — un frein qui ne confirme pas
 // son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui ne retombe pas
 // (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
-MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational) OR JoystickYNeutral;
+MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
+                       OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
 TonMecaB(IN := MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
 MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
 IF TonMecaB.Q THEN

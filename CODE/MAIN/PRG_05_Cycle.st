@@ -46,6 +46,7 @@ instCycle(
     // sont mutuellement exclusifs dans FB_Modes, plus besoin d'un flag ManuActive séparé).
     Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
     CycleMotionPermit   := CycleMotionPermit,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     

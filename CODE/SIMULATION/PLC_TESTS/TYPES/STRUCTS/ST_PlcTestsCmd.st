@@ -10,6 +10,7 @@ STRUCT
     RunBucket     : BOOL;   // Lance la suite Benne
     RunEncoder    : BOOL;   // Lance la suite Codeurs/Homing
     RunModes      : BOOL;   // Lance la suite Modes/Homme-mort
+    RunHeartbeat  : BOOL;   // Lance la suite Heartbeat IHM↔PLC
     RunAll        : BOOL;   // Déprécié : ignoré, aucune campagne automatique
     RunSuite      : INT;    // Compatibilité : >0 lance une suite manuelle
     RunCase       : INT;    // Cas de la commande unitaire sélectionnée

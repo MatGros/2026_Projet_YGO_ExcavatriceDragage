@@ -36,6 +36,7 @@ instSafetyWinchM1(
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
     ThermalFeedback     := NOT PRG_00_Inputs.M1ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
@@ -78,6 +79,7 @@ instSafetyWinchM2(
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
@@ -166,6 +168,7 @@ instSafetyTranslationM3(
     Mode                := PRG_04_Modes.instModes.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     PhaseRotationOk     := PRG_00_Inputs.PhaseRotationOk,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Online,

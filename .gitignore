@@ -22,10 +22,11 @@ PRJ_CODESYS/
 # Workspace launcher artifacts
 launch_workspace.bat
 launch_workspace.ps1
-workflow.mmd
 
 # WSL/tmuxinator config (local)
 .tmuxinator/
 
 # Pi spec read state (local)
 .pi/spec_read_state.json
+.pi/git/
+.agents/

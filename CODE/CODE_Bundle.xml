@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-18T00:05:50.012560" />
-  <contentHeader name="MGS_v0.4.18_DocSweep_IHMRetrait.project" modificationDateTime="2026-07-18T00:05:50.012560">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-19T00:13:00.676490" />
+  <contentHeader name="MGS_v0.4.19_CommissioningPrep.project" modificationDateTime="2026-07-19T00:13:00.676490">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.18_DocSweep_IHMRetrait</property>
+          <property name="Project" type="string">MGS_v0.4.19_CommissioningPrep</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1097,6 +1097,47 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
+            <variable name="HeartbeatIhmToggle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Heartbeat IHM↔PLC — IHM inverse HeartbeatIhmToggle toutes les 500 ms.
+IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatPlcToggle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : clignotant activité PLC</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : front IHM post-boot reçu et timeout absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmTimeout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : aucun front IHM depuis 2 s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : temps depuis dernier front IHM</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1985,6 +2026,14 @@ Lance la suite Safety</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Modes/Homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RunHeartbeat">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Heartbeat IHM↔PLC</xhtml>
               </documentation>
             </variable>
             <variable name="RunAll">
@@ -3448,12 +3497,12 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
               </documentation>
             </variable>
-            <variable name="SafetyErrorJoystick">
+            <variable name="SafetyErrorOperatorComm">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte joystick CANopen (bit0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
               </documentation>
             </variable>
             <variable name="SafetyErrorDriveComm">
@@ -6769,6 +6818,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort + joystick actif</xhtml>
               </documentation>
             </variable>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC valide ; FALSE = repli cycle obligatoire</xhtml>
+              </documentation>
+            </variable>
             <variable name="StartCycle">
               <type>
                 <BOOL />
@@ -7029,7 +7086,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible, bit4: écart vitesse M1/M2 confirmé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible, bit4: écart vitesse M1/M2 confirmé, bit5: perte heartbeat IHM</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchMps">
@@ -7364,6 +7421,13 @@ IF ResetEdge.Q THEN
     IF State = E_CycleStep.ERROR_HOLD THEN
         State := E_CycleStep.INIT;
     END_IF;
+END_IF;
+
+// 💓 Perte IHM : repli mémorisé. La reconnexion seule ne relance jamais le cycle.
+IF NOT HeartbeatIhmOk AND State &lt;&gt; E_CycleStep.ERROR_HOLD THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0020;
+    State := E_CycleStep.ERROR_HOLD;
 END_IF;
 
 // Défaut de synchronisme : arrêt sûr et acquittement obligatoire.
@@ -10445,6 +10509,1058 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_HeartbeatValidation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Start">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Abort">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AnyFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimGateOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ActiveStimulusId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="Report">
+              <type>
+                <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ConfigErrorCheckIdx">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="SigHeartbeatIhmOk">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Sondes ──</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SigHeartbeatIhmTimeout">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="SigSafetyM1ErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+            </variable>
+            <variable name="SigSafetyM2ErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+            </variable>
+            <variable name="SigSafetyM3ErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="SigCycleErrorId">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+            </variable>
+            <variable name="SigM1FwdRevSpeedFbOff">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="7" />
+              </initialValue>
+            </variable>
+            <variable name="SigM1BrakeFeedback">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2FwdRevSpeedFbOff">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="9" />
+              </initialValue>
+            </variable>
+            <variable name="SigM2BrakeFeedback">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+            </variable>
+            <variable name="SigM3BrakeFeedback">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="11" />
+              </initialValue>
+            </variable>
+            <variable name="SigM3DriveActualFreqHz">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="12" />
+              </initialValue>
+            </variable>
+            <variable name="SigM3DriveStatusWord">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="13" />
+              </initialValue>
+            </variable>
+            <variable name="SigPowerCutOffActive">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="14" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH1Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Étapes ──</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTcH1WaitToggle">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="11" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH1Assert">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="12" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH1Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="19" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH2Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH2Freeze">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="21" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH2Assert">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="22" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH2Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="29" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH3Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="30" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH3Resume">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="31" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH3Assert">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="32" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH3Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="39" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH4Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="40" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH4Reset">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="41" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH4Assert">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="42" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH4Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="49" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH5Setup">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH5MecaB">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="51" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH5Assert">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="52" />
+              </initialValue>
+            </variable>
+            <variable name="StepTcH5Teardown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="59" />
+              </initialValue>
+            </variable>
+            <variable name="Sequencer">
+              <type>
+                <derived name="FB_TestSequencer" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Moteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />
+                  <baseType>
+                    <derived name="ST_TestStepConfig" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tables</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CheckTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxChecks" />
+                  <baseType>
+                    <derived name="ST_TestCheckConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="CaseTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestCases" />
+                  <baseType>
+                    <derived name="ST_TestCaseConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="InvariantTable">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxInvariants" />
+                  <baseType>
+                    <derived name="ST_TestInvariantConfig" />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeBool">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeBool" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sondes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProbeDint">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeDint" />
+                  <baseType>
+                    <DINT />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="ProbeReal">
+              <type>
+                <array>
+                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxProbeReal" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="TableReady">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="StartPrev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StimToggleTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimuli locaux</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StimModeRequest">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="StimResetPulseTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   💓 FB_HeartbeatValidation — Suite table-driven Heartbeat IHM↔PLC
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-14_PLC_Tests_Validation_v1.2.md §7
+   🎯 Simulation uniquement. Stimuli amont : toggle IHM, demande SEMI_AUTO,
+      retours contacteurs/frein M1/M2, frein M3. Jamais d'écriture dans
+      SafeStop/PowerCutOff/HeartbeatOk calculés.
+   🧪 TC-H1 sain ; TC-H2 perte 2 s ; TC-H3 reprise sans redémarrage ;
+      TC-H4 reset conscient ; TC-H5 escalade Méca B M3.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// ═══════════════════════════════════════════════════════════════
+// 1. 🛡️ GATE
+// ═══════════════════════════════════════════════════════════════
+IF NOT GVL_Simulation.SimulationModeActive THEN
+    Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
+              StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
+              ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report);
+    GVL_PLC_Tests.OverrideIhmHeartbeatActive := FALSE;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
+    GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff := FALSE;
+    GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
+    GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
+    GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
+    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Cycle.CmdReset := FALSE;
+    Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+    Report.InProgress := FALSE; Report.Aborted := TRUE; Report.AnyFailed := TRUE;
+    Report.TerminalState := TerminalState; Report.FailureSummary := 'Heartbeat : NOT SimulationModeActive';
+    RETURN;
+END_IF;
+
+SimGateOk := GVL_Simulation.SimulationModeActive
+          AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal
+          AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal
+          AND NOT GVL_Simulation.BrakeThermal_IsReal
+          AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
+
+IF Abort OR NOT SimGateOk THEN
+    GVL_PLC_Tests.OverrideIhmHeartbeatActive := FALSE;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
+    GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff := FALSE;
+    GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
+    GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
+    GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
+    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Cycle.CmdReset := FALSE;
+    IF Busy THEN GVL_IHM.Modes.ModeRequest := StimModeRequest; END_IF;
+    Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+    Report.InProgress := FALSE; Report.Aborted := TRUE; Report.AnyFailed := TRUE;
+    Report.TerminalState := TerminalState; Report.FailureSummary := 'Heartbeat : ABORTED or SimGateOk=FALSE';
+    RETURN;
+END_IF;
+
+IF Start AND NOT StartPrev AND NOT Busy THEN
+    StartPrev := TRUE;
+    Busy := TRUE; Done := FALSE; AnyFailed := FALSE; ConfigError := FALSE;
+    ErrorCode := 0; ErrorMessage := '';
+    Step := 10; StepElapsed := T#0s;
+    StimModeRequest := GVL_IHM.Modes.ModeRequest;
+
+    Report.Name := 'Heartbeat Validation';
+    Report.InProgress := TRUE; Report.AllPassed := FALSE; Report.AnyFailed := FALSE; Report.Aborted := FALSE;
+    Report.TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    Report.ErrorCode := 0; Report.ErrorMessage := ''; Report.FailureSummary := '';
+    Report.FailedTestCase := 0; Report.Duration := T#0s;
+    Report.RunCounter := Report.RunCounter + 1;
+END_IF;
+IF NOT Start THEN StartPrev := FALSE; END_IF;
+
+IF NOT Busy THEN RETURN; END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 2. 📋 TABLES (remplissage unique)
+// ═══════════════════════════════════════════════════════════════
+IF NOT TableReady THEN
+    Report.Name := 'Heartbeat Validation';
+
+    // ── Cas de tests ──
+    CaseTable[1].Name := 'TC-H1 Heartbeat sain';      CaseTable[1].FirstStep := StepTcH1Setup;
+    CaseTable[2].Name := 'TC-H2 Perte IHM 2s';        CaseTable[2].FirstStep := StepTcH2Setup;
+    CaseTable[3].Name := 'TC-H3 Reprise sans redem';  CaseTable[3].FirstStep := StepTcH3Setup;
+    CaseTable[4].Name := 'TC-H4 Reset conscient';     CaseTable[4].FirstStep := StepTcH4Setup;
+    CaseTable[5].Name := 'TC-H5 Escalade Meca B M3';  CaseTable[5].FirstStep := StepTcH5Setup;
+
+    // ── Checks (index = ligne CheckTable) ──
+    // 1: HeartbeatIhmOk = TRUE
+    CheckTable[1].Kind := E_TestCheckKind.BOOL_EQUAL;   CheckTable[1].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[1].ProbeIdx := SigHeartbeatIhmOk;        CheckTable[1].ExpectedBool := TRUE;
+    // 2: bit0 Safety M1 = 0
+    CheckTable[2].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[2].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[2].ProbeIdx := SigSafetyM1ErrorId;        CheckTable[2].Mask := 16#0001;
+    // 3: bit0 Safety M2 = 0
+    CheckTable[3].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[3].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[3].ProbeIdx := SigSafetyM2ErrorId;        CheckTable[3].Mask := 16#0001;
+    // 4: bit0 Safety M3 = 0
+    CheckTable[4].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[4].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[4].ProbeIdx := SigSafetyM3ErrorId;        CheckTable[4].Mask := 16#0001;
+    // 5: bit5 Cycle = 0
+    CheckTable[5].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[5].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[5].ProbeIdx := SigCycleErrorId;           CheckTable[5].Mask := 16#0020;
+
+    // 6: HeartbeatIhmOk = FALSE
+    CheckTable[6].Kind := E_TestCheckKind.BOOL_EQUAL;    CheckTable[6].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[6].ProbeIdx := SigHeartbeatIhmOk;         CheckTable[6].ExpectedBool := FALSE;
+    // 7: HeartbeatIhmTimeout = TRUE
+    CheckTable[7].Kind := E_TestCheckKind.BOOL_EQUAL;    CheckTable[7].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[7].ProbeIdx := SigHeartbeatIhmTimeout;    CheckTable[7].ExpectedBool := TRUE;
+    // 8: bit0 Safety M1 = 1
+    CheckTable[8].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[8].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[8].ProbeIdx := SigSafetyM1ErrorId;        CheckTable[8].Mask := 16#0001;
+    // 9: bit0 Safety M2 = 1
+    CheckTable[9].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[9].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[9].ProbeIdx := SigSafetyM2ErrorId;        CheckTable[9].Mask := 16#0001;
+    // 10: bit0 Safety M3 = 1
+    CheckTable[10].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[10].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[10].ProbeIdx := SigSafetyM3ErrorId;       CheckTable[10].Mask := 16#0001;
+    // 11: bit5 Cycle = 1
+    CheckTable[11].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[11].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[11].ProbeIdx := SigCycleErrorId;          CheckTable[11].Mask := 16#0020;
+
+    // 12: SafeStop M1 (via Error)
+    CheckTable[12].Kind := E_TestCheckKind.BOOL_EQUAL;   CheckTable[12].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[12].ProbeIdx := SigSafetyM1ErrorId;       CheckTable[12].ExpectedBool := TRUE;
+    // 13: SafeStop M2
+    CheckTable[13].Kind := E_TestCheckKind.BOOL_EQUAL;   CheckTable[13].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[13].ProbeIdx := SigSafetyM2ErrorId;       CheckTable[13].ExpectedBool := TRUE;
+    // 14: SafeStop M3
+    CheckTable[14].Kind := E_TestCheckKind.BOOL_EQUAL;   CheckTable[14].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[14].ProbeIdx := SigSafetyM3ErrorId;       CheckTable[14].ExpectedBool := TRUE;
+
+    // 15: HeartbeatIhmOk = TRUE (reprise)
+    CheckTable[15].Kind := E_TestCheckKind.BOOL_EQUAL;   CheckTable[15].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[15].ProbeIdx := SigHeartbeatIhmOk;        CheckTable[15].ExpectedBool := TRUE;
+    // 16-19: bit0 M1/M2/M3 = 1, bit5 Cycle = 1 (mémorisation)
+    CheckTable[16].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[16].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[16].ProbeIdx := SigSafetyM1ErrorId;       CheckTable[16].Mask := 16#0001;
+    CheckTable[17].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[17].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[17].ProbeIdx := SigSafetyM2ErrorId;       CheckTable[17].Mask := 16#0001;
+    CheckTable[18].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[18].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[18].ProbeIdx := SigSafetyM3ErrorId;       CheckTable[18].Mask := 16#0001;
+    CheckTable[19].Kind := E_TestCheckKind.WORD_MASK_ANY; CheckTable[19].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[19].ProbeIdx := SigCycleErrorId;          CheckTable[19].Mask := 16#0020;
+
+    // 20: Reset → bit0 M1/M2/M3 = 0, bit5 Cycle = 0
+    CheckTable[20].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[20].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[20].ProbeIdx := SigSafetyM1ErrorId;         CheckTable[20].Mask := 16#0001;
+    CheckTable[21].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[21].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[21].ProbeIdx := SigSafetyM2ErrorId;         CheckTable[21].Mask := 16#0001;
+    CheckTable[22].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[22].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[22].ProbeIdx := SigSafetyM3ErrorId;         CheckTable[22].Mask := 16#0001;
+    CheckTable[23].Kind := E_TestCheckKind.WORD_MASK_NONE; CheckTable[23].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[23].ProbeIdx := SigCycleErrorId;            CheckTable[23].Mask := 16#0020;
+
+    // 24: TC-H5 Méca B M3 — PowerCutOffActive = TRUE
+    CheckTable[24].Kind := E_TestCheckKind.BOOL_EQUAL;   CheckTable[24].Mode := E_TestCheckMode.CHECK_WAIT_UNTIL;
+    CheckTable[24].ProbeIdx := SigPowerCutOffActive;     CheckTable[24].ExpectedBool := TRUE;
+
+    // ── Étapes ──
+    // TC-H1
+    StepTable[StepTcH1Setup].Name := 'H1 Setup SEMI_AUTO + toggle sain';
+    StepTable[StepTcH1Setup].CaseId := 1; StepTable[StepTcH1Setup].StimulusId := 1;
+    StepTable[StepTcH1Setup].CheckIdx[1] := 1; StepTable[StepTcH1Setup].CheckIdx[2] := 2;
+    StepTable[StepTcH1Setup].CheckIdx[3] := 3; StepTable[StepTcH1Setup].CheckIdx[4] := 4;
+    StepTable[StepTcH1Setup].CheckIdx[5] := 5;
+    StepTable[StepTcH1Setup].TimeoutPT := T#5s; StepTable[StepTcH1Setup].NextOnPass := StepTcH1WaitToggle;
+    StepTable[StepTcH1Setup].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH1WaitToggle].Name := 'H1 Attente premier front post-boot';
+    StepTable[StepTcH1WaitToggle].CaseId := 1; StepTable[StepTcH1WaitToggle].StimulusId := 1;
+    StepTable[StepTcH1WaitToggle].CheckIdx[1] := 1;
+    StepTable[StepTcH1WaitToggle].TimeoutPT := T#4s; StepTable[StepTcH1WaitToggle].NextOnPass := StepTcH1Assert;
+    StepTable[StepTcH1WaitToggle].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1WaitToggle].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH1Assert].Name := 'H1 Assert bit0=0 Safety + bit5=0 Cycle';
+    StepTable[StepTcH1Assert].CaseId := 1; StepTable[StepTcH1Assert].StimulusId := 1;
+    StepTable[StepTcH1Assert].CheckIdx[1] := 2; StepTable[StepTcH1Assert].CheckIdx[2] := 3;
+    StepTable[StepTcH1Assert].CheckIdx[3] := 4; StepTable[StepTcH1Assert].CheckIdx[4] := 5;
+    StepTable[StepTcH1Assert].TimeoutPT := T#2s; StepTable[StepTcH1Assert].NextOnPass := StepTcH1Teardown;
+    StepTable[StepTcH1Assert].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1Assert].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH1Teardown].Name := 'H1 Teardown';
+    StepTable[StepTcH1Teardown].CaseId := 1; StepTable[StepTcH1Teardown].StimulusId := 0;
+    StepTable[StepTcH1Teardown].DwellPT := T#200ms; StepTable[StepTcH1Teardown].TimeoutPT := T#1s;
+    StepTable[StepTcH1Teardown].NextOnPass := 0; StepTable[StepTcH1Teardown].NextOnFail := 0;
+
+    // TC-H2
+    StepTable[StepTcH2Setup].Name := 'H2 Setup toggle figé';
+    StepTable[StepTcH2Setup].CaseId := 2; StepTable[StepTcH2Setup].StimulusId := 2;
+    StepTable[StepTcH2Setup].TimeoutPT := T#1s; StepTable[StepTcH2Setup].NextOnPass := StepTcH2Freeze;
+    StepTable[StepTcH2Setup].NextOnFail := StepTcH2Teardown; StepTable[StepTcH2Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH2Freeze].Name := 'H2 Figer toggle &gt; 2s timeout';
+    StepTable[StepTcH2Freeze].CaseId := 2; StepTable[StepTcH2Freeze].StimulusId := 2;
+    StepTable[StepTcH2Freeze].TimeoutPT := T#3s; StepTable[StepTcH2Freeze].NextOnPass := StepTcH2Assert;
+    StepTable[StepTcH2Freeze].NextOnFail := StepTcH2Teardown; StepTable[StepTcH2Freeze].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH2Assert].Name := 'H2 Assert bit0=1 Safety + bit5=1 Cycle + SafeStop';
+    StepTable[StepTcH2Assert].CaseId := 2; StepTable[StepTcH2Assert].StimulusId := 2;
+    StepTable[StepTcH2Assert].CheckIdx[1] := 6;  StepTable[StepTcH2Assert].CheckIdx[2] := 7;
+    StepTable[StepTcH2Assert].CheckIdx[3] := 8;  StepTable[StepTcH2Assert].CheckIdx[4] := 9;
+    StepTable[StepTcH2Assert].CheckIdx[5] := 10; StepTable[StepTcH2Assert].CheckIdx[6] := 11;
+    StepTable[StepTcH2Assert].CheckIdx[7] := 12; StepTable[StepTcH2Assert].CheckIdx[8] := 13;
+    StepTable[StepTcH2Assert].CheckIdx[9] := 14;
+    StepTable[StepTcH2Assert].TimeoutPT := T#3s; StepTable[StepTcH2Assert].NextOnPass := StepTcH2Teardown;
+    StepTable[StepTcH2Assert].NextOnFail := StepTcH2Teardown; StepTable[StepTcH2Assert].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH2Teardown].Name := 'H2 Teardown';
+    StepTable[StepTcH2Teardown].CaseId := 2; StepTable[StepTcH2Teardown].StimulusId := 0;
+    StepTable[StepTcH2Teardown].DwellPT := T#200ms; StepTable[StepTcH2Teardown].TimeoutPT := T#1s;
+    StepTable[StepTcH2Teardown].NextOnPass := 0; StepTable[StepTcH2Teardown].NextOnFail := 0;
+
+    // TC-H3
+    StepTable[StepTcH3Setup].Name := 'H3 Setup reprise toggle';
+    StepTable[StepTcH3Setup].CaseId := 3; StepTable[StepTcH3Setup].StimulusId := 3;
+    StepTable[StepTcH3Setup].TimeoutPT := T#1s; StepTable[StepTcH3Setup].NextOnPass := StepTcH3Resume;
+    StepTable[StepTcH3Setup].NextOnFail := StepTcH3Teardown; StepTable[StepTcH3Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH3Resume].Name := 'H3 Reprise toggle &gt; 2s';
+    StepTable[StepTcH3Resume].CaseId := 3; StepTable[StepTcH3Resume].StimulusId := 3;
+    StepTable[StepTcH3Resume].TimeoutPT := T#3s; StepTable[StepTcH3Resume].NextOnPass := StepTcH3Assert;
+    StepTable[StepTcH3Resume].NextOnFail := StepTcH3Teardown; StepTable[StepTcH3Resume].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH3Assert].Name := 'H3 Assert bit0=1 mem + bit5=1 mem';
+    StepTable[StepTcH3Assert].CaseId := 3; StepTable[StepTcH3Assert].StimulusId := 3;
+    StepTable[StepTcH3Assert].CheckIdx[1] := 15; StepTable[StepTcH3Assert].CheckIdx[2] := 16;
+    StepTable[StepTcH3Assert].CheckIdx[3] := 17; StepTable[StepTcH3Assert].CheckIdx[4] := 18;
+    StepTable[StepTcH3Assert].CheckIdx[5] := 19;
+    StepTable[StepTcH3Assert].TimeoutPT := T#3s; StepTable[StepTcH3Assert].NextOnPass := StepTcH3Teardown;
+    StepTable[StepTcH3Assert].NextOnFail := StepTcH3Teardown; StepTable[StepTcH3Assert].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH3Teardown].Name := 'H3 Teardown';
+    StepTable[StepTcH3Teardown].CaseId := 3; StepTable[StepTcH3Teardown].StimulusId := 0;
+    StepTable[StepTcH3Teardown].DwellPT := T#200ms; StepTable[StepTcH3Teardown].TimeoutPT := T#1s;
+    StepTable[StepTcH3Teardown].NextOnPass := 0; StepTable[StepTcH3Teardown].NextOnFail := 0;
+
+    // TC-H4
+    StepTable[StepTcH4Setup].Name := 'H4 Setup reset pulse';
+    StepTable[StepTcH4Setup].CaseId := 4; StepTable[StepTcH4Setup].StimulusId := 4;
+    StepTable[StepTcH4Setup].TimeoutPT := T#1s; StepTable[StepTcH4Setup].NextOnPass := StepTcH4Reset;
+    StepTable[StepTcH4Setup].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH4Reset].Name := 'H4 Pulse FaultMachineReset + CmdReset';
+    StepTable[StepTcH4Reset].CaseId := 4; StepTable[StepTcH4Reset].StimulusId := 4;
+    StepTable[StepTcH4Reset].TimeoutPT := T#2s; StepTable[StepTcH4Reset].NextOnPass := StepTcH4Assert;
+    StepTable[StepTcH4Reset].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Reset].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH4Assert].Name := 'H4 Assert bit0=0 Safety + bit5=0 Cycle';
+    StepTable[StepTcH4Assert].CaseId := 4; StepTable[StepTcH4Assert].StimulusId := 1; // retour toggle sain
+    StepTable[StepTcH4Assert].CheckIdx[1] := 20; StepTable[StepTcH4Assert].CheckIdx[2] := 21;
+    StepTable[StepTcH4Assert].CheckIdx[3] := 22; StepTable[StepTcH4Assert].CheckIdx[4] := 23;
+    StepTable[StepTcH4Assert].TimeoutPT := T#3s; StepTable[StepTcH4Assert].NextOnPass := StepTcH4Teardown;
+    StepTable[StepTcH4Assert].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Assert].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH4Teardown].Name := 'H4 Teardown';
+    StepTable[StepTcH4Teardown].CaseId := 4; StepTable[StepTcH4Teardown].StimulusId := 0;
+    StepTable[StepTcH4Teardown].DwellPT := T#200ms; StepTable[StepTcH4Teardown].TimeoutPT := T#1s;
+    StepTable[StepTcH4Teardown].NextOnPass := 0; StepTable[StepTcH4Teardown].NextOnFail := 0;
+
+    // TC-H5
+    StepTable[StepTcH5Setup].Name := 'H5 Setup Méca B M3 frein desserré';
+    StepTable[StepTcH5Setup].CaseId := 5; StepTable[StepTcH5Setup].StimulusId := 5;
+    StepTable[StepTcH5Setup].TimeoutPT := T#1s; StepTable[StepTcH5Setup].NextOnPass := StepTcH5MecaB;
+    StepTable[StepTcH5Setup].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH5MecaB].Name := 'H5 Perte IHM + frein M3 desserré &gt; 3s';
+    StepTable[StepTcH5MecaB].CaseId := 5; StepTable[StepTcH5MecaB].StimulusId := 5;
+    StepTable[StepTcH5MecaB].TimeoutPT := T#7s; StepTable[StepTcH5MecaB].NextOnPass := StepTcH5Assert;
+    StepTable[StepTcH5MecaB].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5MecaB].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH5Assert].Name := 'H5 Assert PowerCutOffActive';
+    StepTable[StepTcH5Assert].CaseId := 5; StepTable[StepTcH5Assert].StimulusId := 5;
+    StepTable[StepTcH5Assert].CheckIdx[1] := 24;
+    StepTable[StepTcH5Assert].TimeoutPT := T#3s; StepTable[StepTcH5Assert].NextOnPass := StepTcH5Teardown;
+    StepTable[StepTcH5Assert].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5Assert].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTcH5Teardown].Name := 'H5 Teardown';
+    StepTable[StepTcH5Teardown].CaseId := 5; StepTable[StepTcH5Teardown].StimulusId := 0;
+    StepTable[StepTcH5Teardown].DwellPT := T#200ms; StepTable[StepTcH5Teardown].TimeoutPT := T#1s;
+    StepTable[StepTcH5Teardown].NextOnPass := 0; StepTable[StepTcH5Teardown].NextOnFail := 0;
+
+    TableReady := TRUE;
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 3. 📥 ACQUIRE — câblage sondes (1 ligne par signal, pas de logique)
+// ═══════════════════════════════════════════════════════════════
+ProbeBool[SigHeartbeatIhmOk]       := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk;
+ProbeBool[SigHeartbeatIhmTimeout]  := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmTimeout;
+ProbeDint[SigSafetyM1ErrorId]      := WORD_TO_DINT(PRG_03_Safety.instSafetyWinchM1.ErrorId);
+ProbeDint[SigSafetyM2ErrorId]      := WORD_TO_DINT(PRG_03_Safety.instSafetyWinchM2.ErrorId);
+ProbeDint[SigSafetyM3ErrorId]      := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
+ProbeDint[SigCycleErrorId]         := WORD_TO_DINT(PRG_05_Cycle.instCycle.ErrorId);
+ProbeBool[SigM1FwdRevSpeedFbOff]   := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff;
+ProbeBool[SigM1BrakeFeedback]      := PRG_00_Inputs.M1BrakeFeedback;
+ProbeBool[SigM2FwdRevSpeedFbOff]   := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff;
+ProbeBool[SigM2BrakeFeedback]      := PRG_00_Inputs.M2BrakeFeedback;
+ProbeBool[SigM3BrakeFeedback]      := PRG_00_Inputs.M3BrakeFeedback;
+ProbeReal[SigM3DriveActualFreqHz]  := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+ProbeDint[SigM3DriveStatusWord]    := WORD_TO_DINT(PRG_00_Inputs.M3_StatusWord_Filtered);
+ProbeBool[SigPowerCutOffActive]    := GVL_IHM.Modes.PowerCutOffActive;
+
+// ═══════════════════════════════════════════════════════════════
+// 4. ⚙️ MOTEUR
+// ═══════════════════════════════════════════════════════════════
+Sequencer(Start := Start, Abort := Abort, FirstStepId := FirstStepId,
+          StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
+          ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report,
+          Busy =&gt; Busy, Done =&gt; Done, AnyFailed =&gt; AnyFailed,
+          ConfigError =&gt; ConfigError, ConfigErrorStepId =&gt; ConfigErrorStepId, ConfigErrorCheckIdx =&gt; ConfigErrorCheckIdx,
+          ActiveStimulusId =&gt; ActiveStimulusId, StepElapsed =&gt; StepElapsed,
+          TerminalState =&gt; TerminalState, ErrorCode =&gt; ErrorCode, ErrorMessage =&gt; ErrorMessage);
+
+// ═══════════════════════════════════════════════════════════════
+// 5. ⚡ STIMULI — modèle hybride : TOR état-complet + pulse timer
+// ═══════════════════════════════════════════════════════════════
+// StimulusId 0 = neutre garanti (tout relâché) — sur Done/Abort par le moteur
+GVL_PLC_Tests.OverrideIhmHeartbeatActive := FALSE;
+GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
+GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff := FALSE;
+GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
+GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
+GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
+GVL_IHM.Modes.ModeRequest := StimModeRequest;
+GVL_IHM.Modes.FaultMachineReset := FALSE;
+GVL_IHM.Cycle.CmdReset := FALSE;
+
+CASE ActiveStimulusId OF
+    1: // TC-H1/TC-H4 : toggle sain 500 ms + SEMI_AUTO
+        GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
+        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        // Toggle 500 ms
+        StimToggleTimer(IN := TRUE, PT := T#500ms);
+        IF StimToggleTimer.Q THEN
+            GVL_PLC_Tests.OverrideIhmHeartbeatToggle := NOT GVL_PLC_Tests.OverrideIhmHeartbeatToggle;
+            StimToggleTimer(IN := FALSE);
+        END_IF;
+
+    2: // TC-H2 : toggle figé (perte IHM)
+        GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
+        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        // OverrideIhmHeartbeatToggle figé = pas de front
+
+    3: // TC-H3 : reprise toggle sain
+        GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
+        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        StimToggleTimer(IN := TRUE, PT := T#500ms);
+        IF StimToggleTimer.Q THEN
+            GVL_PLC_Tests.OverrideIhmHeartbeatToggle := NOT GVL_PLC_Tests.OverrideIhmHeartbeatToggle;
+            StimToggleTimer(IN := FALSE);
+        END_IF;
+
+    4: // TC-H4 : pulse reset conscient
+        GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
+        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        StimToggleTimer(IN := TRUE, PT := T#500ms);
+        IF StimToggleTimer.Q THEN
+            GVL_PLC_Tests.OverrideIhmHeartbeatToggle := NOT GVL_PLC_Tests.OverrideIhmHeartbeatToggle;
+            StimToggleTimer(IN := FALSE);
+        END_IF;
+        StimResetPulseTimer(IN := TRUE, PT := T#1500ms);
+        IF NOT StimResetPulseTimer.Q THEN
+            GVL_IHM.Modes.FaultMachineReset := TRUE;
+            GVL_IHM.Cycle.CmdReset := TRUE;
+        END_IF;
+
+    5: // TC-H5 : perte IHM + frein M3 desserré → Méca B
+        GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
+        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_PLC_Tests.OverrideM3BrakeStuckOpen := TRUE; // frein M3 desserré
+        // Toggle figé = perte IHM
+END_CASE;
+
+// ═══════════════════════════════════════════════════════════════
+// 6. 🛑 Premier échec → fin explicite, stimuli relâchés, rapport figé
+// ═══════════════════════════════════════════════════════════════
+IF ErrorCode &lt;&gt; 0 THEN
+    GVL_PLC_Tests.OverrideIhmHeartbeatActive := FALSE;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen := FALSE;
+    GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff := FALSE;
+    GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
+    GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
+    GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
+    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Cycle.CmdReset := FALSE;
+    GVL_IHM.Modes.ModeRequest := StimModeRequest;
+    Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_FAILED;
+    Report.InProgress := FALSE; Report.TerminalState := TerminalState;
+END_IF;</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a156acc2-4e3c-5683-b273-92abc28e5996</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_IhmHeartbeat" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance ; FALSE = IHM non valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmToggle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IhmTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence maximale de front IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PlcTogglePeriod">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Période du clignotant PLC</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après front IHM post-boot et avant timeout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmTimeout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucun front IHM depuis IhmTimeout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatPlcToggle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant PLC à superviser côté IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeSinceIhmEdge">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic : temps depuis le dernier front IHM</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="LastIhmToggle">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="IhmEdgeSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interdit de valider une valeur RETAIN au boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IhmEdgeDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="IhmTimeoutTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="PlcToggleTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   💓 FB_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v1.5.md (mise à jour Heartbeat requise)
+   🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
+      et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
+   🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
+      de leurs réactions métier.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🛑 Sans Enable, aucune valeur mémorisée ne peut déclarer l'IHM valide.
+IF NOT Enable THEN
+    HeartbeatIhmOk := FALSE;
+    HeartbeatIhmTimeout := TRUE;
+    HeartbeatPlcToggle := FALSE;
+    TimeSinceIhmEdge := T#0s;
+    LastIhmToggle := HeartbeatIhmToggle;
+    IhmEdgeSeen := FALSE;
+    IhmTimeoutTon(IN := FALSE, PT := IhmTimeout);
+    PlcToggleTon(IN := FALSE, PT := PlcTogglePeriod);
+    RETURN;
+END_IF;
+
+// 📥 Front par comparaison : l'IHM écrit un BOOL toggle, pas une impulsion courte.
+IhmEdgeDetected := (HeartbeatIhmToggle &lt;&gt; LastIhmToggle);
+LastIhmToggle := HeartbeatIhmToggle;
+IF IhmEdgeDetected THEN
+    IhmEdgeSeen := TRUE;
+END_IF;
+
+// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout même sans front,
+// mais HeartbeatIhmOk reste FALSE tant qu'un premier front post-boot n'est pas observé.
+IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
+TimeSinceIhmEdge := IhmTimeoutTon.ET;
+HeartbeatIhmTimeout := IhmTimeoutTon.Q;
+HeartbeatIhmOk := IhmEdgeSeen AND NOT HeartbeatIhmTimeout;
+
+// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
+PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
+IF PlcToggleTon.Q THEN
+    HeartbeatPlcToggle := NOT HeartbeatPlcToggle;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>27ea6b0f-df94-59ee-ac07-585c8e3e993b</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Input" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -12251,6 +13367,11 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <derived name="FB_ModesValidation" />
               </type>
             </variable>
+            <variable name="instHeartbeatValidation">
+              <type>
+                <derived name="FB_HeartbeatValidation" />
+              </type>
+            </variable>
             <variable name="RunAllTrig">
               <type>
                 <derived name="R_TRIG" />
@@ -12347,6 +13468,21 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <INT />
               </type>
             </variable>
+            <variable name="StartHeartbeat">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AbortHeartbeat">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstStepHeartbeat">
+              <type>
+                <INT />
+              </type>
+            </variable>
             <variable name="ChainMode">
               <type>
                 <BOOL />
@@ -12395,6 +13531,11 @@ TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket
               </type>
             </variable>
             <variable name="LastLoggedBucketRun">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="LastLoggedHeartbeatRun">
               <type>
                 <UDINT />
               </type>
@@ -12495,6 +13636,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
         AbortEncoder := FALSE;
         StartModes := FALSE;
         AbortModes := FALSE;
+        StartHeartbeat := FALSE;
+        AbortHeartbeat := FALSE;
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
 
@@ -12515,6 +13658,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
         ELSIF GVL_PLC_Tests.Cmd.RunModes THEN
             GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteModes;
             GVL_PLC_Tests.Cmd.RunModes := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunHeartbeat THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteHeartbeat;
+            GVL_PLC_Tests.Cmd.RunHeartbeat := FALSE;
         END_IF;
         GVL_PLC_Tests.Cmd.RunAll := FALSE;
 
@@ -12611,6 +13757,21 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage suite Heartbeat IHM↔PLC.
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+            IF GVL_Simulation.SimulationModeActive
+               AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal
+               AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal THEN
+                ChainMode := FALSE;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteHeartbeat;
+                StartHeartbeat := TRUE;
+                FirstStepHeartbeat := 10;
+                GVL_PLC_Tests.Status.FailureSummary := '';
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            END_IF;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
         // Commande d'effacement du rapport — acquittement explicite, retour à IDLE
@@ -12633,6 +13794,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
         StartSafety := FALSE;
         StartTranslation := FALSE;
         StartBucket := FALSE;
+        StartHeartbeat := FALSE;
 
         // 🛡️ Aucun orchestrateur ne doit attendre Done indéfiniment.
         SuiteElapsed := SuiteElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
@@ -12648,6 +13810,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 AbortEncoder := TRUE;
             ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
                 AbortModes := TRUE;
+            ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+                AbortHeartbeat := TRUE;
             ELSE
                 AbortBucket := TRUE;
             END_IF;
@@ -12658,6 +13822,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
             AbortSafety := TRUE;
             AbortTranslation := TRUE;
             AbortBucket := TRUE;
+            AbortHeartbeat := TRUE;
         END_IF;
 
         // Surveillance de la fin d'exécution — Safety d'abord
@@ -12833,6 +13998,18 @@ CASE GVL_PLC_Tests.Status.RunState OF
             ELSE
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
             END_IF;
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat AND instHeartbeatValidation.Done THEN
+            AbortHeartbeat := FALSE;
+            FinalAborted := instHeartbeatValidation.Report.Aborted;
+            FinalAnyFailed := instHeartbeatValidation.AnyFailed;
+            GVL_PLC_Tests.Status.FailureSummary := instHeartbeatValidation.Report.FailureSummary;
+            IF FinalAborted THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+            ELSIF FinalAnyFailed THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+            ELSE
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder AND instEncoderValidation.Done THEN
             AbortEncoder := FALSE;
             FinalAborted := instEncoderValidation.Report.Aborted;
@@ -12877,6 +14054,7 @@ instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, 
 instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
 instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, FirstStepId := FirstStepEncoder);
 instModesValidation(Start := StartModes, Abort := AbortModes, FirstStepId := FirstStepModes);
+instHeartbeatValidation(Start := StartHeartbeat, Abort := AbortHeartbeat, FirstStepId := FirstStepHeartbeat);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
@@ -12886,6 +14064,7 @@ GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
 GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
 GVL_PLC_Tests.SuiteEncoderValidation := instEncoderValidation.Report;
 GVL_PLC_Tests.SuiteModesValidation := instModesValidation.Report;
+GVL_PLC_Tests.SuiteHeartbeatValidation := instHeartbeatValidation.Report;
 
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
@@ -12914,6 +14093,14 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.TerminalState := instEncoderValidation.TerminalState;
         GVL_PLC_Tests.Status.ErrorCode := instEncoderValidation.ErrorCode;
         GVL_PLC_Tests.Status.ErrorMessage := instEncoderValidation.ErrorMessage;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instHeartbeatValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instHeartbeatValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instHeartbeatValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instHeartbeatValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instHeartbeatValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instHeartbeatValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instHeartbeatValidation.ErrorMessage;
     ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
         GVL_PLC_Tests.Status.ActiveSuiteName := instModesValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instModesValidation.Report.CurrentCaseId;
@@ -13006,6 +14193,19 @@ IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
         IF instModesValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
             IF instModesValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instHeartbeatValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instHeartbeatValidation.Report.Cases[Idx].Ok THEN
                 PassedCount := PassedCount + 1;
             ELSE
                 FailedCount := FailedCount + 1;
@@ -14802,6 +16002,14 @@ EmergencyArming_RQ := Cmd.EmergencyArming_Cmd;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Operational</xhtml>
               </documentation>
             </variable>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
+              </documentation>
+            </variable>
             <variable name="PhaseRotationOk">
               <type>
                 <BOOL />
@@ -14926,7 +16134,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -14955,12 +16163,12 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coup de poing / coupure puissance amont</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorJoystick">
+            <variable name="ErrorOperatorComm">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte joystick / CANopen (bit0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorDriveComm">
@@ -15089,7 +16297,7 @@ IF NOT Enable THEN
     ErrorId := 16#0000;
     SafeStop := FALSE;
     PowerCutOff := FALSE;
-    ErrorJoystick := FALSE;
+    ErrorOperatorComm := FALSE;
     ErrorDriveComm := FALSE;
     ErrorPhaseRotation := FALSE;
     ErrorBrakeThermal := FALSE;
@@ -15107,8 +16315,8 @@ END_IF;
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
-// 🔍 2. PERTE JOYSTICK/CAN (bit0)
-IF (NOT JoystickOnline OR NOT JoystickOperational) THEN
+// 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
+IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -15138,7 +16346,12 @@ END_IF;
 // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
 // Si le translation est commandé à l'arrêt (Direction = 0 et frein appliqué) mais que le variateur 
 // tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) &gt; 3s
-IF (Direction = 0) AND NOT BrakeCmd THEN
+IF NOT HeartbeatIhmOk THEN
+    // 💓 Perte IHM : l'arrêt est exigé même si une ancienne Direction reste mémorisée.
+    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré avant de
+    // laisser l'escalade PowerCutOff intervenir après PostRampTimeout.
+    UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
+ELSIF (Direction = 0) AND NOT BrakeCmd THEN
     UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
 ELSE
     UncommandedActiveB := FALSE;
@@ -15201,7 +16414,7 @@ SafeStop := Error OR NOT EmergencyStopOk;
 PowerCutOff := (ErrorId AND 16#00F8) &lt;&gt; 16#0000;
 
 // Décapsulage du bitfield ErrorId pour l'IHM
-ErrorJoystick       := (ErrorId AND 16#0001) &lt;&gt; 16#0000;
+ErrorOperatorComm   := (ErrorId AND 16#0001) &lt;&gt; 16#0000;
 ErrorDriveComm      := (ErrorId AND 16#0002) &lt;&gt; 16#0000;
 ErrorPhaseRotation  := (ErrorId AND 16#0004) &lt;&gt; 16#0000;
 ErrorBrakeThermal   := (ErrorId AND 16#0008) &lt;&gt; 16#0000;
@@ -15282,6 +16495,14 @@ State := E_State.READY;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Operational</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderAvailable">
@@ -15941,8 +17162,8 @@ END_IF;
 ResetEdge(CLK := Reset);
 
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL
-IF NOT JoystickOnline OR NOT JoystickOperational THEN
-    ErrorId := ErrorId OR 16#0001;       // Perte joystick/CAN : pas de commande opérateur valide
+IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
+    ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
@@ -16031,7 +17252,8 @@ END_IF;
 // 🔧 REX 2026-07-08 (demande utilisateur) : BrakeFeedback ajouté — un frein qui ne confirme pas
 // son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui ne retombe pas
 // (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
-MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational) OR JoystickYNeutral;
+MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
+                       OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
 TonMecaB(IN := MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
 MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
 IF TonMecaB.Q THEN
@@ -17064,6 +18286,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si le garde-fou a limité le palier demandé</xhtml>
               </documentation>
             </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Miroir de ConfigErrorId &lt;&gt; 0 (config table invalide)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfigErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bitfield config : bit0 = table invalide (seuils, hyst, contacteurs)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="SpeedRefInt">
@@ -17106,18 +18344,63 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Lib Util — transition palier 4→5</xhtml>
               </documentation>
             </variable>
+            <variable name="_ConfigValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Validation config locale (P0.2 audit)
+Résultat validation table + MaxStepNumber</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_ConfigValidPrev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire cycle précédent pour détection front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_ConfigErrorTrig">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant erreur config (pour reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_ConfigErrorIdInt">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accumulateur interne défauts config</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_MaxStepClamped">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MaxStepNumber borné [1..5]</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §2, §6
+   📄 Audit P0.2 : DOC/AUDIT_Winch_v1.0.md §2.2
    📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
    📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
-                       (M1 et M2 ont chacune la leur — pas de table globale)
+                        (M1 et M2 ont chacune la leur — pas de table globale)
+   📥 MaxStepNumber  : plafond palier (1..5), borné et validé ici
    📤 Contactor1..4  : état de chaque contacteur de vitesse (BOOL individuel,
-                       lu directement dans `Table.P&lt;palier&gt;R&lt;relais&gt;`)
+                        lu directement dans `Table.P&lt;palier&gt;R&lt;relais&gt;`)
    📤 StepNumber     : n° palier courant (0 = arrêt, 1..5)
+   📤 ConfigError    : TRUE si table invalide ou MaxStepNumber hors bornes
+   📤 ConfigErrorId  : WORD bitfield (bit0 = config invalide)
    🧩 Réutilisation lib Util (Partie3 §0) : HYSTERESIS pour la sélection
       de palier anti-battement — AUCUN seuil "maison" recalculé.
    ⚠️ CORRECTIF interface HYSTERESIS (2026-07-01) : `Util` 3.5.19.0 expose
@@ -17128,16 +18411,24 @@ END_IF;
       remplacé par 4 sorties BOOL individuelles, lues directement dans la
       table (`P&lt;palier&gt;R&lt;relais&gt;`) — plus de bit-extraction côté FB_Winch,
       paramétrage un contacteur à la fois pendant la mise en service.
-   ⚠️ Brique réduite (Partie3 §1bis) : pas d'Enable/Reset/Error au sens
-      "FB métier" — c'est un décodeur pur, composé À L'INTÉRIEUR de
+   ⚠️ Brique réduite (Partie3 §1bis) : pas d'Enable/Reset/ErrorId/State
+      au sens "FB métier" — c'est un décodeur pur, composé À L'INTÉRIEUR de
       FB_Winch, qui porte lui la sécurité/le contrat complet.
+      ➕ MAIS on ajoute 2 sorties locales `ConfigError` + `ConfigErrorId`
+      pour signaler une table de config invalide (P0.2 audit).
    🆕 AJOUT (2026-07-03quinquies, spec descente/couple) : `MaxStepNumber` plafonne
       le palier atteignable (défaut 5 = comportement inchangé). Sert à `FB_Winch`
       pour limiter la vitesse en descente (charge entraînante, pas besoin d'aller
       vite) SANS changer la logique de décodage elle-même — juste un plafond
       appliqué APRÈS la sélection par hystérésis, avant la lecture de la table.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_SpeedStep) ===</xhtml>
+   🛡️ CORRECTIF P0.2 (2026-07-21) :
+      - Bornage `MaxStepNumber` ∈ [1..5] dès l'entrée
+      - Validation table : seuils croissants 0..100 %, hystérésis &gt; 0,
+        contacteurs cohérents (au moins 1 par palier si palier ≤ MaxStepNumber)
+      - Sortie `ConfigError` / `ConfigErrorId` (bit0 = table invalide)
+      - Forçage sorties sûres (contacteurs FALSE, StepNumber=0) si erreur config
+      - Reset sur front (R_TRIG) + cause disparue (conforme Partie 3 §5)
+   ════════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
@@ -17146,18 +18437,128 @@ END_IF;
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_SpeedStep) ===
 
-// 🛑 1. GATE — pas de mouvement demandé = palier 0, tous contacteurs à FALSE
-IF NOT Enable THEN
+// ─────────────────────────────────────────────────────────────────────────
+// 🛡️ 0. VALIDATION CONFIGURATION (P0.2) — exécutée CHAQUE cycle pour détecter
+//    toute corruption IHM/PERSISTENT, même siEnable=FALSE (sorties sûres forcée)
+// ─────────────────────────────────────────────────────────────────────────
+
+// 🔧 Bornage systématique MaxStepNumber ∈ [1..5]
+IF MaxStepNumber &lt; 1 THEN
+    _MaxStepClamped := 1;
+ELSIF MaxStepNumber &gt; 5 THEN
+    _MaxStepClamped := 5;
+ELSE
+    _MaxStepClamped := MaxStepNumber;
+END_IF;
+
+// 🔍 Validation table ST_SpeedStepTable
+// Critères (Partie 9 §2 + audit P0.2) :
+// 1. Seuils croissants stricts : StepThreshold_Pct[1] &lt; [2] &lt; [3] &lt; [4] &lt; [5]
+// 2. Seuils dans [0..100] %
+// 3. HystMargin &gt; 0
+// 4. Pour chaque palier 1.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
+//    (On ne valide PAS les paliers &gt; _MaxStepClamped — ils ne seront jamais atteints)
+_ConfigValid := TRUE;
+_ConfigErrorIdInt := 16#0000;
+
+// Critère 1 : seuils croissants
+IF NOT (Table.StepThreshold_Pct[1] &lt; Table.StepThreshold_Pct[2] AND
+        Table.StepThreshold_Pct[2] &lt; Table.StepThreshold_Pct[3] AND
+        Table.StepThreshold_Pct[3] &lt; Table.StepThreshold_Pct[4] AND
+        Table.StepThreshold_Pct[4] &lt; Table.StepThreshold_Pct[5]) THEN
+    _ConfigValid := FALSE;
+    _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;  // bit0
+END_IF;
+
+// Critère 2 : seuils dans [0..100]
+IF (Table.StepThreshold_Pct[1] &lt; 0.0) OR (Table.StepThreshold_Pct[5] &gt; 100.0) THEN
+    _ConfigValid := FALSE;
+    _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+END_IF;
+
+// Critère 3 : hystérésis &gt; 0
+IF HystMargin &lt;= 0.0 THEN
+    _ConfigValid := FALSE;
+    _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+END_IF;
+
+// Critère 4 : cohérence contacteurs par palier (seulement jusqu'au plafond actif)
+IF _ConfigValid THEN
+    // Helper local inline : teste si au moins 1 contacteur TRUE pour un palier
+    // Palier 1
+    IF _MaxStepClamped &gt;= 1 THEN
+        IF NOT (Table.P1R1 OR Table.P1R2 OR Table.P1R3 OR Table.P1R4) THEN
+            _ConfigValid := FALSE;
+            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+        END_IF;
+    END_IF;
+    // Palier 2
+    IF _MaxStepClamped &gt;= 2 THEN
+        IF NOT (Table.P2R1 OR Table.P2R2 OR Table.P2R3 OR Table.P2R4) THEN
+            _ConfigValid := FALSE;
+            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+        END_IF;
+    END_IF;
+    // Palier 3
+    IF _MaxStepClamped &gt;= 3 THEN
+        IF NOT (Table.P3R1 OR Table.P3R2 OR Table.P3R3 OR Table.P3R4) THEN
+            _ConfigValid := FALSE;
+            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+        END_IF;
+    END_IF;
+    // Palier 4
+    IF _MaxStepClamped &gt;= 4 THEN
+        IF NOT (Table.P4R1 OR Table.P4R2 OR Table.P4R3 OR Table.P4R4) THEN
+            _ConfigValid := FALSE;
+            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+        END_IF;
+    END_IF;
+    // Palier 5
+    IF _MaxStepClamped &gt;= 5 THEN
+        IF NOT (Table.P5R1 OR Table.P5R2 OR Table.P5R3 OR Table.P5R4) THEN
+            _ConfigValid := FALSE;
+            _ConfigErrorIdInt := _ConfigErrorIdInt OR 16#0001;
+        END_IF;
+    END_IF;
+END_IF;
+
+// 🛡️ Gestion erreur config : front montant + reset sur front Reset (cause disparue)
+// Note : pas d'entrée Reset dédiée (brique réduite) → on réarme quand config redevient valide
+//        (front descendant de _ConfigValid). Conforme Partie 3 §5 : cause disparue + front.
+_ConfigErrorTrig(CLK := NOT _ConfigValid);  // Front montant = apparition erreur
+
+// Mémoire erreur config : reste TRUE tant que config invalide OU pas de réarmement
+// Réarmement = front montant de _ConfigValid (cause disparue) — détecté via _ConfigValidPrev
+IF _ConfigErrorTrig.Q THEN
+    // Nouvelle erreur : on la mémorise
+    _ConfigValidPrev := FALSE;  // Force détection front montant au cycle suivant si redevient valide
+ELSIF _ConfigValid AND NOT _ConfigValidPrev THEN
+    // Config redevenue valide : front montant → on efface l'erreur (reset sur front)
+    _ConfigValidPrev := TRUE;
+ELSIF NOT _ConfigValid THEN
+    _ConfigValidPrev := FALSE;
+END_IF;
+
+// Sorties erreur config (miroir standard Partie 3)
+ConfigErrorId := _ConfigErrorIdInt;
+ConfigError   := (ConfigErrorId &lt;&gt; 16#0000);
+
+// ─────────────────────────────────────────────────────────────────────────
+// 🛑 1. GATE — Enable FALSE OU config invalide = palier 0, sorties sûres
+// ─────────────────────────────────────────────────────────────────────────
+IF (NOT Enable) OR (NOT _ConfigValid) THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     StepNumber := 0;
     SpeedGuardLimited := FALSE;
     RETURN;
 END_IF;
 
+// ─────────────────────────────────────────────────────────────────────────
 // 🪜 2. SÉLECTION DU PALIER (HYSTERESIS lib Util : IN/HIGH/LOW → OUT)
 //    OUT = TRUE tant que IN &lt; LOW (régime "bas") ; OUT bascule à FALSE une fois
 //    IN &gt; HIGH (régime "haut" confirmé) ; maintien entre LOW et HIGH (anti-battement).
 //    =&gt; NOT Hyst_n.OUT = "on a franchi le seuil n vers le haut" (palier n+1 atteint).
+// ─────────────────────────────────────────────────────────────────────────
 SpeedRefInt := REAL_TO_INT(SpeedRefPct);
 
 Hyst1(IN := SpeedRefInt, HIGH := REAL_TO_INT(Table.StepThreshold_Pct[1] + HystMargin), LOW := REAL_TO_INT(Table.StepThreshold_Pct[1] - HystMargin));
@@ -17171,15 +18572,19 @@ IF NOT Hyst2.OUT THEN StepNumber := 3; END_IF;
 IF NOT Hyst3.OUT THEN StepNumber := 4; END_IF;
 IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
 
+// ─────────────────────────────────────────────────────────────────────────
 // 🆕 2bis. PLAFOND (2026-07-03quinquies) — appliqué APRÈS la sélection hystérésis,
 // AVANT la lecture table : le 0..100% de la consigne peut réclamer le palier 5,
-// mais ne dépassera jamais MaxStepNumber (ex. limitation couple en descente, voir FB_Winch)
-IF StepNumber &gt; MaxStepNumber THEN
-    StepNumber := MaxStepNumber;
+// mais ne dépassera jamais _MaxStepClamped (ex. limitation couple en descente)
+// ─────────────────────────────────────────────────────────────────────────
+IF StepNumber &gt; _MaxStepClamped THEN
+    StepNumber := _MaxStepClamped;
 END_IF;
 
+// ─────────────────────────────────────────────────────────────────────────
 // 🛡️ 2ter. GARDE-FOU VITESSE RÉELLE — limite uniquement la consigne de palier.
 // Si la vitesse n'est pas validée stable, seul le palier 1 reste autorisé.
+// ─────────────────────────────────────────────────────────────────────────
 SpeedGuardLimited := FALSE;
 IF SpeedGuardEnable THEN
     IF NOT SpeedGuardReady THEN
@@ -17193,15 +18598,36 @@ IF SpeedGuardEnable THEN
     END_IF;
 END_IF;
 
+// ─────────────────────────────────────────────────────────────────────────
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
+//    CASE couvre explicitement 0..5 : StepNumber=0 → tous FALSE (sécurité)
+// ─────────────────────────────────────────────────────────────────────────
 CASE StepNumber OF
-    1: Contactor1 := Table.P1R1; Contactor2 := Table.P1R2; Contactor3 := Table.P1R3; Contactor4 := Table.P1R4;
-    2: Contactor1 := Table.P2R1; Contactor2 := Table.P2R2; Contactor3 := Table.P2R3; Contactor4 := Table.P2R4;
-    3: Contactor1 := Table.P3R1; Contactor2 := Table.P3R2; Contactor3 := Table.P3R3; Contactor4 := Table.P3R4;
-    4: Contactor1 := Table.P4R1; Contactor2 := Table.P4R2; Contactor3 := Table.P4R3; Contactor4 := Table.P4R4;
-    5: Contactor1 := Table.P5R1; Contactor2 := Table.P5R2; Contactor3 := Table.P5R3; Contactor4 := Table.P5R4;
+    0:  // Arrêt / config invalide / Enable=FALSE — sécurité positive
+        Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    1:  Contactor1 := Table.P1R1; Contactor2 := Table.P1R2; Contactor3 := Table.P1R3; Contactor4 := Table.P1R4;
+    2:  Contactor1 := Table.P2R1; Contactor2 := Table.P2R2; Contactor3 := Table.P2R3; Contactor4 := Table.P2R4;
+    3:  Contactor1 := Table.P3R1; Contactor2 := Table.P3R2; Contactor3 := Table.P3R3; Contactor4 := Table.P3R4;
+    4:  Contactor1 := Table.P4R1; Contactor2 := Table.P4R2; Contactor3 := Table.P4R3; Contactor4 := Table.P4R4;
+    5:  Contactor1 := Table.P5R1; Contactor2 := Table.P5R2; Contactor3 := Table.P5R3; Contactor4 := Table.P5R4;
+ELSE
+    // Défense en profondeur : valeur StepNumber inattendue → sécurité
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    StepNumber := 0;
 END_CASE;
-</xhtml>
+
+(* ═══════════════════════════════════════════════════════════════
+   📝 NOTE D'APPLICATION MANUELLE CODESYS 3.5
+   ═══════════════════════════════════════════════════════════════
+   1. Ouvrir le POU FB_SpeedStep dans l'arborescence CODESYS (dossier TREUILS)
+   2. Copier la partie DECLARATION (lignes 33-58) dans la zone VAR_INPUT/VAR_OUTPUT/VAR
+   3. Copier la partie IMPLEMENTATION (lignes 61 à fin) dans le corps ST
+   4. Vérifier que la librairie `Util` est référencée (HYSTERESIS, R_TRIG)
+   5. Rebuild (F11) → 0 erreur attendue
+   6. Vérifier dans FB_Winch que l'instance SpeedStep compile toujours
+      (interface compatible : nouvelles sorties ConfigError/ConfigErrorId ajoutées,
+       entrées/sorties existantes inchangées)
+   ═══════════════════════════════════════════════════════════════ *)</xhtml>
           </ST>
         </body>
         <addData>
@@ -22774,6 +24200,20 @@ END_IF;
 IF GVL_PLC_Tests.OverrideM3PhantomFreq THEN
     M3_ActualFrequencyHz_Filtered := 100; // 🧪 Simule Méca A : 1.00Hz mesuré malgré arrêt commandé (seuil 0.5Hz)
 END_IF;
+
+// 🛡️ Surcharges retours arrêt M1/M2 — polarité inverse : arrêt confirmé = TRUE.
+IF GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff THEN
+    M1FwdRevSpeedFeedbackOff := GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff;
+END_IF;
+IF GVL_PLC_Tests.OverrideM1BrakeFeedback THEN
+    M1BrakeFeedback := GVL_PLC_Tests.OverrideM1BrakeFeedback;
+END_IF;
+IF GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff THEN
+    M2FwdRevSpeedFeedbackOff := GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff;
+END_IF;
+IF GVL_PLC_Tests.OverrideM2BrakeFeedback THEN
+    M2BrakeFeedback := GVL_PLC_Tests.OverrideM2BrakeFeedback;
+END_IF;
 </xhtml>
           </ST>
         </body>
@@ -22818,6 +24258,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation joystick (Lot 3 — voir CODE/SIMULATION/)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instIhmHeartbeat">
+              <type>
+                <derived name="FB_IhmHeartbeat" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -22874,6 +24322,20 @@ instDiagEthercat(
     DeviceEncoderM1State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
     DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal),
     DeviceEncoderM2State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
+);
+
+// 💓 2bis. Heartbeat IHM↔PLC — appelé avant PRG_03_Safety pour fournir le statut même cycle.
+instIhmHeartbeat(
+    Enable := TRUE,
+    // 🧪 Sans IHM réelle sur banc, BlinkClock fournit un toggle sain ; mettre
+    // IhmHeartbeat_IsReal := TRUE pour tester une perte/reprise réelle du heartbeat IHM.
+    HeartbeatIhmToggle := SEL(GVL_PLC_Tests.OverrideIhmHeartbeatActive,
+                              SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.IhmHeartbeat_IsReal,
+                                  GVL_IHM.Commun.HeartbeatIhmToggle,
+                                  GVL_Global.BlinkClock),
+                              GVL_PLC_Tests.OverrideIhmHeartbeatToggle),
+    IhmTimeout := T#2s,
+    PlcTogglePeriod := T#500ms
 );
 
 // 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT JoystickSignal_IsReal
@@ -23311,6 +24773,7 @@ instSafetyWinchM1(
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
     ThermalFeedback     := NOT PRG_00_Inputs.M1ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
@@ -23353,6 +24816,7 @@ instSafetyWinchM2(
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
@@ -23441,6 +24905,7 @@ instSafetyTranslationM3(
     Mode                := PRG_04_Modes.instModes.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     PhaseRotationOk     := PRG_00_Inputs.PhaseRotationOk,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Online,
@@ -23685,6 +25150,7 @@ instCycle(
     // sont mutuellement exclusifs dans FB_Modes, plus besoin d'un flag ManuActive séparé).
     Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
     CycleMotionPermit   := CycleMotionPermit,
+    HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     
@@ -24827,6 +26293,13 @@ GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
 GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
 GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_08_AuxiliaryControl.HydraulicFaultOk; // 🆕 REX 2026-07-18 — diagnostic seul, aucune commande PLC
 
+// 💓 Heartbeat IHM↔PLC — le toggle IHM est lu directement en PRG_01 ; ici, on publie
+// les diagnostics calculés au même scan pour l'affichage et l'historisation IHM.
+GVL_IHM.Commun.HeartbeatPlcToggle  := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatPlcToggle;
+GVL_IHM.Commun.HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk;
+GVL_IHM.Commun.HeartbeatIhmTimeout := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmTimeout;
+GVL_IHM.Commun.HeartbeatIhmElapsed := PRG_01_Diagnostics.instIhmHeartbeat.TimeSinceIhmEdge;
+
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
 // pas seulement le pulse — ArmingSeqStep&lt;&gt;0 englobe déjà tout sauf le verrouillage final.
@@ -25173,7 +26646,7 @@ GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filter
 GVL_IHM.TranslationM3.DriveActualFreqHz    := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
 GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
-GVL_IHM.TranslationM3.SafetyErrorJoystick     := PRG_03_Safety.instSafetyTranslationM3.ErrorJoystick;
+GVL_IHM.TranslationM3.SafetyErrorOperatorComm := PRG_03_Safety.instSafetyTranslationM3.ErrorOperatorComm;
 GVL_IHM.TranslationM3.SafetyErrorDriveComm    := PRG_03_Safety.instSafetyTranslationM3.ErrorDriveComm;
 GVL_IHM.TranslationM3.SafetyErrorPhaseRotation:= PRG_03_Safety.instSafetyTranslationM3.ErrorPhaseRotation;
 GVL_IHM.TranslationM3.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTranslationM3.ErrorBrakeThermal;
@@ -25955,6 +27428,14 @@ Rapport de la suite Safety</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Modes/Homme-mort (post-IHM_MANU)</xhtml>
           </documentation>
         </variable>
+        <variable name="SuiteHeartbeatValidation">
+          <type>
+            <derived name="ST_TestSuiteReport" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Heartbeat IHM↔PLC</xhtml>
+          </documentation>
+        </variable>
         <variable name="OverrideChainTrue">
           <type>
             <BOOL />
@@ -26090,6 +27571,57 @@ TRUE = RawX/Y/Button pilotés par les 3 champs suivants</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui homme-mort simulé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideIhmHeartbeatActive">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01.
+Aucun test n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
+TRUE = le banc fournit le toggle IHM</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideIhmHeartbeatToggle">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur IHM→PLC, figée ou inversée par FB_HeartbeatValidation</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM1FwdRevSpeedFbOff">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Surcharges retours arrêt M1/M2 — polaires inversées : arrêt confirmé = TRUE.
+TRUE = contacteurs retombés (sain)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM1BrakeFeedback">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein serré (sain)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM2FwdRevSpeedFbOff">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteurs retombés (sain)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideM2BrakeFeedback">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein serré (sain)</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -26306,6 +27838,17 @@ TRUE = RawX/Y/Button pilotés par les 3 champs suivants</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Modes/Homme-mort, post-suppression IHM_MANU (Cmd.RunSuite)</xhtml>
           </documentation>
         </variable>
+        <variable name="SuiteHeartbeat">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="6" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Heartbeat IHM↔PLC (Cmd.RunSuite)</xhtml>
+          </documentation>
+        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
@@ -26397,6 +27940,17 @@ câbler le joystick réel (signal analogique/CAN brut RawX/RawY/RawButton) tout 
 bus/nœud CANopen (Joystick_IsReal) simulé sain, pour tester le joystick physique avant que le
 diagnostic CANopen/EtherCAT ne soit fiabilisé (sans faux défaut CAN pendant ce test).
 Signal joystick brut (RawX/RawY/RawButton uniquement)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="IhmHeartbeat_IsReal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Heartbeat IHM Ethernet : FALSE = heartbeat simulé par GVL_Global.BlinkClock</xhtml>
           </documentation>
         </variable>
         <variable name="EmergencyStopChain_IsReal">
@@ -26729,6 +28283,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="E_DiagState" ObjectId="39664b51-89a6-5c70-97d4-b9cecb9f2e88" />
           <Object Name="FB_DiagCanOpen" ObjectId="94985939-6432-5df4-8717-0ad1efb0fdb4" />
           <Object Name="FB_DiagEthercat" ObjectId="268197d6-ad0a-5ec3-82c7-3a1f88f6bae6" />
+          <Object Name="FB_IhmHeartbeat" ObjectId="27ea6b0f-df94-59ee-ac07-585c8e3e993b" />
           <Object Name="ST_DiagDevice" ObjectId="68ef7967-d114-5e9c-853e-21c8e5a90a1f" />
         </Folder>
         <Folder Name="MODES">
@@ -26778,12 +28333,13 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Folder Name="SUITE_ENCODER">
               <Object Name="FB_EncoderValidation" ObjectId="619e8bc6-54ae-5f02-aebe-115a30065e45" />
             </Folder>
-            <Folder Name="SUITE_MODES">
-              <Object Name="FB_ModesValidation" ObjectId="382b521c-76df-5610-b353-42f0bb0338c2" />
-            </Folder>
             <Folder Name="SUITE_SAFETY">
+              <Object Name="FB_HeartbeatValidation" ObjectId="a156acc2-4e3c-5683-b273-92abc28e5996" />
               <Object Name="FB_PLC_Tests_Management" ObjectId="4f9edc6d-f5f9-594b-bef8-0d282881abd3" />
               <Object Name="FB_SafetyValidation" ObjectId="17d2249d-bc77-5f26-9a28-7d259414db20" />
+            </Folder>
+            <Folder Name="SUITE_MODES">
+              <Object Name="FB_ModesValidation" ObjectId="382b521c-76df-5610-b353-42f0bb0338c2" />
             </Folder>
             <Folder Name="BRICKS">
               <Object Name="FB_TestCheck" ObjectId="96c0e8a5-037a-59f8-8d24-0b688cef585a" />
