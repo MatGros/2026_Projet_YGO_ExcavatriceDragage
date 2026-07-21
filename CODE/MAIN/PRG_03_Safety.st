@@ -184,7 +184,7 @@ instSafetyTranslationM3(
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
     // 🆕 REX 2026-07-18 : limites extrêmes dérivées du décodage 5 capteurs (mot valide), plus
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
-    LimitSwitchFwd      := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd,
-    LimitSwitchRev      := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev,
-    SensorWordIncoherent := PRG_07_TranslationControl.instPositionDecoder.Incoherent
+    LimitSwitchFwd      := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd,
+    LimitSwitchRev      := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev,
+    SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent
 );

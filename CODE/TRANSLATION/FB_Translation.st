@@ -75,6 +75,7 @@ VAR
     DirectionAtArrival     : INT;
     ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
     MovementRequested      : BOOL;         // Pilote FB_Brake
+    FirstScanDone          : BOOL;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -97,6 +98,13 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
 
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
+    RETURN;
+END_IF;
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    ErrorId := 16#0000;
     RETURN;
 END_IF;
 

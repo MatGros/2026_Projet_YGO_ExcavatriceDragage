@@ -4,6 +4,13 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.21_SimM3BootFix` — 2026-07-21
+- Correction polarité frein Méca B dans `FB_Safety_Translation` (`NOT BrakeFeedback`)
+- Position neutre P2 (00111) au boot sans cible dans `FB_Sim_Translation`
+- Boot simulation M3 Translation 100% sain sans faux défaut ni blocage AU
+
+---
+
 ### `v0.4.20_WinchCorePrep` — 2026-07-21
 - WINCH-CORE-01 · hauteurs 8,0/8,5 m · DISABLE M1/M2/M3
 - Bypass codeur individuel MAINT_N2 · ConfigError SpeedStep bit2

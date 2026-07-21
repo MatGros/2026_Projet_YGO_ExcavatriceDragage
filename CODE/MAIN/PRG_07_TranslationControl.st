@@ -10,7 +10,6 @@
 PROGRAM PRG_07_TranslationControl
 VAR
     instTranslationM3           : FB_Translation;
-    instPositionDecoder         : FB_Translation_PositionDecoder; // 🆕 REX 2026-07-18 : décodage mot 5 capteurs (AF_Partie-02 v2.12 §3bis)
 
     // Commandes arbitrées après sélection Manuel/Auto
     M3_StartStop_Active     : BOOL;
@@ -29,17 +28,7 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
 
-// ── 0. DÉCODAGE MOT CAPTEURS (5 positions, indépendant du mode/de la cible) ─
-// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — remplace le câblage direct
-// des anciens capteurs Fosse1/Tremie sur LimitSwitchFwd/Rev par un décodage complet du mot
-// 5 bits (Trémie|PV|P2|P1|Maintenance), avec détection d'incohérence (capteur collé/HS).
-instPositionDecoder(
-    SensorTremie      := PRG_00_Inputs.TranslationPosTremie,
-    SensorPV          := PRG_00_Inputs.TranslationPosPV,
-    SensorP2          := PRG_00_Inputs.TranslationPosP2,
-    SensorP1          := PRG_00_Inputs.TranslationPosP1,
-    SensorMaintenance := PRG_00_Inputs.TranslationPosMaintenance
-);
+// ── 0. DÉCODAGE MOT CAPTEURS (exécuté en position 0 dans PRG_00_Inputs) ──────
 
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -139,8 +128,8 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
-    LimitSwitchFwd          := instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
-    LimitSwitchRev          := instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
+    LimitSwitchFwd          := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
+    LimitSwitchRev          := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),

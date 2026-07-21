@@ -546,10 +546,10 @@ ProbeDint[SigErrorIdT2NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTransl
 ProbeBool[SigMecaAError]       := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
 ProbeDint[SigErrorIdT3NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
 
-// 🆕 REX 2026-07-18 : sondes TC-T4/T5 (décodeur réel, via PRG_07_TranslationControl)
-ProbeBool[SigDecoderIncoherent]   := PRG_07_TranslationControl.instPositionDecoder.Incoherent;
-ProbeBool[SigLimitFwd]            := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
-ProbeBool[SigLimitRev]            := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+// 🆕 REX 2026-07-18 : sondes TC-T4/T5 (décodeur réel, via PRG_00_Inputs)
+ProbeBool[SigDecoderIncoherent]   := PRG_00_Inputs.instPositionDecoder.Incoherent;
+ProbeBool[SigLimitFwd]            := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd;
+ProbeBool[SigLimitRev]            := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev;
 ProbeBool[SigSensorIncoherentErr] := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 ProbeDint[SigErrorIdT5NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
 

@@ -1,49 +1,108 @@
 {
   "direction": "BT",
+  "classes": {
+    "input":       "fill:#1565c0,color:#ffffff,stroke:#0d47a1,stroke-width:2px",
+    "refinement":  "fill:#ef6c00,color:#ffffff,stroke:#e65100,stroke-width:2px",
+    "gate":        "fill:#2e7d32,color:#ffffff,stroke:#1b5e20,stroke-width:2px",
+    "validation":  "fill:#c2185b,color:#ffffff,stroke:#880e4f,stroke-width:2px",
+    "trace":       "fill:#7b1fa2,color:#ffffff,stroke:#4a148c,stroke-width:2px",
+    "safety":      "fill:#b71c1c,color:#ffffff,stroke:#7f0000,stroke-width:2px"
+  },
   "groups": [
-    {"id": "INPUT", "label": "📥 ENTRÉES", "class": "input"},
-    {"id": "REFINEMENT", "label": "🧠 REFINEMENT, PLANNING ET FUSION", "class": "refinement"},
-    {"id": "GATES", "label": "🟢 GATES DÉTERMINISTES", "class": "gate"},
-    {"id": "VALIDATION", "label": "✅ VALIDATION HUMAINE ET AGENTS", "class": "validation"},
-    {"id": "TRACEABILITY", "label": "📚 TRAÇABILITÉ", "class": "trace"}
+    { "id": "INPUT",        "label": "ENTREES",                      "class": "input",      "color": "BBDEFB" },
+    { "id": "QUALIFY",      "label": "QUALIFICATION C0-C4",          "class": "refinement", "color": "FFF9C4" },
+    { "id": "FAST",         "label": "FAST LANE -- C0-C1",           "class": "refinement", "color": "DCEDC8" },
+    { "id": "STANDARD",     "label": "STANDARD LANE -- C2-C3",       "class": "refinement", "color": "B3E5FC" },
+    { "id": "SAFETY",       "label": "SAFETY LANE -- C4",            "class": "safety",     "color": "FFCCBC" },
+    { "id": "GATES",        "label": "GATES DETERMINISTES",          "class": "gate",       "color": "C8E6C9" },
+    { "id": "DUAL",         "label": "DOUBLE REVUE PARALLELE A/B",   "class": "safety",     "color": "FFCDD2" },
+    { "id": "VALIDATION",   "label": "VALIDATION HUMAINE",           "class": "validation", "color": "F8BBD0" },
+    { "id": "TRACEABILITY", "label": "TRACABILITE",                  "class": "trace",      "color": "E1BEE7" }
   ],
   "nodes": [
-    {"id": "A1", "label": "CODE_CHANGE\nModification programme ou bug", "group": "INPUT"},
-    {"id": "A2", "label": "NEW_INFORMATION\nClient, chantier ou essai", "group": "INPUT"},
-    {"id": "B1", "label": "Pre-edit Gate\npre_edit_gate.py\nSpecs DOC lues ?", "group": "REFINEMENT"},
-    {"id": "B2", "label": "Requirement Intake\nrequirement-intake skill\nInformation qualifiée", "group": "REFINEMENT"},
-    {"id": "B3", "label": "Scope et criticité\nC0-C4 et politique Ponytail", "group": "REFINEMENT"},
-    {"id": "B3_F", "label": "Analyse Multi-Modèle\nFusion Harness\n/opinion et /fusion", "group": "REFINEMENT"},
-    {"id": "B4", "label": "Plan d’action\nFix et Guard", "group": "REFINEMENT"},
-    {"id": "B5", "label": "Exécution Claude Code\nOuvrier High Effort\nAbonnement Pro", "group": "REFINEMENT"},
-    {"id": "C1", "label": "Gate 1 : Structure\ncheck_structure.py", "group": "GATES"},
-    {"id": "C2", "label": "Gate 2 : Code Style\ncheck_code_style.py\nTokens, VAR_OUTPUT, W1, W3, W5", "group": "GATES"},
-    {"id": "C3", "label": "Gate 3 : Bundle Freshness\ncheck_bundle_freshness.py", "group": "GATES"},
-    {"id": "C4", "label": "Gate 4 : PyTest\n306 tests générateur et intégration", "group": "GATES"},
-    {"id": "C5", "label": "Gate 5 : Compilation CODESYS\ncheck_codesys_compile.py", "group": "GATES"},
-    {"id": "D1", "label": "Revue Herdr\nRead-only, advisory-only", "group": "VALIDATION"},
-    {"id": "D2", "label": "Compilation CODESYS\nImport bundle et Build", "group": "VALIDATION"},
-    {"id": "D3", "label": "Essais Simulation\nBanc PLC_TESTS", "group": "VALIDATION"},
-    {"id": "D4", "label": "Validation Terrain\nFAT et SAT", "group": "VALIDATION"},
-    {"id": "E1", "label": "fix : correction locale", "group": "TRACEABILITY"},
-    {"id": "E2", "label": "guard : gate, template ou script", "group": "TRACEABILITY"},
-    {"id": "E3", "label": "WORKFLOW.md\nDouble boucle", "group": "TRACEABILITY"},
-    {"id": "E4", "label": "VERSION_HISTORY.md", "group": "TRACEABILITY"},
-    {"id": "E5", "label": "PLAN_TASK.md", "group": "TRACEABILITY"}
+    { "group": "INPUT",       "id": "A1",   "label": "CODE_CHANGE\nModification programme ou bug" },
+    { "group": "INPUT",       "id": "A2",   "label": "NEW_INFORMATION\nClient, chantier ou essai" },
+
+    { "group": "QUALIFY",     "id": "Q1",   "label": "Pi qualifie C0 a C4\nHumain valide en 1 mot" },
+
+    { "group": "FAST",        "id": "F1",   "label": "Pre-edit Gate\npre_edit_gate.py" },
+    { "group": "FAST",        "id": "F2",   "label": "Plan + Code\nPi seul -- pas de multi-modele" },
+
+    { "group": "STANDARD",    "id": "S1",   "label": "Pre-edit Gate\npre_edit_gate.py" },
+    { "group": "STANDARD",    "id": "S2",   "label": "REGISTRE_ACTIONS (propose)\nTASK_CONTEXT.yaml (propose)" },
+    { "group": "STANDARD",    "id": "S3",   "label": "Plan + Code\nPi modele fort" },
+    { "group": "STANDARD",    "id": "S4",   "label": "Revue Herdr\n1 agent -- read-only, advisory" },
+
+    { "group": "SAFETY",      "id": "C4_1", "label": "REGISTRE_ACTIONS (obligatoire)\nTASK_CONTEXT.yaml (obligatoire)\nTEST_DESIGN.md (obligatoire)" },
+    { "group": "SAFETY",      "id": "C4_2", "label": "ALERTE RISQUES\nValidation humaine artefacts" },
+    { "group": "SAFETY",      "id": "C4_3", "label": "Code ST\nPi High Effort" },
+
+    { "group": "GATES",       "id": "G1",   "label": "Gate 1 : Structure\ncheck_structure.py" },
+    { "group": "GATES",       "id": "G2",   "label": "Gate 2 : Code Style\ncheck_code_style.py" },
+    { "group": "GATES",       "id": "G3",   "label": "Gate 3 : Bundle Freshness\ncheck_bundle_freshness.py" },
+    { "group": "GATES",       "id": "G4",   "label": "Gate 4 : PyTest\n306 tests generateur" },
+    { "group": "GATES",       "id": "G5",   "label": "Gate 5 : Compilation CODESYS\ncheck_codesys_compile.py" },
+
+    { "group": "DUAL",        "id": "D_A",  "label": "Agent A\nRevue read-only\nContexte isole" },
+    { "group": "DUAL",        "id": "D_B",  "label": "Agent B\nRevue read-only\nContexte isole" },
+    { "group": "DUAL",        "id": "D_R",  "label": "Consensus --> synthese\nDivergence --> ALERTE humain\nPositions A/B cote a cote" },
+
+    { "group": "VALIDATION",  "id": "V1",   "label": "Compilation CODESYS\nImport bundle et Build" },
+    { "group": "VALIDATION",  "id": "V2",   "label": "Essais Simulation\nBanc PLC_TESTS" },
+    { "group": "VALIDATION",  "id": "V3",   "label": "Validation Terrain\nFAT et SAT" },
+
+    { "group": "TRACEABILITY","id": "E1",   "label": "fix : correction locale" },
+    { "group": "TRACEABILITY","id": "E2",   "label": "guard : gate, template ou script" },
+    { "group": "TRACEABILITY","id": "E3",   "label": "WORKFLOW.md\nDouble boucle" },
+    { "group": "TRACEABILITY","id": "E4",   "label": "VERSION_HISTORY.md" },
+    { "group": "TRACEABILITY","id": "E5",   "label": "PLAN_TASK.md" }
   ],
   "edges": [
-    ["A1", "B1"], ["A2", "B2"], ["B1", "B3"], ["B2", "B3"], ["B3", "B3_F"], ["B3_F", "B4"], ["B4", "B5"], ["B5", "C1"],
-    ["C1", "C2"], ["C2", "C3"], ["C3", "C4"], ["C4", "C5"], ["C5", "D1"],
-    ["C5", "D2", "Si log disponible"], ["D1", "D2"], ["D2", "D3"], ["D3", "D4"],
-    ["D4", "E1"], ["D4", "E2"], ["E1", "E3"], ["E2", "E3"], ["E3", "E4"], ["E3", "E5"],
-    ["C2", "B4", "ERROR", "dotted"], ["C4", "B4", "FAIL", "dotted"],
-    ["C5", "B4", "Erreur Cxxxx", "dotted"], ["D2", "B4", "Erreur build", "dotted"]
-  ],
-  "classes": {
-    "input": "fill:#1565c0,color:#ffffff,stroke:#0d47a1,stroke-width:2px",
-    "refinement": "fill:#ef6c00,color:#ffffff,stroke:#e65100,stroke-width:2px",
-    "gate": "fill:#2e7d32,color:#ffffff,stroke:#1b5e20,stroke-width:2px",
-    "validation": "fill:#c2185b,color:#ffffff,stroke:#880e4f,stroke-width:2px",
-    "trace": "fill:#7b1fa2,color:#ffffff,stroke:#4a148c,stroke-width:2px"
-  }
+    ["A1",   "Q1"],
+    ["A2",   "Q1"],
+
+    ["Q1",   "F1",   "C0-C1"],
+    ["Q1",   "S1",   "C2-C3"],
+    ["Q1",   "C4_1", "C4"],
+
+    ["F1",   "F2"],
+    ["F2",   "G1"],
+
+    ["S1",   "S2"],
+    ["S2",   "S3"],
+    ["S3",   "G1"],
+
+    ["C4_1", "C4_2"],
+    ["C4_2", "C4_3"],
+    ["C4_3", "G1"],
+
+    ["G1",   "G2"],
+    ["G2",   "G3"],
+    ["G3",   "G4"],
+    ["G4",   "G5"],
+
+    ["G5",   "S4",  "C2-C3", "dotted"],
+    ["G5",   "D_A", "C4",    "dotted"],
+    ["G5",   "D_B", "C4",    "dotted"],
+
+    ["S4",   "V1"],
+    ["D_A",  "D_R"],
+    ["D_B",  "D_R"],
+    ["D_R",  "V1"],
+
+    ["V1",   "V2"],
+    ["V2",   "V3"],
+
+    ["V3",   "E1"],
+    ["V3",   "E2"],
+    ["E1",   "E3"],
+    ["E2",   "E3"],
+    ["E3",   "E4"],
+    ["E3",   "E5"],
+
+    ["G2",   "Q1",   "ERROR",        "dotted"],
+    ["G4",   "Q1",   "FAIL",         "dotted"],
+    ["G5",   "Q1",   "Erreur Cxxxx", "dotted"],
+    ["V1",   "Q1",   "Erreur build", "dotted"]
+  ]
 }

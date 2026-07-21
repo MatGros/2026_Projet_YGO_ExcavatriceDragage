@@ -21,6 +21,7 @@ Cet environnement ouvre, dans le terminal intégré VS Code, neuf onglets indép
 | **✅ Gates** | `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys` | Contrôles Python du workflow |
 | **🤠 Herdr** | `herdr start-agent claude` | Agent Herdr/Claude optionnel |
 | **📊 Workflow Graph** | `python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header` | Génération de tous les diagrammes Mermaid |
+| **🌐 OmniRoute Server** | `omniroute` | Serveur OmniRoute |
 
 Chaque terminal utilise la racine du projet comme répertoire courant :
 `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage`.

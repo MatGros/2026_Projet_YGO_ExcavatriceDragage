@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-21T10:05:06.429861" />
-  <contentHeader name="MGS_v0.4.19_CommissioningPrep.project" modificationDateTime="2026-07-21T10:05:06.429861">
+  <contentHeader name="MGS_v0.4.21_SimM3BootFix.project" modificationDateTime="2026-07-21T10:05:06.429861">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">MGS_v0.4.19_CommissioningPrep</property>
+          <property name="Project" type="string">MGS_v0.4.21_SimM3BootFix</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -11566,12 +11566,12 @@ IF IhmEdgeDetected THEN
     IhmEdgeSeen := TRUE;
 END_IF;
 
-// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout même sans front,
-// mais HeartbeatIhmOk reste FALSE tant qu'un premier front post-boot n'est pas observé.
+// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout au bout de IhmTimeout.
+// HeartbeatIhmOk reste TRUE tant que le timeout n'est pas expiré (boot propre sans alarme au scan 1).
 IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
 TimeSinceIhmEdge := IhmTimeoutTon.ET;
 HeartbeatIhmTimeout := IhmTimeoutTon.Q;
-HeartbeatIhmOk := IhmEdgeSeen AND NOT HeartbeatIhmTimeout;
+HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
 
 // 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
 PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
@@ -11663,6 +11663,11 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -11690,10 +11695,17 @@ END_IF;
 // 1. Inversion NO/NC
 ValueRaw := InputRaw XOR InvertLogic;
 
-// 2. Filtrage anti-rebond — ne valide le changement d'état qu'après FilterTime stable
-FilterTon(IN := (ValueRaw &lt;&gt; State), PT := FilterTime);
-IF FilterTon.Q THEN
-    State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+// 2. Initialisation premier scan &amp; Filtrage anti-rebond
+// Au premier scan post-boot, State prend directement la valeur saine brute sans attendre le délai de 20ms,
+// ce qui évite d'émettre des fausses alarmes transitoires au démarrage de l'automate.
+IF NOT FirstScanDone THEN
+    State := ValueRaw;
+    FirstScanDone := TRUE;
+ELSE
+    FilterTon(IN := (ValueRaw &lt;&gt; State), PT := FilterTime);
+    IF FilterTon.Q THEN
+        State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+    END_IF;
 END_IF;
 
 // 3. Diagnostic voie/carte
@@ -13086,7 +13098,7 @@ IF NOT StepStarted THEN
     StepStarted := TRUE;
     StepElapsed := T#0s;
     CASE Step OF
-        5: StepLimit := T#3s;         // Préambule : armement contacteur simulé
+        5: StepLimit := T#5s;         // Préambule : armement contacteur simulé
         10, 20: StepLimit := T#3s;   // Mode appliqué + neutre initial
         11, 21: StepLimit := T#5s;   // Armement + départ mouvement
         12: StepLimit := T#5s;       // TC-M1 uniquement : relâchement → arrêt
@@ -16658,6 +16670,11 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -16700,6 +16717,13 @@ END_IF;
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
+
 // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
 IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
     ErrorId := ErrorId OR 16#0001;
@@ -16733,11 +16757,11 @@ END_IF;
 // tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) &gt; 3s
 IF NOT HeartbeatIhmOk THEN
     // 💓 Perte IHM : l'arrêt est exigé même si une ancienne Direction reste mémorisée.
-    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré avant de
+    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré (NOT BrakeFeedback) avant de
     // laisser l'escalade PowerCutOff intervenir après PostRampTimeout.
-    UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
+    UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
 ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-    UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+    UncommandedActiveB := DriveStatusWord.0 OR NOT BrakeFeedback;
 ELSE
     UncommandedActiveB := FALSE;
 END_IF;
@@ -17290,6 +17314,11 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <derived name="R_TRIG" />
               </type>
             </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="CycleTimeCalc">
               <type>
                 <derived name="FB_CycleTime" />
@@ -17561,6 +17590,13 @@ END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
 
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL
 IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
@@ -18519,16 +18555,19 @@ Reached := (ElapsedS &gt;= TravelTimeS);
 // La simulation doit donc produire un mot valide à chaque instant, et non
 // uniquement activer le capteur de la cible. Le mot est :
 //   11111 Trémie | 01111 PV | 00111 P2 | 00011 P1 | 00001 approche Maintenance | 00000 Maintenance.
-// Tant qu'une cible n'est pas atteinte, la position virtuelle reste à droite (00000),
-// sauf lors de l'approche Trémie où le PV (01111) est activé.
+// 🔧 REX 2026-07-21 : au repos / boot (TargetNum = 0), la position neutre par défaut
+// est positionnée sur P2 (00111) pour éviter d'être par défaut sur le fin de course extrême Maintenance (00000).
 PosTremie := FALSE;
 PosPV := FALSE;
-PosP2 := FALSE;
-PosP1 := FALSE;
-PosMaintenance := FALSE; // état de repos simulé : mot valide 00000
 
-IF TargetNum = 1 THEN
+IF TargetNum = 0 THEN
+    // Position neutre par défaut au boot (P2 = 00111) — évite le fin de course extrême arrière au démarrage
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 1 THEN
     // Trajet vers Trémie : PV puis Trémie, avec les trois capteurs de droite actifs.
+    PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
     IF ElapsedS &gt;= (TravelTimeS - PVLeadTimeS) THEN
         PosPV := TRUE;
         PosP2 := TRUE;
@@ -18538,18 +18577,25 @@ IF TargetNum = 1 THEN
     IF Reached THEN
         PosTremie := TRUE;
     END_IF;
-ELSIF TargetNum = 2 AND Reached THEN
+ELSIF TargetNum = 2 THEN
     // P2 = 00111
     PosP2 := TRUE;
     PosP1 := TRUE;
     PosMaintenance := TRUE;
-ELSIF TargetNum = 3 AND Reached THEN
+ELSIF TargetNum = 3 THEN
     // P1 = 00011
+    PosP2 := FALSE;
     PosP1 := TRUE;
     PosMaintenance := TRUE;
-ELSIF TargetNum = 4 AND Reached THEN
+ELSIF TargetNum = 4 THEN
     // Maintenance = 00000 : PosMaintenance reste FALSE pour respecter le codage.
+    PosP2 := FALSE;
+    PosP1 := FALSE;
     PosMaintenance := FALSE;
+ELSE
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
 END_IF;
 </xhtml>
           </ST>
@@ -21171,6 +21217,11 @@ Filtrage capteur de position cible</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Pilote FB_Brake</xhtml>
               </documentation>
             </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -21208,6 +21259,13 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
 
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
+    RETURN;
+END_IF;
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -22391,10 +22449,10 @@ ProbeDint[SigErrorIdT2NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTransl
 ProbeBool[SigMecaAError]       := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
 ProbeDint[SigErrorIdT3NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
 
-// 🆕 REX 2026-07-18 : sondes TC-T4/T5 (décodeur réel, via PRG_07_TranslationControl)
-ProbeBool[SigDecoderIncoherent]   := PRG_07_TranslationControl.instPositionDecoder.Incoherent;
-ProbeBool[SigLimitFwd]            := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
-ProbeBool[SigLimitRev]            := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+// 🆕 REX 2026-07-18 : sondes TC-T4/T5 (décodeur réel, via PRG_00_Inputs)
+ProbeBool[SigDecoderIncoherent]   := PRG_00_Inputs.instPositionDecoder.Incoherent;
+ProbeBool[SigLimitFwd]            := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd;
+ProbeBool[SigLimitRev]            := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev;
 ProbeBool[SigSensorIncoherentErr] := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 ProbeDint[SigErrorIdT5NoParasite] := WORD_TO_DINT(PRG_03_Safety.instSafetyTranslationM3.ErrorId);
 
@@ -23135,6 +23193,11 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse</xhtml>
               </documentation>
             </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -23224,6 +23287,13 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     Error := FALSE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
     ErrorId := 16#0000;
     RETURN;
 END_IF;
@@ -24261,13 +24331,18 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Retour frein translation M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴</xhtml>
               </documentation>
             </variable>
+            <variable name="instPositionDecoder">
+              <type>
+                <derived name="FB_Translation_PositionDecoder" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-21 : décodage du mot des 5 capteurs position M3 (position 0, avant PRG_03_Safety)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3_StatusWord_Filtered">
               <type>
                 <WORD />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Variables intermédiaires filtrées/simulées pour contourner la lecture seule des PDO</xhtml>
-              </documentation>
             </variable>
             <variable name="M3_ActualFrequencyHz_Filtered">
               <type>
@@ -24611,20 +24686,29 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosTremie_DI, instSimTranslation.PosTremie), FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosPV(InputRaw := GVL_Translation_M3_Stub.PosPV_DI OR instSimTranslation.PosPV, FilterTime := T#20MS);
+instTranslationPosPV(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, GVL_Translation_M3_Stub.PosPV_DI, instSimTranslation.PosPV), FilterTime := T#20MS);
 TranslationPosPV := instTranslationPosPV.State;
 
-instTranslationPosP2(InputRaw := PosFosse2_DI OR instSimTranslation.PosP2, FilterTime := T#20MS);
+instTranslationPosP2(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosFosse2_DI, instSimTranslation.PosP2), FilterTime := T#20MS);
 TranslationPosP2 := instTranslationPosP2.State;
 
-instTranslationPosP1(InputRaw := PosFosse1_DI OR instSimTranslation.PosP1, FilterTime := T#20MS);
+instTranslationPosP1(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosFosse1_DI, instSimTranslation.PosP1), FilterTime := T#20MS);
 TranslationPosP1 := instTranslationPosP1.State;
 
-instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosMaintenance_DI, instSimTranslation.PosMaintenance), FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
+
+// 🆕 REX 2026-07-21 : Décodage immédiat du mot 5 capteurs position M3 (scan position 0)
+instPositionDecoder(
+    SensorTremie      := TranslationPosTremie,
+    SensorPV          := TranslationPosPV,
+    SensorP2          := TranslationPosP2,
+    SensorP1          := TranslationPosP1,
+    SensorMaintenance := TranslationPosMaintenance
+);
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
 M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
@@ -24660,6 +24744,8 @@ IF GVL_PLC_Tests.OverrideChainFalse THEN
 END_IF;
 IF GVL_PLC_Tests.OverrideContactorFalse THEN
     EmergencyStopOk := FALSE;
+ELSIF GVL_PLC_Tests.OverrideEmergencyStopOkTrue THEN
+    EmergencyStopOk := TRUE;
 END_IF;
 
 // Surcharges (overrides) du banc de tests — Translation M3 (niveau capteur amont uniquement)
@@ -25402,9 +25488,9 @@ instSafetyTranslationM3(
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
     // 🆕 REX 2026-07-18 : limites extrêmes dérivées du décodage 5 capteurs (mot valide), plus
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
-    LimitSwitchFwd      := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd,
-    LimitSwitchRev      := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev,
-    SensorWordIncoherent := PRG_07_TranslationControl.instPositionDecoder.Incoherent
+    LimitSwitchFwd      := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd,
+    LimitSwitchRev      := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev,
+    SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent
 );
 </xhtml>
           </ST>
@@ -26411,14 +26497,6 @@ GVL_Simulation.refWinchM2  REF= instWinchM2;
                 <derived name="FB_Translation" />
               </type>
             </variable>
-            <variable name="instPositionDecoder">
-              <type>
-                <derived name="FB_Translation_PositionDecoder" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : décodage mot 5 capteurs (AF_Partie-02 v2.12 §3bis)</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_StartStop_Active">
               <type>
                 <BOOL />
@@ -26478,17 +26556,7 @@ Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct</xhtml>
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
 
-// ── 0. DÉCODAGE MOT CAPTEURS (5 positions, indépendant du mode/de la cible) ─
-// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — remplace le câblage direct
-// des anciens capteurs Fosse1/Tremie sur LimitSwitchFwd/Rev par un décodage complet du mot
-// 5 bits (Trémie|PV|P2|P1|Maintenance), avec détection d'incohérence (capteur collé/HS).
-instPositionDecoder(
-    SensorTremie      := PRG_00_Inputs.TranslationPosTremie,
-    SensorPV          := PRG_00_Inputs.TranslationPosPV,
-    SensorP2          := PRG_00_Inputs.TranslationPosP2,
-    SensorP1          := PRG_00_Inputs.TranslationPosP1,
-    SensorMaintenance := PRG_00_Inputs.TranslationPosMaintenance
-);
+// ── 0. DÉCODAGE MOT CAPTEURS (exécuté en position 0 dans PRG_00_Inputs) ──────
 
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -26588,8 +26656,8 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
-    LimitSwitchFwd          := instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
-    LimitSwitchRev          := instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
+    LimitSwitchFwd          := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
+    LimitSwitchRev          := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
@@ -27123,15 +27191,24 @@ GVL_IHM.TranslationM3.ErrorId              := PRG_07_TranslationControl.instTran
 GVL_IHM.TranslationM3.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
 GVL_IHM.TranslationM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
 GVL_IHM.TranslationM3.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
-GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
-GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
-GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
-GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
-GVL_IHM.TranslationM3.SensorsWord         := PRG_07_TranslationControl.instPositionDecoder.SensorsWord;
-GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_07_TranslationControl.instPositionDecoder.Incoherent;
-GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
-GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+// 🧭 Position validée IHM : masquée (forcée à FALSE) si le mot capteurs est incohérent (position indéterminée)
+IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
+    GVL_IHM.TranslationM3.PositionTremie      := FALSE;
+    GVL_IHM.TranslationM3.PositionPV          := FALSE;
+    GVL_IHM.TranslationM3.PositionP2          := FALSE;
+    GVL_IHM.TranslationM3.PositionP1          := FALSE;
+    GVL_IHM.TranslationM3.PositionMaintenance := FALSE;
+ELSE
+    GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
+    GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
+    GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
+    GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
+    GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+END_IF;
+GVL_IHM.TranslationM3.SensorsWord         := PRG_00_Inputs.instPositionDecoder.SensorsWord;
+GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_00_Inputs.instPositionDecoder.Incoherent;
+GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd;
+GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev;
 GVL_IHM.TranslationM3.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
 GVL_IHM.TranslationM3.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
@@ -27954,6 +28031,14 @@ Force la boucle AU à TRUE</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à FALSE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="OverrideEmergencyStopOkTrue">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à TRUE (réarmé)</xhtml>
           </documentation>
         </variable>
         <variable name="OverrideM3AtTremie">

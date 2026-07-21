@@ -28,6 +28,7 @@ VAR_GLOBAL
     OverrideChainTrue          : BOOL;                // Force la boucle AU à TRUE
     OverrideChainFalse         : BOOL;                // Force la boucle AU à FALSE
     OverrideContactorFalse     : BOOL;                // Force le retour contacteur à FALSE
+    OverrideEmergencyStopOkTrue : BOOL;               // Force le retour contacteur à TRUE (réarmé)
 
     // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — Translation M3
     // (niveau capteur amont uniquement, jamais une sortie de commande calculée — voir

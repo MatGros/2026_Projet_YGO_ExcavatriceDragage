@@ -15,7 +15,10 @@ tests_implementation_paths: [] # fichiers ST du test/extension de suite
 tests_status: planned|implemented|executed
 test_execution_evidence: [] # résultat simulation/CODESYS, ajouté après exécution
 review_required: false
-# Règle : forbidden obligatoire pour C3/C4 et tout sujet safety détecté.
+# double_review_required : true obligatoire pour C4 et tout sujet safety.
+# Déclenche la procédure A/B parallèle (TEST_DESIGN + ST généré + revue safety).
+dual_review_required: false
+# Ponytail : forbidden obligatoire pour C3/C4 et tout sujet safety détecté.
 pony_tail: forbidden|allowed
 human_validation_required: true
 ```
@@ -24,6 +27,15 @@ Le fichier est préparé avant toute modification et reste spécifique à la tâ
 
 Ponytail est interdit pour : safety, normes, redondance, AU, PowerCutOff, SafeStop,
 freins, contacteurs, limites physiques, interlocks, homing safety et FAT/SAT.
+
+## Valeurs obligatoires par criticité
+
+| Champ | C0-C1 | C2-C3 | C4 |
+|---|---|---|---|
+| `tests_automated_required` | false | false / true | **true** |
+| `dual_review_required` | false | false | **true** |
+| `pony_tail` | allowed | allowed / forbidden | **forbidden** |
+| `human_validation_required` | true | true | **true** |
 
 ## Gate tests C3/C4
 

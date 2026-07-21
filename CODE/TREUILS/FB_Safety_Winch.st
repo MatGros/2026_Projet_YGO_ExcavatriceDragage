@@ -193,6 +193,7 @@ END_VAR
 VAR
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
+    FirstScanDone       : BOOL;
 
     // 🔧 REX 2026-07-07 — Méca A (bit7)
     CycleTimeCalc       : FB_CycleTime;
@@ -271,6 +272,13 @@ END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
 
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL
 IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN

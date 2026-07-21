@@ -58,6 +58,7 @@ VAR
     PostRampTimeout     : TIME := T#3S;
     UncommandedActiveB  : BOOL;
     UncommandedActiveA  : BOOL;
+    FirstScanDone       : BOOL;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -85,6 +86,13 @@ END_IF;
 
 Ready := TRUE;
 ResetEdge(CLK := Reset);
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
 
 // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
 IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
@@ -119,11 +127,11 @@ END_IF;
 // tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) > 3s
 IF NOT HeartbeatIhmOk THEN
     // 💓 Perte IHM : l'arrêt est exigé même si une ancienne Direction reste mémorisée.
-    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré avant de
+    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré (NOT BrakeFeedback) avant de
     // laisser l'escalade PowerCutOff intervenir après PostRampTimeout.
-    UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
+    UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
 ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-    UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+    UncommandedActiveB := DriveStatusWord.0 OR NOT BrakeFeedback;
 ELSE
     UncommandedActiveB := FALSE;
 END_IF;

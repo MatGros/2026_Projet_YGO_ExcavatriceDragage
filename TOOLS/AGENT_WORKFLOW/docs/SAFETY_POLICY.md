@@ -14,7 +14,16 @@ AU, PowerCutOff, SafeStop, frein, contacteur, redondance, fin de course, homing 
 Pour ces sujets :
 
 - Ponytail désactivé pour l'analyse et la justification ;
-- review croisée read-only ;
+- **Double revue parallèle A/B obligatoire** (voir `MODEL_ROUTING.md`) ;
 - tests et preuves explicitement listés ;
 - aucune modification silencieuse ;
 - aucun rapport ne peut conclure à une validation Safety normative.
+
+## 🔴 Double revue parallèle A/B — Procédure
+
+S'applique à : TEST_DESIGN, ST généré, toute revue C4 safety.
+
+1. Agent A et Agent B reçoivent **identiquement** le même contexte (TASK_CONTEXT + artefact).
+2. Les agents travaillent **sans se voir** — résultats collectés séparément.
+3. Pi analyse : consensus → synthèse humain ; divergence → 🚨 alerte + positions A/B côte à côte.
+4. L'humain tranche en cas de divergence. Aucun agent ne valide la safety.

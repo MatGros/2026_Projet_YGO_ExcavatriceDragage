@@ -2,14 +2,23 @@
 
 | Rôle | Responsabilité |
 |---|---|
-| Pi | orchestration et décision de workflow |
-| Modèle fort | architecture, code métier critique, safety assistée |
-| Modèle économique/OSS | résumé, documentation, contrôle simple |
-| Herdr | délégation/review optionnelle, un agent à la fois par défaut |
+| Pi | orchestration, qualification C0-C4, décision de workflow |
+| Modèle fort (High Effort) | architecture, code métier critique, génération ST safety C4 |
+| Modèle économique/OSS | résumé, documentation, contrôle simple C0-C1 |
+| Herdr Agent A | revue read-only parallèle (C4) — reçoit contexte sans voir Agent B |
+| Herdr Agent B | revue read-only parallèle (C4) — reçoit contexte sans voir Agent A |
+| Herdr (C2-C3) | revue read-only, 1 seul agent, advisory-only |
 | Python/pytest | preuves déterministes |
-| Automaticien | validation finale, safety, CODESYS, essais |
+| Automaticien | qualification finale C0-C4, validation safety, CODESYS, essais |
 
 Un agent secondaire ne commit pas et ne modifie pas le code en review.
+
+## Règle multi-modèle
+
+- **C0-C1** : Pi seul, aucun agent secondaire.
+- **C2-C3** : 1 agent Herdr en revue read-only uniquement.
+- **C4** : Double revue A/B parallèle obligatoire — pour TEST_DESIGN, ST généré et toute revue safety.
+- **Jamais** : multi-modèle systématique, `/opinion` ou `/fusion` automatiques.
 
 ## Source de vérité CODESYS
 
