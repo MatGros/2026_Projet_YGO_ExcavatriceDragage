@@ -1,67 +1,36 @@
-# 🧭 NAVBOARD — Fiche mémo Excavatrice Dragage
+# 🧭 NAVBOARD — Conditions de mouvement
 
-## 🗺️ Circulation des données
+## ✅ Commun à TOUT mouvement
+`Enable=1`·`EmergencyStopOk=1`·`DeadmanArmed=1`·`SafeStop=0`·`Error=0`·`PowerCutOff=0`
 
-```
-┌──────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────┐
-│ IHM  │◄─↕►│ GVL_IHM  │◄─↕►│ PRG_09  │◄─↕►│ PRG_XX  │◄─↕►│ FB_XX   │◄─↕►│ I/O │
-│ HMI  │    │ RETAIN   │    │Supervis.│    │Control  │    │Métier   │    │Phys.│
-└──────┘   └──────────┘   └──────────┘   └──────────┘   └──────────┘   └──────┘
-                                   ↕
-                             ┌──────────────┐
-                             │GVL_PERSISTENT│ ← tout paramètre réglable
-                             │ RETAIN       │
-                             └──────────────┘
-```
+## ↔️ Translation M3
 
-📎 Diagrammes détaillés par sous-système : `DOC/DIAGRAMS/CODE/DIAG_CODE_*.png`
+| Action | ✅=1 | ❌=0 | 👉 détail |
+|--------|------|------|-----------|
+| Avancer | `StartStop`·`Dir=+1` | `TargetReached`·`ArrivalLock`·`LimitSwitchFwd` | cible Trémie=1 |
+| Reculer | `StartStop`·`Dir=-1` | `LimitSwitchRev`·`TargetReached`·`ArrivalLock` | cible P2/P1/Maint |
+| Frein serré | `BrakeCmd=0` par `StartStop=0` ou `SafeStop=1` | — | rampe decel normale/rapide |
 
-## 📋 Sous-systèmes — fichiers clés
+## 🪣 Treuils M1/M2
 
-| Sous-système | Control | FB métier | Safety | IHM struct | PERSISTENT |
-|---|---|---|---|---|---|
-| 🕹️ Joystick | `PRG_01_Diagnostics` | `FB_Joystick` | — | `ST_JoystickHMI` | `_Joystick*` |
-| 🪣 Winch M1 | `PRG_06_WinchControl` | `FB_Winch` | `FB_Safety_Winch` | `ST_WinchHMI` | `_Winch*M1*` |
-| 🪣 Winch M2 | `PRG_06_WinchControl` | `FB_Winch` | `FB_Safety_Winch` | `ST_WinchHMI` | `_Winch*M2*` |
-| ↔️ Translation M3 | `PRG_07_TranslationControl` | `FB_Translation` | `FB_Safety_Translation` | `ST_TranslationHMI` | `_Translation*` |
-| 🗜️ Benne | `PRG_06_WinchControl` | `FB_Bucket` | — | `ST_BucketHMI` | `_Bucket*` |
-| 🔄 Synchro | `PRG_06_WinchControl` | `FB_WinchSync` | — | `ST_SyncHMI` | `_WinchSync*` |
-| 🛡️ Safety global | `PRG_03_Safety` | `FB_Safety_*` | — | `ST_ModesHMI` | — |
-| 🔄 Modes | `PRG_04_Modes` | `FB_Modes` | — | `ST_ModesHMI` | — |
-| 🔁 Cycle | `PRG_05_Cycle` | `FB_Cycle` | — | `ST_CycleHMI` | — |
+| Action | ✅=1 | ❌=0 |
+|--------|------|------|
+| Descendre | `StartStop`·`Dir=+1` | `CableLimitDescent_M`·`SpeedStep bloque`·`MecaE_SyncCritique` |
+| Monter | `StartStop`·`Dir=-1` | `CableLimitAscent_M`·`MecaE_SyncCritique` |
+| Frein serré | `BrakeCmd=0` par `StartStop=0`·`SafeStop=1`·`PowerCutOff=1` | — |
 
-## 🧱 Briques communes (COMMUN/)
+## 🗜️ Benne
 
-`FB_FilterPT1`·`FB_Brake`·`FB_Input_Digital`·`FB_Output_Relay`·`FB_Ramp`·`FB_AxisScale`·`FB_CycleTime`
+| Action | ✅=1 | ❌=0 |
+|--------|------|------|
+| Fermer | `CloseReq` | `GlissementM1`·`OffsetCloseM déjà`·M2 Ascent bloqué |
+| Ouvrir | `OpenReq` | `OffsetOpenM déjà`·M1/M2 différence cohérente |
+| Désynchro | `OffsetCloseM>0` et M2 bouge seul | `CoherenceLimitM` |
 
-## 🍳 5 recettes fréquentes
+## 🔄 Modes
 
-**① Ajouter un paramètre réglable IHM**
-```
-GVL_PERSISTENT (défaut+RETAIN) 
-  → PRG_09 (mapping vers FB si nécessaire)
-  → PRG_XX (câbler sur entrée FB)
-  → GVL_IHM (champ exposé, optionnel si QUALIFIED_ONLY)
-```
-
-**② Ajouter une valeur d'affichage IHM (lecture seule)**
-```
-Sortie FB → PRG_XX → PRG_09 (mapping ligne) → GVL_IHM champ → IHM
-```
-
-**③ Ajouter un défaut (ErrorId bit)**
-```
-FB_XX.ErrorId bit N → PRG_09 mapping (décapsulage booléen) → GVL_IHM
-→ Reset front R_TRIG + ResetEdge.Q pour effacer le bit
-```
-
-**④ Câbler un capteur TOR ou analogique**
-```
-PRG_00_Inputs (lecture I/O) → PRG_XX (logique) → FB_XX → PRG_09 → GVL_IHM
-```
-
-**⑤ Changer un paramètre existant**
-```
-Ne toucher QUE GVL_PERSISTENT (valeur par défaut) OU IHM (si exposé).
-RIEN dans les FB_*.st (leurs defaults sont des fallbacks, pas la source).
-```
+| Action | ✅=1 | ❌=0 |
+|--------|------|------|
+| Passer SEMI_AUTO | `ModeRequest=SEMI_AUTO`·`Ready=1`·`Not Busy` | tout mouvement en cours |
+| Passer MAINT_N1 | `ModeRequest=MAINT_N1`·`AU réarmé` | cycle actif |
+| Réarmer défaut | `Reset=↑` (front) | `cause défaut disparue` |
