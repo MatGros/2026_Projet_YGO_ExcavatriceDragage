@@ -1,0 +1,86 @@
+{
+  "autorun": false,
+  "terminals": [
+    {
+      "name": "🥧 Pi",
+      "cwd": "${workspaceFolder}",
+      "command": "pi",
+      "open": true,
+      "focus": false,
+      "icon": "hubot",
+      "color": "terminal.ansiCyan"
+    },
+    {
+      "name": "🚀 AGY Antigravity",
+      "cwd": "${workspaceFolder}",
+      "command": "agy",
+      "open": true,
+      "focus": false,
+      "icon": "rocket",
+      "color": "terminal.ansiBlue"
+    },
+    {
+      "name": "🧠 Claude Code",
+      "cwd": "${workspaceFolder}",
+      "command": "claude",
+      "open": true,
+      "focus": false,
+      "icon": "code",
+      "color": "terminal.ansiRed"
+    },
+    {
+      "name": "🦙 Claude Code (Ollama)",
+      "cwd": "${workspaceFolder}",
+      "command": "ollama launch claude --model gemma4:e4b",
+      "open": true,
+      "focus": false,
+      "icon": "cpu",
+      "color": "terminal.ansiBrightMagenta"
+    },
+    {
+      "name": "🔓 OpenCode",
+      "cwd": "${workspaceFolder}",
+      "command": "opencode --agent orchestrateur",
+      "open": true,
+      "focus": false,
+      "icon": "organization",
+      "color": "terminal.ansiBrightBlue"
+    },
+    {
+      "name": "🦙 OpenCode (Ollama)",
+      "cwd": "${workspaceFolder}",
+      "command": "ollama launch opencode --model gemma4:e4b",
+      "open": true,
+      "focus": false,
+      "icon": "cpu",
+      "color": "terminal.ansiBrightCyan"
+    },
+    {
+      "name": "✅ Gates",
+      "cwd": "${workspaceFolder}",
+      "command": "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys",
+      "open": true,
+      "focus": false,
+      "icon": "check",
+      "color": "terminal.ansiGreen"
+    },
+    {
+      "name": "🤠 Herdr",
+      "cwd": "${workspaceFolder}",
+      "command": "herdr start-agent claude",
+      "open": true,
+      "focus": false,
+      "icon": "robot",
+      "color": "terminal.ansiYellow"
+    },
+    {
+      "name": "📊 Workflow Graph",
+      "cwd": "${workspaceFolder}",
+      "command": "python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header",
+      "open": true,
+      "focus": false,
+      "icon": "graph",
+      "color": "terminal.ansiMagenta"
+    }
+  ]
+}

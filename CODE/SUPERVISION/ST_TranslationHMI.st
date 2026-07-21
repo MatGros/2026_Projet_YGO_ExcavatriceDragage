@@ -60,7 +60,7 @@ STRUCT
     (* 🛡️ Sécurité (FB_Safety_Translation) *)
     SafetyError             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
     SafetyErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
-    SafetyErrorJoystick     : BOOL;    (* 🎮 Perte joystick CANopen (bit0) *)
+    SafetyErrorOperatorComm : BOOL;    (* 🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0) *)
     SafetyErrorDriveComm    : BOOL;    (* 📡 Perte communication EtherCAT variateur (bit1) *)
     SafetyErrorPhaseRotation: BOOL;    (* ⚡ Mauvaise rotation de phases électriques (bit2) *)
     SafetyErrorBrakeThermal : BOOL;    (* 🌡️ Surchauffe thermique frein commun (bit3) *)

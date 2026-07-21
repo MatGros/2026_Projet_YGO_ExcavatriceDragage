@@ -15,6 +15,7 @@ VAR_INPUT
     Mode                : E_Mode;      // Mode courant
     JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
+    HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
     PhaseRotationOk     : BOOL;        // PRG_00_Inputs.PhaseRotationOk (TRUE = OK)
     BrakeThermalFeedback: BOOL;        // Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)
 
@@ -35,12 +36,12 @@ VAR_OUTPUT
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Perte Joystick / CAN" - perte joystick ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
+    ErrorId             : WORD;        // bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Décélération rapide (PLC)
     PowerCutOff         : BOOL;        // 🧨 Coup de poing / coupure puissance amont
-    ErrorJoystick       : BOOL;        // 🎮 Perte joystick / CANopen (bit0)
+    ErrorOperatorComm   : BOOL;        // 🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)
     ErrorDriveComm      : BOOL;        // 📡 Perte communication EtherCAT variateur (bit1)
     ErrorPhaseRotation  : BOOL;        // ⚡ Mauvaise rotation de phases (bit2)
     ErrorBrakeThermal   : BOOL;        // 🌡️ Surchauffe thermique frein commun (bit3)
@@ -67,7 +68,7 @@ IF NOT Enable THEN
     ErrorId := 16#0000;
     SafeStop := FALSE;
     PowerCutOff := FALSE;
-    ErrorJoystick := FALSE;
+    ErrorOperatorComm := FALSE;
     ErrorDriveComm := FALSE;
     ErrorPhaseRotation := FALSE;
     ErrorBrakeThermal := FALSE;
@@ -85,8 +86,8 @@ END_IF;
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
-// 🔍 2. PERTE JOYSTICK/CAN (bit0)
-IF (NOT JoystickOnline OR NOT JoystickOperational) THEN
+// 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
+IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -116,7 +117,12 @@ END_IF;
 // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
 // Si le translation est commandé à l'arrêt (Direction = 0 et frein appliqué) mais que le variateur 
 // tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) > 3s
-IF (Direction = 0) AND NOT BrakeCmd THEN
+IF NOT HeartbeatIhmOk THEN
+    // 💓 Perte IHM : l'arrêt est exigé même si une ancienne Direction reste mémorisée.
+    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré avant de
+    // laisser l'escalade PowerCutOff intervenir après PostRampTimeout.
+    UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
+ELSIF (Direction = 0) AND NOT BrakeCmd THEN
     UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
 ELSE
     UncommandedActiveB := FALSE;
@@ -179,7 +185,7 @@ SafeStop := Error OR NOT EmergencyStopOk;
 PowerCutOff := (ErrorId AND 16#00F8) <> 16#0000;
 
 // Décapsulage du bitfield ErrorId pour l'IHM
-ErrorJoystick       := (ErrorId AND 16#0001) <> 16#0000;
+ErrorOperatorComm   := (ErrorId AND 16#0001) <> 16#0000;
 ErrorDriveComm      := (ErrorId AND 16#0002) <> 16#0000;
 ErrorPhaseRotation  := (ErrorId AND 16#0004) <> 16#0000;
 ErrorBrakeThermal   := (ErrorId AND 16#0008) <> 16#0000;

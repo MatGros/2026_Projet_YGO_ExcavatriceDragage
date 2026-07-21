@@ -31,6 +31,7 @@ VAR_GLOBAL
     // bus/nœud CANopen (Joystick_IsReal) simulé sain, pour tester le joystick physique avant que le
     // diagnostic CANopen/EtherCAT ne soit fiabilisé (sans faux défaut CAN pendant ce test).
     JoystickSignal_IsReal      : BOOL := FALSE; // Signal joystick brut (RawX/RawY/RawButton uniquement)
+    IhmHeartbeat_IsReal        : BOOL := FALSE; // Heartbeat IHM Ethernet : FALSE = heartbeat simulé par GVL_Global.BlinkClock
 
     // ── Capteurs/retours câblés (I/O discrètes, indépendantes du bus) ──────────
     EmergencyStopChain_IsReal  : BOOL := FALSE; // Chaîne AU câblée (EmergencyStopOk_DI)

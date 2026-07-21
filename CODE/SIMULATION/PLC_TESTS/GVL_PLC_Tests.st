@@ -22,6 +22,7 @@ VAR_GLOBAL
     SuiteBucketValidation      : ST_TestSuiteReport;  // Rapport de la suite Bucket
     SuiteEncoderValidation     : ST_TestSuiteReport;  // Rapport de la suite Codeurs/Homing nominal
     SuiteModesValidation       : ST_TestSuiteReport;  // Rapport de la suite Modes/Homme-mort (post-IHM_MANU)
+    SuiteHeartbeatValidation   : ST_TestSuiteReport;  // Rapport de la suite Heartbeat IHM↔PLC
 
     // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — chaîne Safety AU
     OverrideChainTrue          : BOOL;                // Force la boucle AU à TRUE
@@ -51,4 +52,15 @@ VAR_GLOBAL
     OverrideJoystickRawX       : INT;                // Débattement axe X simulé (5000=neutre, 10000=fond)
     OverrideJoystickRawY       : INT;                // Débattement axe Y simulé (5000=neutre, 10000=fond)
     OverrideJoystickRawButton  : BOOL;               // Appui homme-mort simulé
+
+    // 💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01.
+    // Aucun test n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
+    OverrideIhmHeartbeatActive : BOOL;               // TRUE = le banc fournit le toggle IHM
+    OverrideIhmHeartbeatToggle : BOOL;               // Valeur IHM→PLC, figée ou inversée par FB_HeartbeatValidation
+
+    // 🛡️ Surcharges retours arrêt M1/M2 — polaires inversées : arrêt confirmé = TRUE.
+    OverrideM1FwdRevSpeedFbOff : BOOL;               // TRUE = contacteurs retombés (sain)
+    OverrideM1BrakeFeedback    : BOOL;               // TRUE = frein serré (sain)
+    OverrideM2FwdRevSpeedFbOff : BOOL;               // TRUE = contacteurs retombés (sain)
+    OverrideM2BrakeFeedback    : BOOL;               // TRUE = frein serré (sain)
 END_VAR

@@ -272,3 +272,17 @@ END_IF;
 IF GVL_PLC_Tests.OverrideM3PhantomFreq THEN
     M3_ActualFrequencyHz_Filtered := 100; // 🧪 Simule Méca A : 1.00Hz mesuré malgré arrêt commandé (seuil 0.5Hz)
 END_IF;
+
+// 🛡️ Surcharges retours arrêt M1/M2 — polarité inverse : arrêt confirmé = TRUE.
+IF GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff THEN
+    M1FwdRevSpeedFeedbackOff := GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff;
+END_IF;
+IF GVL_PLC_Tests.OverrideM1BrakeFeedback THEN
+    M1BrakeFeedback := GVL_PLC_Tests.OverrideM1BrakeFeedback;
+END_IF;
+IF GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff THEN
+    M2FwdRevSpeedFeedbackOff := GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff;
+END_IF;
+IF GVL_PLC_Tests.OverrideM2BrakeFeedback THEN
+    M2BrakeFeedback := GVL_PLC_Tests.OverrideM2BrakeFeedback;
+END_IF;

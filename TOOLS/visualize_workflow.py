@@ -1,158 +1,188 @@
 #!/usr/bin/env python3
-"""Generate Mermaid diagram of the project workflow gates and their interactions.
+"""Generate Pro-style PlantUML diagrams for the project workflow.
 
-Outputs:
-- Mermaid diagram (stdout)
-- Can be piped to file: python visualize_workflow.py > workflow.mmd
-- View in VS Code (Markdown preview), GitHub, or Mermaid live editor
+Replaces old Mermaid diagrams with modern, high-definition PNG images.
+- workflow: read from AGENT_WORKFLOW/config/workflow_diagram.json;
+- structure: built from the AGENT_WORKFLOW filesystem.
 """
 
 from __future__ import annotations
 
 import argparse
-import sys
+import base64
+import html
+import json
+import re
+import struct
+import urllib.request
+import zlib
 from pathlib import Path
 
+# Le serveur public PlantUML rejette/coupe silencieusement tout raster
+# au-delà de ~4096px (PLANTUML_LIMIT_SIZE). On se garde une marge et on
+# force systématiquement une directive `scale max` (la seule qui empêche
+# réellement le crop côté serveur - contrairement aux skinparam
+# maxImageWidth/maxImageHeight qui ne le font PAS de façon fiable).
+PLANTUML_SERVER_HARD_LIMIT = 4096
+SAFE_MAX_DIM = 3800
 
-MERMAID_TEMPLATE = """```mermaid
-flowchart TD
-    %% ============================================================
-    %% WORKFLOW GATES PIPELINE - MGS Project
-    %% Generated automatically by visualize_workflow.py
-    %% ============================================================
+# --- Style PlantUML "Pro" Centralisé ---
+PUML_STYLE = """
+' --- Style Configuration ---
+' RÈGLE GÉNÉRALE : Utilisation des emojis autorisée et recommandée pour réduire la taille du texte et favoriser une lecture visuelle intuitive.
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 10
+skinparam fontname "Segoe UI"
+skinparam fontsize 14
+skinparam ArrowColor #455A64
+skinparam ArrowThickness 1.5
 
-    subgraph INPUT["[IN] ENTRÉES"]
-        A1[CODE_CHANGE\nModification programme/bug]
-        A2[NEW_INFORMATION\nClient/chantier/essai]
-    end
-
-    subgraph REFINEMENT["[REF] REFINEMENT & PLANNING"]
-        B1[Pre-edit Gate\npre_edit_gate.py\n-> Specs DOC lues ?]
-        B2[Requirement Intake\nrequirement_intake skill\n-> NEW_INFORMATION qualifiee]
-        B3[Scope & Criticite\nC0-C4 + Ponytail policy]
-        B4[Plan d'action\nFix + Guard]
-    end
-
-    subgraph GATES["[GATE] GATES DÉTERMINISTES (run_all_gates.py)"]
-        C1[Gate 1: Structure\ncheck_structure.py\n-> Arborescence CODE/]
-        C2[Gate 2: Code Style\ncheck_code_style.py\n-> Tokens interdits\n-> VAR_OUTPUT writes\n-> Homme-mort (W1)\n-> FDC sans rampe (W3)\n-> DESIGN comments (W5)\n-> Refs DOC]
-        C3[Gate 3: Bundle Freshness\ncheck_bundle_freshness.py\n-> Regeneration deterministe]
-        C4[Gate 4: PyTest\npytest (306 tests)\n-> Generateur\n-> Tests integration\n-> Tests unitaires]
-        C5[Gate 5: CODESYS Compile\ncheck_codesys_compile.py\n-> Log build -> 0 erreur]
-    end
-
-    subgraph VALIDATION["[OK] VALIDATION HUMAINE"]
-        D1[Review Herdr\nRead-only, advisory-only]
-        D2[Compilation CODESYS\nImport bundle + Build]
-        D3[Essais Simulation\nBanc PLC_TESTS]
-        D4[Validation Terrain\nFAT/SAT]
-    end
-
-    subgraph TRACEABILITY["[DOC] TRAÇABILITÉ"]
-        E1[fix: correction locale]
-        E2[guard: gate/template/script]
-        E3[WORKFLOW.md double boucle]
-        E4[VERSION_HISTORY.md]
-        E5[PLAN_TASK.md]
-    end
-
-    %% Flux principal
-    A1 --> B1
-    A2 --> B2
-    B1 --> B3
-    B2 --> B3
-    B3 --> B4
-    B4 --> C1
-
-    %% Gates sequentiels
-    C1 --> C2
-    C2 --> C3
-    C3 --> C4
-    C4 --> C5
-
-    %% Gate 5 optionnel (si compilation dispo)
-    C5 -.->|Si log dispo| D2
-
-    %% Validation
-    C5 --> D1
-    D1 --> D2
-    D2 --> D3
-    D3 --> D4
-
-    %% Tracabilite (double boucle)
-    D4 --> E1
-    D4 --> E2
-    E1 --> E3
-    E2 --> E3
-    E3 --> E4
-    E3 --> E5
-
-    %% Feedbacks loops
-    C2 -.->|ERROR| B4
-    C4 -.->|FAIL| B4
-    C5 -.->|Erreur Cxxxx| B4
-    D2 -.->|Erreur build| B4
-
-    %% Styles
-    classDef input fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef refinement fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;
-    classDef gate fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef validation fill:#fce4ec,stroke:#c2185b,stroke-width:2px;
-    classDef trace fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-
-    class A1,A2 input;
-    class B1,B2,B3,B4 refinement;
-    class C1,C2,C3,C4,C5 gate;
-    class D1,D2,D3,D4 validation;
-    class E1,E2,E3,E4,E5 trace;
-
-    %% Clickable links (GitHub/Markdown)
-    click A1 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md" "CODE_CHANGE workflow"
-    click A2 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/prompts/requirement-intake.md" "NEW_INFORMATION intake"
-    click C1 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/scripts/check_structure.py" "Structure check"
-    click C2 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py" "Code style check"
-    click C3 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/scripts/check_bundle_freshness.py" "Bundle freshness"
-    click C4 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/tree/main/TOOLS/ST_PLCOPENXML_GENERATOR/tests" "PyTest suite"
-    click C5 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/scripts/check_codesys_compile.py" "CODESYS compile check"
-    click E3 "https://github.com/MatGros/2026_Projet_YGO_ExcavatriceDragage/blob/main/TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md" "Double-loop rule"
-```
-
-
-**Legende :**
-- [BLUE] Bleu = Entrees
-- [ORANGE] Orange = Refinement/Planning
-- [GREEN] Vert = Gates deterministes (bloquants)
-- [PURPLE] Rose = Validation humaine (non automatisable)
-- [VIOLET] Violet = Tracabilite / Double boucle
-
-**Fleches :**
-- Pleines = flux normal
-- Pointillees = optionnel / conditionnel
-- Rouge pointille = boucles de retroaction (retour en arriere si echec)
+' --- Colors ---
+!define REFINEMENT_COLOR #FFE0B2
+!define GATE_COLOR #C8E6C9
+!define VALIDATION_COLOR #F8BBD0
+!define TRACE_COLOR #E1BEE7
+!define INPUT_COLOR #BBDEFB
+!define DIRECTORY_COLOR #E3F2FD
+!define ROOT_COLOR #263238
 """
 
+def plantuml_encode(puml_text):
+    """Encode PlantUML text for the official server API."""
+    compressor = zlib.compressobj(level=-1, method=zlib.DEFLATED, wbits=-15)
+    zlib_data = compressor.compress(puml_text.encode("utf-8"))
+    zlib_data += compressor.flush()
+    base64_data = base64.b64encode(zlib_data).decode("utf-8")
+    std_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    puml_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
+    table = str.maketrans(std_chars, puml_chars)
+    return base64_data.translate(table)
+
+def _ensure_scale_safety(puml_text: str, max_dim: int = SAFE_MAX_DIM) -> str:
+    """Injecte `scale max WxH` après @startuml si absent, pour empêcher
+    tout dépassement de la limite serveur PlantUML (crop silencieux)."""
+    if "scale " in puml_text:
+        return puml_text
+    lines = puml_text.splitlines()
+    for i, line in enumerate(lines):
+        if line.strip().startswith("@startuml"):
+            lines.insert(i + 1, f"scale max {max_dim}x{max_dim}")
+            return "\n".join(lines)
+    return puml_text
+
+
+def _read_png_dimensions(data: bytes) -> tuple[int, int]:
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("signature PNG absente/invalide")
+    width, height = struct.unpack(">II", data[16:24])
+    return width, height
+
+
+def render_puml(puml_text, output_path: Path, output_format="png") -> bool:
+    """Render PlantUML text to an image file via the official server.
+
+    Injecte une garde anti-crop puis valide le résultat (taille fichier +
+    dimensions réelles du PNG). Retourne True si le diagramme est fiable,
+    False sinon (fichier quand même écrit pour inspection)."""
+    puml_text = _ensure_scale_safety(puml_text) if output_format == "png" else puml_text
+    encoded = plantuml_encode(puml_text)
+    url = f"http://www.plantuml.com/plantuml/{output_format}/{encoded}"
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    try:
+        with urllib.request.urlopen(req) as response:
+            if response.status != 200:
+                print(f"[ECHEC] {output_path.name} : serveur PlantUML HTTP {response.status}")
+                return False
+            data = response.read()
+    except Exception as e:
+        print(f"[ECHEC] {output_path.name} : rendu PlantUML impossible ({e})")
+        return False
+
+    output_path.write_bytes(data)
+
+    if len(data) < 5000:
+        print(f"[ECHEC] {output_path.name} : fichier suspect ({len(data)} octets, probablement une erreur PlantUML)")
+        return False
+
+    if output_format != "png":
+        print(f"[OK] {output_path.name} ({len(data)} octets)")
+        return True
+
+    try:
+        width, height = _read_png_dimensions(data)
+    except ValueError as e:
+        print(f"[ECHEC] {output_path.name} : {e}")
+        return False
+
+    if width >= PLANTUML_SERVER_HARD_LIMIT or height >= PLANTUML_SERVER_HARD_LIMIT:
+        print(
+            f"[ECHEC] {output_path.name} : {width}x{height}px atteint/dépasse la limite "
+            f"serveur ({PLANTUML_SERVER_HARD_LIMIT}px) -> diagramme probablement CROPPED. "
+            f"Réduire SAFE_MAX_DIM ou scinder le diagramme en plusieurs vues."
+        )
+        return False
+
+    print(f"[OK] {output_path.name} généré ({width}x{height}px, {len(data)} octets)")
+    return True
+
+def load_manifest(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+def build_workflow_puml(manifest: dict) -> str:
+    # Layout dot (defaut) produit un canvas natif trop grand pour ce nombre
+    # de noeuds -> le serveur PlantUML clippe avant meme d'appliquer `scale`.
+    # smetana tasse le layout et reste dans la limite serveur.
+    lines = ["@startuml Workflow", "!pragma layout smetana", PUML_STYLE]
+    lines.append('title Workflow de Développement Automate (Hybride Pi + Claude)')
+    
+    nodes_by_group = {}
+    for node in manifest["nodes"]:
+        nodes_by_group.setdefault(node.get("group"), []).append(node)
+    
+    color_map = {
+        "INPUT": "BBDEFB",
+        "REFINEMENT": "FFE0B2",
+        "GATES": "C8E6C9",
+        "VALIDATION": "F8BBD0",
+        "TRACEABILITY": "E1BEE7"
+    }
+    
+    for group in manifest["groups"]:
+        puml_color = color_map.get(group["id"], "EEEEEE")
+        lines.append(f'rectangle "{group["label"]}" as {group["id"]} #{puml_color} {{')
+        for node in nodes_by_group.get(group.get("id"), []):
+            label_text = node["label"].replace("\n", "\\n")
+            lines.append(f'    rectangle "{label_text}" as {node["id"]}')
+        lines.append("}")
+    
+    for edge in manifest["edges"]:
+        source, target = edge[0], edge[1]
+        edge_label = f' : {edge[2]}' if len(edge) > 2 else ""
+        style = edge[3] if len(edge) > 3 else "solid"
+        arrow = ".." if style == "dotted" else "--"
+        lines.append(f"{source} {arrow}> {target}{edge_label}")
+    
+    lines.append("@enduml")
+    return "\n".join(lines)
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate Mermaid workflow diagram")
-    parser.add_argument("-o", "--output", type=Path, help="Output file (default: stdout)")
-    parser.add_argument("--no-header", action="store_true", help="Omit markdown code fence")
+    project_root = Path(__file__).resolve().parents[1]
+    workflow_root = project_root / "TOOLS" / "AGENT_WORKFLOW"
+    manifest = workflow_root / "config" / "workflow_diagram.json"
+
+    parser = argparse.ArgumentParser(description="Generate Pro PlantUML diagrams")
+    parser.add_argument("--output-dir", type=Path, default=project_root / "DOC" / "DIAGRAMS")
     args = parser.parse_args()
+    workflow_dir = args.output_dir / "TOOLS"
+    workflow_dir.mkdir(parents=True, exist_ok=True)
 
-    content = MERMAID_TEMPLATE
-    if args.no_header:
-        # Extract just the mermaid content
-        lines = content.split('\n')
-        # Remove first and last line (```mermaid and ```)
-        content = '\n'.join(lines[1:-1])
+    # 1. Workflow
+    print("Génération du Workflow...")
+    workflow_puml = build_workflow_puml(load_manifest(manifest))
+    ok = render_puml(workflow_puml, workflow_dir / "DIAG_WF_DevelopmentWorkflow.png")
 
-    if args.output:
-        args.output.write_text(content, encoding="utf-8")
-        print(f"Written to {args.output}")
-    else:
-        print(content)
-
-    return 0
-
+    return 0 if ok else 1
 
 if __name__ == "__main__":
     raise SystemExit(main())

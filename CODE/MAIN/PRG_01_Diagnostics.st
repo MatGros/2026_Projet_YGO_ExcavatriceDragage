@@ -12,6 +12,7 @@ VAR
     instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
     FB_Joystick_0    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
     instSimJoystick  : FB_Sim_Joystick;      // 🧪 Simulation joystick (Lot 3 — voir CODE/SIMULATION/)
+    instIhmHeartbeat : FB_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_01_Diagnostics) ===
@@ -54,6 +55,20 @@ instDiagEthercat(
     DeviceEncoderM1State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
     DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal),
     DeviceEncoderM2State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
+);
+
+// 💓 2bis. Heartbeat IHM↔PLC — appelé avant PRG_03_Safety pour fournir le statut même cycle.
+instIhmHeartbeat(
+    Enable := TRUE,
+    // 🧪 Sans IHM réelle sur banc, BlinkClock fournit un toggle sain ; mettre
+    // IhmHeartbeat_IsReal := TRUE pour tester une perte/reprise réelle du heartbeat IHM.
+    HeartbeatIhmToggle := SEL(GVL_PLC_Tests.OverrideIhmHeartbeatActive,
+                              SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.IhmHeartbeat_IsReal,
+                                  GVL_IHM.Commun.HeartbeatIhmToggle,
+                                  GVL_Global.BlinkClock),
+                              GVL_PLC_Tests.OverrideIhmHeartbeatToggle),
+    IhmTimeout := T#2s,
+    PlcTogglePeriod := T#500ms
 );
 
 // 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT JoystickSignal_IsReal

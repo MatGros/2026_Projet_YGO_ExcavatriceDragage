@@ -11,6 +11,7 @@ VAR_INPUT
     Reset               : BOOL;         // Acquittement défaut (front)
     EmergencyStopOk     : BOOL;         // Chaîne de sécurité OK
     CycleMotionPermit   : BOOL;         // Homme-mort + joystick actif
+    HeartbeatIhmOk      : BOOL;         // 💓 IHM↔PLC valide ; FALSE = repli cycle obligatoire
 
     // Commandes opérateur
     StartCycle          : BOOL;         // Demande lancement / reprise cycle (IHM)
@@ -55,7 +56,7 @@ VAR_OUTPUT
     Busy                : BOOL;         // Cycle automatique actif
     Done                : BOOL;         // Cycle automatique complété
     Error               : BOOL;         // Défaut cycle
-    ErrorId             : WORD;         // bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible, bit4: écart vitesse M1/M2 confirmé
+    ErrorId             : WORD;         // bit0: Timeout descente/limite, bit1: désynchronisme treuils, bit2: cible invalide, bit3: stabilisation M1/M2 impossible, bit4: écart vitesse M1/M2 confirmé, bit5: perte heartbeat IHM
     SpeedMismatchMps    : REAL;         // Écart absolu de vitesse M1/M2 (m/s)
     SpeedMismatchActive : BOOL;         // Seuil vitesse dépassé sur le cycle courant
     SpeedMismatchConfirmed : BOOL;      // Écart vitesse confirmé pendant SpeedMismatchTimeout
@@ -167,6 +168,13 @@ IF ResetEdge.Q THEN
     IF State = E_CycleStep.ERROR_HOLD THEN
         State := E_CycleStep.INIT;
     END_IF;
+END_IF;
+
+// 💓 Perte IHM : repli mémorisé. La reconnexion seule ne relance jamais le cycle.
+IF NOT HeartbeatIhmOk AND State <> E_CycleStep.ERROR_HOLD THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0020;
+    State := E_CycleStep.ERROR_HOLD;
 END_IF;
 
 // Défaut de synchronisme : arrêt sûr et acquittement obligatoire.

@@ -4,12 +4,28 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.19_CommissioningPrep` — 2026-07-21
+- Préparation version mise en service terrain (pre-commissioning)
+- Audit treuils M1/M2 (`DOC/AUDIT_Winch_v1.0.md`), suites PLC_TESTS validées
+- Génération du bundle PLCopenXML `MGS_v0.4.19_CommissioningPrep`
+
+---
+
 ### `v0.4.18_PlcTests_ManualSuites` — 2026-07-19
 - Suites PLC_TESTS séparées : `RunSafety`, `RunTranslation`, `RunBucket`, `RunEncoder`, `RunModes`
 - `RunAll` déprécié/ignoré : aucun lancement automatique au chargement
 - Manager en lecture seule des sorties FB ; correction des erreurs CODESYS C0037
 - Watchdog : arrêt + rapport de la suite active, sans blocage des autres suites
 - AF Partie 14 complétée par l'addendum suites manuelles indépendantes
+
+---
+
+### `Audit_Winch_v1.0` — 2026-07-21
+- Audit complet fonctionnalité treuils (M1/M2) : architecture, safety, synchronisme, IHM, ergonomie
+- 2 P0 critiques : incohérence hauteurs (8.0/8.5/12.5m), FB_SpeedStep MaxStepNumber non borné
+- 5 P1 : contradiction "sans codeur", latence PRG_03/PRG_06, synchronisme ambigu, seuils non validés, IHM ne reflète pas commandes effectives
+- Bonnes/mauvaises idées identifiées, plan d'actions en 3 phases (P0 avant machine, banc, terrain)
+- Doc créée : `DOC/AUDIT_Winch_v1.0.md`
 
 ---
 
