@@ -6,34 +6,34 @@
 TYPE ST_WinchHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
-    TopSensorPositionM      : REAL := 8.5;      (* 📐 Position cible du capteur haut (m) *)
-    HomingTargetM           : REAL := 0.0;      (* 🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m] *)
+    TopSensorPosition_M      : REAL := 8.5;      (* 📐 Position cible du capteur haut (m) *)
+    HomingTarget_M           : REAL := 0.0;      (* 🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m] *)
     MaxStepDescente         : INT := 3;         (* 🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
                                                     commun M1/M2 (même profil de déplacement), miroir bidirectionnel
                                                     _WinchMaxStepDescent (voir PRG_09_Supervision),
-                                                    même principe que CableLimitDescentM/SlowdownDistanceM/SlowSpeedPct *)
+                                                    même principe que CableLimitDescent_M/SlowdownDistance_M/SlowSpeed_Pct *)
     RampAccelRate           : REAL := 50.0;     (* 📈 Rampe d'accélération (%/s) *)
     RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     RampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
-    CableLimitDescentM      : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
-    CableLimitAscentM       : REAL := 8.0;      (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) —
-                                                    distincte de TopSensorPositionM (8.5m, réservé au Homing) *)
-    SlowdownDistanceM       : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
-    SlowSpeedPct            : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
+    CableLimitDescent_M      : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
+    CableLimitAscent_M       : REAL := 8.0;      (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) —
+                                                    distincte de TopSensorPosition_M (8.5m, réservé au Homing) *)
+    SlowdownDistance_M       : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
+    SlowSpeed_Pct            : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
 
     (* 🚦 États & Mesures (Lecture seule) *)
-    PositionM               : REAL;             (* 📊 Position actuelle du câble (mètres) *)
-    MeasuredSpeedMps        : REAL;             (* 📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue *)
-    SpeedDeltaMps            : REAL;             (* 🔍 Variation de vitesse entre deux scans (m/s) *)
+    Position_M               : REAL;             (* 📊 Position actuelle du câble (mètres) *)
+    MeasuredSpeed_Mps        : REAL;             (* 📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue *)
+    SpeedDelta_Mps            : REAL;             (* 🔍 Variation de vitesse entre deux scans (m/s) *)
     SpeedVariationDetected   : BOOL;            (* 🔍 Seuil de variation dépassé sur le scan courant *)
     SpeedVariationConfirmed  : BOOL;            (* 🛡️ Variation confirmée pendant la durée paramétrée *)
     SpeedStable               : BOOL;            (* 🟢 Vitesse stable pendant la durée paramétrée *)
     SpeedMonitorError        : BOOL;             (* 🔴 Défaut mémorisé du moniteur vitesse *)
     SpeedMonitorErrorId      : WORD;             (* ❌ Bitfield du moniteur vitesse *)
-    EstimatedLoadPct         : REAL;             (* 📊 Estimation empirique, non certifiée *)
+    EstimatedLoad_Pct         : REAL;             (* 📊 Estimation empirique, non certifiée *)
     LoadEstimateConfigured    : BOOL;             (* 🟢 Table charge validée pour lecture *)
     SpeedGuardLimited         : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
-    SpeedRefPct             : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
+    SpeedRef_Pct             : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l'automate interne (FB_Winch) *)
     Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
@@ -69,7 +69,7 @@ STRUCT
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)
     EncoderFaultBypassActive: BOOL;             (* 🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
     CableLimitDescentReached: BOOL;             (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
-    CableLimitAscentReached : BOOL;             (* ⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscentM) *)
+    CableLimitAscentReached : BOOL;             (* ⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscent_M) *)
     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
@@ -94,8 +94,8 @@ STRUCT
     SafetyErrorId           : WORD;             (* ❌ Code bitfield du défaut de sécurité *)
     InhibitActive           : BOOL;             (* 🆕 REX 2026-07-08 : miroir lecture seule — confirme que
                                                     l'inhibition a bien été arbitrée (actif seulement si MAINT_N2) *)
-    MecaADriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM *)
-    MecaCDriftM             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM *)
+    MecaADrift_M             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM *)
+    MecaCDrift_M             : REAL;             (* 🆕 REX 2026-07-08 : dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM *)
     MecaBElapsedTime        : TIME;             (* 🆕 REX 2026-07-08 : temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout *)
 END_STRUCT
 END_TYPE

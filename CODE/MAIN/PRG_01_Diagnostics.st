@@ -95,12 +95,12 @@ FB_Joystick_0(
     RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
     RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
     Calibrate           := GVL_IHM.JoystickJOY1.Calibrate,
-    InvertX             := FALSE,
-    InvertY             := FALSE,
-    Deadband            := 10.0,
-    FilterTime          := TIME#100ms,
-    AccelRate           := 50.0,
-    DecelRate           := 150.0,
+    InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
+    InvertY             := _JoystickInvertY,       // 🔧 idem
+    Deadband            := _JoystickDeadband_Pct,  // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
+    FilterTime          := _JoystickFilterTime,    // 🔧 idem
+    AccelRate           := _JoystickAccelRate_Pct, // 🔧 idem
+    DecelRate           := _JoystickDecelRate_Pct, // 🔧 idem
     // 🛡️ Délais de sécurité Homme-Mort : temporisations courtes (10s/500ms) si joystick réel, longues (5min/1s) si simulé
     DeadmanRearmTimeout := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#5M, T#10S),
     NeutralHoldTime     := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.JoystickSignal_IsReal, T#1S, T#500MS)

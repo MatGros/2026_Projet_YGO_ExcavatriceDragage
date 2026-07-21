@@ -6,10 +6,10 @@
 TYPE ST_SyncHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
-    SyncToleranceM      : REAL := 0.25;     (* 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M *)
+    SyncTolerance_M      : REAL := 0.25;     (* 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M *)
 
     (* 🚦 États (Lecture seule) *)
-    DeltaPosM           : REAL;             (* 📊 Écart de position réel mesuré (m) *)
+    DeltaPos_M           : REAL;             (* 📊 Écart de position réel mesuré (m) *)
     SyncActive          : BOOL;             (* ⚖️ Indicateur si surveillance active *)
     SyncWarn            : BOOL;             (* ⚠️ LED d'alarme écart hors tolérance *)
     Ready               : BOOL;             (* 🟢 Bloc de synchro prêt *)

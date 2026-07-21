@@ -11,7 +11,7 @@ STRUCT
     SelectedTargetNum       : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
     ReqFwd                  : BOOL;    (* ↔️ Requête marche avant manuelle (bouton IHM, pas encore arbitrée) *)
     ReqRev                  : BOOL;    (* ↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
-    FreqSetpointHz          : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs *)
+    FreqSetpoint_Hz          : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs *)
     JoystickSelect          : BOOL;    (* 🕹️ TRUE = joystick, FALSE = boutons ReqFwd/ReqRev *)
 
     (* 🚦 États & diagnostics FB_Translation *)
@@ -24,11 +24,11 @@ STRUCT
     BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein (lecture seule, TRUE = desserré) *)
     BrakeFeedback           : BOOL;    (* 🔌 Retour physique de l'état du frein *)
     PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
-    DriveActualFreqHz       : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
+    DriveActualFreq_Hz       : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
     DriveControlWord        : WORD;    (* ⚙️ Mot de commande AC600 réellement appliqué *)
-    DriveFreqRefHz          : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
+    DriveFreqRef_Hz          : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
     ActiveDirection          : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
-    ActiveSpeedRefPct        : REAL;    (* 📊 Consigne active après arbitrage *)
+    ActiveSpeedRef_Pct        : REAL;    (* 📊 Consigne active après arbitrage *)
 
     (* 🔌 Diagnostic variateur EtherCAT (décodé — pas de bit-masking côté IHM) *)
     DriveCommReady          : BOOL;    (* 📡 Variateur M3 : communication prête (StatusWord bit7) *)
