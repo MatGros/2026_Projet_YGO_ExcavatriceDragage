@@ -51,12 +51,12 @@ IF IhmEdgeDetected THEN
     IhmEdgeSeen := TRUE;
 END_IF;
 
-// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout même sans front,
-// mais HeartbeatIhmOk reste FALSE tant qu'un premier front post-boot n'est pas observé.
+// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout au bout de IhmTimeout.
+// HeartbeatIhmOk reste TRUE tant que le timeout n'est pas expiré (boot propre sans alarme au scan 1).
 IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
 TimeSinceIhmEdge := IhmTimeoutTon.ET;
 HeartbeatIhmTimeout := IhmTimeoutTon.Q;
-HeartbeatIhmOk := IhmEdgeSeen AND NOT HeartbeatIhmTimeout;
+HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
 
 // 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
 PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);

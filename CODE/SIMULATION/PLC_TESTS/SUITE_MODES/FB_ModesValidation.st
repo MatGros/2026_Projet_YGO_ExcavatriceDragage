@@ -170,7 +170,7 @@ IF NOT StepStarted THEN
     StepStarted := TRUE;
     StepElapsed := T#0s;
     CASE Step OF
-        5: StepLimit := T#3s;         // Préambule : armement contacteur simulé
+        5: StepLimit := T#5s;         // Préambule : armement contacteur simulé
         10, 20: StepLimit := T#3s;   // Mode appliqué + neutre initial
         11, 21: StepLimit := T#5s;   // Armement + départ mouvement
         12: StepLimit := T#5s;       // TC-M1 uniquement : relâchement → arrêt

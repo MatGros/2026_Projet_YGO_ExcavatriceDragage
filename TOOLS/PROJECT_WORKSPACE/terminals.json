@@ -81,6 +81,15 @@
       "focus": false,
       "icon": "graph",
       "color": "terminal.ansiMagenta"
+    },
+    {
+      "name": "🌐 OmniRoute Server",
+      "cwd": "${workspaceFolder}",
+      "command": "omniroute",
+      "open": true,
+      "focus": false,
+      "icon": "server",
+      "color": "terminal.ansiBrightGreen"
     }
   ]
 }

@@ -23,17 +23,27 @@ PRJ_CODESYS/
 launch_workspace.bat
 launch_workspace.ps1
 
-# WSL/tmuxinator config (local)
+# WSL / Tmuxinator / Tests
 .tmuxinator/
+.pytest_cache/
+.pytest-run/
 
-# Pi spec read state (local)
-.pi/spec_read_state.json
-.pi/git/
+# Outils / Agents / Plugins tiers
 .agents/
+.codex/
+.immorterm/
+.opencode/
+.pi/
+opencode.json
+.mcp.json
+package-lock.json
 
-# IDE / agents locaux
+# Configuration et caches IDE
+.cursor/
+.windsurf/
+.clinerules/
+.vscode/
 .claude/
 .mgs-workspace.code-workspace
-.opencode/
-.vscode/
-node_modules
+node_modules/
+

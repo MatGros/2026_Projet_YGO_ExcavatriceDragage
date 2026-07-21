@@ -142,6 +142,7 @@ VAR
     DirectionChangePending : BOOL;
     EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
     ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
+    FirstScanDone       : BOOL;
 END_VAR
 
 IF NOT Enable OR NOT EmergencyStopOk THEN
@@ -160,6 +161,13 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     Error := FALSE;
+    ErrorId := 16#0000;
+    RETURN;
+END_IF;
+
+// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
     ErrorId := 16#0000;
     RETURN;
 END_IF;

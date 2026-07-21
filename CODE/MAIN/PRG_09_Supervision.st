@@ -448,15 +448,24 @@ GVL_IHM.TranslationM3.ErrorId              := PRG_07_TranslationControl.instTran
 GVL_IHM.TranslationM3.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
 GVL_IHM.TranslationM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
 GVL_IHM.TranslationM3.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
-GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
-GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
-GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
-GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
-GVL_IHM.TranslationM3.SensorsWord         := PRG_07_TranslationControl.instPositionDecoder.SensorsWord;
-GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_07_TranslationControl.instPositionDecoder.Incoherent;
-GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchFwd;
-GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_07_TranslationControl.instPositionDecoder.LimitSwitchRev;
+// 🧭 Position validée IHM : masquée (forcée à FALSE) si le mot capteurs est incohérent (position indéterminée)
+IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
+    GVL_IHM.TranslationM3.PositionTremie      := FALSE;
+    GVL_IHM.TranslationM3.PositionPV          := FALSE;
+    GVL_IHM.TranslationM3.PositionP2          := FALSE;
+    GVL_IHM.TranslationM3.PositionP1          := FALSE;
+    GVL_IHM.TranslationM3.PositionMaintenance := FALSE;
+ELSE
+    GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
+    GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
+    GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
+    GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
+    GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+END_IF;
+GVL_IHM.TranslationM3.SensorsWord         := PRG_00_Inputs.instPositionDecoder.SensorsWord;
+GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_00_Inputs.instPositionDecoder.Incoherent;
+GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd;
+GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev;
 GVL_IHM.TranslationM3.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
 GVL_IHM.TranslationM3.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady

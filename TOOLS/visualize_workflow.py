@@ -130,38 +130,36 @@ def load_manifest(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 def build_workflow_puml(manifest: dict) -> str:
-    # Layout dot (defaut) produit un canvas natif trop grand pour ce nombre
-    # de noeuds -> le serveur PlantUML clippe avant meme d'appliquer `scale`.
-    # smetana tasse le layout et reste dans la limite serveur.
-    lines = ["@startuml Workflow", "!pragma layout smetana", PUML_STYLE]
-    lines.append('title Workflow de Développement Automate (Hybride Pi + Claude)')
+    lines = ["@startuml Workflow", PUML_STYLE]
+    lines.append('title Workflow de Developpement Automate (Hybride Pi + Claude)')
+    lines.append('top to bottom direction')
     
     nodes_by_group = {}
     for node in manifest["nodes"]:
         nodes_by_group.setdefault(node.get("group"), []).append(node)
     
-    color_map = {
+    legacy_color_map = {
         "INPUT": "BBDEFB",
         "REFINEMENT": "FFE0B2",
         "GATES": "C8E6C9",
         "VALIDATION": "F8BBD0",
         "TRACEABILITY": "E1BEE7"
     }
-    
+
     for group in manifest["groups"]:
-        puml_color = color_map.get(group["id"], "EEEEEE")
-        lines.append(f'rectangle "{group["label"]}" as {group["id"]} #{puml_color} {{')
+        puml_color = group.get("color") or legacy_color_map.get(group["id"], "EEEEEE")
+        lines.append(f'package "{group["label"]}" as {group["id"]} #{puml_color} {{')
         for node in nodes_by_group.get(group.get("id"), []):
             label_text = node["label"].replace("\n", "\\n")
-            lines.append(f'    rectangle "{label_text}" as {node["id"]}')
+            lines.append(f'    card "{label_text}" as {node["id"]}')
         lines.append("}")
     
     for edge in manifest["edges"]:
         source, target = edge[0], edge[1]
         edge_label = f' : {edge[2]}' if len(edge) > 2 else ""
         style = edge[3] if len(edge) > 3 else "solid"
-        arrow = ".." if style == "dotted" else "--"
-        lines.append(f"{source} {arrow}> {target}{edge_label}")
+        arrow = "..>" if style == "dotted" else "-->"
+        lines.append(f"{source} {arrow} {target}{edge_label}")
     
     lines.append("@enduml")
     return "\n".join(lines)

@@ -52,7 +52,8 @@ VAR_OUTPUT
     TranslationPosMaintenance : BOOL;  // 🔧 Position maintenance (NO), extrême droite, accès MAINT_N2 uniquement : TRUE=en position service ✅ | FALSE=absent
     M3BrakeFeedback       : BOOL;  // 🔒 Retour frein translation M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
 
-    // 🆕 Variables intermédiaires filtrées/simulées pour contourner la lecture seule des PDO
+    // 🆕 REX 2026-07-21 : décodage du mot des 5 capteurs position M3 (position 0, avant PRG_03_Safety)
+    instPositionDecoder           : FB_Translation_PositionDecoder;
     M3_StatusWord_Filtered        : WORD;
     M3_ActualFrequencyHz_Filtered : UINT;
 END_VAR
@@ -246,20 +247,29 @@ instSimTranslation(
     TravelTimeS := 8.0
 );
 
-instTranslationPosTremie(InputRaw := PosTremie_DI OR instSimTranslation.PosTremie, FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosTremie_DI, instSimTranslation.PosTremie), FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosPV(InputRaw := GVL_Translation_M3_Stub.PosPV_DI OR instSimTranslation.PosPV, FilterTime := T#20MS);
+instTranslationPosPV(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, GVL_Translation_M3_Stub.PosPV_DI, instSimTranslation.PosPV), FilterTime := T#20MS);
 TranslationPosPV := instTranslationPosPV.State;
 
-instTranslationPosP2(InputRaw := PosFosse2_DI OR instSimTranslation.PosP2, FilterTime := T#20MS);
+instTranslationPosP2(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosFosse2_DI, instSimTranslation.PosP2), FilterTime := T#20MS);
 TranslationPosP2 := instTranslationPosP2.State;
 
-instTranslationPosP1(InputRaw := PosFosse1_DI OR instSimTranslation.PosP1, FilterTime := T#20MS);
+instTranslationPosP1(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosFosse1_DI, instSimTranslation.PosP1), FilterTime := T#20MS);
 TranslationPosP1 := instTranslationPosP1.State;
 
-instTranslationPosMaintenance(InputRaw := PosMaintenance_DI OR instSimTranslation.PosMaintenance, FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosMaintenance_DI, instSimTranslation.PosMaintenance), FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
+
+// 🆕 REX 2026-07-21 : Décodage immédiat du mot 5 capteurs position M3 (scan position 0)
+instPositionDecoder(
+    SensorTremie      := TranslationPosTremie,
+    SensorPV          := TranslationPosPV,
+    SensorP2          := TranslationPosP2,
+    SensorP1          := TranslationPosP1,
+    SensorMaintenance := TranslationPosMaintenance
+);
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
 M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
@@ -295,6 +305,8 @@ IF GVL_PLC_Tests.OverrideChainFalse THEN
 END_IF;
 IF GVL_PLC_Tests.OverrideContactorFalse THEN
     EmergencyStopOk := FALSE;
+ELSIF GVL_PLC_Tests.OverrideEmergencyStopOkTrue THEN
+    EmergencyStopOk := TRUE;
 END_IF;
 
 // Surcharges (overrides) du banc de tests — Translation M3 (niveau capteur amont uniquement)

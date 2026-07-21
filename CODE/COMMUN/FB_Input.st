@@ -27,8 +27,9 @@ VAR_OUTPUT
     ErrorId     : WORD;         // bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS
 END_VAR
 VAR
-    FilterTon   : TON;
-    ValueRaw    : BOOL;
+    FilterTon     : TON;
+    ValueRaw      : BOOL;
+    FirstScanDone : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Input) ===
@@ -36,10 +37,17 @@ END_VAR
 // 1. Inversion NO/NC
 ValueRaw := InputRaw XOR InvertLogic;
 
-// 2. Filtrage anti-rebond — ne valide le changement d'état qu'après FilterTime stable
-FilterTon(IN := (ValueRaw <> State), PT := FilterTime);
-IF FilterTon.Q THEN
-    State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+// 2. Initialisation premier scan & Filtrage anti-rebond
+// Au premier scan post-boot, State prend directement la valeur saine brute sans attendre le délai de 20ms,
+// ce qui évite d'émettre des fausses alarmes transitoires au démarrage de l'automate.
+IF NOT FirstScanDone THEN
+    State := ValueRaw;
+    FirstScanDone := TRUE;
+ELSE
+    FilterTon(IN := (ValueRaw <> State), PT := FilterTime);
+    IF FilterTon.Q THEN
+        State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+    END_IF;
 END_IF;
 
 // 3. Diagnostic voie/carte
