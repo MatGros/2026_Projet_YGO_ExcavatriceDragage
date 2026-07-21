@@ -128,7 +128,8 @@ END_CASE;
 
 // ── 2. EXÉCUTION DU PILOTAGE DU TRANSLATION M3 ──────────────────────────────
 instTranslationM3(
-    Enable                  := PRG_06_WinchControl.StubMachineEnableN1,
+    Enable                  := PRG_06_WinchControl.StubMachineEnableN1
+                               AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
     Mode                    := PRG_04_Modes.instModes.Mode,

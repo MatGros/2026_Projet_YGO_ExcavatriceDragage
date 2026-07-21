@@ -63,4 +63,7 @@ VAR_GLOBAL
     OverrideM1BrakeFeedback    : BOOL;               // TRUE = frein serré (sain)
     OverrideM2FwdRevSpeedFbOff : BOOL;               // TRUE = contacteurs retombés (sain)
     OverrideM2BrakeFeedback    : BOOL;               // TRUE = frein serré (sain)
+
+    // 🧹 WINCH-CORE-01 — rejoue la purge boot uniquement en simulation pour le test PLC.
+    OverrideHmiCommandPurge    : BOOL;               // TRUE = purge commandes RETAIN dans PRG_00
 END_VAR

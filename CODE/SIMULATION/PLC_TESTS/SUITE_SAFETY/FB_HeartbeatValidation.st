@@ -137,7 +137,7 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     StartPrev := TRUE;
     Busy := TRUE; Done := FALSE; AnyFailed := FALSE; ConfigError := FALSE;
     ErrorCode := 0; ErrorMessage := '';
-    Step := 10; StepElapsed := T#0s;
+    StepElapsed := T#0s;
     StimModeRequest := GVL_IHM.Modes.ModeRequest;
 
     Report.Name := 'Heartbeat Validation';
@@ -247,13 +247,13 @@ IF NOT TableReady THEN
     StepTable[StepTcH1Setup].TimeoutPT := T#5s; StepTable[StepTcH1Setup].NextOnPass := StepTcH1WaitToggle;
     StepTable[StepTcH1Setup].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH1WaitToggle].Name := 'H1 Attente premier front post-boot';
+    StepTable[StepTcH1WaitToggle].Name := 'H1 Attente 1er front post-boot';
     StepTable[StepTcH1WaitToggle].CaseId := 1; StepTable[StepTcH1WaitToggle].StimulusId := 1;
     StepTable[StepTcH1WaitToggle].CheckIdx[1] := 1;
     StepTable[StepTcH1WaitToggle].TimeoutPT := T#4s; StepTable[StepTcH1WaitToggle].NextOnPass := StepTcH1Assert;
     StepTable[StepTcH1WaitToggle].NextOnFail := StepTcH1Teardown; StepTable[StepTcH1WaitToggle].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH1Assert].Name := 'H1 Assert bit0=0 Safety + bit5=0 Cycle';
+    StepTable[StepTcH1Assert].Name := 'H1 Assert bit0=0 & bit5=0';
     StepTable[StepTcH1Assert].CaseId := 1; StepTable[StepTcH1Assert].StimulusId := 1;
     StepTable[StepTcH1Assert].CheckIdx[1] := 2; StepTable[StepTcH1Assert].CheckIdx[2] := 3;
     StepTable[StepTcH1Assert].CheckIdx[3] := 4; StepTable[StepTcH1Assert].CheckIdx[4] := 5;
@@ -276,7 +276,7 @@ IF NOT TableReady THEN
     StepTable[StepTcH2Freeze].TimeoutPT := T#3s; StepTable[StepTcH2Freeze].NextOnPass := StepTcH2Assert;
     StepTable[StepTcH2Freeze].NextOnFail := StepTcH2Teardown; StepTable[StepTcH2Freeze].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH2Assert].Name := 'H2 Assert bit0=1 Safety + bit5=1 Cycle + SafeStop';
+    StepTable[StepTcH2Assert].Name := 'H2 Assert bit0=1 & SafeStop';
     StepTable[StepTcH2Assert].CaseId := 2; StepTable[StepTcH2Assert].StimulusId := 2;
     StepTable[StepTcH2Assert].CheckIdx[1] := 6;  StepTable[StepTcH2Assert].CheckIdx[2] := 7;
     StepTable[StepTcH2Assert].CheckIdx[3] := 8;  StepTable[StepTcH2Assert].CheckIdx[4] := 9;
@@ -302,7 +302,7 @@ IF NOT TableReady THEN
     StepTable[StepTcH3Resume].TimeoutPT := T#3s; StepTable[StepTcH3Resume].NextOnPass := StepTcH3Assert;
     StepTable[StepTcH3Resume].NextOnFail := StepTcH3Teardown; StepTable[StepTcH3Resume].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH3Assert].Name := 'H3 Assert bit0=1 mem + bit5=1 mem';
+    StepTable[StepTcH3Assert].Name := 'H3 Assert bit0=1 & bit5=1';
     StepTable[StepTcH3Assert].CaseId := 3; StepTable[StepTcH3Assert].StimulusId := 3;
     StepTable[StepTcH3Assert].CheckIdx[1] := 15; StepTable[StepTcH3Assert].CheckIdx[2] := 16;
     StepTable[StepTcH3Assert].CheckIdx[3] := 17; StepTable[StepTcH3Assert].CheckIdx[4] := 18;
@@ -321,12 +321,12 @@ IF NOT TableReady THEN
     StepTable[StepTcH4Setup].TimeoutPT := T#1s; StepTable[StepTcH4Setup].NextOnPass := StepTcH4Reset;
     StepTable[StepTcH4Setup].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH4Reset].Name := 'H4 Pulse FaultMachineReset + CmdReset';
+    StepTable[StepTcH4Reset].Name := 'H4 Pulse Reset IHM & Cycle';
     StepTable[StepTcH4Reset].CaseId := 4; StepTable[StepTcH4Reset].StimulusId := 4;
     StepTable[StepTcH4Reset].TimeoutPT := T#2s; StepTable[StepTcH4Reset].NextOnPass := StepTcH4Assert;
     StepTable[StepTcH4Reset].NextOnFail := StepTcH4Teardown; StepTable[StepTcH4Reset].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH4Assert].Name := 'H4 Assert bit0=0 Safety + bit5=0 Cycle';
+    StepTable[StepTcH4Assert].Name := 'H4 Assert bit0=0 & bit5=0';
     StepTable[StepTcH4Assert].CaseId := 4; StepTable[StepTcH4Assert].StimulusId := 1; // retour toggle sain
     StepTable[StepTcH4Assert].CheckIdx[1] := 20; StepTable[StepTcH4Assert].CheckIdx[2] := 21;
     StepTable[StepTcH4Assert].CheckIdx[3] := 22; StepTable[StepTcH4Assert].CheckIdx[4] := 23;
@@ -339,12 +339,12 @@ IF NOT TableReady THEN
     StepTable[StepTcH4Teardown].NextOnPass := 0; StepTable[StepTcH4Teardown].NextOnFail := 0;
 
     // TC-H5
-    StepTable[StepTcH5Setup].Name := 'H5 Setup Méca B M3 frein desserré';
+    StepTable[StepTcH5Setup].Name := 'H5 Setup Meca B M3 frein open';
     StepTable[StepTcH5Setup].CaseId := 5; StepTable[StepTcH5Setup].StimulusId := 5;
     StepTable[StepTcH5Setup].TimeoutPT := T#1s; StepTable[StepTcH5Setup].NextOnPass := StepTcH5MecaB;
     StepTable[StepTcH5Setup].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
-    StepTable[StepTcH5MecaB].Name := 'H5 Perte IHM + frein M3 desserré > 3s';
+    StepTable[StepTcH5MecaB].Name := 'H5 Perte IHM + M3 open > 3s';
     StepTable[StepTcH5MecaB].CaseId := 5; StepTable[StepTcH5MecaB].StimulusId := 5;
     StepTable[StepTcH5MecaB].TimeoutPT := T#7s; StepTable[StepTcH5MecaB].NextOnPass := StepTcH5Assert;
     StepTable[StepTcH5MecaB].NextOnFail := StepTcH5Teardown; StepTable[StepTcH5MecaB].FailAction := E_TestFailAction.FAIL_CONTINUE;

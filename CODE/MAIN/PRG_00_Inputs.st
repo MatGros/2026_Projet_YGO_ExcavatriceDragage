@@ -99,9 +99,53 @@ VAR
     
     // 🧪 Suite de tests de validation (exécutée uniquement en simulation)
     instTestsManagement                  : FB_PLC_Tests_Management;
+
+    // 🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.
+    HmiCommandsInitialized               : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
+
+// 🧹 WINCH-CORE-01 — PURGE COMMANDES IHM RETAIN AU BOOT
+// PRG_00 est exécuté avant PRG_01..PRG_10 : aucune commande mémorisée ne peut donc
+// produire un front ou un mouvement pendant le premier scan. Les états sûrs maintenus
+// (`CmdEmergencyCutOff`, inhibitions) ne sont volontairement pas effacés.
+// L'override permet uniquement à la suite PLC de rejouer ce scénario en simulation.
+IF NOT HmiCommandsInitialized
+   OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
+    GVL_IHM.HmiInitDone := FALSE;
+
+    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Modes.ModeReset := FALSE;
+    GVL_IHM.Modes.CmdEmergencyArming := FALSE;
+
+    GVL_IHM.M1TreuilRetenue.CmdReset := FALSE;
+    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
+    GVL_IHM.M1TreuilRetenue.ConfirmCoherence := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdReset := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+    GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass := FALSE;
+    GVL_IHM.M2TreuilBucket.ConfirmCoherence := FALSE;
+
+    GVL_IHM.Bucket.CmdOpen := FALSE;
+    GVL_IHM.Bucket.CmdClose := FALSE;
+    GVL_IHM.Bucket.CmdReset := FALSE;
+    GVL_IHM.Bucket.CmdConfirmOpenPosition := FALSE;
+    GVL_IHM.Bucket.CmdConfirmClosePosition := FALSE;
+
+    GVL_IHM.Cycle.CmdStart := FALSE;
+    GVL_IHM.Cycle.CmdPause := FALSE;
+    GVL_IHM.Cycle.CmdAbort := FALSE;
+    GVL_IHM.Cycle.CmdReset := FALSE;
+
+    GVL_IHM.TranslationM3.ReqFwd := FALSE;
+    GVL_IHM.TranslationM3.ReqRev := FALSE;
+    GVL_IHM.JoystickJOY1.Calibrate := FALSE;
+
+    HmiCommandsInitialized := TRUE;
+    GVL_IHM.HmiInitDone := TRUE;
+END_IF;
 
 // 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
 // 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille

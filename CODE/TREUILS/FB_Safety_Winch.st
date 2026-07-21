@@ -127,6 +127,7 @@ VAR_INPUT
     JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
     HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
+    EncoderFaultBypass  : BOOL;        // 🔧 Autorisation maintenance sans codeur ; effective uniquement en MAINT_N2
     ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_00_Inputs.M1/M2ThermalFeedback)
     BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_00_Inputs.BrakeThermalFeedback)
     SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si NOT SyncEnable
@@ -217,6 +218,7 @@ VAR
     TonOppositeDirection  : TON;
     TonNoMovement         : TON;
     OppositeDirectionActive : BOOL;
+    EncoderAvailableEffective : BOOL;   // Codeur valide OU bypass individuel autorisé en MAINT_N2
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
@@ -278,7 +280,12 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
-IF NOT EncoderAvailable THEN
+// 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
+// Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
+// Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
+EncoderAvailableEffective := EncoderAvailable
+                             OR (EncoderFaultBypass AND (Mode = E_Mode.MAINT_N2));
+IF NOT EncoderAvailableEffective THEN
     ErrorId := ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;

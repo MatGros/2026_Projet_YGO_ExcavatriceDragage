@@ -182,9 +182,9 @@ END_IF;
 // retiré avec IHM_MANU — PRG_06_WinchControl applique désormais un plafond fixe (5 montée /
 // _WinchMaxStepDescent descente), identique Auto et Manuel, plus de réglage IHM à initialiser.
 
-IF GVL_IHM.Modes.ModeRequest = E_Mode.DISABLE THEN
-    GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
-END_IF;
+// 🔧 WINCH-CORE-01 : DISABLE est un mode opérateur valide et ne doit jamais être
+// remplacé automatiquement par MAINT_N1. La sortie de DISABLE exige une nouvelle
+// demande explicite ; M1/M2/M3 restent neutralisés tant que le mode est actif.
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
@@ -320,6 +320,8 @@ GVL_IHM.M1TreuilRetenue.ForbidAscentActive       := PRG_03_Safety.instSafetyWinc
 GVL_IHM.M1TreuilRetenue.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M1TreuilRetenue.ThermalFault             := NOT PRG_00_Inputs.M1ThermalFeedback;
 GVL_IHM.M1TreuilRetenue.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.M1TreuilRetenue.EncoderFaultBypassActive := GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass
+                                                     AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
 GVL_IHM.M1TreuilRetenue.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM1Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.M1TreuilRetenue.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck; // 🔧 REX 2026-07-07
@@ -383,6 +385,8 @@ GVL_IHM.M2TreuilBucket.ForbidAscentActive       := PRG_03_Safety.instSafetyWinch
 GVL_IHM.M2TreuilBucket.SlackCableDetected       := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M2TreuilBucket.ThermalFault             := NOT PRG_00_Inputs.M2ThermalFeedback;
 GVL_IHM.M2TreuilBucket.EncoderFault             := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.M2TreuilBucket.EncoderFaultBypassActive := GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass
+                                                   AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M2TreuilBucket.CableLimitDescentReached := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
 GVL_IHM.M2TreuilBucket.CableLimitAscentReached  := PRG_06_WinchControl.CableLimitAscentM2Reached; // 🆕 REX 2026-07-15 (8)
 GVL_IHM.M2TreuilBucket.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck; // 🔧 REX 2026-07-07

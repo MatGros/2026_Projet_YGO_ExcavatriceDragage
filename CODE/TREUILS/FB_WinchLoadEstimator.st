@@ -18,6 +18,7 @@ VAR_INPUT
     Mode               : E_Mode;
     ActiveSpeedStep    : INT;                       // Palier commandé 0..5
     MeasuredSpeedMps   : REAL;                      // Vitesse câble absolue
+    MeasuredSpeedSignedMps : REAL;                  // Vitesse signée : positive = montée, négative = descente
     SpeedConfig        : ST_WinchSpeedConfig;       // Plages vitesse mesurée
     LoadTable          : ST_WinchLoadEstimateTable;// Table empirique 5x5
 END_VAR
@@ -32,6 +33,7 @@ VAR_OUTPUT
     SpeedBand          : INT;                      // Bande vitesse courante 0..5
     EstimatedLoadPct   : REAL;                     // Estimation informative 0..100 %
     Configured         : BOOL;                     // TRUE si table explicitement validée
+    Ascending          : BOOL;                     // TRUE uniquement pendant une montée mesurée
 END_VAR
 VAR
     ResetEdge          : R_TRIG;
@@ -52,6 +54,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     SpeedBand := 0;
     EstimatedLoadPct := 0.0;
     Configured := FALSE;
+    Ascending := FALSE;
     HasPreviousBand := FALSE;
     RETURN;
 END_IF;
@@ -62,6 +65,10 @@ Done := FALSE;
 State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
+// 📈 WINCH-CORE-01 : l'estimation de charge n'a de sens qu'en montée.
+// La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
+// mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
+Ascending := (MeasuredSpeedSignedMps > 0.0);
 
 // 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps < 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps <= 0.0) THEN
@@ -93,7 +100,9 @@ ELSE
 END_IF;
 
 // 📊 3. LECTURE TABLE — estimation informative uniquement.
-IF Configured AND (ActiveSpeedStep >= 1) AND (ActiveSpeedStep <= 5) AND (SpeedBand >= 1) AND (SpeedBand <= 5) THEN
+IF Configured AND Ascending
+   AND (ActiveSpeedStep >= 1) AND (ActiveSpeedStep <= 5)
+   AND (SpeedBand >= 1) AND (SpeedBand <= 5) THEN
     SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
     IF (SelectedLoadPct < 0.0) OR (SelectedLoadPct > 100.0) THEN
         ErrorId := ErrorId OR 16#0001;

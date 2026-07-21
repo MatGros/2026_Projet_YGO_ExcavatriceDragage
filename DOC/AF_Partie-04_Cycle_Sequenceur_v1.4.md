@@ -1,5 +1,9 @@
 # 📋 Analyse Fonctionnelle — Partie 4 : Cycle & Séquenceur (v1.4)
 
+> 🔧 **WINCH-CORE-01 (2026-07-21)** — La fin de `ASCENDING_LOADED` utilise désormais
+> `CableLimitM1AscentM` (8,0 m par défaut), identique à la limite haute d'exploitation de
+> `FB_Winch`. La cible homing/capteur haut 8,5 m ne sert plus à dériver ce seuil.
+>
 > **v1.4 — Décisions client cycle semi-auto (2026-07-18)** : toute commande de mouvement reste
 > conditionnée par l'homme-mort joystick ; le relâchement met le cycle en attente sur son étape,
 > puis une sollicitation valide reprend cette étape. La descente de recherche utilise le retour
@@ -198,7 +202,9 @@ Après `SYNCHRO_ADJUST`, `CTRL_ASCENDING` constitue une étape de contrôle obli
 - un délai maximal `CtrlAscentTimeout` (`30 s` par défaut) évite toute attente infinie si un treuil,
   un câble ou la benne est bloqué ;
 - la montée chargée (`ASCENDING_LOADED`) n'est autorisée qu'après validation simultanée des deux
-  codeurs et maintien de l'homme-mort.
+  codeurs et maintien de l'homme-mort ;
+- elle s'arrête à `M1_CablePosM >= CableLimitM1AscentM` (8,0 m par défaut), puis passe à
+  `DRAINING_PAUSE`.
 
 Le défaut de stabilisation est signalé par le bit 3 de `ErrorId`. Une reprise exige la disparition
 de la cause, un acquittement et un nouvel ordre opérateur.

@@ -67,6 +67,7 @@ STRUCT
     SlackCableDetected      : BOOL;             (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* 🔥 Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)
+    EncoderFaultBypassActive: BOOL;             (* 🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
     CableLimitDescentReached: BOOL;             (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
     CableLimitAscentReached : BOOL;             (* ⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscentM) *)
     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
@@ -80,6 +81,7 @@ STRUCT
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
     CmdReset                : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
     CmdHome                 : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
+    CmdEncoderFaultBypass   : BOOL;             (* 🔧 Autorisation maintenue de manœuvre sans codeur, effective uniquement MAINT_N2 *)
     ConfirmCoherence        : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
     CmdInhibit              : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)

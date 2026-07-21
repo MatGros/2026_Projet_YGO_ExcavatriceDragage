@@ -1,5 +1,9 @@
 # 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.10)
 
+> 🔧 **WINCH-CORE-01 (2026-07-21)** — Référentiel mécanique confirmé : capteur haut et
+> cible homing M1/M2 à 8,5 m ; limite d'exploitation à 8,0 m. Les anciennes valeurs
+> illustratives 12,0/12,5 m sont supprimées.
+>
 > 🔄 **Mise à jour supervision 2026-07-18** : les états Homing M1/M2 sont désormais exposés
 > dans `GVL_IHM.M1TreuilRetenue` et `GVL_IHM.M2TreuilBucket` (`HomingBusy`, `HomingDone`,
 > `HomingError`, `HomingErrorId`, `HomingState`, `HomingStateAtError`, `HomingSuspect`,
@@ -15,7 +19,7 @@
 > homing **≠ 0** (§2), jusqu'ici seulement implémenté en code (`FB_Encoder_Homing.st`), absent de
 > la doc. Corrige aussi le § Machine d'état qui montrait encore l'ancienne hypothèse
 > `HomingRefRaw:=PresetValue` (valable uniquement cible 0.00 m — obsolète depuis passage à
-> `TopSensorPositionM ≈ 12.50 m`).
+> `TopSensorPositionM ≈ 8.50 m`).
 >
 > 🛡️ **REX 2026-07-18** — Le bornage codeur `[-99 ; +99] m` s'applique désormais aux deux
 > flux : cible libre unitaire et `TopSensorPositionM` nominale. Toute cible hors domaine est
@@ -83,7 +87,7 @@
 >   `PowerCutOff` (coupure de puissance pilotée logiciel — anti-survitesse/anti-débordement haut).
 >   Seuls les boutons coup-de-poing opérateur restent un AU purement matériel.
 > - ✅ **Flux homing nominal réglé (§1)** : le capteur haut est **le** déclencheur (cycle d'INIT,
->   les 2 treuils), référencé à `TopSensorPositionM` (paramétrable, **≈ 12.50 m** indicatif). Le
+>   les 2 treuils), référencé à `TopSensorPositionM` (paramétrable, **≈ 8.50 m** indicatif). Le
 >   « toucher d'eau » **a toujours été un simple repère visuel** pour l'opérateur, **jamais** une
 >   entrée automate (précision terrain 2026-07-02 — ne pas confondre avec le capteur de contact
 >   fond, BOOL, Partie4 §`BOTTOM_TOUCH_WAIT`, qui est un capteur réel mais distinct, pour le
@@ -150,7 +154,7 @@ Lors du montage mécanique (câble neuf ou codeur remplacé), deux situations di
 1. 🔝 **Homing nominal (routine, cycle d'INIT)** — ✅ **flux réglé 2026-07-02** : les 2 treuils
    montent **synchronisés** (`FB_WinchSync` actif) jusqu'au **capteur de position haute unique et
    répétable** (§7bis) ; un seul appui IHM référence **les deux codeurs simultanément** à
-   `TopSensorPositionM` (paramétrable, valeur indicative aujourd'hui **≈ 12.50 m** au-dessus du
+   `TopSensorPositionM` (paramétrable, valeur indicative aujourd'hui **≈ 8.50 m** au-dessus du
    niveau d'eau). Le **déclencheur du homing a toujours été une action opérateur** (bouton IHM),
    jamais un capteur automatisé de niveau d'eau — le contact eau **reste ce qu'il a toujours
    été** : un repère **visuel** pour l'opérateur (voir procédure de calibration §7bis), pas une
@@ -216,7 +220,7 @@ PresetValue  := HomingRefTargetNominal                                         (
 HomingRefRaw := PresetValue − round(TopSensorPositionM × PointsPerRev / CableM_PerRev)
 ```
 
-Ainsi `CablePosM = TopSensorPositionM` (≈ 12.50 m) exactement au moment du homing — **pas** 0.00 m.
+Ainsi `CablePosM = TopSensorPositionM` (≈ 8.50 m) exactement au moment du homing — **pas** 0.00 m.
 Formule inverse (mètres → `RawPos`, ex. calcul terrain/maintenance) :
 
 ```
@@ -225,13 +229,13 @@ RawPos(m) = HomingRefRaw + round(m × PointsPerRev / CableM_PerRev)
 ```
 
 📐 **Exemple complet — position codeur à 8.5 m** (`PointsPerRev = 8192`, `MultiTurnRevsMax = 4096`,
-`CableM_PerRev = 2.0`, `TopSensorPositionM = 12.50 m`) :
+`CableM_PerRev = 2.0`, `TopSensorPositionM = 8.50 m`) :
 ```
 Centre    = (PointsPerRev × MultiTurnRevsMax) / 2 = (8192 × 4096) / 2 = 16 777 216
 RawPos(m) = Centre + (m − TopSensorPositionM) × (PointsPerRev/CableM_PerRev)
           = Centre + (m − TopSensorPositionM) × 4096
 
-RawPos(8.5) = 16 777 216 + (8.5 − 12.5) × 4096
+RawPos(8.5) = 16 777 216 + (8.5 − 8.5) × 4096
             = 16 777 216 − 16 384
             = 16 760 832 pts
 ```
@@ -425,7 +429,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
 | `TopPositionSensor` | BOOL | 🔧 **2026-07-02** — État du capteur de position haute **UNIQUE, COMMUN aux 2 treuils** (§7bis), issu de l'I/O Mapping réel (`GVL_Homing_Stub` supprimé). Câblé identiquement sur les 2 instances. Flux nominal : `Home` n'est accepté que si `TopPositionSensor = FALSE` (contact ouvert, position haute atteinte — logique fail-safe NC, pas seulement la demande opérateur — cohérent avec le principe « arrêt confirmé par retours réels », voir §7) |
-| `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `TopPositionSensor` (paramétrable, valeur indicative **≈ 12.50 m**, ajustée via la procédure de calibration §7bis), bornée **[-99.00 ; +99.00]** m au front `Home` |
+| `TopSensorPositionM` | REAL (RETAIN) | ✅ **2026-07-02** — Cible imposée en flux **nominal** au déclenchement par `TopPositionSensor` (paramétrable, valeur indicative **≈ 8.50 m**, ajustée via la procédure de calibration §7bis), bornée **[-99.00 ; +99.00]** m au front `Home` |
 | `HomingTargetM` | REAL | Cible de position à imposer **en flux unitaire uniquement** (`MAINT_N2`), bornée **[-99.00 ; +99.00]** m (§3.6) — remplace l'ancien usage "flux nominal verrouillé à 0.00" (le flux nominal utilise désormais `TopSensorPositionM`, pas ce champ) |
 | `ConfirmCoherence` | BOOL | Action opérateur (**front**) levant un doute §3.7, disponible `MAINT_N1` **ou** `MAINT_N2` |
 | `RawPos` | `UDINT` | Valeur brute codeur courante (sortie `FB_Encoder_Abs`) |
@@ -479,7 +483,7 @@ READY    → (front ConfirmCoherence, Mode IN MAINT_N1/N2) → HomingSuspect:=FA
 2. Relâcher le joystick — arrêt confirmé (contacteurs + frein, ErrorId bit2 à 0).
 3. Appuyer le bouton IHM unique « Réf/Homing COD1+COD2 » → `Home` sur **les deux instances**
    simultanément ; accepté seulement si `TopPositionSensor = FALSE` sur les deux (contact ouvert, position haute atteinte — ErrorId bit4
-   sinon) ; cible = `TopSensorPositionM` (paramétrable, ≈ 12.50 m). Confirmation mot de
+   sinon) ; cible = `TopSensorPositionM` (paramétrable, ≈ 8.50 m). Confirmation mot de
    passe/message gérée par l'IHM en amont si le niveau l'exige.
 4. `Done` sur les deux instances → affichage `CablePosM` ≈ `TopSensorPositionM` sur M1 **et** M2.
 5. **Contrôle visuel de calibration** (voir §7bis) : descendre jusqu'au contact visuel de l'eau,
@@ -602,7 +606,7 @@ matérielle**, en a été **retiré**. C'est désormais un **capteur TOR lu par 
    « toucher d'eau » (jugé visuellement, varie avec le niveau d'eau réel), ce capteur haut donne
    une position mécanique **fixe et répétable** — c'est **le** déclencheur du homing nominal
    (cycle d'INIT, les 2 treuils). Référencé à `TopSensorPositionM` (RETAIN, paramétrable, valeur
-   indicative **≈ 12.50 m** au-dessus du niveau d'eau — à ajuster sur site, voir procédure de
+   indicative **≈ 8.50 m** au-dessus du niveau d'eau — à ajuster sur site, voir procédure de
    calibration ci-dessous).
 2. **Protection anti-débordement haut, hors mode référencement** : si ce capteur s'active alors
    que le treuil concerné n'est **pas** en train de faire un homing volontaire, l'automate
@@ -618,7 +622,7 @@ dragage, Partie4 §`BOTTOM_TOUCH_WAIT`) sert de **contrôle visuel de calibratio
 manuellement par l'opérateur :
 
 ```
-1. Référencer au capteur haut (flux nominal §1) → CablePosM = TopSensorPositionM (ex. 12.50 m)
+1. Référencer au capteur haut (flux nominal §1) → CablePosM = TopSensorPositionM (ex. 8.50 m)
 2. Descendre les 2 treuils jusqu'au contact visuel réel de l'eau
 3. Lire CablePosM à cet instant :
      SI CablePosM ≈ 0.00 m (tolérance ex. ±0.10 m, 📌 à fixer sur site — voir
@@ -635,10 +639,10 @@ manuellement par l'opérateur :
 
 En fonctionnement **normal** (hors homing volontaire), les treuils ralentissent et s'arrêtent avant d'atteindre le capteur physique de position haute. Ce dernier reste une protection ultime (`PowerCutOff`), pas une butée de fonctionnement courant.
 
-- **Zone de ralentissement et Arrêt virtuel normal haut** : Dès qu'un treuil est référencé (`Homed = TRUE`), une limite virtuelle normale haute est calculée à `HomingTargetMx_M - WinchTopStopMarginM` (par exemple 12.00 m si la cible est à 12.50 m et la marge est à 0.50 m). À l'approche de cette position (`CablePosM >= TopLimitM - SlowdownDistanceM`), la consigne de vitesse est bridée à `SlowSpeedPct` (15%). Une fois l'arrêt virtuel normal atteint (12.00 m), la montée est interdite (`ForbidAscent := TRUE`), forçant l'arrêt rampé.
-- **HomingApproachEnable** : En mode `MAINT_N2` (avec mot de passe), l'opérateur peut cocher la case IHM `HomingApproachEnableRequest` pour dépasser la butée virtuelle normale de 12.00 m. Cela permet d'approcher lentement le capteur physique. Dans ce cas, la vitesse est bridée au **palier 1** (`MaxStepNumber := 1` dans `FB_Winch`) et l'arrêt se fait soit sur la limite logicielle absolue à `HomingTargetMx_M` (12.50 m) soit par l'activation physique du capteur.
+- **Zone de ralentissement et Arrêt virtuel normal haut** : Dès qu'un treuil est référencé (`Homed = TRUE`), une limite virtuelle normale haute est calculée à `HomingTargetMx_M - WinchTopStopMarginM` (par exemple 8.00 m si la cible est à 8.50 m et la marge est à 0.50 m). À l'approche de cette position (`CablePosM >= TopLimitM - SlowdownDistanceM`), la consigne de vitesse est bridée à `SlowSpeedPct` (15%). Une fois l'arrêt virtuel normal atteint (8.00 m), la montée est interdite (`ForbidAscent := TRUE`), forçant l'arrêt rampé.
+- **HomingApproachEnable** : En mode `MAINT_N2` (avec mot de passe), l'opérateur peut cocher la case IHM `HomingApproachEnableRequest` pour dépasser la butée virtuelle normale de 8.00 m. Cela permet d'approcher lentement le capteur physique. Dans ce cas, la vitesse est bridée au **palier 1** (`MaxStepNumber := 1` dans `FB_Winch`) et l'arrêt se fait soit sur la limite logicielle absolue à `HomingTargetMx_M` (8.50 m) soit par l'activation physique du capteur.
 - **Modèle de sécurité à 3 couches (Méca D - bit 11)** :
-  1. *Couche 1* : Arrêt virtuel logiciel à 12.00 m (ou 12.50 m si approche autorisée).
+  1. *Couche 1* : Arrêt virtuel logiciel à 8.00 m (ou 8.50 m si approche autorisée).
   2. *Couche 2* : Coupure immédiate `ForbidAscent` si le capteur physique `TopPositionSensor` est activé (logique NC).
   3. *Couche 3 (Méca D)* : Si le capteur physique haut est actionné hors homing (ou si la limite logicielle redondante est franchie) et que les contacteurs physiques (`FwdRevSpeedFeedbackOff`) ou le frein (`BrakeFeedback`) ne confirment pas l'arrêt complet sous `PostRampTimeout` (3 s), le défaut **Méca D** (bit 11) se déclenche, provoquant un `SafeStop` et un `PowerCutOff`.
 
@@ -708,7 +712,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 - [ ] Confirmer le rôle de `CodeSeqTrigCmd` (`COD1_CodeSeqTrigCmd`/`COD2_CodeSeqTrigCmd`) —
       📌 voir `DOC/PLAN_TASK_v1.0.md` §3 (T8)
 - [x] Flux homing nominal réglé (§1/§7bis, 2026-07-02) : capteur haut = déclencheur unique,
-      `TopSensorPositionM` ≈ 12.50 m paramétrable, toucher d'eau = contrôle visuel de calibration
+      `TopSensorPositionM` ≈ 8.50 m paramétrable, toucher d'eau = contrôle visuel de calibration
 - [x] Coder l'extension `FB_Safety_Winch` (§7bis) : `M1_M2_TopPositionSensor`, `InReferencingMode` →
       `PowerCutOff` — ✅ Codé et raccordé (2026-07-08)
 - [x] Concevoir + coder la limite haute « normale » (ralentissement avant position extrême, §7bis)
@@ -798,7 +802,7 @@ est désormais **I/O Mapping réel** (plus de GVL à créer pour ce signal).
    FALSE → TRUE → FALSE (front ; les deux peuvent être envoyés simultanément).
 4. Observer instHomingM1 : Busy doit passer TRUE brièvement, puis Done pulse à TRUE,
    Homed := TRUE, ErrorId reste à 0.
-5. Observer instEncoderScaleM1.CablePosM : doit afficher ≈ M1_TopSensorPositionM (12.50 m par
+5. Observer instEncoderScaleM1.CablePosM : doit afficher ≈ M1_TopSensorPositionM (8.50 m par
    défaut) — CORRESPONDANCE ATTENDUE avec PresetValue = HomingRefTargetNominal (16 777 216 pts)
    sur instEncoderAbsM1.RawPos une fois PresetAck reçu (dépend du COD1 réel — si le codeur COD1
    n'accepte pas encore le preset réellement, PresetNak/timeout est attendu tant que

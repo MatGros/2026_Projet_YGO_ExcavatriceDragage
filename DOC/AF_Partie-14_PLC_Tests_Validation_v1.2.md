@@ -1,5 +1,9 @@
 # 📋 Analyse Fonctionnelle — Partie 14 : Tests de Validation de la Sécurité (v1.2)
 
+> 🔧 **WINCH-CORE-01 (2026-07-21)** — `FB_ModesValidation` est étendu de TC-M7 à
+> TC-M12 : DISABLE M1/M2/M3, bypass codeur MAINT_N2, ConfigError SpeedStep,
+> estimateur montée seule, seuil `ASCENDING_LOADED` et purge commandes RETAIN.
+>
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Définition et architecture des tests de validation automatisés de la chaîne de sécurité (Arrêt d'Urgence et commande des contacteurs de puissance).
 > **Version** : v1.2 (2026-07-16) — §7 **réécrit intégralement** : spécification finale du framework de test in-PLC (architecture de données, moteur d'exécution, catalogue de primitives, IHM de pilotage, preuve de couverture TC-01/02/03, plan de migration), issue d'une double revue croisée entre deux analyses expertes indépendantes (primitives de test ↔ architecture de données/IHM) + audit final. **Remplace entièrement** le cadrage v1.1 §7. Base §1-6 **inchangée**. ⚠️ **Aucune modification de `CODE/` n'accompagne cette version** — cadrage uniquement ; migration à dérouler séparément (§7.6).
@@ -721,7 +725,13 @@ La suite ciblée `SuiteModes = 5` (`FB_ModesValidation`, 🆕 mission suppressio
 - sécurité active et aucun mouvement possible sans autorisation de mode (perte
   `EmergencyStopOk` → `Mode=DISABLE` + `FB_Winch` neutralisé, quel que soit le mode précédent) ;
 - le séquenceur (`FB_Cycle`) ne bloque jamais : une tentative réelle de démarrage
-  (`GVL_IHM.Cycle.CmdStart`) hors `SEMI_AUTO` reste sans effet (`Busy` reste `FALSE`).
+  (`GVL_IHM.Cycle.CmdStart`) hors `SEMI_AUTO` reste sans effet (`Busy` reste `FALSE`) ;
+- `DISABLE` explicite neutralise M1, M2 et M3 ;
+- le bypass codeur reste refusé hors `MAINT_N2`, puis exige un front `Reset` ;
+- une configuration `FB_SpeedStep` invalide lève `FB_Winch.ErrorId` bit2 et coupe les sorties ;
+- `EstimatedLoadPct` vaut zéro en descente et devient actif en montée ;
+- `ASCENDING_LOADED` s'arrête à `CableLimitM1AscentM` ;
+- l'override de test rejoue la purge boot des commandes IHM RETAIN.
 
 Le Homing nominal sans IHM_MANU reste couvert par `SuiteEncoder` (TC-E1/E2), pas dupliqué ici.
 
@@ -737,7 +747,7 @@ de seuil restent celles configurées dans `GVL_PERSISTENT` et doivent être conf
 | V3 — écart vitesse remontée | M1 avance, M2 ralentit pendant `CTRL_ASCENDING` | `SpeedMismatchMps` dépasse le seuil, bit4 cycle, `ERROR_HOLD` après temporisation |
 | V4 — relâchement homme-mort | `CycleMotionPermit := FALSE` pendant une transition | arrêt/pause sans défaut vitesse parasite |
 | V5 — garde-fou palier | Demander P4/P5 avec bande vitesse inférieure | `SpeedGuardLimited=TRUE`, palier limité ; aucun `SafeStop` généré |
-| V6 — table non configurée | `LoadTable.IsConfigured := FALSE` | `EstimatedLoadPct=0`, `LoadEstimateConfigured=FALSE`, aucun mouvement modifié |
+| V6 — table non configurée / descente | `LoadTable.IsConfigured := FALSE` ou vitesse signée ≤ 0 | `EstimatedLoadPct=0`, aucun mouvement modifié |
 | V7 — obstacle/treuil bloqué | Un codeur progresse, l'autre reste quasi fixe | diagnostic vitesse + désynchronisme ; réaction safety/cycle vérifiée séparément |
 
 ⚠️ La validation simulation ne prouve pas la capacité mécanique réelle. Les cas V1, V3, V5

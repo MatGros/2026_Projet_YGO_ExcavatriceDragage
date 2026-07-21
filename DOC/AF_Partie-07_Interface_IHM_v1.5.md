@@ -1,5 +1,10 @@
 # 📋 Analyse Fonctionnelle — Partie 7 : Interface de Supervision IHM (v1.5)
 
+> 🔧 **WINCH-CORE-01 (2026-07-21)** — Ajout, sans modification des visualisations, de
+> `CmdEncoderFaultBypass` et `EncoderFaultBypassActive` dans `ST_WinchHMI`. Les commandes
+> impulsionnelles RETAIN sont purgées dans `PRG_00_Inputs` avant leur première consommation.
+> `CmdEmergencyCutOff` et les inhibitions sûres ne sont pas effacés.
+>
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Benne, Translation, Cycle, Synchro).  
 > **Version** : v1.5 (2026-07-18, alignement avec `PRG_00`→`PRG_10`, `GVL_IHM.Cycle` et l'interface complète `GVL_IHM.TranslationM3`).
@@ -20,6 +25,10 @@ L'interface opérateur (HMI) nécessite un point d'accès standardisé et unique
 
 Toutes les variables d'échange IHM sont regroupées dans la liste de variables globales `GVL_IHM`.
 
+⚠️ `GVL_IHM` restant `RETAIN`, `PRG_00_Inputs` remet à `FALSE` au premier scan les commandes
+mouvement/reset/homing susceptibles d'être rejouées. Cette purge précède `PRG_01` à `PRG_10`.
+Elle ne modifie ni les paramètres de calibration, ni `CmdEmergencyCutOff`, ni les inhibitions.
+
 ---
 
 ## ⚙️ 2. Structures de données (`_TYPES`)
@@ -31,7 +40,7 @@ Regroupe les informations nécessaires au contrôle et au diagnostic d'un treuil
 TYPE ST_WinchHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture RETAIN) *)
-    TopSensorPositionM      : REAL := 12.5;     (* Position cible du capteur haut (m) *)
+    TopSensorPositionM      : REAL := 8.5;      (* Position cible du capteur haut / homing (m) *)
     MaxStepDescente         : INT := 3;         (* Limitation palier vitesse en descente (1..5) - commun M1/M2 *)
     RampAccelRate           : REAL := 50.0;     (* Rampe d'accélération (%/s) *)
     RampDecelNormalRate     : REAL := 150.0;    (* Rampe de décélération normale (%/s) *)
@@ -68,6 +77,7 @@ STRUCT
     SlackCableDetected      : BOOL;             (* Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* Perte de liaison ou incohérence codeur *)
+    EncoderFaultBypassActive: BOOL;             (* Bypass effectivement accepté en MAINT_N2 *)
     CableLimitDescentReached: BOOL;             (* Longueur max de câble atteinte (limite basse physique) *)
     Encoder                 : ST_EncoderHMI;    (* Données d'échange et diagnostic du codeur *)
     
@@ -78,6 +88,7 @@ STRUCT
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
     CmdReset                : BOOL;             (* Demande reset par treuil, agrégée dans le reset domaine partagé *)
     CmdHome                 : BOOL;             (* Lancement de la prise d'origine *)
+    CmdEncoderFaultBypass   : BOOL;             (* Autorisation maintenue sans codeur, MAINT_N2 uniquement *)
     ConfirmCoherence        : BOOL;             (* Confirmation de cohérence au démarrage *)
     CmdInhibit              : BOOL;             (* Bouton IHM inhibition treuil (MAINT_N2) *)
     

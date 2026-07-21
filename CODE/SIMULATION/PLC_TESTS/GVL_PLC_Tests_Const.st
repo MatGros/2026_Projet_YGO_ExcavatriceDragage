@@ -8,9 +8,9 @@
 {attribute 'qualified_only'}
 VAR_GLOBAL CONSTANT
     MaxTestCases     : INT := 8;    // par suite
-    MaxSteps         : INT := 64;   // par suite, table PLATE ; tous les StepId doivent rester <= 64
+    MaxSteps         : INT := 128;  // par suite, table PLATE ; WINCH-CORE-01 ajoute les étapes 65..111
     MaxChecks        : INT := 64;   // CheckTable par suite
-    MaxChecksPerStep : INT := 4;
+    MaxChecksPerStep : INT := 10;
     MaxInvariants    : INT := 4;    // actifs en parallèle
     MaxProbeBool     : INT := 32;
     MaxProbeDint     : INT := 16;    // INT/WORD/étapes séquenceur → conversion au câblage (WORD_TO_DINT)

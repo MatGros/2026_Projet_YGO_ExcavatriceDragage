@@ -63,7 +63,7 @@ END_VAR
         COD2_PresettTrigCmd) et écrira automatiquement la valeur du preset
         dans les registres bruts simulés.
       - Vérifier que instHomingM1.Homed et instHomingM2.Homed passent à TRUE.
-      - La position calculée (CablePosM) doit se caler exactement à 12.5m
+      - La position calculée (CablePosM) doit se caler exactement à 8.5m
          (ou la valeur définie par TopSensorPositionM de chaque structure IHM).
 
    4. TEST DU BENNE (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
@@ -76,9 +76,9 @@ END_VAR
         * UP / enrouler (Direction = 1) pour la FERMETURE
         * DOWN / dérouler (Direction = -1) pour l'OUVERTURE
       - Le bloc Benne prend le contrôle de M2 en vitesse lente forcée :
-        * En fermeture, le codeur simulé M2 augmente jusqu'à ce que CablePosM2 >= CablePosM1 + OffsetCloseM (12.5m + 10.0m = 22.5m).
-        * En ouverture, le codeur simulé M2 diminue jusqu'à ce que CablePosM2 <= CablePosM1 + OffsetOpenM (12.5m + 0.0m = 12.5m).
-          ⚠️ Juste après un homing M1+M2 (les deux à 12.5m), la cible d'ouverture est DÉJÀ atteinte
+        * En fermeture, le codeur simulé M2 augmente jusqu'à ce que CablePosM2 >= CablePosM1 + OffsetCloseM (8.5m + 10.0m = 18.5m).
+        * En ouverture, le codeur simulé M2 diminue jusqu'à ce que CablePosM2 <= CablePosM1 + OffsetOpenM (8.5m + 0.0m = 8.5m).
+          ⚠️ Juste après un homing M1+M2 (les deux à 8.5m), la cible d'ouverture est DÉJÀ atteinte
           (CablePosM2 = CablePosM1) : une demande d'ouverture se termine donc immédiatement (Done)
           sans mouvement réel de M2 — comportement normal, pas un bug.
       - Vérifier que Benne.Busy passe à FALSE et Benne.Done à TRUE lorsque la

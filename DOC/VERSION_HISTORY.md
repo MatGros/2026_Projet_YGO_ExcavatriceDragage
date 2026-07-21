@@ -4,6 +4,14 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.20_WinchCorePrep` — 2026-07-21
+- WINCH-CORE-01 · hauteurs 8,0/8,5 m · DISABLE M1/M2/M3
+- Bypass codeur individuel MAINT_N2 · ConfigError SpeedStep bit2
+- Charge estimée montée seule · seuil cycle aligné · purge commandes boot
+- Tests PLC Modes étendus TC-M7→M12 · aucune visualisation modifiée
+
+---
+
 ### `v0.4.19_CommissioningPrep` — 2026-07-21
 - Préparation version mise en service terrain (pre-commissioning)
 - Audit treuils M1/M2 (`DOC/AUDIT_Winch_v1.0.md`), suites PLC_TESTS validées
