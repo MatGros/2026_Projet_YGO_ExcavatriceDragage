@@ -30,3 +30,9 @@ launch_workspace.ps1
 .pi/spec_read_state.json
 .pi/git/
 .agents/
+
+# IDE / agents locaux
+.claude/
+.mgs-workspace.code-workspace
+.opencode/
+.vscode/
