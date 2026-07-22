@@ -10,14 +10,14 @@
       courante. Extraction PURE de la logique déjà en place dans
       `PRG_02_Encoders.st` (bloc "SIMULATION SUR BANC DE TEST") — aucun
       changement de comportement, juste la dissociation en FB dédié.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT EncoderMx_IsReal)
+   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
    📥 SpeedScaleFactor : 🔧 REX 2026-07-07 — multiplicateur de vitesse simulation (confort de test
       banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
-      d'origine. Câblé sur GVL_Simulation.EncoderSimSpeedFactor (réglable à chaud, sans recompiler).
+      d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
    🔧 REX 2026-07-08 : `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`

@@ -19,8 +19,8 @@ VAR_INPUT
     AbortCycle          : BOOL;         // Demande abandon cycle (IHM)
 
     // Cibles et paramètres
-    TargetDepthM        : REAL;         // Profondeur de consigne (négative)
-    TargetOffsetM       : REAL;         // Écart de fermeture benne cible
+    SetDepthM        : REAL;         // Profondeur de consigne (négative)
+    SetOffsetM       : REAL;         // Écart de fermeture benne cible
     SelectedTargetNum_IHM : INT;        // Cible sélectionnée (2=P2, 3=P1 — 🆕 REX 2026-07-18, ex-1=Fosse1/2=Fosse2, voir AF_Partie-02 v2.12 §3bis)
 
     // Feedbacks physique & matériel

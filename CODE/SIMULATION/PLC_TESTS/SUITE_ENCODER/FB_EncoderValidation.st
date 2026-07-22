@@ -13,7 +13,7 @@ FUNCTION_BLOCK PUBLIC FB_EncoderValidation
 VAR_INPUT
     Start       : BOOL;
     Abort       : BOOL;
-    FirstStepId : INT;
+    CaseId      : INT; // 0=tous ; 1..2=cas ciblé
 END_VAR
 VAR_OUTPUT
     Busy            : BOOL;
@@ -34,7 +34,7 @@ VAR
     StartPrev       : BOOL;
     ResetIssued     : BOOL;
     Step            : INT;
-    CaseId          : INT;
+    CurrentCaseId   : INT;
     StepStarted     : BOOL;
     StepTimer       : TON;
     StepLimit       : TIME;
@@ -47,8 +47,8 @@ END_VAR
 
 // Gate simulation : une suite non exécutable se termine explicitement.
 SimGateOk := GVL_Simulation.SimulationModeActive
-          AND NOT GVL_Simulation.EncoderM1_IsReal
-          AND NOT GVL_Simulation.EncoderM2_IsReal;
+          AND NOT GVL_Simulation.BusEncoderM1IsReal
+          AND NOT GVL_Simulation.BusEncoderM2IsReal;
 
 // Valeurs par défaut de commande : aucun front ne reste actif hors étape dédiée.
 M1HomePulse := FALSE;
@@ -56,8 +56,8 @@ M2HomePulse := FALSE;
 ActiveStimulusId := 0;
 
 IF Abort THEN
-    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
-    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
+    GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;
@@ -79,8 +79,21 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     ErrorCode := 0;
     ErrorMessage := '';
     TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
-    Step := FirstStepId;
-    IF (Step <> 10) AND (Step <> 20) THEN Step := 10; END_IF;
+    IF CaseId < 0 OR CaseId > 2 THEN
+        Busy := FALSE;
+        Done := TRUE;
+        AnyFailed := TRUE;
+        ConfigError := TRUE;
+        ErrorCode := 3002;
+        ErrorMessage := 'Encoder/Homing CaseId invalide';
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+        Report.TerminalState := TerminalState;
+        Report.AnyFailed := TRUE;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        RETURN;
+    END_IF;
+    IF CaseId = 2 THEN Step := 20; ELSE Step := 10; END_IF;
     Report.Name := 'Encoder/Homing Validation';
     Report.InProgress := TRUE;
     Report.AllPassed := FALSE;
@@ -121,8 +134,8 @@ StepElapsed := StepElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.Task
 Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
 Report.CurrentStepId := Step;
 // 🧭 Mapping rapport : étapes 10/11 = TC-E1 ; étapes 20/21/22 = TC-E2.
-CaseId := SEL(Step >= 20, 2, 1);
-Report.CurrentCaseId := CaseId;
+CurrentCaseId := SEL(Step >= 20, 2, 1);
+Report.CurrentCaseId := CurrentCaseId;
 
 IF NOT StepStarted THEN
     StepStarted := TRUE;
@@ -147,7 +160,7 @@ StepTimer(IN := TRUE, PT := StepLimit);
 CASE Step OF
     // TC-E1 : gate et interface IHM nominale accessibles.
     10:
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N2;
         IF NOT SimGateOk THEN
             StepFailed := TRUE;
             ErrorCode := 3003;
@@ -167,9 +180,9 @@ CASE Step OF
             Step := 0;
         END_IF;
 
-    // TC-E2 : fronts CmdHome indépendants, envoyés simultanément.
+    // TC-E2 : fronts BtnHome indépendants, envoyés simultanément.
     20:
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N2;
         IF NOT SimGateOk THEN
             StepFailed := TRUE;
             ErrorCode := 3003;
@@ -183,16 +196,16 @@ CASE Step OF
     21:
         M1HomePulse := TRUE;
         M2HomePulse := TRUE;
-        GVL_IHM.M1TreuilRetenue.CmdHome := M1HomePulse;
-        GVL_IHM.M2TreuilBucket.CmdHome := M2HomePulse;
+        GVL_IHM.M1TreuilRetenue.BtnHome := M1HomePulse;
+        GVL_IHM.M2TreuilBucket.BtnHome := M2HomePulse;
         StepPassed := TRUE;
         Step := 22;
         StepStarted := FALSE;
 
     // TC-E2 : aucune attente infinie : les deux instances doivent finir ou déclarer une erreur.
     22:
-        GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
-        GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+        GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
+        GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
         IF (GVL_IHM.M1TreuilRetenue.HomingDone OR GVL_IHM.M1TreuilRetenue.Homed)
            AND (GVL_IHM.M2TreuilBucket.HomingDone OR GVL_IHM.M2TreuilBucket.Homed) THEN
             StepPassed := TRUE;
@@ -233,20 +246,20 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
         Report.AllPassed := NOT AnyFailed;
         Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
         TerminalState := Report.TerminalState;
-        IF CaseId = 1 THEN
-            Report.Cases[CaseId].Name := 'TC-E1 Interface Homing nominale';
+        IF CurrentCaseId = 1 THEN
+            Report.Cases[CurrentCaseId].Name := 'TC-E1 Interface Homing nominale';
         ELSE
-            Report.Cases[CaseId].Name := 'TC-E2 Commandes Home M1/M2';
+            Report.Cases[CurrentCaseId].Name := 'TC-E2 Commandes Home M1/M2';
         END_IF;
-        Report.Cases[CaseId].Executed := TRUE;
-        Report.Cases[CaseId].Ok := NOT AnyFailed;
-        Report.Cases[CaseId].FailedStepId := 0;
-        Report.Cases[CaseId].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Cases[CurrentCaseId].Executed := TRUE;
+        Report.Cases[CurrentCaseId].Ok := NOT AnyFailed;
+        Report.Cases[CurrentCaseId].FailedStepId := 0;
+        Report.Cases[CurrentCaseId].FailReason := E_TestFailReason.FAIL_NONE;
         IF AnyFailed THEN
-            Report.Cases[CaseId].FailedStepId := Report.CurrentStepId;
-            Report.Cases[CaseId].FailReason := E_TestFailReason.FAIL_CHECK;
+            Report.Cases[CurrentCaseId].FailedStepId := Report.CurrentStepId;
+            Report.Cases[CurrentCaseId].FailReason := E_TestFailReason.FAIL_CHECK;
         END_IF;
-        Report.Cases[CaseId].Duration := Report.Duration;
+        Report.Cases[CurrentCaseId].Duration := Report.Duration;
         IF AnyFailed THEN Report.FailureSummary := 'Encoder/Homing : échec ou timeout'; END_IF;
     ELSE
         StepStarted := FALSE;
@@ -255,8 +268,8 @@ END_IF;
 
 // Limite globale de sécurité de la suite : 30 s maximum.
 IF Report.Duration >= T#30s AND Busy THEN
-    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
-    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
+    GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;

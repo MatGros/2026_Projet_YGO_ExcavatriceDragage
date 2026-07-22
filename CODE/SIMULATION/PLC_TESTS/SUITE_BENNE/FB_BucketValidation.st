@@ -9,7 +9,7 @@ FUNCTION_BLOCK PUBLIC FB_BucketValidation
 VAR_INPUT
     Start                      : BOOL;        // Commande de démarrage des tests
     Abort                      : BOOL;        // Commande d'abandon
-    FirstStepId                : INT;         // Première étape à exécuter
+    CaseId                     : INT;         // 0=tous ; 1..6=cas ciblé
     instBucket                 : REFERENCE TO FB_Bucket;    // 🆕 Instance benne à tester
     instWinchM2                : REFERENCE TO FB_Winch;     // 🆕 Instance treuil M2 à tester
 END_VAR
@@ -123,7 +123,7 @@ END_VAR
 
 // 1. 🛡️ GATE
 IF NOT GVL_Simulation.SimulationModeActive THEN
-    Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
+    Sequencer(Start := FALSE, Abort := TRUE, CaseId := CaseId,
               StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
               ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report);
 
@@ -132,11 +132,11 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
 END_IF;
 
 // Gate spécifique Bucket : refuse si M1 ou M2 sont en simulation réelle (Sûreté)
-SimGateOk := NOT GVL_Simulation.EncoderM1_IsReal AND NOT GVL_Simulation.EncoderM2_IsReal;
+SimGateOk := NOT GVL_Simulation.BusEncoderM1IsReal AND NOT GVL_Simulation.BusEncoderM2IsReal;
 
 // 🔧 REX 2026-07-17 : garde-fou REFERENCE TO — PRG_00_Inputs (qui appelle cette suite via
 // FB_PLC_Tests_Management) s'exécute AVANT PRG_06_WinchControl dans l'ordre du scan (00 avant 06).
-// GVL_Simulation.refBucket/refWinchM2 ne sont assignés qu'en fin de PRG_06_WinchControl -> au tout
+// GVL_Simulation.LinkBucket/LinkWinchM2 ne sont assignés qu'en fin de PRG_06_WinchControl -> au tout
 // premier scan, ces références sont encore invalides. Déréférencer instBucket.xxx sans ce garde
 // provoquait une EXCEPTION RUNTIME CODESYS (accès référence invalide) au démarrage de la simulation.
 IF NOT __ISVALIDREF(instBucket) OR NOT __ISVALIDREF(instWinchM2) THEN
@@ -606,7 +606,7 @@ ProbeReal[SigM2TopLimit]       := instWinchM2.TopLimitM;
 Sequencer(
     Start := Start,
     Abort := Abort,
-    FirstStepId := FirstStepId,
+    CaseId := CaseId,
     StepTable := StepTable,
     CheckTable := CheckTable,
     CaseTable := CaseTable,

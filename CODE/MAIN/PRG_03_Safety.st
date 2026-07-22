@@ -25,8 +25,8 @@ instSafetyWinchM1(
     // (PRG_06_WinchControl), qui a BESOIN d'un SafeStop/ForbidAscent/ForbidDescent réels pour
     // rampé/ralentir proprement (ex-doctrine "Conditional Bypass" devenue obsolète et RETIRÉE
     // ici : chaque capteur/retour a DÉJÀ sa propre granularité réel/simulé — GVL_Simulation.
-    // EncoderM1_IsReal, ContactorFeedbackM1_IsReal, ThermalM1_IsReal, TopPositionSensor_IsReal,
-    // SlackCableSwitch_IsReal — un composant simulé est déjà forcé "sain" en amont (PRG_00_Inputs/
+    // BusEncoderM1IsReal, SensorM1ContactorFeedbackIsReal, SensorM1ThermalIsReal, SensorTopPositionIsReal,
+    // SensorSlackCableIsReal — un composant simulé est déjà forcé "sain" en amont (PRG_00_Inputs/
     // PRG_02_Encoders), donc Enable n'a plus besoin de bypasser tout le domaine : un vrai défaut
     // sur un composant RÉEL protège, un composant SIMULÉ ne fait jamais défaut de lui-même).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
@@ -38,7 +38,7 @@ instSafetyWinchM1(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
-    EncoderFaultBypass  := GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass,
+    EncoderFaultBypass  := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback     := NOT PRG_00_Inputs.M1ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -46,7 +46,7 @@ instSafetyWinchM1(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM1.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
-    CableLimitDescentM  := _CableLimitM1Descent_M,
+    CfgCableLimitDescentM  := _CableLimitM1Descent_M,
     Direction           := PRG_06_WinchControl.M1_Direction_Active,
     MovementCommanded   := PRG_06_WinchControl.instWinchM1.RelayFwd OR PRG_06_WinchControl.instWinchM1.RelayRev,
     Homed               := PRG_02_Encoders.instHomingM1.Homed,
@@ -82,7 +82,7 @@ instSafetyWinchM2(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
-    EncoderFaultBypass  := GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass,
+    EncoderFaultBypass  := GVL_IHM.M2TreuilBucket.Bypass.EncoderFault,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,
@@ -90,7 +90,7 @@ instSafetyWinchM2(
     TopPositionSensor   := PRG_00_Inputs.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM2.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    CableLimitDescentM  := _CableLimitM2Descent_M,
+    CfgCableLimitDescentM  := _CableLimitM2Descent_M,
     Direction           := PRG_06_WinchControl.M2_Direction_Active,
     MovementCommanded   := PRG_06_WinchControl.instWinchM2.RelayFwd OR PRG_06_WinchControl.instWinchM2.RelayRev,
     Homed               := PRG_02_Encoders.instHomingM2.Homed,

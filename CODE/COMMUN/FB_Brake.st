@@ -27,7 +27,7 @@ VAR_INPUT
     DelayMotorDecel     : TIME := T#500ms;            // Délai décélération/ouverture contacteur avant collage frein
     FeedbackTimeout     : TIME := T#1s;               // Délai max cohérence commande/retour frein
     BypassContactorCheck: BOOL;                       // 🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,
-                                                       // voir GVL_Simulation.ContactorFeedbackMx_IsReal, passé
+                                                       // voir GVL_Simulation.SensorMxContactorFeedbackIsReal, passé
                                                        // par l'appelant FB_Winch/FB_Translation — TOUJOURS FALSE réel)
 END_VAR
 VAR_OUTPUT

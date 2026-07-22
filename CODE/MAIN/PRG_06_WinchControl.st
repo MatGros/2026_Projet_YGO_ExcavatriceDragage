@@ -94,8 +94,8 @@ instBucket(
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.Bucket.CmdOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
-    CmdClose_IHM        := GVL_IHM.Bucket.CmdClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
+    CmdOpen_IHM         := GVL_IHM.Bucket.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
+    CmdClose_IHM        := GVL_IHM.Bucket.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
     JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
     JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -104,10 +104,10 @@ instBucket(
     HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
-    ConfirmOpenPosition := GVL_IHM.Bucket.CmdConfirmOpenPosition, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
-    ConfirmClosePosition:= GVL_IHM.Bucket.CmdConfirmClosePosition, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
+    ConfirmOpenPosition := GVL_IHM.Bucket.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
+    ConfirmClosePosition:= GVL_IHM.Bucket.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
     Config              := _BucketConfig,
-    TimeoutDuration     := GVL_IHM.Bucket.TimeoutDuration,
+    CfgTimeoutDuration     := GVL_IHM.Bucket.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
@@ -251,7 +251,7 @@ instWinchSync(
     HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
     SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
-    SyncToleranceM  := _WinchSyncTolerance_M,
+    CfgSyncToleranceM  := _WinchSyncTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
     
     RelayFwdM1      := instWinchM1.RelayFwd,
@@ -414,7 +414,7 @@ instWinchM1(
     SpeedStepTable          := _WinchSpeedStepTable,
     // 🔧 REX 2026-07-15 (9) : EffectiveMaxStepDescente/Ascent (voir calcul plus haut) — Auto garde
     // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
-    MaxStepDescente         := EffectiveMaxStepDescente,
+    CfgMaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := EffectiveMaxStepAscent,
     MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM1.SpeedBand,
     SpeedGuardEnable        := SpeedGuardEnableM1,
@@ -424,10 +424,10 @@ instWinchM1(
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
-    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal,
-    RampAccelRate           := _WinchM1RampAccelRate_Pct,
-    RampDecelNormalRate     := _WinchM1RampDecelNormal_Pct,
-    RampDecelFastRate       := _WinchM1RampDecelFast_Pct,
+    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal,
+    CfgRampAccelRate           := _WinchM1RampAccelRate_Pct,
+    CfgRampDecelNormalRate     := _WinchM1RampDecelNormal_Pct,
+    CfgRampDecelFastRate       := _WinchM1RampDecelFast_Pct,
     Homed                   := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM1.HomingSuspect, // 🆕 Câblage de l'incertitude M1
     CablePosM               := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -436,8 +436,8 @@ instWinchM1(
     // ForbidAscentM1_Raw ci-dessus, pas le capteur physique (réservé au Homing).
     TopLimitM               := _CableLimitM1Ascent_M,
     BottomLimitM            := BottomLimitM1_Active,
-    SlowdownDistanceM       := _WinchSlowdownDistance_M,
-    SlowSpeedPct            := _WinchSlowSpeed_Pct
+    CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
+    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct
 );
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
@@ -456,7 +456,7 @@ instWinchM2(
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
     // 🔧 REX 2026-07-15 (9) : idem M1 (voir §6 ci-dessus).
-    MaxStepDescente         := EffectiveMaxStepDescente,
+    CfgMaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := EffectiveMaxStepAscent,
     MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM2.SpeedBand,
     SpeedGuardEnable        := SpeedGuardEnableM2,
@@ -466,18 +466,18 @@ instWinchM2(
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
-    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal,
-    RampAccelRate           := _WinchM2RampAccelRate_Pct,
-    RampDecelNormalRate     := _WinchM2RampDecelNormal_Pct,
-    RampDecelFastRate       := _WinchM2RampDecelFast_Pct,
+    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal,
+    CfgRampAccelRate           := _WinchM2RampAccelRate_Pct,
+    CfgRampDecelNormalRate     := _WinchM2RampDecelNormal_Pct,
+    CfgRampDecelFastRate       := _WinchM2RampDecelFast_Pct,
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage benne fermé).
     TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
-    SlowdownDistanceM       := _WinchSlowdownDistance_M,
-    SlowSpeedPct            := _WinchSlowSpeed_Pct
+    CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
+    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct
 );
 
 // ── 8. ALIMENTATION PRG_10_Outputs (sorties physiques) ──────────────────
@@ -506,5 +506,5 @@ PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;
 // 🔧 REX 2026-07-17 : ":=" sur une REFERENCE TO fait une COPIE DE VALEUR (écrit à travers la
 // référence), PAS un rebind -- sur une référence pas encore liée (1er scan), ça écrit à une
 // adresse invalide -> ACCESS VIOLATION runtime CODESYS. "REF=" est l'opérateur dédié au rebind.
-GVL_Simulation.refBucket   REF= instBucket;
-GVL_Simulation.refWinchM2  REF= instWinchM2;
+GVL_Simulation.LinkBucket   REF= instBucket;
+GVL_Simulation.LinkWinchM2  REF= instWinchM2;

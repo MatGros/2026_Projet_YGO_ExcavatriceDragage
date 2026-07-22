@@ -6,14 +6,14 @@
 TYPE ST_ModesHMI :
 STRUCT
     CurrentMode     : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
-    ModeRequest     : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM (REX 2026-07-07) *)
+    SelMode     : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM (REX 2026-07-07) *)
     EmergencyStopOk    : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
-    FaultMachineReset  : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07, ex-MachineReset) *)
-    ModeReset          : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement (REX 2026-07-07) *)
+    BtnFaultReset  : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07, ex-MachineReset) *)
+    BtnModeReset          : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement (REX 2026-07-07) *)
     AnyFaultActive     : BOOL;   (* 🔴 REX 2026-07-07 : au moins un défaut/alarme actif dans le domaine
                                      sécurité/métier — s'éteint seul quand la cause disparaît ET que
-                                     FaultMachineReset a été pressé (OR de tous les .Error du domaine,
-                                     même périmètre que FaultMachineReset) *)
+                                     BtnFaultReset a été pressé (OR de tous les .Error du domaine,
+                                     même périmètre que BtnFaultReset) *)
     PowerCutOffActive  : BOOL;   (* 🧨 REX 2026-07-07 : au moins un Méca A/B/C (FB_Safety_Winch) ou
                                      PowerCutOff Translation actif — TRUE = coupure demandée. Attention :
                                      PowerCutOff_A_RQ/B_RQ (sortie physique réelle) sont à la polarité
@@ -21,8 +21,8 @@ STRUCT
                                      polarité "alarme" (TRUE=problème) pour cohérence avec AnyFaultActive *)
 
     // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
-    CmdEmergencyArming : BOOL;   (* 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique *)
-    CmdEmergencyCutOff : BOOL;   (* 🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance) *)
+    BtnEmergencyArming : BOOL;   (* 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique *)
+    BtnEmergencyCutOff : BOOL;   (* 🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance) *)
     EmergencyChainOk   : BOOL;   (* 🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif) *)
     PowerContactorOk   : BOOL;   (* 🔌 Contacteur de puissance confirmé engagé (miroir EmergencyStopOk) *)
     EmergencyArmable   : BOOL;   (* 🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,
@@ -33,6 +33,6 @@ STRUCT
 
     // 🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
     // sélection treuil au joystick, arbitrée par FB_Modes (MAINT_N2 uniquement, forcé à 3=Couplé sinon)
-    JoystickWinchSelect : INT; (* 🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir FB_Modes.JoystickWinchSelectArbitrated *)
+    SelJoystickWinch : INT; (* 🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir FB_Modes.JoystickWinchSelectArbitrated *)
 END_STRUCT
 END_TYPE

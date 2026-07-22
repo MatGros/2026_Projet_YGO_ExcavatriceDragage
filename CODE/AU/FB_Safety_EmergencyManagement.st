@@ -12,11 +12,11 @@ FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
-    ArmRequest          : BOOL;        // Demande de réarmement (CmdEmergencyArming)
+    ArmRequest          : BOOL;        // Demande de réarmement (BtnEmergencyArming)
     EmergencyChain      : BOOL;        // Retour physique boucle d'urgence amont contacteur
     EmergencyStopOk     : BOOL;        // Confirmation contacteur de puissance principal
     PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
-    CmdEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
+    BtnEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -50,7 +50,7 @@ Logic(
     EmergencyChain := EmergencyChain,
     EmergencyStopOk := EmergencyStopOk,
     PowerCutOffRequest := PowerCutOffRequest,
-    CmdEmergencyCutOff := CmdEmergencyCutOff
+    BtnEmergencyCutOff := BtnEmergencyCutOff
 );
 
 Output(

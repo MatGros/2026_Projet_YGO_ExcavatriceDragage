@@ -15,7 +15,7 @@ STRUCT
     DeadmanArmed : BOOL;      (* 🔫 Geste homme-mort armé (FB_Joystick.DeadmanArmed) *)
     Online      : BOOL;       (* 📡 Liaison CAN joystick active *)
     Operational : BOOL;       (* 🟢 Joystick opérationnel *)
-    Calibrate   : BOOL;       (* 🎯 Demande de recalage au neutre *)
+    BtnCalibrate   : BOOL;       (* 🎯 Demande de recalage au neutre *)
     Error       : BOOL;       (* 🔴 Joystick en défaut *)
     ErrorId     : WORD;       (* ❌ Code défaut joystick *)
 END_STRUCT

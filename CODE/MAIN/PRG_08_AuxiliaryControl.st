@@ -21,4 +21,4 @@ END_VAR
 
 // 🌡️ Retour thermique brut (NC) — entrée physique ThermHydraulique_DI ;
 // tant que non câblé, ce point lira FALSE côté image process réelle si absent, d'où l'OR simulation.
-HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.HydraulicThermal_IsReal);
+HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorHydraulicThermalIsReal);

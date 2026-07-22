@@ -42,7 +42,7 @@ VAR_INPUT
     RawX            : INT;        // Valeur brute axe X
     RawY            : INT;        // Valeur brute axe Y
     RawButton       : BOOL;       // État brut bouton
-    Calibrate       : BOOL;       // Demande de recalage neutre
+    BtnCalibrate       : BOOL;       // Demande de recalage neutre
     InvertX         : BOOL := FALSE;
     InvertY         : BOOL := FALSE;
     Deadband        : REAL := 10.0;  // 🔧 2026-07-02 (demande utilisateur) : 5.0 → 10.0 %
@@ -131,7 +131,7 @@ CycleTimeCalc();
 Button := RawButton;
 
 // 🎯 4. CALIBRATION DYNAMIQUE (Zone RETAIN)
-IF Calibrate AND NOT LastCalibrate THEN
+IF BtnCalibrate AND NOT LastCalibrate THEN
     IF RawX >= 2000 AND RawX <= 8000 AND RawY >= 2000 AND RawY <= 8000 THEN
         NeutralXMem := RawX;
         NeutralYMem := RawY;
@@ -142,7 +142,7 @@ IF Calibrate AND NOT LastCalibrate THEN
     END_IF;
 END_IF;
 Error := (ErrorId <> 16#0000);
-LastCalibrate := Calibrate;
+LastCalibrate := BtnCalibrate;
 
 // 🧮 4bis. MISE À L'ÉCHELLE (avant homme-mort — le neutre s'évalue sur les 2 axes déjà deadbandés)
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, Deadband := Deadband);

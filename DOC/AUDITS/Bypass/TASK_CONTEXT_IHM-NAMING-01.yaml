@@ -1,0 +1,93 @@
+task_id: "IHM-NAMING-01"
+request: >
+  Renommage complet en un seul lot : (1) convention IHM Btn/Sel/Set/Tgl/Cfg sur toutes
+  les structures ST_*HMI (Winch, Bucket, Translation, Modes, Joystick, Sync, Cycle,
+  Commun) ; (2) convention simulation Sensor/Bus/Sim/Tst/Link sur GVL_Simulation ;
+  (3) nouveau struct Bypass dedie par metier (ST_*HMI.Bypass) pour les bypass
+  maintenance MAINT_N2, separe de GVL_Simulation qui reste en l'etat structurel
+  (juste renomme).
+criticality: "C4"
+scope_code:
+  - "CODE/SUPERVISION/ST_WinchHMI.st"
+  - "CODE/SUPERVISION/ST_BucketHMI.st"
+  - "CODE/SUPERVISION/ST_TranslationHMI.st"
+  - "CODE/SUPERVISION/ST_ModesHMI.st"
+  - "CODE/SUPERVISION/ST_JoystickHMI.st"
+  - "CODE/SUPERVISION/ST_SyncHMI.st"
+  - "CODE/SUPERVISION/ST_CycleHMI.st"
+  - "CODE/SUPERVISION/ST_CommunHMI.st"
+  - "CODE/SUPERVISION/GVL_IHM.st"
+  - "CODE/SIMULATION/GVL_Simulation.st"
+  - "CODE/MAIN/PRG_00_Inputs.st"
+  - "CODE/MAIN/PRG_01_Diagnostics.st"
+  - "CODE/MAIN/PRG_02_Encoders.st"
+  - "CODE/MAIN/PRG_03_Safety.st"
+  - "CODE/MAIN/PRG_04_Modes.st"
+  - "CODE/MAIN/PRG_05_Cycle.st"
+  - "CODE/MAIN/PRG_06_WinchControl.st"
+  - "CODE/MAIN/PRG_07_TranslationControl.st"
+  - "CODE/MAIN/PRG_08_AuxiliaryControl.st"
+  - "CODE/MAIN/PRG_09_Supervision.st"
+  - "CODE/MODES/FB_Modes.st"
+  - "CODE/TREUILS/FB_Safety_Winch.st"
+  - "CODE/TREUILS/FB_Winch.st"
+  - "CODE/TREUILS/BENNE/FB_Bucket.st"
+  - "CODE/TRANSLATION/FB_Safety_Translation.st"
+  - "CODE/TRANSLATION/FB_Translation.st"
+  - "CODE/COMMUN/FB_Brake.st"
+  - "CODE/CYCLE/FB_Cycle.st"
+  - "CODE/SIMULATION/FB_Sim_Encoder.st"
+  - "CODE/SIMULATION/FB_Sim_Joystick.st"
+  - "CODE/SIMULATION/FB_Sim_Translation.st"
+  - "CODE/SIMULATION/FB_Sim_Safety.st"
+  - "CODE/SIMULATION/PLC_TESTS/CORE/FB_TranslationTestFixture.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_BENNE/FB_BucketValidation.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_ENCODER/FB_EncoderValidation.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_MODES/FB_ModesValidation.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_SAFETY/FB_HeartbeatValidation.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_SAFETY/FB_PLC_Tests_Management.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_SAFETY/FB_SafetyValidation.st"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/FB_TranslationValidation.st"
+scope_doc:
+  - "DOC/NAMING_CONVENTION.md"
+  - "DOC/AF_Partie-03_Template_FB_Commun_v1.3.md"
+  - "DOC/AF_Partie-07_Interface_IHM_v1.5.md"
+  - "DOC/AF_Partie-09_Fonction_Winch_v1.11.md"
+  - "DOC/AF_Partie-11_Fonction_Translation_v1.9.md"
+  - "DOC/AF_Partie-12_Fonction_Benne_v1.4.md"
+  - "DOC/AF_Partie-13_Fonction_Simulation_v1.2.md"
+  - "DOC/VERSION_HISTORY.md"
+out_of_scope:
+  - "BypassContactorCheck (O3 : renomme si trouve sur le chemin, sinon reporte, priorite basse)"
+  - "Renommage logique metier interne aux FB (variables VAR locales hors structs HMI/simulation) — chantier separe deja identifie en session"
+  - "Comportement fonctionnel des blocs Safety — renommage pur, aucune logique/seuil/condition modifiee"
+  - "Visualisation IHM graphique elle-meme (tags a remapper manuellement par l'utilisateur apres import bundle)"
+acceptance_criteria:
+  - "Toutes les structures ST_*HMI utilisent les prefixes Btn/Sel/Set/Tgl/Cfg selon NAMING_CONVENTION.md (section Variables IHM), sans underscore apres le prefixe."
+  - "GVL_Simulation utilise les prefixes Sensor/Bus/Sim/Tst/Link avec Repere juste apres le prefixe pour les GVL plates (SensorM1ThermalIsReal, pas SensorThermalM1IsReal)."
+  - "Repere fonctionnel numerote (ex: Contactor1..4) reste colle a sa fonction, jamais separe (SensorM1Contactor4IsReal)."
+  - "Nouveau struct ST_Bypass<Metier> (ex: ST_BypassWinch) cree et imbrique dans chaque ST_*HMI concerne (Winch x2 instances, Translation, Bucket) — jamais de champ bypass isole a la racine."
+  - "Bypass communs (thermique frein, mou cable, position haute, rotation phase) dans ST_CommunHMI.Bypass, pas duplique par axe."
+  - "GVL_Simulation reste structurellement inchangee (pas de sous-structs, liste plate conservee) — seuls les NOMS changent."
+  - "Flux VAR_INPUT respecte partout : aucun FB metier ne lit GVL_Simulation ou GVL_IHM directement depuis son corps — injection depuis PRG_03_Safety/PRG_06/PRG_07 uniquement (pattern deja conforme EncoderFaultBypass a generaliser)."
+  - "Granularite fine conservee : pas de bypass bloc entier (doctrine Conditional Bypass, retiree, ne pas reintroduire)."
+  - "Bundle PLCopenXML regenere et frais (check_bundle_freshness.py = PASS)."
+  - "Mapping complet OldName -> NewName documente dans VERSION_HISTORY.md pour permettre le remappage manuel des tags IHM graphiques."
+tests_required:
+  - "Compilation CODESYS manuelle (utilisateur, apres import bundle)"
+  - "Suites PLC_TESTS existantes (SUITE_SAFETY, SUITE_TRANSLATION, SUITE_BENNE, SUITE_ENCODER, SUITE_MODES) doivent continuer a passer apres renommage sans aucune modification de leur propre code (preuve que le renommage est bien 1:1, pas de perte de cablage VAR_INPUT)."
+# Gate C3/C4 (check_task_test_contract.py) : aucun lot safety sans artefact de test PLC,
+# meme un renommage pur touchant des VAR_INPUT de blocs Safety (EncoderFaultBypass, Inhibit,
+# BypassContactorFeedback...). Artefact = suite de non-regression qui verifie que chaque
+# bypass renomme est toujours effectivement cable et fonctionnel (pas juste renomme a vide).
+tests_automated_required: true
+tests_implementation_paths:
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_SAFETY/FB_SafetyValidation.st (suite existante, executee telle quelle apres renommage — verifie EncoderFaultBypass/Inhibit/Bypass* toujours cables)"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_BENNE/FB_BucketValidation.st (idem, Bucket)"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/FB_TranslationValidation.st (idem, Translation)"
+tests_status: "planned"
+test_execution_evidence: []
+review_required: true
+dual_review_required: true
+pony_tail: forbidden
+human_validation_required: true

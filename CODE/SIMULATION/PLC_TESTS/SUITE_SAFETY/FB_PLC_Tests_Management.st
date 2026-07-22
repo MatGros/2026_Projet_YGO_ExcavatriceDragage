@@ -21,22 +21,22 @@ VAR
     // Variables de commande internes
     StartSafety          : BOOL;
     AbortSafety          : BOOL;
-    FirstStepSafety      : INT;
+    RequestedCaseSafety  : INT;
     StartTranslation     : BOOL;
     AbortTranslation     : BOOL;
     RequestedCaseTranslation : INT; // 🆕 2026-07-22 : CaseId direct (0=toutes,1..6) — JAMAIS de FirstStepId (audit v1.0 C2)
     StartBucket           : BOOL;
     AbortBucket           : BOOL;
-    FirstStepBucket       : INT;
+    RequestedCaseBucket   : INT;
     StartEncoder          : BOOL;
     AbortEncoder          : BOOL;
-    FirstStepEncoder      : INT;
+    RequestedCaseEncoder  : INT;
     StartModes            : BOOL;
     AbortModes            : BOOL;
-    FirstStepModes        : INT;
+    RequestedCaseModes    : INT;
     StartHeartbeat        : BOOL;
     AbortHeartbeat        : BOOL;
-    FirstStepHeartbeat    : INT;
+    RequestedCaseHeartbeat : INT;
     StartFramework        : BOOL;
     FrameworkScanCount    : INT;
 
@@ -106,9 +106,25 @@ CASE GVL_PLC_Tests.Status.RunState OF
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
 
-        // Normalisation des commandes unitaires vers l'interface historique RunSuite.
-        // Une seule commande est consommée ; RunAll reste volontairement ignoré.
-        IF GVL_PLC_Tests.Cmd.RunSafety THEN
+        // 🧪 RunAll prioritaire : démarre une campagne complète depuis Safety.
+        IF RunAllTrig.Q THEN
+            ChainMode := TRUE;
+            CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSafety;
+            RequestedCaseSafety := 0;
+            RequestedCaseTranslation := 0;
+            RequestedCaseBucket := 0;
+            RequestedCaseEncoder := 0;
+            RequestedCaseModes := 0;
+            RequestedCaseHeartbeat := 0;
+            FinalAborted := FALSE;
+            FinalAnyFailed := FALSE;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
+            GVL_PLC_Tests.Status.FailureSummary := '';
+            StartSafety := TRUE;
+            GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+        // Normalisation des commandes unitaires vers RunSuite.
+        ELSIF GVL_PLC_Tests.Cmd.RunSafety THEN
             GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteSafety;
             GVL_PLC_Tests.Cmd.RunSafety := FALSE;
         ELSIF GVL_PLC_Tests.Cmd.RunTranslation THEN
@@ -130,24 +146,14 @@ CASE GVL_PLC_Tests.Status.RunState OF
             StartFramework := TRUE;
             GVL_PLC_Tests.Cmd.RunFramework := FALSE;
         END_IF;
-        GVL_PLC_Tests.Cmd.RunAll := FALSE;
 
-        // RunAll est désactivé : chaque suite est lancée manuellement.
         // Démarrage d'une suite ciblée (Safety)
         IF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteSafety THEN
             IF GVL_Simulation.SimulationModeActive AND instSafetyValidation.SimGateOk THEN
                 ChainMode := FALSE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSafety;
                 StartSafety := TRUE;
-                IF GVL_PLC_Tests.Cmd.RunCase = 1 THEN
-                    FirstStepSafety := 10;
-                ELSIF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
-                    FirstStepSafety := 20;
-                ELSIF GVL_PLC_Tests.Cmd.RunCase = 3 THEN
-                    FirstStepSafety := 30;
-                ELSE
-                    FirstStepSafety := 10; // Par défaut TC-01
-                END_IF;
+                RequestedCaseSafety := GVL_PLC_Tests.Cmd.RunCase;
                 GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
@@ -176,15 +182,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ChainMode := FALSE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
                 StartBucket := TRUE;
-                IF GVL_PLC_Tests.Cmd.RunCase = 1 THEN
-                    FirstStepBucket := 10;
-                ELSIF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
-                    FirstStepBucket := 20;
-                ELSIF GVL_PLC_Tests.Cmd.RunCase = 3 THEN
-                    FirstStepBucket := 30;
-                ELSE
-                    FirstStepBucket := 10; // Par défaut TC-B1
-                END_IF;
+                RequestedCaseBucket := GVL_PLC_Tests.Cmd.RunCase;
                 GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
@@ -197,11 +195,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ChainMode := FALSE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteEncoder;
                 StartEncoder := TRUE;
-                IF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
-                    FirstStepEncoder := 20;
-                ELSE
-                    FirstStepEncoder := 10;
-                END_IF;
+                RequestedCaseEncoder := GVL_PLC_Tests.Cmd.RunCase;
                 GVL_PLC_Tests.Status.FailureSummary := '';
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
@@ -214,7 +208,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 ChainMode := FALSE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteModes;
                 StartModes := TRUE;
-                FirstStepModes := 10;
+                RequestedCaseModes := GVL_PLC_Tests.Cmd.RunCase;
                 GVL_PLC_Tests.Status.FailureSummary := '';
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
@@ -224,12 +218,12 @@ CASE GVL_PLC_Tests.Status.RunState OF
         // Démarrage suite Heartbeat IHM↔PLC.
         ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
             IF GVL_Simulation.SimulationModeActive
-               AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal
-               AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal THEN
+               AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal
+               AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal THEN
                 ChainMode := FALSE;
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteHeartbeat;
                 StartHeartbeat := TRUE;
-                FirstStepHeartbeat := 10;
+                RequestedCaseHeartbeat := GVL_PLC_Tests.Cmd.RunCase;
                 GVL_PLC_Tests.Status.FailureSummary := '';
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             END_IF;
@@ -239,6 +233,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
 
         // 🧪 Smoke test géré directement ici : aucune instance/table/runtime.
         IF StartFramework THEN
+            ChainMode := FALSE;
             FrameworkScanCount := 0;
             GVL_PLC_Tests.FrameworkResult.InProgress := TRUE;
             GVL_PLC_Tests.FrameworkResult.AllPassed := FALSE;
@@ -274,6 +269,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
         StartSafety := FALSE;
         StartTranslation := FALSE;
         StartBucket := FALSE;
+        StartEncoder := FALSE;
+        StartModes := FALSE;
         StartHeartbeat := FALSE;
         StartFramework := FALSE;
 
@@ -316,6 +313,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
             AbortSafety := TRUE;
             AbortTranslation := TRUE;
             AbortBucket := TRUE;
+            AbortEncoder := TRUE;
+            AbortModes := TRUE;
             AbortHeartbeat := TRUE;
         END_IF;
 
@@ -343,6 +342,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 // 🔗 Enchaîne vers Translation (continue même si Safety a échoué — logique
                 // FAIL_CONTINUE déjà appliquée au niveau des cases/steps, voir §7.3.4)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
+                SuiteElapsed := T#0s;
                 StartTranslation := TRUE;
                 RequestedCaseTranslation := 0; // Enchaînement RunAll -> toutes les cases Translation
             ELSIF ChainMode AND NOT instSafetyValidation.Report.Aborted AND NOT instTranslationValidation.SimGateOk THEN
@@ -395,8 +395,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
             IF ChainMode AND (NOT instTranslationValidation.Report.Aborted OR SuiteWatchdogExpired) AND instBucketValidation.SimGateOk THEN
                 // 🔗 Enchaîne vers Bucket (2026-07-16 : 3e maillon Safety→Translation→Bucket)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteBucket;
+                SuiteElapsed := T#0s;
                 StartBucket := TRUE;
-                FirstStepBucket := 10;
+                RequestedCaseBucket := 0;
             ELSIF ChainMode AND NOT instTranslationValidation.Report.Aborted AND NOT instBucketValidation.SimGateOk THEN
                 // Même garde-fou que Safety→Translation : Bucket ne doit jamais démarrer sans son
                 // SimGateOk (refuse si M1/M2 en simulation réelle, voir FB_BucketValidation §1).
@@ -458,9 +459,15 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 GVL_PLC_Tests.EventLog[EventIdx].Message := instBucketValidation.ErrorMessage;
             END_IF;
             IF ChainMode THEN
-                FinalAborted := instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted OR instBucketValidation.Report.Aborted;
-                FinalAnyFailed := instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed OR instBucketValidation.AnyFailed;
-                // 🏷️ Combine jusqu'à 3 résumés (Safety, Translation, Bucket — seul cas où les 3 ont tourné)
+                // Campagne complète : Bucket terminé → Encoder.
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteEncoder;
+                SuiteElapsed := T#0s;
+                StartEncoder := TRUE;
+                RequestedCaseEncoder := 0;
+                // Conserve les verdicts précédents pour le verdict final.
+                FinalAborted := FinalAborted OR instSafetyValidation.Report.Aborted OR instTranslationValidation.Report.Aborted OR instBucketValidation.Report.Aborted;
+                FinalAnyFailed := FinalAnyFailed OR instSafetyValidation.AnyFailed OR instTranslationValidation.AnyFailed OR instBucketValidation.AnyFailed;
+                // 🏷️ Combine jusqu'à 3 résumés intermédiaires.
                 GVL_PLC_Tests.Status.FailureSummary := '';
                 IF instSafetyValidation.Report.FailureSummary <> '' THEN
                     GVL_PLC_Tests.Status.FailureSummary := instSafetyValidation.Report.FailureSummary;
@@ -483,20 +490,29 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 FinalAborted := instBucketValidation.Report.Aborted;
                 FinalAnyFailed := instBucketValidation.AnyFailed;
                 GVL_PLC_Tests.Status.FailureSummary := instBucketValidation.Report.FailureSummary;
-            END_IF;
-        GVL_PLC_Tests.Cmd.RunAll := FALSE; // 🔧 Retombe ICI (Done atteint), pas au démarrage
-            IF FinalAborted THEN
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
-            ELSIF FinalAnyFailed THEN
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
-            ELSE
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+                GVL_PLC_Tests.Cmd.RunAll := FALSE;
+                IF FinalAborted THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+                ELSIF FinalAnyFailed THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+                ELSE
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+                END_IF;
             END_IF;
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat AND instHeartbeatValidation.Done THEN
             AbortHeartbeat := FALSE;
-            FinalAborted := instHeartbeatValidation.Report.Aborted;
-            FinalAnyFailed := instHeartbeatValidation.AnyFailed;
-            GVL_PLC_Tests.Status.FailureSummary := instHeartbeatValidation.Report.FailureSummary;
+            FinalAborted := FinalAborted OR instHeartbeatValidation.Report.Aborted;
+            FinalAnyFailed := FinalAnyFailed OR instHeartbeatValidation.AnyFailed;
+            IF instHeartbeatValidation.Report.FailureSummary <> '' THEN
+                IF GVL_PLC_Tests.Status.FailureSummary <> '' THEN
+                    GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instHeartbeatValidation.Report.FailureSummary));
+                ELSE
+                    GVL_PLC_Tests.Status.FailureSummary := instHeartbeatValidation.Report.FailureSummary;
+                END_IF;
+            END_IF;
+            // ChainMode reste mémorisé au terminal pour agréger toute la campagne.
+            // Le prochain lancement ciblé le remet explicitement à FALSE.
+            GVL_PLC_Tests.Cmd.RunAll := FALSE;
             IF FinalAborted THEN
                 GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
             ELSIF FinalAnyFailed THEN
@@ -506,49 +522,85 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder AND instEncoderValidation.Done THEN
             AbortEncoder := FALSE;
-            FinalAborted := instEncoderValidation.Report.Aborted;
-            FinalAnyFailed := instEncoderValidation.AnyFailed;
-            GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.FailureSummary;
+            IF ChainMode THEN
+                FinalAborted := FinalAborted OR instEncoderValidation.Report.Aborted;
+                FinalAnyFailed := FinalAnyFailed OR instEncoderValidation.AnyFailed;
+                IF instEncoderValidation.Report.FailureSummary <> '' THEN
+                    IF GVL_PLC_Tests.Status.FailureSummary <> '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instEncoderValidation.Report.FailureSummary));
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.FailureSummary;
+                    END_IF;
+                END_IF;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteModes;
+                SuiteElapsed := T#0s;
+                StartModes := TRUE;
+                RequestedCaseModes := 0;
+            ELSE
+                FinalAborted := instEncoderValidation.Report.Aborted;
+                FinalAnyFailed := instEncoderValidation.AnyFailed;
+                GVL_PLC_Tests.Status.FailureSummary := instEncoderValidation.Report.FailureSummary;
+            END_IF;
             IF SuiteWatchdogExpired THEN
                 GVL_PLC_Tests.Status.FailureSummary := 'Watchdog suite Encoder/Homing expire';
                 FinalAborted := FALSE;
                 FinalAnyFailed := TRUE;
             END_IF;
-            IF FinalAborted THEN
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
-            ELSIF FinalAnyFailed THEN
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
-            ELSE
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            IF NOT ChainMode THEN
+                IF FinalAborted THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+                ELSIF FinalAnyFailed THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+                ELSE
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+                END_IF;
             END_IF;
         ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes AND instModesValidation.Done THEN
             AbortModes := FALSE;
-            FinalAborted := instModesValidation.Report.Aborted;
-            FinalAnyFailed := instModesValidation.AnyFailed;
-            GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.FailureSummary;
+            IF ChainMode THEN
+                FinalAborted := FinalAborted OR instModesValidation.Report.Aborted;
+                FinalAnyFailed := FinalAnyFailed OR instModesValidation.AnyFailed;
+                IF instModesValidation.Report.FailureSummary <> '' THEN
+                    IF GVL_PLC_Tests.Status.FailureSummary <> '' THEN
+                        GVL_PLC_Tests.Status.FailureSummary := CONCAT(GVL_PLC_Tests.Status.FailureSummary, CONCAT(' || ', instModesValidation.Report.FailureSummary));
+                    ELSE
+                        GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.FailureSummary;
+                    END_IF;
+                END_IF;
+                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteHeartbeat;
+                SuiteElapsed := T#0s;
+                StartHeartbeat := TRUE;
+                RequestedCaseHeartbeat := 0;
+            ELSE
+                FinalAborted := instModesValidation.Report.Aborted;
+                FinalAnyFailed := instModesValidation.AnyFailed;
+                GVL_PLC_Tests.Status.FailureSummary := instModesValidation.Report.FailureSummary;
+            END_IF;
             IF SuiteWatchdogExpired THEN
                 GVL_PLC_Tests.Status.FailureSummary := 'Watchdog suite Modes/Homme-mort expire';
                 FinalAborted := FALSE;
                 FinalAnyFailed := TRUE;
             END_IF;
-            IF FinalAborted THEN
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
-            ELSIF FinalAnyFailed THEN
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
-            ELSE
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            IF NOT ChainMode THEN
+                IF FinalAborted THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+                ELSIF FinalAnyFailed THEN
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+                ELSE
+                    GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+                END_IF;
             END_IF;
         END_IF;
 
 END_CASE;
 
 // 3. Appel des instances de suites
-instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
+instSafetyValidation(Start := StartSafety, Abort := AbortSafety, CaseId := RequestedCaseSafety);
 instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, CaseId := RequestedCaseTranslation);
-instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
-instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, FirstStepId := FirstStepEncoder);
-instModesValidation(Start := StartModes, Abort := AbortModes, FirstStepId := FirstStepModes);
-instHeartbeatValidation(Start := StartHeartbeat, Abort := AbortHeartbeat, FirstStepId := FirstStepHeartbeat);
+instBucketValidation(Start := StartBucket, Abort := AbortBucket, CaseId := RequestedCaseBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
+instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, CaseId := RequestedCaseEncoder);
+instModesValidation(Start := StartModes, Abort := AbortModes, CaseId := RequestedCaseModes);
+instHeartbeatValidation(Start := StartHeartbeat, Abort := AbortHeartbeat, CaseId := RequestedCaseHeartbeat);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
@@ -680,7 +732,7 @@ IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteBucket THEN
     END_FOR;
 END_IF;
 
-IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder THEN
+IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder THEN
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
         IF instEncoderValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
@@ -693,7 +745,7 @@ IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteEncoder THEN
     END_FOR;
 END_IF;
 
-IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
+IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
         IF instModesValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
@@ -706,7 +758,7 @@ IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
     END_FOR;
 END_IF;
 
-IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
+IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
     FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
         IF instHeartbeatValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;

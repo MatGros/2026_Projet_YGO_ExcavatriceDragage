@@ -46,7 +46,7 @@ VAR_INPUT
     HomedM1         : BOOL;        // Sortie FB_Encoder_Homing M1
     HomedM2         : BOOL;        // Sortie FB_Encoder_Homing M2
     SyncEnable      : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — Sortie FB_Modes, TRUE=synchro voulue
-    SyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
+    CfgSyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
     ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: benne fermé/ouvert)
     
     // 🆕 Signaux de commande réels des treuils (pour contrôle de cohérence)
@@ -128,7 +128,7 @@ END_IF;
 // 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
 // transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2), évite le blocage
 // intempestif constaté sur incident terrain (0.24m transitoire).
-DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > SyncToleranceM);
+DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
     ErrorId := ErrorId OR 16#0001;

@@ -6,7 +6,7 @@
 TYPE ST_SyncHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
-    SyncToleranceM       : REAL := 0.25;     (* 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M *)
+    CfgSyncToleranceM       : REAL := 0.25;     (* 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M *)
 
     (* 🚦 États (Lecture seule) *)
     DeltaPosM            : REAL;             (* 📊 Écart de position réel mesuré (m) *)
@@ -18,6 +18,6 @@ STRUCT
     State               : E_State;          (* 🤖 État de l'automate interne *)
 
     (* 🎮 Commandes / Bypasses *)
-    SyncEnableRequest   : BOOL := TRUE;      (* ☑️ 🔧 REX 2026-07-08 : coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé *)
+    SelSyncEnable   : BOOL := TRUE;      (* ☑️ 🔧 REX 2026-07-08 : coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé *)
 END_STRUCT
 END_TYPE

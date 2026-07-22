@@ -31,9 +31,9 @@ VAR_INPUT
     BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
 
     // Réglages rampe (RETAIN)
-    RampAccelRate                : REAL := 20.0;    // %/s — accélération
-    RampDecelNormalRate          : REAL := 40.0;    // %/s — décélération normale
-    RampDecelFastRate            : REAL := 100.0;   // %/s — décélération RAPIDE
+    CfgRampAccelRate                : REAL := 20.0;    // %/s — accélération
+    CfgRampDecelNormalRate          : REAL := 40.0;    // %/s — décélération normale
+    CfgRampDecelFastRate            : REAL := 100.0;   // %/s — décélération RAPIDE
     DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt
 
     // Réglages ETHERCAT uniquement (RETAIN)
@@ -92,7 +92,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
 
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    SpeedRamp(Target := 0.0, AccelRate := CfgRampAccelRate, DecelRate := CfgRampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
 
     ArrivalLock := FALSE;
 
@@ -149,8 +149,8 @@ IF ArrivalLock THEN
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,
-          AccelRate := RampAccelRate,
-          DecelRate := SEL(SafeStop, RampDecelNormalRate, RampDecelFastRate),
+          AccelRate := CfgRampAccelRate,
+          DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)

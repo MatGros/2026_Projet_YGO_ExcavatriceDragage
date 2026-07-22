@@ -12,7 +12,7 @@ STRUCT
     RunModes      : BOOL;   // Lance la suite Modes/Homme-mort
     RunHeartbeat  : BOOL;   // Lance la suite Heartbeat IHM↔PLC
     RunFramework  : BOOL;   // Lance l'autotest indépendant du framework
-    RunAll        : BOOL;   // Déprécié : ignoré, aucune campagne automatique
+    RunAll        : BOOL;   // Lance Safety→Translation→Bucket→Encoder→Modes→Heartbeat
     RunSuite      : INT;    // Compatibilité : >0 lance une suite manuelle
     RunCase       : INT;    // Cas de la commande unitaire sélectionnée
     Abort         : BOOL;   // Abandonne le test en cours

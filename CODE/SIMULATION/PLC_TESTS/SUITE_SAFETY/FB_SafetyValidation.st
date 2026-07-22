@@ -2,7 +2,7 @@ FUNCTION_BLOCK PUBLIC FB_SafetyValidation
 VAR_INPUT
     Start                      : BOOL;        // Commande de démarrage des tests
     Abort                      : BOOL;        // Commande d'abandon
-    FirstStepId                : INT;         // Première étape à exécuter
+    CaseId                     : INT;         // 0=tous ; 1..3=cas ciblé
 END_VAR
 VAR_OUTPUT
     Busy                       : BOOL;
@@ -47,6 +47,7 @@ VAR CONSTANT
     StepTc02Teardown                : INT := 29;
 
     StepTc03Setup                   : INT := 30;
+    StepTc03ResetRelease            : INT := 31;
     StepTc03LockoutWindow           : INT := 32;
     StepTc03LockoutEnd              : INT := 34;
     StepTc03PostReArm               : INT := 35;
@@ -83,7 +84,7 @@ END_VAR
 // 1. 🛡️ GATE
 IF NOT GVL_Simulation.SimulationModeActive THEN
     // Abort interne immédiat
-    Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
+    Sequencer(Start := FALSE, Abort := TRUE, CaseId := CaseId,
               StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
               ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report);
               
@@ -97,7 +98,7 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
 END_IF;
 
 // La chaîne d'urgence physique ne doit pas être en mode simulation réelle active (sécurité matérielle)
-SimGateOk := NOT GVL_Simulation.EmergencyStopChain_IsReal;
+SimGateOk := NOT GVL_Simulation.SensorEmergencyStopChainIsReal;
 
 // 2. 📋 TABLES (Remplissage déclaratif unique)
 IF NOT TableReady THEN
@@ -346,15 +347,24 @@ IF NOT TableReady THEN
     StepTable[StepTc02Teardown].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
     // --- SCÉNARIO 3 ---
-    StepTable[StepTc03Setup].Name := 'TC03 Setup lockout';
+    StepTable[StepTc03Setup].Name := 'TC03 Reset initial';
     StepTable[StepTc03Setup].CaseId := 3;
-    StepTable[StepTc03Setup].StimulusId := 5; // Blocage contacteur (OverrideContactorFalse := TRUE) + Arm
-    StepTable[StepTc03Setup].CheckIdx[1] := 13; // EmergencyArmingFailed := TRUE
-    StepTable[StepTc03Setup].CheckIdx[2] := 14; // LockoutActive := TRUE
-    StepTable[StepTc03Setup].TimeoutPT := T#10s;
-    StepTable[StepTc03Setup].NextOnPass := StepTc03LockoutWindow;
+    StepTable[StepTc03Setup].StimulusId := 9; // Reset seul, aucune demande d'armement
+    StepTable[StepTc03Setup].CheckIdx[1] := 1;
+    StepTable[StepTc03Setup].TimeoutPT := T#3s;
+    StepTable[StepTc03Setup].NextOnPass := StepTc03ResetRelease;
     StepTable[StepTc03Setup].NextOnFail := StepTc03Teardown;
     StepTable[StepTc03Setup].FailAction := E_TestFailAction.FAIL_CONTINUE;
+
+    StepTable[StepTc03ResetRelease].Name := 'TC03 Front arm panne';
+    StepTable[StepTc03ResetRelease].CaseId := 3;
+    StepTable[StepTc03ResetRelease].StimulusId := 5; // Reset relâché + contacteur bloqué + front Arm
+    StepTable[StepTc03ResetRelease].CheckIdx[1] := 13;
+    StepTable[StepTc03ResetRelease].CheckIdx[2] := 14;
+    StepTable[StepTc03ResetRelease].TimeoutPT := T#10s;
+    StepTable[StepTc03ResetRelease].NextOnPass := StepTc03LockoutWindow;
+    StepTable[StepTc03ResetRelease].NextOnFail := StepTc03Teardown;
+    StepTable[StepTc03ResetRelease].FailAction := E_TestFailAction.FAIL_CONTINUE;
 
     StepTable[StepTc03LockoutWindow].Name := 'TC03 Lockout cmd ign';
     StepTable[StepTc03LockoutWindow].CaseId := 3;
@@ -444,7 +454,7 @@ instEdgeCountChain(
 Sequencer(
     Start := Start,
     Abort := Abort,
-    FirstStepId := FirstStepId,
+    CaseId := CaseId,
     StepTable := StepTable,
     CheckTable := CheckTable,
     CaseTable := CaseTable,
@@ -507,12 +517,12 @@ CASE ActiveStimulusId OF
         ArmRequest := TRUE;
         ResetFaults := FALSE;
 
-    5: // TC-03 : Contacteur puissance bloqué ouvert (OverrideContactorFalse) + Armement
+    5: // TC-03 : contacteur bloqué ouvert + front d'armement, reset relâché
         GVL_PLC_Tests.OverrideChainTrue := FALSE;
         GVL_PLC_Tests.OverrideChainFalse := FALSE;
         GVL_PLC_Tests.OverrideContactorFalse := TRUE;
         ArmRequest := TRUE;
-        ResetFaults := TRUE;
+        ResetFaults := FALSE;
 
     6: // TC-03 : Tentative armement pendant lockout
         GVL_PLC_Tests.OverrideChainTrue := FALSE;
@@ -534,10 +544,17 @@ CASE ActiveStimulusId OF
         GVL_PLC_Tests.OverrideContactorFalse := FALSE;
         ArmRequest := TRUE;
         ResetFaults := FALSE;
+
+    9: // TC-03 : reset initial seul, front distinct de l'armement
+        GVL_PLC_Tests.OverrideChainTrue := FALSE;
+        GVL_PLC_Tests.OverrideChainFalse := FALSE;
+        GVL_PLC_Tests.OverrideContactorFalse := FALSE;
+        ArmRequest := FALSE;
+        ResetFaults := TRUE;
 END_CASE;
 
 // Recopie IHM/métier
 IF Busy THEN
-    GVL_IHM.Modes.CmdEmergencyArming := ArmRequest;
-    GVL_IHM.Modes.FaultMachineReset  := ResetFaults;
+    GVL_IHM.Modes.BtnEmergencyArming := ArmRequest;
+    GVL_IHM.Modes.BtnFaultReset  := ResetFaults;
 END_IF;

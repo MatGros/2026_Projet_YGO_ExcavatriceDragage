@@ -1,8 +1,8 @@
 FUNCTION_BLOCK FB_TestSequencer
 VAR_INPUT
-    Start       : BOOL;              // Front : lance à FirstStepId
+    Start       : BOOL;              // Front : lance la suite
     Abort       : BOOL;              // Niveau : arrêt immédiat propre
-    FirstStepId : INT;               // Run all = 1er SETUP ; run one = FirstStep du case visé
+    CaseId      : INT;               // 0=tous ; 1..MaxTestCases=cas ciblé
 END_VAR
 VAR_IN_OUT                           // 🔗 zéro copie
     StepTable      : ARRAY[1..GVL_PLC_Tests_Const.MaxSteps]      OF ST_TestStepConfig;
@@ -68,6 +68,8 @@ VAR
     // 🏷️ Construction de Report.FailureSummary (1 ligne lisible, tous les cas en échec)
     ReasonText          : STRING(20);
     EntryText           : STRING(80);
+    FirstStepLocal      : INT;
+    RequestedCaseId     : INT;
 END_VAR
 // === IMPLEMENTATION ===
 StartTrig(CLK := Start);
@@ -81,12 +83,26 @@ IF StartTrig.Q THEN
     ErrorCode := 0;
     ErrorMessage := '';
 
-    // 🛡️ Un démarrage invalide est terminal, jamais silencieux.
-    IF FirstStepId < 1 OR FirstStepId > GVL_PLC_Tests_Const.MaxSteps THEN
+    // 🛡️ Résolution interne CaseId → première étape, jamais d'étape exposée.
+    RequestedCaseId := CaseId;
+    IF CaseId < 0 OR CaseId > GVL_PLC_Tests_Const.MaxTestCases THEN
         ConfigError := TRUE;
-        ConfigErrorStepId := FirstStepId;
+        ConfigErrorStepId := CaseId;
         ErrorCode := 1001;
-        ErrorMessage := 'FirstStepId hors limites';
+        ErrorMessage := 'CaseId hors limites';
+        FirstStepLocal := 0;
+    ELSIF CaseId = 0 THEN
+        FirstStepLocal := CaseTable[1].FirstStep;
+    ELSE
+        FirstStepLocal := CaseTable[CaseId].FirstStep;
+    END_IF;
+    IF NOT ConfigError THEN
+        IF FirstStepLocal < 1 OR FirstStepLocal > GVL_PLC_Tests_Const.MaxSteps THEN
+            ConfigError := TRUE;
+            ConfigErrorStepId := FirstStepLocal;
+            ErrorCode := 1001;
+            ErrorMessage := 'CaseTable.FirstStep hors limites';
+        END_IF;
     END_IF;
     
     // Validation des étapes
@@ -208,7 +224,7 @@ IF StartTrig.Q AND NOT ConfigError THEN
     Busy := TRUE;
     Done := FALSE;
     AnyFailed := FALSE;
-    CurrentStepId := FirstStepId;
+    CurrentStepId := FirstStepLocal;
     StepStarted := FALSE;
     
     // RAZ Rapport
@@ -220,7 +236,7 @@ IF StartTrig.Q AND NOT ConfigError THEN
     Report.ErrorCode := 0;
     Report.ErrorMessage := '';
     Report.FailedTestCase := 0;
-    Report.CurrentStepId := FirstStepId;
+    Report.CurrentStepId := FirstStepLocal;
     IF CurrentStepId >= 1 AND CurrentStepId <= GVL_PLC_Tests_Const.MaxSteps THEN
         Report.CurrentCaseId := StepTable[CurrentStepId].CaseId;
     ELSE
@@ -277,6 +293,15 @@ IF Busy THEN
         RETURN;
     END_IF;
     
+    // 🔒 Fin automatique dès qu'un run ciblé tenterait d'entrer dans le cas suivant.
+    IF CurrentStepId > 0 AND RequestedCaseId > 0 THEN
+        IF StepTable[CurrentStepId].CaseId <> RequestedCaseId THEN
+            CurrentStepId := 0;
+            ActiveStimulusId := 0;
+            StepStarted := FALSE;
+        END_IF;
+    END_IF;
+
     IF CurrentStepId > 0 THEN
     CurrentCaseId := StepTable[CurrentStepId].CaseId;
     ActiveStimulusId := StepTable[CurrentStepId].StimulusId;
@@ -357,6 +382,19 @@ IF Busy THEN
 
     FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
         Kdx := StepTable[CurrentStepId].CheckIdx[Jdx];
+        IF Kdx < 0 OR Kdx > GVL_PLC_Tests_Const.MaxChecks THEN
+            ConfigError := TRUE;
+            ConfigErrorStepId := CurrentStepId;
+            ConfigErrorCheckIdx := Kdx;
+            ErrorCode := 1006;
+            ErrorMessage := 'CheckIdx runtime hors limites';
+            Busy := FALSE;
+            Done := TRUE;
+            AnyFailed := TRUE;
+            ActiveStimulusId := 0;
+            TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+            RETURN;
+        END_IF;
         IF Kdx > 0 THEN
             Checks[Jdx](Config := CheckTable[Kdx], Evaluate := TRUE, ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal);
             
@@ -457,6 +495,19 @@ IF Busy THEN
         NeverDuringPassed := TRUE;
         FOR Jdx := 1 TO GVL_PLC_Tests_Const.MaxChecksPerStep DO
             Kdx := StepTable[CurrentStepId].CheckIdx[Jdx];
+            IF Kdx < 0 OR Kdx > GVL_PLC_Tests_Const.MaxChecks THEN
+                ConfigError := TRUE;
+                ConfigErrorStepId := CurrentStepId;
+                ConfigErrorCheckIdx := Kdx;
+                ErrorCode := 1006;
+                ErrorMessage := 'CheckIdx timeout hors limites';
+                Busy := FALSE;
+                Done := TRUE;
+                AnyFailed := TRUE;
+                ActiveStimulusId := 0;
+                TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+                RETURN;
+            END_IF;
             IF Kdx > 0 THEN
                 IF CheckTable[Kdx].Mode = E_TestCheckMode.CHECK_NEVER_DURING THEN
                     // Jamais violé pendant toute la fenêtre

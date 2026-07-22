@@ -6,8 +6,8 @@ STRUCT
     CmdPause             : BOOL;
     CmdAbort             : BOOL;
     CmdReset             : BOOL;
-    TargetDepthM          : REAL := -12.5;
-    TargetOffsetM         : REAL := 1.5;
+    SetDepthM          : REAL := -12.5;
+    SetOffsetM         : REAL := 1.5;
     Ready                : BOOL;
     Busy                 : BOOL;
     Done                 : BOOL;
@@ -15,7 +15,7 @@ STRUCT
     ErrorId              : WORD;
     CycleStep            : E_CycleStep;
     CycleStateStr        : STRING(80);
-    SelectedTargetNum    : INT;
+    SelTarget    : INT;
     KoboldContactFond    : BOOL;
     KoboldContactorCmd   : BOOL;
     LimitLegalReached    : BOOL;
@@ -30,6 +30,6 @@ STRUCT
     DeadmanArmed         : BOOL;
     JoystickMotionActive : BOOL;
     MotionPermit         : BOOL;
-    SimKoboldContactFond : BOOL;
+    TstKoboldContactFond : BOOL;
 END_STRUCT
 END_TYPE

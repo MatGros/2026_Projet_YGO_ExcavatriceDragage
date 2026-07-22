@@ -18,15 +18,18 @@ STRUCT
     LimitLegalDepthMinAllowed : REAL; (* 📐 Cote min de dragage autorisée (m, négatif) *)
     LimitLegalEnabled         : BOOL; (* 🟢 Activation de la limite légale *)
     LimitLegalReached         : BOOL; (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
-    HomingApproachEnableRequest    : BOOL; (* 🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser
+    SelHomingApproachEnable    : BOOL; (* 🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser
                                           l'arrêt normal haut pour approcher le capteur physique (préparation
                                           homing) — voir FB_Modes.HomingApproachEnable, commun M1/M2 *)
     HydraulicThermalFault     : BOOL; (* 🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique
                                           (PRG_08_AuxiliaryControl, diagnostic seul — aucune commande PLC) *)
 
-    (* 💓 Heartbeat IHM↔PLC — IHM inverse HeartbeatIhmToggle toutes les 500 ms. *)
-    HeartbeatIhmToggle        : BOOL; (* IHM→PLC : toggle périodique, jamais valeur constante *)
-    HeartbeatPlcToggle        : BOOL; (* PLC→IHM : clignotant activité PLC *)
+    (* 🔧 Bypass maintenance de capteurs COMMUNS (voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md) *)
+    Bypass : ST_BypassCommun;    (* SlackCable, TopPositionSensor — capteur physique unique M1/M2, jamais duplique par axe *)
+
+    (* 💓 Heartbeat IHM↔PLC — IHM inverse TglHeartbeatIhm toutes les 500 ms. *)
+    TglHeartbeatIhm        : BOOL; (* IHM→PLC : toggle périodique, jamais valeur constante *)
+    TglHeartbeatPlc        : BOOL; (* PLC→IHM : clignotant activité PLC *)
     HeartbeatIhmOk            : BOOL; (* PLC→IHM : front IHM post-boot reçu et timeout absent *)
     HeartbeatIhmTimeout       : BOOL; (* PLC→IHM : aucun front IHM depuis 2 s *)
     HeartbeatIhmElapsed       : TIME; (* PLC→IHM : temps depuis dernier front IHM *)

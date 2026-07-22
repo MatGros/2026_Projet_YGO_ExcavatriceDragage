@@ -7,7 +7,7 @@ TYPE ST_BucketHMI :
 STRUCT
     (* ⚙️ Configurations & Paramètres (Lecture/Écriture RETAIN) *)
     Config              : ST_BucketConfig; (* 🔧 Offsets Open/Close/Coherence *)
-    TimeoutDuration     : TIME := T#30s;    (* ⏱️ Temps max pour l'ouverture/fermeture *)
+    CfgTimeoutDuration     : TIME := T#30s;    (* ⏱️ Temps max pour l'ouverture/fermeture *)
 
     (* 🚦 États & Retours (Lecture seule) *)
     State               : ST_BucketState;  (* 🚥 État mémorisé (IsOpen, IsClosed, etc.) *)
@@ -32,13 +32,13 @@ STRUCT
                                                 qui reste la valeur de sécurité/surveillance de référence *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
-    CmdOpen             : BOOL;             (* 🪣 Bouton commande ouverture *)
-    CmdClose            : BOOL;             (* 🪣 Bouton commande fermeture *)
-    CmdReset            : BOOL;             (* 🔑 Acquittement défaut benne *)
-    CmdConfirmOpenPosition : BOOL;          (* 🆕 REX 2026-07-08 : référencement benne position ouverte (mise en
+    BtnOpen             : BOOL;             (* 🪣 Bouton commande ouverture *)
+    BtnClose            : BOOL;             (* 🪣 Bouton commande fermeture *)
+    BtnReset            : BOOL;             (* 🔑 Acquittement défaut benne *)
+    BtnConfirmOpenPos : BOOL;          (* 🆕 REX 2026-07-08 : référencement benne position ouverte (mise en
                                                 service) — confirmation pure, AUCUN mouvement, à utiliser juste après
                                                 le référencement des codeurs M1/M2 (benne physiquement ouvert) *)
-    CmdConfirmClosePosition : BOOL;         (* 🆕 REX 2026-07-08 : référencement benne position fermée (mise en
+    BtnConfirmClosePos : BOOL;         (* 🆕 REX 2026-07-08 : référencement benne position fermée (mise en
                                                 service) — confirmation pure, AUCUN mouvement, à utiliser juste après
                                                 le référencement des codeurs M1/M2 (benne physiquement fermé) *)
 END_STRUCT

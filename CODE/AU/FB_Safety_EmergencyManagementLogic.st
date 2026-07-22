@@ -11,11 +11,11 @@ FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
-    ArmRequest          : BOOL;        // Demande de réarmement (CmdEmergencyArming)
+    ArmRequest          : BOOL;        // Demande de réarmement (BtnEmergencyArming)
     EmergencyChain      : BOOL;        // Retour physique boucle d'urgence amont contacteur
     EmergencyStopOk     : BOOL;        // Confirmation contacteur de puissance principal
     PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
-    CmdEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
+    BtnEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
 END_VAR
 VAR_OUTPUT
     Error               : BOOL;
@@ -165,8 +165,8 @@ IF TonArmingLockout.Q THEN
 END_IF;
 
 // 📤 4. GÉNÉRATION DES CONSIGNES LOGIQUES
-Cmd.PowerCutOff_A_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
-Cmd.PowerCutOff_B_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT CmdEmergencyCutOff AND NOT RedundancyTestFailed;
+Cmd.PowerCutOff_A_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
+Cmd.PowerCutOff_B_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
 
 // 📤 5. SYNTHÈSE DES ERREURS
 ErrorId := 16#0000;

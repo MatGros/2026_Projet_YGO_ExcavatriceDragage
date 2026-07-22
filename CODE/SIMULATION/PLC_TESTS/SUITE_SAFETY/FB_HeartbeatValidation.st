@@ -13,7 +13,7 @@ FUNCTION_BLOCK PUBLIC FB_HeartbeatValidation
 VAR_INPUT
     Start       : BOOL;
     Abort       : BOOL;
-    FirstStepId : INT;
+    CaseId      : INT; // 0=tous ; 1..5=cas ciblé
 END_VAR
 VAR_OUTPUT
     Busy                    : BOOL;
@@ -92,7 +92,7 @@ END_VAR
 // 1. 🛡️ GATE
 // ═══════════════════════════════════════════════════════════════
 IF NOT GVL_Simulation.SimulationModeActive THEN
-    Sequencer(Start := FALSE, Abort := TRUE, FirstStepId := FirstStepId,
+    Sequencer(Start := FALSE, Abort := TRUE, CaseId := CaseId,
               StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
               ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report);
     GVL_PLC_Tests.OverrideIhmHeartbeatActive := FALSE;
@@ -101,7 +101,7 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
-    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Modes.BtnFaultReset := FALSE;
     GVL_IHM.Cycle.CmdReset := FALSE;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
@@ -111,10 +111,10 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
 END_IF;
 
 SimGateOk := GVL_Simulation.SimulationModeActive
-          AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal
-          AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal
-          AND NOT GVL_Simulation.BrakeThermal_IsReal
-          AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal;
+          AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal
+          AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal
+          AND NOT GVL_Simulation.SensorBrakeThermalIsReal
+          AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal;
 
 IF Abort OR NOT SimGateOk THEN
     GVL_PLC_Tests.OverrideIhmHeartbeatActive := FALSE;
@@ -123,9 +123,9 @@ IF Abort OR NOT SimGateOk THEN
     GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
-    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Modes.BtnFaultReset := FALSE;
     GVL_IHM.Cycle.CmdReset := FALSE;
-    IF Busy THEN GVL_IHM.Modes.ModeRequest := StimModeRequest; END_IF;
+    IF Busy THEN GVL_IHM.Modes.SelMode := StimModeRequest; END_IF;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
     Report.InProgress := FALSE; Report.Aborted := TRUE; Report.AnyFailed := TRUE;
@@ -138,7 +138,7 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     Busy := TRUE; Done := FALSE; AnyFailed := FALSE; ConfigError := FALSE;
     ErrorCode := 0; ErrorMessage := '';
     StepElapsed := T#0s;
-    StimModeRequest := GVL_IHM.Modes.ModeRequest;
+    StimModeRequest := GVL_IHM.Modes.SelMode;
 
     Report.Name := 'Heartbeat Validation';
     Report.InProgress := TRUE; Report.AllPassed := FALSE; Report.AnyFailed := FALSE; Report.Aborted := FALSE;
@@ -384,7 +384,7 @@ ProbeBool[SigPowerCutOffActive]    := GVL_IHM.Modes.PowerCutOffActive;
 // ═══════════════════════════════════════════════════════════════
 // 4. ⚙️ MOTEUR
 // ═══════════════════════════════════════════════════════════════
-Sequencer(Start := Start, Abort := Abort, FirstStepId := FirstStepId,
+Sequencer(Start := Start, Abort := Abort, CaseId := CaseId,
           StepTable := StepTable, CheckTable := CheckTable, CaseTable := CaseTable, InvariantTable := InvariantTable,
           ProbeBool := ProbeBool, ProbeDint := ProbeDint, ProbeReal := ProbeReal, Report := Report,
           Busy => Busy, Done => Done, AnyFailed => AnyFailed,
@@ -402,14 +402,14 @@ GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff := FALSE;
 GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
 GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
 GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
-GVL_IHM.Modes.ModeRequest := StimModeRequest;
-GVL_IHM.Modes.FaultMachineReset := FALSE;
+GVL_IHM.Modes.SelMode := StimModeRequest;
+GVL_IHM.Modes.BtnFaultReset := FALSE;
 GVL_IHM.Cycle.CmdReset := FALSE;
 
 CASE ActiveStimulusId OF
     1: // TC-H1/TC-H4 : toggle sain 500 ms + SEMI_AUTO
         GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
-        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
         // Toggle 500 ms
         StimToggleTimer(IN := TRUE, PT := T#500ms);
         IF StimToggleTimer.Q THEN
@@ -419,12 +419,12 @@ CASE ActiveStimulusId OF
 
     2: // TC-H2 : toggle figé (perte IHM)
         GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
-        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
         // OverrideIhmHeartbeatToggle figé = pas de front
 
     3: // TC-H3 : reprise toggle sain
         GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
-        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
         StimToggleTimer(IN := TRUE, PT := T#500ms);
         IF StimToggleTimer.Q THEN
             GVL_PLC_Tests.OverrideIhmHeartbeatToggle := NOT GVL_PLC_Tests.OverrideIhmHeartbeatToggle;
@@ -433,7 +433,7 @@ CASE ActiveStimulusId OF
 
     4: // TC-H4 : pulse reset conscient
         GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
-        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
         StimToggleTimer(IN := TRUE, PT := T#500ms);
         IF StimToggleTimer.Q THEN
             GVL_PLC_Tests.OverrideIhmHeartbeatToggle := NOT GVL_PLC_Tests.OverrideIhmHeartbeatToggle;
@@ -441,13 +441,13 @@ CASE ActiveStimulusId OF
         END_IF;
         StimResetPulseTimer(IN := TRUE, PT := T#1500ms);
         IF NOT StimResetPulseTimer.Q THEN
-            GVL_IHM.Modes.FaultMachineReset := TRUE;
+            GVL_IHM.Modes.BtnFaultReset := TRUE;
             GVL_IHM.Cycle.CmdReset := TRUE;
         END_IF;
 
     5: // TC-H5 : perte IHM + frein M3 desserré → Méca B
         GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE;
-        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
         GVL_PLC_Tests.OverrideM3BrakeStuckOpen := TRUE; // frein M3 desserré
         // Toggle figé = perte IHM
 END_CASE;
@@ -462,9 +462,9 @@ IF ErrorCode <> 0 THEN
     GVL_PLC_Tests.OverrideM1BrakeFeedback := FALSE;
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
-    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Modes.BtnFaultReset := FALSE;
     GVL_IHM.Cycle.CmdReset := FALSE;
-    GVL_IHM.Modes.ModeRequest := StimModeRequest;
+    GVL_IHM.Modes.SelMode := StimModeRequest;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_FAILED;
     Report.InProgress := FALSE; Report.TerminalState := TerminalState;

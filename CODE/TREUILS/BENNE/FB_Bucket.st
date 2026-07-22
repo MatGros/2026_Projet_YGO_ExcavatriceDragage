@@ -24,9 +24,9 @@
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
         voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md "flux nominal, benne ouvert").
-        Remplace le contournement précédent (un CmdOpen qui se terminait par coïncidence car la
+        Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
-        `ConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
+        `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
    🆕 REX 2026-07-08 (audit sécurité, demande utilisateur) :
       - `M1_Busy`/`M2_Busy` : la demande d'ouverture/fermeture n'est acceptée (mémorisation
         `CloseReq`/`OpenReq` + transition vers BUSY) QUE si les deux treuils sont à l'arrêt —
@@ -53,7 +53,7 @@ VAR_INPUT
     HomedM1             : BOOL;             // Codeur M1 référencé (instHomingM1.Homed) — REX 2026-07-07
     HomedM2             : BOOL;             // Codeur M2 référencé (instHomingM2.Homed) — REX 2026-07-07
     Config              : ST_BucketConfig; // Configuration (RETAIN site)
-    TimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
+    CfgTimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
     M1SlipToleranceM    : REAL := 1.0;      // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
     M1_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM1.Busy — doit être à l'arrêt pour armer une demande
     M2_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM2.Busy — doit être à l'arrêt pour armer une demande
@@ -175,7 +175,7 @@ END_IF;
 // 🆕 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE (mise en service, REX 2026-07-08) — voir bandeau
 // Action de CONFIRMATION pure (aucun mouvement, ne pilote pas M2) : mémorise BucketState.IsOpen
 // directement, à utiliser juste après le référencement des codeurs (M1=M2, benne physiquement
-// ouvert vérifié par l'opérateur). Gardée comme ConfirmCoherence (FB_Encoder_Homing) : front,
+// ouvert vérifié par l'opérateur). Gardée comme BtnConfirmCoherence (FB_Encoder_Homing) : front,
 // MAINT_N1/N2 uniquement, codeurs déjà référencés, treuils à l'arrêt (pas de séquence en cours).
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
@@ -241,7 +241,7 @@ END_IF;
 
 // ⏲️ 5. SURVEILLANCE TIMEOUT MOUVEMENT (bit 0)
 // Déclenche si le mouvement actif (M2_StartStop = TRUE) dure plus longtemps que le timeout
-TonTimeout(IN := (State = E_State.BUSY AND M2_StartStop), PT := TimeoutDuration);
+TonTimeout(IN := (State = E_State.BUSY AND M2_StartStop), PT := CfgTimeoutDuration);
 IF TonTimeout.Q THEN
     ErrorId := ErrorId OR 16#0001;
 END_IF;

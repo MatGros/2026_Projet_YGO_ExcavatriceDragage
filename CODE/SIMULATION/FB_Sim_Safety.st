@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
    ───────────────────────────────────────────────────────────────
-   📥 Enable          : activation de la simulation (SimulationModeActive AND NOT EmergencyStopChain_IsReal)
+   📥 Enable          : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
    📥 PowerCutOff_A   : demande de coupure PLC canal A (maintenu à TRUE en marche normale)
    📥 PowerCutOff_B   : demande de coupure PLC canal B (maintenu à TRUE en marche normale)
    📥 EmergencyArming : impulsion de réarmement (EmergencyArming_RQ)

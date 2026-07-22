@@ -9,7 +9,7 @@
       inconditionnel actuel. Réutilise `TON` (Partie3 §0 — pas de temporisation
       réimplémentée), même principe que `ContactorFeedbackTimeout` déjà en place
       dans `FB_Winch.st`/`FB_Translation.st`.
-   📥 Enable       : simulation active (ex. SimulationModeActive AND NOT ContactorFeedbackM3_IsReal)
+   📥 Enable       : simulation active (ex. SimulationModeActive AND NOT SensorM3ContactorFeedbackIsReal)
    📥 Command      : ordre envoyé au contacteur (TRUE = fermé/actif)
    📥 MirrorDelay  : délai de fermeture/ouverture simulé — À FIXER nettement SOUS le
       `ContactorFeedbackTimeout` du FB consommateur (`FB_Winch`/`FB_Translation`), sinon le
