@@ -26,14 +26,14 @@ complet) : retirées de la liste "autorisée", déplacées en "à éviter" ci-de
 ### Rôle / catégorie
 | Abrév. | Sens | Exemple réel dans `CODE/` |
 |---|---|---|
-| `Cmd` | Commande (signal final vers actionneur/bus — Niveau 2, préfixe) | `CmdX` (ex. `ReqFwd`/`CmdX` du Translation), `BrakeCmd` (legacy, suffixe) |
-| `Req` | Requête brute, pas encore arbitrée (Niveau 2, préfixe) | `ReqFwd`/`ReqRev`, `OpenReq`/`CloseReq` (legacy, suffixe) |
+| `Cmd` | Commande (signal final vers actionneur/bus — Niveau 2, préfixe) | `CmdReset`, `CmdOpen`/`CmdClose` (Bucket), `BrakeCmd` (legacy, suffixe) |
+| `Req` | Requête brute, pas encore arbitrée (Niveau 2, préfixe) | `OpenReq`/`CloseReq` (legacy, suffixe) — voir §`Req` vs `Cmd`, pas de préfixe `Req` en usage actuellement |
 | `Ref` | Consigne | `SpeedRef`, `CablePosRef`, `RefPosM` |
 | `Act` | Valeur mesurée/actuelle | `SpeedAct`, `CablePosAct` |
 | `Diag` | Diagnostic | `FB_DiagCanOpen`, `FB_DiagEthercat`, `ST_DiagDevice` |
 | `Calc` | Calcul / calculateur (nom d'instance) | `CycleTimeCalc` (instance de `FB_CycleTime`) |
 | `Trig` | Détection de front (variable de travail interne) | `TrigM1Fwd`, `TrigM3Rev` |
-| `Fwd` / `Rev` | Avant / Arrière (forward/reverse) | `RelayFwd`, `LimitSwitchFwd`, `ReqFwd` |
+| `Fwd` / `Rev` | Avant / Arrière (forward/reverse) | `RelayFwd`, `LimitSwitchFwd`, `BtnFwd` |
 | `Min` / `Max` | Limite basse / haute | `MaxStepDescente`, `LimitLegalDepthMinAllowed` |
 | `Pos` | Position — coexiste avec la forme complète (les deux existent dans le code, pas de règle stricte) | `CablePos_M`, `TranslationPosFosse1` **et** `Position_M`, `PositionSensorTarget` |
 
@@ -171,12 +171,12 @@ SoftStartRampActive          → gestion rampe soft-start
 | `ReqX` | Requête brute (bouton IHM / séquenceur), **pas encore arbitrée** | Entrée d'un arbitrage (interlocks, sélection Manu/Auto, limitation) |
 | `CmdX` | Signal **final** vers l'actionneur/le bus, après arbitrage | Sortie FB ou variable écrite juste avant le matériel |
 
-Exemple de pipeline complet (Translation M3) :
+Exemple de pipeline (illustratif — pas le pipeline réel actuel, voir note ⚠️ ci-dessous) :
 ```
-ST_TranslationHMI.ReqFwd (bouton IHM, brut)
-  → PRG_10_Outputs.M3Fwd_Demand (arbitré Manu/Joystick)
-  → PRG_10_Outputs.M3Fwd_Eff (après interlocks AU/SafeStop)
-  → M3_CommandWord (signal final envoyé sur le bus EtherCAT)
+<champ brut IHM> (bouton IHM, pas encore arbitré)
+  → <variable arbitrée Manu/Joystick>
+  → <variable après interlocks AU/SafeStop>
+  → <signal final envoyé sur le bus>
 ```
 
 🎯 **Cap long terme (pas ce soir)** : généraliser le préfixe (rôle/type d'abord) à TOUT —
@@ -186,10 +186,14 @@ quelle variable, peu importe le mécanisme. Gros chantier (renomme `Ready`/`Busy
 `SpeedRef`/`CablePosM`/`TopPositionSensor`... utilisés dans tout le projet) — **à planifier à
 part**, jamais en improvisé. Voir `PLAN_TASK.md` §🏷️ Nommage.
 
-⚠️ **Périmètre appliqué ce soir : uniquement `ST_TranslationHMI.ReqFwd`/`ReqRev`** (ex-`M3_RelayFwd/Rev`,
-seuls champs `Req`/`Cmd` créés cette session). Tout le reste de l'existant garde sa forme
-d'origine, **non touché, pas une nouvelle incohérence accidentelle** — audit/rename à part si
-un jour voulu (voir `PLAN_TASK.md`) :
+⚠️ **Non retenu (audit 2026-07-22)** : la migration `Req`/`Cmd` avait été appliquée un temps à
+`ST_TranslationHMI` (`ReqFwd`/`ReqRev`, ex-`M3_RelayFwd/Rev`, seuls champs créés le 2026-07-15) —
+**mais le code actuel garde `BtnFwd`/`BtnRev`/`TglJoystickMaster`/`SelTarget`**, la migration
+n'a pas été conservée (revert non tracé dans `VERSION_HISTORY.md`). Le pattern `Req`/`Cmd`
+reste une piste valable pour le chantier de nommage généralisé ci-dessus, mais **n'est
+appliqué nulle part dans le code actuel** — ne pas s'y fier comme référence d'un état existant.
+Reste en préfixe `CmdX` établi (catégorie différente, pas cette migration), à auditer/migrer
+plus tard si un jour voulu (voir `PLAN_TASK.md`) :
 - `CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/`CmdInhibit` (`FB_Bucket`/`FB_Winch`/`ST_BucketHMI`/
   `ST_WinchHMI`) — déjà en préfixe, cohérent avec la règle, mais catégorie `Cmd` utilisée ici pour
   une **requête** (pas un signal final) : à harmoniser vers `Req` dans ce chantier séparé.
@@ -283,11 +287,11 @@ Les structures d'échange IHM (`ST_WinchHMI`, `ST_BucketHMI`, `ST_TranslationHMI
 **Règles strictes :**
 - **Jamais** de `Cmd` dans `ST_*HMI` — `Cmd` réservé aux signaux finaux vers actionneur/bus (niveau 2 pipeline `Req`→`Cmd`)
 - **Jamais** de `Req` dans `ST_*HMI` — `Req` = requête brute entrant dans arbitrage
-- **Pas d'underscore** après le préfixe — format `<Préfixe><PascalCase>` (ex: `BtnReset`, `SelTarget`, `SetFreqHz`)
+- **Pas d'underscore** après le préfixe — format `<Préfixe><PascalCase>` (ex: `BtnReset`, `SelTarget`, `SetFreq_Hz`)
 - Underscore **uniquement** pour suffixes d'unité (`_M`, `_Hz`, `_Pct`, `_Mps`, `_Ms`)
 - État (`Ready`, `Busy`, `Error`...), Mesure (`Position_M`, `Speed_Mps`...), Diagnostic (`ErrorId`...), Sortie physique (`RelayFwd`, `Brake`...) : **pas de préfixe**, forme établie conservée
 
-> ⚠️ **Migration** : toute modification de ces noms dans `CODE/SUPERVISION/*.st` casse les liaisons IHM (tags graphiques). Ne renommer **qu'en migration planifiée** (bundle PLCopenXML + mise à jour IHM simultanée, mapping `OldName → NewName` documenté). L'existant (`CmdReset`, `ReqFwd`, `FreqSetpoint_Hz`...) reste valide tant que la migration n'est pas décidée.
+> ⚠️ **Migration** : toute modification de ces noms dans `CODE/SUPERVISION/*.st` casse les liaisons IHM (tags graphiques). Ne renommer **qu'en migration planifiée** (bundle PLCopenXML + mise à jour IHM simultanée, mapping `OldName → NewName` documenté). L'existant (`CmdReset`, `BtnFwd`, `SetFreq_Hz`...) reste valide tant que la migration n'est pas décidée.
 
 ---
 
@@ -360,7 +364,7 @@ construit toujours en 2 étapes distinctes, chacune avec sa propre règle.
 | Instance | Repère ? | Pourquoi |
 |---|---|---|
 | `WinchM1`, `WinchM2` | Oui | 2 treuils physiques, il faut distinguer lequel |
-| `M3Translation` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
+| `TranslationM3` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
 | `JOY1Joystick` | Oui | Repère = ID noeud CANopen physique |
 | `Bucket` | **Non** | Un seul benne sur la machine — un repère (`BucketM2`) répéterait le `M2` déjà présent dans ses propres champs (`M2PositionCorrected`, `LastPosM2Close`...) : tenté puis annulé le 2026-07-15, stutter |
 
@@ -375,18 +379,18 @@ requête, voir `Req`/`Cmd` plus haut). Les catégories déjà univoques gardent 
 ⚠️ **Ne jamais répéter le Repère du niveau 1 à l'intérieur du champ** — le nom du struct porte
 déjà le contexte matériel :
 ```
-✅ GVL_IHM.M3Translation.ReqFwd
-❌ GVL_IHM.M3Translation.M3ReqFwd   (M3 déjà dans TranslationM3, répétition inutile)
+✅ GVL_IHM.TranslationM3.BtnFwd
+❌ GVL_IHM.TranslationM3.M3BtnFwd   (M3 déjà dans TranslationM3, répétition inutile)
 ```
 
 ### Exemple complet (les 2 niveaux assemblés)
 ```
-GVL_IHM . TranslationM3 . ReqFwd
+GVL_IHM . TranslationM3 . BtnFwd
           └───┬────┘  └─┬─┘
           Niveau 1    Niveau 2
         Mécanisme+   Rôle+Fonction
-         Repère      (Req = requête
-       (Translation+M3)   brute, Fwd =
+         Repère      (Btn = bouton
+       (Translation+M3)   IHM, Fwd =
                        avant)
 ```
 

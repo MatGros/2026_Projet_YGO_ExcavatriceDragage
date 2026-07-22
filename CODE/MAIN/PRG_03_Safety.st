@@ -82,7 +82,7 @@ instSafetyWinchM2(
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
-    EncoderFaultBypass  := GVL_IHM.M2TreuilBucket.Bypass.EncoderFault,
+    EncoderFaultBypass  := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback     := NOT PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalFeedback := NOT PRG_00_Inputs.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     SlackCableDetected  := NOT PRG_00_Inputs.SlackCableSwitch,

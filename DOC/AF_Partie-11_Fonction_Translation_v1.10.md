@@ -6,15 +6,15 @@
 ## 🆕 Sous-mode positionneur en maintenance
 
 En `MAINT_N1` ou `MAINT_N2`, l'opérateur choisit explicitement le sous-mode avec
-`GVL_IHM.M3Translation.PositioningSelect` :
+`GVL_IHM.TranslationM3.PositioningSelect` :
 
-| `PositioningSelect` | Sous-mode | `SelectedTargetNum` | Arrêt |
+| `PositioningSelect` | Sous-mode | `SelTarget` | Arrêt |
 |---|---|---|---|
 | `FALSE` | Jog manuel | Ignoré, forcé à 0 dans `PRG_07_TranslationControl` | Fins de course extrêmes uniquement |
 | `TRUE` | Positionneur manuel | 1=Trémie, 2=P2, 3=P1, 4=Maintenance | Sur le capteur cible, via `TargetReached` puis `ArrivalLock` |
 
-- Le sens et la vitesse restent des commandes manuelles : boutons IHM `ReqFwd`/`ReqRev`
-  ou joystick selon `JoystickSelect`.
+- Le sens et la vitesse restent des commandes manuelles : boutons IHM `BtnFwd`/`BtnRev`
+  ou joystick selon `TglJoystickMaster`.
 - Le positionneur ne calcule pas le sens vers cible. L'opérateur doit choisir le sens
   cohérent ; il peut toujours s'éloigner de la cible.
 - La cible 4 reste autorisée uniquement lorsque `MaintenanceTargetEnable=TRUE`
@@ -33,7 +33,7 @@ l'implémentation actuelle. L'IHM doit afficher `PositionReached` pour informer 
 
 ## 🛡️ Arbitrage commandes boutons / joystick
 
-Quand `JoystickSelect=FALSE`, seuls `ReqFwd` et `ReqRev` définissent le sens.
+Quand `TglJoystickMaster=FALSE`, seuls `BtnFwd` et `BtnRev` définissent le sens.
 Sans requête bouton, le sens est forcé à 0 : aucune direction joystick ne peut être reprise
 implicitement. L'homme-mort `DeadmanArmed` reste obligatoire pour tout mouvement.
 
@@ -47,5 +47,5 @@ implicitement. L'homme-mort `DeadmanArmed` reste obligatoire pour tout mouvement
 ## 🔧 Application CODESYS 3.5
 
 Importer le bundle complet `CODE/CODE_Bundle.xml` à la racine de l'application. Sur l'IHM,
-lier un sélecteur Jog/Positionneur à `GVL_IHM.M3Translation.PositioningSelect` et un voyant
-"Position atteinte" à `GVL_IHM.M3Translation.PositionReached`.
+lier un sélecteur Jog/Positionneur à `GVL_IHM.TranslationM3.PositioningSelect` et un voyant
+"Position atteinte" à `GVL_IHM.TranslationM3.PositionReached`.

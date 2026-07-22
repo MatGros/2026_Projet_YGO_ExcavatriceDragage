@@ -35,7 +35,7 @@ Contrat standard que **tout FB métier respecte** :
 - **[Partie 4 (v1.4)](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md)** — Cycle & séquenceur (`E_CycleStep`, synchro, frein, translation, benne, rampes).
 - **[Partie 5 (v1.6)](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
 - **[Partie 6 (v1.6)](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)** — Conditionnement E/S.
-- **[Partie 7 (v1.5)](DOC/AF_Partie-07_Interface_IHM_v1.5.md)** — Interface HMI.
+- **[Partie 7 (v1.6)](DOC/AF_Partie-07_Interface_IHM_v1.6.md)** — Interface HMI.
 
 ### 6️⃣ **Fonctions Métier (Partie 8+)**
 - **[Partie 8 (v1.3)](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md)** — Fonction Joystick.
@@ -65,7 +65,7 @@ excavatrice-dragage/
 │   ├── AF_Partie-04_Cycle_Sequenceur_v1.4.md
 │   ├── AF_Partie-05_Modes_Maintenance_v1.6.md
 │   ├── AF_Partie-06_IO_Conditioning_v1.6.md
-│   ├── AF_Partie-07_Interface_IHM_v1.5.md
+│   ├── AF_Partie-07_Interface_IHM_v1.6.md
 │   ├── AF_Partie-08_Fonction_Joystick_v1.3.md
 │   ├── AF_Partie-09_Fonction_Winch_v1.11.md
 │   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.10.md

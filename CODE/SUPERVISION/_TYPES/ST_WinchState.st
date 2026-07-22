@@ -1,0 +1,55 @@
+(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_WinchState — États, mesures et diagnostics HMI pour un Treuil M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné aux retours d'informations et bargraphes HMI.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_WinchState :
+STRUCT
+    (* 🚦 États & Mesures (Lecture seule) *)
+    Position_M              : REAL;             (* 📊 Position actuelle du câble (mètres) *)
+    MeasuredSpeed_Mps       : REAL;             (* 📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue *)
+    SpeedDelta_Mps          : REAL;             (* 🔍 Variation de vitesse entre deux scans (m/s) *)
+    SpeedVariationDetected  : BOOL;             (* 🔍 Seuil de variation dépassé sur le scan courant *)
+    SpeedVariationConfirmed : BOOL;             (* 🛡️ Variation confirmée pendant la durée paramétrée *)
+    SpeedStable             : BOOL;             (* 🟢 Vitesse stable pendant la durée paramétrée *)
+    SpeedMonitorError       : BOOL;             (* 🔴 Défaut mémorisé du moniteur vitesse *)
+    SpeedMonitorErrorId     : WORD;             (* ❌ Bitfield du moniteur vitesse *)
+    EstimatedLoadPct        : REAL;             (* 📊 Estimation empirique, non certifiée *)
+    LoadEstimateConfigured  : BOOL;             (* 🟢 Table charge validée pour lecture *)
+    SpeedGuardLimited       : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
+    SpeedRef_Pct            : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
+    StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
+    FBState                 : E_State;          (* 🤖 État de l'automate interne (FB_Winch) *)
+    Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
+    Busy                    : BOOL;             (* ⚙️ Mouvement en cours *)
+    Done                    : BOOL;             (* ✅ Action terminée *)
+    Error                   : BOOL;             (* 🔴 Treuil en défaut *)
+    ErrorId                 : WORD;             (* ❌ Code bitfield du défaut treuil *)
+    
+    (* 🔌 Sorties Physiques / Indicateurs LEDs *)
+    RelayFwd                : BOOL;             (* 🛗 Relais Montée activé *)
+    RelayRev                : BOOL;             (* 🛗 Relais Descente activé *)
+    Contactor1              : BOOL;             (* 🔌 Contacteur vitesse palier 1 *)
+    Contactor2              : BOOL;             (* 🔌 Contacteur vitesse palier 2 *)
+    Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)
+    Contactor4              : BOOL;             (* 🔌 Contacteur vitesse palier 4 *)
+    BrakeCmd                : BOOL;             (* 🔓 Commande frein (TRUE = desserré / libre) *)
+    
+    (* 🛡️ Sécurités & Diagnostics *)
+    Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
+    HomingBusy              : BOOL;             (* ⏳ Référencement en cours *)
+    HomingDone              : BOOL;             (* ✅ Pulse de référencement réussi *)
+    HomingError             : BOOL;             (* 🔴 Défaut de référencement *)
+    HomingErrorId           : WORD;             (* ❌ Bitfield défaut homing *)
+    HomingState             : E_State;          (* 🤖 État FB_Encoder_Homing *)
+    HomingStateAtError      : E_State;          (* 🧭 État lors du défaut *)
+    HomingSuspect           : BOOL;             (* ⚠️ Référence à confirmer *)
+    HomingRefRaw            : UDINT;            (* 📐 Référence brute appliquée *)
+    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
+    
+    (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
+    ContactorsCheck         : ST_ContactorCheck; (* 🔌 Coherence contacteurs sens+vitesse *)
+    BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
+    InhibitActive           : BOOL;             (* 🆕 miroir lecture seule — inhibition arbitrée *)
+END_STRUCT
+END_TYPE

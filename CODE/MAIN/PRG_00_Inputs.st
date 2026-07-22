@@ -120,29 +120,29 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.Modes.BtnModeReset := FALSE;
     GVL_IHM.Modes.BtnEmergencyArming := FALSE;
 
-    GVL_IHM.M1TreuilRetenue.BtnReset := FALSE;
-    GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.Cmd.BtnReset := FALSE;
+    GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
-    GVL_IHM.M1TreuilRetenue.BtnConfirmCoherence := FALSE;
-    GVL_IHM.M2TreuilBucket.BtnReset := FALSE;
-    GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
-    GVL_IHM.M2TreuilBucket.Bypass.EncoderFault := FALSE;
-    GVL_IHM.M2TreuilBucket.BtnConfirmCoherence := FALSE;
+    GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence := FALSE;
+    GVL_IHM.M2TreuilBenne.Cmd.BtnReset := FALSE;
+    GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.EncoderFault := FALSE;
+    GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence := FALSE;
 
-    GVL_IHM.Bucket.BtnOpen := FALSE;
-    GVL_IHM.Bucket.BtnClose := FALSE;
-    GVL_IHM.Bucket.BtnReset := FALSE;
-    GVL_IHM.Bucket.BtnConfirmOpenPos := FALSE;
-    GVL_IHM.Bucket.BtnConfirmClosePos := FALSE;
+    GVL_IHM.M2Benne.BtnOpen := FALSE;
+    GVL_IHM.M2Benne.BtnClose := FALSE;
+    GVL_IHM.M2Benne.BtnReset := FALSE;
+    GVL_IHM.M2Benne.BtnConfirmOpenPos := FALSE;
+    GVL_IHM.M2Benne.BtnConfirmClosePos := FALSE;
 
-    GVL_IHM.Cycle.CmdStart := FALSE;
-    GVL_IHM.Cycle.CmdPause := FALSE;
-    GVL_IHM.Cycle.CmdAbort := FALSE;
-    GVL_IHM.Cycle.CmdReset := FALSE;
+    GVL_IHM.Cycle.BtnStart := FALSE;
+    GVL_IHM.Cycle.BtnPause := FALSE;
+    GVL_IHM.Cycle.BtnAbort := FALSE;
+    GVL_IHM.Cycle.BtnReset := FALSE;
 
-    GVL_IHM.M3Translation.SelPositioning := FALSE;
-    GVL_IHM.M3Translation.BtnFwd := FALSE;
-    GVL_IHM.M3Translation.BtnRev := FALSE;
+    GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
+    GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;
+    GVL_IHM.TranslationM3.Cmd.BtnRev := FALSE;
     GVL_IHM.JOY1Joystick.BtnCalibrate := FALSE;
 
     HmiCommandsInitialized := TRUE;

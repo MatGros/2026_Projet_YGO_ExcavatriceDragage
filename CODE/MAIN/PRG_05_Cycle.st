@@ -30,13 +30,13 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
 
 // 🕹️ Interface unique de commande cycle depuis GVL_IHM.
-CmdStartCycle_IHM := GVL_IHM.Cycle.CmdStart;
-CmdPauseCycle_IHM := GVL_IHM.Cycle.CmdPause;
-CmdAbortCycle_IHM := GVL_IHM.Cycle.CmdAbort;
-CmdResetCycle_IHM := GVL_IHM.Cycle.CmdReset;
-SetDepthM      := GVL_IHM.Cycle.SetDepthM;
-SetOffsetM     := GVL_IHM.Cycle.SetOffsetM;
-GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.TstKoboldContactFond;
+CmdStartCycle_IHM := GVL_IHM.Cycle.BtnStart;
+CmdPauseCycle_IHM := GVL_IHM.Cycle.BtnPause;
+CmdAbortCycle_IHM := GVL_IHM.Cycle.BtnAbort;
+CmdResetCycle_IHM := GVL_IHM.Cycle.BtnReset;
+SetDepthM      := GVL_IHM.Cycle.SetDepth_M;
+SetOffsetM     := GVL_IHM.Cycle.SetOffset_M;
+GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.Test.KoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
 
@@ -56,12 +56,12 @@ instCycle(
     
     SetDepthM        := SetDepthM,
     SetOffsetM       := SetOffsetM,
-    SelectedTargetNum_IHM := GVL_IHM.M3Translation.SelTarget,
+    SelectedTargetNum_IHM := GVL_IHM.TranslationM3.Cmd.SelTarget,
 
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
-    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed,
+    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M,
     WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -87,12 +87,12 @@ instCycle(
     Benne_IsClosed    := _BucketState.IsClosed
 );
 
-GVL_IHM.Cycle.SpeedMismatchMps         := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.SpeedMismatch_Mps         := instCycle.SpeedMismatchMps;
 GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
 GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 
 // 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
-GVL_IHM.Cycle.CmdStart := FALSE;
-GVL_IHM.Cycle.CmdPause := FALSE;
-GVL_IHM.Cycle.CmdAbort := FALSE;
-GVL_IHM.Cycle.CmdReset := FALSE;
+GVL_IHM.Cycle.BtnStart := FALSE;
+GVL_IHM.Cycle.BtnPause := FALSE;
+GVL_IHM.Cycle.BtnAbort := FALSE;
+GVL_IHM.Cycle.BtnReset := FALSE;

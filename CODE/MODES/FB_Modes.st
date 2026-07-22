@@ -44,8 +44,8 @@ VAR_INPUT
     EmergencyStopOk     : BOOL;        // Standard
     SelMode         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
     SelSyncEnable   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
-    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1TreuilRetenue.BtnInhibit — bouton IHM inhibition M1
-    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2TreuilBucket.BtnInhibit — bouton IHM inhibition M2
+    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1Winch.BtnInhibit — bouton IHM inhibition M1
+    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2Winch.BtnInhibit — bouton IHM inhibition M2
     SelHomingApproachEnable : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.SelHomingApproachEnable — case IHM
                                         // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard

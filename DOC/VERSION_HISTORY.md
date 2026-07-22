@@ -4,6 +4,45 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.31_CommissioningDocsIhmState` — 2026-07-22
+- NAVBOARD Joystick/M3 + checklists v1.1 alignés sur IHM `.Cmd/.State/.Safety`
+- Fiches terrain courtes : ordre de bascule simulation, mouvement prudent, reset sûr
+
+---
+
+### `v0.4.30_SupervisionStateAndExportFix` — 2026-07-22
+- Remplacement du namespace sémantique `.Status.` par `.State.` pour clarifier le retour d'états
+- Regroupement physique de toutes les structures DUTs (`ST_*.st`) dans le sous-dossier `CODE/SUPERVISION/_TYPES/`
+- Résolution des erreurs de compilation CODESYS (201 erreurs) par correction directe des chemins de variables obsolètes dans le fichier d'export XML `Device.export`
+- Alignement du code source des suites de tests PLC (`FB_ModesValidation.st`, `FB_HeartbeatValidation.st`), de `PRG_05_Cycle.st` et de `PRG_09_Supervision.st`
+
+---
+
+### `v0.4.29_SupervisionStructuredCmdStatus` — 2026-07-22
+- Structuration complète de supervision des axes Winch M1/M2 et Translation M3 en Cmd/Status/Cfg
+- Création des types DUT dédiés ST_WinchCmd, ST_WinchStatus, ST_WinchCfg, ST_TranslationCmd, ST_TranslationStatus
+- Alignement complet du remapping IHM dans PRG_09_Supervision, des autres POUs et des suites de tests PLC
+- Consolidation documentaire avec l'Analyse Fonctionnelle Partie 7 v1.6 complète
+
+---
+
+### `v0.4.28_SupervisionFrenchExceptions` — 2026-07-22
+- Restauration des exceptions de nommage en Français exigées pour l'IHM
+- Renommage en `M1TreuilRetenue`, `M2TreuilBenne` et `M2Benne`
+- Isolation des variables de test HMI (Tst*) sous des structures dédiées Test (ST_TestTranslation/ST_TestCycle)
+- Isolation des diagnostics de sécurité IHM (SafetyError*) sous des structures dédiées Safety (ST_SafetyTranslation/ST_SafetyWinch)
+- Alignement de tous les programmes consommateurs (`PRG_00` à `PRG_10`) et tests PLC
+
+---
+
+### `v0.4.27_SupervisionConformityRename` — 2026-07-22
+- Renommage complet de la supervision GVL_IHM et des structures ST_*HMI
+- Alignement strict avec les repères physiques : M1Winch, M2Winch, M2WinchBucket, TranslationM3
+- Ajout systématique des underscores pour les suffixes d'unités physiques (_M, _Pct, _Hz, _Mps)
+- Adaptation de tous les programmes consommateurs (PRG_00 à PRG_10) et suites de tests PLC
+
+---
+
 ### `v0.4.26_IhmCompatibilityRepair` — 2026-07-22
 - Restauration des noms publics IHM historiques : visualisation inchangée
 - `CODE_Bundle.xml` inclut désormais `GVL_PERSISTENT` requis par les PRG

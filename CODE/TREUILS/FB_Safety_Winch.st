@@ -183,7 +183,7 @@ VAR_OUTPUT
     PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
 
     // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
-    // par l'IHM pour la mise en service (voir PRG_09_Supervision, GVL_IHM.M1TreuilRetenue/M2)
+    // par l'IHM pour la mise en service (voir PRG_09_Supervision, GVL_IHM.M1Winch/M2Winch)
     MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
     MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM
     MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout

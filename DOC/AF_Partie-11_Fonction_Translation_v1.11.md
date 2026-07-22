@@ -4,7 +4,7 @@
 
 ## 🕹️ Retour IHM déflexion joystick
 
-`GVL_IHM.M3Translation.JoystickDeflectionPct` expose la déflexion fonctionnelle signée de
+`GVL_IHM.TranslationM3.JoystickDeflectionPct` expose la déflexion fonctionnelle signée de
 l'axe X du joystick, issue de `FB_Joystick_0.AxisCmdX.SpeedRef` :
 
 | Valeur | Sens IHM |

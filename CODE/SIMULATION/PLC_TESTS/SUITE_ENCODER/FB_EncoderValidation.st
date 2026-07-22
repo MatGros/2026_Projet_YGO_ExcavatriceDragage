@@ -56,8 +56,8 @@ M2HomePulse := FALSE;
 ActiveStimulusId := 0;
 
 IF Abort THEN
-    GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
-    GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
+    GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;
@@ -165,8 +165,8 @@ CASE Step OF
             StepFailed := TRUE;
             ErrorCode := 3003;
             ErrorMessage := 'Gate simulation codeurs inactif';
-        ELSIF NOT GVL_IHM.M1TreuilRetenue.HomingError
-           AND NOT GVL_IHM.M2TreuilBucket.HomingError THEN
+        ELSIF NOT GVL_IHM.M1TreuilRetenue.State.HomingError
+           AND NOT GVL_IHM.M2TreuilBenne.State.HomingError THEN
             StepPassed := TRUE;
             Step := 11;
             StepStarted := FALSE;
@@ -174,8 +174,8 @@ CASE Step OF
 
     // TC-E1 : vérifier que le rapport IHM des deux treuils existe avant commande.
     11:
-        IF (GVL_IHM.M1TreuilRetenue.HomingState >= E_State.DISABLED)
-           AND (GVL_IHM.M2TreuilBucket.HomingState >= E_State.DISABLED) THEN
+        IF (GVL_IHM.M1TreuilRetenue.State.HomingState >= E_State.DISABLED)
+           AND (GVL_IHM.M2TreuilBenne.State.HomingState >= E_State.DISABLED) THEN
             StepPassed := TRUE;
             Step := 0;
         END_IF;
@@ -196,21 +196,21 @@ CASE Step OF
     21:
         M1HomePulse := TRUE;
         M2HomePulse := TRUE;
-        GVL_IHM.M1TreuilRetenue.BtnHome := M1HomePulse;
-        GVL_IHM.M2TreuilBucket.BtnHome := M2HomePulse;
+        GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := M1HomePulse;
+        GVL_IHM.M2TreuilBenne.Cmd.BtnHome := M2HomePulse;
         StepPassed := TRUE;
         Step := 22;
         StepStarted := FALSE;
 
     // TC-E2 : aucune attente infinie : les deux instances doivent finir ou déclarer une erreur.
     22:
-        GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
-        GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
-        IF (GVL_IHM.M1TreuilRetenue.HomingDone OR GVL_IHM.M1TreuilRetenue.Homed)
-           AND (GVL_IHM.M2TreuilBucket.HomingDone OR GVL_IHM.M2TreuilBucket.Homed) THEN
+        GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
+        GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
+        IF (GVL_IHM.M1TreuilRetenue.State.HomingDone OR GVL_IHM.M1TreuilRetenue.State.Homed)
+           AND (GVL_IHM.M2TreuilBenne.State.HomingDone OR GVL_IHM.M2TreuilBenne.State.Homed) THEN
             StepPassed := TRUE;
             Step := 0;
-        ELSIF GVL_IHM.M1TreuilRetenue.HomingError OR GVL_IHM.M2TreuilBucket.HomingError THEN
+        ELSIF GVL_IHM.M1TreuilRetenue.State.HomingError OR GVL_IHM.M2TreuilBenne.State.HomingError THEN
             StepFailed := TRUE;
         END_IF;
 END_CASE;
@@ -268,8 +268,8 @@ END_IF;
 
 // Limite globale de sécurité de la suite : 30 s maximum.
 IF Report.Duration >= T#30s AND Busy THEN
-    GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
-    GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
+    GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;
