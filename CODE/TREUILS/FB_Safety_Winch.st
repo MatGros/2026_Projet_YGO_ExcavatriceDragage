@@ -135,7 +135,7 @@ VAR_INPUT
     TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
-    CableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
+    CfgCableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
     Direction           : INT;         // 🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)
     MovementCommanded   : BOOL;        // TRUE si au moins un contacteur de sens est réellement commandé
     Homed               : BOOL;        // Indique si le treuil est référencé
@@ -335,9 +335,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
-// Sécurité active hors référencement. Si la position de câble descend sous la limite basse physique (CablePosM <= CableLimitDescentM),
+// Sécurité active hors référencement. Si la position de câble descend sous la limite basse physique (CablePosM <= CfgCableLimitDescentM),
 // alors on interdit uniquement la descente.
-IF (CableLimitDescentM < 0.0) AND (CablePosM <= CableLimitDescentM) AND NOT InReferencingMode THEN
+IF (CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
     ErrorId := ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;

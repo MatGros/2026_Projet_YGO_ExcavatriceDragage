@@ -291,6 +291,61 @@ Les structures d'échange IHM (`ST_WinchHMI`, `ST_BucketHMI`, `ST_TranslationHMI
 
 ---
 
+## Variables de simulation (GVL_Simulation) — Préfixes sémantiques
+
+`GVL_Simulation` mélange aujourd'hui 3 familles différentes pour exprimer « donnée simulée »
+(`_IsReal`, `_Simulated`, `Sim...`) sans cohérence, plus des variables hors PascalCase
+(`refBucket`). Convention cible (à appliquer en migration planifiée, pas maintenant) :
+
+| Préfixe | Sémantique | Exemple | Remplace |
+|---|---|---|---|
+| `Bus` | Device bus de terrain (EtherCAT/CANopen), granularité réel/simulé | `BusEncoderM1IsReal`, `BusJoystickIsReal` | `EncoderM1_IsReal`, `Joystick_IsReal` |
+| `Sensor` | Capteur/retour câblé (I/O discrète), granularité réel/simulé | `SensorTopPositionIsReal`, `SensorM1ThermalIsReal` | `TopPositionSensor_IsReal`, `ThermalM1_IsReal` |
+| `Sim` | Valeur simulée calculée (remplace un `_DI` en mode simu) | `SimM1BrakeFeedback`, `SimKoboldContactFond` | `M1BrakeFeedback_Simulated`, `KoboldContactFond_Simulated` |
+| `Tst` | Outil/commande de test banc (même famille que `Tst` côté IHM) | `TstEncoderSpeedFactor`, `TstInjectSyncDeviationM1` | `EncoderSimSpeedFactor`, `InjectSyncDeviationM1` |
+| `Link` | Référence CODESYS (`REFERENCE TO`) vers une instance, fenêtre de passage tests PLC | `LinkBucket`, `LinkWinchM2` | `refBucket`, `refWinchM2` |
+
+⚠️ **`Ref` exclu volontairement** pour ce rôle : déjà pris par « consigne » (`SpeedRef`,
+`CablePosRef`) ET évoque le référencement codeur (Homing) — collision de sens à 3 signification
+s'il était aussi utilisé pour une référence `REFERENCE TO`. `Link` lève l'ambiguïté.
+
+### Règle — Repère juste après le préfixe (GVL plates uniquement)
+
+Dans une **GVL plate** (liste à plat, pas de struct imbriquée par instance/axe comme
+`GVL_IHM.WinchM1.xxx`), le Repère matériel (M1/M2/M3) se place **juste après le préfixe**,
+avant la fonction — pour que le tri alphabétique (vue Watch/Instance CODESYS) regroupe
+automatiquement toutes les variables du même axe, sans avoir besoin de déplier une structure :
+
+```
+<Préfixe><Repère><Fonction>[<Suffixe>]
+```
+
+✅ `SensorM1ContactorFeedbackIsReal`, `SensorM1ThermalIsReal`, `SensorM2ThermalIsReal`
+❌ `SensorContactorFeedbackM1IsReal` (regroupe par fonction, pas par axe — mélange les axes
+à l'écran, impossible à lire vite en session stress terrain)
+
+⚠️ Ne s'applique QUE aux GVL plates. Dans une struct imbriquée par instance
+(`GVL_IHM.WinchM1.CmdReset`), le Repère est déjà porté par le nom de l'instance — ne
+JAMAIS le répéter dans le champ (règle existante, voir section « Construction d'un nom »
+ci-dessous).
+
+### Repères multiples (axe + sous-composant fonctionnel numéroté)
+
+Si une fonction porte elle-même un repère numérique propre (ex: `Contactor1`..`Contactor4`
+= palier vitesse), ce repère fonctionnel reste **toujours collé** à son mot de fonction,
+formant un bloc indissociable. Seul l'axe/mécanisme (repère le plus large et stable :
+M1/M2/M3) remonte juste après le préfixe.
+
+```
+<Préfixe><Axe><Fonction+RepèreFonctionnel><Suffixe>
+```
+
+✅ `SensorM1Contactor4IsReal` (M1 = axe, `Contactor4` = fonction+repère indissociable)
+❌ `SensorContactor4M1IsReal` (casse le regroupement par axe)
+❌ `Sensor4M1ContactorIsReal` (sépare le repère fonctionnel de sa fonction, perd le sens)
+
+---
+
 ## Construction d'un nom : instance → champ (2 niveaux, jamais mélangés)
 
 🔧 REX 2026-07-15 : formalisé après plusieurs allers-retours sur le Translation M3 — un nom se

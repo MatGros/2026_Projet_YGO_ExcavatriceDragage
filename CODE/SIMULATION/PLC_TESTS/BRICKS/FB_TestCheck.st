@@ -23,12 +23,19 @@ VAR
     StableTimer  : TON;
     EvaluateTrig : R_TRIG;
     Cond         : BOOL;
+    ProbeIdxLocal : INT;
 END_VAR
 // === IMPLEMENTATION ===
-// Toujours mettre à jour les triggers des sondes TOR pour ne pas rater de transition
-IF Config.ProbeIdx >= 1 AND Config.ProbeIdx <= GVL_PLC_Tests_Const.MaxProbeBool THEN
-    RisingTrig(CLK := ProbeBool[Config.ProbeIdx]);
-    FallingTrig(CLK := ProbeBool[Config.ProbeIdx]);
+// Toujours mettre à jour les triggers, avec borne validée AVANT l'accès.
+ProbeIdxLocal := Config.ProbeIdx;
+IF ProbeIdxLocal >= 1 THEN
+    IF ProbeIdxLocal <= GVL_PLC_Tests_Const.MaxProbeBool THEN
+        RisingTrig(CLK := ProbeBool[ProbeIdxLocal]);
+        FallingTrig(CLK := ProbeBool[ProbeIdxLocal]);
+    ELSE
+        RisingTrig(CLK := FALSE);
+        FallingTrig(CLK := FALSE);
+    END_IF;
 ELSE
     RisingTrig(CLK := FALSE);
     FallingTrig(CLK := FALSE);
@@ -49,16 +56,16 @@ IF Config.ProbeIdx >= 1 THEN
     CASE Config.Kind OF
         E_TestCheckKind.BOOL_EQUAL, E_TestCheckKind.BOOL_RISING, E_TestCheckKind.BOOL_FALLING:
             IF Config.ProbeIdx <= GVL_PLC_Tests_Const.MaxProbeBool THEN
-                ObservedBool := ProbeBool[Config.ProbeIdx];
+                ObservedBool := ProbeBool[ProbeIdxLocal];
             END_IF;
         E_TestCheckKind.DINT_EQUAL, E_TestCheckKind.DINT_NOT_EQUAL, E_TestCheckKind.DINT_IN_RANGE,
         E_TestCheckKind.WORD_MASK_ALL, E_TestCheckKind.WORD_MASK_ANY, E_TestCheckKind.WORD_MASK_NONE:
             IF Config.ProbeIdx <= GVL_PLC_Tests_Const.MaxProbeDint THEN
-                ObservedDint := ProbeDint[Config.ProbeIdx];
+                ObservedDint := ProbeDint[ProbeIdxLocal];
             END_IF;
         E_TestCheckKind.REAL_IN_RANGE:
             IF Config.ProbeIdx <= GVL_PLC_Tests_Const.MaxProbeReal THEN
-                ObservedReal := ProbeReal[Config.ProbeIdx];
+                ObservedReal := ProbeReal[ProbeIdxLocal];
             END_IF;
     END_CASE;
 END_IF;

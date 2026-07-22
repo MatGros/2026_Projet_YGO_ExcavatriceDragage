@@ -31,7 +31,7 @@ FUNCTION_BLOCK PUBLIC FB_ModesValidation
 VAR_INPUT
     Start       : BOOL;
     Abort       : BOOL;
-    FirstStepId : INT;
+    CaseId      : INT; // 0=tous ; 1..12=cas ciblé
 END_VAR
 VAR_OUTPUT
     Busy            : BOOL;
@@ -51,7 +51,8 @@ END_VAR
 VAR
     StartPrev       : BOOL;
     Step            : INT;
-    CaseId          : INT;
+    CurrentCaseId   : INT;
+    RequestedCaseId : INT;
     StepStarted     : BOOL;
     StepTimer       : TON;
     StepLimit       : TIME;
@@ -83,19 +84,19 @@ END_VAR
 
 // Gate simulation : nécessite le joystick simulé (override programmatique) et M1 simulé.
 SimGateOk := GVL_Simulation.SimulationModeActive
-          AND NOT GVL_Simulation.JoystickSignal_IsReal
-          AND NOT GVL_Simulation.EncoderM1_IsReal
-          AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal;
+          AND NOT GVL_Simulation.BusJoystickSignalIsReal
+          AND NOT GVL_Simulation.BusEncoderM1IsReal
+          AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal;
 
 ActiveStimulusId := 0;
 
 IF Abort THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
-    GVL_IHM.Modes.FaultMachineReset := FALSE;
+    GVL_IHM.Modes.BtnFaultReset := FALSE;
     GVL_IHM.Cycle.CmdStart := FALSE;
     GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
-    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;
@@ -116,12 +117,37 @@ IF Start AND NOT StartPrev AND NOT Busy THEN
     ErrorCode := 0;
     ErrorMessage := '';
     TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
-    Step := FirstStepId;
-    IF (Step <> 5) AND (Step <> 10) AND (Step <> 20) AND (Step <> 30) AND (Step <> 40)
-       AND (Step <> 50) AND (Step <> 60) AND (Step <> 65) AND (Step <> 70)
-       AND (Step <> 80) AND (Step <> 90) AND (Step <> 100) AND (Step <> 110) THEN
-        Step := 5;
+    IF CaseId < 0 OR CaseId > 12 THEN
+        Busy := FALSE;
+        Done := TRUE;
+        AnyFailed := TRUE;
+        ConfigError := TRUE;
+        ErrorCode := 5001;
+        ErrorMessage := 'Modes CaseId invalide';
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+        Report.TerminalState := TerminalState;
+        Report.AnyFailed := TRUE;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        RETURN;
     END_IF;
+    RequestedCaseId := CaseId;
+    CASE RequestedCaseId OF
+        1: Step := 10;
+        2: Step := 20;
+        3: Step := 30;
+        4: Step := 40;
+        5: Step := 50;
+        6: Step := 60;
+        7: Step := 70;
+        8: Step := 90;
+        9: Step := 80;
+        10: Step := 90;
+        11: Step := 100;
+        12: Step := 110;
+    ELSE
+        Step := 5;
+    END_CASE;
     Report.Name := 'Modes / Homme-mort Validation';
     Report.InProgress := TRUE;
     Report.AllPassed := FALSE;
@@ -163,8 +189,8 @@ END_IF;
 StepElapsed := StepElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
 Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
 Report.CurrentStepId := Step;
-CaseId := (Step / 10);
-Report.CurrentCaseId := CaseId;
+CurrentCaseId := (Step / 10);
+Report.CurrentCaseId := CurrentCaseId;
 
 IF NOT StepStarted THEN
     StepStarted := TRUE;
@@ -203,9 +229,9 @@ NeutralHoldTimer(IN := (Step = 13) AND (ABS(GVL_PLC_Tests.OverrideJoystickRawY -
 CASE Step OF
     // ─────────── Préambule : armement contacteur simulé (requis sans hardware) ───────────
     5:
-        GVL_IHM.Modes.CmdEmergencyArming := TRUE; // pulse réarmement → SimContactorOk → EmergencyStopOk
+        GVL_IHM.Modes.BtnEmergencyArming := TRUE; // pulse réarmement → SimContactorOk → EmergencyStopOk
         IF PRG_00_Inputs.EmergencyStopOk THEN
-            GVL_IHM.Modes.CmdEmergencyArming := FALSE;
+            GVL_IHM.Modes.BtnEmergencyArming := FALSE;
             StepPassed := TRUE;
             Step := 10;
             StepStarted := FALSE;
@@ -213,7 +239,7 @@ CASE Step OF
 
     // ─────────── TC-M1 : MAINT_N1 + homme-mort (+ arrêt + reprise) ───────────
     10:
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
         GVL_PLC_Tests.OverrideJoystickRawY := 5000; // neutre
         GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
         IF SimGateOk AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) THEN
@@ -256,7 +282,7 @@ CASE Step OF
         GVL_PLC_Tests.OverrideJoystickRawY := 10000;
         IF PRG_06_WinchControl.instWinchM1.RelayFwd THEN
             StepPassed := TRUE;
-            Step := 20; // Enchaîne directement sur TC-M2 (teardown commun ci-dessous)
+            IF RequestedCaseId = 1 THEN Step := 0; ELSE Step := 20; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -264,7 +290,7 @@ CASE Step OF
     20:
         GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
         GVL_PLC_Tests.OverrideJoystickRawY := 5000;
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N2;
         IF SimGateOk AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
             StepPassed := TRUE;
             Step := 21;
@@ -276,7 +302,7 @@ CASE Step OF
         GVL_PLC_Tests.OverrideJoystickRawY := 10000;
         IF PRG_06_WinchControl.instWinchM1.RelayFwd THEN
             StepPassed := TRUE;
-            Step := 30;
+            IF RequestedCaseId = 2 THEN Step := 0; ELSE Step := 30; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -284,10 +310,10 @@ CASE Step OF
     30:
         GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
         GVL_PLC_Tests.OverrideJoystickRawY := 5000;
-        GVL_IHM.Modes.ModeRequest := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
         IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
             StepPassed := TRUE;
-            Step := 40;
+            IF RequestedCaseId = 3 THEN Step := 0; ELSE Step := 40; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -295,13 +321,13 @@ CASE Step OF
     40:
         IF GVL_Simulation.SimulationModeActive AND SimGateOk THEN
             StepPassed := TRUE;
-            Step := 50;
+            IF RequestedCaseId = 4 THEN Step := 0; ELSE Step := 50; END_IF;
             StepStarted := FALSE;
         END_IF;
 
     // ─────────── TC-M5 : Sécurité active + aucun mouvement sans autorisation de mode ───────────
     50:
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
         GVL_PLC_Tests.OverrideContactorFalse := TRUE; // Force EmergencyStopOk := FALSE (voir PRG_00_Inputs)
         IF PRG_04_Modes.instModes.Mode = E_Mode.DISABLE THEN
             StepPassed := TRUE;
@@ -319,11 +345,11 @@ CASE Step OF
 
     52:
         GVL_PLC_Tests.OverrideContactorFalse := FALSE;
-        GVL_IHM.Modes.FaultMachineReset := TRUE;
+        GVL_IHM.Modes.BtnFaultReset := TRUE;
         IF PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE THEN
-            GVL_IHM.Modes.FaultMachineReset := FALSE;
+            GVL_IHM.Modes.BtnFaultReset := FALSE;
             StepPassed := TRUE;
-            Step := 60;
+            IF RequestedCaseId = 5 THEN Step := 0; ELSE Step := 60; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -333,13 +359,13 @@ CASE Step OF
         // démarrage (GVL_IHM.Cycle.CmdStart, ré-assertée chaque scan pour couvrir l'ordre
         // des tâches) pendant >200 ms hors SEMI_AUTO — instCycle.Enable=FALSE doit la rendre
         // sans effet (Busy reste FALSE), pas un simple instantané qui ne prouverait rien.
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1;
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
         GVL_IHM.Cycle.CmdStart := TRUE;
         IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) AND (StepElapsed >= T#200MS) THEN
             GVL_IHM.Cycle.CmdStart := FALSE;
             IF NOT PRG_05_Cycle.instCycle.Busy THEN
                 StepPassed := TRUE;
-                Step := 65;
+                IF RequestedCaseId = 6 THEN Step := 0; ELSE Step := 65; END_IF;
             ELSE
                 StepFailed := TRUE;
                 Step := 0;
@@ -349,7 +375,7 @@ CASE Step OF
 
     // ─────────── TC-M7 : DISABLE explicite neutralise M1/M2/M3 ───────────
     65:
-        GVL_IHM.Modes.ModeRequest := E_Mode.DISABLE;
+        GVL_IHM.Modes.SelMode := E_Mode.DISABLE;
         IF PRG_04_Modes.instModes.Mode = E_Mode.DISABLE THEN
             StepPassed := TRUE;
             Step := 66;
@@ -364,7 +390,7 @@ CASE Step OF
            AND NOT PRG_06_WinchControl.instWinchM2.RelayFwd
            AND (PRG_07_TranslationControl.instTranslationM3.DriveControlWord = 0) THEN
             StepPassed := TRUE;
-            Step := 70;
+            IF RequestedCaseId = 7 THEN Step := 0; ELSE Step := 70; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -376,7 +402,7 @@ CASE Step OF
             HeartbeatIhmOk := TRUE, EncoderAvailable := FALSE, EncoderFaultBypass := TRUE,
             ThermalFeedback := FALSE, BrakeThermalFeedback := FALSE, SlackCableDetected := FALSE,
             PhaseRotationOk := TRUE, TopPositionSensor := TRUE, InReferencingMode := FALSE,
-            CablePosM := 0.0, CableLimitDescentM := -20.0, Direction := 0,
+            CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Direction := 0,
             MovementCommanded := FALSE, Homed := FALSE, HomingSuspect := FALSE, TopLimitM := 8.5,
             FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE, JoystickYNeutral := FALSE,
             BenneHoldStillActive := FALSE, ExpectedOtherWinchPosM := 0.0, BenneBusy := FALSE,
@@ -395,7 +421,7 @@ CASE Step OF
             HeartbeatIhmOk := TRUE, EncoderAvailable := FALSE, EncoderFaultBypass := TRUE,
             ThermalFeedback := FALSE, BrakeThermalFeedback := FALSE, SlackCableDetected := FALSE,
             PhaseRotationOk := TRUE, TopPositionSensor := TRUE, InReferencingMode := FALSE,
-            CablePosM := 0.0, CableLimitDescentM := -20.0, Direction := 0,
+            CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Direction := 0,
             MovementCommanded := FALSE, Homed := FALSE, HomingSuspect := FALSE, TopLimitM := 8.5,
             FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE, JoystickYNeutral := FALSE,
             BenneHoldStillActive := FALSE, ExpectedOtherWinchPosM := 0.0, BenneBusy := FALSE,
@@ -403,7 +429,7 @@ CASE Step OF
         );
         IF ((TestSafetyWinch.ErrorId AND 16#0002) = 0) AND NOT TestSafetyWinch.SafeStop THEN
             StepPassed := TRUE;
-            Step := 80;
+            IF RequestedCaseId = 8 THEN Step := 0; ELSE Step := 80; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -413,18 +439,18 @@ CASE Step OF
             Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
             StartStop := TRUE, SafeStop := FALSE, ForbidDescent := FALSE, ForbidAscent := FALSE,
             Direction := 1, SpeedRefPct := 50.0, SpeedStepTable := TestSpeedTable,
-            MaxStepDescente := 3, MaxStepAscent := 5, HomingApproachActive := FALSE,
+            CfgMaxStepDescente := 3, MaxStepAscent := 5, HomingApproachActive := FALSE,
             FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := TRUE, BypassContactorCheck := TRUE,
             SpeedStepHystMargin := 0.0, Homed := TRUE, HomingSuspect := FALSE,
             CablePosM := 0.0, TopLimitM := 8.0, BottomLimitM := -20.0,
-            SlowdownDistanceM := 1.0, SlowSpeedPct := 15.0
+            CfgSlowdownDistanceM := 1.0, CfgSlowSpeedPct := 15.0
         );
         IF ((TestWinch.ErrorId AND 16#0004) <> 0)
            AND NOT TestWinch.RelayFwd AND NOT TestWinch.RelayRev
            AND NOT TestWinch.Contactor1 AND NOT TestWinch.Contactor2
            AND NOT TestWinch.Contactor3 AND NOT TestWinch.Contactor4 THEN
             StepPassed := TRUE;
-            Step := 90;
+            IF RequestedCaseId = 9 THEN Step := 0; ELSE Step := 90; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -451,7 +477,7 @@ CASE Step OF
         );
         IF (TestLoadEstimator.EstimatedLoadPct = 42.0) AND TestLoadEstimator.Ascending THEN
             StepPassed := TRUE;
-            Step := 100;
+            IF RequestedCaseId = 10 THEN Step := 0; ELSE Step := 100; END_IF;
             StepStarted := FALSE;
         END_IF;
 
@@ -494,30 +520,30 @@ CASE Step OF
         // forcer l'état. On vérifie que les sorties restent à l'arrêt.
         IF NOT TestCycle.CmdWinchM1_StartStop AND NOT TestCycle.CmdWinchM2_StartStop THEN
             StepPassed := TRUE;
-            Step := 110;
+            IF RequestedCaseId = 11 THEN Step := 0; ELSE Step := 110; END_IF;
             StepStarted := FALSE;
         END_IF;
 
     // ─────────── TC-M12 : purge commandes RETAIN avant consommation ───────────
     110:
-        GVL_IHM.M1TreuilRetenue.CmdHome := TRUE;
-        GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := TRUE;
-        GVL_IHM.M2TreuilBucket.CmdReset := TRUE;
-        GVL_IHM.Bucket.CmdClose := TRUE;
+        GVL_IHM.M1TreuilRetenue.BtnHome := TRUE;
+        GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := TRUE;
+        GVL_IHM.M2TreuilBucket.BtnReset := TRUE;
+        GVL_IHM.Bucket.BtnClose := TRUE;
         GVL_IHM.Cycle.CmdStart := TRUE;
-        GVL_IHM.TranslationM3.ReqFwd := TRUE;
+        GVL_IHM.TranslationM3.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
         StepPassed := TRUE;
         Step := 111;
         StepStarted := FALSE;
 
     111:
-        IF NOT GVL_IHM.M1TreuilRetenue.CmdHome
-           AND NOT GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass
-           AND NOT GVL_IHM.M2TreuilBucket.CmdReset
-           AND NOT GVL_IHM.Bucket.CmdClose
+        IF NOT GVL_IHM.M1TreuilRetenue.BtnHome
+           AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
+           AND NOT GVL_IHM.M2TreuilBucket.BtnReset
+           AND NOT GVL_IHM.Bucket.BtnClose
            AND NOT GVL_IHM.Cycle.CmdStart
-           AND NOT GVL_IHM.TranslationM3.ReqFwd
+           AND NOT GVL_IHM.TranslationM3.BtnFwd
            AND GVL_IHM.HmiInitDone THEN
             GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
             StepPassed := TRUE;
@@ -548,7 +574,7 @@ IF StepPassed OR StepFailed OR StepTimer.Q THEN
         GVL_PLC_Tests.OverrideJoystickActive := FALSE;
         GVL_PLC_Tests.OverrideContactorFalse := FALSE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
-        GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
+        GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
         Busy := FALSE;
         Done := TRUE;
         Report.InProgress := FALSE;
@@ -577,7 +603,7 @@ IF Report.Duration >= T#90s AND Busy THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
     GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
-    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     Busy := FALSE;
     Done := TRUE;
     AnyFailed := TRUE;

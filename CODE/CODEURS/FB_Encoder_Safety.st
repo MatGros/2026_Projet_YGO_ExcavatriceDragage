@@ -72,7 +72,7 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 
 // 🔍 4. RELAIS INCOHÉRENCE REDÉMARRAGE (§3.7, calculée par FB_Encoder_Homing) — bit1
-// Pas d'acquittement ici : la levée se fait via ConfirmCoherence/nouveau Home côté
+// Pas d'acquittement ici : la levée se fait via BtnConfirmCoherence/nouveau Home côté
 // FB_Encoder_Homing (source), ce FB ne fait QUE relayer l'information pour FB_Modes.
 IF HomingSuspect THEN
     ErrorId := ErrorId OR 16#0002;

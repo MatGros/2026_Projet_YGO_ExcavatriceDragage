@@ -16,38 +16,38 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_04_Modes) ===
 
 // 🆕 Exclusion mutuelle des inhibitions de treuils (soit M1, soit M2, jamais les deux)
-IF GVL_IHM.M1TreuilRetenue.CmdInhibit AND GVL_IHM.M2TreuilBucket.CmdInhibit THEN
+IF GVL_IHM.M1TreuilRetenue.BtnInhibit AND GVL_IHM.M2TreuilBucket.BtnInhibit THEN
     // Si M1 était déjà activé, on rejette la demande sur M2 (M2 retombe à FALSE)
     IF PrevInhibitM1 THEN
-        GVL_IHM.M2TreuilBucket.CmdInhibit := FALSE;
+        GVL_IHM.M2TreuilBucket.BtnInhibit := FALSE;
     // Si M2 était déjà activé, on rejette la demande sur M1 (M1 retombe à FALSE)
     ELSIF PrevInhibitM2 THEN
-        GVL_IHM.M1TreuilRetenue.CmdInhibit := FALSE;
+        GVL_IHM.M1TreuilRetenue.BtnInhibit := FALSE;
     ELSE
         // repli de sécurité si les deux s'activent de façon synchrone sans transition
-        GVL_IHM.M1TreuilRetenue.CmdInhibit := FALSE;
-        GVL_IHM.M2TreuilBucket.CmdInhibit := FALSE;
+        GVL_IHM.M1TreuilRetenue.BtnInhibit := FALSE;
+        GVL_IHM.M2TreuilBucket.BtnInhibit := FALSE;
     END_IF;
 END_IF;
 
-PrevInhibitM1 := GVL_IHM.M1TreuilRetenue.CmdInhibit;
-PrevInhibitM2 := GVL_IHM.M2TreuilBucket.CmdInhibit;
+PrevInhibitM1 := GVL_IHM.M1TreuilRetenue.BtnInhibit;
+PrevInhibitM2 := GVL_IHM.M2TreuilBucket.BtnInhibit;
 
 // 🆕 Si l'un des treuils est inhibé, synchro impossible par nature -> reset case IHM à TRUE
 // (🔧 REX 2026-07-08 : polarité inversée, TRUE = état neutre "synchro voulue")
-IF GVL_IHM.M1TreuilRetenue.CmdInhibit OR GVL_IHM.M2TreuilBucket.CmdInhibit THEN
-    GVL_IHM.Sync.SyncEnableRequest := TRUE;
+IF GVL_IHM.M1TreuilRetenue.BtnInhibit OR GVL_IHM.M2TreuilBucket.BtnInhibit THEN
+    GVL_IHM.Sync.SelSyncEnable := TRUE;
 END_IF;
 
 instModes(
     Enable              := TRUE,
-    Reset               := GVL_IHM.Modes.ModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
+    Reset               := GVL_IHM.Modes.BtnModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
-    ModeRequest         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
-    SyncEnableRequest   := GVL_Modes_Stub.SyncEnableRequest_IHM,
-    InhibitM1Request    := GVL_IHM.M1TreuilRetenue.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
-    InhibitM2Request    := GVL_IHM.M2TreuilBucket.CmdInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
-    HomingApproachEnableRequest := GVL_IHM.Commun.HomingApproachEnableRequest, // 🆕 REX 2026-07-08 (2)
+    SelMode         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
+    SelSyncEnable   := GVL_Modes_Stub.SyncEnableRequest_IHM,
+    InhibitM1Request    := GVL_IHM.M1TreuilRetenue.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
+    InhibitM2Request    := GVL_IHM.M2TreuilBucket.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
+    SelHomingApproachEnable := GVL_IHM.Commun.SelHomingApproachEnable, // 🆕 REX 2026-07-08 (2)
     EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
-    JoystickWinchSelectRequest := GVL_IHM.Modes.JoystickWinchSelect // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
+    JoystickWinchSelectRequest := GVL_IHM.Modes.SelJoystickWinch // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
 );

@@ -11,14 +11,14 @@
 FUNCTION_BLOCK PUBLIC FB_IhmHeartbeat
 VAR_INPUT
     Enable              : BOOL;              // Active la surveillance ; FALSE = IHM non valide
-    HeartbeatIhmToggle  : BOOL;              // Toggle IHM, inversion attendue toutes les 500 ms
+    TglHeartbeatIhm  : BOOL;              // Toggle IHM, inversion attendue toutes les 500 ms
     IhmTimeout          : TIME := T#2s;     // Absence maximale de front IHM
     PlcTogglePeriod     : TIME := T#500ms;  // Période du clignotant PLC
 END_VAR
 VAR_OUTPUT
     HeartbeatIhmOk      : BOOL;              // TRUE après front IHM post-boot et avant timeout
     HeartbeatIhmTimeout : BOOL;              // TRUE = aucun front IHM depuis IhmTimeout
-    HeartbeatPlcToggle  : BOOL;              // Clignotant PLC à superviser côté IHM
+    TglHeartbeatPlc  : BOOL;              // Clignotant PLC à superviser côté IHM
     TimeSinceIhmEdge    : TIME;              // Diagnostic : temps depuis le dernier front IHM
 END_VAR
 VAR
@@ -35,9 +35,9 @@ END_VAR
 IF NOT Enable THEN
     HeartbeatIhmOk := FALSE;
     HeartbeatIhmTimeout := TRUE;
-    HeartbeatPlcToggle := FALSE;
+    TglHeartbeatPlc := FALSE;
     TimeSinceIhmEdge := T#0s;
-    LastIhmToggle := HeartbeatIhmToggle;
+    LastIhmToggle := TglHeartbeatIhm;
     IhmEdgeSeen := FALSE;
     IhmTimeoutTon(IN := FALSE, PT := IhmTimeout);
     PlcToggleTon(IN := FALSE, PT := PlcTogglePeriod);
@@ -45,8 +45,8 @@ IF NOT Enable THEN
 END_IF;
 
 // 📥 Front par comparaison : l'IHM écrit un BOOL toggle, pas une impulsion courte.
-IhmEdgeDetected := (HeartbeatIhmToggle <> LastIhmToggle);
-LastIhmToggle := HeartbeatIhmToggle;
+IhmEdgeDetected := (TglHeartbeatIhm <> LastIhmToggle);
+LastIhmToggle := TglHeartbeatIhm;
 IF IhmEdgeDetected THEN
     IhmEdgeSeen := TRUE;
 END_IF;
@@ -61,5 +61,5 @@ HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
 // 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
 PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
 IF PlcToggleTon.Q THEN
-    HeartbeatPlcToggle := NOT HeartbeatPlcToggle;
+    TglHeartbeatPlc := NOT TglHeartbeatPlc;
 END_IF;

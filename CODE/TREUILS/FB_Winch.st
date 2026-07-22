@@ -36,7 +36,7 @@
       en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.11.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
-      nouveau paramètre `MaxStepDescente` (défaut 2). En descente
+      nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
       (`CommandedDirection = -1`), le palier atteignable par `FB_SpeedStep` est
       plafonné à cette valeur MÊME à consigne joystick 100% — la charge est
       entraînante en descente (image de couple, pas besoin d'aller vite). En
@@ -77,7 +77,7 @@ VAR_INPUT
     Direction               : INT;
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
-    MaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
+    CfgMaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
     MaxStepAscent           : INT := 5;    // 🆕 REX 2026-07-15 (9) : Plafond palier en montée (CommandedDirection=1) — 5 = pas de restriction
                                              // (valeur fixe Auto ET Manuel, voir PRG_06_WinchControl).
     HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
@@ -85,10 +85,10 @@ VAR_INPUT
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback           : BOOL;
     BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed (axe simulé,
-                                       // voir GVL_Simulation.ContactorFeedbackMx_IsReal — TOUJOURS FALSE réel)
-    RampAccelRate           : REAL := 50.0;
-    RampDecelNormalRate     : REAL := 150.0;
-    RampDecelFastRate       : REAL := 400.0;
+                                       // voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)
+    CfgRampAccelRate           : REAL := 50.0;
+    CfgRampDecelNormalRate     : REAL := 150.0;
+    CfgRampDecelFastRate       : REAL := 400.0;
     SpeedStepHystMargin     : REAL := 2.0;
     DirectionInterlockDelay : TIME := T#200ms;
     ContactorFeedbackTimeout: TIME := T#500ms;
@@ -101,8 +101,8 @@ VAR_INPUT
     CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
     TopLimitM               : REAL := 8.5;      // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
-    SlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
-    SlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)
+    CfgSlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
+    CfgSlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)
     MeasuredSpeedBand       : INT := 0;         // 🛡️ Bande vitesse réelle validée
     SpeedGuardEnable        : BOOL := FALSE;   // 🛡️ Activation garde-fou changement de palier
     SpeedGuardReady         : BOOL := FALSE;   // 🟢 Conditions de stabilité validées
@@ -157,7 +157,7 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     BrakeContactorCheck := Brake.ContactorCheck;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
-    SpeedRamp(Target := 0.0, AccelRate := RampAccelRate, DecelRate := RampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    SpeedRamp(Target := 0.0, AccelRate := CfgRampAccelRate, DecelRate := CfgRampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     Error := FALSE;
@@ -195,20 +195,20 @@ IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
     IF Homed AND NOT HomingSuspect THEN
         // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
-        IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM >= (TopLimitM - SlowdownDistanceM)) THEN
-            RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
+        IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM >= (TopLimitM - CfgSlowdownDistanceM)) THEN
+            RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
         END_IF;
         
         // En descente (engagement ou mouvement actif), ralentit à l'approche de la limite basse
-        IF ((CommandedDirection = -1) OR (Direction = -1)) AND (CablePosM <= (BottomLimitM + SlowdownDistanceM)) THEN
-            RampTargetPct := MIN(RampTargetPct, SlowSpeedPct);
+        IF ((CommandedDirection = -1) OR (Direction = -1)) AND (CablePosM <= (BottomLimitM + CfgSlowdownDistanceM)) THEN
+            RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
         END_IF;
     END_IF;
 END_IF;
 
 SpeedRamp(Target := RampTargetPct,
-          AccelRate := RampAccelRate,
-          DecelRate := SEL(EffectiveSafeStop, RampDecelNormalRate, RampDecelFastRate),
+          AccelRate := CfgRampAccelRate,
+          DecelRate := SEL(EffectiveSafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
 IF Direction <> CommandedDirection THEN
@@ -228,12 +228,12 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-// 🆕 Plafond dynamique de palier (MaxStepDescente en descente, Palier 1 si non référencé ou douteux,
+// 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
 // Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
 IF NOT Homed OR HomingSuspect THEN
     ActiveMaxStep := 1;
 ELSIF CommandedDirection = -1 THEN
-    ActiveMaxStep := MaxStepDescente;
+    ActiveMaxStep := CfgMaxStepDescente;
 ELSIF (CommandedDirection = 1) AND HomingApproachActive THEN
     ActiveMaxStep := 1;
 ELSIF CommandedDirection = 1 THEN
@@ -295,7 +295,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🧪 Simulation (GVL_Simulation.ContactorFeedbackMx_IsReal, passé par l'appelant via
+// 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
 // se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
 // 🔧 REX 2026-07-07 : bit2 (ex-RevContactorCheck) libre/inutilisé, fusionné dans bit1.

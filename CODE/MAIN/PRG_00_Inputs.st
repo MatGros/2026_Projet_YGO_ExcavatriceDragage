@@ -110,40 +110,40 @@ END_VAR
 // 🧹 WINCH-CORE-01 — PURGE COMMANDES IHM RETAIN AU BOOT
 // PRG_00 est exécuté avant PRG_01..PRG_10 : aucune commande mémorisée ne peut donc
 // produire un front ou un mouvement pendant le premier scan. Les états sûrs maintenus
-// (`CmdEmergencyCutOff`, inhibitions) ne sont volontairement pas effacés.
+// (`BtnEmergencyCutOff`, inhibitions) ne sont volontairement pas effacés.
 // L'override permet uniquement à la suite PLC de rejouer ce scénario en simulation.
 IF NOT HmiCommandsInitialized
    OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
     GVL_IHM.HmiInitDone := FALSE;
 
-    GVL_IHM.Modes.FaultMachineReset := FALSE;
-    GVL_IHM.Modes.ModeReset := FALSE;
-    GVL_IHM.Modes.CmdEmergencyArming := FALSE;
+    GVL_IHM.Modes.BtnFaultReset := FALSE;
+    GVL_IHM.Modes.BtnModeReset := FALSE;
+    GVL_IHM.Modes.BtnEmergencyArming := FALSE;
 
-    GVL_IHM.M1TreuilRetenue.CmdReset := FALSE;
-    GVL_IHM.M1TreuilRetenue.CmdHome := FALSE;
-    GVL_IHM.M1TreuilRetenue.CmdEncoderFaultBypass := FALSE;
-    GVL_IHM.M1TreuilRetenue.ConfirmCoherence := FALSE;
-    GVL_IHM.M2TreuilBucket.CmdReset := FALSE;
-    GVL_IHM.M2TreuilBucket.CmdHome := FALSE;
-    GVL_IHM.M2TreuilBucket.CmdEncoderFaultBypass := FALSE;
-    GVL_IHM.M2TreuilBucket.ConfirmCoherence := FALSE;
+    GVL_IHM.M1TreuilRetenue.BtnReset := FALSE;
+    GVL_IHM.M1TreuilRetenue.BtnHome := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
+    GVL_IHM.M1TreuilRetenue.BtnConfirmCoherence := FALSE;
+    GVL_IHM.M2TreuilBucket.BtnReset := FALSE;
+    GVL_IHM.M2TreuilBucket.BtnHome := FALSE;
+    GVL_IHM.M2TreuilBucket.Bypass.EncoderFault := FALSE;
+    GVL_IHM.M2TreuilBucket.BtnConfirmCoherence := FALSE;
 
-    GVL_IHM.Bucket.CmdOpen := FALSE;
-    GVL_IHM.Bucket.CmdClose := FALSE;
-    GVL_IHM.Bucket.CmdReset := FALSE;
-    GVL_IHM.Bucket.CmdConfirmOpenPosition := FALSE;
-    GVL_IHM.Bucket.CmdConfirmClosePosition := FALSE;
+    GVL_IHM.Bucket.BtnOpen := FALSE;
+    GVL_IHM.Bucket.BtnClose := FALSE;
+    GVL_IHM.Bucket.BtnReset := FALSE;
+    GVL_IHM.Bucket.BtnConfirmOpenPos := FALSE;
+    GVL_IHM.Bucket.BtnConfirmClosePos := FALSE;
 
     GVL_IHM.Cycle.CmdStart := FALSE;
     GVL_IHM.Cycle.CmdPause := FALSE;
     GVL_IHM.Cycle.CmdAbort := FALSE;
     GVL_IHM.Cycle.CmdReset := FALSE;
 
-    GVL_IHM.TranslationM3.PositioningSelect := FALSE;
-    GVL_IHM.TranslationM3.ReqFwd := FALSE;
-    GVL_IHM.TranslationM3.ReqRev := FALSE;
-    GVL_IHM.JoystickJOY1.Calibrate := FALSE;
+    GVL_IHM.TranslationM3.SelPositioning := FALSE;
+    GVL_IHM.TranslationM3.BtnFwd := FALSE;
+    GVL_IHM.TranslationM3.BtnRev := FALSE;
+    GVL_IHM.JoystickJOY1.BtnCalibrate := FALSE;
 
     HmiCommandsInitialized := TRUE;
     GVL_IHM.HmiInitDone := TRUE;
@@ -152,11 +152,11 @@ END_IF;
 // 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
 // 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille
 // sécurité, TRUE=OK) quand SimulationModeActive ET que ce capteur précis n'est
-// pas encore câblé réellement (GVL_Simulation.*_IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md.
+// pas encore câblé réellement (GVL_Simulation.Bus*/Sensor*IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md.
 
 // Simulation de la chaîne de sécurité AU / réarmement (Lot 1)
 instSimSafety(
-    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EmergencyStopChain_IsReal,
+    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorEmergencyStopChainIsReal,
     PowerCutOff_A   := PowerCutOff_A_RQ,
     PowerCutOff_B   := PowerCutOff_B_RQ,
     EmergencyArming := EmergencyArming_RQ,
@@ -173,7 +173,7 @@ EmergencyChain := instEmergencyChain.State;
 
 // 🔧 REX 2026-07-07 : M1_M2_SlackCableSwitch_DI → M2_SlackCableSwitch_DI (capteur physiquement
 // uniquement sur le tambour M2, le préfixe M1_M2_ ne reflétait pas la réalité du câblage)
-instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SlackCableSwitch_IsReal), FilterTime := T#20MS);
+instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorSlackCableIsReal), FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
 
 // 🪨 Kobold : entrée dédiée, distincte du mou de câble.
@@ -181,8 +181,8 @@ SlackCableSwitch := instSlackCableSwitch.State;
 instKoboldContactFond(
     InputRaw := KoboldContactFond_DI
                 OR (GVL_Simulation.SimulationModeActive
-                    AND NOT GVL_Simulation.KoboldContactFond_IsReal
-                    AND GVL_Simulation.KoboldContactFond_Simulated),
+                    AND NOT GVL_Simulation.SensorKoboldContactFondIsReal
+                    AND GVL_Simulation.SimKoboldContactFondValue),
     FilterTime := T#20MS);
 KoboldContactFond := instKoboldContactFond.State;
 
@@ -194,42 +194,42 @@ KoboldContactFond := instKoboldContactFond.State;
 // même principe déjà assumé ailleurs (EncoderFaultPresent, BenneHoldStillActive).
 SimTopSensorTriggered := (NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _HomingTargetM1_M))
                       OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= _HomingTargetM2_M));
-instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TopPositionSensor_IsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
+instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTopPositionIsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
 TopPositionSensor := instTopPositionSensor.State;
 
-instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.PhaseRotationOk_IsReal), FilterTime := T#20MS);
+instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorPhaseRotationIsReal), FilterTime := T#20MS);
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
 // 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 (1 seul fil, voir bandeau ci-dessus)
-instBrakeThermalFeedback(InputRaw := BrakeThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BrakeThermal_IsReal), FilterTime := T#20MS);
+instBrakeThermalFeedback(InputRaw := BrakeThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorBrakeThermalIsReal), FilterTime := T#20MS);
 BrakeThermalFeedback := instBrakeThermalFeedback.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
 // 🧪 Simulation des retours contacteurs M1 (retombés si aucun sens/vitesse commandé)
 M1_FwdRevSpeedFeedbackOff_Simulated := NOT (PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev OR PRG_10_Outputs.M1SpeedContactor1 OR PRG_10_Outputs.M1SpeedContactor2 OR PRG_10_Outputs.M1SpeedContactor3 OR PRG_10_Outputs.M1SpeedContactor4);
-instM1FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal, M1_FwdRevSpeedFeedbackOff_DI, M1_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
+instM1FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_FwdRevSpeedFeedbackOff_DI, M1_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
 M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
 
-instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ThermalM1_IsReal), FilterTime := T#20MS);
+instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ThermalIsReal), FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
 
 // 🧪 Simulation du retour frein M1 (fermé si commande inactive)
 M1BrakeFeedback_Simulated := NOT PRG_10_Outputs.M1BrakeCmd;
-instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM1_IsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), FilterTime := T#20MS);
+instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
 // 🧪 Simulation des retours contacteurs M2 (retombés si aucun sens/vitesse commandé)
 M2_FwdRevSpeedFeedbackOff_Simulated := NOT (PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev OR PRG_10_Outputs.M2SpeedContactor1 OR PRG_10_Outputs.M2SpeedContactor2 OR PRG_10_Outputs.M2SpeedContactor3 OR PRG_10_Outputs.M2SpeedContactor4);
-instM2FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal, M2_FwdRevSpeedFeedbackOff_DI, M2_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
+instM2FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_FwdRevSpeedFeedbackOff_DI, M2_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
 M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
 
-instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ThermalM2_IsReal), FilterTime := T#20MS);
+instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ThermalIsReal), FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;
 
 // 🧪 Simulation du retour frein M2 (fermé si commande inactive)
 M2BrakeFeedback_Simulated := NOT PRG_10_Outputs.M2BrakeCmd;
-instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM2_IsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), FilterTime := T#20MS);
+instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
@@ -241,26 +241,26 @@ M2BrakeFeedback := instM2BrakeFeedback.State;
 // Lecture décalée d'1 cycle (10 ms, M3_CommandWord réécrit en position
 // 10 par PRG_10_Outputs après ce PRG_00) — négligeable devant TravelTimeS (8s).
 instSimTranslation(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal,
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal,
     TargetNum   := GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM,
     RelayFwd    := M3_CommandWord = 1,
     RelayRev    := M3_CommandWord = 2,
     TravelTimeS := 8.0
 );
 
-instTranslationPosTremie(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosTremie_DI, instSimTranslation.PosTremie), FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosTremie_DI, instSimTranslation.PosTremie), FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosPV(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, GVL_Translation_M3_Stub.PosPV_DI, instSimTranslation.PosPV), FilterTime := T#20MS);
+instTranslationPosPV(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, GVL_Translation_M3_Stub.PosPV_DI, instSimTranslation.PosPV), FilterTime := T#20MS);
 TranslationPosPV := instTranslationPosPV.State;
 
-instTranslationPosP2(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosFosse2_DI, instSimTranslation.PosP2), FilterTime := T#20MS);
+instTranslationPosP2(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosFosse2_DI, instSimTranslation.PosP2), FilterTime := T#20MS);
 TranslationPosP2 := instTranslationPosP2.State;
 
-instTranslationPosP1(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosFosse1_DI, instSimTranslation.PosP1), FilterTime := T#20MS);
+instTranslationPosP1(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosFosse1_DI, instSimTranslation.PosP1), FilterTime := T#20MS);
 TranslationPosP1 := instTranslationPosP1.State;
 
-instTranslationPosMaintenance(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.TranslationPosition_IsReal, PosMaintenance_DI, instSimTranslation.PosMaintenance), FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosMaintenance_DI, instSimTranslation.PosMaintenance), FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
 // 🆕 REX 2026-07-21 : Décodage immédiat du mot 5 capteurs position M3 (scan position 0)
@@ -274,11 +274,11 @@ instPositionDecoder(
  
 // 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
 M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
-instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), FilterTime := T#20MS);
+instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
 
 // 🧪 Simulation/Filtrage des retours variateur EtherCAT M3 (lecture seule physique contournée)
-IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.VariateurM3_IsReal THEN
+IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal THEN
     M3_ActualFrequencyHz_Filtered := M3_SetpointFrequencyHz;
     
     // Status Word : Bit0 (Operation), Bit7 (Operation Enable)
@@ -295,7 +295,7 @@ ELSE
 END_IF;
 
 // 🧪 Appel de la suite globale de tests de validation automate
-instTestsManagement(instBucket := GVL_Simulation.refBucket, instWinchM2 := GVL_Simulation.refWinchM2);
+instTestsManagement(instBucket := GVL_Simulation.LinkBucket, instWinchM2 := GVL_Simulation.LinkWinchM2);
 
 // Surcharges (overrides) demandées par le banc de tests automatique
 IF GVL_PLC_Tests.OverrideChainTrue THEN

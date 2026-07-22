@@ -6,19 +6,19 @@
 TYPE ST_WinchHMI :
 STRUCT
     (* ⚙️ Paramètres / Calibration (Lecture/Écriture) *)
-    TopSensorPositionM       : REAL := 8.5;      (* 📐 Position cible du capteur haut (m) *)
-    HomingTargetM            : REAL := 0.0;      (* 🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m] *)
-    MaxStepDescente         : INT := 3;         (* 🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
+    CfgTopSensorPosM       : REAL := 8.5;      (* 📐 Position cible du capteur haut (m) *)
+    CfgHomingTargetM            : REAL := 0.0;      (* 🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m] *)
+    CfgMaxStepDescente         : INT := 3;         (* 🛑 Limitation palier vitesse en descente (1..5) — 🔧 REX 2026-07-08 :
                                                     commun M1/M2 (même profil de déplacement), miroir bidirectionnel
                                                     _WinchMaxStepDescent (voir PRG_09_Supervision),
                                                     même principe que CableLimitDescent_M/SlowdownDistance_M/SlowSpeed_Pct *)
-    RampAccelRate           : REAL := 50.0;     (* 📈 Rampe d'accélération (%/s) *)
-    RampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
-    RampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
-    CableLimitDescentM       : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
-    CableLimitAscentM        : REAL := 8.0;      (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) *)
-    SlowdownDistanceM        : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
-    SlowSpeedPct             : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
+    CfgRampAccelRate           : REAL := 50.0;     (* 📈 Rampe d'accélération (%/s) *)
+    CfgRampDecelNormalRate     : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
+    CfgRampDecelFastRate       : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
+    CfgCableLimitDescentM       : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
+    CfgCableLimitAscentM        : REAL := 8.0;      (* 📐 REX 2026-07-15 (6) : limite haute d'exploitation NORMALE (m) *)
+    CfgSlowdownDistanceM        : REAL := 1.0;      (* 📏 Distance avant limite pour enclencher le ralentissement (m) *)
+    CfgSlowSpeedPct             : REAL := 15.0;     (* 📉 Vitesse de consigne lente dans la zone de ralentissement (%) *)
 
     (* 🚦 États & Mesures (Lecture seule) *)
     PositionM                : REAL;             (* 📊 Position actuelle du câble (mètres) *)
@@ -66,7 +66,7 @@ STRUCT
     SlackCableDetected      : BOOL;             (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault            : BOOL;             (* 🔥 Défaut surchauffe thermique moteur *)
     EncoderFault            : BOOL;             (* 🔌 Perte de liaison ou incohérence codeur *)
-    EncoderFaultBypassActive: BOOL;             (* 🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
+    SensorEncoderFaultBypassActive: BOOL;             (* 🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
     CableLimitDescentReached: BOOL;             (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
     CableLimitAscentReached : BOOL;             (* ⚠️ REX 2026-07-15 (8) : limite haute d'exploitation normale atteinte (CableLimitAscent_M) *)
     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
@@ -78,17 +78,16 @@ STRUCT
     BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
-    CmdReset                : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
-    CmdHome                 : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
-    CmdEncoderFaultBypass   : BOOL;             (* 🔧 Autorisation maintenue de manœuvre sans codeur, effective uniquement MAINT_N2 *)
-    ConfirmCoherence        : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
-    CmdInhibit              : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
+    BtnReset                : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
+    BtnHome                 : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
+    BtnConfirmCoherence     : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
+    BtnInhibit              : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)
 
-    (* 🐞 Bypasses de Test (Visualisation / Forçage) *)
-    BypassContactorFeedback : BOOL;             (* 🔌 Bypass retours contacteurs (banc de test) *)
-    BypassSlackCable        : BOOL;             (* ⚠️ Bypass capteur mou de câble (banc de test) *)
-    BypassTopPositionSensor : BOOL;             (* 📐 Bypass capteur position haute (banc de test) *)
+    (* 🔧 Bypass maintenance (dedie a CE treuil — voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md) *)
+    Bypass : ST_BypassWinch;             (* EncoderFault, ContactorFeedback — propre a M1 ou M2 *)
+
+    (* 🐞 Diagnostics *)
     SafetyError             : BOOL;             (* 🛡️ Bloc sécurité (Safety) en défaut *)
     SafetyErrorId           : WORD;             (* ❌ Code bitfield du défaut de sécurité *)
     InhibitActive           : BOOL;             (* 🆕 REX 2026-07-08 : miroir lecture seule — confirme que

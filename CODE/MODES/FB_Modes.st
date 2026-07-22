@@ -12,7 +12,7 @@
    🔧 REX 2026-07-07 : contrôle `PasswordOk`/bit1 (`MAINT_N2` sans mot de passe) retiré à la
       demande explicite de l'utilisateur — l'accès à `MAINT_N2` est désormais géré **uniquement**
       côté IHM (visibilité des actions selon niveau utilisateur), pas de filet de sécurité côté
-      automate. `ModeRequest = MAINT_N2` est donc accepté sans condition supplémentaire.
+      automate. `SelMode = MAINT_N2` est donc accepté sans condition supplémentaire.
    🔴 HORS PÉRIMÈTRE CE LOT (Partie5 §2/§3, pas encore codé faute de FB_Cycle/FB_Bucket) :
       `OverrideBucket`, `OverrideLimit`/limite légale de dragage. À ajouter quand
       `FB_Cycle`/`FB_Bucket` existeront — ne pas inventer un override sans consommateur.
@@ -42,11 +42,11 @@ VAR_INPUT
     Enable              : BOOL;        // Standard
     Reset               : BOOL;        // Acquittement défaut (front) — bit0
     EmergencyStopOk     : BOOL;        // Standard
-    ModeRequest         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
-    SyncEnableRequest   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
-    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1TreuilRetenue.CmdInhibit — bouton IHM inhibition M1
-    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2TreuilBucket.CmdInhibit — bouton IHM inhibition M2
-    HomingApproachEnableRequest : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.HomingApproachEnableRequest — case IHM
+    SelMode         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
+    SelSyncEnable   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
+    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1TreuilRetenue.BtnInhibit — bouton IHM inhibition M1
+    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2TreuilBucket.BtnInhibit — bouton IHM inhibition M2
+    SelHomingApproachEnable : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.SelHomingApproachEnable — case IHM
                                         // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
     JoystickWinchSelectRequest : INT;  // 🆕 TASK-0001 : 1=M1, 2=M2, 3=Couplé (brut IHM)
@@ -60,10 +60,10 @@ VAR_OUTPUT
     State               : E_State;
     StateAtError        : E_State;
     Mode                : E_Mode;      // 🎯 Mode ARBITRÉ — diffusé à TOUS les FB métier (remplace E_Mode.MAINT_N1 codé en dur)
-    SyncEnable          : BOOL;        // → FALSE seulement si Mode=MAINT_N1/N2 ET SyncEnableRequest décoché (Décision D_OVERRIDESYNC 2026-07-04)
+    SyncEnable          : BOOL;        // → FALSE seulement si Mode=MAINT_N1/N2 ET SelSyncEnable décoché (Décision D_OVERRIDESYNC 2026-07-04)
     InhibitM1           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM1Request
     InhibitM2           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM2Request
-    HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND HomingApproachEnableRequest
+    HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND SelHomingApproachEnable
     JoystickWinchSelectArbitrated : INT; // 🆕 TASK-0001 : arbitré, forcé à 3 (Couplé) hors MAINT_N2
     MaintenanceM3TargetEnable : BOOL;    // 🆕 REX 2026-07-18 : TRUE seulement si Mode=MAINT_N2 — autorise
                                           // la cible Translation "Maintenance" (AF_Partie-02 v2.12 §3bis :
@@ -99,7 +99,7 @@ ResetEdge(CLK := Reset);
 
 // 🔍 3. GARDE-FOUS
 // bit0 : SEMI_AUTO demandé mais défaut codeur présent → refusé, repli MAINT_N1
-IF (ModeRequest = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -108,17 +108,17 @@ END_IF;
 // 📤 4. ARBITRAGE DU MODE
 // 🔧 REX 2026-07-07 : plus de garde-fou mot de passe ici — MAINT_N2 accepté directement,
 // l'accès est filtré en amont côté IHM (visibilité des actions selon niveau utilisateur).
-IF (ModeRequest = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
     Mode := E_Mode.MAINT_N1;
 ELSE
-    Mode := ModeRequest;
+    Mode := SelMode;
 END_IF;
 
 // 📤 5. SYNC ENABLE — actionnable en MAINT_N1 OU MAINT_N2 (Décision D_OVERRIDESYNC 2026-07-04)
 // Anciennement restreint à MAINT_N2 uniquement, mais l'opérateur peut avoir besoin de la
 // procédure de récupération mou câble dès MAINT_N1. 🔧 REX 2026-07-08 : polarité inversée —
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
-SyncEnable := NOT ((Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) AND NOT SyncEnableRequest);
+SyncEnable := NOT ((Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
 
 // 📤 5bis. INHIBITION TREUIL — mise en service, demande utilisateur (REX 2026-07-08)
 // UNIQUEMENT actionnable en MAINT_N2 (contrairement à SyncEnable, actionnable aussi N1) —
@@ -132,7 +132,7 @@ InhibitM2 := (Mode = E_Mode.MAINT_N2) AND InhibitM2Request;
 // UNIQUEMENT actionnable en MAINT_N2 — remplace l'ancien test direct Mode<>MAINT_N2 dans
 // PRG_06_WinchControl.st, qui bypassait l'arrêt normal pour N'IMPORTE QUELLE opération N2.
 // Désormais un choix conscient explicite est requis EN PLUS du mode.
-HomingApproachEnable := (Mode = E_Mode.MAINT_N2) AND HomingApproachEnableRequest;
+HomingApproachEnable := (Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
 
 // 📤 5quater. SÉLECTEUR JOYSTICK — TASK-0001 (2026-07-15)
 // M1 seul (=1) ou M2 seul (=2) au joystick est réservé au mode MAINT_N2

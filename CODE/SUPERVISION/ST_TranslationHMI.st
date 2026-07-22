@@ -8,12 +8,12 @@
 TYPE ST_TranslationHMI :
 STRUCT
     (* 🎮 Commandes opérateur (manuel / maintenance) *)
-    PositioningSelect       : BOOL;    (* 🎯 TRUE = positionneur sur SelectedTargetNum ; FALSE = jog libre *)
-    SelectedTargetNum       : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
-    ReqFwd                  : BOOL;    (* ↔️ Requête marche avant manuelle (bouton IHM, pas encore arbitrée) *)
-    ReqRev                  : BOOL;    (* ↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
-    FreqSetpointHz           : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs *)
-    JoystickSelect          : BOOL;    (* 🕹️ TRUE = joystick, FALSE = boutons ReqFwd/ReqRev *)
+    SelPositioning       : BOOL;    (* 🎯 TRUE = positionneur sur SelTarget ; FALSE = jog libre *)
+    SelTarget       : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
+    BtnFwd                  : BOOL;    (* ↔️ Requête marche avant manuelle (bouton IHM, pas encore arbitrée) *)
+    BtnRev                  : BOOL;    (* ↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée) *)
+    SetFreqHz           : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs *)
+    TglJoystickMaster          : BOOL;    (* 🕹️ TRUE = joystick, FALSE = boutons BtnFwd/BtnRev *)
 
     (* 🚦 États & diagnostics FB_Translation *)
     FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Translation) *)
@@ -37,8 +37,8 @@ STRUCT
     DriveCommReady          : BOOL;    (* 📡 Variateur M3 : communication prête (StatusWord bit7) *)
     DrivePowerReady         : BOOL;    (* ⚡ Variateur M3 : puissance prête (StatusWord bit0) *)
 
-    (* 🐞 Bypass diag (banc de test — auto-calculé depuis GVL_Simulation) *)
-    BypassContactorFeedback : BOOL;    (* 🔌 Activation du bypass des retours contacteurs (sens + frein) *)
+    (* 🔧 Bypass maintenance (voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md) *)
+    Bypass : ST_BypassTranslation;    (* ContactorFeedback — auto-calculé depuis GVL_Simulation *)
 
     (* 📍 Mot capteurs et positions Translation M3 *)
     PositionTremie          : BOOL;
@@ -54,11 +54,11 @@ STRUCT
     SimulationModeActive    : BOOL;
 
     (* 🧪 Commandes de test Translation, actives uniquement sur banc *)
-    TestSensorsWordActive   : BOOL;
-    TestSensorsWord         : BYTE;
-    TestAtTremie             : BOOL;
-    TestBrakeStuckOpen       : BOOL;
-    TestPhantomFreq         : BOOL;
+    TstSensorsWordActive   : BOOL;
+    TstSensorsWord         : BYTE;
+    TstAtTremie             : BOOL;
+    TstBrakeStuckOpen       : BOOL;
+    TstPhantomFreq         : BOOL;
 
     (* 🛡️ Sécurité (FB_Safety_Translation) *)
     SafetyError             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)

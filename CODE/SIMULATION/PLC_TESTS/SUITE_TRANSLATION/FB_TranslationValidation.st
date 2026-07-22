@@ -100,9 +100,9 @@ END_VAR
 
 // 1. 🛡️ GATE Niveau 1/2 — calculé en continu (lu par le manager Niveau 3, même hors Busy)
 // Refuse si un des équipements M3 est déjà recâblé réel.
-SimGateOk := NOT GVL_Simulation.TranslationPosition_IsReal
-         AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
-         AND NOT GVL_Simulation.VariateurM3_IsReal;
+SimGateOk := NOT GVL_Simulation.SensorTranslationPositionIsReal
+         AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal
+         AND NOT GVL_Simulation.BusVariateurM3IsReal;
 
 // 2. 📋 PLAN — construction (une fois) + validation ; les index de sondes
 //    sont transmis ICI, jamais relus depuis l'instance.
@@ -213,5 +213,5 @@ NeutralConfirmedPrevious := instCleanup.NeutralConfirmed
 // conflit car les suites s'exécutent toujours de façon mutuellement exclusive
 // (FB_PLC_Tests_Management n'active qu'une suite à la fois).
 IF Busy THEN
-    GVL_IHM.Modes.FaultMachineReset := ResetFaults;
+    GVL_IHM.Modes.BtnFaultReset := ResetFaults;
 END_IF;

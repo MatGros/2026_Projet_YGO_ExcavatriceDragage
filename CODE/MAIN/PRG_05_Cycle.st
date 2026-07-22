@@ -19,8 +19,8 @@ VAR
     CmdResetCycle_IHM   : BOOL;         // 🔧 REX 2026-07-07 : reset dédié FB_Cycle, jamais mélangé au reset défauts général
 
     // Paramètres cibles réglés par l'opérateur
-    TargetDepthM        : REAL := -12.5; // Profondeur de dragage cible (mètres, négative)
-    TargetOffsetM       : REAL := 1.5;  // Décalage cible de fermeture du benne (mètres)
+    SetDepthM        : REAL := -12.5; // Profondeur de dragage cible (mètres, négative)
+    SetOffsetM       : REAL := 1.5;  // Décalage cible de fermeture du benne (mètres)
     CycleMotionPermit    : BOOL;        // Homme-mort + axe Y actif
     // 🧪 T43 — paramètres provisoirement désactivés ; à définir avec T45.
     SpeedMismatchThresholdMps : REAL := 0.0;
@@ -34,9 +34,9 @@ CmdStartCycle_IHM := GVL_IHM.Cycle.CmdStart;
 CmdPauseCycle_IHM := GVL_IHM.Cycle.CmdPause;
 CmdAbortCycle_IHM := GVL_IHM.Cycle.CmdAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.CmdReset;
-TargetDepthM      := GVL_IHM.Cycle.TargetDepthM;
-TargetOffsetM     := GVL_IHM.Cycle.TargetOffsetM;
-GVL_Simulation.KoboldContactFond_Simulated := GVL_IHM.Cycle.SimKoboldContactFond;
+SetDepthM      := GVL_IHM.Cycle.SetDepthM;
+SetOffsetM     := GVL_IHM.Cycle.SetOffsetM;
+GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.TstKoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
 
@@ -54,9 +54,9 @@ instCycle(
     PauseCycle          := CmdPauseCycle_IHM,
     AbortCycle          := CmdAbortCycle_IHM,
     
-    TargetDepthM        := TargetDepthM,
-    TargetOffsetM       := TargetOffsetM,
-    SelectedTargetNum_IHM := GVL_IHM.TranslationM3.SelectedTargetNum,
+    SetDepthM        := SetDepthM,
+    SetOffsetM       := SetOffsetM,
+    SelectedTargetNum_IHM := GVL_IHM.TranslationM3.SelTarget,
 
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,

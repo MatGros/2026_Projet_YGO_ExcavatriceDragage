@@ -31,15 +31,15 @@ END_VAR
 
    1. CONFIGURATION INITIALE DU BANC DE TEST :
       - Bit maître déjà TRUE par défaut : GVL_Simulation.SimulationModeActive
-      - Tous les `_IsReal` restent FALSE par défaut (tout est simulé). Si un
+      - Tous les `*IsReal` restent FALSE par défaut (tout est simulé). Si un
         device précis est déjà câblé réel, basculer UNIQUEMENT son
-        `_IsReal` à TRUE (ex. GVL_Simulation.EmergencyStopChain_IsReal).
+        `*IsReal` à TRUE (ex. GVL_Simulation.SensorEmergencyStopChainIsReal).
       - Forcer la demande de mode machine en maintenance N1 :
-        GVL_IHM.Modes.ModeRequest := E_Mode.MAINT_N1
+        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1
       - Acquitter les défauts initiaux domaine sécurité/métier (🔧 REX 2026-07-07 : plus de
-        reset unique — Modes/Cycle ont chacun le leur, voir GVL_IHM.Modes.ModeReset /
+        reset unique — Modes/Cycle ont chacun le leur, voir GVL_IHM.Modes.BtnModeReset /
         CmdResetCycle_IHM dans PRG_05_Cycle) :
-        GVL_IHM.Modes.FaultMachineReset := TRUE puis FALSE (front)
+        GVL_IHM.Modes.BtnFaultReset := TRUE puis FALSE (front)
 
    2. TEST DU MOUVEMENT DES TREUILS :
       - Le homme-mort joystick reste RÉEL (plus de bypass) : simuler un appui
@@ -53,10 +53,10 @@ END_VAR
       - S'assurer que le mode est MAINT_N1 (requis pour le homing nominal).
       - Les treuils doivent être arrêtés (pas de commande de mouvement).
       - Simuler l'activation du capteur de position haute commun :
-        GVL_Simulation.TopPositionSensor_IsReal reste FALSE, puis forcer
+        GVL_Simulation.SensorTopPositionIsReal reste FALSE, puis forcer
         PRG_00_Inputs.M1_M2_TopPositionSensor_DI à TRUE (ou l'OR équivalent)
        - Lancer le homing nominal en basculant indépendamment le bouton du treuil voulu :
-         GVL_IHM.M1TreuilRetenue.CmdHome ou GVL_IHM.M2TreuilBucket.CmdHome := TRUE puis FALSE (front).
+         GVL_IHM.M1TreuilRetenue.BtnHome ou GVL_IHM.M2TreuilBucket.BtnHome := TRUE puis FALSE (front).
          Les deux fronts peuvent être envoyés simultanément ; aucun sélecteur HomingMode_IHM
          ni bouton StubHomeButton_IHM n'est utilisé.
       - La simulation détectera le signal de preset (COD1_PresettTrigCmd /
@@ -64,14 +64,14 @@ END_VAR
         dans les registres bruts simulés.
       - Vérifier que instHomingM1.Homed et instHomingM2.Homed passent à TRUE.
       - La position calculée (CablePosM) doit se caler exactement à 8.5m
-         (ou la valeur définie par TopSensorPositionM de chaque structure IHM).
+         (ou la valeur définie par CfgTopSensorPosM de chaque structure IHM).
 
    4. TEST DU BENNE (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
       - S'assurer que les treuils ont été préalablement référencés (Homed = TRUE sur M1 ET M2 —
         désormais vérifié en dur par FB_Bucket, bit3 ErrorId "Codeur(s) non référencé(s)" sinon).
       - Choisir une commande Benne sur l'IHM :
-        * Pour OUVRIR : GVL_IHM.Bucket.CmdOpen := TRUE (et CmdClose := FALSE)
-        * Pour FERMER : GVL_IHM.Bucket.CmdClose := TRUE (et CmdOpen := FALSE)
+        * Pour OUVRIR : GVL_IHM.Bucket.BtnOpen := TRUE (et BtnClose := FALSE)
+        * Pour FERMER : GVL_IHM.Bucket.BtnClose := TRUE (et BtnOpen := FALSE)
       - Actionner et maintenir le joystick Y dans le sens correspondant :
         * UP / enrouler (Direction = 1) pour la FERMETURE
         * DOWN / dérouler (Direction = -1) pour l'OUVERTURE

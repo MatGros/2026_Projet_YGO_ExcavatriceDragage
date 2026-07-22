@@ -11,8 +11,8 @@
    🧮 Calcul (généralise le cas historique cible=0.00, Partie10 §3.2/§3.3) :
       - `PresetValue` = `HomingRefTargetNominal` = (PointsPerRev × MultiTurnRevsMax) / 2
         (constante, TOUJOURS la même — centre exact de la plage, marge anti-débordement)
-      - `HomingRefRaw` = `PresetValue` − round(`TopSensorPositionM` × PointsPerRev / CableM_PerRev)
-        (ainsi `CablePosM` = `TopSensorPositionM` exactement au moment du homing)
+      - `HomingRefRaw` = `PresetValue` − round(`CfgTopSensorPosM` × PointsPerRev / CableM_PerRev)
+        (ainsi `CablePosM` = `CfgTopSensorPosM` exactement au moment du homing)
       ⚠️ ÉVOLUTION vs interface §5 d'origine : `HomingRefRaw` est ajouté en sortie explicite
       (le document original supposait implicitement `HomingRefRaw := PresetValue`, valable
       uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈8.50 m).
@@ -22,7 +22,7 @@
       - Les 2 instances (M1/M2) sont autonomes : le même bouton IHM pilote les deux `Home`
         simultanément (câblage PRG_MAIN), mais chacune valide/rejette SES PROPRES conditions
         indépendamment (pas d'attente mutuelle ni de synchro de déclenchement).
-      - `ConfirmCoherence`/§3.7 (incohérence redémarrage) : implémenté a minima (bit9), mais
+      - `BtnConfirmCoherence`/§3.7 (incohérence redémarrage) : implémenté a minima (bit9), mais
         non testé en conditions réelles de coupure secteur — à revalider.
    ═══════════════════════════════════════════════════════════════ *)
 
@@ -37,13 +37,13 @@ VAR_INPUT
     Home                 : BOOL;        // Demande de référencement (front, bouton IHM UNIQUE)
     UnitaryMode          : BOOL;        // TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)
     WinchSelected        : BOOL;        // TRUE = cette instance est le treuil sélectionné
-    HomingTargetM        : REAL;        // Cible libre unitaire, limitée à [-99.0 ; +99.0] m
-    ConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
+    CfgHomingTargetM        : REAL;        // Cible libre unitaire, limitée à [-99.0 ; +99.0] m
+    BtnConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
     TopPositionSensor    : BOOL;        // 🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils
                                          // (les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
                                          // IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
                                          // voir PRG_MAIN.st
-    TopSensorPositionM   : REAL := 8.5;   // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
+    CfgTopSensorPosM   : REAL := 8.5;   // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
     FwdRevSpeedFeedbackOff : BOOL;      // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                          // retombés" CE TREUIL — arrêt confirmé (remplace ContactorFeedbackFwd/Rev)
     BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)
@@ -80,7 +80,7 @@ VAR
     InitDone             : BOOL;        // Contrôle cohérence §3.7 fait une fois par session Enable
     ArretConfirme        : BOOL;
     PresetValueCalc      : UDINT;       // = HomingRefTargetNominal (constant tant que PointsPerRev/MultiTurnRevsMax fixes)
-    TargetPoints         : DINT;        // Écart signé TopSensorPositionM → points, figé pendant la séquence
+    TargetPoints         : DINT;        // Écart signé CfgTopSensorPosM → points, figé pendant la séquence
     TargetPositionM      : REAL;        // Cible retenue : nominale ou unitaire
     RawDiffRestart       : DINT;        // Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)
 END_VAR
@@ -106,7 +106,7 @@ Ready := TRUE;
 // 🔑 2. FRONTS
 ResetEdge(CLK := Reset);
 HomeEdge(CLK := Home);
-ConfirmCoherenceEdge(CLK := ConfirmCoherence);
+ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
 
 // 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
@@ -123,7 +123,7 @@ ELSE
     IF State = E_State.INIT THEN State := E_State.READY; END_IF;
 END_IF;
 
-// ✅ 4. LEVÉE DU DOUTE (ConfirmCoherence, §3.7) — indépendant du Reset générique
+// ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
 IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
     Calib.HomingSuspect := FALSE;
     ErrorId := ErrorId AND 16#FDFF;   // efface bit9
@@ -137,9 +137,9 @@ ArretConfirme := FwdRevSpeedFeedbackOff AND BrakeFeedback;
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
     IF UnitaryMode THEN
-        TargetPositionM := HomingTargetM;
+        TargetPositionM := CfgHomingTargetM;
     ELSE
-        TargetPositionM := TopSensorPositionM;
+        TargetPositionM := CfgTopSensorPosM;
     END_IF;
 
     // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
@@ -181,7 +181,7 @@ IF State = E_State.BUSY THEN
         Done := TRUE;
         State := E_State.READY;
         // 🔧 REX 2026-07-07 : un homing réussi re-établit la référence tout aussi validement
-        // qu'un ConfirmCoherence explicite — efface donc aussi bit9 (incohérence redémarrage),
+        // qu'un BtnConfirmCoherence explicite — efface donc aussi bit9 (incohérence redémarrage),
         // sinon ErrorId/Error restait bloqué à TRUE après un homing réussi (jamais mappé vers
         // l'IHM, invisible sauf sur GVL_IHM.Modes.AnyFaultActive qui restait à 1 sans raison visible).
         ErrorId := ErrorId AND 16#FDFF;
@@ -194,7 +194,7 @@ END_IF;
 // 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
 // à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par ConfirmCoherence/Home)
+    ErrorId := ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
 END_IF;
 
 // 📤 8. SORTIES ÉTAT
@@ -210,6 +210,6 @@ IF EncoderAvailable AND (State <> E_State.BUSY) THEN
 END_IF;
 
 Busy := (State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après ConfirmCoherence
+Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;

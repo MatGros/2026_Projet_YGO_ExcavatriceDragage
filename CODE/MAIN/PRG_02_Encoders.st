@@ -36,7 +36,7 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
-// 🔧 REX 2026-07-16 : ex-M1_IsReal/M2_IsReal ("Conditional Bypass Doctrine") RETIRÉS — plus
+// 🔧 REX 2026-07-16 : ex-EncoderM1_IsReal/EncoderM2_IsReal ("Conditional Bypass Doctrine") RETIRÉS — plus
 // aucun consommateur une fois le bypass Homing IHM_MANU supprimé (voir fin de fichier, ex-bloc
 // IF PRG_10_Outputs.ManuActive THEN ... HomingEncoder_M1/M2 ... END_IF).
 
@@ -51,7 +51,7 @@ M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 // 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
 // survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
 instSimEncoderM1(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal,
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal,
     // 🔧 REX 2026-07-15 (2) : lit directement instWinchM1 (PRG_06_WinchControl) — M1 est désormais
     // piloté par FB_Winch en Auto ET en Manu (ex-SimM1Fwd_Eff/PRG_10_Outputs retiré, obsolète) :
     // RelayFwd/RelayRev respectent déjà SafeStop/ForbidAscent/ForbidDescent nativement, plus besoin
@@ -61,38 +61,38 @@ instSimEncoderM1(
     SpeedRefPct := M1_SimSpeedPct,
     PresetCmd   := (COD1_PresettTrigCmd = 2),
     PresetValue := COD1_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
+    SpeedScaleFactor := GVL_Simulation.TstEncoderSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
     // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E) — 4096 = PointsPerRev/CableM_PerRev (8192/2.0)
-    TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM1,
-    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
+    TestOffsetCmd := GVL_Simulation.TstInjectSyncDeviationM1,
+    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.TstSyncDeviationOffsetM * 4096.0),
     RawPos      := _SimEncoderRawPosM1
 );
 instSimEncoderM2(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal,
+    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal,
     // 🔧 REX 2026-07-15 (2) : idem M1 ci-dessus, lit instWinchM2 (ex-SimM2Fwd_Eff retiré).
     RelayFwd    := PRG_06_WinchControl.instWinchM2.RelayFwd,
     RelayRev    := PRG_06_WinchControl.instWinchM2.RelayRev,
     SpeedRefPct := M2_SimSpeedPct,
     PresetCmd   := (COD2_PresettTrigCmd = 2),
     PresetValue := COD2_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.EncoderSimSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
+    SpeedScaleFactor := GVL_Simulation.TstEncoderSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
     // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E)
-    TestOffsetCmd := GVL_Simulation.InjectSyncDeviationM2,
-    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.SyncDeviationOffsetM * 4096.0),
+    TestOffsetCmd := GVL_Simulation.TstInjectSyncDeviationM2,
+    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.TstSyncDeviationOffsetM * 4096.0),
     RawPos      := _SimEncoderRawPosM2
 );
 
 // Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
-// simulation par PRG_01_Diagnostics [SEL sur EncoderMx_IsReal] pour ne pas remonter de faux
+// simulation par PRG_01_Diagnostics [SEL sur BusEncoderMxIsReal] pour ne pas remonter de faux
 // défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
 // lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM1_IsReal) THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal) THEN
     M1_RawPosToUse := instSimEncoderM1.RawPosOut;
 ELSE
     M1_RawPosToUse := COD1_PosValue;
 END_IF;
 
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.EncoderM2_IsReal) THEN
+IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal) THEN
     M2_RawPosToUse := instSimEncoderM2.RawPosOut;
 ELSE
     M2_RawPosToUse := COD2_PosValue;
@@ -128,14 +128,14 @@ instHomingM1(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M1TreuilRetenue.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M1TreuilRetenue.BtnHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1),
-    HomingTargetM        := _HomingUnitaryTargetM1_M,
-    ConfirmCoherence     := GVL_IHM.M1TreuilRetenue.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    CfgHomingTargetM        := _HomingUnitaryTargetM1_M,
+    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    TopSensorPositionM   := _HomingTargetM1_M,
+    CfgTopSensorPosM   := _HomingTargetM1_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
@@ -177,14 +177,14 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M2TreuilBucket.CmdHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M2TreuilBucket.BtnHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
-    HomingTargetM        := _HomingUnitaryTargetM2_M,
-    ConfirmCoherence     := GVL_IHM.M2TreuilBucket.ConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    CfgHomingTargetM        := _HomingUnitaryTargetM2_M,
+    BtnConfirmCoherence     := GVL_IHM.M2TreuilBucket.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    TopSensorPositionM   := _HomingTargetM2_M,
+    CfgTopSensorPosM   := _HomingTargetM2_M,
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,

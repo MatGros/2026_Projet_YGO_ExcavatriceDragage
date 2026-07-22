@@ -7,14 +7,17 @@
       simulation CODESYS. Modèle hiérarchique :
         - `SimulationModeActive` = bit maître. `TRUE` (défaut) = TOUS les devices
           sont simulés par défaut.
-        - Un booléen `<Device>_IsReal` par device/capteur permet de sortir CE
-          device précis de la simulation un par un, au fur et à mesure du
+        - Un booléen `Bus<Device>IsReal`/`Sensor<Device>IsReal` par device/capteur permet
+          de sortir CE device précis de la simulation un par un, au fur et à mesure du
           recâblage réel en mise en service — SANS modifier le code.
-      État effectif "ce device est simulé" = `SimulationModeActive AND NOT <Device>_IsReal`.
+      État effectif "ce device est simulé" = `SimulationModeActive AND NOT <Device>IsReal`.
    🔧 REMPLACE `GVL_DEBUG.st` (6 flags indépendants ajoutés au coup par coup).
    ⚠️ TOUJOURS repasser `SimulationModeActive` à `FALSE` avant exploitation réelle
-      avec la machine effectivement câblée (ou basculer chaque `_IsReal` à `TRUE`
+      avec la machine effectivement câblée (ou basculer chaque `*IsReal` à `TRUE`
       au fur et à mesure du recâblage, sans toucher au bit maître).
+   📛 Convention nommage (session Bypass, voir DOC/NAMING_CONVENTION.md) :
+      `Bus` = device bus de terrain, `Sensor` = capteur/retour câblé, `Sim` = valeur simulée
+      calculée, `Tst` = outil/commande de test banc, `Link` = référence CODESYS (REFERENCE TO).
    ═══════════════════════════════════════════════════════════════ *)
 
 {attribute 'qualified_only'}
@@ -22,54 +25,54 @@ VAR_GLOBAL
     SimulationModeActive       : BOOL := TRUE;  // 🔑 Bit maître — FALSE = tout redevient réel d'un coup
 
     // ── Devices bus de terrain (EtherCAT/CANopen) — 1:1 avec les devices réels ──
-    VariateurM3_IsReal         : BOOL := FALSE; // AC600 EtherCAT (translation M3)
-    EncoderM1_IsReal           : BOOL := FALSE; // COD1 EtherCAT
-    EncoderM2_IsReal           : BOOL := FALSE; // COD2 EtherCAT
-    Joystick_IsReal            : BOOL := FALSE; // CANopen JOY1 — bus/nœud (CanOnline/CanOperational)
+    BusVariateurM3IsReal         : BOOL := FALSE; // AC600 EtherCAT (translation M3)
+    BusEncoderM1IsReal           : BOOL := FALSE; // COD1 EtherCAT
+    BusEncoderM2IsReal           : BOOL := FALSE; // COD2 EtherCAT
+    BusJoystickIsReal            : BOOL := FALSE; // CANopen JOY1 — bus/nœud (CanOnline/CanOperational)
     // 🆕 REX 2026-07-08 (demande utilisateur) : granularité séparée du bus ci-dessus — permet de
     // câbler le joystick réel (signal analogique/CAN brut RawX/RawY/RawButton) tout en laissant le
-    // bus/nœud CANopen (Joystick_IsReal) simulé sain, pour tester le joystick physique avant que le
+    // bus/nœud CANopen (BusJoystickIsReal) simulé sain, pour tester le joystick physique avant que le
     // diagnostic CANopen/EtherCAT ne soit fiabilisé (sans faux défaut CAN pendant ce test).
-    JoystickSignal_IsReal      : BOOL := FALSE; // Signal joystick brut (RawX/RawY/RawButton uniquement)
-    IhmHeartbeat_IsReal        : BOOL := FALSE; // Heartbeat IHM Ethernet : FALSE = heartbeat simulé par GVL_Global.BlinkClock
+    BusJoystickSignalIsReal      : BOOL := FALSE; // Signal joystick brut (RawX/RawY/RawButton uniquement)
+    BusIhmHeartbeatIsReal        : BOOL := FALSE; // Heartbeat IHM Ethernet : FALSE = heartbeat simulé par GVL_Global.BlinkClock
 
     // ── Capteurs/retours câblés (I/O discrètes, indépendantes du bus) ──────────
-    EmergencyStopChain_IsReal  : BOOL := FALSE; // Chaîne AU câblée (EmergencyStopOk_DI)
-    TopPositionSensor_IsReal   : BOOL := FALSE; // Fin de course haut commun M1/M2
-    SlackCableSwitch_IsReal    : BOOL := FALSE; // Mou de câble M2
-    PhaseRotationOk_IsReal     : BOOL := FALSE; // Contrôle rotation phases
-    ThermalM1_IsReal           : BOOL := FALSE; // Thermique moteur M1
-    ThermalM2_IsReal           : BOOL := FALSE; // Thermique moteur M2
-    BrakeThermal_IsReal        : BOOL := FALSE; // 🆕 REX 2026-07-08 : thermique frein COMMUN M1/M2/M3 (1 seul fil)
-    ContactorFeedbackM1_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M1
-    ContactorFeedbackM2_IsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M2
-    ContactorFeedbackM3_IsReal: BOOL := FALSE; // Retour contacteur (sens + frein) translation M3
-    TranslationPosition_IsReal     : BOOL := FALSE; // Capteurs Trémie/PV/P2/P1/Maintenance
-    KoboldContactFond_IsReal       : BOOL := FALSE; // Retour contact fond Kobold (%IX0.5)
-    HydraulicThermal_IsReal        : BOOL := FALSE; // 🆕 REX 2026-07-18 : thermique centrale hydraulique (PRG_08_AuxiliaryControl)
+    SensorEmergencyStopChainIsReal  : BOOL := FALSE; // Chaîne AU câblée (EmergencyStopOk_DI)
+    SensorTopPositionIsReal   : BOOL := FALSE; // Fin de course haut commun M1/M2
+    SensorSlackCableIsReal    : BOOL := FALSE; // Mou de câble M2
+    SensorPhaseRotationIsReal     : BOOL := FALSE; // Contrôle rotation phases
+    SensorM1ThermalIsReal           : BOOL := FALSE; // Thermique moteur M1
+    SensorM2ThermalIsReal           : BOOL := FALSE; // Thermique moteur M2
+    SensorBrakeThermalIsReal        : BOOL := FALSE; // 🆕 REX 2026-07-08 : thermique frein COMMUN M1/M2/M3 (1 seul fil)
+    SensorM1ContactorFeedbackIsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M1
+    SensorM2ContactorFeedbackIsReal: BOOL := FALSE; // Retours contacteurs (sens + frein) treuil M2
+    SensorM3ContactorFeedbackIsReal: BOOL := FALSE; // Retour contacteur (sens + frein) translation M3
+    SensorTranslationPositionIsReal     : BOOL := FALSE; // Capteurs Trémie/PV/P2/P1/Maintenance
+    SensorKoboldContactFondIsReal       : BOOL := FALSE; // Retour contact fond Kobold (%IX0.5)
+    SensorHydraulicThermalIsReal        : BOOL := FALSE; // 🆕 REX 2026-07-18 : thermique centrale hydraulique (PRG_08_AuxiliaryControl)
 
     // ── Utilitaires banc d'essai (sans préfixe DBG_) ───────────────────────────
-    JoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)
-    JoystickForceMaxRaw        : INT := 10000;  // Simule une consigne à fond
-    KoboldContactFond_Simulated : BOOL := FALSE; // Simulation du contact fond Kobold
+    TstJoystickForceNeutralRaw    : INT := 5000;   // Simule le retour au centre (RawX/RawY)
+    TstJoystickForceMaxRaw        : INT := 10000;  // Simule une consigne à fond
+    SimKoboldContactFondValue : BOOL := FALSE; // Simulation du contact fond Kobold
 
     // 🔧 REX 2026-07-07 : confort de test banc — accélère le déplacement des codeurs simulés
     // (FB_Sim_Encoder). 1.0 = comportement d'origine. Réglable à chaud, sans recompiler.
     // Sans rapport avec une calibration réelle — reste à 1.0 hors essais bancs.
-    EncoderSimSpeedFactor      : REAL := 3.0;
+    TstEncoderSpeedFactor      : REAL := 3.0;
 
     // 🆕 REX 2026-07-08 (4) — test banc : injecte un VRAI saut de position dans le compteur codeur
     // simulé (front montant), comme un glissement mécanique réel — pas un offset artificiel figé.
     // Permet de tester Concept 1 (arrêt rampe normale, écart mineur), Méca E (écart critique) ET
     // le rattrapage au joystick (SyncEnable=FALSE → bouger le treuil décalé → SyncEnable=TRUE),
     // puisque c'est une vraie position simulée, pas un overlay — le rattrapage la résorbe réellement.
-    InjectSyncDeviationM1      : BOOL := FALSE; // Front montant = applique le saut sur M1
-    InjectSyncDeviationM2      : BOOL := FALSE; // Front montant = applique le saut sur M2
-    SyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)
+    TstInjectSyncDeviationM1      : BOOL := FALSE; // Front montant = applique le saut sur M1
+    TstInjectSyncDeviationM2      : BOOL := FALSE; // Front montant = applique le saut sur M2
+    TstSyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)
                                                   // pour tester Concept 1 ; > WinchCriticalSyncTolerance_M
                                                   // (2.0) pour tester Méca E
 
     // 🧪 Références instances métier — fenêtre de passage pour tests PLC UNIQUEMENT
-    refBucket      : REFERENCE TO FB_Bucket;     // 🆕 Instance benne (PRG_06_WinchControl)
-    refWinchM2     : REFERENCE TO FB_Winch;      // 🆕 Instance treuil M2 (PRG_06_WinchControl) — pour FB_BucketValidation
+    LinkBucket      : REFERENCE TO FB_Bucket;     // 🆕 Instance benne (PRG_06_WinchControl)
+    LinkWinchM2     : REFERENCE TO FB_Winch;      // 🆕 Instance treuil M2 (PRG_06_WinchControl) — pour FB_BucketValidation
 END_VAR

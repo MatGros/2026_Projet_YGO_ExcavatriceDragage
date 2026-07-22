@@ -14,7 +14,7 @@ FUNCTION_BLOCK PUBLIC FB_TranslationTestFixture
 VAR_INPUT
     CheckRequested        : BOOL; // Front : nouvelle vérification demandée (sur Start suite)
     SimulationModeActive  : BOOL;
-    SimGateOk             : BOOL; // Niveau 2 : aucune E/S M3 (_IsReal) incompatible
+    SimGateOk             : BOOL; // Niveau 2 : aucune E/S M3 (*IsReal) incompatible
 END_VAR
 VAR_OUTPUT
     FixturePassed  : BOOL;
@@ -35,7 +35,7 @@ IF CheckTrig.Q THEN
     ELSIF NOT SimGateOk THEN
         FixturePassed := FALSE;
         FixtureFailed := TRUE;
-        FailReason := 'E/S M3 recablees reelles (_IsReal) incompatibles avec le banc de test';
+        FailReason := 'E/S M3 recablees reelles (*IsReal) incompatibles avec le banc de test';
     ELSE
         FixturePassed := TRUE;
         FixtureFailed := FALSE;

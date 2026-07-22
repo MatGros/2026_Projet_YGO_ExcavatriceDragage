@@ -9,7 +9,7 @@
       sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
       continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
       (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT TranslationPosition_IsReal)
+   📥 Enable      : simulation active (SimulationModeActive AND NOT SensorTranslationPositionIsReal)
    📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
                     — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
                     — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de

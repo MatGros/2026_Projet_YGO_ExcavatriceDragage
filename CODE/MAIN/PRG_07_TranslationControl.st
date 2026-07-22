@@ -20,11 +20,11 @@ VAR
 
     // Target active (HMI en manuel, instCycle en auto) — 0=Aucun, 1=Trémie, 2=P2, 3=P1,
     // 4=Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).
-    SelectedTargetNum       : INT;
+    SelTarget       : INT;
 
 // 🆕 Commande maintenance depuis ST_TranslationHMI (GVL_IHM.TranslationM3).
 // L'objet Translation ne dépend plus de IHM_MANU pour ses commandes M3.
-    FreqPct                 : REAL; // Conversion FreqSetpointHz (Hz) → % pleine échelle pour SpeedRefPct
+    FreqPct                 : REAL; // Conversion SetFreqHz (Hz) → % pleine échelle pour SpeedRefPct
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
@@ -35,7 +35,7 @@ END_VAR
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
     M3_PositioningActive  := TRUE;
-    SelectedTargetNum    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
+    SelTarget    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
     M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
@@ -47,7 +47,7 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Détermination automatique du sens de marche selon la cible :
     // - Trémie (cible 1) = Marche Avant (Direction := 1)
     // - P2/P1/Maintenance (cibles 2/3/4) = Marche Arrière (Direction := -1)
-    IF SelectedTargetNum = 1 THEN
+    IF SelTarget = 1 THEN
         M3_Direction_Active := 1;
     ELSE
         M3_Direction_Active := -1;
@@ -62,44 +62,44 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
    OR (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
     // 🛠️ Maintenance N1/N2 : sous-mode explicite IHM.
-    // PositioningSelect=FALSE : jog libre, aucun capteur n'arrête hors fins de course.
-    // PositioningSelect=TRUE : le capteur de SelectedTargetNum arrête le mouvement.
-    M3_PositioningActive := GVL_IHM.TranslationM3.PositioningSelect;
-    SelectedTargetNum := SEL(M3_PositioningActive,
+    // SelPositioning=FALSE : jog libre, aucun capteur n'arrête hors fins de course.
+    // SelPositioning=TRUE : le capteur de SelTarget arrête le mouvement.
+    M3_PositioningActive := GVL_IHM.TranslationM3.SelPositioning;
+    SelTarget := SEL(M3_PositioningActive,
                              0,
                              StubTranslationPositionSelect_IHM);
 
-    IF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqFwd THEN
+    IF NOT GVL_IHM.TranslationM3.TglJoystickMaster AND GVL_IHM.TranslationM3.BtnFwd THEN
         M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqRev THEN
+    ELSIF NOT GVL_IHM.TranslationM3.TglJoystickMaster AND GVL_IHM.TranslationM3.BtnRev THEN
         M3_Direction_Active := -1;
-    ELSIF GVL_IHM.TranslationM3.JoystickSelect THEN
+    ELSIF GVL_IHM.TranslationM3.TglJoystickMaster THEN
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     ELSE
-        // Boutons sélectionnés sans ReqFwd/ReqRev : jamais de reprise joystick implicite.
+        // Boutons sélectionnés sans BtnFwd/BtnRev : jamais de reprise joystick implicite.
         M3_Direction_Active := 0;
     END_IF;
     // 🛡️ REX 2026-07-19 (revue mission IHM_MANU) : DeadmanArmed exigé même en pilotage boutons
-    // IHM (ReqFwd/ReqRev), pas seulement en pilotage joystick — sinon les boutons IHM
+    // IHM (BtnFwd/BtnRev), pas seulement en pilotage joystick — sinon les boutons IHM
     // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                           AND (NOT GVL_IHM.TranslationM3.JoystickSelect
+                           AND (NOT GVL_IHM.TranslationM3.TglJoystickMaster
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
-    // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.FreqSetpointHz (consigne Hz réglable opérateur,
+    // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.SetFreqHz (consigne Hz réglable opérateur,
     // limitée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
-    // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
+    // 250-251/271-272 : SetFreqHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
-    FreqPct := (GVL_IHM.TranslationM3.FreqSetpointHz / _TranslationMaxFreq_Hz) * 100.0;
-    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.JoystickSelect,
+    FreqPct := (GVL_IHM.TranslationM3.SetFreqHz / _TranslationMaxFreq_Hz) * 100.0;
+    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.TglJoystickMaster,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
     // Mode Manuel/Maintenance : Consignes issues du Joystick et sélecteur HMI
     M3_PositioningActive := FALSE;
-    SelectedTargetNum    := StubTranslationPositionSelect_IHM;
+    SelTarget    := StubTranslationPositionSelect_IHM;
     M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
     M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
@@ -112,12 +112,12 @@ M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
 // 🆕 REX 2026-07-18 : cible Maintenance (4) bloquée hors MAINT_N2 (AF_Partie-02 v2.12 §3bis) —
 // arbitrage centralisé dans FB_Modes (aucun re-test de Mode ici), refuse toute cible si interdite.
-IF (SelectedTargetNum = 4) AND NOT PRG_04_Modes.instModes.MaintenanceM3TargetEnable THEN
-    SelectedTargetNum := 0;
+IF (SelTarget = 4) AND NOT PRG_04_Modes.instModes.MaintenanceM3TargetEnable THEN
+    SelTarget := 0;
 END_IF;
 
 // Câblage du capteur de butée de la cible sélectionnée (PV exclu : jamais une cible d'arrêt)
-CASE SelectedTargetNum OF
+CASE SelTarget OF
     1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
     2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP2;
     3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP1;
@@ -143,12 +143,12 @@ instTranslationM3(
     LimitSwitchRev          := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
-    RampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
-    RampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
-    RampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
+    CfgRampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
+    CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
+    CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.BypassContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
-    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.ContactorFeedbackM3_IsReal
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
+    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal
 );
 
 // 🔴 Recopie commande de frein translation
