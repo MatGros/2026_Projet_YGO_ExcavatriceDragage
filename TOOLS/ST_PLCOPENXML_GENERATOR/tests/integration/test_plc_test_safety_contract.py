@@ -13,7 +13,10 @@ PLC = ROOT / "CODE" / "SIMULATION" / "PLC_TESTS"
 
 
 def test_translation_step_ids_fit_the_table():
-    source = (PLC / "SUITE_TRANSLATION" / "FB_TranslationValidation.st").read_text(encoding="utf-8")
+    # 🆕 2026-07-22 : les index d'étapes Translation vivent désormais dans
+    # FB_TranslationTestPlan.st (CORE/, source de vérité unique du plan
+    # déclaratif) — plus dans le fichier suite lui-même, voir audit v1.0.
+    source = (PLC / "CORE" / "FB_TranslationTestPlan.st").read_text(encoding="utf-8")
     max_steps = int(re.search(r"MaxSteps\s*:\s*INT\s*:=\s*(\d+)", (PLC / "GVL_PLC_Tests_Const.st").read_text(encoding="utf-8")).group(1))
     step_ids = [int(value) for value in re.findall(r"Step\w+\s*:\s*INT\s*:=\s*(\d+)", source)]
     assert step_ids

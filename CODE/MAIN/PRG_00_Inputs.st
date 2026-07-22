@@ -140,6 +140,7 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.Cycle.CmdAbort := FALSE;
     GVL_IHM.Cycle.CmdReset := FALSE;
 
+    GVL_IHM.TranslationM3.PositioningSelect := FALSE;
     GVL_IHM.TranslationM3.ReqFwd := FALSE;
     GVL_IHM.TranslationM3.ReqRev := FALSE;
     GVL_IHM.JoystickJOY1.Calibrate := FALSE;

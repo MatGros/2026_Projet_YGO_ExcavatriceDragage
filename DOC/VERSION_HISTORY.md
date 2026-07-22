@@ -4,12 +4,32 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.26_IhmCompatibilityRepair` — 2026-07-22
+- Restauration des noms publics IHM historiques : visualisation inchangée
+- `CODE_Bundle.xml` inclut désormais `GVL_PERSISTENT` requis par les PRG
+- À confirmer : compilation CODESYS après import du bundle réparé
+
+---
+
 ### `v0.4.23_TranslationM3_PersistentRamp` — 2026-07-22
 - 🔴 BUG : `ST_TranslationHMI.PositionMaintenance` vs PRG_09 `Position_Maintenance` (nom divergents, erreur compilation) — aligné sur struct (`PositionMaintenance`)
 - 🟡 Translation ramp rates → PERSISTENT : `_TranslationRampAccelRate_Pct`(20)·`_TranslationRampDecelNormal_Pct`(40)·`_TranslationRampDecelFast_Pct`(100) dans GVL_PERSISTENT + câblage PRG_07 (auparavant hardcodés dans FB_Translation)
 - 🟡 Speed cap 40% → PERSISTENT `_TranslationAutoSpeedCap_Pct` (remplace `MIN(40.0,..)` hardcodé dans PRG_07)
 - 🟠 Unification source fréquence max : `DriveFreqScaleMaxHz` câblé depuis `_TranslationMaxFreq_Hz` par PRG_07 (plus de double source)
 - DOC AF_Partie-11 : nouveau tableau PERSISTENT Translation M3 + note source unique
+
+---
+
+### `v0.4.24_TranslationM3_Positioner` — 2026-07-22
+- MAINT M3 : `PositioningSelect` explicite, Jog/Positionneur + `PositionReached` IHM
+- Boutons IHM sans requête : direction neutre, plus de fallback joystick implicite
+- Docs Partie 7 v1.6 / Partie 11 v1.10 + NAVBOARD synchronisés
+
+---
+
+### `v0.4.25_TranslationM3_JoystickAnimation` — 2026-07-22
+- `JoystickDeflectionPct` : axe X fonctionnel M3 signé, animation IHM autour du neutre
+- Docs Partie 7 v1.7 / Partie 11 v1.11 + NAVBOARD synchronisés
 
 ---
 

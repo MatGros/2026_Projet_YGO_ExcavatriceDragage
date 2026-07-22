@@ -88,7 +88,9 @@ def main(argv: list[str] | None = None) -> int:
                 include_deps=not args.no_deps,
                 project_name=args.project_name,
                 timestamp_override=args.timestamp,
-                exclude_gvl_persistent=True,
+                # Un bundle complet doit inclure les paramètres PERSISTENT requis par les PRG.
+                # Les exclure crée des identificateurs non définis après import dans un projet incomplet.
+                exclude_gvl_persistent=False,
             )
             bundle_name = args.bundle[:-4] if args.bundle.lower().endswith(".xml") else args.bundle
             out_path = args.out_dir / f"{bundle_name}.xml"

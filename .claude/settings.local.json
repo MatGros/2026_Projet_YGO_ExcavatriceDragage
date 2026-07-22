@@ -79,7 +79,19 @@
       "Skill(antigravity:delegate)",
       "Bash(xargs sed -i 's/Benne/Benne/g')",
       "Bash(sort -t. -k3 -n -u)",
-      "Skill(codex:rescue)"
+      "Skill(codex:rescue)",
+      "Bash(where python *)",
+      "Bash(py -3 -m pytest --version)",
+      "Bash(python3 -m pytest --version)",
+      "Bash(py -3 -m pytest TOOLS/ST_PLCOPENXML_GENERATOR/tests/integration/test_cli_full_code_tree.py -q)",
+      "Bash(py -3 -m pytest TOOLS/ST_PLCOPENXML_GENERATOR/tests -q)",
+      "Bash(git diff *)",
+      "Read(//tmp/**)",
+      "Bash(py -3 -m pytest TOOLS/ST_PLCOPENXML_GENERATOR/tests/integration/test_plc_test_safety_contract.py -q)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(echo \"=== 3bis\\) instPlan.SigXxx code reel \\(hors commentaires //\\) -> doit etre VIDE ===\")",
+      "Bash(rg -c \"StepVerdictTrig|RunStartTrig|FinalizeTrig\" CODE/SIMULATION/PLC_TESTS/CORE/*.st CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/*.st)",
+      "Bash(rg -c \"^\\\\s*WHILE\\\\b|END_WHILE\" CODE/SIMULATION/PLC_TESTS/CORE/*.st CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/*.st)"
     ],
     "ask": [
       "Bash(git reset *)",

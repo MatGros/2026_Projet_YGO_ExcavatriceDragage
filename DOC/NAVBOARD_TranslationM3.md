@@ -4,13 +4,16 @@
 
 **Fichiers** : `PRG_07_TranslationControl`·`FB_Translation`·`FB_Safety_Translation` (instance `PRG_03_Safety.instSafetyTranslationM3`)·`FB_Translation_PositionDecoder` (instance `PRG_00_Inputs.instPositionDecoder`)·`PRG_09_Supervision` L46-61
 **IHM** : `ST_TranslationHMI` → `GVL_IHM.TranslationM3`
+**Animation joystick M3** : `JoystickDeflectionPct` = axe X fonctionnel signé `-100..+100 %` ; 0=neutre
 **PERSISTENT** : `_TranslationMaxFreq_Hz`(60)·`_TranslationRampAccelRate_Pct`(20)·`_TranslationRampDecelNormal_Pct`(40)·`_TranslationRampDecelFast_Pct`(100)·`_TranslationAutoSpeedCap_Pct`(40)
 **Reset** : `PRG_09_Supervision.FaultMachineReset_IHM` = `GVL_IHM.Modes.FaultMachineReset` OR `CmdReset` M1/M2/Bucket — ⚠️ **pas de CmdReset propre à M3**
 **📎 Diagrammes** : `DOC/DIAGRAMS/CODE/DIAG_CODE_TranslationM3_HiFi.png`
 
 ---
 
-## 🎚️ Modes réels (`E_Mode` : DISABLE=0·MAINT_N1=1·MAINT_N2=2·SEMI_AUTO=3 — **pas de mode MANUAL**)
+## 🎚️ Modes réels (`E_Mode` : DISABLE=0·MAINT_N1=1·MAINT_N2=2·SEMI_AUTO=3)
+
+`MAINT_N1` et `MAINT_N2` sont les **modes manuels** ; aucun libellé d'énumération `MANUAL` séparé.
 
 **🔄 SEMI_AUTO** — cycle choisit la cible, sens automatique, opérateur valide au joystick
 - Cible : `PRG_05_Cycle.instCycle.CmdTranslationM3_Target` (1=Trémie→Dir+1 ; 2/3/4→Dir-1)
@@ -23,12 +26,17 @@
 - Vitesse : `FreqSetpoint_Hz` (pleine consigne opérateur, convertie en % de `_TranslationMaxFreq_Hz`)
 - ✅ `DeadmanArmed`·`ReqFwd`(ou `ReqRev`)
 - ❌ `AxisCmdX.StartStop` PAS nécessaire (bypass si `JoystickSelect=FALSE`)
-- ⚠️ **PIÈGE (PRG_07 L69-70)** : si NI `ReqFwd` NI `ReqRev`, la direction retombe sur `AxisCmdX.Direction` (joystick) → bouger le joystick X avec deadman armé fait bouger M3 à **pleine consigne** `FreqSetpoint_Hz`
+- ✅ Sans `ReqFwd` ni `ReqRev` : direction forcée à 0 ; aucune reprise joystick implicite
 
 **🕹️ MAINT_N1/N2 — joystick** (`GVL_IHM.TranslationM3.JoystickSelect=TRUE`)
 - Direction : `AxisCmdX.Direction`
 - Vitesse : `Hz = déflexion joystick (%) × FreqSetpoint_Hz` (formule : `(ABS(SpeedRef)/100) × FreqPct`, `FreqPct = FreqSetpoint_Hz/_TranslationMaxFreq_Hz×100`)
 - ✅ `DeadmanArmed`·`AxisCmdX.StartStop`·`AxisCmdX.Direction≠0`
+
+**🎯 MAINT_N1/N2 — sous-mode positionneur** (`GVL_IHM.TranslationM3.PositioningSelect=TRUE`)
+- `SelectedTargetNum` actif : arrêt sur la cible choisie ; sens toujours choisi manuellement (boutons ou joystick)
+- `PositioningSelect=FALSE` : jog libre, cible forcée à 0 ; seuls les FdC extrêmes arrêtent
+- ✅ Retour IHM : `GVL_IHM.TranslationM3.PositionReached` (non mémorisé, TRUE sur cible débouncée)
 
 **🚫 DISABLE (branche ELSE PRG_07 L89-95)** : consignes joystick recopiées MAIS `Enable=FALSE` (Mode=DISABLE) → FB neutralisé, **aucun mouvement possible**. Branche morte — ne PAS croire à un "mode manuel sans deadman".
 
@@ -83,7 +91,7 @@
 | StartStop validé mais rien | `SafeStop` actif → `instSafetyTranslationM3.ErrorId` |
 | Erreur directe | `instTranslationM3.ErrorId` bit0=frein·bit3=variateur (DriveStatusWord.4)·bit6=FdC |
 | Bloqué sur cible | `ArrivalLock` → repartir en sens inverse |
-| Bouge sans bouton en MAINT | Piège joystick fallback (PRG_07 L69-70) — voir ⚠️ ci-dessus |
+| Positionneur n'arrête pas | `PositioningSelect=TRUE`·`SelectedTargetNum` valide·capteur cible |
 | Pas assez de vitesse | `_TranslationMaxFreq_Hz`=60·`_TranslationAutoSpeedCap_Pct`=40·`FreqSetpoint_Hz` IHM |
 | Défaut ne s'efface pas | Reset = front `GVL_IHM.Modes.FaultMachineReset` (pas de CmdReset M3) + cause disparue |
 

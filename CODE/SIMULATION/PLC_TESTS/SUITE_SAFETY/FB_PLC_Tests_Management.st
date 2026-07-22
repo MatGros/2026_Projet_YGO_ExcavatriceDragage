@@ -13,7 +13,6 @@ VAR
     instModesValidation       : FB_ModesValidation;
     instHeartbeatValidation   : FB_HeartbeatValidation;
 
-
     // Triggers pour IHM tactiles
     RunAllTrig           : R_TRIG;
     AbortTrig            : R_TRIG;
@@ -25,7 +24,7 @@ VAR
     FirstStepSafety      : INT;
     StartTranslation     : BOOL;
     AbortTranslation     : BOOL;
-    FirstStepTranslation : INT;
+    RequestedCaseTranslation : INT; // 🆕 2026-07-22 : CaseId direct (0=toutes,1..6) — JAMAIS de FirstStepId (audit v1.0 C2)
     StartBucket           : BOOL;
     AbortBucket           : BOOL;
     FirstStepBucket       : INT;
@@ -38,6 +37,8 @@ VAR
     StartHeartbeat        : BOOL;
     AbortHeartbeat        : BOOL;
     FirstStepHeartbeat    : INT;
+    StartFramework        : BOOL;
+    FrameworkScanCount    : INT;
 
     // 🔗 Enchaînement multi-suites (CmdRunAll) — 2026-07-16 : ajout Translation puis Bucket
     ChainMode            : BOOL;  // TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket
@@ -101,6 +102,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
         AbortModes := FALSE;
         StartHeartbeat := FALSE;
         AbortHeartbeat := FALSE;
+        StartFramework := FALSE;
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
 
@@ -124,6 +126,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
         ELSIF GVL_PLC_Tests.Cmd.RunHeartbeat THEN
             GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteHeartbeat;
             GVL_PLC_Tests.Cmd.RunHeartbeat := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunFramework THEN
+            StartFramework := TRUE;
+            GVL_PLC_Tests.Cmd.RunFramework := FALSE;
         END_IF;
         GVL_PLC_Tests.Cmd.RunAll := FALSE;
 
@@ -150,23 +155,18 @@ CASE GVL_PLC_Tests.Status.RunState OF
             GVL_PLC_Tests.Cmd.RunCase := 0;
 
         // Démarrage d'une suite ciblée (Translation)
+        // 🆕 2026-07-22 : CaseId transmis TEL QUEL (0=toutes,1..6) — le manager ne
+        // connaît plus aucun détail interne d'étape (audit v1.0 C2). Refus de
+        // gate désormais explicite PRECONDITION_FAILED, jamais silencieux (C3).
         ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteTranslation THEN
-            IF GVL_Simulation.SimulationModeActive AND instTranslationValidation.SimGateOk THEN
-                ChainMode := FALSE;
-                CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
-                StartTranslation := TRUE;
-                IF GVL_PLC_Tests.Cmd.RunCase = 1 THEN
-                    FirstStepTranslation := 10;
-                ELSIF GVL_PLC_Tests.Cmd.RunCase = 2 THEN
-                    FirstStepTranslation := 20;
-                ELSIF GVL_PLC_Tests.Cmd.RunCase = 3 THEN
-                    FirstStepTranslation := 30;
-                ELSE
-                    FirstStepTranslation := 10; // Par défaut TC-T1
-                END_IF;
-                GVL_PLC_Tests.Status.FailureSummary := ''; // 🔄 RAZ à chaque nouveau run
-                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
-            END_IF;
+            // La suite possède seule sa fixture : même un refus produit un rapport neuf
+            // PRECONDITION_FAILED, jamais un Status correct avec un ancien rapport.
+            ChainMode := FALSE;
+            CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
+            StartTranslation := TRUE;
+            RequestedCaseTranslation := GVL_PLC_Tests.Cmd.RunCase;
+            GVL_PLC_Tests.Status.FailureSummary := '';
+            GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
 
@@ -237,6 +237,23 @@ CASE GVL_PLC_Tests.Status.RunState OF
             GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
+        // 🧪 Smoke test géré directement ici : aucune instance/table/runtime.
+        IF StartFramework THEN
+            FrameworkScanCount := 0;
+            GVL_PLC_Tests.FrameworkResult.InProgress := TRUE;
+            GVL_PLC_Tests.FrameworkResult.AllPassed := FALSE;
+            GVL_PLC_Tests.FrameworkResult.AnyFailed := FALSE;
+            GVL_PLC_Tests.FrameworkResult.CurrentTestId := 1;
+            GVL_PLC_Tests.FrameworkResult.FailedTestId := 0;
+            GVL_PLC_Tests.FrameworkResult.TestsPassed := 0;
+            GVL_PLC_Tests.FrameworkResult.TestsFailed := 0;
+            GVL_PLC_Tests.FrameworkResult.ErrorMessage := '';
+            GVL_PLC_Tests.FrameworkResult.RunCounter := GVL_PLC_Tests.FrameworkResult.RunCounter + 1;
+            GVL_PLC_Tests.Status.FailureSummary := '';
+            CurrentSuiteIdx := 7;
+            GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+        END_IF;
+
         // Commande d'effacement du rapport — acquittement explicite, retour à IDLE
         IF ClearReportTrig.Q THEN
             // La réinitialisation des rapports Steps[]/Cases[] est gérée par le moteur
@@ -258,6 +275,20 @@ CASE GVL_PLC_Tests.Status.RunState OF
         StartTranslation := FALSE;
         StartBucket := FALSE;
         StartHeartbeat := FALSE;
+        StartFramework := FALSE;
+
+        // 🧪 Smoke framework natif : 3 scans, sans appeler aucun moteur de test.
+        IF CurrentSuiteIdx = 7 THEN
+            FrameworkScanCount := FrameworkScanCount + 1;
+            IF FrameworkScanCount >= 3 THEN
+                GVL_PLC_Tests.FrameworkResult.InProgress := FALSE;
+                GVL_PLC_Tests.FrameworkResult.AllPassed := TRUE;
+                GVL_PLC_Tests.FrameworkResult.AnyFailed := FALSE;
+                GVL_PLC_Tests.FrameworkResult.TestsPassed := 1;
+                GVL_PLC_Tests.FrameworkResult.TestsFailed := 0;
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
+        END_IF;
 
         // 🛡️ Aucun orchestrateur ne doit attendre Done indéfiniment.
         SuiteElapsed := SuiteElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
@@ -313,7 +344,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 // FAIL_CONTINUE déjà appliquée au niveau des cases/steps, voir §7.3.4)
                 CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteTranslation;
                 StartTranslation := TRUE;
-                FirstStepTranslation := 10;
+                RequestedCaseTranslation := 0; // Enchaînement RunAll -> toutes les cases Translation
             ELSIF ChainMode AND NOT instSafetyValidation.Report.Aborted AND NOT instTranslationValidation.SimGateOk THEN
                 // 🔧 REX 2026-07-16 : bug trouvé — le chaînage sautait la vérification SimGateOk
                 // (le démarrage ciblé Cmd.RunSuite=2 la faisait, pas celui-ci). Sans ce garde-fou,
@@ -513,7 +544,7 @@ END_CASE;
 
 // 3. Appel des instances de suites
 instSafetyValidation(Start := StartSafety, Abort := AbortSafety, FirstStepId := FirstStepSafety);
-instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, FirstStepId := FirstStepTranslation);
+instTranslationValidation(Start := StartTranslation, Abort := AbortTranslation, CaseId := RequestedCaseTranslation);
 instBucketValidation(Start := StartBucket, Abort := AbortBucket, FirstStepId := FirstStepBucket, instBucket := instBucket, instWinchM2 := instWinchM2);
 instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, FirstStepId := FirstStepEncoder);
 instModesValidation(Start := StartModes, Abort := AbortModes, FirstStepId := FirstStepModes);
@@ -524,6 +555,7 @@ GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
 GVL_PLC_Tests.Status.SuiteWatchdogExpired := SuiteWatchdogExpired;
 GVL_PLC_Tests.SuiteSafetyValidation := instSafetyValidation.Report;
 GVL_PLC_Tests.SuiteTranslationValidation := instTranslationValidation.Report;
+GVL_PLC_Tests.SuiteTranslationResult := instTranslationValidation.Result; // 🆕 Résultat plat clair
 GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
 GVL_PLC_Tests.SuiteEncoderValidation := instEncoderValidation.Report;
 GVL_PLC_Tests.SuiteModesValidation := instModesValidation.Report;
@@ -532,7 +564,17 @@ GVL_PLC_Tests.SuiteHeartbeatValidation := instHeartbeatValidation.Report;
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
     GVL_PLC_Tests.Status.ActiveSuiteId := CurrentSuiteIdx;
-    IF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation THEN
+    // 🧪 L'autotest framework a sa propre progression : ne jamais afficher
+    // le rapport Safety résiduel lorsque CurrentSuiteIdx=7.
+    IF CurrentSuiteIdx = 7 THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := 'Framework Validation';
+        GVL_PLC_Tests.Status.ActiveCaseId := GVL_PLC_Tests.FrameworkResult.CurrentTestId;
+        GVL_PLC_Tests.Status.ActiveStepId := GVL_PLC_Tests.FrameworkResult.CurrentTestId;
+        GVL_PLC_Tests.Status.StepElapsed := T#0s;
+        GVL_PLC_Tests.Status.TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+        GVL_PLC_Tests.Status.ErrorCode := GVL_PLC_Tests.FrameworkResult.FailedTestId;
+        GVL_PLC_Tests.Status.ErrorMessage := GVL_PLC_Tests.FrameworkResult.ErrorMessage;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteTranslation THEN
         GVL_PLC_Tests.Status.ActiveSuiteName := instTranslationValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instTranslationValidation.Report.CurrentCaseId;
         GVL_PLC_Tests.Status.ActiveStepId := instTranslationValidation.Report.CurrentStepId;
