@@ -34,5 +34,14 @@ STRUCT
     // 🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
     // sélection treuil au joystick, arbitrée par FB_Modes (MAINT_N2 uniquement, forcé à 3=Couplé sinon)
     SelJoystickWinch : INT; (* 🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir FB_Modes.JoystickWinchSelectArbitrated *)
+
+    // 🆕 REX (session WINCH-BTN-01) — reouverture documentee doctrine T40 (voir
+    // DOC/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md). Bascule UNIQUEMENT
+    // la SOURCE du signal StartStop/Direction/SpeedRefPct (joystick vs boutons IHM) —
+    // SelJoystickWinch ci-dessus reste l'unique autorite de selection treuil (M1/M2/Couple),
+    // appliquee IDENTIQUEMENT quelle que soit la source. Accessible des MAINT_N1 (pas de mot
+    // de passe), homme-mort joystick reel toujours obligatoire meme en pilotage boutons
+    // (lecon precedent AF_Partie-11 v1.9 §6bis, bug Translation deja corrige).
+    TglJoystickMaster : BOOL := TRUE; (* 🕹️ TRUE (defaut) = joystick pilote Winch (comportement historique, preserve au boot) ; FALSE = boutons IHM BtnUp/BtnDown *)
 END_STRUCT
 END_TYPE

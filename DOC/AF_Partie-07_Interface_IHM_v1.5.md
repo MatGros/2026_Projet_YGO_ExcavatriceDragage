@@ -7,7 +7,7 @@
 >
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5  
 > **Rôle** : Spécification des structures de données d'échange et du mapping pour la supervision IHM (M1, M2, Benne, Translation, Cycle, Synchro).  
-> **Version** : v1.5 (2026-07-18, alignement avec `PRG_00`→`PRG_10`, `GVL_IHM.Cycle` et l'interface complète `GVL_IHM.TranslationM3`).
+> **Version** : v1.5 (2026-07-18, alignement avec `PRG_00`→`PRG_10`, `GVL_IHM.Cycle` et l'interface complète `GVL_IHM.M3Translation`).
 > 🆕 **T44 (2026-07-18)** : ajout des mesures vitesse câble M1/M2, variations vitesse et
 > état des moniteurs dans `ST_WinchHMI`, ainsi que de l'écart vitesse M1/M2 dans `ST_CycleHMI`.
 > **v1.5 (2026-07-18)** : `PRG_MAIN` supprimé des descriptions opératoires ; le mapping est porté par `PRG_09_Supervision`, les commandes sont consommées par les programmes métier concernés. Ajout des interfaces Cycle et Translation M3 complètes.  
@@ -291,9 +291,9 @@ VAR_GLOBAL RETAIN
     WinchM2 : ST_WinchHMI;  (* Variables d'échange IHM Treuil Auxiliaire M2 *)
     Benne : ST_BucketHMI;(* Variables d'échange IHM Mécanisme Benne *)
     Sync    : ST_SyncHMI;   (* Variables d'échange IHM Surveillance de synchro *)
-    JoystickJOY1 : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
+    JOY1Joystick : ST_JoystickHMI; (* Variables d'échange IHM Joystick *)
     Modes   : ST_ModesHMI;  (* Variables d'échange IHM Modes de marche *)
-    TranslationM3 : ST_TranslationHMI;(* Variables d'échange IHM Translation M3 *)
+    M3Translation : ST_TranslationHMI;(* Variables d'échange IHM Translation M3 *)
     Network : ST_NetworkDiagHMI;(* Variables d'échange IHM Diagnostics réseau *)
 END_VAR
 ```
@@ -317,7 +317,7 @@ Le mapping bidirectionnel est centralisé dans `PRG_09_Supervision.st` :
    * Les overrides de test sont autorisés uniquement lorsque `GVL_Simulation.SimulationModeActive = TRUE`.
 
 Les commandes de cycle sont regroupées dans `GVL_IHM.Cycle` et acquittées par `PRG_05_Cycle`.
-Les commandes Translation M3 sont regroupées dans `GVL_IHM.TranslationM3` et consommées par
+Les commandes Translation M3 sont regroupées dans `GVL_IHM.M3Translation` et consommées par
 `PRG_07_TranslationControl`. Les structures ST réelles du dossier `CODE/SUPERVISION` font foi.
 
 ---

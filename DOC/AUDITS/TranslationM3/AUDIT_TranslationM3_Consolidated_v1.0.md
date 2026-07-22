@@ -165,7 +165,7 @@
 
 ## 🖥️ 4. INTERFACE IHM / SUPERVISION
 
-### 4.1 Structure `ST_TranslationHMI` (GVL_IHM.TranslationM3) — Mapping vérifié
+### 4.1 Structure `ST_TranslationHMI` (GVL_IHM.M3Translation) — Mapping vérifié
 
 | Catégorie | Champs clés | Statut | Source |
 |-----------|-------------|--------|--------|

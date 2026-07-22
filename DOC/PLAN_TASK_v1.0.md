@@ -49,7 +49,7 @@ Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 b
 
 | Domaine | État actuel | Suite prévue |
 |---|---|---|
-| Translation M3 / cinq capteurs | ✅ Implémenté et exposé dans `GVL_IHM.TranslationM3` | Essais CODESYS puis terrain |
+| Translation M3 / cinq capteurs | ✅ Implémenté et exposé dans `GVL_IHM.M3Translation` | Essais CODESYS puis terrain |
 | Translation M3 / sécurité | ✅ Limites Trémie/Maintenance + incohérence capteurs + SafeStop/PowerCutOff | Vérifier les réactions sur banc |
 | Cycle semi-auto / Kobold | ✅ Contact, remontée synchronisée et reprise homme-mort raccordés | Finaliser la stabilisation et les cas d'obstacle |
 | IHM cycle et Translation | ✅ GVL de commande, état, diagnostic et simulation | Étendre aux Codeurs/Homing et aux tests opérateur |

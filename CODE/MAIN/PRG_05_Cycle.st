@@ -56,7 +56,7 @@ instCycle(
     
     SetDepthM        := SetDepthM,
     SetOffsetM       := SetOffsetM,
-    SelectedTargetNum_IHM := GVL_IHM.TranslationM3.SelTarget,
+    SelectedTargetNum_IHM := GVL_IHM.M3Translation.SelTarget,
 
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,

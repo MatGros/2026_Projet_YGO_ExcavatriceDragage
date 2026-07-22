@@ -360,8 +360,8 @@ construit toujours en 2 étapes distinctes, chacune avec sa propre règle.
 | Instance | Repère ? | Pourquoi |
 |---|---|---|
 | `WinchM1`, `WinchM2` | Oui | 2 treuils physiques, il faut distinguer lequel |
-| `TranslationM3` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
-| `JoystickJOY1` | Oui | Repère = ID noeud CANopen physique |
+| `M3Translation` | Oui | Identifiant matériel du variateur (cohérence avec M1/M2 des treuils) |
+| `JOY1Joystick` | Oui | Repère = ID noeud CANopen physique |
 | `Bucket` | **Non** | Un seul benne sur la machine — un repère (`BucketM2`) répéterait le `M2` déjà présent dans ses propres champs (`M2PositionCorrected`, `LastPosM2Close`...) : tenté puis annulé le 2026-07-15, stutter |
 
 ### Niveau 2 — Champ à l'intérieur du struct
@@ -375,8 +375,8 @@ requête, voir `Req`/`Cmd` plus haut). Les catégories déjà univoques gardent 
 ⚠️ **Ne jamais répéter le Repère du niveau 1 à l'intérieur du champ** — le nom du struct porte
 déjà le contexte matériel :
 ```
-✅ GVL_IHM.TranslationM3.ReqFwd
-❌ GVL_IHM.TranslationM3.M3ReqFwd   (M3 déjà dans TranslationM3, répétition inutile)
+✅ GVL_IHM.M3Translation.ReqFwd
+❌ GVL_IHM.M3Translation.M3ReqFwd   (M3 déjà dans TranslationM3, répétition inutile)
 ```
 
 ### Exemple complet (les 2 niveaux assemblés)

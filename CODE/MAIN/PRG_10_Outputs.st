@@ -127,7 +127,7 @@ KoboldContactor_DQ := KoboldContactorCmd
 M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
 M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
 // 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
-// PRG_09_Supervision (GVL_IHM.TranslationM3), valables dans tous les modes.
+// PRG_09_Supervision (GVL_IHM.M3Translation), valables dans tous les modes.
 
 // Relais de direction M3 obsolètes forcés à FALSE
 M3_RelayFwd_DQ := FALSE;

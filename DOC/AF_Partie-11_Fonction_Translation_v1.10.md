@@ -6,7 +6,7 @@
 ## 🆕 Sous-mode positionneur en maintenance
 
 En `MAINT_N1` ou `MAINT_N2`, l'opérateur choisit explicitement le sous-mode avec
-`GVL_IHM.TranslationM3.PositioningSelect` :
+`GVL_IHM.M3Translation.PositioningSelect` :
 
 | `PositioningSelect` | Sous-mode | `SelectedTargetNum` | Arrêt |
 |---|---|---|---|
@@ -47,5 +47,5 @@ implicitement. L'homme-mort `DeadmanArmed` reste obligatoire pour tout mouvement
 ## 🔧 Application CODESYS 3.5
 
 Importer le bundle complet `CODE/CODE_Bundle.xml` à la racine de l'application. Sur l'IHM,
-lier un sélecteur Jog/Positionneur à `GVL_IHM.TranslationM3.PositioningSelect` et un voyant
-"Position atteinte" à `GVL_IHM.TranslationM3.PositionReached`.
+lier un sélecteur Jog/Positionneur à `GVL_IHM.M3Translation.PositioningSelect` et un voyant
+"Position atteinte" à `GVL_IHM.M3Translation.PositionReached`.

@@ -23,7 +23,7 @@
 >   est désormais **toujours active**, y compris en Manu (Méca A/B, thermique, rotation phase,
 >   perte com EtherCAT/joystick). Ceci débloque `FB_TranslationValidation` (TC-T1/T2/T3, voir
 >   `AF_Partie-14`), dont l'exécution était impossible tant que `Enable=FALSE` masquait tout défaut.
-> * **Vitesse en Manu — diffère volontairement du Winch** : `GVL_IHM.TranslationM3.FreqSetpointHz`
+> * **Vitesse en Manu — diffère volontairement du Winch** : `GVL_IHM.M3Translation.FreqSetpointHz`
 >   (consigne Hz réglable opérateur, limitée par `PRG_10_Outputs` à `_TranslationMaxFreq_Hz`) reste
 >   la référence pleine échelle pour boutons HMI **et** joystick — reproduit le comportement exact
 >   de l'ex-bypass. Le Winch utilise `100.0` fixe en boutons HMI (paliers discrets de contacteurs,
@@ -37,9 +37,9 @@
 > * Détail complet : `DOC/IHM_MANU_Journal_Modifications.md` §12.
 >
 > 🆕 **v1.6 (2026-07-15) — Finalisation IHM (`ST_TranslationHMI`)** :
-> * `ST_TranslationHMI` (`GVL_IHM.TranslationM3`) reprend les commandes manuelles ex-`ST_IHM_MANU`
+> * `ST_TranslationHMI` (`GVL_IHM.M3Translation`) reprend les commandes manuelles ex-`ST_IHM_MANU`
 >   (`ReqFwd`/`ReqRev`/`FreqSetpointHz`, sans préfixe `M3_` — redondant une fois scopé sous
->   `GVL_IHM.TranslationM3.xxx`).
+>   `GVL_IHM.M3Translation.xxx`).
 > * Diagnostic variateur **décodé** : `DriveCommReady`/`DrivePowerReady` (booléens, StatusWord
 >   bit7/bit0) remplacent le `WORD` brut `DriveStatusWord` — binding visu direct (LED/checkbox),
 >   pas de bit-masking côté développeur IHM. Le défaut variateur (bit4) reste couvert par
@@ -50,8 +50,8 @@
 >   `BrakeFeedback` transmis à `FB_Translation`.
 > * `DriveActualFreqHz` : source unique `PRG_00_Inputs.M3_ActualFrequencyHz_Filtered`, écrite
 >   une seule fois (`PRG_09_Supervision`), valable Auto ET Manu.
-> * `GVL_IHM.Translation` renommé `GVL_IHM.TranslationM3` (cohérence avec `WinchM1`/`WinchM2` — le nom
->   du membre porte son identifiant matériel). Idem `Joystick`→`JoystickJOY1`. `Benne` reste
+> * `GVL_IHM.Translation` renommé `GVL_IHM.M3Translation` (cohérence avec `WinchM1`/`WinchM2` — le nom
+>   du membre porte son identifiant matériel). Idem `Joystick`→`JOY1Joystick`. `Benne` reste
 >   sans suffixe (contrairement à Translation/Joystick, pas de paire M1/M2 à distinguer — un suffixe
 >   `M2` répéterait `M2` déjà présent dans ses propres champs, ex. `M2PositionCorrected`).
 > * **Bug corrigé** (hors périmètre IHM strict, découvert au passage) : la simulation de trajet
@@ -252,7 +252,7 @@ Les variables physiques suivantes doivent être configurées dans l'I/O Mapping 
 
 ---
 
-## 🖥️ 6. Interface IHM (`ST_TranslationHMI`, `GVL_IHM.TranslationM3`)
+## 🖥️ 6. Interface IHM (`ST_TranslationHMI`, `GVL_IHM.M3Translation`)
 
 Structure d'échange IHM (migration depuis l'ex-`ST_IHM_MANU`, **terminée et définitive**, v1.9 —
 IHM_MANU supprimé). En MAINT_N1/MAINT_N2, `ReqFwd`/`ReqRev`/`FreqSetpointHz` alimentent
@@ -278,7 +278,7 @@ l'arbitrage `PRG_07_TranslationControl` §1bis (gatée par `Mode`), qui pilote l
 
 ### Interface complète de supervision et de test
 
-`GVL_IHM.TranslationM3` constitue l'interface unique de supervision de l'objet métier
+`GVL_IHM.M3Translation` constitue l'interface unique de supervision de l'objet métier
 Translation M3. Elle expose également le mot de progression des cinq capteurs :
 `bit4=Trémie`, `bit3=PV`, `bit2=P2`, `bit1=P1`, `bit0=Maintenance`.
 
@@ -303,6 +303,6 @@ seule la validation du mouvement (`StartStop`) exige en plus que l'opérateur ma
 homme-mort du joystick, conformément au principe transverse « tout mouvement validé au joystick
 homme-mort » (voir `CLAUDE.md`).
 
-Les champs `Test*` de `GVL_IHM.TranslationM3` ne sont utilisables que sur le banc de
+Les champs `Test*` de `GVL_IHM.M3Translation` ne sont utilisables que sur le banc de
 simulation. Ils recopient les overrides Translation prévus dans `GVL_PLC_Tests` et ne
 créent aucune commande physique supplémentaire.

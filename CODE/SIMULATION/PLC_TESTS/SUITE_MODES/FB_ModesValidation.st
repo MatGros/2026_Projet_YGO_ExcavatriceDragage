@@ -531,7 +531,7 @@ CASE Step OF
         GVL_IHM.M2TreuilBucket.BtnReset := TRUE;
         GVL_IHM.Bucket.BtnClose := TRUE;
         GVL_IHM.Cycle.CmdStart := TRUE;
-        GVL_IHM.TranslationM3.BtnFwd := TRUE;
+        GVL_IHM.M3Translation.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
         StepPassed := TRUE;
         Step := 111;
@@ -543,7 +543,7 @@ CASE Step OF
            AND NOT GVL_IHM.M2TreuilBucket.BtnReset
            AND NOT GVL_IHM.Bucket.BtnClose
            AND NOT GVL_IHM.Cycle.CmdStart
-           AND NOT GVL_IHM.TranslationM3.BtnFwd
+           AND NOT GVL_IHM.M3Translation.BtnFwd
            AND GVL_IHM.HmiInitDone THEN
             GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
             StepPassed := TRUE;

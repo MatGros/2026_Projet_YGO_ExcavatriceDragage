@@ -78,6 +78,13 @@ STRUCT
     BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
 
     (* 🎮 Commandes Opérateur (Boutons tactiles) *)
+    // 🆕 REX (session WINCH-BTN-01) — mouvement direct MAINTENU (tant qu'appuye, relachement =
+    // arret rampe normale), JAMAIS impulsionnel. Actif seulement si GVL_IHM.Modes.TglJoystickMaster
+    // =FALSE (source boutons) ET ce treuil selectionne par SelJoystickWinch (M1/M2/Couple, deja
+    // arbitre par FB_Modes) ET homme-mort joystick reel arme (DeadmanArmed, comme le joystick).
+    // Voir DOC/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
+    BtnUp                   : BOOL;             (* ⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible) *)
+    BtnDown                 : BOOL;             (* ⬇️ Mouvement descente maintenu (mode boutons IHM, MAINT_N1 accessible) *)
     BtnReset                : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
     BtnHome                 : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
     BtnConfirmCoherence     : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
