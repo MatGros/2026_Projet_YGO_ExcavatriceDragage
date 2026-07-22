@@ -94,8 +94,8 @@ instBucket(
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.Bucket.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
-    CmdClose_IHM        := GVL_IHM.Bucket.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
+    CmdOpen_IHM         := GVL_IHM.M2Benne.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
+    CmdClose_IHM        := GVL_IHM.M2Benne.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
     JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
     JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -104,10 +104,10 @@ instBucket(
     HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
-    ConfirmOpenPosition := GVL_IHM.Bucket.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
-    ConfirmClosePosition:= GVL_IHM.Bucket.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
+    ConfirmOpenPosition := GVL_IHM.M2Benne.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
+    ConfirmClosePosition:= GVL_IHM.M2Benne.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
     Config              := _BucketConfig,
-    CfgTimeoutDuration     := GVL_IHM.Bucket.CfgTimeoutDuration,
+    CfgTimeoutDuration     := GVL_IHM.M2Benne.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
@@ -178,9 +178,9 @@ ELSE
     ELSE
         // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — même sélection treuil, même homme-mort
         // joystick réel obligatoire, même gate directionnel synchro que la branche joystick ci-dessus.
-        IF GVL_IHM.M1TreuilRetenue.BtnUp THEN
+        IF GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1_Direction_Active := 1;
-        ELSIF GVL_IHM.M1TreuilRetenue.BtnDown THEN
+        ELSIF GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1_Direction_Active := -1;
         ELSE
             M1_Direction_Active := 0;
@@ -240,9 +240,9 @@ ELSE
         ELSE
             // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — BtnUp M2 = enroulage/montée (+1),
             // même convention que le joystick (AxisCmdY.Direction=+1 => Direction=+1).
-            IF GVL_IHM.M2TreuilBucket.BtnUp THEN
+            IF GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2_Direction_Active := 1;
-            ELSIF GVL_IHM.M2TreuilBucket.BtnDown THEN
+            ELSIF GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2_Direction_Active := -1;
             ELSE
                 M2_Direction_Active := 0;

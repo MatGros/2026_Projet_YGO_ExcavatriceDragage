@@ -51,7 +51,7 @@ index `2`). Cette checklist :
 | 1.3 | Chaîne AU physique réarmée | `PRG_00_Inputs.EmergencyStopOk = TRUE` (contact contacteur de puissance confirmé, pas seulement boucle AU) | ☐ |
 | 1.4 | Mode machine au démarrage de la checklist | `E_Mode.MAINT_N1` (droits standard, pas de mot de passe) — passer en `MAINT_N2` uniquement pour les items le nécessitant explicitement (§11.6 cible Maintenance) | ☐ |
 | 1.5 | Personnel évacué de la zone de débattement translation | Aucune personne dans la trajectoire Trémie↔Maintenance avant tout essai marche avant/arrière (§5) | ☐ |
-| 1.6 | Accès IHM disponible : `GVL_IHM.M3Translation.*` en vue (superviseur ou instance CODESYS online) | Champs `Ready/Busy/Error/ErrorId`, `SafetyError/SafetyErrorId`, `SensorsWord`, `DriveActualFreqHz`, `DriveCommReady/DrivePowerReady` visibles en direct | ☐ |
+| 1.6 | Accès IHM disponible : `GVL_IHM.TranslationM3.*` en vue (superviseur ou instance CODESYS online) | Champs `Ready/Busy/Error/ErrorId`, `SafetyError/SafetyErrorId`, `SensorsWord`, `DriveActualFreqHz`, `DriveCommReady/DrivePowerReady` visibles en direct | ☐ |
 | 1.7 | Défaut initial acquitté | `PRG_09_Supervision.FaultMachineReset_IHM` disponible (front) pour acquitter tout défaut levé pendant les essais (Reset = front obligatoire, cause disparue + appui) | ☐ |
 
 ⚠️ **Point de vigilance majeur** : tant que `SimulationModeActive=TRUE` et qu'un `_IsReal` reste
@@ -219,7 +219,7 @@ Seules 6 combinaisons monotones sont valides.
 | 11.6 | `00000` | Extrême droite / Maintenance | Positionner physiquement en Maintenance (nécessite `MAINT_N2`, §5.8) | `LimitSwitchRev=TRUE`, `Incoherent=FALSE` | ☐ |
 | 11.7 | Mot incohérent (ex. `10101`, capteur collé) | — | Forcer/simuler un capteur en défaut (deux capteurs non adjacents actifs) | `Incoherent=TRUE` ⇒ `FB_Safety_Translation.ErrorId` bit7 ⇒ **`SafeStop` ET `PowerCutOff`** (défense en profondeur, décision client) | ☐ |
 | 11.8 | Chaque capteur individuellement câblé | Actionner chaque capteur TOR un par un à vide (hors mouvement) | `PRG_00_Inputs.TranslationPos<Zone>` bascule sans rebond excessif (filtre `T#20ms` sur chaque `FB_Input`) | ☐ |
-| 11.9 | Cohérence mot IHM | Comparer `GVL_IHM.M3Translation.SensorsWord` (bit4..bit0) affiché avec la position physique réelle | Correspondance exacte à chaque étape 11.1→11.6 | ☐ |
+| 11.9 | Cohérence mot IHM | Comparer `GVL_IHM.TranslationM3.SensorsWord` (bit4..bit0) affiché avec la position physique réelle | Correspondance exacte à chaque étape 11.1→11.6 | ☐ |
 
 ---
 
@@ -266,7 +266,7 @@ diagnostics bus). Ces items sont donc **exclusivement terrain**, à couvrir ici 
 | 14.3 | Mauvaise rotation de phases (bit2) | Provoquer/simuler une inversion de rotation de phase (`PhaseRotationOk_DI`) | `ErrorId` bit2 ⇒ `SafeStop=TRUE` seul, **pas** de `PowerCutOff` (bit2 hors masque) | ☐ |
 | 14.4 | Thermique frein commun (bit3) | Déjà couvert en détail §13.1 | Voir §13 | ☐ |
 | 14.5 | Combinaison multiple | Provoquer 2 défauts simultanés (ex. bit1 + bit6) | `ErrorId` cumule les deux bits (bitfield OR), `PowerCutOff` s'active dès qu'au moins un bit du masque `0x00F8` est présent | ☐ |
-| 14.6 | Cohérence IHM des diagnostics découplés | Comparer `GVL_IHM.M3Translation.SafetyError*` (champs décomposés bit par bit) avec `SafetyErrorId` brut pendant 14.1/14.3 | Chaque booléen IHM (`SafetyErrorJoystick`, `SafetyErrorPhaseRotation`, etc.) reflète exactement le bit correspondant, pas de bit-masking à faire côté IHM | ☐ |
+| 14.6 | Cohérence IHM des diagnostics découplés | Comparer `GVL_IHM.TranslationM3.SafetyError*` (champs décomposés bit par bit) avec `SafetyErrorId` brut pendant 14.1/14.3 | Chaque booléen IHM (`SafetyErrorJoystick`, `SafetyErrorPhaseRotation`, etc.) reflète exactement le bit correspondant, pas de bit-masking à faire côté IHM | ☐ |
 
 ---
 
@@ -332,7 +332,7 @@ secours (comportement indéterminé selon l'état électrique flottant de l'entr
 
 - **Aucun graphique IHM dédié n'a été audité** (hors périmètre) : toute lecture de champ
   (`SensorsWord`, `ErrorId`, `DriveActualFreqHz`...) suppose un accès à l'instance CODESYS online
-  ou à une vue superviseur déjà construite exposant `GVL_IHM.M3Translation.*`.
+  ou à une vue superviseur déjà construite exposant `GVL_IHM.TranslationM3.*`.
 - **§4.5 (limitation finale 0-100 %)** est vérifié par lecture de code (`PRG_07_TranslationControl.st`
   ligne "Limitation finale M3"), pas par essai physique dans cette session — à confirmer au banc.
 - **Cohérence architecture** : ✅ `AF_Partie-02` v2.12 indique désormais le pilotage EtherCAT

@@ -6,12 +6,12 @@
    ═══════════════════════════════════════════════════════════════ *)
 VAR_GLOBAL RETAIN
     M1TreuilRetenue : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Retenue (M1) *)
-    M2TreuilBucket : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Benne (M2) *)
-    Bucket : ST_BucketHMI;(* 🪣 Variables d'échange IHM Mécanisme Benne (M2) *)
+    M2TreuilBenne : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Benne (M2) *)
+    M2Benne : ST_BucketHMI;(* 🪣 Variables d'échange IHM Mécanisme Benne (M2) *)
     Sync    : ST_SyncHMI;   (* ⚖️ Variables d'échange IHM Surveillance de synchro *)
     JOY1Joystick : ST_JoystickHMI; (* 🕹️ Variables d'échange IHM Joystick (noeud CANopen JOY1) *)
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
-    M3Translation : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
+    TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     Cycle   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
@@ -56,7 +56,7 @@ END_VAR
         GVL_Simulation.SensorTopPositionIsReal reste FALSE, puis forcer
         PRG_00_Inputs.M1_M2_TopPositionSensor_DI à TRUE (ou l'OR équivalent)
        - Lancer le homing nominal en basculant indépendamment le bouton du treuil voulu :
-         GVL_IHM.M1TreuilRetenue.BtnHome ou GVL_IHM.M2TreuilBucket.BtnHome := TRUE puis FALSE (front).
+          GVL_IHM.M1Winch.BtnHome ou GVL_IHM.M2Winch.BtnHome := TRUE puis FALSE (front).
          Les deux fronts peuvent être envoyés simultanément ; aucun sélecteur HomingMode_IHM
          ni bouton StubHomeButton_IHM n'est utilisé.
       - La simulation détectera le signal de preset (COD1_PresettTrigCmd /

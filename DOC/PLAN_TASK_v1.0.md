@@ -10,7 +10,8 @@
 
 | Date | Jalon |
 |---|---|
-| 2026-07-21 | `v0.4.19_CommissioningPrep` — Préparation version mise en service terrain (pre-commissioning), audit treuils M1/M2 (`DOC/AUDIT_Winch_v1.0.md`), bundles PLCopenXML mis à jour |
+| 2026-07-22 | `v0.4.27_SupervisionConformityRename` — Renommage complet supervision GVL_IHM + ST_*HMI et conformité suffixes physiques (_M, _Pct, _Hz, _Mps) |
+| 2026-07-22 | `v0.4.26_IhmCompatibilityRepair` — Restauration des noms publics IHM historiques : visualisation inchangée |
 | 2026-07-15 | `v0.4.8` — IHM_MANU M1/M2 pilotés via `FB_Winch` (rampe/ralentissement natifs, retrait doctrine "Conditional Bypass"), nouvelle limite `CableLimitAscentM1/2_M`, correctifs Méca B (bit8) + benne couplé + `FB_Safety_Translation` (latch défaut) |
 | 2026-07-09 | Audit complet + ce `PLAN_TASK` |
 | 2026-07-09 | `PLAN_Finalisation_v1.1` (bloquants résolus + priorités actées) + `SAT_Protocole_Essais_v1.0` (protocole recette écrit) — ⚠️ pas encore commités |
@@ -49,7 +50,7 @@ Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 b
 
 | Domaine | État actuel | Suite prévue |
 |---|---|---|
-| Translation M3 / cinq capteurs | ✅ Implémenté et exposé dans `GVL_IHM.M3Translation` | Essais CODESYS puis terrain |
+| Translation M3 / cinq capteurs | ✅ Implémenté et exposé dans `GVL_IHM.TranslationM3` | Essais CODESYS puis terrain |
 | Translation M3 / sécurité | ✅ Limites Trémie/Maintenance + incohérence capteurs + SafeStop/PowerCutOff | Vérifier les réactions sur banc |
 | Cycle semi-auto / Kobold | ✅ Contact, remontée synchronisée et reprise homme-mort raccordés | Finaliser la stabilisation et les cas d'obstacle |
 | IHM cycle et Translation | ✅ GVL de commande, état, diagnostic et simulation | Étendre aux Codeurs/Homing et aux tests opérateur |
@@ -73,8 +74,10 @@ d'absence de consommateur. `PosPV_DI` et `StubTranslationPositionSelect_IHM` res
 ne pas supprimer le GVL entier.
 
 ### 🏷️ Nommage — chantier séparé (2026-07-15)
-Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), pilotée sur Translation M3
-uniquement (`ST_TranslationHMI.ReqFwd/ReqRev`). Reste en préfixe `CmdX`, à auditer/migrer plus tard :
+Règle `Req`/`Cmd` préfixe formalisée (`NAMING_CONVENTION.md`), initialement pilotée sur
+Translation M3 uniquement (`ST_TranslationHMI.ReqFwd/ReqRev`) — ⚠️ **non retenue** (audit
+2026-07-22) : le code actuel garde `BtnFwd`/`BtnRev`/`TglJoystickMaster`/`SelTarget`, la
+migration Req/Cmd n'est appliquée nulle part dans le code. Reste en préfixe `CmdX`, à auditer/migrer plus tard :
 `FB_Bucket`/`FB_Winch`/`ST_BucketHMI`/`ST_WinchHMI` (`CmdOpen`/`CmdClose`/`CmdReset`/`CmdHome`/
 `CmdInhibit`) et `FB_Cycle` (`CmdWinchM1_*`/`CmdTranslationM3_*`/`CmdBucket_*`) — blast radius plus
 large (interfaces FB largement utilisées), plan dédié à valider avant d'y toucher.

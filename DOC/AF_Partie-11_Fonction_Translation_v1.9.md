@@ -252,21 +252,21 @@ Les variables physiques suivantes doivent être configurées dans l'I/O Mapping 
 
 ---
 
-## 🖥️ 6. Interface IHM (`ST_TranslationHMI`, `GVL_IHM.M3Translation`)
+## 🖥️ 6. Interface IHM (`ST_TranslationHMI`, `GVL_IHM.TranslationM3`)
 
 Structure d'échange IHM (migration depuis l'ex-`ST_IHM_MANU`, **terminée et définitive**, v1.9 —
-IHM_MANU supprimé). En MAINT_N1/MAINT_N2, `ReqFwd`/`ReqRev`/`FreqSetpointHz` alimentent
+IHM_MANU supprimé). En MAINT_N1/MAINT_N2, `BtnFwd`/`BtnRev`/`SetFreq_Hz` alimentent
 l'arbitrage `PRG_07_TranslationControl` §1bis (gatée par `Mode`), qui pilote la même instance
 `FB_Translation` qu'en Auto (historique de la migration : `DOC/IHM_MANU_Journal_Modifications.md` §12).
 
 | Champ | Type | Sens | Rôle |
 |-------|------|------|------|
-| `SelectedTargetNum` | INT | IHM→PLC | Cible : `1=Trémie`, `2=P2`, `3=P1`, `4=Maintenance` ; PV n'est pas une cible |
-| `ReqFwd` / `ReqRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) — n'entraîne un mouvement que si `DeadmanArmed` (homme-mort joystick) est actif, voir §6bis |
-| `FreqSetpointHz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), limitée à `_TranslationMaxFreq_Hz` — référence de vitesse pleine échelle en Manu (boutons ET joystick, voir bandeau v1.7) |
+| `SelTarget` | INT | IHM→PLC | Cible : `1=Trémie`, `2=P2`, `3=P1`, `4=Maintenance` ; PV n'est pas une cible |
+| `BtnFwd` / `BtnRev` | BOOL | IHM→PLC | Commande manuelle marche avant/arrière (EtherCAT, pas un relais physique) — n'entraîne un mouvement que si `DeadmanArmed` (homme-mort joystick) est actif, voir §6bis |
+| `SetFreq_Hz` | REAL | IHM→PLC | Consigne fréquence manuelle (Hz), limitée à `_TranslationMaxFreq_Hz` — référence de vitesse pleine échelle en Manu (boutons ET joystick, voir bandeau v1.7) |
 | `FBState` | E_State | PLC→IHM | État interne `FB_Translation` (diagnostic) |
 | `Ready/Busy/Done/Error/ErrorId` | — | PLC→IHM | Statuts standards `FB_Translation` |
-| `BrakeCmd` | BOOL | PLC→IHM | Miroir lecture seule (TRUE = desserré) — pas de forçage inconditionnel : le déblocage en MAINT passe par `ReqFwd`/`ReqRev` (mouvement), qui desserre le frein nativement via `FB_Brake` (même doctrine que `ST_WinchHMI`) |
+| `BrakeCmd` | BOOL | PLC→IHM | Miroir lecture seule (TRUE = desserré) — pas de forçage inconditionnel : le déblocage en MAINT passe par `BtnFwd`/`BtnRev` (mouvement), qui desserre le frein nativement via `FB_Brake` (même doctrine que `ST_WinchHMI`) |
 | `BrakeFeedback` | BOOL | PLC→IHM | Retour physique bobine frein |
 | `PositionSensorTarget` | BOOL | PLC→IHM | Capteur position cible atteint |
 | `DriveActualFreqHz` | REAL | PLC→IHM | Fréquence réelle mesurée (Hz), source unique `PRG_00_Inputs`, Auto ET Manu |
@@ -278,7 +278,7 @@ l'arbitrage `PRG_07_TranslationControl` §1bis (gatée par `Mode`), qui pilote l
 
 ### Interface complète de supervision et de test
 
-`GVL_IHM.M3Translation` constitue l'interface unique de supervision de l'objet métier
+`GVL_IHM.TranslationM3` constitue l'interface unique de supervision de l'objet métier
 Translation M3. Elle expose également le mot de progression des cinq capteurs :
 `bit4=Trémie`, `bit3=PV`, `bit2=P2`, `bit1=P1`, `bit0=Maintenance`.
 
@@ -287,7 +287,7 @@ Les champs `PositionTremie`, `PositionPV`, `PositionP2`, `PositionP1`,
 `LimitSwitchRev` permettent de diagnostiquer directement le câblage et la position estimée.
 `SafetySafeStop` et `SafetyPowerCutOff` indiquent la réaction de sécurité effective.
 
-En maintenance N1/N2, les commandes `ReqFwd`/`ReqRev` et `FreqSetpointHz` sont traitées
+En maintenance N1/N2, les commandes `BtnFwd`/`BtnRev` et `SetFreq_Hz` sont traitées
 par `PRG_07_TranslationControl` sans dépendre de `IHM_MANU`. En mode `SEMI_AUTO`, la
 commande vient du cycle et reste conditionnée par l'homme-mort et le joystick X.
 
@@ -295,14 +295,14 @@ commande vient du cycle et reste conditionnée par l'homme-mort et le joystick X
 
 🆕 **v1.9 (2026-07-19, revue sécurité post-suppression IHM_MANU)** : `M3_StartStop_Active`
 exige désormais `PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed` **quel que soit** le mode de
-pilotage sélectionné (`JoystickSelect` TRUE ou FALSE). Auparavant, piloter M3 via les boutons
-`ReqFwd`/`ReqRev` (`JoystickSelect=FALSE`) ne testait aucune condition homme-mort — écart
+pilotage sélectionné (`TglJoystickMaster` TRUE ou FALSE). Auparavant, piloter M3 via les boutons
+`BtnFwd`/`BtnRev` (`TglJoystickMaster=FALSE`) ne testait aucune condition homme-mort — écart
 relevé lors de la revue de sécurité de la mission de suppression d'IHM_MANU (le bug préexistait
 à IHM_MANU, hérité de l'ex-bypass direct). Sens/vitesse restent pilotables via les boutons IHM ;
 seule la validation du mouvement (`StartStop`) exige en plus que l'opérateur maintienne le
 homme-mort du joystick, conformément au principe transverse « tout mouvement validé au joystick
 homme-mort » (voir `CLAUDE.md`).
 
-Les champs `Test*` de `GVL_IHM.M3Translation` ne sont utilisables que sur le banc de
+Les champs `Test*` de `GVL_IHM.TranslationM3` ne sont utilisables que sur le banc de
 simulation. Ils recopient les overrides Translation prévus dans `GVL_PLC_Tests` et ne
 créent aucune commande physique supplémentaire.

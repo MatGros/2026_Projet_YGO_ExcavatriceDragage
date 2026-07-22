@@ -94,7 +94,7 @@ IF Abort THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
     GVL_IHM.Modes.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.CmdStart := FALSE;
+    GVL_IHM.Cycle.BtnStart := FALSE;
     GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     Busy := FALSE;
@@ -356,13 +356,13 @@ CASE Step OF
     // ─────────── TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais ───────────
     60:
         // 🔧 REX 2026-07-19 (revue mission IHM_MANU, finding B) : tentative RÉELLE de
-        // démarrage (GVL_IHM.Cycle.CmdStart, ré-assertée chaque scan pour couvrir l'ordre
+        // démarrage (GVL_IHM.Cycle.BtnStart, ré-assertée chaque scan pour couvrir l'ordre
         // des tâches) pendant >200 ms hors SEMI_AUTO — instCycle.Enable=FALSE doit la rendre
         // sans effet (Busy reste FALSE), pas un simple instantané qui ne prouverait rien.
         GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
-        GVL_IHM.Cycle.CmdStart := TRUE;
+        GVL_IHM.Cycle.BtnStart := TRUE;
         IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) AND (StepElapsed >= T#200MS) THEN
-            GVL_IHM.Cycle.CmdStart := FALSE;
+            GVL_IHM.Cycle.BtnStart := FALSE;
             IF NOT PRG_05_Cycle.instCycle.Busy THEN
                 StepPassed := TRUE;
                 IF RequestedCaseId = 6 THEN Step := 0; ELSE Step := 65; END_IF;
@@ -526,24 +526,24 @@ CASE Step OF
 
     // ─────────── TC-M12 : purge commandes RETAIN avant consommation ───────────
     110:
-        GVL_IHM.M1TreuilRetenue.BtnHome := TRUE;
+        GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := TRUE;
         GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := TRUE;
-        GVL_IHM.M2TreuilBucket.BtnReset := TRUE;
-        GVL_IHM.Bucket.BtnClose := TRUE;
-        GVL_IHM.Cycle.CmdStart := TRUE;
-        GVL_IHM.M3Translation.BtnFwd := TRUE;
+        GVL_IHM.M2TreuilBenne.Cmd.BtnReset := TRUE;
+        GVL_IHM.M2Benne.BtnClose := TRUE;
+        GVL_IHM.Cycle.BtnStart := TRUE;
+        GVL_IHM.TranslationM3.Cmd.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
         StepPassed := TRUE;
         Step := 111;
         StepStarted := FALSE;
 
     111:
-        IF NOT GVL_IHM.M1TreuilRetenue.BtnHome
+        IF NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
            AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
-           AND NOT GVL_IHM.M2TreuilBucket.BtnReset
-           AND NOT GVL_IHM.Bucket.BtnClose
-           AND NOT GVL_IHM.Cycle.CmdStart
-           AND NOT GVL_IHM.M3Translation.BtnFwd
+           AND NOT GVL_IHM.M2TreuilBenne.Cmd.BtnReset
+           AND NOT GVL_IHM.M2Benne.BtnClose
+           AND NOT GVL_IHM.Cycle.BtnStart
+           AND NOT GVL_IHM.TranslationM3.Cmd.BtnFwd
            AND GVL_IHM.HmiInitDone THEN
             GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
             StepPassed := TRUE;
