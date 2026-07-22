@@ -1,94 +1,101 @@
 # 🧭 NAVBOARD — Translation M3
 
-**COMMUN** : ✅Enable·✅ESOk·❌SafeStop·❌Error·❌PwrCutOff·❌ModeDISABLE
+**COMMUN (toutes actions)** : ✅`Enable`(=`PRG_06_WinchControl.StubMachineEnableN1` AND Mode≠DISABLE)·✅`PRG_00_Inputs.EmergencyStopOk`·❌`instSafetyTranslationM3.SafeStop`·❌`instTranslationM3.Error`·❌`PowerCutOff`
 
-**Fichiers** : `PRG_07_TranslationControl`·`FB_Translation`·`FB_Safety_Translation`·`FB_Translation_PositionDecoder`·`PRG_09_Supervision` §9
+**Fichiers** : `PRG_07_TranslationControl`·`FB_Translation`·`FB_Safety_Translation` (instance `PRG_03_Safety.instSafetyTranslationM3`)·`FB_Translation_PositionDecoder` (instance `PRG_00_Inputs.instPositionDecoder`)·`PRG_09_Supervision` L46-61
 **IHM** : `ST_TranslationHMI` → `GVL_IHM.TranslationM3`
-**PERSISTENT** : `_TranslationMaxFreq_Hz`·`_TranslationRamp*_Pct`·`_TranslationAutoSpeedCap_Pct`
+**PERSISTENT** : `_TranslationMaxFreq_Hz`(60)·`_TranslationRampAccelRate_Pct`(20)·`_TranslationRampDecelNormal_Pct`(40)·`_TranslationRampDecelFast_Pct`(100)·`_TranslationAutoSpeedCap_Pct`(40)
+**Reset** : `PRG_09_Supervision.FaultMachineReset_IHM` = `GVL_IHM.Modes.FaultMachineReset` OR `CmdReset` M1/M2/Bucket — ⚠️ **pas de CmdReset propre à M3**
 **📎 Diagrammes** : `DOC/DIAGRAMS/CODE/DIAG_CODE_TranslationM3_HiFi.png`
 
 ---
 
+## 🎚️ Modes réels (`E_Mode` : DISABLE=0·MAINT_N1=1·MAINT_N2=2·SEMI_AUTO=3 — **pas de mode MANUAL**)
+
 **🔄 SEMI_AUTO** — cycle choisit la cible, sens automatique, opérateur valide au joystick
-- Cible depuis `PRG_05_Cycle.instCycle.CmdTranslationM3_Target`
-- Direction : cible=1(Trémie) → +1, cible={2,3,4} → -1
-- Vitesse plafonnée à `_TranslationAutoSpeedCap_Pct` (40%) × déflexion joystick
-- ✅ `CmdCycleStart`·`DeadmanArmed`·`AxisCmdX.StartStop`
-- ❌ capteur cible déjà atteint·⚠️ PV ralentit si Dir=+1
+- Cible : `PRG_05_Cycle.instCycle.CmdTranslationM3_Target` (1=Trémie→Dir+1 ; 2/3/4→Dir-1)
+- Vitesse : `MIN(_TranslationAutoSpeedCap_Pct, ABS(AxisCmdX.SpeedRef))` — **MIN(40%, déflexion)**, pas un produit
+- ✅ `instCycle.CmdTranslationM3_Start`·`FB_Joystick_0.DeadmanArmed`·`FB_Joystick_0.AxisCmdX.StartStop`
+- ⚠️ `TranslationPosPV` (SlowdownSensor) ralentit si Dir=+1
 
-**🎮 MAINT_N1/N2 — boutons IHM** (`JoystickSelect=FALSE`)
-- Direction par `ReqFwd`(=+1) ou `ReqRev`(=-1)
-- Vitesse = `FreqSetpoint_Hz` (100% de la consigne opérateur)
-- ✅ `DeadmanArmed`·`ReqFwd`(ou `ReqRev`)·direction≠0
-- ❌ `AxisCmdX.StartStop` PAS nécessaire
+**🎮 MAINT_N1/N2 — boutons IHM** (`GVL_IHM.TranslationM3.JoystickSelect=FALSE`)
+- Direction : `ReqFwd`(=+1) ou `ReqRev`(=-1)
+- Vitesse : `FreqSetpoint_Hz` (pleine consigne opérateur, convertie en % de `_TranslationMaxFreq_Hz`)
+- ✅ `DeadmanArmed`·`ReqFwd`(ou `ReqRev`)
+- ❌ `AxisCmdX.StartStop` PAS nécessaire (bypass si `JoystickSelect=FALSE`)
+- ⚠️ **PIÈGE (PRG_07 L69-70)** : si NI `ReqFwd` NI `ReqRev`, la direction retombe sur `AxisCmdX.Direction` (joystick) → bouger le joystick X avec deadman armé fait bouger M3 à **pleine consigne** `FreqSetpoint_Hz`
 
-**🕹️ MAINT_N1/N2 — joystick** (`JoystickSelect=TRUE`)
-- Direction depuis joystick axe X
-- Vitesse = déflexion joystick (%) × `FreqSetpoint_Hz` × `_TranslationMaxFreq_Hz`
+**🕹️ MAINT_N1/N2 — joystick** (`GVL_IHM.TranslationM3.JoystickSelect=TRUE`)
+- Direction : `AxisCmdX.Direction`
+- Vitesse : `Hz = déflexion joystick (%) × FreqSetpoint_Hz` (formule : `(ABS(SpeedRef)/100) × FreqPct`, `FreqPct = FreqSetpoint_Hz/_TranslationMaxFreq_Hz×100`)
 - ✅ `DeadmanArmed`·`AxisCmdX.StartStop`·`AxisCmdX.Direction≠0`
 
-**🕹️ MANUAL** — joystick direct, pas de deadman
-- Direction + vitesse depuis joystick (brut)
-- ✅ `AxisCmdX.StartStop`·`AxisCmdX.Direction≠0`
-- ❌ **pas de DeadmanArmed** (contrôle direct)
+**🚫 DISABLE (branche ELSE PRG_07 L89-95)** : consignes joystick recopiées MAIS `Enable=FALSE` (Mode=DISABLE) → FB neutralisé, **aucun mouvement possible**. Branche morte — ne PAS croire à un "mode manuel sans deadman".
+
+- Cible maintenance : `SelectedTargetNum` ← `GVL_IHM.TranslationM3.SelectedTargetNum` (via `StubTranslationPositionSelect_IHM`, PRG_09 L46)
 
 ---
 
 **🚫 Bloqueurs communs à TOUS les modes** (en plus de COMMUN)
-- ❌ `LimitSwitchFwd` (si Dir=+1)·`LimitSwitchRev` (si Dir=-1)
-- ❌ `ArrivalLock` (capteur cible verrouillé)
-- ❌ `TargetReached` (cible déjà atteinte)
-- ❌ Cible 4 (Maintenance) si pas MAINT_N2
+- ❌ `instPositionDecoder.LimitSwitchFwd` (si Dir=+1)·`LimitSwitchRev` (si Dir=-1)
+- ❌ `ArrivalLock` (interne FB_Translation : arrêt verrouillé sur capteur cible tant que même direction)
+- ❌ `TargetReached` (capteur cible sélectionnée actif, après debounce)
+- ❌ Cible 4 (Maintenance) refusée si `NOT instModes.MaintenanceM3TargetEnable` (MAINT_N2 requis)
+- ⏱️ Interlock changement de sens : `DirectionInterlockDelay` 200 ms à l'arrêt
 
-**📌 Positions cibles** : 1=Trémie·2=P2·3=P1·4=Maintenance·PV=jamais une cible (ralentissement seul)
-**📌 Capteurs** : `SensorsWord` bit4=Trémie bit3=PV bit2=P2 bit1=P1 bit0=Maint — mots valides `11111→01111→00111→00011→00001→00000`
+**📌 Cibles** : 1=Trémie·2=P2·3=P1·4=Maintenance·PV=jamais une cible (ralentissement seul, Dir=+1)
+**📌 Capteurs** : `PRG_00_Inputs.TranslationPosTremie/PosPV/PosP2/PosP1/PosMaintenance` → `instPositionDecoder.SensorsWord` bit4=Trémie bit3=PV bit2=P2 bit1=P1 bit0=Maint — mots valides `11111→01111→00111→00011→00001→00000`
 
 ## 🧩 Systèmes périphériques (impact M3)
 
-**🔬 Simulation** (`GVL_Simulation`) : `SimulationModeActive` verrouille les overrides IHM (PRG_09 L50-61). Flags `*_IsReal` = FALSE → valeurs forcées saines, TRUE → valeurs réelles
-- `ContactorFeedbackM3_IsReal=FALSE` → brake feedback bypassé (cohérence forcée)
-- `BrakeThermal_IsReal=FALSE` → thermique frein forcé sain (évite bit3 en simulation)
-- `EmergencyStopChain_IsReal=FALSE` → `ESOk` forcé TRUE
-- `PhaseRotationOk_IsReal=FALSE` → rotation phases forcée OK
-- `Joystick_IsReal=FALSE` → CAN joystick forcé online
-- `IhmHeartbeat_IsReal=FALSE` → heartbeat IHM forcé OK
+**🔬 Simulation** (`GVL_Simulation`) : bit maître `SimulationModeActive` (défaut TRUE). Device simulé = `SimulationModeActive AND NOT <Device>_IsReal` → forcé sain
+- `VariateurM3_IsReal` : AC600 EtherCAT (Online/Operational forcés OK sinon)
+- `ContactorFeedbackM3_IsReal` : retour frein M3 — pilote `BypassContactorCheck` (PRG_07 L140) ET `GVL_IHM.TranslationM3.BypassContactorFeedback` (PRG_09 L274)
+- `BrakeThermal_IsReal` : thermique frein commun M1/M2/M3 (bit3)
+- `EmergencyStopChain_IsReal` : chaîne AU (`EmergencyStopOk`)
+- `PhaseRotationOk_IsReal` : rotation phases (bit2)
+- `Joystick_IsReal` : bus/nœud CANopen (bit0) — ≠ `JoystickSignal_IsReal` (signal brut RawX/RawY seul)
+- `IhmHeartbeat_IsReal` : heartbeat simulé par `GVL_Global.BlinkClock` si FALSE
+- `TranslationPosition_IsReal` : 5 capteurs position (sinon `FB_Sim_Translation`)
 
-**🧪 Tests overrides** (PRG_09 L48-61, ACTIFS uniquement si `SimulationModeActive`) :
-- `TestSensorsWordActive` + `TestSensorsWord` → force mot capteurs (test cohérence bit7)
-- `TestAtTremie` → force capteur Trémie (test limite bit6)
-- `TestBrakeStuckOpen` → force feedback frein collé (test Méca B bit4)
-- `TestPhantomFreq` → force fréquence fantôme (test Méca A bit5)
+**🧪 Overrides test** (`GVL_IHM.TranslationM3.Test*` → `GVL_PLC_Tests.OverrideM3*`, PRG_09 L50-61 — forcés FALSE hors `SimulationModeActive`) :
+- `TestSensorsWordActive`+`TestSensorsWord` → `OverrideM3SensorsWord` (test bit7 incohérence)
+- `TestAtTremie` → `OverrideM3AtTremie` (test bit6 limite)
+- `TestBrakeStuckOpen` → `OverrideM3BrakeStuckOpen` (test Méca B bit4)
+- `TestPhantomFreq` → `OverrideM3PhantomFreq` (test Méca A bit5)
 
-**📡 Périphériques externes** :
-- **CAN joystick** : `DeviceJoystick.Offline` → bit0 SafeStop
-- **Heartbeat IHM** : perte toggle 2s → `HeartbeatIhmOk=FALSE` → bit0 SafeStop
-- **EtherCAT variateur** : `DeviceVariateur.Offline` → bit1 SafeStop
-- **AU chain** : `ESOk=FALSE` → SafeStop permanent + sorties physiques coupées
-- **Phase rotation** : `PhaseRotationOk=FALSE` → bit2 SafeStop
-- **Thermique frein commun M1/M2/M3** : `BrakeThermalFeedback=FALSE` → bit3 SafeStop+PwrCutOff
-- **RedundancyTestFailed** / **EmergencyArmingFailed** : bloquent l'armement AU → `ESOk=FALSE` indirect
+**📡 Périphériques externes** (entrées `FB_Safety_Translation`, câblées PRG_03_Safety L164+) :
+- CAN joystick : `JoystickOnline`/`JoystickOperational` (instDiagCanOpen) → bit0
+- Heartbeat IHM : `instIhmHeartbeat.HeartbeatIhmOk` (timeout `IhmTimeout`=2s sans front) → bit0
+- EtherCAT variateur : `DriveOnline`/`DriveOperational` (instDiagEthercat.DeviceVariateur*) → bit1
+- Chaîne AU : `EmergencyStopOk=FALSE` → `SafeStop` direct (L188 : `SafeStop := Error OR NOT EmergencyStopOk`)
+- Rotation phases : `PhaseRotationOk` (PRG_00_Inputs) → bit2
+- Thermique frein commun : `BrakeThermalFeedback=TRUE` → bit3
+- Réarmement AU : `RedundancyTestFailed`/`EmergencyArmingFailed` (PRG_10_Outputs) bloquent le réarmement → `EmergencyStopOk` reste FALSE
 
-**📊 Sévérité** : `PowerCutOff` (bits 3-7) > `SafeStop` (bits 0-7 + !ESOk) > `StartStop bloqué` (Deadman·AxisCmdX.StartStop·ReqFwd/Rev = FALSE, pas de défaut)
+**📊 Sévérité** : `PowerCutOff` (bits 3-7, masque `16#00F8`) > `SafeStop` (tout bit OU `NOT EmergencyStopOk`) > pas de mouvement sans défaut (`DeadmanArmed`/`StartStop`/`ReqFwd`/`ReqRev` absents)
 
 ## 🔧 Dépannage
 
 | Problème | Voir |
 |----------|------|
-| Rien (DISABLED) | Enable/ESOk/Deadman manquants |
-| StartStop validé mais rien | `SafeStop` actif → `FB_Safety_Translation.ErrorId` |
-| Erreur directe | `FB_Translation.ErrorId` bit0=frein·bit3=variateur·bit6=FdC |
+| Rien (DISABLED) | `StubMachineEnableN1`·Mode=DISABLE·`EmergencyStopOk` |
+| StartStop validé mais rien | `SafeStop` actif → `instSafetyTranslationM3.ErrorId` |
+| Erreur directe | `instTranslationM3.ErrorId` bit0=frein·bit3=variateur (DriveStatusWord.4)·bit6=FdC |
 | Bloqué sur cible | `ArrivalLock` → repartir en sens inverse |
-| Pas assez de vitesse | `_TranslationMaxFreq_Hz`=60Hz·`_TranslationAutoSpeedCap_Pct`=40% |
+| Bouge sans bouton en MAINT | Piège joystick fallback (PRG_07 L69-70) — voir ⚠️ ci-dessus |
+| Pas assez de vitesse | `_TranslationMaxFreq_Hz`=60·`_TranslationAutoSpeedCap_Pct`=40·`FreqSetpoint_Hz` IHM |
+| Défaut ne s'efface pas | Reset = front `GVL_IHM.Modes.FaultMachineReset` (pas de CmdReset M3) + cause disparue |
 
-## 🛡️ FB_Safety_Translation — ErrorId
+## 🛡️ FB_Safety_Translation — ErrorId (sorties décapsulées pour IHM)
 
-| bit | Défaut | Effet |
-|-----|--------|-------|
-| 0 | Perte opérateur (CAN joystick ou heartbeat IHM) | SafeStop |
-| 1 | Perte EtherCAT variateur | SafeStop |
-| 2 | Rotation phases | SafeStop |
-| 3 | Surchauffe frein commun M1/M2/M3 | SafeStop + PwrCutOff |
-| 4 | Méca B — incohérence arrêt (variateur tourne/frein ouvert malgré ordre arrêt) | SafeStop + PwrCutOff |
-| 5 | Méca A — mouvement non commandé (fréquence >0.5Hz à l'arrêt) | SafeStop + PwrCutOff |
-| 6 | Fin de course extrême | SafeStop + PwrCutOff |
-| 7 | Incohérence mot capteurs position (hors progression valide) | SafeStop + PwrCutOff |
+| bit | Sortie BOOL | Défaut | Effet |
+|-----|-------------|--------|-------|
+| 0 | `ErrorOperatorComm` | Perte opérateur (CAN joystick OU heartbeat IHM) | SafeStop |
+| 1 | `ErrorDriveComm` | Perte EtherCAT variateur | SafeStop |
+| 2 | `ErrorPhaseRotation` | Rotation phases | SafeStop |
+| 3 | `ErrorBrakeThermal` | Surchauffe frein commun M1/M2/M3 | SafeStop + PowerCutOff |
+| 4 | `ErrorMecaB` | Méca B — variateur tourne/frein ouvert malgré ordre arrêt (>3s) | SafeStop + PowerCutOff |
+| 5 | `ErrorMecaA` | Méca A — fréquence >0.5 Hz à l'arrêt (>1s) | SafeStop + PowerCutOff |
+| 6 | `ErrorLimitSwitch` | Fin de course extrême | SafeStop + PowerCutOff |
+| 7 | `ErrorSensorIncoherent` | Mot capteurs hors progression valide | SafeStop + PowerCutOff |
