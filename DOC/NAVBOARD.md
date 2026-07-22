@@ -1,24 +1,43 @@
-# 🧭 NAVBOARD
+# 🧭 NAVBOARD — Translation M3
 
-COMMUN: ✅Enable·✅ESOk·✅Deadman  ❌SafeStop·❌Error·❌PwrCutOff·❌ModeDISABLE·❌Inhibit
+**Fichiers** : `PRG_07_TranslationControl` · `FB_Translation` · `FB_Safety_Translation` · `FB_Translation_PositionDecoder`
+**IHM** : `ST_TranslationHMI` → `GVL_IHM.TranslationM3`
+**PERSISTENT** : `_TranslationMaxFreq_Hz`·`_TranslationRampAccelRate_Pct`·`_TranslationRampDecelNormal_Pct`·`_TranslationRampDecelFast_Pct`·`_TranslationAutoSpeedCap_Pct`
+**📎 Diagrammes** : `DOC/DIAGRAMS/CODE/DIAG_CODE_TranslationM3_HiFi.png`
 
-↔️ M3 Avancer: ✅StartStop·✅Dir=1·✅ModeOK  ❌LimitFwd·❌ArrivalLock·❌TargetReached·❌MaintTarget
-↔️ M3 Reculer: ✅StartStop·✅Dir=-1·✅ModeOK ❌LimitRev·❌ArrivalLock·❌TargetReached·❌MaintTarget
+## ✅ Avancer / Reculer
 
-🪣 M1 Descendre: ✅StartStop·✅Dir=1·✅Homed·✅Jsy{1,3}  ❌ForbidDescent·❌CableDescent·❌LimitLegal·❌StepMax·❌BenneBusy·❌SyncBlkDn·❌EncoderKO
-🪣 M1 Monter:    ✅StartStop·✅Dir=-1·✅Homed·✅Jsy{1,3} ❌ForbidAscent·❌CableAscent·❌HomingTarget·❌BenneBusy·❌SyncBlkUp·❌EncoderKO
+**COMMUN** (toujours avant) : ✅Enable·✅ESOk·✅Deadman·❌SafeStop·❌Error·❌PwrCutOff·❌ModeDISABLE
 
-🪣 M2 Descendre: ✅StartStop·✅Dir=-1·✅Homed·✅Jsy{2,3} ❌ForbidDescent·❌CableDescent·❌LimitLegal·❌StepMax·❌BenneBusy·❌SyncBlkUp·❌EncoderKO
-🪣 M2 Monter:    ✅StartStop·✅Dir=1·✅Homed·✅Jsy{2,3}  ❌ForbidAscent·❌CableAscent·❌HomingTarget·❌M2Shift·❌BenneBusy·❌SyncBlkDn·❌EncoderKO
+**Avancer** (vers Trémie) : ✅StartStop·✅Dir=1·✅ModeOK  ❌LimitFwd·❌ArrivalLock·❌TargetReached·❌MaintTargetBlocked
+**Reculer** (vers P2/P1/Maint) : ✅StartStop·✅Dir=-1·✅ModeOK  ❌LimitRev·❌ArrivalLock·❌TargetReached·❌MaintTargetBlocked
 
-🗜️ Benne Fermer: ✅CloseReq·✅JsySS·✅JsyDir=1·✅Homed  ❌M1Busy·❌M2Busy·❌Incoherent·❌Timeout·❌Limites·❌Glissement·❌EncoderKO
-🗜️ Benne Ouvrir: ✅OpenReq·✅JsySS·✅JsyDir=-1·✅Homed  ❌M1Busy·❌M2Busy·❌Incoherent·❌Timeout·❌Limites·❌Glissement·❌EncoderKO
+## 🔧 Commissioning — si ça bouge pas
 
-🔄 →SEMI_AUTO: ✅ModeReq=SA·✅Ready·✅ESOk  ❌EncoderFault·❌Busy
-🔄 →MAINT_N1:  ✅ModeReq=N1·✅Ready·✅ESOk  ❌Busy·❌cycle
-🔄 →MAINT_N2:  ✅ModeReq=N2·✅Ready·✅ESOk  ❌Busy
-🔄 Réarmer:    ✅frontReset  ❌causeDefaut
+| Problème | Vérifier |
+|----------|----------|
+| Rien ne se passe | `GVL_IHM.TranslationM3.FBState` = DISABLED ? → Enable/ESOk/Deadman manquants |
+| StartStop validé mais pas de mouvement | `SafeStop` = 1 ? → Regarder `FB_Safety_Translation.ErrorId` |
+| Défaut direct | `FB_Translation.ErrorId` → bit0=frein, bit3=variateur, bit6=FdC |
+| Arrivé sur cible et bloqué | `ArrivalLock` actif → remettre en marche arrière pour dégager |
+| Vitesse max trop faible | `_TranslationMaxFreq_Hz` (60 Hz) / `DriveFreqScaleMaxHz` = 60 |
+| Ralentissement trop tôt / trop tard | `ApproachSpeedPct` (20%) / capteur PV en ligne ? |
 
-📌 Jsy{1,3}=JoystickWinchSelect {1,3}M1/{2,3}M2 · SyncBlk=écart synchro directionnel
-📌 M2Shift=butée+OffsetCloseM · LimitLegal=_LimitLegalEnabled+pos≤_LimitLegalDepthMinAllowed
-📌 EncoderKO=!Available ou !Homed/HomingSuspect · Incoherent=StateIncoherent/ErrorId.3
+## 📡 Capteurs position M3
+
+Mot des 5 capteurs : `SensorsWord` (BYTE) : bit4=Trémie bit3=PV bit2=P2 bit1=P1 bit0=Maint
+Mots valides (progression monotone) : `11111→01111→00111→00011→00001→00000`
+Toute autre combinaison = `SensorWordIncoherent` → SafeStop + PowerCutOff
+
+## 🛡️ FB_Safety_Translation — ErrorId bits
+
+| bit | Défaut | Effet |
+|-----|--------|-------|
+| 0 | Perte opérateur (joystick CAN ou heartbeat IHM) | SafeStop |
+| 1 | Perte EtherCAT variateur | SafeStop |
+| 2 | Rotation phases | SafeStop |
+| 3 | Surchauffe frein commun | SafeStop + PowerCutOff |
+| 4 | Méca B — incohérence arrêt (variateur tourne ou frein ouvert malgré arrêt) | SafeStop + PowerCutOff |
+| 5 | Méca A — mouvement non commandé (fréquence > 0.5 Hz à l'arrêt) | SafeStop + PowerCutOff |
+| 6 | Fin de course extrême | SafeStop + PowerCutOff |
+| 7 | Incohérence mot capteurs position | SafeStop + PowerCutOff |
