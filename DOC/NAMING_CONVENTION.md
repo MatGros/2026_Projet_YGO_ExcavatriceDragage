@@ -229,16 +229,16 @@ réglage figé.
 ```
 Reset, Enable, StartStop
 ```
- 
+
 **Sorties** → état/propriété :
 ```
 Ready, Busy, Done, Error
 IsOverload, HasFault
 SafeStop            → sortie d'un bloc safety métier (état, pas une commande)
 ```
- 
+
 ---
- 
+
 ## Suffixes d'unité (règle stricte)
 Toujours précédés d'un underscore `_` pour lisibilité immédiate (évite la confusion `CablePosM` vs `CablePos_M`) :
 ```
@@ -266,7 +266,31 @@ Les variables déclarées dans la liste globale persistante (`GVL_PERSISTENT.st`
 - `_WinchMaxStepDescent` (sans unité, correction linguistique de "Descente" en "Descent")
 
 ---
- 
+
+## Variables IHM (structures ST_*HMI) — Préfixes sémantiques (collés)
+
+Les structures d'échange IHM (`ST_WinchHMI`, `ST_BucketHMI`, `ST_TranslationHMI`, `ST_ModesHMI`, `ST_JoystickHMI`, `ST_SyncHMI`, `ST_CycleHMI`, `ST_CommunHMI`) suivent une convention de préfixes **sans underscore après le préfixe** — format `<Préfixe><PascalCase>` (ex: `BtnReset`, `SelTarget`, `SetFreqHz`).
+
+| Préfixe | Sémantique | Exemple | Cycle de vie |
+|---|---|---|---|
+| `Btn` | Bouton impulsionnel (IHM → PLC, front) | `BtnReset`, `BtnHome`, `BtnOpen` | Consommé par `R_TRIG` / `F_TRIG` |
+| `Sel` | Sélecteur / Choix maintenu (IHM → PLC) | `SelMode`, `SelTarget`, `SelWinchMode` | Valeur persistante, `INT`/`ENUM` |
+| `Set` | Consigne numérique exploitable (IHM → PLC) | `SetFreqHz`, `SetDepthM`, `SetSpeedPct` | Bornée PLC, modifiable en mouvement |
+| `Tgl` | Bascule / Toggle booléen (IHM ↔ PLC) | `TglJoystickMaster`, `TglBypassContactor` | État persistant `TRUE`/`FALSE` |
+| `Cfg` | Paramètre de configuration / mise en service (RETAIN) | `CfgTopSensorPos_M`, `CfgRampAccelRate` | Rarement modifié, souvent `RETAIN` |
+| `Tst` | Commande de test banc uniquement | `TstSensorsWord`, `TstBrakeStuckOpen` | Jamais en production, `GVL_Simulation` gate |
+
+**Règles strictes :**
+- **Jamais** de `Cmd` dans `ST_*HMI` — `Cmd` réservé aux signaux finaux vers actionneur/bus (niveau 2 pipeline `Req`→`Cmd`)
+- **Jamais** de `Req` dans `ST_*HMI` — `Req` = requête brute entrant dans arbitrage
+- **Pas d'underscore** après le préfixe — format `<Préfixe><PascalCase>` (ex: `BtnReset`, `SelTarget`, `SetFreqHz`)
+- Underscore **uniquement** pour suffixes d'unité (`_M`, `_Hz`, `_Pct`, `_Mps`, `_Ms`)
+- État (`Ready`, `Busy`, `Error`...), Mesure (`Position_M`, `Speed_Mps`...), Diagnostic (`ErrorId`...), Sortie physique (`RelayFwd`, `Brake`...) : **pas de préfixe**, forme établie conservée
+
+> ⚠️ **Migration** : toute modification de ces noms dans `CODE/SUPERVISION/*.st` casse les liaisons IHM (tags graphiques). Ne renommer **qu'en migration planifiée** (bundle PLCopenXML + mise à jour IHM simultanée, mapping `OldName → NewName` documenté). L'existant (`CmdReset`, `ReqFwd`, `FreqSetpoint_Hz`...) reste valide tant que la migration n'est pas décidée.
+
+---
+
 ## Construction d'un nom : instance → champ (2 niveaux, jamais mélangés)
 
 🔧 REX 2026-07-15 : formalisé après plusieurs allers-retours sur le Translation M3 — un nom se

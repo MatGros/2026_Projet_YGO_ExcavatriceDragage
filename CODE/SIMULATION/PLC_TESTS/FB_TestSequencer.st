@@ -58,6 +58,7 @@ VAR
     CaseIdx             : INT;
     CaseStartStep       : INT;
     CaseStep            : INT;
+    CaseWalkCount       : INT;
     CaseOk              : BOOL;
     CaseExecuted        : BOOL;
     CaseFailedStep      : INT;
@@ -521,9 +522,26 @@ IF Busy AND CurrentStepId = 0 THEN
             CaseDuration := T#0s;
             CaseFailReason := E_TestFailReason.FAIL_NONE;
             
-            // Parcourir la chaîne d'étapes à partir de FirstStep
+            // 🔒 Parcours borné et index validé AVANT déréférencement.
+            // CODESYS peut évaluer StepTable[CaseStep] même si CaseStep=0
+            // dans une condition composée : ancienne version = Access Violation CPU.
             CaseStep := CaseStartStep;
-            WHILE CaseStep > 0 AND StepTable[CaseStep].CaseId = CaseIdx DO
+            FOR CaseWalkCount := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
+                IF CaseStep = 0 THEN
+                    EXIT;
+                END_IF;
+                IF CaseStep < 1 OR CaseStep > GVL_PLC_Tests_Const.MaxSteps THEN
+                    ConfigError := TRUE;
+                    ConfigErrorStepId := CaseStep;
+                    ErrorCode := 1004;
+                    ErrorMessage := 'Agregation : etape hors limites';
+                    CaseOk := FALSE;
+                    EXIT;
+                END_IF;
+                IF StepTable[CaseStep].CaseId <> CaseIdx THEN
+                    EXIT;
+                END_IF;
+
                 IF Report.Steps[CaseStep].Executed THEN
                     CaseExecuted := TRUE;
                     CaseDuration := CaseDuration + Report.Steps[CaseStep].Duration;
@@ -531,16 +549,21 @@ IF Busy AND CurrentStepId = 0 THEN
                         CaseOk := FALSE;
                         CaseFailedStep := CaseStep;
                         CaseFailReason := Report.Steps[CaseStep].FailReason;
+                        CaseStep := StepTable[CaseStep].NextOnFail;
+                    ELSE
+                        CaseStep := StepTable[CaseStep].NextOnPass;
                     END_IF;
-                END_IF;
-                
-                // Suivre NextOnPass ou NextOnFail selon l'exécution réelle
-                IF Report.Steps[CaseStep].Executed AND NOT Report.Steps[CaseStep].Passed THEN
-                    CaseStep := StepTable[CaseStep].NextOnFail;
                 ELSE
                     CaseStep := StepTable[CaseStep].NextOnPass;
                 END_IF;
-            END_WHILE;
+            END_FOR;
+            IF CaseStep <> 0 AND CaseWalkCount > GVL_PLC_Tests_Const.MaxSteps THEN
+                ConfigError := TRUE;
+                ConfigErrorStepId := CaseStep;
+                ErrorCode := 1005;
+                ErrorMessage := 'Agregation : cycle de transitions';
+                CaseOk := FALSE;
+            END_IF;
             
             Report.Cases[CaseIdx].Name := CaseTable[CaseIdx].Name; // 🏷️ Lisible directement en Watch, sans chercher l'index
             Report.Cases[CaseIdx].Executed := CaseExecuted;

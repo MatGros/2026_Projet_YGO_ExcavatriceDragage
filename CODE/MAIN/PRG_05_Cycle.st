@@ -34,8 +34,8 @@ CmdStartCycle_IHM := GVL_IHM.Cycle.CmdStart;
 CmdPauseCycle_IHM := GVL_IHM.Cycle.CmdPause;
 CmdAbortCycle_IHM := GVL_IHM.Cycle.CmdAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.CmdReset;
-TargetDepthM      := GVL_IHM.Cycle.TargetDepth_M;
-TargetOffsetM     := GVL_IHM.Cycle.TargetOffset_M;
+TargetDepthM      := GVL_IHM.Cycle.TargetDepthM;
+TargetOffsetM     := GVL_IHM.Cycle.TargetOffsetM;
 GVL_Simulation.KoboldContactFond_Simulated := GVL_IHM.Cycle.SimKoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
@@ -61,7 +61,7 @@ instCycle(
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
-    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M,
+    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed,
     WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -87,7 +87,7 @@ instCycle(
     Benne_IsClosed    := _BucketState.IsClosed
 );
 
-GVL_IHM.Cycle.SpeedMismatch_Mps        := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.SpeedMismatchMps         := instCycle.SpeedMismatchMps;
 GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
 GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 

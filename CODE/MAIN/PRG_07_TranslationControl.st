@@ -15,6 +15,7 @@ VAR
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
     M3_SpeedRef_Active      : REAL;
+    M3_PositioningActive    : BOOL;
     M3_PositionSensorTarget : BOOL;
 
     // Target active (HMI en manuel, instCycle en auto) — 0=Aucun, 1=Trémie, 2=P2, 3=P1,
@@ -33,6 +34,7 @@ END_VAR
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
+    M3_PositioningActive  := TRUE;
     SelectedTargetNum    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
@@ -59,15 +61,23 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 // FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
 ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
    OR (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
-    // 🛠️ Maintenance N1/N2 : commandes dédiées TranslationM3 ou joystick.
-    SelectedTargetNum := StubTranslationPositionSelect_IHM;
+    // 🛠️ Maintenance N1/N2 : sous-mode explicite IHM.
+    // PositioningSelect=FALSE : jog libre, aucun capteur n'arrête hors fins de course.
+    // PositioningSelect=TRUE : le capteur de SelectedTargetNum arrête le mouvement.
+    M3_PositioningActive := GVL_IHM.TranslationM3.PositioningSelect;
+    SelectedTargetNum := SEL(M3_PositioningActive,
+                             0,
+                             StubTranslationPositionSelect_IHM);
 
     IF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqFwd THEN
         M3_Direction_Active := 1;
     ELSIF NOT GVL_IHM.TranslationM3.JoystickSelect AND GVL_IHM.TranslationM3.ReqRev THEN
         M3_Direction_Active := -1;
-    ELSE
+    ELSIF GVL_IHM.TranslationM3.JoystickSelect THEN
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
+    ELSE
+        // Boutons sélectionnés sans ReqFwd/ReqRev : jamais de reprise joystick implicite.
+        M3_Direction_Active := 0;
     END_IF;
     // 🛡️ REX 2026-07-19 (revue mission IHM_MANU) : DeadmanArmed exigé même en pilotage boutons
     // IHM (ReqFwd/ReqRev), pas seulement en pilotage joystick — sinon les boutons IHM
@@ -82,12 +92,13 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : FreqSetpointHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
-    FreqPct := (GVL_IHM.TranslationM3.FreqSetpoint_Hz / _TranslationMaxFreq_Hz) * 100.0;
+    FreqPct := (GVL_IHM.TranslationM3.FreqSetpointHz / _TranslationMaxFreq_Hz) * 100.0;
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.JoystickSelect,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
     // Mode Manuel/Maintenance : Consignes issues du Joystick et sélecteur HMI
+    M3_PositioningActive := FALSE;
     SelectedTargetNum    := StubTranslationPositionSelect_IHM;
     M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
     M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;

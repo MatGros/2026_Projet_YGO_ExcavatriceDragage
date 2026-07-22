@@ -19,6 +19,8 @@ VAR_GLOBAL
     // (ex. SuiteWinchValidation à venir), jamais un index à retenir.
     SuiteSafetyValidation      : ST_TestSuiteReport;  // Rapport de la suite Safety
     SuiteTranslationValidation : ST_TestSuiteReport;  // Rapport de la suite Translation M3
+    SuiteTranslationResult     : ST_TranslationTestResult; // 🆕 Résultat plat clair Translation
+    FrameworkResult            : ST_TestFrameworkResult;   // 🧪 Autotest indépendant du framework
     SuiteBucketValidation      : ST_TestSuiteReport;  // Rapport de la suite Bucket
     SuiteEncoderValidation     : ST_TestSuiteReport;  // Rapport de la suite Codeurs/Homing nominal
     SuiteModesValidation       : ST_TestSuiteReport;  // Rapport de la suite Modes/Homme-mort (post-IHM_MANU)

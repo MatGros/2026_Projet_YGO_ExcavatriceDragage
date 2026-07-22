@@ -12,7 +12,7 @@ STRUCT
     (* 🚦 États & Retours (Lecture seule) *)
     State               : ST_BucketState;  (* 🚥 État mémorisé (IsOpen, IsClosed, etc.) *)
     FBState             : E_State;          (* 🤖 État de l'automate interne (FB_Bucket) *)
-    ActiveOffset_M       : REAL;             (* 📐 Offset actif injecté dans la synchro *)
+    ActiveOffsetM        : REAL;             (* 📐 Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* 🛗 Commande Start/Stop forcée vers M2 *)
     M2Direction         : INT;              (* 🛗 Commande direction forcée vers M2 *)
     M2ForceSlowSpeed    : BOOL;             (* 🐢 Blocage vitesse rapide de M2 *)
@@ -21,7 +21,7 @@ STRUCT
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
     Error               : BOOL;             (* 🔴 Benne en défaut *)
     ErrorId             : WORD;             (* ❌ Code bitfield du défaut benne *)
-    RemainingTravel_M    : REAL;             (* 📏 REX 2026-07-07 : distance restante avant cible (m),
+    RemainingTravelM     : REAL;             (* 📏 REX 2026-07-07 : distance restante avant cible (m),
                                                 pour jauge/aiguille IHM — 0.0 hors mouvement *)
     CloseReq            : BOOL;             (* 🆕 REX 2026-07-08 : demande de fermeture active (image FB_Bucket) —
                                                 FALSE dès la cible atteinte OU le retour à la position de départ *)

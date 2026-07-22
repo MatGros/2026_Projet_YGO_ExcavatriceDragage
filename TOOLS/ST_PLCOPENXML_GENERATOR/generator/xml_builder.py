@@ -306,8 +306,30 @@ def _build_globalvars_data(
     if "CONSTANT" in block.qualifiers:
         global_vars.set("constant", "true")
 
-    for var in block.variables:
-        global_vars.append(_variable_element(var, objects_by_name, diagnostics, obj.name))
+    for persistent_index, var in enumerate(block.variables):
+        variable = _variable_element(var, objects_by_name, diagnostics, obj.name)
+        if "PERSISTENT" in block.qualifiers:
+            # CODESYS requires this per-variable attribute to import a PERSISTENT GVL.
+            # Without it, variable documentation is parsed as invalid ST declaration text.
+            variable_adddata = ET.Element("addData")
+            attributes_data = ET.SubElement(variable_adddata, "data")
+            attributes_data.set("name", "http://www.3s-software.com/plcopenxml/attributes")
+            attributes_data.set("handleUnknown", "implementation")
+            attributes_el = ET.SubElement(attributes_data, "Attributes")
+            attribute = ET.SubElement(attributes_el, "Attribute")
+            attribute.set("Name", "order_in_persistent_editor")
+            attribute.set("Value", str(persistent_index))
+            documentation_index = next(
+                (index for index, child in enumerate(variable) if child.tag == "documentation"),
+                len(variable),
+            )
+            variable.insert(documentation_index, variable_adddata)
+            # CODESYS 3.5 imports PERSISTENT variable XHTML documentation as ST text
+            # on this target. Keep the source comments, but omit XML documentation.
+            for child in list(variable):
+                if child.tag == "documentation":
+                    variable.remove(child)
+        global_vars.append(variable)
 
     if obj.attribute_pragmas:
         adddata = ET.SubElement(global_vars, "addData")
@@ -332,7 +354,7 @@ def _build_globalvars_data(
         object_id_el = ET.SubElement(data_el, "ObjectId")
         object_id_el.text = guid
 
-    if obj.header_comment:
+    if obj.header_comment and "PERSISTENT" not in block.qualifiers:
         global_vars.append(_documentation(obj.header_comment))
 
     return data
