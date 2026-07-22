@@ -43,6 +43,33 @@
 **📌 Positions cibles** : 1=Trémie·2=P2·3=P1·4=Maintenance·PV=jamais une cible (ralentissement seul)
 **📌 Capteurs** : `SensorsWord` bit4=Trémie bit3=PV bit2=P2 bit1=P1 bit0=Maint — mots valides `11111→01111→00111→00011→00001→00000`
 
+## 🧩 Systèmes périphériques (impact M3)
+
+**🔬 Simulation** (`GVL_Simulation`) : `SimulationModeActive` verrouille les overrides IHM (PRG_09 L50-61). Flags `*_IsReal` = FALSE → valeurs forcées saines, TRUE → valeurs réelles
+- `ContactorFeedbackM3_IsReal=FALSE` → brake feedback bypassé (cohérence forcée)
+- `BrakeThermal_IsReal=FALSE` → thermique frein forcé sain (évite bit3 en simulation)
+- `EmergencyStopChain_IsReal=FALSE` → `ESOk` forcé TRUE
+- `PhaseRotationOk_IsReal=FALSE` → rotation phases forcée OK
+- `Joystick_IsReal=FALSE` → CAN joystick forcé online
+- `IhmHeartbeat_IsReal=FALSE` → heartbeat IHM forcé OK
+
+**🧪 Tests overrides** (PRG_09 L48-61, ACTIFS uniquement si `SimulationModeActive`) :
+- `TestSensorsWordActive` + `TestSensorsWord` → force mot capteurs (test cohérence bit7)
+- `TestAtTremie` → force capteur Trémie (test limite bit6)
+- `TestBrakeStuckOpen` → force feedback frein collé (test Méca B bit4)
+- `TestPhantomFreq` → force fréquence fantôme (test Méca A bit5)
+
+**📡 Périphériques externes** :
+- **CAN joystick** : `DeviceJoystick.Offline` → bit0 SafeStop
+- **Heartbeat IHM** : perte toggle 2s → `HeartbeatIhmOk=FALSE` → bit0 SafeStop
+- **EtherCAT variateur** : `DeviceVariateur.Offline` → bit1 SafeStop
+- **AU chain** : `ESOk=FALSE` → SafeStop permanent + sorties physiques coupées
+- **Phase rotation** : `PhaseRotationOk=FALSE` → bit2 SafeStop
+- **Thermique frein commun M1/M2/M3** : `BrakeThermalFeedback=FALSE` → bit3 SafeStop+PwrCutOff
+- **RedundancyTestFailed** / **EmergencyArmingFailed** : bloquent l'armement AU → `ESOk=FALSE` indirect
+
+**📊 Sévérité** : `PowerCutOff` (bits 3-7) > `SafeStop` (bits 0-7 + !ESOk) > `StartStop bloqué` (Deadman·AxisCmdX.StartStop·ReqFwd/Rev = FALSE, pas de défaut)
+
 ## 🔧 Dépannage
 
 | Problème | Voir |
