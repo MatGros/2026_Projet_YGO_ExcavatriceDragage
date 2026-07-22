@@ -350,7 +350,7 @@ La source unique de commande et de diagnostic du cycle est `GVL_IHM.Cycle`.
 Les commandes `CmdStart`, `CmdPause`, `CmdAbort` et `CmdReset` sont des impulsions
 acquittées automatiquement par le PLC, même si la GVL est déclarée `RETAIN`.
 
-La cible de travail reste portée par `GVL_IHM.TranslationM3.SelectedTargetNum` :
+La cible de travail reste portée par `GVL_IHM.M3Translation.SelectedTargetNum` :
 `2=P2` ou `3=P1`. Toute autre valeur au démarrage est refusée avec `ErrorId` bit 2.
 
 Le mouvement du cycle est conditionné par `GVL_IHM.Cycle.MotionPermit`, issu de

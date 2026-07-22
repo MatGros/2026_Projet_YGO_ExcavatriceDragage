@@ -140,10 +140,10 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.Cycle.CmdAbort := FALSE;
     GVL_IHM.Cycle.CmdReset := FALSE;
 
-    GVL_IHM.TranslationM3.SelPositioning := FALSE;
-    GVL_IHM.TranslationM3.BtnFwd := FALSE;
-    GVL_IHM.TranslationM3.BtnRev := FALSE;
-    GVL_IHM.JoystickJOY1.BtnCalibrate := FALSE;
+    GVL_IHM.M3Translation.SelPositioning := FALSE;
+    GVL_IHM.M3Translation.BtnFwd := FALSE;
+    GVL_IHM.M3Translation.BtnRev := FALSE;
+    GVL_IHM.JOY1Joystick.BtnCalibrate := FALSE;
 
     HmiCommandsInitialized := TRUE;
     GVL_IHM.HmiInitDone := TRUE;

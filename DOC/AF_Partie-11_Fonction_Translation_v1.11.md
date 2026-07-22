@@ -4,7 +4,7 @@
 
 ## 🕹️ Retour IHM déflexion joystick
 
-`GVL_IHM.TranslationM3.JoystickDeflectionPct` expose la déflexion fonctionnelle signée de
+`GVL_IHM.M3Translation.JoystickDeflectionPct` expose la déflexion fonctionnelle signée de
 l'axe X du joystick, issue de `FB_Joystick_0.AxisCmdX.SpeedRef` :
 
 | Valeur | Sens IHM |
@@ -15,7 +15,7 @@ l'axe X du joystick, issue de `FB_Joystick_0.AxisCmdX.SpeedRef` :
 
 Le signal est déjà calibré, filtré, rampé et borné par `FB_Joystick`. Il sert uniquement à
 l'animation fonctionnelle de la vue M3. Les valeurs brutes et diagnostics du joystick restent
-dans `GVL_IHM.JoystickJOY1` et ne sont pas dupliqués dans l'objet Translation.
+dans `GVL_IHM.JOY1Joystick` et ne sont pas dupliqués dans l'objet Translation.
 
 ## 📂 Sources CODESYS
 

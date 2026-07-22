@@ -43,16 +43,16 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.SelMode;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
-StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.SelTarget;
+StubTranslationPositionSelect_IHM          := GVL_IHM.M3Translation.SelTarget;
 
 // 🧪 Commandes de test Translation depuis la supervision.
 // Verrouillage obligatoire : aucune surcharge IHM ne peut être active hors simulation.
 IF GVL_Simulation.SimulationModeActive THEN
-    GVL_PLC_Tests.OverrideM3SensorsWordActive := GVL_IHM.TranslationM3.TstSensorsWordActive;
-    GVL_PLC_Tests.OverrideM3SensorsWord       := GVL_IHM.TranslationM3.TstSensorsWord;
-    GVL_PLC_Tests.OverrideM3AtTremie          := GVL_IHM.TranslationM3.TstAtTremie;
-    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := GVL_IHM.TranslationM3.TstBrakeStuckOpen;
-    GVL_PLC_Tests.OverrideM3PhantomFreq       := GVL_IHM.TranslationM3.TstPhantomFreq;
+    GVL_PLC_Tests.OverrideM3SensorsWordActive := GVL_IHM.M3Translation.TstSensorsWordActive;
+    GVL_PLC_Tests.OverrideM3SensorsWord       := GVL_IHM.M3Translation.TstSensorsWord;
+    GVL_PLC_Tests.OverrideM3AtTremie          := GVL_IHM.M3Translation.TstAtTremie;
+    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := GVL_IHM.M3Translation.TstBrakeStuckOpen;
+    GVL_PLC_Tests.OverrideM3PhantomFreq       := GVL_IHM.M3Translation.TstPhantomFreq;
 ELSE
     GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
     GVL_PLC_Tests.OverrideM3AtTremie          := FALSE;
@@ -133,8 +133,8 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 // homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.BtnHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
-// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JoystickJOY1.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
-// PRG_01_Diagnostics.FB_Joystick_0.BtnCalibrate := GVL_IHM.JoystickJOY1.BtnCalibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
+// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
+// PRG_01_Diagnostics.FB_Joystick_0.BtnCalibrate := GVL_IHM.JOY1Joystick.BtnCalibrate;  // ❌ supprimé : VAR locale non accessible en écriture (C0037)
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
@@ -274,7 +274,7 @@ GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 // TopPositionSensor passent dans Commun.Bypass (capteur physique UNIQUE partage M1/M2, plus de duplication).
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal;
 GVL_IHM.M2TreuilBucket.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal;
-GVL_IHM.TranslationM3.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal;
+GVL_IHM.M3Translation.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal;
 GVL_IHM.Commun.Bypass.SlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorSlackCableIsReal;
 GVL_IHM.Commun.Bypass.TopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTopPositionIsReal;
 
@@ -440,59 +440,59 @@ GVL_IHM.Sync.State      := PRG_06_WinchControl.instWinchSync.State;
 
 
 // ── 9. MAPPING ÉTATS TRANSLATION M3 → IHM ────────────────────────────────────
-GVL_IHM.TranslationM3.FBState              := PRG_07_TranslationControl.instTranslationM3.State;
-GVL_IHM.TranslationM3.Ready                := PRG_07_TranslationControl.instTranslationM3.Ready;
-GVL_IHM.TranslationM3.Busy                 := PRG_07_TranslationControl.instTranslationM3.Busy;
-GVL_IHM.TranslationM3.Done                 := PRG_07_TranslationControl.instTranslationM3.Done;
-GVL_IHM.TranslationM3.Error                := PRG_07_TranslationControl.instTranslationM3.Error;
-GVL_IHM.TranslationM3.ErrorId              := PRG_07_TranslationControl.instTranslationM3.ErrorId;
-GVL_IHM.TranslationM3.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
-GVL_IHM.TranslationM3.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
-GVL_IHM.TranslationM3.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
-GVL_IHM.TranslationM3.PositionReached      := PRG_07_TranslationControl.M3_PositioningActive
+GVL_IHM.M3Translation.FBState              := PRG_07_TranslationControl.instTranslationM3.State;
+GVL_IHM.M3Translation.Ready                := PRG_07_TranslationControl.instTranslationM3.Ready;
+GVL_IHM.M3Translation.Busy                 := PRG_07_TranslationControl.instTranslationM3.Busy;
+GVL_IHM.M3Translation.Done                 := PRG_07_TranslationControl.instTranslationM3.Done;
+GVL_IHM.M3Translation.Error                := PRG_07_TranslationControl.instTranslationM3.Error;
+GVL_IHM.M3Translation.ErrorId              := PRG_07_TranslationControl.instTranslationM3.ErrorId;
+GVL_IHM.M3Translation.BrakeCmd             := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
+GVL_IHM.M3Translation.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedback;
+GVL_IHM.M3Translation.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
+GVL_IHM.M3Translation.PositionReached      := PRG_07_TranslationControl.M3_PositioningActive
                                             AND PRG_07_TranslationControl.instTranslationM3.TargetReached;
-GVL_IHM.TranslationM3.JoystickDeflectionPct := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+GVL_IHM.M3Translation.JoystickDeflectionPct := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
 // 🧭 Position validée IHM : masquée (forcée à FALSE) si le mot capteurs est incohérent (position indéterminée)
 IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
-    GVL_IHM.TranslationM3.PositionTremie      := FALSE;
-    GVL_IHM.TranslationM3.PositionPV          := FALSE;
-    GVL_IHM.TranslationM3.PositionP2          := FALSE;
-    GVL_IHM.TranslationM3.PositionP1          := FALSE;
-    GVL_IHM.TranslationM3.PositionMaintenance := FALSE;
+    GVL_IHM.M3Translation.PositionTremie      := FALSE;
+    GVL_IHM.M3Translation.PositionPV          := FALSE;
+    GVL_IHM.M3Translation.PositionP2          := FALSE;
+    GVL_IHM.M3Translation.PositionP1          := FALSE;
+    GVL_IHM.M3Translation.PositionMaintenance := FALSE;
 ELSE
-    GVL_IHM.TranslationM3.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
-    GVL_IHM.TranslationM3.PositionPV          := PRG_00_Inputs.TranslationPosPV;
-    GVL_IHM.TranslationM3.PositionP2          := PRG_00_Inputs.TranslationPosP2;
-    GVL_IHM.TranslationM3.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-    GVL_IHM.TranslationM3.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+    GVL_IHM.M3Translation.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
+    GVL_IHM.M3Translation.PositionPV          := PRG_00_Inputs.TranslationPosPV;
+    GVL_IHM.M3Translation.PositionP2          := PRG_00_Inputs.TranslationPosP2;
+    GVL_IHM.M3Translation.PositionP1          := PRG_00_Inputs.TranslationPosP1;
+    GVL_IHM.M3Translation.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
 END_IF;
-GVL_IHM.TranslationM3.SensorsWord         := PRG_00_Inputs.instPositionDecoder.SensorsWord;
-GVL_IHM.TranslationM3.SensorWordIncoherent:= PRG_00_Inputs.instPositionDecoder.Incoherent;
-GVL_IHM.TranslationM3.LimitSwitchFwd     := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd;
-GVL_IHM.TranslationM3.LimitSwitchRev     := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev;
-GVL_IHM.TranslationM3.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
-GVL_IHM.TranslationM3.SimulationModeActive := GVL_Simulation.SimulationModeActive;
+GVL_IHM.M3Translation.SensorsWord         := PRG_00_Inputs.instPositionDecoder.SensorsWord;
+GVL_IHM.M3Translation.SensorWordIncoherent:= PRG_00_Inputs.instPositionDecoder.Incoherent;
+GVL_IHM.M3Translation.LimitSwitchFwd     := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd;
+GVL_IHM.M3Translation.LimitSwitchRev     := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev;
+GVL_IHM.M3Translation.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
+GVL_IHM.M3Translation.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
-GVL_IHM.TranslationM3.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.TranslationM3.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.M3Translation.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.M3Translation.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
-GVL_IHM.TranslationM3.DriveActualFreqHz     := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
-GVL_IHM.TranslationM3.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
-GVL_IHM.TranslationM3.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
-GVL_IHM.TranslationM3.SafetyErrorOperatorComm := PRG_03_Safety.instSafetyTranslationM3.ErrorOperatorComm;
-GVL_IHM.TranslationM3.SafetyErrorDriveComm    := PRG_03_Safety.instSafetyTranslationM3.ErrorDriveComm;
-GVL_IHM.TranslationM3.SafetyErrorPhaseRotation:= PRG_03_Safety.instSafetyTranslationM3.ErrorPhaseRotation;
-GVL_IHM.TranslationM3.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTranslationM3.ErrorBrakeThermal;
-GVL_IHM.TranslationM3.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaB;
-GVL_IHM.TranslationM3.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
-GVL_IHM.TranslationM3.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
-GVL_IHM.TranslationM3.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
-GVL_IHM.TranslationM3.SafetySafeStop       := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
-GVL_IHM.TranslationM3.SafetyPowerCutOff    := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
-GVL_IHM.TranslationM3.DriveControlWord     := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
-GVL_IHM.TranslationM3.DriveFreqRefHz        := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
-GVL_IHM.TranslationM3.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
-GVL_IHM.TranslationM3.ActiveSpeedRefPct     := PRG_07_TranslationControl.M3_SpeedRef_Active;
+GVL_IHM.M3Translation.DriveActualFreqHz     := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.M3Translation.SafetyError          := PRG_03_Safety.instSafetyTranslationM3.Error;
+GVL_IHM.M3Translation.SafetyErrorId        := PRG_03_Safety.instSafetyTranslationM3.ErrorId;
+GVL_IHM.M3Translation.SafetyErrorOperatorComm := PRG_03_Safety.instSafetyTranslationM3.ErrorOperatorComm;
+GVL_IHM.M3Translation.SafetyErrorDriveComm    := PRG_03_Safety.instSafetyTranslationM3.ErrorDriveComm;
+GVL_IHM.M3Translation.SafetyErrorPhaseRotation:= PRG_03_Safety.instSafetyTranslationM3.ErrorPhaseRotation;
+GVL_IHM.M3Translation.SafetyErrorBrakeThermal := PRG_03_Safety.instSafetyTranslationM3.ErrorBrakeThermal;
+GVL_IHM.M3Translation.SafetyErrorMecaB        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaB;
+GVL_IHM.M3Translation.SafetyErrorMecaA        := PRG_03_Safety.instSafetyTranslationM3.ErrorMecaA;
+GVL_IHM.M3Translation.SafetyErrorLimitSwitch  := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
+GVL_IHM.M3Translation.SafetyErrorSensorIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
+GVL_IHM.M3Translation.SafetySafeStop       := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+GVL_IHM.M3Translation.SafetyPowerCutOff    := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+GVL_IHM.M3Translation.DriveControlWord     := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+GVL_IHM.M3Translation.DriveFreqRefHz        := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
+GVL_IHM.M3Translation.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
+GVL_IHM.M3Translation.ActiveSpeedRefPct     := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
 // ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
 GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;
@@ -502,7 +502,7 @@ GVL_IHM.Cycle.Error                := PRG_05_Cycle.instCycle.Error;
 GVL_IHM.Cycle.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
 GVL_IHM.Cycle.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
 GVL_IHM.Cycle.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
-GVL_IHM.Cycle.SelTarget    := GVL_IHM.TranslationM3.SelTarget;
+GVL_IHM.Cycle.SelTarget    := GVL_IHM.M3Translation.SelTarget;
 GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
 GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
@@ -517,18 +517,18 @@ GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.JoystickJOY1.RawX       := PRG_01_Diagnostics.FB_Joystick_0.RawX;   // 🔧 REX 2026-07-21 : depuis FB (pas JoyXRaw_ANA1 direct) — cohérent simulation
-GVL_IHM.JoystickJOY1.RawY       := PRG_01_Diagnostics.FB_Joystick_0.RawY;   // idem
-GVL_IHM.JoystickJOY1.RawButton  := PRG_01_Diagnostics.FB_Joystick_0.RawButton; // idem
-GVL_IHM.JoystickJOY1.CmdX        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.JoystickJOY1.CmdY        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.JoystickJOY1.NeutralXAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct; // 🆕 REX 2026-07-21 : neutre calibré
-GVL_IHM.JoystickJOY1.NeutralYAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct; // 🆕 idem
-GVL_IHM.JoystickJOY1.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed; // 🆕 REX 2026-07-21 : visu IHM homme-mort
-GVL_IHM.JoystickJOY1.Online     := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
-GVL_IHM.JoystickJOY1.Operational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JoystickJOY1.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.JoystickJOY1.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JOY1Joystick.RawX       := PRG_01_Diagnostics.FB_Joystick_0.RawX;   // 🔧 REX 2026-07-21 : depuis FB (pas JoyXRaw_ANA1 direct) — cohérent simulation
+GVL_IHM.JOY1Joystick.RawY       := PRG_01_Diagnostics.FB_Joystick_0.RawY;   // idem
+GVL_IHM.JOY1Joystick.RawButton  := PRG_01_Diagnostics.FB_Joystick_0.RawButton; // idem
+GVL_IHM.JOY1Joystick.CmdX        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
+GVL_IHM.JOY1Joystick.CmdY        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JOY1Joystick.NeutralXAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct; // 🆕 REX 2026-07-21 : neutre calibré
+GVL_IHM.JOY1Joystick.NeutralYAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct; // 🆕 idem
+GVL_IHM.JOY1Joystick.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed; // 🆕 REX 2026-07-21 : visu IHM homme-mort
+GVL_IHM.JOY1Joystick.Online     := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JOY1Joystick.Operational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
+GVL_IHM.JOY1Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────

@@ -18,14 +18,14 @@
 | # | Vérification | Valeur attendue | Où lire |
 |---|---|---|---|
 | 0.1 | Mode simulation désactivé | `GVL_Simulation.SimulationModeActive = FALSE` | Vue instance CODESYS (pas d'IHM graphique — voir ⚠️ §6) |
-| 0.2 | Signal joystick réel (pas simulé) | `GVL_Simulation.JoystickSignal_IsReal = TRUE` | idem |
-| 0.3 | Bus/nœud CANopen joystick réel (pas simulé) | `GVL_Simulation.Joystick_IsReal = TRUE` | idem |
+| 0.2 | Signal joystick réel (pas simulé) | `GVL_Simulation.BusJoystickSignalIsReal = TRUE` | idem |
+| 0.3 | Bus/nœud CANopen joystick réel (pas simulé) | `GVL_Simulation.BusJoystickIsReal = TRUE` | idem |
 | 0.4 | Temporisations homme-mort en valeurs **production** (pas les valeurs test banc) | `PRG_01_Diagnostics.FB_Joystick_0.DeadmanRearmTimeout = T#10S` et `.NeutralHoldTime = T#500MS` | Vue instance `FB_Joystick_0` |
 
 ⚠️ **Point de vigilance majeur** (`PRG_01_Diagnostics.st` lignes 58-62, commentaire en l'état dans
 le code) : ces temporisations basculent **automatiquement** entre valeurs test (5 min / 1 s, si
-`NOT JoystickSignal_IsReal`) et production (10 s / 500 ms, si signal réel) via un `SEL` sur
-`JoystickSignal_IsReal`/`SimulationModeActive`. Le point 0.2 ci-dessus est donc la **condition
+`NOT BusJoystickSignalIsReal`) et production (10 s / 500 ms, si signal réel) via un `SEL` sur
+`BusJoystickSignalIsReal`/`SimulationModeActive`. Le point 0.2 ci-dessus est donc la **condition
 racine** de 0.4 — si le signal reste marqué simulé par erreur (flag non repassé à `TRUE`), le
 homme-mort réel tournera silencieusement avec des délais de confort (5 min de réarmement) au lieu
 des délais sûrs (10 s) **sans qu'aucune alarme ne le signale**. À vérifier explicitement au
@@ -33,11 +33,11 @@ commissioning, pas supposé.
 
 ---
 
-## 🎯 1. Calibration du neutre (`Calibrate`, front)
+## 🎯 1. Calibration du neutre (`BtnCalibrate`, front)
 
 | # | Procédure | Attendu | Pass/Fail |
 |---|---|---|---|
-| 1.1 | Manche au repos physique, déclencher `GVL_IHM.JoystickJOY1.Calibrate` (front) | `NeutralXMem`/`NeutralYMem` (`FB_Joystick_0.NeutralXAct`/`NeutralYAct`) prennent la valeur `RawX`/`RawY` courante | Neutre affiché = brut lu au moment du front, à ±0 pt |
+| 1.1 | Manche au repos physique, déclencher `GVL_IHM.JOY1Joystick.BtnCalibrate` (front) | `NeutralXMem`/`NeutralYMem` (`FB_Joystick_0.NeutralXAct`/`NeutralYAct`) prennent la valeur `RawX`/`RawY` courante | Neutre affiché = brut lu au moment du front, à ±0 pt |
 | 1.2 | Calibrer avec `RawX` ou `RawY` hors plage **2000..8000** (ex. manche non raccordé, 0 ou 10000) | Calibration **refusée**, `ErrorId` bit0 (`16#0001`) levé, `Error := TRUE` | FAIL si le neutre est quand même mémorisé hors plage |
 | 1.3 | Après échec 1.2 : reset (front `Reset`) **avec** RawX/Y toujours hors plage | `ErrorId` bit0 **reste** levé (pas d'auto-effacement, cause non disparue) | FAIL si le défaut s'efface sans cause résolue |
 | 1.4 | Ramener RawX/Y en plage valide, puis reset (front) | `ErrorId` bit0 s'efface, `Error := FALSE` | — |
@@ -90,7 +90,7 @@ plage physique différente de chaque côté (5500 pts vers le haut, 4500 vers le
 | # | Procédure | Attendu | Pass/Fail |
 |---|---|---|---|
 | 4.1 | Débrancher/couper le bus CANopen pendant un mouvement armé | `BusCanOpenOP.Operational → FALSE` → gate `FB_Joystick` s'active : sorties forcées à 0, `DeadmanArmed → FALSE` immédiatement (coupure, pas rampe — c'est une perte de commande, pas un relâchement volontaire) | FAIL si le dernier ordre reste actif après perte CAN |
-| 4.2 | Pendant la coupure CAN | `GVL_IHM.JoystickJOY1.ErrorId` bit0 (`16#0001`, perte liaison CAN) et/ou bit1 (`16#0002`, non-opérationnel) levés selon le cas | — |
+| 4.2 | Pendant la coupure CAN | `GVL_IHM.JOY1Joystick.ErrorId` bit0 (`16#0001`, perte liaison CAN) et/ou bit1 (`16#0002`, non-opérationnel) levés selon le cas | — |
 | 4.3 | Rebrancher le bus | Retour à `Operational := TRUE` après reprise ; `ErrorId` s'efface sur reset (front) une fois le bus effectivement rétabli (pas d'auto-effacement sans front `Reset`) | — |
 | 4.4 | Reset (front) **pendant que le bus est encore coupé** | `ErrorId` bits **restent** levés (cause encore présente) | FAIL si effacement prématuré |
 | 4.5 | Après rebranchement + reset : réarmement homme-mort | Nouvel appui **au neutre** requis (comme après toute neutralisation, §3.1/3.10) — aucun mouvement ne doit reprendre "tout seul" à la reconnexion | FAIL si un mouvement repart sans nouvel appui bouton |

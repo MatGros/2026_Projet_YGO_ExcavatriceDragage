@@ -47,11 +47,11 @@ index `2`). Cette checklist :
 | # | Prérequis | Valeur attendue | Pass/Fail |
 |---|-----------|------------------|-----------|
 | 1.1 | `GVL_Simulation.SimulationModeActive` | `FALSE` avant tout essai réel machine (sinon toute la chaîne M3 tourne en simulation logicielle, aucune valeur terrain n'est significative) | ☐ |
-| 1.2 | Bascule progressive des `_IsReal` M3 (voir §15 pour méthode détaillée) : `VariateurM3_IsReal`, `TranslationPosition_IsReal`, `ContactorFeedbackM3_IsReal`, `PhaseRotationOk_IsReal`, `BrakeThermal_IsReal` | Chacun passé à `TRUE` un par un au fur et à mesure du câblage réel confirmé | ☐ |
+| 1.2 | Bascule progressive des `_IsReal` M3 (voir §15 pour méthode détaillée) : `BusVariateurM3IsReal`, `SensorTranslationPositionIsReal`, `SensorM3ContactorFeedbackIsReal`, `SensorPhaseRotationIsReal`, `SensorBrakeThermalIsReal` | Chacun passé à `TRUE` un par un au fur et à mesure du câblage réel confirmé | ☐ |
 | 1.3 | Chaîne AU physique réarmée | `PRG_00_Inputs.EmergencyStopOk = TRUE` (contact contacteur de puissance confirmé, pas seulement boucle AU) | ☐ |
 | 1.4 | Mode machine au démarrage de la checklist | `E_Mode.MAINT_N1` (droits standard, pas de mot de passe) — passer en `MAINT_N2` uniquement pour les items le nécessitant explicitement (§11.6 cible Maintenance) | ☐ |
 | 1.5 | Personnel évacué de la zone de débattement translation | Aucune personne dans la trajectoire Trémie↔Maintenance avant tout essai marche avant/arrière (§5) | ☐ |
-| 1.6 | Accès IHM disponible : `GVL_IHM.TranslationM3.*` en vue (superviseur ou instance CODESYS online) | Champs `Ready/Busy/Error/ErrorId`, `SafetyError/SafetyErrorId`, `SensorsWord`, `DriveActualFreqHz`, `DriveCommReady/DrivePowerReady` visibles en direct | ☐ |
+| 1.6 | Accès IHM disponible : `GVL_IHM.M3Translation.*` en vue (superviseur ou instance CODESYS online) | Champs `Ready/Busy/Error/ErrorId`, `SafetyError/SafetyErrorId`, `SensorsWord`, `DriveActualFreqHz`, `DriveCommReady/DrivePowerReady` visibles en direct | ☐ |
 | 1.7 | Défaut initial acquitté | `PRG_09_Supervision.FaultMachineReset_IHM` disponible (front) pour acquitter tout défaut levé pendant les essais (Reset = front obligatoire, cause disparue + appui) | ☐ |
 
 ⚠️ **Point de vigilance majeur** : tant que `SimulationModeActive=TRUE` et qu'un `_IsReal` reste
@@ -86,8 +86,8 @@ Codage nominal (Given Command 1, `0x3101`) : `0`=Aucun/Arrêt, `1`=Marche avant,
 | # | Test | Procédure | Valeur attendue | Pass/Fail |
 |---|------|-----------|------------------|-----------|
 | 3.1 | Mot à l'arrêt (repos) | Aucune commande, machine au neutre | `DriveControlWord = 0`, `M3_CommandWord = 0` (recopié en sortie par `PRG_10_Outputs`) | ☐ |
-| 3.2 | Mot en marche avant | Commander `Direction=+1` (joystick ou `ReqFwd`), homme-mort armé | `DriveControlWord = 1` tant que `MovementRequested=TRUE` (vitesse rampée `> 0.1 %`) | ☐ |
-| 3.3 | Mot en marche arrière | Commander `Direction=-1` (`ReqRev`), homme-mort armé | `DriveControlWord = 2` | ☐ |
+| 3.2 | Mot en marche avant | Commander `Direction=+1` (joystick ou `BtnFwd`), homme-mort armé | `DriveControlWord = 1` tant que `MovementRequested=TRUE` (vitesse rampée `> 0.1 %`) | ☐ |
+| 3.3 | Mot en marche arrière | Commander `Direction=-1` (`BtnRev`), homme-mort armé | `DriveControlWord = 2` | ☐ |
 | 3.4 | Mot pendant un `Reset` | Maintenir `Reset=TRUE` (front) | `DriveControlWord = 7` — prioritaire sur toute autre commande (voir code : test `IF Reset THEN...ELSIF Error...`) | ☐ |
 | 3.5 | Mot pendant un défaut (`Error=TRUE`) | Provoquer un défaut (ex. Fdc extrême, §12) | `DriveControlWord = 0` (arrêt forcé, sortie sûre) même si `StartStop`/`Direction` restent actifs | ☐ |
 | 3.6 | Cohérence variateur : réponse du AC600 au mot reçu | Observer le variateur physique (afficheur local ou son) lors des tests 3.2/3.3 | Le AC600 démarre effectivement dans le sens correspondant, sans inversion sens/mot | ☐ |
@@ -103,10 +103,10 @@ Codage nominal (Given Command 1, `0x3101`) : `0`=Aucun/Arrêt, `1`=Marche avant,
 | # | Test | Procédure | Valeur attendue | Pass/Fail |
 |---|------|-----------|------------------|-----------|
 | 4.1 | Conversion consigne → Hz | Commander une consigne connue (ex. 50 % pleine échelle) | `DriveFreqRefHz ≈ 30.0 Hz` (50 % × 60 Hz) — nominal machine (voir commentaire code : "fonctionnement standard/nominal 30Hz à 50% de consigne") | ☐ |
-| 4.2 | Conversion pleine échelle | Consigne 100 % (butée haute joystick ou `FreqSetpointHz = _TranslationMaxFreq_Hz = 60.0 Hz` en MAINT) | `DriveFreqRefHz ≈ 60.0 Hz`, jamais au-delà (voir clamp final §4.5) | ☐ |
+| 4.2 | Conversion pleine échelle | Consigne 100 % (butée haute joystick ou `SetFreqHz = _TranslationMaxFreq_Hz = 60.0 Hz` en MAINT) | `DriveFreqRefHz ≈ 60.0 Hz`, jamais au-delà (voir clamp final §4.5) | ☐ |
 | 4.3 | Codage bus centi-Hz | Lire `M3_SetpointFrequencyHz` (PDO brut) pendant le test 4.1 | Valeur ≈ `3000` (30.00 Hz × 100), cohérent avec `REAL_TO_UINT(DriveFreqRefHz * 100.0)` (`PRG_10_Outputs`) | ☐ |
 | 4.4 | Fréquence réelle mesurée | Une fois en marche stabilisée, comparer affichage variateur local vs `DriveActualFreqHz` (PLC) | Écart < 1 Hz (tolérance capteur/bus) ; `M3_ActualFrequencyHz_Filtered` = `M3_ActualFrequencyHz` brut ÷ 100 | ☐ |
-| 4.5 | Clamp final de sécurité (0..100 %) | Forcer artificiellement une consigne hors plage en amont (ex. `FreqSetpointHz` opérateur > `_TranslationMaxFreq_Hz` saisi manuellement) | `PRG_07_TranslationControl` applique `M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0)` **avant** `FB_Translation` — la consigne ne dépasse jamais 100 % / 60 Hz quelle que soit la source (joystick, IHM, cycle) | ☐ |
+| 4.5 | Clamp final de sécurité (0..100 %) | Forcer artificiellement une consigne hors plage en amont (ex. `SetFreqHz` opérateur > `_TranslationMaxFreq_Hz` saisi manuellement) | `PRG_07_TranslationControl` applique `M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0)` **avant** `FB_Translation` — la consigne ne dépasse jamais 100 % / 60 Hz quelle que soit la source (joystick, IHM, cycle) | ☐ |
 | 4.6 | Rampe d'accélération | Depuis l'arrêt, commander `StartStop=TRUE` à pleine consigne | Montée en fréquence à `RampAccelRate = 20.0 %/s` (soit ≈12 Hz/s) — pas de à-coup | ☐ |
 | 4.7 | Ralentissement à l'approche (voir aussi §10) | Approcher Trémie avec `SlowdownSensor` actif | `DriveFreqRefHz` plafonné à `ApproachSpeedPct = 20.0 %` (≈12 Hz), uniquement `Direction=1` | ☐ |
 
@@ -116,17 +116,17 @@ Codage nominal (Given Command 1, `0x3101`) : `0`=Aucun/Arrêt, `1`=Marche avant,
 
 Rappel sécurité **v1.9** (`AF_Partie-11 §6bis`) : depuis la suppression d'IHM_MANU, **le
 homme-mort joystick (`DeadmanArmed`) est exigé quel que soit le mode de pilotage** (boutons IHM
-`ReqFwd`/`ReqRev` **ou** joystick) — un oubli de vérifier cette condition invaliderait le test.
+`BtnFwd`/`BtnRev` **ou** joystick) — un oubli de vérifier cette condition invaliderait le test.
 
 | # | Test | Procédure | Valeur attendue | Pass/Fail |
 |---|------|-----------|------------------|-----------|
-| 5.1 | Marche avant, pilotage joystick | `Mode=MAINT_N1`, `JoystickSelect=TRUE`, joystick homme-mort armé, déflexion axe X positive | `Direction=+1`, `StartStop=TRUE` uniquement si `DeadmanArmed=TRUE` et `AxisCmdX.StartStop=TRUE` ; machine avance | ☐ |
-| 5.2 | Marche avant, pilotage boutons IHM | `JoystickSelect=FALSE`, `ReqFwd=TRUE`, **joystick maintenu homme-mort à part** | Le mouvement ne démarre **que si** `DeadmanArmed=TRUE` en parallèle — `ReqFwd` seul (sans homme-mort actif) ne doit produire **aucun** mouvement (`M3_StartStop_Active=FALSE`) | ☐ |
+| 5.1 | Marche avant, pilotage joystick | `Mode=MAINT_N1`, `TglJoystickMaster=TRUE`, joystick homme-mort armé, déflexion axe X positive | `Direction=+1`, `StartStop=TRUE` uniquement si `DeadmanArmed=TRUE` et `AxisCmdX.StartStop=TRUE` ; machine avance | ☐ |
+| 5.2 | Marche avant, pilotage boutons IHM | `TglJoystickMaster=FALSE`, `BtnFwd=TRUE`, **joystick maintenu homme-mort à part** | Le mouvement ne démarre **que si** `DeadmanArmed=TRUE` en parallèle — `BtnFwd` seul (sans homme-mort actif) ne doit produire **aucun** mouvement (`M3_StartStop_Active=FALSE`) | ☐ |
 | 5.3 | Marche arrière, pilotage joystick | Symétrique à 5.1, déflexion axe X négative | `Direction=-1`, comportement identique en miroir | ☐ |
-| 5.4 | Marche arrière, pilotage boutons IHM | Symétrique à 5.2 avec `ReqRev` | Idem 5.2, homme-mort obligatoire | ☐ |
+| 5.4 | Marche arrière, pilotage boutons IHM | Symétrique à 5.2 avec `BtnRev` | Idem 5.2, homme-mort obligatoire | ☐ |
 | 5.5 | Relâchement homme-mort en cours de marche | Marche avant en cours (5.1), relâcher le bouton homme-mort joystick | `DeadmanArmed→FALSE` ⇒ `StartStop→FALSE` ⇒ rampe décel **normale** (40 %/s, pas d'arrêt instantané) puis arrêt frein | ☐ |
 | 5.6 | Cible atteinte pendant la marche | Laisser translater jusqu'à un capteur de position cible (P1/P2/Trémie/Maintenance) | `TargetReached=TRUE` (après debounce `CaptorDebounce=100ms`) ⇒ `ArrivalLock=TRUE` ⇒ vitesse forcée à 0 dans le sens d'arrivée ; seul le sens opposé permet de se dégager | ☐ |
-| 5.7 | Sélection de cible interdite hors MAINT_N2 | En `MAINT_N1`, sélectionner cible `4` (Maintenance) | `SelectedTargetNum` forcé à `0` (`MaintenanceM3TargetEnable=FALSE` hors `MAINT_N2`) — pas d'accès à la zone Maintenance sans droits étendus | ☐ |
+| 5.7 | Sélection de cible interdite hors MAINT_N2 | En `MAINT_N1`, sélectionner cible `4` (Maintenance) | `SelTarget` forcé à `0` (`MaintenanceM3TargetEnable=FALSE` hors `MAINT_N2`) — pas d'accès à la zone Maintenance sans droits étendus | ☐ |
 | 5.8 | Sélection de cible autorisée en MAINT_N2 | Passer `Mode=MAINT_N2` (mot de passe), sélectionner cible `4` | `MaintenanceM3TargetEnable=TRUE`, cible acceptée, capteur `TranslationPosMaintenance` câblé sur `M3_PositionSensorTarget` | ☐ |
 
 ---
@@ -199,7 +199,7 @@ ralentissement, **et seulement en direction Trémie** (`Direction=1`). Décision
 |---|------|-----------|------------------|-----------|
 | 10.1 | Ralentissement à l'approche Trémie | Marche avant (`Direction=1`) à pleine vitesse, franchir le capteur PV | `RampTargetPct` plafonné à `ApproachSpeedPct=20.0%` dès `SlowdownSensor=TRUE` ; fréquence chute à ≈12 Hz avant d'atteindre Trémie | ☐ |
 | 10.2 | Pas de ralentissement en sens Maintenance | Marche arrière (`Direction=-1`), franchir la zone PV en s'éloignant de Trémie | Aucun plafonnement — vitesse pleine échelle maintenue (le ralentissement PV ne s'applique qu'à `Direction=1`) | ☐ |
-| 10.3 | PV n'est pas une cible d'arrêt | Observer le comportement au passage PV (les deux sens) | Le mouvement continue au-delà de PV sans `ArrivalLock` (PV exclu de `CASE SelectedTargetNum` — capteur cible jamais câblé sur PV) | ☐ |
+| 10.3 | PV n'est pas une cible d'arrêt | Observer le comportement au passage PV (les deux sens) | Le mouvement continue au-delà de PV sans `ArrivalLock` (PV exclu de `CASE SelTarget` — capteur cible jamais câblé sur PV) | ☐ |
 | 10.4 | Arrêt exact ensuite sur Trémie | Poursuivre jusqu'au capteur Trémie après ralentissement PV | Arrêt net sur `PositionTremie=TRUE` (debounce 100 ms), `ArrivalLock=TRUE` | ☐ |
 
 ---
@@ -219,7 +219,7 @@ Seules 6 combinaisons monotones sont valides.
 | 11.6 | `00000` | Extrême droite / Maintenance | Positionner physiquement en Maintenance (nécessite `MAINT_N2`, §5.8) | `LimitSwitchRev=TRUE`, `Incoherent=FALSE` | ☐ |
 | 11.7 | Mot incohérent (ex. `10101`, capteur collé) | — | Forcer/simuler un capteur en défaut (deux capteurs non adjacents actifs) | `Incoherent=TRUE` ⇒ `FB_Safety_Translation.ErrorId` bit7 ⇒ **`SafeStop` ET `PowerCutOff`** (défense en profondeur, décision client) | ☐ |
 | 11.8 | Chaque capteur individuellement câblé | Actionner chaque capteur TOR un par un à vide (hors mouvement) | `PRG_00_Inputs.TranslationPos<Zone>` bascule sans rebond excessif (filtre `T#20ms` sur chaque `FB_Input`) | ☐ |
-| 11.9 | Cohérence mot IHM | Comparer `GVL_IHM.TranslationM3.SensorsWord` (bit4..bit0) affiché avec la position physique réelle | Correspondance exacte à chaque étape 11.1→11.6 | ☐ |
+| 11.9 | Cohérence mot IHM | Comparer `GVL_IHM.M3Translation.SensorsWord` (bit4..bit0) affiché avec la position physique réelle | Correspondance exacte à chaque étape 11.1→11.6 | ☐ |
 
 ---
 
@@ -266,7 +266,7 @@ diagnostics bus). Ces items sont donc **exclusivement terrain**, à couvrir ici 
 | 14.3 | Mauvaise rotation de phases (bit2) | Provoquer/simuler une inversion de rotation de phase (`PhaseRotationOk_DI`) | `ErrorId` bit2 ⇒ `SafeStop=TRUE` seul, **pas** de `PowerCutOff` (bit2 hors masque) | ☐ |
 | 14.4 | Thermique frein commun (bit3) | Déjà couvert en détail §13.1 | Voir §13 | ☐ |
 | 14.5 | Combinaison multiple | Provoquer 2 défauts simultanés (ex. bit1 + bit6) | `ErrorId` cumule les deux bits (bitfield OR), `PowerCutOff` s'active dès qu'au moins un bit du masque `0x00F8` est présent | ☐ |
-| 14.6 | Cohérence IHM des diagnostics découplés | Comparer `GVL_IHM.TranslationM3.SafetyError*` (champs décomposés bit par bit) avec `SafetyErrorId` brut pendant 14.1/14.3 | Chaque booléen IHM (`SafetyErrorJoystick`, `SafetyErrorPhaseRotation`, etc.) reflète exactement le bit correspondant, pas de bit-masking à faire côté IHM | ☐ |
+| 14.6 | Cohérence IHM des diagnostics découplés | Comparer `GVL_IHM.M3Translation.SafetyError*` (champs décomposés bit par bit) avec `SafetyErrorId` brut pendant 14.1/14.3 | Chaque booléen IHM (`SafetyErrorJoystick`, `SafetyErrorPhaseRotation`, etc.) reflète exactement le bit correspondant, pas de bit-masking à faire côté IHM | ☐ |
 
 ---
 
@@ -278,11 +278,11 @@ Conforme au modèle `GVL_Simulation` (`AF_Partie-13`) : bit maître `SimulationM
 | # | Étape | Flag à bascule | Ce que ça déverrouille |
 |---|-------|-----------------|--------------------------|
 | 15.1 | Validation logique pure (banc, aucun câblage réel) | `SimulationModeActive=TRUE`, tous `_IsReal=FALSE` | Rejoue `FB_TranslationValidation` (TC-T1→T6) en toute sécurité |
-| 15.2 | Variateur AC600 réellement raccordé EtherCAT | `VariateurM3_IsReal=TRUE` | §2, §3, §4 deviennent significatifs (mot de commande réel, fréquence réelle) |
-| 15.3 | Capteurs de position réellement câblés | `TranslationPosition_IsReal=TRUE` | §10, §11, §12 deviennent significatifs |
-| 15.4 | Retour contacteur/frein M3 réellement câblé | `ContactorFeedbackM3_IsReal=TRUE` | Diagnostic frein (`BrakeContactorCheck`) fiable, plus de bypass |
-| 15.5 | Contrôle rotation de phase réellement câblé | `PhaseRotationOk_IsReal=TRUE` | §14.3 devient significatif |
-| 15.6 | Thermique frein commun réellement câblé | `BrakeThermal_IsReal=TRUE` | §13.1 devient significatif |
+| 15.2 | Variateur AC600 réellement raccordé EtherCAT | `BusVariateurM3IsReal=TRUE` | §2, §3, §4 deviennent significatifs (mot de commande réel, fréquence réelle) |
+| 15.3 | Capteurs de position réellement câblés | `SensorTranslationPositionIsReal=TRUE` | §10, §11, §12 deviennent significatifs |
+| 15.4 | Retour contacteur/frein M3 réellement câblé | `SensorM3ContactorFeedbackIsReal=TRUE` | Diagnostic frein (`BrakeContactorCheck`) fiable, plus de bypass |
+| 15.5 | Contrôle rotation de phase réellement câblé | `SensorPhaseRotationIsReal=TRUE` | §14.3 devient significatif |
+| 15.6 | Thermique frein commun réellement câblé | `SensorBrakeThermalIsReal=TRUE` | §13.1 devient significatif |
 | 15.7 | Bascule finale | `SimulationModeActive=FALSE` | Coupe toute simulation résiduelle d'un coup — dernière étape, une fois tous les `_IsReal` ci-dessus confirmés `TRUE` |
 
 ⚠️ Ne **jamais** passer `SimulationModeActive=FALSE` avant d'avoir confirmé individuellement
@@ -332,7 +332,7 @@ secours (comportement indéterminé selon l'état électrique flottant de l'entr
 
 - **Aucun graphique IHM dédié n'a été audité** (hors périmètre) : toute lecture de champ
   (`SensorsWord`, `ErrorId`, `DriveActualFreqHz`...) suppose un accès à l'instance CODESYS online
-  ou à une vue superviseur déjà construite exposant `GVL_IHM.TranslationM3.*`.
+  ou à une vue superviseur déjà construite exposant `GVL_IHM.M3Translation.*`.
 - **§4.5 (limitation finale 0-100 %)** est vérifié par lecture de code (`PRG_07_TranslationControl.st`
   ligne "Limitation finale M3"), pas par essai physique dans cette session — à confirmer au banc.
 - **Cohérence architecture** : ✅ `AF_Partie-02` v2.12 indique désormais le pilotage EtherCAT

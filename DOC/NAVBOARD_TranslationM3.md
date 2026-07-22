@@ -3,7 +3,7 @@
 **COMMUN (toutes actions)** : ✅`Enable`(=`PRG_06_WinchControl.StubMachineEnableN1` AND Mode≠DISABLE)·✅`PRG_00_Inputs.EmergencyStopOk`·❌`instSafetyTranslationM3.SafeStop`·❌`instTranslationM3.Error`·❌`PowerCutOff`
 
 **Fichiers** : `PRG_07_TranslationControl`·`FB_Translation`·`FB_Safety_Translation` (instance `PRG_03_Safety.instSafetyTranslationM3`)·`FB_Translation_PositionDecoder` (instance `PRG_00_Inputs.instPositionDecoder`)·`PRG_09_Supervision` L46-61
-**IHM** : `ST_TranslationHMI` → `GVL_IHM.TranslationM3`
+**IHM** : `ST_TranslationHMI` → `GVL_IHM.M3Translation`
 **Animation joystick M3** : `JoystickDeflectionPct` = axe X fonctionnel signé `-100..+100 %` ; 0=neutre
 **PERSISTENT** : `_TranslationMaxFreq_Hz`(60)·`_TranslationRampAccelRate_Pct`(20)·`_TranslationRampDecelNormal_Pct`(40)·`_TranslationRampDecelFast_Pct`(100)·`_TranslationAutoSpeedCap_Pct`(40)
 **Reset** : `PRG_09_Supervision.FaultMachineReset_IHM` = `GVL_IHM.Modes.FaultMachineReset` OR `CmdReset` M1/M2/Bucket — ⚠️ **pas de CmdReset propre à M3**
@@ -21,26 +21,26 @@
 - ✅ `instCycle.CmdTranslationM3_Start`·`FB_Joystick_0.DeadmanArmed`·`FB_Joystick_0.AxisCmdX.StartStop`
 - ⚠️ `TranslationPosPV` (SlowdownSensor) ralentit si Dir=+1
 
-**🎮 MAINT_N1/N2 — boutons IHM** (`GVL_IHM.TranslationM3.JoystickSelect=FALSE`)
+**🎮 MAINT_N1/N2 — boutons IHM** (`GVL_IHM.M3Translation.JoystickSelect=FALSE`)
 - Direction : `ReqFwd`(=+1) ou `ReqRev`(=-1)
 - Vitesse : `FreqSetpoint_Hz` (pleine consigne opérateur, convertie en % de `_TranslationMaxFreq_Hz`)
 - ✅ `DeadmanArmed`·`ReqFwd`(ou `ReqRev`)
 - ❌ `AxisCmdX.StartStop` PAS nécessaire (bypass si `JoystickSelect=FALSE`)
 - ✅ Sans `ReqFwd` ni `ReqRev` : direction forcée à 0 ; aucune reprise joystick implicite
 
-**🕹️ MAINT_N1/N2 — joystick** (`GVL_IHM.TranslationM3.JoystickSelect=TRUE`)
+**🕹️ MAINT_N1/N2 — joystick** (`GVL_IHM.M3Translation.JoystickSelect=TRUE`)
 - Direction : `AxisCmdX.Direction`
 - Vitesse : `Hz = déflexion joystick (%) × FreqSetpoint_Hz` (formule : `(ABS(SpeedRef)/100) × FreqPct`, `FreqPct = FreqSetpoint_Hz/_TranslationMaxFreq_Hz×100`)
 - ✅ `DeadmanArmed`·`AxisCmdX.StartStop`·`AxisCmdX.Direction≠0`
 
-**🎯 MAINT_N1/N2 — sous-mode positionneur** (`GVL_IHM.TranslationM3.PositioningSelect=TRUE`)
+**🎯 MAINT_N1/N2 — sous-mode positionneur** (`GVL_IHM.M3Translation.PositioningSelect=TRUE`)
 - `SelectedTargetNum` actif : arrêt sur la cible choisie ; sens toujours choisi manuellement (boutons ou joystick)
 - `PositioningSelect=FALSE` : jog libre, cible forcée à 0 ; seuls les FdC extrêmes arrêtent
-- ✅ Retour IHM : `GVL_IHM.TranslationM3.PositionReached` (non mémorisé, TRUE sur cible débouncée)
+- ✅ Retour IHM : `GVL_IHM.M3Translation.PositionReached` (non mémorisé, TRUE sur cible débouncée)
 
 **🚫 DISABLE (branche ELSE PRG_07 L89-95)** : consignes joystick recopiées MAIS `Enable=FALSE` (Mode=DISABLE) → FB neutralisé, **aucun mouvement possible**. Branche morte — ne PAS croire à un "mode manuel sans deadman".
 
-- Cible maintenance : `SelectedTargetNum` ← `GVL_IHM.TranslationM3.SelectedTargetNum` (via `StubTranslationPositionSelect_IHM`, PRG_09 L46)
+- Cible maintenance : `SelectedTargetNum` ← `GVL_IHM.M3Translation.SelectedTargetNum` (via `StubTranslationPositionSelect_IHM`, PRG_09 L46)
 
 ---
 
@@ -58,7 +58,7 @@
 
 **🔬 Simulation** (`GVL_Simulation`) : bit maître `SimulationModeActive` (défaut TRUE). Device simulé = `SimulationModeActive AND NOT <Device>_IsReal` → forcé sain
 - `VariateurM3_IsReal` : AC600 EtherCAT (Online/Operational forcés OK sinon)
-- `ContactorFeedbackM3_IsReal` : retour frein M3 — pilote `BypassContactorCheck` (PRG_07 L140) ET `GVL_IHM.TranslationM3.BypassContactorFeedback` (PRG_09 L274)
+- `ContactorFeedbackM3_IsReal` : retour frein M3 — pilote `BypassContactorCheck` (PRG_07 L140) ET `GVL_IHM.M3Translation.BypassContactorFeedback` (PRG_09 L274)
 - `BrakeThermal_IsReal` : thermique frein commun M1/M2/M3 (bit3)
 - `EmergencyStopChain_IsReal` : chaîne AU (`EmergencyStopOk`)
 - `PhaseRotationOk_IsReal` : rotation phases (bit2)
@@ -66,7 +66,7 @@
 - `IhmHeartbeat_IsReal` : heartbeat simulé par `GVL_Global.BlinkClock` si FALSE
 - `TranslationPosition_IsReal` : 5 capteurs position (sinon `FB_Sim_Translation`)
 
-**🧪 Overrides test** (`GVL_IHM.TranslationM3.Test*` → `GVL_PLC_Tests.OverrideM3*`, PRG_09 L50-61 — forcés FALSE hors `SimulationModeActive`) :
+**🧪 Overrides test** (`GVL_IHM.M3Translation.Test*` → `GVL_PLC_Tests.OverrideM3*`, PRG_09 L50-61 — forcés FALSE hors `SimulationModeActive`) :
 - `TestSensorsWordActive`+`TestSensorsWord` → `OverrideM3SensorsWord` (test bit7 incohérence)
 - `TestAtTremie` → `OverrideM3AtTremie` (test bit6 limite)
 - `TestBrakeStuckOpen` → `OverrideM3BrakeStuckOpen` (test Méca B bit4)

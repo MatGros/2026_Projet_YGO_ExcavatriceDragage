@@ -22,7 +22,7 @@ VAR
     // 4=Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).
     SelTarget       : INT;
 
-// 🆕 Commande maintenance depuis ST_TranslationHMI (GVL_IHM.TranslationM3).
+// 🆕 Commande maintenance depuis ST_TranslationHMI (GVL_IHM.M3Translation).
 // L'objet Translation ne dépend plus de IHM_MANU pour ses commandes M3.
     FreqPct                 : REAL; // Conversion SetFreqHz (Hz) → % pleine échelle pour SpeedRefPct
 END_VAR
@@ -64,16 +64,16 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // 🛠️ Maintenance N1/N2 : sous-mode explicite IHM.
     // SelPositioning=FALSE : jog libre, aucun capteur n'arrête hors fins de course.
     // SelPositioning=TRUE : le capteur de SelTarget arrête le mouvement.
-    M3_PositioningActive := GVL_IHM.TranslationM3.SelPositioning;
+    M3_PositioningActive := GVL_IHM.M3Translation.SelPositioning;
     SelTarget := SEL(M3_PositioningActive,
                              0,
                              StubTranslationPositionSelect_IHM);
 
-    IF NOT GVL_IHM.TranslationM3.TglJoystickMaster AND GVL_IHM.TranslationM3.BtnFwd THEN
+    IF NOT GVL_IHM.M3Translation.TglJoystickMaster AND GVL_IHM.M3Translation.BtnFwd THEN
         M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.TranslationM3.TglJoystickMaster AND GVL_IHM.TranslationM3.BtnRev THEN
+    ELSIF NOT GVL_IHM.M3Translation.TglJoystickMaster AND GVL_IHM.M3Translation.BtnRev THEN
         M3_Direction_Active := -1;
-    ELSIF GVL_IHM.TranslationM3.TglJoystickMaster THEN
+    ELSIF GVL_IHM.M3Translation.TglJoystickMaster THEN
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     ELSE
         // Boutons sélectionnés sans BtnFwd/BtnRev : jamais de reprise joystick implicite.
@@ -84,16 +84,16 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                           AND (NOT GVL_IHM.TranslationM3.TglJoystickMaster
+                           AND (NOT GVL_IHM.M3Translation.TglJoystickMaster
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
-    // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.SetFreqHz (consigne Hz réglable opérateur,
+    // 🎯 Vitesse : conserve GVL_IHM.M3Translation.SetFreqHz (consigne Hz réglable opérateur,
     // limitée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : SetFreqHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
-    FreqPct := (GVL_IHM.TranslationM3.SetFreqHz / _TranslationMaxFreq_Hz) * 100.0;
-    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.TglJoystickMaster,
+    FreqPct := (GVL_IHM.M3Translation.SetFreqHz / _TranslationMaxFreq_Hz) * 100.0;
+    M3_SpeedRef_Active := SEL(GVL_IHM.M3Translation.TglJoystickMaster,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
@@ -147,7 +147,7 @@ instTranslationM3(
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
+    BrakeFeedback           := SEL(GVL_IHM.M3Translation.Bypass.ContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
     BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal
 );
 
