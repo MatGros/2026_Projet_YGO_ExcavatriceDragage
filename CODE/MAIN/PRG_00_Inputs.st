@@ -129,11 +129,11 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.M2TreuilBenne.Bypass.EncoderFault := FALSE;
     GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence := FALSE;
 
-    GVL_IHM.M2Benne.BtnOpen := FALSE;
-    GVL_IHM.M2Benne.BtnClose := FALSE;
-    GVL_IHM.M2Benne.BtnReset := FALSE;
-    GVL_IHM.M2Benne.BtnConfirmOpenPos := FALSE;
-    GVL_IHM.M2Benne.BtnConfirmClosePos := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
 
     GVL_IHM.Cycle.BtnStart := FALSE;
     GVL_IHM.Cycle.BtnPause := FALSE;

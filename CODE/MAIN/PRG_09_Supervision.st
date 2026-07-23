@@ -49,7 +49,7 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.SelMode;
-GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
+GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
 
 // 🧪 Commandes de test Translation depuis la supervision.
@@ -71,7 +71,7 @@ END_IF;
 FaultMachineReset_IHM := GVL_IHM.Modes.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
-                    OR GVL_IHM.M2Benne.BtnReset;
+                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
 
 // 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
 // (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
@@ -184,20 +184,24 @@ IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Sync.CfgInitialized THEN
-    GVL_IHM.Sync.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
-    GVL_IHM.Sync.CfgInitialized := TRUE;
+IF NOT GVL_IHM.M1M2Sync.Cfg.Initialized THEN
+    GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
+    GVL_IHM.M1M2Sync.Cfg.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF GVL_IHM.M2Benne.Config.OffsetOpenM = 0.0 AND GVL_IHM.M2Benne.Config.OffsetCloseM = 0.0 THEN
-    GVL_IHM.M2Benne.Config := _BucketConfig;
-    GVL_IHM.M2Benne.CfgTimeoutDuration := T#30s;
+IF NOT GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized THEN
+    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config := _BucketConfig;
+    GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration := T#30s;
+    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized := TRUE;
 END_IF;
 
-IF GVL_IHM.Commun.LimitLegalDepthMinAllowed_M = 0.0 THEN
-    GVL_IHM.Commun.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
-    GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
+IF NOT GVL_IHM.Commun.Cfg.Initialized THEN
+    GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
+    GVL_IHM.Commun.Cfg.LimitLegalEnabled           := _LimitLegalEnabled;
+    GVL_IHM.Commun.Cfg.SelHomingApproachEnable     := FALSE; (* défaut inactif *)
+    GVL_IHM.Commun.Cfg.Initialized                 := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent    := TRUE;
 END_IF;
 
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
@@ -240,16 +244,23 @@ IF NOT GVL_IHM.Network.Bypass.Initialized THEN
     GVL_IHM.Network.Bypass.Initialized := TRUE;
 END_IF;
 
-// 🌐 Sync/Bucket : pas encore de struct Bypass dédié (hors périmètre de ce lot, voir §3) —
-// mécanisme BypassRestoreDone conservé UNIQUEMENT pour ces 2-là.
+IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
+    IF BypassSyncGlobal THEN
+        GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized THEN
+    IF BypassBucketGlobal THEN
+        GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized := TRUE;
+END_IF;
+
+// 🌐 BypassRestoreDone est désormais 100% orphelin (tous les bypass ont migré sur leur propre flag .Initialized).
 // 🐛 FIX 2026-07-23 : BypassRestoreDone en VAR RETAIN (évite re-forcage au boot si GVL_IHM intact).
 IF NOT BypassRestoreDone THEN
-    IF BypassSyncGlobal AND GVL_IHM.Sync.BypassGlobal = FALSE THEN
-        GVL_IHM.Sync.BypassGlobal := TRUE;
-    END_IF;
-    IF BypassBucketGlobal AND GVL_IHM.M2Benne.BypassGlobal = FALSE THEN
-        GVL_IHM.M2Benne.BypassGlobal := TRUE;
-    END_IF;
     BypassRestoreDone := TRUE;
 END_IF;
 
@@ -277,11 +288,11 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
 END_IF;
 // ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit, désormais clos
-// par le flag `Sync.CfgInitialized` (posé en §2 uniquement après restauration réussie).
-IF GVL_IHM.Sync.CfgInitialized THEN
-    _WinchSyncTolerance_M       := GVL_IHM.Sync.CfgSyncTolerance_M;
+// par le flag `M1M2Sync.Cfg.Initialized` (posé en §2 uniquement après restauration réussie).
+IF GVL_IHM.M1M2Sync.Cfg.Initialized THEN
+    _WinchSyncTolerance_M       := GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M;
 END_IF;
-_BucketConfig              := GVL_IHM.M2Benne.Config;
+_BucketConfig              := GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
@@ -350,16 +361,18 @@ IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initial
     GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
 
-_LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
-_LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
+IF GVL_IHM.Commun.Cfg.Initialized THEN
+    _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
+    _LimitLegalEnabled           := GVL_IHM.Commun.Cfg.LimitLegalEnabled;
+END_IF;
 
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
 BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
 BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
-BypassSyncGlobal            := GVL_IHM.Sync.BypassGlobal;
+BypassSyncGlobal            := GVL_IHM.M1M2Sync.Bypass.Global;
 BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
-BypassBucketGlobal          := GVL_IHM.M2Benne.BypassGlobal;
+BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
@@ -511,33 +524,33 @@ GVL_IHM.M2TreuilBenne.State.InhibitActive            := PRG_04_Modes.instModes.I
 
 
 // ── 7. MAPPING ÉTATS BENNE → IHM ───────────────────────────────────────
-GVL_IHM.M2Benne.FBState          := PRG_06_WinchControl.instBucket.State;
-GVL_IHM.M2Benne.ActiveOffset_M     := PRG_06_WinchControl.instBucket.ActiveOffsetM;
-GVL_IHM.M2Benne.M2StartStop      := PRG_06_WinchControl.instBucket.M2_StartStop;
-GVL_IHM.M2Benne.M2Direction      := PRG_06_WinchControl.instBucket.M2_Direction;
-GVL_IHM.M2Benne.M2ForceSlowSpeed := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
-GVL_IHM.M2Benne.Ready            := PRG_06_WinchControl.instBucket.Ready;
-GVL_IHM.M2Benne.Busy             := PRG_06_WinchControl.instBucket.Busy;
-GVL_IHM.M2Benne.Done             := PRG_06_WinchControl.instBucket.Done;
-GVL_IHM.M2Benne.Error            := PRG_06_WinchControl.instBucket.Error;
-GVL_IHM.M2Benne.ErrorId          := PRG_06_WinchControl.instBucket.ErrorId;
-GVL_IHM.M2Benne.RemainingTravel_M  := PRG_06_WinchControl.instBucket.RemainingTravelM;
-GVL_IHM.M2Benne.CloseActive         := PRG_06_WinchControl.instBucket.CloseReq; // 🆕 REX 2026-07-08
-GVL_IHM.M2Benne.OpenActive          := PRG_06_WinchControl.instBucket.OpenReq;  // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBenne.Bucket.State.FBState          := PRG_06_WinchControl.instBucket.State;
+GVL_IHM.M2TreuilBenne.Bucket.State.ActiveOffset_M   := PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2StartStop      := PRG_06_WinchControl.instBucket.M2_StartStop;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2Direction      := PRG_06_WinchControl.instBucket.M2_Direction;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2ForceSlowSpeed := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
+GVL_IHM.M2TreuilBenne.Bucket.State.Ready            := PRG_06_WinchControl.instBucket.Ready;
+GVL_IHM.M2TreuilBenne.Bucket.State.Busy             := PRG_06_WinchControl.instBucket.Busy;
+GVL_IHM.M2TreuilBenne.Bucket.State.Done             := PRG_06_WinchControl.instBucket.Done;
+GVL_IHM.M2TreuilBenne.Bucket.State.Error            := PRG_06_WinchControl.instBucket.Error;
+GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId          := PRG_06_WinchControl.instBucket.ErrorId;
+GVL_IHM.M2TreuilBenne.Bucket.State.RemainingTravel_M:= PRG_06_WinchControl.instBucket.RemainingTravelM;
+GVL_IHM.M2TreuilBenne.Bucket.State.CloseActive      := PRG_06_WinchControl.instBucket.CloseReq; // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBenne.Bucket.State.OpenActive       := PRG_06_WinchControl.instBucket.OpenReq;  // 🆕 REX 2026-07-08
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
 // doit être égale à GVL_IHM.M1TreuilRetenue.Position_M quand tout est nominal (voir bandeau ST_BucketHMI).
-GVL_IHM.M2Benne.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
-GVL_IHM.M2Benne.State            := _BucketState;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.M2TreuilBenne.Bucket.State.MechState        := _BucketState;
 
 
 // ── 8. MAPPING ÉTATS SYNCHRONISATION → IHM ─────────────────────────────────
-GVL_IHM.Sync.DeltaPos_M   := PRG_06_WinchControl.instWinchSync.DeltaPosM;
-GVL_IHM.Sync.SyncActive := PRG_06_WinchControl.instWinchSync.SyncActive;
-GVL_IHM.Sync.SyncWarn   := PRG_06_WinchControl.instWinchSync.SyncWarn;
-GVL_IHM.Sync.Ready      := PRG_06_WinchControl.instWinchSync.Ready;
-GVL_IHM.Sync.Error      := PRG_06_WinchControl.instWinchSync.Error;
-GVL_IHM.Sync.ErrorId    := PRG_06_WinchControl.instWinchSync.ErrorId;
-GVL_IHM.Sync.State      := PRG_06_WinchControl.instWinchSync.State;
+GVL_IHM.M1M2Sync.State.DeltaPos_M   := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.M1M2Sync.State.SyncActive := PRG_06_WinchControl.instWinchSync.SyncActive;
+GVL_IHM.M1M2Sync.State.SyncWarn   := PRG_06_WinchControl.instWinchSync.SyncWarn;
+GVL_IHM.M1M2Sync.State.Ready      := PRG_06_WinchControl.instWinchSync.Ready;
+GVL_IHM.M1M2Sync.State.Error      := PRG_06_WinchControl.instWinchSync.Error;
+GVL_IHM.M1M2Sync.State.ErrorId    := PRG_06_WinchControl.instWinchSync.ErrorId;
+GVL_IHM.M1M2Sync.State.FBState    := PRG_06_WinchControl.instWinchSync.State;
 
 
 // ── 9. MAPPING ÉTATS TRANSLATION M3 → IHM ────────────────────────────────────
@@ -607,7 +620,7 @@ GVL_IHM.Cycle.SelTarget    := GVL_IHM.TranslationM3.Cmd.SelTarget;
 GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
 GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.LimitLegalDepth_M      := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
+GVL_IHM.Cycle.LimitLegalDepth_M      := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
 GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
 GVL_IHM.Cycle.WinchSyncDelta_M       := PRG_06_WinchControl.instWinchSync.DeltaPosM;
 GVL_IHM.Cycle.M1Position_M           := PRG_02_Encoders.instEncoderScaleM1.CablePosM;

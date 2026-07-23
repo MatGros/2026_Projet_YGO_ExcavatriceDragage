@@ -15,12 +15,8 @@ STRUCT
     BrakeThermalFault         : BOOL; (* 🌡️ Défaut/perte thermique frein — retour unique commun M1/M2/M3, escalade PowerCutOff *)
     PhaseRotationFault        : BOOL; (* 🆕 REX 2026-07-08 : rotation de phase incorrecte — retour unique commun M1/M2/M3
                                           (auparavant invisible IHM, seulement décodable via SafetyErrorId bit4/bit2) *)
-    LimitLegalDepthMinAllowed_M : REAL; (* 📐 Cote min de dragage autorisée (m, négatif) *)
-    LimitLegalEnabled         : BOOL; (* 🟢 Activation de la limite légale *)
     LimitLegalReached         : BOOL; (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
-    SelHomingApproachEnable    : BOOL; (* 🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser
-                                          l'arrêt normal haut pour approcher le capteur physique (préparation
-                                          homing) — voir FB_Modes.HomingApproachEnable, commun M1/M2 *)
+    Cfg                       : ST_CommunCfg; (* 🔧 Configuration des paramètres communs machine *)
     HydraulicThermalFault     : BOOL; (* 🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique
                                           (PRG_08_AuxiliaryControl, diagnostic seul — aucune commande PLC) *)
 

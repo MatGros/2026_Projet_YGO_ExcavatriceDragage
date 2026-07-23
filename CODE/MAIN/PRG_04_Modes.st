@@ -36,7 +36,7 @@ PrevInhibitM2 := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit;
 // 🆕 Si l'un des treuils est inhibé, synchro impossible par nature -> reset case IHM à TRUE
 // (🔧 REX 2026-07-08 : polarité inversée, TRUE = état neutre "synchro voulue")
 IF GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit OR GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit THEN
-    GVL_IHM.Sync.SelSyncEnable := TRUE;
+    GVL_IHM.M1M2Sync.Cmd.SelSyncEnable := TRUE;
 END_IF;
 
 instModes(
@@ -47,7 +47,7 @@ instModes(
     SelSyncEnable   := GVL_Modes_Stub.SyncEnableRequest_IHM,
     InhibitM1Request    := GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     InhibitM2Request    := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
-    SelHomingApproachEnable := GVL_IHM.Commun.SelHomingApproachEnable, // 🆕 REX 2026-07-08 (2)
+    SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable, // 🆕 REX 2026-07-08 (2)
     EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
     JoystickWinchSelectRequest := GVL_IHM.Modes.SelJoystickWinch // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
 );

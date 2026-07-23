@@ -20,5 +20,8 @@ STRUCT
 
     (* 🔧 Bypass maintenance *)
     Bypass                  : ST_BypassWinch;
+
+    (* 🪣 Benne — pertinent uniquement pour M2 (M2TreuilBenne.Bucket), M1 ne l'utilise pas — voir §1 *)
+    Bucket                  : ST_BucketHMI;
 END_STRUCT
 END_TYPE
