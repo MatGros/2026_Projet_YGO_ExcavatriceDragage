@@ -29,6 +29,7 @@ VAR_INPUT
     HomingSuspect    : BOOL;        // Sortie FB_Encoder_Homing DE CE TREUIL (§3.7, déjà calculé)
     PositionMinM     : REAL := -99.0;  // Bornage physique dur (Partie10 §3.6)
     PositionMaxM     : REAL := 99.0;
+    BypassGlobal     : BOOL := FALSE;  // 🌐 Force ErrorId=0, ignore bornage (mise en service)
 END_VAR
 VAR_OUTPUT
     Ready            : BOOL;
@@ -64,8 +65,13 @@ State := E_State.READY;
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
+// 🌐 BYPASS GLOBAL : force ErrorId = 0, ignore bornage et incohérence
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
 // 🔍 3. BORNAGE PHYSIQUE ABSOLU (§3.6) — bit0
-IF (CablePosM < PositionMinM) OR (CablePosM > PositionMaxM) THEN
+IF NOT BypassGlobal AND ((CablePosM < PositionMinM) OR (CablePosM > PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -74,10 +80,12 @@ END_IF;
 // 🔍 4. RELAIS INCOHÉRENCE REDÉMARRAGE (§3.7, calculée par FB_Encoder_Homing) — bit1
 // Pas d'acquittement ici : la levée se fait via BtnConfirmCoherence/nouveau Home côté
 // FB_Encoder_Homing (source), ce FB ne fait QUE relayer l'information pour FB_Modes.
-IF HomingSuspect THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSE
-    ErrorId := ErrorId AND 16#FFFD;
+IF NOT BypassGlobal THEN
+    IF HomingSuspect THEN
+        ErrorId := ErrorId OR 16#0002;
+    ELSE
+        ErrorId := ErrorId AND 16#FFFD;
+    END_IF;
 END_IF;
 
 // 🧊 5. GELER SUR DOUTE (§6) — CablePosMSafe ne suit PAS CablePosM si hors plage

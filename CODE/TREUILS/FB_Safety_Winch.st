@@ -168,6 +168,8 @@ VAR_INPUT
     MovementSpeedThresholdMps : REAL := 0.02; // Seuil mouvement mesurable pour contrôles sens/absence
     OppositeDirectionTimeout  : TIME := T#500MS; // Confirmation sens réel opposé à la commande
     NoMovementTimeout         : TIME := T#3S;    // Confirmation absence de mouvement malgré commande
+    // 🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications
+    BypassGlobal              : BOOL := FALSE;
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -280,8 +282,19 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
-// 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL
-IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
+// 🌐 BYPASS GLOBAL : si TRUE, on force ErrorId = 0 ET on saute toute la logique de sécurité
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+    TonMecaB(IN := FALSE);
+    TonMecaD(IN := FALSE);
+    TonOppositeDirection(IN := FALSE);
+    TonMecaE(IN := FALSE);
+END_IF;
+
+// 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
+IF NOT BypassGlobal THEN
+
+    IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
     ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -483,6 +496,8 @@ IF TonNoMovement.Q THEN
 ELSIF ResetEdge.Q AND (NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) >= MovementSpeedThresholdMps)) THEN
     ErrorId := ErrorId AND 16#7FFF;
 END_IF;
+
+END_IF; // fin IF NOT BypassGlobal
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)

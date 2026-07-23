@@ -61,6 +61,7 @@ VAR_INPUT
      ConfirmClosePosition : BOOL;            // 🆕 REX 2026-07-08 : bouton IHM référencement benne fermé (front, mise en service)
      InhibitM1           : BOOL;             // 🆕 REX 2026-07-08 : M1 est inhibé
      InhibitM2           : BOOL;             // 🆕 REX 2026-07-08 : M2 est inhibé
+     BypassGlobal        : BOOL := FALSE;    // 🌐 TRUE = force ErrorId=0, ignore toutes les erreurs benne
  END_VAR
 VAR_OUTPUT
     Ready               : BOOL;             // FB prêt à fonctionner
@@ -127,6 +128,12 @@ END_IF;
 
 // 🔑 2. GESTION DU RESET (FRONT MONTANT)
 ResetEdge(CLK := Reset);
+
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 (ignore toutes les erreurs benne)
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
 IF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;

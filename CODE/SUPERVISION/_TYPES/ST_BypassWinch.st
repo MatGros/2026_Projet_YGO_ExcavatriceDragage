@@ -13,5 +13,6 @@ TYPE ST_BypassWinch :
 STRUCT
     EncoderFault      : BOOL; (* 🔧 Autorisation maintenue de manœuvre sans codeur, effective uniquement MAINT_N2 *)
     ContactorFeedback : BOOL; (* 🔌 Bypass retours contacteurs (banc de test) *)
+    Global            : BOOL; (* 🌐 Bypass GLOBAL : ignore TOUTES les surveillances de ce treuil (M1 ou M2) *)
 END_STRUCT
 END_TYPE

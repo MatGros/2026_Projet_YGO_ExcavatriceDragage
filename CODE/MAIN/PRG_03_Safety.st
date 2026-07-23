@@ -67,7 +67,9 @@ instSafetyWinchM1(
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2 // 🆕 REX 2026-07-08 (7)
+    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 (7)
+    // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
+    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 // 2. Sécurité Treuil M2
@@ -110,7 +112,8 @@ instSafetyWinchM2(
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
+    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 (7)
+    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 // 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
@@ -186,5 +189,15 @@ instSafetyTranslationM3(
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
     LimitSwitchFwd      := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd,
     LimitSwitchRev      := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev,
-    SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent
+    SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent,
+    // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass - pilotés IHM)
+    BypassGlobal          := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassOperatorComm    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.OperatorComm,
+    BypassDriveComm       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.DriveComm,
+    BypassPhaseRotation   := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.PhaseRotation,
+    BypassBrakeThermal    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.BrakeThermal,
+    BypassMecaB           := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.MecaB,
+    BypassMecaA           := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.MecaA,
+    BypassLimitSwitch     := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch,
+    BypassSensorIncoherent:= GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.SensorIncoherent
 );

@@ -54,6 +54,7 @@ VAR_INPUT
     PointsPerRev         : UDINT := 8192;   // Confirmé fiche technique (Partie10 §3.3)
     MultiTurnRevsMax     : UDINT := 4096;   // Confirmé fiche technique (Partie10 §3.3)
     CableM_PerRev        : REAL := 2.0;     // Confirmé terrain 2026-07-02 (Partie10 §2)
+    BypassGlobal         : BOOL := FALSE;   // 🌐 Ignore arrêt confirmé et capteur haut (mise en service)
 END_VAR
 VAR_OUTPUT
     Ready                : BOOL;
@@ -132,7 +133,8 @@ END_IF;
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
 // 🛡️ Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
-ArretConfirme := FwdRevSpeedFeedbackOff AND BrakeFeedback;
+// 🌐 BypassGlobal = TRUE → on saute la vérification d'arrêt (mise en service)
+ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
@@ -143,7 +145,15 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
     END_IF;
 
     // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
-    IF (Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2) THEN
+    // 🌐 BypassGlobal = TRUE → saute TOUTES les vérifications, force le homing
+    IF BypassGlobal THEN
+        // Force homing sans condition
+        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        PresetValue := PresetValueCalc;
+        PresetRequest := TRUE;
+        State := E_State.BUSY;
+    ELSIF (Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
     ELSIF UnitaryMode AND (Mode <> E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;
@@ -155,11 +165,12 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
     ELSIF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
         ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
-    ELSIF NOT UnitaryMode AND TopPositionSensor THEN
+    ELSIF NOT BypassGlobal AND NOT UnitaryMode AND (TargetPositionM <> 0.0) AND TopPositionSensor THEN
         // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
         // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
         // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
-        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé (requis uniquement en MAINT_N1)
+        // 🆕 Si TargetPositionM = 0.0 (homing à zéro), on ignore le capteur haut (position courante).
+        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)

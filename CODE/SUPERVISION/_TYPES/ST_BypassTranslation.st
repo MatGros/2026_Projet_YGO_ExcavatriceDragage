@@ -6,6 +6,35 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BypassTranslation :
 STRUCT
-    ContactorFeedback : BOOL; (* 🔌 Activation du bypass des retours contacteurs (sens + frein) *)
+    (* 🔌 Bypass retour contacteur frein (existant) *)
+    ContactorFeedback : BOOL;
+
+    (* 🧭 Bypass mot capteurs M3 incohérent *)
+    SensorIncoherent : BOOL;
+
+    (* 🚧 Bypass butées extrêmes (LimitSwitchFwd / LimitSwitchRev) *)
+    LimitSwitch : BOOL;
+
+    (* 📡 Bypass perte communication opérateur (joystick CAN / heartbeat IHM) *)
+    OperatorComm : BOOL;
+
+    (* 📡 Bypass perte communication drive (EtherCAT) *)
+    DriveComm : BOOL;
+
+    (* ⚡ Bypass défaut rotation de phases *)
+    PhaseRotation : BOOL;
+
+    (* 🌡️ Bypass surchauffe frein *)
+    BrakeThermal : BOOL;
+
+    (* 🛑 Bypass Méca B (absence confirmation arrêt) *)
+    MecaB : BOOL;
+
+    (* 🔄 Bypass Méca A (mouvement non commandé) *)
+    MecaA : BOOL;
+
+    (* 🌐 Bypass GLOBAL : désactive TOUTES les surveillances Safety Translation M3
+       ⚠️ Prioritaire sur les bypass individuels ci-dessus *)
+    Global : BOOL;
 END_STRUCT
 END_TYPE

@@ -110,7 +110,8 @@ instBucket(
     CfgTimeoutDuration     := GVL_IHM.M2Benne.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
-    InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
+    InhibitM2           := PRG_04_Modes.instModes.InhibitM2,  // 🆕 REX 2026-07-08
+    BypassGlobal        := GVL_IHM.M2Benne.BypassGlobal      // 🌐 Bypass benne (RETAIN)
 );
 
 // 🆕 REX 2026-07-08 (4) — Concept 1 (écart synchro mineur) : bit0 seul (écart position, hors
@@ -176,22 +177,22 @@ ELSE
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
         M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
     ELSE
-        // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — même sélection treuil, même homme-mort
-        // joystick réel obligatoire, même gate directionnel synchro que la branche joystick ci-dessus.
-        IF GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
+        // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
+        // Remplacent l'ancien sélecteur JoystickWinchSelectArbitrated.
+        // Priorité : Both > M1/M2 individuels
+        IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1_Direction_Active := 1;
-        ELSIF GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
+        ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1_Direction_Active := -1;
         ELSE
             M1_Direction_Active := 0;
         END_IF;
         M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed // 🔒 homme-mort joystick reel TOUJOURS requis, meme en boutons
-                                AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
-                                     OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
+                                AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                     OR GVL_IHM.M1TreuilRetenue.Bypass.Global)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
-        M1_SpeedRef_Active  := 100.0; // Vitesse pleine echelle bouton maintenu — FB_SpeedStep/rampe gerent la progression paliers, identique au joystick a fond
+        M1_SpeedRef_Active  := 100.0;
     END_IF;
 END_IF;
 
@@ -239,21 +240,21 @@ ELSE
             M2_SpeedRef_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
         ELSE
             // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — BtnUp M2 = enroulage/montée (+1),
-            // même convention que le joystick (AxisCmdY.Direction=+1 => Direction=+1).
-            IF GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
+            // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
+            // Priorité : Both > M2 > M1
+            IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2_Direction_Active := 1;
-            ELSIF GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
+            ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2_Direction_Active := -1;
             ELSE
                 M2_Direction_Active := 0;
             END_IF;
             M2_StartStop_Active := (M2_Direction_Active <> 0)
-                                    AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed // 🔒 homme-mort joystick reel TOUJOURS requis, meme en boutons
-                                    AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
-                                         OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
+                                    AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                         OR GVL_IHM.M2TreuilBenne.Bypass.Global)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
-            M2_SpeedRef_Active := 100.0; // Vitesse pleine echelle bouton maintenu — FB_SpeedStep/rampe gerent la progression paliers
+            M2_SpeedRef_Active := 100.0;
         END_IF;
     END_IF;
 END_IF;
@@ -310,7 +311,8 @@ instWinchSync(
     Contactor3_M1   := instWinchM1.Contactor3,
     Contactor3_M2   := instWinchM2.Contactor3,
     Contactor4_M1   := instWinchM1.Contactor4,
-    Contactor4_M2   := instWinchM2.Contactor4
+    Contactor4_M2   := instWinchM2.Contactor4,
+    BypassGlobal    := GVL_IHM.Sync.BypassGlobal
 );
 
 // Table active M2 (verrouille TOUS les paliers sur la combinaison réelle du palier 1 si
@@ -482,7 +484,9 @@ instWinchM1(
     TopLimitM               := _CableLimitM1Ascent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct
+    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
+    BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
@@ -522,7 +526,9 @@ instWinchM2(
     TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct
+    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    // 🌐 Bypass Global M2 (GVL_IHM.M2TreuilBenne.Bypass.Global)
+    BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 // ── 8. ALIMENTATION PRG_10_Outputs (sorties physiques) ──────────────────
