@@ -129,10 +129,31 @@ Groupe **conservé** `GVL_IHM.Modes`, split interne en `Cmd`/`State` :
 
 ---
 
+## ✅ Lot 2e — Joystick (vérifié)
+
+Groupe **conservé** `GVL_IHM.JOY1Joystick`, split interne en `Cmd`/`State` :
+
+| Ancien chemin | Nouveau chemin |
+|---|---|
+| `GVL_IHM.JOY1Joystick.BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` |
+| `GVL_IHM.JOY1Joystick.RawX` | `GVL_IHM.JOY1Joystick.State.RawX` |
+| `GVL_IHM.JOY1Joystick.RawY` | `GVL_IHM.JOY1Joystick.State.RawY` |
+| `GVL_IHM.JOY1Joystick.RawButton` | `GVL_IHM.JOY1Joystick.State.RawButton` |
+| `GVL_IHM.JOY1Joystick.AxisCmdX` | `GVL_IHM.JOY1Joystick.State.AxisCmdX` |
+| `GVL_IHM.JOY1Joystick.AxisCmdY` | `GVL_IHM.JOY1Joystick.State.AxisCmdY` |
+| `GVL_IHM.JOY1Joystick.NeutralXAct` | `GVL_IHM.JOY1Joystick.State.NeutralXAct` |
+| `GVL_IHM.JOY1Joystick.NeutralYAct` | `GVL_IHM.JOY1Joystick.State.NeutralYAct` |
+| `GVL_IHM.JOY1Joystick.DeadmanArmed` | `GVL_IHM.JOY1Joystick.State.DeadmanArmed` |
+| `GVL_IHM.JOY1Joystick.Online` | `GVL_IHM.JOY1Joystick.State.Online` |
+| `GVL_IHM.JOY1Joystick.Operational` | `GVL_IHM.JOY1Joystick.State.Operational` |
+| `GVL_IHM.JOY1Joystick.Error` | `GVL_IHM.JOY1Joystick.State.Error` |
+| `GVL_IHM.JOY1Joystick.ErrorId` | `GVL_IHM.JOY1Joystick.State.ErrorId` |
+
+---
+
 ## 🔜 Lots à venir (pas encore de document de tâche)
 
-- **Joystick** — split Cmd/State prévu.
-- **Cycle** — split Cmd/State/Cfg prévu (contient `SetDepth_M`/`SetOffset_M`, priorité 1).
+- **Cycle** — split Cmd/State/Cfg/Test prévu (contient `SetDepth_M`/`SetOffset_M`, priorité 1, T66).
 
 Cette section sera complétée à chaque nouveau lot committé — une seule table par domaine, jamais
 de réécriture des lots déjà ✅.

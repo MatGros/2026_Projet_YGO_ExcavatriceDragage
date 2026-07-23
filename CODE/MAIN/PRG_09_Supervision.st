@@ -140,7 +140,7 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFaile
 // homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.BtnHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
-// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
+// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
@@ -631,18 +631,18 @@ GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.JOY1Joystick.RawX       := PRG_01_Diagnostics.FB_Joystick_0.RawX;
-GVL_IHM.JOY1Joystick.RawY       := PRG_01_Diagnostics.FB_Joystick_0.RawY;
-GVL_IHM.JOY1Joystick.RawButton  := PRG_01_Diagnostics.FB_Joystick_0.RawButton;
-GVL_IHM.JOY1Joystick.AxisCmdX        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.JOY1Joystick.AxisCmdY        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.JOY1Joystick.NeutralXAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct;
-GVL_IHM.JOY1Joystick.NeutralYAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct;
-GVL_IHM.JOY1Joystick.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
-GVL_IHM.JOY1Joystick.Online     := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
-GVL_IHM.JOY1Joystick.Operational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.JOY1Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JOY1Joystick.State.RawX         := PRG_01_Diagnostics.FB_Joystick_0.RawX;
+GVL_IHM.JOY1Joystick.State.RawY         := PRG_01_Diagnostics.FB_Joystick_0.RawY;
+GVL_IHM.JOY1Joystick.State.RawButton    := PRG_01_Diagnostics.FB_Joystick_0.RawButton;
+GVL_IHM.JOY1Joystick.State.AxisCmdX     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.JOY1Joystick.State.Online       := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JOY1Joystick.State.Operational  := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.State.Error        := PRG_01_Diagnostics.FB_Joystick_0.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────

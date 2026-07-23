@@ -143,7 +143,7 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnRev := FALSE;
-    GVL_IHM.JOY1Joystick.BtnCalibrate := FALSE;
+    GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate := FALSE;
 
     HmiCommandsInitialized := TRUE;
     GVL_IHM.HmiInitDone := TRUE;

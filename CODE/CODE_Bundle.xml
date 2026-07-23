@@ -2290,7 +2290,61 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_JoystickCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnCalibrate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>486d3dcf-ebc5-586d-9a94-ea39a076f411</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_JoystickCmd — Commandes IHM pour le Joystick
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_JoystickHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_JoystickCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_JoystickState" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5f006dc4-3bb9-55fd-9755-c378359d9979</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
+   Bypass (concept absent de ce struct).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_JoystickState">
         <baseType>
           <struct>
             <variable name="RawX">
@@ -2373,14 +2427,6 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Joystick opérationnel</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnCalibrate">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre</xhtml>
-              </documentation>
-            </variable>
             <variable name="Error">
               <type>
                 <BOOL />
@@ -2401,14 +2447,12 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>5f006dc4-3bb9-55fd-9755-c378359d9979</ObjectId>
+            <ObjectId>f7e9804f-8654-5e66-a418-611d9f5fae02</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
-   ───────────────────────────────────────────────────────────────
-   🎨 Destiné à l'affichage et au contrôle du joystick depuis l'IHM.
+   🚦 ST_JoystickState — États et diagnostics IHM du Joystick
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -28806,7 +28850,7 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnRev := FALSE;
-    GVL_IHM.JOY1Joystick.BtnCalibrate := FALSE;
+    GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate := FALSE;
 
     HmiCommandsInitialized := TRUE;
     GVL_IHM.HmiInitDone := TRUE;
@@ -29161,7 +29205,7 @@ FB_Joystick_0(
     RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
     RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
     RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
-    BtnCalibrate           := GVL_IHM.JOY1Joystick.BtnCalibrate,
+    BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
     InvertY             := _JoystickInvertY,       // 🔧 idem
     Deadband            := _JoystickDeadband_Pct,  // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
@@ -31259,7 +31303,7 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFaile
 // homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.BtnHome sont désormais câblés
 // directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
 
-// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
+// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
@@ -31750,18 +31794,18 @@ GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.JOY1Joystick.RawX       := PRG_01_Diagnostics.FB_Joystick_0.RawX;
-GVL_IHM.JOY1Joystick.RawY       := PRG_01_Diagnostics.FB_Joystick_0.RawY;
-GVL_IHM.JOY1Joystick.RawButton  := PRG_01_Diagnostics.FB_Joystick_0.RawButton;
-GVL_IHM.JOY1Joystick.AxisCmdX        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.JOY1Joystick.AxisCmdY        := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.JOY1Joystick.NeutralXAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct;
-GVL_IHM.JOY1Joystick.NeutralYAct := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct;
-GVL_IHM.JOY1Joystick.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
-GVL_IHM.JOY1Joystick.Online     := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
-GVL_IHM.JOY1Joystick.Operational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.Error       := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.JOY1Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JOY1Joystick.State.RawX         := PRG_01_Diagnostics.FB_Joystick_0.RawX;
+GVL_IHM.JOY1Joystick.State.RawY         := PRG_01_Diagnostics.FB_Joystick_0.RawY;
+GVL_IHM.JOY1Joystick.State.RawButton    := PRG_01_Diagnostics.FB_Joystick_0.RawButton;
+GVL_IHM.JOY1Joystick.State.AxisCmdX     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.JOY1Joystick.State.Online       := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JOY1Joystick.State.Operational  := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.State.Error        := PRG_01_Diagnostics.FB_Joystick_0.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
@@ -34458,7 +34502,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
             <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
             <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
             <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
+            <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
             <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
             <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
             <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />

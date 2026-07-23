@@ -102,7 +102,7 @@ FB_Joystick_0(
     RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
     RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
     RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
-    BtnCalibrate           := GVL_IHM.JOY1Joystick.BtnCalibrate,
+    BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
     InvertY             := _JoystickInvertY,       // 🔧 idem
     Deadband            := _JoystickDeadband_Pct,  // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
