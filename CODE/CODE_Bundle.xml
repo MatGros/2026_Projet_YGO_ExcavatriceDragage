@@ -1868,29 +1868,9 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_CycleHMI">
+      <dataType name="ST_CycleCfg">
         <baseType>
           <struct>
-            <variable name="BtnStart">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BtnPause">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BtnAbort">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BtnReset">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="SetDepth_M">
               <type>
                 <REAL />
@@ -1898,6 +1878,9 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
               <initialValue>
                 <simpleValue value="-12.5" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
+              </documentation>
             </variable>
             <variable name="SetOffset_M">
               <type>
@@ -1906,121 +1889,108 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
               <initialValue>
                 <simpleValue value="1.5" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
+              </documentation>
             </variable>
-            <variable name="Ready">
+            <variable name="Initialized">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
             </variable>
-            <variable name="Busy">
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>19cafd99-3b26-50ad-b40a-cdf9fb79d238</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_CycleCfg — Configuration du cycle semi-automatique
+   🐛 T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_09_Supervision.st §2/§3)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnStart">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">▶️ Lancement cycle automatique</xhtml>
+              </documentation>
             </variable>
-            <variable name="Done">
+            <variable name="BtnPause">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏸️ Pause cycle automatique</xhtml>
+              </documentation>
             </variable>
-            <variable name="Error">
+            <variable name="BtnAbort">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏹️ Abandon / arrêt cycle automatique</xhtml>
+              </documentation>
             </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-            <variable name="CycleStep">
-              <type>
-                <derived name="E_CycleStep" />
-              </type>
-            </variable>
-            <variable name="CycleStateStr">
-              <type>
-                <string length="80" />
-              </type>
-            </variable>
-            <variable name="SelTarget">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="KoboldContactFond">
+            <variable name="BtnReset">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général (REX 2026-07-07)</xhtml>
+              </documentation>
             </variable>
-            <variable name="KoboldContactorCmd">
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_CycleCmd — Commandes IHM pour le cycle semi-automatique
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
               <type>
-                <BOOL />
+                <derived name="ST_CycleCmd" />
               </type>
             </variable>
-            <variable name="LimitLegalReached">
+            <variable name="State">
               <type>
-                <BOOL />
+                <derived name="ST_CycleState" />
               </type>
             </variable>
-            <variable name="LimitLegalDepth_M">
+            <variable name="Cfg">
               <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="WinchSyncError">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="WinchSyncDelta_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="SpeedMismatch_Mps">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="SpeedMismatchActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="SpeedMismatchConfirmed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1Position_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="M2Position_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="DeadmanArmed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="JoystickMotionActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="MotionPermit">
-              <type>
-                <BOOL />
+                <derived name="ST_CycleCfg" />
               </type>
             </variable>
             <variable name="Test">
               <type>
                 <derived name="ST_TestCycle" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ INCHANGÉ — déjà un sous-struct correctement isolé avant ce lot</xhtml>
+              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -2030,8 +2000,206 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Interface IHM du cycle semi-automatique.
-   Les commandes Cmd* sont des impulsions acquittées par le PLC.</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State / Cfg / Test (2026-07-24), homogène avec ST_WinchHMI.
+   🐛 T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_09_Supervision.st §2/§3) —
+   avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
+   compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleState">
+        <baseType>
+          <struct>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Séquenceur prêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Cycle en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Cycle terminé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code défaut cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Étape courante du Grafcet</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStateStr">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Libellé texte de l'étape courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Miroir lecture seule de GVL_IHM.TranslationM3.Cmd.SelTarget</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactFond">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique réel capteur contact de fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Commande contacteur Kobold (calculée par FB_Cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Miroir de GVL_IHM.Commun.LimitLegalReached</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Miroir de GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Miroir de l'erreur synchro M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncDelta_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Miroir de l'écart synchro M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatch_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré (T43/T45)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse détecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Position câble M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Position câble M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Homme-mort joystick armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickMotionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Mouvement joystick actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Homme-mort + axe Y actif (CycleMotionPermit)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3316cae9-98ac-5b12-9b8d-a24f1a7445d8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_CycleState — États et diagnostics IHM du cycle semi-automatique
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_DiagDevice">
@@ -12470,7 +12638,7 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
     Report.InProgress := FALSE; Report.Aborted := TRUE; Report.AnyFailed := TRUE;
@@ -12492,7 +12660,7 @@ IF Abort OR NOT SimGateOk THEN
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
     IF Busy THEN GVL_IHM.Modes.Cmd.SelMode := StimModeRequest; END_IF;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
@@ -12772,7 +12940,7 @@ GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
 GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
 GVL_IHM.Modes.Cmd.SelMode := StimModeRequest;
 GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-GVL_IHM.Cycle.BtnReset := FALSE;
+GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 
 CASE ActiveStimulusId OF
     1: // TC-H1/TC-H4 : toggle sain 500 ms + SEMI_AUTO
@@ -12810,7 +12978,7 @@ CASE ActiveStimulusId OF
         StimResetPulseTimer(IN := TRUE, PT := T#1500ms);
         IF NOT StimResetPulseTimer.Q THEN
             GVL_IHM.Modes.Cmd.BtnFaultReset := TRUE;
-            GVL_IHM.Cycle.BtnReset := TRUE;
+            GVL_IHM.Cycle.Cmd.BtnReset := TRUE;
         END_IF;
 
     5: // TC-H5 : perte IHM + frein M3 desserré → Méca B
@@ -12831,7 +12999,7 @@ IF ErrorCode &lt;&gt; 0 THEN
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
     GVL_IHM.Modes.Cmd.SelMode := StimModeRequest;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_FAILED;
@@ -14423,7 +14591,7 @@ Done := FALSE;
               (perte EmergencyStopOk → Mode=DISABLE + FB_Winch neutralisé,
               quel que soit le mode précédent)
       TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais — une tentative réelle de
-              démarrage (`GVL_IHM.Cycle.CmdStart`) hors SEMI_AUTO reste sans effet.
+              démarrage (`GVL_IHM.Cycle.Cmd.BtnStart`) hors SEMI_AUTO reste sans effet.
       TC-M7 : DISABLE explicite neutralise M1/M2/M3.
       TC-M8 : bypass codeur refusé hors MAINT_N2, accepté en MAINT_N2 après Reset.
       TC-M9 : ConfigError FB_SpeedStep remonte au bit2 de FB_Winch, sorties sûres.
@@ -14452,7 +14620,7 @@ IF Abort THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnStart := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
     GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     Busy := FALSE;
@@ -14714,13 +14882,13 @@ CASE Step OF
     // ─────────── TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais ───────────
     60:
         // 🔧 REX 2026-07-19 (revue mission IHM_MANU, finding B) : tentative RÉELLE de
-        // démarrage (GVL_IHM.Cycle.BtnStart, ré-assertée chaque scan pour couvrir l'ordre
+        // démarrage (GVL_IHM.Cycle.Cmd.BtnStart, ré-assertée chaque scan pour couvrir l'ordre
         // des tâches) pendant &gt;200 ms hors SEMI_AUTO — instCycle.Enable=FALSE doit la rendre
         // sans effet (Busy reste FALSE), pas un simple instantané qui ne prouverait rien.
         GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
-        GVL_IHM.Cycle.BtnStart := TRUE;
+        GVL_IHM.Cycle.Cmd.BtnStart := TRUE;
         IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) AND (StepElapsed &gt;= T#200MS) THEN
-            GVL_IHM.Cycle.BtnStart := FALSE;
+            GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
             IF NOT PRG_05_Cycle.instCycle.Busy THEN
                 StepPassed := TRUE;
                 IF RequestedCaseId = 6 THEN Step := 0; ELSE Step := 65; END_IF;
@@ -14888,7 +15056,7 @@ CASE Step OF
         GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := TRUE;
         GVL_IHM.M2TreuilBenne.Cmd.BtnReset := TRUE;
         GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := TRUE;
-        GVL_IHM.Cycle.BtnStart := TRUE;
+        GVL_IHM.Cycle.Cmd.BtnStart := TRUE;
         GVL_IHM.TranslationM3.Cmd.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
         StepPassed := TRUE;
@@ -14900,7 +15068,7 @@ CASE Step OF
            AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
            AND NOT GVL_IHM.M2TreuilBenne.Cmd.BtnReset
            AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
-           AND NOT GVL_IHM.Cycle.BtnStart
+           AND NOT GVL_IHM.Cycle.Cmd.BtnStart
            AND NOT GVL_IHM.TranslationM3.Cmd.BtnFwd
            AND GVL_IHM.HmiInitDone THEN
             GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
@@ -28842,10 +29010,10 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
 
-    GVL_IHM.Cycle.BtnStart := FALSE;
-    GVL_IHM.Cycle.BtnPause := FALSE;
-    GVL_IHM.Cycle.BtnAbort := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 
     GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;
@@ -30025,12 +30193,12 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
 
 // 🕹️ Interface unique de commande cycle depuis GVL_IHM.
-CmdStartCycle_IHM := GVL_IHM.Cycle.BtnStart;
-CmdPauseCycle_IHM := GVL_IHM.Cycle.BtnPause;
-CmdAbortCycle_IHM := GVL_IHM.Cycle.BtnAbort;
-CmdResetCycle_IHM := GVL_IHM.Cycle.BtnReset;
-SetDepthM      := GVL_IHM.Cycle.SetDepth_M;
-SetOffsetM     := GVL_IHM.Cycle.SetOffset_M;
+CmdStartCycle_IHM := GVL_IHM.Cycle.Cmd.BtnStart;
+CmdPauseCycle_IHM := GVL_IHM.Cycle.Cmd.BtnPause;
+CmdAbortCycle_IHM := GVL_IHM.Cycle.Cmd.BtnAbort;
+CmdResetCycle_IHM := GVL_IHM.Cycle.Cmd.BtnReset;
+SetDepthM      := GVL_IHM.Cycle.Cfg.SetDepth_M;
+SetOffsetM     := GVL_IHM.Cycle.Cfg.SetOffset_M;
 GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.Test.KoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
@@ -30082,15 +30250,15 @@ instCycle(
     Benne_IsClosed    := _BucketState.IsClosed
 );
 
-GVL_IHM.Cycle.SpeedMismatch_Mps         := instCycle.SpeedMismatchMps;
-GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
-GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
+GVL_IHM.Cycle.State.SpeedMismatch_Mps       := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.State.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
+GVL_IHM.Cycle.State.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 
 // 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
-GVL_IHM.Cycle.BtnStart := FALSE;
-GVL_IHM.Cycle.BtnPause := FALSE;
-GVL_IHM.Cycle.BtnAbort := FALSE;
-GVL_IHM.Cycle.BtnReset := FALSE;
+GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
+GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
+GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
+GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 </xhtml>
           </ST>
         </body>
@@ -31367,6 +31535,13 @@ IF NOT GVL_IHM.Commun.Cfg.Initialized THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent    := TRUE;
 END_IF;
 
+IF NOT GVL_IHM.Cycle.Cfg.Initialized THEN
+    GVL_IHM.Cycle.Cfg.SetDepth_M  := _CycleSetDepth_M;
+    GVL_IHM.Cycle.Cfg.SetOffset_M := _CycleSetOffset_M;
+    GVL_IHM.Cycle.Cfg.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
+END_IF;
+
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
 // 🐛 FIX 2026-07-23 : `ConfigRestoredFromPersistent` ne doit JAMAIS disparaître tout seul —
 // même doctrine que les défauts métier (cause disparue + appui reset conscient pour effacer).
@@ -31527,6 +31702,11 @@ END_IF;
 IF GVL_IHM.Commun.Cfg.Initialized THEN
     _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
     _LimitLegalEnabled           := GVL_IHM.Commun.Cfg.LimitLegalEnabled;
+END_IF;
+
+IF GVL_IHM.Cycle.Cfg.Initialized THEN
+    _CycleSetDepth_M  := GVL_IHM.Cycle.Cfg.SetDepth_M;
+    _CycleSetOffset_M := GVL_IHM.Cycle.Cfg.SetOffset_M;
 END_IF;
 
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
@@ -31772,25 +31952,25 @@ GVL_IHM.TranslationM3.State.ActiveDirection      := PRG_07_TranslationControl.M3
 GVL_IHM.TranslationM3.State.ActiveSpeedRef_Pct     := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
 // ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
-GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;
-GVL_IHM.Cycle.Busy                 := PRG_05_Cycle.instCycle.Busy;
-GVL_IHM.Cycle.Done                 := PRG_05_Cycle.instCycle.Done;
-GVL_IHM.Cycle.Error                := PRG_05_Cycle.instCycle.Error;
-GVL_IHM.Cycle.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
-GVL_IHM.Cycle.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
-GVL_IHM.Cycle.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
-GVL_IHM.Cycle.SelTarget    := GVL_IHM.TranslationM3.Cmd.SelTarget;
-GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
-GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
-GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.LimitLegalDepth_M      := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
-GVL_IHM.Cycle.WinchSyncDelta_M       := PRG_06_WinchControl.instWinchSync.DeltaPosM;
-GVL_IHM.Cycle.M1Position_M           := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
-GVL_IHM.Cycle.M2Position_M           := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.Cycle.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
-GVL_IHM.Cycle.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
-GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
+GVL_IHM.Cycle.State.Ready                := PRG_05_Cycle.instCycle.Ready;
+GVL_IHM.Cycle.State.Busy                 := PRG_05_Cycle.instCycle.Busy;
+GVL_IHM.Cycle.State.Done                 := PRG_05_Cycle.instCycle.Done;
+GVL_IHM.Cycle.State.Error                := PRG_05_Cycle.instCycle.Error;
+GVL_IHM.Cycle.State.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
+GVL_IHM.Cycle.State.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
+GVL_IHM.Cycle.State.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
+GVL_IHM.Cycle.State.SelTarget            := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_IHM.Cycle.State.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
+GVL_IHM.Cycle.State.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+GVL_IHM.Cycle.State.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.Cycle.State.LimitLegalDepth_M    := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
+GVL_IHM.Cycle.State.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
+GVL_IHM.Cycle.State.WinchSyncDelta_M     := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.Cycle.State.M1Position_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Cycle.State.M2Position_M         := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.Cycle.State.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.Cycle.State.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+GVL_IHM.Cycle.State.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
@@ -33251,6 +33431,36 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
+        <variable name="_CycleSetDepth_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="-12.5" />
+          </initialValue>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+              <Attributes>
+                <Attribute Name="order_in_persistent_editor" Value="41" />
+              </Attributes>
+            </data>
+          </addData>
+        </variable>
+        <variable name="_CycleSetOffset_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1.5" />
+          </initialValue>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+              <Attributes>
+                <Attribute Name="order_in_persistent_editor" Value="42" />
+              </Attributes>
+            </data>
+          </addData>
+        </variable>
         <variable name="_LimitLegalDepthMinAllowed_M">
           <type>
             <REAL />
@@ -33261,7 +33471,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="41" />
+                <Attribute Name="order_in_persistent_editor" Value="43" />
               </Attributes>
             </data>
           </addData>
@@ -33276,7 +33486,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="42" />
+                <Attribute Name="order_in_persistent_editor" Value="44" />
               </Attributes>
             </data>
           </addData>
@@ -33291,7 +33501,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="43" />
+                <Attribute Name="order_in_persistent_editor" Value="45" />
               </Attributes>
             </data>
           </addData>
@@ -33306,7 +33516,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="44" />
+                <Attribute Name="order_in_persistent_editor" Value="46" />
               </Attributes>
             </data>
           </addData>
@@ -33321,7 +33531,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="45" />
+                <Attribute Name="order_in_persistent_editor" Value="47" />
               </Attributes>
             </data>
           </addData>
@@ -33336,7 +33546,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="46" />
+                <Attribute Name="order_in_persistent_editor" Value="48" />
               </Attributes>
             </data>
           </addData>
@@ -34500,7 +34710,10 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
             <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
+            <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+            <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
             <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
+            <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
             <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
             <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
             <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />

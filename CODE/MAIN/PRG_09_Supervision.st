@@ -204,6 +204,13 @@ IF NOT GVL_IHM.Commun.Cfg.Initialized THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent    := TRUE;
 END_IF;
 
+IF NOT GVL_IHM.Cycle.Cfg.Initialized THEN
+    GVL_IHM.Cycle.Cfg.SetDepth_M  := _CycleSetDepth_M;
+    GVL_IHM.Cycle.Cfg.SetOffset_M := _CycleSetOffset_M;
+    GVL_IHM.Cycle.Cfg.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
+END_IF;
+
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
 // 🐛 FIX 2026-07-23 : `ConfigRestoredFromPersistent` ne doit JAMAIS disparaître tout seul —
 // même doctrine que les défauts métier (cause disparue + appui reset conscient pour effacer).
@@ -364,6 +371,11 @@ END_IF;
 IF GVL_IHM.Commun.Cfg.Initialized THEN
     _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
     _LimitLegalEnabled           := GVL_IHM.Commun.Cfg.LimitLegalEnabled;
+END_IF;
+
+IF GVL_IHM.Cycle.Cfg.Initialized THEN
+    _CycleSetDepth_M  := GVL_IHM.Cycle.Cfg.SetDepth_M;
+    _CycleSetOffset_M := GVL_IHM.Cycle.Cfg.SetOffset_M;
 END_IF;
 
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
@@ -609,25 +621,25 @@ GVL_IHM.TranslationM3.State.ActiveDirection      := PRG_07_TranslationControl.M3
 GVL_IHM.TranslationM3.State.ActiveSpeedRef_Pct     := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
 // ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
-GVL_IHM.Cycle.Ready                := PRG_05_Cycle.instCycle.Ready;
-GVL_IHM.Cycle.Busy                 := PRG_05_Cycle.instCycle.Busy;
-GVL_IHM.Cycle.Done                 := PRG_05_Cycle.instCycle.Done;
-GVL_IHM.Cycle.Error                := PRG_05_Cycle.instCycle.Error;
-GVL_IHM.Cycle.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
-GVL_IHM.Cycle.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
-GVL_IHM.Cycle.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
-GVL_IHM.Cycle.SelTarget    := GVL_IHM.TranslationM3.Cmd.SelTarget;
-GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
-GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
-GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.LimitLegalDepth_M      := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
-GVL_IHM.Cycle.WinchSyncDelta_M       := PRG_06_WinchControl.instWinchSync.DeltaPosM;
-GVL_IHM.Cycle.M1Position_M           := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
-GVL_IHM.Cycle.M2Position_M           := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.Cycle.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
-GVL_IHM.Cycle.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
-GVL_IHM.Cycle.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
+GVL_IHM.Cycle.State.Ready                := PRG_05_Cycle.instCycle.Ready;
+GVL_IHM.Cycle.State.Busy                 := PRG_05_Cycle.instCycle.Busy;
+GVL_IHM.Cycle.State.Done                 := PRG_05_Cycle.instCycle.Done;
+GVL_IHM.Cycle.State.Error                := PRG_05_Cycle.instCycle.Error;
+GVL_IHM.Cycle.State.ErrorId              := PRG_05_Cycle.instCycle.ErrorId;
+GVL_IHM.Cycle.State.CycleStep            := PRG_05_Cycle.instCycle.CycleStep;
+GVL_IHM.Cycle.State.CycleStateStr        := PRG_05_Cycle.instCycle.CycleStateStr;
+GVL_IHM.Cycle.State.SelTarget            := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_IHM.Cycle.State.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
+GVL_IHM.Cycle.State.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+GVL_IHM.Cycle.State.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.Cycle.State.LimitLegalDepth_M    := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
+GVL_IHM.Cycle.State.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
+GVL_IHM.Cycle.State.WinchSyncDelta_M     := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.Cycle.State.M1Position_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Cycle.State.M2Position_M         := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_IHM.Cycle.State.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.Cycle.State.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+GVL_IHM.Cycle.State.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────

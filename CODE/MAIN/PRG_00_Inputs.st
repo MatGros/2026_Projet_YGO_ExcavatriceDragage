@@ -135,10 +135,10 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
 
-    GVL_IHM.Cycle.BtnStart := FALSE;
-    GVL_IHM.Cycle.BtnPause := FALSE;
-    GVL_IHM.Cycle.BtnAbort := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 
     GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;

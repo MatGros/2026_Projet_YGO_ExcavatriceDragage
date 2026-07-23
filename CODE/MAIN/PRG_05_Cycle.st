@@ -30,12 +30,12 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_05_Cycle) ===
 
 // 🕹️ Interface unique de commande cycle depuis GVL_IHM.
-CmdStartCycle_IHM := GVL_IHM.Cycle.BtnStart;
-CmdPauseCycle_IHM := GVL_IHM.Cycle.BtnPause;
-CmdAbortCycle_IHM := GVL_IHM.Cycle.BtnAbort;
-CmdResetCycle_IHM := GVL_IHM.Cycle.BtnReset;
-SetDepthM      := GVL_IHM.Cycle.SetDepth_M;
-SetOffsetM     := GVL_IHM.Cycle.SetOffset_M;
+CmdStartCycle_IHM := GVL_IHM.Cycle.Cmd.BtnStart;
+CmdPauseCycle_IHM := GVL_IHM.Cycle.Cmd.BtnPause;
+CmdAbortCycle_IHM := GVL_IHM.Cycle.Cmd.BtnAbort;
+CmdResetCycle_IHM := GVL_IHM.Cycle.Cmd.BtnReset;
+SetDepthM      := GVL_IHM.Cycle.Cfg.SetDepth_M;
+SetOffsetM     := GVL_IHM.Cycle.Cfg.SetOffset_M;
 GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.Test.KoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
@@ -87,12 +87,12 @@ instCycle(
     Benne_IsClosed    := _BucketState.IsClosed
 );
 
-GVL_IHM.Cycle.SpeedMismatch_Mps         := instCycle.SpeedMismatchMps;
-GVL_IHM.Cycle.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
-GVL_IHM.Cycle.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
+GVL_IHM.Cycle.State.SpeedMismatch_Mps       := instCycle.SpeedMismatchMps;
+GVL_IHM.Cycle.State.SpeedMismatchActive     := instCycle.SpeedMismatchActive;
+GVL_IHM.Cycle.State.SpeedMismatchConfirmed  := instCycle.SpeedMismatchConfirmed;
 
 // 🧹 Les commandes restent impulsionnelles même si GVL_IHM est RETAIN.
-GVL_IHM.Cycle.BtnStart := FALSE;
-GVL_IHM.Cycle.BtnPause := FALSE;
-GVL_IHM.Cycle.BtnAbort := FALSE;
-GVL_IHM.Cycle.BtnReset := FALSE;
+GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
+GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
+GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
+GVL_IHM.Cycle.Cmd.BtnReset := FALSE;

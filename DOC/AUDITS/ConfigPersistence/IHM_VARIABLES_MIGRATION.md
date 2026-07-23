@@ -151,9 +151,54 @@ Groupe **conservé** `GVL_IHM.JOY1Joystick`, split interne en `Cmd`/`State` :
 
 ---
 
+## ✅ Lot 2f — Cycle (vérifié) — clôt le Lot 2
+
+⚠️ **Priorité sécurité (T66) corrigée** : ce lot a aussi créé un backing `GVL_PERSISTENT` réel pour
+`SetDepth_M`/`SetOffset_M` (`_CycleSetDepth_M`/`_CycleSetOffset_M`), qui n'en avaient aucun avant
+(juste un défaut compilé dans le DUT) — câblage restauration/sauvegarde identique au pattern
+`M1M2Sync.Cfg`.
+
+Groupe **conservé** `GVL_IHM.Cycle`, split interne en `Cmd`/`State`/`Cfg`/`Test` (`Test` existait
+déjà, inchangé) :
+
+| Ancien chemin | Nouveau chemin |
+|---|---|
+| `GVL_IHM.Cycle.BtnStart` | `GVL_IHM.Cycle.Cmd.BtnStart` |
+| `GVL_IHM.Cycle.BtnPause` | `GVL_IHM.Cycle.Cmd.BtnPause` |
+| `GVL_IHM.Cycle.BtnAbort` | `GVL_IHM.Cycle.Cmd.BtnAbort` |
+| `GVL_IHM.Cycle.BtnReset` | `GVL_IHM.Cycle.Cmd.BtnReset` |
+| `GVL_IHM.Cycle.SetDepth_M` | `GVL_IHM.Cycle.Cfg.SetDepth_M` |
+| `GVL_IHM.Cycle.SetOffset_M` | `GVL_IHM.Cycle.Cfg.SetOffset_M` |
+| `GVL_IHM.Cycle.Ready` | `GVL_IHM.Cycle.State.Ready` |
+| `GVL_IHM.Cycle.Busy` | `GVL_IHM.Cycle.State.Busy` |
+| `GVL_IHM.Cycle.Done` | `GVL_IHM.Cycle.State.Done` |
+| `GVL_IHM.Cycle.Error` | `GVL_IHM.Cycle.State.Error` |
+| `GVL_IHM.Cycle.ErrorId` | `GVL_IHM.Cycle.State.ErrorId` |
+| `GVL_IHM.Cycle.CycleStep` | `GVL_IHM.Cycle.State.CycleStep` |
+| `GVL_IHM.Cycle.CycleStateStr` | `GVL_IHM.Cycle.State.CycleStateStr` |
+| `GVL_IHM.Cycle.SelTarget` | `GVL_IHM.Cycle.State.SelTarget` |
+| `GVL_IHM.Cycle.KoboldContactFond` | `GVL_IHM.Cycle.State.KoboldContactFond` |
+| `GVL_IHM.Cycle.KoboldContactorCmd` | `GVL_IHM.Cycle.State.KoboldContactorCmd` |
+| `GVL_IHM.Cycle.LimitLegalReached` | `GVL_IHM.Cycle.State.LimitLegalReached` |
+| `GVL_IHM.Cycle.LimitLegalDepth_M` | `GVL_IHM.Cycle.State.LimitLegalDepth_M` |
+| `GVL_IHM.Cycle.WinchSyncError` | `GVL_IHM.Cycle.State.WinchSyncError` |
+| `GVL_IHM.Cycle.WinchSyncDelta_M` | `GVL_IHM.Cycle.State.WinchSyncDelta_M` |
+| `GVL_IHM.Cycle.SpeedMismatch_Mps` | `GVL_IHM.Cycle.State.SpeedMismatch_Mps` |
+| `GVL_IHM.Cycle.SpeedMismatchActive` | `GVL_IHM.Cycle.State.SpeedMismatchActive` |
+| `GVL_IHM.Cycle.SpeedMismatchConfirmed` | `GVL_IHM.Cycle.State.SpeedMismatchConfirmed` |
+| `GVL_IHM.Cycle.M1Position_M` | `GVL_IHM.Cycle.State.M1Position_M` |
+| `GVL_IHM.Cycle.M2Position_M` | `GVL_IHM.Cycle.State.M2Position_M` |
+| `GVL_IHM.Cycle.DeadmanArmed` | `GVL_IHM.Cycle.State.DeadmanArmed` |
+| `GVL_IHM.Cycle.JoystickMotionActive` | `GVL_IHM.Cycle.State.JoystickMotionActive` |
+| `GVL_IHM.Cycle.MotionPermit` | `GVL_IHM.Cycle.State.MotionPermit` |
+
+`GVL_IHM.Cycle.Test.KoboldContactFond` **ne bouge pas** (déjà correctement isolé avant ce lot).
+
+---
+
 ## 🔜 Lots à venir (pas encore de document de tâche)
 
-- **Cycle** — split Cmd/State/Cfg/Test prévu (contient `SetDepth_M`/`SetOffset_M`, priorité 1, T66).
+_(Lot 2 sera complet une fois Cycle vérifié — reste ensuite la persistance généralisée, Lot 3.)_
 
 Cette section sera complétée à chaque nouveau lot committé — une seule table par domaine, jamais
 de réécriture des lots déjà ✅.

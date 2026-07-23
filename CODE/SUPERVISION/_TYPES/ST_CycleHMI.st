@@ -1,35 +1,16 @@
-(* 🔄 Interface IHM du cycle semi-automatique.
-   Les commandes Cmd* sont des impulsions acquittées par le PLC. *)
+(* ═══════════════════════════════════════════════════════════════
+   🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State / Cfg / Test (2026-07-24), homogène avec ST_WinchHMI.
+   🐛 T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_09_Supervision.st §2/§3) —
+   avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
+   compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
+   ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CycleHMI :
 STRUCT
-    BtnStart             : BOOL;
-    BtnPause             : BOOL;
-    BtnAbort             : BOOL;
-    BtnReset             : BOOL;
-    SetDepth_M          : REAL := -12.5;
-    SetOffset_M         : REAL := 1.5;
-    Ready                : BOOL;
-    Busy                 : BOOL;
-    Done                 : BOOL;
-    Error                : BOOL;
-    ErrorId              : WORD;
-    CycleStep            : E_CycleStep;
-    CycleStateStr        : STRING(80);
-    SelTarget    : INT;
-    KoboldContactFond    : BOOL;
-    KoboldContactorCmd   : BOOL;
-    LimitLegalReached    : BOOL;
-    LimitLegalDepth_M      : REAL;
-    WinchSyncError       : BOOL;
-    WinchSyncDelta_M       : REAL;
-    SpeedMismatch_Mps      : REAL;
-    SpeedMismatchActive  : BOOL;
-    SpeedMismatchConfirmed : BOOL;
-    M1Position_M           : REAL;
-    M2Position_M           : REAL;
-    DeadmanArmed         : BOOL;
-    JoystickMotionActive : BOOL;
-    MotionPermit         : BOOL;
-    Test                 : ST_TestCycle;
+    Cmd   : ST_CycleCmd;
+    State : ST_CycleState;
+    Cfg   : ST_CycleCfg;
+    Test  : ST_TestCycle; (* ⚠️ INCHANGÉ — déjà un sous-struct correctement isolé avant ce lot *)
 END_STRUCT
 END_TYPE
