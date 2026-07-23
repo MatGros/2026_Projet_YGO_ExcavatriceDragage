@@ -6,35 +6,27 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BypassTranslation :
 STRUCT
-    (* 🔌 Bypass retour contacteur frein (existant) *)
-    ContactorFeedback : BOOL;
+    (* 📡 1. Communication & Systèmes auxiliaires *)
+    OperatorComm      : BOOL; (* 📡 Bypass communication esclave CANopen Joystick / heartbeat IHM *)
+    DriveComm         : BOOL; (* 📡 Bypass diagnostic esclave EtherCAT AC600 (variateur) *)
+    ContactorFeedback : BOOL; (* 🔌 Bypass feedbacks contacteur de frein *)
+    PhaseRotation     : BOOL; (* ⚡ Bypass défaut rotation de phases (commun machine) *)
+    BrakeThermal      : BOOL; (* 🌡️ Bypass surchauffe thermique frein (commun machine) *)
 
-    (* 🧭 Bypass mot capteurs M3 incohérent *)
-    SensorIncoherent : BOOL;
+    (* 🚧 2. Limites physiques et Positionnement *)
+    LimitSwitch       : BOOL; (* 🚧 Bypass fins de course physiques avant/arrière *)
+    SensorIncoherent  : BOOL; (* 🧭 Bypass incohérence mot capteurs de position *)
 
-    (* 🚧 Bypass butées extrêmes (LimitSwitchFwd / LimitSwitchRev) *)
-    LimitSwitch : BOOL;
+    (* ⚙️ 3. Sécurité Mécanique (Méca A-B) *)
+    MecaA             : BOOL; (* 🔄 Bypass Méca A : mouvement non commandé à l'arrêt *)
+    MecaB             : BOOL; (* 🛑 Bypass Méca B : absence confirmation arrêt (frein/contacteurs) *)
 
-    (* 📡 Bypass perte communication opérateur (joystick CAN / heartbeat IHM) *)
-    OperatorComm : BOOL;
-
-    (* 📡 Bypass perte communication drive (EtherCAT) *)
-    DriveComm : BOOL;
-
-    (* ⚡ Bypass défaut rotation de phases *)
-    PhaseRotation : BOOL;
-
-    (* 🌡️ Bypass surchauffe frein *)
-    BrakeThermal : BOOL;
-
-    (* 🛑 Bypass Méca B (absence confirmation arrêt) *)
-    MecaB : BOOL;
-
-    (* 🔄 Bypass Méca A (mouvement non commandé) *)
-    MecaA : BOOL;
-
-    (* 🌐 Bypass GLOBAL : désactive TOUTES les surveillances Safety Translation M3
-       ⚠️ Prioritaire sur les bypass individuels ci-dessus *)
-    Global : BOOL;
+    (* 🛡️ 4. Hiérarchie & Restauration *)
+    Safety            : BOOL; (* 🛡️ Bypass groupé : tous les bits qui provoquent un PowerCutOff *)
+    Process           : BOOL; (* ⚙️ Bypass groupé : tous les bits qui provoquent un SafeStop *)
+    Global            : BOOL; (* 🌐 Bypass Global : ignore toutes les sécurités de cet axe *)
+    // 🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+    // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_09_Supervision.st
+    Initialized       : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT
 END_TYPE

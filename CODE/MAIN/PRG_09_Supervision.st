@@ -209,27 +209,43 @@ IF instAckConfigRestored.Q THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
 END_IF;
 
-// 🌐 Restauration des bypass RETAIN au boot UNIQUEMENT (premier scan)
+// 🌐 Restauration des bypass RETAIN au boot UNIQUEMENT — co-localisation flag Initialized
 // Après ça, seule la sauvegarde IHM→RETAIN fonctionne (jamais l'inverse).
 // Évite le bug où une écriture IHM était écrasée par la restauration.
-// 🐛 FIX 2026-07-23 : BypassRestoreDone passé en VAR RETAIN (voir déclaration en tête de fichier)
-// — en simple VAR il repassait à FALSE à CHAQUE reset/download, même quand GVL_IHM (RETAIN) était
-// resté intact, ce qui pouvait re-forcer un bypass Global que l'opérateur venait de désactiver.
-IF NOT BypassRestoreDone THEN
-    IF BypassTranslationGlobal AND GVL_IHM.TranslationM3.Bypass.Global = FALSE THEN
+IF NOT GVL_IHM.TranslationM3.Bypass.Initialized THEN
+    IF BypassTranslationGlobal THEN
         GVL_IHM.TranslationM3.Bypass.Global := TRUE;
     END_IF;
-    IF BypassWinchM1Global AND GVL_IHM.M1TreuilRetenue.Bypass.Global = FALSE THEN
+    GVL_IHM.TranslationM3.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.M1TreuilRetenue.Bypass.Initialized THEN
+    IF BypassWinchM1Global THEN
         GVL_IHM.M1TreuilRetenue.Bypass.Global := TRUE;
     END_IF;
-    IF BypassWinchM2Global AND GVL_IHM.M2TreuilBenne.Bypass.Global = FALSE THEN
+    GVL_IHM.M1TreuilRetenue.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
+    IF BypassWinchM2Global THEN
         GVL_IHM.M2TreuilBenne.Bypass.Global := TRUE;
     END_IF;
+    GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.Network.Bypass.Initialized THEN
+    IF BypassNetworkGlobal THEN
+        GVL_IHM.Network.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.Network.Bypass.Initialized := TRUE;
+END_IF;
+
+// 🌐 Sync/Bucket : pas encore de struct Bypass dédié (hors périmètre de ce lot, voir §3) —
+// mécanisme BypassRestoreDone conservé UNIQUEMENT pour ces 2-là.
+// 🐛 FIX 2026-07-23 : BypassRestoreDone en VAR RETAIN (évite re-forcage au boot si GVL_IHM intact).
+IF NOT BypassRestoreDone THEN
     IF BypassSyncGlobal AND GVL_IHM.Sync.BypassGlobal = FALSE THEN
         GVL_IHM.Sync.BypassGlobal := TRUE;
-    END_IF;
-    IF BypassNetworkGlobal AND GVL_IHM.Network.Bypass.Global = FALSE THEN
-        GVL_IHM.Network.Bypass.Global := TRUE;
     END_IF;
     IF BypassBucketGlobal AND GVL_IHM.M2Benne.BypassGlobal = FALSE THEN
         GVL_IHM.M2Benne.BypassGlobal := TRUE;
