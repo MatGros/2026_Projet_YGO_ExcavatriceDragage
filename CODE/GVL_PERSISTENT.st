@@ -50,7 +50,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _WinchSlowSpeed_Pct           : REAL := 15.0;  // Vitesse lente zone ralentissement (%)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
-    _WinchSyncTolerance_M : REAL := 0.25; // Tolérance écart (REX 2026-07-08 : 0.10 -> 0.25)
+    _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 0.25); // 🌉 Pont FB_CfgPersistBridge_SyncCfg
     _WinchCriticalSyncTolerance_M : REAL := 2.0; // Méca E : écart critique
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 

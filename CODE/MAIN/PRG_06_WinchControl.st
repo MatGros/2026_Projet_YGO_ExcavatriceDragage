@@ -297,7 +297,7 @@ instWinchSync(
     HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
     SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
-    CfgSyncToleranceM  := _WinchSyncTolerance_M,
+    CfgSyncToleranceM  := _SyncCfgPersist.CfgSyncTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
     
     RelayFwdM1      := instWinchM1.RelayFwd,

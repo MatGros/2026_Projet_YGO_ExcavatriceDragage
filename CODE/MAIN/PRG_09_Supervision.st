@@ -20,6 +20,7 @@ END_VAR
 VAR
     instBlink1Hz : BLINK; // 🧩 Réutilisation lib Util (Partie3 §0) — horloge clignotement système
     instAckConfigRestored : R_TRIG; // 🔔 Front acquittement opérateur restauration config PERSISTENT (§2bis)
+    instCfgPersistBridgeSync : FB_CfgPersistBridge_SyncCfg; // 🌉 Pont persistance M1M2Sync.Cfg (Lot 3a, pilote)
 END_VAR
 VAR RETAIN
     // 🐛 FIX 2026-07-23 : passé de VAR simple à VAR RETAIN — en VAR simple, ce flag repassait à
@@ -184,9 +185,8 @@ IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.M1M2Sync.Cfg.Initialized THEN
-    GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
-    GVL_IHM.M1M2Sync.Cfg.Initialized := TRUE;
+instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
+IF instCfgPersistBridgeSync.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -293,11 +293,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
     _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
-END_IF;
-// ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit, désormais clos
-// par le flag `M1M2Sync.Cfg.Initialized` (posé en §2 uniquement après restauration réussie).
-IF GVL_IHM.M1M2Sync.Cfg.Initialized THEN
-    _WinchSyncTolerance_M       := GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M;
 END_IF;
 _BucketConfig              := GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config;
 
