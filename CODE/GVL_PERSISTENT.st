@@ -79,6 +79,10 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickInvertX : BOOL := FALSE; // Inversion axe X
     _JoystickInvertY : BOOL := FALSE; // Inversion axe Y
 
+    // 🔄 CYCLE (dragage semi-automatique)
+    _CycleSetDepth_M  : REAL := -12.5; // T66 : profondeur de dragage cible (m, négative)
+    _CycleSetOffset_M : REAL := 1.5;   // T66 : décalage cible de fermeture benne (m)
+
     // 📏 RÉGLEMENTATION / LÉGAL
     _LimitLegalDepthMinAllowed_M   : REAL := -15.0; // Cote min dragage autorisée (m)
     _LimitLegalEnabled           : BOOL := TRUE;  // Activation limite légale

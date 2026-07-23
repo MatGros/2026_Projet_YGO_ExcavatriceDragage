@@ -15,7 +15,7 @@
               (perte EmergencyStopOk → Mode=DISABLE + FB_Winch neutralisé,
               quel que soit le mode précédent)
       TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais — une tentative réelle de
-              démarrage (`GVL_IHM.Cycle.CmdStart`) hors SEMI_AUTO reste sans effet.
+              démarrage (`GVL_IHM.Cycle.Cmd.BtnStart`) hors SEMI_AUTO reste sans effet.
       TC-M7 : DISABLE explicite neutralise M1/M2/M3.
       TC-M8 : bypass codeur refusé hors MAINT_N2, accepté en MAINT_N2 après Reset.
       TC-M9 : ConfigError FB_SpeedStep remonte au bit2 de FB_Winch, sorties sûres.
@@ -94,7 +94,7 @@ IF Abort THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnStart := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
     GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     Busy := FALSE;
@@ -356,13 +356,13 @@ CASE Step OF
     // ─────────── TC-M6 : Séquenceur (FB_Cycle) ne bloque jamais ───────────
     60:
         // 🔧 REX 2026-07-19 (revue mission IHM_MANU, finding B) : tentative RÉELLE de
-        // démarrage (GVL_IHM.Cycle.BtnStart, ré-assertée chaque scan pour couvrir l'ordre
+        // démarrage (GVL_IHM.Cycle.Cmd.BtnStart, ré-assertée chaque scan pour couvrir l'ordre
         // des tâches) pendant >200 ms hors SEMI_AUTO — instCycle.Enable=FALSE doit la rendre
         // sans effet (Busy reste FALSE), pas un simple instantané qui ne prouverait rien.
         GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
-        GVL_IHM.Cycle.BtnStart := TRUE;
+        GVL_IHM.Cycle.Cmd.BtnStart := TRUE;
         IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) AND (StepElapsed >= T#200MS) THEN
-            GVL_IHM.Cycle.BtnStart := FALSE;
+            GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
             IF NOT PRG_05_Cycle.instCycle.Busy THEN
                 StepPassed := TRUE;
                 IF RequestedCaseId = 6 THEN Step := 0; ELSE Step := 65; END_IF;
@@ -530,7 +530,7 @@ CASE Step OF
         GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := TRUE;
         GVL_IHM.M2TreuilBenne.Cmd.BtnReset := TRUE;
         GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := TRUE;
-        GVL_IHM.Cycle.BtnStart := TRUE;
+        GVL_IHM.Cycle.Cmd.BtnStart := TRUE;
         GVL_IHM.TranslationM3.Cmd.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
         StepPassed := TRUE;
@@ -542,7 +542,7 @@ CASE Step OF
            AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
            AND NOT GVL_IHM.M2TreuilBenne.Cmd.BtnReset
            AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
-           AND NOT GVL_IHM.Cycle.BtnStart
+           AND NOT GVL_IHM.Cycle.Cmd.BtnStart
            AND NOT GVL_IHM.TranslationM3.Cmd.BtnFwd
            AND GVL_IHM.HmiInitDone THEN
             GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;

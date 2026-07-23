@@ -102,7 +102,7 @@ IF NOT GVL_Simulation.SimulationModeActive THEN
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
     Report.InProgress := FALSE; Report.Aborted := TRUE; Report.AnyFailed := TRUE;
@@ -124,7 +124,7 @@ IF Abort OR NOT SimGateOk THEN
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
     IF Busy THEN GVL_IHM.Modes.Cmd.SelMode := StimModeRequest; END_IF;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
@@ -404,7 +404,7 @@ GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
 GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
 GVL_IHM.Modes.Cmd.SelMode := StimModeRequest;
 GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-GVL_IHM.Cycle.BtnReset := FALSE;
+GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 
 CASE ActiveStimulusId OF
     1: // TC-H1/TC-H4 : toggle sain 500 ms + SEMI_AUTO
@@ -442,7 +442,7 @@ CASE ActiveStimulusId OF
         StimResetPulseTimer(IN := TRUE, PT := T#1500ms);
         IF NOT StimResetPulseTimer.Q THEN
             GVL_IHM.Modes.Cmd.BtnFaultReset := TRUE;
-            GVL_IHM.Cycle.BtnReset := TRUE;
+            GVL_IHM.Cycle.Cmd.BtnReset := TRUE;
         END_IF;
 
     5: // TC-H5 : perte IHM + frein M3 desserré → Méca B
@@ -463,7 +463,7 @@ IF ErrorCode <> 0 THEN
     GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff := FALSE;
     GVL_PLC_Tests.OverrideM2BrakeFeedback := FALSE;
     GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Cycle.BtnReset := FALSE;
+    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
     GVL_IHM.Modes.Cmd.SelMode := StimModeRequest;
     Busy := FALSE; Done := TRUE; AnyFailed := TRUE;
     TerminalState := E_TestTerminalState.TEST_TERMINAL_FAILED;
