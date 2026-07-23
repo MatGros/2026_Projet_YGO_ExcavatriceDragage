@@ -8332,6 +8332,73 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_CfgPersistBridge_SyncCfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 TRUE pendant 1 scan le boot où la restauration a eu lieu —</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_SyncCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.M1M2Sync.Cfg — struct exposé à l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_SyncCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._SyncCfgPersist — mémoire PERSISTENT</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌉 FB_CfgPersistBridge_SyncCfg — Pont persistance générique pour ST_SyncCfg
+   ───────────────────────────────────────────────────────────────
+   🎯 Remplace les blocs manuels restauration/sauvegarde dupliqués à chaque domaine
+   (voir DOC/AUDITS/ConfigPersistence/). Une instance = un couple (struct IHM, struct
+   GVL_PERSISTENT) du MÊME type. Logique :
+   - Hmi.Initialized = FALSE (RETAIN invalidé, ex. changement de layout DUT) → restaure
+     Hmi depuis Persist, marque Initialized, pulse JustRestored 1 scan.
+   - Hmi.Initialized = TRUE → sauvegarde continue Hmi vers Persist (jamais l'inverse).
+   🔒 Défense en profondeur : jamais d'écriture PERSISTENT avant qu'une restauration
+   réussie n'ait eu lieu (même principe que tous les blocs Cfg du Lot 2).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>13a2c158-675a-51ae-9722-c0aab6c4c8b0</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Cycle" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -30755,7 +30822,7 @@ instWinchSync(
     HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
     SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
-    CfgSyncToleranceM  := _WinchSyncTolerance_M,
+    CfgSyncToleranceM  := _SyncCfgPersist.CfgSyncTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
     
     RelayFwdM1      := instWinchM1.RelayFwd,
@@ -31324,6 +31391,14 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Front acquittement opérateur restauration config PERSISTENT (§2bis)</xhtml>
               </documentation>
             </variable>
+            <variable name="instCfgPersistBridgeSync">
+              <type>
+                <derived name="FB_CfgPersistBridge_SyncCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌉 Pont persistance M1M2Sync.Cfg (Lot 3a, pilote)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassRestoreDone">
               <type>
                 <BOOL />
@@ -31515,9 +31590,8 @@ IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.M1M2Sync.Cfg.Initialized THEN
-    GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
-    GVL_IHM.M1M2Sync.Cfg.Initialized := TRUE;
+instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
+IF instCfgPersistBridgeSync.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -31624,11 +31698,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
     _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
-END_IF;
-// ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit, désormais clos
-// par le flag `M1M2Sync.Cfg.Initialized` (posé en §2 uniquement après restauration réussie).
-IF GVL_IHM.M1M2Sync.Cfg.Initialized THEN
-    _WinchSyncTolerance_M       := GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M;
 END_IF;
 _BucketConfig              := GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config;
 
@@ -33154,12 +33223,16 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_WinchSyncTolerance_M">
+        <variable name="_SyncCfgPersist">
           <type>
-            <REAL />
+            <derived name="ST_SyncCfg" />
           </type>
           <initialValue>
-            <simpleValue value="0.25" />
+            <structValue>
+              <value member="CfgSyncTolerance_M">
+                <simpleValue value="0.25" />
+              </value>
+            </structValue>
           </initialValue>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -34555,6 +34628,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         <Folder Name="COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
+          <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
           <Object Name="FB_Output" ObjectId="b60dd37c-0508-57b7-805e-ba43b1805814" />
