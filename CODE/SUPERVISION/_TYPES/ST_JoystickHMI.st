@@ -1,22 +1,13 @@
 (* ═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   🎨 Destiné à l'affichage et au contrôle du joystick depuis l'IHM.
+   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
+   Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_JoystickHMI :
 STRUCT
-    RawX        : INT;        (* 🕹️ Axe X brut du joystick (0..10000) *)
-    RawY        : INT;        (* 🕹️ Axe Y brut du joystick (0..10000) *)
-    RawButton   : BOOL;       (* 🔘 Bouton homme-mort brut *)
-    AxisCmdX    : ST_AxisCmd; (* ⚙️ Consigne d'axe X normalisée (sortie FB_Joystick) *)
-    AxisCmdY    : ST_AxisCmd; (* ⚙️ Consigne d'axe Y normalisée (sortie FB_Joystick) *)
-    NeutralXAct : INT;        (* 🎯 Neutre X calibré actuel (lecture seule) *)
-    NeutralYAct : INT;        (* 🎯 Neutre Y calibré actuel (lecture seule) *)
-    DeadmanArmed : BOOL;      (* 🔫 Geste homme-mort armé (FB_Joystick.DeadmanArmed) *)
-    Online      : BOOL;       (* 📡 Liaison CAN joystick active *)
-    Operational : BOOL;       (* 🟢 Joystick opérationnel *)
-    BtnCalibrate   : BOOL;       (* 🎯 Demande de recalage au neutre *)
-    Error       : BOOL;       (* 🔴 Joystick en défaut *)
-    ErrorId     : WORD;       (* ❌ Code défaut joystick *)
+    Cmd   : ST_JoystickCmd;
+    State : ST_JoystickState;
 END_STRUCT
 END_TYPE
