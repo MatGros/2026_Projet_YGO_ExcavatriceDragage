@@ -4,6 +4,18 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `DOC_RESTORATION_AF07_AF11` — 2026-07-23
+- Restauration intégrale post-audit de `AF_Partie-11_Fonction_Translation_v1.11.md` (v1.12, EtherCAT AC600, 5 capteurs, Méca A/B)
+- Consolidation complète de `AF_Partie-07_Interface_IHM_v1.7.md` (v1.9, structures ST_*HMI & GVL_IHM), suppression du doublon v1.8
+- Intégration cartographie flux IHM, audits bypass & persistance config
+
+### `AUDIT_ConfigPersistence` — 2026-07-23
+- Audit persistance étendu à tout `GVL_IHM` : `TranslationM3.Cmd.SetFreq_Hz`, `Cycle.SetDepth_M/
+  SetOffset_M`, calib joystick, `M2Benne.CfgTimeoutDuration`, `BypassRestoreDone` identifiés
+  non/mal protégés — décisions et options architecturales dans `DOC/AUDITS/ConfigPersistence/`
+- Piste retenue à investiguer : struct persistant miroir + FB générique par type (`FB_CfgPersist_*`),
+  homogénéisation `ST_BucketHMI`/`ST_SyncHMI` vers le pattern Cmd/State/Cfg/Bypass (Winch/Translation)
+
 ### `CONFIG-PERSIST-01` — 2026-07-23
 - Fix persistance config IHM (`CfgMaxStepDescente` et 10+ champs Cfg M1/M2/Sync) : sentinelles
   `= 0.0` cassées remplacées par flag `Initialized`/`CfgInitialized` dédié

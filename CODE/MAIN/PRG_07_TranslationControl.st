@@ -158,7 +158,7 @@ instTranslationM3(
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
-    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal,
+    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal),
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 

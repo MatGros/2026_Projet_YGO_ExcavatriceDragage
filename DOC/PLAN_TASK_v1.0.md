@@ -10,6 +10,8 @@
 
 | Date | Jalon |
 |---|---|
+| 2026-07-24 | 🎯 **Priorité Demain** — 1) Chargement API + vérification Visualisation IHM (remapping). 2) Qualification purge Bypass Global (M1, M2, M3). 3) Essai du fonctionnement **Capteur Kobold** (contact fond) & IHM. 4) Essai du **Positionneur Translation M3** ("Aller à la position" Trémie/Maintenance/Zone travail). |
+| 2026-07-23 | Correctifs terrain — Purge `BypassContactorCheck` (M1, M2, M3), documentation audit `AUDIT_BypassGlobal_Homogenization_v1.0.md` et consignation `MES-004`. |
 | 2026-07-22 | `v0.4.27_SupervisionConformityRename` — Renommage complet supervision GVL_IHM + ST_*HMI et conformité suffixes physiques (_M, _Pct, _Hz, _Mps) |
 | 2026-07-22 | `v0.4.26_IhmCompatibilityRepair` — Restauration des noms publics IHM historiques : visualisation inchangée |
 | 2026-07-15 | `v0.4.8` — IHM_MANU M1/M2 pilotés via `FB_Winch` (rampe/ralentissement natifs, retrait doctrine "Conditional Bypass"), nouvelle limite `CableLimitAscentM1/2_M`, correctifs Méca B (bit8) + benne couplé + `FB_Safety_Translation` (latch défaut) |
@@ -180,6 +182,14 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T63 | ⏸️ Persistance flags simulation + split `GVL_SimulationBench` reportés : bindings visualisation à maquetter avant import | Projet + IHM | REX session revertée, hors scope WINCH-CORE-01 |
 | T64 | 🟠 Essais treuils du 2026-07-23 : plafond de palier vitesse réglé temporairement à `0`. Confirmer le comportement effectif, tracer les essais, puis définir/restaurer la valeur d'exploitation avant mise en service normale | Projet / Terrain | `REGISTRE_Suivi_MiseEnService_v1.0.md` MES-003 |
 | T65 | 🟠 Test PLC automatique manquant pour le fix persistance config (`Cfg.Initialized`/`CfgInitialized`, `ConfigRestoredFromPersistent`) — requis avant clôture C3/safety (`AF_Partie-14` §Contrat tests). Vérification manuelle Watch/forçage possible en attendant | Projet | `CONFIG-PERSIST-01`, `PRG_09_Supervision.st` §2/§2bis/§3 |
+| T66 | 🔴 `Cycle.SetDepth_M`/`SetOffset_M` (défauts -12,5 m / 1,5 m) aucune protection persistance — cible profondeur cycle semi-auto peut revenir silencieusement sans alarme. Priorité la plus élevée de l'audit général | Projet / Sécurité | AF_Partie-15 §4, `PRG_05_Cycle.st` |
+| T67 | 🟠 `TranslationM3.Cmd.SetFreq_Hz` aucune protection persistance — alimente directement `FreqPct` (vitesse réelle M3), repli silencieux sur 30% par défaut | Projet | AF_Partie-15 §4, `PRG_07_TranslationControl.st:97-100` |
+| T68 | 🟠 Calibration neutre joystick (`_JoystickNeutralX/Y`) jamais réécrite après `BtnCalibrate` — perdue à CHAQUE reboot, pas seulement invalidation RETAIN (bug distinct, pas un pb de sentinelle) | Projet | AF_Partie-15 §4, `FB_Joystick.st` |
+| T69 | 🟡 `M2Benne.CfgTimeoutDuration` toujours réinitialisé à `T#30s` au boot, jamais lu depuis PERSISTENT — écrasement systématique d'un réglage opérateur | Projet | AF_Partie-15 §4, `PRG_09_Supervision.st` §2 |
+| T70 | ❓ `Modes.SelMode`/`SelJoystickWinch`/`TglJoystickMaster` repartent en valeur restrictive (MAINT_N1) au boot — à confirmer si voulu (sécurité) ou oubli avant de traiter | Projet / Client | AF_Partie-15 §4 |
+| T71 | 🟡 Gate statique Python à créer (`TOOLS/AGENT_WORKFLOW/scripts/`) : détecte automatiquement tout champ `Cfg`/`Set` de `GVL_IHM` sans variable miroir `GVL_PERSISTENT` + bloc restore — aurait détecté T66/T67 sans audit manuel | Projet | AF_Partie-15 §5 |
+| T72 | 🟠 Interverrouillage de sécurité commande / frein : conditionner l'activation des contacteurs de sens (`RelayFwd`/`RelayRev`) à l'ordre effectif de desserrage du frein (`BrakeCmd = TRUE`), pour interdire physiquement toute alimentation moteur sous frein serré par l'automate. | Projet / Sécurité | `FB_Winch.st`, `FB_Translation.st`, REX 2026-07-23 |
+
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 

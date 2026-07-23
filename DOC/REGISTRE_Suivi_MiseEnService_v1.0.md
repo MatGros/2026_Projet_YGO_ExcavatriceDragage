@@ -31,7 +31,21 @@
 
 ## 2. Entrées de séance
 
-### MES-003 — Palier vitesse treuils limité à 0
+### MES-004 — Neutralisation & Purge des retours contacteurs/freins par le Bypass Global (M1, M2, M3)
+
+| Champ | Valeur |
+|---|---|
+| Date | 2026-07-23 |
+| Lieu / environnement | Essais terrain |
+| Version CODE/DOC | Main branch — `PRG_06_WinchControl.st`, `PRG_07_TranslationControl.st`, `DOC/AUDITS/Bypass/AUDIT_BypassGlobal_Homogenization_v1.0.md` |
+| Périmètre | Treuils M1/M2, Translation M3, `FB_Winch`, `FB_Translation`, `FB_Brake` |
+| Statut | 🟢 Validé / Appliqué |
+| Constat | Lors de l'enclenchement d'un Bypass Global d'axe (`Bypass.Global`), les sous-blocs `FB_Brake` et `FB_Winch` conservaient leurs erreurs `StuckOpen` / `StuckClosed` mémorisées avant l'activation du bypass, car leur entrée `BypassContactorCheck` n'était reliée qu'à la simulation. Le mouvement restait bloqué à 0 malgré le bypass. |
+| Solution appliquée | Modification de l'alimentation de `BypassContactorCheck` sur les instances `instWinchM1`, `instWinchM2` (dans `PRG_06_WinchControl.st`) et `instTranslationM3` (dans `PRG_07_TranslationControl.st`) en y incluant la condition `OR GVL_IHM.Mx.Bypass.Global`. Désormais, le Bypass Global purge inconditionnellement et instantanément les erreurs contacteurs et freins résiduelles. |
+| Observation sécurité | Constat d'un décalage de séquence sur M2 : alimenter les contacteurs de sens avant que le frein soit piloté/ouvert fait forcer/patiner le moteur sous frein serré. Nécessité d'ajouter un interverrouillage interdisant l'alimentation des contacteurs si le frein n'est pas piloté. |
+| Preuves attendues | Succès de génération du bundle XML (`PASS`), validation sur terrain par déblocage immédiat de l'axe M3 et M2 lors de l'activation du Bypass. |
+
+---
 
 | Champ | Valeur |
 |---|---|
@@ -61,7 +75,7 @@
 | Homing | Cible d'homing unitaire M1 et M2 réglable, initialisée à `0,0 m`. Le homing à zéro ignore le capteur haut pour prendre la position courante comme référence. |
 | Vigilance | Les bypass facilitent la mise en service mais masquent des protections. Vérifier leur état avant tout mouvement et les désactiver dès que le matériel concerné est validé. |
 | À valider | Comportement de chaque bypass, persistance après redémarrage, homing M1/M2 à `0,0 m`, cohérence de la position et réarmement sûr. |
-| Références | `96ef589`, `CODE/MAIN/GVL_BypassRetain.st`, `FB_Encoder_Homing.st`, `AF_Partie-13_Fonction_Simulation_v1.3.md` |
+| Références | `96ef589`, `CODE/MAIN/GVL_BypassRetain.st`, `FB_Encoder_Homing.st`, `AF_Partie-13_Fonction_Simulation_v1.3.md`, `DOC/AUDITS/ConfigPersistence/AUDIT_ConfigPersistence_v1.2.md` |
 
 ---
 
