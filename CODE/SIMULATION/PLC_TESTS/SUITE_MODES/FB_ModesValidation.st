@@ -529,7 +529,7 @@ CASE Step OF
         GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := TRUE;
         GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := TRUE;
         GVL_IHM.M2TreuilBenne.Cmd.BtnReset := TRUE;
-        GVL_IHM.M2Benne.BtnClose := TRUE;
+        GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := TRUE;
         GVL_IHM.Cycle.BtnStart := TRUE;
         GVL_IHM.TranslationM3.Cmd.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
@@ -541,7 +541,7 @@ CASE Step OF
         IF NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
            AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
            AND NOT GVL_IHM.M2TreuilBenne.Cmd.BtnReset
-           AND NOT GVL_IHM.M2Benne.BtnClose
+           AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
            AND NOT GVL_IHM.Cycle.BtnStart
            AND NOT GVL_IHM.TranslationM3.Cmd.BtnFwd
            AND GVL_IHM.HmiInitDone THEN

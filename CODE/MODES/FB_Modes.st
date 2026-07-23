@@ -46,7 +46,7 @@ VAR_INPUT
     SelSyncEnable   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
     InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1Winch.BtnInhibit — bouton IHM inhibition M1
     InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2Winch.BtnInhibit — bouton IHM inhibition M2
-    SelHomingApproachEnable : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.SelHomingApproachEnable — case IHM
+    SelHomingApproachEnable : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.Cfg.SelHomingApproachEnable — case IHM
                                         // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
     EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
     JoystickWinchSelectRequest : INT;  // 🆕 TASK-0001 : 1=M1, 2=M2, 3=Couplé (brut IHM)

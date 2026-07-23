@@ -94,8 +94,8 @@ instBucket(
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2Benne.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
-    CmdClose_IHM        := GVL_IHM.M2Benne.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
+    CmdClose_IHM        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
     JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
     JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -104,14 +104,14 @@ instBucket(
     HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
-    ConfirmOpenPosition := GVL_IHM.M2Benne.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
-    ConfirmClosePosition:= GVL_IHM.M2Benne.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
+    ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
+    ConfirmClosePosition:= GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
     Config              := _BucketConfig,
-    CfgTimeoutDuration     := GVL_IHM.M2Benne.CfgTimeoutDuration,
+    CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2,  // 🆕 REX 2026-07-08
-    BypassGlobal        := GVL_IHM.M2Benne.BypassGlobal      // 🌐 Bypass benne (RETAIN)
+    BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global      // 🌐 Bypass benne (RETAIN)
 );
 
 // 🆕 REX 2026-07-08 (4) — Concept 1 (écart synchro mineur) : bit0 seul (écart position, hors
@@ -312,7 +312,7 @@ instWinchSync(
     Contactor3_M2   := instWinchM2.Contactor3,
     Contactor4_M1   := instWinchM1.Contactor4,
     Contactor4_M2   := instWinchM2.Contactor4,
-    BypassGlobal    := GVL_IHM.Sync.BypassGlobal
+    BypassGlobal    := GVL_IHM.M1M2Sync.Bypass.Global
 );
 
 // Table active M2 (verrouille TOUS les paliers sur la combinaison réelle du palier 1 si

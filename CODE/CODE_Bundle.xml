@@ -742,6 +742,108 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_BucketCfg">
+        <baseType>
+          <struct>
+            <variable name="Config">
+              <type>
+                <derived name="ST_BucketConfig" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Offsets Open/Close/Coherence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTimeoutDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#30s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps max pour l'ouverture/fermeture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51266ef6-8a4b-5d43-bb90-88297b050ea8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_BucketCfg — Configuration de la benne (M2)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_BucketCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Bouton commande ouverture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Bouton commande fermeture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Acquittement défaut benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnConfirmOpenPos">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnConfirmClosePos">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>758915ca-bb53-5f1a-ae3f-b495527bc5f4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_BucketCmd — Commandes IHM pour la benne (M2)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_BucketConfig">
         <baseType>
           <struct>
@@ -787,33 +889,50 @@
       <dataType name="ST_BucketHMI">
         <baseType>
           <struct>
-            <variable name="Config">
+            <variable name="Cmd">
               <type>
-                <derived name="ST_BucketConfig" />
+                <derived name="ST_BucketCmd" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Configurations &amp; Paramètres (Lecture/Écriture RETAIN)
-🔧 Offsets Open/Close/Coherence</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgTimeoutDuration">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#30s0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps max pour l'ouverture/fermeture</xhtml>
-              </documentation>
             </variable>
             <variable name="State">
+              <type>
+                <derived name="ST_BucketHMIState" />
+              </type>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_BucketCfg" />
+              </type>
+            </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassBucket" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e003b81c-fc6d-5cd1-ad20-f66aa3e150a5</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_BucketHMI — Données d'échange IHM pour la benne (M2)
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_BucketHMIState">
+        <baseType>
+          <struct>
+            <variable name="MechState">
               <type>
                 <derived name="ST_BucketState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États &amp; Retours (Lecture seule)
-🚥 État mémorisé (IsOpen, IsClosed, etc.)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...) — ex-champ "State", renommé pour éviter collision de nom avec ce sous-struct</xhtml>
               </documentation>
             </variable>
             <variable name="FBState">
@@ -901,7 +1020,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 REX 2026-07-07 : distance restante avant cible (m),</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance restante avant cible (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CloseActive">
@@ -909,7 +1028,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : demande de fermeture active (image FB_Bucket) —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande de fermeture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenActive">
@@ -917,7 +1036,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : demande d'ouverture active (image FB_Bucket), même principe</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande d'ouverture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="M2PositionCorrected">
@@ -925,69 +1044,19 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 REX 2026-07-07 : WinchM2.PositionM - ActiveOffset_M —</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Bouton commande ouverture</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnClose">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Bouton commande fermeture</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnReset">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Acquittement défaut benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnConfirmOpenPos">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : référencement benne position ouverte (mise en</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnConfirmClosePos">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : référencement benne position fermée (mise en</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassGlobal">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global (RETAIN, mise en service)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 WinchM2.PositionM - ActiveOffset_M, affichage bargraphe</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e003b81c-fc6d-5cd1-ad20-f66aa3e150a5</ObjectId>
+            <ObjectId>ea0b3689-7d29-5817-9b66-52896d468768</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_BucketHMI — Données d'échange IHM pour le benne
-   ───────────────────────────────────────────────────────────────
-   🎨 Intègre la configuration, l'état persistant et les commandes.
+   🚦 ST_BucketHMIState — États et diagnostics IHM de la benne (M2)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1046,6 +1115,46 @@
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md §4.B
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_BypassBucket">
+        <baseType>
+          <struct>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 1. Hiérarchie &amp; Restauration
+🌐 Bypass Global : ignore toute surveillance du mécanisme benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_09_Supervision.st
+🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>77e7b77e-4a14-5220-93aa-7bb27ede6733</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_BypassBucket — Bypass de la surveillance benne (M2)
+   🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
+      les autres défauts du même bloc.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1159,6 +1268,46 @@
    🔒 Permet de forcer les esclaves réseau (CAN, EtherCAT) à "online"
       pour le diagnostic, sans devoir toucher à chaque bit individuel.
       Jamais actif en production.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_BypassSync">
+        <baseType>
+          <struct>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass GLOBAL synchro : ignore toute erreur de synchronisation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f65a7185-61a7-56a0-8f9e-37d0e97f5130</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
+   🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
+      les autres défauts du même bloc (voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1455,6 +1604,57 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_CommunCfg">
+        <baseType>
+          <struct>
+            <variable name="LimitLegalDepthMinAllowed_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Cote min de dragage autorisée (m, négatif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalEnabled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Activation de la limite légale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelHomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a78d6264-59a9-5814-98b4-1f4ebf760abf</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_CommunCfg — Configuration des paramètres communs machine
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_CommunHMI">
         <baseType>
           <struct>
@@ -1482,22 +1682,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitLegalDepthMinAllowed_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Cote min de dragage autorisée (m, négatif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitLegalEnabled">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Activation de la limite légale</xhtml>
-              </documentation>
-            </variable>
             <variable name="LimitLegalReached">
               <type>
                 <BOOL />
@@ -1506,12 +1690,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite légale de profondeur de dragage atteinte (globale)</xhtml>
               </documentation>
             </variable>
-            <variable name="SelHomingApproachEnable">
+            <variable name="Cfg">
               <type>
-                <BOOL />
+                <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (2) : case IHM — autorise (si MAINT_N2) à dépasser</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configuration des paramètres communs machine</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalFault">
@@ -3176,7 +3360,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_SyncHMI">
+      <dataType name="ST_SyncCfg">
         <baseType>
           <struct>
             <variable name="CfgSyncTolerance_M">
@@ -3187,11 +3371,10 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="0.25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Paramètres / Calibration (Lecture/Écriture)
-📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgInitialized">
+            <variable name="Initialized">
               <type>
                 <BOOL />
               </type>
@@ -3199,16 +3382,96 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu) — PRG_09_Supervision.st §2/§3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot, ex-CfgInitialized renommé pour cohérence avec ST_WinchCfg</xhtml>
               </documentation>
             </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a3eb8b55-b4ee-5884-9780-22df0c7ecf3c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncCmd">
+        <baseType>
+          <struct>
+            <variable name="SelSyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c4516adb-d5c4-5442-aed3-fe5c7a9333fa</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_SyncCmd — Commandes IHM pour la synchronisation M1/M2
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_SyncCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_SyncState" />
+              </type>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_SyncCfg" />
+              </type>
+            </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassSync" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_SyncHMI — Données d'échange IHM pour la synchronisation M1/M2
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncState">
+        <baseType>
+          <struct>
             <variable name="DeltaPos_M">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États (Lecture seule)
-📊 Écart de position réel mesuré (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Écart de position réel mesuré (m)</xhtml>
               </documentation>
             </variable>
             <variable name="SyncActive">
@@ -3251,49 +3514,24 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code défaut synchro</xhtml>
               </documentation>
             </variable>
-            <variable name="State">
+            <variable name="FBState">
               <type>
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SelSyncEnable">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes / Bypasses
-☑️ 🔧 REX 2026-07-08 : coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassGlobal">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass GLOBAL synchro : ignore toute erreur de synchronisation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync) — ex-"State", renommé pour éviter collision avec le sous-struct State</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a</ObjectId>
+            <ObjectId>f5b307ad-efb8-5c21-8a1b-ab717dc1a82b</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_SyncHMI — Données d'échange IHM pour la synchronisation
-   ───────────────────────────────────────────────────────────────
-   🎨 Paramètres d'écart, écart réel et alarmes.
+   🚦 ST_SyncState — États et diagnostics de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4884,6 +5122,14 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Bucket">
+              <type>
+                <derived name="ST_BucketHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Benne — pertinent uniquement pour M2 (M2TreuilBenne.Bucket), M1 ne l'utilise pas — voir §1</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -13510,7 +13756,7 @@ Done := NOT Error;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.SelHomingApproachEnable — case IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.Cfg.SelHomingApproachEnable — case IHM</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderFaultPresent">
@@ -14558,7 +14804,7 @@ CASE Step OF
         GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := TRUE;
         GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := TRUE;
         GVL_IHM.M2TreuilBenne.Cmd.BtnReset := TRUE;
-        GVL_IHM.M2Benne.BtnClose := TRUE;
+        GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := TRUE;
         GVL_IHM.Cycle.BtnStart := TRUE;
         GVL_IHM.TranslationM3.Cmd.BtnFwd := TRUE;
         GVL_PLC_Tests.OverrideHmiCommandPurge := TRUE;
@@ -14570,7 +14816,7 @@ CASE Step OF
         IF NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
            AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
            AND NOT GVL_IHM.M2TreuilBenne.Cmd.BtnReset
-           AND NOT GVL_IHM.M2Benne.BtnClose
+           AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
            AND NOT GVL_IHM.Cycle.BtnStart
            AND NOT GVL_IHM.TranslationM3.Cmd.BtnFwd
            AND GVL_IHM.HmiInitDone THEN
@@ -28507,11 +28753,11 @@ IF NOT HmiCommandsInitialized
     GVL_IHM.M2TreuilBenne.Bypass.EncoderFault := FALSE;
     GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence := FALSE;
 
-    GVL_IHM.M2Benne.BtnOpen := FALSE;
-    GVL_IHM.M2Benne.BtnClose := FALSE;
-    GVL_IHM.M2Benne.BtnReset := FALSE;
-    GVL_IHM.M2Benne.BtnConfirmOpenPos := FALSE;
-    GVL_IHM.M2Benne.BtnConfirmClosePos := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
 
     GVL_IHM.Cycle.BtnStart := FALSE;
     GVL_IHM.Cycle.BtnPause := FALSE;
@@ -29558,7 +29804,7 @@ PrevInhibitM2 := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit;
 // 🆕 Si l'un des treuils est inhibé, synchro impossible par nature -&gt; reset case IHM à TRUE
 // (🔧 REX 2026-07-08 : polarité inversée, TRUE = état neutre "synchro voulue")
 IF GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit OR GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit THEN
-    GVL_IHM.Sync.SelSyncEnable := TRUE;
+    GVL_IHM.M1M2Sync.Cmd.SelSyncEnable := TRUE;
 END_IF;
 
 instModes(
@@ -29569,7 +29815,7 @@ instModes(
     SelSyncEnable   := GVL_Modes_Stub.SyncEnableRequest_IHM,
     InhibitM1Request    := GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     InhibitM2Request    := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
-    SelHomingApproachEnable := GVL_IHM.Commun.SelHomingApproachEnable, // 🆕 REX 2026-07-08 (2)
+    SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable, // 🆕 REX 2026-07-08 (2)
     EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
     JoystickWinchSelectRequest := GVL_IHM.Modes.SelJoystickWinch // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
 );
@@ -29727,7 +29973,7 @@ instCycle(
     // Retour dédié Kobold — distinct du mou de câble.
     KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
-    LimitLegalDepthM    := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M,
+    LimitLegalDepthM    := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M,
     WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -30055,8 +30301,8 @@ instBucket(
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2Benne.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
-    CmdClose_IHM        := GVL_IHM.M2Benne.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
+    CmdClose_IHM        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
     JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
     JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -30065,14 +30311,14 @@ instBucket(
     HomedM2             := PRG_02_Encoders.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,   // 🆕 REX 2026-07-08
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
-    ConfirmOpenPosition := GVL_IHM.M2Benne.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
-    ConfirmClosePosition:= GVL_IHM.M2Benne.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
+    ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
+    ConfirmClosePosition:= GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
     Config              := _BucketConfig,
-    CfgTimeoutDuration     := GVL_IHM.M2Benne.CfgTimeoutDuration,
+    CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
     InhibitM2           := PRG_04_Modes.instModes.InhibitM2,  // 🆕 REX 2026-07-08
-    BypassGlobal        := GVL_IHM.M2Benne.BypassGlobal      // 🌐 Bypass benne (RETAIN)
+    BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global      // 🌐 Bypass benne (RETAIN)
 );
 
 // 🆕 REX 2026-07-08 (4) — Concept 1 (écart synchro mineur) : bit0 seul (écart position, hors
@@ -30273,7 +30519,7 @@ instWinchSync(
     Contactor3_M2   := instWinchM2.Contactor3,
     Contactor4_M1   := instWinchM1.Contactor4,
     Contactor4_M2   := instWinchM2.Contactor4,
-    BypassGlobal    := GVL_IHM.Sync.BypassGlobal
+    BypassGlobal    := GVL_IHM.M1M2Sync.Bypass.Global
 );
 
 // Table active M2 (verrouille TOUS les paliers sur la combinaison réelle du palier 1 si
@@ -30883,7 +31129,7 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.SelMode;
-GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.Sync.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
+GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
 
 // 🧪 Commandes de test Translation depuis la supervision.
@@ -30905,7 +31151,7 @@ END_IF;
 FaultMachineReset_IHM := GVL_IHM.Modes.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
-                    OR GVL_IHM.M2Benne.BtnReset;
+                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
 
 // 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
 // (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
@@ -31018,20 +31264,24 @@ IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Sync.CfgInitialized THEN
-    GVL_IHM.Sync.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
-    GVL_IHM.Sync.CfgInitialized := TRUE;
+IF NOT GVL_IHM.M1M2Sync.Cfg.Initialized THEN
+    GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
+    GVL_IHM.M1M2Sync.Cfg.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF GVL_IHM.M2Benne.Config.OffsetOpenM = 0.0 AND GVL_IHM.M2Benne.Config.OffsetCloseM = 0.0 THEN
-    GVL_IHM.M2Benne.Config := _BucketConfig;
-    GVL_IHM.M2Benne.CfgTimeoutDuration := T#30s;
+IF NOT GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized THEN
+    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config := _BucketConfig;
+    GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration := T#30s;
+    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized := TRUE;
 END_IF;
 
-IF GVL_IHM.Commun.LimitLegalDepthMinAllowed_M = 0.0 THEN
-    GVL_IHM.Commun.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
-    GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
+IF NOT GVL_IHM.Commun.Cfg.Initialized THEN
+    GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
+    GVL_IHM.Commun.Cfg.LimitLegalEnabled           := _LimitLegalEnabled;
+    GVL_IHM.Commun.Cfg.SelHomingApproachEnable     := FALSE; (* défaut inactif *)
+    GVL_IHM.Commun.Cfg.Initialized                 := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent    := TRUE;
 END_IF;
 
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
@@ -31074,16 +31324,23 @@ IF NOT GVL_IHM.Network.Bypass.Initialized THEN
     GVL_IHM.Network.Bypass.Initialized := TRUE;
 END_IF;
 
-// 🌐 Sync/Bucket : pas encore de struct Bypass dédié (hors périmètre de ce lot, voir §3) —
-// mécanisme BypassRestoreDone conservé UNIQUEMENT pour ces 2-là.
+IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
+    IF BypassSyncGlobal THEN
+        GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized THEN
+    IF BypassBucketGlobal THEN
+        GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized := TRUE;
+END_IF;
+
+// 🌐 BypassRestoreDone est désormais 100% orphelin (tous les bypass ont migré sur leur propre flag .Initialized).
 // 🐛 FIX 2026-07-23 : BypassRestoreDone en VAR RETAIN (évite re-forcage au boot si GVL_IHM intact).
 IF NOT BypassRestoreDone THEN
-    IF BypassSyncGlobal AND GVL_IHM.Sync.BypassGlobal = FALSE THEN
-        GVL_IHM.Sync.BypassGlobal := TRUE;
-    END_IF;
-    IF BypassBucketGlobal AND GVL_IHM.M2Benne.BypassGlobal = FALSE THEN
-        GVL_IHM.M2Benne.BypassGlobal := TRUE;
-    END_IF;
     BypassRestoreDone := TRUE;
 END_IF;
 
@@ -31111,11 +31368,11 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
 END_IF;
 // ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit, désormais clos
-// par le flag `Sync.CfgInitialized` (posé en §2 uniquement après restauration réussie).
-IF GVL_IHM.Sync.CfgInitialized THEN
-    _WinchSyncTolerance_M       := GVL_IHM.Sync.CfgSyncTolerance_M;
+// par le flag `M1M2Sync.Cfg.Initialized` (posé en §2 uniquement après restauration réussie).
+IF GVL_IHM.M1M2Sync.Cfg.Initialized THEN
+    _WinchSyncTolerance_M       := GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M;
 END_IF;
-_BucketConfig              := GVL_IHM.M2Benne.Config;
+_BucketConfig              := GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
@@ -31184,16 +31441,18 @@ IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initial
     GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
 
-_LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
-_LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
+IF GVL_IHM.Commun.Cfg.Initialized THEN
+    _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
+    _LimitLegalEnabled           := GVL_IHM.Commun.Cfg.LimitLegalEnabled;
+END_IF;
 
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
 BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
 BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
-BypassSyncGlobal            := GVL_IHM.Sync.BypassGlobal;
+BypassSyncGlobal            := GVL_IHM.M1M2Sync.Bypass.Global;
 BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
-BypassBucketGlobal          := GVL_IHM.M2Benne.BypassGlobal;
+BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
@@ -31345,33 +31604,33 @@ GVL_IHM.M2TreuilBenne.State.InhibitActive            := PRG_04_Modes.instModes.I
 
 
 // ── 7. MAPPING ÉTATS BENNE → IHM ───────────────────────────────────────
-GVL_IHM.M2Benne.FBState          := PRG_06_WinchControl.instBucket.State;
-GVL_IHM.M2Benne.ActiveOffset_M     := PRG_06_WinchControl.instBucket.ActiveOffsetM;
-GVL_IHM.M2Benne.M2StartStop      := PRG_06_WinchControl.instBucket.M2_StartStop;
-GVL_IHM.M2Benne.M2Direction      := PRG_06_WinchControl.instBucket.M2_Direction;
-GVL_IHM.M2Benne.M2ForceSlowSpeed := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
-GVL_IHM.M2Benne.Ready            := PRG_06_WinchControl.instBucket.Ready;
-GVL_IHM.M2Benne.Busy             := PRG_06_WinchControl.instBucket.Busy;
-GVL_IHM.M2Benne.Done             := PRG_06_WinchControl.instBucket.Done;
-GVL_IHM.M2Benne.Error            := PRG_06_WinchControl.instBucket.Error;
-GVL_IHM.M2Benne.ErrorId          := PRG_06_WinchControl.instBucket.ErrorId;
-GVL_IHM.M2Benne.RemainingTravel_M  := PRG_06_WinchControl.instBucket.RemainingTravelM;
-GVL_IHM.M2Benne.CloseActive         := PRG_06_WinchControl.instBucket.CloseReq; // 🆕 REX 2026-07-08
-GVL_IHM.M2Benne.OpenActive          := PRG_06_WinchControl.instBucket.OpenReq;  // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBenne.Bucket.State.FBState          := PRG_06_WinchControl.instBucket.State;
+GVL_IHM.M2TreuilBenne.Bucket.State.ActiveOffset_M   := PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2StartStop      := PRG_06_WinchControl.instBucket.M2_StartStop;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2Direction      := PRG_06_WinchControl.instBucket.M2_Direction;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2ForceSlowSpeed := PRG_06_WinchControl.instBucket.M2_ForceSlowSpeed;
+GVL_IHM.M2TreuilBenne.Bucket.State.Ready            := PRG_06_WinchControl.instBucket.Ready;
+GVL_IHM.M2TreuilBenne.Bucket.State.Busy             := PRG_06_WinchControl.instBucket.Busy;
+GVL_IHM.M2TreuilBenne.Bucket.State.Done             := PRG_06_WinchControl.instBucket.Done;
+GVL_IHM.M2TreuilBenne.Bucket.State.Error            := PRG_06_WinchControl.instBucket.Error;
+GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId          := PRG_06_WinchControl.instBucket.ErrorId;
+GVL_IHM.M2TreuilBenne.Bucket.State.RemainingTravel_M:= PRG_06_WinchControl.instBucket.RemainingTravelM;
+GVL_IHM.M2TreuilBenne.Bucket.State.CloseActive      := PRG_06_WinchControl.instBucket.CloseReq; // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBenne.Bucket.State.OpenActive       := PRG_06_WinchControl.instBucket.OpenReq;  // 🆕 REX 2026-07-08
 // 📊 REX 2026-07-07 : position M2 corrigée de l'offset actif — affichage bargraphe uniquement,
 // doit être égale à GVL_IHM.M1TreuilRetenue.Position_M quand tout est nominal (voir bandeau ST_BucketHMI).
-GVL_IHM.M2Benne.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
-GVL_IHM.M2Benne.State            := _BucketState;
+GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM;
+GVL_IHM.M2TreuilBenne.Bucket.State.MechState        := _BucketState;
 
 
 // ── 8. MAPPING ÉTATS SYNCHRONISATION → IHM ─────────────────────────────────
-GVL_IHM.Sync.DeltaPos_M   := PRG_06_WinchControl.instWinchSync.DeltaPosM;
-GVL_IHM.Sync.SyncActive := PRG_06_WinchControl.instWinchSync.SyncActive;
-GVL_IHM.Sync.SyncWarn   := PRG_06_WinchControl.instWinchSync.SyncWarn;
-GVL_IHM.Sync.Ready      := PRG_06_WinchControl.instWinchSync.Ready;
-GVL_IHM.Sync.Error      := PRG_06_WinchControl.instWinchSync.Error;
-GVL_IHM.Sync.ErrorId    := PRG_06_WinchControl.instWinchSync.ErrorId;
-GVL_IHM.Sync.State      := PRG_06_WinchControl.instWinchSync.State;
+GVL_IHM.M1M2Sync.State.DeltaPos_M   := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+GVL_IHM.M1M2Sync.State.SyncActive := PRG_06_WinchControl.instWinchSync.SyncActive;
+GVL_IHM.M1M2Sync.State.SyncWarn   := PRG_06_WinchControl.instWinchSync.SyncWarn;
+GVL_IHM.M1M2Sync.State.Ready      := PRG_06_WinchControl.instWinchSync.Ready;
+GVL_IHM.M1M2Sync.State.Error      := PRG_06_WinchControl.instWinchSync.Error;
+GVL_IHM.M1M2Sync.State.ErrorId    := PRG_06_WinchControl.instWinchSync.ErrorId;
+GVL_IHM.M1M2Sync.State.FBState    := PRG_06_WinchControl.instWinchSync.State;
 
 
 // ── 9. MAPPING ÉTATS TRANSLATION M3 → IHM ────────────────────────────────────
@@ -31441,7 +31700,7 @@ GVL_IHM.Cycle.SelTarget    := GVL_IHM.TranslationM3.Cmd.SelTarget;
 GVL_IHM.Cycle.KoboldContactFond    := PRG_00_Inputs.KoboldContactFond;
 GVL_IHM.Cycle.KoboldContactorCmd   := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 GVL_IHM.Cycle.LimitLegalReached    := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.LimitLegalDepth_M      := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
+GVL_IHM.Cycle.LimitLegalDepth_M      := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
 GVL_IHM.Cycle.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Error;
 GVL_IHM.Cycle.WinchSyncDelta_M       := PRG_06_WinchControl.instWinchSync.DeltaPosM;
 GVL_IHM.Cycle.M1Position_M           := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
@@ -32058,15 +32317,7 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Variables d'échange IHM Treuil Benne (M2)</xhtml>
           </documentation>
         </variable>
-        <variable name="M2Benne">
-          <type>
-            <derived name="ST_BucketHMI" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Variables d'échange IHM Mécanisme Benne (M2)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="Sync">
+        <variable name="M1M2Sync">
           <type>
             <derived name="ST_SyncHMI" />
           </type>
@@ -34154,11 +34405,17 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         <Folder Name="SUPERVISION">
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
           <Folder Name="_TYPES">
+            <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+            <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
             <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
+            <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
+            <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
             <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
             <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
+            <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
             <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
+            <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
             <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
             <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
@@ -34167,7 +34424,10 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
             <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
             <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
+            <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
+            <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
             <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
+            <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
             <Object Name="ST_TestCycle" ObjectId="60a8cfd9-07ff-593e-b4e7-932f1aeab649" />
             <Object Name="ST_TestTranslation" ObjectId="678d0cb3-86df-5268-8714-2a554010910d" />
             <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
