@@ -7,7 +7,7 @@
    🔧 REX 2026-07-07 : séparation des resets — l'ancien MachineReset_IHM (unique, câblé sur
       TOUT y compris FB_Modes/FB_Cycle) est retiré. FaultMachineReset_IHM ne couvre plus que le
       domaine sécurité/métier (Winch, Safety, Encodeurs, Benne, Joystick, Translation) ;
-      FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.BtnModeReset côté
+      FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.Cmd.BtnModeReset côté
       PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
    ═══════════════════════════════════════════════════════════════
    📄 Docs : DOC/AF_Partie-07_Interface_IHM_v1.5.md
@@ -48,7 +48,7 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
-GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.SelMode;
+GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.Cmd.SelMode;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
 
@@ -68,7 +68,7 @@ ELSE
 END_IF;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
-FaultMachineReset_IHM := GVL_IHM.Modes.BtnFaultReset
+FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
@@ -76,7 +76,7 @@ FaultMachineReset_IHM := GVL_IHM.Modes.BtnFaultReset
 // 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
 // (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
 // Sert à savoir, côté IHM, quand un appui sur BtnFaultReset est utile/attendu.
-GVL_IHM.Modes.AnyFaultActive :=
+GVL_IHM.Modes.State.AnyFaultActive :=
        PRG_01_Diagnostics.instDiagCanOpen.Error
     OR PRG_01_Diagnostics.instDiagEthercat.Error
     OR PRG_01_Diagnostics.FB_Joystick_0.Error
@@ -104,10 +104,10 @@ GVL_IHM.Modes.AnyFaultActive :=
 // 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont — polarité "alarme" (TRUE=
 // problème), PAS celle de PowerCutOff_A_RQ (qui est en fail-safe maintenu, TRUE=OK depuis
 // l'inversion de polarité). On relit directement les .PowerCutOff sources, pas la sortie physique.
-GVL_IHM.Modes.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+GVL_IHM.Modes.State.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
                                  OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
                                  OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff
-                                 OR GVL_IHM.Modes.BtnEmergencyCutOff;
+                                 OR GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
 
 // 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 — signal UNIQUE (1 seul fil, pas de sens à
 // le dupliquer par axe), remonté une seule fois au niveau global GVL_IHM (même principe que
@@ -126,15 +126,15 @@ GVL_IHM.Commun.HeartbeatIhmElapsed := PRG_01_Diagnostics.instIhmHeartbeat.TimeSi
 // 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
 // EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
 // pas seulement le pulse — ArmingSeqStep<>0 englobe déjà tout sauf le verrouillage final.
-GVL_IHM.Modes.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
-GVL_IHM.Modes.PowerContactorOk    := PRG_00_Inputs.EmergencyStopOk;
-GVL_IHM.Modes.EmergencyArmingBusy := (PRG_10_Outputs.ArmingSeqStep <> 0) OR PRG_10_Outputs.EmergencyArmingLockoutActive;
-GVL_IHM.Modes.EmergencyArmable    := PRG_00_Inputs.EmergencyChain
+GVL_IHM.Modes.State.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
+GVL_IHM.Modes.State.PowerContactorOk    := PRG_00_Inputs.EmergencyStopOk;
+GVL_IHM.Modes.State.EmergencyArmingBusy := (PRG_10_Outputs.ArmingSeqStep <> 0) OR PRG_10_Outputs.EmergencyArmingLockoutActive;
+GVL_IHM.Modes.State.EmergencyArmable    := PRG_00_Inputs.EmergencyChain
                                     AND (PRG_10_Outputs.ArmingSeqStep = 0)
                                     AND NOT PRG_10_Outputs.EmergencyArmingLockoutActive
                                     AND NOT PRG_10_Outputs.RedundancyTestFailed;
-GVL_IHM.Modes.RedundancyTestFailed := PRG_10_Outputs.RedundancyTestFailed;
-GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
+GVL_IHM.Modes.State.RedundancyTestFailed := PRG_10_Outputs.RedundancyTestFailed;
+GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 // 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
 // homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.BtnHome sont désormais câblés
@@ -646,8 +646,8 @@ GVL_IHM.JOY1Joystick.ErrorId     := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
-GVL_IHM.Modes.CurrentMode     := PRG_04_Modes.instModes.Mode;
-GVL_IHM.Modes.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+GVL_IHM.Modes.State.CurrentMode     := PRG_04_Modes.instModes.Mode;
+GVL_IHM.Modes.State.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
 
 
 // ── 12. MAPPING DIAGNOSTICS BUS → IHM ────────────────────────────────────

@@ -144,11 +144,11 @@ PowerCutOffReq := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
 instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    ArmRequest := GVL_IHM.Modes.BtnEmergencyArming,
+    ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
     EmergencyChain := PRG_00_Inputs.EmergencyChain,
     EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
     PowerCutOffRequest := PowerCutOffReq,
-    BtnEmergencyCutOff := GVL_IHM.Modes.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );
 
 // Affectation des sorties physiques et logiques de coupure/réarmement

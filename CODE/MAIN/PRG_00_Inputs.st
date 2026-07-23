@@ -116,9 +116,9 @@ IF NOT HmiCommandsInitialized
    OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
     GVL_IHM.HmiInitDone := FALSE;
 
-    GVL_IHM.Modes.BtnFaultReset := FALSE;
-    GVL_IHM.Modes.BtnModeReset := FALSE;
-    GVL_IHM.Modes.BtnEmergencyArming := FALSE;
+    GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
+    GVL_IHM.Modes.Cmd.BtnModeReset := FALSE;
+    GVL_IHM.Modes.Cmd.BtnEmergencyArming := FALSE;
 
     GVL_IHM.M1TreuilRetenue.Cmd.BtnReset := FALSE;
     GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;

@@ -213,5 +213,5 @@ NeutralConfirmedPrevious := instCleanup.NeutralConfirmed
 // conflit car les suites s'exécutent toujours de façon mutuellement exclusive
 // (FB_PLC_Tests_Management n'active qu'une suite à la fois).
 IF Busy THEN
-    GVL_IHM.Modes.BtnFaultReset := ResetFaults;
+    GVL_IHM.Modes.Cmd.BtnFaultReset := ResetFaults;
 END_IF;
