@@ -93,7 +93,7 @@ ActiveStimulusId := 0;
 IF Abort THEN
     GVL_PLC_Tests.OverrideJoystickActive := FALSE;
     GVL_PLC_Tests.OverrideContactorFalse := FALSE;
-    GVL_IHM.Modes.BtnFaultReset := FALSE;
+    GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
     GVL_IHM.Cycle.BtnStart := FALSE;
     GVL_PLC_Tests.OverrideHmiCommandPurge := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
@@ -229,9 +229,9 @@ NeutralHoldTimer(IN := (Step = 13) AND (ABS(GVL_PLC_Tests.OverrideJoystickRawY -
 CASE Step OF
     // ─────────── Préambule : armement contacteur simulé (requis sans hardware) ───────────
     5:
-        GVL_IHM.Modes.BtnEmergencyArming := TRUE; // pulse réarmement → SimContactorOk → EmergencyStopOk
+        GVL_IHM.Modes.Cmd.BtnEmergencyArming := TRUE; // pulse réarmement → SimContactorOk → EmergencyStopOk
         IF PRG_00_Inputs.EmergencyStopOk THEN
-            GVL_IHM.Modes.BtnEmergencyArming := FALSE;
+            GVL_IHM.Modes.Cmd.BtnEmergencyArming := FALSE;
             StepPassed := TRUE;
             Step := 10;
             StepStarted := FALSE;
@@ -239,7 +239,7 @@ CASE Step OF
 
     // ─────────── TC-M1 : MAINT_N1 + homme-mort (+ arrêt + reprise) ───────────
     10:
-        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
         GVL_PLC_Tests.OverrideJoystickRawY := 5000; // neutre
         GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
         IF SimGateOk AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) THEN
@@ -290,7 +290,7 @@ CASE Step OF
     20:
         GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
         GVL_PLC_Tests.OverrideJoystickRawY := 5000;
-        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
         IF SimGateOk AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
             StepPassed := TRUE;
             Step := 21;
@@ -310,7 +310,7 @@ CASE Step OF
     30:
         GVL_PLC_Tests.OverrideJoystickRawButton := FALSE;
         GVL_PLC_Tests.OverrideJoystickRawY := 5000;
-        GVL_IHM.Modes.SelMode := E_Mode.SEMI_AUTO;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
         IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
             StepPassed := TRUE;
             IF RequestedCaseId = 3 THEN Step := 0; ELSE Step := 40; END_IF;
@@ -327,7 +327,7 @@ CASE Step OF
 
     // ─────────── TC-M5 : Sécurité active + aucun mouvement sans autorisation de mode ───────────
     50:
-        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
         GVL_PLC_Tests.OverrideContactorFalse := TRUE; // Force EmergencyStopOk := FALSE (voir PRG_00_Inputs)
         IF PRG_04_Modes.instModes.Mode = E_Mode.DISABLE THEN
             StepPassed := TRUE;
@@ -345,9 +345,9 @@ CASE Step OF
 
     52:
         GVL_PLC_Tests.OverrideContactorFalse := FALSE;
-        GVL_IHM.Modes.BtnFaultReset := TRUE;
+        GVL_IHM.Modes.Cmd.BtnFaultReset := TRUE;
         IF PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE THEN
-            GVL_IHM.Modes.BtnFaultReset := FALSE;
+            GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
             StepPassed := TRUE;
             IF RequestedCaseId = 5 THEN Step := 0; ELSE Step := 60; END_IF;
             StepStarted := FALSE;
@@ -359,7 +359,7 @@ CASE Step OF
         // démarrage (GVL_IHM.Cycle.BtnStart, ré-assertée chaque scan pour couvrir l'ordre
         // des tâches) pendant >200 ms hors SEMI_AUTO — instCycle.Enable=FALSE doit la rendre
         // sans effet (Busy reste FALSE), pas un simple instantané qui ne prouverait rien.
-        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N1;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
         GVL_IHM.Cycle.BtnStart := TRUE;
         IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1) AND (StepElapsed >= T#200MS) THEN
             GVL_IHM.Cycle.BtnStart := FALSE;
@@ -375,7 +375,7 @@ CASE Step OF
 
     // ─────────── TC-M7 : DISABLE explicite neutralise M1/M2/M3 ───────────
     65:
-        GVL_IHM.Modes.SelMode := E_Mode.DISABLE;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.DISABLE;
         IF PRG_04_Modes.instModes.Mode = E_Mode.DISABLE THEN
             StepPassed := TRUE;
             Step := 66;

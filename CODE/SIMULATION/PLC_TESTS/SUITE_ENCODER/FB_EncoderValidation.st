@@ -160,7 +160,7 @@ StepTimer(IN := TRUE, PT := StepLimit);
 CASE Step OF
     // TC-E1 : gate et interface IHM nominale accessibles.
     10:
-        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
         IF NOT SimGateOk THEN
             StepFailed := TRUE;
             ErrorCode := 3003;
@@ -182,7 +182,7 @@ CASE Step OF
 
     // TC-E2 : fronts BtnHome indépendants, envoyés simultanément.
     20:
-        GVL_IHM.Modes.SelMode := E_Mode.MAINT_N2;
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
         IF NOT SimGateOk THEN
             StepFailed := TRUE;
             ErrorCode := 3003;

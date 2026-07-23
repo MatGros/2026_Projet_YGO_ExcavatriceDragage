@@ -194,7 +194,7 @@ IF State = E_State.BUSY THEN
         // 🔧 REX 2026-07-07 : un homing réussi re-établit la référence tout aussi validement
         // qu'un BtnConfirmCoherence explicite — efface donc aussi bit9 (incohérence redémarrage),
         // sinon ErrorId/Error restait bloqué à TRUE après un homing réussi (jamais mappé vers
-        // l'IHM, invisible sauf sur GVL_IHM.Modes.AnyFaultActive qui restait à 1 sans raison visible).
+        // l'IHM, invisible sauf sur GVL_IHM.Modes.State.AnyFaultActive qui restait à 1 sans raison visible).
         ErrorId := ErrorId AND 16#FDFF;
     ELSIF PresetNak THEN
         ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)

@@ -41,7 +41,7 @@ END_IF;
 
 instModes(
     Enable              := TRUE,
-    Reset               := GVL_IHM.Modes.BtnModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
+    Reset               := GVL_IHM.Modes.Cmd.BtnModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     SelMode         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
     SelSyncEnable   := GVL_Modes_Stub.SyncEnableRequest_IHM,
@@ -49,5 +49,5 @@ instModes(
     InhibitM2Request    := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable, // 🆕 REX 2026-07-08 (2)
     EncoderFaultPresent := PRG_02_Encoders.EncoderFaultPresent,   // 1 cycle de retard (reçu de PRG_02_Encoders)
-    JoystickWinchSelectRequest := GVL_IHM.Modes.SelJoystickWinch // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
+    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch // 🆕 TASK-0001, rapatrié depuis IHM_MANU (2026-07-19)
 );

@@ -154,7 +154,7 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 ELSE
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01,
     // réouverture documentée T40) : le joystick n'est plus la SEULE source —
-    // GVL_IHM.Modes.TglJoystickMaster bascule vers les boutons IHM maintenus (BtnUp/BtnDown),
+    // GVL_IHM.Modes.Cmd.TglJoystickMaster bascule vers les boutons IHM maintenus (BtnUp/BtnDown),
     // homme-mort joystick réel TOUJOURS exigé en parallèle (même leçon que le précédent bug
     // Translation M3, AF_Partie-11 v1.9 §6bis — jamais implicite). Voir
     // DOC/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
@@ -166,7 +166,7 @@ ELSE
     // décél, M1 bougeait/frein décollait à la fin d'un cycle benne). DeadmanArmed reste FALSE
     // en continu jusqu'au repassage neutre + réappui, sans dépendre du temps de rampe.
     // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (nécessaire pour le gate directionnel ci-dessous).
-    IF GVL_IHM.Modes.TglJoystickMaster THEN
+    IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Source = joystick (comportement historique, inchangé)
         M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
         M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instBucket.Busy
@@ -217,7 +217,7 @@ ELSE
                                    ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
     ELSE
         // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01) :
-        // idem M1 (voir bandeau branche M1 ci-dessus) — GVL_IHM.Modes.TglJoystickMaster bascule la
+        // idem M1 (voir bandeau branche M1 ci-dessus) — GVL_IHM.Modes.Cmd.TglJoystickMaster bascule la
         // SOURCE, JoystickWinchSelectArbitrated reste l'unique sélecteur treuil (2=M2 seul, 3=Couplé,
         // forcé à 3 hors MAINT_N2), IDENTIQUE quelle que soit la source.
         // 🔧 REX 2026-07-08 : + AND DeadmanArmed, même raison que M1 ci-dessus
@@ -229,7 +229,7 @@ ELSE
         // Direction=+1 (monter, qui RATTRAPE). Symétrique inversé par rapport à M1 (qui utilise +1/-1
         // directement car SignedDeltaPosM est déjà dans SON référentiel). Même inversion appliquée
         // à la branche boutons IHM ci-dessous (BtnUp M2 = Direction -1, RATTRAPE si M1 en retard).
-        IF GVL_IHM.Modes.TglJoystickMaster THEN
+        IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
             M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed

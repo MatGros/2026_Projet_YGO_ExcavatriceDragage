@@ -555,6 +555,6 @@ END_CASE;
 
 // Recopie IHM/métier
 IF Busy THEN
-    GVL_IHM.Modes.BtnEmergencyArming := ArmRequest;
-    GVL_IHM.Modes.BtnFaultReset  := ResetFaults;
+    GVL_IHM.Modes.Cmd.BtnEmergencyArming := ArmRequest;
+    GVL_IHM.Modes.Cmd.BtnFaultReset  := ResetFaults;
 END_IF;
