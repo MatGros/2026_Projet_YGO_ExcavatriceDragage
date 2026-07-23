@@ -1,12 +1,22 @@
 (* ═══════════════════════════════════════════════════════════════
    🌐 ST_BypassNetwork — Bypass général du diagnostic réseau
    ───────────────────────────────────────────────────────────────
-   🔒 Permet de forcer les devices réseau (CAN, EtherCAT) à "online"
+   🔒 Permet de forcer les esclaves réseau (CAN, EtherCAT) à "online"
       pour le diagnostic, sans devoir toucher à chaque bit individuel.
       Jamais actif en production.
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BypassNetwork :
 STRUCT
-    Global : BOOL; (* 🌐 Force TOUS les devices réseau à Online (TRUE = bypass total) *)
+    (* 📡 1. Communication & Systèmes esclaves *)
+    Joystick    : BOOL; (* 🕹️ Bypass diagnostic esclave CANopen Joystick *)
+    EncoderM1   : BOOL; (* 🧲 Bypass diagnostic esclave EtherCAT COD1 (M1 codeur) *)
+    EncoderM2   : BOOL; (* 🧲 Bypass diagnostic esclave EtherCAT COD2 (M2 codeur) *)
+    VariateurM3 : BOOL; (* ↔️ Bypass diagnostic esclave EtherCAT AC600 (M3 drive) *)
+
+    (* 🛡️ 2. Hiérarchie & Restauration *)
+    Global      : BOOL; (* 🌐 Bypass Global : tous les esclaves réseau à la fois *)
+    // 🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+    // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_09_Supervision.st
+    Initialized : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT
 END_TYPE

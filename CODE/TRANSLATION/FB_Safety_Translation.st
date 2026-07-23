@@ -41,6 +41,8 @@ VAR_INPUT
     BypassMecaA           : BOOL := FALSE;   // 🔄 Bypass Méca A
     BypassLimitSwitch     : BOOL := FALSE;   // 🚧 Bypass butées extrêmes
     BypassSensorIncoherent: BOOL := FALSE;   // 🧭 Bypass incohérence mot capteurs
+    BypassSafety          : BOOL := FALSE;   // 🛡️ Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)
+    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -119,7 +121,7 @@ IF NOT BypassGlobal THEN
     // ResetEdge clearing est fait dans chaque bloc individuel ci-dessous.
 
     // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
-    IF NOT BypassOperatorComm THEN
+    IF NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
             ErrorId := ErrorId OR 16#0001;
         END_IF;
@@ -127,7 +129,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFE; END_IF;
 
     // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
-    IF NOT BypassDriveComm THEN
+    IF NOT (BypassProcess OR BypassDriveComm) THEN
         IF (NOT DriveOnline OR NOT DriveOperational) THEN
             ErrorId := ErrorId OR 16#0002;
         END_IF;
@@ -135,7 +137,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFD; END_IF;
 
     // 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
-    IF NOT BypassPhaseRotation THEN
+    IF NOT (BypassProcess OR BypassPhaseRotation) THEN
         IF NOT PhaseRotationOk THEN
             ErrorId := ErrorId OR 16#0004;
         END_IF;
@@ -143,7 +145,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFB; END_IF;
 
     // 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
-    IF NOT BypassBrakeThermal THEN
+    IF NOT (BypassSafety OR BypassBrakeThermal) THEN
         IF BrakeThermalFeedback THEN
             ErrorId := ErrorId OR 16#0008;
         END_IF;
@@ -151,7 +153,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFF7; END_IF;
 
     // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
-    IF NOT BypassMecaB THEN
+    IF NOT (BypassSafety OR BypassMecaB) THEN
         IF NOT HeartbeatIhmOk THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
         ELSIF (Direction = 0) AND NOT BrakeCmd THEN
@@ -167,7 +169,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFEF; END_IF;
 
     // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
-    IF NOT BypassMecaA THEN
+    IF NOT (BypassSafety OR BypassMecaA) THEN
         IF (Direction = 0) AND NOT BrakeCmd THEN
             UncommandedActiveA := ABS(DriveActualFreqHz) > 0.5;
         ELSE
@@ -181,7 +183,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
 
     // 🔍 3sexies. DÉPASSEMENT FINS DE COURSE EXTRÊMES (bit6)
-    IF BypassLimitSwitch THEN
+    IF (BypassSafety OR BypassLimitSwitch) THEN
         // Nettoye le bit 6 résiduel (posé avant activation du bypass)
         ErrorId := ErrorId AND 16#FFBF;
     ELSE
@@ -192,7 +194,7 @@ IF NOT BypassGlobal THEN
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFBF; END_IF;
 
     // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
-    IF BypassSensorIncoherent THEN
+    IF (BypassSafety OR BypassSensorIncoherent) THEN
         // Nettoye le bit 7 résiduel
         ErrorId := ErrorId AND 16#FF7F;
     ELSE
