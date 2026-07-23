@@ -7,7 +7,7 @@
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Définition et architecture des tests de validation automatisés de la chaîne de sécurité (Arrêt d'Urgence et commande des contacteurs de puissance).
 > **Version** : v1.2 (2026-07-16) — §7 **réécrit intégralement** : spécification finale du framework de test in-PLC (architecture de données, moteur d'exécution, catalogue de primitives, IHM de pilotage, preuve de couverture TC-01/02/03, plan de migration), issue d'une double revue croisée entre deux analyses expertes indépendantes (primitives de test ↔ architecture de données/IHM) + audit final. **Remplace entièrement** le cadrage v1.1 §7. Base §1-6 **inchangée**. ⚠️ **Aucune modification de `CODE/` n'accompagne cette version** — cadrage uniquement ; migration à dérouler séparément (§7.6).
-> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P13 Simulation v1.2](AF_Partie-13_Fonction_Simulation_v1.2.md), [P3 Template FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) (contrat FB, profils §1bis), [P7 Interface IHM v1.5](AF_Partie-07_Interface_IHM_v1.5.md) (pattern `ST_*HMI`), [NAMING_CONVENTION.md](NAMING_CONVENTION.md).
+> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P13 Simulation v1.3](AF_Partie-13_Fonction_Simulation_v1.3.md), [P3 Template FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) (contrat FB, profils §1bis), [P7 Interface IHM v1.7](AF_Partie-07_Interface_IHM_v1.7.md) (pattern `ST_*HMI`), [NAMING_CONVENTION.md](NAMING_CONVENTION.md).
 
 ---
 

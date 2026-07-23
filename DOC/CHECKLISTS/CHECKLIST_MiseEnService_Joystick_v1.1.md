@@ -18,4 +18,5 @@
 
 **Verdict JOY1** : ☐ PASS · ☐ FAIL · ☐ Non testé (raison : __________)
 
-📎 Détail technique : `CHECKLIST_MiseEnService_Joystick_v1.0.md` (historique) et `AF_Partie-08_Fonction_Joystick_v1.3.md`.
+📎 Détail technique : `../../ARCHIVES/Doc/CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.0.md`
+(historique) et `../AF_Partie-08_Fonction_Joystick_v1.3.md`.

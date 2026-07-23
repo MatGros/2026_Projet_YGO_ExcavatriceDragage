@@ -132,7 +132,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T13 | ✅ Aucun identifiant Safety Mouvement A/B/C actif. Les suffixes `PowerCutOff_A/B` sont conservés : canaux physiques redondants, pas rôles métier | Projet | AF_Partie-01, CODE/AU |
 | T15 | 🔎 Source logicielle clarifiée : `PRG_00_Inputs.EmergencyStopOk` vient de `EmergencyStopOk_DI` (retour contacteur de puissance) ; simulation et override tests restent explicitement séparés. Validation du câblage réel et du comportement post-réarmement à réaliser | Projet / Terrain | AF_Partie-01 §Sécurité électrique, AF_Partie-03 §1, `PRG_00_Inputs` |
 | T16 | ✅ Vestige `PRG_JOY1` retiré des instructions actives ; programme réel `PRG_01_Diagnostics`, filtre `FB_Filter_PT1` | Projet | AF_Partie-08 §6bis |
-| T17 | ✅ Checklist mise en service Joystick réalisée + limitation de robustesse ajoutée sur `FB_AxisScale`, `FB_Ramp` et la consigne finale M3 | Projet / Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.0.md`, AF_Partie-08 §8 |
+| T17 | 🟠 Checklist Joystick rédigée ; exécution terrain et verdict signé restant à réaliser. Limitations de robustesse ajoutées sur `FB_AxisScale`, `FB_Ramp` et la consigne finale M3 | Projet / Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md`, AF_Partie-08 §8 |
 | T18 | ✅ GVL d'échange IHM créée et structurée par métier (modes, Translation M3, cycle, diagnostics) | Projet | `GVL_IHM` + Partie 7 v1.5 |
 | T19 | Mapping `ChannelOk` carte/voie E-S (diagnostic carte non exploité) à définir si besoin confirmé | Projet | AF_Partie-06 §4 |
 | T20 | Sélecteur treuil IHM (visu/physique) — variable rapatriée dans `GVL_IHM.Modes.JoystickWinchSelect` (2026-07-19, ex-`GVL_IHM.IHM_MANU`) ; widget visu physique restant à faire. Arbitrage MAINT_N2 fait, cf. AF_Partie-05 v1.6 | Projet | AF_Partie-05 §2, AF_Partie-09 §1 |
@@ -141,7 +141,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T23 | ✅ Homing nominal et unitaire MAINT_N2 raccordés : sélection M1/M2, cible libre par treuil, limite ±99 m et diagnostics bits0/1/4 | Projet | `FB_Encoder_Homing`, `PRG_02_Encoders`, `ST_WinchHMI` |
 | T24 | ✅ `FB_Encoder_Safety` intégré (instances M1/M2, inhibition `SEMI_AUTO`, diagnostic IHM) | Projet | AF_Partie-10 §9bis |
 | T25 | 🟠 Suite automatisée nominale Encoder/Homing renforcée : gate simulation explicite, watchdog local, rapports TC-E1/TC-E2 corrigés ; essais CODESYS et scénarios unitaire/bornage/redémarrage restant | Projet / Terrain | `SuiteEncoder = 4`, AF_Partie-10 §10 |
-| T26 | ✅ Checklist mise en service Translation AC600 réalisée (EtherCAT, mot de commande, fréquence, marche avant/arrière, interlock sens, arrêt normal/SafeStop/AU, PV, 5 capteurs, Fdc extrêmes, thermique, diagnostics non couverts par TC-T1→T6) — clarification périmètre thermique (frein commun M3 ≠ centrale hydraulique, non liée) | Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.0.md`, AF_Partie-11 §8 |
+| T26 | 🟠 Checklist Translation AC600 rédigée ; exécution terrain et verdict signé restant à réaliser (EtherCAT, commande, fréquence, sens, arrêts, PV, 5 capteurs, Fdc, thermique, diagnostics) | Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.1.md`, AF_Partie-11 §8 |
 | T27 | Benne : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-12 §6 |
 | T28 | ✅ Plafond palier "essais progressifs" (`WinchMaxStepFwd/Rev`) retiré avec IHM_MANU (2026-07-19) — `PRG_06_WinchControl` applique désormais un plafond fixe (5/`_WinchMaxStepDescent`), identique Auto et Manuel | Projet | Session 2026-07-19 |
 | T29 | ✅ Terminologie active alignée : Translation M3, M1 Retenue, M2 Benne | Projet | CODE + AF métiers |
@@ -165,19 +165,21 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T47 | ✅ Ajouter le garde-fou de passage de palier : vitesse minimale atteinte + stabilité temporelle + absence de désynchronisme/variation anormale | Projet / Sécurité | `FB_SpeedStep`, `FB_Winch`, `FB_Encoder_SpeedMonitor` — activation terrain restant à valider |
 | T48 | 🟠 Valider les réactions et seuils par simulation puis essais terrain : démarrage en charge, treuil freiné, câble mou, effort asymétrique, perte codeur | Projet / Terrain | Matrice V1–V7 ajoutée AF_Partie-14 §7.4.4 ; exécution CODESYS/terrain restante |
 | T49 | ✅ Hauteurs unifiées : 8,0 m limite exploitation ; 8,5 m capteur/homing. Références 12,0/12,5 purgées du code et des specs actives | Projet + Mécanique | WINCH-CORE-01, `GVL_PERSISTENT`, P4/P7/P9/P10 |
-| T50 | ✅ `FB_SpeedStep` borné/validé ; ConfigError remonté dans `FB_Winch.ErrorId` bit2, sorties sûres. Palier 1 tout FALSE autorisé (résistances insérées) | Projet | WINCH-CORE-01, `AUDIT_Winch_v1.0.md` §2.2 |
-| T52 | 🔴 Valider chaîne `PowerCutOff` physique : câblage sorties A/B, contacteur puissance, retour confirmation, temps coupure réel (P0.3 audit Winch) | Électricité + Projet | `AUDIT_Winch_v1.0.md` §2.3, `PRG_10_Outputs.st:136-156` |
+| T50 | ✅ `FB_SpeedStep` borné/validé ; ConfigError remonté dans `FB_Winch.ErrorId` bit2, sorties sûres. Palier 1 tout FALSE autorisé (résistances insérées) | Projet | WINCH-CORE-01, `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §2.2 |
+| T52 | 🔴 Valider chaîne `PowerCutOff` physique : câblage sorties A/B, contacteur puissance, retour confirmation, temps coupure réel (P0.3 audit Winch) | Électricité + Projet | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §2.3, `PRG_10_Outputs.st:136-156` |
 | T53 | ✅ Choix implémenté : safety stricte par défaut ; bypass individuel maintenu uniquement en MAINT_N2 + Reset, sans masquer les autres défauts | Projet | WINCH-CORE-01, `FB_Safety_Winch`, P9 |
-| T54 | 🟠 Documenter latence PRG_03→PRG_06→PRG_10 (~10 ms) et l'intégrer au calcul temps d'arrêt (P1.2) | Projet | `AUDIT_Winch_v1.0.md` §3.2 |
-| T55 | 🟠 Définir stratégie synchronisme unique (info / mineur / majeur / critique) et aligner DOC/CODE/IHM (P1.3) | Projet | `AUDIT_Winch_v1.0.md` §3.3, `FB_WinchSync`, `PRG_06:329-338` |
-| T56 | 🟠 Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ms, 500 ms) avec charge/vide/frein chaud (P1.4) | Projet / Terrain | `AUDIT_Winch_v1.0.md` §3.4, `FB_Safety_Winch:149-169` |
-| T57 | 🟠 Unifier limite haute M2 selon offset benne : une seule limite active distribuée à Winch/Safety/IHM (P1.5) | Projet | `AUDIT_Winch_v1.0.md` §3.5, `PRG_06:379` vs `PRG_03:53,96` |
-| T58 | 🟠 Purge boot des commandes RETAIN réalisée dans PRG_00 ; séparation Config/Commands/Status/Alarms différée jusqu'à maquette IHM validée | Projet + IHM | WINCH-CORE-01, `AUDIT_Winch_v1.0.md` §5.2 |
-| T59 | 🟡 IHM afficher arrêt croisé effectif (ForbidAscentM1_Active) pas seulement safety local (P5.3) | IHM | `AUDIT_Winch_v1.0.md` §5.3, `PRG_09:319,382` vs `PRG_06:393-398` |
+| T54 | 🟠 Documenter latence PRG_03→PRG_06→PRG_10 (~10 ms) et l'intégrer au calcul temps d'arrêt (P1.2) | Projet | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §3.2 |
+| T55 | 🟠 Définir stratégie synchronisme unique (info / mineur / majeur / critique) et aligner DOC/CODE/IHM (P1.3) | Projet | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §3.3, `FB_WinchSync`, `PRG_06:329-338` |
+| T56 | 🟠 Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ms, 500 ms) avec charge/vide/frein chaud (P1.4) | Projet / Terrain | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §3.4, `FB_Safety_Winch:149-169` |
+| T57 | 🟠 Unifier limite haute M2 selon offset benne : une seule limite active distribuée à Winch/Safety/IHM (P1.5) | Projet | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §3.5, `PRG_06:379` vs `PRG_03:53,96` |
+| T58 | 🟠 Purge boot des commandes RETAIN réalisée dans PRG_00 ; séparation Config/Commands/Status/Alarms différée jusqu'à maquette IHM validée | Projet + IHM | WINCH-CORE-01, `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §5.2 |
+| T59 | 🟡 IHM afficher arrêt croisé effectif (ForbidAscentM1_Active) pas seulement safety local (P5.3) | IHM | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §5.3, `PRG_09:319,382` vs `PRG_06:393-398` |
 | T60 | ✅ `E_Mode.DISABLE` neutralise explicitement FB_Winch M1/M2 et FB_Translation M3 | Projet | WINCH-CORE-01, suite TC-M7 |
 | T61 | ✅ Estimateur de charge actif uniquement pour vitesse signée positive (montée) | Projet | WINCH-CORE-01, suite TC-M10 |
 | T62 | ✅ Fin `ASCENDING_LOADED` alignée sur `_CableLimitM1Ascent_M` (8,0 m) | Projet | WINCH-CORE-01, suite TC-M11 |
 | T63 | ⏸️ Persistance flags simulation + split `GVL_SimulationBench` reportés : bindings visualisation à maquetter avant import | Projet + IHM | REX session revertée, hors scope WINCH-CORE-01 |
+| T64 | 🟠 Essais treuils du 2026-07-23 : plafond de palier vitesse réglé temporairement à `0`. Confirmer le comportement effectif, tracer les essais, puis définir/restaurer la valeur d'exploitation avant mise en service normale | Projet / Terrain | `REGISTRE_Suivi_MiseEnService_v1.0.md` MES-003 |
+| T65 | 🟠 Test PLC automatique manquant pour le fix persistance config (`Cfg.Initialized`/`CfgInitialized`, `ConfigRestoredFromPersistent`) — requis avant clôture C3/safety (`AF_Partie-14` §Contrat tests). Vérification manuelle Watch/forçage possible en attendant | Projet | `CONFIG-PERSIST-01`, `PRG_09_Supervision.st` §2/§2bis/§3 |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 
@@ -204,6 +206,13 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | 6.2 | SafeStop en séquence Auto | `ERROR_HOLD` immédiat, reprise exacte après Reset+Start une fois défaut disparu |
 
 **Fiche signature** : Date / Responsable Automatisme / Représentant Client + tableau Pass/Fail par test + commentaires.
+
+### 🧾 Journal des séances MES / REX
+
+Les constats, mesures et décisions issus du banc ou du terrain sont consignés dans
+`REGISTRE_Suivi_MiseEnService_v1.0.md`. Toute action différée issue d'une séance doit
+être créée ou mise à jour ici au §3 avec un identifiant `Txx` : ce plan reste l'unique source des
+reliquats à implémenter.
 
 ---
 

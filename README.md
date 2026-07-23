@@ -35,15 +35,15 @@ Contrat standard que **tout FB métier respecte** :
 - **[Partie 4 (v1.4)](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md)** — Cycle & séquenceur (`E_CycleStep`, synchro, frein, translation, benne, rampes).
 - **[Partie 5 (v1.6)](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale gérée par `FB_Modes`).
 - **[Partie 6 (v1.6)](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)** — Conditionnement E/S.
-- **[Partie 7 (v1.6)](DOC/AF_Partie-07_Interface_IHM_v1.6.md)** — Interface HMI.
+- **[Partie 7 (v1.7)](DOC/AF_Partie-07_Interface_IHM_v1.7.md)** — Interface HMI.
 
 ### 6️⃣ **Fonctions Métier (Partie 8+)**
 - **[Partie 8 (v1.3)](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md)** — Fonction Joystick.
 - **[Partie 9 (v1.11)](DOC/AF_Partie-09_Fonction_Winch_v1.11.md)** — Fonction Winch (M1/M2, safety mou câble/thermique, garde-fous roue libre).
 - **[Partie 10 (v1.10)](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md)** — Fonction Encoder & Homing.
-- **[Partie 11 (v1.9)](DOC/AF_Partie-11_Fonction_Translation_v1.9.md)** — Fonction Translation (M3 variateur AC600).
+- **[Partie 11 (v1.11)](DOC/AF_Partie-11_Fonction_Translation_v1.11.md)** — Fonction Translation (M3 variateur AC600).
 - **[Partie 12 (v1.4)](DOC/AF_Partie-12_Fonction_Benne_v1.4.md)** — Fonction Benne (M2, désynchronisation, garde-fou glissement).
-- **[Partie 13 (v1.2)](DOC/AF_Partie-13_Fonction_Simulation_v1.2.md)** — Fonction Simulation.
+- **[Partie 13 (v1.3)](DOC/AF_Partie-13_Fonction_Simulation_v1.3.md)** — Fonction Simulation.
 - **[Partie 14 (v1.2)](DOC/AF_Partie-14_PLC_Tests_Validation_v1.2.md)** — Tests de validation sécurité (TC-01/02/03), framework de test in-PLC.
 - **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
@@ -65,13 +65,13 @@ excavatrice-dragage/
 │   ├── AF_Partie-04_Cycle_Sequenceur_v1.4.md
 │   ├── AF_Partie-05_Modes_Maintenance_v1.6.md
 │   ├── AF_Partie-06_IO_Conditioning_v1.6.md
-│   ├── AF_Partie-07_Interface_IHM_v1.6.md
+│   ├── AF_Partie-07_Interface_IHM_v1.7.md
 │   ├── AF_Partie-08_Fonction_Joystick_v1.3.md
 │   ├── AF_Partie-09_Fonction_Winch_v1.11.md
 │   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
-│   ├── AF_Partie-11_Fonction_Translation_v1.9.md
+│   ├── AF_Partie-11_Fonction_Translation_v1.11.md
 │   ├── AF_Partie-12_Fonction_Benne_v1.4.md
-│   ├── AF_Partie-13_Fonction_Simulation_v1.2.md
+│   ├── AF_Partie-13_Fonction_Simulation_v1.3.md
 │   ├── AF_Partie-14_PLC_Tests_Validation_v1.2.md
 │   ├── AUDIT_Coherence_Documentaire_v1.0.md
 │   └── PLAN_TASK_v1.0.md     (pilotage : jalons, tâches, TBD/questions client)

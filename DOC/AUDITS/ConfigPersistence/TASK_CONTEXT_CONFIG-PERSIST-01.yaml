@@ -1,0 +1,49 @@
+task_id: "CONFIG-PERSIST-01"
+request: >
+  Fiabiliser la persistance des paramètres de config exposés a l'IHM (GVL_IHM, RETAIN simple) qui
+  doivent survivre a un rechargement de programme via GVL_PERSISTENT (PERSISTENT RETAIN). Bug
+  initial signale par l'utilisateur : GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente repart au
+  defaut struct (3) au chargement d'un nouveau programme au lieu de conserver la valeur reglee.
+  Cause racine : sentinelles boot-restore `IF champ = 0.0 THEN` cassees des que le defaut struct
+  reel du champ teste n'est pas 0.0 (CfgTopSensorPos_M:=8.5, CfgSyncTolerance_M:=0.25) -> le bloc
+  de restauration ne s'executait plus, 10+ champs Cfg (paliers, rampes SafeStop, limites cable,
+  tolerance synchro) ne se resynchronisaient jamais depuis le vrai PERSISTENT. Revue par agent
+  expert automatisme/securite machine avant implementation (verdict : plan valide sur le principe,
+  amende sur l'emplacement du flag + ajout alarme operateur obligatoire).
+criticality: "C3"
+scope_code:
+  - "CODE/MAIN/PRG_09_Supervision.st"
+  - "CODE/SUPERVISION/_TYPES/ST_WinchCfg.st"
+  - "CODE/SUPERVISION/_TYPES/ST_SyncHMI.st"
+  - "CODE/SUPERVISION/_TYPES/ST_CommunHMI.st"
+scope_doc:
+  - "DOC/AF_Partie-07_Interface_IHM_v1.8.md"
+  - "DOC/PLAN_TASK_v1.0.md"
+  - "DOC/VERSION_HISTORY.md"
+out_of_scope:
+  - "Refonte architecture (IHM lit/ecrit PERSISTENT en direct, suppression du miroir GVL_IHM) : non applicable, l'IHM (supervision externe) n'a jamais d'acces direct aux variables PLC internes -- ecarte par l'utilisateur"
+  - "M2Benne.Config (OffsetOpenM/CloseM) et Commun.LimitLegalDepthMinAllowed_M/Enabled : sentinelle deja correcte (defaut struct reellement 0.0), aucun changement"
+  - "Translation M3 : pas de struct Cfg IHM-editable equivalente identifiee, hors perimetre de ce lot"
+  - "Logique safety elle-meme (FB_Safety_Winch/FB_Safety_Translation) : aucune modification, seule la restauration de la CONFIG qui alimente ces FB est corrigee"
+acceptance_criteria:
+  - "Flag Initialized (ST_WinchCfg) / CfgInitialized (ST_SyncHMI) : defaut FALSE, pose TRUE uniquement apres restauration complete PERSISTENT->IHM du groupe, meme scan que les assignations (pas de scan separe)."
+  - "Bloc §3 (propagation IHM->PERSISTENT) garde par le flag Initialized/CfgInitialized correspondant pour chaque champ concerne -- ne peut plus ecraser le PERSISTENT avec une valeur GVL_IHM fraichement resettee avant restauration."
+  - "ConfigRestoredFromPersistent (Commun) : pose TRUE des qu'une restauration a lieu sur n'importe quel groupe, ne disparait JAMAIS automatiquement -- seul un front sur BtnAckConfigRestored l'efface (doctrine reset=front)."
+  - "BypassRestoreDone : VAR RETAIN (plus simple VAR) -- ne se reinitialise plus a chaque download/reset si GVL_IHM RETAIN est reste intact."
+  - "CfgMaxStepDescente/CfgMaxStepAscent (commun M1/M2) : mirroir bidirectionnel garde par Initialized des DEUX treuils simultanement (evenement de boot partage)."
+  - "Bundle PLCopenXML regenere et frais (check_bundle_freshness.py = PASS)."
+tests_required:
+  - "Gates Python structure/style (pre-existant : erreurs DOC reference/NAVBOARDS non liees a ce lot, deja presentes avant modification)"
+  - "Compilation CODESYS manuelle (utilisateur)"
+  - "Simulation PLC manuelle (Watch/forcage) : forcer Cfg.Initialized:=FALSE + champs Cfg a leur defaut struct + valeur PERSISTENT differente -> verifier restauration correcte + ConfigRestoredFromPersistent=TRUE + acquittement front"
+# Gate C3/safety (limites physiques cable, rampe SafeStop, tolerance synchro/interlock) :
+# test PLC automatique obligatoire avant cloture, pony_tail interdit sur ce sujet.
+tests_automated_required: true
+tests_implementation_paths:
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_SUPERVISION/FB_SupervisionValidation.st (a creer -- TC-CP1: reset RETAIN simule + restauration M1/M2/Sync, TC-CP2: alarme ConfigRestoredFromPersistent + acquittement front, TC-CP3: propagation IHM->PERSISTENT bloquee avant Initialized)"
+tests_status: "planned"
+test_execution_evidence: []
+review_required: true
+dual_review_required: false
+pony_tail: forbidden
+human_validation_required: true

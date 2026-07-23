@@ -37,7 +37,7 @@ câble mécanique de position haute retiré de la chaîne AU matérielle, géré
 - **[Partie 4](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md)** — Cycle & séquenceur (`E_CycleStep`, INIT, synchro, frein, translation, benne, rampes).
 - **[Partie 5](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md)** — Modes & maintenance (N1/N2, AU/`SafeStop`/`PowerCutOff`, limite légale — gérée par `FB_Modes` uniquement).
 - **[Partie 6](DOC/AF_Partie-06_IO_Conditioning_v1.6.md)** — Conditionnement E/S (`FB_Input_Digital`, `FB_Output_Relay`).
-- **[Partie 7](DOC/AF_Partie-07_Interface_IHM_v1.6.md)** — Interface supervision (`GVL_IHM`, structures HMI, Cycle et Translation M3).
+- **[Partie 7](DOC/AF_Partie-07_Interface_IHM_v1.7.md)** — Interface supervision (`GVL_IHM`, structures HMI, Cycle et Translation M3).
 - **[Partie 8](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md)** — Fonction métier Joystick (docs métier par FB numérotées 8+).
 
 ---
@@ -127,13 +127,13 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie-04_Cycle_Sequenceur_v1.4.md](DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md) — Cycle, synchro, frein, benne, rampes
 - [AF_Partie-05_Modes_Maintenance_v1.6.md](DOC/AF_Partie-05_Modes_Maintenance_v1.6.md) — Modes, maintenance N1/N2, AU, limite légale
 - [AF_Partie-06_IO_Conditioning_v1.6.md](DOC/AF_Partie-06_IO_Conditioning_v1.6.md) — Conditionnement E/S
-- [AF_Partie-07_Interface_IHM_v1.6.md](DOC/AF_Partie-07_Interface_IHM_v1.6.md) — Interface IHM (structures ST_*HMI, mapping GVL_IHM)
+- [AF_Partie-07_Interface_IHM_v1.7.md](DOC/AF_Partie-07_Interface_IHM_v1.7.md) — Interface IHM (structures ST_*HMI, mapping GVL_IHM)
 - [AF_Partie-08_Fonction_Joystick_v1.3.md](DOC/AF_Partie-08_Fonction_Joystick_v1.3.md) — Fonction métier Joystick (8+ = métier par FB)
 - [AF_Partie-09_Fonction_Winch_v1.11.md](DOC/AF_Partie-09_Fonction_Winch_v1.11.md) — Fonction Winch (M1/M2, safety mou de câble/thermique, garde-fous Méca A–E : roue libre/pilotage sans commande/glissement benne/capteur haut/écart synchro critique)
 - [AF_Partie-10_Fonction_Encoder_Homing_v1.10.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md) — Codeur & Homing
-- [AF_Partie-11_Fonction_Translation_v1.9.md](DOC/AF_Partie-11_Fonction_Translation_v1.9.md) — Fonction Translation (M3, ex-Translation)
+- [AF_Partie-11_Fonction_Translation_v1.11.md](DOC/AF_Partie-11_Fonction_Translation_v1.11.md) — Fonction Translation (M3, ex-Translation)
 - [AF_Partie-12_Fonction_Benne_v1.4.md](DOC/AF_Partie-12_Fonction_Benne_v1.4.md) — Fonction Benne (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
-- [AF_Partie-13_Fonction_Simulation_v1.2.md](DOC/AF_Partie-13_Fonction_Simulation_v1.2.md) — Fonction Simulation (flags bits maître + granularité par device)
+- [AF_Partie-13_Fonction_Simulation_v1.3.md](DOC/AF_Partie-13_Fonction_Simulation_v1.3.md) — Fonction Simulation (flags bits maître + granularité par device)
 - [AF_Partie-14_PLC_Tests_Validation_v1.2.md](DOC/AF_Partie-14_PLC_Tests_Validation_v1.2.md) — Tests de validation sécurité (TC-01/02/03), framework de test in-PLC piloté par tables §7 (spec finale, migration M1→M6 pas encore codée), limites CI/CD réelles
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 - [PLAN_TASK_v1.0.md](DOC/PLAN_TASK_v1.0.md) — 🗂️ **Pilotage projet, PAS une spec** : jalons connus de l'affaire, état des tâches/features (fait/priorisé/partiel/différé/manquant), reliquats/TBD/questions client. Toute info organisationnelle trouvée dans une `AF_PartieN` doit y renvoyer (`📌 Suivi : PLAN_TASK.md §3`) au lieu d'y rester — garde les `AF_PartieN` focalisées sur la spec fonctionnelle pure.
