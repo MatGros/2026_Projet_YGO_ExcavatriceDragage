@@ -5,16 +5,25 @@
    🎯 Rôle : le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'étant
       pas disponible pour les essais, toute la machine doit pouvoir tourner en
       simulation CODESYS. Modèle hiérarchique :
-        - `SimulationModeActive` = bit maître. `TRUE` (défaut) = TOUS les devices
-          sont simulés par défaut.
+        - `SimulationModeActive` = bit maître. `FALSE` (défaut depuis REX 2026-07-22) =
+          machine réelle par défaut ; `TRUE` = TOUS les devices simulés d'un coup
+          (bascule globale banc d'essai, plus l'état courant par défaut).
         - Un booléen `Bus<Device>IsReal`/`Sensor<Device>IsReal` par device/capteur permet
           de sortir CE device précis de la simulation un par un, au fur et à mesure du
           recâblage réel en mise en service — SANS modifier le code.
       État effectif "ce device est simulé" = `SimulationModeActive AND NOT <Device>IsReal`.
    🔧 REMPLACE `GVL_DEBUG.st` (6 flags indépendants ajoutés au coup par coup).
-   ⚠️ TOUJOURS repasser `SimulationModeActive` à `FALSE` avant exploitation réelle
-      avec la machine effectivement câblée (ou basculer chaque `*IsReal` à `TRUE`
-      au fur et à mesure du recâblage, sans toucher au bit maître).
+   🆕 REX 2026-07-22 : `BusJoystickIsReal`, `BusVariateurM3IsReal`, `BusEncoderM1/M2IsReal`
+      et `BusIhmHeartbeatIsReal` pilotent maintenant SEULS le bypass diagnostic (Online/
+      Operational/heartbeat) dans PRG_01_Diagnostics.st — DÉCOUPLÉS de `SimulationModeActive`.
+      Objectif : garder ces bus/communication bypassables un par un même simulation
+      globale coupée (banc sans IHM/CANopen/EtherCAT câblés). Les AUTRES devices
+      (position codeur simulée, signaux joystick, capteurs, contacteurs, chaîne AU…)
+      restent gardés par le bit maître comme avant.
+   ⚠️ TOUJOURS repasser chaque `Bus*IsReal` diag (Joystick/VariateurM3/EncoderM1/EncoderM2/
+      IhmHeartbeat) à `TRUE` au fur et à mesure du recâblage réel — ils ne suivent plus
+      `SimulationModeActive`. Pour le reste des devices, `SimulationModeActive := FALSE`
+      bascule tout d'un coup (ou `*IsReal` un par un, sans toucher au bit maître).
    📛 Convention nommage (session Bypass, voir DOC/NAMING_CONVENTION.md) :
       `Bus` = device bus de terrain, `Sensor` = capteur/retour câblé, `Sim` = valeur simulée
       calculée, `Tst` = outil/commande de test banc, `Link` = référence CODESYS (REFERENCE TO).
@@ -22,7 +31,7 @@
 
 {attribute 'qualified_only'}
 VAR_GLOBAL
-    SimulationModeActive       : BOOL := TRUE;  // 🔑 Bit maître — FALSE = tout redevient réel d'un coup
+    SimulationModeActive       : BOOL := FALSE; // 🔑 Bit maître — 🆕 REX 2026-07-22 : défaut FALSE (machine réelle) ; TRUE = tout simulé d'un coup
 
     // ── Devices bus de terrain (EtherCAT/CANopen) — 1:1 avec les devices réels ──
     BusVariateurM3IsReal         : BOOL := FALSE; // AC600 EtherCAT (translation M3)

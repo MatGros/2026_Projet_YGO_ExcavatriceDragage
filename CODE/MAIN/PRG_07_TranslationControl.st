@@ -70,9 +70,9 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
                              StubTranslationPositionSelect_IHM);
 
     IF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
-        M3_Direction_Active := 1;
+        M3_Direction_Active := 1;   // → Trémie (+1)
     ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
-        M3_Direction_Active := -1;
+        M3_Direction_Active := -1;  // → Maintenance (-1)
     ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     ELSE
@@ -82,8 +82,10 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // 🛡️ REX 2026-07-19 (revue mission IHM_MANU) : DeadmanArmed exigé même en pilotage boutons
     // IHM (BtnFwd/BtnRev), pas seulement en pilotage joystick — sinon les boutons IHM
     // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
+    // 🌐 Bypass.Global = TRUE → ignore la condition homme-mort (test/simulation)
     M3_StartStop_Active := (M3_Direction_Active <> 0)
-                           AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                           AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                OR GVL_IHM.TranslationM3.Bypass.Global)
                            AND (NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
@@ -92,7 +94,10 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : SetFreqHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
-    FreqPct := (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0;
+    // 🔧 Si SetFreq_Hz = 0 (pas configuré), on utilise une vitesse par défaut de 30%.
+    FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
+                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0,
+                  30.0); // défaut 30% si SetFreq_Hz non renseigné
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
@@ -103,6 +108,11 @@ ELSE
     M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
     M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+END_IF;
+
+// 🔄 Inversion de sens IHM (mise en service)
+IF GVL_IHM.TranslationM3.Cmd.InvertDirection THEN
+    M3_Direction_Active := M3_Direction_Active * (-1);
 END_IF;
 
 // 🛡️ Limitation finale M3 : toute source de commande (joystick, IHM ou cycle) arrive
@@ -147,8 +157,9 @@ instTranslationM3(
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
-    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
+    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal,
+    BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 
 // 🔴 Recopie commande de frein translation

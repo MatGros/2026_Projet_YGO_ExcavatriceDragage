@@ -62,6 +62,8 @@ VAR_INPUT
     Contactor3_M2   : BOOL;
     Contactor4_M1   : BOOL;
     Contactor4_M2   : BOOL;
+    // 🌐 Bypass Global : force ErrorId = 0, ignore toute erreur de synchro
+    BypassGlobal    : BOOL := FALSE;
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;
@@ -105,6 +107,11 @@ State := E_State.READY;
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
 // 🎚️ 3. SyncActive SELON MODE (Partie9 §9, décisions actées 2026-07-02)
 CASE Mode OF
     E_Mode.MAINT_N1:
@@ -114,6 +121,9 @@ CASE Mode OF
     ELSE
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
+
+// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'écart
+IF NOT BypassGlobal THEN
 
 // 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
 IF HomedM1 AND HomedM2 THEN
@@ -154,7 +164,9 @@ IF MismatchTimer.Q THEN
     ErrorId := ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
-END_IF;
+END_IF; // fin du IF MismatchActive
+
+END_IF; // fin IF NOT BypassGlobal
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);

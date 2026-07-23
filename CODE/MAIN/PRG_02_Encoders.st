@@ -128,15 +128,15 @@ instHomingM1(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1),
     CfgHomingTargetM        := _HomingUnitaryTargetM1_M,
-    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    CfgTopSensorPosM   := _HomingTargetM1_M,
-    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
+    CfgTopSensorPosM   := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _HomingTargetM1_M, 0.0),
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
     EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
@@ -144,7 +144,8 @@ instHomingM1(
     PresetNak            := instEncoderAbsM1.PresetNak,
     PointsPerRev         := 8192,
     MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0
+    CableM_PerRev        := 2.0,
+    BypassGlobal         := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 instEncoderScaleM1(
@@ -177,14 +178,14 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _HomingUnitaryTargetM2_M,
     BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    CfgTopSensorPosM   := _HomingTargetM2_M,
+    CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _HomingTargetM2_M, 0.0),
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
@@ -193,7 +194,8 @@ instHomingM2(
     PresetNak            := instEncoderAbsM2.PresetNak,
     PointsPerRev         := 8192,
     MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0
+    CableM_PerRev        := 2.0,
+    BypassGlobal         := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 instEncoderScaleM2(
@@ -212,7 +214,8 @@ instEncoderSafetyM1(
     CablePosM       := instEncoderScaleM1.CablePosM,
     HomingSuspect   := instHomingM1.HomingSuspect,
     PositionMinM    := -99.0,
-    PositionMaxM    := 99.0
+    PositionMaxM    := 99.0,
+    BypassGlobal    := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 
@@ -224,7 +227,8 @@ instEncoderSafetyM2(
     CablePosM       := instEncoderScaleM2.CablePosM,
     HomingSuspect   := instHomingM2.HomingSuspect,
     PositionMinM    := -99.0,
-    PositionMaxM    := 99.0
+    PositionMaxM    := 99.0,
+    BypassGlobal    := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 

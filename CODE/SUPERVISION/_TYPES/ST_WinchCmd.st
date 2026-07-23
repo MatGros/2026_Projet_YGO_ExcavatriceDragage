@@ -12,5 +12,7 @@ STRUCT
     BtnConfirmCoherence : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
     BtnInhibit          : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)
+    BtnHomingAtZero     : BOOL;             (* 🆕 REX mise en service : force le homing à 0 m (points codeur centre),
+                                                    sans devoir modifier CfgTopSensorPos_M *)
 END_STRUCT
 END_TYPE

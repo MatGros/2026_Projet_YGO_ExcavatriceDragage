@@ -19,6 +19,7 @@ VAR_OUTPUT
 END_VAR
 VAR
     instBlink1Hz : BLINK; // 🧩 Réutilisation lib Util (Partie3 §0) — horloge clignotement système
+    BypassRestoreDone : BOOL := FALSE; // 🌐 Flag restauration unique des bypass (boot)
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_09_Supervision) ===
@@ -177,6 +178,31 @@ IF GVL_IHM.Commun.LimitLegalDepthMinAllowed_M = 0.0 THEN
     GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
+// 🌐 Restauration des bypass RETAIN au boot UNIQUEMENT (premier scan)
+// Après ça, seule la sauvegarde IHM→RETAIN fonctionne (jamais l'inverse).
+// Évite le bug où une écriture IHM était écrasée par la restauration.
+IF NOT BypassRestoreDone THEN
+    IF BypassTranslationGlobal AND GVL_IHM.TranslationM3.Bypass.Global = FALSE THEN
+        GVL_IHM.TranslationM3.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassWinchM1Global AND GVL_IHM.M1TreuilRetenue.Bypass.Global = FALSE THEN
+        GVL_IHM.M1TreuilRetenue.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassWinchM2Global AND GVL_IHM.M2TreuilBenne.Bypass.Global = FALSE THEN
+        GVL_IHM.M2TreuilBenne.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassSyncGlobal AND GVL_IHM.Sync.BypassGlobal = FALSE THEN
+        GVL_IHM.Sync.BypassGlobal := TRUE;
+    END_IF;
+    IF BypassNetworkGlobal AND GVL_IHM.Network.Bypass.Global = FALSE THEN
+        GVL_IHM.Network.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassBucketGlobal AND GVL_IHM.M2Benne.BypassGlobal = FALSE THEN
+        GVL_IHM.M2Benne.BypassGlobal := TRUE;
+    END_IF;
+    BypassRestoreDone := TRUE;
+END_IF;
+
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
@@ -251,6 +277,14 @@ GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 
 _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
 _LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
+
+// 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
+BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
+BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
+BypassSyncGlobal            := GVL_IHM.Sync.BypassGlobal;
+BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
+BypassBucketGlobal          := GVL_IHM.M2Benne.BypassGlobal;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled

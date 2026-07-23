@@ -33,5 +33,9 @@ STRUCT
     HeartbeatIhmOk            : BOOL; (* PLC→IHM : front IHM post-boot reçu et timeout absent *)
     HeartbeatIhmTimeout       : BOOL; (* PLC→IHM : aucun front IHM depuis 2 s *)
     HeartbeatIhmElapsed       : TIME; (* PLC→IHM : temps depuis dernier front IHM *)
+
+    // 🆕 Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
+    BtnWinchBothUp     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
+    BtnWinchBothDown   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
 END_STRUCT
 END_TYPE

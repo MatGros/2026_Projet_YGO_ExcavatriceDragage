@@ -19,5 +19,6 @@ STRUCT
 
     (* 🎮 Commandes / Bypasses *)
     SelSyncEnable   : BOOL := TRUE;      (* ☑️ 🔧 REX 2026-07-08 : coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé *)
+    BypassGlobal    : BOOL := FALSE;      (* 🌐 Bypass GLOBAL synchro : ignore toute erreur de synchronisation *)
 END_STRUCT
 END_TYPE

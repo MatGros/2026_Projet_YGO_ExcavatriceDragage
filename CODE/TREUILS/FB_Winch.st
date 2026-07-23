@@ -86,6 +86,7 @@ VAR_INPUT
     BrakeFeedback           : BOOL;
     BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed (axe simulé,
                                        // voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)
+    BypassGlobal            : BOOL;   // 🌐 TRUE = force ErrorId=0, ignore toutes les erreurs du FB
     CfgRampAccelRate           : REAL := 50.0;
     CfgRampDecelNormalRate     : REAL := 150.0;
     CfgRampDecelFastRate       : REAL := 400.0;
@@ -231,7 +232,12 @@ END_IF;
 // 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
 // Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
 IF NOT Homed OR HomingSuspect THEN
-    ActiveMaxStep := 1;
+    // 🆕 Bypass.Global = TRUE → pas de limitation, on applique la règle normale
+    IF BypassGlobal THEN
+        ActiveMaxStep := SEL(CommandedDirection = -1, MaxStepAscent, CfgMaxStepDescente);
+    ELSE
+        ActiveMaxStep := 1;
+    END_IF;
 ELSIF CommandedDirection = -1 THEN
     ActiveMaxStep := CfgMaxStepDescente;
 ELSIF (CommandedDirection = 1) AND HomingApproachActive THEN
@@ -289,7 +295,13 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
 
-IF Brake.Error THEN
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
+IF NOT BypassGlobal THEN
+    IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -317,6 +329,8 @@ IF SpeedStep.ConfigError THEN
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
 END_IF;
+
+END_IF; // fin IF NOT BypassGlobal
 
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);

@@ -41,5 +41,7 @@ STRUCT
     BtnConfirmClosePos : BOOL;         (* 🆕 REX 2026-07-08 : référencement benne position fermée (mise en
                                                 service) — confirmation pure, AUCUN mouvement, à utiliser juste après
                                                 le référencement des codeurs M1/M2 (benne physiquement fermé) *)
+    (* 🌐 Bypass Global (RETAIN, mise en service) *)
+    BypassGlobal     : BOOL;
 END_STRUCT
 END_TYPE

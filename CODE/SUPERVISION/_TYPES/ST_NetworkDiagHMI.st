@@ -16,5 +16,8 @@ STRUCT
     VariateurM3         : ST_DiagDevice;  (* ↔️ Diagnostics esclave AC600 *)
     EcatError           : BOOL;           (* ⚠️ Anomalie EtherCAT *)
     EcatErrorId         : WORD;           (* ❌ Code anomalie EtherCAT *)
+    
+    (* 🌐 Bypass réseau global *)
+    Bypass              : ST_BypassNetwork;
 END_STRUCT
 END_TYPE

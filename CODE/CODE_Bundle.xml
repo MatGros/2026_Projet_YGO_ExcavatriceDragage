@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-21T10:05:06.429861" />
-  <contentHeader name="PLC_TESTS_SafetySequencerPatch.project" modificationDateTime="2026-07-21T10:05:06.429861">
+  <contentHeader name="Projet_YGO_ExcavatriceDragage.project" modificationDateTime="2026-07-21T10:05:06.429861">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">PLC_TESTS_SafetySequencerPatch</property>
+          <property name="Project" type="string">Projet_YGO_ExcavatriceDragage</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -968,6 +968,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : référencement benne position fermée (mise en</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global (RETAIN, mise en service)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1079,6 +1087,34 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_BypassNetwork">
+        <baseType>
+          <struct>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Force TOUS les devices réseau à Online (TRUE = bypass total)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b983f7fc-8c50-586b-bda1-7708d152c981</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌐 ST_BypassNetwork — Bypass général du diagnostic réseau
+   ───────────────────────────────────────────────────────────────
+   🔒 Permet de forcer les devices réseau (CAN, EtherCAT) à "online"
+      pour le diagnostic, sans devoir toucher à chaque bit individuel.
+      Jamais actif en production.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_BypassTranslation">
         <baseType>
           <struct>
@@ -1087,7 +1123,80 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Activation du bypass des retours contacteurs (sens + frein)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Bypass retour contacteur frein (existant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Bypass mot capteurs M3 incohérent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass butées extrêmes (LimitSwitchFwd / LimitSwitchRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass perte communication drive (EtherCAT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Bypass défaut rotation de phases</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Bypass surchauffe frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Bypass Méca B (absence confirmation arrêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Bypass Méca A (mouvement non commandé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass GLOBAL : désactive TOUTES les surveillances Safety Translation M3
+       ⚠️ Prioritaire sur les bypass individuels ci-dessus</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1123,6 +1232,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Bypass retours contacteurs (banc de test)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass GLOBAL : ignore TOUTES les surveillances de ce treuil (M1 ou M2)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1261,6 +1378,23 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : temps depuis dernier front IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnWinchBothUp">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
+⬆️ Monte les 2 treuils simultanément</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnWinchBothDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ Descend les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2136,6 +2270,14 @@ de passe), homme-mort joystick reel toujours obligatoire meme en pilotage bouton
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code anomalie EtherCAT</xhtml>
               </documentation>
             </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassNetwork" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass réseau global</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2905,6 +3047,17 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes / Bypasses
 ☑️ 🔧 REX 2026-07-08 : coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass GLOBAL synchro : ignore toute erreur de synchronisation</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3794,7 +3947,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant manuelle (bouton IHM, pas encore arbitrée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
             <variable name="BtnRev">
@@ -3802,7 +3955,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière manuelle (bouton IHM, pas encore arbitrée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
             <variable name="SetFreq_Hz">
@@ -3819,6 +3972,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ TRUE = joystick, FALSE = boutons BtnFwd/BtnRev</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InvertDirection">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4411,6 +4572,14 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnHomingAtZero">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX mise en service : force le homing à 0 m (points codeur centre),</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5477,6 +5646,17 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : M2 est inhibé</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 TRUE = force ErrorId=0, ignore toutes les erreurs benne</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -5800,6 +5980,12 @@ END_IF;
 
 // 🔑 2. GESTION DU RESET (FRONT MONTANT)
 ResetEdge(CLK := Reset);
+
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 (ignore toutes les erreurs benne)
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
 IF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;
@@ -10139,6 +10325,17 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmé terrain 2026-07-02 (Partie10 §2)</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Ignore arrêt confirmé et capteur haut (mise en service)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -10382,7 +10579,8 @@ END_IF;
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
 // 🛡️ Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
-ArretConfirme := FwdRevSpeedFeedbackOff AND BrakeFeedback;
+// 🌐 BypassGlobal = TRUE → on saute la vérification d'arrêt (mise en service)
+ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
@@ -10393,7 +10591,15 @@ IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
     END_IF;
 
     // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
-    IF (Mode &lt;&gt; E_Mode.MAINT_N1) AND (Mode &lt;&gt; E_Mode.MAINT_N2) THEN
+    // 🌐 BypassGlobal = TRUE → saute TOUTES les vérifications, force le homing
+    IF BypassGlobal THEN
+        // Force homing sans condition
+        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        PresetValue := PresetValueCalc;
+        PresetRequest := TRUE;
+        State := E_State.BUSY;
+    ELSIF (Mode &lt;&gt; E_Mode.MAINT_N1) AND (Mode &lt;&gt; E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
     ELSIF UnitaryMode AND (Mode &lt;&gt; E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;
@@ -10405,11 +10611,12 @@ IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
     ELSIF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
         ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
-    ELSIF NOT UnitaryMode AND TopPositionSensor THEN
+    ELSIF NOT BypassGlobal AND NOT UnitaryMode AND (TargetPositionM &lt;&gt; 0.0) AND TopPositionSensor THEN
         // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
         // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
         // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
-        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé (requis uniquement en MAINT_N1)
+        // 🆕 Si TargetPositionM = 0.0 (homing à zéro), on ignore le capteur haut (position courante).
+        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)
@@ -10542,6 +10749,17 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <simpleValue value="99" />
               </initialValue>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Force ErrorId=0, ignore bornage (mise en service)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -10659,8 +10877,13 @@ State := E_State.READY;
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
+// 🌐 BYPASS GLOBAL : force ErrorId = 0, ignore bornage et incohérence
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
 // 🔍 3. BORNAGE PHYSIQUE ABSOLU (§3.6) — bit0
-IF (CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM) THEN
+IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -10669,10 +10892,12 @@ END_IF;
 // 🔍 4. RELAIS INCOHÉRENCE REDÉMARRAGE (§3.7, calculée par FB_Encoder_Homing) — bit1
 // Pas d'acquittement ici : la levée se fait via BtnConfirmCoherence/nouveau Home côté
 // FB_Encoder_Homing (source), ce FB ne fait QUE relayer l'information pour FB_Modes.
-IF HomingSuspect THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSE
-    ErrorId := ErrorId AND 16#FFFD;
+IF NOT BypassGlobal THEN
+    IF HomingSuspect THEN
+        ErrorId := ErrorId OR 16#0002;
+    ELSE
+        ErrorId := ErrorId AND 16#FFFD;
+    END_IF;
 END_IF;
 
 // 🧊 5. GELER SUR DOUTE (§6) — CablePosMSafe ne suit PAS CablePosM si hors plage
@@ -17290,6 +17515,106 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
+🌐 Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Bypass perte communication opérateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassDriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass perte communication drive</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Bypass défaut rotation phases</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Bypass surchauffe frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Bypass Méca B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Bypass Méca A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass butées extrêmes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassSensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Bypass incohérence mot capteurs</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -17510,89 +17835,104 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
-// 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
-IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-    ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+// 🌐 BYPASS GLOBAL : si actif → force ErrorId = 0 et saute toutes les vérifications
+// (les bits d'erreur resteraient coincés si on ne les nettoie pas)
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+    TonMecaB(IN := FALSE);
+    TonMecaA(IN := FALSE);
 END_IF;
 
-// 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
-IF (NOT DriveOnline OR NOT DriveOperational) THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
+// ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
+// On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
+IF NOT BypassGlobal THEN
+    // ResetEdge clearing est fait dans chaque bloc individuel ci-dessous.
 
-// 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
-IF NOT PhaseRotationOk THEN
-    ErrorId := ErrorId OR 16#0004;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
-END_IF;
+    // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
+    IF NOT BypassOperatorComm THEN
+        IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
+            ErrorId := ErrorId OR 16#0001;
+        END_IF;
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFE; END_IF;
 
-// 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
-IF BrakeThermalFeedback THEN
-    ErrorId := ErrorId OR 16#0008;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFF7;
-END_IF;
+    // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
+    IF NOT BypassDriveComm THEN
+        IF (NOT DriveOnline OR NOT DriveOperational) THEN
+            ErrorId := ErrorId OR 16#0002;
+        END_IF;
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFD; END_IF;
 
-// 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
-// Si le translation est commandé à l'arrêt (Direction = 0 et frein appliqué) mais que le variateur 
-// tourne toujours (Operation bit0 = 1) ou que le frein est resté ouvert (feedback = TRUE) &gt; 3s
-IF NOT HeartbeatIhmOk THEN
-    // 💓 Perte IHM : l'arrêt est exigé même si une ancienne Direction reste mémorisée.
-    // Méca B confirme fréquence nulle, variateur hors Operation et frein serré (NOT BrakeFeedback) avant de
-    // laisser l'escalade PowerCutOff intervenir après PostRampTimeout.
-    UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
-ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-    UncommandedActiveB := DriveStatusWord.0 OR NOT BrakeFeedback;
-ELSE
-    UncommandedActiveB := FALSE;
-END_IF;
+    // 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
+    IF NOT BypassPhaseRotation THEN
+        IF NOT PhaseRotationOk THEN
+            ErrorId := ErrorId OR 16#0004;
+        END_IF;
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFB; END_IF;
 
-TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
+    // 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
+    IF NOT BypassBrakeThermal THEN
+        IF BrakeThermalFeedback THEN
+            ErrorId := ErrorId OR 16#0008;
+        END_IF;
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFF7; END_IF;
 
-IF TonMecaB.Q THEN
-    ErrorId := ErrorId OR 16#0010;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFEF;
-END_IF;
+    // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
+    IF NOT BypassMecaB THEN
+        IF NOT HeartbeatIhmOk THEN
+            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
+        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
+            UncommandedActiveB := DriveStatusWord.0 OR NOT BrakeFeedback;
+        ELSE
+            UncommandedActiveB := FALSE;
+        END_IF;
+        TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
+        IF TonMecaB.Q THEN ErrorId := ErrorId OR 16#0010; END_IF;
+    ELSE
+        TonMecaB(IN := FALSE);
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFEF; END_IF;
 
-// 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
-// Si le translation est commandé à l'arrêt, mais qu'une fréquence réelle est mesurée (&gt; 0.5 Hz) pendant &gt; 1s
-IF (Direction = 0) AND NOT BrakeCmd THEN
-    UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
-ELSE
-    UncommandedActiveA := FALSE;
-END_IF;
+    // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
+    IF NOT BypassMecaA THEN
+        IF (Direction = 0) AND NOT BrakeCmd THEN
+            UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
+        ELSE
+            UncommandedActiveA := FALSE;
+        END_IF;
+        TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+        IF TonMecaA.Q THEN ErrorId := ErrorId OR 16#0020; END_IF;
+    ELSE
+        TonMecaA(IN := FALSE);
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
 
-TonMecaA(IN := UncommandedActiveA, PT := T#1S);
+    // 🔍 3sexies. DÉPASSEMENT FINS DE COURSE EXTRÊMES (bit6)
+    IF BypassLimitSwitch THEN
+        // Nettoye le bit 6 résiduel (posé avant activation du bypass)
+        ErrorId := ErrorId AND 16#FFBF;
+    ELSE
+        IF LimitSwitchFwd OR LimitSwitchRev THEN
+            ErrorId := ErrorId OR 16#0040;
+        END_IF;
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFBF; END_IF;
 
-IF TonMecaA.Q THEN
-    ErrorId := ErrorId OR 16#0020;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFDF;
-END_IF;
+    // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
+    IF BypassSensorIncoherent THEN
+        // Nettoye le bit 7 résiduel
+        ErrorId := ErrorId AND 16#FF7F;
+    ELSE
+        IF SensorWordIncoherent THEN
+            ErrorId := ErrorId OR 16#0080;
+        END_IF;
+    END_IF;
+    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FF7F; END_IF;
 
-// 🔍 3sexies. DÉPASSEMENT FINS DE COURSE EXTRÊMES (bit6)
-IF LimitSwitchFwd OR LimitSwitchRev THEN
-    ErrorId := ErrorId OR 16#0040;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;
-END_IF;
-
-// 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
-// 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — toute combinaison des 5
-// capteurs Trémie/PV/P2/P1/Maintenance hors des 6 mots valides (progression monotone) signale
-// un capteur collé/HS ou un défaut mécanique : escalade SafeStop + PowerCutOff, même traitement
-// que Méca A/B (défense en profondeur, décision utilisateur).
-IF SensorWordIncoherent THEN
-    ErrorId := ErrorId OR 16#0080;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FF7F;
-END_IF;
+END_IF; // fin IF NOT BypassGlobal
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -17972,6 +18312,17 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation absence de mouvement malgré commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -18384,8 +18735,19 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
-// 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL
-IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
+// 🌐 BYPASS GLOBAL : si TRUE, on force ErrorId = 0 ET on saute toute la logique de sécurité
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+    TonMecaB(IN := FALSE);
+    TonMecaD(IN := FALSE);
+    TonOppositeDirection(IN := FALSE);
+    TonMecaE(IN := FALSE);
+END_IF;
+
+// 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
+IF NOT BypassGlobal THEN
+
+    IF NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk THEN
     ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -18587,6 +18949,8 @@ IF TonNoMovement.Q THEN
 ELSIF ResetEdge.Q AND (NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) &gt;= MovementSpeedThresholdMps)) THEN
     ErrorId := ErrorId AND 16#7FFF;
 END_IF;
+
+END_IF; // fin IF NOT BypassGlobal
 
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
@@ -21894,6 +22258,14 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 TRUE = ignore les fins de course extrêmes</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeFeedback">
               <type>
                 <BOOL />
@@ -22257,7 +22629,8 @@ TargetReached := CaptorDebounceTon.Q;
 RampTargetPct := 0.0;
 IF NOT SafeStop AND StartStop THEN
     // Si butée fin de course extrême atteinte dans le sens de marche demandé, consigne forcée à 0
-    IF (Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev) THEN
+    // 🌐 BypassLimitSwitch = TRUE → ignore cette protection
+    IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
         RampTargetPct := 0.0;
     ELSE
         RampTargetPct := ABS(SpeedRefPct);
@@ -22330,7 +22703,8 @@ ELSE
 END_IF;
 
 // Sécurité : si Fdc extrême atteint dans le sens de marche, coupure commande immédiate (sans rampe ni couple)
-IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
+// 🌐 BypassLimitSwitch = TRUE → ignore cette protection (test/mise en service)
+IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
     DriveControlWord := 0;
     DriveFreqRefHz := 0.0;
     SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
@@ -22359,11 +22733,16 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
-// Défaut fin de course extrême atteint (bit6)
-IF LimitSwitchFwd OR LimitSwitchRev THEN
-    ErrorId := ErrorId OR 16#0040;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;
+// 🚧 Défaut fin de course extrême (bit6) — si bypassé, on NETTOIE le bit résiduel
+IF BypassLimitSwitch THEN
+    ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
+ELSE
+    IF LimitSwitchFwd OR LimitSwitchRev THEN
+        ErrorId := ErrorId OR 16#0040;
+    END_IF;
+END_IF;
+IF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFBF;   // Reset normal (complémentaire)
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -25928,6 +26307,15 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed (axe simulé,</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)
+🌐 TRUE = force ErrorId=0, ignore toutes les erreurs du FB</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgRampAccelRate">
               <type>
                 <REAL />
@@ -25935,9 +26323,6 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
               <initialValue>
                 <simpleValue value="50" />
               </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)</xhtml>
-              </documentation>
             </variable>
             <variable name="CfgRampDecelNormalRate">
               <type>
@@ -26458,7 +26843,12 @@ END_IF;
 // 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
 // Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
 IF NOT Homed OR HomingSuspect THEN
-    ActiveMaxStep := 1;
+    // 🆕 Bypass.Global = TRUE → pas de limitation, on applique la règle normale
+    IF BypassGlobal THEN
+        ActiveMaxStep := SEL(CommandedDirection = -1, MaxStepAscent, CfgMaxStepDescente);
+    ELSE
+        ActiveMaxStep := 1;
+    END_IF;
 ELSIF CommandedDirection = -1 THEN
     ActiveMaxStep := CfgMaxStepDescente;
 ELSIF (CommandedDirection = 1) AND HomingApproachActive THEN
@@ -26516,7 +26906,13 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
 
-IF Brake.Error THEN
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
+IF NOT BypassGlobal THEN
+    IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -26544,6 +26940,8 @@ IF SpeedStep.ConfigError THEN
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
 END_IF;
+
+END_IF; // fin IF NOT BypassGlobal
 
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -27025,6 +27423,17 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global : force ErrorId = 0, ignore toute erreur de synchro</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -27204,6 +27613,11 @@ State := E_State.READY;
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
+IF BypassGlobal THEN
+    ErrorId := 16#0000;
+END_IF;
+
 // 🎚️ 3. SyncActive SELON MODE (Partie9 §9, décisions actées 2026-07-02)
 CASE Mode OF
     E_Mode.MAINT_N1:
@@ -27213,6 +27627,9 @@ CASE Mode OF
     ELSE
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
+
+// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'écart
+IF NOT BypassGlobal THEN
 
 // 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
 IF HomedM1 AND HomedM2 THEN
@@ -27253,7 +27670,9 @@ IF MismatchTimer.Q THEN
     ErrorId := ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
-END_IF;
+END_IF; // fin du IF MismatchActive
+
+END_IF; // fin IF NOT BypassGlobal
 
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -27993,32 +28412,40 @@ instSimJoystick(
 
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par BusJoystickIsReal UNIQUEMENT (bus/nœud),
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
+// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — BusJoystickIsReal seul pilote
+// désormais ce bypass diag, pour rester actif même simulation globale coupée (banc sans bus
+// CANopen câblé). Repasser BusJoystickIsReal := TRUE au câblage réel du bus/nœud CANopen.
 instDiagCanOpen(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    CANbusOnline := (CANbus.GetBusState() = 1) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusJoystickIsReal), // 1 = ACTIVE (ou simulation)
-    DeviceJoystickOnline := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusJoystickIsReal)
+    CANbusOnline := (CANbus.GetBusState() = 1) OR (NOT GVL_Simulation.BusJoystickIsReal) OR GVL_IHM.Network.Bypass.Global, // 1 = ACTIVE (ou bypass)
+    DeviceJoystickOnline := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusJoystickIsReal) OR GVL_IHM.Network.Bypass.Global
 );
 
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
+// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — Bus&lt;Device&gt;IsReal seul pilote
+// désormais ce bypass diag par device, pour rester actif même simulation globale coupée (banc
+// sans bus EtherCAT câblé). Repasser chaque Bus&lt;Device&gt;IsReal := TRUE au câblage réel.
 instDiagEthercat(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
-    DeviceVariateurOnline := (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal),
-    DeviceVariateurState := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
-    DeviceEncoderM1Online := (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal),
-    DeviceEncoderM1State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8),
-    DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal),
-    DeviceEncoderM2State := SEL((GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING), 0, 8)
+    DeviceVariateurOnline := (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusVariateurM3IsReal) OR GVL_IHM.Network.Bypass.Global,
+    DeviceVariateurState := SEL((NOT GVL_Simulation.BusVariateurM3IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8),
+    DeviceEncoderM1Online := (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusEncoderM1IsReal) OR GVL_IHM.Network.Bypass.Global,
+    DeviceEncoderM1State := SEL((NOT GVL_Simulation.BusEncoderM1IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8),
+    DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusEncoderM2IsReal) OR GVL_IHM.Network.Bypass.Global,
+    DeviceEncoderM2State := SEL((NOT GVL_Simulation.BusEncoderM2IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8)
 );
 
 // 💓 2bis. Heartbeat IHM↔PLC — appelé avant PRG_03_Safety pour fournir le statut même cycle.
+// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — BusIhmHeartbeatIsReal seul
+// pilote désormais ce bypass, pour rester actif même simulation globale coupée (IHM réelle pas
+// encore câblée niveau visu). Sans IHM réelle sur banc, BlinkClock fournit un toggle sain ;
+// mettre BusIhmHeartbeatIsReal := TRUE dès que la visu toggle réellement TglHeartbeatIhm.
 instIhmHeartbeat(
     Enable := TRUE,
-    // 🧪 Sans IHM réelle sur banc, BlinkClock fournit un toggle sain ; mettre
-    // BusIhmHeartbeatIsReal := TRUE pour tester une perte/reprise réelle du heartbeat IHM.
     TglHeartbeatIhm := SEL(GVL_PLC_Tests.OverrideIhmHeartbeatActive,
-                              SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusIhmHeartbeatIsReal,
+                              SEL(NOT GVL_Simulation.BusIhmHeartbeatIsReal,
                                   GVL_IHM.Commun.TglHeartbeatIhm,
                                   GVL_Global.BlinkClock),
                               GVL_PLC_Tests.OverrideIhmHeartbeatToggle),
@@ -28278,15 +28705,15 @@ instHomingM1(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated &lt;&gt; 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1),
     CfgHomingTargetM        := _HomingUnitaryTargetM1_M,
-    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    CfgTopSensorPosM   := _HomingTargetM1_M,
-    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
+    CfgTopSensorPosM   := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _HomingTargetM1_M, 0.0),
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
     BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
     EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
@@ -28294,7 +28721,8 @@ instHomingM1(
     PresetNak            := instEncoderAbsM1.PresetNak,
     PointsPerRev         := 8192,
     MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0
+    CableM_PerRev        := 2.0,
+    BypassGlobal         := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 instEncoderScaleM1(
@@ -28327,14 +28755,14 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated &lt;&gt; 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _HomingUnitaryTargetM2_M,
     BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
-    CfgTopSensorPosM   := _HomingTargetM2_M,
+    CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _HomingTargetM2_M, 0.0),
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
@@ -28343,7 +28771,8 @@ instHomingM2(
     PresetNak            := instEncoderAbsM2.PresetNak,
     PointsPerRev         := 8192,
     MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0
+    CableM_PerRev        := 2.0,
+    BypassGlobal         := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 instEncoderScaleM2(
@@ -28362,7 +28791,8 @@ instEncoderSafetyM1(
     CablePosM       := instEncoderScaleM1.CablePosM,
     HomingSuspect   := instHomingM1.HomingSuspect,
     PositionMinM    := -99.0,
-    PositionMaxM    := 99.0
+    PositionMaxM    := 99.0,
+    BypassGlobal    := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 
@@ -28374,7 +28804,8 @@ instEncoderSafetyM2(
     CablePosM       := instEncoderScaleM2.CablePosM,
     HomingSuspect   := instHomingM2.HomingSuspect,
     PositionMinM    := -99.0,
-    PositionMaxM    := 99.0
+    PositionMaxM    := 99.0,
+    BypassGlobal    := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 
@@ -28492,7 +28923,9 @@ instSafetyWinchM1(
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2 // 🆕 REX 2026-07-08 (7)
+    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 (7)
+    // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
+    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 // 2. Sécurité Treuil M2
@@ -28535,7 +28968,8 @@ instSafetyWinchM2(
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1 // 🆕 REX 2026-07-08 (7)
+    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 (7)
+    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 // 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
@@ -28611,7 +29045,17 @@ instSafetyTranslationM3(
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
     LimitSwitchFwd      := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd,
     LimitSwitchRev      := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev,
-    SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent
+    SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent,
+    // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass - pilotés IHM)
+    BypassGlobal          := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassOperatorComm    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.OperatorComm,
+    BypassDriveComm       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.DriveComm,
+    BypassPhaseRotation   := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.PhaseRotation,
+    BypassBrakeThermal    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.BrakeThermal,
+    BypassMecaB           := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.MecaB,
+    BypassMecaA           := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.MecaA,
+    BypassLimitSwitch     := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch,
+    BypassSensorIncoherent:= GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.SensorIncoherent
 );
 </xhtml>
           </ST>
@@ -29201,7 +29645,8 @@ instBucket(
     CfgTimeoutDuration     := GVL_IHM.M2Benne.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
-    InhibitM2           := PRG_04_Modes.instModes.InhibitM2  // 🆕 REX 2026-07-08
+    InhibitM2           := PRG_04_Modes.instModes.InhibitM2,  // 🆕 REX 2026-07-08
+    BypassGlobal        := GVL_IHM.M2Benne.BypassGlobal      // 🌐 Bypass benne (RETAIN)
 );
 
 // 🆕 REX 2026-07-08 (4) — Concept 1 (écart synchro mineur) : bit0 seul (écart position, hors
@@ -29267,22 +29712,22 @@ ELSE
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
         M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
     ELSE
-        // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — même sélection treuil, même homme-mort
-        // joystick réel obligatoire, même gate directionnel synchro que la branche joystick ci-dessus.
-        IF GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
+        // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
+        // Remplacent l'ancien sélecteur JoystickWinchSelectArbitrated.
+        // Priorité : Both &gt; M1/M2 individuels
+        IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1_Direction_Active := 1;
-        ELSIF GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
+        ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1_Direction_Active := -1;
         ELSE
             M1_Direction_Active := 0;
         END_IF;
         M1_StartStop_Active := (M1_Direction_Active &lt;&gt; 0) AND NOT instBucket.Busy
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed // 🔒 homme-mort joystick reel TOUJOURS requis, meme en boutons
-                                AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
-                                     OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
+                                AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                     OR GVL_IHM.M1TreuilRetenue.Bypass.Global)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
-        M1_SpeedRef_Active  := 100.0; // Vitesse pleine echelle bouton maintenu — FB_SpeedStep/rampe gerent la progression paliers, identique au joystick a fond
+        M1_SpeedRef_Active  := 100.0;
     END_IF;
 END_IF;
 
@@ -29330,21 +29775,21 @@ ELSE
             M2_SpeedRef_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
         ELSE
             // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — BtnUp M2 = enroulage/montée (+1),
-            // même convention que le joystick (AxisCmdY.Direction=+1 =&gt; Direction=+1).
-            IF GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
+            // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
+            // Priorité : Both &gt; M2 &gt; M1
+            IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2_Direction_Active := 1;
-            ELSIF GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
+            ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2_Direction_Active := -1;
             ELSE
                 M2_Direction_Active := 0;
             END_IF;
             M2_StartStop_Active := (M2_Direction_Active &lt;&gt; 0)
-                                    AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed // 🔒 homme-mort joystick reel TOUJOURS requis, meme en boutons
-                                    AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
-                                         OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
+                                    AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                         OR GVL_IHM.M2TreuilBenne.Bypass.Global)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
-            M2_SpeedRef_Active := 100.0; // Vitesse pleine echelle bouton maintenu — FB_SpeedStep/rampe gerent la progression paliers
+            M2_SpeedRef_Active := 100.0;
         END_IF;
     END_IF;
 END_IF;
@@ -29401,7 +29846,8 @@ instWinchSync(
     Contactor3_M1   := instWinchM1.Contactor3,
     Contactor3_M2   := instWinchM2.Contactor3,
     Contactor4_M1   := instWinchM1.Contactor4,
-    Contactor4_M2   := instWinchM2.Contactor4
+    Contactor4_M2   := instWinchM2.Contactor4,
+    BypassGlobal    := GVL_IHM.Sync.BypassGlobal
 );
 
 // Table active M2 (verrouille TOUS les paliers sur la combinaison réelle du palier 1 si
@@ -29573,7 +30019,9 @@ instWinchM1(
     TopLimitM               := _CableLimitM1Ascent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct
+    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
+    BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
@@ -29613,7 +30061,9 @@ instWinchM2(
     TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct
+    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    // 🌐 Bypass Global M2 (GVL_IHM.M2TreuilBenne.Bypass.Global)
+    BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
 // ── 8. ALIMENTATION PRG_10_Outputs (sorties physiques) ──────────────────
@@ -29768,9 +30218,9 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
                              StubTranslationPositionSelect_IHM);
 
     IF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
-        M3_Direction_Active := 1;
+        M3_Direction_Active := 1;   // → Trémie (+1)
     ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
-        M3_Direction_Active := -1;
+        M3_Direction_Active := -1;  // → Maintenance (-1)
     ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
         M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     ELSE
@@ -29780,8 +30230,10 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // 🛡️ REX 2026-07-19 (revue mission IHM_MANU) : DeadmanArmed exigé même en pilotage boutons
     // IHM (BtnFwd/BtnRev), pas seulement en pilotage joystick — sinon les boutons IHM
     // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
+    // 🌐 Bypass.Global = TRUE → ignore la condition homme-mort (test/simulation)
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
-                           AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                           AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                OR GVL_IHM.TranslationM3.Bypass.Global)
                            AND (NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
@@ -29790,7 +30242,10 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
     // 250-251/271-272 : SetFreqHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
-    FreqPct := (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0;
+    // 🔧 Si SetFreq_Hz = 0 (pas configuré), on utilise une vitesse par défaut de 30%.
+    FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
+                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0,
+                  30.0); // défaut 30% si SetFreq_Hz non renseigné
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
                               FreqPct,
                               (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
@@ -29801,6 +30256,11 @@ ELSE
     M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
     M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
     M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+END_IF;
+
+// 🔄 Inversion de sens IHM (mise en service)
+IF GVL_IHM.TranslationM3.Cmd.InvertDirection THEN
+    M3_Direction_Active := M3_Direction_Active * (-1);
 END_IF;
 
 // 🛡️ Limitation finale M3 : toute source de commande (joystick, IHM ou cycle) arrive
@@ -29845,8 +30305,9 @@ instTranslationM3(
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
-    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
+    BypassContactorCheck    := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal,
+    BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 
 // 🔴 Recopie commande de frein translation
@@ -29926,6 +30387,17 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Réutilisation lib Util (Partie3 §0) — horloge clignotement système</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassRestoreDone">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Flag restauration unique des bypass (boot)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -30105,6 +30577,31 @@ IF GVL_IHM.Commun.LimitLegalDepthMinAllowed_M = 0.0 THEN
     GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
+// 🌐 Restauration des bypass RETAIN au boot UNIQUEMENT (premier scan)
+// Après ça, seule la sauvegarde IHM→RETAIN fonctionne (jamais l'inverse).
+// Évite le bug où une écriture IHM était écrasée par la restauration.
+IF NOT BypassRestoreDone THEN
+    IF BypassTranslationGlobal AND GVL_IHM.TranslationM3.Bypass.Global = FALSE THEN
+        GVL_IHM.TranslationM3.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassWinchM1Global AND GVL_IHM.M1TreuilRetenue.Bypass.Global = FALSE THEN
+        GVL_IHM.M1TreuilRetenue.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassWinchM2Global AND GVL_IHM.M2TreuilBenne.Bypass.Global = FALSE THEN
+        GVL_IHM.M2TreuilBenne.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassSyncGlobal AND GVL_IHM.Sync.BypassGlobal = FALSE THEN
+        GVL_IHM.Sync.BypassGlobal := TRUE;
+    END_IF;
+    IF BypassNetworkGlobal AND GVL_IHM.Network.Bypass.Global = FALSE THEN
+        GVL_IHM.Network.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassBucketGlobal AND GVL_IHM.M2Benne.BypassGlobal = FALSE THEN
+        GVL_IHM.M2Benne.BypassGlobal := TRUE;
+    END_IF;
+    BypassRestoreDone := TRUE;
+END_IF;
+
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
@@ -30179,6 +30676,14 @@ GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 
 _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
 _LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
+
+// 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
+BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
+BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
+BypassSyncGlobal            := GVL_IHM.Sync.BypassGlobal;
+BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
+BypassBucketGlobal          := GVL_IHM.M2Benne.BypassGlobal;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
@@ -30903,6 +31408,89 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
     <configurations />
   </instances>
   <addData>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_BypassRetain" retain="true">
+        <variable name="BypassTranslationGlobal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Translation M3 (FB_Safety_Translation + FB_Translation)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassWinchM1Global">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Treuil M1 (FB_Safety_Winch + FB_Winch)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassWinchM2Global">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Treuil M2 (FB_Safety_Winch + FB_Winch)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassSyncGlobal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Synchro M1/M2 (FB_WinchSync)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassNetworkGlobal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Réseau CAN/EtherCAT (force Online)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassBucketGlobal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Benne (FB_Bucket)</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8a5a0aa3-b846-51e6-8d69-984f589c979d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   💾 GVL_BypassRetain — Variables RETAIN pour les bypass de mise en service
+   ───────────────────────────────────────────────────────────────
+   🔒 Survit au Warm Restart (CPU Stop/Start) mais PAS au Download.
+   🎯 Utilisé uniquement lors de la mise en service / débogage.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Global">
         <variable name="BlinkClock">
@@ -32468,10 +33056,10 @@ TRUE = purge commandes RETAIN dans PRG_00</xhtml>
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="TRUE" />
+            <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — FALSE = tout redevient réel d'un coup</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — 🆕 REX 2026-07-22 : défaut FALSE (machine réelle) ; TRUE = tout simulé d'un coup</xhtml>
           </documentation>
         </variable>
         <variable name="BusVariateurM3IsReal">
@@ -32811,16 +33399,25 @@ Front montant = applique le saut sur M1</xhtml>
    🎯 Rôle : le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'étant
       pas disponible pour les essais, toute la machine doit pouvoir tourner en
       simulation CODESYS. Modèle hiérarchique :
-        - `SimulationModeActive` = bit maître. `TRUE` (défaut) = TOUS les devices
-          sont simulés par défaut.
+        - `SimulationModeActive` = bit maître. `FALSE` (défaut depuis REX 2026-07-22) =
+          machine réelle par défaut ; `TRUE` = TOUS les devices simulés d'un coup
+          (bascule globale banc d'essai, plus l'état courant par défaut).
         - Un booléen `Bus&lt;Device&gt;IsReal`/`Sensor&lt;Device&gt;IsReal` par device/capteur permet
           de sortir CE device précis de la simulation un par un, au fur et à mesure du
           recâblage réel en mise en service — SANS modifier le code.
       État effectif "ce device est simulé" = `SimulationModeActive AND NOT &lt;Device&gt;IsReal`.
    🔧 REMPLACE `GVL_DEBUG.st` (6 flags indépendants ajoutés au coup par coup).
-   ⚠️ TOUJOURS repasser `SimulationModeActive` à `FALSE` avant exploitation réelle
-      avec la machine effectivement câblée (ou basculer chaque `*IsReal` à `TRUE`
-      au fur et à mesure du recâblage, sans toucher au bit maître).
+   🆕 REX 2026-07-22 : `BusJoystickIsReal`, `BusVariateurM3IsReal`, `BusEncoderM1/M2IsReal`
+      et `BusIhmHeartbeatIsReal` pilotent maintenant SEULS le bypass diagnostic (Online/
+      Operational/heartbeat) dans PRG_01_Diagnostics.st — DÉCOUPLÉS de `SimulationModeActive`.
+      Objectif : garder ces bus/communication bypassables un par un même simulation
+      globale coupée (banc sans IHM/CANopen/EtherCAT câblés). Les AUTRES devices
+      (position codeur simulée, signaux joystick, capteurs, contacteurs, chaîne AU…)
+      restent gardés par le bit maître comme avant.
+   ⚠️ TOUJOURS repasser chaque `Bus*IsReal` diag (Joystick/VariateurM3/EncoderM1/EncoderM2/
+      IhmHeartbeat) à `TRUE` au fur et à mesure du recâblage réel — ils ne suivent plus
+      `SimulationModeActive`. Pour le reste des devices, `SimulationModeActive := FALSE`
+      bascule tout d'un coup (ou `*IsReal` un par un, sans toucher au bit maître).
    📛 Convention nommage (session Bypass, voir DOC/NAMING_CONVENTION.md) :
       `Bus` = device bus de terrain, `Sensor` = capteur/retour câblé, `Sim` = valeur simulée
       calculée, `Tst` = outil/commande de test banc, `Link` = référence CODESYS (REFERENCE TO).
@@ -33014,6 +33611,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
         </Folder>
         <Folder Name="MAIN">
+          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
           <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
           <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
@@ -33033,6 +33631,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Folder Name="_TYPES">
             <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
             <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
+            <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
             <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />

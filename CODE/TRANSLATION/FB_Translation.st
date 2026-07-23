@@ -28,6 +28,7 @@ VAR_INPUT
     DriveActualFreqHz            : REAL;       // Fréquence réelle mesurée (Hz)
 
     BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
+    BypassLimitSwitch            : BOOL;       // 🚧 TRUE = ignore les fins de course extrêmes
     BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
 
     // Réglages rampe (RETAIN)
@@ -122,7 +123,8 @@ TargetReached := CaptorDebounceTon.Q;
 RampTargetPct := 0.0;
 IF NOT SafeStop AND StartStop THEN
     // Si butée fin de course extrême atteinte dans le sens de marche demandé, consigne forcée à 0
-    IF (Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev) THEN
+    // 🌐 BypassLimitSwitch = TRUE → ignore cette protection
+    IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
         RampTargetPct := 0.0;
     ELSE
         RampTargetPct := ABS(SpeedRefPct);
@@ -195,7 +197,8 @@ ELSE
 END_IF;
 
 // Sécurité : si Fdc extrême atteint dans le sens de marche, coupure commande immédiate (sans rampe ni couple)
-IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
+// 🌐 BypassLimitSwitch = TRUE → ignore cette protection (test/mise en service)
+IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
     DriveControlWord := 0;
     DriveFreqRefHz := 0.0;
     SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
@@ -224,11 +227,16 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
-// Défaut fin de course extrême atteint (bit6)
-IF LimitSwitchFwd OR LimitSwitchRev THEN
-    ErrorId := ErrorId OR 16#0040;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;
+// 🚧 Défaut fin de course extrême (bit6) — si bypassé, on NETTOIE le bit résiduel
+IF BypassLimitSwitch THEN
+    ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
+ELSE
+    IF LimitSwitchFwd OR LimitSwitchRev THEN
+        ErrorId := ErrorId OR 16#0040;
+    END_IF;
+END_IF;
+IF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFBF;   // Reset normal (complémentaire)
 END_IF;
 
 Error := (ErrorId <> 16#0000);
