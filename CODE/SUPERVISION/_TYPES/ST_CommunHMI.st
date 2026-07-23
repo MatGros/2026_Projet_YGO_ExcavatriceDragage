@@ -37,5 +37,11 @@ STRUCT
     // 🆕 Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
     BtnWinchBothUp     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
     BtnWinchBothDown   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
+
+    // 🐛 FIX 2026-07-23 : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+    // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
+    // (doctrine reset=front, PRG_09_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
+    ConfigRestoredFromPersistent : BOOL; (* ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier *)
+    BtnAckConfigRestored         : BOOL; (* 🔘 IHM→PLC : acquittement opérateur (front) *)
 END_STRUCT
 END_TYPE

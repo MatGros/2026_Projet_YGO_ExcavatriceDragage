@@ -1397,6 +1397,25 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ Descend les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
+            <variable name="ConfigRestoredFromPersistent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
+(doctrine reset=front, PRG_09_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
+⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnAckConfigRestored">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔘 IHM→PLC : acquittement opérateur (front)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2980,6 +2999,17 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
 📐 Tolérance max d'écart (m) — 🔧 REX 2026-07-08 (5) : 0.10→0.25, aligné _WinchSyncTolerance_M</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu) — PRG_09_Supervision.st §2/§3</xhtml>
+              </documentation>
+            </variable>
             <variable name="DeltaPos_M">
               <type>
                 <REAL />
@@ -4431,6 +4461,17 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descente (1..5)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgMaxStepAscent">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgRampAccelRate">
               <type>
                 <REAL />
@@ -4506,6 +4547,19 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Vitesse de consigne lente dans la zone de ralentissement (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
+       métier dont le défaut peut valoir n'importe quoi) — PRG_09_Supervision.st §2/§3
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -29668,7 +29722,7 @@ SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (
 
 // 🔧 REX 2026-07-19 : palier max — même valeur Auto ET Manuel depuis la suppression d'IHM_MANU
 // (ex-plafond "essais progressifs" IHM_MANU, explicitement marqué TEMPORAIRE, retiré).
-EffectiveMaxStepAscent   := 5;
+EffectiveMaxStepAscent   := _WinchMaxStepAscent;
 EffectiveMaxStepDescente := _WinchMaxStepDescent;
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
@@ -29919,10 +29973,10 @@ SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000)
                        OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
-ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
+ForbidDescentM1_Raw := (NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND PRG_03_Safety.instSafetyWinchM1.ForbidDescent)
                        OR (_LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _LimitLegalDepthMinAllowed_M));
-ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
+ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safety.instSafetyWinchM2.ForbidDescent)
                        OR (_LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _LimitLegalDepthMinAllowed_M));
 
@@ -29949,11 +30003,13 @@ CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _CableLimitM1Ascent_M)
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
-ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
-                       OR (PRG_02_Encoders.instHomingM1.Homed
-                           AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _HomingTargetM1_M))
-                       OR CableLimitAscentM1Reached;
+ForbidAscentM1_Raw  := NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND (
+                          PRG_03_Safety.instSafetyWinchM1.ForbidAscent
+                          OR (PRG_02_Encoders.instHomingM1.Homed
+                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
+                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _HomingTargetM1_M))
+                          OR CableLimitAscentM1Reached
+                       );
 // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
 // La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le benne est fermé (IsClosed)
 // ou en cours de fermeture (CloseReq). Sinon (benne ouvert/en cours d'ouverture), M2 doit
@@ -29966,11 +30022,13 @@ CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (_CableLimitM2Ascent_M + M2_LimitShift))
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
-ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
-                       OR (PRG_02_Encoders.instHomingM2.Homed
-                           AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (_HomingTargetM2_M + M2_LimitShift)))
-                       OR CableLimitAscentM2Reached;
+ForbidAscentM2_Raw  := NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND (
+                          PRG_03_Safety.instSafetyWinchM2.ForbidAscent
+                          OR (PRG_02_Encoders.instHomingM2.Homed
+                              AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
+                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= (_HomingTargetM2_M + M2_LimitShift)))
+                          OR CableLimitAscentM2Reached
+                       );
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -30389,6 +30447,14 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Réutilisation lib Util (Partie3 §0) — horloge clignotement système</xhtml>
               </documentation>
             </variable>
+            <variable name="instAckConfigRestored">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Front acquittement opérateur restauration config PERSISTENT (§2bis)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassRestoreDone">
               <type>
                 <BOOL />
@@ -30397,7 +30463,10 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Flag restauration unique des bypass (boot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : passé de VAR simple à VAR RETAIN — en VAR simple, ce flag repassait à
+FALSE à CHAQUE reset/download (même quand GVL_IHM RETAIN restait intact), re-déclenchant la
+restauration bypass et pouvant re-forcer un bypass Global que l'opérateur venait de couper.
+🌐 Flag restauration unique des bypass (boot)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -30537,10 +30606,19 @@ GVL_IHM.Modes.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
 
 
 // ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
-IF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M = 0.0 THEN
+// 🐛 FIX 2026-07-23 : sentinelles `= 0.0` remplacées par un flag `Initialized`/`CfgInitialized`
+// dédié (défaut FALSE non ambigu). L'ancienne sentinelle `CfgTopSensorPos_M = 0.0` ne se
+// déclenchait JAMAIS (défaut struct réel = 8.5, ST_WinchCfg.st) → ce bloc M1/M2 ne s'exécutait
+// plus après un reset RETAIN (ex. changement de struct ST_*HMI, comme lors de cette session) et
+// TOUTE la config (paliers, rampes, limites câble, synchro...) retombait au défaut struct brut
+// sans jamais se resynchroniser depuis le vrai PERSISTENT. Idem pour `Sync.CfgSyncTolerance_M`
+// (défaut réel 0.25, piège documenté REX 2026-07-08 (5) ci-dessous, désormais clos).
+// 📄 Voir DOC/AF_Partie-07_Interface_IHM_v1.8.md.
+IF NOT GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
     GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M  := _HomingTargetM1_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM1_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent       := _WinchMaxStepAscent;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate       := _WinchM1RampAccelRate_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate   := _WinchM1RampDecelFast_Pct;
@@ -30548,12 +30626,15 @@ IF GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M = 0.0 THEN
     GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M   := _CableLimitM1Ascent_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M   := _WinchSlowdownDistance_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct        := _WinchSlowSpeed_Pct;
+    GVL_IHM.M1TreuilRetenue.Cfg.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
 END_IF;
 
-IF GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M = 0.0 THEN
+IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M  := _HomingTargetM2_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM2_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
+    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent       := _WinchMaxStepAscent;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate       := _WinchM2RampAccelRate_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate   := _WinchM2RampDecelFast_Pct;
@@ -30561,10 +30642,14 @@ IF GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M = 0.0 THEN
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M   := _CableLimitM2Ascent_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M   := _WinchSlowdownDistance_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct        := _WinchSlowSpeed_Pct;
+    GVL_IHM.M2TreuilBenne.Cfg.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF GVL_IHM.Sync.CfgSyncTolerance_M = 0.0 THEN
+IF NOT GVL_IHM.Sync.CfgInitialized THEN
     GVL_IHM.Sync.CfgSyncTolerance_M          := _WinchSyncTolerance_M;
+    GVL_IHM.Sync.CfgInitialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
 IF GVL_IHM.M2Benne.Config.OffsetOpenM = 0.0 AND GVL_IHM.M2Benne.Config.OffsetCloseM = 0.0 THEN
@@ -30577,9 +30662,21 @@ IF GVL_IHM.Commun.LimitLegalDepthMinAllowed_M = 0.0 THEN
     GVL_IHM.Commun.LimitLegalEnabled         := _LimitLegalEnabled;
 END_IF;
 
+// ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
+// 🐛 FIX 2026-07-23 : `ConfigRestoredFromPersistent` ne doit JAMAIS disparaître tout seul —
+// même doctrine que les défauts métier (cause disparue + appui reset conscient pour effacer).
+// Tant que l'opérateur n'a pas vérifié/acquitté, le bit reste visible à l'IHM.
+instAckConfigRestored(CLK := GVL_IHM.Commun.BtnAckConfigRestored);
+IF instAckConfigRestored.Q THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
+END_IF;
+
 // 🌐 Restauration des bypass RETAIN au boot UNIQUEMENT (premier scan)
 // Après ça, seule la sauvegarde IHM→RETAIN fonctionne (jamais l'inverse).
 // Évite le bug où une écriture IHM était écrasée par la restauration.
+// 🐛 FIX 2026-07-23 : BypassRestoreDone passé en VAR RETAIN (voir déclaration en tête de fichier)
+// — en simple VAR il repassait à FALSE à CHAQUE reset/download, même quand GVL_IHM (RETAIN) était
+// resté intact, ce qui pouvait re-forcer un bypass Global que l'opérateur venait de désactiver.
 IF NOT BypassRestoreDone THEN
     IF BypassTranslationGlobal AND GVL_IHM.TranslationM3.Bypass.Global = FALSE THEN
         GVL_IHM.TranslationM3.Bypass.Global := TRUE;
@@ -30604,7 +30701,10 @@ END_IF;
 
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-// ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
+// 🐛 FIX 2026-07-23 : chaque bloc ci-dessous est désormais gardé par le flag `Cfg.Initialized`/
+// `Sync.CfgInitialized` posé en §2 — défense en profondeur : même si l'ordre du fichier changeait
+// un jour, on ne peut plus écraser le vrai PERSISTENT avec une valeur GVL_IHM fraîchement
+// resettée au défaut struct AVANT que la restauration (§2) ait eu lieu. Revue sécurité 2026-07-23.
 _HomingTargetM1_M            := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
 _HomingTargetM2_M            := GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M;
 _HomingUnitaryTargetM1_M     := GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M;
@@ -30612,67 +30712,89 @@ _HomingUnitaryTargetM2_M     := GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M;
 // 🔧 REX 2026-07-08 : CfgMaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
 // ci-dessous (même pattern que CableLimitDescent_M/SlowdownDistance_M/SlowSpeed_Pct), plus de
 // propagation à sens unique séparée par treuil ici.
-_WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate;
-_WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate;
-_WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate;
-_WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
-_WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
-_WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
-// ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit : cette ligne
-// écrase _WinchSyncTolerance_M avec GVL_IHM.Sync.SyncTolerance_M À CHAQUE SCAN.
-// Si on change UNIQUEMENT la valeur par défaut dans GVL_PERSISTENT.st (ou ST_SyncHMI.st), ça ne
-// suffit pas : la valeur restaurée au boot (bloc §2 ci-dessus, `IF ... = 0.0 THEN`) ne s'applique
-// que si le RETAIN IHM est à 0.0 (premier démarrage) — sinon l'ancienne valeur IHM re-propage ici
-// et écrase silencieusement toute nouvelle valeur par défaut au scan suivant.
-_WinchSyncTolerance_M       := GVL_IHM.Sync.CfgSyncTolerance_M;
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
+    _WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate;
+    _WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate;
+    _WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate;
+END_IF;
+IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
+    _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
+    _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
+    _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
+END_IF;
+// ⚠️ REX 2026-07-08 (5) — PIÈGE pont IHM→PERSISTENT découvert lors de l'audit, désormais clos
+// par le flag `Sync.CfgInitialized` (posé en §2 uniquement après restauration réussie).
+IF GVL_IHM.Sync.CfgInitialized THEN
+    _WinchSyncTolerance_M       := GVL_IHM.Sync.CfgSyncTolerance_M;
+END_IF;
 _BucketConfig              := GVL_IHM.M2Benne.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
-IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
-    _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente;
-ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
-    _WinchMaxStepDescent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente;
-END_IF;
-GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
-GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
+        _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente;
+    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
+        _WinchMaxStepDescent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
+    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
 
-IF GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M &lt;&gt; _CableLimitM1Descent_M THEN
-    _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M;
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent &lt;&gt; _WinchMaxStepAscent THEN
+        _WinchMaxStepAscent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent;
+    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent &lt;&gt; _WinchMaxStepAscent THEN
+        _WinchMaxStepAscent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent := _WinchMaxStepAscent;
+    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent := _WinchMaxStepAscent;
 END_IF;
-GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M := _CableLimitM1Descent_M;
 
-IF GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M &lt;&gt; _CableLimitM2Descent_M THEN
-    _CableLimitM2Descent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M;
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M &lt;&gt; _CableLimitM1Descent_M THEN
+        _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M := _CableLimitM1Descent_M;
 END_IF;
-GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M := _CableLimitM2Descent_M;
+
+IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
+    IF GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M &lt;&gt; _CableLimitM2Descent_M THEN
+        _CableLimitM2Descent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M;
+    END_IF;
+    GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M := _CableLimitM2Descent_M;
+END_IF;
 
 // 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescent_M ci-dessus.
-IF GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M &lt;&gt; _CableLimitM1Ascent_M THEN
-    _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M;
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M &lt;&gt; _CableLimitM1Ascent_M THEN
+        _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M := _CableLimitM1Ascent_M;
 END_IF;
-GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M := _CableLimitM1Ascent_M;
 
-IF GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M &lt;&gt; _CableLimitM2Ascent_M THEN
-    _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M;
+IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
+    IF GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M &lt;&gt; _CableLimitM2Ascent_M THEN
+        _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M;
+    END_IF;
+    GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M := _CableLimitM2Ascent_M;
 END_IF;
-GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M := _CableLimitM2Ascent_M;
 
-IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
-    _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M;
-ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
-    _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M;
-END_IF;
-GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
-GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
+IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
+        _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M;
+    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
+        _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
+    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
 
-IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
-    _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct;
-ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
-    _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct;
+    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
+        _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct;
+    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
+        _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
+    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
-GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
-GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 
 _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.LimitLegalDepthMinAllowed_M;
 _LimitLegalEnabled         := GVL_IHM.Commun.LimitLegalEnabled;
@@ -31882,6 +32004,21 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
+        <variable name="_WinchMaxStepAscent">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5" />
+          </initialValue>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+              <Attributes>
+                <Attribute Name="order_in_persistent_editor" Value="8" />
+              </Attributes>
+            </data>
+          </addData>
+        </variable>
         <variable name="_WinchSpeedConfig">
           <type>
             <derived name="ST_WinchSpeedConfig" />
@@ -31918,7 +32055,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="8" />
+                <Attribute Name="order_in_persistent_editor" Value="9" />
               </Attributes>
             </data>
           </addData>
@@ -31930,7 +32067,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="9" />
+                <Attribute Name="order_in_persistent_editor" Value="10" />
               </Attributes>
             </data>
           </addData>
@@ -31945,7 +32082,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="10" />
+                <Attribute Name="order_in_persistent_editor" Value="11" />
               </Attributes>
             </data>
           </addData>
@@ -31960,7 +32097,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="11" />
+                <Attribute Name="order_in_persistent_editor" Value="12" />
               </Attributes>
             </data>
           </addData>
@@ -31975,7 +32112,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="12" />
+                <Attribute Name="order_in_persistent_editor" Value="13" />
               </Attributes>
             </data>
           </addData>
@@ -31990,7 +32127,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="13" />
+                <Attribute Name="order_in_persistent_editor" Value="14" />
               </Attributes>
             </data>
           </addData>
@@ -32005,7 +32142,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="14" />
+                <Attribute Name="order_in_persistent_editor" Value="15" />
               </Attributes>
             </data>
           </addData>
@@ -32020,7 +32157,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="15" />
+                <Attribute Name="order_in_persistent_editor" Value="16" />
               </Attributes>
             </data>
           </addData>
@@ -32035,7 +32172,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="16" />
+                <Attribute Name="order_in_persistent_editor" Value="17" />
               </Attributes>
             </data>
           </addData>
@@ -32050,7 +32187,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="17" />
+                <Attribute Name="order_in_persistent_editor" Value="18" />
               </Attributes>
             </data>
           </addData>
@@ -32065,7 +32202,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="18" />
+                <Attribute Name="order_in_persistent_editor" Value="19" />
               </Attributes>
             </data>
           </addData>
@@ -32080,7 +32217,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="19" />
+                <Attribute Name="order_in_persistent_editor" Value="20" />
               </Attributes>
             </data>
           </addData>
@@ -32095,7 +32232,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="20" />
+                <Attribute Name="order_in_persistent_editor" Value="21" />
               </Attributes>
             </data>
           </addData>
@@ -32110,7 +32247,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="21" />
+                <Attribute Name="order_in_persistent_editor" Value="22" />
               </Attributes>
             </data>
           </addData>
@@ -32125,7 +32262,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="22" />
+                <Attribute Name="order_in_persistent_editor" Value="23" />
               </Attributes>
             </data>
           </addData>
@@ -32140,7 +32277,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="23" />
+                <Attribute Name="order_in_persistent_editor" Value="24" />
               </Attributes>
             </data>
           </addData>
@@ -32155,7 +32292,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="24" />
+                <Attribute Name="order_in_persistent_editor" Value="25" />
               </Attributes>
             </data>
           </addData>
@@ -32180,7 +32317,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="25" />
+                <Attribute Name="order_in_persistent_editor" Value="26" />
               </Attributes>
             </data>
           </addData>
@@ -32192,7 +32329,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="26" />
+                <Attribute Name="order_in_persistent_editor" Value="27" />
               </Attributes>
             </data>
           </addData>
@@ -32207,7 +32344,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="27" />
+                <Attribute Name="order_in_persistent_editor" Value="28" />
               </Attributes>
             </data>
           </addData>
@@ -32222,7 +32359,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="28" />
+                <Attribute Name="order_in_persistent_editor" Value="29" />
               </Attributes>
             </data>
           </addData>
@@ -32237,7 +32374,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="29" />
+                <Attribute Name="order_in_persistent_editor" Value="30" />
               </Attributes>
             </data>
           </addData>
@@ -32252,7 +32389,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="30" />
+                <Attribute Name="order_in_persistent_editor" Value="31" />
               </Attributes>
             </data>
           </addData>
@@ -32267,7 +32404,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="31" />
+                <Attribute Name="order_in_persistent_editor" Value="32" />
               </Attributes>
             </data>
           </addData>
@@ -32282,7 +32419,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="32" />
+                <Attribute Name="order_in_persistent_editor" Value="33" />
               </Attributes>
             </data>
           </addData>
@@ -32297,7 +32434,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="33" />
+                <Attribute Name="order_in_persistent_editor" Value="34" />
               </Attributes>
             </data>
           </addData>
@@ -32312,7 +32449,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="34" />
+                <Attribute Name="order_in_persistent_editor" Value="35" />
               </Attributes>
             </data>
           </addData>
@@ -32327,7 +32464,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="35" />
+                <Attribute Name="order_in_persistent_editor" Value="36" />
               </Attributes>
             </data>
           </addData>
@@ -32342,7 +32479,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="36" />
+                <Attribute Name="order_in_persistent_editor" Value="37" />
               </Attributes>
             </data>
           </addData>
@@ -32357,7 +32494,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="37" />
+                <Attribute Name="order_in_persistent_editor" Value="38" />
               </Attributes>
             </data>
           </addData>
@@ -32372,7 +32509,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="38" />
+                <Attribute Name="order_in_persistent_editor" Value="39" />
               </Attributes>
             </data>
           </addData>
@@ -32387,7 +32524,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="39" />
+                <Attribute Name="order_in_persistent_editor" Value="40" />
               </Attributes>
             </data>
           </addData>
@@ -32402,7 +32539,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="40" />
+                <Attribute Name="order_in_persistent_editor" Value="41" />
               </Attributes>
             </data>
           </addData>
@@ -32417,7 +32554,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="41" />
+                <Attribute Name="order_in_persistent_editor" Value="42" />
               </Attributes>
             </data>
           </addData>
@@ -32432,7 +32569,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="42" />
+                <Attribute Name="order_in_persistent_editor" Value="43" />
               </Attributes>
             </data>
           </addData>
@@ -32447,7 +32584,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="43" />
+                <Attribute Name="order_in_persistent_editor" Value="44" />
               </Attributes>
             </data>
           </addData>
@@ -32462,7 +32599,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="44" />
+                <Attribute Name="order_in_persistent_editor" Value="45" />
               </Attributes>
             </data>
           </addData>
@@ -32477,7 +32614,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="45" />
+                <Attribute Name="order_in_persistent_editor" Value="46" />
               </Attributes>
             </data>
           </addData>

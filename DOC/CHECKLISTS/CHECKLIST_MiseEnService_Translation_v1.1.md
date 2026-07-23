@@ -57,4 +57,5 @@
 
 **Verdict M3** : ☐ PASS · ☐ FAIL · ☐ Non testé (raison : __________)
 
-📎 Détail historique : `CHECKLIST_MiseEnService_Translation_v1.0.md`. Références : `AF_Partie-07_Interface_IHM_v1.6.md`, `AF_Partie-11_Fonction_Translation_v1.9.md`.
+📎 Détail historique : `../../ARCHIVES/Doc/CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.0.md`.
+Références : `../AF_Partie-07_Interface_IHM_v1.7.md`, `../AF_Partie-11_Fonction_Translation_v1.11.md`.

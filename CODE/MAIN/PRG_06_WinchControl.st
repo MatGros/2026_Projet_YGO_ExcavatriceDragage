@@ -133,7 +133,7 @@ SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (
 
 // 🔧 REX 2026-07-19 : palier max — même valeur Auto ET Manuel depuis la suppression d'IHM_MANU
 // (ex-plafond "essais progressifs" IHM_MANU, explicitement marqué TEMPORAIRE, retiré).
-EffectiveMaxStepAscent   := 5;
+EffectiveMaxStepAscent   := _WinchMaxStepAscent;
 EffectiveMaxStepDescente := _WinchMaxStepDescent;
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
@@ -384,10 +384,10 @@ SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
                        OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000));
 
-ForbidDescentM1_Raw := PRG_03_Safety.instSafetyWinchM1.ForbidDescent
+ForbidDescentM1_Raw := (NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND PRG_03_Safety.instSafetyWinchM1.ForbidDescent)
                        OR (_LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _LimitLegalDepthMinAllowed_M));
-ForbidDescentM2_Raw := PRG_03_Safety.instSafetyWinchM2.ForbidDescent
+ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safety.instSafetyWinchM2.ForbidDescent)
                        OR (_LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _LimitLegalDepthMinAllowed_M));
 
@@ -414,11 +414,13 @@ CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _CableLimitM1Ascent_M)
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
-ForbidAscentM1_Raw  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent
-                       OR (PRG_02_Encoders.instHomingM1.Homed
-                           AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _HomingTargetM1_M))
-                       OR CableLimitAscentM1Reached;
+ForbidAscentM1_Raw  := NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND (
+                          PRG_03_Safety.instSafetyWinchM1.ForbidAscent
+                          OR (PRG_02_Encoders.instHomingM1.Homed
+                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
+                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _HomingTargetM1_M))
+                          OR CableLimitAscentM1Reached
+                       );
 // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
 // La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le benne est fermé (IsClosed)
 // ou en cours de fermeture (CloseReq). Sinon (benne ouvert/en cours d'ouverture), M2 doit
@@ -431,11 +433,13 @@ CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_CableLimitM2Ascent_M + M2_LimitShift))
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
-ForbidAscentM2_Raw  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent
-                       OR (PRG_02_Encoders.instHomingM2.Homed
-                           AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_HomingTargetM2_M + M2_LimitShift)))
-                       OR CableLimitAscentM2Reached;
+ForbidAscentM2_Raw  := NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND (
+                          PRG_03_Safety.instSafetyWinchM2.ForbidAscent
+                          OR (PRG_02_Encoders.instHomingM2.Homed
+                              AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
+                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_HomingTargetM2_M + M2_LimitShift)))
+                          OR CableLimitAscentM2Reached
+                       );
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);

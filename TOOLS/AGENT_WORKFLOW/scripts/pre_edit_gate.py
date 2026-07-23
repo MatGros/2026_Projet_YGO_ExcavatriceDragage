@@ -9,7 +9,7 @@ from pathlib import Path
 
 SPEC_MAP = {
     "CODE/AU/": ["DOC/AF_Partie-03_Template_FB_Commun_v1.3.md", "DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md"],
-    "CODE/TRANSLATION/": ["DOC/AF_Partie-11_Fonction_Translation_v1.9.md", "DOC/AF_Partie-03_Template_FB_Commun_v1.3.md"],
+    "CODE/TRANSLATION/": ["DOC/AF_Partie-11_Fonction_Translation_v1.11.md", "DOC/AF_Partie-03_Template_FB_Commun_v1.3.md"],
     "CODE/TREUILS/": ["DOC/AF_Partie-09_Fonction_Winch_v1.11.md", "DOC/AF_Partie-03_Template_FB_Commun_v1.3.md"],
     "CODE/CODEURS/": ["DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md"],
     "CODE/BENNE/": ["DOC/AF_Partie-12_Fonction_Benne_v1.4.md"],

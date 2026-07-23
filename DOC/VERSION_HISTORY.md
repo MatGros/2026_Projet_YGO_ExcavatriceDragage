@@ -4,6 +4,28 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `CONFIG-PERSIST-01` — 2026-07-23
+- Fix persistance config IHM (`CfgMaxStepDescente` et 10+ champs Cfg M1/M2/Sync) : sentinelles
+  `= 0.0` cassées remplacées par flag `Initialized`/`CfgInitialized` dédié
+- Alarme IHM `ConfigRestoredFromPersistent` + acquittement front (`BtnAckConfigRestored`)
+- Bug cousin corrigé : `BypassRestoreDone` passé en `VAR RETAIN` (repartait à FALSE à chaque download)
+- ⚠️ Test PLC automatique restant à écrire (T65) — vérification manuelle Watch/forçage en attendant
+
+### `DOC_ClassementEtREX_Treuils` — 2026-07-23
+- Anciennes checklists, P13 v1.2 et audits clôturés déplacés en archives
+- NAVBOARDs regroupés dans `DOC/NAVBOARDS/`
+- P7 v1.6, P11 v1.9/v1.10 et audit Winch déplacés sans fusion
+- Essais treuils : plafond palier temporairement réglé à `0` (`T64`)
+
+### `96ef589` — 2026-07-23
+- Bypass globaux/ciblés Winch · Translation M3 · synchro · benne · réseau
+- Homing unitaire M1/M2 réglable, cible initiale `0,0 m`
+- Validation banc/terrain et désactivation finale des bypass requises
+
+### `DOC_SuiviMiseEnService` — 2026-07-23
+- Registre historique MES créé : séances, mesures, preuves et décisions terrain
+- `PLAN_TASK` reste la source unique des actions différées à implémenter (`Txx`)
+
 ### `v0.4.31_CommissioningDocsIhmState` — 2026-07-22
 - NAVBOARD Joystick/M3 + checklists v1.1 alignés sur IHM `.Cmd/.State/.Safety`
 - Fiches terrain courtes : ordre de bascule simulation, mouvement prudent, reset sûr

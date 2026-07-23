@@ -26,6 +26,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     ); // Table paliers commune (REX 2026-07-08 : fusion M1/M2)
     _WinchMaxStepDescent : INT := 3; // Palier max descente commun M1/M2
+    _WinchMaxStepAscent  : INT := 5; // Palier max montée commun M1/M2
     // 🪜 T45 — caractérisation vitesse réelle ; valeurs initiales provisoires à mesurer.
     _WinchSpeedConfig : ST_WinchSpeedConfig := (
         MaxMeasuredSpeedMps    := 2.0,

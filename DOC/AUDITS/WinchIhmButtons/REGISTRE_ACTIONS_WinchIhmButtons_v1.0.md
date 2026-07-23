@@ -14,7 +14,7 @@
 | Avant (T40, 2026-07-19) | Constat session (captures IHM cible) |
 |---|---|
 | Winch/Benne = aucun bouton IHM de mouvement, pilotage exclusif joystick homme-mort | L'IHM physique/cible à livrer contient des boutons de mouvement réels : `Btn_WinchBenneUp/Down`, `Btn_WinchRetenueUp/Down`, `Btn_WinchSyncUp` |
-| Justification retrait : audit sécurité jugeait le pilotage direct "dangereux" (`AUDIT_Winch_v1.0.md:269`) | Besoin métier réel confirmé : page de mise en service **permanente** (pas temporaire), nécessaire pour piloter treuils indépendamment/couplés, accessible dès MAINT_N1 |
+| Justification retrait : audit sécurité jugeait le pilotage direct "dangereux" (`../../../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md:269`) | Besoin métier réel confirmé : page de mise en service **permanente** (pas temporaire), nécessaire pour piloter treuils indépendamment/couplés, accessible dès MAINT_N1 |
 
 📌 **Ce registre traite cette réouverture explicitement, avec les mêmes garde-fous que ceux qui
 avaient motivé le retrait** — pas une extension mécanique du pattern Translation M3 (l'agent de
@@ -136,7 +136,7 @@ pour pilotage unitaire joystick).
 - Session utilisateur ↔ Claude (captures IHM cible, comportement bouton, mode accès)
 - `DOC/PLAN_TASK_v1.0.md` T40 (doctrine retrait IHM_MANU)
 - `DOC/AF_Partie-05_Modes_Maintenance_v1.6.md` §MAINT_N1/N2 (pilotage unitaire déjà prévu dès N1)
-- `DOC/AF_Partie-11_Fonction_Translation_v1.9.md` §6bis (précédent homme-mort boutons IHM)
-- `AUDIT_Winch_v1.0.md:269` (justification historique du retrait)
+- `DOC/AF_Partie-11_Fonction_Translation_v1.11.md` §6bis (précédent homme-mort boutons IHM)
+- `../../../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md:269` (justification historique du retrait)
 - `CODE/MAIN/PRG_06_WinchControl.st` §1/§2 (arbitrage actuel joystick)
 - `CODE/TREUILS/FB_Winch.st` (interface StartStop/Direction/SpeedRefPct déjà compatible)
