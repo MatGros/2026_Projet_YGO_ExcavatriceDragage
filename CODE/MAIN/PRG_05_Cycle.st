@@ -70,7 +70,7 @@ instCycle(
     M2_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps,
     SpeedMismatchThresholdMps := SpeedMismatchThresholdMps,
     SpeedMismatchTimeout      := SpeedMismatchTimeout,
-    CableLimitM1AscentM       := _CableLimitM1Ascent_M,
+    CableLimitM1AscentM       := _WinchM1CfgPersist.CfgCableLimitAscent_M,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
     Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,

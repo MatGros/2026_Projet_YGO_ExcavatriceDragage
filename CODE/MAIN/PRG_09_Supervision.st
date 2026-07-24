@@ -24,6 +24,8 @@ VAR
     instCfgPersistBridgeCycle : FB_CfgPersistBridge_CycleCfg; // 🌉 Pont persistance Cycle.Cfg (Lot 3b)
     instCfgPersistBridgeCommun : FB_CfgPersistBridge_CommunCfg; // 🌉 Pont persistance Commun.Cfg (Lot 3b)
     instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg; // 🌉 Pont persistance M2TreuilBenne.Bucket.Cfg (Lot 3b)
+    instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg; // 🌉 Pont persistance M1TreuilRetenue.Cfg (Lot 3d-2)
+    instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg; // 🌉 Pont persistance M2TreuilBenne.Cfg (Lot 3d-2)
 END_VAR
 VAR RETAIN
     // 🐛 FIX 2026-07-23 : passé de VAR simple à VAR RETAIN — en VAR simple, ce flag repassait à
@@ -156,27 +158,13 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFaile
 // sans jamais se resynchroniser depuis le vrai PERSISTENT. Idem pour `Sync.CfgSyncTolerance_M`
 // (défaut réel 0.25, piège documenté REX 2026-07-08 (5) ci-dessous, désormais clos).
 // 📄 Voir DOC/AF_Partie-07_Interface_IHM_v1.8.md.
-IF NOT GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M  := _HomingTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate       := _WinchM1RampAccelRate_Pct;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate   := _WinchM1RampDecelFast_Pct;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M  := _CableLimitM1Descent_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M   := _CableLimitM1Ascent_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.Initialized := TRUE;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
+instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
+IF instCfgPersistBridgeWinchM1.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M  := _HomingTargetM2_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM2_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate       := _WinchM2RampAccelRate_Pct;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate   := _WinchM2RampDecelFast_Pct;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M  := _CableLimitM2Descent_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M   := _CableLimitM2Ascent_M;
-    GVL_IHM.M2TreuilBenne.Cfg.Initialized := TRUE;
+instCfgPersistBridgeWinchM2(Hmi := GVL_IHM.M2TreuilBenne.Cfg, Persist := _WinchM2CfgPersist);
+IF instCfgPersistBridgeWinchM2.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -266,50 +254,6 @@ END_IF;
 // `Sync.CfgInitialized` posé en §2 — défense en profondeur : même si l'ordre du fichier changeait
 // un jour, on ne peut plus écraser le vrai PERSISTENT avec une valeur GVL_IHM fraîchement
 // resettée au défaut struct AVANT que la restauration (§2) ait eu lieu. Revue sécurité 2026-07-23.
-_HomingTargetM1_M            := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
-_HomingTargetM2_M            := GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M;
-_HomingUnitaryTargetM1_M     := GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M;
-_HomingUnitaryTargetM2_M     := GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M;
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
-    _WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate;
-    _WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate;
-    _WinchM1RampDecelFast_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate;
-END_IF;
-IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
-    _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
-    _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
-END_IF;
-
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M <> _CableLimitM1Descent_M THEN
-        _CableLimitM1Descent_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M := _CableLimitM1Descent_M;
-END_IF;
-
-IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    IF GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M <> _CableLimitM2Descent_M THEN
-        _CableLimitM2Descent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M;
-    END_IF;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M := _CableLimitM2Descent_M;
-END_IF;
-
-// 🆕 REX 2026-07-15 (6) — même pattern miroir bidirectionnel que CableLimitDescent_M ci-dessus.
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M <> _CableLimitM1Ascent_M THEN
-        _CableLimitM1Ascent_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M := _CableLimitM1Ascent_M;
-END_IF;
-
-IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    IF GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M <> _CableLimitM2Ascent_M THEN
-        _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M;
-    END_IF;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M := _CableLimitM2Ascent_M;
-END_IF;
-
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
 BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
 BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
