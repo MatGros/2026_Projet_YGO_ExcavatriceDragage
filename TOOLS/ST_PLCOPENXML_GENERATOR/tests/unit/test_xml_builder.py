@@ -273,7 +273,11 @@ def test_composite_struct_init_field_order_follows_struct_declaration_not_source
     assert [m.find("simpleValue").get("value") for m in members] == ["1", "2", "3"]
 
 
-def test_nested_struct_in_struct_init_is_skipped_with_warning():
+def test_nested_struct_in_struct_init():
+    other_struct = SourceObject(
+        kind="struct", name="ST_Other", folder="X", file_path="x",
+        struct_fields=[VariableDecl("X", BaseType("REAL"))],
+    )
     struct_obj = SourceObject(
         kind="struct", name="ST_Cfg", folder="X", file_path="x",
         struct_fields=[VariableDecl("Inner", DerivedType("ST_Other"))],
@@ -290,20 +294,29 @@ def test_nested_struct_in_struct_init_is_skipped_with_warning():
                     VariableDecl(
                         "Cfg",
                         DerivedType("ST_Cfg"),
-                        init=StructInitValue((("Inner", StructInitValue((("X", SimpleInitValue("1")),))),)),
+                        init=StructInitValue((("Inner", StructInitValue((("X", SimpleInitValue("1.0")),))),)),
                     )
                 ],
             )
         ],
     )
     diag = DiagnosticCollector()
-    root = build_project_xml("GVL_Demo", {"GVL_Demo": gvl_obj, "ST_Cfg": struct_obj}, diag, include_deps=False)
+    root = build_project_xml(
+        "GVL_Demo",
+        {"GVL_Demo": gvl_obj, "ST_Cfg": struct_obj, "ST_Other": other_struct},
+        diag,
+        include_deps=False
+    )
     struct_value = root.find(
         "addData/data[@name='http://www.3s-software.com/plcopenxml/globalvars']"
         "/globalVars/variable/initialValue/structValue"
     )
-    assert struct_value.findall("value") == []
-    assert diag.of(Severity.WARNING)
+    inner_val = struct_value.find("value[@member='Inner']/structValue")
+    assert inner_val is not None
+    x_val = inner_val.find("value[@member='X']/simpleValue")
+    assert x_val is not None
+    assert x_val.get("value") == "1"
+    assert not diag.has_errors()
 
 
 def test_array_member_inside_struct_init():

@@ -146,20 +146,11 @@ def _init_value_inner(
             return None
         member_values = init.as_dict()
         el = ET.Element("structValue")
-        # Field order follows the referenced STRUCT's declared order (the
-        # source order of the ST initializer happens to always match it in
-        # CODE/, but the declared order is the safer source of truth).
         for field in struct_obj.struct_fields:
             if field.name not in member_values:
                 continue
             member_init = member_values[field.name]
-            if isinstance(member_init, StructInitValue):
-                diagnostics.warning(
-                    f"nested struct-in-struct initializer for {field.name!r} in {context_label} is "
-                    "unconfirmed against any real PLCopenXML sample; skipping this field",
-                    context_label,
-                )
-                continue
+            # Allow nested struct-in-struct initializer recursion directly.
             member_el = _init_value_inner(member_init, field.type, objects_by_name, diagnostics, context_label)
             if member_el is None:
                 continue
