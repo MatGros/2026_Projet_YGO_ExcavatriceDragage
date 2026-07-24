@@ -21,6 +21,9 @@ VAR
     instBlink1Hz : BLINK; // 🧩 Réutilisation lib Util (Partie3 §0) — horloge clignotement système
     instAckConfigRestored : R_TRIG; // 🔔 Front acquittement opérateur restauration config PERSISTENT (§2bis)
     instCfgPersistBridgeSync : FB_CfgPersistBridge_SyncCfg; // 🌉 Pont persistance M1M2Sync.Cfg (Lot 3a, pilote)
+    instCfgPersistBridgeCycle : FB_CfgPersistBridge_CycleCfg; // 🌉 Pont persistance Cycle.Cfg (Lot 3b)
+    instCfgPersistBridgeCommun : FB_CfgPersistBridge_CommunCfg; // 🌉 Pont persistance Commun.Cfg (Lot 3b)
+    instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg; // 🌉 Pont persistance M2TreuilBenne.Bucket.Cfg (Lot 3b)
 END_VAR
 VAR RETAIN
     // 🐛 FIX 2026-07-23 : passé de VAR simple à VAR RETAIN — en VAR simple, ce flag repassait à
@@ -190,25 +193,19 @@ IF instCfgPersistBridgeSync.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized THEN
-    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config := _BucketConfig;
-    GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration := T#30s;
-    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized := TRUE;
+instCfgPersistBridgeBucket(Hmi := GVL_IHM.M2TreuilBenne.Bucket.Cfg, Persist := _BucketCfgPersist);
+IF instCfgPersistBridgeBucket.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Commun.Cfg.Initialized THEN
-    GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
-    GVL_IHM.Commun.Cfg.LimitLegalEnabled           := _LimitLegalEnabled;
-    GVL_IHM.Commun.Cfg.SelHomingApproachEnable     := FALSE; (* défaut inactif *)
-    GVL_IHM.Commun.Cfg.Initialized                 := TRUE;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent    := TRUE;
+instCfgPersistBridgeCommun(Hmi := GVL_IHM.Commun.Cfg, Persist := _CommunCfgPersist);
+IF instCfgPersistBridgeCommun.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Cycle.Cfg.Initialized THEN
-    GVL_IHM.Cycle.Cfg.SetDepth_M  := _CycleSetDepth_M;
-    GVL_IHM.Cycle.Cfg.SetOffset_M := _CycleSetOffset_M;
-    GVL_IHM.Cycle.Cfg.Initialized := TRUE;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
+instCfgPersistBridgeCycle(Hmi := GVL_IHM.Cycle.Cfg, Persist := _CycleCfgPersist);
+IF instCfgPersistBridgeCycle.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
@@ -294,7 +291,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
 END_IF;
-_BucketConfig              := GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
@@ -363,16 +359,6 @@ IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initial
     GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
 
-IF GVL_IHM.Commun.Cfg.Initialized THEN
-    _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
-    _LimitLegalEnabled           := GVL_IHM.Commun.Cfg.LimitLegalEnabled;
-END_IF;
-
-IF GVL_IHM.Cycle.Cfg.Initialized THEN
-    _CycleSetDepth_M  := GVL_IHM.Cycle.Cfg.SetDepth_M;
-    _CycleSetOffset_M := GVL_IHM.Cycle.Cfg.SetOffset_M;
-END_IF;
-
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
 BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
 BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
@@ -382,9 +368,9 @@ BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
 BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
-GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
-                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _LimitLegalDepthMinAllowed_M))
-                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _LimitLegalDepthMinAllowed_M)));
+GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
+                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M))
+                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 

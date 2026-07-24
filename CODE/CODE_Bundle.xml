@@ -8332,6 +8332,181 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_CfgPersistBridge_BucketCfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_BucketCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.M2TreuilBenne.Bucket.Cfg</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_BucketCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._BucketCfgPersist</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌉 FB_CfgPersistBridge_BucketCfg — Pont persistance générique pour ST_BucketCfg
+   ───────────────────────────────────────────────────────────────
+   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
+   seul le type ST_BucketCfg change. La copie struct-à-struct gère aussi le sous-struct imbriqué
+   Config : ST_BucketConfig automatiquement (pas de traitement spécial nécessaire).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>92413952-2771-5afc-8a20-3321f99627f5</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CfgPersistBridge_CommunCfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.Commun.Cfg</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._CommunCfgPersist</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌉 FB_CfgPersistBridge_CommunCfg — Pont persistance générique pour ST_CommunCfg
+   ───────────────────────────────────────────────────────────────
+   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
+   seul le type ST_CommunCfg change.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b0d11d68-8853-56c7-85fa-cb0f8b6449b6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CfgPersistBridge_CycleCfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_CycleCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.Cycle.Cfg</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_CycleCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._CycleCfgPersist</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌉 FB_CfgPersistBridge_CycleCfg — Pont persistance générique pour ST_CycleCfg
+   ───────────────────────────────────────────────────────────────
+   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
+   seul le type ST_CycleCfg change.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8d6e7f94-2d43-5ea3-b409-34f87f99a9e5</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_CfgPersistBridge_SyncCfg" pouType="functionBlock">
         <interface>
           <inputVars />
@@ -30631,7 +30806,7 @@ instBucket(
     M2_Busy             := instWinchM2.Busy,   // 🆕 REX 2026-07-08
     ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne ouvert
     ConfirmClosePosition:= GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos, // 🆕 REX 2026-07-08 — bouton IHM référencement benne fermé
-    Config              := _BucketConfig,
+    Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
     InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
@@ -30879,13 +31054,13 @@ END_IF;
 // Mode=SEMI_AUTO — la limite légale doit stopper la descente dans TOUS les modes dès qu'elle
 // est activée (constat terrain : ne s'arrêtait pas en MAINT_N1/N2 alors qu'attendu).
 BottomLimitM1_Active := _CableLimitM1Descent_M;
-IF _LimitLegalEnabled THEN
-    BottomLimitM1_Active := MAX(BottomLimitM1_Active, _LimitLegalDepthMinAllowed_M);
+IF _CommunCfgPersist.LimitLegalEnabled THEN
+    BottomLimitM1_Active := MAX(BottomLimitM1_Active, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
 END_IF;
 
 BottomLimitM2_Active := _CableLimitM2Descent_M;
-IF _LimitLegalEnabled THEN
-    BottomLimitM2_Active := MAX(BottomLimitM2_Active, _LimitLegalDepthMinAllowed_M);
+IF _CommunCfgPersist.LimitLegalEnabled THEN
+    BottomLimitM2_Active := MAX(BottomLimitM2_Active, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
 END_IF;
 
 // ── 5bis. COUPLAGE CROISÉ M1/M2 — REX 2026-07-07 ────────────────────────
@@ -30910,11 +31085,11 @@ SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
                        OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
 ForbidDescentM1_Raw := (NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND PRG_03_Safety.instSafetyWinchM1.ForbidDescent)
-                       OR (_LimitLegalEnabled
-                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _LimitLegalDepthMinAllowed_M));
+                       OR (_CommunCfgPersist.LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safety.instSafetyWinchM2.ForbidDescent)
-                       OR (_LimitLegalEnabled
-                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _LimitLegalDepthMinAllowed_M));
+                       OR (_CommunCfgPersist.LimitLegalEnabled
+                           AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 
 // 🔧 REX 2026-07-15 (6) — demande utilisateur : arrêt réel encodeur en fonctionnement NORMAL,
 // distinct du capteur physique (bit5/Méca D côté FB_Safety_Winch). Seuil = CableLimitAscentMx_M,
@@ -30950,7 +31125,7 @@ ForbidAscentM1_Raw  := NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND (
 // La butée haute de M2 n'est décalée de l'OffsetCloseM QUE si le benne est fermé (IsClosed)
 // ou en cours de fermeture (CloseReq). Sinon (benne ouvert/en cours d'ouverture), M2 doit
 // s'arrêter à la butée normale (CableLimitAscentM2_M) pour s'arrêter proprement en même temps que M1.
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketConfig.OffsetCloseM);
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketCfgPersist.Config.OffsetCloseM);
 
 // 🆕 REX 2026-07-15 (8) : idem M1 (voir ci-dessus).
 CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
@@ -31399,6 +31574,30 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🌉 Pont persistance M1M2Sync.Cfg (Lot 3a, pilote)</xhtml>
               </documentation>
             </variable>
+            <variable name="instCfgPersistBridgeCycle">
+              <type>
+                <derived name="FB_CfgPersistBridge_CycleCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌉 Pont persistance Cycle.Cfg (Lot 3b)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCfgPersistBridgeCommun">
+              <type>
+                <derived name="FB_CfgPersistBridge_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌉 Pont persistance Commun.Cfg (Lot 3b)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCfgPersistBridgeBucket">
+              <type>
+                <derived name="FB_CfgPersistBridge_BucketCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌉 Pont persistance M2TreuilBenne.Bucket.Cfg (Lot 3b)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassRestoreDone">
               <type>
                 <BOOL />
@@ -31595,25 +31794,19 @@ IF instCfgPersistBridgeSync.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized THEN
-    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config := _BucketConfig;
-    GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration := T#30s;
-    GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized := TRUE;
+instCfgPersistBridgeBucket(Hmi := GVL_IHM.M2TreuilBenne.Bucket.Cfg, Persist := _BucketCfgPersist);
+IF instCfgPersistBridgeBucket.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Commun.Cfg.Initialized THEN
-    GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M := _LimitLegalDepthMinAllowed_M;
-    GVL_IHM.Commun.Cfg.LimitLegalEnabled           := _LimitLegalEnabled;
-    GVL_IHM.Commun.Cfg.SelHomingApproachEnable     := FALSE; (* défaut inactif *)
-    GVL_IHM.Commun.Cfg.Initialized                 := TRUE;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent    := TRUE;
+instCfgPersistBridgeCommun(Hmi := GVL_IHM.Commun.Cfg, Persist := _CommunCfgPersist);
+IF instCfgPersistBridgeCommun.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Cycle.Cfg.Initialized THEN
-    GVL_IHM.Cycle.Cfg.SetDepth_M  := _CycleSetDepth_M;
-    GVL_IHM.Cycle.Cfg.SetOffset_M := _CycleSetOffset_M;
-    GVL_IHM.Cycle.Cfg.Initialized := TRUE;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
+instCfgPersistBridgeCycle(Hmi := GVL_IHM.Cycle.Cfg, Persist := _CycleCfgPersist);
+IF instCfgPersistBridgeCycle.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
@@ -31699,7 +31892,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
 END_IF;
-_BucketConfig              := GVL_IHM.M2TreuilBenne.Bucket.Cfg.Config;
 
 // 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
 // déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
@@ -31768,16 +31960,6 @@ IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initial
     GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
 
-IF GVL_IHM.Commun.Cfg.Initialized THEN
-    _LimitLegalDepthMinAllowed_M := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
-    _LimitLegalEnabled           := GVL_IHM.Commun.Cfg.LimitLegalEnabled;
-END_IF;
-
-IF GVL_IHM.Cycle.Cfg.Initialized THEN
-    _CycleSetDepth_M  := GVL_IHM.Cycle.Cfg.SetDepth_M;
-    _CycleSetOffset_M := GVL_IHM.Cycle.Cfg.SetOffset_M;
-END_IF;
-
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
 BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
 BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
@@ -31787,9 +31969,9 @@ BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
 BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
-GVL_IHM.Commun.LimitLegalReached         := _LimitLegalEnabled
-                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _LimitLegalDepthMinAllowed_M))
-                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _LimitLegalDepthMinAllowed_M)));
+GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
+                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M))
+                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
@@ -33272,20 +33454,27 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_BucketConfig">
+        <variable name="_BucketCfgPersist">
           <type>
-            <derived name="ST_BucketConfig" />
+            <derived name="ST_BucketCfg" />
           </type>
           <initialValue>
             <structValue>
-              <value member="OffsetOpenM">
-                <simpleValue value="0" />
+              <value member="Config">
+                <structValue>
+                  <value member="OffsetOpenM">
+                    <simpleValue value="0" />
+                  </value>
+                  <value member="OffsetCloseM">
+                    <simpleValue value="10" />
+                  </value>
+                  <value member="CoherenceLimitM">
+                    <simpleValue value="0.05" />
+                  </value>
+                </structValue>
               </value>
-              <value member="OffsetCloseM">
-                <simpleValue value="10" />
-              </value>
-              <value member="CoherenceLimitM">
-                <simpleValue value="0.05" />
+              <value member="CfgTimeoutDuration">
+                <simpleValue value="TIME#30s0ms" />
               </value>
             </structValue>
           </initialValue>
@@ -33504,12 +33693,19 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_CycleSetDepth_M">
+        <variable name="_CycleCfgPersist">
           <type>
-            <REAL />
+            <derived name="ST_CycleCfg" />
           </type>
           <initialValue>
-            <simpleValue value="-12.5" />
+            <structValue>
+              <value member="SetDepth_M">
+                <simpleValue value="-12.5" />
+              </value>
+              <value member="SetOffset_M">
+                <simpleValue value="1.5" />
+              </value>
+            </structValue>
           </initialValue>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -33519,47 +33715,27 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_CycleSetOffset_M">
+        <variable name="_CommunCfgPersist">
           <type>
-            <REAL />
+            <derived name="ST_CommunCfg" />
           </type>
           <initialValue>
-            <simpleValue value="1.5" />
+            <structValue>
+              <value member="LimitLegalDepthMinAllowed_M">
+                <simpleValue value="-15" />
+              </value>
+              <value member="LimitLegalEnabled">
+                <simpleValue value="TRUE" />
+              </value>
+              <value member="SelHomingApproachEnable">
+                <simpleValue value="FALSE" />
+              </value>
+            </structValue>
           </initialValue>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
                 <Attribute Name="order_in_persistent_editor" Value="42" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_LimitLegalDepthMinAllowed_M">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="-15" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="43" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_LimitLegalEnabled">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="TRUE" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="44" />
               </Attributes>
             </data>
           </addData>
@@ -33574,7 +33750,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="45" />
+                <Attribute Name="order_in_persistent_editor" Value="43" />
               </Attributes>
             </data>
           </addData>
@@ -33589,7 +33765,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="46" />
+                <Attribute Name="order_in_persistent_editor" Value="44" />
               </Attributes>
             </data>
           </addData>
@@ -33604,7 +33780,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="47" />
+                <Attribute Name="order_in_persistent_editor" Value="45" />
               </Attributes>
             </data>
           </addData>
@@ -33619,7 +33795,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="48" />
+                <Attribute Name="order_in_persistent_editor" Value="46" />
               </Attributes>
             </data>
           </addData>
@@ -34628,6 +34804,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         <Folder Name="COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
+          <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
+          <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
+          <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
           <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
