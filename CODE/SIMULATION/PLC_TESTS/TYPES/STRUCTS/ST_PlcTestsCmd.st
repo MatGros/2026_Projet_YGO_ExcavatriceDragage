@@ -11,6 +11,7 @@ STRUCT
     RunEncoder    : BOOL;   // Lance la suite Codeurs/Homing
     RunModes      : BOOL;   // Lance la suite Modes/Homme-mort
     RunHeartbeat  : BOOL;   // Lance la suite Heartbeat IHM↔PLC
+    RunSupervision: BOOL;   // Lance la suite Supervision/Persistance config
     RunFramework  : BOOL;   // Lance l'autotest indépendant du framework
     RunAll        : BOOL;   // Lance Safety→Translation→Bucket→Encoder→Modes→Heartbeat
     RunSuite      : INT;    // Compatibilité : >0 lance une suite manuelle

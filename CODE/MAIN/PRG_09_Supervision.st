@@ -188,6 +188,14 @@ IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+// 🎯 Translation M3 : persistance ciblée du seul réglage SetFreq_Hz.
+// Aucun pont struct complet : BtnFwd/BtnRev restent impérativement non persistants.
+IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
+    GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := _TranslationSetFreq_Hz;
+    GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
 // 🐛 FIX 2026-07-23 : `ConfigRestoredFromPersistent` ne doit JAMAIS disparaître tout seul —
 // même doctrine que les défauts métier (cause disparue + appui reset conscient pour effacer).
@@ -261,6 +269,12 @@ BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
 BypassSyncGlobal            := GVL_IHM.M1M2Sync.Bypass.Global;
 BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
 BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
+
+// 🎯 Sauvegarde ciblée Translation M3 : uniquement SetFreq_Hz, jamais les commandes IHM.
+IF GVL_IHM.TranslationM3.Cmd.Initialized THEN
+    _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
+END_IF;
+
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled

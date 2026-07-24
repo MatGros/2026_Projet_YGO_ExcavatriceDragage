@@ -3038,6 +3038,14 @@ Lance la suite Safety</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Heartbeat IHM↔PLC</xhtml>
               </documentation>
             </variable>
+            <variable name="RunSupervision">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Supervision/Persistance config</xhtml>
+              </documentation>
+            </variable>
             <variable name="RunFramework">
               <type>
                 <BOOL />
@@ -4740,6 +4748,17 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
             </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4752,6 +4771,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🎮 ST_TranslationCmd — Commandes IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
+   📄 2026-07-24 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
+      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -15702,6 +15723,11 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <derived name="FB_HeartbeatValidation" />
               </type>
             </variable>
+            <variable name="instSupervisionValidation">
+              <type>
+                <derived name="FB_SupervisionValidation" />
+              </type>
+            </variable>
             <variable name="RunAllTrig">
               <type>
                 <derived name="R_TRIG" />
@@ -15816,6 +15842,21 @@ voir AF_Partie-14 §7.3.4)</xhtml>
                 <INT />
               </type>
             </variable>
+            <variable name="StartSupervision">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AbortSupervision">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedCaseSupervision">
+              <type>
+                <INT />
+              </type>
+            </variable>
             <variable name="StartFramework">
               <type>
                 <BOOL />
@@ -15879,6 +15920,11 @@ TRUE = run déclenché par RunAll, enchaîne Safety PUIS Translation PUIS Bucket
               </type>
             </variable>
             <variable name="LastLoggedHeartbeatRun">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="LastLoggedSupervisionRun">
               <type>
                 <UDINT />
               </type>
@@ -15981,6 +16027,8 @@ CASE GVL_PLC_Tests.Status.RunState OF
         AbortModes := FALSE;
         StartHeartbeat := FALSE;
         AbortHeartbeat := FALSE;
+        StartSupervision := FALSE;
+        AbortSupervision := FALSE;
         StartFramework := FALSE;
         SuiteElapsed := T#0s;
         SuiteWatchdogExpired := FALSE;
@@ -15995,6 +16043,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
             RequestedCaseEncoder := 0;
             RequestedCaseModes := 0;
             RequestedCaseHeartbeat := 0;
+            RequestedCaseSupervision := 0;
             FinalAborted := FALSE;
             FinalAnyFailed := FALSE;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
@@ -16021,6 +16070,9 @@ CASE GVL_PLC_Tests.Status.RunState OF
         ELSIF GVL_PLC_Tests.Cmd.RunHeartbeat THEN
             GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteHeartbeat;
             GVL_PLC_Tests.Cmd.RunHeartbeat := FALSE;
+        ELSIF GVL_PLC_Tests.Cmd.RunSupervision THEN
+            GVL_PLC_Tests.Cmd.RunSuite := GVL_PLC_Tests_Const.SuiteSupervision;
+            GVL_PLC_Tests.Cmd.RunSupervision := FALSE;
         ELSIF GVL_PLC_Tests.Cmd.RunFramework THEN
             StartFramework := TRUE;
             GVL_PLC_Tests.Cmd.RunFramework := FALSE;
@@ -16108,6 +16160,17 @@ CASE GVL_PLC_Tests.Status.RunState OF
             END_IF;
             GVL_PLC_Tests.Cmd.RunSuite := 0;
             GVL_PLC_Tests.Cmd.RunCase := 0;
+
+        // Démarrage suite Supervision/Persistance config : autonome, sans simulation matérielle.
+        ELSIF GVL_PLC_Tests.Cmd.RunSuite = GVL_PLC_Tests_Const.SuiteSupervision THEN
+            ChainMode := FALSE;
+            CurrentSuiteIdx := GVL_PLC_Tests_Const.SuiteSupervision;
+            StartSupervision := TRUE;
+            RequestedCaseSupervision := GVL_PLC_Tests.Cmd.RunCase;
+            GVL_PLC_Tests.Status.FailureSummary := '';
+            GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_RUNNING;
+            GVL_PLC_Tests.Cmd.RunSuite := 0;
+            GVL_PLC_Tests.Cmd.RunCase := 0;
         END_IF;
 
         // 🧪 Smoke test géré directement ici : aucune instance/table/runtime.
@@ -16151,6 +16214,7 @@ CASE GVL_PLC_Tests.Status.RunState OF
         StartEncoder := FALSE;
         StartModes := FALSE;
         StartHeartbeat := FALSE;
+        StartSupervision := FALSE;
         StartFramework := FALSE;
 
         // 🧪 Smoke framework natif : 3 scans, sans appeler aucun moteur de test.
@@ -16182,19 +16246,22 @@ CASE GVL_PLC_Tests.Status.RunState OF
                 AbortModes := TRUE;
             ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
                 AbortHeartbeat := TRUE;
+            ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSupervision THEN
+                AbortSupervision := TRUE;
             ELSE
                 AbortBucket := TRUE;
             END_IF;
         END_IF;
 
         // Abandon propre ou perte du mode Simulation — coupe la suite active
-        IF AbortTrig.Q OR NOT GVL_Simulation.SimulationModeActive THEN
+        IF AbortTrig.Q OR ((NOT GVL_Simulation.SimulationModeActive) AND (CurrentSuiteIdx &lt;&gt; GVL_PLC_Tests_Const.SuiteSupervision)) THEN
             AbortSafety := TRUE;
             AbortTranslation := TRUE;
             AbortBucket := TRUE;
             AbortEncoder := TRUE;
             AbortModes := TRUE;
             AbortHeartbeat := TRUE;
+            AbortSupervision := TRUE;
         END_IF;
 
         // Surveillance de la fin d'exécution — Safety d'abord
@@ -16469,6 +16536,35 @@ CASE GVL_PLC_Tests.Status.RunState OF
                     GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
                 END_IF;
             END_IF;
+        ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSupervision AND instSupervisionValidation.Done THEN
+            AbortSupervision := FALSE;
+            IF instSupervisionValidation.TerminalState &lt;&gt; E_TestTerminalState.TEST_TERMINAL_DONE AND instSupervisionValidation.Report.RunCounter &lt;&gt; LastLoggedSupervisionRun THEN
+                LastLoggedSupervisionRun := instSupervisionValidation.Report.RunCounter;
+                GVL_PLC_Tests.EventSequence := GVL_PLC_Tests.EventSequence + 1;
+                IF GVL_PLC_Tests.EventCount &lt; GVL_PLC_Tests_Const.MaxTestEvents THEN
+                    GVL_PLC_Tests.EventCount := GVL_PLC_Tests.EventCount + 1;
+                ELSE
+                    GVL_PLC_Tests.EventOverflow := TRUE;
+                END_IF;
+                EventIdx := UDINT_TO_INT(GVL_PLC_Tests.EventSequence MOD INT_TO_UDINT(GVL_PLC_Tests_Const.MaxTestEvents)) + 1;
+                GVL_PLC_Tests.EventLog[EventIdx].Sequence := GVL_PLC_Tests.EventSequence;
+                GVL_PLC_Tests.EventLog[EventIdx].Severity := E_TestEventSeverity.TEST_EVENT_ERROR;
+                GVL_PLC_Tests.EventLog[EventIdx].SuiteId := GVL_PLC_Tests_Const.SuiteSupervision;
+                GVL_PLC_Tests.EventLog[EventIdx].CaseId := instSupervisionValidation.Report.CurrentCaseId;
+                GVL_PLC_Tests.EventLog[EventIdx].StepId := instSupervisionValidation.Report.CurrentStepId;
+                GVL_PLC_Tests.EventLog[EventIdx].Code := instSupervisionValidation.ErrorCode;
+                GVL_PLC_Tests.EventLog[EventIdx].Message := instSupervisionValidation.ErrorMessage;
+            END_IF;
+            FinalAborted := instSupervisionValidation.Report.Aborted;
+            FinalAnyFailed := instSupervisionValidation.AnyFailed;
+            GVL_PLC_Tests.Status.FailureSummary := instSupervisionValidation.Report.FailureSummary;
+            IF FinalAborted THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_ABORTED;
+            ELSIF FinalAnyFailed THEN
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_FAILED;
+            ELSE
+                GVL_PLC_Tests.Status.RunState := E_TestRunState.TESTRUN_PASSED;
+            END_IF;
         END_IF;
 
 END_CASE;
@@ -16480,6 +16576,7 @@ instBucketValidation(Start := StartBucket, Abort := AbortBucket, CaseId := Reque
 instEncoderValidation(Start := StartEncoder, Abort := AbortEncoder, CaseId := RequestedCaseEncoder);
 instModesValidation(Start := StartModes, Abort := AbortModes, CaseId := RequestedCaseModes);
 instHeartbeatValidation(Start := StartHeartbeat, Abort := AbortHeartbeat, CaseId := RequestedCaseHeartbeat);
+instSupervisionValidation(Start := StartSupervision, Abort := AbortSupervision, CaseId := RequestedCaseSupervision);
 
 // 4. Centralisation et recopie vers GVL_PLC_Tests
 GVL_PLC_Tests.Status.SimulationActive := GVL_Simulation.SimulationModeActive;
@@ -16491,6 +16588,7 @@ GVL_PLC_Tests.SuiteBucketValidation := instBucketValidation.Report;
 GVL_PLC_Tests.SuiteEncoderValidation := instEncoderValidation.Report;
 GVL_PLC_Tests.SuiteModesValidation := instModesValidation.Report;
 GVL_PLC_Tests.SuiteHeartbeatValidation := instHeartbeatValidation.Report;
+GVL_PLC_Tests.SuiteSupervisionValidation := instSupervisionValidation.Report;
 
 // 5. Mise à jour des indicateurs de progression IHM
 IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
@@ -16537,6 +16635,14 @@ IF GVL_PLC_Tests.Status.RunState = E_TestRunState.TESTRUN_RUNNING THEN
         GVL_PLC_Tests.Status.TerminalState := instHeartbeatValidation.TerminalState;
         GVL_PLC_Tests.Status.ErrorCode := instHeartbeatValidation.ErrorCode;
         GVL_PLC_Tests.Status.ErrorMessage := instHeartbeatValidation.ErrorMessage;
+    ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSupervision THEN
+        GVL_PLC_Tests.Status.ActiveSuiteName := instSupervisionValidation.Report.Name;
+        GVL_PLC_Tests.Status.ActiveCaseId := instSupervisionValidation.Report.CurrentCaseId;
+        GVL_PLC_Tests.Status.ActiveStepId := instSupervisionValidation.Report.CurrentStepId;
+        GVL_PLC_Tests.Status.StepElapsed := instSupervisionValidation.StepElapsed;
+        GVL_PLC_Tests.Status.TerminalState := instSupervisionValidation.TerminalState;
+        GVL_PLC_Tests.Status.ErrorCode := instSupervisionValidation.ErrorCode;
+        GVL_PLC_Tests.Status.ErrorMessage := instSupervisionValidation.ErrorMessage;
     ELSIF CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteModes THEN
         GVL_PLC_Tests.Status.ActiveSuiteName := instModesValidation.Report.Name;
         GVL_PLC_Tests.Status.ActiveCaseId := instModesValidation.Report.CurrentCaseId;
@@ -16642,6 +16748,19 @@ IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteHeartbeat THEN
         IF instHeartbeatValidation.Report.Cases[Idx].Executed THEN
             TotalCount := TotalCount + 1;
             IF instHeartbeatValidation.Report.Cases[Idx].Ok THEN
+                PassedCount := PassedCount + 1;
+            ELSE
+                FailedCount := FailedCount + 1;
+            END_IF;
+        END_IF;
+    END_FOR;
+END_IF;
+
+IF ChainMode OR CurrentSuiteIdx = GVL_PLC_Tests_Const.SuiteSupervision THEN
+    FOR Idx := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        IF instSupervisionValidation.Report.Cases[Idx].Executed THEN
+            TotalCount := TotalCount + 1;
+            IF instSupervisionValidation.Report.Cases[Idx].Ok THEN
                 PassedCount := PassedCount + 1;
             ELSE
                 FailedCount := FailedCount + 1;
@@ -21435,6 +21554,538 @@ END_CASE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>12afad9c-c87d-50d6-b33c-dd7c6f83a8e4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_SupervisionValidation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Start">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Abort">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CaseId">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=tous ; 1..5=cas ciblé</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AnyFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="Report">
+              <type>
+                <derived name="ST_TestSuiteReport" />
+              </type>
+            </variable>
+            <variable name="TerminalState">
+              <type>
+                <derived name="E_TestTerminalState" />
+              </type>
+            </variable>
+            <variable name="ConfigError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ConfigErrorStepId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorCode">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="ErrorMessage">
+              <type>
+                <string length="160" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="StartPrev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CurrentCaseId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="RequestedCaseId">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="StepStarted">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="StepLimit">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="StepFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StepPassed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="BackupSyncTolerance">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sauvegardes obligatoires (voir §0/§1) — restaurées dans les 3 chemins de sortie.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BackupSyncInitialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BackupTranslationFreq">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="BackupTranslationInitialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">============================================================================
+   🧪 FB_SupervisionValidation — Suite PLC Persistance Config (chantier ConfigPersistence)
+   ============================================================================
+   🎯 Rôle : valide le mécanisme générique FB_CfgPersistBridge_&lt;Type&gt; (restauration
+      PERSISTENT-&gt;IHM au boot, sauvegarde continue IHM-&gt;PERSISTENT, alarme
+      ConfigRestoredFromPersistent) en profondeur sur M1M2Sync (le plus simple), puis
+      un balayage de couverture léger (lecture seule, sans risque) des 5 autres domaines
+      à pont générique, puis un test dédié pour Translation (pattern manuel, pas de pont).
+   📄 Couvre (TASK_CONTEXT_CONFIG-PERSIST-01.yaml, T65) :
+      TC-CP1 : Restauration PERSISTENT-&gt;IHM quand Initialized=FALSE (M1M2Sync)
+      TC-CP2 : Alarme ConfigRestoredFromPersistent ne s'éteint QUE sur front BtnAckConfigRestored
+      TC-CP3 : Sauvegarde continue IHM-&gt;PERSISTENT stable après restauration (pas de corruption)
+      TC-CP4 : Balayage de couverture (lecture seule) — Cycle/Commun/Bucket/WinchM1/WinchM2
+               ont chacun Cfg.Initialized=TRUE en fonctionnement normal
+      TC-CP5 : Translation.Cmd.SetFreq_Hz (pattern manuel, pas de pont générique) — même
+               restauration/alarme que TC-CP1, Lot 4 requis
+   ⚠️ TC-CP1/CP2/CP3/CP5 forcent des variables GVL_PERSISTENT réelles (Sync, Translation) —
+      sauvegardées au démarrage du test, restaurées dans les 3 chemins de sortie (fin normale,
+      Abort, watchdog). Ne JAMAIS retirer cette sauvegarde/restauration.
+   🧩 Même moteur allégé (CASE direct) que FB_ModesValidation — pas de StepTable/CheckTable.
+   ============================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+IF Abort THEN
+    // 🛡️ Restauration obligatoire AVANT de sortir (voir §0).
+    _SyncCfgPersist.CfgSyncTolerance_M := BackupSyncTolerance;
+    GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M := BackupSyncTolerance;
+    GVL_IHM.M1M2Sync.Cfg.Initialized := BackupSyncInitialized;
+    _TranslationSetFreq_Hz := BackupTranslationFreq;
+    GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := BackupTranslationFreq;
+    GVL_IHM.TranslationM3.Cmd.Initialized := BackupTranslationInitialized;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
+    GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
+    Busy := FALSE;
+    Done := TRUE;
+    AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_ABORTED;
+    Report.Aborted := TRUE;
+    Report.AnyFailed := TRUE;
+    Report.TerminalState := TerminalState;
+    Report.FailureSummary := 'Supervision/Persistance : ABORTED';
+    RETURN;
+END_IF;
+
+IF Start AND NOT StartPrev AND NOT Busy THEN
+    StartPrev := TRUE;
+    Busy := TRUE;
+    Done := FALSE;
+    AnyFailed := FALSE;
+    ConfigError := FALSE;
+    ErrorCode := 0;
+    ErrorMessage := '';
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_NONE;
+    IF CaseId &lt; 0 OR CaseId &gt; 5 THEN
+        Busy := FALSE;
+        Done := TRUE;
+        AnyFailed := TRUE;
+        ConfigError := TRUE;
+        ErrorCode := 6001;
+        ErrorMessage := 'Supervision CaseId invalide';
+        TerminalState := E_TestTerminalState.TEST_TERMINAL_CONFIG_ERROR;
+        Report.TerminalState := TerminalState;
+        Report.AnyFailed := TRUE;
+        Report.ErrorCode := ErrorCode;
+        Report.ErrorMessage := ErrorMessage;
+        RETURN;
+    END_IF;
+    RequestedCaseId := CaseId;
+
+    // 🛡️ Sauvegarde obligatoire AVANT toute modification (voir §0) — toujours faite, quel que
+    // soit le cas demandé, pour rester sûr quel que soit le chemin de sortie emprunté.
+    BackupSyncTolerance          := _SyncCfgPersist.CfgSyncTolerance_M;
+    BackupSyncInitialized        := GVL_IHM.M1M2Sync.Cfg.Initialized;
+    BackupTranslationFreq        := _TranslationSetFreq_Hz;
+    BackupTranslationInitialized := GVL_IHM.TranslationM3.Cmd.Initialized;
+
+    CASE RequestedCaseId OF
+        1: Step := 10;
+        2: Step := 20;
+        3: Step := 30;
+        4: Step := 40;
+        5: Step := 50;
+    ELSE
+        Step := 10; // run all, démarre à TC-CP1
+    END_CASE;
+    Report.Name := 'Supervision / Persistance Config Validation';
+    Report.InProgress := TRUE;
+    Report.AllPassed := FALSE;
+    Report.AnyFailed := FALSE;
+    Report.Aborted := FALSE;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := 0;
+    Report.ErrorMessage := '';
+    Report.FailureSummary := '';
+    Report.CurrentStepId := Step;
+    Report.Duration := T#0s;
+    Report.RunCounter := Report.RunCounter + 1;
+    FOR Index := 1 TO GVL_PLC_Tests_Const.MaxSteps DO
+        Report.Steps[Index].Executed := FALSE;
+        Report.Steps[Index].Passed := FALSE;
+        Report.Steps[Index].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Steps[Index].Duration := T#0s;
+    END_FOR;
+    FOR Index := 1 TO GVL_PLC_Tests_Const.MaxTestCases DO
+        Report.Cases[Index].Executed := FALSE;
+        Report.Cases[Index].Ok := FALSE;
+        Report.Cases[Index].FailedStepId := 0;
+        Report.Cases[Index].FailReason := E_TestFailReason.FAIL_NONE;
+        Report.Cases[Index].Duration := T#0s;
+    END_FOR;
+    StepStarted := FALSE;
+ELSIF NOT Start THEN
+    StartPrev := FALSE;
+END_IF;
+
+IF NOT Busy THEN
+    RETURN;
+END_IF;
+
+StepElapsed := StepElapsed + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+Report.Duration := Report.Duration + UDINT_TO_TIME(INT_TO_UDINT(GVL_PLC_Tests_Const.TaskCycleMs));
+Report.CurrentStepId := Step;
+CurrentCaseId := (Step / 10);
+Report.CurrentCaseId := CurrentCaseId;
+
+IF NOT StepStarted THEN
+    StepStarted := TRUE;
+    StepElapsed := T#0s;
+    CASE Step OF
+        10: StepLimit := T#200MS;
+        11: StepLimit := T#500MS;
+        20: StepLimit := T#200MS;
+        21: StepLimit := T#500MS;
+        22: StepLimit := T#500MS;
+        23: StepLimit := T#500MS;
+        30: StepLimit := T#200MS;
+        31: StepLimit := T#500MS;
+        40, 41, 42, 43, 44: StepLimit := T#2S; // généreux : la vraie machine a pu booter juste avant ce test
+        50: StepLimit := T#200MS;
+        51: StepLimit := T#500MS;
+        52: StepLimit := T#1S;
+    ELSE
+        ConfigError := TRUE;
+        ConfigErrorStepId := Step;
+        ErrorCode := 6002;
+        ErrorMessage := 'Supervision étape inconnue';
+        StepLimit := T#0s;
+    END_CASE;
+END_IF;
+
+StepTimer(IN := TRUE, PT := StepLimit);
+
+CASE Step OF
+    // ─────────── TC-CP1 : Restauration PERSISTENT-&gt;IHM (M1M2Sync) ───────────
+    10:
+        // Arrange : valeur PERSISTENT sentinelle distincte du défaut réel (0.25), IHM au défaut
+        // struct (0.0) + Initialized:=FALSE -&gt; déclenche la restauration au prochain passage du
+        // pont réel (PRG_09_Supervision.instCfgPersistBridgeSync, tourne chaque scan MainTask).
+        _SyncCfgPersist.CfgSyncTolerance_M := 0.42;
+        GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M := 0.0;
+        GVL_IHM.M1M2Sync.Cfg.Initialized := FALSE;
+        StepPassed := TRUE;
+        Step := 11;
+        StepStarted := FALSE;
+
+    11:
+        // Assert : Hmi restauré depuis Persist, Initialized repassé TRUE.
+        IF (GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M = 0.42) AND GVL_IHM.M1M2Sync.Cfg.Initialized THEN
+            StepPassed := TRUE;
+            IF RequestedCaseId = 1 THEN Step := 0; ELSE Step := 20; END_IF;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-CP2 : Alarme ConfigRestoredFromPersistent, doctrine reset=front ───────────
+    20:
+        // Arrange autonome : TC-CP2 doit aussi être exécutable seul (CaseId=2),
+        // sans dépendre de la sentinelle créée par TC-CP1.
+        _SyncCfgPersist.CfgSyncTolerance_M := 0.42;
+        GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M := 0.0;
+        GVL_IHM.M1M2Sync.Cfg.Initialized := FALSE; // déclenche restauration + alarme
+        StepPassed := TRUE;
+        Step := 21;
+        StepStarted := FALSE;
+
+    21:
+        IF GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
+            StepPassed := TRUE;
+            Step := 22;
+            StepStarted := FALSE;
+        END_IF;
+
+    22:
+        // L'alarme ne doit JAMAIS s'éteindre seule (doctrine reset=front, REX 2026-07-23).
+        IF StepElapsed &gt;= T#200MS THEN
+            IF GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
+                StepPassed := TRUE;
+                Step := 23;
+                StepStarted := FALSE;
+            ELSE
+                StepFailed := TRUE; // régression doctrine reset=front
+            END_IF;
+        END_IF;
+
+    23:
+        // Acquittement par front opérateur.
+        GVL_IHM.Commun.BtnAckConfigRestored := TRUE;
+        IF NOT GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
+            GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
+            StepPassed := TRUE;
+            IF RequestedCaseId = 2 THEN Step := 0; ELSE Step := 30; END_IF;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-CP3 : Sauvegarde continue stable (pas de corruption) ───────────
+    30:
+        // Arrange autonome : TC-CP3 doit aussi être exécutable seul (CaseId=3).
+        _SyncCfgPersist.CfgSyncTolerance_M := 0.42;
+        GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M := 0.0;
+        GVL_IHM.M1M2Sync.Cfg.Initialized := FALSE;
+        StepPassed := TRUE;
+        Step := 31;
+        StepStarted := FALSE;
+
+    31:
+        IF StepElapsed &gt;= T#200MS THEN
+            IF (_SyncCfgPersist.CfgSyncTolerance_M = 0.42)
+               AND (GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M = 0.42)
+               AND GVL_IHM.M1M2Sync.Cfg.Initialized THEN
+                StepPassed := TRUE;
+                IF RequestedCaseId = 3 THEN Step := 0; ELSE Step := 40; END_IF;
+                StepStarted := FALSE;
+            ELSE
+                StepFailed := TRUE; // Persist ou Hmi a dérivé -&gt; corruption
+            END_IF;
+        END_IF;
+
+    // ─────────── TC-CP4 : Balayage de couverture (lecture seule, sans risque) ───────────
+    40:
+        IF GVL_IHM.Cycle.Cfg.Initialized THEN
+            StepPassed := TRUE; Step := 41; StepStarted := FALSE;
+        END_IF;
+
+    41:
+        IF GVL_IHM.Commun.Cfg.Initialized THEN
+            StepPassed := TRUE; Step := 42; StepStarted := FALSE;
+        END_IF;
+
+    42:
+        IF GVL_IHM.M2TreuilBenne.Bucket.Cfg.Initialized THEN
+            StepPassed := TRUE; Step := 43; StepStarted := FALSE;
+        END_IF;
+
+    43:
+        IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
+            StepPassed := TRUE; Step := 44; StepStarted := FALSE;
+        END_IF;
+
+    44:
+        IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
+            StepPassed := TRUE;
+            IF RequestedCaseId = 4 THEN Step := 0; ELSE Step := 50; END_IF;
+            StepStarted := FALSE;
+        END_IF;
+
+    // ─────────── TC-CP5 : Translation SetFreq_Hz (pattern manuel, Lot 4 requis) ───────────
+    50:
+        _TranslationSetFreq_Hz := 12.5; // valeur sentinelle distincte du défaut réel (0.0)
+        GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := 0.0;
+        GVL_IHM.TranslationM3.Cmd.Initialized := FALSE;
+        StepPassed := TRUE;
+        Step := 51;
+        StepStarted := FALSE;
+
+    51:
+        IF (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz = 12.5) AND GVL_IHM.TranslationM3.Cmd.Initialized THEN
+            StepPassed := TRUE;
+            Step := 52;
+            StepStarted := FALSE;
+        END_IF;
+
+    52:
+        IF GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
+            GVL_IHM.Commun.BtnAckConfigRestored := TRUE;
+            IF NOT GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
+                GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
+                StepPassed := TRUE;
+                Step := 0;
+                StepStarted := FALSE;
+            END_IF;
+        END_IF;
+END_CASE;
+
+// Verdict local de l'étape : PASS, FAIL ou TIMEOUT contrôlé.
+IF StepPassed OR StepFailed OR StepTimer.Q THEN
+    IF StepPassed THEN
+        Report.Steps[Report.CurrentStepId].Passed := TRUE;
+        Report.Steps[Report.CurrentStepId].FailReason := E_TestFailReason.FAIL_NONE;
+    ELSE
+        Report.Steps[Report.CurrentStepId].Passed := FALSE;
+        Report.Steps[Report.CurrentStepId].FailReason := SEL(StepFailed, E_TestFailReason.FAIL_TIMEOUT, E_TestFailReason.FAIL_CHECK);
+        AnyFailed := TRUE;
+    END_IF;
+    Report.Steps[Report.CurrentStepId].Executed := TRUE;
+    Report.Steps[Report.CurrentStepId].Duration := StepElapsed;
+    IF NOT StepPassed THEN
+        Step := 0; // Échec ou timeout = fin immédiate.
+    END_IF;
+    StepPassed := FALSE;
+    StepFailed := FALSE;
+    StepTimer(IN := FALSE, PT := StepLimit);
+    StepElapsed := T#0s;
+    IF Step = 0 THEN
+        // 🛡️ Restauration obligatoire AVANT de sortir (voir §0) — fin normale ou échec/timeout.
+        _SyncCfgPersist.CfgSyncTolerance_M := BackupSyncTolerance;
+        GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M := BackupSyncTolerance;
+        GVL_IHM.M1M2Sync.Cfg.Initialized := BackupSyncInitialized;
+        _TranslationSetFreq_Hz := BackupTranslationFreq;
+        GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := BackupTranslationFreq;
+        GVL_IHM.TranslationM3.Cmd.Initialized := BackupTranslationInitialized;
+        GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
+        GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
+        Busy := FALSE;
+        Done := TRUE;
+        Report.InProgress := FALSE;
+        Report.AnyFailed := AnyFailed;
+        Report.AllPassed := NOT AnyFailed;
+        Report.TerminalState := SEL(AnyFailed, E_TestTerminalState.TEST_TERMINAL_DONE, E_TestTerminalState.TEST_TERMINAL_FAILED);
+        TerminalState := Report.TerminalState;
+        Report.Cases[1].Name := 'TC-CP1..CP5 Persistance Config';
+        Report.Cases[1].Executed := TRUE;
+        Report.Cases[1].Ok := NOT AnyFailed;
+        Report.Cases[1].FailedStepId := 0;
+        Report.Cases[1].FailReason := E_TestFailReason.FAIL_NONE;
+        IF AnyFailed THEN
+            Report.Cases[1].FailedStepId := Report.CurrentStepId;
+            Report.Cases[1].FailReason := E_TestFailReason.FAIL_CHECK;
+            Report.FailureSummary := CONCAT('Supervision/Persistance : échec étape ', INT_TO_STRING(Report.CurrentStepId));
+        END_IF;
+        Report.Cases[1].Duration := Report.Duration;
+    ELSE
+        StepStarted := FALSE;
+    END_IF;
+END_IF;
+
+// Limite globale de sécurité de la suite : 90 s maximum.
+IF Report.Duration &gt;= T#90s AND Busy THEN
+    // 🛡️ Restauration obligatoire AVANT de sortir (voir §0) — watchdog.
+    _SyncCfgPersist.CfgSyncTolerance_M := BackupSyncTolerance;
+    GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M := BackupSyncTolerance;
+    GVL_IHM.M1M2Sync.Cfg.Initialized := BackupSyncInitialized;
+    _TranslationSetFreq_Hz := BackupTranslationFreq;
+    GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := BackupTranslationFreq;
+    GVL_IHM.TranslationM3.Cmd.Initialized := BackupTranslationInitialized;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
+    GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
+    Busy := FALSE;
+    Done := TRUE;
+    AnyFailed := TRUE;
+    TerminalState := E_TestTerminalState.TEST_TERMINAL_WATCHDOG_TIMEOUT;
+    Report.InProgress := FALSE;
+    Report.AnyFailed := TRUE;
+    Report.AllPassed := FALSE;
+    Report.TerminalState := TerminalState;
+    Report.ErrorCode := 6003;
+    Report.ErrorMessage := 'Watchdog Supervision/Persistance expiré';
+    Report.FailureSummary := Report.ErrorMessage;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ccdf4c8-a7f8-5a2b-98ca-5e00b38f9951</ObjectId>
           </data>
         </addData>
       </pou>
@@ -31870,6 +32521,14 @@ IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+// 🎯 Translation M3 : persistance ciblée du seul réglage SetFreq_Hz.
+// Aucun pont struct complet : BtnFwd/BtnRev restent impérativement non persistants.
+IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
+    GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := _TranslationSetFreq_Hz;
+    GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
 // ── 2bis. ACQUITTEMENT RESTAURATION CONFIG (front, doctrine reset=front) ───
 // 🐛 FIX 2026-07-23 : `ConfigRestoredFromPersistent` ne doit JAMAIS disparaître tout seul —
 // même doctrine que les défauts métier (cause disparue + appui reset conscient pour effacer).
@@ -31943,6 +32602,12 @@ BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
 BypassSyncGlobal            := GVL_IHM.M1M2Sync.Bypass.Global;
 BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
 BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
+
+// 🎯 Sauvegarde ciblée Translation M3 : uniquement SetFreq_Hz, jamais les commandes IHM.
+IF GVL_IHM.TranslationM3.Cmd.Initialized THEN
+    _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
+END_IF;
+
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
@@ -33353,12 +34018,12 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_JoystickNeutralX">
+        <variable name="_TranslationSetFreq_Hz">
           <type>
-            <INT />
+            <REAL />
           </type>
           <initialValue>
-            <simpleValue value="5000" />
+            <simpleValue value="0" />
           </initialValue>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -33368,7 +34033,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_JoystickNeutralY">
+        <variable name="_JoystickNeutralX">
           <type>
             <INT />
           </type>
@@ -33383,6 +34048,21 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
+        <variable name="_JoystickNeutralY">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5000" />
+          </initialValue>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+              <Attributes>
+                <Attribute Name="order_in_persistent_editor" Value="19" />
+              </Attributes>
+            </data>
+          </addData>
+        </variable>
         <variable name="_JoystickDeadband_Pct">
           <type>
             <REAL />
@@ -33393,7 +34073,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="19" />
+                <Attribute Name="order_in_persistent_editor" Value="20" />
               </Attributes>
             </data>
           </addData>
@@ -33408,7 +34088,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="20" />
+                <Attribute Name="order_in_persistent_editor" Value="21" />
               </Attributes>
             </data>
           </addData>
@@ -33423,7 +34103,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="21" />
+                <Attribute Name="order_in_persistent_editor" Value="22" />
               </Attributes>
             </data>
           </addData>
@@ -33438,7 +34118,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="22" />
+                <Attribute Name="order_in_persistent_editor" Value="23" />
               </Attributes>
             </data>
           </addData>
@@ -33453,7 +34133,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="23" />
+                <Attribute Name="order_in_persistent_editor" Value="24" />
               </Attributes>
             </data>
           </addData>
@@ -33468,7 +34148,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="24" />
+                <Attribute Name="order_in_persistent_editor" Value="25" />
               </Attributes>
             </data>
           </addData>
@@ -33490,7 +34170,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="25" />
+                <Attribute Name="order_in_persistent_editor" Value="26" />
               </Attributes>
             </data>
           </addData>
@@ -33527,7 +34207,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="26" />
+                <Attribute Name="order_in_persistent_editor" Value="27" />
               </Attributes>
             </data>
           </addData>
@@ -33542,7 +34222,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="27" />
+                <Attribute Name="order_in_persistent_editor" Value="28" />
               </Attributes>
             </data>
           </addData>
@@ -33557,7 +34237,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="28" />
+                <Attribute Name="order_in_persistent_editor" Value="29" />
               </Attributes>
             </data>
           </addData>
@@ -33572,7 +34252,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="29" />
+                <Attribute Name="order_in_persistent_editor" Value="30" />
               </Attributes>
             </data>
           </addData>
@@ -33587,7 +34267,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="30" />
+                <Attribute Name="order_in_persistent_editor" Value="31" />
               </Attributes>
             </data>
           </addData>
@@ -33707,6 +34387,14 @@ Rapport de la suite Safety</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Heartbeat IHM↔PLC</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SuiteSupervisionValidation">
+          <type>
+            <derived name="ST_TestSuiteReport" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport Supervision/Persistance config</xhtml>
           </documentation>
         </variable>
         <variable name="OverrideChainTrue">
@@ -34137,6 +34825,17 @@ TRUE = purge commandes RETAIN dans PRG_00</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Heartbeat IHM↔PLC (Cmd.RunSuite)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SuiteSupervision">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="8" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">index Supervision/Persistance config — 7 = Framework Validation</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -34649,6 +35348,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             </Folder>
             <Folder Name="SUITE_MODES">
               <Object Name="FB_ModesValidation" ObjectId="382b521c-76df-5610-b353-42f0bb0338c2" />
+            </Folder>
+            <Folder Name="SUITE_SUPERVISION">
+              <Object Name="FB_SupervisionValidation" ObjectId="9ccdf4c8-a7f8-5a2b-98ca-5e00b38f9951" />
             </Folder>
             <Folder Name="BRICKS">
               <Object Name="FB_TestCheck" ObjectId="96c0e8a5-037a-59f8-8d24-0b688cef585a" />

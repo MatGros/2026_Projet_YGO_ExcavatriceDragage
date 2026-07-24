@@ -25,6 +25,7 @@ VAR_GLOBAL
     SuiteEncoderValidation     : ST_TestSuiteReport;  // Rapport de la suite Codeurs/Homing nominal
     SuiteModesValidation       : ST_TestSuiteReport;  // Rapport de la suite Modes/Homme-mort (post-IHM_MANU)
     SuiteHeartbeatValidation   : ST_TestSuiteReport;  // Rapport de la suite Heartbeat IHM↔PLC
+    SuiteSupervisionValidation : ST_TestSuiteReport;  // Rapport Supervision/Persistance config
 
     // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — chaîne Safety AU
     OverrideChainTrue          : BOOL;                // Force la boucle AU à TRUE
