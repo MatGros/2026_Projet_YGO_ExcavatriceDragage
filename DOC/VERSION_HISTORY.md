@@ -4,6 +4,20 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.4.27_Audit_Persistance_Bypass_Frein` — 2026-07-24
+- Audit exhaustif de rémanence `PERSISTENT` / `RETAIN` + Bridge Pattern `PRG_09_Supervision`
+- Diagnostic complet de l'incident d'échauffement frein (`FB_Brake` ↔ `FB_Winch`)
+- Publication du rapport d'audit et cahier d'essais dans `DOC/AUDITS/RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md`
+
+### `v0.4.26_ConfigPersistence_TranslationSupervisionSuite` — 2026-07-24
+- Translation M3 `SetFreq_Hz` protégé : `_TranslationSetFreq_Hz` + flag `Initialized` dédié (Lot 4)
+- Suite test PLC `FB_SupervisionValidation` (TC-CP1..CP5) : Sync approfondi + balayage Cycle/
+  Commun/Bucket/Winch M1+M2 + Translation (Lot 6)
+- Raccordement orchestrateur `FB_PLC_Tests_Management` (`SuiteSupervision=8`, ciblée hors `RunAll`)
+- Clôture chantier `ConfigPersistence` (Lots 1-6) · contrat `CONFIG-PERSIST-01` → `tests_status:
+  implemented` (exécution CODESYS réelle restant à faire)
+- Commits `a88e56d`/`3faa941` poussés sur `origin/main`
+
 ### `DOC_RESTORATION_AF07_AF11` — 2026-07-23
 - Restauration intégrale post-audit de `AF_Partie-11_Fonction_Translation_v1.11.md` (v1.12, EtherCAT AC600, 5 capteurs, Méca A/B)
 - Consolidation complète de `AF_Partie-07_Interface_IHM_v1.7.md` (v1.9, structures ST_*HMI & GVL_IHM), suppression du doublon v1.8

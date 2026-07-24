@@ -317,14 +317,16 @@ CASE Step OF
         END_IF;
 
     52:
-        IF GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
-            GVL_IHM.Commun.BtnAckConfigRestored := TRUE;
-            IF NOT GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
-                GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
-                StepPassed := TRUE;
-                Step := 0;
-                StepStarted := FALSE;
-            END_IF;
+        // 🐛 Fix 2026-07-24 (échec réel constaté à l'exécution CODESYS) : l'ancien garde-fou externe
+        // "IF ConfigRestoredFromPersistent THEN" pouvait sauter la détection de succès si l'alarme
+        // s'éteignait (front BtnAckConfigRestored traité par PRG_09_Supervision) avant le scan suivant
+        // de ce test -> blocage jusqu'au timeout. Vérification inconditionnelle, alignée sur TC-CP2 (23).
+        GVL_IHM.Commun.BtnAckConfigRestored := TRUE;
+        IF NOT GVL_IHM.Commun.ConfigRestoredFromPersistent THEN
+            GVL_IHM.Commun.BtnAckConfigRestored := FALSE;
+            StepPassed := TRUE;
+            Step := 0;
+            StepStarted := FALSE;
         END_IF;
 END_CASE;
 
