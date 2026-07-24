@@ -6109,6 +6109,14 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <derived name="R_TRIG" />
               </type>
             </variable>
+            <variable name="BypassEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 REX 2026-07-24 : Front montant activation bypass pour réarmement immédiat</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonMagnetise">
               <type>
                 <derived name="TON" />
@@ -6173,6 +6181,7 @@ Ready := TRUE;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
+BypassEdge(CLK := BypassContactorCheck);
 
 // 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
 IF MovementRequested THEN
@@ -6215,6 +6224,9 @@ ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
     ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
+    IF BypassEdge.Q THEN
+        StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
+    END_IF;
 END_IF;
 
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
@@ -24427,6 +24439,14 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="BrakeSafetyOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ REX 2026-07-24 : Interlock anti-échauffement frein</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -24577,6 +24597,13 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       BypassContactorCheck := BypassContactorCheck);
 BrakeCmd := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
+
+// 🛡️ Interlock de sécurité frein : si FB_Brake est en ERREUR, coupure immédiate de la commande variateur AC600
+BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
+IF NOT BrakeSafetyOk THEN
+    DriveControlWord := 0;
+    DriveFreqRefHz := 0.0;
+END_IF;
 
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
@@ -28538,6 +28565,14 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse</xhtml>
               </documentation>
             </variable>
+            <variable name="BrakeSafetyOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ REX 2026-07-24 : Interlock anti-échauffement frein</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
@@ -28731,8 +28766,11 @@ Contactor2 := SpeedStep.Contactor2;
 Contactor3 := SpeedStep.Contactor3;
 Contactor4 := SpeedStep.Contactor4;
 
-RelayFwd := (CommandedDirection = 1) AND (StepNumber &gt; 0);
-RelayRev := (CommandedDirection = -1) AND (StepNumber &gt; 0);
+// 🛑 Interlock de sécurité frein : magnétisation normale autorisée, mais coupure stricte des relais si FB_Brake est en ERREUR
+BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
+
+RelayFwd := (CommandedDirection = 1) AND (StepNumber &gt; 0) AND BrakeSafetyOk;
+RelayRev := (CommandedDirection = -1) AND (StepNumber &gt; 0) AND BrakeSafetyOk;
 
 IF ForbidDescent THEN
     RelayRev := FALSE;
