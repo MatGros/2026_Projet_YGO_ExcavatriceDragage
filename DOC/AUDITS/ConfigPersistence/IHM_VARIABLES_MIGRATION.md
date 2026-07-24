@@ -196,6 +196,24 @@ déjà, inchangé) :
 
 ---
 
+## ✅ Lot 3d-1 — Winch : 4 champs communs M1/M2 déplacés vers Commun.Cfg (vérifié)
+
+⚠️ **Chemin très probablement câblé sur le pupitre IHM réel** (contrairement à la plupart des
+lots précédents) — c'est le domaine du bug originel de ce chantier. Vérifier le pupitre avant
+et après ce lot.
+
+`M1TreuilRetenue.Cfg`/`M2TreuilBenne.Cfg` avaient CHACUN leur propre chemin pour 4 valeurs en
+réalité PARTAGÉES (même valeur forcée des deux côtés) — un seul chemin les remplace tous les deux :
+
+| Ancien chemin (×2, M1 et M2, valeur toujours identique) | Nouveau chemin (prévu) |
+|---|---|
+| `GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente` / `GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente` | `GVL_IHM.Commun.Cfg.WinchMaxStepDescente` |
+| `GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent` / `GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent` | `GVL_IHM.Commun.Cfg.WinchMaxStepAscent` |
+| `GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M` / `GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M` | `GVL_IHM.Commun.Cfg.WinchSlowdownDistance_M` |
+| `GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct` / `GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct` | `GVL_IHM.Commun.Cfg.WinchSlowSpeed_Pct` |
+
+---
+
 ## 🔜 Lots à venir (pas encore de document de tâche)
 
 _(Lot 2 sera complet une fois Cycle vérifié — reste ensuite la persistance généralisée, Lot 3.)_

@@ -1631,6 +1631,50 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchMaxStepDescente">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descente (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchMaxStepAscent">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowdownDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Vitesse de consigne lente dans la zone de ralentissement (%), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -1652,6 +1696,9 @@
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔧 ST_CommunCfg — Configuration des paramètres communs machine
+   📄 2026-07-24 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
+   WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
+   ad-hoc dans PRG_09_Supervision.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -5131,28 +5178,6 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgMaxStepDescente">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descente (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgMaxStepAscent">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5)</xhtml>
-              </documentation>
-            </variable>
             <variable name="CfgRampAccelRate">
               <type>
                 <REAL />
@@ -5208,28 +5233,6 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgSlowdownDistance_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite pour enclencher le ralentissement (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgSlowSpeed_Pct">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="15" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Vitesse de consigne lente dans la zone de ralentissement (%)</xhtml>
-              </documentation>
-            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -5255,6 +5258,9 @@ Alimenté par FB_TranslationReportFinalizer (CORE).
    🔧 ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
+   📄 2026-07-24 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
+   déplacés vers GVL_IHM.Commun.Cfg (WinchMaxStepDescente/etc.) — étaient partagés M1/M2 via
+   réconciliation ad-hoc, une seule instance dans Commun élimine le besoin de réconciliation.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -30833,8 +30839,8 @@ SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (
 
 // 🔧 REX 2026-07-19 : palier max — même valeur Auto ET Manuel depuis la suppression d'IHM_MANU
 // (ex-plafond "essais progressifs" IHM_MANU, explicitement marqué TEMPORAIRE, retiré).
-EffectiveMaxStepAscent   := _WinchMaxStepAscent;
-EffectiveMaxStepDescente := _WinchMaxStepDescent;
+EffectiveMaxStepAscent   := _CommunCfgPersist.WinchMaxStepAscent;
+EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -31187,8 +31193,8 @@ instWinchM1(
     // ForbidAscentM1_Raw ci-dessus, pas le capteur physique (réservé au Homing).
     TopLimitM               := _CableLimitM1Ascent_M,
     BottomLimitM            := BottomLimitM1_Active,
-    CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    CfgSlowdownDistanceM       := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowSpeedPct            := _CommunCfgPersist.WinchSlowSpeed_Pct,
     // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
     BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
@@ -31229,8 +31235,8 @@ instWinchM2(
     // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage benne fermé).
     TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
-    CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    CfgSlowdownDistanceM       := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowSpeedPct            := _CommunCfgPersist.WinchSlowSpeed_Pct,
     // 🌐 Bypass Global M2 (GVL_IHM.M2TreuilBenne.Bypass.Global)
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
@@ -31760,15 +31766,11 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFaile
 IF NOT GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
     GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M  := _HomingTargetM1_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent       := _WinchMaxStepAscent;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate       := _WinchM1RampAccelRate_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate   := _WinchM1RampDecelFast_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M  := _CableLimitM1Descent_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M   := _CableLimitM1Ascent_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M   := _WinchSlowdownDistance_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct        := _WinchSlowSpeed_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
 END_IF;
@@ -31776,15 +31778,11 @@ END_IF;
 IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M  := _HomingTargetM2_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM2_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent       := _WinchMaxStepAscent;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate       := _WinchM2RampAccelRate_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate   := _WinchM2RampDecelFast_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M  := _CableLimitM2Descent_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M   := _CableLimitM2Ascent_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M   := _WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct        := _WinchSlowSpeed_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -31879,9 +31877,6 @@ _HomingTargetM1_M            := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
 _HomingTargetM2_M            := GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M;
 _HomingUnitaryTargetM1_M     := GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M;
 _HomingUnitaryTargetM2_M     := GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M;
-// 🔧 REX 2026-07-08 : CfgMaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
-// ci-dessous (même pattern que CableLimitDescent_M/SlowdownDistance_M/SlowSpeed_Pct), plus de
-// propagation à sens unique séparée par treuil ici.
 IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
     _WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate;
     _WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate;
@@ -31891,26 +31886,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
     _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
-END_IF;
-
-// 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
-// déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
-        _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente &lt;&gt; _WinchMaxStepDescent THEN
-        _WinchMaxStepDescent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
-
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent &lt;&gt; _WinchMaxStepAscent THEN
-        _WinchMaxStepAscent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent &lt;&gt; _WinchMaxStepAscent THEN
-        _WinchMaxStepAscent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent := _WinchMaxStepAscent;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent := _WinchMaxStepAscent;
 END_IF;
 
 IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
@@ -31940,24 +31915,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
         _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M;
     END_IF;
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M := _CableLimitM2Ascent_M;
-END_IF;
-
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
-        _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M &lt;&gt; _WinchSlowdownDistance_M THEN
-        _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
-
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
-        _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct &lt;&gt; _WinchSlowSpeed_Pct THEN
-        _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
 
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
@@ -33142,36 +33099,6 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
-        <variable name="_WinchMaxStepDescent">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="3" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="7" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchMaxStepAscent">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="5" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="8" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
         <variable name="_WinchSpeedConfig">
           <type>
             <derived name="ST_WinchSpeedConfig" />
@@ -33208,7 +33135,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="9" />
+                <Attribute Name="order_in_persistent_editor" Value="7" />
               </Attributes>
             </data>
           </addData>
@@ -33220,7 +33147,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="10" />
+                <Attribute Name="order_in_persistent_editor" Value="8" />
               </Attributes>
             </data>
           </addData>
@@ -33235,7 +33162,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="11" />
+                <Attribute Name="order_in_persistent_editor" Value="9" />
               </Attributes>
             </data>
           </addData>
@@ -33250,7 +33177,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="12" />
+                <Attribute Name="order_in_persistent_editor" Value="10" />
               </Attributes>
             </data>
           </addData>
@@ -33265,7 +33192,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="13" />
+                <Attribute Name="order_in_persistent_editor" Value="11" />
               </Attributes>
             </data>
           </addData>
@@ -33280,7 +33207,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="14" />
+                <Attribute Name="order_in_persistent_editor" Value="12" />
               </Attributes>
             </data>
           </addData>
@@ -33295,7 +33222,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="15" />
+                <Attribute Name="order_in_persistent_editor" Value="13" />
               </Attributes>
             </data>
           </addData>
@@ -33310,7 +33237,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="16" />
+                <Attribute Name="order_in_persistent_editor" Value="14" />
               </Attributes>
             </data>
           </addData>
@@ -33325,7 +33252,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="17" />
+                <Attribute Name="order_in_persistent_editor" Value="15" />
               </Attributes>
             </data>
           </addData>
@@ -33340,7 +33267,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="18" />
+                <Attribute Name="order_in_persistent_editor" Value="16" />
               </Attributes>
             </data>
           </addData>
@@ -33355,7 +33282,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="19" />
+                <Attribute Name="order_in_persistent_editor" Value="17" />
               </Attributes>
             </data>
           </addData>
@@ -33370,37 +33297,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="20" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchSlowdownDistance_M">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="1" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="21" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchSlowSpeed_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="15" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="22" />
+                <Attribute Name="order_in_persistent_editor" Value="18" />
               </Attributes>
             </data>
           </addData>
@@ -33419,7 +33316,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="23" />
+                <Attribute Name="order_in_persistent_editor" Value="19" />
               </Attributes>
             </data>
           </addData>
@@ -33434,7 +33331,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="24" />
+                <Attribute Name="order_in_persistent_editor" Value="20" />
               </Attributes>
             </data>
           </addData>
@@ -33449,7 +33346,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="25" />
+                <Attribute Name="order_in_persistent_editor" Value="21" />
               </Attributes>
             </data>
           </addData>
@@ -33481,7 +33378,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="26" />
+                <Attribute Name="order_in_persistent_editor" Value="22" />
               </Attributes>
             </data>
           </addData>
@@ -33493,7 +33390,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="27" />
+                <Attribute Name="order_in_persistent_editor" Value="23" />
               </Attributes>
             </data>
           </addData>
@@ -33508,7 +33405,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="28" />
+                <Attribute Name="order_in_persistent_editor" Value="24" />
               </Attributes>
             </data>
           </addData>
@@ -33523,7 +33420,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="29" />
+                <Attribute Name="order_in_persistent_editor" Value="25" />
               </Attributes>
             </data>
           </addData>
@@ -33538,7 +33435,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="30" />
+                <Attribute Name="order_in_persistent_editor" Value="26" />
               </Attributes>
             </data>
           </addData>
@@ -33553,7 +33450,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="31" />
+                <Attribute Name="order_in_persistent_editor" Value="27" />
               </Attributes>
             </data>
           </addData>
@@ -33568,7 +33465,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="32" />
+                <Attribute Name="order_in_persistent_editor" Value="28" />
               </Attributes>
             </data>
           </addData>
@@ -33583,7 +33480,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="33" />
+                <Attribute Name="order_in_persistent_editor" Value="29" />
               </Attributes>
             </data>
           </addData>
@@ -33598,7 +33495,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="34" />
+                <Attribute Name="order_in_persistent_editor" Value="30" />
               </Attributes>
             </data>
           </addData>
@@ -33613,7 +33510,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="35" />
+                <Attribute Name="order_in_persistent_editor" Value="31" />
               </Attributes>
             </data>
           </addData>
@@ -33628,7 +33525,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="36" />
+                <Attribute Name="order_in_persistent_editor" Value="32" />
               </Attributes>
             </data>
           </addData>
@@ -33643,7 +33540,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="37" />
+                <Attribute Name="order_in_persistent_editor" Value="33" />
               </Attributes>
             </data>
           </addData>
@@ -33658,7 +33555,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="38" />
+                <Attribute Name="order_in_persistent_editor" Value="34" />
               </Attributes>
             </data>
           </addData>
@@ -33673,7 +33570,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="39" />
+                <Attribute Name="order_in_persistent_editor" Value="35" />
               </Attributes>
             </data>
           </addData>
@@ -33688,7 +33585,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="40" />
+                <Attribute Name="order_in_persistent_editor" Value="36" />
               </Attributes>
             </data>
           </addData>
@@ -33710,7 +33607,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="41" />
+                <Attribute Name="order_in_persistent_editor" Value="37" />
               </Attributes>
             </data>
           </addData>
@@ -33730,12 +33627,24 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
               <value member="SelHomingApproachEnable">
                 <simpleValue value="FALSE" />
               </value>
+              <value member="WinchMaxStepDescente">
+                <simpleValue value="3" />
+              </value>
+              <value member="WinchMaxStepAscent">
+                <simpleValue value="5" />
+              </value>
+              <value member="WinchSlowdownDistance_M">
+                <simpleValue value="1" />
+              </value>
+              <value member="WinchSlowSpeed_Pct">
+                <simpleValue value="15" />
+              </value>
             </structValue>
           </initialValue>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="42" />
+                <Attribute Name="order_in_persistent_editor" Value="38" />
               </Attributes>
             </data>
           </addData>
@@ -33750,7 +33659,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="43" />
+                <Attribute Name="order_in_persistent_editor" Value="39" />
               </Attributes>
             </data>
           </addData>
@@ -33765,7 +33674,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="44" />
+                <Attribute Name="order_in_persistent_editor" Value="40" />
               </Attributes>
             </data>
           </addData>
@@ -33780,7 +33689,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="45" />
+                <Attribute Name="order_in_persistent_editor" Value="41" />
               </Attributes>
             </data>
           </addData>
@@ -33795,7 +33704,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="46" />
+                <Attribute Name="order_in_persistent_editor" Value="42" />
               </Attributes>
             </data>
           </addData>
