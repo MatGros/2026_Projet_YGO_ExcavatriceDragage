@@ -43,7 +43,17 @@ def main() -> int:
         return code
 
     print("\n" + "=" * 60)
-    print("GATE 3: Bundle freshness")
+    print("GATE 3: Config persistence (Cfg<->PERSISTENT mirror, Initialized guard, sentinels)")
+    print("=" * 60)
+    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_config_persistence.py", "."], project_root)
+    print(out.strip())
+    if err:
+        print(err.strip(), file=sys.stderr)
+    if code:
+        return code
+
+    print("\n" + "=" * 60)
+    print("GATE 4: Bundle freshness")
     print("=" * 60)
     code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_bundle_freshness.py", "."], project_root)
     print(out.strip())
@@ -51,7 +61,7 @@ def main() -> int:
         return code
 
     print("\n" + "=" * 60)
-    print("GATE 4: PyTest (generator tests)")
+    print("GATE 5: PyTest (generator tests)")
     print("=" * 60)
     # Use Python 3.13 where pytest is installed
     py313 = Path("C:/Python313/python.exe")
@@ -67,7 +77,7 @@ def main() -> int:
 
     if not args.skip_codesys and args.codesys_log:
         print("\n" + "=" * 60)
-        print("GATE 5: CODESYS compilation")
+        print("GATE 6: CODESYS compilation")
         print("=" * 60)
         code, out, err = run([
             sys.executable,
