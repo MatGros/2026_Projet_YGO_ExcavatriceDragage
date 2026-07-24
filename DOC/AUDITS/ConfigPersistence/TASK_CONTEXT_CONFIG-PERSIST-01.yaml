@@ -58,7 +58,8 @@ tests_automated_required: true
 tests_implementation_paths:
   - "CODE/SIMULATION/PLC_TESTS/SUITE_SUPERVISION/FB_SupervisionValidation.st (TC-CP1: restauration M1M2Sync, TC-CP2: alarme+ack front, TC-CP3: sauvegarde continue stable, TC-CP4: balayage couverture 5 domaines, TC-CP5: Translation pattern manuel)"
 tests_status: "implemented"
-test_execution_evidence: []
+test_execution_evidence:
+  - "2026-07-24 : RunSupervision (CaseId=0, suite complete TC-CP1..CP5) -> TESTRUN_PASSED en CODESYS reel (utilisateur). Un aller-retour : 1re execution en echec etape 52 (TC-CP5) sur un bug du TEST lui-meme (garde-fou externe redondant dans FB_SupervisionValidation.st, pas un bug PRG_09_Supervision.st reel) ; corrige, re-execute, PASSED."
 review_required: true
 dual_review_required: false
 pony_tail: forbidden

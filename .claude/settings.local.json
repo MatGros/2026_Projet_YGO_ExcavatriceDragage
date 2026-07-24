@@ -92,7 +92,8 @@
       "Bash(echo \"=== 3bis\\) instPlan.SigXxx code reel \\(hors commentaires //\\) -> doit etre VIDE ===\")",
       "Bash(rg -c \"StepVerdictTrig|RunStartTrig|FinalizeTrig\" CODE/SIMULATION/PLC_TESTS/CORE/*.st CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/*.st)",
       "Bash(rg -c \"^\\\\s*WHILE\\\\b|END_WHILE\" CODE/SIMULATION/PLC_TESTS/CORE/*.st CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/*.st)",
-      "Bash(sort -t'T' -k2 -n -u)"
+      "Bash(sort -t'T' -k2 -n -u)",
+      "Bash(venv/Scripts/python.exe -m pytest tests/)"
     ],
     "ask": [
       "Bash(git reset *)",
