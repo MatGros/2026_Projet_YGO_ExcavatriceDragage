@@ -314,7 +314,27 @@ Conditionnement des relais de sens moteur (`RelayFwd` / `RelayRev`) à la sécur
 3. **Périmètre du reste du programme** : Les sous-systèmes Cycle, Modes, Safety et Homing restent **totalement protégés et non impactés**.
 
 ---
-*Fin du rapport d'audit — Document généré dans `DOC/AUDITS/RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md`.*
+
+## 🚀 8. COMPTE-RENDU D'INTÉGRATION & DE LIVRAISON CODE
+
+### 📦 8.1. Fichiers ST Modifiés dans le Projet (`CODE/`)
+1. **`CODE/COMMUN/FB_Brake.st`** :
+   * Ajout de la variable `BypassEdge : R_TRIG`.
+   * Déclenchement de `StateAtError := E_State.DISABLED` sur `BypassEdge.Q` ➔ Acquittement et réarmement automatique dès l'activation du bypass.
+2. **`CODE/TREUILS/FB_Winch.st`** :
+   * Ajout de `BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck`.
+   * Conditionnement des relais `RelayFwd` et `RelayRev` à `BrakeSafetyOk` ➔ Interlock matériel 100% étanche.
+3. **`CODE/TRANSLATION/FB_Translation.st`** :
+   * Ajout de `BrakeSafetyOk`.
+   * Forçage de `DriveControlWord := 0` et `DriveFreqRefHz := 0.0` si le frein est en erreur ➔ Protection du variateur AC600.
+
+### 📦 8.2. Empaquetage & Bundle Généré
+* **Bundle XML CODESYS** : `CODE/CODE_Bundle.xml` généré et contrôlé fresh (`PASS`).
+* **Jalon Git** : Commit `af0ff56` — `feat(safety): interlock frein anti-echauffement et rearmement sur front bypass (v0.4.28)`.
+
+---
+*Fin du rapport d'audit et d'intégration — Document finalisé dans `DOC/AUDITS/RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md`.*
+
 
 
 
