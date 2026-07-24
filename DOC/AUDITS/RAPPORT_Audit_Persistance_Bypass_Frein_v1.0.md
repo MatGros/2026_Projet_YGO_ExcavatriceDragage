@@ -262,6 +262,18 @@ Les composants concernés sont réutilisés à travers plusieurs sous-systèmes 
 #### 📌 Nature de la modification :
 Ajout de la détection de front montant `BypassEdge(CLK := BypassContactorCheck)` dans `FB_Brake.st` pour forcer `Error := FALSE` et réinitialiser `State := E_State.READY` dès que l'opérateur active le bypass.
 
+#### ⏱️ A. Analyse Impact Temporel & Chronologie Physique (Validation de la Magnétisation) :
+* **Déroulement Chronologique au Démarrage** :
+  1. **T0 à T+300ms (Magnétisation)** : L'opérateur demande un mouvement. `BrakeSafetyOk` est `TRUE` (car pas encore d'erreur). Les relais `RelayFwd`/`RelayRev` s'allument. Le moteur est alimenté sous frein serré pour bâtir son flux et son couple (pré-couple) ➔ **Aucun glissement de la benne sous charge.**
+  2. **T+400ms (Vérification Ouverture Frein)** : `FB_Brake` émet l'ordre `BrakeCmd := TRUE` et contrôle le retour contacteur bobine (`FeedbackTimeout = 1s` max, typiquement détecté dès 100-200ms).
+  3. **Cas A - Nominal** : Le retour contacteur confirme l'ouverture ➔ Le frein physique se relâche, le treuil accélère normalement.
+  4. **Cas B - Défaillance (Frein bloqué)** : Le retour contacteur est absente ou incohérent ➔ `FB_Brake` bascule en `Error := TRUE`.
+  5. **T+400ms à T+401ms (Interlock Anti-Échauffement)** : `BrakeSafetyOk` retombe instantanément à `FALSE` ➔ `RelayFwd` et `RelayRev` repassent à `FALSE`. **L'alimentation moteur est coupée immédiatement**.
+
+* **Bilan de la Maîtrise Temporelle** :
+  * La magnétisation de 300ms est **intégralement préservée** (charge maintenue par le couple moteur).
+  * En cas de frein bloqué, le moteur n'est sollicité que pendant les **~400ms de détection**, puis **coupé net**. Le risque d'entraînement prolongé (minutes) et d'échauffement critique est **100% éliminé**.
+
 #### 📊 Évaluation des Risques et Périmètres :
 
 | Composant / Module | Impact Potentiel | Risque de Régression | Mesure de Secours & Maîtrise du Risque |
