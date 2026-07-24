@@ -245,7 +245,14 @@ def test_gvl_persistent_composite_init_matches_structvalue_and_arrayvalue_exactl
     composite init) and WinchM1SpeedStepTable (struct init with a nested
     array member) must match the confirmed real structValue/arrayValue shape
     with zero divergence -- this is the case a previous draft of this tool
-    assumed was unsupported and planned to skip with a WARNING."""
+    assumed was unsupported and planned to skip with a WARNING.
+
+    GrappinConfig's real counterpart in CODE/ is now nested one level deeper
+    (_BucketCfgPersist.Config, since the Lot 3 persistence-bridge pattern wraps
+    it in ST_BucketCfg alongside CfgTimeoutDuration) -- the offsets sub-struct
+    itself is still the same real-world entity, so the comparison drills into
+    that nested member instead of the top-level variable for this one case.
+    """
     reference_text = (SAMPLES_DIR / "GVL_PERSISTENT.xml").read_text(encoding="utf-8-sig")
     reference_root = ET.fromstring(reference_text)
     for el in reference_root.iter():
@@ -255,28 +262,39 @@ def test_gvl_persistent_composite_init_matches_structvalue_and_arrayvalue_exactl
     diag = DiagnosticCollector()
     generated_root = build_project_xml("GVL_PERSISTENT", objects_by_name, diag, include_deps=False)
 
-    def find_struct_value(root, var_name):
+    def find_struct_value(root, var_name, member_path=()):
         global_vars = root.find(
             "addData/data[@name='http://www.3s-software.com/plcopenxml/globalvars']/globalVars"
         )
+        struct_val = None
         for var in global_vars.findall("variable"):
             if var.get("name") == var_name:
-                return var.find("initialValue/structValue")
-        return None
+                struct_val = var.find("initialValue/structValue")
+                break
+        for member in member_path:
+            if struct_val is None:
+                return None
+            value_el = struct_val.find(f"value[@member='{member}']")
+            struct_val = value_el.find("structValue") if value_el is not None else None
+        return struct_val
 
-    for var_name in ("_BucketConfig", "_WinchSpeedStepTable"):
-        gen_struct = find_struct_value(generated_root, var_name)
-        ref_var_name = "WinchM1SpeedStepTable" if var_name == "_WinchSpeedStepTable" else "GrappinConfig"
+    cases = (
+        ("_BucketCfgPersist", ("Config",), "GrappinConfig"),
+        ("_WinchSpeedStepTable", (), "WinchM1SpeedStepTable"),
+    )
+    for var_name, member_path, ref_var_name in cases:
+        gen_struct = find_struct_value(generated_root, var_name, member_path)
         ref_struct = find_struct_value(reference_root, ref_var_name)
-        assert gen_struct is not None, f"{var_name}: generated structValue missing"
+        label = "/".join((var_name,) + member_path)
+        assert gen_struct is not None, f"{label}: generated structValue missing"
         assert ref_struct is not None, f"{ref_var_name}: reference structValue missing"
         errors: list[str] = []
-        compare_elements(gen_struct, ref_struct, f"GVL_PERSISTENT/{var_name}/structValue", errors, ignore_simple_values=True)
+        compare_elements(gen_struct, ref_struct, f"GVL_PERSISTENT/{label}/structValue", errors, ignore_simple_values=True)
         assert not errors, "\n".join(errors)
 
     from generator.diagnostics import Severity
 
     warnings_about_these_vars = [
-        w for w in diag.of(Severity.WARNING) if "_BucketConfig" in str(w) or "_WinchSpeedStepTable" in str(w)
+        w for w in diag.of(Severity.WARNING) if "_BucketCfgPersist" in str(w) or "_WinchSpeedStepTable" in str(w)
     ]
     assert not warnings_about_these_vars

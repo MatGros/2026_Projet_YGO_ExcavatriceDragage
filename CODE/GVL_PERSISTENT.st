@@ -55,11 +55,14 @@ VAR_GLOBAL PERSISTENT RETAIN
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
     // 🪣 BENNE
-    _BucketConfig : ST_BucketConfig := (
-        OffsetOpenM      := 0.0,   // Position ouverture relative (m)
-        OffsetCloseM     := 10.0,  // Position fermeture relative (m) - Valeur terrain
-        CoherenceLimitM  := 0.05   // Tolérance cohérence (m)
-    );
+    _BucketCfgPersist : ST_BucketCfg := (
+        Config := (
+            OffsetOpenM      := 0.0,
+            OffsetCloseM     := 10.0,
+            CoherenceLimitM  := 0.05
+        ),
+        CfgTimeoutDuration := T#30s
+    ); // 🌉 Pont FB_CfgPersistBridge_BucketCfg
     _BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
 
     // ↔️ TRANSLATION (M3)
@@ -80,12 +83,10 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickInvertY : BOOL := FALSE; // Inversion axe Y
 
     // 🔄 CYCLE (dragage semi-automatique)
-    _CycleSetDepth_M  : REAL := -12.5; // T66 : profondeur de dragage cible (m, négative)
-    _CycleSetOffset_M : REAL := 1.5;   // T66 : décalage cible de fermeture benne (m)
+    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg (T66)
 
     // 📏 RÉGLEMENTATION / LÉGAL
-    _LimitLegalDepthMinAllowed_M   : REAL := -15.0; // Cote min dragage autorisée (m)
-    _LimitLegalEnabled           : BOOL := TRUE;  // Activation limite légale
+    _CommunCfgPersist : ST_CommunCfg := (LimitLegalDepthMinAllowed_M := -15.0, LimitLegalEnabled := TRUE, SelHomingApproachEnable := FALSE); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 
     // 🚦 SYSTÈME / IHM
     _BlinkTimeOn  : TIME := T#1s;    // Durée allumé horloge clignotement système (voyants IHM/diag)
