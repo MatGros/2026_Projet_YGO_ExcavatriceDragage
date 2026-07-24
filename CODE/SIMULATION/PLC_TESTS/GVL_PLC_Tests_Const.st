@@ -26,4 +26,5 @@ VAR_GLOBAL CONSTANT
     SuiteEncoder     : INT := 4;    // index de suite Codeurs/Homing nominal (Cmd.RunSuite)
     SuiteModes       : INT := 5;    // index de suite Modes/Homme-mort, post-suppression IHM_MANU (Cmd.RunSuite)
     SuiteHeartbeat   : INT := 6;    // index de suite Heartbeat IHM↔PLC (Cmd.RunSuite)
+    SuiteSupervision : INT := 8;    // index Supervision/Persistance config — 7 = Framework Validation
 END_VAR

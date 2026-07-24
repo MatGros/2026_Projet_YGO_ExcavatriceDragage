@@ -70,6 +70,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationRampDecelNormal_Pct : REAL := 40.0;  // Décélération normale (%/s)
     _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
     _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
+    _TranslationSetFreq_Hz          : REAL := 0.0;   // 🚦 Consigne fréquence manuelle opérateur (Hz) — protégée depuis Lot 4
 
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)

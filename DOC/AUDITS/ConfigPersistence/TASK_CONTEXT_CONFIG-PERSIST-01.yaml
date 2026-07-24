@@ -13,18 +13,34 @@ request: >
 criticality: "C3"
 scope_code:
   - "CODE/MAIN/PRG_09_Supervision.st"
+  - "CODE/MAIN/PRG_00_Inputs.st"
+  - "CODE/MAIN/PRG_02_Encoders.st"
+  - "CODE/MAIN/PRG_03_Safety.st"
+  - "CODE/MAIN/PRG_05_Cycle.st"
+  - "CODE/MAIN/PRG_06_WinchControl.st"
+  - "CODE/MAIN/PRG_07_TranslationControl.st"
+  - "CODE/GVL_PERSISTENT.st"
+  - "CODE/COMMUN/FB_CfgPersistBridge_SyncCfg.st"
+  - "CODE/COMMUN/FB_CfgPersistBridge_CycleCfg.st"
+  - "CODE/COMMUN/FB_CfgPersistBridge_CommunCfg.st"
+  - "CODE/COMMUN/FB_CfgPersistBridge_BucketCfg.st"
+  - "CODE/COMMUN/FB_CfgPersistBridge_WinchCfg.st"
   - "CODE/SUPERVISION/_TYPES/ST_WinchCfg.st"
-  - "CODE/SUPERVISION/_TYPES/ST_SyncHMI.st"
-  - "CODE/SUPERVISION/_TYPES/ST_CommunHMI.st"
+  - "CODE/SUPERVISION/_TYPES/ST_SyncCfg.st"
+  - "CODE/SUPERVISION/_TYPES/ST_CommunCfg.st"
+  - "CODE/SUPERVISION/_TYPES/ST_BucketCfg.st"
+  - "CODE/SUPERVISION/_TYPES/ST_CycleCfg.st"
+  - "CODE/SUPERVISION/_TYPES/ST_TranslationCmd.st"
+  - "TOOLS/AGENT_WORKFLOW/scripts/check_config_persistence.py"
 scope_doc:
   - "DOC/AF_Partie-07_Interface_IHM_v1.8.md"
   - "DOC/PLAN_TASK_v1.0.md"
   - "DOC/VERSION_HISTORY.md"
 out_of_scope:
   - "Refonte architecture (IHM lit/ecrit PERSISTENT en direct, suppression du miroir GVL_IHM) : non applicable, l'IHM (supervision externe) n'a jamais d'acces direct aux variables PLC internes -- ecarte par l'utilisateur"
-  - "M2Benne.Config (OffsetOpenM/CloseM) et Commun.LimitLegalDepthMinAllowed_M/Enabled : sentinelle deja correcte (defaut struct reellement 0.0), aucun changement"
-  - "Translation M3 : pas de struct Cfg IHM-editable equivalente identifiee, hors perimetre de ce lot"
-  - "Logique safety elle-meme (FB_Safety_Winch/FB_Safety_Translation) : aucune modification, seule la restauration de la CONFIG qui alimente ces FB est corrigee"
+  - "Winch Cfg partage M1/M2 (CfgMaxStepDescente/Ascent/SlowdownDistance_M/SlowSpeed_Pct) : deplaces vers Commun.Cfg (Lot 3d-1), plus un probleme de reconciliation -- resolu structurellement, pas par ce lot de test"
+  - "Joystick _JoystickNeutralX/Y : verifie deja correctement ecrit par reference (VAR_IN_OUT FB_Joystick), aucun bug -- voir PLAN_TASK T68 corrige"
+  - "Logique safety elle-meme (FB_Safety_Winch/FB_Safety_Translation) : aucune modification, seule la restauration de la CONFIG qui alimente ces FB est testee"
 acceptance_criteria:
   - "Flag Initialized (ST_WinchCfg) / CfgInitialized (ST_SyncHMI) : defaut FALSE, pose TRUE uniquement apres restauration complete PERSISTENT->IHM du groupe, meme scan que les assignations (pas de scan separe)."
   - "Bloc §3 (propagation IHM->PERSISTENT) garde par le flag Initialized/CfgInitialized correspondant pour chaque champ concerne -- ne peut plus ecraser le PERSISTENT avec une valeur GVL_IHM fraichement resettee avant restauration."
@@ -40,8 +56,8 @@ tests_required:
 # test PLC automatique obligatoire avant cloture, pony_tail interdit sur ce sujet.
 tests_automated_required: true
 tests_implementation_paths:
-  - "CODE/SIMULATION/PLC_TESTS/SUITE_SUPERVISION/FB_SupervisionValidation.st (a creer -- TC-CP1: reset RETAIN simule + restauration M1/M2/Sync, TC-CP2: alarme ConfigRestoredFromPersistent + acquittement front, TC-CP3: propagation IHM->PERSISTENT bloquee avant Initialized)"
-tests_status: "planned"
+  - "CODE/SIMULATION/PLC_TESTS/SUITE_SUPERVISION/FB_SupervisionValidation.st (TC-CP1: restauration M1M2Sync, TC-CP2: alarme+ack front, TC-CP3: sauvegarde continue stable, TC-CP4: balayage couverture 5 domaines, TC-CP5: Translation pattern manuel)"
+tests_status: "implemented"
 test_execution_evidence: []
 review_required: true
 dual_review_required: false
