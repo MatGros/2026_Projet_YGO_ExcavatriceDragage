@@ -133,8 +133,8 @@ SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (
 
 // 🔧 REX 2026-07-19 : palier max — même valeur Auto ET Manuel depuis la suppression d'IHM_MANU
 // (ex-plafond "essais progressifs" IHM_MANU, explicitement marqué TEMPORAIRE, retiré).
-EffectiveMaxStepAscent   := _WinchMaxStepAscent;
-EffectiveMaxStepDescente := _WinchMaxStepDescent;
+EffectiveMaxStepAscent   := _CommunCfgPersist.WinchMaxStepAscent;
+EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
 
 // ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
@@ -487,8 +487,8 @@ instWinchM1(
     // ForbidAscentM1_Raw ci-dessus, pas le capteur physique (réservé au Homing).
     TopLimitM               := _CableLimitM1Ascent_M,
     BottomLimitM            := BottomLimitM1_Active,
-    CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    CfgSlowdownDistanceM       := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowSpeedPct            := _CommunCfgPersist.WinchSlowSpeed_Pct,
     // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
     BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
@@ -529,8 +529,8 @@ instWinchM2(
     // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage benne fermé).
     TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
-    CfgSlowdownDistanceM       := _WinchSlowdownDistance_M,
-    CfgSlowSpeedPct            := _WinchSlowSpeed_Pct,
+    CfgSlowdownDistanceM       := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowSpeedPct            := _CommunCfgPersist.WinchSlowSpeed_Pct,
     // 🌐 Bypass Global M2 (GVL_IHM.M2TreuilBenne.Bypass.Global)
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );

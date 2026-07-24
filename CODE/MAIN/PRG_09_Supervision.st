@@ -159,15 +159,11 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFaile
 IF NOT GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
     GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M  := _HomingTargetM1_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM1_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent       := _WinchMaxStepAscent;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate       := _WinchM1RampAccelRate_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate := _WinchM1RampDecelNormal_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelFastRate   := _WinchM1RampDecelFast_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitDescent_M  := _CableLimitM1Descent_M;
     GVL_IHM.M1TreuilRetenue.Cfg.CfgCableLimitAscent_M   := _CableLimitM1Ascent_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M   := _WinchSlowdownDistance_M;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct        := _WinchSlowSpeed_Pct;
     GVL_IHM.M1TreuilRetenue.Cfg.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE; // ⚠️ Restauration détectée — acquittement opérateur requis (§2bis)
 END_IF;
@@ -175,15 +171,11 @@ END_IF;
 IF NOT GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M  := _HomingTargetM2_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M       := _HomingUnitaryTargetM2_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente     := _WinchMaxStepDescent; // 🔧 REX 2026-07-08 : commun M1/M2
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent       := _WinchMaxStepAscent;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate       := _WinchM2RampAccelRate_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate := _WinchM2RampDecelNormal_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate   := _WinchM2RampDecelFast_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitDescent_M  := _CableLimitM2Descent_M;
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M   := _CableLimitM2Ascent_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M   := _WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct        := _WinchSlowSpeed_Pct;
     GVL_IHM.M2TreuilBenne.Cfg.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -278,9 +270,6 @@ _HomingTargetM1_M            := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
 _HomingTargetM2_M            := GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M;
 _HomingUnitaryTargetM1_M     := GVL_IHM.M1TreuilRetenue.Cfg.CfgHomingTarget_M;
 _HomingUnitaryTargetM2_M     := GVL_IHM.M2TreuilBenne.Cfg.CfgHomingTarget_M;
-// 🔧 REX 2026-07-08 : CfgMaxStepDescente désormais commun M1/M2 — voir bloc miroir bidirectionnel
-// ci-dessous (même pattern que CableLimitDescent_M/SlowdownDistance_M/SlowSpeed_Pct), plus de
-// propagation à sens unique séparée par treuil ici.
 IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
     _WinchM1RampAccelRate_Pct   := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampAccelRate;
     _WinchM1RampDecelNormal_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgRampDecelNormalRate;
@@ -290,26 +279,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
     _WinchM2RampAccelRate_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampAccelRate;
     _WinchM2RampDecelNormal_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelNormalRate;
     _WinchM2RampDecelFast_Pct   := GVL_IHM.M2TreuilBenne.Cfg.CfgRampDecelFastRate;
-END_IF;
-
-// 🔧 REX 2026-07-08 (demande utilisateur) : CfgMaxStepDescente commun M1/M2 — même profil de
-// déplacement des 2 treuils, même pattern miroir que CableLimitDescent_M ci-dessous.
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente <> _WinchMaxStepDescent THEN
-        _WinchMaxStepDescent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente <> _WinchMaxStepDescent THEN
-        _WinchMaxStepDescent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepDescente := _WinchMaxStepDescent;
-
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent <> _WinchMaxStepAscent THEN
-        _WinchMaxStepAscent := GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent <> _WinchMaxStepAscent THEN
-        _WinchMaxStepAscent := GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgMaxStepAscent := _WinchMaxStepAscent;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgMaxStepAscent := _WinchMaxStepAscent;
 END_IF;
 
 IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized THEN
@@ -339,24 +308,6 @@ IF GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
         _CableLimitM2Ascent_M := GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M;
     END_IF;
     GVL_IHM.M2TreuilBenne.Cfg.CfgCableLimitAscent_M := _CableLimitM2Ascent_M;
-END_IF;
-
-IF GVL_IHM.M1TreuilRetenue.Cfg.Initialized AND GVL_IHM.M2TreuilBenne.Cfg.Initialized THEN
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M <> _WinchSlowdownDistance_M THEN
-        _WinchSlowdownDistance_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M <> _WinchSlowdownDistance_M THEN
-        _WinchSlowdownDistance_M := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowdownDistance_M := _WinchSlowdownDistance_M;
-
-    IF GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct <> _WinchSlowSpeed_Pct THEN
-        _WinchSlowSpeed_Pct := GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct;
-    ELSIF GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct <> _WinchSlowSpeed_Pct THEN
-        _WinchSlowSpeed_Pct := GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct;
-    END_IF;
-    GVL_IHM.M1TreuilRetenue.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
-    GVL_IHM.M2TreuilBenne.Cfg.CfgSlowSpeed_Pct := _WinchSlowSpeed_Pct;
 END_IF;
 
 // 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)

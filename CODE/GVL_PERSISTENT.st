@@ -25,8 +25,6 @@ VAR_GLOBAL PERSISTENT RETAIN
         P5R1 := TRUE,  P5R2 := TRUE,  P5R3 := TRUE,  P5R4 := TRUE,
         StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]
     ); // Table paliers commune (REX 2026-07-08 : fusion M1/M2)
-    _WinchMaxStepDescent : INT := 3; // Palier max descente commun M1/M2
-    _WinchMaxStepAscent  : INT := 5; // Palier max montée commun M1/M2
     // 🪜 T45 — caractérisation vitesse réelle ; valeurs initiales provisoires à mesurer.
     _WinchSpeedConfig : ST_WinchSpeedConfig := (
         MaxMeasuredSpeedMps    := 2.0,
@@ -46,8 +44,6 @@ VAR_GLOBAL PERSISTENT RETAIN
     _CableLimitM2Descent_M       : REAL := -20.0; // Limite basse physique M2 (m)
     _CableLimitM1Ascent_M        : REAL := 8.0;  // Limite haute exploitation M1 (m) < HomingTarget (8.5)
     _CableLimitM2Ascent_M        : REAL := 8.0;  // Limite haute exploitation M2 (m) < HomingTarget (8.5)
-    _WinchSlowdownDistance_M     : REAL := 1.0;   // Distance ralentissement commune (m)
-    _WinchSlowSpeed_Pct           : REAL := 15.0;  // Vitesse lente zone ralentissement (%)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
     _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 0.25); // 🌉 Pont FB_CfgPersistBridge_SyncCfg
@@ -86,7 +82,15 @@ VAR_GLOBAL PERSISTENT RETAIN
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg (T66)
 
     // 📏 RÉGLEMENTATION / LÉGAL
-    _CommunCfgPersist : ST_CommunCfg := (LimitLegalDepthMinAllowed_M := -15.0, LimitLegalEnabled := TRUE, SelHomingApproachEnable := FALSE); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
+    _CommunCfgPersist : ST_CommunCfg := (
+        LimitLegalDepthMinAllowed_M := -15.0,
+        LimitLegalEnabled := TRUE,
+        SelHomingApproachEnable := FALSE,
+        WinchMaxStepDescente := 3,
+        WinchMaxStepAscent := 5,
+        WinchSlowdownDistance_M := 1.0,
+        WinchSlowSpeed_Pct := 15.0
+    ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg (+ champs Winch communs M1/M2 rapatriés 2026-07-24)
 
     // 🚦 SYSTÈME / IHM
     _BlinkTimeOn  : TIME := T#1s;    // Durée allumé horloge clignotement système (voyants IHM/diag)
