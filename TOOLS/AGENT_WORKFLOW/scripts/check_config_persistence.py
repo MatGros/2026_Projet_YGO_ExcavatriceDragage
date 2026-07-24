@@ -27,11 +27,19 @@ TYPES_DIR = Path("CODE/SUPERVISION/_TYPES")
 PERSISTENT_FILE = Path("CODE/GVL_PERSISTENT.st")
 SUPERVISION_FILE = Path("CODE/MAIN/PRG_09_Supervision.st")
 
-TYPE_DECL_RE = re.compile(r"TYPE\s+(ST_\w+)\s*:")
+TYPE_DECL_RE = re.compile(r"TYPE\s+(ST_\w+)\s*:", re.IGNORECASE)
+STRUCT_BODY_RE = re.compile(r"STRUCT(.*?)END_STRUCT", re.DOTALL | re.IGNORECASE)
 FIELD_NAME_RE = re.compile(r"^\s*([A-Za-z_]\w*)\s*:", re.MULTILINE)
 PERSISTENT_VAR_RE = re.compile(r"^\s*(_\w+)\s*:\s*(ST_\w+)\b", re.MULTILINE)
 PERSISTENT_ANY_VAR_RE = re.compile(r"^\s*(_\w+)\s*:\s*\w", re.MULTILINE)
-SENTINEL_RE = re.compile(r"=\s*0\.0\s+THEN")
+# Deliberately keeps the THEN requirement (this flags the specific "IF ... = 0.0 THEN"
+# init-sentinel anti-pattern, not every "= 0.0" comparison) but tolerates: extra trailing
+# zeros (0.00), other conditions between the comparison and THEN (OR Enable THEN), and the
+# comparison/THEN split across lines. Stops at ';' so it can't run past a statement boundary
+# into unrelated code (an IF condition never contains a bare ';' before its own THEN).
+SENTINEL_RE = re.compile(r"=\s*0\.0+\b[^;]{0,80}?\bTHEN\b", re.IGNORECASE | re.DOTALL)
+BLOCK_COMMENT_RE = re.compile(r"\(\*.*?\*\)", re.DOTALL)
+LINE_COMMENT_RE = re.compile(r"//.*$", re.MULTILINE)
 
 # Check 4 - substrings that never belong in a PERSISTENT variable name (volatile /
 # momentary signals recomputed every scan, not operator config to survive a reboot).
@@ -39,24 +47,42 @@ VOLATILE_NAME_MARKERS = ("CycleStep", "DeadmanArmed", "StartStop", "RawX", "RawY
 
 
 def read(path: Path) -> str:
-    return path.read_text(encoding="utf-8")
+    # utf-8-sig: harmlessly strips a BOM if present (CODESYS exports sometimes have one),
+    # behaves exactly like utf-8 when absent.
+    return path.read_text(encoding="utf-8-sig")
+
+
+def strip_comments(source: str) -> str:
+    """Blank out //... and (* ... *) comments, preserving line breaks (and therefore line
+    numbers) so callers that report a line number stay accurate. Prevents both false
+    positives (comment text that happens to look like code, e.g. a REX note quoting an old
+    sentinel or a field name) and false negatives (a real field/pattern hidden inside a
+    comment that should NOT count as present)."""
+
+    def blank_block(m: re.Match[str]) -> str:
+        return re.sub(r"[^\n]", " ", m.group(0))
+
+    source = BLOCK_COMMENT_RE.sub(blank_block, source)
+    source = LINE_COMMENT_RE.sub("", source)
+    return source
 
 
 def struct_fields(source: str) -> set[str]:
     # crude but sufficient: field declarations are the "Name : Type" lines between
     # STRUCT and END_STRUCT, one per line, matching this project's formatting convention.
-    body_match = re.search(r"STRUCT(.*?)END_STRUCT", source, re.DOTALL)
+    # Case-folded: CODESYS/IEC 61131-3 keywords and identifiers are case-insensitive.
+    body_match = STRUCT_BODY_RE.search(strip_comments(source))
     if not body_match:
         return set()
-    return {m.group(1) for m in FIELD_NAME_RE.finditer(body_match.group(1))}
+    return {m.group(1).lower() for m in FIELD_NAME_RE.finditer(body_match.group(1))}
 
 
 def check_cfg_persistent_mirror(root: Path, errors: list[str]) -> None:
-    persistent_source = read(root / PERSISTENT_FILE)
+    persistent_source = strip_comments(read(root / PERSISTENT_FILE))
     declared_types = {m.group(2) for m in PERSISTENT_VAR_RE.finditer(persistent_source)}
 
     for cfg_file in sorted((root / TYPES_DIR).glob("ST_*Cfg.st")):
-        type_match = TYPE_DECL_RE.search(read(cfg_file))
+        type_match = TYPE_DECL_RE.search(strip_comments(read(cfg_file)))
         if not type_match:
             errors.append(f"{cfg_file.name}: no TYPE declaration found")
             continue
@@ -70,31 +96,31 @@ def check_cfg_persistent_mirror(root: Path, errors: list[str]) -> None:
 
 def check_initialized_guard(root: Path, errors: list[str]) -> None:
     for cfg_file in sorted((root / TYPES_DIR).glob("ST_*Cfg.st")):
-        if "Initialized" not in struct_fields(read(cfg_file)):
+        if "initialized" not in struct_fields(read(cfg_file)):
             errors.append(f"{cfg_file.name}: missing Initialized : BOOL field")
 
     for bypass_file in sorted((root / TYPES_DIR).glob("ST_Bypass*.st")):
         fields = struct_fields(read(bypass_file))
-        if "Global" not in fields:
+        if "global" not in fields:
             continue  # not GVL_BypassRetain-backed (e.g. ST_BypassCommun) - see module docstring
-        if "Initialized" not in fields:
+        if "initialized" not in fields:
             errors.append(f"{bypass_file.name}: has Global but no Initialized : BOOL field")
 
 
 def check_no_sentinel(root: Path, errors: list[str]) -> None:
-    for lineno, line in enumerate(read(root / SUPERVISION_FILE).splitlines(), start=1):
-        stripped = line.strip()
-        if stripped.startswith("//") or stripped.startswith("(*"):
-            continue
-        if SENTINEL_RE.search(line):
-            errors.append(
-                f"PRG_09_Supervision.st:{lineno}: obsolete '= 0.0 THEN' sentinel "
-                "(use a dedicated Initialized flag instead)"
-            )
+    # Whole-source search (not line-by-line) so a sentinel/THEN split across lines is still
+    # caught; line number is derived from the match's start offset for accurate reporting.
+    source = strip_comments(read(root / SUPERVISION_FILE))
+    for m in SENTINEL_RE.finditer(source):
+        lineno = source.count("\n", 0, m.start()) + 1
+        errors.append(
+            f"PRG_09_Supervision.st:{lineno}: obsolete '= 0.0 THEN' sentinel "
+            "(use a dedicated Initialized flag instead)"
+        )
 
 
 def check_no_volatile_persisted(root: Path, errors: list[str]) -> None:
-    persistent_source = read(root / PERSISTENT_FILE)
+    persistent_source = strip_comments(read(root / PERSISTENT_FILE))
     for m in PERSISTENT_ANY_VAR_RE.finditer(persistent_source):
         var_name = m.group(1)
         for marker in VOLATILE_NAME_MARKERS:
