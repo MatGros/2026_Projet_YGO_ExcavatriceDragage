@@ -12,10 +12,6 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🏗️ TREUILS (M1, M2)
     _CalibM1 : ST_EncoderCalib; // Calibration treuil M1
     _CalibM2 : ST_EncoderCalib; // Calibration treuil M2
-    _HomingTargetM1_M : REAL := 8.5; // Hauteur cible homing M1 (m)
-    _HomingTargetM2_M : REAL := 8.5; // Hauteur cible homing M2 (m)
-    _HomingUnitaryTargetM1_M : REAL := 0.0; // Cible libre homing unitaire M1 (MAINT_N2)
-    _HomingUnitaryTargetM2_M : REAL := 0.0; // Cible libre homing unitaire M2 (MAINT_N2)
 
     _WinchSpeedStepTable : ST_SpeedStepTable := (
         P1R1 := FALSE, P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
@@ -33,17 +29,24 @@ VAR_GLOBAL PERSISTENT RETAIN
     );
     _WinchLoadEstimateTable : ST_WinchLoadEstimateTable;
 
-    _WinchM1RampAccelRate_Pct    : REAL := 50.0;
-    _WinchM1RampDecelNormal_Pct  : REAL := 150.0;
-    _WinchM1RampDecelFast_Pct    : REAL := 400.0; // CRITIQUE (SafeStop)
-    _WinchM2RampAccelRate_Pct    : REAL := 50.0;
-    _WinchM2RampDecelNormal_Pct  : REAL := 150.0;
-    _WinchM2RampDecelFast_Pct    : REAL := 400.0; // CRITIQUE (SafeStop)
-
-    _CableLimitM1Descent_M       : REAL := -20.0; // Limite basse physique M1 (m)
-    _CableLimitM2Descent_M       : REAL := -20.0; // Limite basse physique M2 (m)
-    _CableLimitM1Ascent_M        : REAL := 8.0;  // Limite haute exploitation M1 (m) < HomingTarget (8.5)
-    _CableLimitM2Ascent_M        : REAL := 8.0;  // Limite haute exploitation M2 (m) < HomingTarget (8.5)
+    _WinchM1CfgPersist : ST_WinchCfg := (
+        CfgTopSensorPos_M := 8.5,
+        CfgHomingTarget_M := 0.0,
+        CfgRampAccelRate := 50.0,
+        CfgRampDecelNormalRate := 150.0,
+        CfgRampDecelFastRate := 400.0,
+        CfgCableLimitDescent_M := -20.0,
+        CfgCableLimitAscent_M := 8.0
+    ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
+    _WinchM2CfgPersist : ST_WinchCfg := (
+        CfgTopSensorPos_M := 8.5,
+        CfgHomingTarget_M := 0.0,
+        CfgRampAccelRate := 50.0,
+        CfgRampDecelNormalRate := 150.0,
+        CfgRampDecelFastRate := 400.0,
+        CfgCableLimitDescent_M := -20.0,
+        CfgCableLimitAscent_M := 8.0
+    ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
     _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 0.25); // 🌉 Pont FB_CfgPersistBridge_SyncCfg

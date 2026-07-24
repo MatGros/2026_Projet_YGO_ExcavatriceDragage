@@ -353,12 +353,12 @@ END_IF;
 // 🔧 REX 2026-07-07 : limite légale appliquée sur LimitLegalEnabled SEUL, plus de garde
 // Mode=SEMI_AUTO — la limite légale doit stopper la descente dans TOUS les modes dès qu'elle
 // est activée (constat terrain : ne s'arrêtait pas en MAINT_N1/N2 alors qu'attendu).
-BottomLimitM1_Active := _CableLimitM1Descent_M;
+BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
 IF _CommunCfgPersist.LimitLegalEnabled THEN
     BottomLimitM1_Active := MAX(BottomLimitM1_Active, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
 END_IF;
 
-BottomLimitM2_Active := _CableLimitM2Descent_M;
+BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
 IF _CommunCfgPersist.LimitLegalEnabled THEN
     BottomLimitM2_Active := MAX(BottomLimitM2_Active, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
 END_IF;
@@ -411,14 +411,14 @@ ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safet
 // PRG_09_Supervision), symétrique à CableLimitDescentReached. Réutilisé ci-dessous dans ForbidAscentM1_Raw.
 CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                             AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _CableLimitM1Ascent_M)
+                             AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _WinchM1CfgPersist.CfgCableLimitAscent_M)
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
 ForbidAscentM1_Raw  := NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND (
                           PRG_03_Safety.instSafetyWinchM1.ForbidAscent
                           OR (PRG_02_Encoders.instHomingM1.Homed
                               AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
-                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _HomingTargetM1_M))
+                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _WinchM1CfgPersist.CfgTopSensorPos_M))
                           OR CableLimitAscentM1Reached
                        );
 // 🐛 REX 2026-07-08 (7) — BUG CORRIGÉ (retour terrain) / REX 2026-07-08 (2) :
@@ -430,14 +430,14 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketC
 // 🆕 REX 2026-07-15 (8) : idem M1 (voir ci-dessus).
 CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
                              AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                             AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_CableLimitM2Ascent_M + M2_LimitShift))
+                             AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift))
                              AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
 
 ForbidAscentM2_Raw  := NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND (
                           PRG_03_Safety.instSafetyWinchM2.ForbidAscent
                           OR (PRG_02_Encoders.instHomingM2.Homed
                               AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
-                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_HomingTargetM2_M + M2_LimitShift)))
+                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift)))
                           OR CableLimitAscentM2Reached
                        );
 
@@ -476,16 +476,16 @@ instWinchM1(
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal),
-    CfgRampAccelRate           := _WinchM1RampAccelRate_Pct,
-    CfgRampDecelNormalRate     := _WinchM1RampDecelNormal_Pct,
-    CfgRampDecelFastRate       := _WinchM1RampDecelFast_Pct,
+    CfgRampAccelRate           := _WinchM1CfgPersist.CfgRampAccelRate,
+    CfgRampDecelNormalRate     := _WinchM1CfgPersist.CfgRampDecelNormalRate,
+    CfgRampDecelFastRate       := _WinchM1CfgPersist.CfgRampDecelFastRate,
     Homed                   := PRG_02_Encoders.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM1.HomingSuspect, // 🆕 Câblage de l'incertitude M1
     CablePosM               := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     // 🔧 REX 2026-07-15 (6) : CableLimitAscentM1_M (limite ABSOLUE d'exploitation normale, ex-
     // HomingTargetM1_M) — la rampe/ralentissement de FB_Winch cible désormais la même limite que
     // ForbidAscentM1_Raw ci-dessus, pas le capteur physique (réservé au Homing).
-    TopLimitM               := _CableLimitM1Ascent_M,
+    TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM       := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowSpeedPct            := _CommunCfgPersist.WinchSlowSpeed_Pct,
@@ -520,14 +520,14 @@ instWinchM2(
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal),
-    CfgRampAccelRate           := _WinchM2RampAccelRate_Pct,
-    CfgRampDecelNormalRate     := _WinchM2RampDecelNormal_Pct,
-    CfgRampDecelFastRate       := _WinchM2RampDecelFast_Pct,
+    CfgRampAccelRate           := _WinchM2CfgPersist.CfgRampAccelRate,
+    CfgRampDecelNormalRate     := _WinchM2CfgPersist.CfgRampDecelNormalRate,
+    CfgRampDecelFastRate       := _WinchM2CfgPersist.CfgRampDecelFastRate,
     Homed                   := PRG_02_Encoders.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Encoders.instHomingM2.HomingSuspect, // 🆕 Câblage de l'incertitude M2
     CablePosM               := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     // 🔧 REX 2026-07-15 (6) : idem M1 (voir ci-dessus), + M2_LimitShift (décalage benne fermé).
-    TopLimitM               := _CableLimitM2Ascent_M + M2_LimitShift,
+    TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM       := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowSpeedPct            := _CommunCfgPersist.WinchSlowSpeed_Pct,
