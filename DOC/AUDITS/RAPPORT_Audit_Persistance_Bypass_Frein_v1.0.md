@@ -218,6 +218,91 @@ END_IF;
 | **TEST-06** (Interlock Anti-Échauffement) | `FB_Winch` / `FB_Translation` | Absence de conditionnement de `RelayFwd/Rev` par l'état du frein `BrakeCmd`. | Conditionnement strict des relais de sens par `BrakeReleasePermit`. | 🟢 **Protection Matérielle 100%** : Suppression totale du risque d'entraînement sur frein fermé. |
 
 ---
+
+## 🔬 7. ÉTUDE D'IMPACT DÉTAILLÉE DU PROGRAMME & FONCTIONNEMENT (TEST-05 & TEST-06)
+
+Cette étude analyse l'impact technique, temporel et fonctionnel des modifications proposées afin de s'assurer qu'**aucune régression ou effet de bord** ne perturbera le reste du programme.
+
+---
+
+### 🔍 7.1. Cartographie de la Dépendance Code
+
+Les composants concernés sont réutilisés à travers plusieurs sous-systèmes :
+
+```
+                        ┌────────────────────────┐
+                        │   PRG_09_Supervision   │
+                        └───────────┬────────────┘
+                                    │ (Ordres Reset / Bypass)
+                                    ▼
+         ┌──────────────────────────┴──────────────────────────┐
+         │                                                     │
+         ▼                                                     ▼
+┌────────────────────────┐                             ┌────────────────────────┐
+│  PRG_06_WinchControl   │                             │ PRG_07_TranslationCtrl │
+└────────┬───────────────┘                             └───────────┬────────────┘
+         │                                                         │
+         ▼                                                         ▼
+┌────────────────────────┐                             ┌────────────────────────┐
+│  FB_Winch (M1 / M2)    │                             │  FB_Translation (M3)   │
+└────────┬───────────────┘                             └───────────┬────────────┘
+         │                                                         │
+         └──────────────────────────┬──────────────────────────────┘
+                                    │ (Composition FB_Brake)
+                                    ▼
+                        ┌────────────────────────┐
+                        │    FB_Brake (COMMUN)   │
+                        └────────────────────────┘
+```
+
+---
+
+### 📊 7.2. Analyse d'Impact du Correctif TEST-05 (`FB_Brake.st`)
+
+#### 📌 Nature de la modification :
+Ajout de la détection de front montant `BypassEdge(CLK := BypassContactorCheck)` dans `FB_Brake.st` pour forcer `Error := FALSE` et réinitialiser `State := E_State.READY` dès que l'opérateur active le bypass.
+
+#### 📊 Évaluation des Risques et Périmètres :
+
+| Composant / Module | Impact Potentiel | Risque de Régression | Mesure de Secours & Maîtrise du Risque |
+| :--- | :--- | :---: | :--- |
+| **`FB_Brake` (Interne)** | Purge automatique du bit0 `ErrorId` et sortie de l'état `StateAtError` sans attendre `ResetEdge`. | 🟢 **NUL** | Seul le front montant (`BypassEdge.Q`) réarme l'état. Le maintien du bypass ne perturbe pas le fonctionnement normal. |
+| **`FB_Winch` (M1 & M2)** | `Brake.Error` passe immédiatement de `TRUE` à `FALSE` sur activation du bypass. | 🟢 **NUL** | Comportement désiré : `FB_Winch` reçoit un bloc frein réarmé et prêt pour le fonctionnement dégradé. |
+| **`FB_Translation` (M3)** | `Brake.Error` retombe à `FALSE`, purgeant le bit0 du `ErrorId` de translation. | 🟢 **NUL** | Alignement parfait avec le treuil. |
+| **IHM / Supervision** | Le voyant `StuckClosed` / `StuckOpen` s'éteint et l'alarme IHM s'acquitte dès le basculement du switch bypass. | 🟢 **POSITIF** | Élimine la frustration d'IHM bloquée où le bouton Reset était sans effet. |
+
+---
+
+### 📊 7.3. Analyse d'Impact du Correctif TEST-06 (Interlock Frein `FB_Winch` & `FB_Translation`)
+
+#### 📌 Nature de la modification :
+Conditionnement des relais de sens moteur (`RelayFwd` / `RelayRev`) à la sécurité du frein via `BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck`.
+
+#### ⏱️ A. Analyse Impact Temporel & Pré-Couple Treuil (Point Critique) :
+* **Comportement Nominal** : Lors d'un démarrage normal, `FB_Brake` temporise `DelayContactClose` (100ms) + `DelayMagnetise` (300ms) avant d'émettre `BrakeCmd = TRUE`.
+* **Vérification du Risque de Glissement de Charge** :
+  * Si l'interlock exigeait `BrakeCmd = TRUE` pour émettre `RelayFwd`/`RelayRev`, les contacteurs moteur s'ouvriraient pendant les 300ms de magnétisation ➔ **La benne retomberait par manque de couple** !
+  * **Solution Retenue dans l'Étude** : En utilisant `BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck` au lieu de `BrakeCmd`, **la magnétisation moteur s'effectue normalement**, mais **les relais de sens sont immédiatement coupés SI `FB_Brake` bascule en `Error = TRUE`**.
+
+#### 📊 B. Évaluation Globale par Domaine Machine :
+
+| Domaine / Fonction | Analyse de l'Impact | Risque Majeur Identifié | Solution de Maîtrise dans le Code |
+| :--- | :--- | :---: | :--- |
+| **Pré-couple Treuil (M1/M2)** | Le moteur s'aimante normalement avant l'ouverture physique du frein. | 🟢 **Maîtrisé** | La condition `NOT Brake.Error` autorise la magnétisation tout en bloquant l'ordre si le frein est en échec. |
+| **Translation M3 (AC600)** | Le variateur EtherCAT AC600 reçoit la consigne fréquence. | 🟢 **NUL** | Le variateur gère lui-même sa rampe de flux ; bloquer `DriveControlWord` sur `Brake.Error` empêche la consigne sans détruire le variateur. |
+| **Séquenceur Cycle Auto** | `PRG_05_Cycle` surveille `WinchM1.Busy` et `Done`. | 🟢 **SÉCURISÉ** | Si le frein est bloqué, le treuil ne bouge pas et le cycle retombe proprement en `ERROR_HOLD` par timeout de mouvement. |
+| **Modes Maintenance** | Mouvements manuels en `MAINT_N1` / `MAINT_N2`. | 🟢 **SÉCURISÉ** | L'opérateur peut toujours bouger l'axe si le bypass frein est activé (`BypassContactorCheck = TRUE`). |
+
+---
+
+## ✅ CONCLUSION DE L'ÉTUDE D'IMPACT
+
+1. **TEST-05 (Acquittement Bypass)** : Zero risque de régression, impact 100% positif sur l'IHM et l'exploitation.
+2. **TEST-06 (Interlock Frein Treuil)** : L'utilisation de la règle `BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck` préserve la magnétisation moteur (évite le glissement de la benne) tout en **verrouillant instantanément l'alimentation treuil dès qu'une anomalie frein est confirmée**.
+3. **Périmètre du reste du programme** : Les sous-systèmes Cycle, Modes, Safety et Homing restent **totalement protégés et non impactés**.
+
+---
 *Fin du rapport d'audit — Document généré dans `DOC/AUDITS/RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md`.*
+
 
 
