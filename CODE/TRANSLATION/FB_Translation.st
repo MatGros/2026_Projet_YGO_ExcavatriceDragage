@@ -77,6 +77,7 @@ VAR
     ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
     MovementRequested      : BOOL;         // Pilote FB_Brake
     FirstScanDone          : BOOL;
+    BrakeSafetyOk          : BOOL;         // 🛡️ REX 2026-07-24 : Interlock anti-échauffement frein
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -212,6 +213,13 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       BypassContactorCheck := BypassContactorCheck);
 BrakeCmd := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
+
+// 🛡️ Interlock de sécurité frein : si FB_Brake est en ERREUR, coupure immédiate de la commande variateur AC600
+BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
+IF NOT BrakeSafetyOk THEN
+    DriveControlWord := 0;
+    DriveFreqRefHz := 0.0;
+END_IF;
 
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN

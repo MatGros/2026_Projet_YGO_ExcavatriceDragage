@@ -44,6 +44,7 @@ END_VAR
 VAR
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
+    BypassEdge          : R_TRIG;        // 🔑 REX 2026-07-24 : Front montant activation bypass pour réarmement immédiat
     TonMagnetise        : TON;           // Temporisation avant relâche
     TonDecel            : TON;           // Temporisation avant collage
     TonFeedback         : TON;           // Timeout cohérence commande/retour
@@ -65,6 +66,7 @@ Ready := TRUE;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
+BypassEdge(CLK := BypassContactorCheck);
 
 // 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
 IF MovementRequested THEN
@@ -107,6 +109,9 @@ ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
     ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
+    IF BypassEdge.Q THEN
+        StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
+    END_IF;
 END_IF;
 
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)

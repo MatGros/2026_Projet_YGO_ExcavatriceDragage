@@ -143,6 +143,7 @@ VAR
     DirectionChangePending : BOOL;
     EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
     ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
+    BrakeSafetyOk       : BOOL;   // 🛡️ REX 2026-07-24 : Interlock anti-échauffement frein
     FirstScanDone       : BOOL;
 END_VAR
 
@@ -261,8 +262,11 @@ Contactor2 := SpeedStep.Contactor2;
 Contactor3 := SpeedStep.Contactor3;
 Contactor4 := SpeedStep.Contactor4;
 
-RelayFwd := (CommandedDirection = 1) AND (StepNumber > 0);
-RelayRev := (CommandedDirection = -1) AND (StepNumber > 0);
+// 🛑 Interlock de sécurité frein : magnétisation normale autorisée, mais coupure stricte des relais si FB_Brake est en ERREUR
+BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
+
+RelayFwd := (CommandedDirection = 1) AND (StepNumber > 0) AND BrakeSafetyOk;
+RelayRev := (CommandedDirection = -1) AND (StepNumber > 0) AND BrakeSafetyOk;
 
 IF ForbidDescent THEN
     RelayRev := FALSE;
