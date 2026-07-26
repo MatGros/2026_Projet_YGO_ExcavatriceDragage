@@ -4,6 +4,11 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.5.0_PostCableReplacement` — 2026-07-26
+- Jalon v0.5.0 après changement des câbles physiques (suite aux essais filmés en v0.4.27)
+- Nettoyage et archivage des anciens projets de qualification dans `ARCHIVES/Code/`
+- Mise à jour de la documentation de suivi et des checklists de mise en service
+
 ### `v0.4.27_Audit_Persistance_Bypass_Frein` — 2026-07-24
 - Audit exhaustif de rémanence `PERSISTENT` / `RETAIN` + Bridge Pattern `PRG_09_Supervision`
 - Diagnostic complet de l'incident d'échauffement frein (`FB_Brake` ↔ `FB_Winch`)
