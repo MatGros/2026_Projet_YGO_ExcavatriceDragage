@@ -19,6 +19,10 @@ ARCHIVES/Prj_codesys/
 
 .pytest_cache/
 PRJ_CODESYS/
+# Exception : l'export du programme reel est VERSIONNE (sert de reference pour
+# comparer CODE/ au programme reellement charge dans l'automate).
+!PRJ_CODESYS/PROJ_Full_ImportExport/
+!PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
 # Workspace launcher artifacts
 launch_workspace.bat
