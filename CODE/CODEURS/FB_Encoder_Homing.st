@@ -166,13 +166,10 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
     ELSIF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
         ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
     ELSIF NOT BypassGlobal AND NOT UnitaryMode AND (TargetPositionM <> 0.0) AND TopPositionSensor THEN
-        // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
-        // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
-        // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
-        // 🆕 Si TargetPositionM = 0.0 (homing à zéro), on ignore le capteur haut (position courante).
         ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
+        ErrorId := ErrorId AND 16#FFC0;       // Nettoie les erreurs de rejet 0..5
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         PresetValue := PresetValueCalc;
@@ -191,11 +188,8 @@ IF State = E_State.BUSY THEN
         Calib.LastKnownRawPos := PresetValueCalc;
         Done := TRUE;
         State := E_State.READY;
-        // 🔧 REX 2026-07-07 : un homing réussi re-établit la référence tout aussi validement
-        // qu'un BtnConfirmCoherence explicite — efface donc aussi bit9 (incohérence redémarrage),
-        // sinon ErrorId/Error restait bloqué à TRUE après un homing réussi (jamais mappé vers
-        // l'IHM, invisible sauf sur GVL_IHM.Modes.State.AnyFaultActive qui restait à 1 sans raison visible).
-        ErrorId := ErrorId AND 16#FDFF;
+        // 🔧 REX 2026-07-24 : Un homing réussi efface l'intégralité de ErrorId (y compris les anciens rejets 0..5 et le bit9)
+        ErrorId := 16#0000;
     ELSIF PresetNak THEN
         ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
         State := E_State.READY;

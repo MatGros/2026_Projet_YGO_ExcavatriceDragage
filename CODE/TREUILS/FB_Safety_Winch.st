@@ -317,11 +317,12 @@ END_IF;
 // Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
 // Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
 EncoderAvailableEffective := EncoderAvailable
+                             OR BypassGlobal
                              OR ((EncoderFaultBypass OR BypassProcess) AND (Mode = E_Mode.MAINT_N2));
 IF NOT EncoderAvailableEffective THEN
     ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
+ELSE
+    ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total

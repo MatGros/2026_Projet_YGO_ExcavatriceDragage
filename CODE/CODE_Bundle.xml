@@ -146,6 +146,7 @@
               <value name="INIT" value="2" />
               <value name="MONITORING" value="3" />
               <value name="ERROR" value="4" />
+              <value name="SIMULATED" value="5" />
             </values>
           </enum>
         </baseType>
@@ -161,7 +162,7 @@
               <EnumValue>
                 <Name>READY</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt (opérationnel, pas de défaut)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt (opérationnel réel, pas de défaut)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -179,7 +180,16 @@
               <EnumValue>
                 <Name>ERROR</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Présence anomalie de communication</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Présence anomalie de communication
+🆕 REX 2026-07-24 (demande utilisateur, mise en service) : distingue explicitement "bypassé
+par simulation/bypass réseau IHM" de READY (réellement online) — évite la confusion vue en
+mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypass, pas le bus réel).</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SIMULATED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation (Bus&lt;Device&gt;IsReal=FALSE) ou bypass réseau IHM actif — pas le bus réel</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -9750,20 +9760,38 @@ TimeLast := TimeCurrent;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement des défauts</xhtml>
               </documentation>
             </variable>
-            <variable name="CANbusOnline">
+            <variable name="CANbusStateRaw">
               <type>
-                <BOOL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État du bus CANopen (TRUE = OK)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 : valeurs BRUTES non interprétées — l'appelant (PRG_01) ne fait plus
+qu'acquérir, cette FB décide seule de l'interprétation (voir en-tête).
+Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — PAS 1)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeviceJoystickOnline">
+            <variable name="DeviceJoystickStateRaw">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute JOY1.GetDeviceState()</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimBypassActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick en ligne / opérationnel (TRUE = OK)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active pour ce device (SimulationModeActive AND NOT BusJoystickIsReal), calculé par l'appelant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM (GVL_IHM.Network.Bypass.Global)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -9813,7 +9841,7 @@ TimeLast := TimeCurrent;
                 <derived name="E_DiagState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diag — voir en-tête (INIT/SIMULATED/READY/ERROR)</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
@@ -9840,6 +9868,21 @@ TimeLast := TimeCurrent;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave Joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="CANbusStateRawOut">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — miroirs bruts (voir VAR_INPUT ci-dessus), lisibles directement sur
+l'instance (Device.Application.PRG_01_Diagnostics.instDiagCanOpen.&lt;Nom&gt;) sans dépendre
+du reste de la logique de bypass/simulation.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviceJoystickStateRawOut">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -9850,12 +9893,71 @@ TimeLast := TimeCurrent;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecteur front de reset</xhtml>
               </documentation>
             </variable>
+            <variable name="CANbusOnlineReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — interprétation interne (voir en-tête)
+Bus réellement actif, hors tout bypass</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviceJoystickOnlineReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick réellement RUNNING, hors tout bypass</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation OU bypass réseau IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CANbusOnlineEff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif utilisé pour la logique (réel OU bypass)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviceJoystickOnlineEff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Operational effectif utilisé pour la logique (réel OU bypass)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📡 FB_DiagCanOpen — Diagnostic de communication bus CANopen / Joystick
-   ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
+   ───────────────────────────────────────────────────────────────
+   🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE responsabilités —
+   PRG_01_Diagnostics ne transmet plus que les valeurs BRUTES (GetBusState()/GetDeviceState())
+   et les 2 bypass bruts (simulation par device, bypass réseau IHM global) ; c'est CE FB qui
+   décide désormais Online/Operational ET distingue explicitement dans `State` :
+     - INIT       : pas encore online (ni réel, ni bypass) — initialisation normale
+     - SIMULATED  : bypass actif (simulation ou bypass réseau IHM) mais bus réel PAS confirmé online
+     - READY      : bus réellement online (le bypass, actif ou non, ne change rien ici)
+     - ERROR      : défaut détecté
+   But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
+   bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
+   réel ne l'était pas.
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+
+   🐛 REX 2026-07-24 (bis) — BUG CORRIGÉ (mesure terrain mise en service) : l'ancien code comparait
+   CANbusStateRaw = 1 pour "actif", valeur JAMAIS vérifiée sur le vrai bus (devinée à l'écriture du
+   code initial). Mesure réelle : device physique "Bus Active=TRUE, Fault=FALSE" ⇒ CANbusStateRaw
+   = 2. Comparaison corrigée à = 2. ⚠️ Cette valeur reste une CONSTATATION EMPIRIQUE (pas de doc
+   vendeur consultée) — à reconfirmer si possible en simulant une vraie coupure bus (la valeur doit
+   changer et NE PLUS valoir 2).</xhtml>
           </documentation>
         </interface>
         <body>
@@ -9871,47 +9973,60 @@ IF NOT Enable THEN
     DeviceJoystick.Operational := FALSE;
     DeviceJoystick.Error := FALSE;
     DeviceJoystick.ErrorId := 16#0000;
+    // 🐛 REX 2026-07-24 (ter) — BUG CORRIGÉ : DeviceCanOpenMaster.State n'était JAMAIS assigné
+    // (ni ici, ni dans le corps normal ci-dessous) → restait figé sur sa valeur d'init DISABLED
+    // (E_DiagState := 0 par défaut) quel que soit l'état réel du bus. Constaté en mise en service :
+    // bus réellement ACTIVE mais GVL_IHM.Network.BusCanOpen.State affichait DISABLED en continu.
+    DeviceCanOpenMaster.State := E_DiagState.DISABLED;
+    DeviceCanOpenMaster.Online := FALSE;
+    DeviceCanOpenMaster.Operational := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
+    CANbusStateRawOut := CANbusStateRaw;         // 🆕 miroir toujours à jour, même désactivé
+    DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 
-// 🔑 2. RESET FRONT — Efface les défauts si la cause a disparu
+// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES (REX 2026-07-24, rapatrié depuis PRG_01_Diagnostics)
+CANbusOnlineReal         := (CANbusStateRaw = 2); // 🐛 REX 2026-07-24 (bis) : corrigé de 1 → 2 (mesure terrain, voir en-tête)
+DeviceJoystickOnlineReal := (DeviceJoystickStateRaw = DEVICE_STATE.RUNNING);
+BypassActive             := SimBypassActive OR NetworkBypassActive;
+CANbusOnlineEff          := CANbusOnlineReal OR BypassActive;
+DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR BypassActive;
+
+// 🔑 3. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    IF (CANbusOnline AND DeviceJoystickOnline) THEN
+    IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
         DeviceJoystick.ErrorId := 16#0000;
         StateAtError := E_DiagState.DISABLED;
     END_IF;
 END_IF;
 
-// 🔍 3. DIAGNOSTIC JOYSTICK
+// 🔍 4. DIAGNOSTIC JOYSTICK
 // Bit 0 : Perte de communication CAN
-IF NOT CANbusOnline THEN
-    DeviceJoystick.ErrorId := 16#0001;  (* Perte liaison CAN joystick *)
+IF NOT CANbusOnlineEff THEN
+    DeviceJoystick.ErrorId := DeviceJoystick.ErrorId OR 16#0001;  (* Perte liaison CAN joystick *)
     DeviceJoystick.Online := FALSE;
 ELSE
     DeviceJoystick.Online := TRUE;
-    IF ResetEdge.Q THEN
-        DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFE;
-    END_IF;
+    DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFE; (* Effacement auto si la liaison revient *)
 END_IF;
 
 // Bit 1 : Mode non-opérationnel (esclave CANopen en pré-op ou défaut)
-IF NOT DeviceJoystickOnline THEN
+IF NOT DeviceJoystickOnlineEff THEN
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId OR 16#0002;  (* Joystick pas opérationnel *)
     DeviceJoystick.Operational := FALSE;
 ELSE
     DeviceJoystick.Operational := TRUE;
-    IF ResetEdge.Q THEN
-        DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFD;
-    END_IF;
+    DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFD; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-// 🚦 4. MACHINE D'ÉTAT JOYSTICK
+// 🚦 5. MACHINE D'ÉTAT JOYSTICK
 // REX 2026-07-08 : correction de la précédence d'affichage IHM des états d'erreur.
+// 🆕 REX 2026-07-24 : distingue SIMULATED (bypass actif, bus réel pas confirmé) de READY (réel).
 IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
     DeviceJoystick.State := E_DiagState.ERROR;
     IF StateAtError = E_DiagState.DISABLED THEN
@@ -9919,19 +10034,35 @@ IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
     END_IF;
 ELSIF NOT (DeviceJoystick.Online AND DeviceJoystick.Operational) THEN
     DeviceJoystick.State := E_DiagState.INIT;
+ELSIF BypassActive AND NOT (CANbusOnlineReal AND DeviceJoystickOnlineReal) THEN
+    DeviceJoystick.State := E_DiagState.SIMULATED;
 ELSE
     DeviceJoystick.State := E_DiagState.READY;
 END_IF;
 
 State := DeviceJoystick.State;
 
-// 📤 5. SORTIES GLOBALES
+// 📤 6. SORTIES GLOBALES
 DeviceJoystick.Error := (DeviceJoystick.ErrorId &lt;&gt; 0);
 Error := DeviceJoystick.Error;
 ErrorId := DeviceJoystick.ErrorId;
 
-DeviceCanOpenMaster.Operational := CANbusOnline;
-DeviceCanOpenMaster.Online := CANbusOnline;
+DeviceCanOpenMaster.Operational := CANbusOnlineEff;
+DeviceCanOpenMaster.Online := CANbusOnlineEff;
+
+// 🐛 REX 2026-07-24 (ter) : State du bus maître, jamais assigné avant (voir bug ci-dessus au GATE).
+// Pas d'ErrorId propre au master (les défauts bus sont remontés via DeviceJoystick.ErrorId bit 0).
+IF NOT CANbusOnlineEff THEN
+    DeviceCanOpenMaster.State := E_DiagState.INIT;
+ELSIF BypassActive AND NOT CANbusOnlineReal THEN
+    DeviceCanOpenMaster.State := E_DiagState.SIMULATED;
+ELSE
+    DeviceCanOpenMaster.State := E_DiagState.READY;
+END_IF;
+
+// 🆕 REX 2026-07-24 — miroirs bruts (voir en-tête), toujours à jour
+CANbusStateRawOut := CANbusStateRaw;
+DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
 
 // Briques génériques pour conformité standard
 Busy := FALSE;
@@ -9964,55 +10095,65 @@ Done := FALSE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement des défauts</xhtml>
               </documentation>
             </variable>
-            <variable name="DeviceVariateurOnline">
+            <variable name="DeviceVariateurStateRaw">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 : valeurs BRUTES non interprétées — l'appelant (PRG_01) ne fait plus
+qu'acquérir, cette FB décide seule de l'interprétation (voir en-tête).
+Variateur M3 (AC600_ECAT_Drive)
+Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviceVariateurSimBypass">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Variateur M3 (AC600_ECAT_Drive)
-Variateur en ligne (TRUE = OK)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active (SimulationModeActive AND NOT BusVariateurM3IsReal), calculé par l'appelant</xhtml>
               </documentation>
             </variable>
-            <variable name="DeviceVariateurState">
+            <variable name="DeviceEncoderM1StateRaw">
               <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État esclave variateur (8 = OP)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviceEncoderM1Online">
-              <type>
-                <BOOL />
+                <derived name="DEVICE_STATE" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M1 (COD1_CODEUR)
-Encodeur M1 en ligne (TRUE = OK)</xhtml>
+Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
               </documentation>
             </variable>
-            <variable name="DeviceEncoderM1State">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État esclave encodeur M1 (8 = OP)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviceEncoderM2Online">
+            <variable name="DeviceEncoderM1SimBypass">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M2 (COD2_CODEUR)
-Encodeur M2 en ligne (TRUE = OK)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active (SimulationModeActive AND NOT BusEncoderM1IsReal)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeviceEncoderM2State">
+            <variable name="DeviceEncoderM2StateRaw">
               <type>
-                <WORD />
+                <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État esclave encodeur M2 (8 = OP)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M2 (COD2_CODEUR)
+Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviceEncoderM2SimBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active (SimulationModeActive AND NOT BusEncoderM2IsReal)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NetworkBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM (GVL_IHM.Network.Bypass.Global), commun aux 3 devices</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -10062,7 +10203,7 @@ Encodeur M2 en ligne (TRUE = OK)</xhtml>
                 <derived name="E_DiagState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du diagnostic global</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du diagnostic global — voir en-tête</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
@@ -10105,6 +10246,25 @@ Encodeur M2 en ligne (TRUE = OK)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD2</xhtml>
               </documentation>
             </variable>
+            <variable name="DeviceVariateurStateRawOut">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — miroirs bruts (voir VAR_INPUT ci-dessus), lisibles directement sur
+l'instance (Device.Application.PRG_01_Diagnostics.instDiagEthercat.&lt;Nom&gt;).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviceEncoderM1StateRawOut">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+            </variable>
+            <variable name="DeviceEncoderM2StateRawOut">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -10115,11 +10275,77 @@ Encodeur M2 en ligne (TRUE = OK)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecteur front de reset</xhtml>
               </documentation>
             </variable>
+            <variable name="VariateurOnlineReal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — interprétation interne (voir en-tête)
+GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1OnlineReal">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EncoderM2OnlineReal">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="VariateurBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation OU bypass réseau IHM, pour ce device</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1Bypass">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EncoderM2Bypass">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="VariateurOnlineEff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif utilisé pour la logique (réel OU bypass)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1OnlineEff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EncoderM2OnlineEff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📡 FB_DiagEthercat — Diagnostic de communication bus EtherCAT (3 esclaves)
-   ═══════════════════════════════════════════════════════════════
+   ───────────────────────────────────────────────────────────────
+   🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE responsabilités —
+   PRG_01_Diagnostics ne transmet plus que les valeurs BRUTES (GetDeviceState()) et les 2 bypass
+   bruts par device (simulation, bypass réseau IHM global) ; c'est CE FB qui décide désormais
+   Online/Operational ET distingue explicitement dans `State` :
+     - INIT       : pas encore online (ni réel, ni bypass) — initialisation normale
+     - SIMULATED  : bypass actif (simulation ou bypass réseau IHM) mais bus réel PAS confirmé online
+     - READY      : bus réellement online (le bypass, actif ou non, ne change rien ici)
+     - ERROR      : défaut détecté
+   But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
+   bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
+   réel ne l'était pas.
    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
           </documentation>
         </interface>
@@ -10145,103 +10371,98 @@ IF NOT Enable THEN
     DeviceEncoderM2.Error := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
+    // 🐛 REX 2026-07-24 (ter) — BUG CORRIGÉ (même bug que FB_DiagCanOpen, trouvé en mise en
+    // service) : DeviceEthercatMaster.State/.Online/.Operational n'étaient JAMAIS remis à zéro ici
+    // (ni .State assigné nulle part dans le corps normal) → restaient figés sur la dernière valeur
+    // active (ou DISABLED=0 par défaut au tout premier cycle) même après désactivation/rechargement.
+    DeviceEthercatMaster.State := E_DiagState.DISABLED;
+    DeviceEthercatMaster.Online := FALSE;
+    DeviceEthercatMaster.Operational := FALSE;
+    // 🆕 miroirs bruts toujours à jour, même désactivé (voir en-tête)
+    DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
+    DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
+    DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 
-// 🔑 2. RESET FRONT
+// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES (REX 2026-07-24, rapatrié depuis PRG_01_Diagnostics)
+VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
+EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
+EncoderM2OnlineReal := (DeviceEncoderM2StateRaw = DEVICE_STATE.RUNNING);
+
+VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive;
+EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive;
+EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive;
+
+VariateurOnlineEff := VariateurOnlineReal OR VariateurBypass;
+EncoderM1OnlineEff := EncoderM1OnlineReal OR EncoderM1Bypass;
+EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
+
+// 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
 
-// 🔍 3. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
-DeviceVariateur.Online := DeviceVariateurOnline;
-DeviceVariateur.Operational := DeviceVariateur.Online AND (DeviceVariateurState = 8);
+// 🔍 4. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
+DeviceVariateur.Online := VariateurOnlineEff;
+DeviceVariateur.Operational := VariateurOnlineEff;
 
 IF NOT DeviceVariateur.Online THEN
-    DeviceVariateur.ErrorId := 16#0010;  (* Perte liaison physique variateur *)
+    DeviceVariateur.ErrorId := DeviceVariateur.ErrorId OR 16#0010;  (* Perte liaison physique variateur *)
 ELSE
-    IF ResetEdge.Q THEN
-        DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEF;
-    END_IF;
+    DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-IF NOT DeviceVariateur.Operational AND DeviceVariateur.Online THEN
-    DeviceVariateur.ErrorId := DeviceVariateur.ErrorId OR 16#0011;  (* Variateur pré-opérationnel *)
-ELSE
-    IF ResetEdge.Q THEN
-        DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEE;
-    END_IF;
-END_IF;
-
-// 🔍 4. DIAGNOSTIC ENCODEUR M1 (COD1_CODEUR / WinchM1)
-DeviceEncoderM1.Online := DeviceEncoderM1Online;
-DeviceEncoderM1.Operational := DeviceEncoderM1.Online AND (DeviceEncoderM1State = 8);
+// 🔍 5. DIAGNOSTIC ENCODEUR M1 (COD1_CODEUR / WinchM1)
+DeviceEncoderM1.Online := EncoderM1OnlineEff;
+DeviceEncoderM1.Operational := EncoderM1OnlineEff;
 
 IF NOT DeviceEncoderM1.Online THEN
-    DeviceEncoderM1.ErrorId := 16#0020;  (* Perte liaison encodeur M1 *)
+    DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId OR 16#0020;  (* Perte liaison encodeur M1 *)
 ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDF;
-    END_IF;
+    DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-IF NOT DeviceEncoderM1.Operational AND DeviceEncoderM1.Online THEN
-    DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId OR 16#0021;  (* Encodeur M1 pré-opérationnel *)
-ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDE;
-    END_IF;
-END_IF;
-
-// 🔍 5. DIAGNOSTIC ENCODEUR M2 (COD2_CODEUR / WinchM2)
-DeviceEncoderM2.Online := DeviceEncoderM2Online;
-DeviceEncoderM2.Operational := DeviceEncoderM2.Online AND (DeviceEncoderM2State = 8);
+// 🔍 6. DIAGNOSTIC ENCODEUR M2 (COD2_CODEUR / WinchM2)
+DeviceEncoderM2.Online := EncoderM2OnlineEff;
+DeviceEncoderM2.Operational := EncoderM2OnlineEff;
 
 IF NOT DeviceEncoderM2.Online THEN
-    DeviceEncoderM2.ErrorId := 16#0030;  (* Perte liaison encodeur M2 *)
+    DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId OR 16#0030;  (* Perte liaison encodeur M2 *)
 ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF;
-    END_IF;
+    DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-IF NOT DeviceEncoderM2.Operational AND DeviceEncoderM2.Online THEN
-    DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId OR 16#0031;  (* Encodeur M2 pré-opérationnel *)
-ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCE;
-    END_IF;
-END_IF;
-
-// 🚦 6. STATE MACHINES DE CHAQUE APPAREIL
+// 🚦 7. STATE MACHINES DE CHAQUE APPAREIL — 🆕 REX 2026-07-24 : distingue SIMULATED (bypass actif,
+// bus réel pas confirmé) de READY (réel).
 IF DeviceVariateur.ErrorId &lt;&gt; 0 THEN
     DeviceVariateur.State := E_DiagState.ERROR;
-ELSIF NOT DeviceVariateur.Online THEN
+ELSIF NOT VariateurOnlineEff THEN
     DeviceVariateur.State := E_DiagState.INIT;
-ELSIF DeviceVariateur.Operational THEN
-    DeviceVariateur.State := E_DiagState.READY;
+ELSIF VariateurBypass AND NOT VariateurOnlineReal THEN
+    DeviceVariateur.State := E_DiagState.SIMULATED;
 ELSE
-    DeviceVariateur.State := E_DiagState.MONITORING;
+    DeviceVariateur.State := E_DiagState.READY;
 END_IF;
 
 IF DeviceEncoderM1.ErrorId &lt;&gt; 0 THEN
     DeviceEncoderM1.State := E_DiagState.ERROR;
-ELSIF NOT DeviceEncoderM1.Online THEN
+ELSIF NOT EncoderM1OnlineEff THEN
     DeviceEncoderM1.State := E_DiagState.INIT;
-ELSIF DeviceEncoderM1.Operational THEN
-    DeviceEncoderM1.State := E_DiagState.READY;
+ELSIF EncoderM1Bypass AND NOT EncoderM1OnlineReal THEN
+    DeviceEncoderM1.State := E_DiagState.SIMULATED;
 ELSE
-    DeviceEncoderM1.State := E_DiagState.MONITORING;
+    DeviceEncoderM1.State := E_DiagState.READY;
 END_IF;
 
 IF DeviceEncoderM2.ErrorId &lt;&gt; 0 THEN
     DeviceEncoderM2.State := E_DiagState.ERROR;
-ELSIF NOT DeviceEncoderM2.Online THEN
+ELSIF NOT EncoderM2OnlineEff THEN
     DeviceEncoderM2.State := E_DiagState.INIT;
-ELSIF DeviceEncoderM2.Operational THEN
-    DeviceEncoderM2.State := E_DiagState.READY;
+ELSIF EncoderM2Bypass AND NOT EncoderM2OnlineReal THEN
+    DeviceEncoderM2.State := E_DiagState.SIMULATED;
 ELSE
-    DeviceEncoderM2.State := E_DiagState.MONITORING;
+    DeviceEncoderM2.State := E_DiagState.READY;
 END_IF;
 
 // Fige la phase du diagnostic global sur le premier défaut
@@ -10251,7 +10472,7 @@ IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR 
     END_IF;
 END_IF;
 
-// 📤 7. RÉSUMÉ ET DÉFAUTS
+// 📤 8. RÉSUMÉ ET DÉFAUTS
 DeviceVariateur.Error := (DeviceVariateur.ErrorId &lt;&gt; 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId &lt;&gt; 0);
 DeviceEncoderM2.Error := (DeviceEncoderM2.ErrorId &lt;&gt; 0);
@@ -10271,14 +10492,22 @@ END_IF;
 
 IF Error THEN
     State := E_DiagState.ERROR;
-ELSIF NOT (DeviceVariateur.Operational AND DeviceEncoderM1.Operational AND DeviceEncoderM2.Operational) THEN
-    State := E_DiagState.MONITORING;
+ELSIF NOT (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) THEN
+    State := E_DiagState.INIT;
+ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass)
+      AND NOT (VariateurOnlineReal AND EncoderM1OnlineReal AND EncoderM2OnlineReal) THEN
+    State := E_DiagState.SIMULATED;
 ELSE
     State := E_DiagState.READY;
 END_IF;
 
-DeviceEthercatMaster.Online := DeviceVariateur.Online AND DeviceEncoderM1.Online AND DeviceEncoderM2.Online;
-DeviceEthercatMaster.Operational := DeviceVariateur.Operational AND DeviceEncoderM1.Operational AND DeviceEncoderM2.Operational;
+DeviceEthercatMaster.Online := VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff;
+DeviceEthercatMaster.Operational := DeviceEthercatMaster.Online;
+
+// 🆕 REX 2026-07-24 — miroirs bruts (voir en-tête), toujours à jour
+DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
+DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
+DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
 
 Busy := FALSE;
 Done := FALSE;
@@ -11156,8 +11385,8 @@ ResetEdge(CLK := Reset);
 // 🔍 3. DIAGNOSTIC BUS / ALARME
 IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
     ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
 END_IF;
 EncoderAvailable := (ErrorId AND 16#0001) = 0;
 
@@ -11697,13 +11926,10 @@ IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
     ELSIF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
         ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
     ELSIF NOT BypassGlobal AND NOT UnitaryMode AND (TargetPositionM &lt;&gt; 0.0) AND TopPositionSensor THEN
-        // 🔧 CORRIGÉ 2026-07-04 : polarité inversée (testait NOT TopPositionSensor). Convention
-        // NAMING_CONVENTION.md : TRUE = sain/non atteint, FALSE = position haute confirmée
-        // (contact ouvert) — le Home nominal doit être rejeté tant que TopPositionSensor=TRUE.
-        // 🆕 Si TargetPositionM = 0.0 (homing à zéro), on ignore le capteur haut (position courante).
         ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
+        ErrorId := ErrorId AND 16#FFC0;       // Nettoie les erreurs de rejet 0..5
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         PresetValue := PresetValueCalc;
@@ -11722,11 +11948,8 @@ IF State = E_State.BUSY THEN
         Calib.LastKnownRawPos := PresetValueCalc;
         Done := TRUE;
         State := E_State.READY;
-        // 🔧 REX 2026-07-07 : un homing réussi re-établit la référence tout aussi validement
-        // qu'un BtnConfirmCoherence explicite — efface donc aussi bit9 (incohérence redémarrage),
-        // sinon ErrorId/Error restait bloqué à TRUE après un homing réussi (jamais mappé vers
-        // l'IHM, invisible sauf sur GVL_IHM.Modes.State.AnyFaultActive qui restait à 1 sans raison visible).
-        ErrorId := ErrorId AND 16#FDFF;
+        // 🔧 REX 2026-07-24 : Un homing réussi efface l'intégralité de ErrorId (y compris les anciens rejets 0..5 et le bit9)
+        ErrorId := 16#0000;
     ELSIF PresetNak THEN
         ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
         State := E_State.READY;
@@ -11970,8 +12193,8 @@ END_IF;
 // 🔍 3. BORNAGE PHYSIQUE ABSOLU (§3.6) — bit0
 IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que la position revient dans la plage valide *)
 END_IF;
 
 // 🔍 4. RELAIS INCOHÉRENCE REDÉMARRAGE (§3.7, calculée par FB_Encoder_Homing) — bit1
@@ -20095,11 +20318,12 @@ END_IF;
 // Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
 // Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
 EncoderAvailableEffective := EncoderAvailable
+                             OR BypassGlobal
                              OR ((EncoderFaultBypass OR BypassProcess) AND (Mode = E_Mode.MAINT_N2));
 IF NOT EncoderAvailableEffective THEN
     ErrorId := ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
+ELSE
+    ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
@@ -29525,10 +29749,7 @@ CASE Mode OF
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
-// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'écart
-IF NOT BypassGlobal THEN
-
-// 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
+// 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
     DeltaPosM := ABS(SignedDeltaPosM);
@@ -29536,6 +29757,9 @@ ELSE
     SignedDeltaPosM := 0.0;
     DeltaPosM := 0.0;
 END_IF;
+
+// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
+IF NOT BypassGlobal THEN
 
 // 🔍 5. DÉTECTION ÉCART HORS TOLÉRANCE — bit0
 // 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
@@ -29991,29 +30215,26 @@ IF NOT HmiCommandsInitialized
    OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
     GVL_IHM.HmiInitDone := FALSE;
 
-    GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Modes.Cmd.BtnModeReset := FALSE;
+    // 🔧 REX 2026-07-24 (demande utilisateur) : Les boutons d'acquittement/reset (BtnFaultReset, etc.)
+    // ne sont plus écrasés en boucle à FALSE par l'automate. Les blocs métier utilisent leur propre R_TRIG (ResetEdge).
+    // Cela permet au technicien terrain de basculer la variable librement à 1 puis 0 dans CODESYS.
     GVL_IHM.Modes.Cmd.BtnEmergencyArming := FALSE;
 
-    GVL_IHM.M1TreuilRetenue.Cmd.BtnReset := FALSE;
     GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence := FALSE;
-    GVL_IHM.M2TreuilBenne.Cmd.BtnReset := FALSE;
     GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
     GVL_IHM.M2TreuilBenne.Bypass.EncoderFault := FALSE;
     GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence := FALSE;
 
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := FALSE;
-    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
 
     GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
     GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
     GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
-    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 
     GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;
@@ -30272,6 +30493,49 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety</xhtml>
               </documentation>
             </variable>
+            <variable name="RawCanBusState">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
+valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device :
+une fois pour le test logique ci-dessous, une fois pour le miroir diag brut sur les FB).
+CANbus.GetBusState() brut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawJoystickState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() brut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawVariateurState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AC600_ECAT_Drive.GetDeviceState() brut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawEncoderM1State">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">COD1_CODEUR.GetDeviceState() brut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawEncoderM2State">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">COD2_CODEUR.GetDeviceState() brut</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -30307,42 +30571,51 @@ instSimJoystick(
     TestOverrideRawButton := GVL_PLC_Tests.OverrideJoystickRawButton
 );
 
+// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 ne fait plus
+// qu'ACQUÉRIR les valeurs brutes bus (GetBusState()/GetDeviceState()) et les flags de simulation ;
+// c'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
+// (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
+// Values lues UNE fois par cycle (variables déclarées en VAR ci-dessus), réutilisées ci-dessous.
+RawCanBusState    := CANbus.GetBusState();
+RawJoystickState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState();
+RawVariateurState := AC600_ECAT_Drive.GetDeviceState();
+RawEncoderM1State := COD1_CODEUR.GetDeviceState();
+RawEncoderM2State := COD2_CODEUR.GetDeviceState();
+
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par BusJoystickIsReal UNIQUEMENT (bus/nœud),
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
-// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — BusJoystickIsReal seul pilote
-// désormais ce bypass diag, pour rester actif même simulation globale coupée (banc sans bus
-// CANopen câblé). Repasser BusJoystickIsReal := TRUE au câblage réel du bus/nœud CANopen.
 instDiagCanOpen(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    CANbusOnline := (CANbus.GetBusState() = 1) OR (NOT GVL_Simulation.BusJoystickIsReal) OR GVL_IHM.Network.Bypass.Global, // 1 = ACTIVE (ou bypass)
-    DeviceJoystickOnline := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusJoystickIsReal) OR GVL_IHM.Network.Bypass.Global
+    CANbusStateRaw := RawCanBusState,
+    DeviceJoystickStateRaw := RawJoystickState,
+    SimBypassActive := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusJoystickIsReal,
+    NetworkBypassActive := GVL_IHM.Network.Bypass.Global
 );
 
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
-// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — Bus&lt;Device&gt;IsReal seul pilote
-// désormais ce bypass diag par device, pour rester actif même simulation globale coupée (banc
-// sans bus EtherCAT câblé). Repasser chaque Bus&lt;Device&gt;IsReal := TRUE au câblage réel.
 instDiagEthercat(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
-    DeviceVariateurOnline := (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusVariateurM3IsReal) OR GVL_IHM.Network.Bypass.Global,
-    DeviceVariateurState := SEL((NOT GVL_Simulation.BusVariateurM3IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8),
-    DeviceEncoderM1Online := (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusEncoderM1IsReal) OR GVL_IHM.Network.Bypass.Global,
-    DeviceEncoderM1State := SEL((NOT GVL_Simulation.BusEncoderM1IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8),
-    DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusEncoderM2IsReal) OR GVL_IHM.Network.Bypass.Global,
-    DeviceEncoderM2State := SEL((NOT GVL_Simulation.BusEncoderM2IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8)
+    DeviceVariateurStateRaw := RawVariateurState,
+    DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal,
+    DeviceEncoderM1StateRaw := RawEncoderM1State,
+    DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal,
+    DeviceEncoderM2StateRaw := RawEncoderM2State,
+    DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal,
+    NetworkBypassActive := GVL_IHM.Network.Bypass.Global
 );
 
 // 💓 2bis. Heartbeat IHM↔PLC — appelé avant PRG_03_Safety pour fournir le statut même cycle.
-// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — BusIhmHeartbeatIsReal seul
-// pilote désormais ce bypass, pour rester actif même simulation globale coupée (IHM réelle pas
-// encore câblée niveau visu). Sans IHM réelle sur banc, BlinkClock fournit un toggle sain ;
-// mettre BusIhmHeartbeatIsReal := TRUE dès que la visu toggle réellement TglHeartbeatIhm.
+// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : RE-COUPLÉ à SimulationModeActive
+// (annule le découplage REX 2026-07-22, même raison qu'au §1/§2 ci-dessus). Bypass actif
+// UNIQUEMENT si SimulationModeActive=TRUE ET BusIhmHeartbeatIsReal=FALSE. Sans IHM réelle sur
+// banc (simulation active), BlinkClock fournit un toggle sain ; mettre BusIhmHeartbeatIsReal :=
+// TRUE dès que la visu toggle réellement TglHeartbeatIhm.
 instIhmHeartbeat(
     Enable := TRUE,
     TglHeartbeatIhm := SEL(GVL_PLC_Tests.OverrideIhmHeartbeatActive,
-                              SEL(NOT GVL_Simulation.BusIhmHeartbeatIsReal,
+                              SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusIhmHeartbeatIsReal,
                                   GVL_IHM.Commun.TglHeartbeatIhm,
                                   GVL_Global.BlinkClock),
                               GVL_PLC_Tests.OverrideIhmHeartbeatToggle),
@@ -32709,7 +32982,9 @@ GVL_IHM.M1TreuilRetenue.Safety.ForbidDescent     := PRG_06_WinchControl.ForbidDe
 GVL_IHM.M1TreuilRetenue.Safety.ForbidAscent      := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
 GVL_IHM.M1TreuilRetenue.Safety.SlackCable        := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M1TreuilRetenue.Safety.ThermalFault      := NOT PRG_00_Inputs.M1ThermalFeedback;
-GVL_IHM.M1TreuilRetenue.Safety.EncoderFault      := NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent;
+GVL_IHM.M1TreuilRetenue.Safety.EncoderFault      := (NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent)
+                                                    AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global
+                                                    AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;
 GVL_IHM.M1TreuilRetenue.Safety.BypassActive      := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
                                                      AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.Safety.CableLimitDescent := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) &lt;&gt; 16#0000;
@@ -32774,7 +33049,9 @@ GVL_IHM.M2TreuilBenne.Safety.ForbidDescent     := PRG_06_WinchControl.ForbidDesc
 GVL_IHM.M2TreuilBenne.Safety.ForbidAscent      := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
 GVL_IHM.M2TreuilBenne.Safety.SlackCable        := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M2TreuilBenne.Safety.ThermalFault      := NOT PRG_00_Inputs.M2ThermalFeedback;
-GVL_IHM.M2TreuilBenne.Safety.EncoderFault      := NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent;
+GVL_IHM.M2TreuilBenne.Safety.EncoderFault      := (NOT PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM2.EncoderIncoherent)
+                                                  AND NOT GVL_IHM.M2TreuilBenne.Bypass.Global
+                                                  AND NOT GVL_IHM.M2TreuilBenne.Bypass.EncoderFault;
 GVL_IHM.M2TreuilBenne.Safety.BypassActive      := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault
                                                      AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M2TreuilBenne.Safety.CableLimitDescent := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) &lt;&gt; 16#0000;

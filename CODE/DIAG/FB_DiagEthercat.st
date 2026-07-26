@@ -1,24 +1,39 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 FB_DiagEthercat — Diagnostic de communication bus EtherCAT (3 esclaves)
-   ═══════════════════════════════════════════════════════════════
+   ───────────────────────────────────────────────────────────────
+   🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE responsabilités —
+   PRG_01_Diagnostics ne transmet plus que les valeurs BRUTES (GetDeviceState()) et les 2 bypass
+   bruts par device (simulation, bypass réseau IHM global) ; c'est CE FB qui décide désormais
+   Online/Operational ET distingue explicitement dans `State` :
+     - INIT       : pas encore online (ni réel, ni bypass) — initialisation normale
+     - SIMULATED  : bypass actif (simulation ou bypass réseau IHM) mais bus réel PAS confirmé online
+     - READY      : bus réellement online (le bypass, actif ou non, ne change rien ici)
+     - ERROR      : défaut détecté
+   But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
+   bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
+   réel ne l'était pas.
    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
 *)
 FUNCTION_BLOCK PUBLIC FB_DiagEthercat
 VAR_INPUT
     Enable              : BOOL;        (* Active la surveillance EtherCAT *)
     Reset               : BOOL;        (* Front d'acquittement des défauts *)
-    
+
+    // 🆕 REX 2026-07-24 : valeurs BRUTES non interprétées — l'appelant (PRG_01) ne fait plus
+    // qu'acquérir, cette FB décide seule de l'interprétation (voir en-tête).
     (* Variateur M3 (AC600_ECAT_Drive) *)
-    DeviceVariateurOnline : BOOL;      (* Variateur en ligne (TRUE = OK) *)
-    DeviceVariateurState : WORD;       (* État esclave variateur (8 = OP) *)
-    
+    DeviceVariateurStateRaw     : DEVICE_STATE; (* Valeur brute AC600_ECAT_Drive.GetDeviceState() *)
+    DeviceVariateurSimBypass    : BOOL;         (* TRUE = simulation active (SimulationModeActive AND NOT BusVariateurM3IsReal), calculé par l'appelant *)
+
     (* Encodeur M1 (COD1_CODEUR) *)
-    DeviceEncoderM1Online : BOOL;      (* Encodeur M1 en ligne (TRUE = OK) *)
-    DeviceEncoderM1State : WORD;       (* État esclave encodeur M1 (8 = OP) *)
-    
+    DeviceEncoderM1StateRaw     : DEVICE_STATE; (* Valeur brute COD1_CODEUR.GetDeviceState() *)
+    DeviceEncoderM1SimBypass    : BOOL;         (* TRUE = simulation active (SimulationModeActive AND NOT BusEncoderM1IsReal) *)
+
     (* Encodeur M2 (COD2_CODEUR) *)
-    DeviceEncoderM2Online : BOOL;      (* Encodeur M2 en ligne (TRUE = OK) *)
-    DeviceEncoderM2State : WORD;       (* État esclave encodeur M2 (8 = OP) *)
+    DeviceEncoderM2StateRaw     : DEVICE_STATE; (* Valeur brute COD2_CODEUR.GetDeviceState() *)
+    DeviceEncoderM2SimBypass    : BOOL;         (* TRUE = simulation active (SimulationModeActive AND NOT BusEncoderM2IsReal) *)
+
+    NetworkBypassActive         : BOOL;         (* TRUE = bypass réseau global IHM (GVL_IHM.Network.Bypass.Global), commun aux 3 devices *)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;        (* Logique de surveillance active *)
@@ -26,15 +41,30 @@ VAR_OUTPUT
     Done                : BOOL;        (* Non utilisé *)
     Error               : BOOL;        (* Résumé anomalie de communication bus *)
     ErrorId             : WORD;        (* Code défaut global résumé *)
-    State               : E_DiagState; (* Phase courante du diagnostic global *)
+    State               : E_DiagState; (* Phase courante du diagnostic global — voir en-tête *)
     StateAtError        : E_DiagState; (* Phase figée à l'apparition de l'erreur *)
     DeviceEthercatMaster : ST_DiagDevice; (* Diagnostics bus EtherCAT *)
     DeviceVariateur     : ST_DiagDevice;  (* Diagnostics esclave AC600 *)
     DeviceEncoderM1     : ST_DiagDevice;  (* Diagnostics esclave COD1 *)
     DeviceEncoderM2     : ST_DiagDevice;  (* Diagnostics esclave COD2 *)
+    // 🆕 REX 2026-07-24 — miroirs bruts (voir VAR_INPUT ci-dessus), lisibles directement sur
+    // l'instance (Device.Application.PRG_01_Diagnostics.instDiagEthercat.<Nom>).
+    DeviceVariateurStateRawOut : DEVICE_STATE;
+    DeviceEncoderM1StateRawOut : DEVICE_STATE;
+    DeviceEncoderM2StateRawOut : DEVICE_STATE;
 END_VAR
 VAR
     ResetEdge           : R_TRIG;      (* Détecteur front de reset *)
+    // 🆕 REX 2026-07-24 — interprétation interne (voir en-tête)
+    VariateurOnlineReal  : BOOL; (* GetDeviceState() = RUNNING, hors tout bypass *)
+    EncoderM1OnlineReal  : BOOL;
+    EncoderM2OnlineReal  : BOOL;
+    VariateurBypass      : BOOL; (* Simulation OU bypass réseau IHM, pour ce device *)
+    EncoderM1Bypass      : BOOL;
+    EncoderM2Bypass      : BOOL;
+    VariateurOnlineEff   : BOOL; (* Online effectif utilisé pour la logique (réel OU bypass) *)
+    EncoderM1OnlineEff   : BOOL;
+    EncoderM2OnlineEff   : BOOL;
 END_VAR
 
 // 🛑 1. GATE : Désactivation si Enable = FALSE
@@ -55,103 +85,98 @@ IF NOT Enable THEN
     DeviceEncoderM2.Error := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
+    // 🐛 REX 2026-07-24 (ter) — BUG CORRIGÉ (même bug que FB_DiagCanOpen, trouvé en mise en
+    // service) : DeviceEthercatMaster.State/.Online/.Operational n'étaient JAMAIS remis à zéro ici
+    // (ni .State assigné nulle part dans le corps normal) → restaient figés sur la dernière valeur
+    // active (ou DISABLED=0 par défaut au tout premier cycle) même après désactivation/rechargement.
+    DeviceEthercatMaster.State := E_DiagState.DISABLED;
+    DeviceEthercatMaster.Online := FALSE;
+    DeviceEthercatMaster.Operational := FALSE;
+    // 🆕 miroirs bruts toujours à jour, même désactivé (voir en-tête)
+    DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
+    DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
+    DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 
-// 🔑 2. RESET FRONT
+// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES (REX 2026-07-24, rapatrié depuis PRG_01_Diagnostics)
+VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
+EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
+EncoderM2OnlineReal := (DeviceEncoderM2StateRaw = DEVICE_STATE.RUNNING);
+
+VariateurBypass := DeviceVariateurSimBypass OR NetworkBypassActive;
+EncoderM1Bypass := DeviceEncoderM1SimBypass OR NetworkBypassActive;
+EncoderM2Bypass := DeviceEncoderM2SimBypass OR NetworkBypassActive;
+
+VariateurOnlineEff := VariateurOnlineReal OR VariateurBypass;
+EncoderM1OnlineEff := EncoderM1OnlineReal OR EncoderM1Bypass;
+EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
+
+// 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
 
-// 🔍 3. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
-DeviceVariateur.Online := DeviceVariateurOnline;
-DeviceVariateur.Operational := DeviceVariateur.Online AND (DeviceVariateurState = 8);
+// 🔍 4. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
+DeviceVariateur.Online := VariateurOnlineEff;
+DeviceVariateur.Operational := VariateurOnlineEff;
 
 IF NOT DeviceVariateur.Online THEN
-    DeviceVariateur.ErrorId := 16#0010;  (* Perte liaison physique variateur *)
+    DeviceVariateur.ErrorId := DeviceVariateur.ErrorId OR 16#0010;  (* Perte liaison physique variateur *)
 ELSE
-    IF ResetEdge.Q THEN
-        DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEF;
-    END_IF;
+    DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-IF NOT DeviceVariateur.Operational AND DeviceVariateur.Online THEN
-    DeviceVariateur.ErrorId := DeviceVariateur.ErrorId OR 16#0011;  (* Variateur pré-opérationnel *)
-ELSE
-    IF ResetEdge.Q THEN
-        DeviceVariateur.ErrorId := DeviceVariateur.ErrorId AND 16#FFEE;
-    END_IF;
-END_IF;
-
-// 🔍 4. DIAGNOSTIC ENCODEUR M1 (COD1_CODEUR / WinchM1)
-DeviceEncoderM1.Online := DeviceEncoderM1Online;
-DeviceEncoderM1.Operational := DeviceEncoderM1.Online AND (DeviceEncoderM1State = 8);
+// 🔍 5. DIAGNOSTIC ENCODEUR M1 (COD1_CODEUR / WinchM1)
+DeviceEncoderM1.Online := EncoderM1OnlineEff;
+DeviceEncoderM1.Operational := EncoderM1OnlineEff;
 
 IF NOT DeviceEncoderM1.Online THEN
-    DeviceEncoderM1.ErrorId := 16#0020;  (* Perte liaison encodeur M1 *)
+    DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId OR 16#0020;  (* Perte liaison encodeur M1 *)
 ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDF;
-    END_IF;
+    DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-IF NOT DeviceEncoderM1.Operational AND DeviceEncoderM1.Online THEN
-    DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId OR 16#0021;  (* Encodeur M1 pré-opérationnel *)
-ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM1.ErrorId := DeviceEncoderM1.ErrorId AND 16#FFDE;
-    END_IF;
-END_IF;
-
-// 🔍 5. DIAGNOSTIC ENCODEUR M2 (COD2_CODEUR / WinchM2)
-DeviceEncoderM2.Online := DeviceEncoderM2Online;
-DeviceEncoderM2.Operational := DeviceEncoderM2.Online AND (DeviceEncoderM2State = 8);
+// 🔍 6. DIAGNOSTIC ENCODEUR M2 (COD2_CODEUR / WinchM2)
+DeviceEncoderM2.Online := EncoderM2OnlineEff;
+DeviceEncoderM2.Operational := EncoderM2OnlineEff;
 
 IF NOT DeviceEncoderM2.Online THEN
-    DeviceEncoderM2.ErrorId := 16#0030;  (* Perte liaison encodeur M2 *)
+    DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId OR 16#0030;  (* Perte liaison encodeur M2 *)
 ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF;
-    END_IF;
+    DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-IF NOT DeviceEncoderM2.Operational AND DeviceEncoderM2.Online THEN
-    DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId OR 16#0031;  (* Encodeur M2 pré-opérationnel *)
-ELSE
-    IF ResetEdge.Q THEN
-        DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCE;
-    END_IF;
-END_IF;
-
-// 🚦 6. STATE MACHINES DE CHAQUE APPAREIL
+// 🚦 7. STATE MACHINES DE CHAQUE APPAREIL — 🆕 REX 2026-07-24 : distingue SIMULATED (bypass actif,
+// bus réel pas confirmé) de READY (réel).
 IF DeviceVariateur.ErrorId <> 0 THEN
     DeviceVariateur.State := E_DiagState.ERROR;
-ELSIF NOT DeviceVariateur.Online THEN
+ELSIF NOT VariateurOnlineEff THEN
     DeviceVariateur.State := E_DiagState.INIT;
-ELSIF DeviceVariateur.Operational THEN
-    DeviceVariateur.State := E_DiagState.READY;
+ELSIF VariateurBypass AND NOT VariateurOnlineReal THEN
+    DeviceVariateur.State := E_DiagState.SIMULATED;
 ELSE
-    DeviceVariateur.State := E_DiagState.MONITORING;
+    DeviceVariateur.State := E_DiagState.READY;
 END_IF;
 
 IF DeviceEncoderM1.ErrorId <> 0 THEN
     DeviceEncoderM1.State := E_DiagState.ERROR;
-ELSIF NOT DeviceEncoderM1.Online THEN
+ELSIF NOT EncoderM1OnlineEff THEN
     DeviceEncoderM1.State := E_DiagState.INIT;
-ELSIF DeviceEncoderM1.Operational THEN
-    DeviceEncoderM1.State := E_DiagState.READY;
+ELSIF EncoderM1Bypass AND NOT EncoderM1OnlineReal THEN
+    DeviceEncoderM1.State := E_DiagState.SIMULATED;
 ELSE
-    DeviceEncoderM1.State := E_DiagState.MONITORING;
+    DeviceEncoderM1.State := E_DiagState.READY;
 END_IF;
 
 IF DeviceEncoderM2.ErrorId <> 0 THEN
     DeviceEncoderM2.State := E_DiagState.ERROR;
-ELSIF NOT DeviceEncoderM2.Online THEN
+ELSIF NOT EncoderM2OnlineEff THEN
     DeviceEncoderM2.State := E_DiagState.INIT;
-ELSIF DeviceEncoderM2.Operational THEN
-    DeviceEncoderM2.State := E_DiagState.READY;
+ELSIF EncoderM2Bypass AND NOT EncoderM2OnlineReal THEN
+    DeviceEncoderM2.State := E_DiagState.SIMULATED;
 ELSE
-    DeviceEncoderM2.State := E_DiagState.MONITORING;
+    DeviceEncoderM2.State := E_DiagState.READY;
 END_IF;
 
 // Fige la phase du diagnostic global sur le premier défaut
@@ -161,7 +186,7 @@ IF (DeviceVariateur.ErrorId <> 0 OR DeviceEncoderM1.ErrorId <> 0 OR DeviceEncode
     END_IF;
 END_IF;
 
-// 📤 7. RÉSUMÉ ET DÉFAUTS
+// 📤 8. RÉSUMÉ ET DÉFAUTS
 DeviceVariateur.Error := (DeviceVariateur.ErrorId <> 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId <> 0);
 DeviceEncoderM2.Error := (DeviceEncoderM2.ErrorId <> 0);
@@ -181,14 +206,22 @@ END_IF;
 
 IF Error THEN
     State := E_DiagState.ERROR;
-ELSIF NOT (DeviceVariateur.Operational AND DeviceEncoderM1.Operational AND DeviceEncoderM2.Operational) THEN
-    State := E_DiagState.MONITORING;
+ELSIF NOT (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) THEN
+    State := E_DiagState.INIT;
+ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass)
+      AND NOT (VariateurOnlineReal AND EncoderM1OnlineReal AND EncoderM2OnlineReal) THEN
+    State := E_DiagState.SIMULATED;
 ELSE
     State := E_DiagState.READY;
 END_IF;
 
-DeviceEthercatMaster.Online := DeviceVariateur.Online AND DeviceEncoderM1.Online AND DeviceEncoderM2.Online;
-DeviceEthercatMaster.Operational := DeviceVariateur.Operational AND DeviceEncoderM1.Operational AND DeviceEncoderM2.Operational;
+DeviceEthercatMaster.Online := VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff;
+DeviceEthercatMaster.Operational := DeviceEthercatMaster.Online;
+
+// 🆕 REX 2026-07-24 — miroirs bruts (voir en-tête), toujours à jour
+DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
+DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
+DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
 
 Busy := FALSE;
 Done := FALSE;

@@ -13,6 +13,15 @@ VAR
     FB_Joystick_0    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
     instSimJoystick  : FB_Sim_Joystick;      // 🧪 Simulation joystick (Lot 3 — voir CODE/SIMULATION/)
     instIhmHeartbeat : FB_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
+
+    // 🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
+    // valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device :
+    // une fois pour le test logique ci-dessous, une fois pour le miroir diag brut sur les FB).
+    RawCanBusState    : INT;          // CANbus.GetBusState() brut
+    RawJoystickState  : DEVICE_STATE; // JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() brut
+    RawVariateurState : DEVICE_STATE; // AC600_ECAT_Drive.GetDeviceState() brut
+    RawEncoderM1State : DEVICE_STATE; // COD1_CODEUR.GetDeviceState() brut
+    RawEncoderM2State : DEVICE_STATE; // COD2_CODEUR.GetDeviceState() brut
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_01_Diagnostics) ===
@@ -36,42 +45,51 @@ instSimJoystick(
     TestOverrideRawButton := GVL_PLC_Tests.OverrideJoystickRawButton
 );
 
+// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 ne fait plus
+// qu'ACQUÉRIR les valeurs brutes bus (GetBusState()/GetDeviceState()) et les flags de simulation ;
+// c'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
+// (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
+// Values lues UNE fois par cycle (variables déclarées en VAR ci-dessus), réutilisées ci-dessous.
+RawCanBusState    := CANbus.GetBusState();
+RawJoystickState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState();
+RawVariateurState := AC600_ECAT_Drive.GetDeviceState();
+RawEncoderM1State := COD1_CODEUR.GetDeviceState();
+RawEncoderM2State := COD2_CODEUR.GetDeviceState();
+
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par BusJoystickIsReal UNIQUEMENT (bus/nœud),
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
-// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — BusJoystickIsReal seul pilote
-// désormais ce bypass diag, pour rester actif même simulation globale coupée (banc sans bus
-// CANopen câblé). Repasser BusJoystickIsReal := TRUE au câblage réel du bus/nœud CANopen.
 instDiagCanOpen(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    CANbusOnline := (CANbus.GetBusState() = 1) OR (NOT GVL_Simulation.BusJoystickIsReal) OR GVL_IHM.Network.Bypass.Global, // 1 = ACTIVE (ou bypass)
-    DeviceJoystickOnline := (JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusJoystickIsReal) OR GVL_IHM.Network.Bypass.Global
+    CANbusStateRaw := RawCanBusState,
+    DeviceJoystickStateRaw := RawJoystickState,
+    SimBypassActive := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusJoystickIsReal,
+    NetworkBypassActive := GVL_IHM.Network.Bypass.Global
 );
 
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
-// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — Bus<Device>IsReal seul pilote
-// désormais ce bypass diag par device, pour rester actif même simulation globale coupée (banc
-// sans bus EtherCAT câblé). Repasser chaque Bus<Device>IsReal := TRUE au câblage réel.
 instDiagEthercat(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
-    DeviceVariateurOnline := (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusVariateurM3IsReal) OR GVL_IHM.Network.Bypass.Global,
-    DeviceVariateurState := SEL((NOT GVL_Simulation.BusVariateurM3IsReal) OR (AC600_ECAT_Drive.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8),
-    DeviceEncoderM1Online := (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusEncoderM1IsReal) OR GVL_IHM.Network.Bypass.Global,
-    DeviceEncoderM1State := SEL((NOT GVL_Simulation.BusEncoderM1IsReal) OR (COD1_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8),
-    DeviceEncoderM2Online := (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR (NOT GVL_Simulation.BusEncoderM2IsReal) OR GVL_IHM.Network.Bypass.Global,
-    DeviceEncoderM2State := SEL((NOT GVL_Simulation.BusEncoderM2IsReal) OR (COD2_CODEUR.GetDeviceState() = DEVICE_STATE.RUNNING) OR GVL_IHM.Network.Bypass.Global, 0, 8)
+    DeviceVariateurStateRaw := RawVariateurState,
+    DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal,
+    DeviceEncoderM1StateRaw := RawEncoderM1State,
+    DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal,
+    DeviceEncoderM2StateRaw := RawEncoderM2State,
+    DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal,
+    NetworkBypassActive := GVL_IHM.Network.Bypass.Global
 );
 
 // 💓 2bis. Heartbeat IHM↔PLC — appelé avant PRG_03_Safety pour fournir le statut même cycle.
-// 🆕 REX 2026-07-22 : bypass DÉCOUPLÉ de SimulationModeActive — BusIhmHeartbeatIsReal seul
-// pilote désormais ce bypass, pour rester actif même simulation globale coupée (IHM réelle pas
-// encore câblée niveau visu). Sans IHM réelle sur banc, BlinkClock fournit un toggle sain ;
-// mettre BusIhmHeartbeatIsReal := TRUE dès que la visu toggle réellement TglHeartbeatIhm.
+// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : RE-COUPLÉ à SimulationModeActive
+// (annule le découplage REX 2026-07-22, même raison qu'au §1/§2 ci-dessus). Bypass actif
+// UNIQUEMENT si SimulationModeActive=TRUE ET BusIhmHeartbeatIsReal=FALSE. Sans IHM réelle sur
+// banc (simulation active), BlinkClock fournit un toggle sain ; mettre BusIhmHeartbeatIsReal :=
+// TRUE dès que la visu toggle réellement TglHeartbeatIhm.
 instIhmHeartbeat(
     Enable := TRUE,
     TglHeartbeatIhm := SEL(GVL_PLC_Tests.OverrideIhmHeartbeatActive,
-                              SEL(NOT GVL_Simulation.BusIhmHeartbeatIsReal,
+                              SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusIhmHeartbeatIsReal,
                                   GVL_IHM.Commun.TglHeartbeatIhm,
                                   GVL_Global.BlinkClock),
                               GVL_PLC_Tests.OverrideIhmHeartbeatToggle),
