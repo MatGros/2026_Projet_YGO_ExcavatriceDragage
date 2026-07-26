@@ -69,6 +69,14 @@ Joystick · Winch/SpeedStep · Benne · Encoder (pipeline) · Safety_Winch (14 b
 ### ❌ Manquant
 IHM visu graphique (dossier `visu/` vide, seule la couche d'échange `GVL_IHM` existe).
 
+### ❌ Abandonné — framework de tests automatiques in-PLC (2026-07-26, v0.5.1)
+`PLC_TESTS` (`FB_TestSequencer`, BRICKS/CORE, 8 suites de validation, 45 fichiers / 7 300 lignes)
+**retiré** → `ARCHIVES/Code/PLC_TESTS/`. **Motif** : 43 % des lignes ST du projet et 30 Ko de RAM
+pour des rapports jamais relus, + resynchronisation des 7 suites à chaque évolution métier.
+`GVL_PLC_Tests` survit, réduite à ses 20 `Override*` = points d'injection de pannes en **forçage
+manuel**. Non-régression (ex-TC-01/02/03, matrice V1–V7) → simulation CODESYS manuelle + FAT/SAT.
+Spec archivée : `ARCHIVES/Doc/AF_Partie-14_PLC_Tests_Validation_v1.2.md`.
+
 ### 🗑️ Nettoyage dû
 `GVL_BUS`/`GVL_Machine_Stub` ✅ supprimés (2026-07-15, orphelins confirmés) · `ST_IHM_MANU` ✅ supprimé (2026-07-19) ·
 Anciens champs `GVL_Translation_M3_Stub` liés à `DEGRADED_IO` ✅ supprimés après confirmation
@@ -165,7 +173,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T45 | ✅ Définir les 5 plages de vitesse réelle à partir de `VitesseMaxMps` (valeur provisoire 2,0 m/s), avec seuils paramétrables et hystérésis | Projet / Client | `ST_WinchSpeedConfig`, AF_Partie-09 — valeurs à confirmer terrain |
 | T46 | ✅ Créer le tableau 2D empirique `palier contacteurs × vitesse mesurée → charge estimée %` ; valeur informative non certifiée, réglable en mise en service | Projet / Terrain | `ST_WinchSpeedConfig`, `ST_WinchLoadEstimateTable`, `FB_WinchLoadEstimator` |
 | T47 | ✅ Ajouter le garde-fou de passage de palier : vitesse minimale atteinte + stabilité temporelle + absence de désynchronisme/variation anormale | Projet / Sécurité | `FB_SpeedStep`, `FB_Winch`, `FB_Encoder_SpeedMonitor` — activation terrain restant à valider |
-| T48 | 🟠 Valider les réactions et seuils par simulation puis essais terrain : démarrage en charge, treuil freiné, câble mou, effort asymétrique, perte codeur | Projet / Terrain | Matrice V1–V7 ajoutée AF_Partie-14 §7.4.4 ; exécution CODESYS/terrain restante |
+| T48 | 🟠 Valider les réactions et seuils par simulation puis essais terrain : démarrage en charge, treuil freiné, câble mou, effort asymétrique, perte codeur | Projet / Terrain | Matrice V1–V7 (ex-AF_Partie-14 §7.4.4, archivée) ; à rejouer en simulation manuelle / terrain |
 | T49 | ✅ Hauteurs unifiées : 8,0 m limite exploitation ; 8,5 m capteur/homing. Références 12,0/12,5 purgées du code et des specs actives | Projet + Mécanique | WINCH-CORE-01, `GVL_PERSISTENT`, P4/P7/P9/P10 |
 | T50 | ✅ `FB_SpeedStep` borné/validé ; ConfigError remonté dans `FB_Winch.ErrorId` bit2, sorties sûres. Palier 1 tout FALSE autorisé (résistances insérées) | Projet | WINCH-CORE-01, `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §2.2 |
 | T52 | 🔴 Valider chaîne `PowerCutOff` physique : câblage sorties A/B, contacteur puissance, retour confirmation, temps coupure réel (P0.3 audit Winch) | Électricité + Projet | `../ARCHIVES/Doc/AUDITS/Winch/AUDIT_Winch_v1.0.md` §2.3, `PRG_10_Outputs.st:136-156` |

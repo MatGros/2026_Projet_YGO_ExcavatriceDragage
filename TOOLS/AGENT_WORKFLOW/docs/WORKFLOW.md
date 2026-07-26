@@ -49,7 +49,7 @@ Pre-edit Gate
 → 🔴 DOUBLE REVUE PARALLÈLE A/B
      Agent A ──┐ (même contexte, sans voir l'autre)
      Agent B ──┴─► Consensus ✅ / Divergence 🚨 → alerte humain
-→ CODESYS import → PLC_TESTS simulation → Terrain
+→ CODESYS import → simulation CODESYS manuelle → Terrain
 ```
 
 ## 🔴 Règle Double Revue Parallèle (C4)

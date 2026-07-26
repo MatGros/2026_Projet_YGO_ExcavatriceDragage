@@ -133,13 +133,12 @@ Tous les docs dans **`DOC/`** :
 - [AF_Partie-10_Fonction_Encoder_Homing_v1.10.md](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md) — Codeur & Homing
 - [AF_Partie-11_Fonction_Translation_v1.11.md](DOC/AF_Partie-11_Fonction_Translation_v1.11.md) — Fonction Translation (M3, ex-Translation)
 - [AF_Partie-12_Fonction_Benne_v1.4.md](DOC/AF_Partie-12_Fonction_Benne_v1.4.md) — Fonction Benne (M2, désynchronisation offset ouverture/fermeture, garde-fou glissement M1)
-- [AF_Partie-13_Fonction_Simulation_v1.3.md](DOC/AF_Partie-13_Fonction_Simulation_v1.3.md) — Fonction Simulation (flags bits maître + granularité par device)
-- [AF_Partie-14_PLC_Tests_Validation_v1.2.md](DOC/AF_Partie-14_PLC_Tests_Validation_v1.2.md) — Tests de validation sécurité (TC-01/02/03), framework de test in-PLC piloté par tables §7 (spec finale, migration M1→M6 pas encore codée), limites CI/CD réelles
+- [AF_Partie-13_Fonction_Simulation_v1.4.md](DOC/AF_Partie-13_Fonction_Simulation_v1.4.md) — Fonction Simulation (flags bits maître + granularité par device)
 - [AUDIT_Coherence_Documentaire_v1.0.md](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — Historique des décisions de conception (`SafeStop`, `StartStop`, `EmergencyStopOk`…)
 - [PLAN_TASK_v1.0.md](DOC/PLAN_TASK_v1.0.md) — 🗂️ **Pilotage projet, PAS une spec** : jalons connus de l'affaire, état des tâches/features (fait/priorisé/partiel/différé/manquant), reliquats/TBD/questions client. Toute info organisationnelle trouvée dans une `AF_PartieN` doit y renvoyer (`📌 Suivi : PLAN_TASK.md §3`) au lieu d'y rester — garde les `AF_PartieN` focalisées sur la spec fonctionnelle pure.
 
 ### 📐 Plan de numérotation
-- **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…) · **14** = hors-série, tests/validation (pas un métier FB).
+- **1–3** = fondations · **4–6** = specs transverses (Cycle/Modes/E-S) · **8+** = fonctions métier par FB (Joystick…). Le n° **14** (tests in-PLC) est retiré — framework supprimé en v0.5.1, voir `ARCHIVES/Doc/`.
 
 ### ✍️ Style rédaction — docs de pilotage
 Toujours **concis, direct, TDAH-friendly, emoji, tokens minimaux** pour :

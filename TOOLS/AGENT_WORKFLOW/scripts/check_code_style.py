@@ -50,8 +50,6 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
 
 def requires_doc_reference(path: Path) -> bool:
     normalized = path.as_posix()
-    if "/SIMULATION/PLC_TESTS/" in normalized:
-        return False
     if path.name.startswith(("FB_", "PRG_", "GVL_")):
         return True
     return any(f"/{folder}/" in normalized for folder in ("AU", "TRANSLATION", "TREUILS"))

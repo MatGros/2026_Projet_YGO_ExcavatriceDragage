@@ -113,8 +113,10 @@ MainTask (10 ms)
 ```
 
 `PRG_IP` (`CODE/MAIN/PRG_IP.st`) existe dans l'application mais n'est appelé dans aucune tâche ;
-il est donc inactif. Les programmes de validation PLC sont regroupés sous
-`CODE/SIMULATION/PLC_TESTS/` et ne font pas partie du flux machine nominal.
+il est donc inactif. 🔧 **v0.5.1 (2026-07-26)** : le framework de tests automatiques in-PLC
+(`CODE/SIMULATION/PLC_TESTS/`) a été **retiré** — empreinte automate trop lourde et
+resynchronisation permanente des suites. Archivé dans `ARCHIVES/Code/PLC_TESTS/`. La validation
+de non-régression passe désormais par la simulation CODESYS manuelle et les essais FAT/SAT.
 
 ### 3bis. Translation M3 — codage des positions
 
@@ -221,7 +223,8 @@ interne machine brut** (E/S) ont disparu. Distinction stricte à conserver :
 | `GVL_Modes_Stub` (`MODES`) | Stub sélecteur mode/mot de passe (pas de vrai IHM câblé ce lot) | ✅ Conservée — temporaire, à terme absorbée par `GVL_IHM` |
 | `GVL_Encoder_Stub` | Ancien stub homing/codeur | ❌ Absent du code actuel — ne pas référencer comme GVL active |
 | `GVL_Translation_M3_Stub` (`TRANSLATION`) | Entrée PV à mapper + sélecteur de trajet simulé | ✅ Réduite aux deux variables encore consommées |
-| `GVL_PLC_Tests` / `GVL_PLC_Tests_Const` (`SIMULATION/PLC_TESTS`) | Commandes, états et constantes du framework de validation PLC | ✅ Conservées — uniquement simulation/tests |
+| `GVL_PLC_Tests` (`SIMULATION`) | 20 `Override*` = points d'injection de pannes (forçage manuel + IHM pour capteurs M3) | ✅ Conservée — simulation/essais uniquement |
+| ~~`GVL_PLC_Tests_Const`~~ | Constantes de dimensionnement du framework de tests | ❌ **Supprimée (v0.5.1)** — archivée avec le framework |
 | ~~`GVL_IN`~~ / ~~`GVL_OUT`~~ | Ancien bus d'E/S brutes partagé | ❌ **Supprimées** — remplacées par `PRG_00_Inputs`(`VAR_OUTPUT`)/`PRG_10_Outputs`(`VAR_INPUT`) |
 | ~~`GVL_BUS`~~ (`SYSTEM`) | Ancien `GVL_BusHealth`/`E_DegradationLevel` | ❌ **Supprimé (2026-07-15)** — fichier vide, jamais référencé |
 | ~~`GVL_Machine_Stub`~~ (`SYSTEM`) | Ancien porteur de `MachineReset_IHM` | ❌ **Supprimé (2026-07-15)** — `MachineReset_IHM` est calculé et exposé par `PRG_09_Supervision.FaultMachineReset_IHM` |

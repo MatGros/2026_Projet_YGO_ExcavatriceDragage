@@ -165,7 +165,7 @@ def draw_overview(path: Path):
     # VALIDATION
     y = block([("VALIDATION HUMAINE", fn_b, COLORS["text"]),
                ("CODESYS Import + Build", fn, COLORS["text"]),
-               ("Simulation PLC_TESTS", fn, COLORS["text"]),
+               ("Simulation CODESYS (manuelle)", fn, COLORS["text"]),
                ("Terrain  FAT / SAT", fn, COLORS["text"])],
               COLORS["validation"], y)
     arrow_down(draw, cx, y, y+28); y += 28
@@ -282,7 +282,7 @@ def draw_safety_detail(path: Path):
     # VALIDATION
     y = block(ld("VALIDATION HUMAINE", [
         "CODESYS Import + Build",
-        "Simulation PLC_TESTS",
+        "Simulation CODESYS (manuelle)",
         "Terrain  FAT / SAT",
     ]), COLORS["validation"], y)
     y += 20
