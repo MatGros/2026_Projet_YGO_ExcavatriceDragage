@@ -164,10 +164,13 @@ compilation. Signalé pour exhaustivité : c'est la seule occurrence résiduelle
 
 ## 5. ⚠️ Limites de cet audit
 
-- Vérification **statique**. La compilation CODESYS a été validée par l'utilisateur après la
-  Phase 3, **pas encore après la Phase 5** (allègement `GVL_PLC_Tests` + retrait des 13 types).
-  👉 **Import + compilation restent à refaire** — voir la procédure Phase 5 (importer **avant**
-  de supprimer les objets, ordre inverse de la Phase 3).
+- Vérification **statique**. La compilation CODESYS a été validée par l'utilisateur **après la
+  Phase 3 ET après la Phase 5** (allègement `GVL_PLC_Tests` + retrait des 13 types) — c'est
+  l'état du commit `d9daa41`.
+  👉 Depuis, les commits `9228faf` et `fe075d2` n'ont modifié **que des commentaires** dans les
+  `.st` (liens de doc) — aucune instruction, aucune déclaration. Le bundle a été régénéré, donc
+  un ré-import ne servirait qu'à synchroniser les commentaires côté CODESYS. **Fonctionnellement
+  inutile.**
 - Aucun essai fonctionnel : le comportement des 20 `Override*` en forçage manuel n'a pas été
   rejoué sur machine.
 - La capacité de rejeu automatique de non-régression a disparu avec le framework : ces
