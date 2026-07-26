@@ -82,7 +82,7 @@ VAR
     instTranslationPosMaintenance : FB_Input;
     instM3BrakeFeedback       : FB_Input;
 
-    // 🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md)
+    // 🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md)
     instSimTranslation            : FB_Sim_Translation;
 
     // 🧪 Simulation de la chaîne de sécurité AU / réarmement (Lot 1, combler le trou d'intégration)
@@ -146,7 +146,7 @@ END_IF;
 // 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
 // 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille
 // sécurité, TRUE=OK) quand SimulationModeActive ET que ce capteur précis n'est
-// pas encore câblé réellement (GVL_Simulation.Bus*/Sensor*IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md.
+// pas encore câblé réellement (GVL_Simulation.Bus*/Sensor*IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md.
 
 // Simulation de la chaîne de sécurité AU / réarmement (Lot 1)
 instSimSafety(
@@ -227,7 +227,7 @@ instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT 
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
+// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
 // §Translation). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
 // (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
 // 🔧 L'ancien mode relais DEGRADED_IO est supprimé. La simulation déduit directement le sens de

@@ -23,7 +23,7 @@ END_VAR
 (* ═══════════════════════════════════════════════════════════════
    📝 NOTE : PROCÉDURE DE TEST SUR BANC AVEC SIMULATION DYNAMIQUE
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
    Cette simulation (GVL_Simulation + CODE/SIMULATION/FB_Sim_*) permet de
    valider le comportement des treuils M1/M2, du Homing et du Benne sans
    moteurs ni codeurs physiques connectés.

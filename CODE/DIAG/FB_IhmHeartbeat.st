@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    💓 FB_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v1.5.md (mise à jour Heartbeat requise)
+   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v1.7.md (mise à jour Heartbeat requise)
    🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
       et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
    🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires

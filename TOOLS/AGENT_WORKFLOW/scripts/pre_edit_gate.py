@@ -19,7 +19,7 @@ SPEC_MAP = {
     "CODE/JOYSTICK/": ["DOC/AF_Partie-08_Fonction_Joystick_v1.3.md"],
     "CODE/SIMULATION/": ["DOC/AF_Partie-13_Fonction_Simulation_v1.4.md"],
     "CODE/COMMUN/": ["DOC/AF_Partie-03_Template_FB_Commun_v1.3.md", "DOC/AF_Partie-06_IO_Conditioning_v1.6.md"],
-    "CODE/SUPERVISION/": ["DOC/AF_Partie-07_Interface_IHM_v1.4.md"],
+    "CODE/SUPERVISION/": ["DOC/AF_Partie-07_Interface_IHM_v1.7.md"],
 }
 
 STATE_FILE = Path(".pi/spec_read_state.json")
