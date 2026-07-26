@@ -18,10 +18,14 @@ ARCHIVES/Doc/
 ARCHIVES/Prj_codesys/
 
 .pytest_cache/
-PRJ_CODESYS/
-# Exception : l'export du programme reel est VERSIONNE (sert de reference pour
-# comparer CODE/ au programme reellement charge dans l'automate).
+# Projets CODESYS : binaires lourds et propres a la machine -> hors depot.
+# On exclut le CONTENU (/*) et non le dossier lui-meme, sinon git refuse d'y
+# redescendre et les exceptions ci-dessous seraient sans effet.
+PRJ_CODESYS/*
+# Exception : l'export du programme reel est VERSIONNE — il sert de reference
+# pour comparer CODE/ au programme reellement charge dans l'automate.
 !PRJ_CODESYS/PROJ_Full_ImportExport/
+PRJ_CODESYS/PROJ_Full_ImportExport/*
 !PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
 # Workspace launcher artifacts
