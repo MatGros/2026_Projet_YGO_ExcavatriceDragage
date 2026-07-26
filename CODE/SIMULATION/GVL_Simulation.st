@@ -26,7 +26,7 @@
       bascule tout d'un coup (ou `*IsReal` un par un, sans toucher au bit maître).
    📛 Convention nommage (session Bypass, voir DOC/NAMING_CONVENTION.md) :
       `Bus` = device bus de terrain, `Sensor` = capteur/retour câblé, `Sim` = valeur simulée
-      calculée, `Tst` = outil/commande de test banc, `Link` = référence CODESYS (REFERENCE TO).
+      calculée, `Tst` = outil/commande de test banc.
    ═══════════════════════════════════════════════════════════════ *)
 
 {attribute 'qualified_only'}
@@ -80,8 +80,4 @@ VAR_GLOBAL
     TstSyncDeviationOffsetM       : REAL := 0.5;   // Amplitude du saut (m) — > WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)
                                                   // pour tester Concept 1 ; > WinchCriticalSyncTolerance_M
                                                   // (2.0) pour tester Méca E
-
-    // 🧪 Références instances métier — fenêtre de passage pour tests PLC UNIQUEMENT
-    LinkBucket      : REFERENCE TO FB_Bucket;     // 🆕 Instance benne (PRG_06_WinchControl)
-    LinkWinchM2     : REFERENCE TO FB_Winch;      // 🆕 Instance treuil M2 (PRG_06_WinchControl) — pour FB_BucketValidation
 END_VAR

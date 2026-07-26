@@ -93,7 +93,13 @@
       "Bash(rg -c \"StepVerdictTrig|RunStartTrig|FinalizeTrig\" CODE/SIMULATION/PLC_TESTS/CORE/*.st CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/*.st)",
       "Bash(rg -c \"^\\\\s*WHILE\\\\b|END_WHILE\" CODE/SIMULATION/PLC_TESTS/CORE/*.st CODE/SIMULATION/PLC_TESTS/SUITE_TRANSLATION/*.st)",
       "Bash(sort -t'T' -k2 -n -u)",
-      "Bash(venv/Scripts/python.exe -m pytest tests/)"
+      "Bash(venv/Scripts/python.exe -m pytest tests/)",
+      "Skill(antigravity:status)",
+      "Bash(git ls-tree *)",
+      "Bash(grep \"^CODE/SIMULATION/PLC_TESTS/.*\\\\.st$\")",
+      "Bash(grep \"^CODE/.*\\\\.st$\")",
+      "Bash(grep -iE \"PLC_Tests|_TYPES\\\\\\\\\\\\\\\\\\(ST_Test|E_Test\\)|Simulation|PRG_00|PRG_06\")",
+      "Bash(sed 's/:.*//')"
     ],
     "ask": [
       "Bash(git reset *)",
