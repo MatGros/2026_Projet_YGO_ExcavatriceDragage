@@ -20,7 +20,7 @@ STRUCT
     HydraulicThermalFault     : BOOL; (* 🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique
                                           (PRG_08_AuxiliaryControl, diagnostic seul — aucune commande PLC) *)
 
-    (* 🔧 Bypass maintenance de capteurs COMMUNS (voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md) *)
+    (* 🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)) *)
     Bypass : ST_BypassCommun;    (* SlackCable, TopPositionSensor — capteur physique unique M1/M2, jamais duplique par axe *)
 
     (* 💓 Heartbeat IHM↔PLC — IHM inverse TglHeartbeatIhm toutes les 500 ms. *)

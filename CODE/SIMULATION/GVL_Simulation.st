@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Bit maître + granularité par device (remplace GVL_DEBUG)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.2.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
    🎯 Rôle : le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'étant
       pas disponible pour les essais, toute la machine doit pouvoir tourner en
       simulation CODESYS. Modèle hiérarchique :

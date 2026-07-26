@@ -10,7 +10,7 @@
       FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.Cmd.BtnModeReset côté
       PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v1.5.md
+   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v1.7.md
 *)
 
 PROGRAM PRG_09_Supervision
@@ -284,8 +284,8 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
-// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.2.md) ──────
-// 🔧 REX (session Bypass) : structs Bypass dedies par metier (voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md)
+// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md) ──────
+// 🔧 REX (session Bypass) : structs Bypass dedies par metier (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
 // — ContactorFeedback reste par axe (materiel propre a chaque treuil/translation), SlackCable et
 // TopPositionSensor passent dans Commun.Bypass (capteur physique UNIQUE partage M1/M2, plus de duplication).
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal;

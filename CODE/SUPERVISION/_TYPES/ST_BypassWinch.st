@@ -5,7 +5,7 @@
       contacteurs) — chaque treuil a son propre matériel, donc son
       propre struct (imbriqué M1Winch.Bypass / M2Winch.Bypass).
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
-      les autres défauts du même bloc (voir DOC/AUDITS/Bypass/REGISTRE_ACTIONS_Bypass_v1.0.md).
+      les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
    ⚠️ Les bypass de capteurs COMMUNS (SlackCable, TopPositionSensor — capteur
       physique unique partagé M1/M2) sont dans ST_CommunHMI.Bypass, PAS ici.
    ═══════════════════════════════════════════════════════════════ *)

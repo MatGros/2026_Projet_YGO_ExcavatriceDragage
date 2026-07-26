@@ -16,7 +16,7 @@
         rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
         désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
       Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v1.2.md, migration simulation) : l'ancien bypass
+   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v1.4.md, migration simulation) : l'ancien bypass
       `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
       supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
       CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/

@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v1.9.md
+   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v1.11.md
 *)
 
 PROGRAM PRG_07_TranslationControl
