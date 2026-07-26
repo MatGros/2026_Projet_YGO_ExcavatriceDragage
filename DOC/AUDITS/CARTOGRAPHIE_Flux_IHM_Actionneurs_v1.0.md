@@ -357,7 +357,7 @@ au même scan).
 | Sujet | Doc de référence |
 |---|---|
 | Contrat FB standard/mouvement | `DOC/AF_Partie-03_Template_FB_Commun_v1.3.md` §1/§1bis |
-| Détail métier Winch (Méca A-E) | `DOC/AF_Partie-09_Fonction_Winch_v1.11.md` |
+| Détail métier Winch (Méca A-E) | `DOC/AF_Partie-09_Fonction_Winch_v1.12.md` |
 | Détail métier Translation | `DOC/AF_Partie-11_Fonction_Translation_v1.9.md` |
 | Détail métier Benne | `DOC/AF_Partie-12_Fonction_Benne_v1.4.md` |
 | Détail métier Joystick/homme-mort | `DOC/AF_Partie-08_Fonction_Joystick_v1.3.md` |

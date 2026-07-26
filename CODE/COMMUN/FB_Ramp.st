@@ -2,7 +2,7 @@
    📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2 (usage),
-                   DOC/AF_Partie-09_Fonction_Winch_v1.11.md (correctif ci-dessous)
+                   DOC/AF_Partie-09_Fonction_Winch_v1.12.md (correctif ci-dessous)
    🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
       SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS >= 0,
       jamais concernée par ce bug — voir analyse d'impact ci-dessous).

@@ -1,4 +1,9 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.11)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.12)
+
+> 🔩 **v1.12 (2026-07-26) — POLARITÉ DU RETOUR FREIN, relevé terrain.** Le frein est à **manque de
+> courant** : sortie PLC = 1 → frein **ouvert**. Le retour câblé est l'**image du contacteur de
+> commande**, donc `DI = 1 ⟺ frein OUVERT` — il **recopie** la commande, il n'en est pas le
+> complément. Voir §5bis pour la normalisation et le point de bascule unique.
 
 > 🔧 **WINCH-CORE-01 (2026-07-21)** — Référentiel haut unifié : 8,0 m = limite
 > d'exploitation ; 8,5 m = capteur haut/cible homing. `DISABLE` neutralise M1/M2/M3.
@@ -455,11 +460,50 @@ en particulier sur le délai de relâche (magnétisation) et de collage (décél
 | `M1/M2_SpeedContactor_1..4` | Sortie | 📡 I/O réel | Contacteurs de vitesse |
 | `M1/M2_BrakeCmd` | Sortie | 📡 I/O réel | Bobine frein (`TRUE` = relâché) |
 | `M1/M2_FwdRevSpeedFeedbackOff` | Entrée | 📡 I/O réel | Retour unique contacteurs sens+vitesse retombés |
-| `M1/M2_BrakeFeedback` | Entrée | 📡 I/O réel | Retour contacteur frein |
+| `M1/M2_BrakeFeedback` | Entrée | 📡 I/O réel | Retour contacteur frein — **`1` = frein OUVERT** (image du contacteur de commande). Normalisé en « `TRUE` = serré » par `PRG_00_Inputs`, voir §5bis |
 | `M1_M2_TopPositionSensor` | Entrée | 📡 I/O réel | Capteur position haute commun |
 | `M1/M2_ThermalFeedback` | Entrée | 📡 I/O réel | Thermique moteur |
 | `M1_M2_SlackCableSwitch` | Entrée | 📡 I/O réel | Détecteur mou de câble commun |
 | `BrakeThermalFeedback_DI` | Entrée | 📡 I/O réel | Retour thermique frein commun M1/M2/M3 |
+
+### 🔩 5bis. Polarité du retour frein et point de bascule unique (v1.12)
+
+**Relevé terrain 2026-07-26.** Le frein est à manque de courant (sécurité positive : il colle au
+repos). La sortie PLC `M1/M2/M3_BrakeCmd = 1` alimente la bobine et **ouvre** le frein. Le retour
+d'information n'est pas une mesure du frein : c'est l'**état du contacteur de commande**.
+
+| État réel du frein | DI brut (`M*_BrakeFeedback_DI`) | Après normalisation (`M*BrakeFeedback`) |
+|---|---|---|
+| **Ouvert** (mouvement) | `1` | `FALSE` |
+| **Serré** (repos) | `0` | `TRUE` |
+
+**Pourquoi une normalisation** : toute la couche sécurité aval (`FB_Safety_Winch` Méca A/B/D/E,
+`FB_Safety_Translation` Méca B, `FB_Brake`) raisonne en **« `TRUE` = frein SERRÉ »**, l'état sûr.
+Le DI dit l'inverse. L'inversion est donc faite **une seule fois, à la frontière**, par le
+mécanisme NO/NC de `FB_Input` (rôle prévu, voir AF_Partie-06 §1).
+
+**🔩 Point de bascule unique** — `PRG_00_Inputs`, partie déclaration :
+```
+BrakeFeedbackInvertLogic : BOOL := TRUE;
+```
+Elle alimente `InvertLogic` sur les 3 instances `instM1/M2/M3BrakeFeedback`.
+👉 **Sur site**, si la mesure montre que le retour est en fait inversé (`DI = 1` frein serré) :
+passer **cette seule variable** à `FALSE`. Rien d'autre dans le programme. Modifiable **à chaud en
+vue instance**, sans recompiler.
+
+**🔍 Contrôle de terrain** : machine à l'arrêt, frein **serré**, lire `M*_BrakeFeedback_DI`.
+`0` attendu → `BrakeFeedbackInvertLogic` reste à `TRUE`. Si `1` → basculer à `FALSE`.
+
+⚠️ **Ce que ce retour ne couvre pas** : étant un écho du contacteur, il détecte une bobine ou un
+contacteur défaillant, **mais pas un frein usé, grippé ou qui patine** — il dira « ouvert » parce
+que la commande dit « ouvert ». Le patinage n'est couvert que par **Méca A** (dérive codeur,
+`FB_Safety_Winch` bit7, §4novies).
+
+📌 Historique : avant la v1.12, le programme supposait `TRUE = serré` **au niveau du DI**, et le
+modèle de simulation injectait `NOT BrakeCmd`. Les deux erreurs se compensaient tant que
+`GVL_Simulation.Sensor*ContactorFeedbackIsReal` restait à `FALSE`. Corrigé (commit `1d2e086`).
+
+---
 
 ### 🧪 Simulation & Cohérence
 

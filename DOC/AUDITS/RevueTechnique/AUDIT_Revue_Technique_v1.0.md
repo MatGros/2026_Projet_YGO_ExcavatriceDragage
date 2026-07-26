@@ -3,6 +3,13 @@
 **Version** : v1.0 · **Date** : 2026-07-26 · **État du code** : `9228faf` + 24 fichiers non committés (commentaires uniquement)
 **Nature** : revue **lecture seule**. Aucun fichier `CODE/` modifié dans le cadre de cet audit.
 
+> ## ⚠️ CORRECTIF v1.0a (2026-07-26) — le constat C1 était inversé
+> L'audit concluait que `FB_Brake` avait tort. **C'est l'inverse.** Le relevé terrain a établi que
+> le frein est à manque de courant et que le retour est l'**image du contacteur de commande** :
+> `DI = 1 ⟺ frein OUVERT`. C'est donc `FB_Brake` qui avait raison, et le reste du programme
+> (Méca A/B/D/E + modèle de simulation) qui supposait l'inverse.
+> 👉 Voir §3 réécrit. **Corrigé dans le code** — commit `1d2e086`, spec `AF_Partie-09 v1.12 §5bis`.
+
 ---
 
 ## 1. 🎯 Périmètre réellement couvert
@@ -26,7 +33,7 @@ ci-dessous valent pour ce qui a été lu ; l'absence de constat sur un FB non lu
 
 | # | Gravité | Constat | Fichier |
 |---|---|---|---|
-| **C1** | 🔴 **Critique** | Polarité du contrôle de cohérence frein **inversée** — défaut dormant, se réveillera au câblage réel | `FB_Brake.st:97-101` |
+| **C1** | 🔴 **Critique** — ✅ **CORRIGÉ** (`1d2e086`) | Polarité du retour frein : Méca A/B/D/E + modèle de simulation supposaient `TRUE = serré` au niveau du DI, alors que le câblage donne `1 = ouvert` | `PRG_00_Inputs`, `FB_Safety_Winch`, `FB_Brake` |
 | **C2** | 🟠 Majeur | `ForbidAscent` non initialisé dans le gate `Enable=FALSE` → sortie non déterministe | `FB_Safety_Winch.st:242-265` |
 | **C3** | 🟠 Majeur | Le contrôleur de style produit **36 faux positifs** → il ne détecte plus rien de réel | `check_code_style.py:14` |
 | **C4** | 🟡 Moyen | `DelayMotorDecel` / `TonDecel` = **code mort**, l'interface promet une tempo qui n'existe pas | `FB_Brake.st:27,73,85` |
@@ -36,61 +43,72 @@ ci-dessous valent pour ce qui a été lu ; l'absence de constat sur un FB non lu
 
 ---
 
-## 3. 🔴 C1 — Polarité du contrôle de cohérence frein inversée
+## 3. 🔴 C1 — Polarité du retour frein — ✅ **CORRIGÉ** (`1d2e086`)
 
-### Le constat
+> ⚠️ **Cette section a été entièrement réécrite.** La v1.0 initiale concluait que `FB_Brake` était
+> en tort. Le relevé terrain a montré l'inverse.
 
-Trois déclarations du même signal se contredisent :
+### Le fait établi sur site (2026-07-26)
 
-| Fichier | Déclaration | Sémantique |
+Le frein est à **manque de courant** : sortie PLC = 1 → bobine alimentée → frein **ouvert**.
+Le retour câblé n'est pas une mesure du frein, c'est l'**état du contacteur de commande** :
+
+```
+M*_BrakeFeedback_DI = 1  →  contacteur commandé  →  frein OUVERT
+M*_BrakeFeedback_DI = 0  →  contacteur au repos  →  frein SERRÉ
+```
+
+Le retour **recopie** la commande ; il n'en est pas le complément.
+
+### Qui avait raison
+
+| Élément | Interprétation codée | Verdict |
 |---|---|---|
-| `PRG_00_Inputs.st:36` | `M1BrakeFeedback : BOOL; // Retour frein M1 (NC) : TRUE=frein serré repos` | **TRUE = serré** |
-| `FB_Safety_Winch.st:147` | `BrakeFeedback : BOOL; // Retour frein CE treuil (TRUE = serré/collé)` | **TRUE = serré** |
-| `FB_Brake.st:100-101` | `StuckClosed := (NOT BrakeCmd AND ContactorFeedback); // commandé collé mais retour "relâché"` | **TRUE = relâché** ❌ |
+| `FB_Brake` (test `<>`, `StuckClosed`/`StuckOpen`) | `TRUE` = relâché | ✅ **correct** |
+| `PRG_00_Inputs` — modèle de simulation `:= NOT BrakeCmd` | `TRUE` = serré | 🔴 **inversé** |
+| `FB_Safety_Winch` Méca A/B/D/E — `FwdRevSpeedFeedbackOff AND BrakeFeedback` | `TRUE` = serré | 🔴 **faux** |
+| `FB_Safety_Translation` Méca B — `OR NOT BrakeFeedback` | `TRUE` = serré | 🔴 **faux** |
+| Commentaires `PRG_00:36` / `FB_Safety_Winch:147` | `TRUE` = serré | ❌ faux |
 
-`FB_Brake` est le seul des trois à interpréter `TRUE = relâché`. Le signal traverse pourtant
-`PRG_00_Inputs.M1BrakeFeedback` → `PRG_06_WinchControl` → `FB_Winch.BrakeFeedback` →
-`FB_Brake.ContactorFeedback` (`FB_Winch.st:280`) **sans aucune inversion**.
+### Pourquoi c'est resté invisible
 
-### La conséquence, table de vérité (avec `TRUE = serré`, la convention majoritaire)
+`GVL_Simulation.Sensor*ContactorFeedbackIsReal = FALSE` par défaut → le retour vient du modèle
+simulé, qui appliquait `NOT BrakeCmd`, soit **exactement la polarité que la logique fausse
+attendait**. Les deux erreurs se compensaient. Elles se seraient découvertes **ensemble**, au
+câblage du retour réel.
 
-| Situation | `BrakeCmd` | `Feedback` | Test `BrakeCmd <> Feedback` | Verdict du code | Réalité |
-|---|---|---|---|---|---|
-| Frein relâché, normal | TRUE | FALSE | **différent → DÉFAUT** | 🔴 défaut | ✅ sain |
-| Frein serré, normal | FALSE | TRUE | **différent → DÉFAUT** | 🔴 défaut | ✅ sain |
-| Frein collé alors que relâche commandée | TRUE | TRUE | identique → OK | ✅ sain | 🔴 **défaut réel non vu** |
-| Frein relâché alors que serrage commandé | FALSE | FALSE | identique → OK | ✅ sain | 🔴 **défaut réel non vu** |
+### 💥 Ce qui aurait eu lieu au câblage réel
 
-**Le test est exactement inversé.** Avec la polarité documentée, la condition de défaut devrait
-être `BrakeCmd = ContactorFeedback`, pas `<>`.
+- **Méca B** : à l'arrêt (contacteurs retombés, frein serré → `BrakeFeedback = FALSE`), la condition
+  `NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)` devenait vraie → TON de 3 s → bit8 →
+  **`SafeStop` + `PowerCutOff`, à CHAQUE arrêt**. Idem Méca D au capteur haut, et Méca B côté M3.
+- **Méca A** : ne s'armait plus jamais (elle exige le frein serré) → **perte de la détection roue
+  libre / frein qui patine**, seule protection réelle contre le patinage.
+- **`FB_Brake`** : incohérence permanente → `BrakeCmd := FALSE` (serrage) et `BrakeSafetyOk := FALSE`
+  (coupure des relais) → treuil inutilisable et **serrage sous couple** — mécanisme de l'incident
+  d'échauffement frein de la `v0.4.27`.
 
-### Pourquoi personne ne l'a vu
+### ✅ Correction appliquée — normalisation à la frontière
 
-`GVL_Simulation.SensorM1ContactorFeedbackIsReal := FALSE` par défaut → `BypassContactorCheck = TRUE`
-est propagé jusqu'à `FB_Brake` (`FB_Winch.st:283`) → **tout le bloc de contrôle est court-circuité**
-(`FB_Brake.st:98`). Le défaut est **dormant**.
+Le choix retenu évite de toucher une seule ligne des blocs Safety : l'inversion est faite **une
+fois**, à l'entrée, par le mécanisme NO/NC de `FB_Input` (son rôle, AF_Partie-06 §1).
 
-### 💥 Ce qui se passera le jour du câblage réel
+1. **`PRG_00_Inputs`** — point de bascule unique `BrakeFeedbackInvertLogic : BOOL := TRUE`, passé en
+   `InvertLogic` aux 3 instances `instM1/M2/M3BrakeFeedback`. Le DI (`1 = ouvert`) devient
+   `M*BrakeFeedback = TRUE ⟺ frein serré`, la convention que tout l'aval attendait.
+2. **`PRG_00_Inputs`** — modèle simulé `:= NOT BrakeCmd` → **`:= BrakeCmd`**.
+3. **`FB_Brake`** — test `<>` → **`=`** (les deux signaux sont toujours opposés en marche saine, c'est
+   leur égalité qui trahit le contacteur collé), `StuckClosed`/`StuckOpen` remis à l'endroit.
+4. **`FB_Safety_Winch` / `FB_Safety_Translation`** — **zéro ligne modifiée**.
 
-Dès que `SensorM1ContactorFeedbackIsReal := TRUE` :
-1. `TonFeedback` expire au bout de `FeedbackTimeout` (1 s) — **en permanence**, à l'arrêt comme en mouvement
-2. `ErrorId` bit0 → `Error := TRUE`
-3. `FB_Brake.st:128` : `IF Error THEN BrakeCmd := FALSE` → **le frein se serre**
-4. `FB_Winch.st:266` : `BrakeSafetyOk := NOT Brake.Error` → **coupure des relais de sens**
+Table de vérité vérifiée : 4 cas sur 4. Spec : `AF_Partie-09 v1.12 §5bis`.
 
-👉 **Treuil inutilisable, et serrage de frein sous couple** — exactement le mécanisme de
-l'incident d'échauffement frein documenté en `v0.4.27`.
+### 🟠 Limite résiduelle (non corrigeable par logiciel)
 
-### ✅ Recommandation
-
-**Avant** de passer un `Sensor*ContactorFeedbackIsReal` à `TRUE` :
-1. **Mesurer physiquement** la polarité du retour frein au multimètre, frein serré puis relâché
-2. Aligner les trois déclarations sur le résultat de la mesure
-3. Corriger `FB_Brake.st:97` en conséquence (`<>` ou `=`) **et** les libellés `StuckClosed`/`StuckOpen`
-4. Vérifier que `FB_Safety_Winch` Méca A/B/D reste cohérent : il arme sur
-   `FwdRevSpeedFeedbackOff AND BrakeFeedback` — logique **uniquement** si `TRUE = serré`
-
-⚠️ Ce point conditionne la mise en service. À traiter avant tout essai en charge.
+Ce retour est un **écho du contacteur**, pas une mesure du frein. Il détecte une bobine ou un
+contacteur défaillant, **pas un frein usé, grippé ou qui patine** — il dira « ouvert » parce que la
+commande dit « ouvert ». Le patinage n'est couvert que par **Méca A** (dérive codeur, bit7), ce qui
+rend le constat **C5** (Méca A sans filtrage) d'autant plus important à traiter.
 
 ---
 
