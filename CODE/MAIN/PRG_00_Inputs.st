@@ -97,9 +97,6 @@ VAR
  
     // 🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)
     SimTopSensorTriggered                : BOOL;
-    
-    // 🧪 Suite de tests de validation (exécutée uniquement en simulation)
-    instTestsManagement                  : FB_PLC_Tests_Management;
 
     // 🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.
     HmiCommandsInitialized               : BOOL;
@@ -290,9 +287,6 @@ ELSE
     M3_ActualFrequencyHz_Filtered := M3_ActualFrequencyHz;
     M3_StatusWord_Filtered        := M3_StatusWord;
 END_IF;
-
-// 🧪 Appel de la suite globale de tests de validation automate
-instTestsManagement(instBucket := GVL_Simulation.LinkBucket, instWinchM2 := GVL_Simulation.LinkWinchM2);
 
 // Surcharges (overrides) demandées par le banc de tests automatique
 IF GVL_PLC_Tests.OverrideChainTrue THEN
