@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the organization and responsibility map for Functional Analyses (AF_Partie-01 to 14)."""
+"""Generate the organization and responsibility map for Functional Analyses (AF_Partie-01 to 13)."""
 
 import sys
 from pathlib import Path
@@ -21,7 +21,7 @@ skinparam ranksep 50
 skinparam packagePadding 15
 left to right direction
 
-title Carte des Analyses Fonctionnelles (AF_Partie-01 à 14)
+title Carte des Analyses Fonctionnelles (AF_Partie-01 à 13)
 
 package "1. <img:open-iconic/bolt> FONDATIONS & SOCLE" as PKG1 #E3F2FD {
   rectangle "<img:open-iconic/bolt>\nAF_Partie-01\nÉquipements & AU\n---\n• Chaîne AU matérielle\n• PowerCutOff 1oo2" as AF01 #BBDEFB
@@ -58,23 +58,17 @@ package "3. <img:open-iconic/cogs>\nFONCTIONS MÉTIER ACTIONNEURS" as PKG3 #E8F5
   AF13 --> AF09
 }
 
-package "4. <img:open-iconic/circle-check>\nTESTS & VALIDATION" as PKG4 #F3E5F5 {
-  rectangle "<img:open-iconic/circle-check>\nAF_Partie-14\nPLC Tests & Validation\n---\n• Scénarios TC-01 à TC-03\n• Framework in-PLC" as AF14 #E1BEE7
-}
-
 PKG1 -right-> PKG2 : Contrat FB
 PKG2 -right-> PKG3 : Consignes & Modes
-PKG3 -right-> PKG4 : Actionneurs & Safety
 
 legend bottom
   |= Numérotation |= Rôle & Portée |
   | <img:open-iconic/bolt> 1 à 3 | Fondations système & contrat d'architecture FB |
   | <img:open-iconic/loop> 4 à 7 | Spécifications transverses (Cycle, Modes, E/S, IHM) |
   | <img:open-iconic/cog> 8 à 13 | Fonctions métier dédiées par composant / actionneur |
-  | <img:open-iconic/circle-check> 14 | Validation sécurité & plan de tests in-PLC |
 endlegend
 
-footer Document source : AGENTS.md & DOC/AF_Partie-01 à 14
+footer Document source : AGENTS.md & DOC/AF_Partie-01 à 13
 @enduml
 """
 
@@ -84,5 +78,5 @@ if __name__ == "__main__":
     out_dir.mkdir(parents=True, exist_ok=True)
     output = out_dir / "DIAG_AF_Organisation_Responsabilites.png"
 
-    print("Génération du diagramme d'organisation des AF (AF_Partie-01 à 14)...")
+    print("Génération du diagramme d'organisation des AF (AF_Partie-01 à 13)...")
     raise SystemExit(0 if render_puml(PUML_AF_MAP, output) else 1)

@@ -4,6 +4,14 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.5.1_PlcTestsFrameworkRemoval` — 2026-07-26
+- Retrait du framework de tests automatiques in-PLC (introduit en `v0.4.15`) : `FB_TestSequencer`,
+  BRICKS/CORE, 8 suites de validation · archivé `ARCHIVES/Code/PLC_TESTS/`
+- `CODE/` : 158 → 114 fichiers `.st` (−7 300 lignes, −44 objets CODESYS)
+- `GVL_PLC_Tests` réduite à ses 20 `Override*` (forçages manuels) : −30,2 Ko de RAM
+- `AF_Partie-14` archivée · `AF_Partie-13` → v1.4 · non-régression → simulation manuelle + FAT/SAT
+- Commits `bce21c9` (phases 1-3) · `d9daa41` (phase 5)
+
 ### `v0.5.0_PostCableReplacement` — 2026-07-26
 - Jalon v0.5.0 après changement des câbles physiques (suite aux essais filmés en v0.4.27)
 - Nettoyage et archivage des anciens projets de qualification dans `ARCHIVES/Code/`

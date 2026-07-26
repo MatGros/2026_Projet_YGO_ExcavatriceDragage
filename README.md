@@ -43,8 +43,7 @@ Contrat standard que **tout FB métier respecte** :
 - **[Partie 10 (v1.10)](DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md)** — Fonction Encoder & Homing.
 - **[Partie 11 (v1.11)](DOC/AF_Partie-11_Fonction_Translation_v1.11.md)** — Fonction Translation (M3 variateur AC600).
 - **[Partie 12 (v1.4)](DOC/AF_Partie-12_Fonction_Benne_v1.4.md)** — Fonction Benne (M2, désynchronisation, garde-fou glissement).
-- **[Partie 13 (v1.3)](DOC/AF_Partie-13_Fonction_Simulation_v1.3.md)** — Fonction Simulation.
-- **[Partie 14 (v1.2)](DOC/AF_Partie-14_PLC_Tests_Validation_v1.2.md)** — Tests de validation sécurité (TC-01/02/03), framework de test in-PLC.
+- **[Partie 13 (v1.4)](DOC/AF_Partie-13_Fonction_Simulation_v1.4.md)** — Fonction Simulation.
 - **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
 ### 7️⃣ **[PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md)** 🗂️ **Pilotage projet — pas une spec**
@@ -71,8 +70,7 @@ excavatrice-dragage/
 │   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
 │   ├── AF_Partie-11_Fonction_Translation_v1.11.md
 │   ├── AF_Partie-12_Fonction_Benne_v1.4.md
-│   ├── AF_Partie-13_Fonction_Simulation_v1.3.md
-│   ├── AF_Partie-14_PLC_Tests_Validation_v1.2.md
+│   ├── AF_Partie-13_Fonction_Simulation_v1.4.md
 │   ├── AUDIT_Coherence_Documentaire_v1.0.md
 │   └── PLAN_TASK_v1.0.md     (pilotage : jalons, tâches, TBD/questions client)
 │
@@ -84,7 +82,7 @@ excavatrice-dragage/
 │   ├── DIAG/                  # FB_DiagCanOpen, FB_DiagEthercat
 │   ├── JOYSTICK/               # FB_Joystick et briques associées
 │   ├── MODES/                  # FB_Modes (N1/N2, limite légale)
-│   ├── SIMULATION/             # FB_Sim_*, PLC_TESTS/ (suites de test in-PLC)
+│   ├── SIMULATION/             # FB_Sim_*, GVL_Simulation, GVL_PLC_Tests (forçages manuels)
 │   ├── SUPERVISION/            # Structures HMI (GVL_IHM, ST_*HMI)
 │   ├── TRANSLATION/            # FB_Translation, FB_Safety_Translation (M3, AC600)
 │   ├── TREUILS/                # FB_Winch M1/M2, BENNE/ (FB_Bucket)

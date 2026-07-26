@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_PLC_Tests — Points d'injection de pannes pour essais banc
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.3.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
    🎯 Rôle : forcer artificiellement une entrée physique à un état donné, pour
       reproduire une panne en simulation sans avoir à la câbler réellement.
 

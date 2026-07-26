@@ -1,9 +1,14 @@
-# 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.3)
+# 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.4)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5
 > **Rôle** : Architecture unifiée de simulation banc de test (bit maître + granularité par
 > device), remplaçant `GVL_DEBUG` (6 flags indépendants ajoutés au coup par coup).
-> **Version** : v1.3 (REX 2026-07-22 — `SimulationModeActive` par défaut `FALSE` [machine réelle
+> **Version** : v1.4 (REX 2026-07-26 — retrait du framework de tests automatiques in-PLC
+> [`PLC_TESTS`, archivé `ARCHIVES/Code/PLC_TESTS/`] : `GVL_PLC_Tests` est réduite à ses 20
+> `Override*`, désormais des **forçages manuels** [vue instance CODESYS, et IHM pour les 5
+> capteurs position M3 via `PRG_09_Supervision`]. Plus aucun automate ne les pilote. La
+> non-régression passe par la simulation manuelle et les essais FAT/SAT).
+> **Version 1.3** (REX 2026-07-22 — `SimulationModeActive` par défaut `FALSE` [machine réelle
 > par défaut] ; bypass diagnostic CANopen/EtherCAT/Heartbeat IHM **découplé** du bit maître, piloté
 > désormais SEUL par son `Bus<Device>IsReal`, pour rester actif banc sans bus/IHM câblés même
 > simulation globale coupée).
@@ -104,10 +109,12 @@ des codeurs (`FB_Sim_Encoder`, position/comptage), signal joystick brut (`FB_Sim
 (`FB_Sim_Translation`). Pour ces devices, `SimulationModeActive := FALSE` désactive bien toute la
 simulation associée (comportement d'origine, inchangé).
 
-⚠️ **Test de non-régression obligatoire après import** : rejouer la suite
-`SIMULATION/PLC_TESTS/SUITE_SAFETY/FB_HeartbeatValidation.st` (et modes concernés touchant
-`JoystickOnline`/`JoystickOperational`) pour confirmer que le comportement fonctionnel est
-inchangé à `Bus*IsReal` constant — seul le déclencheur (bit maître retiré) a changé.
+⚠️ **Test de non-régression obligatoire après import** (🔧 v1.4 : la suite automatique
+`FB_HeartbeatValidation` n'existe plus, à rejouer **manuellement**) : forcer
+`GVL_PLC_Tests.OverrideIhmHeartbeatActive := TRUE` puis figer `OverrideIhmHeartbeatToggle`
+→ le timeout heartbeat doit tomber ; le refaire basculer → retour sain. Vérifier aussi les modes
+touchant `JoystickOnline`/`JoystickOperational`, pour confirmer que le comportement fonctionnel
+est inchangé à `Bus*IsReal` constant — seul le déclencheur (bit maître retiré) a changé.
 
 ### 🔝 Simulation dynamique du Capteur de Position Haute (TopPositionSensor)
 
@@ -205,8 +212,9 @@ Miroir commande→retour temporisé (délai mécanique simulé) réutilisant `TO
 4. Après import : `BusJoystickIsReal`, `BusVariateurM3IsReal`, `BusEncoderM1IsReal`,
    `BusEncoderM2IsReal`, `BusIhmHeartbeatIsReal` restent à `FALSE` par défaut → comportement
    inchangé au premier démarrage (bypass toujours actif), même si `SimulationModeActive = FALSE`.
-5. **Non-régression** : rejouer `SIMULATION/PLC_TESTS/SUITE_SAFETY/FB_HeartbeatValidation.st`
-   avant toute validation fonctionnelle du lot.
+5. **Non-régression** : rejouer **manuellement** le scénario heartbeat via
+   `GVL_PLC_Tests.OverrideIhmHeartbeatActive`/`OverrideIhmHeartbeatToggle` (🔧 v1.4 : la suite
+   automatique a été archivée) avant toute validation fonctionnelle du lot.
 
 ---
 
