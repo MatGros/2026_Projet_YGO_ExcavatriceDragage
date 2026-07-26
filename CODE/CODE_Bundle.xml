@@ -321,147 +321,6 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           </data>
         </addData>
       </dataType>
-      <dataType name="E_TestEventSeverity">
-        <baseType>
-          <enum>
-            <values>
-              <value name="TEST_EVENT_INFO" value="0" />
-              <value name="TEST_EVENT_WARNING" value="1" />
-              <value name="TEST_EVENT_ERROR" value="2" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>41e588d1-1ea8-5d99-aa81-d6d6b07b9c32</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_TestFailReason">
-        <baseType>
-          <enum>
-            <values>
-              <value name="FAIL_NONE" value="0" />
-              <value name="FAIL_TIMEOUT" value="1" />
-              <value name="FAIL_CHECK" value="2" />
-              <value name="FAIL_INVARIANT" value="3" />
-              <value name="FAIL_WINDOW_EARLY" value="4" />
-              <value name="FAIL_ABORTED" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>FAIL_TIMEOUT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">TimeoutPT écoulé sans pass (couvre "trop tard")</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FAIL_CHECK</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">CHECK_INSTANT faux, ou NEVER_DURING violé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FAIL_INVARIANT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Invariant multi-étapes violé (voir FailedInvariantId)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FAIL_WINDOW_EARLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pass survenu AVANT MinPT (réaction trop rapide = anormale)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FAIL_ABORTED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Abort commandé ou gate simulation perdu</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>ced6b8c3-cd7a-5052-bb93-74508d4d7454</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_TestRunState">
-        <baseType>
-          <enum>
-            <values>
-              <value name="TESTRUN_IDLE" value="0" />
-              <value name="TESTRUN_RUNNING" value="1" />
-              <value name="TESTRUN_PASSED" value="2" />
-              <value name="TESTRUN_FAILED" value="3" />
-              <value name="TESTRUN_ABORTED" value="4" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c04b435a-42f8-5555-8d99-eef46382e52c</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_TestTerminalState">
-        <baseType>
-          <enum>
-            <values>
-              <value name="TEST_TERMINAL_NONE" value="0" />
-              <value name="TEST_TERMINAL_DONE" value="1" />
-              <value name="TEST_TERMINAL_FAILED" value="2" />
-              <value name="TEST_TERMINAL_ABORTED" value="3" />
-              <value name="TEST_TERMINAL_CONFIG_ERROR" value="4" />
-              <value name="TEST_TERMINAL_WATCHDOG_TIMEOUT" value="5" />
-              <value name="TEST_TERMINAL_PRECONDITION_FAILED" value="6" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>TEST_TERMINAL_PRECONDITION_FAILED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Refus de gate explicite (audit v1.0 C3) — jamais silencieux</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c2e17c82-2f21-52c7-a77f-c922755f7e25</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_AxisCmd">
         <baseType>
           <struct>
@@ -2771,285 +2630,6 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_PlcTestsCmd">
-        <baseType>
-          <struct>
-            <variable name="RunSafety">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes unitaires : une seule suite manuelle à la fois.
-Lance la suite Safety</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunTranslation">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Translation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunBucket">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunEncoder">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Codeurs/Homing</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunModes">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Modes/Homme-mort</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunHeartbeat">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Heartbeat IHM↔PLC</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunSupervision">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance la suite Supervision/Persistance config</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunFramework">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance l'autotest indépendant du framework</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunAll">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lance Safety→Translation→Bucket→Encoder→Modes→Heartbeat</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunSuite">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compatibilité : &gt;0 lance une suite manuelle</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunCase">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cas de la commande unitaire sélectionnée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Abort">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Abandonne le test en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ClearReport">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Efface les rapports de tests</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>0a56ece7-0d70-5b73-ae46-e2234b14f129</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 ST_PlcTestsCmd — Commandes de pilotage du banc de validation
-═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_PlcTestsStatus">
-        <baseType>
-          <struct>
-            <variable name="RunState">
-              <type>
-                <derived name="E_TestRunState" />
-              </type>
-            </variable>
-            <variable name="SimulationActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si la simulation automate est active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveSuiteId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ID de la suite en cours (ex: 1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveCaseId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ID du cas en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveStepId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ID de l'étape en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveSuiteName">
-              <type>
-                <string length="32" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nom de la suite active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveCaseName">
-              <type>
-                <string length="32" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nom du cas active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ActiveStepName">
-              <type>
-                <string length="32" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nom de l'étape active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepElapsed">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé dans l'étape active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepTimeoutPT">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout de l'étape active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CasesTotal">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total de cas à jouer</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CasesPassed">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de cas réussis</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CasesFailed">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de cas en échec</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Heartbeat">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant d'activité (3 pulses sur transition)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailureSummary">
-              <type>
-                <string length="255" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ Détail des défauts du dernier run, TOUTES suites confondues (remonte Report.FailureSummary de chaque suite exécutée) — lisible sans creuser Suite*Validation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TerminalState">
-              <type>
-                <derived name="E_TestTerminalState" />
-              </type>
-            </variable>
-            <variable name="ErrorCode">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="ErrorMessage">
-              <type>
-                <string length="160" />
-              </type>
-            </variable>
-            <variable name="SuiteElapsed">
-              <type>
-                <TIME />
-              </type>
-            </variable>
-            <variable name="SuiteWatchdogExpired">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>3b413159-7897-5a23-b4c1-4c65467f0a5a</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 ST_PlcTestsStatus — États et progression des tests
-═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_SafetyTranslation">
         <baseType>
           <struct>
@@ -3626,70 +3206,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_TestCaseResult">
-        <baseType>
-          <struct>
-            <variable name="Name">
-              <type>
-                <string length="32" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ Libellé lisible (copié de CaseTable[i].Name) — identifie le cas sans chercher l'index</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Executed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Le cas de test a-t-elle été exécuté (ex. non exécuté si setup précédent abort)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Ok">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Succès global du cas de test</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailedStepId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index de la première étape en échec (0 si aucune)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailReason">
-              <type>
-                <derived name="E_TestFailReason" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause de l'échec global du cas de test</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Duration">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée totale du cas de test</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a01b149c-7761-584d-90ca-9ff79721e9da</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 ST_TestCaseResult — Résultat d'un cas de test
-═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_TestCycle">
         <baseType>
           <struct>
@@ -3714,350 +3230,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné uniquement aux stimulations sur banc de test/simulation.
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_TestEvent">
-        <baseType>
-          <struct>
-            <variable name="Sequence">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="Severity">
-              <type>
-                <derived name="E_TestEventSeverity" />
-              </type>
-            </variable>
-            <variable name="SuiteId">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="CaseId">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="StepId">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="Code">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="Message">
-              <type>
-                <string length="160" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>97ecb186-f8f9-5b20-8b2f-6ebd348d8ada</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Événement journalisé par le banc de test</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_TestFrameworkResult">
-        <baseType>
-          <struct>
-            <variable name="InProgress">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="AllPassed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="AnyFailed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="CurrentTestId">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="FailedTestId">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="TestsPassed">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="TestsFailed">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="ErrorMessage">
-              <type>
-                <string length="160" />
-              </type>
-            </variable>
-            <variable name="RunCounter">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>40a2a58e-237d-5406-a153-f1b455a6d963</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Résultat plat de l'autotest indépendant du framework</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_TestStepResult">
-        <baseType>
-          <struct>
-            <variable name="Executed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L'étape a-t-elle été exécutée ?</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Passed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">L'étape a-t-elle été validée ?</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailReason">
-              <type>
-                <derived name="E_TestFailReason" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Raison de l'échec (FAIL_NONE si OK)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailedCheckIdx">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index du check fautif (0 si aucun)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailedInvariantId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Index de l'invariant violé (0 si aucun)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Duration">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée mesurée de l'étape</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ObservedBool">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur observée de la sonde BOOL en échec au verdict</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ObservedDint">
-              <type>
-                <DINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur observée de la sonde DINT en échec au verdict</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ObservedReal">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur observée de la sonde REAL en échec au verdict</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cc65da0a-d694-5a33-a326-289e3481abdb</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 ST_TestStepResult — Résultat d'une étape de test
-═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_TestSuiteReport">
-        <baseType>
-          <struct>
-            <variable name="Name">
-              <type>
-                <string length="32" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nom de la suite de tests</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InProgress">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Exécution en cours ?</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AllPassed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tous les tests de la suite ont réussi ?</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AnyFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Au moins un échec détecté ?</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Aborted">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Suite abandonnée ?</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TerminalState">
-              <type>
-                <derived name="E_TestTerminalState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin explicite, aucune attente implicite sur Done</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorCode">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur de configuration/exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorMessage">
-              <type>
-                <string length="160" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic court exploitable IHM/log</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailedTestCase">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier cas de test en échec (0 si aucun)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailureSummary">
-              <type>
-                <string length="255" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏷️ TOUS les cas en échec en 1 ligne lisible (ex. 'TC-01 (step 15): FAIL_CHECK | TC-03 (step 30): FAIL_TIMEOUT') — évite de parcourir Cases[] un par un</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CurrentStepId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape en cours d'exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CurrentCaseId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cas de test en cours d'exécution</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Duration">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée totale du run de la suite</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RunCounter">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de runs depuis le démarrage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Steps">
-              <type>
-                <array>
-                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxSteps" />
-                  <baseType>
-                    <derived name="ST_TestStepResult" />
-                  </baseType>
-                </array>
-              </type>
-            </variable>
-            <variable name="Cases">
-              <type>
-                <array>
-                  <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestCases" />
-                  <baseType>
-                    <derived name="ST_TestCaseResult" />
-                  </baseType>
-                </array>
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b6ce4c74-704f-559b-8bc7-c06d80a4bda4</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 ST_TestSuiteReport — Rapport d'une suite de tests
-═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_TestTranslation">
@@ -4491,116 +3663,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des retours et mesures de la translation M3.
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_TranslationTestResult">
-        <baseType>
-          <struct>
-            <variable name="TerminalState">
-              <type>
-                <derived name="E_TestTerminalState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État terminal du dernier run (NONE tant qu'aucun run)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RequestedCaseId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">CaseId demandé au dernier Start (0=tous, 1..6=case ciblée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ExecutedCaseId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier cas en cours/joué (0 si aucun)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AllPassed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="AnyFailed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FailedCaseId">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier cas en échec (0 = aucun)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FailedCaseName">
-              <type>
-                <string length="32" />
-              </type>
-            </variable>
-            <variable name="FailReason">
-              <type>
-                <derived name="E_TestFailReason" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause du 1er cas en échec (FAIL_NONE si aucun)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorCode">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="ErrorMessage">
-              <type>
-                <string length="160" />
-              </type>
-            </variable>
-            <variable name="CasesTotal">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="CasesPassed">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="CasesFailed">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="Duration">
-              <type>
-                <TIME />
-              </type>
-            </variable>
-            <variable name="RunCounter">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c654cf21-3e32-52a2-ba75-9ca514caa8a0</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-🧪 ST_TranslationTestResult — Résultat plat de la suite Translation
-───────────────────────────────────────────────────────────────
-🎯 Vue synthétique lisible en 1 coup d'œil (IHM/Watch), en complément
-du rapport détaillé existant ST_TestSuiteReport (Steps[]/Cases[]).
-Alimenté par FB_TranslationReportFinalizer (CORE).
-═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchCfg">
@@ -22731,128 +21793,12 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_PLC_Tests">
-        <variable name="Cmd">
-          <type>
-            <derived name="ST_PlcTestsCmd" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes de pilotage des tests</xhtml>
-          </documentation>
-        </variable>
-        <variable name="Status">
-          <type>
-            <derived name="ST_PlcTestsStatus" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Progression et statut des tests</xhtml>
-          </documentation>
-        </variable>
-        <variable name="EventLog">
-          <type>
-            <array>
-              <dimension lower="1" upper="GVL_PLC_Tests_Const.MaxTestEvents" />
-              <baseType>
-                <derived name="ST_TestEvent" />
-              </baseType>
-            </array>
-          </type>
-        </variable>
-        <variable name="EventCount">
-          <type>
-            <INT />
-          </type>
-        </variable>
-        <variable name="EventSequence">
-          <type>
-            <UDINT />
-          </type>
-        </variable>
-        <variable name="EventOverflow">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="SuiteSafetyValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Rapports par suite — 1 variable NOMMÉE par suite (pas de tableau générique,
-choix utilisateur 2026-07-16) : chaque nouvelle suite ajoute SA variable ici
-(ex. SuiteWinchValidation à venir), jamais un index à retenir.
-Rapport de la suite Safety</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteTranslationValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Translation M3</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteTranslationResult">
-          <type>
-            <derived name="ST_TranslationTestResult" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Résultat plat clair Translation</xhtml>
-          </documentation>
-        </variable>
-        <variable name="FrameworkResult">
-          <type>
-            <derived name="ST_TestFrameworkResult" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Autotest indépendant du framework</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteBucketValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Bucket</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteEncoderValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Codeurs/Homing nominal</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteModesValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Modes/Homme-mort (post-IHM_MANU)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteHeartbeatValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport de la suite Heartbeat IHM↔PLC</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteSupervisionValidation">
-          <type>
-            <derived name="ST_TestSuiteReport" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Rapport Supervision/Persistance config</xhtml>
-          </documentation>
-        </variable>
         <variable name="OverrideChainTrue">
           <type>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — chaîne Safety AU
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Chaîne Safety AU — lues par PRG_00_Inputs
 Force la boucle AU à TRUE</xhtml>
           </documentation>
         </variable>
@@ -22885,9 +21831,8 @@ Force la boucle AU à TRUE</xhtml>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — Translation M3
-(niveau capteur amont uniquement, jamais une sortie de commande calculée — voir
-AF_Partie-14 §7.3.2/§7.5.5)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Translation M3 — lues par PRG_00_Inputs, écrites par PRG_09_Supervision depuis l'IHM
+(niveau capteur amont uniquement, jamais une sortie de commande calculée)
 Force TranslationPosTremie (Fdc extrême avant) à TRUE</xhtml>
           </documentation>
         </variable>
@@ -22926,45 +21871,12 @@ TRUE = force les 5 capteurs depuis OverrideM3SensorsWord</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de test (voir FB_Translation_PositionDecoder)</xhtml>
           </documentation>
         </variable>
-        <variable name="OverrideM1Slip">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Surcharges (overrides) physiques — Bucket
-Simule glissement modéré M1 (1.5m)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM1SlipCritical">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule glissement critique M1 (2.5m)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM2Stuck">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule blocage mécanique M2 (position figée)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM2BootDrift">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule dérive position M2 au démarrage (Boot)</xhtml>
-          </documentation>
-        </variable>
         <variable name="OverrideJoystickActive">
           <type>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Surcharges (overrides) — Joystick (SUITE_MODES, 2026-07-19, voir FB_Sim_Joystick)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Joystick — lues par PRG_01_Diagnostics (voir FB_Sim_Joystick)
 TRUE = RawX/Y/Button pilotés par les 3 champs suivants</xhtml>
           </documentation>
         </variable>
@@ -22997,9 +21909,9 @@ TRUE = RawX/Y/Button pilotés par les 3 champs suivants</xhtml>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01.
-Aucun test n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
-TRUE = le banc fournit le toggle IHM</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01_Diagnostics.
+Rien n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
+TRUE = le forçage fournit le toggle IHM</xhtml>
           </documentation>
         </variable>
         <variable name="OverrideIhmHeartbeatToggle">
@@ -23007,7 +21919,7 @@ TRUE = le banc fournit le toggle IHM</xhtml>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur IHM→PLC, figée ou inversée par FB_HeartbeatValidation</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur IHM→PLC : figer pour provoquer le timeout, faire basculer pour simuler une IHM saine</xhtml>
           </documentation>
         </variable>
         <variable name="OverrideM1FwdRevSpeedFbOff">
@@ -23015,7 +21927,7 @@ TRUE = le banc fournit le toggle IHM</xhtml>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Surcharges retours arrêt M1/M2 — polaires inversées : arrêt confirmé = TRUE.
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Retours d'arrêt M1/M2 — polarité inverse : arrêt confirmé = TRUE. Lues par PRG_00_Inputs.
 TRUE = contacteurs retombés (sain)</xhtml>
           </documentation>
         </variable>
@@ -23048,7 +21960,8 @@ TRUE = contacteurs retombés (sain)</xhtml>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 WINCH-CORE-01 — rejoue la purge boot uniquement en simulation pour le test PLC.
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 WINCH-CORE-01 — rejoue la purge des commandes IHM RETAIN du boot, en simulation
+uniquement (voir PRG_00_Inputs, gardé par GVL_Simulation.SimulationModeActive).
 TRUE = purge commandes RETAIN dans PRG_00</xhtml>
           </documentation>
         </variable>
@@ -23064,246 +21977,27 @@ TRUE = purge commandes RETAIN dans PRG_00</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 GVL_PLC_Tests — Variables globales du banc de validation
+   🧪 GVL_PLC_Tests — Points d'injection de pannes pour essais banc
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de données pour l'IHM et rapports de tests
-      conformément à la spécification v1.2 de l'AF Partie 14.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_PLC_Tests_Const" constant="true">
-        <variable name="MaxTestCases">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="8" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">par suite</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxSteps">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="128" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">par suite, table PLATE ; WINCH-CORE-01 ajoute les étapes 65..111</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxChecks">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="64" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">CheckTable par suite</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxChecksPerStep">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="10" />
-          </initialValue>
-        </variable>
-        <variable name="MaxInvariants">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="4" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">actifs en parallèle</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxProbeBool">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="32" />
-          </initialValue>
-        </variable>
-        <variable name="MaxProbeDint">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="16" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">INT/WORD/étapes séquenceur → conversion au câblage (WORD_TO_DINT)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxProbeReal">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="16" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">analogiques + TIME → REAL ms</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxAnalogStims">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="4" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">instances FB_TestStimulus par suite</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxSeqValues">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="8" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">plus gros poste mémoire par stim</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TaskCycleMs">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="10" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">MainTask — base des mesures en cycles</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxSuiteDurationMs">
-          <type>
-            <DINT />
-          </type>
-          <initialValue>
-            <simpleValue value="180000" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ garde-fou orchestrateur : 3 min maximum par suite</xhtml>
-          </documentation>
-        </variable>
-        <variable name="MaxTestEvents">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="32" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">journal circulaire des événements</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteSafety">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="1" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite (Cmd.RunSuite)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteTranslation">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="2" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Translation M3 (Cmd.RunSuite)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteBucket">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="3" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Bucket (Cmd.RunSuite)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteEncoder">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="4" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Codeurs/Homing nominal (Cmd.RunSuite)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteModes">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="5" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Modes/Homme-mort, post-suppression IHM_MANU (Cmd.RunSuite)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteHeartbeat">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="6" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index de suite Heartbeat IHM↔PLC (Cmd.RunSuite)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SuiteSupervision">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="8" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">index Supervision/Persistance config — 7 = Framework Validation</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>da9df60c-4ce8-5d19-b222-9ace41b88863</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 GVL_PLC_Tests_Const — Constantes de dimensionnement
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Définit les tailles limites des tables de tests
-      pour l'orchestrateur et le moteur de tests.
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.3.md
+   🎯 Rôle : forcer artificiellement une entrée physique à un état donné, pour
+      reproduire une panne en simulation sans avoir à la câbler réellement.
+
+   🔧 REX 2026-07-26 : le framework de tests automatiques in-PLC (FB_TestSequencer,
+      suites de validation, rapports) a été RETIRÉ — empreinte automate trop lourde et
+      resynchronisation permanente des suites à chaque évolution métier. Archivé dans
+      `ARCHIVES/Code/PLC_TESTS/`. Cette GVL survit car ses `Override*` restent le seul
+      moyen d'injecter une panne en essai.
+
+   ⚙️ Qui écrit ces variables désormais :
+      - 🖐️ l'opérateur, en forçage manuel (vue instance / liste de surveillance CODESYS)
+      - 🖥️ l'IHM, pour les 5 capteurs position M3 uniquement (voir PRG_09_Supervision,
+           verrouillé par `GVL_Simulation.SimulationModeActive`)
+      👉 Plus aucun automate ne les pilote : tout est à FALSE au boot, donc aucun effet
+         de bord possible sur la machine réelle.
+
+   🛡️ RÈGLE : ne JAMAIS forcer une sortie de commande calculée, uniquement une entrée
+      physique en amont — un override ne doit pas pouvoir masquer un défaut.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
@@ -23737,30 +22431,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
         </Folder>
-        <Folder Name="SIMULATION">
-          <Folder Name="_TYPES">
-            <Object Name="E_TestEventSeverity" ObjectId="41e588d1-1ea8-5d99-aa81-d6d6b07b9c32" />
-            <Object Name="E_TestFailReason" ObjectId="ced6b8c3-cd7a-5052-bb93-74508d4d7454" />
-            <Object Name="E_TestRunState" ObjectId="c04b435a-42f8-5555-8d99-eef46382e52c" />
-            <Object Name="E_TestTerminalState" ObjectId="c2e17c82-2f21-52c7-a77f-c922755f7e25" />
-            <Object Name="ST_PlcTestsCmd" ObjectId="0a56ece7-0d70-5b73-ae46-e2234b14f129" />
-            <Object Name="ST_PlcTestsStatus" ObjectId="3b413159-7897-5a23-b4c1-4c65467f0a5a" />
-            <Object Name="ST_TestCaseResult" ObjectId="a01b149c-7761-584d-90ca-9ff79721e9da" />
-            <Object Name="ST_TestEvent" ObjectId="97ecb186-f8f9-5b20-8b2f-6ebd348d8ada" />
-            <Object Name="ST_TestFrameworkResult" ObjectId="40a2a58e-237d-5406-a153-f1b455a6d963" />
-            <Object Name="ST_TestStepResult" ObjectId="cc65da0a-d694-5a33-a326-289e3481abdb" />
-            <Object Name="ST_TestSuiteReport" ObjectId="b6ce4c74-704f-559b-8bc7-c06d80a4bda4" />
-            <Object Name="ST_TranslationTestResult" ObjectId="c654cf21-3e32-52a2-ba75-9ca514caa8a0" />
-          </Folder>
-          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
-          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
-          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="GVL_PLC_Tests" ObjectId="075e3c4c-ec9c-57a1-9ae5-eb94d89b5791" />
-          <Object Name="GVL_PLC_Tests_Const" ObjectId="da9df60c-4ce8-5d19-b222-9ace41b88863" />
-          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
-        </Folder>
         <Folder Name="JOYSTICK">
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
           <Object Name="FB_Filter_PT1" ObjectId="564cb076-094f-527b-93bc-caad3ea68d7f" />
@@ -23802,6 +22472,15 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
           <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
+        </Folder>
+        <Folder Name="SIMULATION">
+          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="GVL_PLC_Tests" ObjectId="075e3c4c-ec9c-57a1-9ae5-eb94d89b5791" />
+          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
         <Folder Name="MAIN">
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
