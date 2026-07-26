@@ -12,6 +12,13 @@
       de coller (sinon usure/casse mécanique en plein mouvement).
    🔍 Double vérification retour contacteur bobine (ST_ContactorCheck) :
       incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
+   🆕 REX 2026-07-26 (relevé terrain) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
+      (DI = 1 ⟺ frein ouvert). Il est normalisé « TRUE = frein serré » en amont par
+      `PRG_00_Inputs.BrakeFeedbackInvertLogic` (inversion NO/NC de FB_Input). Ce FB reçoit donc un
+      signal TOUJOURS opposé à `BrakeCmd` en marche saine → le test d'incohérence est `=`, pas `<>`.
+      ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
+      pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
+      FB_Safety_Winch bit7) — pas par ce bloc.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Brake) ===
@@ -21,7 +28,10 @@ VAR_INPUT
     Enable              : BOOL;                     // Contexte général (comme tout FB) — FALSE = frein collé (sûr)
     Reset               : BOOL;                     // Acquittement défaut (front)
     MovementRequested   : BOOL;                      // TRUE = FB_Winch demande un mouvement (sens+palier actifs)
-    ContactorFeedback   : BOOL;                      // Retour d'état câblé de la bobine/contacteur frein
+    ContactorFeedback   : BOOL;                      // Retour frein NORMALISÉ (PRG_00_Inputs) : TRUE = frein SERRÉ
+                                                       // 🆕 REX 2026-07-26 : polarité opposée à BrakeCmd (TRUE = relâché)
+                                                       // → en marche normale les deux DIFFÈRENT toujours ; c'est leur
+                                                       // ÉGALITÉ qui trahit un contacteur collé (voir §4).
     DelayContactClose   : TIME := T#100ms;            // Temps de fermeture contacteur de puissance
     DelayMagnetise      : TIME := T#300ms;            // Délai magnétisation moteur avant ouverture frein
     DelayMotorDecel     : TIME := T#500ms;            // Délai décélération/ouverture contacteur avant collage frein
@@ -94,11 +104,16 @@ Done := (State = E_State.DONE);
 ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
-TonFeedback(IN := (BrakeCmd <> ContactorFeedback), PT := FeedbackTimeout);
+// 🆕 REX 2026-07-26 (relevé terrain) : `ContactorFeedback` est NORMALISÉ « TRUE = frein serré »
+// (PRG_00_Inputs, inversion FB_Input) alors que `BrakeCmd` vaut TRUE = relâché. Les deux sont donc
+// TOUJOURS opposés en marche saine → c'est leur ÉGALITÉ qui signale l'incohérence.
+// ⚠️ Le test était `<>` : il partait de l'hypothèse inverse (retour TRUE = relâché) et aurait levé
+// un défaut permanent dès le câblage du retour réel. Corrigé en `=`.
+TonFeedback(IN := (BrakeCmd = ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
-        ContactorCheck.StuckClosed := (NOT BrakeCmd AND ContactorFeedback);  // commandé collé mais retour "relâché"
-        ContactorCheck.StuckOpen   := (BrakeCmd AND NOT ContactorFeedback);  // commandé relâché mais retour "collé"
+        ContactorCheck.StuckClosed := (BrakeCmd AND ContactorFeedback);            // relâche commandée, retour toujours "serré"
+        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND NOT ContactorFeedback);    // serrage commandé, retour toujours "relâché"
         ErrorId := ErrorId OR 16#0001;
     ELSIF ResetEdge.Q THEN
         ContactorCheck.StuckClosed := FALSE;

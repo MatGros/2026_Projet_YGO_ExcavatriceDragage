@@ -33,12 +33,15 @@ VAR_OUTPUT
                                       // individuel par sens supprimé côté matériel, plus jamais câblé).
                                       // TRUE = tous retombés (sain, rien d'engagé)
     M1ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M1 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴
-    M1BrakeFeedback        : BOOL; // 🔒 Retour frein M1 (NC) : TRUE=frein serré repos ✅ | FALSE=desserré/coupure 🔴
+    M1BrakeFeedback        : BOOL; // 🔒 Retour frein M1, NORMALISÉ : TRUE=frein serré ✅ | FALSE=desserré 🔴
+                                    // ⚠️ Le DI physique vaut 1 quand le frein est OUVERT (image du contacteur
+                                    // de commande) — inversion faite par BrakeFeedbackInvertLogic, voir VAR.
 
     // ── 🪝 TREUIL M2 (même logique que M1) ──────────────────────────────────────────────
     M2FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : idem M1, voir ci-dessus
     M2ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M2 (NC) : TRUE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
-    M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 (NC) : TRUE=serré repos ✅ | FALSE=desserré/coupure 🔴
+    M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2, NORMALISÉ : TRUE=frein serré ✅ | FALSE=desserré 🔴
+                                    // ⚠️ Même remarque que M1 (DI physique = 1 quand frein ouvert).
 
     // ── ↔️ TRANSLATION M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
     // 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
@@ -50,7 +53,8 @@ VAR_OUTPUT
     TranslationPosP2          : BOOL;  // 📍 Position P2 (NO, ex-Fosse2) : TRUE=translation en P2 ✅ | FALSE=absent
     TranslationPosP1          : BOOL;  // 📍 Position P1 (NO, ex-Fosse1) : TRUE=translation en P1 ✅ | FALSE=absent
     TranslationPosMaintenance : BOOL;  // 🔧 Position maintenance (NO), extrême droite, accès MAINT_N2 uniquement : TRUE=en position service ✅ | FALSE=absent
-    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein translation M3 (NC) : TRUE=serré repos ✅ | FALSE=desserré 🔴
+    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein M3, NORMALISÉ : TRUE=frein serré ✅ | FALSE=desserré 🔴
+                                    // ⚠️ Même remarque que M1/M2 (DI physique = 1 quand frein ouvert).
 
     // 🆕 REX 2026-07-21 : décodage du mot des 5 capteurs position M3 (position 0, avant PRG_03_Safety)
     instPositionDecoder           : FB_Translation_PositionDecoder;
@@ -100,6 +104,18 @@ VAR
 
     // 🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.
     HmiCommandsInitialized               : BOOL;
+
+    // 🔩 ═══ POINT DE BASCULE UNIQUE — POLARITÉ DU RETOUR FREIN M1/M2/M3 ═══
+    // 🆕 REX 2026-07-26 (relevé terrain) : le frein est à MANQUE DE COURANT (sortie PLC = 1 →
+    // frein OUVERT). Le retour câblé est l'état du CONTACTEUR DE COMMANDE : s'il est commandé,
+    // donc frein ouvert, on reçoit 1. Câblage réel : DI = 1 ⟺ frein OUVERT.
+    // Or tout le programme aval (FB_Safety_Winch Méca A/B/D/E, FB_Safety_Translation Méca B,
+    // FB_Brake) raisonne en « TRUE = frein SERRÉ » — l'état sûr. On normalise donc ICI, à la
+    // frontière, via l'inversion NO/NC de FB_Input (rôle prévu, voir AF_Partie-06 §1).
+    // 👉 SUR SITE : si la mesure montre que le retour est en fait inversé (DI = 1 ⟺ frein serré),
+    //    passer CETTE SEULE VARIABLE à FALSE. Rien d'autre à toucher dans tout le programme.
+    //    Modifiable à chaud en vue instance, sans recompiler.
+    BrakeFeedbackInvertLogic             : BOOL := TRUE;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
@@ -207,9 +223,11 @@ M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
 instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ThermalIsReal), FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
 
-// 🧪 Simulation du retour frein M1 (fermé si commande inactive)
-M1BrakeFeedback_Simulated := NOT PRG_10_Outputs.M1BrakeCmd;
-instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), FilterTime := T#20MS);
+// 🧪 Simulation du retour frein M1 — 🆕 REX 2026-07-26 : le retour recopie la COMMANDE (image du
+// contacteur de commande), il n'est PAS son complément. Valeur en convention PHYSIQUE (1 = ouvert),
+// comme le DI réel, puisque l'inversion est appliquée juste après par FB_Input.
+M1BrakeFeedback_Simulated := PRG_10_Outputs.M1BrakeCmd;
+instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
@@ -221,9 +239,10 @@ M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
 instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ThermalIsReal), FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;
 
-// 🧪 Simulation du retour frein M2 (fermé si commande inactive)
-M2BrakeFeedback_Simulated := NOT PRG_10_Outputs.M2BrakeCmd;
-instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), FilterTime := T#20MS);
+// 🧪 Simulation du retour frein M2 — 🆕 REX 2026-07-26 : idem M1, le retour recopie la COMMANDE.
+// Valeur en convention PHYSIQUE (1 = ouvert), inversion appliquée par FB_Input juste après.
+M2BrakeFeedback_Simulated := PRG_10_Outputs.M2BrakeCmd;
+instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
@@ -266,9 +285,10 @@ instPositionDecoder(
     SensorMaintenance := TranslationPosMaintenance
 );
  
-// 🧪 Simulation du retour frein M3 (fermé/NC=TRUE si commande inactive)
-M3BrakeFeedback_Simulated := NOT PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
-instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), FilterTime := T#20MS);
+// 🧪 Simulation du retour frein M3 — 🆕 REX 2026-07-26 : idem M1/M2, le retour recopie la COMMANDE.
+// Valeur en convention PHYSIQUE (1 = ouvert), inversion appliquée par FB_Input juste après.
+M3BrakeFeedback_Simulated := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
+instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
 
 // 🧪 Simulation/Filtrage des retours variateur EtherCAT M3 (lecture seule physique contournée)
