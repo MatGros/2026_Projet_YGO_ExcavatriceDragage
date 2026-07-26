@@ -116,29 +116,26 @@ IF NOT HmiCommandsInitialized
    OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
     GVL_IHM.HmiInitDone := FALSE;
 
-    GVL_IHM.Modes.Cmd.BtnFaultReset := FALSE;
-    GVL_IHM.Modes.Cmd.BtnModeReset := FALSE;
+    // 🔧 REX 2026-07-24 (demande utilisateur) : Les boutons d'acquittement/reset (BtnFaultReset, etc.)
+    // ne sont plus écrasés en boucle à FALSE par l'automate. Les blocs métier utilisent leur propre R_TRIG (ResetEdge).
+    // Cela permet au technicien terrain de basculer la variable librement à 1 puis 0 dans CODESYS.
     GVL_IHM.Modes.Cmd.BtnEmergencyArming := FALSE;
 
-    GVL_IHM.M1TreuilRetenue.Cmd.BtnReset := FALSE;
     GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
     GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence := FALSE;
-    GVL_IHM.M2TreuilBenne.Cmd.BtnReset := FALSE;
     GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
     GVL_IHM.M2TreuilBenne.Bypass.EncoderFault := FALSE;
     GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence := FALSE;
 
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := FALSE;
-    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
     GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
 
     GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
     GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
     GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
-    GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
 
     GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
     GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;

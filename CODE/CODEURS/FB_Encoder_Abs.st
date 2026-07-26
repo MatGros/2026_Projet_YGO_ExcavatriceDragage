@@ -107,8 +107,8 @@ ResetEdge(CLK := Reset);
 // 🔍 3. DIAGNOSTIC BUS / ALARME
 IF (AlarmsIn <> 0) OR NOT SlaveOperational THEN
     ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
 END_IF;
 EncoderAvailable := (ErrorId AND 16#0001) = 0;
 

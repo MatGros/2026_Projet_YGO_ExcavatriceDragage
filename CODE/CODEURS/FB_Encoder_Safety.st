@@ -73,8 +73,8 @@ END_IF;
 // 🔍 3. BORNAGE PHYSIQUE ABSOLU (§3.6) — bit0
 IF NOT BypassGlobal AND ((CablePosM < PositionMinM) OR (CablePosM > PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que la position revient dans la plage valide *)
 END_IF;
 
 // 🔍 4. RELAIS INCOHÉRENCE REDÉMARRAGE (§3.7, calculée par FB_Encoder_Homing) — bit1

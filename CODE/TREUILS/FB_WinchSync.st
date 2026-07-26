@@ -122,10 +122,7 @@ CASE Mode OF
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
-// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'écart
-IF NOT BypassGlobal THEN
-
-// 📏 4. ÉCART M1/M2 — fiable UNIQUEMENT si les 2 treuils sont homés
+// 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
     DeltaPosM := ABS(SignedDeltaPosM);
@@ -133,6 +130,9 @@ ELSE
     SignedDeltaPosM := 0.0;
     DeltaPosM := 0.0;
 END_IF;
+
+// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
+IF NOT BypassGlobal THEN
 
 // 🔍 5. DÉTECTION ÉCART HORS TOLÉRANCE — bit0
 // 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
