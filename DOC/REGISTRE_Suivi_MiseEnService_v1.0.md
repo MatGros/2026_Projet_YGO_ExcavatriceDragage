@@ -45,6 +45,25 @@
 
 ---
 
+### MES-010 — Polarité du retour frein : relevé de câblage et normalisation logicielle
+
+| Champ | Valeur |
+|---|---|
+| Date | 2026-07-26 |
+| Lieu / environnement | Mise en service — relevé de câblage armoire |
+| Version CODE/DOC | Commit `1d2e086` — `PRG_00_Inputs.st`, `FB_Brake.st` · `AF_Partie-09_Fonction_Winch_v1.12.md` §5bis |
+| Périmètre | Retours frein M1, M2, M3 |
+| Statut | ✅ Corrigé en logiciel — **contrôle terrain à faire au premier essai** |
+| Constat | Le frein est à **manque de courant** (sortie PLC = 1 → frein ouvert) et le retour câblé est l'**état du contacteur de commande**. Donc `DI = 1 ⟺ frein OUVERT` : le retour **recopie** la commande. Or le programme supposait `TRUE = frein serré` au niveau du DI dans `FB_Safety_Winch` (Méca A/B/D/E), `FB_Safety_Translation` (Méca B) et le modèle de simulation. |
+| Pourquoi c'était invisible | `GVL_Simulation.Sensor*ContactorFeedbackIsReal = FALSE` : le retour venait du modèle simulé, qui appliquait `NOT BrakeCmd`, soit exactement la polarité que la logique fausse attendait. Les deux erreurs se compensaient. |
+| Risque évité | Au câblage du retour réel : **Méca B → `SafeStop` + `PowerCutOff` 3 s après chaque arrêt** ; **Méca A ne s'armant plus** → perte de la détection roue libre / frein qui patine ; `FB_Brake` en incohérence permanente → serrage du frein sous couple et coupure des relais (mécanisme de l'incident d'échauffement `v0.4.27`). |
+| Solution appliquée | Normalisation **à la frontière** par le mécanisme NO/NC de `FB_Input` (son rôle, AF_Partie-06 §1) : nouvelle variable `PRG_00_Inputs.BrakeFeedbackInvertLogic : BOOL := TRUE` alimentant `InvertLogic` sur les 3 instances. Modèle simulé corrigé (`:= BrakeCmd`, sans `NOT`). `FB_Brake` : test d'incohérence `<>` → `=`, libellés `StuckClosed`/`StuckOpen` remis à l'endroit. **`FB_Safety_Winch` et `FB_Safety_Translation` : zéro ligne modifiée.** |
+| 🔩 Action terrain | Machine à l'arrêt, **frein serré**, lire `M1_BrakeFeedback_DI`.<br>• `0` → conforme, `BrakeFeedbackInvertLogic` reste à `TRUE`.<br>• `1` → câblage inverse → passer **cette seule variable** à `FALSE` (à chaud en vue instance, puis figer la valeur d'init et **prévenir pour répercussion au dépôt**). |
+| ⚠️ Limite connue | Ce retour est un **écho du contacteur**, pas une mesure du frein : il ne détecte **pas** un frein usé ou qui patine. Seul **Méca A** (dérive codeur, `FB_Safety_Winch` bit7) couvre ce cas — surveiller son seuil `0,02 m/s`, sans filtre ni temporisation (constat C5, `AUDIT_Revue_Technique_v1.0.md`). |
+| Activation | Passer `GVL_Simulation.SensorM1/M2/M3ContactorFeedbackIsReal` à `TRUE` **axe par axe**, pas les trois d'un coup. |
+
+---
+
 ### MES-009 — Mesure position haute capteur vs arrêt réel treuils
 
 | Champ | Valeur |

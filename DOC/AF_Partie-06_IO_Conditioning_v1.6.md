@@ -7,7 +7,7 @@
 > 📌 **v1.5 (2026-07-07)** — REX terrain (voir Partie 9) : l'exemple d'instance §5 citait encore
 > `M1ContactorFeedbackFwd` (retour individuel par sens) — ce signal est **supprimé côté câblage
 > réel** pour les treuils M1/M2, remplacé par un retour unique par treuil `M1/M2FwdRevSpeedFeedbackOff`.
-> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie-09_Fonction_Winch_v1.11.md`.
+> Exemple mis à jour en conséquence. Détail complet : `DOC/AF_Partie-09_Fonction_Winch_v1.12.md`.
 >
 > 📌 **v1.4** — Correctif documentaire (voir Partie 13) : l'extrait `instEmergencyStopOk` (§ci-dessous)
 > référençait encore `GVL_DEBUG.DBG_EmergencyStopOkBypass_TEST` (supprimé) — remplacé par

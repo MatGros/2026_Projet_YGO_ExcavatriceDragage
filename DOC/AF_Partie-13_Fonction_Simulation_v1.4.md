@@ -18,7 +18,7 @@
 > **Version 1.1** (Revue et mise en œuvre du plan d'action — 2026-07-07)
 > 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md),
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (briques réduites),
-> [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.11.md),
+> [P8 Joystick v1.3](AF_Partie-08_Fonction_Joystick_v1.3.md), [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.12.md),
 > [P11 Translation v1.11](AF_Partie-11_Fonction_Translation_v1.11.md) §3bis/§7/§9bis.
 
 ---

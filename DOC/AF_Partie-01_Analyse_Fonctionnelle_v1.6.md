@@ -14,7 +14,7 @@
 > polarité inversée (bug documenté ci-dessous en bandeau REX, pour ne jamais reproduire l'erreur).
 > Ajout de la **séquence de réarmement** (impulsion 1 s + verrouillage 5 s, commande IHM
 > uniquement, jamais automatique) et d'une **casuistique exhaustive** de tous les cas de figure
-> de la chaîne de coupure de puissance. Voir `DOC/AF_Partie-09_Fonction_Winch_v1.11.md` §4quinquies
+> de la chaîne de coupure de puissance. Voir `DOC/AF_Partie-09_Fonction_Winch_v1.12.md` §4quinquies
 > pour le détail des **Safety Mouvement** (3 aujourd'hui, d'autres pourront s'ajouter — catégorie
 > ouverte, non limitée à un nombre fixe) qui peuvent déclencher une coupure logicielle — non
 > re-décrits ici, seulement référencés. ⚠️ Remarque nommage (retour utilisateur 2026-07-07) :
@@ -160,7 +160,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 
 > 🏷️ **Rappel — « Safety Mouvement ».** Il s'agit d'une **catégorie ouverte** de protections
 > logicielles de `FB_Safety_Winch`, capables de déclencher une coupure de puissance (détail
-> technique complet en `DOC/AF_Partie-09_Fonction_Winch_v1.11.md` §4quinquies, non re-décrit ici).
+> technique complet en `DOC/AF_Partie-09_Fonction_Winch_v1.12.md` §4quinquies, non re-décrit ici).
 > **3 existent aujourd'hui**, nommées par leur **rôle** (voir remarque de nommage plus bas pour
 > pourquoi un simple suffixe de lettre est délibérément évité — d'autres cas viendront s'ajouter
 > à cette liste avec le temps, sans limite de nombre) :

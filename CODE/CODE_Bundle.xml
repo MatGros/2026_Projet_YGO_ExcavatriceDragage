@@ -3017,7 +3017,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md
    🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
    ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
       packé de la 1ère version) : chaque contacteur de vitesse de
@@ -3960,7 +3960,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🧭 Index 2 : bande de vitesse câble mesurée (1..5)
    📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchSpeedConfig">
@@ -4012,7 +4012,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
       Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchState">
@@ -4640,7 +4640,7 @@ Temps de fermeture contacteur de puissance</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §3
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §3
                    (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
@@ -7822,7 +7822,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📐 FB_DriftGuard — Détection de dérive de position pendant armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §4quinquies (Méca A/C)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §4quinquies (Méca A/C)
    🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
       Méca C de FB_Safety_Winch (armement + capture position référence + calcul
       dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
@@ -11018,7 +11018,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
    📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2 (usage),
-                   DOC/AF_Partie-09_Fonction_Winch_v1.11.md (correctif ci-dessous)
+                   DOC/AF_Partie-09_Fonction_Winch_v1.12.md (correctif ci-dessous)
    🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
       SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
       jamais concernée par ce bug — voir analyse d'impact ci-dessous).
@@ -13072,7 +13072,7 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md,
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md,
                    DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §7
                    (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
@@ -14507,7 +14507,7 @@ Résultat validation table + MaxStepNumber</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §2, §6
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §2, §6
    📄 Audit P0.2 : AUDIT_Winch_v1.0 (archivé) §2.2
    📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
    📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
@@ -16035,7 +16035,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -16067,7 +16067,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.11.md §4ter pour le contexte
+      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.12.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
@@ -16497,7 +16497,7 @@ END_IF;
    ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
       reste à 0 % et Configured reste FALSE.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -16904,7 +16904,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.11.md §9
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §9
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
       1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
    🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :
@@ -19045,7 +19045,7 @@ ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.11.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
