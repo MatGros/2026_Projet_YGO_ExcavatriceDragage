@@ -1,73 +1,64 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 GVL_PLC_Tests — Variables globales du banc de validation
+   🧪 GVL_PLC_Tests — Points d'injection de pannes pour essais banc
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de données pour l'IHM et rapports de tests
-      conformément à la spécification v1.2 de l'AF Partie 14.
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.3.md
+   🎯 Rôle : forcer artificiellement une entrée physique à un état donné, pour
+      reproduire une panne en simulation sans avoir à la câbler réellement.
+
+   🔧 REX 2026-07-26 : le framework de tests automatiques in-PLC (FB_TestSequencer,
+      suites de validation, rapports) a été RETIRÉ — empreinte automate trop lourde et
+      resynchronisation permanente des suites à chaque évolution métier. Archivé dans
+      `ARCHIVES/Code/PLC_TESTS/`. Cette GVL survit car ses `Override*` restent le seul
+      moyen d'injecter une panne en essai.
+
+   ⚙️ Qui écrit ces variables désormais :
+      - 🖐️ l'opérateur, en forçage manuel (vue instance / liste de surveillance CODESYS)
+      - 🖥️ l'IHM, pour les 5 capteurs position M3 uniquement (voir PRG_09_Supervision,
+           verrouillé par `GVL_Simulation.SimulationModeActive`)
+      👉 Plus aucun automate ne les pilote : tout est à FALSE au boot, donc aucun effet
+         de bord possible sur la machine réelle.
+
+   🛡️ RÈGLE : ne JAMAIS forcer une sortie de commande calculée, uniquement une entrée
+      physique en amont — un override ne doit pas pouvoir masquer un défaut.
    ═══════════════════════════════════════════════════════════════ *)
 
 {attribute 'qualified_only'}
 VAR_GLOBAL
-    Cmd                        : ST_PlcTestsCmd;      // 🎮 Commandes de pilotage des tests
-    Status                     : ST_PlcTestsStatus;   // 🚦 Progression et statut des tests
-    EventLog                   : ARRAY[1..GVL_PLC_Tests_Const.MaxTestEvents] OF ST_TestEvent;
-    EventCount                 : INT;
-    EventSequence              : UDINT;
-    EventOverflow              : BOOL;
-
-    // 📊 Rapports par suite — 1 variable NOMMÉE par suite (pas de tableau générique,
-    // choix utilisateur 2026-07-16) : chaque nouvelle suite ajoute SA variable ici
-    // (ex. SuiteWinchValidation à venir), jamais un index à retenir.
-    SuiteSafetyValidation      : ST_TestSuiteReport;  // Rapport de la suite Safety
-    SuiteTranslationValidation : ST_TestSuiteReport;  // Rapport de la suite Translation M3
-    SuiteTranslationResult     : ST_TranslationTestResult; // 🆕 Résultat plat clair Translation
-    FrameworkResult            : ST_TestFrameworkResult;   // 🧪 Autotest indépendant du framework
-    SuiteBucketValidation      : ST_TestSuiteReport;  // Rapport de la suite Bucket
-    SuiteEncoderValidation     : ST_TestSuiteReport;  // Rapport de la suite Codeurs/Homing nominal
-    SuiteModesValidation       : ST_TestSuiteReport;  // Rapport de la suite Modes/Homme-mort (post-IHM_MANU)
-    SuiteHeartbeatValidation   : ST_TestSuiteReport;  // Rapport de la suite Heartbeat IHM↔PLC
-    SuiteSupervisionValidation : ST_TestSuiteReport;  // Rapport Supervision/Persistance config
-
-    // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — chaîne Safety AU
-    OverrideChainTrue          : BOOL;                // Force la boucle AU à TRUE
-    OverrideChainFalse         : BOOL;                // Force la boucle AU à FALSE
-    OverrideContactorFalse     : BOOL;                // Force le retour contacteur à FALSE
+    // ⚡ Chaîne Safety AU — lues par PRG_00_Inputs
+    OverrideChainTrue           : BOOL;               // Force la boucle AU à TRUE
+    OverrideChainFalse          : BOOL;               // Force la boucle AU à FALSE
+    OverrideContactorFalse      : BOOL;               // Force le retour contacteur à FALSE
     OverrideEmergencyStopOkTrue : BOOL;               // Force le retour contacteur à TRUE (réarmé)
 
-    // ⚡ Surcharges (overrides) physiques lues par PRG_00_Inputs — Translation M3
-    // (niveau capteur amont uniquement, jamais une sortie de commande calculée — voir
-    // AF_Partie-14 §7.3.2/§7.5.5)
-    OverrideM3AtTremie         : BOOL;                // Force TranslationPosTremie (Fdc extrême avant) à TRUE
-    OverrideM3BrakeStuckOpen   : BOOL;                // Force M3BrakeFeedback (retour bobine) à TRUE (desserré) — simule Méca B
-    OverrideM3PhantomFreq      : BOOL;                // Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A
+    // ⚡ Translation M3 — lues par PRG_00_Inputs, écrites par PRG_09_Supervision depuis l'IHM
+    // (niveau capteur amont uniquement, jamais une sortie de commande calculée)
+    OverrideM3AtTremie          : BOOL;               // Force TranslationPosTremie (Fdc extrême avant) à TRUE
+    OverrideM3BrakeStuckOpen    : BOOL;               // Force M3BrakeFeedback (retour bobine) à TRUE (desserré) — simule Méca B
+    OverrideM3PhantomFreq       : BOOL;               // Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A
     // 🆕 REX 2026-07-18 : force directement les 5 capteurs position M3 depuis un mot de test —
     // seul moyen de tester les 6 mots valides ET les combinaisons incohérentes indépendamment
     // du temps de trajet simulé (FB_Sim_Translation). bit4=Trémie,bit3=PV,bit2=P2,bit1=P1,bit0=Maintenance.
-    OverrideM3SensorsWordActive : BOOL;                // TRUE = force les 5 capteurs depuis OverrideM3SensorsWord
-    OverrideM3SensorsWord       : BYTE;                // Mot de test (voir FB_Translation_PositionDecoder)
+    OverrideM3SensorsWordActive : BOOL;               // TRUE = force les 5 capteurs depuis OverrideM3SensorsWord
+    OverrideM3SensorsWord       : BYTE;               // Mot de test (voir FB_Translation_PositionDecoder)
 
-    // ⚡ Surcharges (overrides) physiques — Bucket
-    OverrideM1Slip           : BOOL;                // Simule glissement modéré M1 (1.5m)
-    OverrideM1SlipCritical   : BOOL;                // Simule glissement critique M1 (2.5m)
-    OverrideM2Stuck          : BOOL;                // Simule blocage mécanique M2 (position figée)
-    OverrideM2BootDrift      : BOOL;                // Simule dérive position M2 au démarrage (Boot)
+    // ⚡ Joystick — lues par PRG_01_Diagnostics (voir FB_Sim_Joystick)
+    OverrideJoystickActive      : BOOL;               // TRUE = RawX/Y/Button pilotés par les 3 champs suivants
+    OverrideJoystickRawX        : INT;                // Débattement axe X simulé (5000=neutre, 10000=fond)
+    OverrideJoystickRawY        : INT;                // Débattement axe Y simulé (5000=neutre, 10000=fond)
+    OverrideJoystickRawButton   : BOOL;               // Appui homme-mort simulé
 
-    // ⚡ Surcharges (overrides) — Joystick (SUITE_MODES, 2026-07-19, voir FB_Sim_Joystick)
-    OverrideJoystickActive     : BOOL;              // TRUE = RawX/Y/Button pilotés par les 3 champs suivants
-    OverrideJoystickRawX       : INT;                // Débattement axe X simulé (5000=neutre, 10000=fond)
-    OverrideJoystickRawY       : INT;                // Débattement axe Y simulé (5000=neutre, 10000=fond)
-    OverrideJoystickRawButton  : BOOL;               // Appui homme-mort simulé
+    // 💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01_Diagnostics.
+    // Rien n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
+    OverrideIhmHeartbeatActive  : BOOL;               // TRUE = le forçage fournit le toggle IHM
+    OverrideIhmHeartbeatToggle  : BOOL;               // Valeur IHM→PLC : figer pour provoquer le timeout, faire basculer pour simuler une IHM saine
 
-    // 💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01.
-    // Aucun test n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
-    OverrideIhmHeartbeatActive : BOOL;               // TRUE = le banc fournit le toggle IHM
-    OverrideIhmHeartbeatToggle : BOOL;               // Valeur IHM→PLC, figée ou inversée par FB_HeartbeatValidation
+    // 🛡️ Retours d'arrêt M1/M2 — polarité inverse : arrêt confirmé = TRUE. Lues par PRG_00_Inputs.
+    OverrideM1FwdRevSpeedFbOff  : BOOL;               // TRUE = contacteurs retombés (sain)
+    OverrideM1BrakeFeedback     : BOOL;               // TRUE = frein serré (sain)
+    OverrideM2FwdRevSpeedFbOff  : BOOL;               // TRUE = contacteurs retombés (sain)
+    OverrideM2BrakeFeedback     : BOOL;               // TRUE = frein serré (sain)
 
-    // 🛡️ Surcharges retours arrêt M1/M2 — polaires inversées : arrêt confirmé = TRUE.
-    OverrideM1FwdRevSpeedFbOff : BOOL;               // TRUE = contacteurs retombés (sain)
-    OverrideM1BrakeFeedback    : BOOL;               // TRUE = frein serré (sain)
-    OverrideM2FwdRevSpeedFbOff : BOOL;               // TRUE = contacteurs retombés (sain)
-    OverrideM2BrakeFeedback    : BOOL;               // TRUE = frein serré (sain)
-
-    // 🧹 WINCH-CORE-01 — rejoue la purge boot uniquement en simulation pour le test PLC.
-    OverrideHmiCommandPurge    : BOOL;               // TRUE = purge commandes RETAIN dans PRG_00
+    // 🧹 WINCH-CORE-01 — rejoue la purge des commandes IHM RETAIN du boot, en simulation
+    // uniquement (voir PRG_00_Inputs, gardé par GVL_Simulation.SimulationModeActive).
+    OverrideHmiCommandPurge     : BOOL;               // TRUE = purge commandes RETAIN dans PRG_00
 END_VAR
