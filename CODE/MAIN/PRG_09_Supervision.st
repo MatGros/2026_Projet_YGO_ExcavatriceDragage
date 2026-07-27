@@ -58,85 +58,8 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
 
-// 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
-// (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
-// Sert à savoir, côté IHM, quand un appui sur BtnFaultReset est utile/attendu.
-GVL_IHM.Modes.State.AnyFaultActive :=
-       PRG_01_Diagnostics.instDiagCanOpen.Error
-    OR PRG_01_Diagnostics.instDiagEthercat.Error
-    OR PRG_01_Diagnostics.FB_Joystick_0.Error
-    OR (NOT PRG_04_Modes.instModes.InhibitM1 AND (
-           PRG_02_Encoders.instEncoderAbsM1.Error
-        OR PRG_02_Encoders.instHomingM1.Error
-        OR PRG_02_Encoders.instEncoderSafetyM1.Error
-        OR PRG_03_Safety.instSafetyWinchM1.Error
-        OR PRG_06_WinchControl.instWinchM1.Error
-    ))
-    OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (
-           PRG_02_Encoders.instEncoderAbsM2.Error
-        OR PRG_02_Encoders.instHomingM2.Error
-        OR PRG_02_Encoders.instEncoderSafetyM2.Error
-        OR PRG_03_Safety.instSafetyWinchM2.Error
-        OR PRG_06_WinchControl.instWinchM2.Error
-    ))
-    OR PRG_03_Safety.instSafetyTranslationM3.Error
-    OR PRG_06_WinchControl.instWinchSync.Error
-    OR PRG_06_WinchControl.instBucket.Error
-    OR PRG_07_TranslationControl.instTranslationM3.Error
-    OR PRG_10_Outputs.RedundancyTestFailed
-    OR PRG_10_Outputs.EmergencyArmingFailed;
 
-// 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont — polarité "alarme" (TRUE=
-// problème), PAS celle de PowerCutOff_A_RQ (qui est en fail-safe maintenu, TRUE=OK depuis
-// l'inversion de polarité). On relit directement les .PowerCutOff sources, pas la sortie physique.
-GVL_IHM.Modes.State.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                                 OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                                 OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff
-                                 OR GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
-
-// 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 — signal UNIQUE (1 seul fil, pas de sens à
-// le dupliquer par axe), remonté une seule fois au niveau global GVL_IHM (même principe que
-// TopPositionSensorActive ci-dessus, PAS dans WinchM1/WinchM2/Translation).
-GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
-GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
-GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_08_AuxiliaryControl.HydraulicFaultOk; // 🆕 REX 2026-07-18 — diagnostic seul, aucune commande PLC
-
-// 💓 Heartbeat IHM↔PLC — le toggle IHM est lu directement en PRG_01 ; ici, on publie
-// les diagnostics calculés au même scan pour l'affichage et l'historisation IHM.
-GVL_IHM.Commun.TglHeartbeatPlc  := PRG_01_Diagnostics.instIhmHeartbeat.TglHeartbeatPlc;
-GVL_IHM.Commun.HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk;
-GVL_IHM.Commun.HeartbeatIhmTimeout := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmTimeout;
-GVL_IHM.Commun.HeartbeatIhmElapsed := PRG_01_Diagnostics.instIhmHeartbeat.TimeSinceIhmEdge;
-
-// 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
-// EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
-// pas seulement le pulse — ArmingSeqStep<>0 englobe déjà tout sauf le verrouillage final.
-GVL_IHM.Modes.State.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
-GVL_IHM.Modes.State.PowerContactorOk    := PRG_00_Inputs.EmergencyStopOk;
-GVL_IHM.Modes.State.EmergencyArmingBusy := (PRG_10_Outputs.ArmingSeqStep <> 0) OR PRG_10_Outputs.EmergencyArmingLockoutActive;
-GVL_IHM.Modes.State.EmergencyArmable    := PRG_00_Inputs.EmergencyChain
-                                    AND (PRG_10_Outputs.ArmingSeqStep = 0)
-                                    AND NOT PRG_10_Outputs.EmergencyArmingLockoutActive
-                                    AND NOT PRG_10_Outputs.RedundancyTestFailed;
-GVL_IHM.Modes.State.RedundancyTestFailed := PRG_10_Outputs.RedundancyTestFailed;
-GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
-
-// 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
-// homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.BtnHome sont désormais câblés
-// directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
-
-// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
-
-
-// ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
-// 🐛 FIX 2026-07-23 : sentinelles `= 0.0` remplacées par un flag `Initialized`/`CfgInitialized`
-// dédié (défaut FALSE non ambigu). L'ancienne sentinelle `CfgTopSensorPos_M = 0.0` ne se
-// déclenchait JAMAIS (défaut struct réel = 8.5, ST_WinchCfg.st) → ce bloc M1/M2 ne s'exécutait
-// plus après un reset RETAIN (ex. changement de struct ST_*HMI, comme lors de cette session) et
-// TOUTE la config (paliers, rampes, limites câble, synchro...) retombait au défaut struct brut
-// sans jamais se resynchroniser depuis le vrai PERSISTENT. Idem pour `Sync.CfgSyncTolerance_M`
-// (défaut réel 0.25, piège documenté REX 2026-07-08 (5) ci-dessous, désormais clos).
-// 📄 Voir DOC/AF_Partie-07_Interface_IHM_v1.8.md.
+// ── 2. BRIDGES ET PERSISTANCE CONFIG (Restauration automatique) ────────────
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
 IF instCfgPersistBridgeWinchM1.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
@@ -208,48 +131,25 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Network.Bypass.Initialized THEN
-    IF BypassNetworkGlobal THEN
-        GVL_IHM.Network.Bypass.Global := TRUE;
-    END_IF;
-    GVL_IHM.Network.Bypass.Initialized := TRUE;
+// Sauvegarde synchrone vers les variables RETAIN si modifiées côté IHM
+IF GVL_IHM.TranslationM3.Bypass.Global <> BypassTranslationGlobal THEN
+    BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
 END_IF;
-
-IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
-    IF BypassSyncGlobal THEN
-        GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
-    END_IF;
-    GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
+IF GVL_IHM.M1TreuilRetenue.Bypass.Global <> BypassWinchM1Global THEN
+    BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 END_IF;
-
-IF NOT GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized THEN
-    IF BypassBucketGlobal THEN
-        GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global := TRUE;
-    END_IF;
-    GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized := TRUE;
+IF GVL_IHM.M2TreuilBenne.Bypass.Global <> BypassWinchM2Global THEN
+    BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
 END_IF;
 
 
-// ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-// 🐛 FIX 2026-07-23 : chaque bloc ci-dessous est désormais gardé par le flag `Cfg.Initialized`/
-// `Sync.CfgInitialized` posé en §2 — défense en profondeur : même si l'ordre du fichier changeait
-// un jour, on ne peut plus écraser le vrai PERSISTENT avec une valeur GVL_IHM fraîchement
-// resettée au défaut struct AVANT que la restauration (§2) ait eu lieu. Revue sécurité 2026-07-23.
-// 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
-BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
-BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
-BypassSyncGlobal            := GVL_IHM.M1M2Sync.Bypass.Global;
-BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
-BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
-
-// 🎯 Sauvegarde ciblée Translation M3 : uniquement SetFreq_Hz, jamais les commandes IHM.
-IF GVL_IHM.TranslationM3.Cmd.Initialized THEN
-    _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
-END_IF;
+// ── 3. CALCULS ET ÉTATS COMMUNS POUR L'IHM ────────────────────────────────
+GVL_IHM.M1TreuilRetenue.State.TopPositionSensorActive := NOT PRG_00_Inputs.TopPositionSensor;
+GVL_IHM.M2TreuilBenne.State.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
+GVL_IHM.M2TreuilBenne.State.SlackCableActive          := NOT PRG_00_Inputs.SlackCableSwitch;
 
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
-// (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
+// (la limite légale s'lique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
                                             AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M))
                                                  OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
@@ -258,14 +158,12 @@ GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md) ──────
-// 🔧 REX (session Bypass) : structs Bypass dedies par metier (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-// — ContactorFeedback reste par axe (materiel propre a chaque treuil/translation), SlackCable et
-// TopPositionSensor passent dans Commun.Bypass (capteur physique UNIQUE partage M1/M2, plus de duplication).
-GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := FALSE;
-GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback := FALSE;
-GVL_IHM.TranslationM3.Bypass.ContactorFeedback := FALSE;
-GVL_IHM.Commun.Bypass.SlackCable        := FALSE;
-GVL_IHM.Commun.Bypass.TopPositionSensor := FALSE;
+// 📄 Lot L6 : Ré-alimentation des miroirs IHM depuis l'état effectif de simulation (SimulationModeActive AND Sim<Domaine>Active)
+GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
@@ -278,8 +176,6 @@ GVL_IHM.M1TreuilRetenue.State.SpeedStable             := PRG_03_Safety.instSpeed
 GVL_IHM.M1TreuilRetenue.State.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM1.Error;
 GVL_IHM.M1TreuilRetenue.State.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM1.ErrorId;
 GVL_IHM.M1TreuilRetenue.State.EstimatedLoadPct          := PRG_03_Safety.instLoadEstimatorM1.EstimatedLoadPct;
-GVL_IHM.M1TreuilRetenue.State.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM1.Configured;
-GVL_IHM.M1TreuilRetenue.State.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM1.SpeedGuardLimited;
 GVL_IHM.M1TreuilRetenue.State.SpeedRef_Pct               := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 GVL_IHM.M1TreuilRetenue.State.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
 GVL_IHM.M1TreuilRetenue.State.FBState                  := PRG_06_WinchControl.instWinchM1.State;
@@ -310,8 +206,8 @@ GVL_IHM.M1TreuilRetenue.Safety.ForbidAscent      := PRG_03_Safety.instSafetyWinc
 GVL_IHM.M1TreuilRetenue.Safety.SlackCable        := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M1TreuilRetenue.Safety.ThermalFault      := NOT PRG_00_Inputs.M1ThermalFeedback;
 GVL_IHM.M1TreuilRetenue.Safety.EncoderFault      := (NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent)
-                                                    AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global
-                                                    AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;
+                                                  AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global
+                                                  AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;
 GVL_IHM.M1TreuilRetenue.Safety.BypassActive      := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
                                                      AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.Safety.CableLimitDescent := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
@@ -345,8 +241,6 @@ GVL_IHM.M2TreuilBenne.State.SpeedStable             := PRG_03_Safety.instSpeedMo
 GVL_IHM.M2TreuilBenne.State.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM2.Error;
 GVL_IHM.M2TreuilBenne.State.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM2.ErrorId;
 GVL_IHM.M2TreuilBenne.State.EstimatedLoadPct          := PRG_03_Safety.instLoadEstimatorM2.EstimatedLoadPct;
-GVL_IHM.M2TreuilBenne.State.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM2.Configured;
-GVL_IHM.M2TreuilBenne.State.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM2.SpeedGuardLimited;
 GVL_IHM.M2TreuilBenne.State.SpeedRef_Pct               := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 GVL_IHM.M2TreuilBenne.State.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
 GVL_IHM.M2TreuilBenne.State.FBState                  := PRG_06_WinchControl.instWinchM2.State;
@@ -478,6 +372,7 @@ GVL_IHM.TranslationM3.Safety.ErrorLimitSwitch    := PRG_03_Safety.instSafetyTran
 GVL_IHM.TranslationM3.Safety.ErrorSensorIncoherent:= PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 GVL_IHM.TranslationM3.Safety.SafeStop          := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.Safety.PowerCutOff       := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+
 GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7;
 GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
