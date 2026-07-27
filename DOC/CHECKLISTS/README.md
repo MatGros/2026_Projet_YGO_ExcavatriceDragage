@@ -13,6 +13,15 @@ Checklists de mise en service et de validation terrain.
 
 ---
 
+## 🧪 Actives
+
+| Checklist | Sert à |
+|---|---|
+| `CHECKLIST_MiseEnRoute_Simulation_v1.0.md` | Activation et test du banc de simulation, domaine par domaine |
+| `CHECKLIST_Essais_Persistance_Bypass_Frein_v1.0.md` | 11 défaillances + 3 protocoles — support de **T92** et **T72** |
+
+---
+
 ## 📦 Archivé (2026-07-27)
 
 `CHECKLIST_MiseEnService_JoystickTranslation_v1.2.md` → `ARCHIVES/Doc/CHECKLISTS/`
