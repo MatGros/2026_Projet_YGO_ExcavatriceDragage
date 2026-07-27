@@ -33,7 +33,7 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 |---|---|---|
 | `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | 🔴 **Source des constats C2→C7**, avec raisonnement et lignes de code. Sans lui, les tâches ci-contre sont des titres sans contenu | **T84** (mesure vitesse) · **T86** (`ForbidAscent`) · **T87** (`DelayMotorDecel`) · **T88** (`FB_CycleTime`) |
 | `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom d'E/S. **§3bis porte la sémantique du Kobold à 3 temps** (hors eau `0` → immergé `1` → fond `0`) | **T81** · **T82** · tout retour à un schéma électrique ou un REX antérieur au 2026-07-27 |
-| `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | **Cahier d'essais** persistance / bypass / freins, **jamais exécuté** | **T92** (qualification bypass + homing 0 m) |
+| `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | ① **Cahier d'essais** persistance / bypass / freins (§4), **jamais exécuté** · ② §6.2 = stratégie de l'interlock frein, base de travail pour T72 · ⚠️ ses correctifs TEST-05/TEST-06 sont **livrés** (`FB_Brake:57`, `FB_Winch:268`), mais **TEST-06 ne couvre pas T72** (voir la note dans `PLAN_TASK`) | **T92** (qualification bypass + homing 0 m) · **T72** |
 | `IHM_VARIABLES_MIGRATION.md` | Journal ancien → nouveau chemin des variables IHM, pour le reparamétrage de la visu. **À tenir à jour à chaque lot** | **T94** · **T95** · toute publication IHM |
 
 ### 📚 Hors de ce dossier, mais indispensables

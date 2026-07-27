@@ -101,7 +101,8 @@
       "Bash(grep -iE \"PLC_Tests|_TYPES\\\\\\\\\\\\\\\\\\(ST_Test|E_Test\\)|Simulation|PRG_00|PRG_06\")",
       "Bash(sed 's/:.*//')",
       "Bash(grep -v \":0$\")",
-      "Bash(xargs -n1 basename)"
+      "Bash(xargs -n1 basename)",
+      "Bash(grep -n \"^#\\\\{1,3\\\\} \" RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md)"
     ],
     "ask": [
       "Bash(git reset *)",
