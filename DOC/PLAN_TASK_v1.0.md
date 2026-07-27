@@ -207,6 +207,12 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 
 
+| T80 | 🔴 **Capteur PV M3 non relié** : la voie est mappée sous `PosPV_DI_` (underscore ajouté par CODESYS sur collision) ; `PRG_00:267` lit `GVL_Translation_M3_Stub.PosPV_DI`, un stub que rien n'écrit. En réel : mot 5 capteurs incohérent en position Trémie → `SafeStop` + `PowerCutOff`, et butées extrêmes M3 inopérantes. Correction : supprimer la déclaration du stub, remapper en `M3_PosPV_DI`, corriger `PRG_00:267` | Projet / Électricité | `AUDITS/PreLivraison/ANALYSE_Impact_Chaines_Actionneurs_v1.0.md` §6.1, `TABLE_Renommage_IO_v1.0.md` §3 |
+| T81 | 🔴 **Sémantique Kobold à 3 temps** : le capteur vaut `0` hors de l'eau, `1` immergé, `0` au fond. Donc `Fond détecté ⟺ retour = 0 ET benne immergée`, l'immersion étant déduite de la position treuils (seuil à définir, ex. < −0,5 m). Or `FB_Cycle.st:272` teste `KoboldContactFond` à `TRUE`, ce qui détecte **l'immersion**, pas le fond. Ajouter la séquence de cohérence position ↔ capteur | Projet / Client | REX utilisateur 2026-07-27, `TABLE_Renommage_IO_v1.0.md` §3bis |
+| T82 | 🟠 **Surveillance activation mesure Kobold** : `KoboldContactor_DQ` alimente la mesure de captage du fond ; sans activation, aucune détection possible et la benne déroule du câble alors qu'elle a touché le fond. Surveiller l'**absence de changement d'état à l'immersion** → défaut à remonter. Noté pour plus tard, pas dans le périmètre immédiat | Projet | REX utilisateur 2026-07-27 |
+
+
+
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 
 ---

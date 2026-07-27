@@ -227,7 +227,7 @@ M1ThermalFeedback := instM1Thermal.State;
 // contacteur de commande), il n'est PAS son complément. Valeur en convention PHYSIQUE (1 = ouvert),
 // comme le DI réel, puisque l'inversion est appliquée juste après par FB_Input.
 M1BrakeFeedback_Simulated := PRG_10_Outputs.M1BrakeCmd;
-instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_BrakeFeedback_BrakeIsOpen_DI, M1BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
@@ -242,7 +242,7 @@ M2ThermalFeedback := instM2Thermal.State;
 // 🧪 Simulation du retour frein M2 — 🆕 REX 2026-07-26 : idem M1, le retour recopie la COMMANDE.
 // Valeur en convention PHYSIQUE (1 = ouvert), inversion appliquée par FB_Input juste après.
 M2BrakeFeedback_Simulated := PRG_10_Outputs.M2BrakeCmd;
-instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_BrakeFeedback_BrakeIsOpen_DI, M2BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
@@ -288,7 +288,7 @@ instPositionDecoder(
 // 🧪 Simulation du retour frein M3 — 🆕 REX 2026-07-26 : idem M1/M2, le retour recopie la COMMANDE.
 // Valeur en convention PHYSIQUE (1 = ouvert), inversion appliquée par FB_Input juste après.
 M3BrakeFeedback_Simulated := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
-instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal, M3_BrakeFeedback_BrakeIsOpen_DI, M3BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
 
 // 🧪 Simulation/Filtrage des retours variateur EtherCAT M3 (lecture seule physique contournée)

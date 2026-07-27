@@ -29,23 +29,30 @@ VAR_GLOBAL PERSISTENT RETAIN
     );
     _WinchLoadEstimateTable : ST_WinchLoadEstimateTable;
 
+    // 📐 🆕 REX 2026-07-27 — valeurs alignées sur les relevés terrain (REGISTRE_Suivi_MiseEnService) :
+    //   • CfgTopSensorPos_M 8.5 → 8.0  (MES-009 : déclenchement physique du capteur haut mesuré à 8,0 m).
+    //     ⚠️ Ce n'est PAS un simple réglage : c'est la position que le homing inscrit au déclenchement
+    //     du capteur. Un écart ici décale TOUTES les positions machine (limites câble, légale, synchro).
+    //   • CfgCableLimitAscent_M 8.0 → 7.5 (MES-009 : arrêt réel observé ≈ 7,5 m — la limite logicielle
+    //     doit rester SOUS le capteur physique, qui reste le garde-fou ultime).
+    //   • CfgRampAccelRate 50.0 → 10.0 (MES-007 / T78 : adoucir le démarrage des treuils).
     _WinchM1CfgPersist : ST_WinchCfg := (
-        CfgTopSensorPos_M := 8.5,
+        CfgTopSensorPos_M := 8.0,
         CfgHomingTarget_M := 0.0,
-        CfgRampAccelRate := 50.0,
+        CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 8.0
+        CfgCableLimitAscent_M := 7.5
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
     _WinchM2CfgPersist : ST_WinchCfg := (
-        CfgTopSensorPos_M := 8.5,
+        CfgTopSensorPos_M := 8.0,
         CfgHomingTarget_M := 0.0,
-        CfgRampAccelRate := 50.0,
+        CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 8.0
+        CfgCableLimitAscent_M := 7.5
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
@@ -54,10 +61,13 @@ VAR_GLOBAL PERSISTENT RETAIN
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
     // 🪣 BENNE
+    // 🆕 REX 2026-07-27 — OffsetCloseM 10.0 → 15.0 : offset M1/M2 en fermeture benne mesuré à
+    // ≈ 15 m sur site (MES-010). ⚠️ Le registre note la mesure comme "non encore analysée" :
+    // valeur à reconfirmer au premier essai benne en charge.
     _BucketCfgPersist : ST_BucketCfg := (
         Config := (
             OffsetOpenM      := 0.0,
-            OffsetCloseM     := 10.0,
+            OffsetCloseM     := 15.0,
             CoherenceLimitM  := 0.05
         ),
         CfgTimeoutDuration := T#30s

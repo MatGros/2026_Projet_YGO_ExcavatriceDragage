@@ -18,6 +18,7 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 
 | Dossier / fichier | Périmètre | Statut |
 |---|---|---|
+| `PreLivraison/` (3 plans `v1.0`) | Rationalisation simulation · ergonomie mise en service · allègement & dette | 🟡 **En définition** (2026-07-26) — plans d'action non validés, **aucun `CODE/` modifié**. Phasage maître : `PLAN_Allegement_Code_v1.0.md` §5 |
 | `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | Persistance, RETAIN, bypasses & freins | **Actif** — rapport exhaustif **+ cahier d'essais** |
 | `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | Revue automatisme / sécurité / IHM (2026-07-26) | **Actif** — C1 corrigé (`1d2e086`), **C2 à C7 non traités** |
 | `IHM_VARIABLES_MIGRATION.md` | Correspondance ancien → nouveau chemin des variables IHM | **Vivant** — à tenir à jour à chaque lot, sert au reparamétrage IHM/SCADA physique |
