@@ -11,6 +11,5 @@ STRUCT
     Cmd   : ST_CycleCmd;
     State : ST_CycleState;
     Cfg   : ST_CycleCfg;
-    Test  : ST_TestCycle; (* ⚠️ INCHANGÉ — déjà un sous-struct correctement isolé avant ce lot *)
 END_STRUCT
 END_TYPE

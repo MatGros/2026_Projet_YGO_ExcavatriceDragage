@@ -19,6 +19,4 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
-// 🌡️ Retour thermique brut (NC) — entrée physique ThermHydraulique_DI ;
-// tant que non câblé, ce point lira FALSE côté image process réelle si absent, d'où l'OR simulation.
-HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorHydraulicThermalIsReal);
+HydraulicFaultOk := HydraulicThermalOk_DI;

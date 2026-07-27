@@ -71,10 +71,10 @@ END_VAR
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
 instM1RelayFwd(Command := M1RelayFwd);
-M1_RelayFwd_DQ := instM1RelayFwd.State;
+M1_RelayFwd_Up_DQ := instM1RelayFwd.State;
 
 instM1RelayRev(Command := M1RelayRev);
-M1_RelayRev_DQ := instM1RelayRev.State;
+M1_RelayRev_Down_DQ := instM1RelayRev.State;
 
 instM1SpeedContactor1(Command := M1SpeedContactor1);
 M1_SpeedContactor_1_DQ := instM1SpeedContactor1.State;
@@ -89,14 +89,14 @@ instM1SpeedContactor4(Command := M1SpeedContactor4);
 M1_SpeedContactor_4_DQ := instM1SpeedContactor4.State;
 
 instM1BrakeCmd(Command := M1BrakeCmd);
-M1_BrakeCmd_RQ := instM1BrakeCmd.State;
+M1_BrakeRelease_RQ := instM1BrakeCmd.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
 instM2RelayFwd(Command := M2RelayFwd);
-M2_RelayFwd_DQ := instM2RelayFwd.State;
+M2_RelayFwd_Up_Close_DQ := instM2RelayFwd.State;
 
 instM2RelayRev(Command := M2RelayRev);
-M2_RelayRev_DQ := instM2RelayRev.State;
+M2_RelayRev_Down_Open_DQ := instM2RelayRev.State;
 
 instM2SpeedContactor1(Command := M2SpeedContactor1);
 M2_SpeedContactor_1_DQ := instM2SpeedContactor1.State;
@@ -111,27 +111,23 @@ instM2SpeedContactor4(Command := M2SpeedContactor4);
 M2_SpeedContactor_4_DQ := instM2SpeedContactor4.State;
 
 instM2BrakeCmd(Command := M2BrakeCmd);
-M2_BrakeCmd_RQ := instM2BrakeCmd.State;
+M2_BrakeRelease_RQ := instM2BrakeCmd.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
 instTranslationBrakeCmd(Command := TranslationBrakeCmd);
-M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
+M3_BrakeRelease_RQ := instTranslationBrakeCmd.State;
 
-// 🪨 Adresse terrain : KoboldContactor_DQ = %QX0.6.
+// 🪨 Adresse terrain : M1_M2_KoboldMeasureEnable_DQ = %QX0.6.
 // Coupure prioritaire si la puissance ou la chaîne AU n'est plus validée.
-KoboldContactor_DQ := KoboldContactorCmd
-                      AND PRG_00_Inputs.EmergencyStopOk
-                      AND PRG_00_Inputs.EmergencyChain;
+M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd
+                               AND PRG_00_Inputs.EmergencyStopOk
+                               AND PRG_00_Inputs.EmergencyChain;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
 M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
 M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
 // 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
 // PRG_09_Supervision (GVL_IHM.TranslationM3), valables dans tous les modes.
-
-// Relais de direction M3 obsolètes forcés à FALSE
-M3_RelayFwd_DQ := FALSE;
-M3_RelayRev_DQ := FALSE;
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
 // 🔧 REX 2026-07-19 : suppression IHM_MANU — plus de bypass conditionnel, PowerCutOffReq
@@ -152,8 +148,8 @@ instSafetyEmergencyManagement(
 );
 
 // Affectation des sorties physiques et logiques de coupure/réarmement
-PowerCutOff_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
-PowerCutOff_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
+PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
+PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
 EmergencyArming_RQ := instSafetyEmergencyManagement.EmergencyArming_RQ;
 
 // Copie des états de diagnostic vers la supervision IHM

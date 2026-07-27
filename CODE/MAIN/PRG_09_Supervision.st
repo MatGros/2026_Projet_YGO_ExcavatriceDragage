@@ -27,12 +27,6 @@ VAR
     instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg; // 🌉 Pont persistance M1TreuilRetenue.Cfg (Lot 3d-2)
     instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg; // 🌉 Pont persistance M2TreuilBenne.Cfg (Lot 3d-2)
 END_VAR
-VAR RETAIN
-    // 🐛 FIX 2026-07-23 : passé de VAR simple à VAR RETAIN — en VAR simple, ce flag repassait à
-    // FALSE à CHAQUE reset/download (même quand GVL_IHM RETAIN restait intact), re-déclenchant la
-    // restauration bypass et pouvant re-forcer un bypass Global que l'opérateur venait de couper.
-    BypassRestoreDone : BOOL := FALSE; // 🌐 Flag restauration unique des bypass (boot)
-END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_09_Supervision) ===
 
@@ -57,21 +51,6 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.Cmd.SelMode;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
-
-// 🧪 Commandes de test Translation depuis la supervision.
-// Verrouillage obligatoire : aucune surcharge IHM ne peut être active hors simulation.
-IF GVL_Simulation.SimulationModeActive THEN
-    GVL_PLC_Tests.OverrideM3SensorsWordActive := GVL_IHM.TranslationM3.Test.SensorsWordActive;
-    GVL_PLC_Tests.OverrideM3SensorsWord       := GVL_IHM.TranslationM3.Test.SensorsWord;
-    GVL_PLC_Tests.OverrideM3AtTremie          := GVL_IHM.TranslationM3.Test.AtTremie;
-    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := GVL_IHM.TranslationM3.Test.BrakeStuckOpen;
-    GVL_PLC_Tests.OverrideM3PhantomFreq       := GVL_IHM.TranslationM3.Test.PhantomFreq;
-ELSE
-    GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
-    GVL_PLC_Tests.OverrideM3AtTremie          := FALSE;
-    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := FALSE;
-    GVL_PLC_Tests.OverrideM3PhantomFreq       := FALSE;
-END_IF;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
@@ -250,12 +229,6 @@ IF NOT GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized := TRUE;
 END_IF;
 
-// 🌐 BypassRestoreDone est désormais 100% orphelin (tous les bypass ont migré sur leur propre flag .Initialized).
-// 🐛 FIX 2026-07-23 : BypassRestoreDone en VAR RETAIN (évite re-forcage au boot si GVL_IHM intact).
-IF NOT BypassRestoreDone THEN
-    BypassRestoreDone := TRUE;
-END_IF;
-
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 // 🐛 FIX 2026-07-23 : chaque bloc ci-dessous est désormais gardé par le flag `Cfg.Initialized`/
@@ -288,11 +261,11 @@ GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 // 🔧 REX (session Bypass) : structs Bypass dedies par metier (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
 // — ContactorFeedback reste par axe (materiel propre a chaque treuil/translation), SlackCable et
 // TopPositionSensor passent dans Commun.Bypass (capteur physique UNIQUE partage M1/M2, plus de duplication).
-GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal;
-GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal;
-GVL_IHM.TranslationM3.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal;
-GVL_IHM.Commun.Bypass.SlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorSlackCableIsReal;
-GVL_IHM.Commun.Bypass.TopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTopPositionIsReal;
+GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := FALSE;
+GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback := FALSE;
+GVL_IHM.TranslationM3.Bypass.ContactorFeedback := FALSE;
+GVL_IHM.Commun.Bypass.SlackCable        := FALSE;
+GVL_IHM.Commun.Bypass.TopPositionSensor := FALSE;
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
@@ -505,9 +478,8 @@ GVL_IHM.TranslationM3.Safety.ErrorLimitSwitch    := PRG_03_Safety.instSafetyTran
 GVL_IHM.TranslationM3.Safety.ErrorSensorIncoherent:= PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 GVL_IHM.TranslationM3.Safety.SafeStop          := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.Safety.PowerCutOff       := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
-// 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
-GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7;
+GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
 GVL_IHM.TranslationM3.State.DriveActualFreq_Hz     := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.State.DriveFreqRef_Hz        := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;

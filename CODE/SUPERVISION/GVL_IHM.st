@@ -21,67 +21,14 @@ VAR_GLOBAL RETAIN
 END_VAR
 
 (* ═══════════════════════════════════════════════════════════════
-   📝 NOTE : PROCÉDURE DE TEST SUR BANC AVEC SIMULATION DYNAMIQUE
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
-   Cette simulation (GVL_Simulation + CODE/SIMULATION/FB_Sim_*) permet de
-   valider le comportement des treuils M1/M2, du Homing et du Benne sans
-   moteurs ni codeurs physiques connectés.
+   📝 NOTE — 🔧 REX 2026-07-27 : l'ancienne procédure de test sur banc (60 lignes) est
+   RETIRÉE d'ici. Elle décrivait un dispositif qui n'existe plus après le débranchement
+   de la simulation (lots L2→L4d) : `instSimJoystick`, `instSimEncoderM1/M2`,
+   `SimulationModeActive` par défaut TRUE, flags `*IsReal`, forçage du capteur haut.
+   Laisser une procédure périmée dans le code est plus dangereux que pas de procédure.
 
-   1. CONFIGURATION INITIALE DU BANC DE TEST :
-      - Bit maître déjà TRUE par défaut : GVL_Simulation.SimulationModeActive
-      - Tous les `*IsReal` restent FALSE par défaut (tout est simulé). Si un
-        device précis est déjà câblé réel, basculer UNIQUEMENT son
-        `*IsReal` à TRUE (ex. GVL_Simulation.SensorEmergencyStopChainIsReal).
-      - Forcer la demande de mode machine en maintenance N1 :
-        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1
-      - Acquitter les défauts initiaux domaine sécurité/métier (🔧 REX 2026-07-07 : plus de
-        reset unique — Modes/Cycle ont chacun le leur, voir GVL_IHM.Modes.Cmd.BtnModeReset /
-        CmdResetCycle_IHM dans PRG_05_Cycle) :
-        GVL_IHM.Modes.Cmd.BtnFaultReset := TRUE puis FALSE (front)
-
-   2. TEST DU MOUVEMENT DES TREUILS :
-      - Le homme-mort joystick reste RÉEL (plus de bypass) : simuler un appui
-        en forçant `PRG_01_Diagnostics.instSimJoystick.RawButton` à TRUE en
-        instance CODESYS, et un débattement via `RawX`/`RawY`.
-      - Vérifier que les codeurs simulés (`PRG_02_Encoders.instSimEncoderM1/M2.RawPosOut`)
-        incrémentent en montée (Fwd) et décrémentent en descente (Rev),
-        proportionnellement à la vitesse.
-
-   3. TEST DE LA PROCÉDURE DE HOMING (RÉFÉRENCEMENT NOMINAL) :
-      - S'assurer que le mode est MAINT_N1 (requis pour le homing nominal).
-      - Les treuils doivent être arrêtés (pas de commande de mouvement).
-      - Simuler l'activation du capteur de position haute commun :
-        GVL_Simulation.SensorTopPositionIsReal reste FALSE, puis forcer
-        PRG_00_Inputs.M1_M2_TopPositionSensor_DI à TRUE (ou l'OR équivalent)
-       - Lancer le homing nominal en basculant indépendamment le bouton du treuil voulu :
-          GVL_IHM.M1Winch.BtnHome ou GVL_IHM.M2Winch.BtnHome := TRUE puis FALSE (front).
-         Les deux fronts peuvent être envoyés simultanément ; aucun sélecteur HomingMode_IHM
-         ni bouton StubHomeButton_IHM n'est utilisé.
-      - La simulation détectera le signal de preset (COD1_PresettTrigCmd /
-        COD2_PresettTrigCmd) et écrira automatiquement la valeur du preset
-        dans les registres bruts simulés.
-      - Vérifier que instHomingM1.Homed et instHomingM2.Homed passent à TRUE.
-      - La position calculée (CablePosM) doit se caler exactement à 8.5m
-         (ou la valeur définie par CfgTopSensorPosM de chaque structure IHM).
-
-   4. TEST DU BENNE (OUVERTURE / FERMETURE) — 🔧 REX 2026-07-07 : sens ET offset inversés
-      - S'assurer que les treuils ont été préalablement référencés (Homed = TRUE sur M1 ET M2 —
-        désormais vérifié en dur par FB_Bucket, bit3 ErrorId "Codeur(s) non référencé(s)" sinon).
-      - Choisir une commande Benne sur l'IHM :
-        * Pour OUVRIR : GVL_IHM.Bucket.BtnOpen := TRUE (et BtnClose := FALSE)
-        * Pour FERMER : GVL_IHM.Bucket.BtnClose := TRUE (et BtnOpen := FALSE)
-      - Actionner et maintenir le joystick Y dans le sens correspondant :
-        * UP / enrouler (Direction = 1) pour la FERMETURE
-        * DOWN / dérouler (Direction = -1) pour l'OUVERTURE
-      - Le bloc Benne prend le contrôle de M2 en vitesse lente forcée :
-        * En fermeture, le codeur simulé M2 augmente jusqu'à ce que CablePosM2 >= CablePosM1 + OffsetCloseM (8.5m + 10.0m = 18.5m).
-        * En ouverture, le codeur simulé M2 diminue jusqu'à ce que CablePosM2 <= CablePosM1 + OffsetOpenM (8.5m + 0.0m = 8.5m).
-          ⚠️ Juste après un homing M1+M2 (les deux à 8.5m), la cible d'ouverture est DÉJÀ atteinte
-          (CablePosM2 = CablePosM1) : une demande d'ouverture se termine donc immédiatement (Done)
-          sans mouvement réel de M2 — comportement normal, pas un bug.
-      - Vérifier que Benne.Busy passe à FALSE et Benne.Done à TRUE lorsque la
-        cible est atteinte, et que l'état physique du benne est mis à jour.
-      - Relâcher le joystick pour terminer le cycle de commande.
+   👉 Simulation en cours de refonte (frontière unique `HwIn`, lots L5→L8) :
+      voir DOC/AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md
+   👉 Procédure de banc à jour : sera republiée dans AF_Partie-13 v2.0 (lot L8).
    ═══════════════════════════════════════════════════════════════ *)
 

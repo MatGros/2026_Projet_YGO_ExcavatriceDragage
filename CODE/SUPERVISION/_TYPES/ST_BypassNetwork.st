@@ -12,6 +12,7 @@ STRUCT
     EncoderM1   : BOOL; (* 🧲 Bypass diagnostic esclave EtherCAT COD1 (M1 codeur) *)
     EncoderM2   : BOOL; (* 🧲 Bypass diagnostic esclave EtherCAT COD2 (M2 codeur) *)
     VariateurM3 : BOOL; (* ↔️ Bypass diagnostic esclave EtherCAT AC600 (M3 drive) *)
+    IhmHeartbeat: BOOL := TRUE; (* 💓 Bypass du bit de vie IHM (défaut TRUE = sécurisé si pas d'IHM) *)
 
     (* 🛡️ 2. Hiérarchie & Restauration *)
     Global      : BOOL; (* 🌐 Bypass Global : tous les esclaves réseau à la fois *)

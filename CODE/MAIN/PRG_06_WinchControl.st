@@ -475,7 +475,7 @@ instWinchM1(
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
-    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal),
+    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     CfgRampAccelRate           := _WinchM1CfgPersist.CfgRampAccelRate,
     CfgRampDecelNormalRate     := _WinchM1CfgPersist.CfgRampDecelNormalRate,
     CfgRampDecelFastRate       := _WinchM1CfgPersist.CfgRampDecelFastRate,
@@ -519,7 +519,7 @@ instWinchM2(
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
-    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal),
+    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global,
     CfgRampAccelRate           := _WinchM2CfgPersist.CfgRampAccelRate,
     CfgRampDecelNormalRate     := _WinchM2CfgPersist.CfgRampDecelNormalRate,
     CfgRampDecelFastRate       := _WinchM2CfgPersist.CfgRampDecelFastRate,

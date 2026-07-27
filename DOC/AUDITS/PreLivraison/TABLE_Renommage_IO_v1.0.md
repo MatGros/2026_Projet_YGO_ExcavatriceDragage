@@ -1,7 +1,7 @@
 # 🏷️ TABLE DE RENOMMAGE — Variables d'E/S device (v1.0)
 
 > 🎯 Lever les ambiguïtés de polarité **à la source**. Le nom doit répondre à : *que signifie `TRUE` ?*
-> 📅 2026-07-27 · 🔗 application en **L5** ([SEQUENCE](SEQUENCE_Execution_Simulation_v1.0.md))
+> 📅 2026-07-27 · 🟢 **APPLIQUÉ ET ALIGNÉ** dans `Device.export` et dans tout `CODE/` (`PRG_00_Inputs`, `PRG_08_AuxiliaryControl`, `PRG_10_Outputs`).
 > ⚠️ Déclencheur : bug **C1** (polarité retour frein) — un nom muet sur sa polarité a coûté un vrai défaut.
 
 ## ✅ Convention retenue — courte, la fonction principale dans le nom
@@ -42,7 +42,7 @@ collision (c'est ce qui a produit `PosPV_DI_` et cassé le capteur PV).
 | 19 | `PosMaintenance_DI` | position maintenance atteinte | **`M3_PosMaintenance_DI`** | 🟡 |
 | 20 | `KoboldContactFond_DI` | ⚠️ **signal à 3 temps, voir §3bis** | **`M1_M2_KoboldContactFond_DI`** (sert aux 2 treuils) | 🔴 |
 
-¹ déjà renommés dans CODESYS le 27/07 (version longue) → à raccourcir.
+¹ passés par une version longue intermédiaire le 27/07, puis raccourcis. ✅ **Tous appliqués.**
 
 ## 2. 📤 SORTIES
 
@@ -69,18 +69,17 @@ directement l'effet machine, sans avoir à se souvenir que `Fwd` sur M2 signifie
 ² 🛑 **À renommer SEUL**, avec revérification de la séquence de réarmement (auto-test A/B).
 Jamais dans un lot groupé — c'est la chaîne de sécurité.
 
-## 3. 🐛 Cas particulier — capteur PV (à corriger, pas seulement à renommer)
+## 3. ✅ Cas particulier — capteur PV : **CORRIGÉ le 2026-07-27** (T80)
 
-La voie est mappée sous **`PosPV_DI_`** (underscore final) ; le programme lit
-`GVL_Translation_M3_Stub.PosPV_DI`, un stub que **rien n'écrit**. Le capteur PV n'est relié à rien.
+La voie était mappée sous `PosPV_DI_` (underscore ajouté par CODESYS sur collision) et le
+programme lisait `GVL_Translation_M3_Stub.PosPV_DI`, un stub que rien n'écrivait → capteur PV
+non relié ⇒ mot incohérent en Trémie ⇒ `SafeStop` + `PowerCutOff`, butées extrêmes inopérantes.
 
-**Effet en réel** : en position Trémie le mot des 5 capteurs devient incohérent → `SafeStop` +
-**`PowerCutOff`**, et les butées extrêmes M3 sont inopérantes.
+**Correction appliquée** : déclaration retirée du stub · voie renommée `M3_PosPV_DI` ·
+`PRG_00_Inputs` lit la variable d'E/S. `StubTranslationPositionSelect_IHM` conservé (consommé).
 
-**Correction, dans cet ordre** :
-1. Supprimer la déclaration `PosPV_DI` de `GVL_Translation_M3_Stub`
-2. Renommer la voie en **`M3_PosPV_DI`** (vérifier l'absence de suffixe parasite)
-3. Code : `PRG_00:267` lit la variable d'E/S au lieu du stub
+🧪 **Test terrain restant** : en position Trémie, vérifier `SensorsWord = 11111`,
+`SensorWordIncoherent = FALSE`, aucun `SafeStop`/`PowerCutOff`, puis le ralentissement PV.
 
 ## 3bis. 🪨 Détecteur de fond Kobold — sémantique réelle (⚠️ information nouvelle 2026-07-27)
 
