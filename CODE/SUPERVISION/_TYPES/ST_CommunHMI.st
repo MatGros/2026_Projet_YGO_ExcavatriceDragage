@@ -39,5 +39,8 @@ STRUCT
     // (doctrine reset=front, PRG_09_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
     ConfigRestoredFromPersistent : BOOL; (* ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier *)
     BtnAckConfigRestored         : BOOL; (* 🔘 IHM→PLC : acquittement opérateur (front) *)
+
+    Preflight : ST_PreflightHMI; (* 🩺 Verdict observateur à l'arrêt — jamais bloquant *)
+    WinchSymmetry : ST_WinchSymmetryHMI; (* ⚖️ MES-008 : mesures passives M1/M2 *)
 END_STRUCT
 END_TYPE

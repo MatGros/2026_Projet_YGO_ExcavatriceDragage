@@ -1845,12 +1845,12 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot d'état Brut Variateur AC600</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx108_BrakeIsOpen_DI">
+            <variable name="Idx108_BrakeApplied">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Frein Translation Ouvert | 0 = Frein Serré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ normalisé (PRG_00 après BrakeFeedbackInvertLogic)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2116,12 +2116,12 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = OK (Tous contacteurs retombés à l'arrêt) | 0 = Contacteur collé 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx104_BrakeIsOpen_DI">
+            <variable name="Idx104_BrakeApplied">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Frein Ouvert (Mouvement) | 0 = Frein Serré (Sécurité/Arrêt)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ normalisé (PRG_00 après BrakeFeedbackInvertLogic)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx105_ThermalOk_DI">
@@ -2515,6 +2515,22 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔘 IHM→PLC : acquittement opérateur (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Preflight">
+              <type>
+                <derived name="ST_PreflightHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Verdict observateur à l'arrêt — jamais bloquant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSymmetry">
+              <type>
+                <derived name="ST_WinchSymmetryHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ MES-008 : mesures passives M1/M2</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4070,6 +4086,37 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="ST_PreflightHMI">
+        <baseType>
+          <struct>
+            <variable name="BtnRun">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>92d0a9ce-c2c2-58b4-a581-46eda63b86d7</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="ST_SafetyTranslation">
         <baseType>
@@ -5697,6 +5744,155 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🎨 Destiné aux retours d'informations et bargraphes HMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="ST_WinchSymmetryCfg">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+            </variable>
+            <variable name="MinimumCommandTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+            </variable>
+            <variable name="MinimumSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e4d6e335-c2ee-5eb4-8c0c-853ba5158a6b</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_WinchSymmetryData">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaStopDistance_Mm, DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>013da017-00af-5581-9a6d-612617b82cd3</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_WinchSymmetryHMI">
+        <baseType>
+          <struct>
+            <variable name="BtnReset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SymmetryOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SymmetryValid">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaStopDistance_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>53f9b377-a390-54de-9b7c-d1db8711e403</ObjectId>
+          </data>
+        </addData>
       </dataType>
     </dataTypes>
     <pous>
@@ -11108,7 +11304,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📥 FB_Input — Entrée TOR conditionnée (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §1
+   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §1
    🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
       complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
       de conditionnement bas niveau, à instancier en tableau (§3) ou
@@ -11585,7 +11781,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
         rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
         désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
       Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v1.4.md, migration simulation) : l'ancien bypass
+   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v2.0.md, migration simulation) : l'ancien bypass
       `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
       supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
       CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/
@@ -12236,7 +12432,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 FB_Output — Sortie relais + feedback (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §2
+   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §2
    🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
       transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
       appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
@@ -12301,6 +12497,136 @@ Error := (ErrorId &lt;&gt; 16#0000);
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>b60dd37c-0508-57b7-805e-ba43b1805814</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Preflight" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Execute">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MachineIsStill">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1BrakeApplied, M2BrakeApplied, M3BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyChain, EmergencyStopOk, EncoderM1Operational, EncoderM2Operational">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PreflightOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ExecuteEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="BootPending">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="RequestPending">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 FB_Preflight — Verdict passif machine arrêtée
+   📄 Doc : DOC/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
+   🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+ExecuteEdge(CLK := Execute);
+RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
+PreflightBusy := RequestPending AND NOT MachineIsStill;
+IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
+IF NOT RequestPending THEN RETURN; END_IF;
+
+PreflightErrorId := 0;
+(* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
+   bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
+   bit9 câble M2 tendu; bit10 mot M3 cohérent; bit11 contacteur sans chaîne;
+   bit12..13 codeur M1/M2 opérationnel; bit14..15 homé et position bornée M1/M2. *)
+IF NOT M1BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0001; END_IF;
+IF NOT M2BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0002; END_IF;
+IF NOT M3BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0004; END_IF;
+IF NOT M1ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0008; END_IF;
+IF NOT M2ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0010; END_IF;
+IF NOT M1ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0020; END_IF;
+IF NOT M2ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0040; END_IF;
+IF NOT BrakeThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0080; END_IF;
+IF NOT PhaseRotationOk THEN PreflightErrorId := PreflightErrorId OR 16#0100; END_IF;
+IF NOT SlackCableTensioned THEN PreflightErrorId := PreflightErrorId OR 16#0200; END_IF;
+IF M3SensorWordIncoherent THEN PreflightErrorId := PreflightErrorId OR 16#0400; END_IF;
+IF EmergencyStopOk AND NOT EmergencyChain THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
+IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000; END_IF;
+IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
+IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
+IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
+PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d31c4cd5-70b8-565a-906d-0e527f36e29d</ObjectId>
           </data>
         </addData>
       </pou>
@@ -15272,7 +15598,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
@@ -15577,7 +15903,7 @@ Machine.HydraulicThermalOk_DI      := TRUE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -15713,7 +16039,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -15854,7 +16180,7 @@ END_IF;
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md</xhtml>
+   📄 Docs : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -15992,7 +16318,7 @@ SimContactorOk := ContactorLatch;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
       instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
@@ -18447,6 +18773,158 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_WinchSymmetry" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1CommandActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2CommandActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M2Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_WinchSymmetryCfg" />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="SymmetryOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SymmetryValid">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Data">
+              <type>
+                <derived name="ST_WinchSymmetryData" />
+              </type>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+            </variable>
+            <variable name="CommandTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="Comparable, Qualified, PreviousQualified, Stopping, StartCapturedM1, StartCapturedM2, StopCapturedM1, StopCapturedM2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartMsM1, StartMsM2, ReleaseMsM1, ReleaseMsM2, ApplyMsM1, ApplyMsM2, StopMsM1, StopMsM2">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MotionTimer, StopTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="StopStartM1_M, StopStartM2_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚖️ FB_WinchSymmetry — Mesure passive MES-008 M1/M2
+   📄 Doc : DOC/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
+   🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+CycleTime(DefaultValueS := 0.010); ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN Data.DeltaStartDelay_Ms:=0; Data.DeltaBrakeReleaseTime_Ms:=0; Data.DeltaBrakeApplyTime_Ms:=0; Data.DeltaStopDistance_Mm:=0; Data.DeltaStopTime_Ms:=0; Data.MaxSyncDeviation_M:=0.0; END_IF;
+Comparable := M1CommandActive AND M2CommandActive AND (M1Direction = M2Direction) AND (M1Direction &lt;&gt; 0);
+CommandTon(IN := Comparable, PT := UDINT_TO_TIME(Config.MinimumCommandTime_Ms));
+Qualified := CommandTon.Q AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps);
+MotionTimer(IN := Comparable, PT := T#1h);
+StopTimer(IN := Stopping, PT := T#1h);
+IF NOT Comparable THEN StartCapturedM1:=FALSE; StartCapturedM2:=FALSE; ReleaseMsM1:=0; ReleaseMsM2:=0; ApplyMsM1:=0; ApplyMsM2:=0; END_IF;
+IF Comparable AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM1 THEN StartMsM1:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM1:=TRUE; END_IF;
+IF Comparable AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM2 THEN StartMsM2:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM2:=TRUE; END_IF;
+IF Qualified THEN
+    IF M1BrakeCmd AND M1BrakeApplied THEN ReleaseMsM1 := ReleaseMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF M2BrakeCmd AND M2BrakeApplied THEN ReleaseMsM2 := ReleaseMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF NOT M1BrakeCmd AND NOT M1BrakeApplied THEN ApplyMsM1 := ApplyMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF NOT M2BrakeCmd AND NOT M2BrakeApplied THEN ApplyMsM2 := ApplyMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF SyncDeviation_M &gt; Data.MaxSyncDeviation_M THEN Data.MaxSyncDeviation_M := SyncDeviation_M; END_IF;
+END_IF;
+IF PreviousQualified AND NOT Comparable THEN Stopping:=TRUE; StopCapturedM1:=FALSE; StopCapturedM2:=FALSE; StopStartM1_M:=M1Position_M; StopStartM2_M:=M2Position_M; END_IF;
+IF Stopping THEN
+    IF (M1Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM1 THEN StopMsM1:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM1:=TRUE; END_IF;
+    IF (M2Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM2 THEN StopMsM2:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM2:=TRUE; END_IF;
+    IF StopCapturedM1 AND StopCapturedM2 THEN
+        Data.DeltaStartDelay_Ms := ABS(UDINT_TO_DINT(StartMsM1)-UDINT_TO_DINT(StartMsM2));
+        Data.DeltaBrakeReleaseTime_Ms := ABS(UDINT_TO_DINT(ReleaseMsM1)-UDINT_TO_DINT(ReleaseMsM2));
+        Data.DeltaBrakeApplyTime_Ms := ABS(UDINT_TO_DINT(ApplyMsM1)-UDINT_TO_DINT(ApplyMsM2));
+        Data.DeltaStopDistance_Mm := REAL_TO_UDINT(ABS(ABS(M1Position_M-StopStartM1_M)-ABS(M2Position_M-StopStartM2_M))*1000.0);
+        Data.DeltaStopTime_Ms := ABS(UDINT_TO_DINT(StopMsM1)-UDINT_TO_DINT(StopMsM2)); Stopping:=FALSE; SymmetryValid:=TRUE;
+    END_IF;
+END_IF;
+SymmetryOk := SymmetryValid AND (Data.DeltaStartDelay_Ms&lt;=Config.DeltaStartDelay_Ms) AND (Data.DeltaBrakeReleaseTime_Ms&lt;=Config.DeltaBrakeReleaseTime_Ms) AND (Data.DeltaBrakeApplyTime_Ms&lt;=Config.DeltaBrakeApplyTime_Ms) AND (Data.DeltaStopDistance_Mm&lt;=Config.DeltaStopDistance_Mm) AND (Data.DeltaStopTime_Ms&lt;=Config.DeltaStopTime_Ms);
+PreviousQualified := Qualified;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d3f3c22f-4579-5b7b-a799-7880ca0e8f82</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_WinchSync" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -19272,7 +19750,7 @@ Modifiable à chaud en vue instance, sans recompiler.</xhtml>
    │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
    │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
    └──────────────────────────┴──────────┴─────────────────────────────────┘
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ══════════════════════════════════════════════════════════════════════════</xhtml>
@@ -21799,7 +22277,7 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
-// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md) ──────
+// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v2.0.md) ──────
 // 📄 Lot L6 : Ré-alimentation des miroirs IHM depuis l'état effectif de simulation (SimulationModeActive AND Sim&lt;Domaine&gt;Active)
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
@@ -21810,6 +22288,17 @@ GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationMod
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
 GVL_IHM.M1TreuilRetenue.State.Position_M                 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Commun.Preflight.PreflightOk := PRG_11_Troubleshooting.instPreflight.PreflightOk;
+GVL_IHM.Commun.Preflight.PreflightDone := PRG_11_Troubleshooting.instPreflight.PreflightDone;
+GVL_IHM.Commun.Preflight.PreflightErrorId := PRG_11_Troubleshooting.instPreflight.PreflightErrorId;
+GVL_IHM.Commun.WinchSymmetry.SymmetryOk := PRG_11_Troubleshooting.instWinchSymmetry.SymmetryOk;
+GVL_IHM.Commun.WinchSymmetry.SymmetryValid := PRG_11_Troubleshooting.instWinchSymmetry.SymmetryValid;
+GVL_IHM.Commun.WinchSymmetry.DeltaStartDelay_Ms := _WinchSymmetryDataPersist.DeltaStartDelay_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaBrakeReleaseTime_Ms := _WinchSymmetryDataPersist.DeltaBrakeReleaseTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaBrakeApplyTime_Ms := _WinchSymmetryDataPersist.DeltaBrakeApplyTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaStopDistance_M := UDINT_TO_REAL(_WinchSymmetryDataPersist.DeltaStopDistance_Mm) / 1000.0;
+GVL_IHM.Commun.WinchSymmetry.DeltaStopTime_Ms := _WinchSymmetryDataPersist.DeltaStopTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M := _WinchSymmetryDataPersist.MaxSyncDeviation_M;
 GVL_IHM.M1TreuilRetenue.State.MeasuredSpeed_Mps          := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
 GVL_IHM.M1TreuilRetenue.State.SpeedDelta_Mps             := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
 GVL_IHM.M1TreuilRetenue.State.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
@@ -22358,7 +22847,7 @@ Pulse 1s en cours</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 PRG_10_Outputs — Écriture des SORTIES physiques (PROGRAMME)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
    🔧 REX 2026-07-19 : suppression définitive du mode IHM_MANU (override direct des sorties,
@@ -22478,6 +22967,28 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
         <interface>
           <inputVars />
           <outputVars />
+          <localVars>
+            <variable name="instPreflight">
+              <type>
+                <derived name="FB_Preflight" />
+              </type>
+            </variable>
+            <variable name="instWinchSymmetry">
+              <type>
+                <derived name="FB_WinchSymmetry" />
+              </type>
+            </variable>
+            <variable name="TonMachineStill">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="MachineIsStillRaw">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕵️‍♂️ PRG_11_Troubleshooting — Programme Espion de Recherche de Pannes (ORIENTÉ FONCTIONS &amp; CONTEXTE)
@@ -22495,6 +23006,24 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
 // === IMPLEMENTATION (corps du PROGRAM PRG_11_Troubleshooting) ===
 
 // 🌐 ─── 0. CONTEXTE MACHINE GLOBAL ───────────────────────────────────────────
+MachineIsStillRaw := NOT (PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev OR PRG_10_Outputs.M1SpeedContactor1 OR PRG_10_Outputs.M1SpeedContactor2 OR PRG_10_Outputs.M1SpeedContactor3 OR PRG_10_Outputs.M1SpeedContactor4)
+                 AND NOT (PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev OR PRG_10_Outputs.M2SpeedContactor1 OR PRG_10_Outputs.M2SpeedContactor2 OR PRG_10_Outputs.M2SpeedContactor3 OR PRG_10_Outputs.M2SpeedContactor4)
+                 AND (M3_CommandWord = 0) AND NOT PRG_10_Outputs.M1BrakeCmd AND NOT PRG_10_Outputs.M2BrakeCmd AND NOT PRG_10_Outputs.TranslationBrakeCmd;
+TonMachineStill(IN := MachineIsStillRaw, PT := T#2s);
+instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonMachineStill.Q,
+    M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback, M3BrakeApplied := PRG_00_Inputs.M3BrakeFeedback,
+    M1ContactorsReleased := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, M2ContactorsReleased := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, M1ThermalOk := PRG_00_Inputs.M1ThermalFeedback, M2ThermalOk := PRG_00_Inputs.M2ThermalFeedback,
+    BrakeThermalOk := PRG_00_Inputs.BrakeThermalFeedback, PhaseRotationOk := PRG_00_Inputs.PhaseRotationOk, SlackCableTensioned := PRG_00_Inputs.SlackCableSwitch, M3SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent,
+    EmergencyChain := PRG_00_Inputs.EmergencyChain, EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
+    HomedM1 := PRG_02_Encoders.instHomingM1.Homed, HomedM2 := PRG_02_Encoders.instHomingM2.Homed,
+    M1PositionInBounds := (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= -99.0) AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= 99.0), M2PositionInBounds := (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= -99.0) AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= 99.0));
+instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
+    M1CommandActive := PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev, M2CommandActive := PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev,
+    M1Direction := PRG_06_WinchControl.M1_Direction_Active, M2Direction := PRG_06_WinchControl.M2_Direction_Active,
+    M1BrakeCmd := PRG_10_Outputs.M1BrakeCmd, M2BrakeCmd := PRG_10_Outputs.M2BrakeCmd, M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback,
+    M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM, M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    M1Speed_Mps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps, M2Speed_Mps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps, SyncDeviation_M := PRG_06_WinchControl.instWinchSync.DeltaPosM,
+    Config := _WinchSymmetryCfgPersist, Data := _WinchSymmetryDataPersist);
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_Simulation.SimulationModeActive;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
@@ -22538,7 +23067,7 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ     := PRG_10
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM1.RawPos);
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff;
-GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeIsOpen_DI         := PRG_00_Inputs.M1BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied           := PRG_00_Inputs.M1BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M1ThermalFeedback;
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
@@ -22578,7 +23107,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ   := 
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM2.RawPos);
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff;
-GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeIsOpen_DI         := PRG_00_Inputs.M2BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied           := PRG_00_Inputs.M2BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M2ThermalFeedback;
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
@@ -22640,7 +23169,7 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI             := 
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := PRG_00_Inputs.TranslationPosMaintenance;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_00_Inputs.M3_StatusWord_Filtered;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeIsOpen_DI       := PRG_00_Inputs.M3BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_00_Inputs.M3BrakeFeedback;
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.FB_Joystick_0.RawX;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
@@ -23153,6 +23682,30 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             </data>
           </addData>
         </variable>
+        <variable name="_WinchSymmetryCfgPersist">
+          <type>
+            <derived name="ST_WinchSymmetryCfg" />
+          </type>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+              <Attributes>
+                <Attribute Name="order_in_persistent_editor" Value="5" />
+              </Attributes>
+            </data>
+          </addData>
+        </variable>
+        <variable name="_WinchSymmetryDataPersist">
+          <type>
+            <derived name="ST_WinchSymmetryData" />
+          </type>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+              <Attributes>
+                <Attribute Name="order_in_persistent_editor" Value="6" />
+              </Attributes>
+            </data>
+          </addData>
+        </variable>
         <variable name="_WinchM1CfgPersist">
           <type>
             <derived name="ST_WinchCfg" />
@@ -23185,7 +23738,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="5" />
+                <Attribute Name="order_in_persistent_editor" Value="7" />
               </Attributes>
             </data>
           </addData>
@@ -23222,7 +23775,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="6" />
+                <Attribute Name="order_in_persistent_editor" Value="8" />
               </Attributes>
             </data>
           </addData>
@@ -23241,7 +23794,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="7" />
+                <Attribute Name="order_in_persistent_editor" Value="9" />
               </Attributes>
             </data>
           </addData>
@@ -23256,7 +23809,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="8" />
+                <Attribute Name="order_in_persistent_editor" Value="10" />
               </Attributes>
             </data>
           </addData>
@@ -23271,7 +23824,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="9" />
+                <Attribute Name="order_in_persistent_editor" Value="11" />
               </Attributes>
             </data>
           </addData>
@@ -23303,7 +23856,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="10" />
+                <Attribute Name="order_in_persistent_editor" Value="12" />
               </Attributes>
             </data>
           </addData>
@@ -23315,7 +23868,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="11" />
+                <Attribute Name="order_in_persistent_editor" Value="13" />
               </Attributes>
             </data>
           </addData>
@@ -23330,7 +23883,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="12" />
+                <Attribute Name="order_in_persistent_editor" Value="14" />
               </Attributes>
             </data>
           </addData>
@@ -23345,7 +23898,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="13" />
+                <Attribute Name="order_in_persistent_editor" Value="15" />
               </Attributes>
             </data>
           </addData>
@@ -23360,7 +23913,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="14" />
+                <Attribute Name="order_in_persistent_editor" Value="16" />
               </Attributes>
             </data>
           </addData>
@@ -23375,7 +23928,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="15" />
+                <Attribute Name="order_in_persistent_editor" Value="17" />
               </Attributes>
             </data>
           </addData>
@@ -23390,7 +23943,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="16" />
+                <Attribute Name="order_in_persistent_editor" Value="18" />
               </Attributes>
             </data>
           </addData>
@@ -23405,7 +23958,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="17" />
+                <Attribute Name="order_in_persistent_editor" Value="19" />
               </Attributes>
             </data>
           </addData>
@@ -23420,7 +23973,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="18" />
+                <Attribute Name="order_in_persistent_editor" Value="20" />
               </Attributes>
             </data>
           </addData>
@@ -23435,7 +23988,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="19" />
+                <Attribute Name="order_in_persistent_editor" Value="21" />
               </Attributes>
             </data>
           </addData>
@@ -23450,7 +24003,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="20" />
+                <Attribute Name="order_in_persistent_editor" Value="22" />
               </Attributes>
             </data>
           </addData>
@@ -23465,7 +24018,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="21" />
+                <Attribute Name="order_in_persistent_editor" Value="23" />
               </Attributes>
             </data>
           </addData>
@@ -23480,7 +24033,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="22" />
+                <Attribute Name="order_in_persistent_editor" Value="24" />
               </Attributes>
             </data>
           </addData>
@@ -23495,7 +24048,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="23" />
+                <Attribute Name="order_in_persistent_editor" Value="25" />
               </Attributes>
             </data>
           </addData>
@@ -23510,7 +24063,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="24" />
+                <Attribute Name="order_in_persistent_editor" Value="26" />
               </Attributes>
             </data>
           </addData>
@@ -23525,7 +24078,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="25" />
+                <Attribute Name="order_in_persistent_editor" Value="27" />
               </Attributes>
             </data>
           </addData>
@@ -23547,7 +24100,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="26" />
+                <Attribute Name="order_in_persistent_editor" Value="28" />
               </Attributes>
             </data>
           </addData>
@@ -23584,7 +24137,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="27" />
+                <Attribute Name="order_in_persistent_editor" Value="29" />
               </Attributes>
             </data>
           </addData>
@@ -23599,7 +24152,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="28" />
+                <Attribute Name="order_in_persistent_editor" Value="30" />
               </Attributes>
             </data>
           </addData>
@@ -23614,7 +24167,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="29" />
+                <Attribute Name="order_in_persistent_editor" Value="31" />
               </Attributes>
             </data>
           </addData>
@@ -23629,7 +24182,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="30" />
+                <Attribute Name="order_in_persistent_editor" Value="32" />
               </Attributes>
             </data>
           </addData>
@@ -23644,7 +24197,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
               <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="31" />
+                <Attribute Name="order_in_persistent_editor" Value="33" />
               </Attributes>
             </data>
           </addData>
@@ -23814,7 +24367,7 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    📄 Lot L6 : Refonte à 5 flags principaux (1 bit maître + 4 domaines)
    🎯 Polarité positive : TRUE = simulé, FALSE = réel (par défaut).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -23986,6 +24539,26 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
         </Folder>
+        <Folder Name="MAIN">
+          <Object Name="FB_Preflight" ObjectId="d31c4cd5-70b8-565a-906d-0e527f36e29d" />
+          <Object Name="FB_WinchSymmetry" ObjectId="d3f3c22f-4579-5b7b-a799-7880ca0e8f82" />
+          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
+          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+          <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
+          <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
+          <Object Name="PRG_02_Encoders" ObjectId="b971c8dd-35c9-56f9-a5f0-9f678de64af4" />
+          <Object Name="PRG_03_Safety" ObjectId="0d6cb680-2b1a-5c6b-97ff-45020fa827aa" />
+          <Object Name="PRG_04_Modes" ObjectId="878272a8-cc45-5ab5-8eee-ef58917243dd" />
+          <Object Name="PRG_05_Cycle" ObjectId="37c173d1-e05f-53f4-aa3f-3cc90e6be97a" />
+          <Object Name="PRG_06_WinchControl" ObjectId="929cd808-ceb9-5310-b784-2c11eefd87f6" />
+          <Object Name="PRG_07_TranslationControl" ObjectId="f7bf93ce-8842-5f35-b9f9-1e29e340d98b" />
+          <Object Name="PRG_08_AuxiliaryControl" ObjectId="a4a4d65c-07cc-5e86-a434-6cd17437a575" />
+          <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
+          <Object Name="PRG_10_Outputs" ObjectId="9584ee4a-a6d9-5e28-a736-6fefeebf7e24" />
+          <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
+          <Object Name="PRG_IP" ObjectId="b6ce8979-9803-5bfc-9c19-fc63a6d2716c" />
+        </Folder>
         <Folder Name="AU">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
@@ -24005,24 +24578,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
-        </Folder>
-        <Folder Name="MAIN">
-          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
-          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
-          <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
-          <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
-          <Object Name="PRG_02_Encoders" ObjectId="b971c8dd-35c9-56f9-a5f0-9f678de64af4" />
-          <Object Name="PRG_03_Safety" ObjectId="0d6cb680-2b1a-5c6b-97ff-45020fa827aa" />
-          <Object Name="PRG_04_Modes" ObjectId="878272a8-cc45-5ab5-8eee-ef58917243dd" />
-          <Object Name="PRG_05_Cycle" ObjectId="37c173d1-e05f-53f4-aa3f-3cc90e6be97a" />
-          <Object Name="PRG_06_WinchControl" ObjectId="929cd808-ceb9-5310-b784-2c11eefd87f6" />
-          <Object Name="PRG_07_TranslationControl" ObjectId="f7bf93ce-8842-5f35-b9f9-1e29e340d98b" />
-          <Object Name="PRG_08_AuxiliaryControl" ObjectId="a4a4d65c-07cc-5e86-a434-6cd17437a575" />
-          <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
-          <Object Name="PRG_10_Outputs" ObjectId="9584ee4a-a6d9-5e28-a736-6fefeebf7e24" />
-          <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
-          <Object Name="PRG_IP" ObjectId="b6ce8979-9803-5bfc-9c19-fc63a6d2716c" />
         </Folder>
         <Folder Name="SUPERVISION">
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
@@ -24071,6 +24626,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
             <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />
             <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
+            <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
             <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
             <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
             <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
@@ -24084,6 +24640,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_WinchCmd" ObjectId="c71b5360-d47d-51c7-a74c-66d1cdd622f0" />
             <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
             <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
+            <Object Name="ST_WinchSymmetryCfg" ObjectId="e4d6e335-c2ee-5eb4-8c0c-853ba5158a6b" />
+            <Object Name="ST_WinchSymmetryData" ObjectId="013da017-00af-5581-9a6d-612617b82cd3" />
+            <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
           </Folder>
         </Folder>
         <Folder Name="">

@@ -168,6 +168,17 @@ GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationMod
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
 GVL_IHM.M1TreuilRetenue.State.Position_M                 := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_IHM.Commun.Preflight.PreflightOk := PRG_11_Troubleshooting.instPreflight.PreflightOk;
+GVL_IHM.Commun.Preflight.PreflightDone := PRG_11_Troubleshooting.instPreflight.PreflightDone;
+GVL_IHM.Commun.Preflight.PreflightErrorId := PRG_11_Troubleshooting.instPreflight.PreflightErrorId;
+GVL_IHM.Commun.WinchSymmetry.SymmetryOk := PRG_11_Troubleshooting.instWinchSymmetry.SymmetryOk;
+GVL_IHM.Commun.WinchSymmetry.SymmetryValid := PRG_11_Troubleshooting.instWinchSymmetry.SymmetryValid;
+GVL_IHM.Commun.WinchSymmetry.DeltaStartDelay_Ms := _WinchSymmetryDataPersist.DeltaStartDelay_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaBrakeReleaseTime_Ms := _WinchSymmetryDataPersist.DeltaBrakeReleaseTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaBrakeApplyTime_Ms := _WinchSymmetryDataPersist.DeltaBrakeApplyTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaStopDistance_M := UDINT_TO_REAL(_WinchSymmetryDataPersist.DeltaStopDistance_Mm) / 1000.0;
+GVL_IHM.Commun.WinchSymmetry.DeltaStopTime_Ms := _WinchSymmetryDataPersist.DeltaStopTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M := _WinchSymmetryDataPersist.MaxSyncDeviation_M;
 GVL_IHM.M1TreuilRetenue.State.MeasuredSpeed_Mps          := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
 GVL_IHM.M1TreuilRetenue.State.SpeedDelta_Mps             := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
 GVL_IHM.M1TreuilRetenue.State.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
