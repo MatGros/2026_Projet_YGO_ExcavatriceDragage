@@ -19,7 +19,6 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | Dossier / fichier | Périmètre | Statut |
 |---|---|---|
 | `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom des variables d'E/S (convention de polarité) | **Vivant** — sert à retrouver un signal dans les schémas électriques et les REX antérieurs |
-| `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | Persistance, RETAIN, bypasses & freins | **Actif** — rapport exhaustif **+ cahier d'essais** |
 | `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | Revue automatisme / sécurité / IHM (2026-07-26) | **Actif** — C1 corrigé (`1d2e086`), **C2 à C7 non traités** |
 | `IHM_VARIABLES_MIGRATION.md` | Correspondance ancien → nouveau chemin des variables IHM | **Vivant** — à tenir à jour à chaque lot, sert au reparamétrage IHM/SCADA physique |
 
@@ -33,7 +32,6 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 |---|---|---|
 | `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | 🔴 **Source des constats C2→C7**, avec raisonnement et lignes de code. Sans lui, les tâches ci-contre sont des titres sans contenu | **T84** (mesure vitesse) · **T86** (`ForbidAscent`) · **T87** (`DelayMotorDecel`) · **T88** (`FB_CycleTime`) |
 | `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom d'E/S. **§3bis porte la sémantique du Kobold à 3 temps** (hors eau `0` → immergé `1` → fond `0`) | **T81** · **T82** · tout retour à un schéma électrique ou un REX antérieur au 2026-07-27 |
-| `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | ① **Cahier d'essais** persistance / bypass / freins (§4), **jamais exécuté** · ② §6.2 = stratégie de l'interlock frein, base de travail pour T72 · ⚠️ ses correctifs TEST-05/TEST-06 sont **livrés** (`FB_Brake:57`, `FB_Winch:268`), mais **TEST-06 ne couvre pas T72** (voir la note dans `PLAN_TASK`) | **T92** (qualification bypass + homing 0 m) · **T72** |
 | `IHM_VARIABLES_MIGRATION.md` | Journal ancien → nouveau chemin des variables IHM, pour le reparamétrage de la visu. **À tenir à jour à chaque lot** | **T94** · **T95** · toute publication IHM |
 
 ### 📚 Hors de ce dossier, mais indispensables
@@ -60,6 +58,7 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | `WinchIhmButtons/` | Commandes IHM treuils | décisions actées, fonctions déjà couvertes |
 | `CARTOGRAPHIE_Flux_IHM_Actionneurs_v1.0.md` | Chemin bouton → sécurité → sortie | 2026-07-24 — **périmée** : antérieure à `HwIn`, aux renommages E/S et à `PRG_11_Troubleshooting`, qui la remplace |
 | `NAVBOARDS/` · `CHECKLIST_MiseEnService_JoystickTranslation` | Tables de repérage variables + cahier d'essais joystick/translation | 2026-07-27 — périmés (noms `GVL_IHM` obsolètes) ; repris par `PRG_11` et `PLAN_TASK` §4 |
+| `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | Persistance, RETAIN, bypass & freins | 2026-07-27 — correctifs TEST-05/06 livrés. Cahier d'essais extrait vers `../CHECKLISTS/CHECKLIST_Essais_Persistance_Bypass_Frein_v1.0.md` ; reste à faire suivi en T72/T92 |
 | `Winch/` | Audit Winch v1.0 | historique — actions reprises dans `PLAN_TASK` |
 | `WinchCore/` | — | historique |
 | `AF_Partie-14_PLC_Tests_Validation_v1.2.md` | Spec du framework de tests supprimé | `v0.5.1` |
