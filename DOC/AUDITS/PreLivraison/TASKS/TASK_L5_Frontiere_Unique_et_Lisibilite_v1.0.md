@@ -86,18 +86,23 @@ migrent dans `PRG_00` §0 et remplissent `HwIn`. **Toute la logique de diagnosti
    §2  Décodage mot capteurs M3
    ══════════════════════════════════════════════════════════════════════════
    🗺️ CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
-   ┌──────────────────────────┬────────────────────────────────────────────┐
-   │ EmergencyStopOk          │ 🔴 portail maître — tout le programme      │
-   │ TopPositionSensor        │ 🔴 ForbidAscent M1+M2 (hors bypass FB)     │
-   │ SlackCableSwitch         │ 🔴 ForbidDescent M2                        │
-   │ BrakeThermalFeedback     │ 🔴 SafeStop + PowerCutOff (3 axes)         │
-   │ PhaseRotationOk          │ 🔴 SafeStop (3 axes)                       │
-   │ M1/M2ThermalFeedback     │ 🔴 SafeStop axe                            │
-   │ M1/M2/M3BrakeFeedback    │ 🟠 Méca A/B/D — escalade si non confirmé   │
-   │ KoboldContactFond        │ 🟠 cycle figé en BOTTOM_TOUCH_WAIT, muet   │
-   │ HydraulicThermalOk       │ ⚪ diagnostic seul                          │
-   └──────────────────────────┴────────────────────────────────────────────┘ *)
+   [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
+   ┌──────────────────────────┬──────────┬─────────────────────────────────┐
+   │ EmergencyStopOk          │ [BLOQUE] │ portail maître — tout le prog.  │
+   │ TopPositionSensor        │ [BLOQUE] │ ForbidAscent M1+M2 (hors bypass)│
+   │ SlackCableSwitch         │ [BLOQUE] │ ForbidDescent M2                │
+   │ BrakeThermalFeedback     │ [ESCAL.] │ SafeStop + PowerCutOff (3 axes) │
+   │ PhaseRotationOk          │ [ESCAL.] │ SafeStop (3 axes)               │
+   │ M1/M2ThermalFeedback     │ [ESCAL.] │ SafeStop axe                    │
+   │ M1/M2/M3BrakeFeedback    │ [ESCAL.] │ Méca A/B/D si arrêt non confirmé│
+   │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
+   │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
+   └──────────────────────────┴──────────┴─────────────────────────────────┘ *)
 ```
+
+⚠️ **Pas de code couleur dans le code source** : l'éditeur CODESYS affiche les commentaires en
+monochrome, donc 🔴 et 🟠 y sont **indistinguables** (deux cercles pleins identiques). Les marqueurs
+doivent rester lisibles en noir et blanc → **tags texte alignés en colonne**, jamais des pastilles.
 
 🔎 **Vérifie chaque effet de blocage dans le code** (`FB_Safety_Winch`, `FB_Safety_Translation`,
 `FB_Cycle`) avant de l'inscrire. Si tu constates un écart avec cette carte, **signale-le**.
@@ -119,7 +124,7 @@ M1BrakeFeedback := instM1BrakeFeedback.State;
 |---|---|
 | 1 | **Le flux tient sur une ligne** : `source ──►[traitement]──► sortie`, puis `└►` consommateurs |
 | 2 | **La polarité est écrite à chaque étage** (voir B2) — c'est là que se cachent les pièges |
-| 3 | **Le blocage est un pictogramme** 🔴/🟠/⚪, pas une phrase |
+| 3 | **Le blocage est un tag court aligné** `[BLOQUE]` / `[ESCAL.]` / `[DIAG]`, pas une phrase — et **jamais un code couleur** (l'éditeur CODESYS est monochrome). Les emojis de forme distincte (⚠️ ⛔ 🔩 📄) restent utiles ; les pastilles de couleur ne le sont pas |
 | 4 | **Le « pourquoi » part en doc**, le code garde un renvoi `📄 AF_Partie-09 §5bis` |
 
 ⚠️ **Zéro perte d'information** : tout commentaire explicatif retiré du code doit être **déplacé**
