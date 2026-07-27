@@ -9,3 +9,13 @@ Checklists de mise en service et de validation terrain.
 | `../../ARCHIVES/Doc/CHECKLISTS/*_v1.0.md` | Historique détaillé, non à utiliser comme fiche action |
 
 ⚠️ Une checklist confirme une exécution/mesure ; elle ne remplace pas une analyse fonctionnelle ni un dossier de conformité réglementaire.
+
+
+---
+
+## 📦 Archivé (2026-07-27)
+
+`CHECKLIST_MiseEnService_JoystickTranslation_v1.2.md` → `ARCHIVES/Doc/CHECKLISTS/`
+Jamais exécutée (T17/T26) et antérieure au renommage des E/S. Le protocole de recette
+fait foi dans `PLAN_TASK` §4 ; le diagnostic terrain passe désormais par
+`PRG_11_Troubleshooting` (`AF_Partie-14`).
