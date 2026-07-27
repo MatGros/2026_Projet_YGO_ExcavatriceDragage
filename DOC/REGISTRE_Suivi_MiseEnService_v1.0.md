@@ -38,14 +38,14 @@
 | Date | 2026-07-24 |
 | Lieu / environnement | Mise en service terrain |
 | Périmètre | Benne (M2), désynchronisation offset ouverture/fermeture (`FB_Bucket.ActiveOffsetM`) |
-| Statut | ⚪ Non testé (mesure brute, pas encore analysée) |
+| Statut | 🟡 **Valeur appliquée 2026-07-27** (`_BucketCfgPersist.OffsetCloseM` 10.0 → 15.0), **à reconfirmer en charge** — suivi `T89` |
 | Constat | Offset M1/M2 mesuré pour la fermeture benne : **≈ 15 m**. |
 | Décision / Action | À comparer avec la valeur configurée de `ActiveOffsetM` (`PRG_06_WinchControl.instBucket`) et avec la doc `AF_Partie-12_Fonction_Benne_v1.4.md`. Pas encore déterminé si conforme au réglage attendu. |
 | Action différée | Nouveau `Txx` à créer dans `PLAN_TASK_v1.0.md` si écart jugé anormal après analyse. |
 
 ---
 
-### MES-010 — Polarité du retour frein : relevé de câblage et normalisation logicielle
+### MES-011 — Polarité du retour frein : relevé de câblage et normalisation logicielle
 
 | Champ | Valeur |
 |---|---|
@@ -71,7 +71,7 @@
 | Date | 2026-07-24 |
 | Lieu / environnement | Mise en service terrain |
 | Périmètre | Capteur position haute commun M1/M2 (TopPositionSensor), arrêt haut treuils |
-| Statut | ⚪ Non testé (mesure brute, pas encore analysée) |
+| Statut | 🟡 **Valeurs appliquées 2026-07-27** (`CfgTopSensorPos_M` 8.5 → **8.0**, `CfgCableLimitAscent_M` 8.0 → **7.5**), **contrôle terrain à faire** — suivi `T90` |
 | Constat | Déclenchement physique du capteur de position haute mesuré à **8 m**. Arrêt réel du mouvement (rampe/mécanique) observé vers **≈ 7,5 m** — soit une marge d'environ 0,5 m avant déclenchement capteur. |
 | Décision / Action | À comparer avec les cibles de homing configurées (`HomingTargetM1_M`/`HomingTargetM2_M`) et la distance de freinage attendue à la vitesse d'approche utilisée. Pas encore déterminé si cet écart de 0,5 m est normal (marge de sécurité voulue) ou à ajuster. |
 | Action différée | Nouveau `Txx` à créer dans `PLAN_TASK_v1.0.md` si l'écart est jugé anormal après analyse. |
