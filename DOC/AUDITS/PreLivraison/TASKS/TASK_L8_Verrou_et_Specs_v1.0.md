@@ -1,3 +1,10 @@
+> # ❌ FICHE ANNULEE (2026-07-27) — NE PAS EXECUTER
+>
+> Remplacee par `TASK_L7-L8_HwSim_Verrou_Specs_v2.0.md`.
+> Motif : le comparateur `FB_HwCompare`/`HwDelta` est abandonne — la lecture cote a cote
+> `HwReal`/`HwSim`/`HwIn` en vue instance et `PRG_11_Troubleshooting` couvrent le besoin
+> sans ajouter de couche. Le reste (verrou + specs) est repris dans la v2.0.
+
 # 🔒 FICHE DE TÂCHE — Lot L8 : verrou anti-récidive + remise à niveau des specs
 
 > 🤖 Agent d'implémentation externe · 📅 2026-07-27 · **v1.0** · 🟢 risque faible (outillage + doc)
