@@ -23,6 +23,29 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | Revue automatisme / sécurité / IHM (2026-07-26) | **Actif** — C1 corrigé (`1d2e086`), **C2 à C7 non traités** |
 | `IHM_VARIABLES_MIGRATION.md` | Correspondance ancien → nouveau chemin des variables IHM | **Vivant** — à tenir à jour à chaque lot, sert au reparamétrage IHM/SCADA physique |
 
+## 🎯 À quoi sert chaque document — pour reprendre le travail
+
+> 📌 **L'ordre des travaux et l'état des tâches sont dans `../PLAN_TASK_v1.0.md`** (§1bis : ce qui
+> est fait et les décisions actées · §3 : les reliquats `Txx` · §4 : la stratégie de mise en service).
+> Ce README dit seulement **quel document ouvrir pour quelle tâche**.
+
+| Document | Sert à | Tâches |
+|---|---|---|
+| `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | 🔴 **Source des constats C2→C7**, avec raisonnement et lignes de code. Sans lui, les tâches ci-contre sont des titres sans contenu | **T84** (mesure vitesse) · **T86** (`ForbidAscent`) · **T87** (`DelayMotorDecel`) · **T88** (`FB_CycleTime`) |
+| `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom d'E/S. **§3bis porte la sémantique du Kobold à 3 temps** (hors eau `0` → immergé `1` → fond `0`) | **T81** · **T82** · tout retour à un schéma électrique ou un REX antérieur au 2026-07-27 |
+| `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | **Cahier d'essais** persistance / bypass / freins, **jamais exécuté** | **T92** (qualification bypass + homing 0 m) |
+| `IHM_VARIABLES_MIGRATION.md` | Journal ancien → nouveau chemin des variables IHM, pour le reparamétrage de la visu. **À tenir à jour à chaque lot** | **T94** · **T95** · toute publication IHM |
+
+### 📚 Hors de ce dossier, mais indispensables
+
+| Document | Sert à |
+|---|---|
+| `../REGISTRE_Suivi_MiseEnService_v1.0.md` | **Consigner chaque séance d'essai** (mesures, constats, décisions). C'est là que doivent aller les relevés de T89, T90, T92, T95 — pas dans une conversation |
+| `../CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md` | Mode d'emploi du banc : activation par domaine, tests, retour en réel |
+| `../AF_Partie-13_Fonction_Simulation_v2.0.md` · `../AF_Partie-14_Fonction_Troubleshooting_v1.0.md` | Architecture de la simulation · diagnostic `PRG_11` |
+
+---
+
 ## 📦 Archivé — plans terminés et implémentés
 
 `../../ARCHIVES/Doc/AUDITS/`

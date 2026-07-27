@@ -264,6 +264,51 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 ## 📋 4. Recette
 
+### 🧭 4.0 Stratégie de mise en service (actée 2026-07-27)
+
+> 🎯 Principe : **on mesure avant de protéger.** Les seuils de sécurité actuels sont théoriques —
+> les activer sans les avoir calibrés sur la machine réelle produirait des déclenchements au jugé.
+
+#### 🔧 Lots code à faire AVANT les essais
+
+| # | Lot | Pourquoi d'abord |
+|---|---|---|
+| **1** | **T84 + T86 + T87** — mesure `MeasuredSpeedMps` (fenêtre ~100 ms), `ForbidAscent` déterministe, `DelayMotorDecel` tranché | Même fichier (`FB_Safety_Winch`/`FB_Brake`) → **un seul passage sur le cœur sécurité**. Sans T84, toutes les mesures suivantes portent sur du bruit. T87 débloque le réglage attendu par T91 |
+| **2** | **T81 + T82** — séquence de détection de fond Kobold | Le cycle semi-auto ne peut pas être qualifié tant que la détection de fond repose sur l'immersion |
+| **3** | **T94 + T95** — garde-fou pilotable/persistant + table `VitesseMax[1..5]` | Ce sont les **outils** de la calibration ci-dessous : sans eux, on ne peut ni mesurer ni conserver le résultat |
+
+#### 🧪 Déroulé sur machine
+
+| Phase | Contenu | Garde-fou vitesse |
+|---|---|---|
+| **0** | Import CODESYS, compilation, `FB_Preflight` → vérifier l'état machine **avant tout mouvement** | — |
+| **1** | Simulation domaine par domaine (`CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation`) | — |
+| **2** | Essais treuils réels : montées/descentes, paliers 1→5, **à vide puis en charge**. Relevés : `VitesseMax` par palier (T95), hauteurs (T90), offset benne (T89), symétrie M1/M2 (`FB_WinchSymmetry`, MES-008) | 🔴 **DÉSACTIVÉ** |
+| **3** | Renseigner `_WinchSpeedConfig.MaxMeasuredSpeedMps` et `SpeedBandMaxMps[1..5]` avec les valeurs **mesurées** (T45/T47) | 🔴 désactivé |
+| **4** | Activer `SpeedGuardEnable` par axe, vérifier que `SpeedGuardLimited` ne se déclenche **pas** en usage normal | 🟢 **ACTIVÉ** |
+| **5** | Qualification bypass + homing 0 m (T92, cahier d'essais `AUDITS/RAPPORT_Audit_Persistance_Bypass_Frein`), puis cycle semi-auto complet | 🟢 activé |
+
+⚠️ **Le garde-fou de palier n'est pas un confort** : engager trop de contacteurs de vitesse au
+démarrage en charge fait **décrocher le moteur et disjoncter la machine** (T47). Il doit être activé
+avant l'exploitation, et son état doit survivre aux downloads (T94).
+
+#### 🔬 Études à mener en parallèle (pas de décision prise)
+
+**T91** séquence frein/puissance asymétrique selon le sens · **T93** temporisations par palier en
+remplacement de la rampe %/s. Les deux interagissent : le temps de décélération conditionne la
+séquence de freinage. À instruire ensemble, sur machine.
+
+#### 🚚 Avant livraison client
+
+`SimulationModeActive = FALSE` et 4 domaines à `FALSE` · **bypass RETAIN remis à zéro** ·
+`Network.Bypass.IhmHeartbeat := FALSE` (**T83**) · `SpeedGuardEnable` activé · valeurs persistantes
+relevées et archivées.
+
+📝 **Chaque phase donne lieu à une entrée `MES-xxx`** dans `REGISTRE_Suivi_MiseEnService_v1.0.md`.
+
+---
+
+
 📥 **Ingéré depuis** `SAT_Protocole_Essais_v1.0.md` (archivé dans `ARCHIVES/Doc/`, contenu ci-dessous fait foi).
 
 ⚠️ **NO-GO mouvement** (diag EtherCAT + câblage CAN joystick, AUDIT D47) à lever formellement avant de dérouler ce protocole.
