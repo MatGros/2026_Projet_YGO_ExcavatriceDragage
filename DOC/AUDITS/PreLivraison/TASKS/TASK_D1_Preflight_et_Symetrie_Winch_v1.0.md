@@ -145,6 +145,73 @@ Seuils **réglables** en `PERSISTENT` (valeurs initiales à proposer, à confirm
 
 ---
 
+## 3bis. 📌 Précisions (2026-07-27, suite au blocage de l'agent)
+
+### A. 🐛 Correctif de libellé `PRG_11` — **inclus dans ce lot**
+
+Incohérence confirmée : la déclaration annonce l'inverse de ce qui est publié.
+
+```
+ST_Chain_Winch_Inputs.st:6      Idx104_BrakeIsOpen_DI : BOOL;  // 1 = Frein Ouvert | 0 = Frein Serré
+PRG_11_Troubleshooting.st:58    Idx104_BrakeIsOpen_DI := PRG_00_Inputs.M1BrakeFeedback;
+                                                          └─ TRUE = frein SERRÉ (après normalisation)
+```
+
+👉 Le diagnostic **affiche l'inverse de la réalité**. À corriger avant de construire le Preflight
+dessus.
+
+**Correction retenue : aligner le NOM sur la valeur** (et non l'inverse), car toute la logique aval
+(`FB_Safety_Winch` Méca A/B/D/E, `FB_Brake`, homing) raisonne en « TRUE = frein serré ». Introduire
+une seconde convention dans le diagnostic recréerait le piège de C1.
+
+| Fichier | Avant | Après |
+|---|---|---|
+| `ST_Chain_Winch_Inputs.st` | `Idx104_BrakeIsOpen_DI` — *« 1 = Frein Ouvert »* | **`Idx104_BrakeApplied`** — *« TRUE = frein SERRÉ (valeur normalisée `PRG_00_Inputs`, après `BrakeFeedbackInvertLogic`) »* |
+| `ST_Chain_Translation_Inputs.st` | `Idx108_BrakeIsOpen_DI` | **`Idx108_BrakeApplied`** — même commentaire |
+| `PRG_11` l. 58, 98, 160 | — | mettre à jour les 3 affectations |
+
+⚠️ Le suffixe `_DI` est retiré : ce n'est plus la valeur brute d'entrée mais la valeur **normalisée**.
+Ne touche à rien d'autre dans `PRG_11`.
+
+### B. Définition de `MachineIsStill`
+
+```
+MachineIsStill :=     NOT (M1RelayFwd OR M1RelayRev OR M1SpeedContactor1..4)
+                  AND NOT (M2RelayFwd OR M2RelayRev OR M2SpeedContactor1..4)
+                  AND (M3_CommandWord = 0)
+                  AND NOT M1BrakeCmd AND NOT M2BrakeCmd AND NOT TranslationBrakeCmd
+```
+
+Toutes ces variables sont des sorties de `PRG_10_Outputs` — **vérifie leurs noms exacts dans le
+fichier**. Rappel : `BrakeCmd = TRUE` signifie **desserrage commandé**, donc `NOT BrakeCmd` =
+frein commandé serré.
+
+⏱️ La condition doit être **stable depuis 2 s** (`TON`) avant qu'un verdict soit rendu — sinon on
+mesure un transitoire. M3 n'a plus de relais de sens en sortie (supprimés) : son activité se lit
+**uniquement** sur `M3_CommandWord`.
+
+### C. Seuils initiaux `FB_WinchSymmetry`
+
+Valeurs de départ, **à confirmer sur site** — à placer en `PERSISTENT`, réglables sans recompiler.
+
+| Seuil | Valeur initiale | Justification |
+|---|---|---|
+| `DeltaStartDelay_Ms` | **100 ms** | Un contacteur réel répond en ~40 ms ; 100 ms d'écart entre les deux treuils est déjà significatif |
+| `DeltaBrakeReleaseTime_Ms` | **100 ms** | Temps de réponse frein documenté à 100–300 ms (`FB_Brake`) |
+| `DeltaBrakeApplyTime_Ms` | **100 ms** | idem, côté serrage |
+| `DeltaStopDistance_M` | **0,10 m** | La tolérance de synchro est de 0,25 m (`CfgSyncTolerance_M`) : 0,10 m est notable sans être alarmiste |
+| `DeltaStopTime_Ms` | **200 ms** | Cohérent avec les rampes de décélération |
+
+**Conditions de « mouvement franc »** (règle R2), également en `PERSISTENT` :
+
+| Paramètre | Valeur initiale |
+|---|---|
+| Durée minimale de commande maintenue | **1 s** |
+| Vitesse mesurée minimale | **0,05 m/s** (2,5× le seuil Méca A de 0,02 m/s, pour rester hors du bruit de quantification) |
+
+⚠️ Ces valeurs sont des **points de départ pour la mise en service**, pas des valeurs validées.
+Documente-les comme telles dans le code et dans ton rapport.
+
 ## 4. ⛔ Interdictions
 
 - ❌ **Aucune modification de la logique existante** : ni `FB_Safety_*`, ni `FB_Winch`, ni
