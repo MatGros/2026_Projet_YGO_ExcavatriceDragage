@@ -173,6 +173,35 @@ une seconde convention dans le diagnostic recréerait le piège de C1.
 ⚠️ Le suffixe `_DI` est retiré : ce n'est plus la valeur brute d'entrée mais la valeur **normalisée**.
 Ne touche à rien d'autre dans `PRG_11`.
 
+### A-bis. 🔗 Règle de cohérence `EmergencyChain` ↔ `EmergencyStopOk`
+
+Ce ne sont **pas** deux images du même signal, et une égalité serait fausse :
+
+| Signal | Sens |
+|---|---|
+| `EmergencyChain` | Boucle AU fermée (coups-de-poing relâchés + contact PLC) — **précondition à l'armement** |
+| `EmergencyStopOk` | Contacteur de **puissance** réellement engagé — le portail maître du programme |
+
+La chaîne conditionne le contacteur, jamais l'inverse. **Règle retenue** :
+
+```
+Anomalie := EmergencyStopOk AND NOT EmergencyChain
+```
+
+| Combinaison | Verdict |
+|---|---|
+| Chaîne `TRUE` · Contacteur `TRUE` | ✅ machine armée, nominal |
+| Chaîne `TRUE` · Contacteur `FALSE` | ✅ **normal** — machine non armée, en attente de réarmement. À afficher comme **information**, pas comme anomalie |
+| Chaîne `FALSE` · Contacteur `FALSE` | ✅ cohérent — AU appuyé ou `PowerCutOff` actif |
+| Chaîne `FALSE` · Contacteur `TRUE` | 🔴 **ANOMALIE** — la puissance est présente alors que la boucle AU est ouverte : **contacteur collé** ou erreur de câblage |
+
+⏱️ Aucune temporisation supplémentaire n'est nécessaire : `FB_Preflight` ne conclut qu'à l'arrêt
+stabilisé depuis 2 s (§B), donc le transitoire de retombée du contacteur (quelques dizaines de ms)
+est déjà exclu.
+
+👉 Applique le même raisonnement partout : **avant de comparer deux signaux, vérifie s'ils décrivent
+la même grandeur.** En cas de doute, arrête-toi et demande — comme tu viens de le faire.
+
 ### B. Définition de `MachineIsStill`
 
 ```
