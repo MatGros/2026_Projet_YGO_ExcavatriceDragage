@@ -21361,8 +21361,8 @@ GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ   := 
 
 
 // 🪣 ─── 4. OUVERTURE / FERMETURE BENNE ─────────────────────────────────────────
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen               := PRG_06_WinchControl.instBucketState.IsOpen;
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed             := PRG_06_WinchControl.instBucketState.IsClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen               := GVL_IHM.M2TreuilBenne.Bucket.State.IsOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed             := GVL_IHM.M2TreuilBenne.Bucket.State.IsClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx103_OffsetPos_M                := PRG_06_WinchControl.instBucket.ActiveOffsetM;
 
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen             := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;
