@@ -21367,11 +21367,11 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
 
 // 🌐 ─── 0. CONTEXTE MACHINE GLOBAL ───────────────────────────────────────────
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_IHM.Commun.Bypass.SimulationEnabled;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_IHM.Commun.Cfg.SimulationEnabled;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
 
-GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (GVL_IHM.Commun.Cmd.SelOperatorSource = 0);
-GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal    := GVL_IHM.Commun.Bypass.OperatorComm;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.MAINT_N1 AND PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.MAINT_N2);
+GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal    := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm OR GVL_IHM.M2TreuilBenne.Bypass.OperatorComm OR GVL_IHM.TranslationM3.Bypass.Global;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal    := GVL_IHM.Commun.Bypass.TopPositionSensor OR GVL_IHM.Commun.Bypass.SlackCable OR GVL_IHM.TranslationM3.Bypass.LimitSwitch;
 
 GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
@@ -21379,7 +21379,7 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx302_EmergencyStopOk        := PRG_0
 GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny       := PRG_03_Safety.instSafetyWinchM1.SafeStop OR PRG_03_Safety.instSafetyWinchM2.SafeStop OR PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny   := PRG_03_Safety.instSafetyWinchM1.PowerCutOff OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 
-GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk         := PRG_01_Diagnostics.instIhmHeartbeat.Ready AND NOT PRG_01_Diagnostics.instIhmHeartbeat.Error;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk         := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy          := PRG_05_Cycle.instCycle.Busy;
 
 
