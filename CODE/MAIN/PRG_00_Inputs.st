@@ -1,11 +1,12 @@
 (* ══════════════════════════════════════════════════════════════════════════
    📥 PRG_00_Inputs — ACQUISITION & CONDITIONNEMENT       ⚙️ scan position 0
    ══════════════════════════════════════════════════════════════════════════
-   §0  MATÉRIEL ──► HwReal ──► HwIn (Image matérielle unique, frontière d'entrée)
-   §1  HwIn     ──► FB_Input ──► VAR_OUTPUT  (filtre 20 ms, polarité NO/NC)
+   §0  MATÉRIEL ──► HwReal (Acquisition brute unique)
+   §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine)
+   §1  HwIn     ──► FB_Input ──► VAR_OUTPUT (Filtre 20 ms, polarité NO/NC)
    §2  Décodage mot capteurs M3
    ══════════════════════════════════════════════════════════════════════════
-   🗺️ CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
+   MAP CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
    [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
    ┌──────────────────────────┬──────────┬─────────────────────────────────┐
    │ EmergencyStopOk          │ [BLOQUE] │ portail maître — tout le prog.  │
@@ -107,6 +108,9 @@ VAR
     instTranslationPosP1          : FB_Input;
     instTranslationPosMaintenance : FB_Input;
     instM3BrakeFeedback       : FB_Input;
+
+    // 🧪 Instance de simulation banc d'essai (Lot L6)
+    instSimBench              : FB_SimBench;
 
     // 🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.
     HmiCommandsInitialized               : BOOL;
@@ -214,8 +218,60 @@ HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
 HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
 
 
-// ─── §0bis HwReal ──► HwIn (Passage inconditionnel frontière HwIn) ───────────
-HwIn := HwReal;
+// ─── §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine) ────
+instSimBench(
+    Enable                   := GVL_Simulation.SimulationModeActive,
+    M1_RelayFwd              := PRG_10_Outputs.M1RelayFwd,
+    M1_RelayRev              := PRG_10_Outputs.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_10_Outputs.M1SpeedContactor1,   // 🔧 REX 2026-07-27 : paliers
+    M1_SpeedContactor_2      := PRG_10_Outputs.M1SpeedContactor2,   // inclus dans le retour unique
+    M1_SpeedContactor_3      := PRG_10_Outputs.M1SpeedContactor3,   // « tous contacteurs retombés »
+    M1_SpeedContactor_4      := PRG_10_Outputs.M1SpeedContactor4,
+    M1_SpeedRefPct           := PRG_06_WinchControl.M1_SpeedRef_Active,
+    M1_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd,
+    M1_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut,
+    M1_BrakeCmd              := PRG_10_Outputs.M1BrakeCmd,
+    M2_RelayFwd              := PRG_10_Outputs.M2RelayFwd,
+    M2_RelayRev              := PRG_10_Outputs.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_10_Outputs.M2SpeedContactor1,   // 🔧 REX 2026-07-27 : idem M1
+    M2_SpeedContactor_2      := PRG_10_Outputs.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_10_Outputs.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_10_Outputs.M2SpeedContactor4,
+    M2_SpeedRefPct           := PRG_06_WinchControl.M2_SpeedRef_Active,
+    M2_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd,
+    M2_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut,
+    M2_BrakeCmd              := PRG_10_Outputs.M2BrakeCmd,
+    M3_Direction             := PRG_07_TranslationControl.M3_Direction_Active,
+    M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
+    M3_BrakeCmd              := PRG_10_Outputs.TranslationBrakeCmd,
+    M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
+    PowerKeepAlive_A         := PRG_10_Outputs.PowerCutOff_A,
+    PowerKeepAlive_B         := PRG_10_Outputs.PowerCutOff_B,
+    EmergencyArming_RQ       := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
+    SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
+    SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
+    SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
+    SimM3SensorsWordActive   := GVL_Simulation.SimM3SensorsWordActive,
+    SimM3SensorsWord         := GVL_Simulation.SimM3SensorsWord,
+    SimJoystickRawX          := GVL_Simulation.SimJoystickRawX,
+    SimJoystickRawY          := GVL_Simulation.SimJoystickRawY,
+    SimJoystickRawButton     := GVL_Simulation.SimJoystickRawButton,
+    SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
+    BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
+    HwReal                   := HwReal,
+    RawPosM1                 := _SimEncoderRawPosM1,
+    RawPosM2                 := _SimEncoderRawPosM2
+);
+
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive
+    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
+    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwReal.Translation; END_IF;
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive
+    THEN HwIn.Operator := instSimBench.Operator;       ELSE HwIn.Operator := HwReal.Operator;       END_IF;
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
+    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwReal.Machine;         END_IF;
 
 
 // ─── §1 HwIn ──► FB_Input ──► VAR_OUTPUT (Conditionnement des entrées) ───────

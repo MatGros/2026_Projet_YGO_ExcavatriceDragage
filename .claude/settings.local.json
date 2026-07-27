@@ -99,7 +99,8 @@
       "Bash(grep \"^CODE/SIMULATION/PLC_TESTS/.*\\\\.st$\")",
       "Bash(grep \"^CODE/.*\\\\.st$\")",
       "Bash(grep -iE \"PLC_Tests|_TYPES\\\\\\\\\\\\\\\\\\(ST_Test|E_Test\\)|Simulation|PRG_00|PRG_06\")",
-      "Bash(sed 's/:.*//')"
+      "Bash(sed 's/:.*//')",
+      "Bash(grep -v \":0$\")"
     ],
     "ask": [
       "Bash(git reset *)",
