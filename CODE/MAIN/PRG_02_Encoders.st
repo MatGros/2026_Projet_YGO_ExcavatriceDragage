@@ -14,9 +14,6 @@ VAR_OUTPUT
     EncoderFaultPresentM2 : BOOL;
 END_VAR
 VAR
-    // 🧪 Simulation banc de test (Lot 2 — voir CODE/SIMULATION/FB_Sim_Encoder.st)
-    instSimEncoderM1      : FB_Sim_Encoder;
-    instSimEncoderM2      : FB_Sim_Encoder;
     M1_RawPosToUse        : UDINT;
     M2_RawPosToUse        : UDINT;
 
@@ -29,9 +26,6 @@ VAR
     instHomingM2       : FB_Encoder_Homing;
     instEncoderSafetyM1 : FB_Encoder_Safety;
     instEncoderSafetyM2 : FB_Encoder_Safety;
-
-    M1_SimSpeedPct      : REAL;
-    M2_SimSpeedPct      : REAL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
@@ -40,63 +34,8 @@ END_VAR
 // aucun consommateur une fois le bypass Homing IHM_MANU supprimé (voir fin de fichier, ex-bloc
 // IF PRG_10_Outputs.ManuActive THEN ... HomingEncoder_M1/M2 ... END_IF).
 
-// 🔧 REX 2026-07-15 (4) — CORRECTIF COMPILATION : ex-SEL(ManuActive, ...) référençait
-// PRG_10_Outputs.SpeedRefPct, supprimé lors du passage de Manu sur FB_Winch (REX 2026-07-15 (2)).
-// Plus besoin de distinguer Auto/Manu ici : instWinchM1/M2.SpeedRamp.Current est désormais LA
-// vitesse rampée réelle dans les DEUX cas (FB_Winch pilote M1/M2 qu'on soit en Auto ou en Manu).
-M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
-M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
-
-// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md)
-// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
-// survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
-instSimEncoderM1(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal,
-    // 🔧 REX 2026-07-15 (2) : lit directement instWinchM1 (PRG_06_WinchControl) — M1 est désormais
-    // piloté par FB_Winch en Auto ET en Manu (ex-SimM1Fwd_Eff/PRG_10_Outputs retiré, obsolète) :
-    // RelayFwd/RelayRev respectent déjà SafeStop/ForbidAscent/ForbidDescent nativement, plus besoin
-    // de signaux Sim dédiés.
-    RelayFwd    := PRG_06_WinchControl.instWinchM1.RelayFwd,
-    RelayRev    := PRG_06_WinchControl.instWinchM1.RelayRev,
-    SpeedRefPct := M1_SimSpeedPct,
-    PresetCmd   := (COD1_PresettTrigCmd = 2),
-    PresetValue := COD1_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.TstEncoderSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
-    // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E) — 4096 = PointsPerRev/CableM_PerRev (8192/2.0)
-    TestOffsetCmd := GVL_Simulation.TstInjectSyncDeviationM1,
-    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.TstSyncDeviationOffsetM * 4096.0),
-    RawPos      := _SimEncoderRawPosM1
-);
-instSimEncoderM2(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal,
-    // 🔧 REX 2026-07-15 (2) : idem M1 ci-dessus, lit instWinchM2 (ex-SimM2Fwd_Eff retiré).
-    RelayFwd    := PRG_06_WinchControl.instWinchM2.RelayFwd,
-    RelayRev    := PRG_06_WinchControl.instWinchM2.RelayRev,
-    SpeedRefPct := M2_SimSpeedPct,
-    PresetCmd   := (COD2_PresettTrigCmd = 2),
-    PresetValue := COD2_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.TstEncoderSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
-    // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E)
-    TestOffsetCmd := GVL_Simulation.TstInjectSyncDeviationM2,
-    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.TstSyncDeviationOffsetM * 4096.0),
-    RawPos      := _SimEncoderRawPosM2
-);
-
-// Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
-// simulation par PRG_01_Diagnostics [SEL sur BusEncoderMxIsReal] pour ne pas remonter de faux
-// défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
-// lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal) THEN
-    M1_RawPosToUse := instSimEncoderM1.RawPosOut;
-ELSE
-    M1_RawPosToUse := COD1_PosValue;
-END_IF;
-
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal) THEN
-    M2_RawPosToUse := instSimEncoderM2.RawPosOut;
-ELSE
-    M2_RawPosToUse := COD2_PosValue;
-END_IF;
+M1_RawPosToUse := COD1_PosValue;
+M2_RawPosToUse := COD2_PosValue;
 
 // 2. TREUIL M1 (Abs → Homing → Scale)
 // 🔧 REX 2026-07-07 : Homing appelé AVANT Scale (et non l'inverse) — Scale lit HomingRefRaw en
@@ -112,9 +51,9 @@ instEncoderAbsM1(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
-    AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
-    WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational OR instSimEncoderM1.Enable,
+    AlarmsIn            := COD1_Alarms,
+    WarningsIn          := COD1_Warnings,
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational,
     PresetRequest       := instHomingM1.PresetRequest,
     PresetValue         := instHomingM1.PresetValue
 );
@@ -162,9 +101,9 @@ instEncoderAbsM2(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
-    AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
-    WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational OR instSimEncoderM2.Enable,
+    AlarmsIn            := COD2_Alarms,
+    WarningsIn          := COD2_Warnings,
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     PresetRequest       := instHomingM2.PresetRequest,
     PresetValue         := instHomingM2.PresetValue
 );

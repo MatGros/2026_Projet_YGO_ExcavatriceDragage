@@ -8,8 +8,6 @@
    ═══════════════════════════════════════════════════════════════ *)
 
 VAR_GLOBAL
-    // 🔌 Nouvelle entrée physique PV à mapper dans CODESYS.
-    PosPV_DI : BOOL;
 
     // 🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
     // Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement seul).

@@ -73,6 +73,24 @@
 
 ---
 
+## 0bis. 🟢 AVANCEMENT au 2026-07-27
+
+| Lot | État | Preuve |
+|---|---|---|
+| **T80** capteur PV | ✅ **FAIT** | `M3_PosPV_DI` relié, stub supprimé |
+| **L2 + L3** retrait `GVL_PLC_Tests` | ✅ **FAIT** | 0 occurrence des 5 objets dans `CODE/` |
+| **L4a** périphérie | ✅ **FAIT** | CK3/CK4 respectés · `DriveCommReady`/`DrivePowerReady` en direct |
+| **L4b** codeurs | ✅ **FAIT** | `FB_Sim_Encoder` retirés, `CODx_PosValue` en direct |
+| **L4c** joystick & diag | ✅ **FAIT** | `DeadmanRearmTimeout := T#10S` figé · **CK6 tranché** : bypass `IhmHeartbeat` + secours `BlinkClock` (voir T83) |
+| **L4d** entrées `PRG_00` | ✅ **FAIT** | 8 `OR` + `FB_Sim_Safety`/`_Translation` retirés |
+| **Renommage E/S** | ✅ **FAIT** (anticipé sur L5) | `TABLE_Renommage_IO_v1.0.md` |
+| Compilation CODESYS cible réelle | ✅ **0 erreur** | validée par l'utilisateur |
+| Bundle PLCopenXML | ✅ 110/110 objets | — |
+
+🏁 **Fin de P1.** Le programme ne parle plus qu'au matériel réel.
+➡️ **Reste : L5 → L8** (frontière unique, `FB_SimBench`, comparateur `HwDelta`, gate CI + spec).
+⚠️ **Aucun banc de simulation disponible tant que L6 n'est pas fait.**
+
 ## 1. 🗺️ Vue d'ensemble
 
 ```

@@ -36,7 +36,6 @@ CmdAbortCycle_IHM := GVL_IHM.Cycle.Cmd.BtnAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.Cmd.BtnReset;
 SetDepthM      := GVL_IHM.Cycle.Cfg.SetDepth_M;
 SetOffsetM     := GVL_IHM.Cycle.Cfg.SetOffset_M;
-GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.Test.KoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
 

@@ -16,9 +16,6 @@ STRUCT
     (* 🔧 Bypass maintenance *)
     Bypass                  : ST_BypassTranslation;
 
-    (* 🧪 Commandes de test (banc uniquement) *)
-    Test                    : ST_TestTranslation;
-
     (* 🛡️ Sécurité (FB_Safety_Translation) *)
     Safety                  : ST_SafetyTranslation;
 END_STRUCT
