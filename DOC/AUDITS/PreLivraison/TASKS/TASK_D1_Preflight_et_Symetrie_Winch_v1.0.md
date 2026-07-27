@@ -238,6 +238,27 @@ Valeurs de départ, **à confirmer sur site** — à placer en `PERSISTENT`, ré
 | Durée minimale de commande maintenue | **1 s** |
 | Vitesse mesurée minimale | **0,05 m/s** (2,5× le seuil Méca A de 0,02 m/s, pour rester hors du bruit de quantification) |
 
+#### 📍 Source de la vitesse — elle existe déjà, ne la recalcule pas
+
+```
+PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps         // vitesse absolue (m/s)
+PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedSignedMps   // vitesse signée (sens)
+            idem instSafetyWinchM2
+```
+
+Produite par `FB_Safety_Winch.st:381` :
+`MeasuredSpeedSignedMps := (CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;`
+Déjà consommée par `FB_Encoder_SpeedMonitor`, `FB_WinchLoadEstimator`, `FB_Cycle` et publiée
+à l'IHM (`PRG_09:300`).
+
+⛔ **Ne recalcule pas la vitesse** et n'introduis aucune nouvelle convention : `PRG_11` s'exécute
+après `PRG_03`, tu lis donc une valeur **du même scan**.
+
+⚠️ **Limite connue, à mentionner dans ton rapport** : c'est une dérivée **brute, sans filtre**, sur
+un cycle de 10 ms. Un pas de quantification codeur (0,2 mm) produit déjà ~0,02 m/s de bruit — d'où
+le seuil de validité fixé à 0,05 m/s. Le filtrage de cette grandeur est le sujet du **constat C5**
+de l'audit et sera traité dans un lot dédié touchant `FB_Safety_Winch` : **hors périmètre de D1**.
+
 ⚠️ Ces valeurs sont des **points de départ pour la mise en service**, pas des valeurs validées.
 Documente-les comme telles dans le code et dans ton rapport.
 
