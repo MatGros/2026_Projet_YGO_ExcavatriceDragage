@@ -4,6 +4,18 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### 0.5.2_Troubleshooting_SignalChain — 2026-07-27
+- Intégration du composant autonome de Recherche de Pannes et Traçabilité Pas-à-Pas
+- PRG_11_Troubleshooting (Position 11 MainTask, pure lecture seule, 0 régression métier)
+- GVL_Troubleshooting (placée sous CODE/MAIN/) orientée Fonctions & Utilisation Machine :
+  1. LevageSynchroniseM1M2 (Mode Couplé Nominal M1+M2)
+  2. LevageUnitaireM1 (Treuil Retenue)
+  3. LevageUnitaireM2 (Treuil Benne)
+  4. BenneOuvertureFermeture (Action Benne par Désynchronisme)
+  5. TranslationPontM3 (Translation Variateur AC600)
+- Indexation chronologique par centaines (100, 200, 300, 400, 500) + commentaires explicites des valeurs nominales
+- Création de DOC/AF_Partie-14_Fonction_Troubleshooting_v1.0.md (v1.2)
+
 ### `v0.5.1_PlcTestsFrameworkRemoval` — 2026-07-26
 - Retrait du framework de tests automatiques in-PLC (introduit en `v0.4.15`) : `FB_TestSequencer`,
   BRICKS/CORE, 8 suites de validation · archivé `ARCHIVES/Code/PLC_TESTS/`
