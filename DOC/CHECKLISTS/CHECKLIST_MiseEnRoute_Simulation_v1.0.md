@@ -91,18 +91,32 @@ contournée.
 
 ---
 
-## 4. 🔍 Comparateur `HwDelta` (disponible après le lot L7)
+## 4. 🔍 Savoir quand basculer un domaine en réel
 
-Sert à savoir **quand basculer un domaine en réel** :
+Les trois images ont **les mêmes champs** et sont lisibles côte à côte en vue instance CODESYS :
 
-1. Câbler physiquement le domaine
-2. `SimShadowCompare := TRUE`, machine **à l'arrêt**
-3. Lire `MismatchCount` :
-   - **`0`** → le réel dit déjà ce que le modèle attend → bascule sûre (`Sim<Domaine>Active := FALSE`)
-   - **`> 0`** → lire `HwDelta` : le champ en écart est soit non câblé, soit **de polarité inversée**
-4. Ne jamais basculer un domaine dont le comparateur signale un écart
+```
+   HwReal  ── ce que dit le matériel
+   HwSim   ── ce que le banc attend
+   HwIn    ── ce que le programme utilise
+```
 
----
+**Méthode**, capteur par capteur :
+
+1. Câbler physiquement le capteur, machine **à l'arrêt**
+2. Ouvrir `PRG_00_Inputs` en vue instance et comparer `HwReal.<domaine>.<signal>` à
+   `HwSim.<domaine>.<signal>`
+3. **Valeurs identiques** → le réel dit déjà ce que le modèle attend → bascule sûre
+4. **Valeurs opposées** → le fil est absent **ou la polarité est inversée** → à instruire
+   *avant* de couper la simulation du domaine
+
+⚠️ Ne comparer que les **grandeurs logiques** (retours contacteurs, freins, capteurs TOR, états
+devices). Une position codeur ou une fréquence M3 ne sont pas comparables : le banc ne prétend pas
+prédire une valeur réelle.
+
+ℹ️ **Il n'existe volontairement aucun comparateur automatique** (décision D11) : le modèle n'est
+pas une vérité de référence, et un indicateur qui clignote à chaque transitoire finirait ignoré.
+Pour un verdict d'état machine, voir `FB_Preflight` (plan Ergonomie, à venir).
 
 ## 5. 🔚 Retour en machine réelle
 
@@ -115,7 +129,7 @@ Sert à savoir **quand basculer un domaine en réel** :
 | 5 | Vérifier `Modes.State.AnyFaultActive = FALSE` avant tout mouvement réel |
 
 ⚠️ **Avant livraison client** : `SimulationModeActive = FALSE`, les 4 domaines à `FALSE`,
-`SimShadowCompare = FALSE`, et `Network.Bypass.IhmHeartbeat` remis à `FALSE` (**T83**).
+et `Network.Bypass.IhmHeartbeat` remis à `FALSE` (**T83**).
 
 ---
 
@@ -126,6 +140,6 @@ Sert à savoir **quand basculer un domaine en réel** :
 | Un défaut contacteur ou frein en simulation | Le modèle diverge du réel — **jamais à bypasser** |
 | Un mot capteurs M3 incohérent non provoqué | Modèle de trajet ou codage croisé à revoir |
 | Un blocage sans cause affichée | Manque de diagnostic → alimente le plan Ergonomie MES |
-| Un écart `HwDelta` inexpliqué machine saine | Polarité ou câblage |
+| Un écart `HwReal` ↔ `HwSim` inexpliqué machine saine | Polarité ou câblage |
 
 📝 Consigner chaque séance dans `DOC/REGISTRE_Suivi_MiseEnService_v1.0.md`.
