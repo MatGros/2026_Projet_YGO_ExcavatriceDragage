@@ -30,29 +30,19 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
-// 🔧 REX 2026-07-16 : ex-EncoderM1_IsReal/EncoderM2_IsReal ("Conditional Bypass Doctrine") RETIRÉS — plus
-// aucun consommateur une fois le bypass Homing IHM_MANU supprimé (voir fin de fichier, ex-bloc
-// IF PRG_10_Outputs.ManuActive THEN ... HomingEncoder_M1/M2 ... END_IF).
-
-M1_RawPosToUse := COD1_PosValue;
-M2_RawPosToUse := COD2_PosValue;
+// 📄 Lot L5 : Les valeurs brutes codeurs sont lues depuis PRG_00_Inputs.HwIn.Winch
+M1_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD1_PosValue;
+M2_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD2_PosValue;
 
 // 2. TREUIL M1 (Abs → Homing → Scale)
-// 🔧 REX 2026-07-07 : Homing appelé AVANT Scale (et non l'inverse) — Scale lit HomingRefRaw en
-// entrée ; si Scale s'exécutait avant Homing, un homing réussi au cycle N ne serait répercuté
-// sur CablePosM qu'au cycle N+1, alors que instHomingM1.Busy (→ InReferencingMode côté
-// FB_Safety_Winch) retombe dès le cycle N — décalage d'1 cycle qui désynchronise le garde-fou
-// anti-transition de Méca A (bit7) et provoque un faux déclenchement PowerCutOff au cycle N+1
-// (saut de position vu hors fenêtre "référencement en cours"). Homing ne dépend d'aucune sortie
-// de Scale (RawPos vient d'instEncoderAbsM1) : aucune dépendance circulaire, réordonnancement sûr.
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
-    AlarmsIn            := COD1_Alarms,
-    WarningsIn          := COD1_Warnings,
+    AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD1_Alarms,
+    WarningsIn          := PRG_00_Inputs.HwIn.Winch.COD1_Warnings,
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational,
     PresetRequest       := instHomingM1.PresetRequest,
     PresetValue         := instHomingM1.PresetValue
@@ -101,8 +91,8 @@ instEncoderAbsM2(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
-    AlarmsIn            := COD2_Alarms,
-    WarningsIn          := COD2_Warnings,
+    AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD2_Alarms,
+    WarningsIn          := PRG_00_Inputs.HwIn.Winch.COD2_Warnings,
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     PresetRequest       := instHomingM2.PresetRequest,
     PresetValue         := instHomingM2.PresetValue
@@ -117,15 +107,15 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated <> 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
-    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
     EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,

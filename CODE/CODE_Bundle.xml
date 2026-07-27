@@ -3175,6 +3175,421 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_HardwareImage">
+        <baseType>
+          <struct>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Treuils M1/M2 + codeurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Translation M3 + variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Opérateur / Joystick / bus CAN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Sécurités/Communs Machine</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6f8e5f63-0c17-53f0-bfdd-b43b9a736035</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwMachine">
+        <baseType>
+          <struct>
+            <variable name="PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirm. contacteur puissance engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermée (coup-de-poing + contact PLC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_KoboldContactFond_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HydraulicThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique centrale hydraulique OK</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b09d9aab-fffb-5955-a0ee-fbdfe07f4a50</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwOperator">
+        <baseType>
+          <struct>
+            <variable name="JoyXRaw_ANA1">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe X (Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyYRaw_ANA2">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe Y (Levage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyBtnRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton brut joystick (Homme-Mort)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanBusState">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État bus CANopen (CANbus.GetBusState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JOY1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device JOY1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ce03b729-667a-50ae-8c74-7bdf588f937a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwTranslation">
+        <baseType>
+          <struct>
+            <variable name="M3_PosTremie_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosPV_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position point de vitesse (pré-ralentissement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP2_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP1_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosMaintenance_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M3 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_StatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status word variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle variateur AC600 (x100)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AC600_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device AC600 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>385ab449-ca64-59fe-be25-3863e9125d20</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwWinch">
+        <baseType>
+          <struct>
+            <variable name="M1_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M1 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M1 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M2 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M2 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1M2_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun M1/M2 libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_TensionedCable_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur mou de câble M2 (câble tendu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD2 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>72c8e04d-71ee-5733-9392-791d275a6b49</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_JoystickCmd">
         <baseType>
           <struct>
@@ -17863,15 +18278,32 @@ Done := FALSE;
         <interface>
           <inputVars />
           <outputVars>
+            <variable name="HwReal">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── 🏗️ FRONTIÈRE UNIQUE HW (Image matérielle brute) ────────────────────
+Image matérielle brute (acquis §0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image d'entrée consommée par tout le programme (§0bis)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EmergencyStopOk">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
-🔧 REX 2026-07-07 : précision terrain — EmergencyStopOk_DI (retour contact auxiliaire NO)
+🔧 REX 2026-07-07 : précision terrain — PowerContactorEngaged_DI (retour contact auxiliaire NO)
 est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
-PAS la boucle AU elle-même (ça, c'est EmergencyChainOK_DI, ci-dessous). Nom EmergencyStopOk
+PAS la boucle AU elle-même (ça, c'est EmergencyChainClosed_DI, ci-dessous). Nom EmergencyStopOk
 conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
 maître du programme, car "puissance réellement présente" est la garantie la plus forte.
 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴</xhtml>
@@ -18200,13 +18632,30 @@ Modifiable à chaud en vue instance, sans recompiler.</xhtml>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📥 PRG_00_Inputs — Acquisition et conditionnement des ENTRÉES (PROGRAMME)
-   ───────────────────────────────────────────────────────────────
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">══════════════════════════════════════════════════════════════════════════
+   📥 PRG_00_Inputs — ACQUISITION &amp; CONDITIONNEMENT       ⚙️ scan position 0
+   ══════════════════════════════════════════════════════════════════════════
+   §0  MATÉRIEL ──► HwReal ──► HwIn (Image matérielle unique, frontière d'entrée)
+   §1  HwIn     ──► FB_Input ──► VAR_OUTPUT  (filtre 20 ms, polarité NO/NC)
+   §2  Décodage mot capteurs M3
+   ══════════════════════════════════════════════════════════════════════════
+   🗺️ CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
+   [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
+   ┌──────────────────────────┬──────────┬─────────────────────────────────┐
+   │ EmergencyStopOk          │ [BLOQUE] │ portail maître — tout le prog.  │
+   │ TopPositionSensor        │ [BLOQUE] │ ForbidAscent M1+M2 (hors bypass)│
+   │ SlackCableSwitch         │ [BLOQUE] │ ForbidDescent M2                │
+   │ BrakeThermalFeedback     │ [ESCAL.] │ SafeStop + PowerCutOff (3 axes) │
+   │ PhaseRotationOk          │ [ESCAL.] │ SafeStop (3 axes)               │
+   │ M1/M2ThermalFeedback     │ [ESCAL.] │ SafeStop axe                    │
+   │ M1/M2/M3BrakeFeedback    │ [ESCAL.] │ Méca A/B/D si arrêt non confirmé│
+   │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
+   │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
+   └──────────────────────────┴──────────┴─────────────────────────────────┘
    📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ══════════════════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
@@ -18252,69 +18701,193 @@ IF NOT HmiCommandsInitialized THEN
     GVL_IHM.HmiInitDone := TRUE;
 END_IF;
 
-// 🛑 ─── COMMUN ────────────────────────────────────────────────────────────
-// 🧪 Simulation : chaque OR ci-dessous force le capteur à son état "sain" (famille
-// sécurité, TRUE=OK) quand SimulationModeActive ET que ce capteur précis n'est
-// pas encore câblé réellement (GVL_Simulation.Bus*/Sensor*IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md.
 
-instEmergencyStopOk(InputRaw := PowerContactorEngaged_DI, FilterTime := T#20MS);
+// ─── §0 MATÉRIEL ──► HwReal (Acquisition brute unique) ──────────────────────
+// Winch M1/M2 &amp; Codeurs
+HwReal.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased_DI;
+HwReal.Winch.M1_ThermalOk_DI          := M1_ThermalOk_DI;
+HwReal.Winch.M1_BrakeIsOpen_DI        := M1_BrakeIsOpen_DI;
+
+HwReal.Winch.M2_ContactorsReleased_DI := M2_ContactorsReleased_DI;
+HwReal.Winch.M2_ThermalOk_DI          := M2_ThermalOk_DI;
+HwReal.Winch.M2_BrakeIsOpen_DI        := M2_BrakeIsOpen_DI;
+
+HwReal.Winch.M1M2_TopPositionFree_DI  := M1M2_TopPositionFree_DI;
+HwReal.Winch.M2_TensionedCable_DI     := M2_TensionedCable_DI;
+
+HwReal.Winch.COD1_PosValue            := COD1_PosValue;
+HwReal.Winch.COD1_Alarms              := COD1_Alarms;
+HwReal.Winch.COD1_Warnings            := COD1_Warnings;
+HwReal.Winch.COD1_DeviceState         := COD1_CODEUR.GetDeviceState();
+
+HwReal.Winch.COD2_PosValue            := COD2_PosValue;
+HwReal.Winch.COD2_Alarms              := COD2_Alarms;
+HwReal.Winch.COD2_Warnings            := COD2_Warnings;
+HwReal.Winch.COD2_DeviceState         := COD2_CODEUR.GetDeviceState();
+
+// Translation M3 &amp; AC600
+HwReal.Translation.M3_PosTremie_DI      := M3_PosTremie_DI;
+HwReal.Translation.M3_PosPV_DI          := M3_PosPV_DI;
+HwReal.Translation.M3_PosP2_DI          := M3_PosP2_DI;
+HwReal.Translation.M3_PosP1_DI          := M3_PosP1_DI;
+HwReal.Translation.M3_PosMaintenance_DI := M3_PosMaintenance_DI;
+HwReal.Translation.M3_BrakeIsOpen_DI    := M3_BrakeIsOpen_DI;
+HwReal.Translation.M3_StatusWord        := M3_StatusWord;
+HwReal.Translation.M3_ActualFrequencyHz := M3_ActualFrequencyHz;
+HwReal.Translation.AC600_DeviceState    := AC600_ECAT_Drive.GetDeviceState();
+
+// Opérateur / Joystick / CANopen
+HwReal.Operator.JoyXRaw_ANA1      := JoyXRaw_ANA1;
+HwReal.Operator.JoyYRaw_ANA2      := JoyYRaw_ANA2;
+HwReal.Operator.JoyBtnRaw         := JoyBtnRaw;
+HwReal.Operator.CanBusState       := CANbus.GetBusState();
+HwReal.Operator.JOY1_DeviceState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState();
+
+// Sécurités / Communs Machine
+HwReal.Machine.PowerContactorEngaged_DI   := PowerContactorEngaged_DI;
+HwReal.Machine.EmergencyChainClosed_DI    := EmergencyChainClosed_DI;
+HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
+HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
+HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
+HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
+
+
+// ─── §0bis HwReal ──► HwIn (Passage inconditionnel frontière HwIn) ───────────
+HwIn := HwReal;
+
+
+// ─── §1 HwIn ──► FB_Input ──► VAR_OUTPUT (Conditionnement des entrées) ───────
+
+//  🔌 HwIn.Machine.PowerContactorEngaged_DI ····· câblage réel : 1 = contacteur puissance engagé
+//         └─►[ instEmergencyStopOk 🔩 ]         ← filtre anti-rebond 20 ms
+//                └─► EmergencyStopOk ··········· [BLOQUE] TRUE = puissance présente ✅ (portail maître)
+//                       └─► PRG_01..11 · FB_Safety_* · FB_Cycle · FB_Winch
+instEmergencyStopOk(InputRaw := HwIn.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
 EmergencyStopOk := instEmergencyStopOk.State;
 
-// 🔧 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC)
-instEmergencyChain(InputRaw := EmergencyChainClosed_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Machine.EmergencyChainClosed_DI ······ câblage réel : 1 = boucle AU fermée
+//         └─►[ instEmergencyChain 🔩 ]          ← filtre anti-rebond 20 ms
+//                └─► EmergencyChain ············ [BLOQUE] TRUE = boucle AU saine ✅ (précondition armement)
+//                       └─► PRG_03_Safety · PRG_06_WinchControl · PRG_11_Troubleshooting
+instEmergencyChain(InputRaw := HwIn.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
 EmergencyChain := instEmergencyChain.State;
 
-instSlackCableSwitch(InputRaw := M2_TensionedCable_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Winch.M2_TensionedCable_DI ··········· câblage réel : 1 = câble tendu (NC)
+//         └─►[ instSlackCableSwitch 🔩 ]        ← filtre anti-rebond 20 ms
+//                └─► SlackCableSwitch ·········· [BLOQUE] TRUE = câble tendu ✅ | FALSE = mou 🔴→ForbidDescent M2
+//                       └─► PRG_03_Safety (instSafetyWinchM1/M2) · PRG_11_Troubleshooting
+instSlackCableSwitch(InputRaw := HwIn.Winch.M2_TensionedCable_DI, FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
 
-instKoboldContactFond(InputRaw := M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Machine.M1_M2_KoboldContactFond_DI ·· câblage réel : 1 = contact fond détecté (NO)
+//         └─►[ instKoboldContactFond 🔩 ]       ← filtre anti-rebond 20 ms
+//                └─► KoboldContactFond ········· [BLOQUE] TRUE = fond touché ✅ → cycle figé BOTTOM_TOUCH_WAIT
+//                       └─► PRG_05_Cycle (instCycle) · PRG_09_Supervision
+instKoboldContactFond(InputRaw := HwIn.Machine.M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
 KoboldContactFond := instKoboldContactFond.State;
 
-instTopPositionSensor(InputRaw := M1M2_TopPositionFree_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Winch.M1M2_TopPositionFree_DI ········ câblage réel : 1 = fin de course libre (NC)
+//         └─►[ instTopPositionSensor 🔩 ]       ← filtre anti-rebond 20 ms
+//                └─► TopPositionSensor ········· [BLOQUE] TRUE = libre ✅ | FALSE = butée haute 🔴→ForbidAscent M1+M2
+//                       └─► PRG_02_Encoders (instHomingM1/M2) · PRG_03_Safety
+instTopPositionSensor(InputRaw := HwIn.Winch.M1M2_TopPositionFree_DI, FilterTime := T#20MS);
 TopPositionSensor := instTopPositionSensor.State;
 
-instCtrlPhaseRotation(InputRaw := PhaseRotationOk_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Machine.PhaseRotationOk_DI ··········· câblage réel : 1 = rotation phases correcte (NC)
+//         └─►[ instCtrlPhaseRotation 🔩 ]       ← filtre anti-rebond 20 ms
+//                └─► PhaseRotationOk ··········· [ESCAL.] TRUE = phases OK ✅ | FALSE = inversées 🔴→SafeStop 3 axes
+//                       └─► PRG_03_Safety (instSafetyWinchM1/M2/TranslationM3)
+instCtrlPhaseRotation(InputRaw := HwIn.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
-instBrakeThermalFeedback(InputRaw := BrakeThermalOk_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Machine.BrakeThermalOk_DI ············ câblage réel : 1 = temp. freins OK (NC, commun M1/M2/M3)
+//         └─►[ instBrakeThermalFeedback 🔩 ]    ← filtre anti-rebond 20 ms
+//                └─► BrakeThermalFeedback ····· [ESCAL.] TRUE = temp OK ✅ | FALSE = surchauffe 🔴→SafeStop+PowerCutOff
+//                       └─► PRG_03_Safety (instSafetyWinchM1/M2/TranslationM3)
+instBrakeThermalFeedback(InputRaw := HwIn.Machine.BrakeThermalOk_DI, FilterTime := T#20MS);
 BrakeThermalFeedback := instBrakeThermalFeedback.State;
 
-// 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
-instM1FwdRevSpeedFeedbackOff(InputRaw := M1_ContactorsReleased_DI, FilterTime := T#20MS);
+// 🪝 TREUIL M1
+//  🔌 HwIn.Winch.M1_ContactorsReleased_DI ······· câblage réel : 1 = tous contacteurs retombés
+//         └─►[ instM1FwdRevSpeedFeedbackOff 🔩 ]← filtre anti-rebond 20 ms
+//                └─► M1FwdRevSpeedFeedbackOff · [ESCAL.] TRUE = retombés ✅ | FALSE = contacteur collé 🔴→Méca A/C
+//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM1)
+instM1FwdRevSpeedFeedbackOff(InputRaw := HwIn.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
 M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
 
-instM1Thermal(InputRaw := M1_ThermalOk_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Winch.M1_ThermalOk_DI ················ câblage réel : 1 = temp. moteur M1 OK (NC)
+//         └─►[ instM1Thermal 🔩 ]               ← filtre anti-rebond 20 ms
+//                └─► M1ThermalFeedback ········· [ESCAL.] TRUE = temp OK ✅ | FALSE = surchauffe 🔴 (NOTE: PRG_03 inverse en "TRUE=défaut")
+//                       └─► PRG_03_Safety (instSafetyWinchM1) · PRG_09_Supervision
+instM1Thermal(InputRaw := HwIn.Winch.M1_ThermalOk_DI, FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
 
-instM1BrakeFeedback(InputRaw := M1_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+//  🔌 HwIn.Winch.M1_BrakeIsOpen_DI ·············· câblage réel : 1 = contacteur commandé = DESSERRÉ
+//         └─►[ instM1BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-09 §5bis
+//                └─► M1BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
+//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM1 Méca A/B/D/E)
+instM1BrakeFeedback(InputRaw := HwIn.Winch.M1_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
-// 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
-instM2FwdRevSpeedFeedbackOff(InputRaw := M2_ContactorsReleased_DI, FilterTime := T#20MS);
+// 🪝 TREUIL M2
+//  🔌 HwIn.Winch.M2_ContactorsReleased_DI ······· câblage réel : 1 = tous contacteurs retombés
+//         └─►[ instM2FwdRevSpeedFeedbackOff 🔩 ]← filtre anti-rebond 20 ms
+//                └─► M2FwdRevSpeedFeedbackOff · [ESCAL.] TRUE = retombés ✅ | FALSE = contacteur collé 🔴→Méca A/C
+//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM2)
+instM2FwdRevSpeedFeedbackOff(InputRaw := HwIn.Winch.M2_ContactorsReleased_DI, FilterTime := T#20MS);
 M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
 
-instM2Thermal(InputRaw := M2_ThermalOk_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Winch.M2_ThermalOk_DI ················ câblage réel : 1 = temp. moteur M2 OK (NC)
+//         └─►[ instM2Thermal 🔩 ]               ← filtre anti-rebond 20 ms
+//                └─► M2ThermalFeedback ········· [ESCAL.] TRUE = temp OK ✅ | FALSE = surchauffe 🔴 (NOTE: PRG_03 inverse en "TRUE=défaut")
+//                       └─► PRG_03_Safety (instSafetyWinchM2) · PRG_09_Supervision
+instM2Thermal(InputRaw := HwIn.Winch.M2_ThermalOk_DI, FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;
 
-instM2BrakeFeedback(InputRaw := M2_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+//  🔌 HwIn.Winch.M2_BrakeIsOpen_DI ·············· câblage réel : 1 = contacteur commandé = DESSERRÉ
+//         └─►[ instM2BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-09 §5bis
+//                └─► M2BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
+//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM2 Méca A/B/D/E)
+instM2BrakeFeedback(InputRaw := HwIn.Winch.M2_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
-// ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-instTranslationPosTremie(InputRaw := M3_PosTremie_DI, FilterTime := T#20MS);
+// ↔️ TRANSLATION M3
+//  🔌 HwIn.Translation.M3_PosTremie_DI ········· câblage réel : 1 = position trémie atteinte (NO)
+//         └─►[ instTranslationPosTremie 🔩 ]    ← filtre anti-rebond 20 ms
+//                └─► TranslationPosTremie ····· [DIAG] TRUE = en position trémie ✅
+//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
+instTranslationPosTremie(InputRaw := HwIn.Translation.M3_PosTremie_DI, FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosPV(InputRaw := M3_PosPV_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Translation.M3_PosPV_DI ············· câblage réel : 1 = zone PV atteinte (NO)
+//         └─►[ instTranslationPosPV 🔩 ]        ← filtre anti-rebond 20 ms
+//                └─► TranslationPosPV ········· [DIAG] TRUE = zone PV atteinte ✅ (pré-ralentissement Trémie)
+//                       └─► instPositionDecoder · PRG_09_Supervision
+instTranslationPosPV(InputRaw := HwIn.Translation.M3_PosPV_DI, FilterTime := T#20MS);
 TranslationPosPV := instTranslationPosPV.State;
 
-instTranslationPosP2(InputRaw := M3_PosP2_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Translation.M3_PosP2_DI ············· câblage réel : 1 = position P2 atteinte (NO)
+//         └─►[ instTranslationPosP2 🔩 ]        ← filtre anti-rebond 20 ms
+//                └─► TranslationPosP2 ········· [DIAG] TRUE = position P2 atteinte ✅
+//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
+instTranslationPosP2(InputRaw := HwIn.Translation.M3_PosP2_DI, FilterTime := T#20MS);
 TranslationPosP2 := instTranslationPosP2.State;
 
-instTranslationPosP1(InputRaw := M3_PosP1_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Translation.M3_PosP1_DI ············· câblage réel : 1 = position P1 atteinte (NO)
+//         └─►[ instTranslationPosP1 🔩 ]        ← filtre anti-rebond 20 ms
+//                └─► TranslationPosP1 ········· [DIAG] TRUE = position P1 atteinte ✅
+//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
+instTranslationPosP1(InputRaw := HwIn.Translation.M3_PosP1_DI, FilterTime := T#20MS);
 TranslationPosP1 := instTranslationPosP1.State;
 
-instTranslationPosMaintenance(InputRaw := M3_PosMaintenance_DI, FilterTime := T#20MS);
+//  🔌 HwIn.Translation.M3_PosMaintenance_DI ···· câblage réel : 1 = position service atteinte (NO)
+//         └─►[ instTranslationPosMaintenance 🔩 ]← filtre anti-rebond 20 ms
+//                └─► TranslationPosMaintenance · [DIAG] TRUE = position service atteinte ✅
+//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
+instTranslationPosMaintenance(InputRaw := HwIn.Translation.M3_PosMaintenance_DI, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
+//  🔌 ─── §2 DÉCODAGE MOT CAPTEURS M3 ──────────────────────────────────────────
 // 🆕 REX 2026-07-21 : Décodage immédiat du mot 5 capteurs position M3 (scan position 0)
 instPositionDecoder(
     SensorTremie      := TranslationPosTremie,
@@ -18324,12 +18897,16 @@ instPositionDecoder(
     SensorMaintenance := TranslationPosMaintenance
 );
 
-instM3BrakeFeedback(InputRaw := M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+//  🔌 HwIn.Translation.M3_BrakeIsOpen_DI ······· câblage réel : 1 = contacteur commandé = DESSERRÉ
+//         └─►[ instM3BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-11 §5
+//                └─► M3BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
+//                       └─► PRG_03_Safety (instSafetyTranslationM3 Méca B) · PRG_09_Supervision
+instM3BrakeFeedback(InputRaw := HwIn.Translation.M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
 
-// Retours variateur EtherCAT M3 physiques directs
-M3_ActualFrequencyHz_Filtered := M3_ActualFrequencyHz;
-M3_StatusWord_Filtered        := M3_StatusWord;
+// Retours variateur EtherCAT M3 physiques directs (recopie HwIn)
+M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+M3_StatusWord_Filtered        := HwIn.Translation.M3_StatusWord;
 </xhtml>
           </ST>
         </body>
@@ -18382,8 +18959,8 @@ M3_StatusWord_Filtered        := M3_StatusWord;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
-valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device :
-une fois pour le test logique ci-dessous, une fois pour le miroir diag brut sur les FB).
+valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device).
+📄 Lot L5 : données remises dans HwIn par PRG_00 §0.
 CANbus.GetBusState() brut</xhtml>
               </documentation>
             </variable>
@@ -18436,16 +19013,15 @@ CANbus.GetBusState() brut</xhtml>
 // === IMPLEMENTATION (corps du PROGRAM PRG_01_Diagnostics) ===
 
 
-// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 ne fait plus
-// qu'ACQUÉRIR les valeurs brutes bus (GetBusState()/GetDeviceState()) et les flags de simulation ;
-// c'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
+// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
+// depuis l'image matérielle HwIn transmise par PRG_00_Inputs.
+// C'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
-// Values lues UNE fois par cycle (variables déclarées en VAR ci-dessus), réutilisées ci-dessous.
-RawCanBusState    := CANbus.GetBusState();
-RawJoystickState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState();
-RawVariateurState := AC600_ECAT_Drive.GetDeviceState();
-RawEncoderM1State := COD1_CODEUR.GetDeviceState();
-RawEncoderM2State := COD2_CODEUR.GetDeviceState();
+RawCanBusState    := PRG_00_Inputs.HwIn.Operator.CanBusState;
+RawJoystickState  := PRG_00_Inputs.HwIn.Operator.JOY1_DeviceState;
+RawVariateurState := PRG_00_Inputs.HwIn.Translation.AC600_DeviceState;
+RawEncoderM1State := PRG_00_Inputs.HwIn.Winch.COD1_DeviceState;
+RawEncoderM2State := PRG_00_Inputs.HwIn.Winch.COD2_DeviceState;
 
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par BusJoystickIsReal UNIQUEMENT (bus/nœud),
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
@@ -18481,29 +19057,20 @@ instIhmHeartbeat(
     PlcTogglePeriod := T#500ms
 );
 
-// 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT BusJoystickSignalIsReal
-// 🔴🔧 REX 2026-07-07 — TEST BANC UNIQUEMENT, PAS DE VALEUR PRODUCTION :
-//    DeadmanRearmTimeout 10s → 5min, NeutralHoldTime 500ms → 1s (confort d'essai, moins de
-//    réappuis/traversées à gérer). ⚠️ RÉDUIT RÉELLEMENT LA SÉCURITÉ HOMME-MORT — à repasser
-//    impérativement à T#10S / T#500MS (ou retirer ces 2 lignes, le FB reprend ses défauts sûrs)
-//    avant toute mise en service réelle avec la machine.
+// 3. Acquisition Joystick — RawX/RawY/RawButton lus depuis PRG_00_Inputs.HwIn.Operator
 FB_Joystick_0(
     Enable              := TRUE,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
-    // 🆕 REX 2026-07-08 : PRG_01 (position 1) s'exécute AVANT PRG_06 (position 6) — BenneBusy lu
-    // ici reflète donc le Busy du scan PRÉCÉDENT (retard d'1 scan, ~10ms, sur la détection du front
-    // descendant). Sans impact pratique : très inférieur aux temps de réponse frein/contacteurs
-    // (100-300ms, voir FB_Brake) — la commande n'a pas le temps de produire un mouvement réel.
     BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
     NeutralXMem         := _JoystickNeutralX,
     NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP          := instDiagCanOpen.DeviceJoystick,
-    RawX                := JoyXRaw_ANA1,
-    RawY                := JoyYRaw_ANA2,
-    RawButton           := JoyBtnRaw,
+    RawX                := PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1,
+    RawY                := PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2,
+    RawButton           := PRG_00_Inputs.HwIn.Operator.JoyBtnRaw,
     BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
     InvertY             := _JoystickInvertY,       // 🔧 idem
@@ -18618,29 +19185,19 @@ FB_Joystick_0(
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
-// 🔧 REX 2026-07-16 : ex-EncoderM1_IsReal/EncoderM2_IsReal ("Conditional Bypass Doctrine") RETIRÉS — plus
-// aucun consommateur une fois le bypass Homing IHM_MANU supprimé (voir fin de fichier, ex-bloc
-// IF PRG_10_Outputs.ManuActive THEN ... HomingEncoder_M1/M2 ... END_IF).
-
-M1_RawPosToUse := COD1_PosValue;
-M2_RawPosToUse := COD2_PosValue;
+// 📄 Lot L5 : Les valeurs brutes codeurs sont lues depuis PRG_00_Inputs.HwIn.Winch
+M1_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD1_PosValue;
+M2_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD2_PosValue;
 
 // 2. TREUIL M1 (Abs → Homing → Scale)
-// 🔧 REX 2026-07-07 : Homing appelé AVANT Scale (et non l'inverse) — Scale lit HomingRefRaw en
-// entrée ; si Scale s'exécutait avant Homing, un homing réussi au cycle N ne serait répercuté
-// sur CablePosM qu'au cycle N+1, alors que instHomingM1.Busy (→ InReferencingMode côté
-// FB_Safety_Winch) retombe dès le cycle N — décalage d'1 cycle qui désynchronise le garde-fou
-// anti-transition de Méca A (bit7) et provoque un faux déclenchement PowerCutOff au cycle N+1
-// (saut de position vu hors fenêtre "référencement en cours"). Homing ne dépend d'aucune sortie
-// de Scale (RawPos vient d'instEncoderAbsM1) : aucune dépendance circulaire, réordonnancement sûr.
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
-    AlarmsIn            := COD1_Alarms,
-    WarningsIn          := COD1_Warnings,
+    AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD1_Alarms,
+    WarningsIn          := PRG_00_Inputs.HwIn.Winch.COD1_Warnings,
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational,
     PresetRequest       := instHomingM1.PresetRequest,
     PresetValue         := instHomingM1.PresetValue
@@ -18689,8 +19246,8 @@ instEncoderAbsM2(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
-    AlarmsIn            := COD2_Alarms,
-    WarningsIn          := COD2_Warnings,
+    AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD2_Alarms,
+    WarningsIn          := PRG_00_Inputs.HwIn.Winch.COD2_Warnings,
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     PresetRequest       := instHomingM2.PresetRequest,
     PresetValue         := instHomingM2.PresetValue
@@ -18705,15 +19262,15 @@ instHomingM2(
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
     Mode                 := PRG_04_Modes.instModes.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
                             AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated &lt;&gt; 3),
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence, // 🔧 REX 2026-07-07 : fusion GVL_Encoder_Stub → GVL_IHM
+    BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
     TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
     CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
-    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
+    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
     EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,
@@ -20313,10 +20870,9 @@ PRG_10_Outputs.TranslationBrakeCmd := instTranslationM3.BrakeCmd;
    ⚙️ Exécuté par la tâche PLC en position 8.
    🔧 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 "Rôle de chaque
       programme" §PRG_08) — le PLC ne commande plus casque, grille ni
-      centrale hydraulique (retiré, ex-§8 PRG_10_Outputs + ex-champs
-      GridOpenCmd/GridCloseCmd/HelmetOpenCmd/HelmetCloseCmd de ST_IHM_MANU).
-      Seul le retour thermique centrale hydraulique est conservé, remonté
-      en diagnostic IHM (aucune commande, aucun auto-démarrage).
+      centrale hydraulique. Seul le retour thermique centrale hydraulique
+      est conservé, remonté en diagnostic IHM.
+   📄 Lot L5 : Lecture depuis PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI
    ═══════════════════════════════════════════════════════════════
    📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md</xhtml>
           </documentation>
@@ -20327,7 +20883,7 @@ PRG_10_Outputs.TranslationBrakeCmd := instTranslationM3.BrakeCmd;
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
-HydraulicFaultOk := HydraulicThermalOk_DI;
+HydraulicFaultOk := PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI;
 </xhtml>
           </ST>
         </body>
@@ -23121,6 +23677,11 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
             <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
             <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+            <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
+            <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+            <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+            <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
             <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
             <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
             <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />

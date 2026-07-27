@@ -14,8 +14,8 @@ VAR
     instIhmHeartbeat : FB_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
 
     // 🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
-    // valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device :
-    // une fois pour le test logique ci-dessous, une fois pour le miroir diag brut sur les FB).
+    // valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device).
+    // 📄 Lot L5 : données remises dans HwIn par PRG_00 §0.
     RawCanBusState    : INT;          // CANbus.GetBusState() brut
     RawJoystickState  : DEVICE_STATE; // JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState() brut
     RawVariateurState : DEVICE_STATE; // AC600_ECAT_Drive.GetDeviceState() brut
@@ -26,16 +26,15 @@ END_VAR
 // === IMPLEMENTATION (corps du PROGRAM PRG_01_Diagnostics) ===
 
 
-// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 ne fait plus
-// qu'ACQUÉRIR les valeurs brutes bus (GetBusState()/GetDeviceState()) et les flags de simulation ;
-// c'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
+// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
+// depuis l'image matérielle HwIn transmise par PRG_00_Inputs.
+// C'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
-// Values lues UNE fois par cycle (variables déclarées en VAR ci-dessus), réutilisées ci-dessous.
-RawCanBusState    := CANbus.GetBusState();
-RawJoystickState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState();
-RawVariateurState := AC600_ECAT_Drive.GetDeviceState();
-RawEncoderM1State := COD1_CODEUR.GetDeviceState();
-RawEncoderM2State := COD2_CODEUR.GetDeviceState();
+RawCanBusState    := PRG_00_Inputs.HwIn.Operator.CanBusState;
+RawJoystickState  := PRG_00_Inputs.HwIn.Operator.JOY1_DeviceState;
+RawVariateurState := PRG_00_Inputs.HwIn.Translation.AC600_DeviceState;
+RawEncoderM1State := PRG_00_Inputs.HwIn.Winch.COD1_DeviceState;
+RawEncoderM2State := PRG_00_Inputs.HwIn.Winch.COD2_DeviceState;
 
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par BusJoystickIsReal UNIQUEMENT (bus/nœud),
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
@@ -71,29 +70,20 @@ instIhmHeartbeat(
     PlcTogglePeriod := T#500ms
 );
 
-// 3. Acquisition Joystick — RawX/RawY/RawButton simulés (instSimJoystick) quand NOT BusJoystickSignalIsReal
-// 🔴🔧 REX 2026-07-07 — TEST BANC UNIQUEMENT, PAS DE VALEUR PRODUCTION :
-//    DeadmanRearmTimeout 10s → 5min, NeutralHoldTime 500ms → 1s (confort d'essai, moins de
-//    réappuis/traversées à gérer). ⚠️ RÉDUIT RÉELLEMENT LA SÉCURITÉ HOMME-MORT — à repasser
-//    impérativement à T#10S / T#500MS (ou retirer ces 2 lignes, le FB reprend ses défauts sûrs)
-//    avant toute mise en service réelle avec la machine.
+// 3. Acquisition Joystick — RawX/RawY/RawButton lus depuis PRG_00_Inputs.HwIn.Operator
 FB_Joystick_0(
     Enable              := TRUE,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
-    // 🆕 REX 2026-07-08 : PRG_01 (position 1) s'exécute AVANT PRG_06 (position 6) — BenneBusy lu
-    // ici reflète donc le Busy du scan PRÉCÉDENT (retard d'1 scan, ~10ms, sur la détection du front
-    // descendant). Sans impact pratique : très inférieur aux temps de réponse frein/contacteurs
-    // (100-300ms, voir FB_Brake) — la commande n'a pas le temps de produire un mouvement réel.
     BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
     NeutralXMem         := _JoystickNeutralX,
     NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP          := instDiagCanOpen.DeviceJoystick,
-    RawX                := JoyXRaw_ANA1,
-    RawY                := JoyYRaw_ANA2,
-    RawButton           := JoyBtnRaw,
+    RawX                := PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1,
+    RawY                := PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2,
+    RawButton           := PRG_00_Inputs.HwIn.Operator.JoyBtnRaw,
     BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
     InvertY             := _JoystickInvertY,       // 🔧 idem
