@@ -12,6 +12,11 @@ FORBIDDEN = ("CoupeEnable", "FB_Watchdog")
 DOC_REF = re.compile(r"DOC/[A-Za-z0-9_./-]+\.md")
 # Détecte instFB.VarOutput :=  (écriture sur VAR_OUTPUT d'une instance)
 VAR_OUTPUT_WRITE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\.(Ready|Busy|Done|Error|ErrorId|State|StateAtError)\s*:=")
+GVL_SIMULATION_REFERENCE = re.compile(r"\bGVL_Simulation\.")
+HYBRID_SIMULATION_FORCING = re.compile(
+    r"\bOR\s*\(\s*GVL_Simulation\.[A-Za-z_][A-Za-z0-9_]*\s+AND\b",
+    re.IGNORECASE,
+)
 # W1: Homme-mort — StartStop/StartStop_Active/Direction sans DeadmanArmed
 HOMME_MORT_MISSING = re.compile(r"\b(StartStop|StartStop_Active|Direction)\s*:=\s*(?!.*DeadmanArmed)(?![^;]*DeadmanArmed)[^;]+")
 # W3: FDC coupe commande sans rampe rapide
@@ -31,21 +36,31 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
         "DeviceVariateur.Error", "DeviceEncoderM1.Error", "DeviceEncoderM2.Error",
         "DeviceVariateur.ErrorId", "DeviceEncoderM1.ErrorId", "DeviceEncoderM2.ErrorId"
     },
-    "MAIN/PRG_09_Supervision.st": {
-        "M1TreuilRetenue.Ready", "M1TreuilRetenue.Busy", "M1TreuilRetenue.Done",
-        "M1TreuilRetenue.Error", "M1TreuilRetenue.ErrorId",
-        "Encoder.Error", "Encoder.ErrorId",
-        "M2TreuilBucket.Ready", "M2TreuilBucket.Busy", "M2TreuilBucket.Done",
-        "M2TreuilBucket.Error", "M2TreuilBucket.ErrorId",
-        "Bucket.Ready", "Bucket.Busy", "Bucket.Done", "Bucket.Error", "Bucket.ErrorId",
-        "Bucket.State",
-        "Sync.Ready", "Sync.Error", "Sync.ErrorId", "Sync.State",
-        "TranslationM3.Ready", "TranslationM3.Busy", "TranslationM3.Done",
-        "TranslationM3.Error", "TranslationM3.ErrorId",
-        "Cycle.Ready", "Cycle.Busy", "Cycle.Done", "Cycle.Error", "Cycle.ErrorId",
-        "JoystickJOY1.Error", "JoystickJOY1.ErrorId"
-    }
 }
+
+SIMULATION_ALLOWED_PATHS = {
+    "CODE/MAIN/PRG_00_Inputs.st",
+    "CODE/MAIN/PRG_09_Supervision.st",
+    "CODE/MAIN/PRG_11_Troubleshooting.st",
+}
+
+
+def strip_st_comments(text: str) -> str:
+    """Replace ST comments with spaces while preserving line numbers."""
+    def blank(match: re.Match[str]) -> str:
+        return re.sub(r"[^\r\n]", " ", match.group(0))
+
+    without_blocks = re.sub(r"\(\*.*?\*\)", blank, text, flags=re.DOTALL)
+    return re.sub(r"//[^\r\n]*", blank, without_blocks)
+
+
+def line_number(text: str, position: int) -> int:
+    return text.count("\n", 0, position) + 1
+
+
+def simulation_reference_allowed(path: Path) -> bool:
+    normalized = path.as_posix()
+    return normalized.startswith("CODE/SIMULATION/") or normalized in SIMULATION_ALLOWED_PATHS
 
 
 def requires_doc_reference(path: Path) -> bool:
@@ -66,6 +81,30 @@ def main() -> int:
 
     for path in files:
         text = path.read_text(encoding="utf-8", errors="replace")
+        executable_text = strip_st_comments(text)
+
+        # L7-L8 : la simulation est confinée à la frontière HwReal/HwSim/HwIn.
+        # Les commentaires sont volontairement ignorés : seule une dépendance exécutable
+        # pourrait réintroduire une fuite dans la logique métier.
+        if not simulation_reference_allowed(path):
+            for match in GVL_SIMULATION_REFERENCE.finditer(executable_text):
+                line = line_number(text, match.start())
+                print(
+                    f"[ERROR] {path}:{line}: GVL_Simulation reference outside allowed simulation boundary",
+                    file=sys.stderr,
+                )
+                errors += 1
+
+        # C1 : ne jamais compléter une valeur réelle par un état simulé « sain ».
+        for match in HYBRID_SIMULATION_FORCING.finditer(executable_text):
+            line = line_number(text, match.start())
+            print(
+                f"[ERROR] {path}:{line}: forbidden hybrid simulation forcing "
+                "OR (GVL_Simulation.<flag> AND ...)",
+                file=sys.stderr,
+            )
+            errors += 1
+
         for token in FORBIDDEN:
             if token in text:
                 print(f"[ERROR] {path}: forbidden token {token}", file=sys.stderr)
@@ -77,6 +116,10 @@ def main() -> int:
             inst_name = m.group(1)
             var_name = m.group(2)
             key = f"{inst_name}.{var_name}"
+            line_start = text.rfind("\n", 0, m.start()) + 1
+            if text[line_start:m.start()].lstrip().startswith("GVL_IHM."):
+                # Bridge Pattern : publication de supervision, pas une écriture dans un FB.
+                continue
             rel_path = path.as_posix()
             if rel_path.startswith("CODE/"):
                 rel_path = rel_path[5:]

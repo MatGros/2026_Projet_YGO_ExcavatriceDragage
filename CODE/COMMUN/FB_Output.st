@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 FB_Output — Sortie relais + feedback (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §2
+   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §2
    🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
       transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
       appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.

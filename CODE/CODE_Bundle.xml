@@ -14871,6 +14871,609 @@ Done := FALSE;
           </data>
         </addData>
       </pou>
+      <pou name="FB_SimBench" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation globale (GVL_Simulation.SimulationModeActive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Commandes issues de l'automate (Scan N-1 / PRG_07 / PRG_10) ──────────</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-27 : les 4 contacteurs de palier participent au retour unique
+« tous contacteurs retombés » — sans eux, le modèle annonce l'arrêt alors qu'un
+palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedContactor_2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_3">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_4">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M1_PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="M1_PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M1_BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-27 : idem M1, voir ci-dessus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SpeedContactor_2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_3">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_4">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M2_PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="M2_PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M2_BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Avant, -1 = Arrière, 0 = Arrêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M3_BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_TargetNum">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible sélectionnée (0..4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_A">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais A maintenu sagement par le PLC</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_B">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais B maintenu sagement par le PLC</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion de réarmement puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimEncoderSpeedFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Stimuli &amp; Paramètres de banc ─────────────────────────────────────────</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimSyncDeviationInjectM1">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimSyncDeviationInjectM2">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimSyncDeviationOffset_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="SimM3SensorsWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimM3SensorsWord">
+              <type>
+                <BYTE />
+              </type>
+              <initialValue>
+                <simpleValue value="16#01" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRawX">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5000" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRawY">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5000" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRawButton">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimKoboldContactValue">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="BtnEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation appui coup-de-poing AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwReal">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Image réelle fallback ────────────────────────────────────────────────</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="RawPosM1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawPosM2">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire _SimEncoderRawPosM2 dans GVL_PERSISTENT</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="instSimEncoderM1">
+              <type>
+                <derived name="FB_Sim_Encoder" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Modèles sous-jacents</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instSimEncoderM2">
+              <type>
+                <derived name="FB_Sim_Encoder" />
+              </type>
+            </variable>
+            <variable name="instSimTranslation">
+              <type>
+                <derived name="FB_Sim_Translation" />
+              </type>
+            </variable>
+            <variable name="instSimJoystick">
+              <type>
+                <derived name="FB_Sim_Joystick" />
+              </type>
+            </variable>
+            <variable name="instSimSafety">
+              <type>
+                <derived name="FB_Sim_Safety" />
+              </type>
+            </variable>
+            <variable name="M1_PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculs internes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_OffsetPts">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+            <variable name="M2_OffsetPts">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+            <variable name="M3_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_ActualFreqHz">
+              <type>
+                <UINT />
+              </type>
+            </variable>
+            <variable name="M3_StatusWordSim">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
+   
+   🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
+      - FB_Sim_Encoder (instM1, instM2)
+      - FB_Sim_Translation (instTranslation)
+      - FB_Sim_Joystick (instJoystick)
+      - FB_Sim_Safety (instSafety)
+   
+   🔒 Brique réduite : 0 lecture de variable globale en interne.
+      Toutes les entrées (commandes, stimuli, HwReal) sont passées en paramètres.
+   
+   🔴 RÈGLES SÉCURITÉ ET POLARITÉ :
+      - Modèle frein M1/M2/M3 : M1_BrakeIsOpen_DI := M1_BrakeCmd (1 = OUVERT).
+        Ne JAMAIS faire NOT BrakeCmd ! (P1 Lot L6).
+      - Retours contacteurs M1/M2 : 1 = tous retombés (TRUE quand RelayFwd=0 et RelayRev=0).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    Winch       := HwReal.Winch;
+    Translation := HwReal.Translation;
+    Operator    := HwReal.Operator;
+    Machine     := HwReal.Machine;
+    RETURN;
+END_IF;
+
+
+// ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
+// Presets codeurs : déclenchés si PresetTriggerCmd = 2
+M1_PresetCmd := (M1_PresetTriggerCmd = 2);
+M2_PresetCmd := (M2_PresetTriggerCmd = 2);
+
+// Conversions d'injection d'écart synchro (0.5m -&gt; points codeur avec 8192 pts/tour, 2m/tour)
+// 1m = 4096 points codeur.
+M1_OffsetPts := REAL_TO_DINT(SimSyncDeviationOffset_M * 4096.0);
+M2_OffsetPts := REAL_TO_DINT(SimSyncDeviationOffset_M * 4096.0);
+
+// Instance modèle codeur M1
+instSimEncoderM1(
+    Enable           := TRUE,
+    RelayFwd         := M1_RelayFwd,
+    RelayRev         := M1_RelayRev,
+    SpeedRefPct      := M1_SpeedRefPct,
+    PresetCmd        := M1_PresetCmd,
+    PresetValue      := M1_PresetValueOut,
+    SpeedScaleFactor := SimEncoderSpeedFactor,
+    TestOffsetCmd    := SimSyncDeviationInjectM1,
+    TestOffsetPts    := M1_OffsetPts,
+    RawPos           := RawPosM1
+);
+
+// Instance modèle codeur M2
+instSimEncoderM2(
+    Enable           := TRUE,
+    RelayFwd         := M2_RelayFwd,
+    RelayRev         := M2_RelayRev,
+    SpeedRefPct      := M2_SpeedRefPct,
+    PresetCmd        := M2_PresetCmd,
+    PresetValue      := M2_PresetValueOut,
+    SpeedScaleFactor := SimEncoderSpeedFactor,
+    TestOffsetCmd    := SimSyncDeviationInjectM2,
+    TestOffsetPts    := M2_OffsetPts,
+    RawPos           := RawPosM2
+);
+
+// Recopie structures Winch simulées :
+// 🛑 POLARITÉ DE FREIN SIMULÉ (P1 Lot L6) : 1 = contacteur commandé = frein OUVERT.
+// Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
+Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
+// 🔧 REX 2026-07-27 : retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
+// Omettre les paliers ferait croire à l'arrêt pendant les transitoires → Méca A armée à tort.
+Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
+                                    OR M1_SpeedContactor_1 OR M1_SpeedContactor_2
+                                    OR M1_SpeedContactor_3 OR M1_SpeedContactor_4);
+Winch.M1_ThermalOk_DI          := TRUE; // Sauf panne simulée
+
+Winch.M2_BrakeIsOpen_DI        := M2_BrakeCmd;
+Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
+                                    OR M2_SpeedContactor_1 OR M2_SpeedContactor_2
+                                    OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
+Winch.M2_ThermalOk_DI          := TRUE;
+
+Winch.M1M2_TopPositionFree_DI  := TRUE; // Butée libre au repos en simu
+Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
+
+Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
+Winch.COD1_Alarms              := 0;
+Winch.COD1_Warnings            := 0;
+Winch.COD1_DeviceState         := 4; // DEVICE_STATE RUNNING = 4 (bus OK)
+
+Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
+Winch.COD2_Alarms              := 0;
+Winch.COD2_Warnings            := 0;
+Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
+
+
+// ── 2. MODÈLE TRANSLATION M3 (AC600) ─────────────────────────────────────────
+M3_RelayFwd := (M3_Direction = 1);
+M3_RelayRev := (M3_Direction = -1);
+
+instSimTranslation(
+    Enable      := TRUE,
+    TargetNum   : = M3_TargetNum,
+    RelayFwd    := M3_RelayFwd,
+    RelayRev    := M3_RelayRev,
+    TravelTimeS := 8.0,
+    PVLeadTimeS := 2.0
+);
+
+// Remplissage capteurs de position M3 :
+IF SimM3SensorsWordActive THEN
+    Translation.M3_PosTremie_DI      := SimM3SensorsWord.0;
+    Translation.M3_PosPV_DI          := SimM3SensorsWord.1;
+    Translation.M3_PosP2_DI          := SimM3SensorsWord.2;
+    Translation.M3_PosP1_DI          := SimM3SensorsWord.3;
+    Translation.M3_PosMaintenance_DI := SimM3SensorsWord.4;
+ELSE
+    Translation.M3_PosTremie_DI      := instSimTranslation.PosTremie;
+    Translation.M3_PosPV_DI          := instSimTranslation.PosPV;
+    Translation.M3_PosP2_DI          := instSimTranslation.PosP2;
+    Translation.M3_PosP1_DI          := instSimTranslation.PosP1;
+    Translation.M3_PosMaintenance_DI := instSimTranslation.PosMaintenance;
+END_IF;
+
+// Polarité frein M3 (1 = OUVERT)
+Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
+
+// Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -&gt; 16#0081
+IF (M3_Direction &lt;&gt; 0) THEN
+    M3_StatusWordSim := 16#0087; // + Operating/Running
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
+ELSE
+    M3_StatusWordSim := 16#0081;
+    M3_ActualFreqHz  := 0;
+END_IF;
+
+Translation.M3_StatusWord        := M3_StatusWordSim;
+Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
+Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
+
+
+// ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
+instSimJoystick(
+    Enable     := TRUE,
+    NeutralRaw := 5000,
+    MaxRaw     := 10000
+);
+
+// Permet aux stimuli de banc de surcharger le retour du joystick si spécifié :
+IF SimJoystickRawX &lt;&gt; 5000 THEN
+    Operator.JoyXRaw_ANA1 := SimJoystickRawX;
+ELSE
+    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+END_IF;
+
+IF SimJoystickRawY &lt;&gt; 5000 THEN
+    Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+ELSE
+    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+END_IF;
+
+IF SimJoystickRawButton THEN
+    Operator.JoyBtnRaw := TRUE;
+ELSE
+    Operator.JoyBtnRaw := instSimJoystick.RawButton;
+END_IF;
+
+Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
+Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
+
+
+// ── 4. MODÈLE SÉCURITÉ &amp; COMMUNS MACHINE ─────────────────────────────────────
+instSimSafety(
+    Enable           := TRUE,
+    PowerCutOff_A    := PowerKeepAlive_A,
+    PowerCutOff_B    := PowerKeepAlive_B,
+    EmergencyArming  := EmergencyArming_RQ,
+    BtnEmergencyStop := BtnEmergencyStop
+);
+
+Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
+Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
+Machine.PhaseRotationOk_DI         := TRUE;
+Machine.BrakeThermalOk_DI          := TRUE;
+Machine.M1_M2_KoboldContactFond_DI := SimKoboldContactValue;
+Machine.HydraulicThermalOk_DI      := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Sim_Encoder" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -18287,6 +18890,14 @@ Done := FALSE;
 Image matérielle brute (acquis §0)</xhtml>
               </documentation>
             </variable>
+            <variable name="HwSim">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image produite par le banc (observation uniquement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="HwIn">
               <type>
                 <derived name="ST_HardwareImage" />
@@ -18602,6 +19213,14 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <derived name="FB_Input" />
               </type>
             </variable>
+            <variable name="instSimBench">
+              <type>
+                <derived name="FB_SimBench" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Instance de simulation banc d'essai (Lot L6)</xhtml>
+              </documentation>
+            </variable>
             <variable name="HmiCommandsInitialized">
               <type>
                 <BOOL />
@@ -18635,11 +19254,12 @@ Modifiable à chaud en vue instance, sans recompiler.</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">══════════════════════════════════════════════════════════════════════════
    📥 PRG_00_Inputs — ACQUISITION &amp; CONDITIONNEMENT       ⚙️ scan position 0
    ══════════════════════════════════════════════════════════════════════════
-   §0  MATÉRIEL ──► HwReal ──► HwIn (Image matérielle unique, frontière d'entrée)
-   §1  HwIn     ──► FB_Input ──► VAR_OUTPUT  (filtre 20 ms, polarité NO/NC)
+   §0  MATÉRIEL ──► HwReal (Acquisition brute unique)
+   §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine)
+   §1  HwIn     ──► FB_Input ──► VAR_OUTPUT (Filtre 20 ms, polarité NO/NC)
    §2  Décodage mot capteurs M3
    ══════════════════════════════════════════════════════════════════════════
-   🗺️ CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
+   MAP CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
    [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
    ┌──────────────────────────┬──────────┬─────────────────────────────────┐
    │ EmergencyStopOk          │ [BLOQUE] │ portail maître — tout le prog.  │
@@ -18752,8 +19372,66 @@ HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
 HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
 
 
-// ─── §0bis HwReal ──► HwIn (Passage inconditionnel frontière HwIn) ───────────
-HwIn := HwReal;
+// ─── §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine) ────
+instSimBench(
+    Enable                   := GVL_Simulation.SimulationModeActive,
+    M1_RelayFwd              := PRG_10_Outputs.M1RelayFwd,
+    M1_RelayRev              := PRG_10_Outputs.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_10_Outputs.M1SpeedContactor1,   // 🔧 REX 2026-07-27 : paliers
+    M1_SpeedContactor_2      := PRG_10_Outputs.M1SpeedContactor2,   // inclus dans le retour unique
+    M1_SpeedContactor_3      := PRG_10_Outputs.M1SpeedContactor3,   // « tous contacteurs retombés »
+    M1_SpeedContactor_4      := PRG_10_Outputs.M1SpeedContactor4,
+    M1_SpeedRefPct           := PRG_06_WinchControl.M1_SpeedRef_Active,
+    M1_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd,
+    M1_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut,
+    M1_BrakeCmd              := PRG_10_Outputs.M1BrakeCmd,
+    M2_RelayFwd              := PRG_10_Outputs.M2RelayFwd,
+    M2_RelayRev              := PRG_10_Outputs.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_10_Outputs.M2SpeedContactor1,   // 🔧 REX 2026-07-27 : idem M1
+    M2_SpeedContactor_2      := PRG_10_Outputs.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_10_Outputs.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_10_Outputs.M2SpeedContactor4,
+    M2_SpeedRefPct           := PRG_06_WinchControl.M2_SpeedRef_Active,
+    M2_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd,
+    M2_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut,
+    M2_BrakeCmd              := PRG_10_Outputs.M2BrakeCmd,
+    M3_Direction             := PRG_07_TranslationControl.M3_Direction_Active,
+    M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
+    M3_BrakeCmd              := PRG_10_Outputs.TranslationBrakeCmd,
+    M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
+    PowerKeepAlive_A         := PRG_10_Outputs.PowerCutOff_A,
+    PowerKeepAlive_B         := PRG_10_Outputs.PowerCutOff_B,
+    EmergencyArming_RQ       := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
+    SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
+    SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
+    SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
+    SimM3SensorsWordActive   := GVL_Simulation.SimM3SensorsWordActive,
+    SimM3SensorsWord         := GVL_Simulation.SimM3SensorsWord,
+    SimJoystickRawX          := GVL_Simulation.SimJoystickRawX,
+    SimJoystickRawY          := GVL_Simulation.SimJoystickRawY,
+    SimJoystickRawButton     := GVL_Simulation.SimJoystickRawButton,
+    SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
+    BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
+    HwReal                   := HwReal,
+    RawPosM1                 := _SimEncoderRawPosM1,
+    RawPosM2                 := _SimEncoderRawPosM2
+);
+
+// 🧪 Image du banc exposée pour lecture côte à côte ; aucune logique métier ne lit HwSim.
+HwSim.Winch       := instSimBench.Winch;
+HwSim.Translation := instSimBench.Translation;
+HwSim.Operator    := instSimBench.Operator;
+HwSim.Machine     := instSimBench.Machine;
+
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive
+    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
+    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwReal.Translation; END_IF;
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive
+    THEN HwIn.Operator := instSimBench.Operator;       ELSE HwIn.Operator := HwReal.Operator;       END_IF;
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
+    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwReal.Machine;         END_IF;
 
 
 // ─── §1 HwIn ──► FB_Input ──► VAR_OUTPUT (Conditionnement des entrées) ───────
@@ -21022,85 +21700,8 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
 
-// 🔴 REX 2026-07-07 : au moins un défaut actif dans le domaine couvert par FaultMachineReset_IHM
-// (même périmètre exact que les 17 blocs alimentés par ce reset — voir bandeau en tête de fichier).
-// Sert à savoir, côté IHM, quand un appui sur BtnFaultReset est utile/attendu.
-GVL_IHM.Modes.State.AnyFaultActive :=
-       PRG_01_Diagnostics.instDiagCanOpen.Error
-    OR PRG_01_Diagnostics.instDiagEthercat.Error
-    OR PRG_01_Diagnostics.FB_Joystick_0.Error
-    OR (NOT PRG_04_Modes.instModes.InhibitM1 AND (
-           PRG_02_Encoders.instEncoderAbsM1.Error
-        OR PRG_02_Encoders.instHomingM1.Error
-        OR PRG_02_Encoders.instEncoderSafetyM1.Error
-        OR PRG_03_Safety.instSafetyWinchM1.Error
-        OR PRG_06_WinchControl.instWinchM1.Error
-    ))
-    OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (
-           PRG_02_Encoders.instEncoderAbsM2.Error
-        OR PRG_02_Encoders.instHomingM2.Error
-        OR PRG_02_Encoders.instEncoderSafetyM2.Error
-        OR PRG_03_Safety.instSafetyWinchM2.Error
-        OR PRG_06_WinchControl.instWinchM2.Error
-    ))
-    OR PRG_03_Safety.instSafetyTranslationM3.Error
-    OR PRG_06_WinchControl.instWinchSync.Error
-    OR PRG_06_WinchControl.instBucket.Error
-    OR PRG_07_TranslationControl.instTranslationM3.Error
-    OR PRG_10_Outputs.RedundancyTestFailed
-    OR PRG_10_Outputs.EmergencyArmingFailed;
 
-// 🧨 REX 2026-07-07 : remontée IHM de la coupure puissance amont — polarité "alarme" (TRUE=
-// problème), PAS celle de PowerCutOff_A_RQ (qui est en fail-safe maintenu, TRUE=OK depuis
-// l'inversion de polarité). On relit directement les .PowerCutOff sources, pas la sortie physique.
-GVL_IHM.Modes.State.PowerCutOffActive := PRG_03_Safety.instSafetyWinchM1.PowerCutOff
-                                 OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
-                                 OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff
-                                 OR GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
-
-// 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 — signal UNIQUE (1 seul fil, pas de sens à
-// le dupliquer par axe), remonté une seule fois au niveau global GVL_IHM (même principe que
-// TopPositionSensorActive ci-dessus, PAS dans WinchM1/WinchM2/Translation).
-GVL_IHM.Commun.BrakeThermalFault := NOT PRG_00_Inputs.BrakeThermalFeedback;
-GVL_IHM.Commun.PhaseRotationFault := NOT PRG_00_Inputs.PhaseRotationOk; // 🆕 REX 2026-07-08 — commun M1/M2/M3, invisible IHM avant
-GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_08_AuxiliaryControl.HydraulicFaultOk; // 🆕 REX 2026-07-18 — diagnostic seul, aucune commande PLC
-
-// 💓 Heartbeat IHM↔PLC — le toggle IHM est lu directement en PRG_01 ; ici, on publie
-// les diagnostics calculés au même scan pour l'affichage et l'historisation IHM.
-GVL_IHM.Commun.TglHeartbeatPlc  := PRG_01_Diagnostics.instIhmHeartbeat.TglHeartbeatPlc;
-GVL_IHM.Commun.HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk;
-GVL_IHM.Commun.HeartbeatIhmTimeout := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmTimeout;
-GVL_IHM.Commun.HeartbeatIhmElapsed := PRG_01_Diagnostics.instIhmHeartbeat.TimeSinceIhmEdge;
-
-// 🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
-// EmergencyArmingBusy couvre TOUTE la séquence (auto-test A/B + pulse + confirmation + verrouillage),
-// pas seulement le pulse — ArmingSeqStep&lt;&gt;0 englobe déjà tout sauf le verrouillage final.
-GVL_IHM.Modes.State.EmergencyChainOk    := PRG_00_Inputs.EmergencyChain;
-GVL_IHM.Modes.State.PowerContactorOk    := PRG_00_Inputs.EmergencyStopOk;
-GVL_IHM.Modes.State.EmergencyArmingBusy := (PRG_10_Outputs.ArmingSeqStep &lt;&gt; 0) OR PRG_10_Outputs.EmergencyArmingLockoutActive;
-GVL_IHM.Modes.State.EmergencyArmable    := PRG_00_Inputs.EmergencyChain
-                                    AND (PRG_10_Outputs.ArmingSeqStep = 0)
-                                    AND NOT PRG_10_Outputs.EmergencyArmingLockoutActive
-                                    AND NOT PRG_10_Outputs.RedundancyTestFailed;
-GVL_IHM.Modes.State.RedundancyTestFailed := PRG_10_Outputs.RedundancyTestFailed;
-GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs.EmergencyArmingFailed;
-
-// 🔧 REX 2026-07-07 : ancien pont IF/ELSIF vers GVL_Encoder_Stub supprimé (bugué — ne pouvait
-// homer qu'un seul treuil à la fois). GVL_IHM.M1TreuilRetenue/M2.BtnHome sont désormais câblés
-// directement dans PRG_02_Encoders.st (instHomingM1/M2.Home) — homing simultané possible.
-
-// ℹ️ BtnCalibrate joystick : lu directement depuis GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate dans PRG_01_Diagnostics (ligne 48)
-
-
-// ── 2. INITIALISATION IHM DEPUIS GVL_PERSISTENT (Boot) ───────────────────
-// 🐛 FIX 2026-07-23 : sentinelles `= 0.0` remplacées par un flag `Initialized`/`CfgInitialized`
-// dédié (défaut FALSE non ambigu). L'ancienne sentinelle `CfgTopSensorPos_M = 0.0` ne se
-// déclenchait JAMAIS (défaut struct réel = 8.5, ST_WinchCfg.st) → ce bloc M1/M2 ne s'exécutait
-// plus après un reset RETAIN (ex. changement de struct ST_*HMI, comme lors de cette session) et
-// TOUTE la config (paliers, rampes, limites câble, synchro...) retombait au défaut struct brut
-// sans jamais se resynchroniser depuis le vrai PERSISTENT. Idem pour `Sync.CfgSyncTolerance_M`
-// (défaut réel 0.25, piège documenté REX 2026-07-08 (5) ci-dessous, désormais clos).
-// 📄 Voir DOC/AF_Partie-07_Interface_IHM_v1.8.md.
+// ── 2. BRIDGES ET PERSISTANCE CONFIG (Restauration automatique) ────────────
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
 IF instCfgPersistBridgeWinchM1.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
@@ -21172,48 +21773,25 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
-IF NOT GVL_IHM.Network.Bypass.Initialized THEN
-    IF BypassNetworkGlobal THEN
-        GVL_IHM.Network.Bypass.Global := TRUE;
-    END_IF;
-    GVL_IHM.Network.Bypass.Initialized := TRUE;
+// Sauvegarde synchrone vers les variables RETAIN si modifiées côté IHM
+IF GVL_IHM.TranslationM3.Bypass.Global &lt;&gt; BypassTranslationGlobal THEN
+    BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
 END_IF;
-
-IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
-    IF BypassSyncGlobal THEN
-        GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
-    END_IF;
-    GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
+IF GVL_IHM.M1TreuilRetenue.Bypass.Global &lt;&gt; BypassWinchM1Global THEN
+    BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 END_IF;
-
-IF NOT GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized THEN
-    IF BypassBucketGlobal THEN
-        GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global := TRUE;
-    END_IF;
-    GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized := TRUE;
+IF GVL_IHM.M2TreuilBenne.Bypass.Global &lt;&gt; BypassWinchM2Global THEN
+    BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
 END_IF;
 
 
-// ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
-// 🐛 FIX 2026-07-23 : chaque bloc ci-dessous est désormais gardé par le flag `Cfg.Initialized`/
-// `Sync.CfgInitialized` posé en §2 — défense en profondeur : même si l'ordre du fichier changeait
-// un jour, on ne peut plus écraser le vrai PERSISTENT avec une valeur GVL_IHM fraîchement
-// resettée au défaut struct AVANT que la restauration (§2) ait eu lieu. Revue sécurité 2026-07-23.
-// 🌐 Sauvegarde des bypass RETAIN (survit au warm restart / download)
-BypassTranslationGlobal     := GVL_IHM.TranslationM3.Bypass.Global;
-BypassWinchM1Global         := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-BypassWinchM2Global         := GVL_IHM.M2TreuilBenne.Bypass.Global;
-BypassSyncGlobal            := GVL_IHM.M1M2Sync.Bypass.Global;
-BypassNetworkGlobal         := GVL_IHM.Network.Bypass.Global;
-BypassBucketGlobal          := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global;
-
-// 🎯 Sauvegarde ciblée Translation M3 : uniquement SetFreq_Hz, jamais les commandes IHM.
-IF GVL_IHM.TranslationM3.Cmd.Initialized THEN
-    _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
-END_IF;
+// ── 3. CALCULS ET ÉTATS COMMUNS POUR L'IHM ────────────────────────────────
+GVL_IHM.M1TreuilRetenue.State.TopPositionSensorActive := NOT PRG_00_Inputs.TopPositionSensor;
+GVL_IHM.M2TreuilBenne.State.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
+GVL_IHM.M2TreuilBenne.State.SlackCableActive          := NOT PRG_00_Inputs.SlackCableSwitch;
 
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
-// (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
+// (la limite légale s'lique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
                                             AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M))
                                                  OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
@@ -21222,14 +21800,12 @@ GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md) ──────
-// 🔧 REX (session Bypass) : structs Bypass dedies par metier (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-// — ContactorFeedback reste par axe (materiel propre a chaque treuil/translation), SlackCable et
-// TopPositionSensor passent dans Commun.Bypass (capteur physique UNIQUE partage M1/M2, plus de duplication).
-GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := FALSE;
-GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback := FALSE;
-GVL_IHM.TranslationM3.Bypass.ContactorFeedback := FALSE;
-GVL_IHM.Commun.Bypass.SlackCable        := FALSE;
-GVL_IHM.Commun.Bypass.TopPositionSensor := FALSE;
+// 📄 Lot L6 : Ré-alimentation des miroirs IHM depuis l'état effectif de simulation (SimulationModeActive AND Sim&lt;Domaine&gt;Active)
+GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
@@ -21242,8 +21818,6 @@ GVL_IHM.M1TreuilRetenue.State.SpeedStable             := PRG_03_Safety.instSpeed
 GVL_IHM.M1TreuilRetenue.State.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM1.Error;
 GVL_IHM.M1TreuilRetenue.State.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM1.ErrorId;
 GVL_IHM.M1TreuilRetenue.State.EstimatedLoadPct          := PRG_03_Safety.instLoadEstimatorM1.EstimatedLoadPct;
-GVL_IHM.M1TreuilRetenue.State.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM1.Configured;
-GVL_IHM.M1TreuilRetenue.State.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM1.SpeedGuardLimited;
 GVL_IHM.M1TreuilRetenue.State.SpeedRef_Pct               := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
 GVL_IHM.M1TreuilRetenue.State.StepNumber               := PRG_06_WinchControl.instWinchM1.StepNumber;
 GVL_IHM.M1TreuilRetenue.State.FBState                  := PRG_06_WinchControl.instWinchM1.State;
@@ -21274,8 +21848,8 @@ GVL_IHM.M1TreuilRetenue.Safety.ForbidAscent      := PRG_03_Safety.instSafetyWinc
 GVL_IHM.M1TreuilRetenue.Safety.SlackCable        := NOT PRG_00_Inputs.SlackCableSwitch;
 GVL_IHM.M1TreuilRetenue.Safety.ThermalFault      := NOT PRG_00_Inputs.M1ThermalFeedback;
 GVL_IHM.M1TreuilRetenue.Safety.EncoderFault      := (NOT PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable OR PRG_02_Encoders.instEncoderSafetyM1.EncoderIncoherent)
-                                                    AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global
-                                                    AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;
+                                                  AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global
+                                                  AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;
 GVL_IHM.M1TreuilRetenue.Safety.BypassActive      := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
                                                      AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.Safety.CableLimitDescent := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) &lt;&gt; 16#0000;
@@ -21309,8 +21883,6 @@ GVL_IHM.M2TreuilBenne.State.SpeedStable             := PRG_03_Safety.instSpeedMo
 GVL_IHM.M2TreuilBenne.State.SpeedMonitorError        := PRG_03_Safety.instSpeedMonitorM2.Error;
 GVL_IHM.M2TreuilBenne.State.SpeedMonitorErrorId      := PRG_03_Safety.instSpeedMonitorM2.ErrorId;
 GVL_IHM.M2TreuilBenne.State.EstimatedLoadPct          := PRG_03_Safety.instLoadEstimatorM2.EstimatedLoadPct;
-GVL_IHM.M2TreuilBenne.State.LoadEstimateConfigured   := PRG_03_Safety.instLoadEstimatorM2.Configured;
-GVL_IHM.M2TreuilBenne.State.SpeedGuardLimited        := PRG_06_WinchControl.instWinchM2.SpeedGuardLimited;
 GVL_IHM.M2TreuilBenne.State.SpeedRef_Pct               := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
 GVL_IHM.M2TreuilBenne.State.StepNumber               := PRG_06_WinchControl.instWinchM2.StepNumber;
 GVL_IHM.M2TreuilBenne.State.FBState                  := PRG_06_WinchControl.instWinchM2.State;
@@ -21442,6 +22014,7 @@ GVL_IHM.TranslationM3.Safety.ErrorLimitSwitch    := PRG_03_Safety.instSafetyTran
 GVL_IHM.TranslationM3.Safety.ErrorSensorIncoherent:= PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 GVL_IHM.TranslationM3.Safety.SafeStop          := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.Safety.PowerCutOff       := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+
 GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7;
 GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
@@ -23093,10 +23666,10 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — 🆕 REX 2026-07-22 : défaut FALSE (machine réelle) ; TRUE = tout simulé d'un coup</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — rien n'est simulé si FALSE (machine réelle)</xhtml>
           </documentation>
         </variable>
-        <variable name="BusVariateurM3IsReal">
+        <variable name="SimWinchActive">
           <type>
             <BOOL />
           </type>
@@ -23104,11 +23677,11 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">── Devices bus de terrain (EtherCAT/CANopen) — 1:1 avec les devices réels ──
-AC600 EtherCAT (translation M3)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Activation par domaine (simulé si SimulationModeActive AND Sim&lt;Domaine&gt;Active)
+M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xhtml>
           </documentation>
         </variable>
-        <variable name="BusEncoderM1IsReal">
+        <variable name="SimTranslationActive">
           <type>
             <BOOL />
           </type>
@@ -23116,10 +23689,10 @@ AC600 EtherCAT (translation M3)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">COD1 EtherCAT</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">AC600 : StatusWord/fréquence, 5 capteurs, frein M3</xhtml>
           </documentation>
         </variable>
-        <variable name="BusEncoderM2IsReal">
+        <variable name="SimOperatorActive">
           <type>
             <BOOL />
           </type>
@@ -23127,10 +23700,10 @@ AC600 EtherCAT (translation M3)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">COD2 EtherCAT</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick : bus CANopen + RawX/RawY/Button</xhtml>
           </documentation>
         </variable>
-        <variable name="BusJoystickIsReal">
+        <variable name="SimMachineActive">
           <type>
             <BOOL />
           </type>
@@ -23138,10 +23711,10 @@ AC600 EtherCAT (translation M3)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">CANopen JOY1 — bus/nœud (CanOnline/CanOperational)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU, contacteur puissance, réarmement, phases, thermiques freins/hydraulique, Kobold</xhtml>
           </documentation>
         </variable>
-        <variable name="BusJoystickSignalIsReal">
+        <variable name="SimM3SensorsWordActive">
           <type>
             <BOOL />
           </type>
@@ -23149,252 +23722,83 @@ AC600 EtherCAT (translation M3)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (demande utilisateur) : granularité séparée du bus ci-dessus — permet de
-câbler le joystick réel (signal analogique/CAN brut RawX/RawY/RawButton) tout en laissant le
-bus/nœud CANopen (BusJoystickIsReal) simulé sain, pour tester le joystick physique avant que le
-diagnostic CANopen/EtherCAT ne soit fiabilisé (sans faux défaut CAN pendant ce test).
-Signal joystick brut (RawX/RawY/RawButton uniquement)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖐️ Stimuli de banc — ENTRÉES du modèle, jamais des forçages du programme</xhtml>
           </documentation>
         </variable>
-        <variable name="BusIhmHeartbeatIsReal">
+        <variable name="SimM3SensorsWord">
           <type>
-            <BOOL />
+            <BYTE />
           </type>
           <initialValue>
-            <simpleValue value="FALSE" />
+            <simpleValue value="16#01" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Heartbeat IHM Ethernet : FALSE = heartbeat simulé par GVL_Global.BlinkClock</xhtml>
-          </documentation>
         </variable>
-        <variable name="SensorEmergencyStopChainIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">── Capteurs/retours câblés (I/O discrètes, indépendantes du bus) ──────────
-Chaîne AU câblée (EmergencyStopOk_DI)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorTopPositionIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course haut commun M1/M2</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorSlackCableIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Mou de câble M2</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorPhaseRotationIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorM1ThermalIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorM2ThermalIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorBrakeThermalIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : thermique frein COMMUN M1/M2/M3 (1 seul fil)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorM1ContactorFeedbackIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs (sens + frein) treuil M1</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorM2ContactorFeedbackIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs (sens + frein) treuil M2</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorM3ContactorFeedbackIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur (sens + frein) translation M3</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorTranslationPositionIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteurs Trémie/PV/P2/P1/Maintenance</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorKoboldContactFondIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contact fond Kobold (%IX0.5)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SensorHydraulicThermalIsReal">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : thermique centrale hydraulique (PRG_08_AuxiliaryControl)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TstJoystickForceNeutralRaw">
+        <variable name="SimJoystickRawX">
           <type>
             <INT />
           </type>
           <initialValue>
             <simpleValue value="5000" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">── Utilitaires banc d'essai (sans préfixe DBG_) ───────────────────────────
-Simule le retour au centre (RawX/RawY)</xhtml>
-          </documentation>
         </variable>
-        <variable name="TstJoystickForceMaxRaw">
+        <variable name="SimJoystickRawY">
           <type>
             <INT />
           </type>
           <initialValue>
-            <simpleValue value="10000" />
+            <simpleValue value="5000" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule une consigne à fond</xhtml>
-          </documentation>
         </variable>
-        <variable name="SimKoboldContactFondValue">
+        <variable name="SimJoystickRawButton">
           <type>
             <BOOL />
           </type>
           <initialValue>
             <simpleValue value="FALSE" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation du contact fond Kobold</xhtml>
-          </documentation>
         </variable>
-        <variable name="TstEncoderSpeedFactor">
+        <variable name="SimKoboldContactValue">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+        </variable>
+        <variable name="SimEncoderSpeedFactor">
           <type>
             <REAL />
           </type>
           <initialValue>
-            <simpleValue value="3" />
+            <simpleValue value="1" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 : confort de test banc — accélère le déplacement des codeurs simulés
-(FB_Sim_Encoder). 1.0 = comportement d'origine. Réglable à chaud, sans recompiler.
-Sans rapport avec une calibration réelle — reste à 1.0 hors essais bancs.</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Remis à 1.0 (défaut nominal)</xhtml>
           </documentation>
         </variable>
-        <variable name="TstInjectSyncDeviationM1">
+        <variable name="SimSyncDeviationInjectM1">
           <type>
             <BOOL />
           </type>
           <initialValue>
             <simpleValue value="FALSE" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — test banc : injecte un VRAI saut de position dans le compteur codeur
-simulé (front montant), comme un glissement mécanique réel — pas un offset artificiel figé.
-Permet de tester Concept 1 (arrêt rampe normale, écart mineur), Méca E (écart critique) ET
-le rattrapage au joystick (SyncEnable=FALSE → bouger le treuil décalé → SyncEnable=TRUE),
-puisque c'est une vraie position simulée, pas un overlay — le rattrapage la résorbe réellement.
-Front montant = applique le saut sur M1</xhtml>
-          </documentation>
         </variable>
-        <variable name="TstInjectSyncDeviationM2">
+        <variable name="SimSyncDeviationInjectM2">
           <type>
             <BOOL />
           </type>
           <initialValue>
             <simpleValue value="FALSE" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant = applique le saut sur M2</xhtml>
-          </documentation>
         </variable>
-        <variable name="TstSyncDeviationOffsetM">
+        <variable name="SimSyncDeviationOffset_M">
           <type>
             <REAL />
           </type>
           <initialValue>
             <simpleValue value="0.5" />
           </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Amplitude du saut (m) — &gt; WinchSyncTolerance_M (0.25) 🔧 REX 2026-07-08 (5)</xhtml>
-          </documentation>
         </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -23408,34 +23812,11 @@ Front montant = applique le saut sur M1</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 GVL_Simulation — Bit maître + granularité par device (remplace GVL_DEBUG)
+   🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
-   🎯 Rôle : le matériel réel (bus EtherCAT/CANopen, capteurs, contacteurs) n'étant
-      pas disponible pour les essais, toute la machine doit pouvoir tourner en
-      simulation CODESYS. Modèle hiérarchique :
-        - `SimulationModeActive` = bit maître. `FALSE` (défaut depuis REX 2026-07-22) =
-          machine réelle par défaut ; `TRUE` = TOUS les devices simulés d'un coup
-          (bascule globale banc d'essai, plus l'état courant par défaut).
-        - Un booléen `Bus&lt;Device&gt;IsReal`/`Sensor&lt;Device&gt;IsReal` par device/capteur permet
-          de sortir CE device précis de la simulation un par un, au fur et à mesure du
-          recâblage réel en mise en service — SANS modifier le code.
-      État effectif "ce device est simulé" = `SimulationModeActive AND NOT &lt;Device&gt;IsReal`.
-   🔧 REMPLACE `GVL_DEBUG.st` (6 flags indépendants ajoutés au coup par coup).
-   🆕 REX 2026-07-22 : `BusJoystickIsReal`, `BusVariateurM3IsReal`, `BusEncoderM1/M2IsReal`
-      et `BusIhmHeartbeatIsReal` pilotent maintenant SEULS le bypass diagnostic (Online/
-      Operational/heartbeat) dans PRG_01_Diagnostics.st — DÉCOUPLÉS de `SimulationModeActive`.
-      Objectif : garder ces bus/communication bypassables un par un même simulation
-      globale coupée (banc sans IHM/CANopen/EtherCAT câblés). Les AUTRES devices
-      (position codeur simulée, signaux joystick, capteurs, contacteurs, chaîne AU…)
-      restent gardés par le bit maître comme avant.
-   ⚠️ TOUJOURS repasser chaque `Bus*IsReal` diag (Joystick/VariateurM3/EncoderM1/EncoderM2/
-      IhmHeartbeat) à `TRUE` au fur et à mesure du recâblage réel — ils ne suivent plus
-      `SimulationModeActive`. Pour le reste des devices, `SimulationModeActive := FALSE`
-      bascule tout d'un coup (ou `*IsReal` un par un, sans toucher au bit maître).
-   📛 Convention nommage (session Bypass, voir DOC/NAMING_CONVENTION.md) :
-      `Bus` = device bus de terrain, `Sensor` = capteur/retour câblé, `Sim` = valeur simulée
-      calculée, `Tst` = outil/commande de test banc.
+   📄 Lot L6 : Refonte à 5 flags principaux (1 bit maître + 4 domaines)
+   🎯 Polarité positive : TRUE = simulé, FALSE = réel (par défaut).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
@@ -23618,6 +23999,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
         </Folder>
         <Folder Name="SIMULATION">
+          <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />

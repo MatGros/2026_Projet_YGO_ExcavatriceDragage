@@ -4,6 +4,8 @@
 
 > Projet : **Excavatrice de dragage** — Automate CODESYS 3.5
 > Périmètre : automatisme + analyse fonctionnelle (IHM hors scope)
+> **Mise à jour 2026-07-27** — noms E/S alignés : `PowerContactorEngaged_DI`,
+> `EmergencyChainClosed_DI`, `PowerKeepAlive_A_RQ` / `PowerKeepAlive_B_RQ`.
 > **v1.6** — Alignment on latest changes (2026-07-08): Arming sequence safety (cannot start if contactor already closed) and arming failure detection (`EmergencyArmingFailed` active after 2s confirmation timeout).
 > **v1.5** — Retour terrain 2026-07-07 : refonte complète de la section **§Sécurité électrique**.
 > 3 signaux distincts désormais identifiés autour de la chaîne AU (`EmergencyChain_DI` boucle
@@ -137,7 +139,7 @@ Partie 3 v1.2 §1/§7.
 L'automate **reste alimenté en permanence** (pas de coupure électrique générale du contrôleur).
 Seule la **puissance moteurs** est coupée par un contacteur général amont, via une **boucle AU
 matérielle** en série (boutons coup-de-poing) **et** un canal piloté par l'automate lui-même
-(`PowerCutOff_A_RQ`/`B_RQ`, voir plus bas). L'automate continue de surveiller et de piloter le
+(`PowerKeepAlive_A_RQ`/`B_RQ`, voir plus bas). L'automate continue de surveiller et de piloter le
 réarmement, il n'est jamais la cible de la coupure.
 
 #### 🧭 Les 3 signaux distincts (REX 2026-07-07)
@@ -148,8 +150,8 @@ précis :
 
 | Signal | Sens | Rôle | Conditionné en |
 |--------|------|------|-----------------|
-| **`EmergencyChain_DI`** | Entrée TOR (NC, 1=sain) | Retour de la **boucle AU physique elle-même** : boutons coup-de-poing opérateur **en série ET** le canal `PowerCutOff` piloté par le PLC, tous deux insérés dans cette même boucle matérielle. `TRUE` = boutons relâchés **ET** pas de coupure PLC en cours. C'est une **précondition à l'armement**, **PAS** le portail maître du programme. | `PRG_00_Inputs.EmergencyChain` |
-| **`EmergencyStopOk_DI`** | Entrée TOR (contact auxiliaire NO, 1=actif) | Confirmation que le **contacteur de puissance est réellement engagé** — la garantie la plus forte possible (« la puissance coule vraiment »). Reste le **portail maître** utilisé par tout le programme (`EmergencyStopOk` en entrée de chaque FB, contrat standard Partie 3 §1). Nom conservé tel quel pour ne pas casser l'interface FB partout dans le code. | `PRG_00_Inputs.EmergencyStopOk` |
+| **`EmergencyChainClosed_DI`** | Entrée TOR (NC, 1=sain) | Retour de la **boucle AU physique elle-même** : boutons coup-de-poing opérateur **en série ET** le canal `PowerKeepAlive` piloté par le PLC. `TRUE` = boucle fermée; précondition à l'armement, **pas** portail maître. | `PRG_00_Inputs.EmergencyChain` |
+| **`PowerContactorEngaged_DI`** | Entrée TOR (contact auxiliaire NO, 1=actif) | Confirmation que le **contacteur de puissance est réellement engagé**. C'est le portail maître `EmergencyStopOk` consommé par les FB. | `PRG_00_Inputs.EmergencyStopOk` |
 | **`EmergencyArming_RQ`** | Sortie TOR (impulsion) | Commande PLC de **réarmement** du contacteur de puissance (mécanisme à ressort, un pulse suffit). | `PRG_10_Outputs` (voir séquence ci-dessous) |
 
 ⚠️ **Ne pas confondre** : `EmergencyChain` dit « les conditions permettant d'armer sont réunies »,
@@ -213,9 +215,9 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > Les suffixes `PowerCutOff_A/B` désignent les deux canaux physiques redondants et sont conservés.
 > Partie 1 (documentaire uniquement). 📌 Suivi : voir `DOC/PLAN_TASK_v1.0.md` §3 (T13).
 
-#### 🧨 Polarité fail-safe de `PowerCutOff_A_RQ` / `B_RQ`
+#### 🧨 Polarité fail-safe de `PowerKeepAlive_A_RQ` / `B_RQ`
 
-`PowerCutOff_A_RQ`/`PowerCutOff_B_RQ` (2 canaux redondants, `PRG_10_Outputs.st`) forment le canal
+`PowerKeepAlive_A_RQ`/`PowerKeepAlive_B_RQ` (2 canaux redondants, `PRG_10_Outputs.st`) forment le canal
 **piloté par le PLC**, en série avec les boutons coup-de-poing dans la même boucle AU matérielle.
 
 > 🔴🔧 **REX 2026-07-07 — correctif critique de polarité, à ne jamais reproduire.**
@@ -228,7 +230,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > figure possible** pour une fonction de sécurité.
 >
 > **Architecture corrigée, à commande maintenue (fail-safe)** : le PLC doit **maintenir**
-> `PowerCutOff_A_RQ`/`B_RQ` à `TRUE` **en permanence** tant que tout va bien. Dès que le PLC
+> `PowerKeepAlive_A_RQ`/`B_RQ` à `TRUE` **en permanence** tant que tout va bien. Dès que le PLC
 > **arrête** de les maintenir (transition `TRUE→FALSE`) — **volontairement** (un des Safety
 > Mouvement de `FB_Safety_Winch` détecte un problème, voir §ci-dessus pour les noms descriptifs et
 > `DOC/AF_Partie-09_Fonction_Winch_v1.5.md` §4quinquies pour le détail technique, non re-décrit ici)

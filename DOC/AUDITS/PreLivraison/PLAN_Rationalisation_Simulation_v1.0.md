@@ -4,7 +4,7 @@
 > d'injection dispersés, avant livraison client.
 > 📅 Créé 2026-07-26 · **révisé 2026-07-27** (décisions actées §0) · **aucun `CODE/` modifié**.
 > 🔗 [PLAN_Ergonomie_MiseEnService_v1.0](PLAN_Ergonomie_MiseEnService_v1.0.md) ·
-> [PLAN_Allegement_Code_v1.0](PLAN_Allegement_Code_v1.0.md) · spec : [AF_Partie-13 v1.4](../../AF_Partie-13_Fonction_Simulation_v1.4.md)
+> [PLAN_Allegement_Code_v1.0](PLAN_Allegement_Code_v1.0.md) · spec : [AF_Partie-13 v2.0](../../AF_Partie-13_Fonction_Simulation_v2.0.md)
 
 ---
 
@@ -396,7 +396,7 @@ contre ~185 lignes centralisées et vérifiables. Le gain réel :
 - 🎯 **Suite possible (non décidée)** : la frontière rend `CODE/SIMULATION` excluable du build via une
   configuration CODESYS « Livraison » (*Exclude from build*) → poids réellement nul et garantie
   absolue côté client. Impossible aujourd'hui, praticable après P2.
-- `AF_Partie-13 v1.4` §2bis (bypass diag « découplé » du bit maître) est **périmé** : le code a
+- `AF_Partie-13 v2.0` §2bis (bypass diag « découplé » du bit maître) est **périmé** : le code a
   re-couplé le 2026-07-24. À corriger en v2.0 (P3).
 - D5 : la remise à 0 des bypass RETAIN au boot en version finale reste **une action de livraison à
   planifier**, hors périmètre de ce plan.

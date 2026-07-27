@@ -51,6 +51,19 @@ complet) : retirées de la liste "autorisée", déplacées en "à éviter" ci-de
 Trois suffixes déjà établis pour les variables globales **mappées directement sur le matériel**
 (hors struct IHM, hors `ReqX`/`CmdX` qui restent au niveau logique) :
 
+### 🧭 E/S TOR : polarité lisible dans le nom (REX C1 — 2026-07-27)
+
+Pour chaque nouveau point TOR, le nom répond sans schéma à « que signifie `TRUE` ? » :
+
+```
+<Domaine>_<ÉtatQuandTRUE>_DI      M1_BrakeIsOpen_DI   → TRUE = frein ouvert
+<Domaine>_<ActionCommandée>_RQ    M1_BrakeRelease_RQ  → TRUE = desserrage commandé
+```
+
+🚫 Éviter les noms muets (`Feedback`, `Status`, `Ok`) seuls lorsqu'ils ne donnent pas la polarité.
+Le bug C1 (retour frein) a démontré qu'une polarité implicite peut masquer un défaut réel.
+Source et cas existants : `AUDITS/PreLivraison/TABLE_Renommage_IO_v1.0.md`.
+
 | Suffixe | Sens | Exemple |
 |---|---|---|
 | `_DI` | **D**igital **I**nput — entrée digitale brute, point I/O physique | `M1_BrakeFeedback_DI`, `PosFosse1_DI`, `EmergencyStopOk_DI` |

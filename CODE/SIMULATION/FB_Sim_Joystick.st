@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en

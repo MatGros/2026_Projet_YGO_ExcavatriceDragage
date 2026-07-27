@@ -157,7 +157,7 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 
 
-// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md) ──────
+// ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v2.0.md) ──────
 // 📄 Lot L6 : Ré-alimentation des miroirs IHM depuis l'état effectif de simulation (SimulationModeActive AND Sim<Domaine>Active)
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
