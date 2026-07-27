@@ -10,6 +10,7 @@
 
 | Date | Jalon |
 |---|---|
+| 2026-07-27 | 🏁 **Chantier pré-livraison — simulation & diagnostic TERMINÉ** (commits `72a3bbc`→`HEAD`). Détail §1bis. Documents de conduite archivés dans `ARCHIVES/Doc/AUDITS/PreLivraison/` : ce plan redevient l'unique source du pilotage |
 | 2026-07-24 | 🎯 **Priorité Demain** — 1) Chargement API + vérification Visualisation IHM (remapping). 2) Qualification purge Bypass Global (M1, M2, M3). 3) Essai du fonctionnement **Capteur Kobold** (contact fond) & IHM. 4) Essai du **Positionneur Translation M3** ("Aller à la position" Trémie/Maintenance/Zone travail). |
 | 2026-07-23 | Correctifs terrain — Purge `BypassContactorCheck` (M1, M2, M3), documentation audit `AUDIT_BypassGlobal_Homogenization_v1.0.md` et consignation `MES-004`. |
 | 2026-07-22 | `v0.4.27_SupervisionConformityRename` — Renommage complet supervision GVL_IHM + ST_*HMI et conformité suffixes physiques (_M, _Pct, _Hz, _Mps) |
@@ -22,6 +23,37 @@
 | 2026-07-07/08 | Réarchitecture `PRG_00`→`PRG_10` (abandon `PLC_PRG_MAIN`), campagne doc massive, audit cohérence documentaire |
 | 2026-07-04 | `PLAN_Finalisation_v1.0` — 1er état des lieux (bloquants, écarts, TBD) |
 | 2026-06-30 | Bootstrap projet (init CODESYS, skill workflow, convention nommage) |
+
+---
+
+## 🏁 1bis. Chantier pré-livraison (2026-07-26 → 27) — ce qui a été fait
+
+### ✅ Terminé
+
+| Lot | Contenu |
+|---|---|
+| **T80** | 🐛 Capteur PV M3 non relié (voie mappée `PosPV_DI_`, lue depuis un stub jamais alimenté) — corrigé |
+| **L2/L3** | `GVL_PLC_Tests` (20 `Override*` + 31 lecteurs) supprimée · `FB_Sim_DigitalMirror`, `ST_TestTranslation`, `ST_TestCycle`, `BypassRestoreDone` retirés |
+| **L4a→L4d** | Simulation **entièrement débranchée** : 8 conditions `DI OR (SimActive AND NOT …IsReal)`, instances `FB_Sim_*`, flag pilotant `DeadmanRearmTimeout` (figé à `T#10S`) |
+| **Renommage E/S** | Convention `<Domaine>_<ÉtatQuandTRUE>_DI` — voir `AUDITS/TABLE_Renommage_IO_v1.0.md` |
+| **L5** | **Frontière unique `HwIn`** : toutes les entrées acquises en un seul point (`PRG_00` §0) + refonte de lisibilité (carte des blocages, polarité affichée à chaque étage) |
+| **L6** | Banc `FB_SimBench` rebranché **derrière** la frontière · `GVL_Simulation` 25 flags → 1 bit maître + 4 domaines, polarité positive |
+| **L7/L8** | `HwSim` exposé (lecture comparée) · gates CI : confinement `GVL_Simulation`, interdiction du forçage hybride, `check_structure`/`check_code_style` réparés · `AF-13 v2.0`, `AF-06 v1.7` |
+| **D1** | `FB_Preflight` (verdict d'état machine à l'arrêt) et `FB_WinchSymmetry` (écarts M1/M2, MES-008) — observateurs purs dans `PRG_11` · correctif libellé `BrakeIsOpen_DI` → `BrakeApplied` |
+
+### 📌 Décisions structurantes actées
+
+| # | Décision |
+|---|---|
+| **Frontière unique** | La simulation ne complète jamais le réel : elle le **remplace en bloc, par domaine entier**, à un seul endroit. Un domaine est simulé **OU** réel, jamais un mélange |
+| **3 outils, 3 besoins** | Bypass IHM = ignorer un défaut sur matériel **présent** · Simulation = fabriquer une valeur pour matériel **absent** · Force natif CODESYS = injecter une panne **ponctuelle** |
+| **Pas de comparateur automatique** | `FB_HwCompare`/`HwDelta` abandonné : le modèle n'est pas une vérité de référence. Lecture côte à côte `HwReal`/`HwSim`/`HwIn` + `PRG_11` suffisent. Le verdict est rendu par `FB_Preflight`, qui compare à un **état attendu connu** |
+| **Nommage E/S** | Le nom porte l'état vrai (`M1_BrakeIsOpen_DI`). Un nom muet sur sa polarité a coûté un défaut réel (C1) |
+| **Une seule convention de polarité** | « TRUE = frein serré » dans tout l'aval. Normalisation **à la frontière** (`BrakeFeedbackInvertLogic`), jamais dans les blocs métier |
+
+### ⬜ Abandonné / différé
+
+`FB_MotionInhibit` (doublon de `PRG_11`) · `FB_FirstFault` (différé — utile seulement si les cascades gênent en essai) · `FB_HwCompare` (voir ci-dessus)
 
 ---
 
@@ -207,9 +239,14 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 
 
+| T84 | 🔴 **Qualité de la mesure `MeasuredSpeedMps`** (constat **C5**) : dérivée brute de `CablePosM` sur **1 cycle de 10 ms** (`FB_Safety_Winch:381`). Un pas de quantification codeur (0,2 mm) produit **0,02 m/s** — soit exactement le seuil Méca A. Mesure illisible à l'affichage et déclenchement possible sur un simple glitch. **Décision 2026-07-27** : améliorer **la mesure** (fenêtre glissante ~100 ms → bruit ÷10), pas la fonction de sécurité — Méca A garde son seuil et sa tempo, ce n'est pas à elle de filtrer. ⚠️ Depuis C1, Méca A est la **seule** protection contre le patinage de frein | Projet / Sécurité | `AUDITS/RevueTechnique/AUDIT_Revue_Technique_v1.0.md` §7 |
+| T85 | 🟠 **La mesure de vitesse est produite par le bloc de sécurité** : `FB_Safety_Winch` calcule `MeasuredSpeedMps`, consommée ensuite par `FB_Encoder_SpeedMonitor`, `FB_WinchLoadEstimator`, `FB_Cycle`, `FB_WinchSymmetry` et l'IHM. Un bloc de sécurité ne devrait pas être **fournisseur de mesure** : la vitesse relève de la chaîne codeur, la sécurité ne fait que la **surveiller**. Déplacer vers `PRG_02`/`FB_Encoder_*`. ⚠️ Touche le cœur sécurité et 5 consommateurs → **après livraison** | Projet / Architecture | Décision utilisateur 2026-07-27 |
+| T86 | 🟠 **C2** — `ForbidAscent` non initialisé dans le gate `Enable = FALSE` de `FB_Safety_Winch` (l. 242-265) : conserve sa dernière valeur, alors que `SafeStop` et `ForbidDescent` sont forcés. Sortie de bloc sécurité non déterministe. À grouper avec T84 (même fichier) | Projet / Sécurité | `AUDIT_Revue_Technique_v1.0.md` §4 |
+| T87 | 🟠 **C4** — `DelayMotorDecel` : paramètre de frein propagé depuis `FB_Winch` et réglable en mise en service, mais son `TON` est armé à `IN := FALSE` → **sans aucun effet**. Supprimer de l'interface **ou** réimplémenter la temporisation ; dans les deux cas corriger l'en-tête de `FB_Brake` qui décrit un comportement inexistant. À grouper avec T84 | Projet / Sécurité | `AUDIT_Revue_Technique_v1.0.md` §6 |
+| T88 | 🔵 **C6** — `FB_CycleTime` ne gère pas le bouclage de `TIME()` (~49,7 jours) : 1 cycle de `CycleTimeS` aberrant → la rampe saute à sa cible. Borné par `LIMIT(±100)` donc non dangereux, mais à-coup possible sur une machine laissée en marche continue. Garde-fou : `IF DeltaTimeMs > 1000 THEN CycleTimeS := DefaultValueS;` | Projet | `AUDIT_Revue_Technique_v1.0.md` §8 |
 | T83 | 🟠 **Bypass heartbeat IHM provisoire** : `ST_BypassNetwork.IhmHeartbeat` créé le 2026-07-27 avec défaut **`TRUE`** (bypass actif) + secours `GVL_Global.BlinkClock` — décision CK6, justifiée tant que la visu ne toggle pas `TglHeartbeatIhm`. ⚠️ Champ **RETAIN** : il survit aux downloads. **Action de livraison : repasser à `FALSE` dès que la visu est opérationnelle**, sinon la perte de l'IHM ne produit plus aucun `SafeStop` | Projet / IHM | `PRG_01_Diagnostics.st:64-67`, `ST_BypassNetwork.st:15` |
 | T80 | ✅ **Résolu 2026-07-27** — **Capteur PV M3 non relié** : la voie est mappée sous `PosPV_DI_` (underscore ajouté par CODESYS sur collision) ; `PRG_00:267` lit `GVL_Translation_M3_Stub.PosPV_DI`, un stub que rien n'écrit. En réel : mot 5 capteurs incohérent en position Trémie → `SafeStop` + `PowerCutOff`, et butées extrêmes M3 inopérantes. Correction : supprimer la déclaration du stub, remapper en `M3_PosPV_DI`, corriger `PRG_00:267` | Projet / Électricité | `AUDITS/PreLivraison/ANALYSE_Impact_Chaines_Actionneurs_v1.0.md` §6.1, `TABLE_Renommage_IO_v1.0.md` §3 |
-| T81 | 🔴 **Séquence de détection de fond Kobold** (précisé 2026-07-27) : ce n'est pas un capteur d'état mais une **fonctionnalité à activer avec une séquence obligatoire** — partir **au-dessus du niveau de l'eau**, puis plonger. Le capteur vaut `0` hors de l'eau, passe à `1` à l'immersion, retombe à `0` au fond. Donc `Fond détecté ⟺ passage 1→0 APRÈS un passage 0→1 confirmé`. Si la séquence n'est pas respectée (pas de front d'immersion), **la détection est impossible**. Or `FB_Cycle.st:272` teste `KoboldContactFond` à `TRUE` : il détecte **l'immersion**, pas le fond. À implémenter : machine d'état de la séquence + cohérence avec la position treuils (seuil d'immersion à définir sur site) | Projet / Client | REX utilisateur 2026-07-27, `TABLE_Renommage_IO_v1.0.md` §3bis |
+| T81 | 🔴 **Séquence de détection de fond Kobold** (précisé 2026-07-27) : ce n'est pas un capteur d'état mais une **fonctionnalité à activer avec une séquence obligatoire** — partir **au-dessus du niveau de l'eau**, puis plonger. Le capteur vaut `0` hors de l'eau, passe à `1` à l'immersion, retombe à `0` au fond. Donc `Fond détecté ⟺ passage 1→0 APRÈS un passage 0→1 confirmé`. Si la séquence n'est pas respectée (pas de front d'immersion), **la détection est impossible**. Or `FB_Cycle.st:272` teste `KoboldContactFond` à `TRUE` : il détecte **l'immersion**, pas le fond. **Valeurs actées 2026-07-27** : départ de séquence à **≥ +1,0 m** au-dessus de 0 ; front `0→1` attendu **entre +0,5 m et −0,5 m** ; fond = front `1→0` **après** un `0→1` confirmé. Les 3 bornes en `PERSISTENT` + réglables IHM | Projet / Client | REX utilisateur 2026-07-27, `AUDITS/TABLE_Renommage_IO_v1.0.md` §3bis |
 | T82 | 🔴 **Arrêt sécurisé si séquence Kobold invalide** (lié à T81) : `M1_M2_KoboldMeasureEnable_DQ` alimente la mesure ; sans activation **ou** sans front d'immersion attendu, aucune détection de fond n'est possible. **Deux issues, et deux seulement** : ① séquence invalide → **arrêt dans l'eau + remontée d'un défaut** (on ne descend pas à l'aveugle) ; ② séquence valide → fond détecté → **arrêt propre** (décélération normale, pas un `SafeStop`). Jamais de descente prolongée sans détection possible | Projet / Sécurité | REX utilisateur 2026-07-27 |
 
 
