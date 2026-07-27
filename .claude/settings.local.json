@@ -100,7 +100,8 @@
       "Bash(grep \"^CODE/.*\\\\.st$\")",
       "Bash(grep -iE \"PLC_Tests|_TYPES\\\\\\\\\\\\\\\\\\(ST_Test|E_Test\\)|Simulation|PRG_00|PRG_06\")",
       "Bash(sed 's/:.*//')",
-      "Bash(grep -v \":0$\")"
+      "Bash(grep -v \":0$\")",
+      "Bash(xargs -n1 basename)"
     ],
     "ask": [
       "Bash(git reset *)",

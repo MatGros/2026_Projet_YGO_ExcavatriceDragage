@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_10_Outputs — Écriture des SORTIES physiques (PROGRAMME)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
    🔧 REX 2026-07-19 : suppression définitive du mode IHM_MANU (override direct des sorties,

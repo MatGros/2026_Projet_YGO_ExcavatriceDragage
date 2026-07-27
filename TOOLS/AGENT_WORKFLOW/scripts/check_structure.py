@@ -67,7 +67,7 @@ def check_doc(root: Path, errors: list[str], warnings: list[str]) -> None:
         errors.append(f"missing directory: {doc}")
         return
 
-    allowed_doc_dirs = {"AUDITS", "CHECKLISTS", "DIAGRAMS"}
+    allowed_doc_dirs = {"AUDITS", "CHECKLISTS", "DIAGRAMS", "NAVBOARDS"}
     for entry in doc.iterdir():
         if entry.is_dir():
             if entry.name not in allowed_doc_dirs:

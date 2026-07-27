@@ -19,7 +19,7 @@
    │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
    │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
    └──────────────────────────┴──────────┴─────────────────────────────────┘
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.6.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ══════════════════════════════════════════════════════════════════════════ *)
@@ -28,6 +28,7 @@ PROGRAM PRG_00_Inputs
 VAR_OUTPUT
     // ── 🏗️ FRONTIÈRE UNIQUE HW (Image matérielle brute) ────────────────────
     HwReal               : ST_HardwareImage; // Image matérielle brute (acquis §0)
+    HwSim                : ST_HardwareImage; // Image produite par le banc (observation uniquement)
     HwIn                 : ST_HardwareImage; // Image d'entrée consommée par tout le programme (§0bis)
 
     // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
@@ -263,6 +264,12 @@ instSimBench(
     RawPosM1                 := _SimEncoderRawPosM1,
     RawPosM2                 := _SimEncoderRawPosM2
 );
+
+// 🧪 Image du banc exposée pour lecture côte à côte ; aucune logique métier ne lit HwSim.
+HwSim.Winch       := instSimBench.Winch;
+HwSim.Translation := instSimBench.Translation;
+HwSim.Operator    := instSimBench.Operator;
+HwSim.Machine     := instSimBench.Machine;
 
 IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive
     THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;

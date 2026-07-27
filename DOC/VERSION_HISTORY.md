@@ -4,6 +4,11 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `L7-L8_HwSim_Verrou_Specs` — 2026-07-27
+- `HwSim` exposée en observation dans `PRG_00_Inputs` ; aucun comparateur `HwDelta`
+- Gates : confinement `GVL_Simulation` + interdiction du forçage hybride
+- `AF_Partie-13` v2.0 · `AF_Partie-06` v1.7 · E/S et sécurité documentées
+
 ### 0.5.2_Troubleshooting_SignalChain — 2026-07-27
 - Intégration du composant autonome de Recherche de Pannes et Traçabilité Pas-à-Pas
 - PRG_11_Troubleshooting (Position 11 MainTask, pure lecture seule, 0 régression métier)
