@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-21T10:05:06.429861" />
-  <contentHeader name="Projet_YGO_ExcavatriceDragage.project" modificationDateTime="2026-07-21T10:05:06.429861">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-21T10:05:06.429861">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Projet_YGO_ExcavatriceDragage</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -876,6 +876,17 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Bypass diagnostic esclave EtherCAT AC600 (M3 drive)</xhtml>
               </documentation>
             </variable>
+            <variable name="IhmHeartbeat">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Bypass du bit de vie IHM (défaut TRUE = sécurisé si pas d'IHM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Global">
               <type>
                 <BOOL />
@@ -1247,6 +1258,922 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
       physique unique partagé M1/M2) sont dans ST_CommunHMI.Bypass, PAS ici.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="ST_ChainBucket">
+        <baseType>
+          <struct>
+            <variable name="Idx101_BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Benne Mécaniquement Ouvert | 0 = Non Confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Benne Mécaniquement Fermé | 0 = Non Confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_OffsetPos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Écart d'Ouverture Câble M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_HmiCmd_BtnOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Ouverture IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_HmiCmd_BtnClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Fermeture IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_CycleCmd_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Ouverture par le Cycle Auto</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = AU Appuyé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_BucketFaultActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Mouvement Benne 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mouvement Mâchoires en cours | 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_BucketDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Cible Atteinte | 0 = En cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx501_M2_CmdRev_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Action Benne M2 ON</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7699fad2-6e4d-5ba2-8474-a7ccec9b870d</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainTranslation">
+        <baseType>
+          <struct>
+            <variable name="Inputs_100">
+              <type>
+                <derived name="ST_Chain_Translation_Inputs" />
+              </type>
+            </variable>
+            <variable name="Demandes_200">
+              <type>
+                <derived name="ST_Chain_Translation_Demandes" />
+              </type>
+            </variable>
+            <variable name="Safety_300">
+              <type>
+                <derived name="ST_Chain_Translation_Safety" />
+              </type>
+            </variable>
+            <variable name="Control_400">
+              <type>
+                <derived name="ST_Chain_Translation_Control" />
+              </type>
+            </variable>
+            <variable name="Outputs_500">
+              <type>
+                <derived name="ST_Chain_Translation_Outputs" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7dbc6f0d-3311-5752-8222-088008af3b8a</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainWinch">
+        <baseType>
+          <struct>
+            <variable name="Inputs_100">
+              <type>
+                <derived name="ST_Chain_Winch_Inputs" />
+              </type>
+            </variable>
+            <variable name="Demandes_200">
+              <type>
+                <derived name="ST_Chain_Winch_Demandes" />
+              </type>
+            </variable>
+            <variable name="Safety_300">
+              <type>
+                <derived name="ST_Chain_Winch_Safety" />
+              </type>
+            </variable>
+            <variable name="Control_400">
+              <type>
+                <derived name="ST_Chain_Winch_Control" />
+              </type>
+            </variable>
+            <variable name="Outputs_500">
+              <type>
+                <derived name="ST_Chain_Winch_Outputs" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cfbad681-bc46-5033-b562-e37133b1f706</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainWinchSync">
+        <baseType>
+          <struct>
+            <variable name="Idx101_M1_CablePos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Position Câble M1 Retenue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_M2_CablePos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Position Câble M2 Benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_SyncDelta_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Écart Relatif M1 - M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_JoyYRaw_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe Y (-100% à +100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_SyncEnabled_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Couplage Synchro Actif (Nominal) | 0 = Découplé ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_ArbitratedSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse Synchro Arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt Urgence 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SyncFaultActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Synchro OK | 1 = Écart Synchro Bloquant 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_M1_ForbidAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M1 Bloquée (Fdc/Safety) 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_M2_ForbidAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M2 Bloquée (Fdc/Safety) 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_SyncMotionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mouvement Synchro Autorisé | 0 = Bloqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_M1_SetpointSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse Calculée M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_M2_SetpointSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse Calculée M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx501_M1_CmdRelayFwd_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_M2_CmdRelayFwd_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>68f6d77a-138b-5a81-867d-04895e9150ef</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Control">
+        <baseType>
+          <struct>
+            <variable name="Idx401_MotionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mouvement Translation Autorisé | 0 = Bloqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_SetpointFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[Hz] Consigne Fréquence Calculée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_DriveControlWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de Commande Calculé Variateur AC600</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>14af5a36-209b-5924-9d37-55e0fe9b9087</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Demandes">
+        <baseType>
+          <struct>
+            <variable name="Idx201_JoyXRaw_ANA">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[pts] Bruts Joystick Axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_JoyXScaled_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe X (-100% à +100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_HmiCmd_BtnFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Avance IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_HmiCmd_BtnRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Recul IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_HmiTargetPosition">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Sélectionnée IHM (1=Trémie, 2=P2, 3=P1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_CycleTargetPosition">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Sélectionnée par le Cycle Auto</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_ModeActive">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant (MANU_N1, AUTO_N1...)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_BypassNetworkActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Comm Variateur OK | 1 = Bypass Réseau Actif ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx209_ArbitratedSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne finale Vitesse Translation</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>54c2779a-7906-561e-8905-7cd39e8fd17a</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Inputs">
+        <baseType>
+          <struct>
+            <variable name="Idx101_PosTremie_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Trémie Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_PosPV_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Zone Ralentissement PV Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_PosP2_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Fosse P2 Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx104_PosP1_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Fosse P1 Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx105_PosMaintenance_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Service Maintenance Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx106_DriveActualFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[Hz] Fréquence Réelle Mesurée Variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx107_DriveStatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot d'état Brut Variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx108_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Frein Translation Ouvert | 0 = Frein Serré</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fb10b748-ace9-58b2-a9b2-22283873ba21</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Outputs">
+        <baseType>
+          <struct>
+            <variable name="Idx501_CmdDriveControlWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de Commande Transmis EtherCAT AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_CmdDriveFreq_Hz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[0.01Hz] Consigne Fréquence Transmise EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx503_CmdBrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bobine Frein Translation Alimentée (Ouvert)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>87cc5d9f-4236-5c35-af2e-39700a24a168</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Safety">
+        <baseType>
+          <struct>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Translation 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_LimitSwitchFwdActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_LimitSwitchRevActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_BypassLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Fins de course actives | 1 = Shuntés IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_PositionDecoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Décodage 5 Capteurs OK | 1 = Incohérence Position 🔴</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>82dcbfd2-2633-5250-924d-68e882d3d0cb</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Control">
+        <baseType>
+          <struct>
+            <variable name="Idx401_MotionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Prêt / Mouvement Autorisé | 0 = Bloqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_SpeedStepCalculated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier Vitesse Calculé (0, 1, 2, 3, 4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_SpeedRamp_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse après Rampe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx404_BrakeReleaseAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ordre Ouverture Frein | 0 = Ordre Serrage</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>52be1c05-56a9-542a-a64f-52f90a2a17c7</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Demandes">
+        <baseType>
+          <struct>
+            <variable name="Idx201_JoyRawPhysical_ANA">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[pts] Bruts convertisseur (-2048 à +2048)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_JoyScaledPhysical_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick (-100% à +100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_HmiManualCmd_BtnUp">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Montée IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_HmiManualCmd_BtnDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descente IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_CycleAutoCmd_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne auto envoyée par le Cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_ModeActive">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant (MANU_N1, AUTO_N1, MAINT_N2...)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_BypassOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Comm Normale OK | 1 = Bypass Réseau Actif ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_ArbitratedSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne finale retenue après arbitrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx209_ArbitratedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d575144c-1279-5e18-b578-c1920999821d</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Inputs">
+        <baseType>
+          <struct>
+            <variable name="Idx101_EncoderRawPos">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[Valeur brutes pts] Codeur connecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_CablePos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Position calculée du câble</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = OK (Tous contacteurs retombés à l'arrêt) | 0 = Contacteur collé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx104_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Frein Ouvert (Mouvement) | 0 = Frein Serré (Sécurité/Arrêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx105_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Température OK (Sain) | 0 = Surchauffe Moteur M1 🔴</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>67a1e74c-4741-5be8-a23f-8d9f82a30cc0</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Outputs">
+        <baseType>
+          <struct>
+            <variable name="Idx501_CmdRelayFwd_Up_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Montée ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_CmdRelayRev_Down_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descente ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx503_CmdSpeedContactor1_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contacteur Vitesse 1 ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx504_CmdSpeedContactor4_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contacteur Vitesse 4 ON (Plein Gaz) | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx505_CmdBrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bobine Frein Alimentée (Ouvert) | 0 = Non Alimentée (Serré)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e680dbf9-a4ea-58b1-b875-ac21a8a6a304</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Safety">
+        <baseType>
+          <struct>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK (Armé) | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Métier Actif 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance Sécurité 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_TopSensorPhysical_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_TopSensorBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Capteur Haut Shunté IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_ForbidAscentEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Montée Autorisée | 1 = MONTÉE BLOQUÉE 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_SlackCablePhysical_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_SlackCableBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Mou de Câble Shunté IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx309_ForbidDescentEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Descente Autorisée | 1 = DESCENTE BLOQUÉE 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx310_MecaFaultMask">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E 🔴</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a86515da-77e1-5634-b6f3-443b78eedf33</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="ST_CommunCfg">
         <baseType>
@@ -1674,14 +2601,6 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
               <type>
                 <derived name="ST_CycleCfg" />
               </type>
-            </variable>
-            <variable name="Test">
-              <type>
-                <derived name="ST_TestCycle" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ INCHANGÉ — déjà un sous-struct correctement isolé avant ce lot</xhtml>
-              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -3206,90 +4125,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_TestCycle">
-        <baseType>
-          <struct>
-            <variable name="KoboldContactFond">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation du capteur de contact de fond Kobold</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>60a8cfd9-07ff-593e-b4e7-932f1aeab649</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 ST_TestCycle — Commandes de test pour le Cycle semi-auto
-   ───────────────────────────────────────────────────────────────
-   🎨 Destiné uniquement aux stimulations sur banc de test/simulation.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_TestTranslation">
-        <baseType>
-          <struct>
-            <variable name="SensorsWordActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation active du mot capteurs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SensorsWord">
-              <type>
-                <BYTE />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation du mot capteurs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation capteur Trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeStuckOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation frein bloqué ouvert</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PhantomFreq">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation fréquence fantôme</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>678d0cb3-86df-5268-8714-2a554010910d</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 ST_TestTranslation — Commandes de test pour la Translation M3
-   ───────────────────────────────────────────────────────────────
-   🎨 Destiné uniquement aux stimulations sur banc de test/simulation.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_TranslationCmd">
         <baseType>
           <struct>
@@ -3402,14 +4237,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Test">
-              <type>
-                <derived name="ST_TestTranslation" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Commandes de test (banc uniquement)</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -13522,89 +14349,6 @@ Done := FALSE;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Sim_DigitalMirror" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="Command">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="MirrorDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#150ms" />
-              </initialValue>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="Feedback">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="TonMirror">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_DigitalMirror — Miroir commande→retour temporisé (contacteur simulé)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
-   🧩 Brique réduite (Partie3 §1bis), générique et réutilisable — outil de banc.
-   🎯 Rôle : simule un retour de contacteur réaliste (délai mécanique de
-      fermeture/ouverture), au lieu d'un miroir "idéal" instantané. Utilisée pour
-      le retour contacteur M3 (`PRG_07_TranslationControl.st`), remplace le miroir
-      inconditionnel actuel. Réutilise `TON` (Partie3 §0 — pas de temporisation
-      réimplémentée), même principe que `ContactorFeedbackTimeout` déjà en place
-      dans `FB_Winch.st`/`FB_Translation.st`.
-   📥 Enable       : simulation active (ex. SimulationModeActive AND NOT SensorM3ContactorFeedbackIsReal)
-   📥 Command      : ordre envoyé au contacteur (TRUE = fermé/actif)
-   📥 MirrorDelay  : délai de fermeture/ouverture simulé — À FIXER nettement SOUS le
-      `ContactorFeedbackTimeout` du FB consommateur (`FB_Winch`/`FB_Translation`), sinon le
-      StuckClosed/StuckOpen se déclenche à tort pendant le délai simulé.
-   📤 Feedback     : retour simulé (suit Command après MirrorDelay)
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_DigitalMirror) ===</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_DigitalMirror) ===
-
-IF NOT Enable THEN
-    TonMirror(IN := FALSE, PT := MirrorDelay);
-    Feedback := Command;   // Hors simulation : miroir idéal (comportement précédent conservé)
-    RETURN;
-END_IF;
-
-TonMirror(IN := (Command &lt;&gt; Feedback), PT := MirrorDelay);
-IF TonMirror.Q THEN
-    Feedback := Command;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>81504ce5-b647-53c2-8f8b-ce94a0f64dac</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_Sim_Encoder" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -13803,29 +14547,6 @@ RawPosOut := RawPos;
                 <simpleValue value="10000" />
               </initialValue>
             </variable>
-            <variable name="TestOverrideActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 TRUE = RawX/Y/Button pilotés par TestOverrideRaw* (suite PLC_TESTS)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TestOverrideRawX">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="TestOverrideRawY">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="TestOverrideRawButton">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawX">
@@ -13885,10 +14606,6 @@ RawPosOut := RawPos;
    💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
       valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
       l'appui homme-mort — exactement comme on forcerait le vrai capteur.
-   🆕 REX 2026-07-19 : `TestOverrideActive` — pilotage programmatique par la suite PLC_TESTS
-      (GVL_PLC_Tests), en complément du forçage manuel en instance CODESYS ci-dessus (les deux
-      mécanismes coexistent, le Force IDE restant prioritaire de toute façon s'il est posé).
-      Nécessaire car un Force CODESYS ne peut pas être déclenché depuis du code ST.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
           </documentation>
@@ -13907,14 +14624,7 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-IF TestOverrideActive THEN
-    // 🆕 REX 2026-07-19 : suite PLC_TESTS — écriture CYCLIQUE volontaire (pas de FirstCycle),
-    // contrairement au forçage manuel, pour permettre un pilotage dynamique scan par scan.
-    RawX := TestOverrideRawX;
-    RawY := TestOverrideRawY;
-    RawButton := TestOverrideRawButton;
-    FirstCycle := FALSE;
-ELSIF FirstCycle THEN
+IF FirstCycle THEN
     RawX := NeutralRaw;
     RawY := NeutralRaw;
     RawButton := FALSE;
@@ -17353,58 +18063,6 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <derived name="FB_Input" />
               </type>
             </variable>
-            <variable name="instSimTranslation">
-              <type>
-                <derived name="FB_Sim_Translation" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation dynamique du trajet translation M3 (Lot 4, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instSimSafety">
-              <type>
-                <derived name="FB_Sim_Safety" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation de la chaîne de sécurité AU / réarmement (Lot 1, combler le trou d'intégration)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1_FwdRevSpeedFeedbackOff_Simulated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation des retours contacteurs et freins M1/M2 (Lot 1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1BrakeFeedback_Simulated">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2_FwdRevSpeedFeedbackOff_Simulated">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2BrakeFeedback_Simulated">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M3BrakeFeedback_Simulated">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="SimTopSensorTriggered">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) : cohérence simulation capteur haut (voir instTopPositionSensor ci-dessous)</xhtml>
-              </documentation>
-            </variable>
             <variable name="HmiCommandsInitialized">
               <type>
                 <BOOL />
@@ -17454,9 +18112,7 @@ Modifiable à chaud en vue instance, sans recompiler.</xhtml>
 // PRG_00 est exécuté avant PRG_01..PRG_10 : aucune commande mémorisée ne peut donc
 // produire un front ou un mouvement pendant le premier scan. Les états sûrs maintenus
 // (`BtnEmergencyCutOff`, inhibitions) ne sont volontairement pas effacés.
-// L'override permet uniquement à la suite PLC de rejouer ce scénario en simulation.
-IF NOT HmiCommandsInitialized
-   OR (GVL_Simulation.SimulationModeActive AND GVL_PLC_Tests.OverrideHmiCommandPurge) THEN
+IF NOT HmiCommandsInitialized THEN
     GVL_IHM.HmiInitDone := FALSE;
 
     // 🔧 REX 2026-07-24 (demande utilisateur) : Les boutons d'acquittement/reset (BtnFaultReset, etc.)
@@ -17494,116 +18150,62 @@ END_IF;
 // sécurité, TRUE=OK) quand SimulationModeActive ET que ce capteur précis n'est
 // pas encore câblé réellement (GVL_Simulation.Bus*/Sensor*IsReal). Voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md.
 
-// Simulation de la chaîne de sécurité AU / réarmement (Lot 1)
-instSimSafety(
-    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorEmergencyStopChainIsReal,
-    PowerCutOff_A   := PowerCutOff_A_RQ,
-    PowerCutOff_B   := PowerCutOff_B_RQ,
-    EmergencyArming := EmergencyArming_RQ,
-    BtnEmergencyStop := GVL_PLC_Tests.OverrideChainFalse
-);
-
-instEmergencyStopOk(InputRaw := EmergencyStopOk_DI OR instSimSafety.SimContactorOk, FilterTime := T#20MS);
+instEmergencyStopOk(InputRaw := PowerContactorEngaged_DI, FilterTime := T#20MS);
 EmergencyStopOk := instEmergencyStopOk.State;
 
-// 🔧 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) — distincte du contacteur de
-// puissance ci-dessus. Réutilise le même flag simulation (même sous-système physique AU).
-instEmergencyChain(InputRaw := EmergencyChainOK_DI OR instSimSafety.SimChainOk, FilterTime := T#20MS);
+// 🔧 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC)
+instEmergencyChain(InputRaw := EmergencyChainClosed_DI, FilterTime := T#20MS);
 EmergencyChain := instEmergencyChain.State;
 
-// 🔧 REX 2026-07-07 : M1_M2_SlackCableSwitch_DI → M2_SlackCableSwitch_DI (capteur physiquement
-// uniquement sur le tambour M2, le préfixe M1_M2_ ne reflétait pas la réalité du câblage)
-instSlackCableSwitch(InputRaw := M2_SlackCableSwitch_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorSlackCableIsReal), FilterTime := T#20MS);
+instSlackCableSwitch(InputRaw := M2_TensionedCable_DI, FilterTime := T#20MS);
 SlackCableSwitch := instSlackCableSwitch.State;
 
-// 🪨 Kobold : entrée dédiée, distincte du mou de câble.
-// Adresse terrain : KoboldContactFond_DI = %IX0.5.
-instKoboldContactFond(
-    InputRaw := KoboldContactFond_DI
-                OR (GVL_Simulation.SimulationModeActive
-                    AND NOT GVL_Simulation.SensorKoboldContactFondIsReal
-                    AND GVL_Simulation.SimKoboldContactFondValue),
-    FilterTime := T#20MS);
+instKoboldContactFond(InputRaw := M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
 KoboldContactFond := instKoboldContactFond.State;
 
-// 🆕 REX 2026-07-08 (4) : cohérence simulation (demande utilisateur) — l'ancien câblage forçait
-// TopPositionSensor à TOUJOURS TRUE (sain) en simulation, quelle que soit la position codeur :
-// impossible de tester bit5/Méca D (capteur haut) en simulation, il ne se déclenchait JAMAIS.
-// Dérivé désormais de la position M1 simulée (référence de l'ensemble, voir FB_Bucket/
-// ActiveOffsetM) — 1 cycle de retard (PRG_00 avant PRG_02 dans l'ordre de tâche), négligeable,
-// même principe déjà assumé ailleurs (EncoderFaultPresent, BenneHoldStillActive).
-SimTopSensorTriggered := (NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= _WinchM1CfgPersist.CfgTopSensorPos_M))
-                      OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= _WinchM2CfgPersist.CfgTopSensorPos_M));
-instTopPositionSensor(InputRaw := M1_M2_TopPositionSensor_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTopPositionIsReal AND NOT SimTopSensorTriggered), FilterTime := T#20MS);
+instTopPositionSensor(InputRaw := M1M2_TopPositionFree_DI, FilterTime := T#20MS);
 TopPositionSensor := instTopPositionSensor.State;
 
-instCtrlPhaseRotation(InputRaw := CtrlPhaseRotation_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorPhaseRotationIsReal), FilterTime := T#20MS);
+instCtrlPhaseRotation(InputRaw := PhaseRotationOk_DI, FilterTime := T#20MS);
 PhaseRotationOk := instCtrlPhaseRotation.State;
 
-// 🆕 REX 2026-07-08 : thermique frein commun M1/M2/M3 (1 seul fil, voir bandeau ci-dessus)
-instBrakeThermalFeedback(InputRaw := BrakeThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorBrakeThermalIsReal), FilterTime := T#20MS);
+instBrakeThermalFeedback(InputRaw := BrakeThermalOk_DI, FilterTime := T#20MS);
 BrakeThermalFeedback := instBrakeThermalFeedback.State;
 
 // 🪝 ─── WINCH M1 ──────────────────────────────────────────────────────────
-// 🧪 Simulation des retours contacteurs M1 (retombés si aucun sens/vitesse commandé)
-M1_FwdRevSpeedFeedbackOff_Simulated := NOT (PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev OR PRG_10_Outputs.M1SpeedContactor1 OR PRG_10_Outputs.M1SpeedContactor2 OR PRG_10_Outputs.M1SpeedContactor3 OR PRG_10_Outputs.M1SpeedContactor4);
-instM1FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_FwdRevSpeedFeedbackOff_DI, M1_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
+instM1FwdRevSpeedFeedbackOff(InputRaw := M1_ContactorsReleased_DI, FilterTime := T#20MS);
 M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
 
-instM1Thermal(InputRaw := M1_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ThermalIsReal), FilterTime := T#20MS);
+instM1Thermal(InputRaw := M1_ThermalOk_DI, FilterTime := T#20MS);
 M1ThermalFeedback := instM1Thermal.State;
 
-// 🧪 Simulation du retour frein M1 — 🆕 REX 2026-07-26 : le retour recopie la COMMANDE (image du
-// contacteur de commande), il n'est PAS son complément. Valeur en convention PHYSIQUE (1 = ouvert),
-// comme le DI réel, puisque l'inversion est appliquée juste après par FB_Input.
-M1BrakeFeedback_Simulated := PRG_10_Outputs.M1BrakeCmd;
-instM1BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal, M1_BrakeFeedback_DI, M1BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+instM1BrakeFeedback(InputRaw := M1_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
-// 🧪 Simulation des retours contacteurs M2 (retombés si aucun sens/vitesse commandé)
-M2_FwdRevSpeedFeedbackOff_Simulated := NOT (PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev OR PRG_10_Outputs.M2SpeedContactor1 OR PRG_10_Outputs.M2SpeedContactor2 OR PRG_10_Outputs.M2SpeedContactor3 OR PRG_10_Outputs.M2SpeedContactor4);
-instM2FwdRevSpeedFeedbackOff(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_FwdRevSpeedFeedbackOff_DI, M2_FwdRevSpeedFeedbackOff_Simulated), FilterTime := T#20MS);
+instM2FwdRevSpeedFeedbackOff(InputRaw := M2_ContactorsReleased_DI, FilterTime := T#20MS);
 M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
 
-instM2Thermal(InputRaw := M2_ThermalFeedback_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ThermalIsReal), FilterTime := T#20MS);
+instM2Thermal(InputRaw := M2_ThermalOk_DI, FilterTime := T#20MS);
 M2ThermalFeedback := instM2Thermal.State;
 
-// 🧪 Simulation du retour frein M2 — 🆕 REX 2026-07-26 : idem M1, le retour recopie la COMMANDE.
-// Valeur en convention PHYSIQUE (1 = ouvert), inversion appliquée par FB_Input juste après.
-M2BrakeFeedback_Simulated := PRG_10_Outputs.M2BrakeCmd;
-instM2BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal, M2_BrakeFeedback_DI, M2BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+instM2BrakeFeedback(InputRaw := M2_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
-// 🧪 Simulation dynamique du trajet M3 (FB_Sim_Translation, non prioritaire — voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
-// §Translation). Appelée AVANT les FB_Input pour que ses sorties soient à jour au même cycle
-// (sinon décalage d'1 cycle sur le OR ci-dessous). Remplace le forçage manuel en vue instance.
-// 🔧 L'ancien mode relais DEGRADED_IO est supprimé. La simulation déduit directement le sens de
-// `M3_CommandWord`, variable PDO EtherCAT réellement envoyée en Auto comme en Manuel.
-// Lecture décalée d'1 cycle (10 ms, M3_CommandWord réécrit en position
-// 10 par PRG_10_Outputs après ce PRG_00) — négligeable devant TravelTimeS (8s).
-instSimTranslation(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal,
-    TargetNum   := GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM,
-    RelayFwd    := M3_CommandWord = 1,
-    RelayRev    := M3_CommandWord = 2,
-    TravelTimeS := 8.0
-);
-
-instTranslationPosTremie(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosTremie_DI, instSimTranslation.PosTremie), FilterTime := T#20MS);
+instTranslationPosTremie(InputRaw := M3_PosTremie_DI, FilterTime := T#20MS);
 TranslationPosTremie := instTranslationPosTremie.State;
 
-instTranslationPosPV(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, GVL_Translation_M3_Stub.PosPV_DI, instSimTranslation.PosPV), FilterTime := T#20MS);
+instTranslationPosPV(InputRaw := M3_PosPV_DI, FilterTime := T#20MS);
 TranslationPosPV := instTranslationPosPV.State;
 
-instTranslationPosP2(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosFosse2_DI, instSimTranslation.PosP2), FilterTime := T#20MS);
+instTranslationPosP2(InputRaw := M3_PosP2_DI, FilterTime := T#20MS);
 TranslationPosP2 := instTranslationPosP2.State;
 
-instTranslationPosP1(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosFosse1_DI, instSimTranslation.PosP1), FilterTime := T#20MS);
+instTranslationPosP1(InputRaw := M3_PosP1_DI, FilterTime := T#20MS);
 TranslationPosP1 := instTranslationPosP1.State;
 
-instTranslationPosMaintenance(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTranslationPositionIsReal, PosMaintenance_DI, instSimTranslation.PosMaintenance), FilterTime := T#20MS);
+instTranslationPosMaintenance(InputRaw := M3_PosMaintenance_DI, FilterTime := T#20MS);
 TranslationPosMaintenance := instTranslationPosMaintenance.State;
 
 // 🆕 REX 2026-07-21 : Décodage immédiat du mot 5 capteurs position M3 (scan position 0)
@@ -17614,76 +18216,13 @@ instPositionDecoder(
     SensorP1          := TranslationPosP1,
     SensorMaintenance := TranslationPosMaintenance
 );
- 
-// 🧪 Simulation du retour frein M3 — 🆕 REX 2026-07-26 : idem M1/M2, le retour recopie la COMMANDE.
-// Valeur en convention PHYSIQUE (1 = ouvert), inversion appliquée par FB_Input juste après.
-M3BrakeFeedback_Simulated := PRG_07_TranslationControl.instTranslationM3.BrakeCmd;
-instM3BrakeFeedback(InputRaw := SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal, M3_BrakeFeedback_DI, M3BrakeFeedback_Simulated), InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
+
+instM3BrakeFeedback(InputRaw := M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
 
-// 🧪 Simulation/Filtrage des retours variateur EtherCAT M3 (lecture seule physique contournée)
-IF GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal THEN
-    M3_ActualFrequencyHz_Filtered := M3_SetpointFrequencyHz;
-    
-    // Status Word : Bit0 (Operation), Bit7 (Operation Enable)
-    IF M3_CommandWord = 1 THEN
-        M3_StatusWord_Filtered := 16#0081; // Operation + Operation Enable
-    ELSIF M3_CommandWord = 2 THEN
-        M3_StatusWord_Filtered := 16#0089; // Operation + Operation Enable + Reverse (bit3)
-    ELSE
-        M3_StatusWord_Filtered := 16#0080; // Stopped + Operation Enable
-    END_IF;
-ELSE
-    M3_ActualFrequencyHz_Filtered := M3_ActualFrequencyHz;
-    M3_StatusWord_Filtered        := M3_StatusWord;
-END_IF;
-
-// Surcharges (overrides) demandées par le banc de tests automatique
-IF GVL_PLC_Tests.OverrideChainTrue THEN
-    EmergencyChain := TRUE;
-END_IF;
-IF GVL_PLC_Tests.OverrideChainFalse THEN
-    EmergencyChain := FALSE;
-END_IF;
-IF GVL_PLC_Tests.OverrideContactorFalse THEN
-    EmergencyStopOk := FALSE;
-ELSIF GVL_PLC_Tests.OverrideEmergencyStopOkTrue THEN
-    EmergencyStopOk := TRUE;
-END_IF;
-
-// Surcharges (overrides) du banc de tests — Translation M3 (niveau capteur amont uniquement)
-IF GVL_PLC_Tests.OverrideM3AtTremie THEN
-    TranslationPosTremie := TRUE; // 🧪 Simule le Fdc extrême avant sans attendre le trajet simulé complet
-END_IF;
-// 🆕 REX 2026-07-18 : force les 5 capteurs position depuis un mot de test (indépendant du temps
-// de trajet simulé) — seul moyen de tester les 6 mots valides ET les combinaisons incohérentes.
-IF GVL_PLC_Tests.OverrideM3SensorsWordActive THEN
-    TranslationPosTremie      := GVL_PLC_Tests.OverrideM3SensorsWord.4;
-    TranslationPosPV          := GVL_PLC_Tests.OverrideM3SensorsWord.3;
-    TranslationPosP2          := GVL_PLC_Tests.OverrideM3SensorsWord.2;
-    TranslationPosP1          := GVL_PLC_Tests.OverrideM3SensorsWord.1;
-    TranslationPosMaintenance := GVL_PLC_Tests.OverrideM3SensorsWord.0;
-END_IF;
-IF GVL_PLC_Tests.OverrideM3BrakeStuckOpen THEN
-    M3BrakeFeedback := TRUE; // 🧪 Simule Méca B : retour frein resté desserré malgré commande fermée
-END_IF;
-IF GVL_PLC_Tests.OverrideM3PhantomFreq THEN
-    M3_ActualFrequencyHz_Filtered := 100; // 🧪 Simule Méca A : 1.00Hz mesuré malgré arrêt commandé (seuil 0.5Hz)
-END_IF;
-
-// 🛡️ Surcharges retours arrêt M1/M2 — polarité inverse : arrêt confirmé = TRUE.
-IF GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff THEN
-    M1FwdRevSpeedFeedbackOff := GVL_PLC_Tests.OverrideM1FwdRevSpeedFbOff;
-END_IF;
-IF GVL_PLC_Tests.OverrideM1BrakeFeedback THEN
-    M1BrakeFeedback := GVL_PLC_Tests.OverrideM1BrakeFeedback;
-END_IF;
-IF GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff THEN
-    M2FwdRevSpeedFeedbackOff := GVL_PLC_Tests.OverrideM2FwdRevSpeedFbOff;
-END_IF;
-IF GVL_PLC_Tests.OverrideM2BrakeFeedback THEN
-    M2BrakeFeedback := GVL_PLC_Tests.OverrideM2BrakeFeedback;
-END_IF;
+// Retours variateur EtherCAT M3 physiques directs
+M3_ActualFrequencyHz_Filtered := M3_ActualFrequencyHz;
+M3_StatusWord_Filtered        := M3_StatusWord;
 </xhtml>
           </ST>
         </body>
@@ -17720,14 +18259,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Traitement joystick (calib/filtre/rampe)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instSimJoystick">
-              <type>
-                <derived name="FB_Sim_Joystick" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation joystick (Lot 3 — voir CODE/SIMULATION/)</xhtml>
               </documentation>
             </variable>
             <variable name="instIhmHeartbeat">
@@ -17797,24 +18328,6 @@ CANbus.GetBusState() brut</xhtml>
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_01_Diagnostics) ===
 
-// 🧪 0. Simulation Joystick (Lot 3, priorité — voir CODE/SIMULATION/FB_Sim_Joystick.st) : appelée
-// AVANT FB_Joystick_0 pour que ses sorties soient à jour au même cycle. Remplace l'ancien bypass
-// homme-mort codé en dur dans FB_Joystick (GVL_DEBUG.DBG_DeadmanBypass_TEST) : quand
-// NOT BusJoystickSignalIsReal, ses sorties remplacent les entrées brutes ci-dessous ; le homme-mort
-// réel de FB_Joystick n'est plus jamais contourné.
-// 🆕 REX 2026-07-08 : gardé désormais par BusJoystickSignalIsReal (PAS BusJoystickIsReal, qui ne
-// couvre que le bus CANopen ci-dessous) — granularité séparée demandée par l'utilisateur : tester
-// le signal joystick réel sans dépendre du diagnostic bus/nœud CANopen (encore simulé sain).
-instSimJoystick(
-    Enable          := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusJoystickSignalIsReal,
-    NeutralRaw      := GVL_Simulation.TstJoystickForceNeutralRaw,
-    MaxRaw          := GVL_Simulation.TstJoystickForceMaxRaw,
-    // 🆕 REX 2026-07-19 : pilotage programmatique par la suite PLC_TESTS (SUITE_MODES)
-    TestOverrideActive    := GVL_PLC_Tests.OverrideJoystickActive,
-    TestOverrideRawX      := GVL_PLC_Tests.OverrideJoystickRawX,
-    TestOverrideRawY      := GVL_PLC_Tests.OverrideJoystickRawY,
-    TestOverrideRawButton := GVL_PLC_Tests.OverrideJoystickRawButton
-);
 
 // 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 ne fait plus
 // qu'ACQUÉRIR les valeurs brutes bus (GetBusState()/GetDeviceState()) et les flags de simulation ;
@@ -17834,7 +18347,7 @@ instDiagCanOpen(
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     CANbusStateRaw := RawCanBusState,
     DeviceJoystickStateRaw := RawJoystickState,
-    SimBypassActive := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusJoystickIsReal,
+    SimBypassActive := FALSE,
     NetworkBypassActive := GVL_IHM.Network.Bypass.Global
 );
 
@@ -17843,27 +18356,20 @@ instDiagEthercat(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
     DeviceVariateurStateRaw := RawVariateurState,
-    DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusVariateurM3IsReal,
+    DeviceVariateurSimBypass := FALSE,
     DeviceEncoderM1StateRaw := RawEncoderM1State,
-    DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal,
+    DeviceEncoderM1SimBypass := FALSE,
     DeviceEncoderM2StateRaw := RawEncoderM2State,
-    DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal,
+    DeviceEncoderM2SimBypass := FALSE,
     NetworkBypassActive := GVL_IHM.Network.Bypass.Global
 );
 
-// 💓 2bis. Heartbeat IHM↔PLC — appelé avant PRG_03_Safety pour fournir le statut même cycle.
-// 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : RE-COUPLÉ à SimulationModeActive
-// (annule le découplage REX 2026-07-22, même raison qu'au §1/§2 ci-dessus). Bypass actif
-// UNIQUEMENT si SimulationModeActive=TRUE ET BusIhmHeartbeatIsReal=FALSE. Sans IHM réelle sur
-// banc (simulation active), BlinkClock fournit un toggle sain ; mettre BusIhmHeartbeatIsReal :=
-// TRUE dès que la visu toggle réellement TglHeartbeatIhm.
+// 💓 2bis. Heartbeat IHM↔PLC (Fix CK6 : secours BlinkClock si IhmHeartbeat bypassé ou pas d'IHM)
 instIhmHeartbeat(
     Enable := TRUE,
-    TglHeartbeatIhm := SEL(GVL_PLC_Tests.OverrideIhmHeartbeatActive,
-                              SEL(GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusIhmHeartbeatIsReal,
-                                  GVL_IHM.Commun.TglHeartbeatIhm,
-                                  GVL_Global.BlinkClock),
-                              GVL_PLC_Tests.OverrideIhmHeartbeatToggle),
+    TglHeartbeatIhm := SEL(GVL_IHM.Network.Bypass.IhmHeartbeat OR GVL_IHM.Network.Bypass.Global,
+                           GVL_IHM.Commun.TglHeartbeatIhm,
+                           GVL_Global.BlinkClock),
     IhmTimeout := T#2s,
     PlcTogglePeriod := T#500ms
 );
@@ -17888,9 +18394,9 @@ FB_Joystick_0(
     NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP          := instDiagCanOpen.DeviceJoystick,
-    RawX                := SEL(instSimJoystick.Enable, JoyXRaw_ANA1, instSimJoystick.RawX),
-    RawY                := SEL(instSimJoystick.Enable, JoyYRaw_ANA2, instSimJoystick.RawY),
-    RawButton           := SEL(instSimJoystick.Enable, JoyBtnRaw, instSimJoystick.RawButton),
+    RawX                := JoyXRaw_ANA1,
+    RawY                := JoyYRaw_ANA2,
+    RawButton           := JoyBtnRaw,
     BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
     InvertY             := _JoystickInvertY,       // 🔧 idem
@@ -17898,9 +18404,9 @@ FB_Joystick_0(
     FilterTime          := _JoystickFilterTime,    // 🔧 idem
     AccelRate           := _JoystickAccelRate_Pct, // 🔧 idem
     DecelRate           := _JoystickDecelRate_Pct, // 🔧 idem
-    // 🛡️ Délais de sécurité Homme-Mort : temporisations courtes (10s/500ms) si joystick réel, longues (5min/1s) si simulé
-    DeadmanRearmTimeout := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.BusJoystickSignalIsReal, T#5M, T#10S),
-    NeutralHoldTime     := SEL(NOT GVL_Simulation.SimulationModeActive OR GVL_Simulation.BusJoystickSignalIsReal, T#1S, T#500MS)
+    // 🛡️ Délais de sécurité Homme-Mort : réordonnés aux valeurs réelles de production (10s / 500ms)
+    DeadmanRearmTimeout := T#10S,
+    NeutralHoldTime     := T#500MS
 );
 </xhtml>
           </ST>
@@ -17935,19 +18441,6 @@ FB_Joystick_0(
             </variable>
           </outputVars>
           <localVars>
-            <variable name="instSimEncoderM1">
-              <type>
-                <derived name="FB_Sim_Encoder" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Simulation banc de test (Lot 2 — voir CODE/SIMULATION/FB_Sim_Encoder.st)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instSimEncoderM2">
-              <type>
-                <derived name="FB_Sim_Encoder" />
-              </type>
-            </variable>
             <variable name="M1_RawPosToUse">
               <type>
                 <UDINT />
@@ -18001,16 +18494,6 @@ FB_Joystick_0(
                 <derived name="FB_Encoder_Safety" />
               </type>
             </variable>
-            <variable name="M1_SimSpeedPct">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="M2_SimSpeedPct">
-              <type>
-                <REAL />
-              </type>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -18032,63 +18515,8 @@ FB_Joystick_0(
 // aucun consommateur une fois le bypass Homing IHM_MANU supprimé (voir fin de fichier, ex-bloc
 // IF PRG_10_Outputs.ManuActive THEN ... HomingEncoder_M1/M2 ... END_IF).
 
-// 🔧 REX 2026-07-15 (4) — CORRECTIF COMPILATION : ex-SEL(ManuActive, ...) référençait
-// PRG_10_Outputs.SpeedRefPct, supprimé lors du passage de Manu sur FB_Winch (REX 2026-07-15 (2)).
-// Plus besoin de distinguer Auto/Manu ici : instWinchM1/M2.SpeedRamp.Current est désormais LA
-// vitesse rampée réelle dans les DEUX cas (FB_Winch pilote M1/M2 qu'on soit en Auto ou en Manu).
-M1_SimSpeedPct := PRG_06_WinchControl.instWinchM1.SpeedRamp.Current;
-M2_SimSpeedPct := PRG_06_WinchControl.instWinchM2.SpeedRamp.Current;
-
-// 1. SIMULATION SUR BANC DE TEST (Lot 2, granularité indépendante M1/M2 — voir DOC/AF_Partie-13_Fonction_Simulation_v1.4.md)
-// 🔧 REX 2026-07-08 : RawPos (VAR_IN_OUT) référence _SimEncoderRawPosM1/M2 —
-// survit à un reset froid comme le ferait un vrai codeur absolu physique (voir GVL_PERSISTENT.st).
-instSimEncoderM1(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal,
-    // 🔧 REX 2026-07-15 (2) : lit directement instWinchM1 (PRG_06_WinchControl) — M1 est désormais
-    // piloté par FB_Winch en Auto ET en Manu (ex-SimM1Fwd_Eff/PRG_10_Outputs retiré, obsolète) :
-    // RelayFwd/RelayRev respectent déjà SafeStop/ForbidAscent/ForbidDescent nativement, plus besoin
-    // de signaux Sim dédiés.
-    RelayFwd    := PRG_06_WinchControl.instWinchM1.RelayFwd,
-    RelayRev    := PRG_06_WinchControl.instWinchM1.RelayRev,
-    SpeedRefPct := M1_SimSpeedPct,
-    PresetCmd   := (COD1_PresettTrigCmd = 2),
-    PresetValue := COD1_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.TstEncoderSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
-    // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E) — 4096 = PointsPerRev/CableM_PerRev (8192/2.0)
-    TestOffsetCmd := GVL_Simulation.TstInjectSyncDeviationM1,
-    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.TstSyncDeviationOffsetM * 4096.0),
-    RawPos      := _SimEncoderRawPosM1
-);
-instSimEncoderM2(
-    Enable      := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal,
-    // 🔧 REX 2026-07-15 (2) : idem M1 ci-dessus, lit instWinchM2 (ex-SimM2Fwd_Eff retiré).
-    RelayFwd    := PRG_06_WinchControl.instWinchM2.RelayFwd,
-    RelayRev    := PRG_06_WinchControl.instWinchM2.RelayRev,
-    SpeedRefPct := M2_SimSpeedPct,
-    PresetCmd   := (COD2_PresettTrigCmd = 2),
-    PresetValue := COD2_PresetValue,
-    SpeedScaleFactor := GVL_Simulation.TstEncoderSpeedFactor,  // 🔧 REX 2026-07-07 : confort de test
-    // 🆕 REX 2026-07-08 (4) : injection saut de test (Concept 1 / Méca E)
-    TestOffsetCmd := GVL_Simulation.TstInjectSyncDeviationM2,
-    TestOffsetPts := REAL_TO_DINT(GVL_Simulation.TstSyncDeviationOffsetM * 4096.0),
-    RawPos      := _SimEncoderRawPosM2
-);
-
-// Aiguillage (par device — 🔧 REX 2026-07-07 : ne PAS utiliser Operational, forcé à TRUE en
-// simulation par PRG_01_Diagnostics [SEL sur BusEncoderMxIsReal] pour ne pas remonter de faux
-// défaut bus — ça sélectionnait donc systématiquement COD1/COD2_PosValue [réel, figé à 0] au
-// lieu de la position simulée, bloquant tout homing/mouvement testé en simulation.
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM1IsReal) THEN
-    M1_RawPosToUse := instSimEncoderM1.RawPosOut;
-ELSE
-    M1_RawPosToUse := COD1_PosValue;
-END_IF;
-
-IF (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.BusEncoderM2IsReal) THEN
-    M2_RawPosToUse := instSimEncoderM2.RawPosOut;
-ELSE
-    M2_RawPosToUse := COD2_PosValue;
-END_IF;
+M1_RawPosToUse := COD1_PosValue;
+M2_RawPosToUse := COD2_PosValue;
 
 // 2. TREUIL M1 (Abs → Homing → Scale)
 // 🔧 REX 2026-07-07 : Homing appelé AVANT Scale (et non l'inverse) — Scale lit HomingRefRaw en
@@ -18104,9 +18532,9 @@ instEncoderAbsM1(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
-    AlarmsIn            := SEL(instSimEncoderM1.Enable, COD1_Alarms, 0),
-    WarningsIn          := SEL(instSimEncoderM1.Enable, COD1_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational OR instSimEncoderM1.Enable,
+    AlarmsIn            := COD1_Alarms,
+    WarningsIn          := COD1_Warnings,
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational,
     PresetRequest       := instHomingM1.PresetRequest,
     PresetValue         := instHomingM1.PresetValue
 );
@@ -18154,9 +18582,9 @@ instEncoderAbsM2(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
-    AlarmsIn            := SEL(instSimEncoderM2.Enable, COD2_Alarms, 0),
-    WarningsIn          := SEL(instSimEncoderM2.Enable, COD2_Warnings, 0),
-    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational OR instSimEncoderM2.Enable,
+    AlarmsIn            := COD2_Alarms,
+    WarningsIn          := COD2_Warnings,
+    SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     PresetRequest       := instHomingM2.PresetRequest,
     PresetValue         := instHomingM2.PresetValue
 );
@@ -18717,7 +19145,6 @@ CmdAbortCycle_IHM := GVL_IHM.Cycle.Cmd.BtnAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.Cmd.BtnReset;
 SetDepthM      := GVL_IHM.Cycle.Cfg.SetDepth_M;
 SetOffsetM     := GVL_IHM.Cycle.Cfg.SetOffset_M;
-GVL_Simulation.SimKoboldContactFondValue := GVL_IHM.Cycle.Test.KoboldContactFond;
 CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
                      AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
 
@@ -19451,7 +19878,7 @@ instWinchM1(
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M1BrakeFeedback,
-    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal),
+    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     CfgRampAccelRate           := _WinchM1CfgPersist.CfgRampAccelRate,
     CfgRampDecelNormalRate     := _WinchM1CfgPersist.CfgRampDecelNormalRate,
     CfgRampDecelFastRate       := _WinchM1CfgPersist.CfgRampDecelFastRate,
@@ -19495,7 +19922,7 @@ instWinchM2(
     HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_00_Inputs.M2BrakeFeedback,
-    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal),
+    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global,
     CfgRampAccelRate           := _WinchM2CfgPersist.CfgRampAccelRate,
     CfgRampDecelNormalRate     := _WinchM2CfgPersist.CfgRampDecelNormalRate,
     CfgRampDecelFastRate       := _WinchM2CfgPersist.CfgRampDecelFastRate,
@@ -19744,7 +20171,7 @@ instTranslationM3(
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
-    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal),
+    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 
@@ -19793,9 +20220,7 @@ PRG_10_Outputs.TranslationBrakeCmd := instTranslationM3.BrakeCmd;
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
-// 🌡️ Retour thermique brut (NC) — entrée physique ThermHydraulique_DI ;
-// tant que non câblé, ce point lira FALSE côté image process réelle si absent, d'où l'OR simulation.
-HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorHydraulicThermalIsReal);
+HydraulicFaultOk := HydraulicThermalOk_DI;
 </xhtml>
           </ST>
         </body>
@@ -19883,20 +20308,6 @@ HydraulicFaultOk := ThermHydraulique_DI OR (GVL_Simulation.SimulationModeActive 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🌉 Pont persistance M2TreuilBenne.Cfg (Lot 3d-2)</xhtml>
               </documentation>
             </variable>
-            <variable name="BypassRestoreDone">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : passé de VAR simple à VAR RETAIN — en VAR simple, ce flag repassait à
-FALSE à CHAQUE reset/download (même quand GVL_IHM RETAIN restait intact), re-déclenchant la
-restauration bypass et pouvant re-forcer un bypass Global que l'opérateur venait de couper.
-🌐 Flag restauration unique des bypass (boot)</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -19941,21 +20352,6 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.Cmd.SelMode;
 GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
-
-// 🧪 Commandes de test Translation depuis la supervision.
-// Verrouillage obligatoire : aucune surcharge IHM ne peut être active hors simulation.
-IF GVL_Simulation.SimulationModeActive THEN
-    GVL_PLC_Tests.OverrideM3SensorsWordActive := GVL_IHM.TranslationM3.Test.SensorsWordActive;
-    GVL_PLC_Tests.OverrideM3SensorsWord       := GVL_IHM.TranslationM3.Test.SensorsWord;
-    GVL_PLC_Tests.OverrideM3AtTremie          := GVL_IHM.TranslationM3.Test.AtTremie;
-    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := GVL_IHM.TranslationM3.Test.BrakeStuckOpen;
-    GVL_PLC_Tests.OverrideM3PhantomFreq       := GVL_IHM.TranslationM3.Test.PhantomFreq;
-ELSE
-    GVL_PLC_Tests.OverrideM3SensorsWordActive := FALSE;
-    GVL_PLC_Tests.OverrideM3AtTremie          := FALSE;
-    GVL_PLC_Tests.OverrideM3BrakeStuckOpen    := FALSE;
-    GVL_PLC_Tests.OverrideM3PhantomFreq       := FALSE;
-END_IF;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
@@ -20134,12 +20530,6 @@ IF NOT GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bucket.Bypass.Initialized := TRUE;
 END_IF;
 
-// 🌐 BypassRestoreDone est désormais 100% orphelin (tous les bypass ont migré sur leur propre flag .Initialized).
-// 🐛 FIX 2026-07-23 : BypassRestoreDone en VAR RETAIN (évite re-forcage au boot si GVL_IHM intact).
-IF NOT BypassRestoreDone THEN
-    BypassRestoreDone := TRUE;
-END_IF;
-
 
 // ── 3. PROPAGATION DES RÉGLAGES IHM → PERSISTANCE ───────────────────────
 // 🐛 FIX 2026-07-23 : chaque bloc ci-dessous est désormais gardé par le flag `Cfg.Initialized`/
@@ -20172,11 +20562,11 @@ GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_00_Inputs.TopPositionSensor;
 // 🔧 REX (session Bypass) : structs Bypass dedies par metier (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
 // — ContactorFeedback reste par axe (materiel propre a chaque treuil/translation), SlackCable et
 // TopPositionSensor passent dans Commun.Bypass (capteur physique UNIQUE partage M1/M2, plus de duplication).
-GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM1ContactorFeedbackIsReal;
-GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM2ContactorFeedbackIsReal;
-GVL_IHM.TranslationM3.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorM3ContactorFeedbackIsReal;
-GVL_IHM.Commun.Bypass.SlackCable        := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorSlackCableIsReal;
-GVL_IHM.Commun.Bypass.TopPositionSensor := GVL_Simulation.SimulationModeActive AND NOT GVL_Simulation.SensorTopPositionIsReal;
+GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := FALSE;
+GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback := FALSE;
+GVL_IHM.TranslationM3.Bypass.ContactorFeedback := FALSE;
+GVL_IHM.Commun.Bypass.SlackCable        := FALSE;
+GVL_IHM.Commun.Bypass.TopPositionSensor := FALSE;
 
 
 // ── 5. MAPPING ÉTATS TREUIL M1 → IHM ─────────────────────────────────────
@@ -20389,9 +20779,8 @@ GVL_IHM.TranslationM3.Safety.ErrorLimitSwitch    := PRG_03_Safety.instSafetyTran
 GVL_IHM.TranslationM3.Safety.ErrorSensorIncoherent:= PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
 GVL_IHM.TranslationM3.Safety.SafeStop          := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.Safety.PowerCutOff       := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
-// 🔧 Diag variateur décodé (pas de bit-masking côté IHM) — StatusWord bit7=CommReady, bit0=PowerReady
-GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7 OR GVL_Simulation.SimulationModeActive;
-GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0 OR GVL_Simulation.SimulationModeActive;
+GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7;
+GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
 GVL_IHM.TranslationM3.State.DriveActualFreq_Hz     := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.State.DriveFreqRef_Hz        := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
@@ -20753,10 +21142,10 @@ Pulse 1s en cours</xhtml>
 
 // 🪝 ─── WINCH M1 — lit les VAR_INPUT de PRG_10_Outputs, écrit les I/O réels ────
 instM1RelayFwd(Command := M1RelayFwd);
-M1_RelayFwd_DQ := instM1RelayFwd.State;
+M1_RelayFwd_Up_DQ := instM1RelayFwd.State;
 
 instM1RelayRev(Command := M1RelayRev);
-M1_RelayRev_DQ := instM1RelayRev.State;
+M1_RelayRev_Down_DQ := instM1RelayRev.State;
 
 instM1SpeedContactor1(Command := M1SpeedContactor1);
 M1_SpeedContactor_1_DQ := instM1SpeedContactor1.State;
@@ -20771,14 +21160,14 @@ instM1SpeedContactor4(Command := M1SpeedContactor4);
 M1_SpeedContactor_4_DQ := instM1SpeedContactor4.State;
 
 instM1BrakeCmd(Command := M1BrakeCmd);
-M1_BrakeCmd_RQ := instM1BrakeCmd.State;
+M1_BrakeRelease_RQ := instM1BrakeCmd.State;
 
 // 🪝 ─── WINCH M2 ──────────────────────────────────────────────────────────
 instM2RelayFwd(Command := M2RelayFwd);
-M2_RelayFwd_DQ := instM2RelayFwd.State;
+M2_RelayFwd_Up_Close_DQ := instM2RelayFwd.State;
 
 instM2RelayRev(Command := M2RelayRev);
-M2_RelayRev_DQ := instM2RelayRev.State;
+M2_RelayRev_Down_Open_DQ := instM2RelayRev.State;
 
 instM2SpeedContactor1(Command := M2SpeedContactor1);
 M2_SpeedContactor_1_DQ := instM2SpeedContactor1.State;
@@ -20793,27 +21182,23 @@ instM2SpeedContactor4(Command := M2SpeedContactor4);
 M2_SpeedContactor_4_DQ := instM2SpeedContactor4.State;
 
 instM2BrakeCmd(Command := M2BrakeCmd);
-M2_BrakeCmd_RQ := instM2BrakeCmd.State;
+M2_BrakeRelease_RQ := instM2BrakeCmd.State;
 
 // ↔️ ─── TRANSLATION M3 ────────────────────────────────────────────────────────
 instTranslationBrakeCmd(Command := TranslationBrakeCmd);
-M3_BrakeCmd_RQ := instTranslationBrakeCmd.State;
+M3_BrakeRelease_RQ := instTranslationBrakeCmd.State;
 
-// 🪨 Adresse terrain : KoboldContactor_DQ = %QX0.6.
+// 🪨 Adresse terrain : M1_M2_KoboldMeasureEnable_DQ = %QX0.6.
 // Coupure prioritaire si la puissance ou la chaîne AU n'est plus validée.
-KoboldContactor_DQ := KoboldContactorCmd
-                      AND PRG_00_Inputs.EmergencyStopOk
-                      AND PRG_00_Inputs.EmergencyChain;
+M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd
+                               AND PRG_00_Inputs.EmergencyStopOk
+                               AND PRG_00_Inputs.EmergencyChain;
 
 // ── Translation M3 — variateur EtherCAT AC600, mot de commande direct (PAS de relais) ──
 M3_CommandWord         := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
 M3_SetpointFrequencyHz := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
 // 🔧 DriveActualFreqHz / DriveCommReady / DrivePowerReady : écrits une seule fois, en
 // PRG_09_Supervision (GVL_IHM.TranslationM3), valables dans tous les modes.
-
-// Relais de direction M3 obsolètes forcés à FALSE
-M3_RelayFwd_DQ := FALSE;
-M3_RelayRev_DQ := FALSE;
 
 // ─── 🧨 COUPURE PUISSANCE AMONT REDONDANTE (Série physique, commande parallèle) ────────
 // 🔧 REX 2026-07-19 : suppression IHM_MANU — plus de bypass conditionnel, PowerCutOffReq
@@ -20834,8 +21219,8 @@ instSafetyEmergencyManagement(
 );
 
 // Affectation des sorties physiques et logiques de coupure/réarmement
-PowerCutOff_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
-PowerCutOff_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
+PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
+PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
 EmergencyArming_RQ := instSafetyEmergencyManagement.EmergencyArming_RQ;
 
 // Copie des états de diagnostic vers la supervision IHM
@@ -20850,6 +21235,189 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>9584ee4a-a6d9-5e28-a736-6fefeebf7e24</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="PRG_11_Troubleshooting" pouType="program">
+        <interface>
+          <inputVars />
+          <outputVars />
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕵️‍♂️ PRG_11_Troubleshooting — Programme Espion de Recherche de Pannes (ORIENTÉ FONCTIONS)
+   ───────────────────────────────────────────────────────────────
+   ⚙️ Exécuté en toute fin de MainTask (Position 11).
+   🔒 ZERO ÉCRITURE SUR LA MACHINE : 100% lecture seule.
+   🎨 Alimente la GVL_Troubleshooting par UTILISATION ET FONCTIONS MACHINE.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (corps du PROGRAM PRG_11_Troubleshooting) ===
+
+// 🛗 ─── 1. LEVAGE SYNCHRONISÉ M1 + M2 (MODE COUPLÉ NOMINAL) ───────────────────
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx102_M2_CablePos_M         := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx103_SyncDelta_M           := PRG_06_WinchControl.instWinchSync.DeltaPosM;
+
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx201_JoyYRaw_Pct           := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM       := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx203_ArbitratedSpeed_Pct   := PRG_06_WinchControl.M1_SpeedRef_Active;
+
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx302_SyncFaultActive       := PRG_06_WinchControl.instWinchSync.Error;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx303_M1_ForbidAscent       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx304_M2_ForbidAscent       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx401_SyncMotionAllowed     := PRG_06_WinchControl.instWinchM1.Ready AND PRG_06_WinchControl.instWinchM2.Ready;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx402_M1_SetpointSpeed_Pct  := PRG_06_WinchControl.M1_SpeedRef_Active;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx403_M2_SetpointSpeed_Pct  := PRG_06_WinchControl.M2_SpeedRef_Active;
+
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ     := PRG_10_Outputs.M1RelayFwd;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ     := PRG_10_Outputs.M2RelayFwd;
+
+
+// 🛗 ─── 2. LEVAGE UNITAIRE M1 (TREUIL RETENUE) ────────────────────────────────
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM1.RawPos);
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeIsOpen_DI         := PRG_00_Inputs.M1BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M1ThermalFeedback;
+
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct:= PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp   := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct      := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive           := PRG_04_Modes.instModes.Mode;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm   := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct  := PRG_06_WinchControl.M1_SpeedRef_Active;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection  := PRG_06_WinchControl.M1_Direction_Active;
+
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive         := PRG_03_Safety.instSafetyWinchM1.SafeStop;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive      := PRG_03_Safety.instSafetyWinchM1.PowerCutOff;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI   := PRG_00_Inputs.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive  := GVL_IHM.Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective  := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI  := PRG_00_Inputs.SlackCableSwitch;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := GVL_IHM.Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_ForbidDescentEffective := PRG_03_Safety.instSafetyWinchM1.ForbidDescent;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask           := INT_TO_WORD(PRG_03_Safety.instSafetyWinchM1.State);
+
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed        := PRG_06_WinchControl.instWinchM1.Ready;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated  := PRG_06_WinchControl.instWinchM1.StepNumber;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct        := PRG_06_WinchControl.M1_SpeedRef_Active;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized:= PRG_06_WinchControl.instWinchM1.BrakeCmd;
+
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx501_CmdRelayFwd_Up_DQ    := PRG_10_Outputs.M1RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx502_CmdRelayRev_Down_DQ  := PRG_10_Outputs.M1RelayRev;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ:= PRG_10_Outputs.M1SpeedContactor1;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ:= PRG_10_Outputs.M1SpeedContactor4;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ   := PRG_10_Outputs.M1BrakeCmd;
+
+
+// 🛗 ─── 3. LEVAGE UNITAIRE M2 (TREUIL BENNE) ──────────────────────────────────
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM2.RawPos);
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeIsOpen_DI         := PRG_00_Inputs.M2BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M2ThermalFeedback;
+
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct:= PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp   := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := GVL_IHM.M2TreuilBenne.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct      := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive           := PRG_04_Modes.instModes.Mode;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm   := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct  := PRG_06_WinchControl.M2_SpeedRef_Active;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection  := PRG_06_WinchControl.M2_Direction_Active;
+
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive         := PRG_03_Safety.instSafetyWinchM2.SafeStop;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive      := PRG_03_Safety.instSafetyWinchM2.PowerCutOff;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI   := PRG_00_Inputs.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive  := GVL_IHM.Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective  := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI  := PRG_00_Inputs.SlackCableSwitch;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := GVL_IHM.Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_ForbidDescentEffective := PRG_03_Safety.instSafetyWinchM2.ForbidDescent;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask           := INT_TO_WORD(PRG_03_Safety.instSafetyWinchM2.State);
+
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed        := PRG_06_WinchControl.instWinchM2.Ready;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated  := PRG_06_WinchControl.instWinchM2.StepNumber;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct        := PRG_06_WinchControl.M2_SpeedRef_Active;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized:= PRG_06_WinchControl.instWinchM2.BrakeCmd;
+
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx501_CmdRelayFwd_Up_DQ    := PRG_10_Outputs.M2RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx502_CmdRelayRev_Down_DQ  := PRG_10_Outputs.M2RelayRev;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ:= PRG_10_Outputs.M2SpeedContactor1;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ:= PRG_10_Outputs.M2SpeedContactor4;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ   := PRG_10_Outputs.M2BrakeCmd;
+
+
+// 🪣 ─── 4. OUVERTURE / FERMETURE BENNE ─────────────────────────────────────────
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen               := PRG_06_WinchControl.instBucketState.IsOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed             := PRG_06_WinchControl.instBucketState.IsClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx103_OffsetPos_M                := PRG_06_WinchControl.instBucket.ActiveOffsetM;
+
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen             := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose            := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open              := PRG_05_Cycle.instCycle.CmdBucket_Open;
+
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed       := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive          := PRG_06_WinchControl.instBucket.Error;
+
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy                 := PRG_06_WinchControl.instBucket.Busy;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone                 := PRG_06_WinchControl.instBucket.Done;
+
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ               := PRG_10_Outputs.M2RelayRev;
+
+
+// ↔️ ─── 5. TRANSLATION PONT M3 (VARIATEUR AC600) ─────────────────────────────
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI         := PRG_00_Inputs.TranslationPosTremie;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI             := PRG_00_Inputs.TranslationPosPV;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx103_PosP2_DI             := PRG_00_Inputs.TranslationPosP2;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI             := PRG_00_Inputs.TranslationPosP1;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := PRG_00_Inputs.TranslationPosMaintenance;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_00_Inputs.M3_StatusWord_Filtered;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeIsOpen_DI       := PRG_00_Inputs.M3BrakeFeedback;
+
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.FB_Joystick_0.RawX;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd        := GVL_IHM.TranslationM3.Cmd.BtnFwd;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev        := GVL_IHM.TranslationM3.Cmd.BtnRev;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition    := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition  := GVL_IHM.Cycle.State.SelTarget;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive           := PRG_04_Modes.instModes.Mode;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive  := GVL_IHM.TranslationM3.Bypass.Global;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := PRG_07_TranslationControl.M3_SpeedRef_Active;
+
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive        := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx303_PowerCutOffActive     := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch    := GVL_IHM.TranslationM3.Bypass.LimitSwitch;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := PRG_03_Safety.instSafetyTranslationM3.ErrorSensorIncoherent;
+
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed        := PRG_07_TranslationControl.instTranslationM3.Ready;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz      := PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx403_DriveControlWord     := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord  := PRG_07_TranslationControl.instTranslationM3.DriveControlWord;
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz      := REAL_TO_UINT(PRG_07_TranslationControl.instTranslationM3.DriveFreqRefHz * 100.0);
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   := PRG_10_Outputs.TranslationBrakeCmd;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>07195219-7877-5f98-aec3-85c8b09adc2c</ObjectId>
           </data>
         </addData>
       </pou>
@@ -21338,13 +21906,13 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <initialValue>
             <structValue>
               <value member="CfgTopSensorPos_M">
-                <simpleValue value="8.5" />
+                <simpleValue value="8" />
               </value>
               <value member="CfgHomingTarget_M">
                 <simpleValue value="0" />
               </value>
               <value member="CfgRampAccelRate">
-                <simpleValue value="50" />
+                <simpleValue value="10" />
               </value>
               <value member="CfgRampDecelNormalRate">
                 <simpleValue value="150" />
@@ -21356,7 +21924,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
                 <simpleValue value="-20" />
               </value>
               <value member="CfgCableLimitAscent_M">
-                <simpleValue value="8" />
+                <simpleValue value="7.5" />
               </value>
             </structValue>
           </initialValue>
@@ -21375,13 +21943,13 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <initialValue>
             <structValue>
               <value member="CfgTopSensorPos_M">
-                <simpleValue value="8.5" />
+                <simpleValue value="8" />
               </value>
               <value member="CfgHomingTarget_M">
                 <simpleValue value="0" />
               </value>
               <value member="CfgRampAccelRate">
-                <simpleValue value="50" />
+                <simpleValue value="10" />
               </value>
               <value member="CfgRampDecelNormalRate">
                 <simpleValue value="150" />
@@ -21393,7 +21961,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
                 <simpleValue value="-20" />
               </value>
               <value member="CfgCableLimitAscent_M">
-                <simpleValue value="8" />
+                <simpleValue value="7.5" />
               </value>
             </structValue>
           </initialValue>
@@ -21466,7 +22034,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
                     <simpleValue value="0" />
                   </value>
                   <value member="OffsetCloseM">
-                    <simpleValue value="10" />
+                    <simpleValue value="15" />
                   </value>
                   <value member="CoherenceLimitM">
                     <simpleValue value="0.05" />
@@ -21835,217 +22403,6 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_PLC_Tests">
-        <variable name="OverrideChainTrue">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Chaîne Safety AU — lues par PRG_00_Inputs
-Force la boucle AU à TRUE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideChainFalse">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force la boucle AU à FALSE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideContactorFalse">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à FALSE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideEmergencyStopOkTrue">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le retour contacteur à TRUE (réarmé)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM3AtTremie">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Translation M3 — lues par PRG_00_Inputs, écrites par PRG_09_Supervision depuis l'IHM
-(niveau capteur amont uniquement, jamais une sortie de commande calculée)
-Force TranslationPosTremie (Fdc extrême avant) à TRUE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM3BrakeStuckOpen">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force M3BrakeFeedback (retour bobine) à TRUE (desserré) — simule Méca B</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM3PhantomFreq">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Force M3_ActualFrequencyHz_Filtered à 1.00Hz malgré arrêt commandé — simule Méca A</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM3SensorsWordActive">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : force directement les 5 capteurs position M3 depuis un mot de test —
-seul moyen de tester les 6 mots valides ET les combinaisons incohérentes indépendamment
-du temps de trajet simulé (FB_Sim_Translation). bit4=Trémie,bit3=PV,bit2=P2,bit1=P1,bit0=Maintenance.
-TRUE = force les 5 capteurs depuis OverrideM3SensorsWord</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM3SensorsWord">
-          <type>
-            <BYTE />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de test (voir FB_Translation_PositionDecoder)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideJoystickActive">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Joystick — lues par PRG_01_Diagnostics (voir FB_Sim_Joystick)
-TRUE = RawX/Y/Button pilotés par les 3 champs suivants</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideJoystickRawX">
-          <type>
-            <INT />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Débattement axe X simulé (5000=neutre, 10000=fond)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideJoystickRawY">
-          <type>
-            <INT />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Débattement axe Y simulé (5000=neutre, 10000=fond)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideJoystickRawButton">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui homme-mort simulé</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideIhmHeartbeatActive">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Heartbeat IHM↔PLC — stimulus AMONT uniquement, consommé par PRG_01_Diagnostics.
-Rien n'écrit dans HeartbeatIhmOk/SafeStop/PowerCutOff calculés.
-TRUE = le forçage fournit le toggle IHM</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideIhmHeartbeatToggle">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur IHM→PLC : figer pour provoquer le timeout, faire basculer pour simuler une IHM saine</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM1FwdRevSpeedFbOff">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Retours d'arrêt M1/M2 — polarité inverse : arrêt confirmé = TRUE. Lues par PRG_00_Inputs.
-TRUE = contacteurs retombés (sain)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM1BrakeFeedback">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein serré (sain)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM2FwdRevSpeedFbOff">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteurs retombés (sain)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideM2BrakeFeedback">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein serré (sain)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OverrideHmiCommandPurge">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 WINCH-CORE-01 — rejoue la purge des commandes IHM RETAIN du boot, en simulation
-uniquement (voir PRG_00_Inputs, gardé par GVL_Simulation.SimulationModeActive).
-TRUE = purge commandes RETAIN dans PRG_00</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>075e3c4c-ec9c-57a1-9ae5-eb94d89b5791</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 GVL_PLC_Tests — Points d'injection de pannes pour essais banc
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v1.4.md
-   🎯 Rôle : forcer artificiellement une entrée physique à un état donné, pour
-      reproduire une panne en simulation sans avoir à la câbler réellement.
-
-   🔧 REX 2026-07-26 : le framework de tests automatiques in-PLC (FB_TestSequencer,
-      suites de validation, rapports) a été RETIRÉ — empreinte automate trop lourde et
-      resynchronisation permanente des suites à chaque évolution métier. Archivé dans
-      `ARCHIVES/Code/PLC_TESTS/`. Cette GVL survit car ses `Override*` restent le seul
-      moyen d'injecter une panne en essai.
-
-   ⚙️ Qui écrit ces variables désormais :
-      - 🖐️ l'opérateur, en forçage manuel (vue instance / liste de surveillance CODESYS)
-      - 🖥️ l'IHM, pour les 5 capteurs position M3 uniquement (voir PRG_09_Supervision,
-           verrouillé par `GVL_Simulation.SimulationModeActive`)
-      👉 Plus aucun automate ne les pilote : tout est à FALSE au boot, donc aucun effet
-         de bord possible sur la machine réelle.
-
-   🛡️ RÈGLE : ne JAMAIS forcer une sortie de commande calculée, uniquement une entrée
-      physique en amont — un override ne doit pas pouvoir masquer un défaut.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Simulation">
         <variable name="SimulationModeActive">
           <type>
@@ -22404,14 +22761,6 @@ Front montant = applique le saut sur M1</xhtml>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Translation_M3_Stub">
-        <variable name="PosPV_DI">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Nouvelle entrée physique PV à mapper dans CODESYS.</xhtml>
-          </documentation>
-        </variable>
         <variable name="StubTranslationPositionSelect_IHM">
           <type>
             <INT />
@@ -22438,6 +22787,69 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
    🧹 REX 2026-07-18 : ancien mode relais `DEGRADED_IO` retiré. Les sorties relais,
       retours contacteurs, défaut TOR et cible générique sans consommateur sont supprimés.
       Restent uniquement PV (entrée réelle à mapper) et le sélecteur de trajet simulé.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Troubleshooting">
+        <variable name="LevageSynchroniseM1M2">
+          <type>
+            <derived name="ST_ChainWinchSync" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 1. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="LevageUnitaireM1">
+          <type>
+            <derived name="ST_ChainWinch" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 2. Levage Unitaire M1 (Treuil Retenue)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="LevageUnitaireM2">
+          <type>
+            <derived name="ST_ChainWinch" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 3. Levage Unitaire M2 (Treuil Benne)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BenneOuvertureFermeture">
+          <type>
+            <derived name="ST_ChainBucket" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 4. Ouverture / Fermeture Benne</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TranslationPontM3">
+          <type>
+            <derived name="ST_ChainTranslation" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 5. Translation Pont M3 (Variateur AC600)</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4eb3d9-a87c-5e82-816b-4cd345ae97ab</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions Machines)
+   ───────────────────────────────────────────────────────────────
+   ⚙️ Emplacement : CODE/MAIN/GVL_Troubleshooting.st
+   🎨 Structurée par UTILISATION ET FONCTIONS MACHINE (pas uniquement par matériel).
+   💬 Permet de localiser en 3 secondes le blocage d'une action utilisateur.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
@@ -22517,17 +22929,16 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
         </Folder>
         <Folder Name="SIMULATION">
-          <Object Name="FB_Sim_DigitalMirror" ObjectId="81504ce5-b647-53c2-8f8b-ce94a0f64dac" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="GVL_PLC_Tests" ObjectId="075e3c4c-ec9c-57a1-9ae5-eb94d89b5791" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
         <Folder Name="MAIN">
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
           <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
           <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
           <Object Name="PRG_02_Encoders" ObjectId="b971c8dd-35c9-56f9-a5f0-9f678de64af4" />
@@ -22539,6 +22950,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="PRG_08_AuxiliaryControl" ObjectId="a4a4d65c-07cc-5e86-a434-6cd17437a575" />
           <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
           <Object Name="PRG_10_Outputs" ObjectId="9584ee4a-a6d9-5e28-a736-6fefeebf7e24" />
+          <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
           <Object Name="PRG_IP" ObjectId="b6ce8979-9803-5bfc-9c19-fc63a6d2716c" />
         </Folder>
         <Folder Name="SUPERVISION">
@@ -22554,6 +22966,20 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
             <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
+            <Object Name="ST_ChainBucket" ObjectId="7699fad2-6e4d-5ba2-8474-a7ccec9b870d" />
+            <Object Name="ST_ChainTranslation" ObjectId="7dbc6f0d-3311-5752-8222-088008af3b8a" />
+            <Object Name="ST_ChainWinch" ObjectId="cfbad681-bc46-5033-b562-e37133b1f706" />
+            <Object Name="ST_ChainWinchSync" ObjectId="68f6d77a-138b-5a81-867d-04895e9150ef" />
+            <Object Name="ST_Chain_Translation_Control" ObjectId="14af5a36-209b-5924-9d37-55e0fe9b9087" />
+            <Object Name="ST_Chain_Translation_Demandes" ObjectId="54c2779a-7906-561e-8905-7cd39e8fd17a" />
+            <Object Name="ST_Chain_Translation_Inputs" ObjectId="fb10b748-ace9-58b2-a9b2-22283873ba21" />
+            <Object Name="ST_Chain_Translation_Outputs" ObjectId="87cc5d9f-4236-5c35-af2e-39700a24a168" />
+            <Object Name="ST_Chain_Translation_Safety" ObjectId="82dcbfd2-2633-5250-924d-68e882d3d0cb" />
+            <Object Name="ST_Chain_Winch_Control" ObjectId="52be1c05-56a9-542a-a64f-52f90a2a17c7" />
+            <Object Name="ST_Chain_Winch_Demandes" ObjectId="d575144c-1279-5e18-b578-c1920999821d" />
+            <Object Name="ST_Chain_Winch_Inputs" ObjectId="67a1e74c-4741-5be8-a23f-8d9f82a30cc0" />
+            <Object Name="ST_Chain_Winch_Outputs" ObjectId="e680dbf9-a4ea-58b1-b875-ac21a8a6a304" />
+            <Object Name="ST_Chain_Winch_Safety" ObjectId="a86515da-77e1-5634-b6f3-443b78eedf33" />
             <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
             <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
@@ -22574,8 +23000,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
             <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
             <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
-            <Object Name="ST_TestCycle" ObjectId="60a8cfd9-07ff-593e-b4e7-932f1aeab649" />
-            <Object Name="ST_TestTranslation" ObjectId="678d0cb3-86df-5268-8714-2a554010910d" />
             <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
             <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
             <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
