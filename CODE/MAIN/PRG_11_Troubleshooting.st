@@ -1,15 +1,33 @@
 (* ═══════════════════════════════════════════════════════════════
-   🕵️‍♂️ PRG_11_Troubleshooting — Programme Espion de Recherche de Pannes (ORIENTÉ FONCTIONS)
+   🕵️‍♂️ PRG_11_Troubleshooting — Programme Espion de Recherche de Pannes (ORIENTÉ FONCTIONS & CONTEXTE)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté en toute fin de MainTask (Position 11).
    🔒 ZERO ÉCRITURE SUR LA MACHINE : 100% lecture seule.
-   🎨 Alimente la GVL_Troubleshooting par UTILISATION ET FONCTIONS MACHINE.
+   🎨 Alimente la GVL_Troubleshooting par CONTEXTE GLOBAL ET FONCTIONS MACHINE.
    ═══════════════════════════════════════════════════════════════ *)
 PROGRAM PRG_11_Troubleshooting
 VAR
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_11_Troubleshooting) ===
+
+// 🌐 ─── 0. CONTEXTE MACHINE GLOBAL ───────────────────────────────────────────
+GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_IHM.Commun.Bypass.SimulationEnabled;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
+
+GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (GVL_IHM.Commun.Cmd.SelOperatorSource = 0);
+GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal    := GVL_IHM.Commun.Bypass.OperatorComm;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal    := GVL_IHM.Commun.Bypass.TopPositionSensor OR GVL_IHM.Commun.Bypass.SlackCable OR GVL_IHM.TranslationM3.Bypass.LimitSwitch;
+
+GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx302_EmergencyStopOk        := PRG_00_Inputs.EmergencyStopOk;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny       := PRG_03_Safety.instSafetyWinchM1.SafeStop OR PRG_03_Safety.instSafetyWinchM2.SafeStop OR PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny   := PRG_03_Safety.instSafetyWinchM1.PowerCutOff OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+
+GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk         := PRG_01_Diagnostics.instIhmHeartbeat.Ready AND NOT PRG_01_Diagnostics.instIhmHeartbeat.Error;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy          := PRG_05_Cycle.instCycle.Busy;
+
 
 // 🛗 ─── 1. LEVAGE SYNCHRONISÉ M1 + M2 (MODE COUPLÉ NOMINAL) ───────────────────
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;

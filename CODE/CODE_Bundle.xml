@@ -1358,6 +1358,113 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_ChainContextGlobal">
+        <baseType>
+          <struct>
+            <variable name="Idx101_ModeActive">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de marche actif (MANUEL, SEMI_AUTO, MAINT_N1, MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_SimulationEnabled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Matériel Réel (Nominal) | 1 = SIMULATION ACTIVE ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_JoystickCommOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Comm CANopen Joystick OK (Sain) | 0 = Perte Comm CAN 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_JoystickSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Pilotage par Joystick Hall | 0 = Pilotage par Boutons IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_BypassNetworkGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Comm Réseau OK | 1 = BYPASS RÉSEAU ACTIF ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_BypassSensorsGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteurs Actifs | 1 = AU MOINS 1 CAPTEUR SHUNTÉ ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle AU Matérielle Fermée (OK) | 0 = AU APPUYÉ 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_EmergencyStopOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Puissance Armée | 0 = Puissance Coupée 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_SafeStopActiveAny">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = AU MOINS UN SAFESTOP MÉTIER ACTIF 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_PowerCutOffActiveAny">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = COUPURE GENERAL COLLAGE ACTIVEE 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_HmiHeartbeatOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Liaison IHM Active | 0 = Perte Liaison IHM 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_CycleAutoBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Séquenceur Auto en Cours | 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>601b64cb-498b-5fca-a2a0-11b24726fea1</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_ChainTranslation">
         <baseType>
           <struct>
@@ -21244,11 +21351,11 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
           <outputVars />
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕵️‍♂️ PRG_11_Troubleshooting — Programme Espion de Recherche de Pannes (ORIENTÉ FONCTIONS)
+   🕵️‍♂️ PRG_11_Troubleshooting — Programme Espion de Recherche de Pannes (ORIENTÉ FONCTIONS &amp; CONTEXTE)
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté en toute fin de MainTask (Position 11).
    🔒 ZERO ÉCRITURE SUR LA MACHINE : 100% lecture seule.
-   🎨 Alimente la GVL_Troubleshooting par UTILISATION ET FONCTIONS MACHINE.
+   🎨 Alimente la GVL_Troubleshooting par CONTEXTE GLOBAL ET FONCTIONS MACHINE.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -21257,6 +21364,24 @@ EmergencyArmingFailed        := instSafetyEmergencyManagement.EmergencyArmingFai
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_11_Troubleshooting) ===
+
+// 🌐 ─── 0. CONTEXTE MACHINE GLOBAL ───────────────────────────────────────────
+GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_IHM.Commun.Bypass.SimulationEnabled;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
+
+GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (GVL_IHM.Commun.Cmd.SelOperatorSource = 0);
+GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal    := GVL_IHM.Commun.Bypass.OperatorComm;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal    := GVL_IHM.Commun.Bypass.TopPositionSensor OR GVL_IHM.Commun.Bypass.SlackCable OR GVL_IHM.TranslationM3.Bypass.LimitSwitch;
+
+GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx302_EmergencyStopOk        := PRG_00_Inputs.EmergencyStopOk;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny       := PRG_03_Safety.instSafetyWinchM1.SafeStop OR PRG_03_Safety.instSafetyWinchM2.SafeStop OR PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny   := PRG_03_Safety.instSafetyWinchM1.PowerCutOff OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+
+GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk         := PRG_01_Diagnostics.instIhmHeartbeat.Ready AND NOT PRG_01_Diagnostics.instIhmHeartbeat.Error;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy          := PRG_05_Cycle.instCycle.Busy;
+
 
 // 🛗 ─── 1. LEVAGE SYNCHRONISÉ M1 + M2 (MODE COUPLÉ NOMINAL) ───────────────────
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
@@ -22793,6 +22918,14 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Troubleshooting">
+        <variable name="ContexteMachineGlobal">
+          <type>
+            <derived name="ST_ChainContextGlobal" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)</xhtml>
+          </documentation>
+        </variable>
         <variable name="LevageSynchroniseM1M2">
           <type>
             <derived name="ST_ChainWinchSync" />
@@ -22845,11 +22978,11 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions Machines)
+   🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions &amp; Contexte)
    ───────────────────────────────────────────────────────────────
    ⚙️ Emplacement : CODE/MAIN/GVL_Troubleshooting.st
-   🎨 Structurée par UTILISATION ET FONCTIONS MACHINE (pas uniquement par matériel).
-   💬 Permet de localiser en 3 secondes le blocage d'une action utilisateur.
+   🎨 Structurée par CONTEXTE GLOBAL MACHINE + FONCTIONS MÉTIER (Utilisation Opérateur).
+   💬 Permet de localiser en 3 secondes l'environnement et le blocage d'une action.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
@@ -22967,6 +23100,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
             <Object Name="ST_ChainBucket" ObjectId="7699fad2-6e4d-5ba2-8474-a7ccec9b870d" />
+            <Object Name="ST_ChainContextGlobal" ObjectId="601b64cb-498b-5fca-a2a0-11b24726fea1" />
             <Object Name="ST_ChainTranslation" ObjectId="7dbc6f0d-3311-5752-8222-088008af3b8a" />
             <Object Name="ST_ChainWinch" ObjectId="cfbad681-bc46-5033-b562-e37133b1f706" />
             <Object Name="ST_ChainWinchSync" ObjectId="68f6d77a-138b-5a81-867d-04895e9150ef" />
