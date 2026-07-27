@@ -13,7 +13,7 @@ END_VAR
 
 // 🌐 ─── 0. CONTEXTE MACHINE GLOBAL ───────────────────────────────────────────
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_IHM.Commun.Cfg.SimulationEnabled;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_Simulation.SimulationModeActive;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
 
 GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (PRG_04_Modes.instModes.Mode <> E_Mode.MAINT_N1 AND PRG_04_Modes.instModes.Mode <> E_Mode.MAINT_N2);
