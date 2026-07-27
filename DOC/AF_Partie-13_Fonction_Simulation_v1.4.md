@@ -1,3 +1,20 @@
+> # ⛔ DOCUMENT PÉRIMÉ — NE PAS S'Y FIER (2026-07-27)
+>
+> L'architecture décrite ci-dessous **n'existe plus dans le code**. Ont été supprimés :
+> `GVL_PLC_Tests` et ses 20 `Override*` · `FB_Sim_DigitalMirror` · les 25 flags `*IsReal`
+> (double négation) · les 8 conditions `DI OR (SimulationModeActive AND NOT …IsReal)` ·
+> les instances `FB_Sim_*` dispersées dans 8 programmes.
+>
+> **Architecture réelle (commits `72a3bbc`, `4817c0b`)** : toutes les entrées matérielles sont
+> acquises en **un seul endroit** (`PRG_00_Inputs` §0) dans une image unique `HwIn`
+> (`ST_HardwareImage`). La simulation se rebranchera **derrière cette frontière** (lot L6) :
+> 1 bit maître + 4 domaines en polarité positive, `FB_SimBench`, 4 `IF` d'aiguillage par
+> domaine entier.
+>
+> 👉 **Référence à jour** : [`AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`](AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md)
+> et les fiches `AUDITS/PreLivraison/TASKS/`.
+> 📌 **Ce document sera remplacé par `AF_Partie-13 v2.0` au lot L8**, une fois L6 et L7 appliqués.
+
 # 📋 Analyse Fonctionnelle — Partie 13 : Fonction Simulation (v1.4)
 
 > **Projet** : Excavatrice de dragage — Automate CODESYS 3.5

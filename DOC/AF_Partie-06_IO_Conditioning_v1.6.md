@@ -1,3 +1,16 @@
+> # ⚠️ MISE À JOUR REQUISE (2026-07-27) — chaîne d'acquisition modifiée
+>
+> Le principe de conditionnement décrit ici (`FB_Input`, filtre 20 ms, inversion NO/NC) **reste
+> exact**. Ce qui a changé, c'est **ce qui se trouve en amont** :
+>
+> | Avant | Maintenant (commit `4817c0b`) |
+> |---|---|
+> | `FB_Input(InputRaw := <Signal>_DI …)` | `FB_Input(InputRaw := HwIn.<Domaine>.<Signal> …)` |
+> | Lectures matérielles dispersées dans 5 programmes | **Une seule** acquisition, `PRG_00_Inputs` §0 → `HwReal` → `HwIn` (`ST_HardwareImage`) |
+> | Noms d'E/S sans polarité (`M1_BrakeFeedback_DI`) | Noms portant l'état vrai (`M1_BrakeIsOpen_DI`) — voir [`TABLE_Renommage_IO_v1.0.md`](AUDITS/PreLivraison/TABLE_Renommage_IO_v1.0.md) |
+>
+> 📌 À intégrer dans une **v1.7**, au lot L8 (avec `AF_Partie-13 v2.0`).
+
 # 📋 Analyse Fonctionnelle — Partie 6 : Conditionnement Entrées/Sorties (v1.6)
 
 > 📌 **v1.6** — Nettoyage documentaire (audit doc) : la remarque "mapping `ChannelOk` à définir"
