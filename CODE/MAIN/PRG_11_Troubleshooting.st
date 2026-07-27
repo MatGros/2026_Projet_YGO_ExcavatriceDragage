@@ -7,11 +7,33 @@
    ═══════════════════════════════════════════════════════════════ *)
 PROGRAM PRG_11_Troubleshooting
 VAR
+    instPreflight : FB_Preflight;
+    instWinchSymmetry : FB_WinchSymmetry;
+    TonMachineStill : TON;
+    MachineIsStillRaw : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_11_Troubleshooting) ===
 
 // 🌐 ─── 0. CONTEXTE MACHINE GLOBAL ───────────────────────────────────────────
+MachineIsStillRaw := NOT (PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev OR PRG_10_Outputs.M1SpeedContactor1 OR PRG_10_Outputs.M1SpeedContactor2 OR PRG_10_Outputs.M1SpeedContactor3 OR PRG_10_Outputs.M1SpeedContactor4)
+                 AND NOT (PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev OR PRG_10_Outputs.M2SpeedContactor1 OR PRG_10_Outputs.M2SpeedContactor2 OR PRG_10_Outputs.M2SpeedContactor3 OR PRG_10_Outputs.M2SpeedContactor4)
+                 AND (M3_CommandWord = 0) AND NOT PRG_10_Outputs.M1BrakeCmd AND NOT PRG_10_Outputs.M2BrakeCmd AND NOT PRG_10_Outputs.TranslationBrakeCmd;
+TonMachineStill(IN := MachineIsStillRaw, PT := T#2s);
+instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonMachineStill.Q,
+    M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback, M3BrakeApplied := PRG_00_Inputs.M3BrakeFeedback,
+    M1ContactorsReleased := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, M2ContactorsReleased := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, M1ThermalOk := PRG_00_Inputs.M1ThermalFeedback, M2ThermalOk := PRG_00_Inputs.M2ThermalFeedback,
+    BrakeThermalOk := PRG_00_Inputs.BrakeThermalFeedback, PhaseRotationOk := PRG_00_Inputs.PhaseRotationOk, SlackCableTensioned := PRG_00_Inputs.SlackCableSwitch, M3SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent,
+    EmergencyChain := PRG_00_Inputs.EmergencyChain, EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
+    HomedM1 := PRG_02_Encoders.instHomingM1.Homed, HomedM2 := PRG_02_Encoders.instHomingM2.Homed,
+    M1PositionInBounds := (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= -99.0) AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= 99.0), M2PositionInBounds := (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= -99.0) AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= 99.0));
+instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
+    M1CommandActive := PRG_10_Outputs.M1RelayFwd OR PRG_10_Outputs.M1RelayRev, M2CommandActive := PRG_10_Outputs.M2RelayFwd OR PRG_10_Outputs.M2RelayRev,
+    M1Direction := PRG_06_WinchControl.M1_Direction_Active, M2Direction := PRG_06_WinchControl.M2_Direction_Active,
+    M1BrakeCmd := PRG_10_Outputs.M1BrakeCmd, M2BrakeCmd := PRG_10_Outputs.M2BrakeCmd, M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback,
+    M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM, M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    M1Speed_Mps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps, M2Speed_Mps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps, SyncDeviation_M := PRG_06_WinchControl.instWinchSync.DeltaPosM,
+    Config := _WinchSymmetryCfgPersist, Data := _WinchSymmetryDataPersist);
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_Simulation.SimulationModeActive;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
@@ -55,7 +77,7 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ     := PRG_10
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM1.RawPos);
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff;
-GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeIsOpen_DI         := PRG_00_Inputs.M1BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied           := PRG_00_Inputs.M1BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M1ThermalFeedback;
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
@@ -95,7 +117,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ   := 
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM2.RawPos);
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff;
-GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeIsOpen_DI         := PRG_00_Inputs.M2BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied           := PRG_00_Inputs.M2BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M2ThermalFeedback;
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
@@ -157,7 +179,7 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI             := 
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := PRG_00_Inputs.TranslationPosMaintenance;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_00_Inputs.M3_StatusWord_Filtered;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeIsOpen_DI       := PRG_00_Inputs.M3BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_00_Inputs.M3BrakeFeedback;
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.FB_Joystick_0.RawX;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
