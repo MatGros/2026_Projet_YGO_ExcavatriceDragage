@@ -20,7 +20,8 @@
 | D6 | Mappage IHM | **Aucune variable `Test` mappée** dans la visu → retrait de `ST_TestTranslation`/`ST_TestCycle` **sans impact IHM**. Ne pas casser les structures de base |
 | D7 | Ordre des chantiers | **1) Simulation · 2) Informations de mise en service** ([plan Ergonomie](PLAN_Ergonomie_MiseEnService_v1.0.md) décalé) |
 | D8 | **Méthode** | **Débrancher d'abord, rebrancher ensuite** : P1 nettoie et se valide sur machine réelle, P2 seulement après (§5) |
-| D9 | **Visibilité** | Le banc doit être **observable en permanence** : `HwReal` / `HwSim` / `HwIn` côte à côte + comparateur `HwDelta` → critère objectif de bascule simulation → réel au câblage (§4bis) |
+| D9 | **Visibilité** | Le banc doit être **observable** : `HwReal` / `HwSim` / `HwIn` exposés côte à côte, lecture directe en vue instance CODESYS (§4bis) |
+| D11 | **Comparateur abandonné** (2026-07-27) | ❌ `FB_HwCompare`/`HwDelta` **ne sera pas développé**. Motifs : ① il comparait le réel à un **modèle**, qui n'est pas une vérité de référence — un écart n'aurait pas dit lequel des deux a tort ; ② `PRG_11_Troubleshooting` couvre déjà l'identification des blocages ; ③ la lecture côte à côte des 3 images suffit à repérer une incohérence de câblage. Le besoin de **verdict** est repris par `FB_Preflight` (plan Ergonomie), qui compare à un **état attendu connu**, sans dépendre du modèle |
 | D10 | **RETAIN / PERSISTENT** | **Perte acceptée** — aucune valeur persistante n'a de contenu à préserver aujourd'hui. Seule contrainte maintenue : **ne pas casser les structures IHM mappées dans la visu** (renommage/déplacement/suppression d'un champ mappé). Conséquence : le retrait des `.Test` se fait dès L3, plus besoin de le grouper avec une livraison IHM |
 
 ### ⚠️ Levée d'ambiguïté — `GVL_PLC_Tests` existe toujours
@@ -236,33 +237,28 @@ L'architecture le fournit presque gratuitement : les trois images ont **les mêm
 
 ```
    HwReal   ── ce que dit le matériel        (rempli EN PERMANENCE, même en simulation)
-   HwSim    ── ce que le banc attend         (calculé EN PERMANENCE si SimShadowCompare)
+   HwSim    ── ce que le banc attend         (sortie de FB_SimBench, exposée en VAR_OUTPUT)
    HwIn     ── ce que le programme utilise   (= l'un ou l'autre, par domaine)
-   HwDelta  ── 🎯 les champs où HwReal ≠ HwSim
 ```
 
 👉 En vue instance CODESYS : **3 colonnes alignées, lecture directe**, sans IHM et sans forçage.
+Pendant le câblage, comparer `HwReal` et `HwSim` sur un capteur donné dit immédiatement si le fil
+est absent ou si la **polarité est inversée**.
 
-#### Le comparateur `HwDelta` — le vrai livrable
+#### ❌ Pas de comparateur automatique (D11, 2026-07-27)
 
-Un `TRUE` dans `HwDelta` = « le matériel ne dit pas ce que le modèle attend ». En mise en service :
+Un bloc `FB_HwCompare` produisant un `HwDelta` a été spécifié puis **abandonné** :
 
-| Situation | Lecture |
+| Motif | |
 |---|---|
-| Câblage d'un capteur, simulation encore active | `HwDelta.Machine.EmergencyStopOk = TRUE` → le fil n'est pas là ou la **polarité est inversée** |
-| Tous les `HwDelta` d'un domaine à `FALSE` | ✅ le domaine peut être basculé en réel **sans surprise** |
-| `HwMismatchCount` (synthèse) | Nombre d'écarts en cours, tous domaines |
+| **Le modèle n'est pas une vérité de référence** | Il exprime ce que le développeur a **supposé** du câblage. Un écart signalé n'aurait pas dit lequel, du réel ou du modèle, a tort |
+| **Doublon** | `PRG_11_Troubleshooting` fournit déjà l'état complet par fonction machine et par couche (entrées → commandes → sécurités → autorisations → sorties) |
+| **Bruit** | Un modèle idéal diverge du réel à chaque transitoire (contacteur ~40 ms, hystérésis frein). Un indicateur qui clignote en permanence finit ignoré |
 
-🎯 **C'est le critère objectif de bascule simulation → réel**, capteur par capteur, au lieu de
-« on coupe et on voit ». **C1 (polarité frein inversée) aurait été visible immédiatement.**
-
-⚠️ **Périmètre de comparaison** : uniquement les grandeurs **logiques** (retours contacteurs,
-freins, capteurs TOR, états devices, mots d'état). Les grandeurs **continues** (position codeur,
-fréquence M3) ne sont pas comparables — le banc ne prétend pas prédire une position réelle. Elles
-restent affichées côte à côte, sans verdict.
-
-`SimShadowCompare : BOOL := FALSE` — active le calcul permanent du banc en mise en service.
-En exploitation : à `FALSE` (le banc ne tourne pas, CPU nul, et l'exclusion du build reste possible).
+👉 Le besoin de **verdict** (« l'état de la machine est-il celui attendu ? ») est repris par
+**`FB_Preflight`** (plan Ergonomie) : il compare à une **table d'états attendus à l'arrêt**, connue
+sans modèle — donc valable aussi **sur machine réelle, simulation éteinte**. C'est lui qui aurait
+détecté C1.
 
 ### 🎁 Ce que l'architecture supprime mécaniquement
 
@@ -296,7 +292,7 @@ Règle à ajouter dans `TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py` :
 | **P0** | 🏁 Baseline | Tag git · export CODESYS · bundle · relevé des bypass RETAIN et valeurs `PERSISTENT` | archivé |
 | **P1a** | 🗑️ Forçages & orphelins | Retrait `GVL_PLC_Tests` (64 l. + 31 pts) · `ST_TestTranslation`/`ST_TestCycle` · `FB_Sim_DigitalMirror` · `BypassRestoreDone` | Compilation + **tableau de neutralité** |
 | **P1b** | 🔌 Débranchement sim | Retrait des instances `FB_Sim_*` et des `OR`/`SEL`/`IF` sim dans `PRG_00/01/02/05/06/07/08/09` · `DeadmanRearmTimeout` figé à `T#10S` | Compilation + **essai machine réelle** |
-| **P2** | 🏗️ Frontière unique | `ST_HardwareImage` · `FB_SimBench` · §0 de `PRG_00` · `GVL_Simulation` à 5 flags · **comparateur `HwDelta` (D9)** · `SimEncoderSpeedFactor := 1.0` | Sim OFF **identique signal à signal** à P1, puis sim ON par domaine, puis `HwDelta` tout à `FALSE` machine saine |
+| **P2** | 🏗️ Frontière unique | `ST_HardwareImage` · `FB_SimBench` · §0 de `PRG_00` · `GVL_Simulation` à 5 flags · **`HwSim` exposé (D9)** · `SimEncoderSpeedFactor := 1.0` | Sim OFF **identique signal à signal** à P1, puis sim ON par domaine |
 | **P3** | 🔒 Verrou & spec | C3 corrigé + règle gate `GVL_Simulation.` confinée · `AF_Partie-13 v2.0` | Gate PASS |
 
 ### 🧾 P1 est **neutre par construction** — c'est démontrable
@@ -372,16 +368,16 @@ valeurs de config restaurées avant tout mouvement, le relevé de baseline (L0) 
 | `ST_HardwareImage` (4 sous-structs, ~40 champs) | **+70** |
 | Recopie `HwReal` + aiguillage (`PRG_00` §0) | **+55** |
 | `FB_SimBench` (enveloppe de composition) | **+60** |
-| 🔍 Comparateur `HwDelta` + `HwMismatchCount` (§4bis, D9) | **+60** |
-| **Net** | **≈ −10 l. (neutre)** |
+| 🔍 Exposition de `HwSim` (§4bis, D9) | **+3** |
+| **Net** | **≈ −70 l.** |
 
 🎯 **Ce refactor ne fait pas maigrir le projet.** Il échange ~256 lignes dispersées et dangereuses
-contre ~245 lignes centralisées et vérifiables. Le gain réel :
+contre ~185 lignes centralisées et vérifiables. Le gain réel :
 
 - **1 seul endroit** où la simulation peut agir (contre 8 programmes) ;
 - **impossible** de forcer une sortie calculée ou de masquer un défaut réel ;
 - un **inventaire E/S lisible** là où il n'en existait aucun ;
-- 🔍 un **comparateur permanent modèle ↔ réel**, critère objectif de bascule au câblage ;
+- 🔍 **trois images côte à côte** (`HwReal`/`HwSim`/`HwIn`) lisibles en vue instance ;
 - un **gate automatique** qui empêche la récidive.
 
 ---

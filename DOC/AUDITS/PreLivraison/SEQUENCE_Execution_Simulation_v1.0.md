@@ -68,7 +68,7 @@
 | **TC12** | Homing | M1 et M2, nominal 8,5 m + homing à 0 |
 | **TC13** | Banc par domaine | `SimWinchActive` seul, puis Translation, Operator, Machine |
 | **TC14** | Banc — injections | Méca E (écart synchro) · mot capteurs M3 valide **et** incohérent |
-| **TC15** | Comparateur | Machine saine + `SimShadowCompare` → **`HwDelta` tout à FALSE** |
+| **TC15** | Lecture comparée | `HwReal` / `HwSim` / `HwIn` lisibles côte à côte en vue instance (aucun comparateur automatique — D11) |
 | **TC16** | Gates outillage | `run_all_gates.py` PASS + bundle régénéré |
 
 ---
@@ -88,7 +88,7 @@
 | Bundle PLCopenXML | ✅ 110/110 objets | — |
 
 🏁 **Fin de P1.** Le programme ne parle plus qu'au matériel réel.
-➡️ **Reste : L5 → L8** (frontière unique, `FB_SimBench`, comparateur `HwDelta`, gate CI + spec).
+➡️ **Reste : L7 (réduit) + L8** — exposition de `HwSim`, verrou CI, specs. Voir `TASKS/TASK_L7-L8_HwSim_Verrou_Specs_v2.0.md`.
 ⚠️ **Aucun banc de simulation disponible tant que L6 n'est pas fait.**
 
 ## 1. 🗺️ Vue d'ensemble
@@ -107,7 +107,7 @@ L4d─ Entrées                     PRG_00          🛑 TC1 TC3 + ESSAI MACHINE
      ══════════ P2 — frontière unique ══════════
 L5 ─ Image matérielle (sans sim) structs + 8 PRG 🛑 TC1 TC3 + ESSAI MACHINE ⭐
 L6 ─ FB_SimBench + aiguillage    SIMULATION      🛑 TC1 TC13 TC14
-L7 ─ Comparateur HwDelta         PRG_00          🛑 TC15
+L7 ─ Exposition HwSim (reduit)   PRG_00          🛑 TC15
      ══════════ P3 — verrou ══════════
 L8 ─ Gate + spec                 TOOLS + DOC     🛑 TC16
 ```
@@ -258,13 +258,13 @@ L8 ─ Gate + spec                 TOOLS + DOC     🛑 TC16
 
 ---
 
-### L7 — Comparateur `HwDelta` 🔍
+### L7 (réduit) — Exposition de `HwSim` 🔍
 
 | | |
 |---|---|
-| **Créés** | `HwSim` exposé · `HwDelta` · `HwMismatchCount` · `SimShadowCompare : BOOL := FALSE` |
+| **Créés** | `HwSim : ST_HardwareImage` exposé en `VAR_OUTPUT`. ❌ **Comparateur abandonné (D11)** — voir `PLAN_Rationalisation` §4bis |
 | **Détail** | Comparaison **des grandeurs logiques uniquement** (TOR, états devices, mots d'état). Les continues (position codeur, fréquence M3) sont affichées côte à côte, **sans verdict** |
-| **Tests** | **TC15** : machine saine + shadow ON ⇒ `HwDelta` tout à `FALSE` |
+| **Tests** | **TC15** : les 3 images lisibles côte à côte en vue instance |
 | **🛑 Point d'arrêt** | Comparateur silencieux sur machine saine (sinon : écart réel à instruire 🎯) |
 | **Risque** | 🟢 (observateur pur, n'écrit jamais dans `HwIn`) |
 | **Effort** | M |
