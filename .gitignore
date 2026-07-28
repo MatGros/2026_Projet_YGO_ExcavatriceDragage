@@ -9,6 +9,9 @@ PRJ/*.bak
 # Python
 __pycache__/
 *.pyc
+TOOLS/OUTILS_ST2PY/out/
+TOOLS/OUTILS_ST2PY/.st2py_cache.json
+TOOLS/OUTILS_ST2PY/tests_dir_marker
 
 # Claude Code local settings
 .claude/settings.local.json
