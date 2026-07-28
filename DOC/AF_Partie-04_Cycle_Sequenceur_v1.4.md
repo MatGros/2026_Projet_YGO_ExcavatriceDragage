@@ -36,16 +36,15 @@
 
 ---
 
-## 🎯 0. Principe
+## 🎯 0. Principe & Doctrine d'Exploitation
 
-Le cycle est un **pseudo-Grafcet** : chaque étape est une **mémoire** (un état de
-`E_CycleStep`). `FB_Cycle` émet `Enable` / `StartStop` / Sens / SpeedRef vers les treuils et la
-translation selon l'étape active. Le passage à une étape **sans mouvement** met **`StartStop :=
-FALSE`** → **rampe de décélération normale** (`Enable` reste actif, synchro ou non selon l'étape).
+Le cycle est un **séquenceur linéaire (Grafcet)** : chaque étape correspond à une sous-action de la machine (déplacement M3, descente, contact fond, prise matière, montée, vidage).
+- **Le cycle auto n'est qu'une surcouche du manuel** : Il enchaîne de manière sécurisée les briques unitaires (`FB_DiveSearch`, `FB_ExtractionSequence`) préalablement qualifiées et validées en mode Maintenance N1.
+- **Guidage IHM Pas-à-Pas** : Chaque étape (`E_CycleStep`) transmet à l'IHM un **message d'instruction clair pour l'opérateur** (indiquant l'état courant et l'action/mouvement attendu de sa part).
+- **Validation Joystick (Homme-mort)** : Même en semi-automatique/automatique, la génération physique des mouvements exige le maintien et l'action du joystick par l'opérateur.
+- **Sortie du Mode Auto & Reprise** : En cas d'abandon ou de sortie du mode automatique vers le mode maintenance, **aucune reprise en cours de cycle n'est autorisée**. L'opérateur doit impérativement ramener la machine en **position initiale de départ (au-dessus de la trémie)** pour pouvoir relancer un nouveau cycle automatique.
 
-⚠️ Toute commande de mouvement passe **toujours** par une validation joystick de l'opérateur
-(homme-mort / intention), même en semi-automatique. La vitesse résulte de la position joystick,
-bornée par la vitesse max autorisée à l'étape (voir §Rampes).
+⚠️ Le passage à une étape **sans mouvement** met **`StartStop := FALSE`** → **rampe de décélération normale** (`Enable` reste actif).
 
 ---
 
@@ -79,14 +78,15 @@ END_TYPE
 ### Transitions nominales
 
 ```
-INIT ──(états cohérents)──► WORK_POS_SELECT ──(position atteinte)──► DESCENDING_OPEN
-DESCENDING_OPEN ──(fond touché)──► BOTTOM_TOUCH_WAIT ──► SYNCHRO_ADJUST
-SYNCHRO_ADJUST ──(benne fermé, ΔPos cible)──► CTRL_ASCENDING
-CTRL_ASCENDING ──(X m remontés)──► ASCENDING_LOADED ──(haut atteint)──► DRAINING_PAUSE
+INIT ──(états cohérents)──► WORK_POS_SELECT ──(position atteinte)──► [FB_DiveSearch] (DESCENDING_OPEN → BOTTOM_TOUCH_WAIT)
+[FB_DiveSearch].Done ──(Fond Touché)──► [FB_ExtractionSequence] (SYNCHRO_ADJUST → CTRL_ASCENDING)
+[FB_ExtractionSequence].Done ──► ASCENDING_LOADED ──(haut atteint)──► DRAINING_PAUSE
 DRAINING_PAUSE ──(tempo + validation)──► TRANSLATION_MOVE ──(position vidage)──► DESCENDING_OPEN_DUMP
 DESCENDING_OPEN_DUMP ──(benne ouvert)──► RETURN_WORK_POS ──(position travail)──► READY ──► (reboucle) DESCENDING_OPEN
 [à tout instant] SafeStop (bloc safety métier concerné par l'étape en cours) ──► ERROR_HOLD
 ```
+
+> 💡 **Non-Duplication du Code & Réutilisation** : Le Cycle Automatique ne réinvente pas la séquence de plongée et de prélèvement. Il appelle directement en cascade les deux sous-programmes **`FB_DiveSearch`** (étapes `DESCENDING_OPEN` à `BOTTOM_TOUCH_WAIT`) puis **`FB_ExtractionSequence`** (étapes `SYNCHRO_ADJUST` à `CTRL_ASCENDING`).
 
 ---
 
@@ -182,14 +182,106 @@ M1+M2 : `CTRL_ASCENDING`, `RETURN_WORK_POS`, etc.).
 
 ---
 
-## 🪨 3ter. Contact Kobold et remontée de sécurité
+## 🪨 3ter. Briques Métier Autonomes Prélèvement (`FB_DiveSearch` & `FB_ExtractionSequence`)
 
-Pendant `DESCENDING_OPEN`, `KoboldContactorCmd` commande le contacteur dédié. Le cycle attend
-`KoboldContactFond` ; le capteur de mou de câble n'est pas utilisé comme substitut.
+> ℹ️ **Indépendance des FB & Découpage** : Les deux Function Blocks ci-dessous sont des **briques applicatives autonomes** (valables et utilisables aussi bien en **Maintenance N1/N2** qu'en **Cycle Automatique**). Elles sont documentées ici dans la Partie 4 car cette section centralise l'analyse fonctionnelle de toutes les cinématiques de prélèvement sous-marin.
 
-Après détection, M1 et M2 remontent ensemble à petite vitesse jusqu'à une position supérieure
-à `LimitLegalDepthM` avec une marge de 0,5 m. Si la limite légale est atteinte avant le contact
-Kobold, le cycle passe en `ERROR_HOLD`. Toute erreur de synchronisation provoque le même repli.
+```
+┌────────────────────────────────────────────────────────┐
+│ 1. FB_DiveSearch (Plongée / Recherche Fond Kobold)    │
+│    - Immersion eau & contrôle benne ouverte            │
+│    - Détection "Fond Touché" (perte signal Kobold)     │
+└──────────────────────────┬─────────────────────────────┘
+                           │ Succès (Fond Touché = TRUE)
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│ 2. FB_ExtractionSequence (Extraction & Remontée)       │
+│    - Fermeture benne (Désynchro M2 / Offset)           │
+│    - Remontée de contrôle petite vitesse (Test effort) │
+│    - Transition vers montée nominale pleine vitesse    │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🔒 Conditions Préalables de Démarrage & Interlocks (Verrouillage de Sécurité)
+
+Afin d'éviter tout démarrage intempestif ou incohérent si l'opérateur active une option au milieu d'une mauvaise manœuvre manuelle, **chaque FB exige le respect strict de ses conditions initiales avant d'autoriser le démarrage du mouvement** :
+
+1. **Conditions Préalables `FB_DiveSearch`** :
+   - **Benne OUVERTE** (`FB_Bucket.IsOpen = TRUE`) : Interdiction absolue de démarrer la plongée si la benne est fermée.
+   - **Position initiale valide** : Câble en zone haute / hors d'eau (ex: altitude > 4,0 m).
+   - **Capteur Kobold au repos** (`FALSE`) avant immersion.
+   - *Si une condition manque* : Le FB se verrouille (`Ready := FALSE`), interdit tout mouvement automatisé et affiche un message de blocage à l'IHM (*"Plongée impossible : benne non ouverte"*). **L'opérateur est alors contraint de décocher l'option pour repasser en Mode Manuel Pur et manœuvrer librement au joystick pour remettre la machine en position sûre**.
+
+2. **Conditions Préalables `FB_ExtractionSequence`** :
+   - **État "Fond Touché" Valide** (`BottomTouchConfirmed = TRUE`) : Délivré automatiquement par `FB_DiveSearch` à l'atteinte du fond.
+   - **Exception Maintenance** : Si l'opérateur coche uniquement *Extraction Seule*, il doit explicitement valider un bouton IHM *"Benne au fond en position"* pour attester que la benne repose au sol.
+   - **Benne non déjà fermée** : Vérification de l'état initial.
+   - *Si une condition manque* : Le FB refuse d'exécuter la fermeture/remontée (*"Extraction impossible : benne non positionnée au fond"*). **L'opérateur doit décocher la brique pour repasser en Mode Manuel Pur s'il souhaite fermer ou remonter la benne manuellement à sa guise**.
+
+---
+
+### 🌊 Brique 1 : `FB_DiveSearch` (Recherche & Plongée Fond Kobold)
+- **Rôle Métier** : Gère la plongée, la surveillance d'immersion eau et la détection du fond de carrière via le capteur Kobold (`KoboldContactFond_DI` %IX0.5, contacteur %QX0.6).
+- **Conditions & Déroulement** :
+  1. Exige impérativement les conditions préalables ci-dessus (Benne OUVERTE).
+  2. Vérifie capteur ouvert (`FALSE`) au-dessus de l'eau (altitude > 4.0 m).
+  3. Valide le passage à l'état immergé (`TRUE`) à la traversée de la surface d'eau.
+  4. Détecte le **"Fond Touché"** au moment où la sonde se détend en touchant le sol ➔ le signal repasse à `FALSE`.
+- **Issues de la brique** :
+  - **`Done` / Succès** : Fond touché validé ➔ Émet l'autorisation d'extraction (`BottomTouchConfirmed = TRUE`).
+  - **Limites / Arrêt** : Atteinte de la limite légale de profondeur (`LimitLegalDepthM`) avant le fond, ou anomalie capteur ➔ Interdiction de descente (`StartStop := FALSE`), alarme guidée IHM.
+
+---
+
+### ⛏️ Brique 2 : `FB_ExtractionSequence` (Fermeture Benne & Remontée Contrôlée)
+- **Rôle Métier** : Séquence le fermage de la benne et la remontée sécurisée initiale.
+- **Conditions & Déroulement** :
+  1. **Condition d'activation** : Nécessite les conditions préalables ci-dessus (`BottomTouchConfirmed = TRUE`).
+  2. **Fermeture Benne** : Pilotage du décalage treuil M2 (offset fermeture `SYNCHRO_ADJUST`).
+  3. **Remontée de Contrôle Petite Vitesse (PV)** : Remontée initiale à 20 % de vitesse pour vérifier l'absence d'objets coincés, de sur-effort ou de déséquilibre critique entre codeurs M1/M2.
+  4. **Montée Pleine Vitesse** : Une fois la stabilité confirmée sur la hauteur de contrôle (`CtrlAscentDistM`), bascule sur la montée chargée nominale.
+
+---
+
+### 🎛️ Architecture Maintenance (N1 / N2) & Mode Manuel Pur par Défaut
+
+En mode Maintenance, le comportement des sous-programmes s'articules autour du mode manuel fondamental :
+
+1. **Mode Manuel Pur (Aucune option sous-programme cochée)** :
+   - Si les briques `FB_DiveSearch` et `FB_ExtractionSequence` sont décochées par l'opérateur, la machine fonctionne en **mode manuel pur**.
+   - **Mouvements & Pilotage** : L'opérateur pilote librement et manuellement les descentes/remontées au joystick.
+   - **Maintien Général des Sécurités** : Toutes les sécurités fonctionnelles et matérielles du système restent pleinement **actives et opérationnelles** (exemples non exhaustifs : longueur max de câble `MaxCableM`, butées d'arrêt haute, limite légale de profondeur `LimitLegalDepthM`, chaîne AU / `PowerCutOff`, surveillance thermique/freins, etc.), à moins qu'elles ne soient explicitement désactivées par un autre mécanisme ou un débrayage spécifique (ex: overrides N2).
+   - **Fonctionnalités Désactivées** : Seules les briques logicielles d'assistance et d'automatisme (contrôle d'immersion Kobold, arrêt automatique au fond, séquence de fermeture automatique et remontée de contrôle automatisée) sont décochées et inhibées.
+
+2. **Valeur par Défaut des Variables (`TRUE` par initialisation PLC)** :
+   - **Initialisation déclarative** : Les variables de commande `EnableDiveSearch` et `EnableExtractionSequence` ont simplement leur valeur d'initialisation par défaut réglée à **`TRUE`** dans l'automate.
+   - **Comportement** : Il n'y a pas d'écriture forcée cyclique à `TRUE` lors de la bascule en Maintenance N1. Les cases à cocher restent dans l'état où l'opérateur les a laissées sur l'IHM, tout en garantissant un démarrage initial sécurisé à `TRUE` à la mise sous tension.
+   - **Objectif Opérateur** : Cela permet d'exécuter la fonction principale de prélèvement (descendre, chercher le fond, prélever, fermer et remonter en sécurité) **facilement et sans se prendre la tête**, tout en gardant la liberté de décocher l'une ou l'autre variable si besoin.
+
+3. **Sélection des Options en Maintenance** :
+   - **`EnableDiveSearch` (Activé par défaut)** : Gère la plongée sous eau avec arrêt automatique net au fond (`Fond Touché`).
+   - **`EnableExtractionSequence` (Activé par défaut)** : Autorise la fermeture automatique/remontée de contrôle dès que le fond est touché. Si seule cette option est cochée, l'opérateur peut poser la benne manuellement puis lancer l'extraction.
+### 🕹️ Conditionnement Joystick (Homme-Mort) & Guidage Textuel IHM
+
+⚠️ **Règle Absolue de Sécurité** :
+- **Aucun mouvement autonome sans opérateur** : Même lorsque `FB_DiveSearch` ou `FB_ExtractionSequence` sont activés (en Maintenance ou en Auto), la génération physique du mouvement exige impérativement la **sollicitation et le maintien du joystick par l'opérateur (Homme-Mort)**. Si l'opérateur relâche le joystick (`JoystickYNeutral = TRUE`), le mouvement s'arrête instantanément en rampe propre (`StartStop := FALSE`), et la séquence se met en attente sur l'étape courante.
+- **Messages Guidés à l'IHM (`StepMessage`)** : À chaque sous-étape de `FB_DiveSearch` et `FB_ExtractionSequence`, l'automate émet un **message texte d'instruction clair et dynamique** sur l'écran IHM. L'opérateur sait exactement :
+  1. Quel est l'état courant du système (ex: *"Séquence 1 : Recherche Fond Kobold en cours"*).
+  2. Ce que l'automate attend de lui (ex: *"Maintenir le joystick vers le bas pour continuer la descente"* ou *"Fond touché ! Pousser le joystick vers le haut pour lancer l'extraction"*).
+  3. L'anomalie éventuelle s'il y a un blocage (ex: *"Action stoppée : Benne fermée interdit la descente sous l'eau"*).
+
+### 🚫 Gestion des Anomalies & Interdiction de Descente
+Si à un moment quelconque de la séquence une incohérence est détectée (ex: benne fermée, absence du signal eau lors du passage sous la surface, signal perdus prématurément hors plage, ou capteur inactif au-dessus de l'eau) :
+- **Interdiction immédiate de la descente** (`StartStop := FALSE` ➔ rampe de décélération propre).
+- **Arrêt sécurisé de la machine** (verrouillage des contacteurs).
+- **Émission d'un message d'alarme guidé à l'opérateur sur l'IHM** indiquant l'anomalie exacte (ex: *"Défaut Kobold : benne non ouverte"* ou *"Incohérence immersion eau Kobold"*).
+
+---
+
+### 3quater. Remontée de Sécurité & Stabilisation après fermeture
+Après détection sûre du fond (perte du signal Kobold valide), M1 et M2 remontent ensemble à petite vitesse jusqu'à une position supérieure à `LimitLegalDepthM` avec une marge de 0,5 m. Si la limite légale est atteinte avant le contact Kobold, le cycle passe en `ERROR_HOLD`.
 
 ### 3quater. Stabilisation après fermeture de la benne (T36)
 

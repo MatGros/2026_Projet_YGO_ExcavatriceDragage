@@ -1,8 +1,11 @@
 # 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.10)
 
 > 🔧 **WINCH-CORE-01 (2026-07-21)** — Référentiel mécanique confirmé : capteur haut et
-> cible homing M1/M2 à 8,5 m ; limite d'exploitation à 8,0 m. Les anciennes valeurs
-> illustratives 12,0/12,5 m sont supprimées.
+> cible homing M1/M2 à 8,5 m ; limite d'exploitation à 8,0 m (arrêt réel ≈ 7,5 m).
+> ⚠️ **Droits IHM & Persistance** : Ces cotes (`CfgTopSensorPos_M`, `CfgCableLimitAscent_M`) restent
+> des valeurs de base configurables et rémanentes (`PERSISTENT`). Elles ne sont pas "libres" au sens
+> opérationnel : leur modification à l'IHM est restreinte aux utilisateurs possédant des droits
+> d'accès spécifiques (Maintenance N2 / Administrateur).
 >
 > 🔄 **Mise à jour supervision 2026-07-18** : les états Homing M1/M2 sont désormais exposés
 > dans `GVL_IHM.M1TreuilRetenue` et `GVL_IHM.M2TreuilBucket` (`HomingBusy`, `HomingDone`,
@@ -363,9 +366,11 @@ Au redémarrage (premier cycle EtherCAT opérationnel après coupure) :
       → RAS, LastKnownRawPos continue d'être mis à jour normalement
 ```
 
-`RestartCoherenceTolerancePts` : paramètre RETAIN, valeur de départ recommandée de l'ordre de
-10-20 % de `PointsPerRev` (quelques cm équivalents) — à ajuster selon le jeu mécanique réel
-observé sur site.
+`RestartCoherenceTolerancePts` : paramètre rémanent `PERSISTENT`, correspondant à la tolérance maximale de glissement ou mouvement tolérée sous tension/hors tension (ex: quelques cm à la jante).
+⚠️ **Droits IHM & Ajustement Saisonnièr / Mécanique** : Cette tolérance n'est **pas figée dans le code**. Elle est paramétrable sur l'IHM, mais son accès est **strictement réservé aux utilisateurs disposant de droits Maintenance Niveau 2 (avec mot de passe)**. Cela permet à un régleur d'élargir ou d'ajuster ce seuil selon les variations mécaniques, l'usure des freins ou le comportement des câbles selon les saisons (été/hiver), sans devoir recompiler le programme PLC.
+
+- **Fonctionnement nominal avec freins serrés** : Au redémarrage, si les freins ont tenu la position et que l'écart `|DINT(RawPos) - DINT(LastKnownRawPos)|` reste inférieur ou égal à `RestartCoherenceTolerancePts`, **aucun doute n'est émis** (`HomingSuspect = FALSE`). La machine conserve son état référencé `Homed = TRUE` et redémarre normalement sans réclamer de homing.
+- **Détection de mouvement/démontage hors tension** : Seul un dépassement effectif de ce seuil (glissement des freins hors tension, démontage du codeur, intervention mécanique) déclenche `HomingSuspect := TRUE`, masquant la sortie `Homed` à `FALSE` et imposant un ré-homing ou une levée de doute explicite.
 
 **Levée du doute** : une action opérateur dédiée `ConfirmCoherence` (front, disponible en
 `MAINT_N1` **ou** `MAINT_N2`) permet d'accepter la position actuellement mesurée comme fiable
