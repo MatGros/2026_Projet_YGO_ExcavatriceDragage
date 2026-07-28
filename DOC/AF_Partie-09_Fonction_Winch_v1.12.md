@@ -27,12 +27,10 @@
 > doit être explicitement validée (`IsConfigured`) ; sinon la sortie reste à 0 %. Cette valeur
 > est informative et ne participe à aucune sécurité ou commande.
 >
-> 🛡️ **T47 (2026-07-18)** — `FB_SpeedStep` peut plafonner le palier selon la bande de vitesse
-> réellement mesurée. Si les conditions de stabilité ne sont pas validées, le palier est limité
-> à 1. La fonction est désactivée par défaut (`SpeedGuardEnable=FALSE`) en attente de validation
-> des seuils et essais terrain ; elle ne remplace pas le `SafeStop`.
-> `SpeedGuardReady` dépend de la stabilité temporisée du moniteur vitesse et de l'absence
-> d'erreur de synchronisation.
+> 🛡️ **T47 / T93 (2026-07-28)** — **Gestion des Rampes & Tampons de Vitesse (`FB_SpeedStep`)** :
+> 1. **Tampons Temporisés de Transition (Mode Temporel par Défaut)** : Chaque transition de palier de vitesse (ex. Palier 1 ➔ 2 ➔ 3) est temporisée par une durée paramétrable à l'IHM (`StepTransitionDelay` / `StepBufferMs`). Cela adoucit les bascules de contacteurs de puissance et protège contre les à-coups mécaniques.
+> 2. **Mode Asservissement au Régime Moteur (Mode Vitesse Réelle)** : Comme pour le passage de vitesses sur un véhicule, ce mode optionnel (`SpeedGuardEnable=TRUE`) conditionne le passage au palier supérieur à l'atteinte d'un régime/vitesse linéaire mesuré effectif de la charge (`MeasuredSpeedMps >= SpeedStepThreshold`). Si la vitesse réelle est trop faible (ex. charge lourde), le palier supérieur est temporairement bloqué pour éviter le décrochage moteur ou la disjonction électrique par surintensité.
+> `SpeedGuardReady` valide cette condition si la vitesse mesurée est stable et la synchro valide.
 >
 > **v1.10** — Nettoyage documentaire (audit doc) : remarques organisationnelles (sélecteur treuil
 > IHM non codé, §4undecies montée en charge, checklist validation v1.7) remplacées par des renvois
@@ -134,7 +132,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 
 | Bloc | Rôle métier |
 |------|-------------|
-| `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1 (paramétrage individuel `P<palier>R<relais>`), sélection par `HYSTERESIS` (lib Util, anti-battement) |
+| `FB_SpeedStep` | Décode `SpeedRefPct` (0..100 %) en 4 sorties `Contactor1..4`, via table `ST_SpeedStepTable` propre à M1/M2 (`P<palier>R<relais>`). Intègre 2 modes de transition :<br>1. **Tampons temporels** : Temporisation paramétrable IHM à chaque changement de palier (anti-coup de bélier mécanique).<br>2. **Conditionnement par régime réel (Mode véhicule)** : `SpeedGuardEnable=TRUE` autorise l'escalade vers un palier supérieur uniquement si la vitesse mesurée dépasse le régime seuil paramétré (évite disjonction/décrochage sous forte charge). |
 | `FB_Brake` | Séquence frein temporisée (relâche après magnétisation, collage après décélération), double vérif retour contacteur |
 | `FB_Safety_Winch` | Bloc safety **métier** du domaine treuil : lève `SafeStop` sur perte joystick/CAN, perte codeur, surchauffe moteur, surchauffe/perte thermique frein, mou de câble (mode normal), Méca A/B/C/D (roue libre, pilotage sans commande, glissement benne escaladé, capteur haut non confirmé arrêté) ; lève `ForbidDescent`/`ForbidAscent` en MAINT+SyncEnable=FALSE — voir §4ter, §4octies et §4nonies ; lève `PowerCutOff` sur thermique moteur/frein et Méca A/B/C/D — voir §4sexies et §4nonies |
 | `FB_Winch` | Assemble les deux + arbitrage rampe `Enable > SafeStop > StartStop` + interlock sens + masquage `RelayRev`/`RelayFwd` sur `ForbidDescent`/`ForbidAscent`. Inhibé (`Enable` forcé à `FALSE`) si `InhibitMx` est actif. |

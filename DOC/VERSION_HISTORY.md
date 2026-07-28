@@ -4,6 +4,16 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.5.3_PreCommissioningPrep` — 2026-07-28
+- Préparation de la nouvelle session de travail & recettes pré-livraison
+- Intégration du registre post-MES `DOC/REGISTRE_Suivi_PostMiseEnService_Livraison10Aout_20260728_v1.0.md`
+- Clarification du pense-bête YGO : isolation simu `PRG_00`, visu pas-à-pas `PRG_11`, dédouanement PLC vs Matériel (Trace 10ms), doctrine MAINT_N1 ➔ Auto
+
+### `DOC_RegistreSuiviPostMES_Livraison10Aout` — 2026-07-28
+- Cadrage du registre post-MES `DOC/REGISTRE_Suivi_PostMiseEnService_Livraison10Aout_20260728_v1.0.md`
+- Préparation des jalons et du journal de bord pour la livraison cible du 10 août 2026
+- Pense-bête YGO : isolation simu `PRG_00`, visu `PRG_11`, dédouanement PLC/Matériel, doctrine MAINT_N1 ➔ Auto
+
 ### `L7-L8_HwSim_Verrou_Specs` — 2026-07-27
 - `HwSim` exposée en observation dans `PRG_00_Inputs` ; aucun comparateur `HwDelta`
 - Gates : confinement `GVL_Simulation` + interdiction du forçage hybride

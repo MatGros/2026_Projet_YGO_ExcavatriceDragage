@@ -10,6 +10,7 @@
 
 | Date | Jalon |
 |---|---|
+| 2026-07-28 | 🚀 `v0.5.3_PreCommissioningPrep` — Initialisation nouvelle session de travail, cadrage registre post-MES (`PMS-XXX`), pense-bête client YGO (isolation simu, visu pas-à-pas, dédouanement PLC/Matériel, MAINT_N1 ➔ Auto) |
 | 2026-07-27 | 🏁 **Chantier pré-livraison — simulation & diagnostic TERMINÉ** (commits `72a3bbc`→`HEAD`). Détail §1bis. Documents de conduite archivés dans `ARCHIVES/Doc/AUDITS/PreLivraison/` : ce plan redevient l'unique source du pilotage |
 | 2026-07-24 | 🎯 **Priorité Demain** — 1) Chargement API + vérification Visualisation IHM (remapping). 2) Qualification purge Bypass Global (M1, M2, M3). 3) Essai du fonctionnement **Capteur Kobold** (contact fond) & IHM. 4) Essai du **Positionneur Translation M3** ("Aller à la position" Trémie/Maintenance/Zone travail). |
 | 2026-07-23 | Correctifs terrain — Purge `BypassContactorCheck` (M1, M2, M3), documentation audit `AUDIT_BypassGlobal_Homogenization_v1.0.md` et consignation `MES-004`. |
