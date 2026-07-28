@@ -4,6 +4,12 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `LOT2A_KoboldMaintenanceAssist` — 2026-07-28
+- `FB_DiveSearch` : Kobold `0→1→0` strict · T81/T82
+- `FB_ExtractionSequence` : benne, palier 1 sur 2,0 m puis montée nominale
+- MAINT_N1/N2 uniquement · cycle semi-auto inchangé · tests PLC isolés à exécuter
+- `AF_Partie-04` v1.5 · v1.4 archivée
+
 ### `T84-T85-T86_EncoderSpeedOwnership` — 2026-07-28
 - Vitesse M1/M2 déplacée de Safety vers chaîne codeur `PRG_02`
 - Fenêtre interne 50 ms · 6 positions horodatées · validité explicite

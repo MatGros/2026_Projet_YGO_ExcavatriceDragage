@@ -22,6 +22,7 @@ VAR
     instAckConfigRestored : R_TRIG; // 🔔 Front acquittement opérateur restauration config PERSISTENT (§2bis)
     instCfgPersistBridgeSync : FB_CfgPersistBridge_SyncCfg; // 🌉 Pont persistance M1M2Sync.Cfg (Lot 3a, pilote)
     instCfgPersistBridgeCycle : FB_CfgPersistBridge_CycleCfg; // 🌉 Pont persistance Cycle.Cfg (Lot 3b)
+    instCfgPersistBridgeDredgingAssist : FB_CfgPersistBridge_DredgingAssistCfg; // 🌉 Pont persistance assistants prélèvement
     instCfgPersistBridgeCommun : FB_CfgPersistBridge_CommunCfg; // 🌉 Pont persistance Commun.Cfg (Lot 3b)
     instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg; // 🌉 Pont persistance M2TreuilBenne.Bucket.Cfg (Lot 3b)
     instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg; // 🌉 Pont persistance M1TreuilRetenue.Cfg (Lot 3d-2)
@@ -87,6 +88,11 @@ END_IF;
 
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.Cycle.Cfg, Persist := _CycleCfgPersist);
 IF instCfgPersistBridgeCycle.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeDredgingAssist(Hmi := GVL_IHM.DredgingAssist.Cfg, Persist := _DredgingAssistCfgPersist);
+IF instCfgPersistBridgeDredgingAssist.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -392,7 +398,42 @@ GVL_IHM.TranslationM3.State.DriveFreqRef_Hz        := PRG_07_TranslationControl.
 GVL_IHM.TranslationM3.State.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
 GVL_IHM.TranslationM3.State.ActiveSpeedRef_Pct     := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
-// ── 9bis. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ──────────────────────────────
+// ── 9bis. MAPPING ASSISTANCE PRÉLÈVEMENT → IHM ─────────────────────────────
+GVL_IHM.DredgingAssist.State.DiveReady := PRG_06_WinchControl.instDiveSearch.Ready;
+GVL_IHM.DredgingAssist.State.DiveBusy := PRG_06_WinchControl.instDiveSearch.Busy;
+GVL_IHM.DredgingAssist.State.DiveDone := PRG_06_WinchControl.instDiveSearch.Done;
+GVL_IHM.DredgingAssist.State.DiveError := PRG_06_WinchControl.instDiveSearch.Error;
+GVL_IHM.DredgingAssist.State.DiveErrorId := PRG_06_WinchControl.instDiveSearch.ErrorId;
+GVL_IHM.DredgingAssist.State.DiveState := PRG_06_WinchControl.instDiveSearch.DiveState;
+GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := PRG_06_WinchControl.instDiveSearch.BottomTouchConfirmed;
+GVL_IHM.DredgingAssist.State.ExtractionReady := PRG_06_WinchControl.instExtractionSequence.Ready;
+GVL_IHM.DredgingAssist.State.ExtractionBusy := PRG_06_WinchControl.instExtractionSequence.Busy;
+GVL_IHM.DredgingAssist.State.ExtractionDone := PRG_06_WinchControl.instExtractionSequence.Done;
+GVL_IHM.DredgingAssist.State.ExtractionError := PRG_06_WinchControl.instExtractionSequence.Error;
+GVL_IHM.DredgingAssist.State.ExtractionErrorId := PRG_06_WinchControl.instExtractionSequence.ErrorId;
+GVL_IHM.DredgingAssist.State.ExtractionState := PRG_06_WinchControl.instExtractionSequence.ExtractionState;
+
+// 🎮 Une seule consigne opérateur : l'assistant qui attend/agit a priorité sur le cycle.
+IF PRG_06_WinchControl.instExtractionSequence.Busy
+   OR PRG_06_WinchControl.instExtractionSequence.Ready
+   OR (NOT GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence) THEN
+    GVL_IHM.DredgingAssist.State.OperatorActionId := PRG_06_WinchControl.instExtractionSequence.OperatorActionId;
+    GVL_IHM.DredgingAssist.State.OperatorAction := PRG_06_WinchControl.instExtractionSequence.OperatorAction;
+ELSIF PRG_06_WinchControl.instDiveSearch.Busy
+   OR PRG_06_WinchControl.instDiveSearch.Ready
+   OR GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch THEN
+    GVL_IHM.DredgingAssist.State.OperatorActionId := PRG_06_WinchControl.instDiveSearch.OperatorActionId;
+    GVL_IHM.DredgingAssist.State.OperatorAction := PRG_06_WinchControl.instDiveSearch.OperatorAction;
+ELSE
+    GVL_IHM.DredgingAssist.State.OperatorActionId := 0;
+    GVL_IHM.DredgingAssist.State.OperatorAction := '';
+END_IF;
+
+// 🎮 Publication de l'unique consigne de conduite. Aucun FB n'écrit directement ce champ IHM.
+GVL_IHM.OperatorAction.ActionId := GVL_IHM.DredgingAssist.State.OperatorActionId;
+GVL_IHM.OperatorAction.Text := GVL_IHM.DredgingAssist.State.OperatorAction;
+
+// ── 9ter. MAPPING CYCLE SEMI-AUTOMATIQUE → IHM ─────────────────────────────
 GVL_IHM.Cycle.State.Ready                := PRG_05_Cycle.instCycle.Ready;
 GVL_IHM.Cycle.State.Busy                 := PRG_05_Cycle.instCycle.Busy;
 GVL_IHM.Cycle.State.Done                 := PRG_05_Cycle.instCycle.Done;

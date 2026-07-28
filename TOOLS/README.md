@@ -60,6 +60,9 @@ Configuration et procédure : `TOOLS/PROJECT_WORKSPACE/README.md`.
 
 Le lancement est volontairement manuel : rien ne démarre à l’ouverture de VS Code.
 
+> Pour un démarrage automatique via session, utilisez également l’extension **Terminal Keeper** (Nguyen Ngoc Long) avec `.vscode/sessions.json`.
+
+
 ### Visualiser le workflow (Mermaid)
 
 ```powershell

@@ -2,9 +2,11 @@
 
 Configuration et mode d’emploi de l’environnement de développement du projet : **Pi**, **AGY Antigravity**, **Claude Code**, **OpenCode** (avec agents Orchestrateur, Codeur & Vérificateur intégrés), gates, **Herdr** et visualisation du workflow.
 
-L’extension VS Code **Terminals Manager** est uniquement le mécanisme utilisé pour afficher ces outils dans le terminal intégré.
+L’extension VS Code **Terminals Manager** est le mécanisme recommandé pour ouvrir manuellement des terminaux configurés dans ce projet.
 
 Extension : `fabiospampinato.vscode-terminals`
+
+> Pour un lancement automatique à l’ouverture du workspace, ce projet contient également une configuration de session dans `.vscode/sessions.json` compatible avec l’extension **Terminal Keeper** de Nguyen Ngoc Long.
 
 ## 🎯 Rôle
 
@@ -33,7 +35,8 @@ Chaque terminal utilise la racine du projet comme répertoire courant :
 3. Ouvrir **Extensions** (`Ctrl+Shift+X`).
 4. Rechercher **Terminals Manager** — auteur **Fabio Spampinato**.
 5. Installer l’extension `fabiospampinato.vscode-terminals`.
-6. Vérifier que Python, Pi, AGY (`agy`), Claude (`claude`) et Herdr sont disponibles dans le `PATH` si ces onglets sont utilisés.
+6. Si vous voulez que des terminaux s’ouvrent automatiquement au démarrage du workspace, installer également **Terminal Keeper** — auteur **Nguyen Ngoc Long**.
+7. Vérifier que Python, Pi, AGY (`agy`), Claude (`claude`) et Herdr sont disponibles dans le `PATH` si ces onglets sont utilisés.
 
 La configuration active lue par VS Code est versionnée à la racine dans :
 

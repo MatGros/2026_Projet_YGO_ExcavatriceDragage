@@ -16,6 +16,18 @@ VAR
     instBucket   : FB_Bucket;
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
+    instDiveSearch : FB_DiveSearch;
+    instExtractionSequence : FB_ExtractionSequence;
+
+    // 🪨 Intention commune maintenance, construite UNE fois avant les assistants.
+    // Les assistants ne lisent jamais directement joystick/IHM et ne créent aucune source parallèle.
+    MaintenanceMotionRequestActive : BOOL;
+    MaintenanceMotionDirection     : INT;
+    MaintenanceMotionSpeed_Pct     : REAL;
+    ManualBottomPositionConfirmed  : BOOL;
+    BottomPositionConfirmed        : BOOL;
+    CmdBucketCloseArbitrated       : BOOL;
+    KoboldContactorCmdArbitrated   : BOOL;
 
     // Variables de commande M1 après arbitrage Manuel/Auto
     M1_StartStop_Active     : BOOL;
@@ -79,7 +91,102 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
 
-// ── 0. COMMANDE DU BENNE (Séquence lente) ─────────────────────────────
+// ── 0. INTENTION MAINTENANCE + ASSISTANTS PRÉLÈVEMENT ──────────────────
+// 🎯 Source unique : joystick OU boutons IHM. En mode boutons, seule la commande
+// commune Both est compatible avec une assistance qui exige les deux treuils synchronisés.
+IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
+    MaintenanceMotionDirection := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
+    MaintenanceMotionRequestActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
+                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                     AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3);
+    MaintenanceMotionSpeed_Pct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef);
+ELSE
+    IF GVL_IHM.Commun.BtnWinchBothUp THEN
+        MaintenanceMotionDirection := 1;
+    ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
+        MaintenanceMotionDirection := -1;
+    ELSE
+        MaintenanceMotionDirection := 0;
+    END_IF;
+    MaintenanceMotionRequestActive := (MaintenanceMotionDirection <> 0)
+                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+    MaintenanceMotionSpeed_Pct := 100.0;
+END_IF;
+
+// 🪨 L'attestation manuelle est une preuve temporaire, distincte du Kobold.
+// Elle est consommée à l'entrée extraction et annulée dès qu'un mouvement la rend caduque.
+IF NOT (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+   OR NOT PRG_00_Inputs.EmergencyStopOk
+   OR PRG_09_Supervision.FaultMachineReset_IHM
+   OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
+   OR _BucketState.IsOpen THEN
+    GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
+END_IF;
+ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
+
+instDiveSearch(
+    Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+              AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    Mode := PRG_04_Modes.instModes.Mode,
+    MotionRequestActive := MaintenanceMotionRequestActive,
+    MotionDirection := MaintenanceMotionDirection,
+    BucketIsOpen := _BucketState.IsOpen,
+    KoboldImmersed := PRG_00_Inputs.KoboldContactFond,
+    M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
+    M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    PositionsValid := PRG_02_Encoders.instHomingM1.Homed AND PRG_02_Encoders.instHomingM2.Homed
+                      AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect,
+    DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
+    ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
+    ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M
+);
+
+// Deux preuves HOMOGÈNES et nommées de la même précondition extraction : Kobold ou attestation opérateur.
+BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed;
+instExtractionSequence(
+    Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+              AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    Mode := PRG_04_Modes.instModes.Mode,
+    MotionRequestActive := MaintenanceMotionRequestActive,
+    MotionDirection := MaintenanceMotionDirection,
+    BottomPositionConfirmed := BottomPositionConfirmed,
+    BucketIsClosed := _BucketState.IsClosed,
+    BucketBusy := instBucket.Busy,
+    BucketError := instBucket.Error,
+    WinchSyncError := instWinchSync.Error,
+    M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
+    M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
+    M1MeasuredSpeedValid := PRG_02_Encoders.M1SpeedValid,
+    M2MeasuredSpeedValid := PRG_02_Encoders.M2SpeedValid,
+    PositionsValid := PRG_02_Encoders.instHomingM1.Homed AND PRG_02_Encoders.instHomingM2.Homed
+                      AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect,
+    ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
+);
+IF instExtractionSequence.BottomConfirmationConsumed THEN
+    GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
+END_IF;
+
+// Un seul arbitre de fermeture : SEMI_AUTO > assistant extraction > demande IHM manuelle.
+IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+    CmdBucketCloseArbitrated := PRG_05_Cycle.instCycle.CmdBucket_Close;
+ELSIF instExtractionSequence.BucketCloseRequest THEN
+    CmdBucketCloseArbitrated := TRUE;
+ELSE
+    CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
+END_IF;
+
+// Un seul producteur logique de commande Kobold : cycle auto OU assistant maintenance.
+IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+    KoboldContactorCmdArbitrated := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+ELSE
+    KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable;
+END_IF;
+
+// ── 1. COMMANDE DU BENNE (Séquence lente) ─────────────────────────────
 // 🔧 REX 2026-07-08 : appelé EN PREMIER (avant l'arbitrage M1/M2 ci-dessous) — audit sécurité :
 // l'ancien ordre (Benne appelé après l'arbitrage) faisait que M1_StartStop_Active lisait
 // instBucket.Busy du scan PRÉCÉDENT, créant une fenêtre d'1 scan où M1 pouvait recevoir une
@@ -95,9 +202,9 @@ instBucket(
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Mode                := PRG_04_Modes.instModes.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
-    CmdClose_IHM        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose OR PRG_05_Cycle.instCycle.CmdBucket_Close,
-    JoystickY_StartStop := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop,
-    JoystickY_Direction := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction,
+    CmdClose_IHM        := CmdBucketCloseArbitrated,
+    MotionRequestActive := MaintenanceMotionRequestActive,
+    MotionDirection     := MaintenanceMotionDirection,
     CablePosM1          := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CablePosM2          := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     HomedM1             := PRG_02_Encoders.instHomingM1.Homed,
@@ -136,7 +243,7 @@ SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (
 EffectiveMaxStepAscent   := _CommunCfgPersist.WinchMaxStepAscent;
 EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
 
-// ── 1. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
+// ── 2. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
 IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche (bug trouvé en
     // review code), le cycle auto pouvait aggraver un écart mineur sans aucune protection quand
@@ -196,7 +303,7 @@ ELSE
     END_IF;
 END_IF;
 
-// ── 2. ARBITRAGE DES CONSIGNES M2 (Benne vs Cycle Automatique vs Joystick) ──
+// ── 3. ARBITRAGE DES CONSIGNES M2 (Benne vs Cycle Automatique vs Joystick) ──
 IF instBucket.Busy THEN
     M2_StartStop_Active := instBucket.M2_StartStop;
     M2_Direction_Active := instBucket.M2_Direction;
@@ -259,7 +366,32 @@ ELSE
     END_IF;
 END_IF;
 
-// ── 2bis. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE BENNE ─────
+// ── 3bis. ASSISTANCE MAINTENANCE : priorité après arbitre manuel, avant les treuils ─
+// DiveSearch garde la main sur toute sa phase active : une pause homme-mort arrête
+// normalement les deux treuils sans laisser le manuel contourner la séquence Kobold.
+IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
+    IF instDiveSearch.Busy THEN
+        M1_Direction_Active := -1;
+        M2_Direction_Active := -1;
+        M1_StartStop_Active := instDiveSearch.DescendPermit
+                               AND NOT SyncMinorDeviationBlocksDown;
+        M2_StartStop_Active := instDiveSearch.DescendPermit
+                               AND NOT SyncMinorDeviationBlocksDown;
+        M1_SpeedRef_Active := MaintenanceMotionSpeed_Pct;
+        M2_SpeedRef_Active := MaintenanceMotionSpeed_Pct;
+    ELSIF instExtractionSequence.Busy AND NOT instBucket.Busy THEN
+        M1_Direction_Active := 1;
+        M2_Direction_Active := 1;
+        M1_StartStop_Active := instExtractionSequence.AscentPermit
+                               AND NOT SyncMinorDeviationBlocksUp;
+        M2_StartStop_Active := instExtractionSequence.AscentPermit
+                               AND NOT SyncMinorDeviationBlocksUp;
+        M1_SpeedRef_Active := MaintenanceMotionSpeed_Pct;
+        M2_SpeedRef_Active := MaintenanceMotionSpeed_Pct;
+    END_IF;
+END_IF;
+
+// ── 3ter. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE BENNE ─────
 // 🆕 REX 2026-07-08 : instBucket est appelé en premier (§0), donc son Busy est frais dans CE scan
 // (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de FB_Joystick_0 (PRG_01),
 // calculé AVANT ce scan de PRG_06. Le désarmement homme-mort sur front descendant de Benne.Busy
@@ -466,7 +598,7 @@ instWinchM1(
     // 🔧 REX 2026-07-15 (9) : EffectiveMaxStepDescente/Ascent (voir calcul plus haut) — Auto garde
     // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
     CfgMaxStepDescente         := EffectiveMaxStepDescente,
-    MaxStepAscent           := EffectiveMaxStepAscent,
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM1.SpeedBand,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM1.SpeedStable
@@ -510,7 +642,7 @@ instWinchM2(
     SpeedStepTable          := M2_SpeedStepTableActive,
     // 🔧 REX 2026-07-15 (9) : idem M1 (voir §6 ci-dessus).
     CfgMaxStepDescente         := EffectiveMaxStepDescente,
-    MaxStepAscent           := EffectiveMaxStepAscent,
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM2.SpeedBand,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM2.SpeedStable
@@ -554,5 +686,5 @@ PRG_10_Outputs.M2SpeedContactor1 := instWinchM2.Contactor1;
 PRG_10_Outputs.M2SpeedContactor2 := instWinchM2.Contactor2;
 PRG_10_Outputs.M2SpeedContactor3 := instWinchM2.Contactor3;
 PRG_10_Outputs.M2SpeedContactor4 := instWinchM2.Contactor4;
-PRG_10_Outputs.KoboldContactorCmd := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+PRG_10_Outputs.KoboldContactorCmd := KoboldContactorCmdArbitrated;
 PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;

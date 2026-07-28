@@ -1,5 +1,11 @@
 # 📋 Analyse Fonctionnelle — Partie 8 : Fonction Joystick (v1.3)
 
+> **Mise à jour 2026-07-28 — exception extraction Kobold** : le front descendant `BenneBusy`
+> désarme toujours l'homme-mort, sauf lorsque `PreserveArmingAfterBucket=TRUE`. Cette entrée est
+> câblée exclusivement par `PRG_01_Diagnostics` pendant `FB_ExtractionSequence.CLOSING_BUCKET` :
+> l'opérateur qui maintient la montée peut donc enchaîner fermeture puis palier 1. Tout autre
+> mouvement benne conserve le passage obligatoire neutre + nouvel armement.
+>
 > **Version 1.3** — Nettoyage documentaire (audit doc) : remarques organisationnelles (renommage
 > `PRG_JOY1` à valider, source `EmergencyStopOk` à définir, checklist de mise en service) remplacées
 > par des renvois courts vers `DOC/PLAN_TASK_v1.0.md` §3 (T15/T16/T17). Aucun changement

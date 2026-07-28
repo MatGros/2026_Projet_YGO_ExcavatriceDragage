@@ -13,7 +13,7 @@
 | Ordre | Lot fonctionnel | Tâches | Dépendances / décision | État | Agent | Validation utilisateur |
 |---:|---|---|---|---|---|---|
 | 1 | Fiabilisation mesure Winch | T84 + T85 + T86 | Fenêtre interne 50 ms ; producteur chaîne codeur ; pulse source générique depuis `PRG_00` ; T87 reporté au lot étude 4 (T91/T93) | 🟠 Implémenté et revu, validation CODESYS/terrain requise | Pi via OmniRoute | ⏳ Validation code attendue |
-| 2 | Séquence de fond Kobold | T81 + T82 | Départ hors eau → immersion `0→1` confirmée → fond `1→0` ; arrêt sûr si séquence invalide | ⬜ À préparer | — | — |
+| 2 | Assistants Kobold maintenance | T81 + T82 | `FB_DiveSearch` : `0→1→0` ; `FB_ExtractionSequence` : fermeture, palier 1 sur 2 m puis nominal ; hors `FB_Cycle` | 🟠 Implémenté, tests PLC créés ; compilation/essais CODESYS requis | Pi + revue Sonnet 5 | ⏳ Validation CODESYS/terrain requise |
 | 3 | Garde-fou et calibration paliers | T94 + T95 | Dépend du lot 1 : mesure vitesse fiabilisée avant calibration | ⬜ En attente lot 1 | — | — |
 | 4 | Frein et commande par paliers | T91 + T93 + décision T87 | Étude montée/descente avant code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel` | ⬜ Étude à préparer | — | — |
 | 5 | Reliquats safety | T72 + T73 + T74 | Réévaluer l’état réel du code après les lots précédents | ⬜ À réévaluer | — | — |

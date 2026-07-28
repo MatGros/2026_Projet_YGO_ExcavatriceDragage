@@ -6,7 +6,7 @@ Package Python + Pi Coding Agent pour automatiser et fiabiliser le workflow CODE
 TOOLS/AGENT_WORKFLOW/
 ├── src/agent_workflow/          # Code importable (scripts, gates, utils)
 ├── scripts/                     # Points d'entrée CLI (installés via pyproject.toml)
-├── skills/                      # Skills Pi Coding (codesys-change, codesys-review, herdr-review, ...)
+├── skills/                      # Skills Pi Coding (codesys-change, codesys-review, ...)
 ├── prompts/                     # Prompts standardisés (requirement-intake, release-check, ...)
 ├── schemas/                     # JSON Schemas (herdr_review, requirement_intake)
 ├── docs/                        # Policies (SAFETY, WORKFLOW, TOKEN, DOC_WRITING, CODE_WRITING, ...)
@@ -98,7 +98,6 @@ check-codesys-compile --log build.log --strict
 |---|---|
 | `codesys-change` | Modification CODE/ : lecture specs, plan, gates, bundle, validation humaine |
 | `codesys-review` | Revue read-only CODE/DOC/tests |
-| `herdr-review` | Délégation review à agent Herdr (read-only) |
 | `doc-sync` | Maj DOC après modification CODE |
 | `release-check` | Checklist fin de tâche avant intégration manuelle |
 | `requirement-intake` | Qualification `NEW_INFORMATION` avant tout code |
@@ -116,7 +115,7 @@ Chargement auto dans Pi via `package.json` → `pi.skills`.
 | `TOKEN_POLICY.md` | Gestion budget tokens, context window, compression |
 | `DOC_WRITING_POLICY.md` | Style docs projet (concision, emoji, versioning) |
 | `CODE_WRITING_POLICY.md` | Style ST (headers, naming, contrats FB, sécurité) |
-| `INTEGRATIONS.md` | Herdr, Pi, Ponytail, config, modes |
+| `INTEGRATIONS.md` | Pi Subagents (défaut), Herdr secours, Ponytail, config, modes |
 | `RELEASE_PROCESS.md` | Checklist fin de tâche |
 | `STRUCTURE_AND_CLEANUP.md` | Arborescence, archivage, nettoyage |
 
