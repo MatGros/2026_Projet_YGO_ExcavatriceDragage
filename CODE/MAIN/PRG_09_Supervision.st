@@ -179,7 +179,7 @@ GVL_IHM.Commun.WinchSymmetry.DeltaBrakeApplyTime_Ms := _WinchSymmetryDataPersist
 GVL_IHM.Commun.WinchSymmetry.DeltaStopDistance_M := UDINT_TO_REAL(_WinchSymmetryDataPersist.DeltaStopDistance_Mm) / 1000.0;
 GVL_IHM.Commun.WinchSymmetry.DeltaStopTime_Ms := _WinchSymmetryDataPersist.DeltaStopTime_Ms;
 GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M := _WinchSymmetryDataPersist.MaxSyncDeviation_M;
-GVL_IHM.M1TreuilRetenue.State.MeasuredSpeed_Mps          := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
+GVL_IHM.M1TreuilRetenue.State.MeasuredSpeed_Mps          := PRG_02_Encoders.M1MeasuredSpeed_Mps;
 GVL_IHM.M1TreuilRetenue.State.SpeedDelta_Mps             := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
 GVL_IHM.M1TreuilRetenue.State.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
 GVL_IHM.M1TreuilRetenue.State.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed;
@@ -244,7 +244,7 @@ GVL_IHM.M1TreuilRetenue.State.InhibitActive            := PRG_04_Modes.instModes
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
 GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.M2TreuilBenne.State.MeasuredSpeed_Mps          := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps;
+GVL_IHM.M2TreuilBenne.State.MeasuredSpeed_Mps          := PRG_02_Encoders.M2MeasuredSpeed_Mps;
 GVL_IHM.M2TreuilBenne.State.SpeedDelta_Mps             := PRG_03_Safety.instSpeedMonitorM2.SpeedDeltaMps;
 GVL_IHM.M2TreuilBenne.State.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationDetected;
 GVL_IHM.M2TreuilBenne.State.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed;

@@ -4,6 +4,12 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T84-T85-T86_EncoderSpeedOwnership` — 2026-07-28
+- Vitesse M1/M2 déplacée de Safety vers chaîne codeur `PRG_02`
+- Fenêtre interne 50 ms · 6 positions horodatées · validité explicite
+- Pulse source Winch réel/simulé confiné à `PRG_00` · `ForbidAscent` déterministe
+- `AF_Partie-09` v1.13 · `AF_Partie-10` v1.11 · validation CODESYS requise
+
 ### `v0.5.3_PreCommissioningPrep` — 2026-07-28
 - Préparation de la nouvelle session de travail & recettes pré-livraison
 - Intégration du registre post-MES `DOC/REGISTRE_Suivi_PostMiseEnService_Livraison10Aout_20260728_v1.0.md`

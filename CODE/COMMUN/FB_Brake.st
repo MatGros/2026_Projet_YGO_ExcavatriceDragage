@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §3
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md §3
                    (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier > 0)

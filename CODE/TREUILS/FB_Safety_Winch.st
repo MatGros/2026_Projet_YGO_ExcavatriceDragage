@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md,
-                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §7
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md,
+                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §7
                    (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
@@ -166,6 +166,9 @@ VAR_INPUT
     // M1, M1 côté instance M2), même principe que ExpectedOtherWinchPosM.
     OtherWinchInhibited     : BOOL;         // Inhibition de l'AUTRE treuil (mise en service N2)
     MovementSpeedThresholdMps : REAL := 0.02; // Seuil mouvement mesurable pour contrôles sens/absence
+    MeasuredSpeedMps          : REAL; // Mesure absolue produite par PRG_02 chaîne codeur
+    MeasuredSpeedSignedMps    : REAL; // Mesure signée produite par PRG_02 chaîne codeur
+    MeasuredSpeedValid        : BOOL; // TRUE si la fenêtre horodatée codeur est complète et fiable
     OppositeDirectionTimeout  : TIME := T#500MS; // Confirmation sens réel opposé à la commande
     NoMovementTimeout         : TIME := T#3S;    // Confirmation absence de mouvement malgré commande
     // 🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications
@@ -201,18 +204,13 @@ VAR_OUTPUT
     MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
     MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM
     MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout
-    MeasuredSpeedMps    : REAL;        // Vitesse linéaire mesurée du câble (m/s), valeur absolue
-    MeasuredSpeedSignedMps : REAL;      // Vitesse signée : positive montée, négative descente
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
     FirstScanDone       : BOOL;
 
-    // 🔧 REX 2026-07-07 — Méca A (bit7)
-    CycleTimeCalc       : FB_CycleTime;
-    LastCablePosM       : REAL;
-    SpeedInitialized    : BOOL;
+    // 🔧 Méca A (bit7) — la vitesse est désormais reçue de la chaîne codeur (T84/T85)
     DriftGuardA         : FB_DriftGuard;   // 🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)
 
     // 🔧 REX 2026-07-07 — Méca B (bit8)
@@ -245,9 +243,8 @@ IF NOT Enable THEN
     Done := FALSE;
     SafeStop := TRUE;
     ForbidDescent := TRUE;
+    ForbidAscent := TRUE; // 🛡️ T86 : sortie safety déterministe pendant neutralisation
     PowerCutOff := FALSE;
-    MeasuredSpeedMps := 0.0;
-    MeasuredSpeedSignedMps := 0.0;
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
@@ -260,17 +257,14 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
-    SpeedInitialized := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
-CycleTimeCalc(DefaultValueS := 0.010); // 🔧 REX 2026-07-07 — Méca A
 
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
-    LastCablePosM := CablePosM;
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
 END_IF;
 LastInReferencingMode := InReferencingMode;
@@ -280,8 +274,6 @@ LastInReferencingMode := InReferencingMode;
 IF NOT EmergencyStopOk THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
-    LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
-    SpeedInitialized := FALSE;
 END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
@@ -372,25 +364,15 @@ END_IF;
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
 // Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
-// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé,
-// seul le check vitesse (MeasuredSpeedMps) reste géré ici (hors périmètre de la brique).
-IF NOT SpeedInitialized OR InReferencingMode THEN
-    MeasuredSpeedSignedMps := 0.0;
-    SpeedInitialized := TRUE;
-ELSE
-    MeasuredSpeedSignedMps := (CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
-END_IF;
-MeasuredSpeedMps := ABS(MeasuredSpeedSignedMps);
-LastCablePosM := CablePosM;
-
+// 🔧 T84/T85 : la chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
 DriftGuardA(
-    Arm        := FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
+    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
     PositionM  := CablePosM,
     ToleranceM := UncommandedDriftToleranceM
 );
 MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
     ErrorId := ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
@@ -486,7 +468,7 @@ END_IF;
 // 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
 // Le signe de la vitesse câble est comparé à la direction commandée uniquement pendant un
 // mouvement effectivement demandé. La temporisation filtre bruit codeur et inversion transitoire.
-OppositeDirectionActive := NOT BypassProcess AND (MovementCommanded AND NOT InReferencingMode
+OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
     AND (((Direction > 0) AND (MeasuredSpeedSignedMps < -MovementSpeedThresholdMps))
       OR ((Direction < 0) AND (MeasuredSpeedSignedMps > MovementSpeedThresholdMps))));
 TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
@@ -500,13 +482,13 @@ END_IF;
 // Détecte charge coincée, contacteur inefficace ou chaîne mécanique non entraînée. SafeStop seul :
 // aucun retour ne justifie une coupure puissance brutale immédiate ; l'escalade reste matérielle.
 TonNoMovement(
-    IN := NOT BypassProcess AND (MovementCommanded AND NOT InReferencingMode
+    IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
           AND (ABS(MeasuredSpeedSignedMps) < MovementSpeedThresholdMps)),
     PT := NoMovementTimeout
 );
 IF TonNoMovement.Q THEN
     ErrorId := ErrorId OR 16#8000;
-ELSIF ResetEdge.Q AND (NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) >= MovementSpeedThresholdMps)) THEN
+ELSIF ResetEdge.Q AND (NOT MeasuredSpeedValid OR NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) >= MovementSpeedThresholdMps)) THEN
     ErrorId := ErrorId AND 16#7FFF;
 END_IF;
 

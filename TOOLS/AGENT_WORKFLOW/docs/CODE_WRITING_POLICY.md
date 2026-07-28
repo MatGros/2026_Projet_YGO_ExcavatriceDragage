@@ -60,7 +60,88 @@ Interface minimale autorisée uniquement si son rôle est documenté dans la spe
 - redémarrage automatique après défaut.
 - réimplémentation d'une librairie CODESYS déjà disponible.
 
-## 5. En-tête obligatoire
+## 5. Programmation orientée objet et encapsulation
+
+### Principes obligatoires
+
+- **Un objet = une responsabilité métier ou technique clairement nommée.** Le propriétaire d’une
+  donnée est le FB qui l’acquiert, la calcule ou garantit sa cohérence. Un bloc safety surveille
+  une mesure ; il ne devient pas son producteur par commodité de câblage.
+- **Composition uniquement** : un FB utilise d’autres FB via des instances privées dans `VAR`.
+  Pas d’héritage, pas de méthode/propriété ajoutée sans décision d’architecture explicite.
+- Les variables internes d’un FB sont privées. Aucun appelant ne les écrit et aucun nouveau flux
+  ne doit dépendre d’un accès à `Instance.VariableInterne`.
+- Les échanges passent uniquement par une interface explicite : `VAR_INPUT`, `VAR_OUTPUT` et
+  `VAR_IN_OUT` lorsqu’un partage par référence est réellement nécessaire et documenté.
+- Une sortie possède **un seul producteur**. Plusieurs consommateurs peuvent la lire, mais ne la
+  recalculent pas et ne créent pas de source parallèle.
+- Une donnée dérivée est calculée une seule fois par son propriétaire, puis distribuée. Exemple :
+  position/vitesse appartiennent à la chaîne codeur ; les blocs Winch, Cycle, Safety et IHM les
+  consomment.
+
+### Interfaces propres
+
+- Chaque entrée exprime une information atomique et compréhensible : mesure, état, commande
+  arbitrée, validité ou événement.
+- Ne pas passer une succession de conditions métier anonymes directement dans un appel de FB.
+  Une expression simple de conversion ou de comparaison locale reste admise ; une décision
+  combinant plusieurs causes doit être calculée par son **propriétaire fonctionnel**, nommée et
+  documentée avant l’appel.
+- Interdit sans arbitrage explicite :
+
+```pascal
+// ❌ Sources de commande fusionnées anonymement à l’interface
+Start := HmiButton OR JoystickActive OR CycleRequest;
+```
+
+- Forme attendue :
+
+```pascal
+// ✅ L’arbitre propriétaire choisit une source légitime et expose le résultat
+StartArbitrated := ...;
+Instance(Start := StartArbitrated);
+```
+
+- Un `OR` reste légitime pour agréger des **états homogènes** clairement documentés, par exemple
+  `AnyError := ErrorM1 OR ErrorM2`. Il ne doit jamais masquer un arbitrage de commandes, une
+  priorité safety ou des causes de natures différentes.
+- Une entrée ne doit pas obliger le FB à deviner la provenance de la donnée. Si la provenance est
+  utile, transmettre un état ou un événement générique défini à la frontière propriétaire, pas
+  une lecture directe d’une GVL étrangère dans le FB.
+- Les paramètres influençant une fonction safety ne sont pas exposés à l’IHM ou en `PERSISTENT`
+  sans exigence métier explicite, bornage, traçabilité et validation humaine. Une constante
+  interne est préférée lorsque le réglage externe n’est pas requis.
+
+### Flux PRG ↔ FB ↔ consommateurs
+
+- Un `PRG_XX` orchestre ; il ne réimplémente pas la responsabilité d’un FB.
+- Les données destinées à d’autres programmes sont exposées par les `VAR_OUTPUT` du programme.
+  Les nouveaux consommateurs ne doivent pas traverser l’encapsulation avec
+  `PRG_XX.Instance.Sortie` si une sortie de programme peut porter proprement le flux.
+- Un consommateur lit la sortie publique du producteur ; il ne lit pas ses mémoires, timers,
+  instances composées ou états intermédiaires.
+- Quand plusieurs valeurs forment un contrat stable et cohérent, utiliser une `ST_*` dédiée
+  (commande, mesure, état, diagnostic). Ne pas créer une structure fourre-tout ni une structure
+  pour une paire de scalaires sans bénéfice de cohésion/versionnement.
+- `VAR_IN_OUT` est réservé aux objets partagés intentionnels (configuration/état persistant ou
+  référence documentée). Il ne sert pas à contourner l’interface ou à permettre plusieurs
+  écrivains.
+- Les GVL sont des frontières identifiées (IHM, persistance, simulation), jamais un canal caché
+  entre FB. Un FB de calcul ou métier ne lit pas une GVL étrangère si l’information peut être
+  fournie par son interface.
+
+### Checklist d’architecture avant code
+
+- [ ] Responsabilité et propriétaire de chaque nouvelle donnée identifiés.
+- [ ] Un seul producteur par sortie ; aucune duplication de calcul.
+- [ ] Internes inaccessibles aux nouveaux consommateurs.
+- [ ] Commandes arbitrées avant l’appel ; aucun `OR` de sources improvisé.
+- [ ] Interface minimale, sémantique et testable.
+- [ ] Structure utilisée seulement si les données forment un contrat cohérent.
+- [ ] Paramètres safety non exposés sans justification validée.
+- [ ] Simulation et provenance cantonnées à leur frontière architecturale.
+
+## 6. En-tête obligatoire
 
 Chaque POU possède un en-tête court et lisible :
 
@@ -76,7 +157,7 @@ Chaque POU possède un en-tête court et lisible :
 
 Un en-tête décrit le rôle et les contraintes. Il ne recopie pas la spécification complète.
 
-## 6. Commentaires
+## 7. Commentaires
 
 - Français, précis, orientés rôle/raison/risque.
 - Emojis comme repères visuels, jamais comme décoration excessive.
@@ -92,7 +173,7 @@ Exemple :
 // 🛡️ SafeStop impose la rampe rapide ; Enable reste maintenu hors AU matériel.
 ```
 
-## 7. Organisation d'un fichier
+## 8. Organisation d'un fichier
 
 ```text
 En-tête
@@ -108,7 +189,7 @@ Diagnostic / IHM
 
 Les sections sont séparées par des commentaires courts et stables.
 
-## 8. Traçabilité
+## 9. Traçabilité
 
 Toute modification CODE précise dans l'en-tête ou le contexte de tâche :
 
@@ -121,7 +202,7 @@ Toute modification CODE précise dans l'en-tête ou le contexte de tâche :
 Le corps ST reste uniquement dans `CODE/`. La documentation métier référence le fichier sans le
 recopier.
 
-## 9. Contrôle avant livraison
+## 10. Contrôle avant livraison
 
 ```text
 Scope → parsing → nommage/interdits → tests → bundle → review → validation CODESYS

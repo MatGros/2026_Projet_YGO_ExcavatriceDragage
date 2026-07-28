@@ -32,7 +32,7 @@ instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
     M1Direction := PRG_06_WinchControl.M1_Direction_Active, M2Direction := PRG_06_WinchControl.M2_Direction_Active,
     M1BrakeCmd := PRG_10_Outputs.M1BrakeCmd, M2BrakeCmd := PRG_10_Outputs.M2BrakeCmd, M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback,
     M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM, M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    M1Speed_Mps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps, M2Speed_Mps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps, SyncDeviation_M := PRG_06_WinchControl.instWinchSync.DeltaPosM,
+    M1Speed_Mps := PRG_02_Encoders.M1MeasuredSpeed_Mps, M2Speed_Mps := PRG_02_Encoders.M2MeasuredSpeed_Mps, SyncDeviation_M := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     Config := _WinchSymmetryCfgPersist, Data := _WinchSymmetryDataPersist);
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_Simulation.SimulationModeActive;

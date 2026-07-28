@@ -23,7 +23,7 @@
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md "flux nominal, benne ouvert").
+        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).

@@ -30,6 +30,7 @@ VAR_OUTPUT
     HwReal               : ST_HardwareImage; // Image matérielle brute (acquis §0)
     HwSim                : ST_HardwareImage; // Image produite par le banc (observation uniquement)
     HwIn                 : ST_HardwareImage; // Image d'entrée consommée par tout le programme (§0bis)
+    WinchInputSourceChanged : BOOL; // Pulse générique : bascule atomique réel ↔ simulé du domaine Winch
 
     // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
     // 🔧 REX 2026-07-07 : précision terrain — PowerContactorEngaged_DI (retour contact auxiliaire NO)
@@ -115,6 +116,11 @@ VAR
 
     // 🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.
     HmiCommandsInitialized               : BOOL;
+
+    // 🧪 Mémoire privée de la source Winch ; aucun détail de simulation ne sort de PRG_00.
+    WinchInputSourceSimulated             : BOOL;
+    PreviousWinchInputSourceSimulated     : BOOL;
+    WinchInputSourceInitialized           : BOOL;
 
     // 🔩 ═══ POINT DE BASCULE UNIQUE — POLARITÉ DU RETOUR FREIN M1/M2/M3 ═══
     // 🆕 REX 2026-07-26 (relevé terrain) : le frein est à MANQUE DE COURANT (sortie PLC = 1 →
@@ -271,7 +277,18 @@ HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
 
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive
+// 🔄 Source Winch atomique + pulse générique. Au boot, la source initiale est mémorisée sans faux pulse.
+WinchInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+IF NOT WinchInputSourceInitialized THEN
+    PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
+    WinchInputSourceInitialized := TRUE;
+    WinchInputSourceChanged := FALSE;
+ELSE
+    WinchInputSourceChanged := (WinchInputSourceSimulated <> PreviousWinchInputSourceSimulated);
+    PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
+END_IF;
+
+IF WinchInputSourceSimulated
     THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;
 IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
     THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwReal.Translation; END_IF;
