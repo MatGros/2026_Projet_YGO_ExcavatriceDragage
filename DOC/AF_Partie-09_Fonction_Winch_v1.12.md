@@ -24,13 +24,14 @@
 >
 > 📊 **T46 (2026-07-18)** — `ST_WinchLoadEstimateTable` et `FB_WinchLoadEstimator` fournissent
 > une estimation empirique par croisement palier commandé × bande de vitesse mesurée. La table
-> doit être explicitement validée (`IsConfigured`) ; sinon la sortie reste à 0 %. Cette valeur
-> est informative et ne participe à aucune sécurité ou commande.
+> (5×5 cases) est **entièrement exposée sur l'IHM (accès paramétrable client/exploitant)**. Le client
+> reste libre d'y saisir les pourcentages de charge qu'il souhaite voir afficher. Cette fonction est
+> **100 % informative** et n'impacte aucune sécurité ni commande de l'automate.
 >
-> 🛡️ **T47 / T93 (2026-07-28)** — **Gestion des Rampes & Tampons de Vitesse (`FB_SpeedStep`)** :
+> 🛡️ **T47 / T93 (2026-07-28)** — **Gestion des Rampes & Garde-Fou de Vitesse (`FB_SpeedStep`)** :
 > 1. **Tampons Temporisés de Transition (Mode Temporel par Défaut)** : Chaque transition de palier de vitesse (ex. Palier 1 ➔ 2 ➔ 3) est temporisée par une durée paramétrable à l'IHM (`StepTransitionDelay` / `StepBufferMs`). Cela adoucit les bascules de contacteurs de puissance et protège contre les à-coups mécaniques.
-> 2. **Mode Asservissement au Régime Moteur (Mode Vitesse Réelle)** : Comme pour le passage de vitesses sur un véhicule, ce mode optionnel (`SpeedGuardEnable=TRUE`) conditionne le passage au palier supérieur à l'atteinte d'un régime/vitesse linéaire mesuré effectif de la charge (`MeasuredSpeedMps >= SpeedStepThreshold`). Si la vitesse réelle est trop faible (ex. charge lourde), le palier supérieur est temporairement bloqué pour éviter le décrochage moteur ou la disjonction électrique par surintensité.
-> `SpeedGuardReady` valide cette condition si la vitesse mesurée est stable et la synchro valide.
+> 2. **Garde-Fou de Vitesse / Régime en Montée (`SpeedGuardEnable=TRUE`)** : **Comportement natif du sous-programme lors de l'extraction/remontée chargée**. Lorsque la benne remonte remplie de matière, cette sécurité conditionne le passage au palier de vitesse supérieur (ex: Palier 1 ➔ 2 ➔ 3) à l'atteinte préalable d'un régime/vitesse linéaire mesuré suffisant (`MeasuredSpeedMps >= SpeedStepThreshold`). Cela empêche l'envoi prématuré des paliers sous forte charge, éliminant tout risque de calage moteur et de disjonction électrique par surintensité. **Plafond Universel** : Conformément à la règle générale du système, toute consigne de palier reste strictement plafonnée par le palier maximal autorisé par le mode ou l'étape courante (ex: si l'étape autorise au maximum le palier 3, la vitesse n'ira jamais au-delà du palier 3).
+> 3. **Équilibre des Treuils & Réglage à Vide** : L'équilibre de charge entre les deux treuils M1 (retenue) et M2 (benne) est contrôlé par la surveillance de synchro (`FB_WinchSync` / `FB_Safety_Winch`). Les seuils du garde-fou de vitesse se configurent simplement par un **essai de montée à vide** avec une **marge/tolérance large (ex: 70-80 % de la vitesse à vide)**. L'estimateur 2D de charge reste une donnée d'affichage IHM 100% indicative et paramétrable par le client.
 >
 > **v1.10** — Nettoyage documentaire (audit doc) : remarques organisationnelles (sélecteur treuil
 > IHM non codé, §4undecies montée en charge, checklist validation v1.7) remplacées par des renvois
