@@ -37,6 +37,7 @@ VAR_INPUT
     EmergencyStopOk : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
     Mode            : E_Mode;     // 🆕 REX 2026-07-08 — changement de mode désarme le homme-mort (voir §4ter)
     BenneBusy       : BOOL;       // 🆕 REX 2026-07-08 — fin de cycle benne (front descendant) désarme le homme-mort (voir §4ter)
+    PreserveArmingAfterBucket : BOOL; // TRUE uniquement pendant fermeture ExtractionSequence : enchaînement palier 1 autorisé
     BusCanOpenOP    : ST_DiagDevice;       // État présence nœud CAN
     JoystickOP      : ST_DiagDevice;       // Mode esclave CANopen actif
     RawX            : INT;        // Valeur brute axe X
@@ -159,15 +160,13 @@ IF Mode <> LastMode THEN
 END_IF;
 LastMode := Mode;
 
-// 🆕 4ter-ter. FIN DE CYCLE BENNE (REX 2026-07-08, demande utilisateur) : désarme le homme-mort
-// dès que Benne.Busy retombe (cible atteinte ou retour position départ). Sans ça, si l'opérateur
-// tient encore le manche poussé (ce qu'il fait pour piloter le benne via M2), les gates
-// "NOT Benne.Busy" côté PRG_06_WinchControl s'ouvrent immédiatement pour M1 ET M2 — les deux
-// treuils démarrent alors directement sur la commande manche en cours, sans repasser par le
-// neutre, et FB_WinchSync (réactivé au même instant) détecte aussitôt un écart de position
-// (M1 immobile pendant le cycle, M2 ayant bougé de l'offset benne) → faux défaut synchro.
+// 🆕 4ter-ter. FIN DE CYCLE BENNE : le désarmement reste la règle générale afin qu'une
+// fermeture manuelle ne démarre jamais M1/M2 par surprise. Seule exception documentée :
+// ExtractionSequence garde l'armement pendant sa fermeture, car elle enchaîne immédiatement
+// vers le contrôle au palier 1 sous ses propres interlocks synchro/position. La sortie de cette
+// brique retombe dès défaut, reset, AU ou abandon ; elle ne contourne pas le neutre autrement.
 BenneBusyFallEdge(CLK := BenneBusy);
-IF BenneBusyFallEdge.Q THEN
+IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmed := FALSE;
     LeftNeutralSinceArm := FALSE;
 END_IF;

@@ -7,7 +7,7 @@ Entrée (CODE_CHANGE ou NEW_INFORMATION)
 → 🏷️ Qualification criticité C0-C4 (Pi propose → humain valide)
 → voie adaptée (Fast / Standard / Safety)
 → artefacts obligatoires selon voie
-→ modification → gates → review → rapport → traçabilité
+→ avis read-only si requis → **arrêt : validation humaine du plan** → modification → gates → rapport → traçabilité
 ```
 
 ## 🔀 3 Voies selon criticité
@@ -16,7 +16,7 @@ Entrée (CODE_CHANGE ou NEW_INFORMATION)
 > Typo, renommage, doc, param mineur, refactor sans impact safety.
 
 ```text
-Pre-edit Gate → Plan → Code → Gates 1-4 → ✅
+Pre-edit Gate → Plan → **validation humaine** → Code → Gates 1-4 → ✅
 ```
 - Pas de multi-modèle, pas de REGISTRE, pas de revue Herdr.
 - Gate 5 (compilation CODESYS) optionnel.
@@ -28,9 +28,10 @@ Pre-edit Gate → Plan → Code → Gates 1-4 → ✅
 Pre-edit Gate
 → REGISTRE_ACTIONS (proposé par Pi)
 → TASK_CONTEXT.yaml (proposé par Pi)
-→ Plan → Code → Gates 1-5
-→ Revue Herdr (1 agent Pi, read-only)
-→ ✅ Validation humaine
+→ 0 ou 1 avis Pi Subagent ciblé (read-only)
+→ Plan → **validation humaine obligatoire** → Code → Gates 1-5
+→ revue complémentaire seulement si anomalie ou demande humaine
+→ ✅ Rapport
 ```
 - REGISTRE et TASK_CONTEXT proposés, non bloquants si refusés.
 - 1 seul agent en revue (pas de double).
@@ -43,13 +44,12 @@ Pre-edit Gate
 → REGISTRE_ACTIONS (obligatoire)
 → TASK_CONTEXT.yaml (obligatoire)
 → TEST_DESIGN.md (obligatoire)
-→ ⚠️ ALERTE RISQUES explicite → Validation humaine artefacts
-→ Code ST (High Effort)
-→ Gates 1-5
-→ 🔴 DOUBLE REVUE PARALLÈLE A/B
-     Agent A ──┐ (même contexte, sans voir l'autre)
-     Agent B ──┴─► Consensus ✅ / Divergence 🚨 → alerte humain
-→ CODESYS import → simulation CODESYS manuelle → Terrain
+→ ⚠️ ALERTE RISQUES explicite
+→ 🔴 DOUBLE AVIS Pi Subagents PARALLÈLES A/B (read-only, même contexte, sans se voir)
+→ synthèse : consensus ✅ / divergence 🚨
+→ **validation humaine obligatoire : artefacts + plan + décision safety**
+→ Code ST (High Effort, un seul exécutant)
+→ Gates 1-5 → CODESYS import → simulation CODESYS manuelle → Terrain
 ```
 
 ## 🔴 Règle Double Revue Parallèle (C4)
@@ -82,10 +82,11 @@ Pi qualifie et propose, l'humain valide en 1 mot.
 - Aucun commit automatique — validation humaine obligatoire.
 - Toute modification safety exige une validation humaine.
 - Ponytail est interdit dès qu'un sujet safety, norme ou redondance est détecté.
-- Toute délégation Herdr suit le cycle bloquant
+- Les avis passent par Pi Subagents et restent read-only. Ils sont toujours attendus, lus et
+  synthétisés avant le plan ; aucun avis n'est lancé en arrière-plan.
+- Herdr est un secours explicite uniquement. S'il est utilisé, suivre le cycle bloquant
   `start → handshake → wait → read → mission → wait → read → contrôle` décrit dans
-  `INTEGRATIONS.md`. Herdr n’émet pas de notification conversationnelle automatique : une mission
-  n’est pas suivie tant que son résultat n’a pas été explicitement attendu et lu.
+  `INTEGRATIONS.md`.
 
 ## 🔄 Règle d'apprentissage continu (Double boucle)
 

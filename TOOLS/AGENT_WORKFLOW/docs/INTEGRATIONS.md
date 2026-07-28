@@ -1,6 +1,45 @@
 # Intégrations agents
 
-## Herdr
+## Pi Subagents — voie par défaut
+
+Plugin utilisateur installé :
+
+```text
+pi-subagents
+```
+
+Il lance des agents enfants Pi avec contexte isolé et restitue leurs avis directement dans la
+conversation. C'est la voie normale pour une analyse, un contre-avis ou une revue : **pas de
+pane Herdr, pas de SDK projet, pas de worktree**.
+
+### Usage sobre
+
+| Besoin | Agents | Écriture |
+|---|---:|---|
+| C0-C1 | aucun | Pi principal après validation du scope si nécessaire |
+| C2 | 0 ou 1 avis ciblé | Pi principal seul |
+| C3 | 1 reviewer/oracle read-only | Pi principal seul |
+| C4 safety | 2 avis A/B read-only parallèles | Pi principal seul, après validation humaine |
+
+- Les avis utilisent `scout`, `planner`, `reviewer` ou `oracle` intégrés au plugin.
+- Un avis est **read-only** : `read`, `grep`, `find`, `ls` uniquement ; pas de modification, pas
+  de commit, pas de sous-délégation.
+- Les deux avis A/B reçoivent le même objectif et les mêmes sources, sans voir le résultat de
+  l'autre.
+- Pi principal compare les rapports, ne fusionne jamais automatiquement leurs propositions et
+  présente : `✅ accords`, `⚠️ divergences`, `🎯 recommandation`, `❓ décision`.
+- Les sous-agents héritent du modèle Pi courant. Le modèle voulu pour les revues est
+  `omni/cc/claude-sonnet-5` lorsqu'il est disponible ; le modèle réellement utilisé est annoncé
+  dans le rapport.
+- Ne pas lancer d'agent de fond : l'avis est attendu, lu et synthétisé avant de poursuivre.
+
+### Point d'arrêt humain obligatoire
+
+Après les avis et **avant toute écriture**, Pi présente un plan court (scope, fichiers, flux,
+risques, gates et tests). L'automaticien répond explicitement `valider le plan` ou formule les
+corrections. Sans cette validation, aucune modification `CODE/` ou `DOC/` n'est faite.
+
+## Herdr — secours explicite
 
 Herdr est une dépendance externe optionnelle, utilisée via le package Pi
 `@andrewjacop/pi-herdr`. Elle orchestre des agents visibles dans des panes séparés.

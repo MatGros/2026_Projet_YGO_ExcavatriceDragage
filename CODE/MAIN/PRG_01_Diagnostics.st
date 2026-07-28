@@ -77,6 +77,8 @@ FB_Joystick_0(
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
     BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
+    PreserveArmingAfterBucket := PRG_06_WinchControl.instExtractionSequence.Busy
+                                  AND (PRG_06_WinchControl.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
     NeutralXMem         := _JoystickNeutralX,
     NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,

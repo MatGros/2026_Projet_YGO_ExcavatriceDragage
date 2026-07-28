@@ -1,0 +1,51 @@
+task_id: "LOT3A-WINCH-FINAL-INTERLOCK"
+request: "Ajouter une barrière logicielle finale M1/M2, au plus près des sorties relais, qui empêche tout saut rapide de palier, tout redémarrage trop rapide et toute puissance moteur avant confirmation de desserrage frein."
+criticality: C4
+scope_code:
+  - "CODE/TREUILS/FB_WinchOutputInterlock.st"
+  - "CODE/TREUILS/E_WinchOutputInterlockState.st"
+  - "CODE/TREUILS/E_WinchOutputInterlockReason.st"
+  - "CODE/TREUILS/FB_Winch.st"
+  - "CODE/MAIN/PRG_06_WinchControl.st"
+  - "CODE/MAIN/PRG_10_Outputs.st"
+  - "CODE/COMMUN/FB_Output.st" (FB conservé comme POU disponible, mais aucune instance ne restera appelée)
+  - "CODE/MAIN/PRG_09_Supervision.st"
+  - "CODE/MAIN/PRG_11_Troubleshooting.st"
+  - "CODE/SUPERVISION/_TYPES"
+  - "CODE/TESTS/PRG_Test_WinchOutputInterlock.st"
+scope_doc:
+  - "DOC/AF_Partie-09_Fonction_Winch_v1.14.md"
+  - "DOC/AF_Partie-06_IO_Conditioning_v1.8.md"
+  - "DOC/PLAN_TASK_v1.0.md"
+  - "DOC/VERSION_HISTORY.md"
+out_of_scope:
+  - "Relais temporisés ou interverrouillage matériel à ajouter dans l'armoire"
+  - "Réglage terrain des temporisations"
+  - "T91/T93/T87 : stratégie détaillée frein/puissance et rampes métier"
+  - "T94/T95 et activation du garde-fou vitesse T47"
+acceptance_criteria:
+  - "La barrière finale est l'unique productrice des sorties relais vitesse M1/M2 dans PRG_10."
+  - "Toutes les 15 instances FB_Output sont retirées : aucune instance FB_Output ne reste appelée dans le programme ; PRG_10 écrit directement les Q M1/M2 après l'interlock et la Q frein M3."
+  - "Elle travaille exclusivement avec RequestedStep et AuthorizedStep : aucune combinaison contacteur arbitraire n'est acceptée."
+  - "Un RequestedStep 0→5 progresse uniquement par pas adjacents, avec au moins T#1s250 entre deux augmentations."
+  - "Le fonctionnement métier normal impose au moins T#1s500 entre paliers ; l'interlock reste passif si ce délai est respecté."
+  - "Après coupure et confirmation FwdRevSpeedFeedbackOff, l'interlock impose T#900ms avant toute nouvelle marche ; FB_Winch impose T#1s en nominal."
+  - "Aucun relais sens ni contacteur vitesse n'est autorisé avant BrakeIsOpenConfirmed après commande de desserrage."
+  - "Perte autorisation, AU, SafeStop ou défaut interlock coupe immédiatement sens et vitesse."
+  - "Les états/temporisations/reasons sont exposés IHM et en lecture seule dans PRG_11."
+  - "Toute incohérence dépassant son timeout est mémorisée et nécessite disparition de cause + Reset sur front."
+tests_required:
+  - "Démarrage normal : interlock transparent après frein et temps mort conformes."
+  - "Demande directe 0→5 : progression 0→1→2→3→4→5 temporisée."
+  - "Redémarrage/inversion : sorties coupées, retour retombé, délai T#900ms obligatoire."
+  - "Frein non confirmé ouvert : aucune puissance ; timeout puis défaut mémorisé."
+  - "Perte autorisation : coupure immédiate de toutes sorties moteur."
+tests_automated_required: true
+tests_implementation_paths:
+  - "CODE/TESTS/PRG_Test_WinchOutputInterlock.st"
+tests_status: planned
+test_execution_evidence: []
+review_required: true
+dual_review_required: true
+pony_tail: forbidden
+human_validation_required: true

@@ -12,6 +12,8 @@ VAR_GLOBAL RETAIN
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
     TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     Cycle   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
+    DredgingAssist : ST_DredgingAssistHMI; (* 🪨 Assistance plongée/extraction MAINT_N1/N2 *)
+    OperatorAction : ST_OperatorAction; (* 🎮 Unique consigne conduite, arbitré en supervision *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     // 🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire

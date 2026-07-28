@@ -46,8 +46,8 @@ VAR_INPUT
     Mode                : E_Mode;           // Mode de marche machine
     CmdOpen_IHM         : BOOL;             // Demande d'ouverture depuis l'IHM
     CmdClose_IHM        : BOOL;             // Demande de fermeture depuis l'IHM
-    JoystickY_StartStop : BOOL;             // Homme-mort joystick (AxisCmdY.StartStop)
-    JoystickY_Direction : INT;              // Sens joystick (AxisCmdY.Direction : 1=montée, -1=descente)
+    MotionRequestActive : BOOL;             // Intention mouvement déjà arbitrée (joystick ou boutons IHM)
+    MotionDirection     : INT;              // Sens arbitré : 1=montée, -1=descente
     CablePosM1          : REAL;             // Position réelle câble treuil M1 (mètres)
     CablePosM2          : REAL;             // Position réelle câble treuil M2 (mètres)
     HomedM1             : BOOL;             // Codeur M1 référencé (instHomingM1.Homed) — REX 2026-07-07
@@ -296,9 +296,9 @@ CASE State OF
 
             // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
             // ⚠️ REX 2026-07-07 : sens inversés (enroulage ferme désormais, déroulage ouvre)
-            IF CloseReq AND JoystickY_StartStop AND (JoystickY_Direction = 1) THEN
+            IF CloseReq AND MotionRequestActive AND (MotionDirection = 1) THEN
                 State := E_State.BUSY;
-            ELSIF OpenReq AND JoystickY_StartStop AND (JoystickY_Direction = -1) THEN
+            ELSIF OpenReq AND MotionRequestActive AND (MotionDirection = -1) THEN
                 State := E_State.BUSY;
             END_IF;
         END_IF;
@@ -323,16 +323,16 @@ CASE State OF
         // 🆕 REX 2026-07-08 : sens inverse autorisé (recul/annulation partielle) pendant CloseReq/
         // OpenReq, mais BORNÉ à la position de départ (M2StartPosM, mémorisée à l'entrée en Busy) —
         // ne permet jamais de dépasser cette position dans le sens opposé au sens principal.
-        IF NOT JoystickY_StartStop THEN
-            // Si relâchement du joystick, arrêt temporaire du mouvement
+        IF NOT MotionRequestActive THEN
+            // Si relâchement de l'intention opérateur, arrêt temporaire du mouvement.
             M2_StartStop := FALSE;
             M2_Direction := 0;
         ELSIF CloseReq THEN
-            IF (JoystickY_Direction = 1) THEN
+            IF (MotionDirection = 1) THEN
                 // Sens principal (fermeture) : M2 enroule (monte) — REX 2026-07-07
                 M2_StartStop := TRUE;
                 M2_Direction := 1;
-            ELSIF (JoystickY_Direction = -1) AND (CablePosM2 > M2StartPosM) THEN
+            ELSIF (MotionDirection = -1) AND (CablePosM2 > M2StartPosM) THEN
                 // Sens inverse : recul autorisé UNIQUEMENT tant qu'on n'est pas revenu à la position
                 // de départ (pas au-delà, donc pas de ré-ouverture complète depuis ici)
                 M2_StartStop := TRUE;
@@ -343,11 +343,11 @@ CASE State OF
                 M2_Direction := 0;
             END_IF;
         ELSIF OpenReq THEN
-            IF (JoystickY_Direction = -1) THEN
+            IF (MotionDirection = -1) THEN
                 // Sens principal (ouverture) : M2 déroule (descend) — REX 2026-07-07
                 M2_StartStop := TRUE;
                 M2_Direction := -1;
-            ELSIF (JoystickY_Direction = 1) AND (CablePosM2 < M2StartPosM) THEN
+            ELSIF (MotionDirection = 1) AND (CablePosM2 < M2StartPosM) THEN
                 // Sens inverse : recul autorisé UNIQUEMENT tant qu'on n'est pas revenu à la position
                 // de départ (pas au-delà, donc pas de re-fermeture complète depuis ici)
                 M2_StartStop := TRUE;
@@ -436,7 +436,7 @@ CASE State OF
         RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : cible atteinte
 
         // Attente du relâchement de la validation joystick pour repasser à READY
-        IF NOT JoystickY_StartStop THEN
+        IF NOT MotionRequestActive THEN
             State := E_State.READY;
         END_IF;
 END_CASE;

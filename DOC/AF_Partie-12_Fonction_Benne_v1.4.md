@@ -7,7 +7,7 @@
 > titre affichait v1.2, le champ "Version" v1.3, alors que le contenu interne (§4 point 8)
 > introduisait déjà une v1.4) + checklist de mise en service (§6) remplacée par un renvoi court
 > vers `DOC/PLAN_TASK_v1.0.md` §3 (T27). Aucun changement de contenu fonctionnel.
-> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.4](AF_Partie-04_Cycle_Sequenceur_v1.4.md) §6, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.12.md) §9/§4quinquies.
+> 🔗 **Dépend de** : [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md), [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md), [P4 Cycle v1.5](AF_Partie-04_Cycle_Sequenceur_v1.5.md) §6, [P9 Winch v1.7](AF_Partie-09_Fonction_Winch_v1.12.md) §9/§4quinquies.
 >
 > 🆕 **v1.3 (2026-07-08)** — Alignement sur la sécurité d'inhibition et ajout du référencement fermé : le benne est désactivé (`Enable := FALSE`) si le treuil M2 (fermeture) est inhibé en Maintenance N2, OU si l'un des deux codeurs de position M1 ou M2 est en défaut ou non référencé. Si seul M1 (retenue) est inhibé, le benne reste manœuvrable. Ajout de deux commandes de référencement manuel IHM à l'arrêt (`CmdConfirmOpenPosition` et `CmdConfirmClosePosition`) qui initialisent l'état mécanique (ouvert/fermé) et recalent de manière cohérente les positions mémorisées de boot en éliminant toutes les erreurs actives.
 > 🔧 **v1.2 (2026-07-07)** — Ajout du garde-fou glissement M1 pendant un mouvement benne (Méca C

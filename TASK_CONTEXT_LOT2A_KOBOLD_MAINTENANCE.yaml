@@ -1,0 +1,39 @@
+task_id: "LOT2A-KOBOLD-MAINTENANCE"
+request: "Rendre la plongée Kobold et l'extraction assistée utilisables en MAINT_N1/N2 avant le cycle semi-auto."
+criticality: C4
+scope_code:
+  - "CODE/CYCLE/FB_DiveSearch.st"
+  - "CODE/CYCLE/FB_ExtractionSequence.st"
+  - "CODE/CYCLE/E_DiveSearchState.st"
+  - "CODE/CYCLE/E_ExtractionSequenceState.st"
+  - "CODE/MAIN/PRG_01_Diagnostics.st"
+  - "CODE/MAIN/PRG_06_WinchControl.st"
+  - "CODE/MAIN/PRG_09_Supervision.st"
+  - "CODE/JOYSTICK/FB_Joystick.st"
+  - "CODE/TESTS/PRG_Test_KoboldMaintenance.st"
+  - "CODE/SUPERVISION/_TYPES"
+  - "CODE/GVL_PERSISTENT.st"
+scope_doc:
+  - "DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md"
+  - "DOC/PLAN_TASK_v1.0.md"
+  - "DOC/VERSION_HISTORY.md"
+out_of_scope:
+  - "Orchestration FB_Cycle en SEMI_AUTO"
+  - "Réglage/calibration terrain des bandes de vitesse"
+  - "Modification générale de la stratégie homme-mort (exception extraction approuvée)"
+acceptance_criteria:
+  - "T81 : fond uniquement sur front 1→0 après immersion 0→1 valide."
+  - "T82 : aucune descente assistée sans séquence Kobold possible."
+  - "MAINT_N1/N2 : plongée et extraction sont activables séparément sans mouvement autonome."
+  - "Une seule consigne opérateur est exposée à l'IHM, séparée des alarmes."
+tests_required:
+  - "Tests PLC de transitions DiveSearch et ExtractionSequence"
+tests_automated_required: true
+tests_implementation_paths:
+  - "CODE/TESTS/PRG_Test_KoboldMaintenance.st"
+tests_status: implemented
+test_execution_evidence: []
+review_required: true
+dual_review_required: true
+pony_tail: forbidden
+human_validation_required: true

@@ -97,6 +97,14 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🔄 CYCLE (dragage semi-automatique)
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg (T66)
 
+    // 🪨 ASSISTANCE PRÉLÈVEMENT MAINTENANCE — T81/T82
+    _DredgingAssistCfgPersist : ST_DredgingAssistCfg := (
+        DiveStartMin_M := 1.0,
+        ImmersionUpper_M := 0.5,
+        ImmersionLower_M := -0.5,
+        ExtractionControlDistance_M := 2.0
+    ); // 🌉 Pont FB_CfgPersistBridge_DredgingAssistCfg
+
     // 📏 RÉGLEMENTATION / LÉGAL
     _CommunCfgPersist : ST_CommunCfg := (
         LimitLegalDepthMinAllowed_M := -15.0,
