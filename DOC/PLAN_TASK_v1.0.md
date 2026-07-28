@@ -6,6 +6,28 @@
 
 ---
 
+## 🧭 Plan d’implémentation orchestré — état courant
+
+> Source unique de suivi des lots automate. Mise à jour uniquement aux changements d’état significatifs.
+
+| Ordre | Lot fonctionnel | Tâches | Dépendances / décision | État | Agent | Validation utilisateur |
+|---:|---|---|---|---|---|---|
+| 1 | Fiabilisation mesure Winch | T84 + T85 + T86 | Fenêtre interne 50 ms ; producteur chaîne codeur ; pulse source générique depuis `PRG_00` ; T87 reporté au lot étude 4 (T91/T93) | 🟠 Implémenté et revu, validation CODESYS/terrain requise | Pi via OmniRoute | ⏳ Validation code attendue |
+| 2 | Séquence de fond Kobold | T81 + T82 | Départ hors eau → immersion `0→1` confirmée → fond `1→0` ; arrêt sûr si séquence invalide | ⬜ À préparer | — | — |
+| 3 | Garde-fou et calibration paliers | T94 + T95 | Dépend du lot 1 : mesure vitesse fiabilisée avant calibration | ⬜ En attente lot 1 | — | — |
+| 4 | Frein et commande par paliers | T91 + T93 + décision T87 | Étude montée/descente avant code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel` | ⬜ Étude à préparer | — | — |
+| 5 | Reliquats safety | T72 + T73 + T74 | Réévaluer l’état réel du code après les lots précédents | ⬜ À réévaluer | — | — |
+| 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⬜ Différé | — | — |
+
+### Règles de conduite
+
+- Un lot à la fois : analyse → plan → validation utilisateur → implémentation agent → contrôle orchestrateur → validation utilisateur.
+- Agents d’exécution : scope borné, aucun commit. Revues : lecture seule.
+- Aucun nouveau document de pilotage : specs `AF_PartieN`, registres existants, ce plan et `VERSION_HISTORY.md` font foi.
+- `TOOLS/OUTILS_ST2PY/` est hors périmètre tant qu’un autre agent y travaille.
+
+---
+
 ## 🏁 1. Jalons connus de l'affaire
 
 | Date | Jalon |
@@ -240,10 +262,10 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 
 
-| T84 | 🔴 **Qualité de la mesure `MeasuredSpeedMps`** (constat **C5**) : dérivée brute de `CablePosM` sur **1 cycle de 10 ms** (`FB_Safety_Winch:381`). Un pas de quantification codeur (0,2 mm) produit **0,02 m/s** — soit exactement le seuil Méca A. Mesure illisible à l'affichage et déclenchement possible sur un simple glitch. **Décision 2026-07-27** : améliorer **la mesure** (fenêtre glissante ~100 ms → bruit ÷10), pas la fonction de sécurité — Méca A garde son seuil et sa tempo, ce n'est pas à elle de filtrer. ⚠️ Depuis C1, Méca A est la **seule** protection contre le patinage de frein | Projet / Sécurité | `AUDITS/RevueTechnique/AUDIT_Revue_Technique_v1.0.md` §7 |
-| T85 | 🟠 **La mesure de vitesse est produite par le bloc de sécurité** : `FB_Safety_Winch` calcule `MeasuredSpeedMps`, consommée ensuite par `FB_Encoder_SpeedMonitor`, `FB_WinchLoadEstimator`, `FB_Cycle`, `FB_WinchSymmetry` et l'IHM. Un bloc de sécurité ne devrait pas être **fournisseur de mesure** : la vitesse relève de la chaîne codeur, la sécurité ne fait que la **surveiller**. Déplacer vers `PRG_02`/`FB_Encoder_*`. ⚠️ Touche le cœur sécurité et 5 consommateurs → **après livraison** | Projet / Architecture | Décision utilisateur 2026-07-27 |
-| T86 | 🟠 **C2** — `ForbidAscent` non initialisé dans le gate `Enable = FALSE` de `FB_Safety_Winch` (l. 242-265) : conserve sa dernière valeur, alors que `SafeStop` et `ForbidDescent` sont forcés. Sortie de bloc sécurité non déterministe. À grouper avec T84 (même fichier) | Projet / Sécurité | `AUDIT_Revue_Technique_v1.0.md` §4 |
-| T87 | 🟠 **C4** — `DelayMotorDecel` : paramètre de frein propagé depuis `FB_Winch` et réglable en mise en service, mais son `TON` est armé à `IN := FALSE` → **sans aucun effet**. Supprimer de l'interface **ou** réimplémenter la temporisation ; dans les deux cas corriger l'en-tête de `FB_Brake` qui décrit un comportement inexistant. À grouper avec T84 | Projet / Sécurité | `AUDIT_Revue_Technique_v1.0.md` §6 |
+| T84 | 🟠 **Implémenté 2026-07-28 — validation CODESYS requise.** `FB_Encoder_SpeedMeasure` : 6 positions horodatées / 5 intervalles, fenêtre interne fixe 50 ms, temps réel écoulé, sans PT1/réglage externe. Seuils et temporisations safety inchangés | Projet / Sécurité | `FB_Encoder_SpeedMeasure`, AF10 v1.11 |
+| T85 | 🟠 **Implémenté 2026-07-28 — validation CODESYS requise.** Vitesse absolue/signée/validité produites uniquement par `PRG_02_Encoders`; `FB_Safety_Winch` est consommateur. Bascule réel/simulé purgée par pulse générique `PRG_00_Inputs.WinchInputSourceChanged` | Projet / Architecture | AF09 v1.13, AF10 v1.11 |
+| T86 | 🟠 **Implémenté 2026-07-28 — validation CODESYS requise.** Gate `Enable=FALSE` de `FB_Safety_Winch` force désormais `ForbidAscent=TRUE` | Projet / Sécurité | `FB_Safety_Winch`, AF09 v1.13 |
+| T87 | 🟠 **C4** — `DelayMotorDecel` : paramètre de frein propagé depuis `FB_Winch` et réglable en mise en service, mais son `TON` est armé à `IN := FALSE` → **sans aucun effet**. Supprimer de l'interface **ou** réimplémenter la temporisation ; dans les deux cas corriger l'en-tête de `FB_Brake` qui décrit un comportement inexistant. Reporté au lot étude T91/T93 (frein/paliers) — **pas** groupé avec T84 | Projet / Sécurité | `AUDIT_Revue_Technique_v1.0.md` §6 |
 | T88 | 🔵 **C6** — `FB_CycleTime` ne gère pas le bouclage de `TIME()` (~49,7 jours) : 1 cycle de `CycleTimeS` aberrant → la rampe saute à sa cible. Borné par `LIMIT(±100)` donc non dangereux, mais à-coup possible sur une machine laissée en marche continue. Garde-fou : `IF DeltaTimeMs > 1000 THEN CycleTimeS := DefaultValueS;` | Projet | `AUDIT_Revue_Technique_v1.0.md` §8 |
 | T89 | 🟡 **Offset benne = ÉTAT de la benne** (MES-010, précisé 2026-07-27) : l'écart de position entre M1 et M2 **définit** l'état mécanique — `M1 = M2` (offset 0) ⇒ benne **OUVERTE** · `M2` décalé de **≈ 15 m** ⇒ benne **FERMÉE**. Ce n'est donc pas un simple réglage : c'est la grandeur qui porte l'ouverture/fermeture, et **tout le cycle en dépend**. Valeur appliquée le 2026-07-27 (`OffsetCloseM` 10.0 → 15.0). À faire : ① valider la cote au premier essai en charge ; ② vérifier que **l'ouverture/fermeture ET le cycle complet sont fonctionnels et simulables** avec cette valeur | Terrain / Projet | `REGISTRE` MES-010, `GVL_PERSISTENT`, `FB_Bucket` |
 | T90 | 🟡 **Hauteurs treuils à contrôler sur site** (MES-009) : capteur haut mesuré à 8,0 m, arrêt réel ≈ 7,5 m. Appliqué le 2026-07-27 : `CfgTopSensorPos_M := 8.0` (position inscrite par le homing au déclenchement du capteur) et `CfgCableLimitAscent_M := 7.5` (limite logicielle sous le capteur physique). ⚠️ Une erreur sur `CfgTopSensorPos_M` **décale toutes les positions machine** → vérifier au premier homing que `Position_M` correspond à la cote réelle. 📌 **À inscrire aussi dans la doc** (`AF_Partie-09` §hauteurs et `AF_Partie-10` homing) : ces deux cotes sont des **valeurs de base de la configuration persistante**, pas des réglages libres | Terrain / Sécurité | `REGISTRE` MES-009, `GVL_PERSISTENT` |
@@ -274,7 +296,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 | # | Lot | Pourquoi d'abord |
 |---|---|---|
-| **1** | **T84 + T86 + T87** — mesure `MeasuredSpeedMps` (fenêtre ~100 ms), `ForbidAscent` déterministe, `DelayMotorDecel` tranché | Même fichier (`FB_Safety_Winch`/`FB_Brake`) → **un seul passage sur le cœur sécurité**. Sans T84, toutes les mesures suivantes portent sur du bruit. T87 débloque le réglage attendu par T91 |
+| **1** | **T84 + T85 + T86** — mesure `MeasuredSpeedMps` (fenêtre interne 50 ms), producteur chaîne codeur (`PRG_02_Encoders`), `ForbidAscent` déterministe | Même fichier/chaîne (`FB_Encoder_SpeedMeasure`/`FB_Safety_Winch`) → **un seul passage sur le cœur sécurité**. Sans T84, toutes les mesures suivantes portent sur du bruit. T87 (`DelayMotorDecel`) **hors périmètre** de ce lot, reporté au lot étude 4 (T91/T93) |
 | **2** | **T81 + T82** — séquence de détection de fond Kobold | Le cycle semi-auto ne peut pas être qualifié tant que la détection de fond repose sur l'immersion |
 | **3** | **T94 + T95** — garde-fou pilotable/persistant + table `VitesseMax[1..5]` | Ce sont les **outils** de la calibration ci-dessous : sans eux, on ne peut ni mesurer ni conserver le résultat |
 

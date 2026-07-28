@@ -1,5 +1,11 @@
-# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.10)
+# 📋 Analyse Fonctionnelle — Partie 10 : Référencement Codeur (Homing) & Commande Indépendante Treuils (v1.11)
 
+> 📐 **v1.11 (2026-07-28) — T84/T85.** La chaîne codeur devient propriétaire unique de la
+> vitesse câble via `FB_Encoder_SpeedMeasure`, composé deux fois dans `PRG_02_Encoders`.
+> Fenêtre interne fixe 50 ms : 6 positions horodatées / 5 intervalles, temps réellement écoulé,
+> sans PT1 ni paramètre IHM/PERSISTENT. Le changement atomique réel↔simulé reste confiné à
+> `PRG_00_Inputs` et purge l'historique par un pulse générique. Voir §3.8.
+>
 > 🔧 **WINCH-CORE-01 (2026-07-21)** — Référentiel mécanique confirmé : capteur haut et
 > cible homing M1/M2 à 8,5 m ; limite d'exploitation à 8,0 m (arrêt réel ≈ 7,5 m).
 > ⚠️ **Droits IHM & Persistance** : Ces cotes (`CfgTopSensorPos_M`, `CfgCableLimitAscent_M`) restent
@@ -44,7 +50,7 @@
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
 > `BrakeFeedback` — voir `CODE/CODEURS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
-> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.12.md` (doc principale
+> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.13.md` (doc principale
 > treuil). Hors périmètre : Translation M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
@@ -146,7 +152,7 @@
 > [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (profils FB),
 > [P4 Cycle v1.4](AF_Partie-04_Cycle_Sequenceur_v1.4.md) §Initialisation/§3 Synchro,
 > [P5 Modes v1.2](AF_Partie-05_Modes_Maintenance_v1.6.md) §2 (`MAINT_N1`/`MAINT_N2`),
-> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.12.md) (`FB_Winch` unitaire M1/M2).
+> [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.13.md) (`FB_Winch` unitaire M1/M2).
 
 ---
 
@@ -342,6 +348,35 @@ Le même bornage s'applique, au front `Home`, aux deux cibles de référencement
 `TopSensorPositionM` (flux nominal) et `HomingTargetM` (flux unitaire `MAINT_N2`). Une cible
 hors `[-99.00 ; +99.00]` m est rejetée par `FB_Encoder_Homing` avec `ErrorId` bit4, sans
 génération de preset.
+
+### 3.8 Mesure de vitesse propriétaire de la chaîne codeur (T84/T85)
+
+`FB_Encoder_SpeedMeasure` est une brique réduite de calcul, composée une fois par axe dans
+`PRG_02_Encoders`. Elle reçoit uniquement `Enable`, `Reset`, `Position_M` et `PositionValid`.
+La fenêtre est une constante interne `T#50MS` : six positions horodatées forment cinq intervalles.
+La vitesse signée utilise le déplacement entre la plus ancienne et la plus récente position,
+divisé par le temps réellement écoulé ; la vitesse absolue est son `ABS`.
+
+Garde-fous : delta temps nul interdit toute division ; ordre temporel invalide ou rebouclage de
+`TIME()` purge localement l'historique, sans dépendre de `FB_CycleTime` ni du chantier T88.
+La sortie `Valid` reste fausse avant une fenêtre complète. Aucun PT1, réglage appelant, IHM,
+PERSISTENT ou accès GVL n'existe dans la brique.
+
+Flux unique :
+
+```text
+PRG_00_Inputs.HwIn.Winch (réel OU simulé)
+  → FB_Encoder_Abs → FB_Encoder_Scale → FB_Encoder_Safety.CablePosMSafe
+  → FB_Encoder_SpeedMeasure
+  → VAR_OUTPUT publics PRG_02_Encoders (absolue, signée, validité)
+  → Safety / monitor / charge / cycle / IHM / diagnostic symétrie
+```
+
+`PRG_00_Inputs.WinchInputSourceChanged` est un pulse générique émis uniquement lors d'une bascule
+effective de source Winch ; aucun faux pulse au boot et aucun détail `GVL_Simulation` n'est propagé.
+`PRG_02_Encoders` purge la mesure sur ce pulse, pendant/à la fin du homing ou preset, et sur toute
+indisponibilité/incohérence de position. Aucun consommateur ne traverse les instances privées de
+`PRG_02_Encoders` pour lire la vitesse.
 
 ### 3.7 Cohérence au redémarrage (nouveau — démontage masqué / rotation hors tension)
 
@@ -691,7 +726,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie-09_Fonction_Winch_v1.12.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie-09_Fonction_Winch_v1.13.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`

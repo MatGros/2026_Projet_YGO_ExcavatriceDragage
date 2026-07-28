@@ -82,6 +82,10 @@ Pi qualifie et propose, l'humain valide en 1 mot.
 - Aucun commit automatique — validation humaine obligatoire.
 - Toute modification safety exige une validation humaine.
 - Ponytail est interdit dès qu'un sujet safety, norme ou redondance est détecté.
+- Toute délégation Herdr suit le cycle bloquant
+  `start → handshake → wait → read → mission → wait → read → contrôle` décrit dans
+  `INTEGRATIONS.md`. Herdr n’émet pas de notification conversationnelle automatique : une mission
+  n’est pas suivie tant que son résultat n’a pas été explicitement attendu et lu.
 
 ## 🔄 Règle d'apprentissage continu (Double boucle)
 

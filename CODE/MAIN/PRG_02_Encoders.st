@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md
 *)
 
 PROGRAM PRG_02_Encoders
@@ -12,6 +12,12 @@ VAR_OUTPUT
     EncoderFaultPresent   : BOOL;   // OR des deux - lu par PRG_04_Modes au cycle suivant
     EncoderFaultPresentM1 : BOOL;
     EncoderFaultPresentM2 : BOOL;
+    M1MeasuredSpeed_Mps       : REAL; // Vitesse câble absolue M1, producteur unique chaîne codeur
+    M1MeasuredSpeedSigned_Mps : REAL; // Vitesse câble signée M1
+    M1SpeedValid              : BOOL; // Six positions valides sur fenêtre horodatée complète
+    M2MeasuredSpeed_Mps       : REAL; // Vitesse câble absolue M2, producteur unique chaîne codeur
+    M2MeasuredSpeedSigned_Mps : REAL; // Vitesse câble signée M2
+    M2SpeedValid              : BOOL; // Six positions valides sur fenêtre horodatée complète
 END_VAR
 VAR
     M1_RawPosToUse        : UDINT;
@@ -26,6 +32,13 @@ VAR
     instHomingM2       : FB_Encoder_Homing;
     instEncoderSafetyM1 : FB_Encoder_Safety;
     instEncoderSafetyM2 : FB_Encoder_Safety;
+    instEncoderSpeedMeasureM1 : FB_Encoder_SpeedMeasure;
+    instEncoderSpeedMeasureM2 : FB_Encoder_SpeedMeasure;
+
+    M1PositionValid : BOOL; // Validité nommée du pipeline M1 avant mesure de vitesse
+    M2PositionValid : BOOL; // Validité nommée du pipeline M2 avant mesure de vitesse
+    M1SpeedReset    : BOOL; // Rupture de continuité position/source M1
+    M2SpeedReset    : BOOL; // Rupture de continuité position/source M2
 END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
@@ -160,5 +173,40 @@ instEncoderSafetyM2(
     BypassGlobal    := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
+
+// 5. MESURE VITESSE — propriétaire unique de la chaîne codeur (T84/T85)
+// La position sûre provient du pipeline aval réel/simulé déjà sélectionné exclusivement dans PRG_00.
+M1PositionValid := instEncoderAbsM1.EncoderAvailable
+                   AND NOT instEncoderSafetyM1.EncoderIncoherent
+                   AND NOT instHomingM1.Busy;
+M2PositionValid := instEncoderAbsM2.EncoderAvailable
+                   AND NOT instEncoderSafetyM2.EncoderIncoherent
+                   AND NOT instHomingM2.Busy;
+
+// 🧹 Un homing/preset ou une bascule de source invalide l'historique, même si la position finale est plausible.
+M1SpeedReset := instHomingM1.Busy OR instHomingM1.Done OR instEncoderAbsM1.PresetAck
+                OR NOT M1PositionValid OR PRG_00_Inputs.WinchInputSourceChanged;
+M2SpeedReset := instHomingM2.Busy OR instHomingM2.Done OR instEncoderAbsM2.PresetAck
+                OR NOT M2PositionValid OR PRG_00_Inputs.WinchInputSourceChanged;
+
+instEncoderSpeedMeasureM1(
+    Enable        := TRUE,
+    Reset         := M1SpeedReset,
+    Position_M    := instEncoderSafetyM1.CablePosMSafe,
+    PositionValid := M1PositionValid
+);
+instEncoderSpeedMeasureM2(
+    Enable        := TRUE,
+    Reset         := M2SpeedReset,
+    Position_M    := instEncoderSafetyM2.CablePosMSafe,
+    PositionValid := M2PositionValid
+);
+
+M1MeasuredSpeed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
+M1MeasuredSpeedSigned_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
+M1SpeedValid              := instEncoderSpeedMeasureM1.Valid;
+M2MeasuredSpeed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
+M2MeasuredSpeedSigned_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
+M2SpeedValid              := instEncoderSpeedMeasureM2.Valid;
 
 EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;

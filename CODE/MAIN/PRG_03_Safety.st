@@ -68,6 +68,9 @@ instSafetyWinchM1(
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 (7)
+    MeasuredSpeedMps       := PRG_02_Encoders.M1MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Encoders.M1MeasuredSpeedSigned_Mps,
+    MeasuredSpeedValid     := PRG_02_Encoders.M1SpeedValid,
     // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
@@ -125,6 +128,9 @@ instSafetyWinchM2(
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 (7)
+    MeasuredSpeedMps       := PRG_02_Encoders.M2MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Encoders.M2MeasuredSpeedSigned_Mps,
+    MeasuredSpeedValid     := PRG_02_Encoders.M2SpeedValid,
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
@@ -142,21 +148,21 @@ instSafetyWinchM2(
 
 // 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
 instSpeedMonitorM1(
-    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1,
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
     Mode                       := PRG_04_Modes.instModes.Mode,
-    SpeedMps                   := instSafetyWinchM1.MeasuredSpeedMps,
+    SpeedMps                   := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
     SpeedVariationTimeout      := T#0ms,
     SpeedStabilityTimeout      := T#0ms
 );
 instSpeedMonitorM2(
-    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2,
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
     Mode                       := PRG_04_Modes.instModes.Mode,
-    SpeedMps                   := instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedMps                   := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
     SpeedVariationTimeout      := T#0ms,
     SpeedStabilityTimeout      := T#0ms
@@ -164,24 +170,24 @@ instSpeedMonitorM2(
 
 // 2ter. Estimation charge — information empirique, jamais une fonction safety.
 instLoadEstimatorM1(
-    Enable           := NOT PRG_04_Modes.instModes.InhibitM1,
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
-    MeasuredSpeedMps      := instSafetyWinchM1.MeasuredSpeedMps,
-    MeasuredSpeedSignedMps:= instSafetyWinchM1.MeasuredSpeedSignedMps,
+    MeasuredSpeedMps      := PRG_02_Encoders.M1MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps:= PRG_02_Encoders.M1MeasuredSpeedSigned_Mps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );
 instLoadEstimatorM2(
-    Enable           := NOT PRG_04_Modes.instModes.InhibitM2,
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
-    MeasuredSpeedMps      := instSafetyWinchM2.MeasuredSpeedMps,
-    MeasuredSpeedSignedMps:= instSafetyWinchM2.MeasuredSpeedSignedMps,
+    MeasuredSpeedMps      := PRG_02_Encoders.M2MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps:= PRG_02_Encoders.M2MeasuredSpeedSigned_Mps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );

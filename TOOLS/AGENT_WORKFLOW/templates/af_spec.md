@@ -8,7 +8,12 @@
 
 ## ⚙️ 2. Architecture / pipeline
 
+Préciser : objets, responsabilité unique, composition et flux `producteur → interface → consommateurs`.
+
 ## 🔌 3. Interface et données
+
+Préciser : propriétaire et producteur unique de chaque donnée, entrées/sorties publiques,
+internes privés, structures cohérentes et arbitrage des commandes avant appel.
 
 ## 🛡️ 4. Sécurité / interlocks
 

@@ -3100,7 +3100,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §9
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §9
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
       modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
@@ -4505,7 +4505,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md
    🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
    ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
       packé de la 1ère version) : chaque contacteur de vitesse de
@@ -5356,7 +5356,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🧭 Index 2 : bande de vitesse câble mesurée (1..5)
    📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.13.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchSpeedConfig">
@@ -5408,7 +5408,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
       Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.13.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchState">
@@ -6185,7 +6185,7 @@ Temps de fermeture contacteur de puissance</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §3
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md §3
                    (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.4.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
@@ -6767,7 +6767,7 @@ END_IF;
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md "flux nominal, benne ouvert").
+        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
@@ -9367,7 +9367,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📐 FB_DriftGuard — Détection de dérive de position pendant armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §4quinquies (Méca A/C)
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md §4quinquies (Méca A/C)
    🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
       Méca C de FB_Safety_Winch (armement + capture position référence + calcul
       dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
@@ -9684,7 +9684,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §3/§6
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
@@ -10180,7 +10180,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
       unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
       moteur n'est piloté ici.
@@ -10511,7 +10511,7 @@ HomingRefRaw := Calib.HomingRefRaw;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §3.6/§3.7
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §3.6/§3.7
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
       - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur
@@ -10664,7 +10664,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §2/§3.1
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §2/§3.1
    ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
       `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
       — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
@@ -10702,6 +10702,257 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>ccb7d973-53c2-5255-9462-8b4a7dc68cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_SpeedMeasure" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorise l'acquisition</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Purge immédiate de l'historique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble sûre en mètres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si la chaîne codeur garantit la position</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue sur la fenêtre horodatée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive montée, négative descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après 6 positions couvrant au moins 50 ms</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="WindowTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50MS" />
+              </initialValue>
+            </variable>
+            <variable name="SamplePeriod">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10MS" />
+              </initialValue>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+            </variable>
+            <variable name="Positions_M">
+              <type>
+                <array>
+                  <dimension lower="0" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="Timestamps">
+              <type>
+                <array>
+                  <dimension lower="0" upper="5" />
+                  <baseType>
+                    <TIME />
+                  </baseType>
+                </array>
+              </type>
+            </variable>
+            <variable name="CurrentTimestamp">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="LastTimestamp">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="ElapsedSinceSample">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="WindowElapsed">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="CollectedSamples">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="TimestampInitialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📐 FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §3.8
+   🛡️ Sécurité : mesure propriétaire de la chaîne codeur ; aucune réaction machine
+   🧩 Dépendances : position sûre fournie par FB_Encoder_Safety
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
+CurrentTimestamp := TIME();
+
+// 🧹 Toute rupture de confiance purge les six positions : aucune ancienne source ne peut contaminer la mesure.
+IF NOT Enable OR Reset OR NOT PositionValid THEN
+    Speed_Mps := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid := FALSE;
+    CollectedSamples := 0;
+    TimestampInitialized := FALSE;
+    RETURN;
+END_IF;
+
+// 🕒 Première position de la nouvelle fenêtre.
+IF NOT TimestampInitialized THEN
+    Positions_M[0] := Position_M;
+    Timestamps[0] := CurrentTimestamp;
+    LastTimestamp := CurrentTimestamp;
+    CollectedSamples := 1;
+    TimestampInitialized := TRUE;
+    Speed_Mps := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid := FALSE;
+    RETURN;
+END_IF;
+
+// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant (indépendant de T88).
+IF CurrentTimestamp &lt; LastTimestamp THEN
+    Positions_M[0] := Position_M;
+    Timestamps[0] := CurrentTimestamp;
+    LastTimestamp := CurrentTimestamp;
+    CollectedSamples := 1;
+    Speed_Mps := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid := FALSE;
+    RETURN;
+END_IF;
+
+ElapsedSinceSample := CurrentTimestamp - LastTimestamp;
+
+// 🛡️ Delta nul : aucune division et aucun doublon d'échantillon.
+IF ElapsedSinceSample &lt;= T#0MS THEN
+    RETURN;
+END_IF;
+
+// 📥 Six positions espacées d'au moins 10 ms donnent cinq intervalles sur la fenêtre interne de 50 ms.
+IF ElapsedSinceSample &gt;= SamplePeriod THEN
+    LastTimestamp := CurrentTimestamp;
+
+    IF CollectedSamples &lt; SampleCount THEN
+        Positions_M[CollectedSamples] := Position_M;
+        Timestamps[CollectedSamples] := CurrentTimestamp;
+        CollectedSamples := CollectedSamples + 1;
+    ELSE
+        FOR Index := 0 TO 4 DO
+            Positions_M[Index] := Positions_M[Index + 1];
+            Timestamps[Index] := Timestamps[Index + 1];
+        END_FOR;
+        Positions_M[5] := Position_M;
+        Timestamps[5] := CurrentTimestamp;
+    END_IF;
+
+    IF CollectedSamples = SampleCount THEN
+        // 🛡️ Ordre temporel et durée minimale contrôlés avant toute conversion/division.
+        IF Timestamps[5] &gt;= Timestamps[0] THEN
+            WindowElapsed := Timestamps[5] - Timestamps[0];
+            IF WindowElapsed &gt;= WindowTime THEN
+                SignedSpeed_Mps := (Positions_M[5] - Positions_M[0])
+                                   / (UDINT_TO_REAL(TIME_TO_UDINT(WindowElapsed)) / 1000.0);
+                Speed_Mps := ABS(SignedSpeed_Mps);
+                Valid := TRUE;
+            ELSE
+                Speed_Mps := 0.0;
+                SignedSpeed_Mps := 0.0;
+                Valid := FALSE;
+            END_IF;
+        ELSE
+            Speed_Mps := 0.0;
+            SignedSpeed_Mps := 0.0;
+            Valid := FALSE;
+            CollectedSamples := 0;
+            TimestampInitialized := FALSE;
+        END_IF;
+    END_IF;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd</ObjectId>
           </data>
         </addData>
       </pou>
@@ -10893,7 +11144,7 @@ END_IF;
    🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
       jusqu'à disparition de la cause et acquittement par front Reset.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md</xhtml>
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -12693,7 +12944,7 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
    📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2 (usage),
-                   DOC/AF_Partie-09_Fonction_Winch_v1.12.md (correctif ci-dessous)
+                   DOC/AF_Partie-09_Fonction_Winch_v1.13.md (correctif ci-dessous)
    🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
       SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
       jamais concernée par ce bug — voir analyse d'impact ci-dessous).
@@ -14349,6 +14600,30 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil mouvement mesurable pour contrôles sens/absence</xhtml>
               </documentation>
             </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesure absolue produite par PRG_02 chaîne codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedSignedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesure signée produite par PRG_02 chaîne codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si la fenêtre horodatée codeur est complète et fiable</xhtml>
+              </documentation>
+            </variable>
             <variable name="OppositeDirectionTimeout">
               <type>
                 <TIME />
@@ -14612,22 +14887,6 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout</xhtml>
               </documentation>
             </variable>
-            <variable name="MeasuredSpeedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire mesurée du câble (m/s), valeur absolue</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MeasuredSpeedSignedMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive montée, négative descente</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -14645,30 +14904,13 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="CycleTimeCalc">
-              <type>
-                <derived name="FB_CycleTime" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Méca A (bit7)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastCablePosM">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="SpeedInitialized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="DriftGuardA">
               <type>
                 <derived name="FB_DriftGuard" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Méca A (bit7) — la vitesse est désormais reçue de la chaîne codeur (T84/T85)
+🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)</xhtml>
               </documentation>
             </variable>
             <variable name="MecaB_NoOperatorCmd">
@@ -14747,8 +14989,8 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md,
-                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md §7
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md,
+                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §7
                    (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
@@ -14875,9 +15117,8 @@ IF NOT Enable THEN
     Done := FALSE;
     SafeStop := TRUE;
     ForbidDescent := TRUE;
+    ForbidAscent := TRUE; // 🛡️ T86 : sortie safety déterministe pendant neutralisation
     PowerCutOff := FALSE;
-    MeasuredSpeedMps := 0.0;
-    MeasuredSpeedSignedMps := 0.0;
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
@@ -14890,17 +15131,14 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
-    SpeedInitialized := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
-CycleTimeCalc(DefaultValueS := 0.010); // 🔧 REX 2026-07-07 — Méca A
 
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
-    LastCablePosM := CablePosM;
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
 END_IF;
 LastInReferencingMode := InReferencingMode;
@@ -14910,8 +15148,6 @@ LastInReferencingMode := InReferencingMode;
 IF NOT EmergencyStopOk THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
-    LastCablePosM := CablePosM;    // 🔧 REX 2026-07-07 (2) : évite le pic de vitesse au premier cycle actif
-    SpeedInitialized := FALSE;
 END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
@@ -15002,25 +15238,15 @@ END_IF;
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
 // Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
-// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé,
-// seul le check vitesse (MeasuredSpeedMps) reste géré ici (hors périmètre de la brique).
-IF NOT SpeedInitialized OR InReferencingMode THEN
-    MeasuredSpeedSignedMps := 0.0;
-    SpeedInitialized := TRUE;
-ELSE
-    MeasuredSpeedSignedMps := (CablePosM - LastCablePosM) / CycleTimeCalc.CycleTimeS;
-END_IF;
-MeasuredSpeedMps := ABS(MeasuredSpeedSignedMps);
-LastCablePosM := CablePosM;
-
+// 🔧 T84/T85 : la chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
 DriftGuardA(
-    Arm        := FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
+    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
     PositionM  := CablePosM,
     ToleranceM := UncommandedDriftToleranceM
 );
 MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
     ErrorId := ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
@@ -15116,7 +15342,7 @@ END_IF;
 // 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
 // Le signe de la vitesse câble est comparé à la direction commandée uniquement pendant un
 // mouvement effectivement demandé. La temporisation filtre bruit codeur et inversion transitoire.
-OppositeDirectionActive := NOT BypassProcess AND (MovementCommanded AND NOT InReferencingMode
+OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
     AND (((Direction &gt; 0) AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
       OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
 TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
@@ -15130,13 +15356,13 @@ END_IF;
 // Détecte charge coincée, contacteur inefficace ou chaîne mécanique non entraînée. SafeStop seul :
 // aucun retour ne justifie une coupure puissance brutale immédiate ; l'escalade reste matérielle.
 TonNoMovement(
-    IN := NOT BypassProcess AND (MovementCommanded AND NOT InReferencingMode
+    IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
           AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
     PT := NoMovementTimeout
 );
 IF TonNoMovement.Q THEN
     ErrorId := ErrorId OR 16#8000;
-ELSIF ResetEdge.Q AND (NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) &gt;= MovementSpeedThresholdMps)) THEN
+ELSIF ResetEdge.Q AND (NOT MeasuredSpeedValid OR NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) &gt;= MovementSpeedThresholdMps)) THEN
     ErrorId := ErrorId AND 16#7FFF;
 END_IF;
 
@@ -16668,7 +16894,7 @@ Résultat validation table + MaxStepNumber</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §2, §6
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md §2, §6
    📄 Audit P0.2 : AUDIT_Winch_v1.0 (archivé) §2.2
    📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
    📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
@@ -18196,7 +18422,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -18228,7 +18454,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.12.md §4ter pour le contexte
+      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.13.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
@@ -18658,7 +18884,7 @@ END_IF;
    ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
       reste à 0 % et Configured reste FALSE.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.13.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -19217,7 +19443,7 @@ PreviousQualified := Qualified;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.12.md §9
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md §9
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
       1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
    🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :
@@ -19382,6 +19608,14 @@ Image matérielle brute (acquis §0)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Image d'entrée consommée par tout le programme (§0bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse générique : bascule atomique réel ↔ simulé du domaine Winch</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyStopOk">
@@ -19707,6 +19941,24 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mémoire privée de la source Winch ; aucun détail de simulation ne sort de PRG_00.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PreviousWinchInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchInputSourceInitialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="BrakeFeedbackInvertLogic">
               <type>
                 <BOOL />
@@ -19902,7 +20154,18 @@ HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
 
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive
+// 🔄 Source Winch atomique + pulse générique. Au boot, la source initiale est mémorisée sans faux pulse.
+WinchInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+IF NOT WinchInputSourceInitialized THEN
+    PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
+    WinchInputSourceInitialized := TRUE;
+    WinchInputSourceChanged := FALSE;
+ELSE
+    WinchInputSourceChanged := (WinchInputSourceSimulated &lt;&gt; PreviousWinchInputSourceSimulated);
+    PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
+END_IF;
+
+IF WinchInputSourceSimulated
     THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;
 IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
     THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwReal.Translation; END_IF;
@@ -20269,6 +20532,54 @@ FB_Joystick_0(
                 <BOOL />
               </type>
             </variable>
+            <variable name="M1MeasuredSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble absolue M1, producteur unique chaîne codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1MeasuredSpeedSigned_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble signée M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Six positions valides sur fenêtre horodatée complète</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2MeasuredSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble absolue M2, producteur unique chaîne codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2MeasuredSpeedSigned_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble signée M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Six positions valides sur fenêtre horodatée complète</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="M1_RawPosToUse">
@@ -20324,6 +20635,48 @@ FB_Joystick_0(
                 <derived name="FB_Encoder_Safety" />
               </type>
             </variable>
+            <variable name="instEncoderSpeedMeasureM1">
+              <type>
+                <derived name="FB_Encoder_SpeedMeasure" />
+              </type>
+            </variable>
+            <variable name="instEncoderSpeedMeasureM2">
+              <type>
+                <derived name="FB_Encoder_SpeedMeasure" />
+              </type>
+            </variable>
+            <variable name="M1PositionValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validité nommée du pipeline M1 avant mesure de vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PositionValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validité nommée du pipeline M2 avant mesure de vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rupture de continuité position/source M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rupture de continuité position/source M2</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -20332,7 +20685,7 @@ FB_Joystick_0(
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md</xhtml>
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -20472,6 +20825,41 @@ instEncoderSafetyM2(
 );
 EncoderFaultPresentM2 := instEncoderSafetyM2.EncoderIncoherent;
 
+// 5. MESURE VITESSE — propriétaire unique de la chaîne codeur (T84/T85)
+// La position sûre provient du pipeline aval réel/simulé déjà sélectionné exclusivement dans PRG_00.
+M1PositionValid := instEncoderAbsM1.EncoderAvailable
+                   AND NOT instEncoderSafetyM1.EncoderIncoherent
+                   AND NOT instHomingM1.Busy;
+M2PositionValid := instEncoderAbsM2.EncoderAvailable
+                   AND NOT instEncoderSafetyM2.EncoderIncoherent
+                   AND NOT instHomingM2.Busy;
+
+// 🧹 Un homing/preset ou une bascule de source invalide l'historique, même si la position finale est plausible.
+M1SpeedReset := instHomingM1.Busy OR instHomingM1.Done OR instEncoderAbsM1.PresetAck
+                OR NOT M1PositionValid OR PRG_00_Inputs.WinchInputSourceChanged;
+M2SpeedReset := instHomingM2.Busy OR instHomingM2.Done OR instEncoderAbsM2.PresetAck
+                OR NOT M2PositionValid OR PRG_00_Inputs.WinchInputSourceChanged;
+
+instEncoderSpeedMeasureM1(
+    Enable        := TRUE,
+    Reset         := M1SpeedReset,
+    Position_M    := instEncoderSafetyM1.CablePosMSafe,
+    PositionValid := M1PositionValid
+);
+instEncoderSpeedMeasureM2(
+    Enable        := TRUE,
+    Reset         := M2SpeedReset,
+    Position_M    := instEncoderSafetyM2.CablePosMSafe,
+    PositionValid := M2PositionValid
+);
+
+M1MeasuredSpeed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
+M1MeasuredSpeedSigned_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
+M1SpeedValid              := instEncoderSpeedMeasureM1.Valid;
+M2MeasuredSpeed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
+M2MeasuredSpeedSigned_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
+M2SpeedValid              := instEncoderSpeedMeasureM2.Valid;
+
 EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
 </xhtml>
           </ST>
@@ -20587,6 +20975,9 @@ instSafetyWinchM1(
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 (7)
+    MeasuredSpeedMps       := PRG_02_Encoders.M1MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Encoders.M1MeasuredSpeedSigned_Mps,
+    MeasuredSpeedValid     := PRG_02_Encoders.M1SpeedValid,
     // 🌐 Bypass Global M1 (GVL_IHM.M1TreuilRetenue.Bypass.Global)
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
@@ -20644,6 +21035,9 @@ instSafetyWinchM2(
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 (7)
+    MeasuredSpeedMps       := PRG_02_Encoders.M2MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Encoders.M2MeasuredSpeedSigned_Mps,
+    MeasuredSpeedValid     := PRG_02_Encoders.M2SpeedValid,
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
@@ -20661,21 +21055,21 @@ instSafetyWinchM2(
 
 // 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
 instSpeedMonitorM1(
-    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1,
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
     Mode                       := PRG_04_Modes.instModes.Mode,
-    SpeedMps                   := instSafetyWinchM1.MeasuredSpeedMps,
+    SpeedMps                   := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
     SpeedVariationTimeout      := T#0ms,
     SpeedStabilityTimeout      := T#0ms
 );
 instSpeedMonitorM2(
-    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2,
+    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
     Mode                       := PRG_04_Modes.instModes.Mode,
-    SpeedMps                   := instSafetyWinchM2.MeasuredSpeedMps,
+    SpeedMps                   := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
     SpeedVariationTimeout      := T#0ms,
     SpeedStabilityTimeout      := T#0ms
@@ -20683,24 +21077,24 @@ instSpeedMonitorM2(
 
 // 2ter. Estimation charge — information empirique, jamais une fonction safety.
 instLoadEstimatorM1(
-    Enable           := NOT PRG_04_Modes.instModes.InhibitM1,
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
-    MeasuredSpeedMps      := instSafetyWinchM1.MeasuredSpeedMps,
-    MeasuredSpeedSignedMps:= instSafetyWinchM1.MeasuredSpeedSignedMps,
+    MeasuredSpeedMps      := PRG_02_Encoders.M1MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps:= PRG_02_Encoders.M1MeasuredSpeedSigned_Mps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );
 instLoadEstimatorM2(
-    Enable           := NOT PRG_04_Modes.instModes.InhibitM2,
+    Enable           := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
-    MeasuredSpeedMps      := instSafetyWinchM2.MeasuredSpeedMps,
-    MeasuredSpeedSignedMps:= instSafetyWinchM2.MeasuredSpeedSignedMps,
+    MeasuredSpeedMps      := PRG_02_Encoders.M2MeasuredSpeed_Mps,
+    MeasuredSpeedSignedMps:= PRG_02_Encoders.M2MeasuredSpeedSigned_Mps,
     SpeedConfig      := _WinchSpeedConfig,
     LoadTable        := _WinchLoadEstimateTable
 );
@@ -20994,8 +21388,8 @@ instCycle(
     WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    M1_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps,
-    M2_MeasuredSpeedMps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps,
+    M1_MeasuredSpeedMps := PRG_02_Encoders.M1MeasuredSpeed_Mps,
+    M2_MeasuredSpeedMps := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedMismatchThresholdMps := SpeedMismatchThresholdMps,
     SpeedMismatchTimeout      := SpeedMismatchTimeout,
     CableLimitM1AscentM       := _WinchM1CfgPersist.CfgCableLimitAscent_M,
@@ -21292,7 +21686,7 @@ ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.12.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.13.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -22299,7 +22693,7 @@ GVL_IHM.Commun.WinchSymmetry.DeltaBrakeApplyTime_Ms := _WinchSymmetryDataPersist
 GVL_IHM.Commun.WinchSymmetry.DeltaStopDistance_M := UDINT_TO_REAL(_WinchSymmetryDataPersist.DeltaStopDistance_Mm) / 1000.0;
 GVL_IHM.Commun.WinchSymmetry.DeltaStopTime_Ms := _WinchSymmetryDataPersist.DeltaStopTime_Ms;
 GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M := _WinchSymmetryDataPersist.MaxSyncDeviation_M;
-GVL_IHM.M1TreuilRetenue.State.MeasuredSpeed_Mps          := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps;
+GVL_IHM.M1TreuilRetenue.State.MeasuredSpeed_Mps          := PRG_02_Encoders.M1MeasuredSpeed_Mps;
 GVL_IHM.M1TreuilRetenue.State.SpeedDelta_Mps             := PRG_03_Safety.instSpeedMonitorM1.SpeedDeltaMps;
 GVL_IHM.M1TreuilRetenue.State.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationDetected;
 GVL_IHM.M1TreuilRetenue.State.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed;
@@ -22364,7 +22758,7 @@ GVL_IHM.M1TreuilRetenue.State.InhibitActive            := PRG_04_Modes.instModes
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
 GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.M2TreuilBenne.State.MeasuredSpeed_Mps          := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps;
+GVL_IHM.M2TreuilBenne.State.MeasuredSpeed_Mps          := PRG_02_Encoders.M2MeasuredSpeed_Mps;
 GVL_IHM.M2TreuilBenne.State.SpeedDelta_Mps             := PRG_03_Safety.instSpeedMonitorM2.SpeedDeltaMps;
 GVL_IHM.M2TreuilBenne.State.SpeedVariationDetected   := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationDetected;
 GVL_IHM.M2TreuilBenne.State.SpeedVariationConfirmed  := PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed;
@@ -23022,7 +23416,7 @@ instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
     M1Direction := PRG_06_WinchControl.M1_Direction_Active, M2Direction := PRG_06_WinchControl.M2_Direction_Active,
     M1BrakeCmd := PRG_10_Outputs.M1BrakeCmd, M2BrakeCmd := PRG_10_Outputs.M2BrakeCmd, M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback,
     M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM, M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
-    M1Speed_Mps := PRG_03_Safety.instSafetyWinchM1.MeasuredSpeedMps, M2Speed_Mps := PRG_03_Safety.instSafetyWinchM2.MeasuredSpeedMps, SyncDeviation_M := PRG_06_WinchControl.instWinchSync.DeltaPosM,
+    M1Speed_Mps := PRG_02_Encoders.M1MeasuredSpeed_Mps, M2Speed_Mps := PRG_02_Encoders.M2MeasuredSpeed_Mps, SyncDeviation_M := PRG_06_WinchControl.instWinchSync.DeltaPosM,
     Config := _WinchSymmetryCfgPersist, Data := _WinchSymmetryDataPersist);
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_Simulation.SimulationModeActive;
@@ -24488,6 +24882,8 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_DiagCanOpen" ObjectId="94985939-6432-5df4-8717-0ad1efb0fdb4" />
           <Object Name="FB_DiagEthercat" ObjectId="268197d6-ad0a-5ec3-82c7-3a1f88f6bae6" />
           <Object Name="FB_IhmHeartbeat" ObjectId="27ea6b0f-df94-59ee-ac07-585c8e3e993b" />
+          <Object Name="FB_Preflight" ObjectId="d31c4cd5-70b8-565a-906d-0e527f36e29d" />
+          <Object Name="FB_WinchSymmetry" ObjectId="d3f3c22f-4579-5b7b-a799-7880ca0e8f82" />
           <Object Name="ST_DiagDevice" ObjectId="68ef7967-d114-5e9c-853e-21c8e5a90a1f" />
         </Folder>
         <Folder Name="MODES">
@@ -24536,28 +24932,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
           <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
+          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
           <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
           <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
-        </Folder>
-        <Folder Name="MAIN">
-          <Object Name="FB_Preflight" ObjectId="d31c4cd5-70b8-565a-906d-0e527f36e29d" />
-          <Object Name="FB_WinchSymmetry" ObjectId="d3f3c22f-4579-5b7b-a799-7880ca0e8f82" />
-          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
-          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
-          <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
-          <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
-          <Object Name="PRG_02_Encoders" ObjectId="b971c8dd-35c9-56f9-a5f0-9f678de64af4" />
-          <Object Name="PRG_03_Safety" ObjectId="0d6cb680-2b1a-5c6b-97ff-45020fa827aa" />
-          <Object Name="PRG_04_Modes" ObjectId="878272a8-cc45-5ab5-8eee-ef58917243dd" />
-          <Object Name="PRG_05_Cycle" ObjectId="37c173d1-e05f-53f4-aa3f-3cc90e6be97a" />
-          <Object Name="PRG_06_WinchControl" ObjectId="929cd808-ceb9-5310-b784-2c11eefd87f6" />
-          <Object Name="PRG_07_TranslationControl" ObjectId="f7bf93ce-8842-5f35-b9f9-1e29e340d98b" />
-          <Object Name="PRG_08_AuxiliaryControl" ObjectId="a4a4d65c-07cc-5e86-a434-6cd17437a575" />
-          <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
-          <Object Name="PRG_10_Outputs" ObjectId="9584ee4a-a6d9-5e28-a736-6fefeebf7e24" />
-          <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
-          <Object Name="PRG_IP" ObjectId="b6ce8979-9803-5bfc-9c19-fc63a6d2716c" />
         </Folder>
         <Folder Name="AU">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
@@ -24578,6 +24955,24 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
+        </Folder>
+        <Folder Name="MAIN">
+          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
+          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+          <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
+          <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
+          <Object Name="PRG_02_Encoders" ObjectId="b971c8dd-35c9-56f9-a5f0-9f678de64af4" />
+          <Object Name="PRG_03_Safety" ObjectId="0d6cb680-2b1a-5c6b-97ff-45020fa827aa" />
+          <Object Name="PRG_04_Modes" ObjectId="878272a8-cc45-5ab5-8eee-ef58917243dd" />
+          <Object Name="PRG_05_Cycle" ObjectId="37c173d1-e05f-53f4-aa3f-3cc90e6be97a" />
+          <Object Name="PRG_06_WinchControl" ObjectId="929cd808-ceb9-5310-b784-2c11eefd87f6" />
+          <Object Name="PRG_07_TranslationControl" ObjectId="f7bf93ce-8842-5f35-b9f9-1e29e340d98b" />
+          <Object Name="PRG_08_AuxiliaryControl" ObjectId="a4a4d65c-07cc-5e86-a434-6cd17437a575" />
+          <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
+          <Object Name="PRG_10_Outputs" ObjectId="9584ee4a-a6d9-5e28-a736-6fefeebf7e24" />
+          <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
+          <Object Name="PRG_IP" ObjectId="b6ce8979-9803-5bfc-9c19-fc63a6d2716c" />
         </Folder>
         <Folder Name="SUPERVISION">
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />

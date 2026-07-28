@@ -8,9 +8,27 @@ Herdr est une dépendance externe optionnelle, utilisée via le package Pi
 Prérequis :
 
 ```text
-pi list              → pi-herdr installé
+pi list             → pi-herdr installé
 herdr --version     → CLI disponible
 herdr status        → serveur running
+```
+
+### Préflight obligatoire
+
+1. Exécuter `herdr status` avant tout lancement.
+2. Si le serveur est arrêté, lancer `herdr` ou `herdr server`, puis revérifier son état.
+3. Sous PowerShell, utiliser la commande complète `herdr` : `rdr` est un alias de
+   `Remove-PSDrive`, pas une abréviation Herdr.
+4. `herdr integration status` peut ne pas afficher Pi sur certaines versions preview : ce n’est
+   pas une preuve d’indisponibilité. Le test décisif est le lancement d’un agent `pi` suivi d’un
+   handshake.
+5. Une erreur Windows `Os code 2 / fichier introuvable` avant ouverture du pane indique d’abord
+   un problème de serveur/processus/PATH, pas un refus du modèle ou un manque de crédits.
+
+Chemin validé sur Windows pour utiliser les modèles configurés dans Pi :
+
+```text
+Herdr → agent pi → fournisseur actif de Pi (ex. OmniRoute)
 ```
 
 ## Règle d'utilisation
@@ -31,23 +49,38 @@ explicite de l'automaticien et ne peut pas être attribué automatiquement.
 ## Flux standard
 
 ```text
-herdr status
+herdr status (serveur running)
    ↓
-agent unique
+herdr_start_agent
    ↓
 handshake court : READY
    ↓
+herdr_wait_agent → herdr_read_agent
+   ↓
 mission découpée en petites consignes
    ↓
-herdr_wait_agent
+herdr_wait_agent(status=idle, délai adapté)
    ↓
-herdr_read_agent + marqueur de fin
+herdr_read_agent immédiatement
    ↓
-contrôle Git/gates Python
+contrôle orchestrateur + Git/gates Python
    ↓
-validation Pi/utilisateur
+information et validation utilisateur
    ↓
 herdr_stop_agent
+```
+
+⚠️ **Herdr ne déclenche pas un nouveau tour de conversation quand l’agent termine.** Après chaque
+`herdr_send_prompt`, l’orchestrateur doit attendre puis lire explicitement le résultat dans la
+même séquence. Il ne doit pas rendre la main avec le seul message « agent lancé ».
+
+Si l’attente expire :
+
+```text
+herdr_get_agent / herdr_list_agents
+→ si working : nouvelle attente
+→ si idle/done : lecture immédiate
+→ si blocked : lire, traiter le blocage ou arrêter proprement
 ```
 
 ### Protocole obligatoire de transmission
@@ -73,9 +106,18 @@ Outils disponibles : `herdr_delegate`, `herdr_start_agent`, `herdr_send_prompt`,
 
 ## Agents recommandés
 
-- `pi` : analyse générale ciblée ;
-- `claude` ou `codex` : review code complexe ;
+- Exécution/revue projet par défaut : Pi via OmniRoute avec
+  `--model omni/cc/claude-sonnet-5`, sauf demande utilisateur contraire ou indisponibilité.
+- `pi` avec un autre modèle : fallback explicite, modèle annoncé à l’utilisateur.
+- `claude` ou `codex` : review code complexe si demandé.
 - `omp` : revue OpenCode si disponible.
 
-Le choix du modèle reste consultatif. Les preuves doivent venir des scripts, de CODESYS
-et des essais requis.
+Lancement Herdr correspondant :
+
+```text
+herdr agent start <nom> --cwd <projet> -- pi --model omni/cc/claude-sonnet-5
+```
+
+Le modèle réellement lancé doit être vérifié dans le pane (`PI_PROVIDER`/`PI_MODEL`) et annoncé.
+Le choix du modèle reste consultatif. Les preuves doivent venir des scripts, de CODESYS et des
+essais requis.

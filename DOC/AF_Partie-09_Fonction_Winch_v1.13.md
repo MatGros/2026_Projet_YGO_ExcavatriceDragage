@@ -1,5 +1,12 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.12)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.13)
 
+> 📐 **v1.13 (2026-07-28) — T84/T85/T86.** La vitesse câble est désormais produite par la chaîne
+> codeur (`FB_Encoder_SpeedMeasure` composé dans `PRG_02_Encoders`) sur 6 positions horodatées,
+> soit 5 intervalles et une fenêtre interne fixe de 50 ms. `FB_Safety_Winch` consomme vitesse
+> absolue/signée/validité ; il ne calcule plus la mesure. Méca A et les bits 14/15 sont inhibés
+> tant que la fenêtre n'est pas valide. `ForbidAscent=TRUE` est déterministe lorsque `Enable=FALSE`.
+> Aucun seuil, masque ou délai safety n'est modifié. Détail producteur : Partie 10 v1.11 §3.8.
+>
 > 🔩 **v1.12 (2026-07-26) — POLARITÉ DU RETOUR FREIN, relevé terrain.** Le frein est à **manque de
 > courant** : sortie PLC = 1 → frein **ouvert**. Le retour câblé est l'**image du contacteur de
 > commande**, donc `DI = 1 ⟺ frein OUVERT` — il **recopie** la commande, il n'en est pas le
@@ -209,8 +216,16 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 | `ForbidAscent` | BOOL | bit5 (fin de course haut) OU bit3+SyncEnable=FALSE (récupération mou câble) |
 | `PowerCutOff` | BOOL | `(ErrorId AND 16#2F84) <> 0` — bits 2, 7/8/9, 10/11 et 13 ; bits14/15 restent en SafeStop seul. |
 | `MecaADriftM` 🆕 v1.7 | REAL | Dérive mesurée Méca A (m) via `FB_DriftGuard` |
-| `MeasuredSpeedMps` 🆕 T41 | REAL | Vitesse linéaire absolue mesurée du câble (m/s), calculée par différence de position |
-| `MeasuredSpeedSignedMps` 🆕 T10 | REAL | Vitesse signée : positive en montée, négative en descente |
+**📥 Entrées vitesse T84/T85** — produites exclusivement par `PRG_02_Encoders` :
+
+| Entrée | Type | Rôle |
+|---|---|---|
+| `MeasuredSpeedMps` | REAL | Vitesse absolue issue de la fenêtre codeur 50 ms |
+| `MeasuredSpeedSignedMps` | REAL | Vitesse signée : positive en montée, négative en descente |
+| `MeasuredSpeedValid` | BOOL | Six positions valides disponibles ; gate Méca A et bits14/15 |
+
+Les anciennes sorties `MeasuredSpeedMps`/`MeasuredSpeedSignedMps` de `FB_Safety_Winch` sont retirées :
+le bloc safety surveille la mesure sans en être propriétaire.
 | `MecaCDriftM` 🆕 v1.7 | REAL | Dérive mesurée Méca C (m) via `FB_DriftGuard` |
 | `MecaBElapsedTime` 🆕 v1.7 | TIME | Temps écoulé confirmation Méca B/D |
 
@@ -519,7 +534,7 @@ modèle de simulation injectait `NOT BrakeCmd`. Les deux erreurs se compensaient
 
 📂 **Code source à copier** — dossier `CODE/` :
 - [`CODE/TREUILS/FB_DriftGuard.st`](../CODE/TREUILS/FB_DriftGuard.st) 🆕 v1.7 — Brique de détection de dérive (Méca A/C)
-- [`CODE/TREUILS/FB_Safety_Winch.st`](../CODE/TREUILS/FB_Safety_Winch.st) — **Mise à jour v1.7** (Méca D, diagnostics IHM, Méca B étendu, refactoring DriftGuard, SafeStop/PowerCutOff)
+- [`CODE/TREUILS/FB_Safety_Winch.st`](../CODE/TREUILS/FB_Safety_Winch.st) — **Mise à jour v1.13** (consommation vitesse codeur valide + sortie `ForbidAscent` déterministe) (Méca D, diagnostics IHM, Méca B étendu, refactoring DriftGuard, SafeStop/PowerCutOff)
 - [`CODE/TREUILS/FB_WinchSync.st`](../CODE/TREUILS/FB_WinchSync.st) — **Mise à jour v1.7** (Ajout entrées d'inhibition M1/M2)
 - [`CODE/MAIN/PRG_00_Inputs.st`](../CODE/MAIN/PRG_00_Inputs.st) — **Mise à jour v1.7** (SimTopSensorTriggered asservi, BrakeThermalFeedback commun, JoystickSignal_IsReal split)
 - [`CODE/MAIN/PRG_03_Safety.st`](../CODE/MAIN/PRG_03_Safety.st) — **Mise à jour v1.7** (Inhibition M1/M2 câblée vers Enable Safety)

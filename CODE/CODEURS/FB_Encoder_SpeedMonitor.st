@@ -8,7 +8,7 @@
    🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
       jusqu'à disparition de la cause et acquittement par front Reset.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
+   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMonitor
