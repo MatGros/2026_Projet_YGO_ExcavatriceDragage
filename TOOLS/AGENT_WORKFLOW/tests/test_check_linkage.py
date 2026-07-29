@@ -181,8 +181,13 @@ instInterlockM1(Enable := TRUE);
     assert "[L5]" in result.stderr
 
 
-def test_l6_programme_absent_de_la_tache(tmp_path: Path) -> None:
-    """Programme renomme : le fichier existe, la tache pointe encore l'ancien nom."""
+def test_aucun_controle_ne_lit_device_export(tmp_path: Path) -> None:
+    """Garde-fou de decision (2026-07-29) : `Device.export` est hors workflow.
+
+    Il est mis a jour au bon vouloir humain, donc un gate qui s'y appuie produit
+    du bruit des que l'export a un jour de retard. L'ancien controle L6 faisait
+    exactement ca. Ce test echoue si quelqu'un le reintroduit.
+    """
     root = make_project(
         tmp_path,
         {
@@ -193,15 +198,44 @@ VAR
 END_VAR
 Dummy := TRUE;
 """,
+            # Export volontairement perime : il ne connait que l'ancien nom.
             "PRJ_CODESYS/PROJ_Full_ImportExport/Device.export": (
                 '<Single Name="Name" Type="string">PRG_10_Outputs</Single>'
             ),
         },
     )
     result = run(root)
-    assert result.returncode == 0  # avertissement, pas erreur (export souvent en retard)
-    assert "[L6]" in result.stdout
-    assert "PRG_10_Outputs_LD" in result.stdout
+    assert result.returncode == 0
+    assert "[L6]" not in result.stdout + result.stderr
+    assert "Device.export" not in result.stdout + result.stderr
+
+    # Verification structurelle : aucune chaine EXECUTABLE ne doit designer
+    # l'export. On passe par l'AST pour ne pas se faire piéger par les
+    # commentaires et docstrings, qui eux ont le droit d'en parler.
+    import ast
+
+    source = (Path(__file__).resolve().parents[1] / "scripts" / "check_linkage.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+    docstrings = {
+        id(node.body[0].value)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Module, ast.FunctionDef, ast.ClassDef))
+        and node.body
+        and isinstance(node.body[0], ast.Expr)
+        and isinstance(node.body[0].value, ast.Constant)
+        and isinstance(node.body[0].value.value, str)
+    }
+    literals = [
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and id(node) not in docstrings
+    ]
+    faulty = [lit for lit in literals if "Device.export" in lit or "PROJ_Full_ImportExport" in lit]
+    assert not faulty, f"check_linkage ne doit jamais lire Device.export : {faulty}"
 
 
 def test_composition_privee_de_meme_nom_non_signalee(tmp_path: Path) -> None:

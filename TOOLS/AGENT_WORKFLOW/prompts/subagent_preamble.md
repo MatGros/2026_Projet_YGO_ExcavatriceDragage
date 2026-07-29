@@ -13,6 +13,27 @@ Automate CODESYS 3.5, machine de dragage. Code ST dans `CODE/`, appliqué **manu
 l'utilisateur dans CODESYS. Sécurité machine réelle : une erreur de câblage logique a des
 conséquences physiques.
 
+## 📝 Contrat de tâche — ta seule référence de succès
+
+> REX 2026-07-29 : sur 53 tâches déléguées, les critères d'acceptation étaient 3 phrases
+> génériques. Un agent rendait donc un rapport « conforme » à **rien**.
+
+Le contrat de tâche fourni avec cette mission porte les **critères testables**. Ils remplacent
+tout critère générique d'acceptation. Ta restitution se juge **contre eux**, pas contre
+« j'ai bien travaillé ».
+
+- Un critère sans moyen de vérification n'est pas un critère → **le signaler, ne pas deviner**.
+- Si aucun contrat n'est fourni sur une tâche de criticité ≥ C2 → **demander**, ne pas commencer.
+
+## 🚨 Devoir d'alerte — non négociable
+
+Tout problème constaté **en cours de route** (incohérence de spec, bug préexistant, risque hors
+scope, doute de sécurité) remonte **immédiatement** à l'orchestrateur — pas à la fin, jamais
+silencieusement, jamais enterré dans un paragraphe de conclusion.
+
+**Signaler n'est pas élargir le périmètre.** On attend le signalement, pas la correction
+spontanée. Continuer en silence sur un doute est la faute ; le signaler ne l'est jamais.
+
 ## À lire avant d'écrire (dans cet ordre, aucune exception)
 
 1. `AGENTS.md` — point d'entrée, guardrails et cas d'arrêt

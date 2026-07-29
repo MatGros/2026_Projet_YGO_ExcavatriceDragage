@@ -4,11 +4,73 @@
 
 ```text
 Entrée (CODE_CHANGE ou NEW_INFORMATION)
+→ 📚 Prise de connaissance (AF + état d'ensemble du programme) — AVANT de planifier
 → 🏷️ Qualification criticité C0-C4 (Pi propose → humain valide)
+→ 🔀 Stratégie patch / rebuild (Pi propose → humain valide)
 → voie adaptée (Fast / Standard / Safety)
+→ 📝 CONTRAT DE TÂCHE : objectifs testables (obligatoire dès C2)
 → artefacts obligatoires selon voie
 → avis read-only si requis → **arrêt : validation humaine du plan** → modification → gates → rapport → traçabilité
 ```
+
+## 🧭 Deux axes indépendants — ne pas les confondre
+
+La criticité dit **combien de cérémonie**. La stratégie dit **quelle forme prend le travail**.
+Les deux se combinent : un `C4 + rebuild` cumule la double revue A/B **et** le contrat de
+conservation. La cérémonie safety n'est jamais allégée par le choix de stratégie.
+
+| | **Patch** — modifier l'existant | **Rebuild** — reconstruire le bloc |
+|---|---|---|
+| **Fast C0-C1** | cas courant | n'existe pas — un C0/C1 ne justifie jamais un bloc neuf |
+| **Standard C2-C3** | voie standard | + **contrat de conservation** validé avant toute coupure |
+| **Safety C4** | voie safety complète | voie safety **et** contrat de conservation |
+
+### 🔀 Quand basculer en rebuild
+
+**Un seul critère suffit** — ce ne sont pas des points à totaliser :
+
+- les retouches seraient **dispersées** dans plusieurs POU ;
+- l'interface doit changer de toute façon (nouvelles entrées/sorties) ;
+- l'encapsulation actuelle est **fausse** : producteur multiple, GVL-canal-caché, internes traversés ;
+- le FB a dérivé du contrat `AF_Partie-03` et accumule des responsabilités ;
+- comprendre l'existant coûte **autant** que le réécrire.
+
+En cas d'hésitation → **patch par défaut** : il est réversible, le rebuild beaucoup moins.
+
+### 🧱 Séquence rebuild (obligatoire si stratégie = rebuild)
+
+```text
+1. Inventaire du périmètre    → check_linkage.py donne les consommateurs
+2. CONTRAT DE CONSERVATION    → ce qui doit survivre / ce qu'on abandonne sciemment
+   ⛔ arrêt : validation humaine du contrat AVANT toute suppression de lien
+3. Nouveau FB, interface propre
+4. Remap des consommateurs
+5. Preuve de non-dégradation  → chaque ligne du contrat vérifiée
+6. Suppression de l'ancien    → check_linkage.py prouve zéro orphelin
+```
+
+⚠️ **Écrire ce qui doit survivre AVANT de couper.** Sans ce contrat écrit en amont,
+« pas de dégradation » n'est qu'une impression.
+
+## 📝 Contrat de tâche — la référence de toute vérification
+
+> REX 2026-07-29 : sur 53 tâches déléguées, les critères d'acceptation étaient **3 phrases
+> génériques** réutilisées telles quelles. Un agent rendait donc un rapport « conforme » à rien.
+> Une vérification qui ne porte sur aucun objectif reste creuse, même rendue obligatoire.
+
+Rédigé par l'**orchestrateur**, **avant** toute écriture ou délégation. Obligatoire dès **C2**.
+
+- Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
+- Emplacement : section `contract:` du `TASK_CONTEXT.yaml` de la tâche
+- Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>`
+
+Il porte : objectif métier · **critères testables** (chacun avec son `verified_by`) · périmètre
+autorisé/interdit · contrat de conservation si rebuild · preuves attendues · modèles autorisés ·
+devoir d'alerte.
+
+🔁 **Il traverse les trois runtimes** — c'est son intérêt principal : les hooks ne couvrent que
+l'orchestrateur Claude Code, le contrat s'applique aussi aux sous-agents Pi (ses critères
+remplacent le boilerplate de l'*acceptance contract*) et aux agents externes.
 
 ## 🔀 3 Voies selon criticité
 
@@ -16,7 +78,7 @@ Entrée (CODE_CHANGE ou NEW_INFORMATION)
 > Typo, renommage, doc, param mineur, refactor sans impact safety.
 
 ```text
-Pre-edit Gate → Plan → **validation humaine** → Code → Gates 1-4 → ✅
+hook PreToolUse (bloque si specs non lues) → Plan → **validation humaine** → Code → Gates → ✅
 ```
 - Pas de multi-modèle, pas de REGISTRE, pas de revue Herdr.
 - Gate 5 (compilation CODESYS) optionnel.
@@ -25,11 +87,12 @@ Pre-edit Gate → Plan → **validation humaine** → Code → Gates 1-4 → ✅
 > Nouveau FB, évolution feature, mouvement/interlock.
 
 ```text
-Pre-edit Gate
+hook PreToolUse (bloque si specs non lues)
+→ CONTRAT DE TÂCHE (obligatoire)
 → REGISTRE_ACTIONS (proposé par Pi)
 → TASK_CONTEXT.yaml (proposé par Pi)
 → 0 ou 1 avis Pi Subagent ciblé (read-only)
-→ Plan → **validation humaine obligatoire** → Code → Gates 1-5
+→ Plan → **validation humaine obligatoire** → Code → Gates → hook Stop
 → revue complémentaire seulement si anomalie ou demande humaine
 → ✅ Rapport
 ```
@@ -40,7 +103,8 @@ Pre-edit Gate
 > AU, PowerCutOff, SafeStop, frein, contacteur, redondance, homing safety, FAT/SAT.
 
 ```text
-Pre-edit Gate
+hook PreToolUse (bloque si specs non lues)
+→ CONTRAT DE TÂCHE (obligatoire)
 → REGISTRE_ACTIONS (obligatoire)
 → TASK_CONTEXT.yaml (obligatoire)
 → TEST_DESIGN.md (obligatoire)
@@ -49,7 +113,7 @@ Pre-edit Gate
 → synthèse : consensus ✅ / divergence 🚨
 → **validation humaine obligatoire : artefacts + plan + décision safety**
 → Code ST (High Effort, un seul exécutant)
-→ Gates 1-5 → CODESYS import → simulation CODESYS manuelle → Terrain
+→ Gates → hook Stop (bloque si liaison rouge) → CODESYS import → simulation CODESYS manuelle → Terrain
 ```
 
 ## 🔴 Règle Double Revue Parallèle (C4)

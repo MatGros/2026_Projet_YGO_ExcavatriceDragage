@@ -19,102 +19,76 @@ def main() -> int:
     parser.add_argument("--codesys-log", type=Path, help="Optional CODESYS build log to validate")
     parser.add_argument("--skip-codesys", action="store_true", help="Skip CODESYS log check")
     parser.add_argument("--strict", action="store_true", help="Fail on any warning")
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="S'arreter au premier gate rouge (defaut : tout executer puis resumer)",
+    )
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[3]
     project_root = root
 
-    print("=" * 60)
-    print("GATE 1: Structure check")
-    print("=" * 60)
-    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_structure.py"], project_root)
-    print(out.strip())
-    if code:
-        return code
+    # REX 2026-07-29 : le runner s'arretait au premier echec. Un seul gate rouge
+    # preexistant masquait donc l'etat de TOUS les suivants — on ne savait plus si
+    # la liaison, le bundle ou les tests passaient. On execute tout, on resume a la fin.
+    results: list[tuple[str, bool]] = []
 
-    print("\n" + "=" * 60)
-    print("GATE 2: Code style (incl. VAR_OUTPUT writes)")
-    print("=" * 60)
-    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py", "CODE"], project_root)
-    print(out.strip())
-    if err:
-        print(err.strip(), file=sys.stderr)
-    if code:
-        return code
+    def gate(title: str, cmd: list[str]) -> bool:
+        print("\n" + "=" * 60)
+        print(title)
+        print("=" * 60)
+        code, out, err = run(cmd, project_root)
+        if out.strip():
+            print(out.strip())
+        if err.strip():
+            print(err.strip(), file=sys.stderr)
+        results.append((title, code == 0))
+        return code == 0
 
-    print("\n" + "=" * 60)
-    print("GATE 2bis: Linkage (instances declarees/appelees, refs croisees, bundle, tache)")
-    print("=" * 60)
-    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py"], project_root)
-    print(out.strip())
-    if err:
-        print(err.strip(), file=sys.stderr)
-    if code:
-        return code
-
-    print("\n" + "=" * 60)
-    print("GATE 3: Config persistence (Cfg<->PERSISTENT mirror, Initialized guard, sentinels)")
-    print("=" * 60)
-    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_config_persistence.py", "."], project_root)
-    print(out.strip())
-    if err:
-        print(err.strip(), file=sys.stderr)
-    if code:
-        return code
-
-    print("\n" + "=" * 60)
-    print("GATE 4: Bundle freshness")
-    print("=" * 60)
-    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_bundle_freshness.py", "."], project_root)
-    print(out.strip())
-    if code:
-        return code
-
-    print("\n" + "=" * 60)
-    print("GATE 5: PyTest (generator tests)")
-    print("=" * 60)
-    # Use Python 3.13 where pytest is installed
     py313 = Path("C:/Python313/python.exe")
     if not py313.exists():
-        print("WARNING: Python 3.13 not found at C:/Python313/python.exe, using current interpreter", file=sys.stderr)
+        print("WARNING: Python 3.13 introuvable, interpreteur courant utilise", file=sys.stderr)
         py313 = Path(sys.executable)
-    code, out, err = run(
-        [
-            str(py313),
-            "-m",
-            "pytest",
-            "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
-            "TOOLS/AGENT_WORKFLOW/tests",
-            "-q",
-        ],
-        project_root,
-    )
-    print(out.strip())
-    if err:
-        print(err.strip(), file=sys.stderr)
-    if code:
-        return code
+
+    S = "TOOLS/AGENT_WORKFLOW/scripts"
+    plan: list[tuple[str, list[str]]] = [
+        ("GATE 1: Structure",                          [sys.executable, f"{S}/check_structure.py"]),
+        ("GATE 2: Code style (VAR_OUTPUT, simulation)", [sys.executable, f"{S}/check_code_style.py", "CODE"]),
+        ("GATE 2bis: LIAISON (instances, refs, bundle)", [sys.executable, f"{S}/check_linkage.py"]),
+        ("GATE 2ter: Routage modele",                  [sys.executable, f"{S}/check_model_routing.py"]),
+        ("GATE 2quater: Liens documentaires",          [sys.executable, f"{S}/check_doc_links.py"]),
+        ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),
+        ("GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/check_bundle_freshness.py", "."]),
+        ("GATE 5: PyTest",                             [str(py313), "-m", "pytest",
+                                                        "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
+                                                        "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
+    ]
+
+    for title, cmd in plan:
+        ok = gate(title, cmd)
+        if not ok and args.fail_fast:
+            break
 
     if not args.skip_codesys and args.codesys_log:
-        print("\n" + "=" * 60)
-        print("GATE 6: CODESYS compilation")
-        print("=" * 60)
-        code, out, err = run([
-            sys.executable,
-            "TOOLS/AGENT_WORKFLOW/scripts/check_codesys_compile.py",
+        gate("GATE 6: Compilation CODESYS", [
+            sys.executable, f"{S}/check_codesys_compile.py",
             "--log", str(args.codesys_log),
-            "--strict" if args.strict else "",
-            "--max-warnings", "0" if args.strict else "10"
-        ], project_root)
-        print(out.strip())
-        if err:
-            print(err.strip(), file=sys.stderr)
-        if code:
-            return code
+            "--max-warnings", "0" if args.strict else "10",
+        ])
 
     print("\n" + "=" * 60)
-    print("ALL GATES PASSED [OK]")
+    print("RESUME")
     print("=" * 60)
+    failed = [title for title, ok in results if not ok]
+    for title, ok in results:
+        print(f"  {'PASS' if ok else 'FAIL'}  {title}")
+    if failed:
+        print(f"\n{len(failed)} gate(s) en echec sur {len(results)} :")
+        for title in failed:
+            print(f"  - {title}")
+        return 1
+    print("\nALL GATES PASSED [OK]")
     return 0
 
 

@@ -12,8 +12,10 @@ Controles :
   L3  appel d'une instance non declaree dans ce POU
   L4  reference croisee POU.Membre.Champ vers un POU/membre inexistant
   L5  typeName du bundle PLCopenXML != type reellement declare
-  L6  PROGRAM absent de la configuration de tache (Device.export)
-  L7  meme nom d'instance declare dans plusieurs POU (ambiguite)
+  L7  meme nom d'instance declare dans plusieurs PROGRAM (ambiguite)
+
+Aucun controle ne lit `Device.export` : cet export est mis a jour au bon vouloir
+humain, il ne peut donc pas servir de reference. Debogage ponctuel uniquement.
 
 Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py            # tout CODE/
@@ -62,7 +64,6 @@ CALL = re.compile(r"\b(?P<name>[A-Za-z_]\w*)\s*\(")
 CROSS_REF = re.compile(r"\b(?P<pou>PRG_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)\s*\.")
 BUNDLE_BLOCK = re.compile(r'<block\b[^>]*typeName="(?P<type>[^"]+)"[^>]*instanceName="(?P<inst>[^"]+)"')
 BUNDLE_POU = re.compile(r'<pou\s+name="(?P<name>[^"]+)"')
-TASK_POU = re.compile(r'<Single Name="Name" Type="string">(PRG_\w+)</Single>')
 
 
 def strip_comments(text: str) -> str:
@@ -144,14 +145,6 @@ def parse_pou(path: Path) -> Pou | None:
             )
     pou.body = "".join(body_chars)
     return pou
-
-
-def load_task_programs(root: Path) -> set[str] | None:
-    export = root / "PRJ_CODESYS" / "PROJ_Full_ImportExport" / "Device.export"
-    if not export.is_file():
-        return None
-    text = export.read_text(encoding="utf-8", errors="replace")
-    return set(TASK_POU.findall(text))
 
 
 def load_bundle_blocks(root: Path) -> list[tuple[str, str, str]]:
@@ -283,20 +276,12 @@ def main() -> int:
                 f"alors que la declaration dit `{declared[0]}`"
             )
 
-    # L6 — programme absent de la configuration de tache
-    task_programs = load_task_programs(root)
-    if task_programs is not None:
-        for pou in sorted(pous.values(), key=lambda p: p.name):
-            if pou.kind != "PROGRAM" or not pou.name.startswith("PRG_"):
-                continue
-            if pou.name.startswith("PRG_Test_"):
-                continue  # bancs de test : jamais dans la tache de production
-            if pou.name not in task_programs:
-                warnings.append(
-                    f"[L6] {pou.path.relative_to(root).as_posix()}: `{pou.name}` absent de la "
-                    f"configuration de tache (Device.export) — a ajouter manuellement dans CODESYS, "
-                    f"sinon le programme ne sera jamais execute"
-                )
+    # L6 RETIRE (decision 2026-07-29). Il lisait `Device.export` pour verifier
+    # qu'un PROGRAM figurait dans la configuration de tache. Or `Device.export`
+    # est mis a jour au bon vouloir humain : ce n'est PAS une reference de
+    # controle, seulement un outil de debogage ponctuel. Le controle produisait
+    # donc du bruit par conception des que l'export avait un jour de retard.
+    # Ne pas le reintroduire : aucun gate ne doit dependre de `Device.export`.
 
     for warning in warnings:
         print(f"[WARN] {warning}")
