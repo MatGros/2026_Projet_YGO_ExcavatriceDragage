@@ -31,6 +31,9 @@ Principes de traduction
   petites fonctions locales). Exclure automatiquement de la conversion : appels matériels, bibliothèques
   propriétaires, fonctionnalité safety critique (AU, PowerCutOff, SafeStop, homing) — ces cas déclenchent
   un blocage automatique et nécessitent une revue humaine (C4 sign‑off).
+- Contrats de données explicites : les modules générés exposent désormais un `CONTRACT` et une fonction
+  `validate_runtime_contract()` pour verrouiller les échanges d'entrée/sortie/état et éviter les agrégats
+  de conditions ambiguës.
 - Sortie : module Python avec une classe par FB, méthodes `__init__()` et `step()`, helpers `to_dict()` /
   `set_inputs_from_mask()`, et docstring lisible. Pour les FB de translation, la génération produit désormais
   un comportement de simulation minimal (machine d'état + temporisation simple) afin de rester proche du

@@ -28,6 +28,7 @@ CACHE_NAME = '.st2py_cache.json'
 CURRENT_BUNDLE_PATH = None
 
 from canonicalize import canonicalize_pou_bytes
+from data_contracts import build_position_decoder_contract, build_translation_contract
 
 
 def compute_hash(bytes_blob):
@@ -282,6 +283,20 @@ def validate_generated_module(pou_name, interface, module_source):
             'output_count': interface_validation['output_count'],
         }
 
+    has_contract = False
+    has_validator = False
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == 'CONTRACT':
+                    has_contract = True
+        if isinstance(node, ast.FunctionDef) and node.name == 'validate_runtime_contract':
+            has_validator = True
+    if not has_contract:
+        errors.append('Generated module does not define a data contract')
+    if not has_validator:
+        errors.append('Generated module does not define a runtime contract validator')
+
     class_def = None
     for node in tree.body:
         if isinstance(node, ast.ClassDef) and node.name == pou_name:
@@ -304,6 +319,9 @@ def validate_generated_module(pou_name, interface, module_source):
         if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
             continue
         if isinstance(node, ast.ClassDef) and node.name == pou_name:
+            top_level_nodes.append(node)
+            continue
+        if isinstance(node, ast.FunctionDef) and node.name == 'validate_runtime_contract':
             top_level_nodes.append(node)
             continue
         if isinstance(node, ast.Assign):
@@ -364,6 +382,8 @@ def write_validation_report(out_dir, pou_name, validation):
 
 
 def render_translation_position_decoder_module_code(pou_name):
+    contract = build_position_decoder_contract()
+    contract_literal = repr(contract.to_dict())
     return f'''# {pou_name}.py
 """
 Prototype de module Python pour {pou_name}.
@@ -378,6 +398,31 @@ VALID_WORDS = {{
     0b00001,
     0b00000,
 }}
+
+CONTRACT = {contract_literal}
+
+
+def validate_runtime_contract(payload: dict, scope: str = 'inputs') -> list:
+    if not isinstance(payload, dict):
+        return ['payload must be a mapping']
+    fields = CONTRACT.get(scope, [])
+    errors = []
+    for field in fields:
+        name = field['name']
+        if name not in payload:
+            errors.append(f'missing {{scope}} field {{name}}')
+            continue
+        value = payload[name]
+        expected_type = field['type']
+        if expected_type == 'bool' and not isinstance(value, bool):
+            errors.append(f'{{scope}} field {{name}} should be bool')
+        elif expected_type == 'int' and not isinstance(value, int):
+            errors.append(f'{{scope}} field {{name}} should be int')
+        elif expected_type == 'float' and not isinstance(value, float):
+            errors.append(f'{{scope}} field {{name}} should be float')
+        elif expected_type == 'str' and not isinstance(value, str):
+            errors.append(f'{{scope}} field {{name}} should be str')
+    return errors
 
 
 class {pou_name}:
@@ -440,6 +485,8 @@ class {pou_name}:
 def render_translation_module_code(pou_name, interface):
     inputs = interface.get('inputs', [])
     outputs = interface.get('outputs', [])
+    contract = build_translation_contract(interface)
+    contract_literal = repr(contract.to_dict())
 
     def render_init_block():
         lines = []
@@ -447,12 +494,10 @@ def render_translation_module_code(pou_name, interface):
             lines.append(f'        self.{var["name"]}: {var["python_type"]} = {_default_value_for_type(var["python_type"])}')
         for var in outputs:
             lines.append(f'        self.{var["name"]}: {var["python_type"]} = {_default_value_for_type(var["python_type"])}')
-        lines.append('        self._state = "IDLE"')
-        lines.append('        self._state_timer_ms = 0.0')
-        lines.append('        self._prev_reset = False')
-        lines.append('        self._prev_enable = False')
-        lines.append('        self._prev_safe_stop = False')
-        lines.append('        self._prev_start_stop = False')
+        for field in contract.state:
+            annotation = {'bool': 'bool', 'int': 'int', 'float': 'float', 'str': 'str'}.get(field.type, 'object')
+            default = repr(field.default) if field.default is not None else 'None'
+            lines.append(f'        self.{field.name}: {annotation} = {default}')
         return '\n'.join(lines)
 
     input_names = [var['name'] for var in inputs]
@@ -469,6 +514,31 @@ Prototype de module Python pour {pou_name}.
 Ce modèle reproduit un comportement de FB de translation proche du cycle PLC avec une machine d'état simple
 et une temporisation minimale pour la simulation hors-PLC.
 """
+
+CONTRACT = {contract_literal}
+
+
+def validate_runtime_contract(payload: dict, scope: str = 'inputs') -> list:
+    if not isinstance(payload, dict):
+        return ['payload must be a mapping']
+    fields = CONTRACT.get(scope, [])
+    errors = []
+    for field in fields:
+        name = field['name']
+        if name not in payload:
+            errors.append(f'missing {{scope}} field {{name}}')
+            continue
+        value = payload[name]
+        expected_type = field['type']
+        if expected_type == 'bool' and not isinstance(value, bool):
+            errors.append(f'{{scope}} field {{name}} should be bool')
+        elif expected_type == 'int' and not isinstance(value, int):
+            errors.append(f'{{scope}} field {{name}} should be int')
+        elif expected_type == 'float' and not isinstance(value, float):
+            errors.append(f'{{scope}} field {{name}} should be float')
+        elif expected_type == 'str' and not isinstance(value, str):
+            errors.append(f'{{scope}} field {{name}} should be str')
+    return errors
 
 
 class {pou_name}:
@@ -615,6 +685,8 @@ class {pou_name}:
 def render_safety_translation_module_code(pou_name, interface):
     inputs = interface.get('inputs', [])
     outputs = interface.get('outputs', [])
+    contract = build_translation_contract(interface)
+    contract_literal = repr(contract.to_dict())
 
     def render_init_block():
         lines = []
@@ -622,14 +694,10 @@ def render_safety_translation_module_code(pou_name, interface):
             lines.append(f'        self.{var["name"]}: {var["python_type"]} = {_default_value_for_type(var["python_type"])}')
         for var in outputs:
             lines.append(f'        self.{var["name"]}: {var["python_type"]} = {_default_value_for_type(var["python_type"])}')
-        lines.append('        self._prev_reset = False')
-        lines.append('        self._first_scan_done = False')
-        lines.append('        self._meca_b_timer_ms = 0.0')
-        lines.append('        self._meca_a_timer_ms = 0.0')
-        lines.append('        self._meca_b_active = False')
-        lines.append('        self._meca_a_active = False')
-        lines.append('        self._post_ramp_timeout_ms = 3000.0')
-        lines.append('        self._meca_a_timeout_ms = 1000.0')
+        for field in contract.state:
+            annotation = {'bool': 'bool', 'int': 'int', 'float': 'float', 'str': 'str'}.get(field.type, 'object')
+            default = repr(field.default) if field.default is not None else 'None'
+            lines.append(f'        self.{field.name}: {annotation} = {default}')
         return '\n'.join(lines)
 
     output_dict_body = []
@@ -642,6 +710,31 @@ def render_safety_translation_module_code(pou_name, interface):
 Prototype de module Python pour {pou_name}.
 Ce modèle reproduit un comportement simplifié du bloc safety de translation pour la simulation hors-PLC.
 """
+
+CONTRACT = {contract_literal}
+
+
+def validate_runtime_contract(payload: dict, scope: str = 'inputs') -> list:
+    if not isinstance(payload, dict):
+        return ['payload must be a mapping']
+    fields = CONTRACT.get(scope, [])
+    errors = []
+    for field in fields:
+        name = field['name']
+        if name not in payload:
+            errors.append(f'missing {{scope}} field {{name}}')
+            continue
+        value = payload[name]
+        expected_type = field['type']
+        if expected_type == 'bool' and not isinstance(value, bool):
+            errors.append(f'{{scope}} field {{name}} should be bool')
+        elif expected_type == 'int' and not isinstance(value, int):
+            errors.append(f'{{scope}} field {{name}} should be int')
+        elif expected_type == 'float' and not isinstance(value, float):
+            errors.append(f'{{scope}} field {{name}} should be float')
+        elif expected_type == 'str' and not isinstance(value, str):
+            errors.append(f'{{scope}} field {{name}} should be str')
+    return errors
 
 
 class {pou_name}:
@@ -782,6 +875,10 @@ def render_module_code(pou_name, interface):
         return render_safety_translation_module_code(pou_name, interface)
 
     inputs = interface.get('inputs', [])
+    outputs = interface.get('outputs', [])
+    contract = build_translation_contract(interface)
+    contract_literal = repr(contract.to_dict())
+    input_lines = []
     for var in inputs:
         input_lines.append(f'        self.{var["name"]}: {var["python_type"]} = {_default_value_for_type(var["python_type"])}')
     output_lines = []
@@ -804,6 +901,32 @@ Prototype de module Python généré à partir de l'interface du POU {pou_name}.
 Ce module n'est pas une traduction ST complète ; il expose un squelette exécutable
 avec les entrées/sorties extraites du bundle PLCopen.
 """
+
+CONTRACT = {contract_literal}
+
+
+def validate_runtime_contract(payload: dict, scope: str = 'inputs') -> list:
+    if not isinstance(payload, dict):
+        return ['payload must be a mapping']
+    fields = CONTRACT.get(scope, [])
+    errors = []
+    for field in fields:
+        name = field['name']
+        if name not in payload:
+            errors.append(f'missing {{scope}} field {{name}}')
+            continue
+        value = payload[name]
+        expected_type = field['type']
+        if expected_type == 'bool' and not isinstance(value, bool):
+            errors.append(f'{{scope}} field {{name}} should be bool')
+        elif expected_type == 'int' and not isinstance(value, int):
+            errors.append(f'{{scope}} field {{name}} should be int')
+        elif expected_type == 'float' and not isinstance(value, float):
+            errors.append(f'{{scope}} field {{name}} should be float')
+        elif expected_type == 'str' and not isinstance(value, str):
+            errors.append(f'{{scope}} field {{name}} should be str')
+    return errors
+
 
 class {pou_name}:
     def __init__(self) -> None:
