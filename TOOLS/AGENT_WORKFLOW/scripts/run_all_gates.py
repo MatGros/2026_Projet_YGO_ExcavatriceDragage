@@ -43,6 +43,16 @@ def main() -> int:
         return code
 
     print("\n" + "=" * 60)
+    print("GATE 2bis: Linkage (instances declarees/appelees, refs croisees, bundle, tache)")
+    print("=" * 60)
+    code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py"], project_root)
+    print(out.strip())
+    if err:
+        print(err.strip(), file=sys.stderr)
+    if code:
+        return code
+
+    print("\n" + "=" * 60)
     print("GATE 3: Config persistence (Cfg<->PERSISTENT mirror, Initialized guard, sentinels)")
     print("=" * 60)
     code, out, err = run([sys.executable, "TOOLS/AGENT_WORKFLOW/scripts/check_config_persistence.py", "."], project_root)
@@ -68,7 +78,17 @@ def main() -> int:
     if not py313.exists():
         print("WARNING: Python 3.13 not found at C:/Python313/python.exe, using current interpreter", file=sys.stderr)
         py313 = Path(sys.executable)
-    code, out, err = run([str(py313), "-m", "pytest", "TOOLS/ST_PLCOPENXML_GENERATOR/tests", "-q"], project_root)
+    code, out, err = run(
+        [
+            str(py313),
+            "-m",
+            "pytest",
+            "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
+            "TOOLS/AGENT_WORKFLOW/tests",
+            "-q",
+        ],
+        project_root,
+    )
     print(out.strip())
     if err:
         print(err.strip(), file=sys.stderr)

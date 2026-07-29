@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 from .diagnostics import DiagnosticCollector
 from .ir import SourceObject
@@ -64,6 +65,15 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
         if f in excluded:
             continue
         source = f.read_text(encoding="utf-8")
+        
+        # 🛡️ Contrôle de syntaxe CODESYS : espace interdit entre ':' et '=' (ex: TargetNum : = M3)
+        clean_code = "\n".join(l.split("//")[0] for l in source.splitlines())
+        if re.search(r":\s+=", clean_code):
+            diagnostics.error(
+                f"Syntax Error: Invalid space between ':' and '=' in assignment operator ':=' in {f.name}",
+                f"{f.parent.name}/{f.name}"
+            )
+
         rel = f.relative_to(code_dir).as_posix()
         rel_parent = f.parent.relative_to(code_dir)
         obj = parse_file(

@@ -16,7 +16,7 @@
 > polarité inversée (bug documenté ci-dessous en bandeau REX, pour ne jamais reproduire l'erreur).
 > Ajout de la **séquence de réarmement** (impulsion 1 s + verrouillage 5 s, commande IHM
 > uniquement, jamais automatique) et d'une **casuistique exhaustive** de tous les cas de figure
-> de la chaîne de coupure de puissance. Voir `DOC/AF_Partie-09_Fonction_Winch_v1.12.md` §4quinquies
+> de la chaîne de coupure de puissance. Voir `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` §4quinquies
 > pour le détail des **Safety Mouvement** (3 aujourd'hui, d'autres pourront s'ajouter — catégorie
 > ouverte, non limitée à un nombre fixe) qui peuvent déclencher une coupure logicielle — non
 > re-décrits ici, seulement référencés. ⚠️ Remarque nommage (retour utilisateur 2026-07-07) :
@@ -162,7 +162,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 
 > 🏷️ **Rappel — « Safety Mouvement ».** Il s'agit d'une **catégorie ouverte** de protections
 > logicielles de `FB_Safety_Winch`, capables de déclencher une coupure de puissance (détail
-> technique complet en `DOC/AF_Partie-09_Fonction_Winch_v1.12.md` §4quinquies, non re-décrit ici).
+> technique complet en `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` §4quinquies, non re-décrit ici).
 > **3 existent aujourd'hui**, nommées par leur **rôle** (voir remarque de nommage plus bas pour
 > pourquoi un simple suffixe de lettre est délibérément évité — d'autres cas viendront s'ajouter
 > à cette liste avec le temps, sans limite de nombre) :
@@ -233,7 +233,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 > `PowerKeepAlive_A_RQ`/`B_RQ` à `TRUE` **en permanence** tant que tout va bien. Dès que le PLC
 > **arrête** de les maintenir (transition `TRUE→FALSE`) — **volontairement** (un des Safety
 > Mouvement de `FB_Safety_Winch` détecte un problème, voir §ci-dessus pour les noms descriptifs et
-> `DOC/AF_Partie-09_Fonction_Winch_v1.5.md` §4quinquies pour le détail technique, non re-décrit ici)
+> `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` §4quinquies pour le détail technique, non re-décrit ici)
 > **ou accidentellement** (PLC plante, perd
 > l'alimentation, dépassement watchdog tâche) — le circuit AU s'ouvre et coupe le contacteur de
 > puissance, exactement comme un bouton coup-de-poing. C'est la logique **inverse** de l'ancienne
@@ -243,7 +243,7 @@ juste après une remise en route ou un AU relâché (voir scénarios ci-dessous)
 PowerCutOff_A_RQ := NOT (instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff OR instSafetyTranslationM3.PowerCutOff) AND NOT GVL_IHM.Modes.CmdEmergencyCutOff;
 PowerCutOff_B_RQ := PowerCutOff_A_RQ;
 ```
-(corps réel dans `CODE/MAIN/PRG_10_Outputs.st` — référencé ici, non recopié en détail).
+(corps réel dans `CODE/MAIN/PRG_10_Outputs_LD.st` — référencé ici, non recopié en détail).
 
 #### 🔁 Séquence de réarmement du contacteur de puissance
 
@@ -259,7 +259,7 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 4. **Verrouillage de 5 secondes** après la fin de l'impulsion : toute nouvelle demande de
    réarmement est **ignorée** pendant cette fenêtre (contrainte mécanique du ressort, temps de
    recharge nécessaire avant une nouvelle tentative).
-5. Retours exposés côté IHM (`GVL_IHM.Modes.*`, voir `CODE/SUPERVISION/ST_ModesHMI.st`) :
+5. Retours exposés côté IHM (`GVL_IHM.Modes.*`, voir `CODE/SUPERVISION/_TYPES/ST_ModesHMI.st`) :
    `EmergencyChainOk` (boucle saine), `PowerContactorOk` (contacteur confirmé engagé, miroir de
    `EmergencyStopOk`), `EmergencyArmable` (réarmement possible **maintenant**),
    `EmergencyArmingBusy` (pulse ou verrouillage en cours — griser le bouton IHM pendant ce temps).
@@ -310,7 +310,7 @@ c'est une **décision explicite de l'opérateur**, prise depuis l'IHM.
 1. Machine en fonctionnement, `EmergencyChain = TRUE`, `EmergencyStopOk = TRUE`.
 2. Un des Safety Mouvement de `FB_Safety_Winch` se déclenche (mouvement non commandé, pilotage
    sans commande opérateur, glissement benne escaladé — détail en
-   `DOC/AF_Partie-09_Fonction_Winch_v1.5.md` §4quinquies) → `instSafetyWinchM1/M2.PowerCutOff` (ou
+   `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` §4quinquies) → `instSafetyWinchM1/M2.PowerCutOff` (ou
    `instSafetyTranslationM3.PowerCutOff`, aujourd'hui toujours `FALSE`, voir remarque ci-dessus) passe
    à `TRUE`.
 3. Le PLC **arrête volontairement** de maintenir `PowerCutOff_A_RQ`/`B_RQ` à `TRUE` (il les

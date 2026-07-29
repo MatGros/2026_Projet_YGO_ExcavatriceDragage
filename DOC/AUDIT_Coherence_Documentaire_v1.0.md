@@ -85,7 +85,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | m2 | `AF_Partie-02` (COMMUN) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ Nom final confirmé par code/export : `FB_Filter_PT1`. |
 | m3 | `AF_Partie-08` §2/§7 vs `AF_Partie-02` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
 | m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie-02_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
-| m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Fonction_Joystick_v1.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
+| m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
 | m6 | `README.md` (structure `CODE/`, workflow) | Décrit `CODE/*.xml` + `extract/inject` round-trip, alors que `CODE/` contient un `.st` et la skill impose la **copie manuelle `.st`** | ✅ **D19** : workflow XML **supprimé** ; export manuel `Device.export` + copie ST manuelle. Corriger README (structure `CODE/`, section « Workflow Édition », `extract.bat`/`inject.bat`, `tools/`). |
 | m7 | `AF_Partie-03` (« **tout** FB respecte le contrat ») vs `AF_Partie-06` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12 + D20** : FB de mouvement = interface standard + `StartStop` ; briques E/S & diag = **types de données propres** (pas de `StartStop`). |
 | m8 | `AF_Partie-02` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ✅ **Sans objet (D21)** : `FB_Watchdog` supprimé (fonction système). Retirer toutes ses références. |
@@ -893,7 +893,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 **Constat** : Commit 26a9f1c (feat benne, 2026-07-08, 15h25) a renommé `OverrideSync`
 → `SyncEnable` dans le code avec inversion de polarité (logique positive désormais), répercuté sur
 5 fichiers `CODE/` (`FB_Modes.st`, `FB_Safety_Winch.st`, `FB_WinchSync.st`, `ST_SyncHMI.st`,
-`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie-05_Modes_Maintenance_v1.2.md`
+`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie-05_Modes_Maintenance_v1.6.md`
 **n'a pas suivi** — elle parle toujours de `OverrideSync` partout (13 occurrences confirmées au
 2026-07-08 après le commit).
 
@@ -921,7 +921,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 | D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie-05_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `ARCHIVES/Doc/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie-02_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie-09_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie-07_Interface_IHM_v1.2.md` (1 occurrence). |
 
 **Fichiers modifiés (documentation)** :
-- ✅ `DOC/AF_Partie-05_Modes_Maintenance_v1.3.md` (NOUVEAU, corrigé avec polarité positive)
+- ✅ `DOC/AF_Partie-05_Modes_Maintenance_v1.6.md` (NOUVEAU, corrigé avec polarité positive)
 - ✅ `ARCHIVES/Doc/AF_Partie-05_Modes_Maintenance_v1.2.md` (archivé, ancien)
 - ✅ `CLAUDE.md` (2 références Partie5 v1.2→v1.3)
 - ✅ `AF_Partie-02_Architecture_Programme_v2.10.md` (2 refs ligne 91, 138)
@@ -941,8 +941,8 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 | D101 | **Ajout note d'investigation — Montée en charge & frein (v1.8)** | Note documentaire ajoutée à `AF_Partie-09_Fonction_Winch_v1.8.md` §4undecies (nouvelle sous-section après §4decies). **Pas de correction de code**, juste identification de **point de vigilance** à tracker pour essais de charge/mise en service complète. Trois paramètres à valider terrain : (1) délai magnétisation suffisant pour transférer charge au moteur sans à-coup ; (2) délai décélération suffisant pour que moteur arrête avant serrage frein ; (3) aucun rebondissement/glissement frein en transition charge-neutre. **Scope complet de refactoring (si besoin)** : possibilité d'ajuster temporisations fixes ou refonte du modèle séquentiel — **déterminé par REX terrain**, non assumé d'avance. Archive v1.7 conservée pour traçabilité historique. Référence croisée mise à jour dans `CLAUDE.md` (pointer v1.8 au lieu de v1.7). |
 
 **Fichiers modifiés (documentation)** :
-- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.8.md` (NOUVEAU, contient note §4undecies)
-- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.8.md` (header mis à jour, v1.7→v1.8)
+- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` (NOUVEAU, contient note §4undecies)
+- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` (header mis à jour, v1.7→v1.8)
 - ✅ `CLAUDE.md` (1 référence Partie9 v1.7→v1.8)
 - ✅ `AUDIT` (ce §41, nouvelle entrée)
 
@@ -996,7 +996,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 | D103 | **Documentation Méca A–E complète (v1.9)** | Nouvelle section §4novies dans `AF_Partie-09_Fonction_Winch_v1.9.md` : (1) **tableau récapitulatif** 5 lignes (Méca / Bit / Armement / Déclenchement / Conséquence / Seuils) — vue d'ensemble 30 secondes ; (2) **5 sous-sections détaillées** (Méca A / B / C / D / E) listant **Rôle** (1 phrase), **Armement** (condition exact du code, commentée), **Déclenchement** (logique), **Conséquence** (SafeStop / PowerCutOff escalade), **Paramètres réglables** (noms variables réelles, défauts, unités), **Subtilités** (ex. Méca C UNIQUEMENT M1, Méca E escalade PowerCutOff sur bit13, pas bit12 seul). **Comportement extracté 100% du code réel** `CODE/WINCH/FB_Safety_Winch.st` (pas de duplication ST, description du comportement seulement). Versionning : v1.8 → v1.9. |
 
 **Fichiers modifiés** :
-- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.9.md` (NOUVEAU, section §4novies ; v1.8 archivé)
+- ✅ `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` (NOUVEAU, section §4novies ; v1.8 archivé)
 - ✅ `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.8.md` (copie conservée pour traçabilité)
 - ✅ `CLAUDE.md` (1 référence : AF_Partie-09 v1.8→v1.9 + description améliorée)
 - ✅ `CODE/WINCH/FB_Safety_Winch.st` (bandeau : DOC ref v1.1→v1.9)

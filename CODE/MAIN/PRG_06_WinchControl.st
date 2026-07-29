@@ -3,10 +3,17 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.13.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
+   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.14.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_06_WinchControl
+VAR_OUTPUT
+    // 🛡️ Demandes brutes explicites : consommées par PRG_10_Outputs_LD.
+    // PRG_06 ne produit jamais les Q ni les commandes finales autorisées.
+    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;
+    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest;
+    KoboldContactorCmdArbitrated : BOOL; // Commande Kobold arbitrée, consommée par PRG_10
+END_VAR
 VAR
     // Stubs
     StubMachineEnableN1 : BOOL := TRUE;
@@ -27,7 +34,6 @@ VAR
     ManualBottomPositionConfirmed  : BOOL;
     BottomPositionConfirmed        : BOOL;
     CmdBucketCloseArbitrated       : BOOL;
-    KoboldContactorCmdArbitrated   : BOOL;
 
     // Variables de commande M1 après arbitrage Manuel/Auto
     M1_StartStop_Active     : BOOL;
@@ -264,7 +270,7 @@ ELSE
     // GVL_IHM.Modes.Cmd.TglJoystickMaster bascule vers les boutons IHM maintenus (BtnUp/BtnDown),
     // homme-mort joystick réel TOUJOURS exigé en parallèle (même leçon que le précédent bug
     // Translation M3, AF_Partie-11 v1.9 §6bis — jamais implicite). Voir
-    // DOC/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
+    // ARCHIVES/Doc/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
     // 🆕 Sélection treuil (TASK-0001, MAINT_N2 uniquement, voir FB_Modes.JoystickWinchSelectArbitrated) :
     // 1=M1 seul, 2=M2 seul, 3=Couplé — forcé à 3 (Couplé) hors MAINT_N2, IDENTIQUE quelle que
     // soit la source (joystick ou boutons) — pas de duplication de la logique de sélection.
@@ -667,24 +673,36 @@ instWinchM2(
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
-// ── 8. ALIMENTATION PRG_10_Outputs (sorties physiques) ──────────────────
-// 🔴🔧 REX 2026-07-07 : PRG_10_Outputs est une tâche indépendante (MainTask, PouList),
-// jamais appelée avec paramètres — ses VAR_INPUT restaient à FALSE en permanence, y compris
-// sur machine réelle (aucun relais/contacteur/frein ne s'activait jamais). Alimentation directe
-// ici, AVANT PRG_10_Outputs dans l'ordre de tâche (position 6 < 10, même cycle API).
-PRG_10_Outputs.M1RelayFwd        := instWinchM1.RelayFwd;
-PRG_10_Outputs.M1RelayRev        := instWinchM1.RelayRev;
-PRG_10_Outputs.M1SpeedContactor1 := instWinchM1.Contactor1;
-PRG_10_Outputs.M1SpeedContactor2 := instWinchM1.Contactor2;
-PRG_10_Outputs.M1SpeedContactor3 := instWinchM1.Contactor3;
-PRG_10_Outputs.M1SpeedContactor4 := instWinchM1.Contactor4;
-PRG_10_Outputs.M1BrakeCmd        := instWinchM1.BrakeCmd;
+// ── 8. PUBLICATION DES DEMANDES BRUTES VERS PRG_10_Outputs_LD ───────────
+// 🛡️ Ordre MainTask requis : PRG_06 est exécuté avant PRG_10. Les structures
+// VAR_OUTPUT sont la frontière explicite producteur/consommateur ; aucune Q et
+// aucune commande autorisée ne sont produites dans ce programme.
+WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM1FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
+WinchM1FinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
+WinchM1FinalInterlockRequest.BrakeReleaseRequest := instWinchM1.BrakeCmd;
+WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
+WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff;
+WinchM1FinalInterlockRequest.RequestedRelayFwd := instWinchM1.RelayFwd;
+WinchM1FinalInterlockRequest.RequestedRelayRev := instWinchM1.RelayRev;
+WinchM1FinalInterlockRequest.RequestedContactor1 := instWinchM1.Contactor1;
+WinchM1FinalInterlockRequest.RequestedContactor2 := instWinchM1.Contactor2;
+WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
+WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
+WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 
-PRG_10_Outputs.M2RelayFwd        := instWinchM2.RelayFwd;
-PRG_10_Outputs.M2RelayRev        := instWinchM2.RelayRev;
-PRG_10_Outputs.M2SpeedContactor1 := instWinchM2.Contactor1;
-PRG_10_Outputs.M2SpeedContactor2 := instWinchM2.Contactor2;
-PRG_10_Outputs.M2SpeedContactor3 := instWinchM2.Contactor3;
-PRG_10_Outputs.M2SpeedContactor4 := instWinchM2.Contactor4;
-PRG_10_Outputs.KoboldContactorCmd := KoboldContactorCmdArbitrated;
-PRG_10_Outputs.M2BrakeCmd        := instWinchM2.BrakeCmd;
+WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM2FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
+WinchM2FinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
+WinchM2FinalInterlockRequest.BrakeReleaseRequest := instWinchM2.BrakeCmd;
+WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
+WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff;
+WinchM2FinalInterlockRequest.RequestedRelayFwd := instWinchM2.RelayFwd;
+WinchM2FinalInterlockRequest.RequestedRelayRev := instWinchM2.RelayRev;
+WinchM2FinalInterlockRequest.RequestedContactor1 := instWinchM2.Contactor1;
+WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
+WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
+WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
+WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;

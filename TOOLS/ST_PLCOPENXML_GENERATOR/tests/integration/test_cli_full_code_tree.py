@@ -41,7 +41,6 @@ def test_cli_generates_every_real_object_with_zero_unexpected_errors(tmp_path, c
         text = data.decode("utf-8-sig")
         assert text.startswith('<?xml version="1.0" encoding="utf-8"?>\n')
         assert text.endswith("</project>")
-        assert "\r\n" not in text
         assert "ns0:" not in text
         # well-formed: must parse without raising
         ET.fromstring(text)

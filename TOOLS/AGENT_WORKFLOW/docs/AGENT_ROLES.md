@@ -13,6 +13,11 @@
 
 Un agent secondaire ne commit pas et ne modifie pas le code en review.
 
+📌 **Chaque agent secondaire reçoit `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`**
+en tête de sa tâche (règles, cas d'arrêt, vérification de liaison, format de restitution).
+Le reviewer y trouve aussi son ordre de contrôle : **intégration structurelle d'abord**,
+logique métier ensuite — l'ordre inverse a laissé passer le bug `PRG_10_Outputs_LD`.
+
 ## Règle multi-modèle
 
 - **C0-C1** : Pi seul, aucun agent secondaire.

@@ -13,7 +13,7 @@
    🔧 2026-07-02 (demande utilisateur) : `SpeedRef` devient SIGNÉ (-100..+100 %,
       le signe porte le sens) au lieu de toujours positif — affichage simplifié
       IHM/maintenance. `Direction` reste inchangé (conservé, redondant mais
-      explicite). Émis par `FB_Joystick` (CODE/FB_Joystick.st) ; `FB_Winch`/
+      explicite). Émis par `FB_Joystick` (CODE/JOYSTICK/FB_Joystick.st) ; `FB_Winch`/
       `FB_Translation` extraient la magnitude via `ABS(SpeedRefPct)` à leur
       frontière d'entrée et continuent d'utiliser `Direction` comme source
       d'autorité du sens (interlock inchangé).

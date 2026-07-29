@@ -559,7 +559,7 @@ Génère un fichier `.xml` individuel par objet ST, en reproduisant la structure
                                            |--> génère GUID via [guid.py]
                                            |--> convertit l'IR en structure XML
 [cli.py] <-- (4. XML Tree) ------------ [xml_builder.py]
-[cli.py] -- (5. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: CODE/WINCH/FB_Winch.xml)
+[cli.py] -- (5. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/FB_Winch.xml)
 ```
 
 #### Usage 2 : Mode Bundle (génération groupée via `--bundle`)

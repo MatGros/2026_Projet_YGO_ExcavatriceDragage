@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.11.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.13.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -29,7 +29,7 @@ VAR_INPUT
 
     BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
     BypassLimitSwitch            : BOOL;       // 🚧 TRUE = ignore les fins de course extrêmes
-    BrakeFeedback                : BOOL;       // Retour d'état câblé bobine frein translation
+    BrakeFeedback                : BOOL;       // Retour normalisé : TRUE = frein serré
 
     // Réglages rampe (RETAIN)
     CfgRampAccelRate                : REAL := 20.0;    // %/s — accélération
@@ -46,7 +46,7 @@ VAR_INPUT
     BrakeDelayContactClose        : TIME := T#100ms; // Voir FB_Brake
     BrakeDelayMagnetise           : TIME := T#300ms; // Voir FB_Brake
     BrakeDelayMotorDecel          : TIME := T#500ms; // Voir FB_Brake
-    BrakeFeedbackTimeout          : TIME := T#1s;    // Voir FB_Brake
+    BrakeFeedbackTimeout          : TIME := T#300ms; // Strictement sous watchdog final 500 ms
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -57,9 +57,9 @@ VAR_OUTPUT
     State               : E_State;
     StateAtError        : E_State;
     TargetReached        : BOOL;       // Capteur position cible
-    DriveControlWord     : WORD;       // Mot de commande AC600
-    DriveFreqRefHz        : REAL;      // Consigne fréquence
-    BrakeCmd                : BOOL;    // Commande bobine frein — TRUE = relâché
+    RequestedDriveControlWord : WORD; // Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD
+    RequestedDriveFreqHz      : REAL; // Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD
+    BrakeReleaseRequest       : BOOL; // Demande métier desserrage, issue de FB_Brake
     BrakeContactorCheck  : ST_ContactorCheck; // Diag contacteur frein
 END_VAR
 VAR
@@ -77,19 +77,18 @@ VAR
     ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
     MovementRequested      : BOOL;         // Pilote FB_Brake
     FirstScanDone          : BOOL;
-    BrakeSafetyOk          : BOOL;         // 🛡️ REX 2026-07-24 : Interlock anti-échauffement frein
 END_VAR
 
 // === IMPLEMENTATION ===
 
 // 🛑 1. GATE (Enable / EmergencyStopOk) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT EmergencyStopOk THEN
-    DriveControlWord := 0; DriveFreqRefHz := 0.0;
+    RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
 
     Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
-    BrakeCmd := Brake.BrakeCmd;
+    BrakeReleaseRequest := Brake.BrakeCmd;
     BrakeContactorCheck := Brake.ContactorCheck;
 
     CommandedDirection := 0;
@@ -177,31 +176,31 @@ END_IF;
 MovementRequested := (CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1);
 
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
-DriveFreqRefHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
+RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
 
 // Pilotage nominal Given Command 1 (0x3101) :
 // 0: None, 1: Forward, 2: Reverse, 7: Reset
 IF Reset THEN
-    DriveControlWord := 7; // Reset défaut variateur
+    RequestedDriveControlWord := 7; // Reset défaut variateur
 ELSIF Error THEN
-    DriveControlWord := 0; // Arrêt sur défaut
+    RequestedDriveControlWord := 0; // Arrêt sur défaut
 ELSIF MovementRequested THEN
     IF CommandedDirection = 1 THEN
-        DriveControlWord := 1; // Marche avant
+        RequestedDriveControlWord := 1; // Marche avant
     ELSIF CommandedDirection = -1 THEN
-        DriveControlWord := 2; // Marche arrière
+        RequestedDriveControlWord := 2; // Marche arrière
     ELSE
-        DriveControlWord := 0;
+        RequestedDriveControlWord := 0;
     END_IF;
 ELSE
-    DriveControlWord := 0;
+    RequestedDriveControlWord := 0;
 END_IF;
 
 // Sécurité : si Fdc extrême atteint dans le sens de marche, coupure commande immédiate (sans rampe ni couple)
 // 🌐 BypassLimitSwitch = TRUE → ignore cette protection (test/mise en service)
 IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
-    DriveControlWord := 0;
-    DriveFreqRefHz := 0.0;
+    RequestedDriveControlWord := 0;
+    RequestedDriveFreqHz := 0.0;
     SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
 END_IF;
 
@@ -211,15 +210,13 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
       DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
       BypassContactorCheck := BypassContactorCheck);
-BrakeCmd := Brake.BrakeCmd;
+BrakeReleaseRequest := Brake.BrakeCmd;
 BrakeContactorCheck := Brake.ContactorCheck;
 
-// 🛡️ Interlock de sécurité frein : si FB_Brake est en ERREUR, coupure immédiate de la commande variateur AC600
-BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
-IF NOT BrakeSafetyOk THEN
-    DriveControlWord := 0;
-    DriveFreqRefHz := 0.0;
-END_IF;
+// 🛡️ FB_Translation ne décide plus la frontière finale : il expose uniquement
+// ses demandes métier. SafeStop est déjà appliqué dans la rampe rapide §4 : tant que
+// la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
+// FB_TranslationOutputInterlock_LD ne doit jamais transformer SafeStop en coupure sèche.
 
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
@@ -267,6 +264,6 @@ Done := FALSE;
 
 // 🛡️ 9. SORTIE SÛRE SUR DÉFAUT
 IF Error THEN
-    DriveControlWord := 0; DriveFreqRefHz := 0.0;
-    BrakeCmd := FALSE;
+    RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
+    BrakeReleaseRequest := FALSE;
 END_IF;

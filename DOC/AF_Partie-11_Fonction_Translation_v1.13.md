@@ -1,5 +1,7 @@
-# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.12)
+# 📋 Analyse Fonctionnelle — Partie 11 : Fonction Translation (v1.13)
 
+> 🆕 **v1.13 (Lot 3A, implémenté — qualification CODESYS différée)** : gate final M3 après `FB_Brake` : les mots AC600 1/2 et toute fréquence sont nuls sans **les deux conditions** `BrakeReleaseRequest=TRUE` et `M3BrakeCommandOpenConfirmed=TRUE`. Watchdog fixe 500 ms ; après timeout, `RestartInhibit` impose disparition cause + front Reset + mot 0 neutre + nouvelle demande. Le code 7 reste exclusivement le reset variateur à fréquence nulle. La confirmation concerne le contacteur/bobine, jamais le frein mécanique. `SafeStop` reste la rampe rapide de `FB_Translation` avec `Enable` maintenu ; l'interlock final n'en fait pas une coupure sèche et attend la retombée effective de la demande.
+>
 > 🆕 **v1.12 (2026-07-23) — Restauration intégrale post-audit & consolidation** :
 > Restauration complète des spécifications techniques de la v1.9 (mapping EtherCAT AC600, 
 > registres de commande/statut, décodage des 5 capteurs, garde-fous Méca A/B, pipeline) 
@@ -23,16 +25,19 @@ Toutes les sécurités (Homme-mort, arrêt sur capteur cible, fins de course ext
 ## ⚙️ 2. Chaîne de traitement (pipeline)
 
 ```
-FB_Joystick.AxisCmdX ──► FB_Translation(M3) ──► DriveControlWord + DriveFreqRefHz ──► AC600 (EtherCAT)
-                                       ──► FB_Brake ──► BrakeCmd (bobine frein M3)
+FB_Joystick.AxisCmdX ──► FB_Translation(M3) ──► RequestedDriveControlWord + RequestedDriveFreqHz
+                                       ──► BrakeReleaseRequest (FB_Brake)
+                                       ──► FB_TranslationOutputInterlock_LD
+                                           ──► DriveControlWord + DriveFreqRefHz + BrakeCmd ──► AC600 / frein
 
-FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(M3)
+FB_Safety_Translation ──► SafeStop     ──► FB_Translation + FB_TranslationOutputInterlock_LD
                   ──► PowerCutOff  ──► Coupure de puissance amont (Boucle d'AU générale)
 ```
 
 | Bloc | Rôle métier |
 |------|-------------|
-| `FB_Translation` | Gère la rampe interne (`FB_Ramp`), l'arbitrage `Enable > SafeStop > StartStop`, l'interlock de sens, l'arrêt sur capteur cible, les coupures immédiates sur fins de course extrêmes, et l'écriture des PDO EtherCAT. |
+| `FB_Translation` | Gère la rampe interne (`FB_Ramp`), l'arbitrage `Enable > SafeStop > StartStop`, l'interlock de sens, l'arrêt sur capteur cible et produit exclusivement les demandes métier `RequestedDriveControlWord`, `RequestedDriveFreqHz`, `BrakeReleaseRequest`. |
+| `FB_TranslationOutputInterlock_LD` | Frontière finale M3 : applique le watchdog frein, interdit 1/2+fréquence tant que `BrakeReleaseRequest` **et** la confirmation contacteur/bobine ne sont pas vrais, mémorise le timeout et impose neutre + nouvelle demande après Reset. Produit seul les PDO/frein appliqués. |
 | `FB_Brake` | Séquence de freinage temporisée standard (Partie9 §FB_Brake), réutilisée avec les réglages propres au frein à manque de courant du translation M3. |
 | `FB_Safety_Translation` | Centralise les sécurités du domaine : perte joystick, perte com EtherCAT, rotation de phase, thermique frein commun, et surveillances physiques Méca A (dérive vitesse) et Méca B (cohérence arrêt). |
 
@@ -81,9 +86,10 @@ FB_Safety_Translation ──► SafeStop     ──► (entrée) FB_Translation(
 |--------|------|------|
 | `Ready/Busy/Done/Error/ErrorId/State/StateAtError` | — | Statuts standards du contrat FB (Partie3 §1) |
 | `TargetReached` | BOOL | Capteur cible confirmé |
-| `DriveControlWord` | WORD | Mot de commande donné au variateur AC600 (0x3101) |
-| `DriveFreqRefHz` | REAL | Consigne de fréquence de sortie (Hz) |
-| `BrakeCmd` | BOOL | Commande de la bobine de frein M3 (TRUE = desserré) |
+| `RequestedDriveControlWord` | WORD | Demande métier AC600 (0=None, 1=Fwd, 2=Rev, 7=Reset), avant interlock final |
+| `RequestedDriveFreqHz` | REAL | Demande métier fréquence (Hz), avant interlock final |
+| `BrakeReleaseRequest` | BOOL | Demande métier de desserrage issue de `FB_Brake` |
+| `BrakeContactorCheck` | `ST_ContactorCheck` | Diagnostic d'incohérence du contacteur de frein |
 | `BrakeContactorCheck` | `ST_ContactorCheck` | Diagnostic d'incohérence du contacteur de frein |
 
 `ErrorId` (`FB_Translation`) :
@@ -182,3 +188,25 @@ Toute autre combinaison déclenche `Incoherent`, transmis à `FB_Safety_Translat
 | `DrivePowerReady` | BOOL | PLC→IHM | StatusWord bit0 (puissance prête) |
 | `JoystickDeflectionPct` | REAL | PLC→IHM | Déflexion fonctionnelle signée axe X (`-100..+100 %`) pour animation IHM |
 | `BypassContactorFeedback` | BOOL | PLC→IHM | Diag banc de test (`GVL_Simulation.ContactorFeedbackM3_IsReal`) |
+
+---
+
+## 🛡️ Lot 3A — Gate final AC600
+
+`FB_Translation` reste propriétaire des rampes, de la demande métier AC600 et de `FB_Brake`. `FB_TranslationOutputInterlock_LD` est la frontière finale distincte : `FB_Translation → FB_TranslationOutputInterlock_LD → PRG_10_Outputs_LD → AC600/frein`.
+
+`M3BrakeCommandOpenConfirmed`, produit et filtré dans `PRG_00_Inputs`, ne confirme que le contacteur/bobine de desserrage. Tant qu'il est faux, `DriveControlWord` 1/2 et `DriveFreqRefHz` sont forcés à zéro ; le mot 7 (reset AC600) est préservé avec fréquence explicitement nulle.
+
+Le watchdog interne non configurable de `T#500ms` démarre sur `BrakeReleaseRequest` effectif ; timeout = frein serré, arrêt mouvement, défaut mémorisé et `RestartInhibit`. Après disparition de cause + front Reset, le mot 0 doit être observé, puis une nouvelle demande 1/2 est exigée : aucun redémarrage automatique. `Enable=FALSE`, `EmergencyStopOk=FALSE` et `SafeStop=TRUE` forcent aussi mot 0, fréquence 0 et frein serré. Le code 7 AC600 reste autorisé durant l'inhibition, toujours avec fréquence nulle. `BrakeFeedbackTimeout` nominal est `T#300ms`, strictement sous ce dernier recours.
+
+Le suffixe `_LD` rend cette frontière finale lisible pour la maintenance. Le générateur PLCopenXML convertit uniquement les `PRG_*_LD` en Ladder ; les `FB_*_LD` restent exportés en ST.
+
+📄 Sources uniques : `CODE/TRANSLATION/FB_Translation.st` et `CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st`.
+
+### Lot 3A — implantation frontière finale
+
+`PRG_07_TranslationControl` publie uniquement `TranslationFinalInterlockRequest` après
+`FB_Translation`. L'unique instance `FB_TranslationOutputInterlock_LD` réside dans
+`PRG_10_Outputs_LD`, juste avant le frein M3 et les PDO AC600. `PRG_07` doit précéder `PRG_10`
+dans MainTask. Le `R_TRIG` de reset de l'interlock est échantillonné avant ses gates Enable/AU : un
+reset maintenu pendant une inhibition ne peut pas devenir un acquittement au retour.

@@ -1,192 +1,167 @@
 ---
 name: codesys-workflow
-description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5 (Device.export). Impose lecture des règles DOC, analyse architecture, plan groupé par concept, génération ST commentée FR, note d'application manuelle, et retour d'expérience versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser FB, PRG, variables, ou "le programme automate". Déclencher AUSSI dès que l'utilisateur demande de déléguer/confier/envoyer ce travail à Gemini (agent d'exécution) — les règles ci-dessous (nommage, contrat FB, sécurité) s'appliquent aussi au résultat produit via le plugin antigravity (skill `antigravity:delegate`).
+description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5. Impose lecture des règles, analyse de l'existant, plan validé, code ST commenté FR, vérification mécanique de liaison, bundle PLCopenXML et REX versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser un FB, un PRG, des variables, ou « le programme automate » — y compris quand le travail est délégué à un autre agent (Gemini/antigravity, Codex, sous-agent Pi).
 ---
 
 # 🏗️ Workflow CODESYS — Excavatrice de Dragage
 
-Procédure **stricte et itérative** pour modifier le programme automate.
-L'utilisateur applique **manuellement** chaque modif dans CODESYS 3.5 (copie du code ST).
+Procédure **stricte et itérative**. L'utilisateur applique **manuellement** chaque modif dans
+CODESYS 3.5 (copie du ST).
 
----
-
-## 🚦 Aiguillage préalable — Qui exécute ?
-
-**Avant l'Étape 0**, déterminer QUI fait le travail :
-
-- **Utilisateur dit "délègue à Gemini" / "utilise l'agent Gemini" / "confie/envoie ça à Gemini"** (ou toute formulation équivalente) → utiliser la skill `antigravity:delegate` (plugin antigravity, voir `CLAUDE.md`). Avant de déléguer, préparer le contexte à transmettre en reprenant les MÊMES règles que l'Étape 0/2 ci-dessous (`NAMING_CONVENTION.md`, contrat FB `AF_Partie-03`, doc métier `AF_PartieN` concerné) — Gemini n'a pas le contexte de cette conversation. Relire le résultat (`git diff`) avant tout commit, même exigence de validation qu'un code écrit par Claude directement.
-- **Sinon (cas normal)** → Claude exécute directement, Étapes 0 à 6 ci-dessous s'appliquent à lui.
-
-⚠️ Cet aiguillage ne concerne QUE le pathway Gemini — l'usage normal de l'outil `Agent` (subagents Claude, forks) reste libre et indépendant de cette skill.
+📖 Les **règles** ne sont pas ici — elles sont dans `DOC/`. Cette skill dit **comment exécuter**,
+pas quoi respecter. En cas de doute sur une règle : `DOC/CODE_QUALITY_STANDARDS.md`.
 
 ---
 
 ## ⛔ RÈGLE D'OR
 
 **NE JAMAIS faire ce qui n'est pas spécifié.**
-Spec incomplète ou ambiguë → **STOP + demander clarification.** Jamais d'approximation, jamais de refactor caché.
+Spec incomplète ou ambiguë → **STOP + demander clarification.** Jamais d'approximation,
+jamais de refactor caché.
 
 ---
 
-## 📚 Étape 0 — Charger les règles (OBLIGATOIRE avant tout)
+## 🚦 Aiguillage — qui exécute ?
 
-Lire et appliquer **systématiquement** :
-- `DOC/NAMING_CONVENTION.md` → PascalCase, préfixes, pas de hongrois
-- `DOC/AF_Partie-03_Template_FB_Commun_v1.2.md` → contrat FB (Enable/Reset/EmergencyStopOk/Mode/Ready/Error… ; profils d'interface §1bis : FB standard vs FB de mouvement `StartStop`/`SafeStop` vs briques réduites ; précédence Enable > SafeStop > StartStop) + réutilisation libs
-- `DOC/AF_Partie-02_Architecture_Programme_v2.6.md` → architecture, tâches, flux
-- `DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.3.md` → équipements & fonctions
+- **« délègue à Gemini »** → skill `antigravity:delegate`. Coller d'abord
+  `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de la tâche : l'agent distant n'a
+  pas le contexte de cette conversation.
+- **Sous-agent Pi / agent Claude** → même préambule obligatoire.
+- **Sinon** → exécution directe, étapes ci-dessous.
 
-⚠️ Toujours utiliser la **version la plus récente** (suffixe `_vX.X` le plus élevé). Anciennes versions dans `ARCHIVES/Doc/`.
+Dans tous les cas, **c'est l'orchestrateur qui valide le résultat** (lecture du `git diff` réel),
+jamais l'agent qui l'a produit.
 
-✋ Si une règle DOC contredit la demande → signaler avant de coder.
+---
 
-🚫 **`ARCHIVES/Doc/` = versions PÉRIMÉES** : ne jamais lire ni prendre en compte ce dossier (gitignoré). Toujours la version active (suffixe `_vX.Y` le plus élevé à la racine de `DOC/`).
+## 📚 Étape 0 — Charger les règles
+
+Lire **la version active** (suffixe `_vX.Y` le plus élevé à la racine de `DOC/`) :
+
+- `AGENTS.md` — guardrails et cas d'arrêt
+- `DOC/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
+- `DOC/NAMING_CONVENTION.md` — nommage
+- `DOC/AF_Partie-03_Template_FB_Commun_v1.3.md` — contrat FB
+- `DOC/AF_Partie-02_Architecture_Programme_v2.12.md` — architecture, tâches, flux
+- la spec métier concernée (`AF_Partie-08` à `-14`)
+
+🚫 `ARCHIVES/Doc/` = versions **périmées**, jamais une source active.
+✋ Si une règle DOC contredit la demande → signaler **avant** de coder.
+
+💡 Les liens de version sont maintenus automatiquement :
+`python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py --fix`.
 
 ---
 
 ## 🔍 Étape 1 — Comprendre l'architecture
 
-Lire `PRJ_CODESYS/PROJ_Full_ImportExport/Device.export` (⚠️ ~89k lignes → **analyse ciblée par grep**, jamais en entier).
-
-Objectif : architecture générale + **devices de communication** (EtherCAT, CANopen…).
-Repérer : tâches, mapping E/S, devices bus.
+`PRJ_CODESYS/PROJ_Full_ImportExport/Device.export` (~89k lignes → **grep ciblé**, jamais en entier) :
+tâches, mapping E/S, devices bus (EtherCAT, CANopen).
 
 ---
 
 ## 🔬 Étape 2 — Analyser l'existant
 
-Avant toute modif, cartographier :
-- **Variables** concernées (GVL, déclarations FB/PRG)
-- **Programmes** (PRG_*) et **Function Blocks** (FB_*) impactés
-- Dépendances / appelants
-
-But : se préparer à une modif **chirurgicale**, sans casser le reste.
+Cartographier avant de toucher : variables concernées, `PRG_*`/`FB_*` impactés, dépendances et
+**appelants**. Objectif : modif chirurgicale.
 
 ---
 
 ## 🧩 Étape 3 — Plan groupé par concept
 
-- Regrouper les modifs **par concept fonctionnel** (pas fichier par fichier)
-- ❌ **Pas de refactor global** sauf si réellement utile **ET validé par l'utilisateur**
-- Présenter le plan → **attendre validation explicite** avant de coder
+- Regrouper **par concept fonctionnel**, pas fichier par fichier
+- ❌ Pas de refactor global sans validation explicite
+- Présenter le plan → **attendre la validation** avant d'écrire
 
 ---
 
-## 🧪 Étape 3bis — Contrat de test obligatoire (C3/C4 / safety)
+## 🧪 Étape 3bis — Contrat de test (C3/C4 & safety)
 
-Pour tout sujet `SafeStop`, `PowerCutOff`, AU, frein, contacteur, interlock, limite physique ou criticité C3/C4 :
+Sujet `SafeStop`, `PowerCutOff`, AU, frein, contacteur, interlock, limite physique :
 
-1. Le `TASK_CONTEXT` doit déclarer `tests_automated_required: true`, les fichiers PLC de test prévus et les critères testables.
-2. Exécuter `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>` avant de coder.
-3. Inclure l'artefact de test dans le même lot que la fonction. Un test manuel Watch/forçage complète la validation mais ne remplace pas le test PLC automatique.
-4. Avant restitution : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT> --release`. Sans statut `implemented` et preuve d'exécution, annoncer explicitement « lot incomplet ».
+1. `TASK_CONTEXT` déclare `tests_automated_required: true`, les fichiers de test et les critères.
+2. `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>` avant de coder.
+3. Test livré **dans le même lot** que la fonction. Un test manuel Watch/forçage complète, ne remplace pas.
+4. Avant restitution : `... check_task_test_contract.py <TASK_CONTEXT> --release`. Sans statut
+   `implemented` + preuve d'exécution → annoncer « lot incomplet ».
 
 ---
 
-## 💻 Étape 4 — Génération code ST + note d'application
+## 💻 Étape 4 — Code ST + note d'application
 
-Après validation du plan :
-
-1. **Code ST** respectant le contrat FB et le nommage
-2. **Commentaires superbien détaillés, en français, avec emoji** 🎯
-   - Bloc d'en-tête : rôle, entrées, sorties, sécurité
-   - Commentaire sur chaque section logique
-3. **Note d'application CODESYS 3.5 détaillée** : où coller, quel POU, quelles déclarations, ordre des étapes — car l'utilisateur applique **tout à la main**.
+1. Code ST conforme au contrat FB et au nommage
+2. Commentaires **français, détaillés, avec emoji** — en-tête (rôle, doc, sécurité, dépendances)
+   + un commentaire par section logique
+3. **Note d'application CODESYS 3.5** : où coller, quel POU, quelles déclarations, dans quel ordre
 
 📁 **Double sortie obligatoire** :
 
-1. 📂 **Code ST à copier → dossier `CODE/`** (jamais ailleurs).
-   - Tout code que l'utilisateur doit copier/créer dans CODESYS est écrit comme **fichier `.st` brut** dans `CODE/`.
-   - Nom = nom du POU, ex. `CODE/PRG_JOY1.st`, `CODE/FB_Winch.st`.
-   - C'est ce fichier que l'utilisateur copie-colle dans CODESYS.
+1. 📂 **`CODE/<DOSSIER>/<NomDuPOU>.st`** — source unique exécutable que l'utilisateur copie
+   (ex. `CODE/JOYSTICK/FB_Joystick.st`, `CODE/TREUILS/FB_Winch.st`).
+2. 📄 **`DOC/AF_Partie-N_Fonction_<Metier>_vX.Y.md`** (N ≥ 8) — rôle métier, pipeline, interface
+   IN/OUT, mapping E/S, **référence** au fichier `CODE/*.st`, note d'application, REX.
 
-2. 📄 **Doc métier + note d'application → dossier `DOC/`** (série AF).
-   - `AF_PartieN_Fonction_<Metier>_vX.Y.md`, **N ≥ 8** (ex. `AF_Partie-08_Fonction_Joystick_v1.1.md`, `AF_Partie-09_Fonction_Winch_v1.0.md`).
-   - Structure : rôle métier → pipeline/blocs → interface → sécurité → mapping E/S → **référence au(x) fichier(s) `CODE/*.st`** → note d'application CODESYS 3.5 → REX.
-   - Versionner `vX.Y`, anciens dans `ARCHIVES/Doc/`.
-
-🧭 **Règle anti-doublon (STRICTE)** : le **corps/implémentation** ST n'existe **qu'une seule fois**, dans `CODE/*.st`.
-- ✅ `DOC/` PEUT contenir : l'**interface IN/OUT** (tableaux des entrées/sorties, types, rôles), le mapping E/S, le pipeline.
-- ❌ `DOC/` ne recopie **JAMAIS** le **corps** du POU (logique, appels, calculs) — il **référence** `CODE/xxx.st`.
-`CODE/` = source unique exécutable à copier ; `DOC/` = métier + interface IN/OUT + mode d'emploi qui pointe vers `CODE/`.
-
-Style commentaires :
-```
-(* ═══════════════════════════════════════════════
-   🎮 FB_Joystick — Acquisition + traitement Hall
-   ───────────────────────────────────────────────
-   📥 Enable          : autorisation traitement ; FALSE = neutralisation (sorties coupées)
-   📤 Ready            : valeurs valides disponibles
-   🛡️ EmergencyStopOk  : conditions globales OK (chaîne AU réarmée)
-   ⚠️ FB de mouvement uniquement (pas FB_Joystick) : StartStop (rampe normale),
-      SafeStop en entrée (sortie du bloc safety métier concerné → rampe rapide, Enable maintenu)
-   ═══════════════════════════════════════════════ *)
-```
+🧭 **Anti-doublon (STRICT)** : le **corps** ST n'existe qu'une fois, dans `CODE/`.
+`DOC/` peut porter l'interface IN/OUT et le mapping, **jamais** la logique — il référence.
 
 ---
 
-## 📦 Étape 4bis — Génération obligatoire du bundle PLCopenXML
+## 🛑 Étape 4bis — Vérification mécanique (BLOQUANTE, tout lot)
 
-Dès qu'un fichier `CODE/**/*.st` est créé ou modifié, générer **avant toute restitution** le bundle complet importable. Ne jamais demander une confirmation intermédiaire et ne jamais prescrire un import fichier-par-fichier.
+> ⛔ Un bundle généré, des tests Python verts ou un XML bien formé **ne prouvent jamais**
+> qu'une fonction est reliée au reste du programme. Le bug `PRG_10_Outputs_LD` a franchi
+> tous ces contrôles (REX 2026-07-29).
 
-### 🛠️ Commande obligatoire
+```powershell
+python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+```
 
-* **Cwd :** racine du projet.
-* **Commande unique :**
-  ```powershell
-  python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
-  ```
-  Elle génère `CODE/CODE_Bundle.xml` puis contrôle sa fraîcheur.
+- `check_linkage.py` prouve : instance déclarée là où elle doit vivre, appelée dans le même POU,
+  aucune orpheline ailleurs, références croisées valides, `typeName` du bundle = type déclaré,
+  programme présent dans la configuration de tâche.
+- Le bloc **`Auto-vérification liaison`** produit par `--report` est **collé dans la restitution**.
+  Un lot restitué sans ce bloc est incomplet.
+- Un échec est **bloquant** : ne pas fournir de procédure d'import, ne pas annoncer le lot prêt.
 
-Un échec de génération ou de fraîcheur est **bloquant** : ne pas fournir de procédure d'import ni annoncer le lot prêt. La restitution doit toujours indiquer le chemin exact : `CODE/CODE_Bundle.xml`.
+🩺 **Cascade d'erreurs** : si CODESYS remonte des dizaines d'erreurs, chercher d'abord
+l'identificateur non défini commun — jamais corriger erreur par erreur avant d'avoir isolé la racine.
 
-### 📥 Méthode d'import dans CODESYS
+### 📥 Import dans CODESYS
 
-1. Dans l'arbre CODESYS 3.5, sélectionner le nœud parent cible (`Application`).
+1. Sélectionner le nœud `Application` dans l'arbre CODESYS 3.5
 2. **Project → Import PLCopenXML...**
-3. Sélectionner `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\CODE_Bundle.xml`.
-4. Valider l'import des objets proposés.
+3. Choisir `CODE/CODE_Bundle.xml`
+4. Valider les objets proposés
 
 ---
 
-## 🔁 Étape 5 — Retour d'expérience (si validé fonctionnel)
+## 🔁 Étape 5 — REX (si validé fonctionnel)
 
-Quand l'utilisateur confirme que ça marche :
-- **Review** : capitaliser la connaissance acquise
-- Proposer mise à jour des specs `DOC/` pour accumuler le savoir
-- ⚠️ **Versionning obligatoire** : nouveau nom de fichier `vX.X` (ne jamais écraser, ex. `_v2.2` → `_v2.3`)
+Quand l'utilisateur confirme que ça marche : capitaliser dans les specs `DOC/`,
+**versionner** (`_v2.2` → `_v2.3`, ancien dans `ARCHIVES/Doc/`, jamais d'écrasement).
+
+🔧 **Règle `fix:` + `guard:`** — tout bug détecté donne **deux** livrables : la correction **et**
+un garde-fou automatique dans `TOOLS/AGENT_WORKFLOW/scripts/` pour que cette classe d'erreur soit
+attrapée seule la prochaine fois. Une réponse purement documentaire à un incident est insuffisante.
 
 ---
 
 ## 🔄 Étape 6 — Rebouclage
 
-Attendre le **nouvel export** utilisateur (Device.export régénéré depuis CODESYS) → reprendre à l'étape 1.
-
----
-
-## 🤝 Délégation à Gemini (si aiguillé ici en tête de skill)
-
-⛔ **Règle d'or de cette section** : je ne fais PAS le travail moi-même, je le prépare pour Gemini.
-
-1. **Comprendre la demande** — si le scope n'est pas clair (quels fichiers, quel comportement attendu), demander avant de déléguer. Ne jamais deviner un scope flou dans un prompt qui partira vers un agent qui n'a pas le contexte de cette conversation.
-2. **Préparer le contexte** : objectif (le POURQUOI, pas juste "modifier X"), scope exact (fichiers + ce qui est explicitement HORS scope), contraintes copiées depuis l'Étape 0/2 ci-dessus (`NAMING_CONVENTION.md`, contrat FB `AF_Partie-03`, doc métier `AF_PartieN` concerné), critères d'acceptation vérifiables.
-3. **Déléguer via `antigravity:delegate`** (ou `antigravity:resume` pour continuer une conversation Antigravity existante).
-4. **Relire le résultat** : diff réel (`git diff`/`git status`), vérifier les critères d'acceptation, régénérer le bundle PLCopenXML (Étape 4bis ci-dessus) si du ST a été touché. `antigravity:review` peut faire une revue croisée read-only en complément.
-5. **Jamais de commit** du résultat délégué sans validation utilisateur (même règle que tout le reste).
-
-💡 **La lecture du diff peut être déléguée à un subagent Claude** (fork, ou agent `code-reviewer`/`general-purpose` via l'outil `Agent`) pour garder ce contexte propre, en plus/à la place de `antigravity:review` — utile sur un gros diff. Mais **la décision finale de valider reste toujours prise par Claude orchestrateur lui-même**, jamais déléguée plus loin : lire le résultat, pas juste lui faire confiance aveuglément.
+Attendre le **nouvel export** utilisateur (`Device.export` régénéré) → reprendre à l'Étape 1.
 
 ---
 
 ## ✅ Checklist rapide
 
-- [ ] Règles DOC lues + appliquées
-- [ ] Spec complète ? (sinon STOP)
-- [ ] Architecture + devices compris
-- [ ] Existant analysé (variables/PRG/FB)
-- [ ] Plan groupé par concept **validé**
-- [ ] Code ST à copier commenté FR + emoji **écrit dans `CODE/*.st`**
-- [ ] Si C3/C4/safety : tests PLC automatiques implémentés + exécutés, contrat tests = PASS (bloquant)
-- [ ] Si `CODE/` a changé : `CODE/CODE_Bundle.xml` généré + `check_bundle_freshness.py` = PASS (bloquant)
-- [ ] Doc métier + note d'application CODESYS 3.5 **dans `DOC/AF_PartieN_Fonction_*`**
-- [ ] REX + specs versionnées `vX.X`
+- [ ] Règles DOC lues (Étape 0) · spec complète, sinon STOP
+- [ ] Architecture + existant analysés (appelants inclus)
+- [ ] Plan groupé par concept **validé par l'utilisateur**
+- [ ] Code ST commenté FR + emoji dans `CODE/<DOSSIER>/*.st`
+- [ ] `check_linkage.py --report` = PASS, bloc collé dans la restitution **(bloquant)**
+- [ ] `CODE/CODE_Bundle.xml` régénéré + `run_all_gates.py` = PASS **(bloquant)**
+- [ ] Si C3/C4/safety : tests PLC implémentés + exécutés **(bloquant)**
+- [ ] Doc métier + note d'application dans `DOC/AF_Partie-N_Fonction_*`
+- [ ] REX + specs versionnées · garde-fou `guard:` ajouté si bug rencontré

@@ -7,5 +7,19 @@
   },
   "enabledPlugins": {
     "codex@openai-codex": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py",
+            "timeout": 90
+          }
+        ]
+      }
+    ]
   }
 }

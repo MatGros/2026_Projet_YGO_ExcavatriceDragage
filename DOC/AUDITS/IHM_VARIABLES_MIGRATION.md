@@ -2,7 +2,7 @@
 
 > 🎯 **But** : liste des chemins `GVL_IHM.*` qui ont changé pendant ce chantier, pour reparamétrer
 > le mapping IHM (SCADA/pupitre). Mis à jour à chaque lot **committé** (pas avant vérification).
-> 📌 Suivi : `PLAN_TASK_v1.0.md`, `DOC/AUDITS/ConfigPersistence/AUDIT_ConfigPersistence_v1.2.md`.
+> 📌 Suivi : `PLAN_TASK_v1.0.md`, `ARCHIVES/Doc/AUDITS/ConfigPersistence/AUDIT_ConfigPersistence_v1.2.md`.
 > ⚠️ Rien ici n'est "peut-être" — chaque ligne = déjà committé et poussé sur `origin/main`.
 
 ---

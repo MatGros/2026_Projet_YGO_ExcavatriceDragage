@@ -50,7 +50,7 @@
 > retour unique par treuil `FwdRevSpeedFeedbackOff` (« tous contacteurs sens+vitesse retombés »).
 > `ArretConfirme` (§5 interface `FB_Encoder_Homing`, §7 sécurité) recalculé sur ce seul signal +
 > `BrakeFeedback` — voir `CODE/CODEURS/FB_Encoder_Homing.st` (règle anti-doublon, pas de recopie
-> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.13.md` (doc principale
+> ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` (doc principale
 > treuil). Hors périmètre : Translation M3 non concerné (retours individuels inchangés).
 >
 > **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
@@ -726,7 +726,7 @@ SI CapteurPositionHaute = FALSE ET NOT EnModeReferencement(CeTreuil) ALORS
 ## 💻 9. État d'avancement / prochaine itération
 
 📌 **Lot "Codeur — acquisition + mise à l'échelle" démarré le 2026-07-02** (voir
-`DOC/AF_Partie-09_Fonction_Winch_v1.13.md` §9 pour le lien avec l'intégration M2).
+`DOC/AF_Partie-09_Fonction_Winch_v1.14.md` §9 pour le lien avec l'intégration M2).
 
 - [ ] Créer `E_WinchSelect` (`_TYPES`) — pas dans ce lot (lié au sélecteur M1/M2/Les deux, hors périmètre acquisition/échelle)
 - [x] Créer `ST_EncoderCalib` (`_TYPES`) — ✅ 2026-07-02 : géré en interne par `FB_Encoder_Homing`

@@ -14,6 +14,8 @@ tests_automated_required: false
 tests_implementation_paths: [] # fichiers ST du test/extension de suite
 tests_status: planned|implemented|executed
 test_execution_evidence: [] # résultat simulation/CODESYS, ajouté après exécution
+# ⛔ Jamais rempli par déduction depuis un bundle généré ou des tests du générateur :
+# uniquement après un log réel d'import/compilation CODESYS fourni par l'utilisateur.
 review_required: false
 # double_review_required : true obligatoire pour C4 et tout sujet safety.
 # Déclenche la procédure A/B parallèle (TEST_DESIGN + ST généré + revue safety).
