@@ -53,7 +53,7 @@ check-code-style CODE/TREUILS/FB_Winch.st
 
 # Pre-edit gate : spécifications lues ?
 pre-edit-gate --check CODE/TRANSLATION/FB_Translation.st
-pre-edit-gate --mark-read DOC/AF_Partie-11_Fonction_Translation_v1.11.md
+pre-edit-gate --mark-read DOC/AF_Partie-11_Fonction_Translation_v1.13.md
 
 # Validation compilation CODESYS
 check-codesys-compile --log build.log --strict
@@ -177,5 +177,5 @@ Tests : structure, style, bundle, pre-edit gate, compile check.
 ## Versioning & Changelog
 
 - Version dans `pyproject.toml`
-- Historique dans `TOOLS/CHANGELOG.md`
+- Historique dans `DOC/VERSION_HISTORY.md`
 - Tags git : `tools/agent-workflow/vX.Y.Z`

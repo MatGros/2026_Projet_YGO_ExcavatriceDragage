@@ -18,6 +18,7 @@ WORKFLOW_DIRS = {
     "schemas",
     "config",
     "reports",
+    "tests",
 }
 
 DOC_FILE_PATTERNS = (

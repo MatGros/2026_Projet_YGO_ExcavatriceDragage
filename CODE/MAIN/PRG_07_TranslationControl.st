@@ -4,10 +4,15 @@
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v1.11.md
+   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v1.13.md
 *)
 
 PROGRAM PRG_07_TranslationControl
+VAR_OUTPUT
+    // 🛡️ Demande brute explicite, consommée par PRG_10_Outputs_LD.
+    // PRG_07 ne produit jamais un PDO/frein M3 autorisé.
+    TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest;
+END_VAR
 VAR
     instTranslationM3           : FB_Translation;
 
@@ -55,7 +60,7 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 // ── 1bis. MAINT_N1/N2 — 2ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
 // 🔧 REX 2026-07-19 : ex-libellé "IHM_MANU" (bypass supprimé) — cette branche est désormais
 // gatée par Mode (MAINT_N1/N2), pas par un flag ManuActive séparé.
-// 🆕 REX 2026-07-16 : remplace l'ex-bypass direct M3_CommandWord dans PRG_10_Outputs — M3 est
+// 🆕 REX 2026-07-16 : remplace l'ex-bypass direct M3_CommandWord dans PRG_10_Outputs_LD — M3 est
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
 // FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
@@ -90,8 +95,8 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
                                 OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.Cmd.SetFreq_Hz (consigne Hz réglable opérateur,
-    // limitée par PRG_10_Outputs à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
-    // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs, ex-lignes
+    // limitée par PRG_10_Outputs_LD à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
+    // pour boutons HMI ET joystick (reproduit exactement l'ex-bypass PRG_10_Outputs_LD, ex-lignes
     // 250-251/271-272 : SetFreqHz = 100%, déflexion joystick = % de cette cible). Convertie en
     // pourcentage car SpeedRefPct (entrée FB_Translation) est une échelle 0-100%, pas des Hz.
     // 🔧 Si SetFreq_Hz = 0 (pas configuré), on utilise une vitesse par défaut de 30%.
@@ -157,10 +162,19 @@ instTranslationM3(
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeCmd),
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 
-// 🔴 Recopie commande de frein translation
-PRG_10_Outputs.TranslationBrakeCmd := instTranslationM3.BrakeCmd;
+// 🛡️ Publication demande brute M3 vers PRG_10_Outputs_LD.
+// Ordre MainTask requis : PRG_07 avant PRG_10. SafeStop reste traité par
+// FB_Translation (rampe rapide) et n'est jamais une coupure sèche ici.
+TranslationFinalInterlockRequest.Enable := PRG_06_WinchControl.StubMachineEnableN1;
+TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
+TranslationFinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
+TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
+TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;

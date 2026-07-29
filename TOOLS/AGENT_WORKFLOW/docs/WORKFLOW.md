@@ -76,6 +76,12 @@ Pi qualifie et propose, l'humain valide en 1 mot.
 
 ## Règles générales
 
+- 📌 **Tout sous-agent (Pi worker/reviewer, Claude, Codex, antigravity) reçoit
+  `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de sa tâche.** Un sous-agent
+  démarre froid : sans ce préambule il ne connaît ni les règles, ni les cas d'arrêt, ni la
+  vérification de liaison — c'est ce qui a laissé passer le bug `PRG_10_Outputs_LD`.
+- 🤖 **Aucun lot n'est restitué sans `check_linkage.py --report`.** Bundle généré et tests Python
+  verts ne prouvent jamais qu'une fonction est reliée.
 - `TOOLS/` reste séparé de `DOC/` et `CODE/`.
 - `ST_PLCOPENXML_GENERATOR` reste autonome ; le workflow peut l'appeler.
 - Les scripts déterministes vérifient avant l'avis des modèles.
@@ -99,6 +105,10 @@ Toute erreur détectée — **à n'importe quelle étape** (édition, gate, comp
 
 | Origine erreur | Garde-fou ajouté |
 |---|---|
+| **Instance déclarée jamais appelée (`PRG_10_Outputs_LD`, 2026-07-29)** | **`check_linkage.py` — gate 2bis + hook PostToolUse** |
+| **Consignes pointant des specs supprimées** | **`check_doc_links.py` (+ `--fix` automatique)** |
+| **Document amputé de sa tête sans être vu (`NAMING_CONVENTION`)** | **`check_doc_links.py` D6 — titre H1 obligatoire** |
+| **Sous-agent démarrant sans les règles projet** | **`prompts/subagent_preamble.md` obligatoire en tête de tâche** |
 | Compilation CODESYS C0037 | Règle `check_code_style` détection écriture VAR_OUTPUT |
 | Oubli homme-mort boutons | Pattern `StartStop.*DeadmanArmed` obligatoire |
 | FDC sans rampe | Template `motion_fb_header` section FDC_EXTRÊMES |

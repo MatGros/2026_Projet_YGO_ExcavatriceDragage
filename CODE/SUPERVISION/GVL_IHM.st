@@ -30,7 +30,7 @@ END_VAR
    Laisser une procédure périmée dans le code est plus dangereux que pas de procédure.
 
    👉 Simulation en cours de refonte (frontière unique `HwIn`, lots L5→L8) :
-      voir DOC/AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md
+      voir ARCHIVES/Doc/AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md
    👉 Procédure de banc à jour : sera republiée dans AF_Partie-13 v2.0 (lot L8).
    ═══════════════════════════════════════════════════════════════ *)
 

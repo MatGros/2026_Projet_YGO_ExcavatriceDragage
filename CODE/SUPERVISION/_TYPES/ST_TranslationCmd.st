@@ -11,7 +11,7 @@ STRUCT
     SelTarget          : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
     BtnFwd             : BOOL;    (* ↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif *)
     BtnRev             : BOOL;    (* ↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif *)
-    SetFreq_Hz         : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs *)
+    SetFreq_Hz         : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD *)
     TglJoystickMaster  : BOOL;    (* 🕹️ TRUE = joystick, FALSE = boutons BtnFwd/BtnRev *)
     InvertDirection    : BOOL;    (* 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service) *)
     Initialized        : BOOL := FALSE; (* 🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot *)

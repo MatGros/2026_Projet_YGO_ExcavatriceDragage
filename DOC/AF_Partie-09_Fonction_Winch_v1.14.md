@@ -1,5 +1,7 @@
-# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.13)
+# 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.14)
 
+> 🆕 **v1.14 (Lot 3A, implémenté — qualification CODESYS différée)** : `FB_Winch` applique explicitement une hausse métier adjacente de palier toutes les **T#1s500ms** avant publication de `StepNumber` à `FB_WinchOutputInterlock_LD`. Toute baisse reste immédiate ; la pré-magnétisation reste exclusivement dans `FB_Brake`. L'interlock final conserve son délai indépendant de dernier recours **T#1s250ms**. `SafeStop` garde la rampe rapide du FB de mouvement : l'interlock final ne serre le frein et ne coupe les Q qu'après retombée effective de la demande métier, sauf `Enable=FALSE`, `EmergencyStopOk=FALSE`, timeout ou défaut final.
+>
 > 📐 **v1.13 (2026-07-28) — T84/T85/T86.** La vitesse câble est désormais produite par la chaîne
 > codeur (`FB_Encoder_SpeedMeasure` composé dans `PRG_02_Encoders`) sur 6 positions horodatées,
 > soit 5 intervalles et une fenêtre interne fixe de 50 ms. `FB_Safety_Winch` consomme vitesse
@@ -109,6 +111,8 @@
 > 🔧 **v1.3 (2026-07-04)** — Révision §4ter : comportement mou de câble revu.
 > 🔧 **v1.2 (2026-07-03)** — Audit de sécurité et intégration du contrôle de cohérence des commandes.
 > 🔧 **v1.1 (2026-07-02)** — Nouvel export `Device.export` avec I/O réel.
+
+> 🆕 **v1.14 (Lot 3A, implémenté — qualification CODESYS différée)** : `FB_WinchOutputInterlock_LD` est la frontière finale visualisable des sorties M1/M2. Il conserve la pré-magnétisation de `FB_Brake`, exige la confirmation filtrée du contacteur/bobine de desserrage avant puissance, applique un watchdog fixe 500 ms, des paliers adjacents et le temps mort de redémarrage. `FB_Winch` / `FB_SpeedStep` reste l'unique propriétaire de `SpeedStepTable` et des quatre combinaisons C1..C4, y compris les mappings M2 Benne dynamiques : l'interlock autorise ou masque exactement cette demande, sans la reconstruire. Cette confirmation ne mesure **pas** la position mécanique du frein.
 
 ---
 
@@ -567,3 +571,26 @@ modèle de simulation injectait `NOT BrakeCmd`. Les deux erreurs se compensaient
 📌 Suivi (checklist de validation v1.7 non réalisée — inhibition treuils, `HomingApproachEnable`,
 modèle 3 couches Méca D, Méca B étendu, diagnostics IHM, simulation capteur haut, scission
 Joystick) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T21).
+
+---
+
+## 🛡️ Lot 3A — Barrière finale visualisable `_LD`
+
+`CODE/TREUILS/FB_WinchOutputInterlock_LD.st` reçoit les sorties métier de `FB_Winch` et produit seul les commandes M1/M2 vers `PRG_10_Outputs_LD`.
+
+- `M1/M2BrakeCommandOpenConfirmed` est produit par `PRG_00_Inputs` après filtre : il confirme le **contacteur/bobine de desserrage**, pas le frein mécanique.
+- Le watchdog interne, fixe `T#500ms`, démarre après `BrakeReleaseRequest` effectif sans confirmation ; il coupe puissance, serre le frein et mémorise le défaut. Réarmement : cause disparue + front Reset.
+- Paliers finaux : P1 aucun contacteur, P2 C1, P3 C1+C2, P4 C1+C2+C3, P5 C1+C2+C3+C4 ; une hausse est adjacente et attend au moins `T#1s250ms`.
+- Après arrêt, retour `FwdRevSpeedFeedbackOff` puis `T#900ms` avant nouveau départ.
+- Après timeout frein : le défaut, `RestartInhibit` et l'obligation d'acquittement survivent à `Enable=FALSE` ou `EmergencyStopOk=FALSE`. Après cause disparue + front `Reset`, une demande moteur nulle doit être observée, puis une nouvelle demande distincte ; la retombée contacteurs + `T#900ms` sont rejouées avant toute puissance.
+
+Le suffixe `_LD` rend cette frontière finale lisible pour la maintenance. Le générateur PLCopenXML convertit uniquement les `PRG_*_LD` en Ladder ; les `FB_*_LD` restent exportés en ST.
+
+📄 Code source unique : `CODE/TREUILS/FB_WinchOutputInterlock_LD.st`. Test PLC préparé, non exécuté : `CODE/TESTS/PRG_Test_FinalBrakePowerInterlock.st`.
+
+### Lot 3A — implantation frontière finale
+
+`PRG_06_WinchControl` publie uniquement `WinchM1FinalInterlockRequest` et
+`WinchM2FinalInterlockRequest` (demandes brutes + contexte). Les deux instances
+`FB_WinchOutputInterlock_LD` résident exclusivement dans `PRG_10_Outputs_LD`, où elles produisent
+les commandes autorisées puis les Q. L'ordre MainTask requis est `PRG_06` avant `PRG_10`.

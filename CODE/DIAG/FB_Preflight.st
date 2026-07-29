@@ -1,6 +1,6 @@
 (* ═══════════════════════════════════════════════════════════════
    🩺 FB_Preflight — Verdict passif machine arrêtée
-   📄 Doc : DOC/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
+   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
    🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK FB_Preflight

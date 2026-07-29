@@ -1,6 +1,6 @@
 (* ═══════════════════════════════════════════════════════════════
    ⚖️ FB_WinchSymmetry — Mesure passive MES-008 M1/M2
-   📄 Doc : DOC/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
+   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
    🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK FB_WinchSymmetry

@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.13.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -27,13 +27,13 @@
       déterministe et indépendante du joystick (voir §3 dans le corps ST).
    🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
-      uniquement pour l'instant — voir CODE/FB_Safety_Winch.st).
+      uniquement pour l'instant — voir CODE/TREUILS/FB_Safety_Winch.st).
    🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
       entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.13.md §4ter pour le contexte
+      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.14.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
@@ -96,7 +96,7 @@ VAR_INPUT
     BrakeDelayContactClose  : TIME := T#100ms;
     BrakeDelayMagnetise     : TIME := T#300ms;
     BrakeDelayMotorDecel    : TIME := T#500ms;
-    BrakeFeedbackTimeout    : TIME := T#1s;
+    BrakeFeedbackTimeout    : TIME := T#300ms; // Strictement sous watchdog final 500 ms
     Homed                   : BOOL;             // 🆕 État de référencement du treuil
     HomingSuspect           : BOOL;             // 🆕 REX 2026-07-08 : Incertitude/doute sur le référencement (§3.7)
     CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
@@ -122,7 +122,9 @@ VAR_OUTPUT
     Contactor2          : BOOL;
     Contactor3          : BOOL;
     Contactor4          : BOOL;
-    StepNumber          : INT;
+    RequestedStep       : INT;             // Palier brut calculé par FB_SpeedStep avant tempo métier
+    StepNumber          : INT;             // Palier métier temporisé, transmis à l'interlock final
+    BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier fixe T#1s500ms
     SpeedGuardLimited   : BOOL;
     BrakeCmd            : BOOL;
     ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
@@ -138,6 +140,7 @@ VAR
     DirectionChangeDelay: TON;
     CommandedDirection  : INT;
     TonContactorsDropped: TON;   // 🔧 REX 2026-07-07 : remplace TonFwdFeedback/TonRevFeedback
+    BusinessStepDelay    : TON;   // 🪜 Tempo métier nominale entre hausses de palier
     AllContactorsCommandedOff : BOOL; // 🔧 REX 2026-07-07
     RampTargetPct       : REAL;
     DirectionChangePending : BOOL;
@@ -151,7 +154,10 @@ IF NOT Enable OR NOT EmergencyStopOk THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
-    StepNumber := SpeedStep.StepNumber;
+    RequestedStep := SpeedStep.StepNumber;
+    StepNumber := 0;
+    BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
+    BusinessStepDelayElapsed := T#0ms;
     Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
@@ -171,6 +177,10 @@ END_IF;
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
     ErrorId := 16#0000;
+    StepNumber := 0;
+    RequestedStep := 0;
+    BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
+    BusinessStepDelayElapsed := T#0ms;
     RETURN;
 END_IF;
 
@@ -255,18 +265,53 @@ SpeedStep(Enable := (ABS(SpeedRamp.Current) > 0.1), SpeedRefPct := ABS(SpeedRamp
           MeasuredSpeedBand := MeasuredSpeedBand,
           SpeedGuardEnable := SpeedGuardEnable,
           SpeedGuardReady := SpeedGuardReady);
-StepNumber := SpeedStep.StepNumber;
+// 🪜 Tempo métier nominale : toute hausse exige T#1s500ms et progresse par pas
+// adjacents. Toute baisse reste immédiate pour ne jamais retarder un arrêt/safety.
+RequestedStep := SpeedStep.StepNumber;
+IF RequestedStep > StepNumber THEN
+    BusinessStepDelay(IN := TRUE, PT := T#1s500ms);
+    BusinessStepDelayElapsed := BusinessStepDelay.ET;
+    IF BusinessStepDelay.Q THEN
+        StepNumber := StepNumber + 1;
+        BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
+    END_IF;
+ELSE
+    BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
+    BusinessStepDelayElapsed := BusinessStepDelay.ET;
+    StepNumber := RequestedStep;
+END_IF;
 SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
-Contactor1 := SpeedStep.Contactor1;
-Contactor2 := SpeedStep.Contactor2;
-Contactor3 := SpeedStep.Contactor3;
-Contactor4 := SpeedStep.Contactor4;
+
+// Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
+// propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
+// FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
+CASE StepNumber OF
+    1:
+        Contactor1 := SpeedStepTable.P1R1; Contactor2 := SpeedStepTable.P1R2;
+        Contactor3 := SpeedStepTable.P1R3; Contactor4 := SpeedStepTable.P1R4;
+    2:
+        Contactor1 := SpeedStepTable.P2R1; Contactor2 := SpeedStepTable.P2R2;
+        Contactor3 := SpeedStepTable.P2R3; Contactor4 := SpeedStepTable.P2R4;
+    3:
+        Contactor1 := SpeedStepTable.P3R1; Contactor2 := SpeedStepTable.P3R2;
+        Contactor3 := SpeedStepTable.P3R3; Contactor4 := SpeedStepTable.P3R4;
+    4:
+        Contactor1 := SpeedStepTable.P4R1; Contactor2 := SpeedStepTable.P4R2;
+        Contactor3 := SpeedStepTable.P4R3; Contactor4 := SpeedStepTable.P4R4;
+    5:
+        Contactor1 := SpeedStepTable.P5R1; Contactor2 := SpeedStepTable.P5R2;
+        Contactor3 := SpeedStepTable.P5R3; Contactor4 := SpeedStepTable.P5R4;
+ELSE
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+END_CASE;
 
 // 🛑 Interlock de sécurité frein : magnétisation normale autorisée, mais coupure stricte des relais si FB_Brake est en ERREUR
 BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
 
-RelayFwd := (CommandedDirection = 1) AND (StepNumber > 0) AND BrakeSafetyOk;
-RelayRev := (CommandedDirection = -1) AND (StepNumber > 0) AND BrakeSafetyOk;
+// Le sens et la pré-magnétisation suivent la demande brute ; le palier métier
+// temporisé reste seul transmis à l'interlock final pour autoriser la puissance.
+RelayFwd := (CommandedDirection = 1) AND (RequestedStep > 0) AND BrakeSafetyOk;
+RelayRev := (CommandedDirection = -1) AND (RequestedStep > 0) AND BrakeSafetyOk;
 
 IF ForbidDescent THEN
     RelayRev := FALSE;

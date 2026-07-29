@@ -1,7 +1,10 @@
 {
+    "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": [
-        "TOOLS/ST_PLCOPENXML_GENERATOR/tests"
+        "TOOLS/OUTILS_ST2PY/tests",
+        "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
+        "TOOLS/ST2PONE/tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.cwd": "${workspaceFolder}"
 }

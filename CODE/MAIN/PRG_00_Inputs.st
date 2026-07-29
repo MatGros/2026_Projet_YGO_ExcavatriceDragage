@@ -19,7 +19,7 @@
    │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
    │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
    └──────────────────────────┴──────────┴─────────────────────────────────┘
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.7.md §5
+   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ══════════════════════════════════════════════════════════════════════════ *)
@@ -57,14 +57,16 @@ VAR_OUTPUT
                                       // individuel par sens supprimé côté matériel, plus jamais câblé).
                                       // TRUE = tous retombés (sain, rien d'engagé)
     M1ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M1 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴
-    M1BrakeFeedback        : BOOL; // 🔒 Retour frein M1, NORMALISÉ : TRUE=frein serré ✅ | FALSE=desserré 🔴
+    M1BrakeFeedback        : BOOL; // 🔒 Retour frein M1 normalisé : TRUE=serré, FALSE=desserré.
+    M1BrakeCommandOpenConfirmed : BOOL; // ✅ Contacteur/bobine desserrage confirmé, pas une mesure mécanique frein.
                                     // ⚠️ Le DI physique vaut 1 quand le frein est OUVERT (image du contacteur
                                     // de commande) — inversion faite par BrakeFeedbackInvertLogic, voir VAR.
 
     // ── 🪝 TREUIL M2 (même logique que M1) ──────────────────────────────────────────────
     M2FwdRevSpeedFeedbackOff : BOOL; // 📡 REX 2026-07-07 : idem M1, voir ci-dessus
     M2ThermalFeedback      : BOOL; // 🌡️ Thermique moteur M2 (NC) : TRUE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff
-    M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2, NORMALISÉ : TRUE=frein serré ✅ | FALSE=desserré 🔴
+    M2BrakeFeedback        : BOOL; // 🔒 Retour frein M2 normalisé : TRUE=serré, FALSE=desserré.
+    M2BrakeCommandOpenConfirmed : BOOL; // ✅ Contacteur/bobine desserrage confirmé, pas une mesure mécanique frein.
                                     // ⚠️ Même remarque que M1 (DI physique = 1 quand frein ouvert).
 
     // ── ↔️ TRANSLATION M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
@@ -77,7 +79,8 @@ VAR_OUTPUT
     TranslationPosP2          : BOOL;  // 📍 Position P2 (NO, ex-Fosse2) : TRUE=translation en P2 ✅ | FALSE=absent
     TranslationPosP1          : BOOL;  // 📍 Position P1 (NO, ex-Fosse1) : TRUE=translation en P1 ✅ | FALSE=absent
     TranslationPosMaintenance : BOOL;  // 🔧 Position maintenance (NO), extrême droite, accès MAINT_N2 uniquement : TRUE=en position service ✅ | FALSE=absent
-    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein M3, NORMALISÉ : TRUE=frein serré ✅ | FALSE=desserré 🔴
+    M3BrakeFeedback       : BOOL;  // 🔒 Retour frein M3 normalisé : TRUE=serré, FALSE=desserré.
+    M3BrakeCommandOpenConfirmed : BOOL; // ✅ Contacteur/bobine desserrage confirmé, pas une mesure mécanique frein.
                                     // ⚠️ Même remarque que M1/M2 (DI physique = 1 quand frein ouvert).
 
     // 🆕 REX 2026-07-21 : décodage du mot des 5 capteurs position M3 (position 0, avant PRG_03_Safety)
@@ -228,32 +231,32 @@ HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
 // ─── §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine) ────
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
-    M1_RelayFwd              := PRG_10_Outputs.M1RelayFwd,
-    M1_RelayRev              := PRG_10_Outputs.M1RelayRev,
-    M1_SpeedContactor_1      := PRG_10_Outputs.M1SpeedContactor1,   // 🔧 REX 2026-07-27 : paliers
-    M1_SpeedContactor_2      := PRG_10_Outputs.M1SpeedContactor2,   // inclus dans le retour unique
-    M1_SpeedContactor_3      := PRG_10_Outputs.M1SpeedContactor3,   // « tous contacteurs retombés »
-    M1_SpeedContactor_4      := PRG_10_Outputs.M1SpeedContactor4,
+    M1_RelayFwd              := PRG_10_Outputs_LD.M1RelayFwd,
+    M1_RelayRev              := PRG_10_Outputs_LD.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_10_Outputs_LD.M1SpeedContactor1,   // 🔧 REX 2026-07-27 : paliers
+    M1_SpeedContactor_2      := PRG_10_Outputs_LD.M1SpeedContactor2,   // inclus dans le retour unique
+    M1_SpeedContactor_3      := PRG_10_Outputs_LD.M1SpeedContactor3,   // « tous contacteurs retombés »
+    M1_SpeedContactor_4      := PRG_10_Outputs_LD.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_06_WinchControl.M1_SpeedRef_Active,
     M1_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut,
-    M1_BrakeCmd              := PRG_10_Outputs.M1BrakeCmd,
-    M2_RelayFwd              := PRG_10_Outputs.M2RelayFwd,
-    M2_RelayRev              := PRG_10_Outputs.M2RelayRev,
-    M2_SpeedContactor_1      := PRG_10_Outputs.M2SpeedContactor1,   // 🔧 REX 2026-07-27 : idem M1
-    M2_SpeedContactor_2      := PRG_10_Outputs.M2SpeedContactor2,
-    M2_SpeedContactor_3      := PRG_10_Outputs.M2SpeedContactor3,
-    M2_SpeedContactor_4      := PRG_10_Outputs.M2SpeedContactor4,
+    M1_BrakeCmd              := PRG_10_Outputs_LD.M1BrakeCmd,
+    M2_RelayFwd              := PRG_10_Outputs_LD.M2RelayFwd,
+    M2_RelayRev              := PRG_10_Outputs_LD.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_10_Outputs_LD.M2SpeedContactor1,   // 🔧 REX 2026-07-27 : idem M1
+    M2_SpeedContactor_2      := PRG_10_Outputs_LD.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_10_Outputs_LD.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_10_Outputs_LD.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_06_WinchControl.M2_SpeedRef_Active,
     M2_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut,
-    M2_BrakeCmd              := PRG_10_Outputs.M2BrakeCmd,
+    M2_BrakeCmd              := PRG_10_Outputs_LD.M2BrakeCmd,
     M3_Direction             := PRG_07_TranslationControl.M3_Direction_Active,
     M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
-    M3_BrakeCmd              := PRG_10_Outputs.TranslationBrakeCmd,
+    M3_BrakeCmd              := PRG_10_Outputs_LD.TranslationBrakeCmd,
     M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
-    PowerKeepAlive_A         := PRG_10_Outputs.PowerCutOff_A,
-    PowerKeepAlive_B         := PRG_10_Outputs.PowerCutOff_B,
+    PowerKeepAlive_A         := PRG_10_Outputs_LD.EmergencyArmingPulseActive,
+    PowerKeepAlive_B         := PRG_10_Outputs_LD.EmergencyArmingLockoutActive,
     EmergencyArming_RQ       := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
@@ -370,6 +373,7 @@ M1ThermalFeedback := instM1Thermal.State;
 //                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM1 Méca A/B/D/E)
 instM1BrakeFeedback(InputRaw := HwIn.Winch.M1_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M1BrakeFeedback := instM1BrakeFeedback.State;
+M1BrakeCommandOpenConfirmed := NOT M1BrakeFeedback; // DI filtré : contacteur desserrage confirmé uniquement.
 
 // 🪝 TREUIL M2
 //  🔌 HwIn.Winch.M2_ContactorsReleased_DI ······· câblage réel : 1 = tous contacteurs retombés
@@ -392,6 +396,7 @@ M2ThermalFeedback := instM2Thermal.State;
 //                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM2 Méca A/B/D/E)
 instM2BrakeFeedback(InputRaw := HwIn.Winch.M2_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M2BrakeFeedback := instM2BrakeFeedback.State;
+M2BrakeCommandOpenConfirmed := NOT M2BrakeFeedback; // DI filtré : contacteur desserrage confirmé uniquement.
 
 // ↔️ TRANSLATION M3
 //  🔌 HwIn.Translation.M3_PosTremie_DI ········· câblage réel : 1 = position trémie atteinte (NO)
@@ -445,6 +450,7 @@ instPositionDecoder(
 //                       └─► PRG_03_Safety (instSafetyTranslationM3 Méca B) · PRG_09_Supervision
 instM3BrakeFeedback(InputRaw := HwIn.Translation.M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
 M3BrakeFeedback := instM3BrakeFeedback.State;
+M3BrakeCommandOpenConfirmed := NOT M3BrakeFeedback; // DI filtré : contacteur desserrage confirmé uniquement.
 
 // Retours variateur EtherCAT M3 physiques directs (recopie HwIn)
 M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;

@@ -116,7 +116,7 @@ PROJET/
 
 | Outil | Version | Changelog |
 |---|---|---|
-| AGENT_WORKFLOW | Voir `TOOLS/AGENT_WORKFLOW/pyproject.toml` | `TOOLS/AGENT_WORKFLOW/CHANGELOG.md` |
-| ST_PLCOPENXML_GENERATOR | Voir `TOOLS/ST_PLCOPENXML_GENERATOR/pyproject.toml` | `TOOLS/ST_PLCOPENXML_GENERATOR/CHANGELOG.md` |
+| AGENT_WORKFLOW | Voir `TOOLS/AGENT_WORKFLOW/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
+| ST_PLCOPENXML_GENERATOR | Voir `TOOLS/ST_PLCOPENXML_GENERATOR/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
 
 Chaque outil gère son propre versioning. Le projet principal référence les versions dans `DOC/VERSION_HISTORY.md`.

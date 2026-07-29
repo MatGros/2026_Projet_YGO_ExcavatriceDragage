@@ -197,7 +197,7 @@ M3_RelayRev := (M3_Direction = -1);
 
 instSimTranslation(
     Enable      := TRUE,
-    TargetNum   : = M3_TargetNum,
+    TargetNum   := M3_TargetNum,
     RelayFwd    := M3_RelayFwd,
     RelayRev    := M3_RelayRev,
     TravelTimeS := 8.0,

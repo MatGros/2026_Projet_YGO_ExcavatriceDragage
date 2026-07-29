@@ -4,6 +4,14 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `LOT3A_FinalBrakePowerInterlock` — 2026-07-28
+- M1/M2 : `FB_WinchOutputInterlock_LD`, watchdog 500 ms, paliers adjacents et redémarrage 900 ms ; mapping C1..C4 conservé exclusivement depuis `FB_Winch` / `SpeedStepTable`
+- M3 : `FB_TranslationOutputInterlock_LD` après `FB_Brake`, 1/2+fréquence bloqués sans demande de desserrage **et** confirmation contacteur/bobine
+- `PRG_10_Outputs_LD` : 15 instances `FB_Output` retirées ; POU conservé sans instance
+- Générateur : seuls `PROGRAM PRG_*_LD` → Ladder ; `FB_*_LD` conservés ST ; BOOL connus en contact→bobine, PDO M3 WORD/UINT en liaison typée
+- `SafeStop` reste la rampe rapide métier ; interlock final coupe après demande nulle, hors gates durs/défaut
+- Tests PLC préparés, non exécutés ; timeout M1/M2 persistant à travers Enable/AU, anti-redémarrage, gates M3 et tempo métier 1,5 s couverts ; qualification CODESYS/simulation obligatoire
+
 ### `LOT2A_KoboldMaintenanceAssist` — 2026-07-28
 - `FB_DiveSearch` : Kobold `0→1→0` strict · T81/T82
 - `FB_ExtractionSequence` : benne, palier 1 sur 2,0 m puis montée nominale
@@ -397,3 +405,4 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 ### `v0.4.0_SimNoHardware` — 2026-07-08
 - Mouvements M1/M2 + benne stables en simulation
 - Aucune MES matérielle réelle
+| 2026-07-29 | Lot 3A | Déplacement architectural des trois instances interlock `_LD` dans `PRG_10_Outputs_LD` ; demandes brutes typées publiques PRG_06/PRG_07. Qualification CODESYS différée. |

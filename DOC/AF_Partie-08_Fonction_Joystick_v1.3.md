@@ -195,5 +195,5 @@ Les anciens écarts sont fermés :
 - [x] Suppression effective de `SafeStop` et renommage `EmergencyStopOk` — fait 2026-07-03septdecies (§6bis).
 
 ✅ Checklist de mise en service (calibration, neutre, deadband, homme-mort, coupure CAN, valeurs
-incohérentes) rédigée : voir `DOC/CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md`
+incohérentes) rédigée : voir `ARCHIVES/Doc/CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md`
 (version terrain active ; v1.0 archivée). Exécution terrain restant à tracer (T17, 2026-07-19).

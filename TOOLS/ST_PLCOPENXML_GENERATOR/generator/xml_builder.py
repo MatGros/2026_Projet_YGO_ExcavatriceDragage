@@ -181,6 +181,10 @@ def _variable_element(
     return el
 
 
+from .ld_builder import build_ld_body
+from .st_types import BaseType
+
+
 def _build_pou(
     obj: SourceObject, guid: str, objects_by_name: dict[str, SourceObject], diagnostics: DiagnosticCollector
 ) -> ET.Element:
@@ -199,11 +203,31 @@ def _build_pou(
     if obj.header_comment:
         interface.append(_documentation(obj.header_comment))
 
-    body = ET.SubElement(pou, "body")
-    st_el = ET.SubElement(body, "ST")
-    xhtml = ET.SubElement(st_el, "xhtml")
-    xhtml.set("xmlns", XHTML_NS)
-    xhtml.text = obj.body_text or ""
+    # `_LD` identifie la frontière Ladder lisible des PROGRAMMES seulement.
+    # Les FB `_LD` gardent ce marqueur de maintenance, mais restent du ST :
+    # leur logique d'état, TON et R_TRIG ne doit jamais être convertie implicitement.
+    if obj.kind == "program" and obj.name.startswith("PRG_") and obj.name.endswith("_LD"):
+        variables = obj.input_vars + obj.output_vars + obj.inout_vars + obj.local_vars + obj.temp_vars
+        boolean_identifiers = {
+            variable.name
+            for variable in variables
+            if isinstance(variable.type, BaseType) and variable.type.name == "BOOL"
+        }
+        # Les appels de blocs LD reprennent strictement leur type déclaré VAR.
+        # Ne jamais deviner FB_Output depuis le nom d'instance : un interlock
+        # final doit rester lisible/importable avec son interface réelle.
+        instance_types = {
+            variable.name: variable.type.name
+            for variable in variables
+            if isinstance(variable.type, DerivedType)
+        }
+        pou.append(build_ld_body(obj.body_text or "", boolean_identifiers, instance_types))
+    else:
+        body = ET.SubElement(pou, "body")
+        st_el = ET.SubElement(body, "ST")
+        xhtml = ET.SubElement(st_el, "xhtml")
+        xhtml.set("xmlns", XHTML_NS)
+        xhtml.text = obj.body_text or ""
 
     pou.append(_objectid_adddata(guid))
     return pou

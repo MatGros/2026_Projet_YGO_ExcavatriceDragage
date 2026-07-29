@@ -142,4 +142,4 @@ et `Network.Bypass.IhmHeartbeat` remis à `FALSE` (**T83**).
 | Un blocage sans cause affichée | Manque de diagnostic → alimente le plan Ergonomie MES |
 | Un écart `HwReal` ↔ `HwSim` inexpliqué machine saine | Polarité ou câblage |
 
-📝 Consigner chaque séance dans `DOC/REGISTRE_Suivi_MiseEnService_v1.0.md`.
+📝 Consigner chaque séance dans `DOC/REGISTRE_Suivi_MiseEnService_20260724_v1.0.md`.

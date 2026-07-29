@@ -17,6 +17,7 @@
 | 3 | Garde-fou et calibration paliers | T94 + T95 | Dépend du lot 1 : mesure vitesse fiabilisée avant calibration | ⬜ En attente lot 1 | — | — |
 | 4 | Frein et commande par paliers | T91 + T93 + décision T87 | Étude montée/descente avant code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel` | ⬜ Étude à préparer | — | — |
 | 5 | Reliquats safety | T72 + T73 + T74 | Réévaluer l’état réel du code après les lots précédents | ⬜ À réévaluer | — | — |
+| 2A | Interlocks finaux frein / puissance | Lot 3A | `FB_WinchOutputInterlock_LD` + `FB_TranslationOutputInterlock_LD` ; `SafeStop` reste la rampe rapide métier, tests PLC préparés ; qualification CODESYS/simulation à faire | 🟠 Implémenté, revue C4 et essais requis | Pi | ⏳ Validation CODESYS/terrain requise |
 | 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⬜ Différé | — | — |
 
 ### Règles de conduite
@@ -392,3 +393,5 @@ nouveaux noms de fichier.
 
 ## 📎 Sources archivées
 `ARCHIVES/Doc/PLAN_Finalisation_v1.0.md` · `ARCHIVES/Doc/PLAN_Finalisation_v1.1.md` · `ARCHIVES/Doc/SAT_Protocole_Essais_v1.0.md`
+
+- 🛡️ Lot 3A : instances finales `_LD` implantées exclusivement dans `PRG_10_Outputs_LD` ; qualification CODESYS/import/PLC/simulation toujours à faire.
