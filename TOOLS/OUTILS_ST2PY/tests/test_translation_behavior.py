@@ -8,6 +8,7 @@ if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
 import fb_gen
+from data_contracts import build_position_decoder_contract, validate_contract
 
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
@@ -64,6 +65,38 @@ def test_validation_accepts_generated_translation_module():
     assert validation['valid'] is True
     assert validation['encapsulated'] is True
     assert validation['io_coherent'] is True
+
+
+def test_position_decoder_contract_validates_coherent_payloads():
+    contract = build_position_decoder_contract()
+    payloads = {
+        'inputs': {
+            'SensorTremie': True,
+            'SensorPV': True,
+            'SensorP2': False,
+            'SensorP1': False,
+            'SensorMaintenance': False,
+        },
+        'outputs': {
+            'SensorsWord': 0x18,
+            'Incoherent': False,
+            'LimitSwitchFwd': False,
+            'LimitSwitchRev': False,
+        },
+        'state': {},
+    }
+    assert validate_contract(contract, payloads) == []
+
+
+def test_generated_translation_module_exposes_contract_and_validator():
+    module = _load_generated_module('FB_Translation')
+    assert hasattr(module, 'CONTRACT')
+    assert 'inputs' in module.CONTRACT
+    assert 'outputs' in module.CONTRACT
+    inputs_payload = {}
+    for field in module.CONTRACT['inputs']:
+        inputs_payload[field['name']] = field['default']
+    assert module.validate_runtime_contract(inputs_payload, 'inputs') == []
 
 
 def test_validation_rejects_non_encapsulated_module():
