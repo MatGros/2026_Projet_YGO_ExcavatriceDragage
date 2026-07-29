@@ -1,46 +1,91 @@
 # Routage des modèles
 
-## Règle générale — Pas de multi-modèle systématique
+> 🔧 **Révisé 2026-07-29.** La version précédente annonçait `omni/cc/claude-sonnet-5` comme
+> modèle de revue privilégié. Les 53 tâches réellement exécutées disaient autre chose
+> (`omni/cx/gpt-5.6-terra` en tête, 18×). Une règle de routage écrite mais jamais vérifiée
+> ne route rien — d'où le garde-fou `check_model_routing.py`, qui relit ce qui a *réellement* tourné.
 
-Le multi-modèle n'est **pas** la règle par défaut. Il est réservé aux cas où le risque le justifie.
+## 🧭 Deux notions à ne pas confondre
 
-| Voie | Modèle | Multi-modèle |
+| Notion | Exemple | Ce que ça change |
 |---|---|---|
-| C0-C1 Fast Lane | Pi seul | ❌ Non |
-| C2 Standard Lane | Pi (modèle fort) | ❌ Non par défaut — 1 avis ciblé seulement si utile |
-| C3 Standard Lane | Pi (modèle fort) | ❌ Non — 1 Pi Subagent read-only si le risque le justifie |
-| C4 Safety Lane | Pi (modèle fort, High Effort) | ✅ Oui — Double avis A/B Pi Subagents obligatoire |
-| C4 + opinion divergente | Pi + humain | L'humain tranche ; Herdr seulement sur demande explicite |
+| **Famille rapide** | `gemini-3.5-flash`, `*-mini`, `*-nano`, `haiku` | Petit modèle conçu pour la vitesse |
+| **Effort réduit** | `claude-sonnet-5:low`, `nemotron-550b:low` | Gros modèle **bridé** |
+
+Un `scout` qui repère des fichiers ne juge rien : les deux lui conviennent.
+Un `reviewer` juge : la famille rapide lui est **interdite**, l'effort réduit est **signalé**.
+
+## 👤 Rôles et modèles
+
+| Rôle | Ce qu'il fait | Famille rapide | Effort |
+|---|---|---|---|
+| `scout` | Repérage, cartographie, « où est X » | ✅ **recommandée** | `:low` |
+| `researcher` | Collecte, lecture documentaire | ✅ autorisée | `:medium` |
+| `worker` | Produit du code | ⛔ interdite | `:high` |
+| `reviewer` | Juge le travail | ⛔ interdite | `:high` |
+| `oracle` | Tranche une question de conception | ⛔ interdite | `:high` |
+
+### 🆕 Modèles rapides — où ils gagnent vraiment
+
+`antigravity/gemini-3.5-flash-medium` · `antigravity/gemini-3.5-flash-high`
+
+Aujourd'hui le `scout` tourne sur `nemotron-550b:low` ou `claude-sonnet-5:low` : on paie un très
+gros modèle bridé pour faire du repérage. Un modèle rapide n'est pas un compromis sur ce poste,
+c'est **le bon outil**.
+
+| Usage | Modèle |
+|---|---|
+| `scout` — repérage, cartographie | `flash-medium` |
+| Résumé, reformulation doc, C0–C1 non-safety | `flash-medium` |
+| Pré-lecture avant une revue coûteuse (débroussaillage) | `flash-high` |
+| **Revue A/B C4, safety, normes, redondance** | ⛔ **interdit** |
+
+L'interdiction safety n'est pas un jugement sur le modèle : c'est la règle existante du projet
+(Ponytail déjà banni du safety) appliquée par cohérence à toute la famille rapide.
+
+## 🔀 Multi-modèle — pas la règle par défaut
+
+| Voie | Analyse | Revue | Double A/B |
+|---|---|---|---|
+| C0–C1 Fast | Pi seul | — | — |
+| C2 Standard | modèle fort | avis ciblé optionnel | — |
+| C3 Standard | modèle fort | 1 Pi Subagent read-only si le risque le justifie | — |
+| C4 Safety | modèle fort **High Effort** | 2 Pi Subagents A/B read-only parallèles | ✅ **obligatoire** |
+| C4 + divergence | Pi + humain | l'humain tranche ; Herdr sur demande explicite | — |
 
 ## 🔴 Double revue parallèle A/B (C4 uniquement)
 
 **Déclencheur** : TEST_DESIGN, ST généré, toute revue safety C4.
 
-**Méthode** :
-1. Agent A Pi Subagent reçoit le contexte complet (TASK_CONTEXT + code/design), en read-only.
-2. Agent B Pi Subagent reçoit exactement le même contexte — **sans voir le résultat de A**, en read-only.
-3. Pi attend, lit puis compare les 2 rapports :
-   - Consensus → synthèse présentée à l'humain.
-   - Divergence (≥1 point contradictoire) → 🚨 alerte + résumé A vs B côte à côte.
+1. Agent A reçoit le contexte complet (contrat de tâche + code), en read-only.
+2. Agent B reçoit **exactement le même contexte**, sans voir le résultat de A.
+3. Pi attend, lit, compare :
+   - consensus → synthèse présentée à l'humain ;
+   - divergence (≥1 point contradictoire) → 🚨 alerte + positions A/B côte à côte.
 
-**Règles** :
-- Pas de fusion automatique des avis.
-- Aucun agent ne modifie, ne commit, ne valide la safety.
-- Ponytail interdit pour toute analyse safety/normative/redondance.
+**Règles** : pas de fusion automatique · aucun agent ne commit ni ne valide la safety ·
+Ponytail et famille rapide interdits sur toute analyse safety/normative/redondance.
 
-## Routage par criticité — récapitulatif
+## ✅ Vérification — le routage est contrôlé, plus seulement déclaré
 
-| Criticité | Analyse | Revue | Double A/B |
-|---|---|---|---|
-| C0 | Pi seul | — | — |
-| C1 | Pi seul | — | — |
-| C2 | Pi modèle fort | avis ciblé optionnel | — |
-| C3 | Pi modèle fort | 1 Pi Subagent read-only si utile | — |
-| C4 | Pi modèle fort High Effort | 2 Pi Subagents A/B read-only parallèles | ✅ obligatoire |
+Chaque `.pi-subagents/artifacts/*_meta.json` enregistre le modèle **réellement exécuté**.
+La preuve est donc déjà dans le dépôt ; il suffit de la lire.
 
-## Fournisseurs
+```powershell
+python TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py            # gate (bloquant)
+python TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py --inventory # qui a fait quoi
+```
 
-Le modèle de revue privilégié est `omni/cc/claude-sonnet-5` lorsqu'il est disponible. Les
-sous-agents héritent sinon du modèle courant de Pi ; le modèle réellement exécuté est rapporté.
+| Contrôle | Détecte |
+|---|---|
+| `M1` | famille rapide sur un rôle de jugement — **erreur** (mention renforcée si sujet safety) |
+| `M2` | effort réduit sur un rôle de jugement — avertissement |
+| `M4` | fournisseur hors catalogue — routage non maîtrisé |
 
-OpenRouter et Ollama sont des fournisseurs optionnels. Les clés ne sont jamais stockées dans le dépôt.
+📌 Les modèles autorisés d'une tâche se déclarent dans son **contrat de tâche**
+(`models_allowed`), pas dans un réglage séparé — voir `templates/task_contract.yaml`.
+
+## 🔌 Fournisseurs
+
+Catalogue connu : `omni/` · `nvidia/` · `antigravity/` · `gh/` · `openrouter/` · `ollama/`.
+Les clés ne sont **jamais** stockées dans le dépôt.

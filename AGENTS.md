@@ -73,6 +73,27 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py             # tous les gate
 Le bloc `Auto-vérification liaison` produit par `--report` est **collé dans la restitution**.
 Sans lui, le lot est incomplet — quel que soit l'agent qui l'écrit.
 
+🔒 **Ces contrôles ne dépendent plus du bon vouloir** (2026-07-29) :
+
+| Hook | Ce qu'il empêche |
+|---|---|
+| `PreToolUse` | Écrire dans `CODE/*.st` sans avoir **réellement lu** les règles — vérifié dans le transcript, pas déclaré |
+| `PostToolUse` | — signale liaison + liens doc à chaque édition |
+| `Stop` | **Conclure un tour** avec une liaison rouge ou un bundle périmé |
+
+🚫 Aucun gate ne lit `Device.export` : cet export est mis à jour au bon vouloir humain,
+c'est un outil de **débogage ponctuel**, jamais une référence de contrôle.
+
+## 📝 Contrat de tâche — obligatoire dès C2
+
+Avant toute écriture ou délégation, l'orchestrateur rédige les **objectifs testables** de la tâche.
+Une vérification qui ne porte sur aucun objectif est creuse : sur 53 tâches déléguées, les critères
+étaient 3 phrases génériques (REX 2026-07-29).
+
+- Gabarit : `TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml`
+- Contrôle : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <TASK_CONTEXT.yaml>`
+- Détail, axes patch/rebuild et séquence rebuild : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`
+
 🔁 **Règle `fix:` + `guard:`** : tout bug détecté donne **deux** livrables — la correction **et**
 un garde-fou automatique dans `TOOLS/AGENT_WORKFLOW/scripts/`. Une réponse purement documentaire
 à un incident est insuffisante.

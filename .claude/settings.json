@@ -9,6 +9,18 @@
     "codex@openai-codex": true
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_pre_edit.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
@@ -17,6 +29,17 @@
             "type": "command",
             "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py",
             "timeout": 90
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python TOOLS/AGENT_WORKFLOW/scripts/hook_stop.py",
+            "timeout": 150
           }
         ]
       }

@@ -138,12 +138,12 @@ def draw_overview(path: Path):
     # 3 LANES
     lane_content = [
         ("FAST LANE  [C0-C1]", COLORS["fast"],
-         ["Pre-edit Gate", "Plan + Code  Pi seul", "Gates 1 a 4", "Pas de multi-modele"]),
+         ["hook PreToolUse (BLOQUE)", "Plan + Code  Pi seul", "Gates 1 a 6", "hook Stop (BLOQUE)"]),
         ("STANDARD LANE  [C2-C3]", COLORS["standard"],
-         ["Registre + Task (proposes)", "Code Pi fort", "Gates 1 a 5", "Revue 1 agent Herdr"]),
+         ["CONTRAT DE TACHE (obligatoire)", "Registre + Task", "Code Pi fort", "Gates 1 a 6 + hook Stop"]),
         ("SAFETY LANE  [C4]", COLORS["safety"],
          ["Registre+Task+TestDesign", "OBLIGATOIRES", "ALERTE RISQUES explicite",
-          "Code ST  High Effort", "Gates 1 a 5", "DOUBLE REVUE  A/B"]),
+          "Code ST  High Effort", "Gates 1 a 6 + hook Stop", "DOUBLE REVUE  A/B"]),
     ]
     max_bh = max(box_h(len(c)+1) for _,_,c in lane_content)
     lane_bots = []
@@ -244,10 +244,11 @@ def draw_safety_detail(path: Path):
     arrow_down(draw, cx, y, y+26); y += 26
 
     # GATES
-    y = block(ld("GATES DETERMINISTES  1 -> 5", [
-        "Gate 1: Structure   Gate 2: Style   Gate 3: Bundle",
-        "Gate 4: PyTest (306 tests)   Gate 5: Compilation CODESYS",
-    ]), COLORS["fast"], y)
+    y = block(ld("GATES DETERMINISTES  1 -> 6", [
+        "Gate 1: Structure   Gate 2: Style   Gate 2bis: LIAISON",
+        "Gate 2ter: ROUTAGE MODELE   Gate 3: Persistance   Gate 4: Bundle",
+        "Gate 5: PyTest   Gate 6: Compilation CODESYS",
+        ]), COLORS["fast"], y)
 
     # Double revue A/B
     ab_y = y + 30
