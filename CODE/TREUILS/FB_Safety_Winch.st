@@ -120,7 +120,7 @@ FUNCTION_BLOCK PUBLIC FB_Safety_Winch
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
-    EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
+    PowerContactorEngaged     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
     Mode                : E_Mode;      // Mode courant (autorisations)
     SyncEnable          : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — FALSE (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (récupération manuelle)
     JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
@@ -269,9 +269,9 @@ IF LastInReferencingMode AND NOT InReferencingMode THEN
 END_IF;
 LastInReferencingMode := InReferencingMode;
 
-// Si le contacteur de puissance est ouvert (EmergencyStopOk = FALSE), on force les sorties de sécurité
+// Si le contacteur de puissance est ouvert (PowerContactorEngaged = FALSE), on force les sorties de sécurité
 // mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
-IF NOT EmergencyStopOk THEN
+IF NOT PowerContactorEngaged THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
 END_IF;
@@ -504,7 +504,7 @@ END_IF;
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
 // (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (🆕 REX 2026-07-08 (4) :
 // Méca E, écart synchro critique) ou si contacteur coupé
-IF NOT EmergencyStopOk THEN
+IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
     SafeStop := (ErrorId AND 16#FF97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
@@ -513,7 +513,7 @@ ELSE
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
-ForbidDescent := (ErrorId AND 16#0040) <> 16#0000 OR NOT EmergencyStopOk;
+ForbidDescent := (ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged;
 
 // ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (récupération mou câble : montée interdite même en récup)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement,

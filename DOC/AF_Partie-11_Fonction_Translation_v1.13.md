@@ -48,7 +48,7 @@ FB_Safety_Translation ──► SafeStop     ──► FB_Translation + FB_Trans
 **📥 Entrées**
 | Entrée | Type | Rôle |
 |--------|------|------|
-| `Enable` / `Reset` / `EmergencyStopOk` / `Mode` | — | Standard (Partie3 §1) |
+| `Enable` / `Reset` / `PowerContactorEngaged` / `Mode` | — | Standard (Partie3 §1) |
 | `StartStop` / `SafeStop` | BOOL | Standard FB de mouvement (Partie3 §1bis) |
 | `Direction` | INT | Consigne de sens -1 (arrière), 0 (neutre), +1 (avant) |
 | `SpeedRefPct` | REAL | Magnitude de la consigne de vitesse (0..100 %) |
@@ -121,7 +121,7 @@ Toute autre combinaison déclenche `Incoherent`, transmis à `FB_Safety_Translat
 **📥 Entrées**
 | Entrée | Type | Rôle |
 |--------|------|------|
-| `Enable` / `Reset` / `EmergencyStopOk` / `Mode` | — | Standard (Partie3 §1) — `Enable` inconditionnel (`PRG_03_Safety.st`) |
+| `Enable` / `Reset` / `PowerContactorEngaged` / `Mode` | — | Standard (Partie3 §1) — `Enable` inconditionnel (`PRG_03_Safety.st`) |
 | `JoystickOnline` / `JoystickOperational` | BOOL | Diagnostics du joystick CANopen |
 | `PhaseRotationOk` | BOOL | Diagnostic de présence et ordre des phases électriques |
 | `BrakeThermalFeedback` | BOOL | Retour thermique commun aux freins M1/M2/M3 |
@@ -197,7 +197,7 @@ Toute autre combinaison déclenche `Incoherent`, transmis à `FB_Safety_Translat
 
 `M3BrakeCommandOpenConfirmed`, produit et filtré dans `PRG_00_Inputs`, ne confirme que le contacteur/bobine de desserrage. Tant qu'il est faux, `DriveControlWord` 1/2 et `DriveFreqRefHz` sont forcés à zéro ; le mot 7 (reset AC600) est préservé avec fréquence explicitement nulle.
 
-Le watchdog interne non configurable de `T#500ms` démarre sur `BrakeReleaseRequest` effectif ; timeout = frein serré, arrêt mouvement, défaut mémorisé et `RestartInhibit`. Après disparition de cause + front Reset, le mot 0 doit être observé, puis une nouvelle demande 1/2 est exigée : aucun redémarrage automatique. `Enable=FALSE`, `EmergencyStopOk=FALSE` et `SafeStop=TRUE` forcent aussi mot 0, fréquence 0 et frein serré. Le code 7 AC600 reste autorisé durant l'inhibition, toujours avec fréquence nulle. `BrakeFeedbackTimeout` nominal est `T#300ms`, strictement sous ce dernier recours.
+Le watchdog interne non configurable de `T#500ms` démarre sur `BrakeReleaseRequest` effectif ; timeout = frein serré, arrêt mouvement, défaut mémorisé et `RestartInhibit`. Après disparition de cause + front Reset, le mot 0 doit être observé, puis une nouvelle demande 1/2 est exigée : aucun redémarrage automatique. `Enable=FALSE`, `PowerContactorEngaged=FALSE` et `SafeStop=TRUE` forcent aussi mot 0, fréquence 0 et frein serré. Le code 7 AC600 reste autorisé durant l'inhibition, toujours avec fréquence nulle. `BrakeFeedbackTimeout` nominal est `T#300ms`, strictement sous ce dernier recours.
 
 Le suffixe `_LD` rend cette frontière finale lisible pour la maintenance. Le générateur PLCopenXML convertit uniquement les `PRG_*_LD` en Ladder ; les `FB_*_LD` restent exportés en ST.
 

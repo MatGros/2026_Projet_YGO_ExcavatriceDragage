@@ -36,8 +36,8 @@ Afin d'éliminer le câblage fil à fil, 3 structures de bus standardisées sont
 
 ### 🔌 A. `ST_HwIn_Bus` (Image d'Entrée Unifiée Réel ↔ Simulation)
 Regroupe l'ensemble des bornes physiques filtrées et prêtes pour les blocs de sécurité :
-- `EmergencyStopOk : BOOL` (Contacteur de puissance engagé)
-- `EmergencyChain : BOOL` (Boucle physique d'arrêt d'urgence)
+- `PowerContactorEngaged : BOOL` (Contacteur de puissance engagé)
+- `EmergencyChainClosed : BOOL` (Boucle physique d'arrêt d'urgence)
 - `TopPositionSensor : BOOL` (Fin de course Haut commun M1/M2)
 - `SlackCableSwitch : BOOL` (Mou de câble tambour M2)
 - `PhaseRotationOk : BOOL` (Rotation des phases réseau)

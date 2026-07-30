@@ -137,7 +137,7 @@ Il ne doit jamais masquer un arbitrage de commandes ni une priorité safety.
 En-tête (rôle, doc source, sécurité, dépendances)
 Déclarations d'interface (VAR_INPUT / VAR_OUTPUT / VAR_IN_OUT)
 Déclarations internes (VAR, VAR CONSTANT)
-Initialisation / gates (Enable, EmergencyStopOk)
+Initialisation / gates (Enable, PowerContactorEngaged)
 Reset sur front
 Sécurité et défauts
 Logique métier

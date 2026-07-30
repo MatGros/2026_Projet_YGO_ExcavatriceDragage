@@ -41,7 +41,7 @@ FUNCTION_BLOCK PUBLIC FB_Modes
 VAR_INPUT
     Enable              : BOOL;        // Standard
     Reset               : BOOL;        // Acquittement défaut (front) — bit0
-    EmergencyStopOk     : BOOL;        // Standard
+    PowerContactorEngaged     : BOOL;        // Standard
     SelMode         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
     SelSyncEnable   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
     InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1Winch.BtnInhibit — bouton IHM inhibition M1
@@ -78,7 +78,7 @@ END_VAR
 
 // 🛑 1. GATE — repli sur le mode de sécurité de veille (DISABLE) si désactivé
 // ou si l'arrêt d'urgence est déclenché.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Mode := E_Mode.DISABLE;
     SyncEnable := TRUE;
     InhibitM1 := FALSE;

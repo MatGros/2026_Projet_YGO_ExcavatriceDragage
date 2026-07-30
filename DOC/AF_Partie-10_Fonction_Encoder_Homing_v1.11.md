@@ -53,7 +53,7 @@
 > ici). Détail complet du changement : `DOC/AF_Partie-09_Fonction_Winch_v1.14.md` (doc principale
 > treuil). Hors périmètre : Translation M3 non concerné (retours individuels inchangés).
 >
-> **v1.6** — Retour terrain 2026-07-03 : `EmergencyStopOk` câblé sur l'I/O réel (retour
+> **v1.6** — Retour terrain 2026-07-03 : `PowerContactorEngaged` câblé sur l'I/O réel (retour
 > contacteur puissance/AU, résout AUDIT Q11 pour le pipeline codeur — §7). `Reset` des FB
 > codeur/homing câblé (`M1/M2_Reset_IHM`, n'était câblé nulle part avant). Nouveau
 > L'ancien GVL de raccordement codeur centralisait Reset/ConfirmCoherence/Home/TopSensorPositionM
@@ -464,7 +464,7 @@ instance par treuil : `FB_Encoder_HomingM1` (COD1), `FB_Encoder_HomingM2` (COD2)
 |--------|------|------|
 | `Enable` | BOOL | Standard |
 | `Reset` | BOOL | Acquittement défaut (front) |
-| `EmergencyStopOk` | BOOL | Standard |
+| `PowerContactorEngaged` | BOOL | Standard |
 | `Mode` | `E_Mode` | `MAINT_N1` autorise le flux **nominal** (cible `TopSensorPositionM`) ; `MAINT_N2` requis pour le flux **unitaire** (cible `HomingTargetM` libre) |
 | `WinchSelect` | `E_WinchSelect` | Doit correspondre à ce treuil pour le flux **unitaire** ; sans objet (ignoré) pour le flux nominal (les 2 treuils référencés ensemble) |
 | `Home` | BOOL | Demande de référencement (**front**, entrée **unique** — mot de passe + confirmation message déjà gérés côté **IHM** en amont) |
@@ -627,7 +627,7 @@ CoE, lui, agit directement sur la mesure native, sans hypothèse de plage côté
   `FB_Encoder_Homing` — la robustesse de la non-écriture **côté bus** (`FB_Encoder_Abs`, en cas de
   coupure pendant la fenêtre SDO elle-même) reste un point d'implémentation à vérifier fiche
   technique/tests (comportement du firmware codeur sur SDO abort en cours d'écriture).
-- ✅ **`EmergencyStopOk` réel (2026-07-03)** — résout **AUDIT Q11** (source de `EmergencyStopOk`,
+- ✅ **`PowerContactorEngaged` réel (2026-07-03)** — résout **AUDIT Q11** (source de `PowerContactorEngaged`,
   laissée ouverte depuis l'audit 2026-07-01) **pour le pipeline codeur** : c'est le **retour
   contacteur de puissance géré par l'arrêt d'urgence** (I/O Mapping réel, description device :
   "Retour état contacteur de puissance géré par arrêt d'urgence"), câblé directement sur

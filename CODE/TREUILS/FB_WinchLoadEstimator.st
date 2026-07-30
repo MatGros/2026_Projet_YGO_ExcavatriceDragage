@@ -14,7 +14,7 @@ FUNCTION_BLOCK PUBLIC FB_WinchLoadEstimator
 VAR_INPUT
     Enable             : BOOL;
     Reset              : BOOL;
-    EmergencyStopOk    : BOOL;
+    PowerContactorEngaged    : BOOL;
     Mode               : E_Mode;
     ActiveSpeedStep    : INT;                       // Palier commandé 0..5
     MeasuredSpeedMps   : REAL;                      // Vitesse câble absolue
@@ -44,7 +44,7 @@ VAR
 END_VAR
 
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
     Busy := FALSE;
     Done := FALSE;

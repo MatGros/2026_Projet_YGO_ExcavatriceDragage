@@ -10,7 +10,7 @@ VAR_INPUT
     M1BrakeApplied, M2BrakeApplied, M3BrakeApplied : BOOL;
     M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk : BOOL;
     BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent : BOOL;
-    EmergencyChain, EmergencyStopOk, EncoderM1Operational, EncoderM2Operational : BOOL;
+    EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational : BOOL;
     HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds : BOOL;
 END_VAR
 VAR_OUTPUT
@@ -47,7 +47,7 @@ IF NOT BrakeThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0080; END_
 IF NOT PhaseRotationOk THEN PreflightErrorId := PreflightErrorId OR 16#0100; END_IF;
 IF NOT SlackCableTensioned THEN PreflightErrorId := PreflightErrorId OR 16#0200; END_IF;
 IF M3SensorWordIncoherent THEN PreflightErrorId := PreflightErrorId OR 16#0400; END_IF;
-IF EmergencyStopOk AND NOT EmergencyChain THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
+IF PowerContactorEngaged AND NOT EmergencyChainClosed THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
 IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000; END_IF;
 IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
 IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;

@@ -59,7 +59,7 @@
 - Frontiere unique : materiel brut -> image reelle/simulee -> image qualifiee -> consommateurs.
 - Polarite normalisee une seule fois en acquisition ; aucun FB metier ne reinverse un signal.
 - Les noms E/S viennent du device/export CODESYS et doivent dire ce que signifie `TRUE`.
-- `EmergencyStopOk` confirme le contacteur puissance ; `EmergencyChain` confirme la boucle AU.
+- `PowerContactorEngaged` confirme le contacteur puissance ; `EmergencyChainClosed` confirme la boucle AU.
 - Les barrieres finales sont en Ladder dans `PRG_OUTPUTS_LD` et sont seules productrices des commandes physiques.
 - `SafeStop` laisse la deceleration metier se terminer ; `Enable=FALSE`, perte contacteur, timeout ou defaut final provoquent la coupure finale appropriee.
 

@@ -34,7 +34,7 @@ FUNCTION_BLOCK FB_Joystick
 VAR_INPUT
     Enable          : BOOL;       // Active la logique
     Reset           : BOOL;       // Acquittement défaut
-    EmergencyStopOk : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
+    PowerContactorEngaged : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
     Mode            : E_Mode;     // 🆕 REX 2026-07-08 — changement de mode désarme le homme-mort (voir §4ter)
     BenneBusy       : BOOL;       // 🆕 REX 2026-07-08 — fin de cycle benne (front descendant) désarme le homme-mort (voir §4ter)
     PreserveArmingAfterBucket : BOOL; // TRUE uniquement pendant fermeture ExtractionSequence : enchaînement palier 1 autorisé
@@ -98,7 +98,7 @@ END_VAR
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
-IF NOT Enable OR NOT EmergencyStopOk OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
+IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0;

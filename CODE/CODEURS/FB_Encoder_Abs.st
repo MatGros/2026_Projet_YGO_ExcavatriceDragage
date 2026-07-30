@@ -44,7 +44,7 @@ FUNCTION_BLOCK PUBLIC FB_Encoder_Abs
 VAR_INPUT
     Enable              : BOOL;        // Standard
     Reset               : BOOL;        // Acquittement défaut (front)
-    EmergencyStopOk     : BOOL;        // Standard
+    PowerContactorEngaged     : BOOL;        // Standard
     Mode                : E_Mode;      // Standard (contexte, pas encore exploité ce lot)
     RawPosIn            : UDINT;       // Brut EtherCAT (ex. COD1_PosValue, %ID)
     AlarmsIn            : UINT;        // Brut EtherCAT (ex. COD1_Alarms)

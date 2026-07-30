@@ -1,6 +1,6 @@
 # 📋 Analyse Fonctionnelle — Partie 9 : Fonction Winch (v1.14)
 
-> 🆕 **v1.14 (Lot 3A, implémenté — qualification CODESYS différée)** : `FB_Winch` applique explicitement une hausse métier adjacente de palier toutes les **T#1s500ms** avant publication de `StepNumber` à `FB_WinchOutputInterlock_LD`. Toute baisse reste immédiate ; la pré-magnétisation reste exclusivement dans `FB_Brake`. L'interlock final conserve son délai indépendant de dernier recours **T#1s250ms**. `SafeStop` garde la rampe rapide du FB de mouvement : l'interlock final ne serre le frein et ne coupe les Q qu'après retombée effective de la demande métier, sauf `Enable=FALSE`, `EmergencyStopOk=FALSE`, timeout ou défaut final.
+> 🆕 **v1.14 (Lot 3A, implémenté — qualification CODESYS différée)** : `FB_Winch` applique explicitement une hausse métier adjacente de palier toutes les **T#1s500ms** avant publication de `StepNumber` à `FB_WinchOutputInterlock_LD`. Toute baisse reste immédiate ; la pré-magnétisation reste exclusivement dans `FB_Brake`. L'interlock final conserve son délai indépendant de dernier recours **T#1s250ms**. `SafeStop` garde la rampe rapide du FB de mouvement : l'interlock final ne serre le frein et ne coupe les Q qu'après retombée effective de la demande métier, sauf `Enable=FALSE`, `PowerContactorEngaged=FALSE`, timeout ou défaut final.
 >
 > 📐 **v1.13 (2026-07-28) — T84/T85/T86.** La vitesse câble est désormais produite par la chaîne
 > codeur (`FB_Encoder_SpeedMeasure` composé dans `PRG_02_Encoders`) sur 6 positions horodatées,
@@ -160,7 +160,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 |--------|------|------|
 | `Enable` | BOOL | `FALSE` = neutralisation totale (sorties coupées). Forcé `FALSE` si `InhibitMx` est actif. |
 | `Reset` | BOOL | Acquittement défaut (front) |
-| `EmergencyStopOk` | BOOL | Chaîne AU réarmée + conditions globales OK |
+| `PowerContactorEngaged` | BOOL | Chaîne AU réarmée + conditions globales OK |
 | `Mode` | `E_Mode` | Contexte (droits arbitrés en amont) |
 | `StartStop` | BOOL | `TRUE` = rampe accélération, `FALSE` = rampe décélération normale |
 | `SafeStop` | BOOL | Sortie `FB_Safety_Winch` : `TRUE` = rampe décélération **rapide** (arrêt total) |
@@ -186,7 +186,7 @@ FB_Safety_Winch ──► SafeStop        ──► (entrée) FB_Winch(M1) — a
 **📥 Entrées**
 | Entrée | Type | Rôle |
 |--------|------|------|
-| `Enable`/`Reset`/`EmergencyStopOk`/`Mode` | — | Contrat standard (Inhibé/`FALSE` si `InhibitMx` actif) |
+| `Enable`/`Reset`/`PowerContactorEngaged`/`Mode` | — | Contrat standard (Inhibé/`FALSE` si `InhibitMx` actif) |
 | `SyncEnable` | BOOL | SyncEnable (MAINT N1/N2) — `FALSE` exclut le bit3 (mou de câble) du SafeStop |
 | `JoystickOnline`/`JoystickOperational` | BOOL | `instDiagCanOpen.DeviceJoystick` |
 | `EncoderAvailable` | BOOL | Sortie `FB_Encoder_Abs` **de ce treuil** |
@@ -582,7 +582,7 @@ Joystick) : voir `DOC/PLAN_TASK_v1.0.md` §3 (T21).
 - Le watchdog interne, fixe `T#500ms`, démarre après `BrakeReleaseRequest` effectif sans confirmation ; il coupe puissance, serre le frein et mémorise le défaut. Réarmement : cause disparue + front Reset.
 - Paliers finaux : P1 aucun contacteur, P2 C1, P3 C1+C2, P4 C1+C2+C3, P5 C1+C2+C3+C4 ; une hausse est adjacente et attend au moins `T#1s250ms`.
 - Après arrêt, retour `FwdRevSpeedFeedbackOff` puis `T#900ms` avant nouveau départ.
-- Après timeout frein : le défaut, `RestartInhibit` et l'obligation d'acquittement survivent à `Enable=FALSE` ou `EmergencyStopOk=FALSE`. Après cause disparue + front `Reset`, une demande moteur nulle doit être observée, puis une nouvelle demande distincte ; la retombée contacteurs + `T#900ms` sont rejouées avant toute puissance.
+- Après timeout frein : le défaut, `RestartInhibit` et l'obligation d'acquittement survivent à `Enable=FALSE` ou `PowerContactorEngaged=FALSE`. Après cause disparue + front `Reset`, une demande moteur nulle doit être observée, puis une nouvelle demande distincte ; la retombée contacteurs + `T#900ms` sont rejouées avant toute puissance.
 
 Le suffixe `_LD` rend cette frontière finale lisible pour la maintenance. Le générateur PLCopenXML convertit uniquement les `PRG_*_LD` en Ladder ; les `FB_*_LD` restent exportés en ST.
 

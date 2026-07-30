@@ -22,20 +22,14 @@
 
 | ID | Attendu | Preuve | Type | Détail |
 |---|---|---|---|---|
-| TC-P08-001 | CAN ou joystick non OP ⇒ sorties axes à 0 et `DeadmanArmed=FALSE` | AxisCmd SpeedRef=0, StartStop=FALSE | AUTO+SITE | §3 |
-| TC-P08-002 | `EmergencyStopOk=FALSE` ⇒ même neutralisation | idem | AUTO | §3 |
-| TC-P08-003 | Armement homme-mort seulement : front bouton **et** les 2 axes au neutre (deadband) | `DeadmanArmed` TRUE | AUTO+SITE | §4 |
-| TC-P08-004 | Sans armement, manche hors neutre ⇒ rampe cible 0 (pas de consigne active) | SpeedRef→0 | AUTO | §4 |
-| TC-P08-005 | En mouvement, bouton relâché > `DeadmanRearmTimeout` (10 s) ⇒ désarmement, décél normale | DeadmanArmed FALSE | AUTO+SITE | §4 |
-| TC-P08-006 | Traversée neutre rapide (inversion) < `NeutralHoldTime` (500 ms) ne désarme pas | DeadmanArmed reste TRUE | AUTO | §4 |
-| TC-P08-007 | Neutre tenu ≥ 500 ms **après** un geste démarré ⇒ désarmement | DeadmanArmed FALSE | AUTO | §4 |
-| TC-P08-008 | Changement de `Mode` ⇒ désarmement | DeadmanArmed FALSE | AUTO | §4 |
-| TC-P08-009 | Front descendant `BenneBusy` désarme **sauf** `PreserveArmingAfterBucket` | règle + exception Extraction | AUTO | §4 |
-| TC-P08-010 | `PreserveArmingAfterBucket` TRUE seulement pendant Extraction `CLOSING_BUCKET` | câblage PRG_01 | AUTO | §6 |
-| TC-P08-011 | Calibration hors plage 2000..8000 ⇒ `ErrorId` bit0 ; Reset front seulement si cause disparue | Error | AUTO | §5 |
-| TC-P08-012 | `SpeedRef` signé −100..+100 ; `StartStop` sur magnitude > 0,1 % | ST_AxisCmd | AUTO | §2 |
-| TC-P08-013 | Consommateurs mouvement exigent `DeadmanArmed` (Winch/Trans/Cycle) | linkage PRG_05/06/07 | AUTO | §6 |
-| TC-P08-014 | Pas d'entrée `SafeStop` sur `FB_Joystick` | interface | AUTO | §1 |
+| TC-P08-001 | Perte contacteur puissance, CAN ou joystick non OP ⇒ sorties axes à 0 et `DeadmanArmed=FALSE` | `SpeedRef=0`, `StartStop=FALSE` | AUTO+SITE | §3 |
+| TC-P08-002 | Homme-mort : armement seulement par front bouton au neutre ; sans armement, la rampe cible 0 | `DeadmanArmed` puis `SpeedRef→0` | AUTO+SITE | §4 |
+| TC-P08-003 | Présence : bouton relâché > 10 s en mouvement ⇒ désarmement et décélération normale | `DeadmanArmed=FALSE` | AUTO+SITE | §4 |
+| TC-P08-004 | Neutre : traversée < 500 ms conserve l'armement ; neutre tenu >= 500 ms après geste désarme | `DeadmanArmed` attendu | AUTO | §4 |
+| TC-P08-005 | Changement de mode ou fin benne désarme ; seule Extraction `CLOSING_BUCKET` peut préserver l'armement | câblage + états | AUTO | §4, §6 |
+| TC-P08-006 | Calibration : hors [2000;8000] ⇒ bit0 ; Reset front seulement cause disparue | `ErrorId` | AUTO | §5 |
+| TC-P08-007 | Contrat consigne : `SpeedRef` signé [-100;+100], `StartStop` sur magnitude ; pas d'entrée `SafeStop` | interface `ST_AxisCmd` / FB | AUTO | §1, §2 |
+| TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` en plus de la consigne | linkage PRG_05/06/07 | AUTO | §6 |
 
 ---
 
@@ -48,7 +42,7 @@
 | Fait | Producteur d'**intention** de conduite, pas d'actionneur |
 | Ne fait pas | Arbitrage mode, limites machine, frein, PowerCutOff, Q physiques |
 
-Profil AF03 : brique métier non-mouvement. Gate : `Enable`, `EmergencyStopOk`, diag CAN/device.
+Profil AF03 : brique métier non-mouvement. Gate : `Enable`, `PowerContactorEngaged`, diag CAN/device.
 
 ---
 
@@ -90,7 +84,7 @@ Paramètres d'appel production (`PRG_01`) : deadband / filtre / rates depuis `GV
 |---|---|
 | `Enable` | `TRUE` fixe dans PRG_01 |
 | `Reset` | `FaultMachineReset_IHM` |
-| `EmergencyStopOk` | `PRG_00_Inputs.EmergencyStopOk` |
+| `PowerContactorEngaged` | `PRG_00_Inputs.PowerContactorEngaged` |
 | `Mode` | `PRG_04_Modes.instModes.Mode` (scan N−1) |
 | `BenneBusy` | `PRG_06.instBucket.Busy` (scan N−1) |
 | `PreserveArmingAfterBucket` | Extraction Busy **et** état `CLOSING_BUCKET` |
@@ -111,7 +105,7 @@ Paramètres d'appel production (`PRG_01`) : deadband / filtre / rates depuis `GV
 | `DeadmanArmed` | Geste armé |
 | `Ready/Busy/Done/Error/ErrorId` | État FB |
 
-**Gate** (`Enable` / `EmergencyStopOk` / master CAN OP / device OP) :
+**Gate** (`Enable` / `PowerContactorEngaged` / master CAN OP / device OP) :
 sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 
 ---

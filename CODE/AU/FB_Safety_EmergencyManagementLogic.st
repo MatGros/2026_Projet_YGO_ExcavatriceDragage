@@ -12,8 +12,8 @@ VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
     ArmRequest          : BOOL;        // Demande de réarmement (BtnEmergencyArming)
-    EmergencyChain      : BOOL;        // Retour physique boucle d'urgence amont contacteur
-    EmergencyStopOk     : BOOL;        // Confirmation contacteur de puissance principal
+    EmergencyChainClosed      : BOOL;        // Retour physique boucle d'urgence amont contacteur
+    PowerContactorEngaged     : BOOL;        // Confirmation contacteur de puissance principal
     PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
     BtnEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
 END_VAR
@@ -72,15 +72,15 @@ ArmReqEdge(CLK := ArmRequest);
 // 🔍 2. ACQUITTEMENT DES DÉFAUTS
 IF ResetEdge.Q THEN
     RedundancyTestFailed := FALSE;
-    IF EmergencyStopOk THEN
+    IF PowerContactorEngaged THEN
         EmergencyArmingFailed := FALSE;
     END_IF;
 END_IF;
 
 // 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
-IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChain 
+IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
    AND NOT EmergencyArmingLockoutActive 
-   AND NOT EmergencyStopOk THEN
+   AND NOT PowerContactorEngaged THEN
     ArmingSeqStep := 1;
 END_IF;
 
@@ -90,7 +90,7 @@ IF ArmingSeqStep = 1 THEN
     ForceTestA := TRUE;
     IF TonTestA.Q THEN
         ForceTestA := FALSE;
-        IF EmergencyChain THEN
+        IF EmergencyChainClosed THEN
             RedundancyTestFailed := TRUE;
             ArmingSeqStep := 0;
         ELSE
@@ -104,7 +104,7 @@ END_IF;
 // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
 TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200ms);
 IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
-    IF EmergencyChain THEN
+    IF EmergencyChainClosed THEN
         ArmingSeqStep := 3;
     ELSE
         ArmingSeqStep := 0;
@@ -117,7 +117,7 @@ IF ArmingSeqStep = 3 THEN
     ForceTestB := TRUE;
     IF TonTestB.Q THEN
         ForceTestB := FALSE;
-        IF EmergencyChain THEN
+        IF EmergencyChainClosed THEN
             RedundancyTestFailed := TRUE;
             ArmingSeqStep := 0;
         ELSE
@@ -131,7 +131,7 @@ END_IF;
 // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
 TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200ms);
 IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
-    IF EmergencyChain THEN
+    IF EmergencyChainClosed THEN
         ArmingSeqStep := 5;
     ELSE
         ArmingSeqStep := 0;
@@ -148,7 +148,7 @@ END_IF;
 // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
 TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2s);
 IF ArmingSeqStep = 6 THEN
-    IF EmergencyStopOk THEN
+    IF PowerContactorEngaged THEN
         ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := FALSE;
     ELSIF TonArmingConfirm.Q THEN

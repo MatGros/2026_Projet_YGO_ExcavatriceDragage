@@ -13,8 +13,8 @@ VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
     ArmRequest          : BOOL;        // Demande de réarmement (BtnEmergencyArming)
-    EmergencyChain      : BOOL;        // Retour physique boucle d'urgence amont contacteur
-    EmergencyStopOk     : BOOL;        // Confirmation contacteur de puissance principal
+    EmergencyChainClosed      : BOOL;        // Retour physique boucle d'urgence amont contacteur
+    PowerContactorEngaged     : BOOL;        // Confirmation contacteur de puissance principal
     PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
     BtnEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
 END_VAR
@@ -47,8 +47,8 @@ Logic(
     Enable := Enable,
     Reset := Reset,
     ArmRequest := ArmRequest,
-    EmergencyChain := EmergencyChain,
-    EmergencyStopOk := EmergencyStopOk,
+    EmergencyChainClosed := EmergencyChainClosed,
+    PowerContactorEngaged := PowerContactorEngaged,
     PowerCutOffRequest := PowerCutOffRequest,
     BtnEmergencyCutOff := BtnEmergencyCutOff
 );
@@ -61,7 +61,7 @@ Output(
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
 Ready := Enable;
 Busy  := (Logic.ArmingSeqStep <> 0);
-Done  := EmergencyStopOk;
+Done  := PowerContactorEngaged;
 Error := Logic.Error;
 ErrorId := Logic.ErrorId;
 

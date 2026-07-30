@@ -122,7 +122,7 @@ END_IF;
 // 🪨 L'attestation manuelle est une preuve temporaire, distincte du Kobold.
 // Elle est consommée à l'entrée extraction et annulée dès qu'un mouvement la rend caduque.
 IF NOT (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
-   OR NOT PRG_00_Inputs.EmergencyStopOk
+   OR NOT PRG_00_Inputs.PowerContactorEngaged
    OR PRG_09_Supervision.FaultMachineReset_IHM
    OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
    OR _BucketState.IsOpen THEN
@@ -134,7 +134,7 @@ instDiveSearch(
     Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode := PRG_04_Modes.instModes.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
@@ -155,7 +155,7 @@ instExtractionSequence(
     Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode := PRG_04_Modes.instModes.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
@@ -205,7 +205,7 @@ instBucket(
                            AND PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable
                            AND PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable, // 🆕 Sécurisé : nécessite les deux codeurs valides et M2 non-inhibé
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
@@ -428,7 +428,7 @@ instWinchSync(
                         AND NOT (ForbidAscentM1_Active OR ForbidAscentM2_Active
                                  OR ForbidDescentM1_Active OR ForbidDescentM2_Active), // 🆕 REX 2026-07-08 (7)
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM1      := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CablePosM2      := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
@@ -592,7 +592,7 @@ instWinchM1(
                                AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE)
                                AND NOT PRG_04_Modes.instModes.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M1_StartStop_Active,
     SafeStop                := SafeStopM1_Active,
@@ -637,7 +637,7 @@ instWinchM2(
                                AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE)
                                AND NOT PRG_04_Modes.instModes.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M2_StartStop_Active,
     SafeStop                := SafeStopM2_Active,
@@ -679,7 +679,7 @@ instWinchM2(
 // aucune commande autorisée ne sont produites dans ce programme.
 WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM1FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-WinchM1FinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 WinchM1FinalInterlockRequest.BrakeReleaseRequest := instWinchM1.BrakeCmd;
 WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
@@ -694,7 +694,7 @@ WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 
 WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM2FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-WinchM2FinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
 WinchM2FinalInterlockRequest.BrakeReleaseRequest := instWinchM2.BrakeCmd;
 WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;

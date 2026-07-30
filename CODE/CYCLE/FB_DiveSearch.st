@@ -10,7 +10,7 @@ FUNCTION_BLOCK FB_DiveSearch
 VAR_INPUT
     Enable                 : BOOL;
     Reset                  : BOOL;
-    EmergencyStopOk        : BOOL;
+    PowerContactorEngaged        : BOOL;
     Mode                   : E_Mode;
     MotionRequestActive    : BOOL; (* Intention déjà arbitrée en amont *)
     MotionDirection        : INT;  (* -1 = descente *)
@@ -46,7 +46,7 @@ VAR
     ErrorCausePresent      : BOOL;
 END_VAR
 
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
     BottomTouchConfirmed := FALSE;

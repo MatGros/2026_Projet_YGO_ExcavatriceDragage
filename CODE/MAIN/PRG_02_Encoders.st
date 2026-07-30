@@ -51,7 +51,7 @@ M2_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD2_PosValue;
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
     AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD1_Alarms,
@@ -68,7 +68,7 @@ instHomingM1(
     Enable               := TRUE,
     Calib                := _CalibM1,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged      := PRG_00_Inputs.PowerContactorEngaged,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
@@ -101,7 +101,7 @@ instEncoderScaleM1(
 instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
     AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD2_Alarms,
@@ -118,7 +118,7 @@ instHomingM2(
     Enable               := TRUE,
     Calib                := _CalibM2,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged      := PRG_00_Inputs.PowerContactorEngaged,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
@@ -151,7 +151,7 @@ instEncoderScaleM2(
 instEncoderSafetyM1(
     Enable          := TRUE,
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM1.CablePosM,
     HomingSuspect   := instHomingM1.HomingSuspect,
@@ -164,7 +164,7 @@ EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 instEncoderSafetyM2(
     Enable          := TRUE,
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM2.CablePosM,
     HomingSuspect   := instHomingM2.HomingSuspect,

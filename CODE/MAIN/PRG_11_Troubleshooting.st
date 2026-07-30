@@ -59,7 +59,7 @@ instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonM
     M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback, M3BrakeApplied := PRG_00_Inputs.M3BrakeFeedback,
     M1ContactorsReleased := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, M2ContactorsReleased := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, M1ThermalOk := PRG_00_Inputs.M1ThermalFeedback, M2ThermalOk := PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalOk := PRG_00_Inputs.BrakeThermalFeedback, PhaseRotationOk := PRG_00_Inputs.PhaseRotationOk, SlackCableTensioned := PRG_00_Inputs.SlackCableSwitch, M3SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent,
-    EmergencyChain := PRG_00_Inputs.EmergencyChain, EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
+    EmergencyChainClosed := PRG_00_Inputs.EmergencyChainClosed, PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1 := PRG_02_Encoders.instHomingM1.Homed, HomedM2 := PRG_02_Encoders.instHomingM2.Homed,
     M1PositionInBounds := (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= -99.0) AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= 99.0), M2PositionInBounds := (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= -99.0) AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= 99.0));
 instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
@@ -77,8 +77,8 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (PRG_
 GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal    := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm OR GVL_IHM.M2TreuilBenne.Bypass.OperatorComm OR GVL_IHM.TranslationM3.Bypass.Global;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal    := GVL_IHM.Commun.Bypass.TopPositionSensor OR GVL_IHM.Commun.Bypass.SlackCable OR GVL_IHM.TranslationM3.Bypass.LimitSwitch;
 
-GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx302_EmergencyStopOk        := PRG_00_Inputs.EmergencyStopOk;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChainClosed;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged  := PRG_00_Inputs.PowerContactorEngaged;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny       := PRG_03_Safety.instSafetyWinchM1.SafeStop OR PRG_03_Safety.instSafetyWinchM2.SafeStop OR PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny   := PRG_03_Safety.instSafetyWinchM1.PowerCutOff OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 
@@ -95,7 +95,7 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx201_JoyYRaw_Pct           := PRG_01
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM       := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx203_ArbitratedSpeed_Pct   := PRG_06_WinchControl.M1_SpeedRef_Active;
 
-GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx302_SyncFaultActive       := PRG_06_WinchControl.instWinchSync.Error;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx303_M1_ForbidAscent       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx304_M2_ForbidAscent       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
@@ -126,7 +126,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm   :=
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct  := PRG_06_WinchControl.M1_SpeedRef_Active;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection  := PRG_06_WinchControl.M1_Direction_Active;
 
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive         := PRG_03_Safety.instSafetyWinchM1.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive      := PRG_03_Safety.instSafetyWinchM1.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI   := PRG_00_Inputs.TopPositionSensor;
@@ -173,7 +173,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm   :=
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct  := PRG_06_WinchControl.M2_SpeedRef_Active;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection  := PRG_06_WinchControl.M2_Direction_Active;
 
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive         := PRG_03_Safety.instSafetyWinchM2.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive      := PRG_03_Safety.instSafetyWinchM2.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI   := PRG_00_Inputs.TopPositionSensor;
@@ -212,7 +212,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen             :=
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose            := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open              := PRG_05_Cycle.instCycle.CmdBucket_Open;
 
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed       := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed       := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive          := PRG_06_WinchControl.instBucket.Error;
 
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy                 := PRG_06_WinchControl.instBucket.Busy;
@@ -241,7 +241,7 @@ GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive           :
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive  := GVL_IHM.TranslationM3.Bypass.Global;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
-GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive        := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx303_PowerCutOffActive     := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;

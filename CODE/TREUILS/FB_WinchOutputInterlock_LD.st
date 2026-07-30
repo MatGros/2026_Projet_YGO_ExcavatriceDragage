@@ -12,7 +12,7 @@ FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock_LD
 VAR_INPUT
     Enable                       : BOOL;
     Reset                        : BOOL;
-    EmergencyStopOk              : BOOL;
+    PowerContactorEngaged              : BOOL;
     SafeStop                     : BOOL;
     BrakeReleaseRequest          : BOOL;
     BrakeCommandOpenConfirmed    : BOOL;
@@ -70,7 +70,7 @@ ResetEdge(CLK := Reset);
 // ErrorId, RestartInhibit et ResetRequired ne sont jamais effacés par une perte
 // Enable/AU : celle-ci coupe uniquement les sorties. Le retour exige toujours un
 // acquittement conscient puis une nouvelle demande opérateur.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#900ms);

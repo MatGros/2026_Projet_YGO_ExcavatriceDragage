@@ -15,7 +15,7 @@ FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMonitor
 VAR_INPUT
     Enable                     : BOOL;        // Autorise la surveillance
     Reset                      : BOOL;        // Acquittement par front
-    EmergencyStopOk            : BOOL;        // Contexte sécurité global valide
+    PowerContactorEngaged            : BOOL;        // Contexte sécurité global valide
     Mode                       : E_Mode;      // Contexte de fonctionnement
     SpeedMps                   : REAL;        // Vitesse linéaire absolue mesurée (m/s)
     SpeedVariationThresholdMps : REAL;        // Variation minimale à surveiller (m/s)
@@ -46,7 +46,7 @@ VAR
 END_VAR
 
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
     Busy := FALSE;
     Done := FALSE;

@@ -4,7 +4,7 @@
 TYPE ST_ModesState :
 STRUCT
     CurrentMode           : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
-    EmergencyStopOk       : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
+    PowerContactorEngaged       : BOOL;   (* 🛡️ État de la chaîne d'arrêt d'urgence *)
     AnyFaultActive        : BOOL;   (* 🔴 REX 2026-07-07 : au moins un défaut/alarme actif dans le domaine
                                         sécurité/métier — s'éteint seul quand la cause disparaît ET que
                                         BtnFaultReset a été pressé (OR de tous les .Error du domaine,
@@ -15,7 +15,7 @@ STRUCT
                                         INVERSÉE (fail-safe, TRUE=maintenu/OK) — ce champ IHM reste en
                                         polarité "alarme" (TRUE=problème) pour cohérence avec AnyFaultActive *)
     EmergencyChainOk      : BOOL;   (* 🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif) *)
-    PowerContactorOk      : BOOL;   (* 🔌 Contacteur de puissance confirmé engagé (miroir EmergencyStopOk) *)
+    PowerContactorOk      : BOOL;   (* 🔌 Contacteur de puissance confirmé engagé (miroir PowerContactorEngaged) *)
     EmergencyArmable      : BOOL;   (* 🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,
                                         ni RedundancyTestFailed) *)
     EmergencyArmingBusy   : BOOL;   (* ⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée *)

@@ -14,7 +14,7 @@ FUNCTION_BLOCK PUBLIC FB_TranslationOutputInterlock_LD
 VAR_INPUT
     Enable                       : BOOL;
     Reset                        : BOOL;
-    EmergencyStopOk              : BOOL;
+    PowerContactorEngaged              : BOOL;
     SafeStop                     : BOOL;
     BrakeReleaseRequest          : BOOL;
     BrakeCommandOpenConfirmed    : BOOL;
@@ -52,7 +52,7 @@ ResetEdge(CLK := Reset);
 
 // RestartInhibit et ResetRequired sont volontairement conservés : un changement
 // Enable/AU ne doit jamais réautoriser automatiquement le mouvement après timeout.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
     DriveFreqRefHz := 0.0;

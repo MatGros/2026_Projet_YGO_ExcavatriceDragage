@@ -23,7 +23,7 @@ FUNCTION_BLOCK PUBLIC FB_Encoder_Safety
 VAR_INPUT
     Enable           : BOOL;        // Standard
     Reset            : BOOL;        // Acquittement défaut (front) — bit0 uniquement (bit1 suit HomingSuspect, voir §7bis)
-    EmergencyStopOk  : BOOL;        // Standard
+    PowerContactorEngaged  : BOOL;        // Standard
     Mode             : E_Mode;      // Standard (contexte, pas encore exploité ce lot)
     CablePosM        : REAL;        // Sortie FB_Encoder_Scale DE CE TREUIL
     HomingSuspect    : BOOL;        // Sortie FB_Encoder_Homing DE CE TREUIL (§3.7, déjà calculé)

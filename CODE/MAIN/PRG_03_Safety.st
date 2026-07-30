@@ -31,7 +31,7 @@ instSafetyWinchM1(
     // sur un composant RÉEL protège, un composant SIMULÉ ne fait jamais défaut de lui-même).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
@@ -92,7 +92,7 @@ instSafetyWinchM2(
     // 🔧 REX 2026-07-15 (2) — même simplification que M1 ci-dessus (voir bandeau instSafetyWinchM1).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
@@ -150,7 +150,7 @@ instSafetyWinchM2(
 instSpeedMonitorM1(
     Enable                     := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged            := PRG_00_Inputs.PowerContactorEngaged,
     Mode                       := PRG_04_Modes.instModes.Mode,
     SpeedMps                   := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
@@ -160,7 +160,7 @@ instSpeedMonitorM1(
 instSpeedMonitorM2(
     Enable                     := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged            := PRG_00_Inputs.PowerContactorEngaged,
     Mode                       := PRG_04_Modes.instModes.Mode,
     SpeedMps                   := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
@@ -172,7 +172,7 @@ instSpeedMonitorM2(
 instLoadEstimatorM1(
     Enable           := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged  := PRG_00_Inputs.PowerContactorEngaged,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M1MeasuredSpeed_Mps,
@@ -183,7 +183,7 @@ instLoadEstimatorM1(
 instLoadEstimatorM2(
     Enable           := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged  := PRG_00_Inputs.PowerContactorEngaged,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M2MeasuredSpeed_Mps,
@@ -201,7 +201,7 @@ instSafetyTranslationM3(
     // InhibitM1/M2) : Enable inconditionnel, comme en Auto.
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,

@@ -39,7 +39,7 @@ FUNCTION_BLOCK PUBLIC FB_WinchSync
 VAR_INPUT
     Enable          : BOOL;        // Standard — Partie5 §2 : FB_WinchSync.Enable := SyncEnable (câblage PRG_MAIN)
     Reset           : BOOL;        // Acquittement défaut (front)
-    EmergencyStopOk : BOOL;        // Standard
+    PowerContactorEngaged : BOOL;        // Standard
     Mode            : E_Mode;      // Arbitre SyncActive (voir en-tête)
     CablePosM1      : REAL;        // Sortie FB_Encoder_Scale M1
     CablePosM2      : REAL;        // Sortie FB_Encoder_Scale M2
@@ -90,7 +90,7 @@ END_VAR
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
 // 🛑 1. GATE
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     DeltaPosM := 0.0;

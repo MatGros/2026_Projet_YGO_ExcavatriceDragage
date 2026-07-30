@@ -99,7 +99,7 @@ Le nom d'une E/S dit ce que signifie `TRUE`.
 | 🛑 Freins | `M*_BrakeIsOpen_DI`, `M*_BrakeRelease_RQ` |
 | 🪨 Kobold | `M1_M2_KoboldContactFond_DI`, `M1_M2_KoboldMeasureEnable_DQ` |
 
-`PowerContactorEngaged_DI` confirme le contacteur de puissance et alimente le portail `EmergencyStopOk`.  
+`PowerContactorEngaged_DI` confirme le contacteur de puissance et alimente le portail `PowerContactorEngaged`.  
 `EmergencyChainClosed_DI` confirme la boucle AU.  
 `PowerKeepAlive_*=TRUE` maintient la puissance ; sa retombee ouvre la chaine.
 

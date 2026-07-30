@@ -9,7 +9,7 @@ FUNCTION_BLOCK FB_ExtractionSequence
 VAR_INPUT
     Enable                     : BOOL;
     Reset                      : BOOL;
-    EmergencyStopOk            : BOOL;
+    PowerContactorEngaged            : BOOL;
     Mode                       : E_Mode;
     MotionRequestActive        : BOOL;
     MotionDirection            : INT; (* +1 = montée *)
@@ -48,7 +48,7 @@ VAR
     ErrorCausePresent          : BOOL;
 END_VAR
 
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
     BottomConfirmationConsumed := FALSE;

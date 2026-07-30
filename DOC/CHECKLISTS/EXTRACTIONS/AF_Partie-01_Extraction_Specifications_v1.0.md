@@ -64,7 +64,7 @@
 |---|---|---|
 | Commande normale | `StartStop = FALSE`, `Enable = TRUE`, pas de `SafeStop` | Deceleration normale. |
 | Arret rapide logiciel | `SafeStop = TRUE`, `Enable = TRUE` | Deceleration rapide ; le FB de mouvement reste actif jusqu'a l'arret. |
-| Neutralisation | `Enable = FALSE` ou `EmergencyStopOk = FALSE` | Sorties du FB neutralisees. |
+| Neutralisation | `Enable = FALSE` ou `PowerContactorEngaged = FALSE` | Sorties du FB neutralisees. |
 | Safety mouvement | Defaut dangereux detecte par le bloc safety du domaine | `SafeStop` et, si le risque le justifie, demande de coupure totale de puissance. |
 | Arret d'urgence / coupure puissance | Bouton AU physique, perte du maintien PLC, ou demande safety majeure | Coupure materielle de l'energie moteurs/actionneurs par le contacteur general ; l'automate reste alimente. |
 
@@ -87,7 +87,7 @@
 | Boucle AU physique | Boutons coup-de-poing en serie ; elle coupe le contacteur general independamment de toute decision logicielle. |
 | Deux sorties relais PLC | Integrees a la boucle AU pour permettre une coupure puissance demandee par l'automate dans certains cas safety. |
 | Retour boucle | Indique que les conditions electriques d'armement sont reunies ; ce n'est pas le portail maitre des FB mouvement. |
-| Retour contacteur | Confirme que le contacteur de puissance est reellement engage ; il devient le portail `EmergencyStopOk` des FB mouvement. |
+| Retour contacteur | Confirme que le contacteur de puissance est reellement engage ; il devient le portail `PowerContactorEngaged` des FB mouvement. |
 | Commande de rearmement | Impulsion PLC commandee explicitement par l'operateur depuis l'IHM ; elle remplace fonctionnellement un bouton de rearmement, elle n'est pas un rearmement automatique. |
 | Anti-auto-rearmement | Le retour a une boucle saine ne doit jamais, a lui seul, reenclencher le contacteur. |
 | Requete de rearmement | Front montant, boucle saine, contacteur ouvert, aucune impulsion/verrouillage deja actif. |
@@ -141,7 +141,7 @@
 
 | Priorite | Point | Action requise |
 |---|---|---|
-| Haute | Noms des E/S safety | Verifier les noms finaux sur les devices reels et/ou l'export CODESYS avant de retenir `EmergencyChain`, `PowerKeepAlive`, `PowerCutOff` ou leurs suffixes. |
+| Haute | Noms des E/S safety | Verifier les noms finaux sur les devices reels et/ou l'export CODESYS avant de retenir `EmergencyChainClosed`, `PowerKeepAlive`, `PowerCutOff` ou leurs suffixes. |
 | Haute | Polarite des sorties safety | Verifier sur le cablage et les devices que `TRUE` maintient bien chaque voie en etat sain et que l'absence de commande ouvre la boucle. |
 | Haute | Redondance A/B | Essai terrain de coupure independant par canal et verification de l'absence de retour de divergence. |
 | Haute | Frein | Definir seuil vitesse, temporisations, source de vitesse fiable et repli en cas de perte de mesure. |

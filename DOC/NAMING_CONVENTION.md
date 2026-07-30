@@ -73,7 +73,7 @@ Source et cas existants : `AUDITS/PreLivraison/TABLE_Renommage_IO_v1.0.md`.
 
 | Suffixe | Sens | Exemple |
 |---|---|---|
-| `_DI` | **D**igital **I**nput — entrée digitale brute, point I/O physique | `M1_BrakeFeedback_DI`, `PosFosse1_DI`, `EmergencyStopOk_DI` |
+| `_DI` | **D**igital **I**nput — entrée digitale brute, point I/O physique | `M1_BrakeFeedback_DI`, `PosFosse1_DI`, `PowerContactorEngaged_DI` |
 | `_DQ` | **D**igital **Q** — sortie digitale, point I/O physique final (après `FB_Output`) | `M1_RelayFwd_DQ`, `M3_RelayFwd_DQ` |
 | `_RQ` | Sortie **relais** — requête maintenue logicielle, juste avant `_DQ`/le contacteur | `PowerCutOff_A_RQ`, `GridUp_RQ`, `HelmetOpen_RQ` |
 
@@ -98,7 +98,7 @@ SafeStop             → BOOL : sortie d'un bloc safety MÉTIER, consommée en e
                         par les FB de mouvement de son domaine (1 SafeStop par métier,
                         pas de signal global unique). TRUE = rampe décélération RAPIDE.
                         Enable reste actif pendant SafeStop (≠ neutralisation).
-EmergencyStopOk       → BOOL : chaîne de sécurité AU (arrêt d'urgence) réarmée / OK,
+PowerContactorEngaged       → BOOL : chaîne de sécurité AU (arrêt d'urgence) réarmée / OK,
                         ou retour contacteur de puissance (source à définir par métier).
                         Anciennement nommé SafetyOk — renommé pour éviter l'ambiguïté
                         avec SafeStop.
@@ -117,7 +117,7 @@ complète sur ce projet (voir incident ci-dessous).
 
 | Famille | Convention | Exemples | Pourquoi |
 |---|---|---|---|
-| **Capteur de sécurité** (entrée brute, suffixe `Ok` ou assimilé fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `EmergencyStopOk`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk`, `GVL_IN.TopPositionSensor` (sain si non atteint), `GVL_IN.DriveFaultOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
+| **Capteur de sécurité** (entrée brute, suffixe `Ok` ou assimilé fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `PowerContactorEngaged`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk`, `GVL_IN.TopPositionSensor` (sain si non atteint), `GVL_IN.DriveFaultOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
 | **Information / état classique** (entrée brute) | `FALSE` = repos ; `TRUE` = capteur atteint/déclenché | `TranslationPosFosse1/Fosse2/Maintenance/Tremie` | Logique directe : "je suis arrivé à la position" = `TRUE`. Pas d'enjeu fail-safe. |
 | **Sortie de COMMANDE d'un bloc Safety** (calculée, PAS un capteur) | `TRUE` = **déclenche** l'action | `SafeStop` (déclenche décél. rapide), `ForbidDescent` (déclenche l'interdiction), `PowerCutOff` (déclenche la coupure) | Nom = un verbe d'action, pas un état de capteur — c'est l'inverse de la famille "sécurité" ci-dessus, volontairement. |
 
@@ -382,7 +382,7 @@ STRUCT
     StartStop   : BOOL;       (* TRUE = rampe accel, FALSE = rampe decel normale *)
     SpeedRef    : REAL;       (* Consigne vitesse 0..100% *)
     Direction   : INT;        (* -1=Rev, 0=Neutre, +1=Fwd *)
-    EmergencyStopOk : BOOL;   (* Chaine AU réarmée / contacteur puissance OK *)
+    PowerContactorEngaged : BOOL;   (* Chaine AU réarmée / contacteur puissance OK *)
 END_STRUCT
 END_TYPE
  

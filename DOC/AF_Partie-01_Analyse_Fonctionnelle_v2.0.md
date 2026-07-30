@@ -111,7 +111,7 @@ coupure de puissance.
 | Role machine | Sens |
 |---|---|
 | Retour boucle AU | Boucle physique fermee ; precondition a l'armement — pas le portail mouvement. |
-| Retour contacteur | Contacteur reellement engage ; portail maitre `EmergencyStopOk` des mouvements. |
+| Retour contacteur | Contacteur reellement engage ; portail maitre `PowerContactorEngaged` des mouvements. |
 | Canaux maintien A/B | Deux voies PLC fail-safe : maintien actif a l'etat sain, ouverture = coupure. |
 | Impulsion rearmement | Commande explicite operateur ; jamais d'auto-rearmement sur seule boucle saine. |
 

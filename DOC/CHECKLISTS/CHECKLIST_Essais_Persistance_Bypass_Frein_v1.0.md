@@ -63,7 +63,7 @@ Ce chapitre résume les **constats expérimentaux réalisés sur le code actuel*
 #### 🧪 Scénario 3 : Auto-Test et Verrouillage Réarmement Boucle d'Urgence (TEST-11)
 * **Contexte** : Contrôle de la redondance des contacteurs d'Arrêt d'Urgence (`FB_Safety_EmergencyManagementLogic`).
 * **Procédure d'Essai** :
-  1. Forcer le retour `EmergencyChain = TRUE` alors que l'étape 1 coupe le canal A (`ForceTestA = TRUE`).
+  1. Forcer le retour `EmergencyChainClosed = TRUE` alors que l'étape 1 coupe le canal A (`ForceTestA = TRUE`).
   2. Vérifier le basculement de `RedundancyTestFailed` à `TRUE` et l'arrêt de la séquence d'armement.
 * **Résultat Attendu** : La commande d'armement `EmergencyArming_Cmd` ne doit jamais être émise (Étape 5 non atteinte). La puissance amont reste coupée. Un appui `Reset` explicite est requis après correction physique.
 

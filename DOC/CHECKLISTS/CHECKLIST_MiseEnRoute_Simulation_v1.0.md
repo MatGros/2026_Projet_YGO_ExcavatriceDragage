@@ -85,7 +85,7 @@ contournée.
 
 | # | Test | Attendu |
 |---|---|---|
-| 1 | Séquence de réarmement (`Modes.Cmd.BtnEmergencyArming`) | auto-test A/B → contacteur confirmé → `EmergencyStopOk = TRUE` |
+| 1 | Séquence de réarmement (`Modes.Cmd.BtnEmergencyArming`) | auto-test A/B → contacteur confirmé → `PowerContactorEngaged = TRUE` |
 | 2 | Couper la chaîne simulée | `SafeStop` immédiat, freins serrés |
 | 3 | Kobold : `SimKoboldContactValue` | ⚠️ voir T81 — la logique de détection de fond est **connue comme incomplète** aujourd'hui |
 
