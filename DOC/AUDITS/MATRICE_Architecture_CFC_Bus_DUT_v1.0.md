@@ -49,41 +49,42 @@ Pour éviter le mélange entre l'Acquisition, la Sécurité, le Contrôle et les
 
 Tous les échanges du CFC reposent sur **8 Structures de Bus Standardisées** :
 
-### 1. `ST_HwIn_Bus` (Bus des Entrées Conditionnées)
+### 1. `ST_HwInBus` (Bus des Entrées Conditionnées)
 - **Émetteur** : `PRG_00_Acquisition_CFC` (`instInputs`)
-- **Reçoit** : Bornier physique + `ST_Cmd_ModesBus` (pour l'aiguillage réversible Réel ↔ Simulation).
+- **Reçoit** : Bornier physique + `ST_CmdModesBus` (pour l'aiguillage réversible Réel ↔ Simulation).
 - **Contenu** : `EmergencyStopOk`, `EmergencyChain`, `TopPositionSensor`, `SlackCableSwitch`, `PhaseRotationOk`, `BrakeThermalFeedback`, `M1FwdRevSpeedFeedbackOff`, `M1ThermalFeedback`, `M1BrakeFeedback`, `M2FwdRevSpeedFeedbackOff`, `M2ThermalFeedback`, `M2BrakeFeedback`, `M3SensorsWord`.
 
-### 2. `ST_Diag_NetworkBus` (Bus de Santé des Lignes Réseau)
+### 2. `ST_DiagNetworkBus` (Bus de Santé des Lignes Réseau)
 - **Émetteur** : `PRG_00_Acquisition_CFC` (`instDiagCanOpen`, `instDiagEthercat`)
 - **Contenu** : `JoystickOnline`, `JoystickOperational`, `DriveM3Online`, `DriveM3Operational`, `EncoderM1Online`, `EncoderM2Online`, `NetworkGlobalError`.
 
-### 3. `ST_Cmd_JoystickBus` (Bus du Organe de Conduite Manuel)
+### 3. `ST_CmdJoystickBus` (Bus du Organe de Conduite Manuel)
 - **Émetteur** : `PRG_00_Acquisition_CFC` (`FB_Joystick_0`)
-- **Contenu** : `DeadmanArmed`, `SpeedRefX_Pct`, `SpeedRefY_Pct`, `RawX`, `RawY`, `JoystickFault`.
+- **Contenu** : `DeadmanArmed`, `SpeedRefX_Pct`, `SpeedRefY_Pct`, `RawX`, `RawY`, `JoystickFault`, `IsCentralPositionX`, `IsCentralPositionY`.
 
-### 4. `ST_Cmd_ModesBus` (Bus de Configuration & Modes Machine)
+### 4. `ST_CmdModesBus` (Bus de Configuration & Modes Machine)
 - **Émetteur** : `FB_Modes`
 - **Contenu** : `ActiveMode` (`E_Mode`), `SimulationModeActive`, `SyncEnable`, `InhibitM1`, `InhibitM2`, `BypassGlobal`, `HomingApproachEnable`.
 
-### 5. `ST_Safety_WinchBus` / `ST_Safety_TranslationBus` (Bus Chapeau Sécurité)
+### 5. `ST_SafetyWinchBus` / `ST_SafetyTranslationBus` (Bus Chapeau Sécurité)
 - **Émetteur** : `FB_Safety_Winch` (M1 & M2) / `FB_Safety_Translation` (M3)
 - **Consommateurs** : Blocs actionneurs `FB_Winch` et `FB_Translation` (Entrée du HAUT).
 - **Contenu** : `SafeStop`, `PowerCutOff`, `ForbidAscent`, `ForbidDescent`, `ErrorId`, `ErrorOperatorComm`, `ErrorDriveComm`, `ErrorMecaA`, `ErrorMecaB`.
 
-### 6. `ST_Cmd_WinchBus` / `ST_Cmd_TranslationBus` (Bus Consignes Arbitrées)
+### 6. `ST_CmdWinchBus` / `ST_CmdTranslationBus` (Bus Consignes Arbitrées)
 - **Émetteur** : Organe de commande (Joystick en Manuel, `FB_Cycle` en Auto, Bouton IHM en Maint).
 - **Contenu** : `StartStop`, `Direction`, `SpeedRefPct`, `TargetNum`, `ActiveOffsetM` (Benne).
 
-### 7. `ST_Action_WinchBus` / `ST_Action_TranslationBus` (Bus d'Ordres Actionneurs)
+### 7. `ST_ActionWinchBus` / `ST_ActionTranslationBus` (Bus d'Ordres Actionneurs)
 - **Émetteur** : Actionneurs `FB_Winch` M1/M2 / `FB_Translation` M3.
 - **Consommateur** : Barrière de sortie `FB_*OutputInterlock_LD`.
 - **Contenu** : `RequestedRelayFwd`, `RequestedRelayRev`, `RequestedContactor1..4`, `RequestedStep`, `BrakeReleaseRequest`, `RequestedDriveFreqHz`, `RequestedDriveControlWord`.
 
-### 8. `ST_State_WinchBus` / `ST_State_TranslationBus` (Bus de Diagnostic IHM & Supervision)
+### 8. `ST_StateWinchBus` / `ST_StateTranslationBus` (Bus de Diagnostic IHM & Supervision)
 - **Émetteur** : Actionneurs & Barrières de sortie.
 - **Consommateur** : `PRG_09_Supervision` ➔ Copie directe dans `GVL_IHM`.
 - **Contenu** : `Ready`, `Busy`, `Done`, `State`, `StateAtError`, `BrakeCmd`, `BrakeTimeoutElapsed`, `RestartInhibit`.
+
 
 ---
 
