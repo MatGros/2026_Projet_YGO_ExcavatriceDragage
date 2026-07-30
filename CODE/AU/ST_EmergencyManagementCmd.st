@@ -7,8 +7,8 @@
       TRUE = voie maintenue saine, FALSE = coupure demandée — la règle C1
       interdit un nom portant « coupure » quand le sens est « maintien »).
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 TYPE ST_EmergencyManagementCmd :

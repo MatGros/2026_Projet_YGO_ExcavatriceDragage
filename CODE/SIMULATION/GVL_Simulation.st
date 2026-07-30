@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13/AF_Partie-13_Fonction_Simulation_v2.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    📄 Lot L6 : Refonte à 5 flags principaux (1 bit maître + 4 domaines)
    🎯 Polarité positive : TRUE = simulé, FALSE = réel (par défaut).
    ═══════════════════════════════════════════════════════════════ *)

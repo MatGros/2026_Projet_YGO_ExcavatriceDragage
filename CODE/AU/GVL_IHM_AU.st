@@ -9,7 +9,7 @@
      GVL_IHM_AU.Cmd.BtnEmergencyArming   -> ecrit par l'IHM
      GVL_IHM_AU.State.ContactorOk         -> lu par l'IHM
    ==============================================================
-    Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
            DOC/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 

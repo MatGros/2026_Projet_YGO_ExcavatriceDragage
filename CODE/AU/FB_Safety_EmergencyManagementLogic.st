@@ -7,8 +7,8 @@
    🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien).
       Ajout autotest démarrage (§5.4 AF01) + bus State/Diag.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
