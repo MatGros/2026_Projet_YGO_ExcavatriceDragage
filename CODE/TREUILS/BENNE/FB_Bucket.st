@@ -1,12 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
    🪣 FB_Bucket — Commande d'ouverture/fermeture du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v2.0.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
       (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
       FERME désormais le benne, DEROULAGE M2 (Direction=-1) l'OUVRE
-      (c'était l'inverse avant). Voir DOC/AF_Partie-12_Fonction_Benne_v1.4.md §REX.
+      (c'était l'inverse avant). Voir DOC/AF_Partie-12_Fonction_Benne_v2.0.md §REX.
    ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
       ne sont fiables que si les codeurs absolus sont référencés (Partie10).
       Sans ça, une position aberrante (codeur non homé) pourrait faire
@@ -23,7 +23,7 @@
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md "flux nominal, benne ouvert").
+        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v2.0.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).

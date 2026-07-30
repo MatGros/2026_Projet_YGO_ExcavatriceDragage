@@ -143,6 +143,25 @@ sous interlocks Extraction. **Hors** cet état, toute fin benne désarme (pas de
 | Reset | Front + Raw encore dans plage → clear bit0 |
 | Neutres | Persistants (`_JoystickNeutralX/Y`) |
 
+### 5bis. Procédure calibration terrain (SITE)
+
+| # | Étape | Attendu |
+|---|---|---|
+| 1 | Manche **relâché physiquement** (repos mécanique) | — |
+| 2 | Front `BtnCalibrate` (IHM) | `NeutralXAct`/`NeutralYAct` ← `RawX`/`RawY` courants |
+| 3 | Vérifier `NeutralXAct`/`NeutralYAct` proches de **5000** ±quelques centaines | Sinon jeu mécanique/capteur à investiguer |
+| 4 | Débattement complet des 2 axes, les 4 directions | `SpeedRef` atteint ±100 % de façon symétrique |
+| 5 | Redémarrage/download PLC | Neutre **conservé** (persistant) — pas de recalibration surprise |
+
+⚠️ **Point ouvert** : présence confirmée d'un bouton `BtnCalibrate` sur l'écran HMI **non
+vérifiée** dans ce lot (variable IHM existe côté PLC, `ST_JoystickCmd`, mais l'écran WebVisu/HMI
+lui-même n'a pas été inspecté). À valider avant mise en service.
+
+| TC | Attendu | Type |
+|---|---|---|
+| TC-P08-009 | Neutre persiste après download/redémarrage PLC | SITE |
+| TC-P08-010 | Bouton calibration accessible et fonctionnel sur écran HMI réel | SITE |
+
 ---
 
 ## 6. Intégration programme
