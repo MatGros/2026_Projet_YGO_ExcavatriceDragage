@@ -6,7 +6,7 @@
       et applique une zone morte en %.
    Sortie : OutPct ∈ [-100.0 .. +100.0] (0.0 si dans la deadband)
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md
+   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
 *)
 
 FUNCTION_BLOCK FB_AxisScale

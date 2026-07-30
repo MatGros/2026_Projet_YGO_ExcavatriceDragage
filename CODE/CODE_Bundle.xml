@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-28T19:15:32.859163" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-28T19:15:32.859163">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T13:13:23.737466" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-30T13:13:23.737466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -566,7 +566,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ ST_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §8
+    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.0.md §3
    ⚠️ MISE EN CONFORMITÉ (remplace la version actuelle du projet) :
       - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
         TRUE = rampe accélération, FALSE = rampe décélération normale)
@@ -2887,8 +2887,8 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §5,
-                   DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §7bis
+    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.0.md §3,
+                    DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2
    Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
    détecter un collage / une absence de fermeture d'un contacteur de
    puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
@@ -3354,7 +3354,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔧 ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §3ter
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3576,7 +3576,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    📄 Transporte les ordres logiques entre le bloc de décision
       et le bloc de commande de la boucle d'urgence.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderCalib">
@@ -4343,7 +4343,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md §Sécurité électrique)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §5)
 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
               </documentation>
             </variable>
@@ -4653,7 +4653,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎮 ST_OperatorAction — Consigne unique de conduite opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v1.7.md
+   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v2.0.md
    🎯 Les alarmes restent dans Error/ErrorId : cette struct répond seulement
       à « quelle action attend-on maintenant de l'opérateur ? ».
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -7050,7 +7050,7 @@ Temps de fermeture contacteur de puissance</xhtml>
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md §3
-                   (règles issues de DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §4)
+                   (règles issues de DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
    📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
@@ -8956,7 +8956,7 @@ Distance de remontée lente de contrôle</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔄 FB_Cycle — Séquenceur du Cycle Automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
@@ -9642,7 +9642,7 @@ Bus réellement actif, hors tout bypass</xhtml>
    But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
    bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
    réel ne l'était pas.
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
 
    🐛 REX 2026-07-24 (bis) — BUG CORRIGÉ (mesure terrain mise en service) : l'ancien code comparait
    CANbusStateRaw = 1 pour "actif", valeur JAMAIS vérifiée sur le vrai bus (devinée à l'écriture du
@@ -10038,7 +10038,7 @@ GetDeviceState() = RUNNING, hors tout bypass</xhtml>
    But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
    bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
    réel ne l'était pas.
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -10399,7 +10399,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌊 FB_DiveSearch — Assistance plongée et recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §3ter
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    🛡️ Sécurité : T81/T82. Jamais de descente assistée sans séquence 0→1→0 valide.
    🧩 Responsabilité : qualifie le Kobold et autorise uniquement la descente cohérente.
    🔌 Interface : intention de descente + mesures → autorisation + fond validé.
@@ -12641,7 +12641,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⛏️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §3ter
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    🛡️ Sécurité : aucune remontée assistée sans fond confirmé ; palier 1 au contrôle.
    🧩 Responsabilité : séquence métier, jamais commande directe de contacteur.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -12953,7 +12953,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    💓 FB_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v1.7.md (mise à jour Heartbeat requise)
+   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
    🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
       et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
    🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
@@ -13094,7 +13094,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📥 FB_Input — Entrée TOR conditionnée (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §1
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1
    🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
       complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
       de conditionnement bas niveau, à instancier en tableau (§3) ou
@@ -13976,7 +13976,7 @@ Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ FB_Modes — Arbitrage du mode machine (MVP — diffusion, pas encore overrides complets)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md §1/§2
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md §1/§2
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 RÔLE CE LOT : sélectionner/arbitrer `Mode` (source unique diffusée à TOUS les FB
       métier) + garde-fous minimaux :
@@ -14228,7 +14228,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 FB_Output — Sortie relais + feedback (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §2
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2
    🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
       transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
       appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
@@ -14727,7 +14727,7 @@ Current := LIMIT(-100.0, Current, 100.0);
    🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le 
       Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -14955,7 +14955,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
    📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
       la boucle d'arrêt d'urgence. Produit les consignes logiques.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -15161,7 +15161,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
    📄 Rôle : Transmet les ordres de sécurité logiques vers les 
       sorties physiques de l'automate (relais d'AU A/B/Impulsion).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -16536,7 +16536,7 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md,
                    DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §7
-                   (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
+                    (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2/§3)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
    📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
@@ -19686,7 +19686,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §3bis
+    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.0.md §3
    🧩 Brique réduite (Partie3 §1bis) : pure logique combinatoire, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
       Maintenance) en mot de progression, dérive les 2 limites extrêmes et
@@ -22364,7 +22364,7 @@ Modifiable à chaud en vue instance, sans recompiler.</xhtml>
    │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
    │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
    └──────────────────────────┴──────────┴─────────────────────────────────┘
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §5
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ══════════════════════════════════════════════════════════════════════════</xhtml>
@@ -22789,7 +22789,7 @@ CANbus.GetBusState() brut</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md ; DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23286,7 +23286,7 @@ EncoderFaultPresent := EncoderFaultPresentM1 OR EncoderFaultPresentM2;
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 3.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23554,7 +23554,7 @@ instSafetyTranslationM3(
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 4.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md</xhtml>
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -23712,7 +23712,7 @@ Profondeur de dragage cible (mètres, négative)</xhtml>
    ⚙️ Exécuté par la tâche PLC en position 5.
    ✅ Gère la machine d'état principale de dragage (FB_Cycle).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md</xhtml>
+   📄 Docs : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -25011,7 +25011,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
       est conservé, remonté en diagnostic IHM.
    📄 Lot L5 : Lecture depuis PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md</xhtml>
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -25130,7 +25130,7 @@ HydraulicFaultOk := PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI;
       FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.Cmd.BtnModeReset côté
       PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v1.7.md</xhtml>
+   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -25769,7 +25769,7 @@ l'ordre MainTask PRG_06 → PRG_07 → PRG_10 est obligatoire.</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 PRG_10_Outputs_LD — Écriture des SORTIES physiques (PROGRAMME LADDER)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §5
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
    📄 Converti automatiquement en Ladder Diagram (&lt;LD&gt;) dans CODESYS.
@@ -29040,7 +29040,7 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
    Note : Programme exécuté en tâche de fond ou asynchrone.
    Le bloc de configuration de l'IP est actuellement stubbé / commenté.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -29883,7 +29883,7 @@ END_CASE
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 PRG_Test_KoboldMaintenance — Tests PLC isolés T81/T82
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §3ter
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    ⚠️ Programme de qualification MANUELLE : non appelé par MainTask.
       L'opérateur l'appelle temporairement dans une tâche de test, pose TestEnable,
       puis lit Passed/Failed. Aucun accès E/S, aucun ordre machine.
@@ -30219,7 +30219,7 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_03_Safety, PRG_09_Supe
       Instancier son propre `BLINK` (lib Util) localement plutôt que de détourner
       ce bit partagé — voir Partie3 §0 (réutilisation obligatoire des libs).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md</xhtml>
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md</xhtml>
         </documentation>
       </globalVars>
     </data>
@@ -30373,7 +30373,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ GVL_Modes_Stub — Variables IHM pour FB_Modes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md §1/§2
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md §1/§2
    🎯 Sélecteur de mode machine forceable : un seul endroit à consulter/forcer
       en mise en service pour piloter le mode.
    🔧 REX 2026-07-07 (1) : GVL_Encoder_Stub (même principe, codeurs) a été fusionné

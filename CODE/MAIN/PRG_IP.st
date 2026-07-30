@@ -4,7 +4,7 @@
    Note : Programme exécuté en tâche de fond ou asynchrone.
    Le bloc de configuration de l'IP est actuellement stubbé / commenté.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
 *)
 PROGRAM PRG_IP
 VAR

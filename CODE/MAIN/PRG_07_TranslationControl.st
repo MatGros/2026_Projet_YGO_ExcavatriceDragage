@@ -44,10 +44,10 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
     M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
-                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
+                            AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                            AND PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop;
     M3_SpeedRef_Active   := MIN(_TranslationAutoSpeedCap_Pct,
-                                ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef));
+                                ABS(PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef));
 
     // Détermination automatique du sens de marche selon la cible :
     // - Trémie (cible 1) = Marche Avant (Direction := 1)
@@ -79,7 +79,7 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;  // → Maintenance (-1)
     ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
+        M3_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdX.Direction;
     ELSE
         // Boutons sélectionnés sans BtnFwd/BtnRev : jamais de reprise joystick implicite.
         M3_Direction_Active := 0;
@@ -89,10 +89,10 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
     // 🌐 Bypass.Global = TRUE → ignore la condition homme-mort (test/simulation)
     M3_StartStop_Active := (M3_Direction_Active <> 0)
-                           AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                           AND (PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                 OR GVL_IHM.TranslationM3.Bypass.Global)
                            AND (NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
-                                OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
+                                OR PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.Cmd.SetFreq_Hz (consigne Hz réglable opérateur,
     // limitée par PRG_10_Outputs_LD à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
@@ -105,14 +105,14 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
                   30.0); // défaut 30% si SetFreq_Hz non renseigné
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
                               FreqPct,
-                              (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
+                              (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
     // Mode Manuel/Maintenance : Consignes issues du Joystick et sélecteur HMI
     M3_PositioningActive := FALSE;
     SelTarget    := StubTranslationPositionSelect_IHM;
-    M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
-    M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
-    M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+    M3_StartStop_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop;
+    M3_Direction_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdX.Direction;
+    M3_SpeedRef_Active   := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
 END_IF;
 
 // 🔄 Inversion de sens IHM (mise en service)

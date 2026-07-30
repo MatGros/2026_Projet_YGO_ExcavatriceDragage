@@ -1,9 +1,9 @@
 (* ═══════════════════════════════════════════════════════════════
    🕹️ FB_Joystick — Acquisition + traitement Hall (bouton = homme-mort EN 574/ISO 13850)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md (historique détaillé des
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md (historique détaillé des
       correctifs : AUDIT D34/D35/D49/D51/D53-D59)
-   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §3
+   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §3
       l'interdit (`FB_Joystick` n'est pas un FB de mouvement, Partie3 §1bis). Agissait de
       plus comme un second `Enable` dans le GATE (coupure immédiate), pas comme la rampe
       rapide attendue d'un `SafeStop` — confusion précisément visée par la règle.

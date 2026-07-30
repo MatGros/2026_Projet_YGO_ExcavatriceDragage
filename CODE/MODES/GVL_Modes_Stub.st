@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎚️ GVL_Modes_Stub — Variables IHM pour FB_Modes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md §1/§2
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md §1/§2
    🎯 Sélecteur de mode machine forceable : un seul endroit à consulter/forcer
       en mise en service pour piloter le mode.
    🔧 REX 2026-07-07 (1) : GVL_Encoder_Stub (même principe, codeurs) a été fusionné

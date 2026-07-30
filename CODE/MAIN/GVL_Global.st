@@ -12,7 +12,7 @@
       Instancier son propre `BLINK` (lib Util) localement plutôt que de détourner
       ce bit partagé — voir Partie3 §0 (réutilisation obligatoire des libs).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
 *)
 {attribute 'qualified_only'}
 VAR_GLOBAL

@@ -8,7 +8,7 @@
       est conservé, remonté en diagnostic IHM.
    📄 Lot L5 : Lecture depuis PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md
+   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
 *)
 
 PROGRAM PRG_08_AuxiliaryControl

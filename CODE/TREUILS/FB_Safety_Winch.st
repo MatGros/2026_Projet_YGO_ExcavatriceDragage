@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md,
                    DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §7
-                   (contrat : DOC/AF_Partie-03_Template_FB_Commun_v1.3.md §1/§7bis)
+                    (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2/§3)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
    📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch

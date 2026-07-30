@@ -10,7 +10,7 @@
       FB_Modes/FB_Cycle ont chacun leur propre Reset dédié (GVL_IHM.Modes.Cmd.BtnModeReset côté
       PRG_04_Modes, CmdResetCycle_IHM côté PRG_05_Cycle) — jamais mélangés.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v1.7.md
+   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 
 PROGRAM PRG_09_Supervision
@@ -375,7 +375,7 @@ GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedbac
 GVL_IHM.TranslationM3.State.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
 GVL_IHM.TranslationM3.State.PositionReached      := PRG_07_TranslationControl.M3_PositioningActive
                                                 AND PRG_07_TranslationControl.instTranslationM3.TargetReached;
-GVL_IHM.TranslationM3.State.JoystickDeflection_Pct := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+GVL_IHM.TranslationM3.State.JoystickDeflection_Pct := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
 // 🧭 Position validée IHM : masquée (forcée à FALSE) si le mot capteurs est incohérent (position indéterminée)
 IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
     GVL_IHM.TranslationM3.State.PositionTremie      := FALSE;
@@ -471,24 +471,24 @@ GVL_IHM.Cycle.State.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Er
 GVL_IHM.Cycle.State.WinchSyncDelta_M     := PRG_06_WinchControl.instWinchSync.DeltaPosM;
 GVL_IHM.Cycle.State.M1Position_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M         := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.Cycle.State.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
-GVL_IHM.Cycle.State.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+GVL_IHM.Cycle.State.DeadmanArmed         := PRG_01_Diagnostics.instJoystick.DeadmanArmed;
+GVL_IHM.Cycle.State.JoystickMotionActive := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop;
 GVL_IHM.Cycle.State.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.JOY1Joystick.State.RawX         := PRG_01_Diagnostics.FB_Joystick_0.RawX;
-GVL_IHM.JOY1Joystick.State.RawY         := PRG_01_Diagnostics.FB_Joystick_0.RawY;
-GVL_IHM.JOY1Joystick.State.RawButton    := PRG_01_Diagnostics.FB_Joystick_0.RawButton;
-GVL_IHM.JOY1Joystick.State.AxisCmdX     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.JOY1Joystick.State.AxisCmdY     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.JOY1Joystick.State.NeutralXAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct;
-GVL_IHM.JOY1Joystick.State.NeutralYAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct;
-GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.JOY1Joystick.State.RawX         := PRG_01_Diagnostics.instJoystick.RawX;
+GVL_IHM.JOY1Joystick.State.RawY         := PRG_01_Diagnostics.instJoystick.RawY;
+GVL_IHM.JOY1Joystick.State.RawButton    := PRG_01_Diagnostics.instJoystick.RawButton;
+GVL_IHM.JOY1Joystick.State.AxisCmdX     := PRG_01_Diagnostics.instJoystick.AxisCmdX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY     := PRG_01_Diagnostics.instJoystick.AxisCmdY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct  := PRG_01_Diagnostics.instJoystick.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct  := PRG_01_Diagnostics.instJoystick.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_01_Diagnostics.instJoystick.DeadmanArmed;
 GVL_IHM.JOY1Joystick.State.Online       := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational  := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.State.Error        := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JOY1Joystick.State.Error        := PRG_01_Diagnostics.instJoystick.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.instJoystick.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────

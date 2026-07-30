@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_10_Outputs_LD — Écriture des SORTIES physiques (PROGRAMME LADDER)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §5
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §5
    ⚙️ Exécuté par la tâche PLC en position 10.
    ✅ Reçoit ses commandes en VAR_INPUT (écrites par le reste du code).
    📄 Converti automatiquement en Ladder Diagram (<LD>) dans CODESYS.

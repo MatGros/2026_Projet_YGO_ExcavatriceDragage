@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 3.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md ; DOC/AF_Partie-03_Template_FB_Commun_v1.3.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
 PROGRAM PRG_03_Safety
@@ -58,7 +58,7 @@ instSafetyWinchM1(
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — le joystick est désormais la SEULE source de
     // mouvement manuel (plus de boutons HMI bruts en parallèle) : le check bouton ajouté en
     // 2026-07-15 (7) pour compenser ce 2ᵉ chemin de commande est devenu sans objet, retiré.
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1),
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef) < 0.1),
     BenneHoldStillActive := PRG_06_WinchControl.instBucket.Busy, // Méca C — M1 doit rester immobile pendant le
                                                                      // benne ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
@@ -118,7 +118,7 @@ instSafetyWinchM2(
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
     // 🔧 REX 2026-07-19 : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus) — suppression IHM_MANU.
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) < 0.1),
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef) < 0.1),
     BenneHoldStillActive := FALSE,
     // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
     // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2

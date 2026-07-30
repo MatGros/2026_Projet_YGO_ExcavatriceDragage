@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🌊 FB_DiveSearch — Assistance plongée et recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §3ter
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    🛡️ Sécurité : T81/T82. Jamais de descente assistée sans séquence 0→1→0 valide.
    🧩 Responsabilité : qualifie le Kobold et autorise uniquement la descente cohérente.
    🔌 Interface : intention de descente + mesures → autorisation + fond validé.

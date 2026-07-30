@@ -50,9 +50,9 @@ def test_d1_lien_mort(tmp_path: Path) -> None:
 def test_d2_version_perimee_detectee_et_corrigee(tmp_path: Path) -> None:
     """AGENTS.md pointait _v1.12 alors que _v1.14 etait la version active."""
     files = {
-        "DOC/AF_Partie-09_Fonction_Winch_v1.12.md": "# Winch ancien\n",
+        "DOC/AF_Partie-09_Fonction_Winch_v1.14.md": "# Winch ancien\n",
         "DOC/AF_Partie-09_Fonction_Winch_v1.14.md": "# Winch actif\n",
-        "AGENTS.md": "# A\nVoir DOC/AF_Partie-09_Fonction_Winch_v1.12.md\n",
+        "AGENTS.md": "# A\nVoir DOC/AF_Partie-09_Fonction_Winch_v1.14.md\n",
     }
     root = make(tmp_path, files)
     assert run(root).returncode == 1

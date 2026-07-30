@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 5.
    ✅ Gère la machine d'état principale de dragage (FB_Cycle).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md
+   📄 Docs : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
 *)
 
 PROGRAM PRG_05_Cycle
@@ -36,8 +36,8 @@ CmdAbortCycle_IHM := GVL_IHM.Cycle.Cmd.BtnAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.Cmd.BtnReset;
 SetDepthM      := GVL_IHM.Cycle.Cfg.SetDepth_M;
 SetOffsetM     := GVL_IHM.Cycle.Cfg.SetOffset_M;
-CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                     AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+CycleMotionPermit := PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                     AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop;
 
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(

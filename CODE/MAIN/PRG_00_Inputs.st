@@ -19,7 +19,7 @@
    │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
    │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
    └──────────────────────────┴──────────┴─────────────────────────────────┘
-   📄 Doc : DOC/AF_Partie-06_IO_Conditioning_v1.8.md §5
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §5
    ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
    ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
    ══════════════════════════════════════════════════════════════════════════ *)
@@ -257,9 +257,11 @@ instSimBench(
     M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
     M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
     M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
-    PowerKeepAlive_A         := GVL_Global.EmergencyArmingPulseActive,
-    PowerKeepAlive_B         := GVL_Global.EmergencyArmingLockoutActive,
-    EmergencyArming_RQ       := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
+    // 🧪 Chaîne AU sim = image des Q physiques (scan N-1, comme le terrain).
+    // ❌ Ne pas brancher Pulse/Lockout/BtnArming : ça court-circuite le FB Emergency.
+    PowerKeepAlive_A         := PowerKeepAlive_A_RQ,
+    PowerKeepAlive_B         := PowerKeepAlive_B_RQ,
+    EmergencyArming_RQ       := EmergencyArming_RQ,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,

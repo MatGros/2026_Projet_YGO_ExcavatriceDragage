@@ -12,7 +12,7 @@
    But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
    bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
    réel ne l'était pas.
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
 *)
 FUNCTION_BLOCK PUBLIC FB_DiagEthercat
 VAR_INPUT
