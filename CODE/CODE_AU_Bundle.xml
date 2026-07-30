@@ -196,6 +196,167 @@
               DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_EmergencyCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnEmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front demande rearmement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau coupure IHM maintenue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnFaultReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement defauts</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>530ff0c1-144b-5832-bee8-f40edd2d06ee</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
+   [IHM] ST_EmergencyCmd -- Commandes IHM pour la chaine AU
+   --------------------------------------------------------------
+   Role : structure d'echange pour les commandes operateur
+          de la chaine d'arret d'urgence (miroir ST_ModesCmd).
+   Pattern : identique a GVL_IHM.Modes.Cmd dans le projet reel.
+          L'IHM ecrit ces champs, le programme les consomme.
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_EmergencyState">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[OK] Etats generaux
+Boucle AU fermee (saine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance demandee par une safety metier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[AU] Sequence de rearmement
+Pret au rearmement (chain OK + pas de lockout + pas de defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[KO] Diagnostics
+Synthese defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0=RedundancyTestFailed, bit1=ArmingFailed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Auto-test A/B a echoue (canal colle/shunte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement echoue (timeout confirmation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage 5s entre tentatives</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>60f821fa-d35a-58c5-ac8a-e1efe1044110</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
+   [IHM] ST_EmergencyState -- Retours d'etat IHM pour chaine AU
+   --------------------------------------------------------------
+   Role : structure d'echange pour les retours d'etat de la
+          chaine d'arret d'urgence (miroir ST_ModesState).
+   Pattern : identique a GVL_IHM.Modes.State dans le projet reel.
+          Le programme ecrit ces champs, l'IHM les lit.
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="FB_Safety_EmergencyManagement" pouType="functionBlock">
@@ -1140,6 +1301,21 @@ Boucle AU fermée (qualifié)</xhtml>
                 <derived name="TON" />
               </type>
             </variable>
+            <variable name="PrevMaintainA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Feedback : sorties physiques du scan PRÉCÉDENT
+(PRG_AU_Acquisition est appelé AVANT PRG_AU_Outputs dans PRG_AU_TestBench,
+donc PRG_AU_Outputs.PowerKeepAlive_A/B_RQ sont les valeurs du cycle N-1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevMaintainB">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -1150,6 +1326,10 @@ Boucle AU fermée (qualifié)</xhtml>
    🧩 Remplit le rôle de PRG_00_Inputs pour le domaine AU uniquement,
       avec les mêmes structures ST_HwMachine (partielle).
    🎯 Pattern : frontière unique HwIn (lot L5 du projet réel).
+   🔄 Feedback simulation : modélise le comportement physique —
+      quand le PLC force MaintainA/B_RQ à FALSE (auto-test A/B),
+      la boucle AU s'ouvre réellement → EmergencyChainClosed repasse
+      à FALSE le cycle suivant (1 cycle de retard = acceptable).
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md</xhtml>
@@ -1162,11 +1342,19 @@ Boucle AU fermée (qualifié)</xhtml>
 // === IMPLEMENTATION ===
 
 // 🔬 Source : simulé ou réel ?
-// En test, on lit depuis GVL_Simulation_AU (SimulationModeActive = TRUE par défaut)
 SimActive := GVL_Simulation_AU.SimulationModeActive;
 
 // 🎯 Qualification de la boucle AU (anti-rebond 20 ms)
-TonChainFilter(IN := GVL_Simulation_AU.SimChainClosed, PT := T#20ms);
+// Si la simulation est active ET que le PLC vient de forcer l'ouverture d'un canal
+// (auto-test A/B), la chaîne "physique" s'ouvre → SimChainClosed est ignoré
+// et la boucle repasse à FALSE (1 cycle de retard, fidèle au réel).
+IF SimActive AND (NOT PrevMaintainA OR NOT PrevMaintainB) THEN
+    // Au moins un canal forcé à FALSE → la chaîne AU est ouverte
+    TonChainFilter(IN := FALSE, PT := T#20ms);
+ELSE
+    // Les deux canaux maintenus → la chaîne AU suit SimChainClosed
+    TonChainFilter(IN := GVL_Simulation_AU.SimChainClosed, PT := T#20ms);
+END_IF;
 EmergencyChainClosed := TonChainFilter.Q;
 
 // 🎯 Qualification retour contacteur (anti-rebond 20 ms)
@@ -1175,6 +1363,10 @@ PowerContactorEngaged := TonContactorFilter.Q;
 
 // 🎯 Agrégation coupure métier (simulée ici, proviendrait de PRG_03_Safety en réel)
 PowerCutOffRequest := GVL_Simulation_AU.SimPowerCutOffReq;
+
+// 📝 Mémorisation pour le prochain cycle (feedback 1 cycle)
+PrevMaintainA := PRG_AU_Outputs.PowerKeepAlive_A_RQ;
+PrevMaintainB := PRG_AU_Outputs.PowerKeepAlive_B_RQ;
 </xhtml>
           </ST>
         </body>
@@ -1262,12 +1454,12 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
 // 🛡️ Appel du composite — entrées depuis Acquisition + IHM
 instEmergencyManagement(
     Enable := TRUE,
-    Reset := GVL_IHM_AU.BtnFaultReset,
-    ArmRequest := GVL_IHM_AU.BtnEmergencyArming,
+    Reset := GVL_IHM_AU.Cmd.BtnFaultReset,
+    ArmRequest := GVL_IHM_AU.Cmd.BtnEmergencyArming,
     EmergencyChainClosed := PRG_AU_Acquisition.EmergencyChainClosed,
     PowerContactorEngaged := PRG_AU_Acquisition.PowerContactorEngaged,
     PowerCutOffRequest := PRG_AU_Acquisition.PowerCutOffRequest,
-    BtnEmergencyCutOff := GVL_IHM_AU.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM_AU.Cmd.BtnEmergencyCutOff
 );
 
 // ⚡ Sorties physiques
@@ -1362,9 +1554,9 @@ Diag  := instEmergencyManagement.Diag;
    📄 Ordonnance les étages Acquisition → Outputs dans l'ordre
       correct (même flux que MainTask réelle).
    🎮 Pilotage via Watch CODESYS :
-      GVL_IHM_AU.BtnEmergencyArming  = TRUE  → lance réarmement
-      GVL_IHM_AU.BtnFaultReset       = TRUE  → acquitte défauts
-      GVL_IHM_AU.BtnEmergencyCutOff  = TRUE  → coupure IHM
+      GVL_IHM_AU.Cmd.BtnEmergencyArming  = TRUE  → lance réarmement
+      GVL_IHM_AU.Cmd.BtnFaultReset       = TRUE  → acquitte défauts
+      GVL_IHM_AU.Cmd.BtnEmergencyCutOff  = TRUE  → coupure IHM
       GVL_Simulation_AU.SimContactorEngaged = TRUE → simule retour contacteur
       GVL_Simulation_AU.SimPowerCutOffReq   = TRUE → simule coupure métier
    👁️ Observation :
@@ -1401,6 +1593,20 @@ Lockout          := PRG_AU_Outputs.Diag.LockoutActive;
 ChainOk          := PRG_AU_Outputs.State.ChainOk;
 ContactorOk      := PRG_AU_Outputs.State.ContactorOk;
 Armable          := PRG_AU_Outputs.State.Armable;
+
+// 📤 Publication IHM — l'opérateur voit ces retours sur son écran
+// [IHM] Publication dans la structure d'etat IHM (lue par la visu operateur)
+GVL_IHM_AU.State.ChainOk              := PRG_AU_Outputs.State.ChainOk;
+GVL_IHM_AU.State.ContactorOk          := PRG_AU_Outputs.State.ContactorOk;
+GVL_IHM_AU.State.Armable              := PRG_AU_Outputs.State.Armable;
+GVL_IHM_AU.State.ArmingBusy           := PRG_AU_Outputs.State.ArmingBusy;
+GVL_IHM_AU.State.RedundancyTestFailed := PRG_AU_Outputs.Diag.RedundancyTestFailed;
+GVL_IHM_AU.State.ArmingFailed         := PRG_AU_Outputs.Diag.ArmFailed;
+GVL_IHM_AU.State.LockoutActive        := PRG_AU_Outputs.Diag.LockoutActive;
+GVL_IHM_AU.State.Step                 := PRG_AU_Outputs.State.Step;
+GVL_IHM_AU.State.Error                := PRG_AU_Outputs.Diag.Error;
+GVL_IHM_AU.State.ErrorId              := PRG_AU_Outputs.Diag.ErrorId;
+GVL_IHM_AU.State.PowerCutOffActive    := GVL_Simulation_AU.SimPowerCutOffReq;
 
 CASE Step OF
     0: StepLabel := 'IDLE (attente armement)';
@@ -1600,29 +1806,20 @@ TRUE = une safety demande la coupure</xhtml>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_IHM_AU">
-        <variable name="BtnEmergencyArming">
+        <variable name="Cmd">
           <type>
-            <BOOL />
+            <derived name="ST_EmergencyCmd" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes IHM (miroir de ST_ModesCmd)
-Front demande réarmement contacteur</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">[IHM] Commandes operateur (Write)</xhtml>
           </documentation>
         </variable>
-        <variable name="BtnEmergencyCutOff">
+        <variable name="State">
           <type>
-            <BOOL />
+            <derived name="ST_EmergencyState" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau coupure IHM maintenue</xhtml>
-          </documentation>
-        </variable>
-        <variable name="BtnFaultReset">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">[IHM] Retours d'etat (Read)</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -1636,16 +1833,19 @@ Front demande réarmement contacteur</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🖥️ GVL_IHM_AU — Structure IHM pour test chaîne AU
-   ───────────────────────────────────────────────────────────────
-   📄 Réplique les champs de ST_ModesCmd/ST_ModesState nécessaires
-      au pilotage de FB_Safety_EmergencyManagement, sans les
-      dépendances aux autres domaines (treuils, translation...).
-   🎯 Pattern identique à GVL_IHM.Modes.Cmd (projet réel).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
+   [IHM] GVL_IHM_AU -- Interface IHM pour le test de la chaine AU
+   --------------------------------------------------------------
+   Role : point d'echange unique entre l'IHM (Watch/visu) et
+          le programme de test de la chaine d'arret d'urgence.
+   Pattern : identique a GVL_IHM.Modes (Cmd + State) dans le
+          projet reel.
+   Usage :
+     GVL_IHM_AU.Cmd.BtnEmergencyArming   -&gt; ecrit par l'IHM
+     GVL_IHM_AU.State.ContactorOk         -&gt; lu par l'IHM
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
         </documentation>
       </globalVars>
     </data>
@@ -1658,6 +1858,8 @@ Front demande réarmement contacteur</xhtml>
           <Object Name="ST_EmergencyManagementCmd" ObjectId="ae2c6921-7efc-58d4-8776-856ce456136e" />
           <Object Name="ST_State_Emergency" ObjectId="4e2ee04c-1b5f-5e6f-817a-f94c46405f29" />
           <Object Name="ST_Diag_Emergency" ObjectId="3f15b664-1dd2-593a-af9a-957a294bd1db" />
+          <Object Name="ST_EmergencyCmd" ObjectId="530ff0c1-144b-5832-bee8-f40edd2d06ee" />
+          <Object Name="ST_EmergencyState" ObjectId="60f821fa-d35a-58c5-ac8a-e1efe1044110" />
           <Object Name="GVL_PERSISTENT_AU" ObjectId="49064159-98e3-5f61-9423-ad9f816b4c1b" />
           <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
           <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />

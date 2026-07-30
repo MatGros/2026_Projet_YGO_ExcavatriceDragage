@@ -10,7 +10,7 @@
       observables en Watch pour vérification de la séquence.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 PROGRAM PRG_AU_Outputs
@@ -34,12 +34,12 @@ END_VAR
 // 🛡️ Appel du composite — entrées depuis Acquisition + IHM
 instEmergencyManagement(
     Enable := TRUE,
-    Reset := GVL_IHM_AU.BtnFaultReset,
-    ArmRequest := GVL_IHM_AU.BtnEmergencyArming,
+    Reset := GVL_IHM_AU.Cmd.BtnFaultReset,
+    ArmRequest := GVL_IHM_AU.Cmd.BtnEmergencyArming,
     EmergencyChainClosed := PRG_AU_Acquisition.EmergencyChainClosed,
     PowerContactorEngaged := PRG_AU_Acquisition.PowerContactorEngaged,
     PowerCutOffRequest := PRG_AU_Acquisition.PowerCutOffRequest,
-    BtnEmergencyCutOff := GVL_IHM_AU.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM_AU.Cmd.BtnEmergencyCutOff
 );
 
 // ⚡ Sorties physiques

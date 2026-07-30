@@ -30,7 +30,7 @@
 
 ## Etat observe utile au design cible
 
-- `PRG_00_Inputs` porte deja une frontiere structuree `HwReal` / `HwSim` / `HwIn` de type `ST_HardwareImage`.
+- `Acquisition (CFC)` porte deja une frontiere structuree `HwReal` / `HwSim` / `HwIn` de type `ST_HardwareImage`.
 - Les contrats IHM sont deja structures par domaine dans `GVL_IHM`.
 - Des structures de chaine existent (`ST_ChainWinch`, `ST_ChainTranslation` et sous-structures Inputs, Demandes, Control, Safety, Outputs), mais leur usage reel dans les programmes CFC reste a cartographier avant de les normaliser.
 - Les barrieres finales `FB_WinchOutputInterlock_LD` et `FB_TranslationOutputInterlock_LD` materialisent une frontiere sortie pertinente pour la lisibilite et la surete.

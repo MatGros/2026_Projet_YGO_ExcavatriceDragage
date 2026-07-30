@@ -2,7 +2,7 @@
 
 > Rôle : mesure position/vitesse câble, référencement (homing), bornage et cohérence.
 > Producteur unique position/vitesse pour tout le programme (Winch, Safety, Cycle, IHM).
-> Source code : `CODE/CODEURS/*.st` · instances dans `PRG_02_Encoders`.
+> Source code : `CODE/CODEURS/*.st` · instances dans `Acquisition (CFC)`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
 > v1.11 archivée : `ARCHIVES/Doc/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md`.
 
@@ -46,8 +46,8 @@ FB_Encoder_Abs ──► FB_Encoder_Homing ──► FB_Encoder_Scale ──► 
     RawPos/preset)     RETAIN Calib)                              cohérence boot)        50ms/6 éch.)
 ```
 
-2 instances (M1/M2), toutes dans `PRG_02_Encoders` — **producteur unique** position/vitesse.
-`FB_Encoder_SpeedMonitor` (diagnostic, `PRG_03_Safety`) : détecte variation brusque, **pas** de SafeStop direct.
+2 instances (M1/M2), toutes dans `Acquisition (CFC)` — **producteur unique** position/vitesse.
+`FB_Encoder_SpeedMonitor` (diagnostic, `Safety (CFC)`) : détecte variation brusque, **pas** de SafeStop direct.
 
 ---
 
@@ -130,7 +130,7 @@ HomingRefRaw    = PresetValueCalc - TargetPoints
 
 **SpeedMeasure** : fenêtre fixe `T#50ms`, 6 échantillons horodatés (5 intervalles), `SamplePeriod=T#10ms`. `Valid` seulement si fenêtre complète. Purge sur `NOT Enable`, `Reset`, perte validité position, rebouclage `TIME()`.
 
-**SpeedMonitor** (diagnostic seul, `PRG_03_Safety`) : compare vitesse cycle à cycle. ⚠️ Seuils câblés à **0 / T#0ms** actuellement → **ne peut jamais déclencher** (volontaire, en attente réglage T45). `SpeedStable` consommé par le garde-fou palier `FB_Winch.SpeedGuardReady`.
+**SpeedMonitor** (diagnostic seul, `Safety (CFC)`) : compare vitesse cycle à cycle. ⚠️ Seuils câblés à **0 / T#0ms** actuellement → **ne peut jamais déclencher** (volontaire, en attente réglage T45). `SpeedStable` consommé par le garde-fou palier `FB_Winch.SpeedGuardReady`.
 
 ---
 
@@ -139,28 +139,28 @@ HomingRefRaw    = PresetValueCalc - TargetPoints
 | DUT | Champs clés | Producteur | Consommateur |
 |---|---|---|---|
 | `ST_EncoderCalib` | `HomingRefRaw`, `LastKnownRawPos`, `RestartCoherenceTolerancePts`(1000), `Homed`, `HomingSuspect` | `FB_Encoder_Homing` (VAR_IN_OUT) | lui-même, `FB_Encoder_Scale` |
-| `ST_EncoderHMI` | `RawPos/Alarms/SlaveOperational/Error/ErrorId` | `PRG_09_Supervision` | IHM |
-| `ST_WinchCfg` | `CfgTopSensorPos_M`, `CfgCableLimitAscent_M` | GVL_PERSISTENT (IHM) | `PRG_02/03/06` |
-| `ST_WinchState` | `Homed/HomingBusy/.../HomingRefRaw/Encoder` | `PRG_09_Supervision` | IHM |
-| `ST_WinchCmd` | `BtnHome/BtnConfirmCoherence/BtnHomingAtZero` | IHM | `PRG_02_Encoders` |
+| `ST_EncoderHMI` | `RawPos/Alarms/SlaveOperational/Error/ErrorId` | `Supervision` | IHM |
+| `ST_WinchCfg` | `CfgTopSensorPos_M`, `CfgCableLimitAscent_M` | GVL_PERSISTENT (IHM) | `Acquisition/03/06` |
+| `ST_WinchState` | `Homed/HomingBusy/.../HomingRefRaw/Encoder` | `Supervision` | IHM |
+| `ST_WinchCmd` | `BtnHome/BtnConfirmCoherence/BtnHomingAtZero` | IHM | `Acquisition (CFC)` |
 
 ---
 
 ## 7. Intégration programme
 
 ```text
-PRG_00  DI/simulation → HwIn.Winch.COD1/2_*
-PRG_01  diag EtherCAT device
-PRG_02  ← PRODUCTEUR UNIQUE position/vitesse
+Acquisition  DI/simulation → HwIn.Winch.COD1/2_*
+Acquisition  diag EtherCAT device
+Acquisition  ← PRODUCTEUR UNIQUE position/vitesse
   1. instEncoderAbsM1/M2      (RawPos, EncoderAvailable)
   2. instHomingM1/M2          (Homed, HomingSuspect, HomingRefRaw) → écrit Calib RETAIN
   3. instEncoderScaleM1/M2    (CablePosM)
   4. instEncoderSafetyM1/M2   (CablePosMSafe, EncoderIncoherent) → EncoderFaultPresent
   5. instEncoderSpeedMeasureM1/M2 (MeasuredSpeed_Mps, SpeedValid)
-PRG_03  instSpeedMonitorM1/M2 (diagnostic, seuils=0 actuellement)
-PRG_04  EncoderFaultPresent → bloque SEMI_AUTO (repli MAINT_N1) — lu 1 scan après PRG_02
-PRG_06  ForbidAscent, TopLimitM:=CfgCableLimitAscent_M (≠ CfgTopSensorPos_M — limite exploit. ≠ cible homing)
-PRG_09  copie vers IHM
+Safety  instSpeedMonitorM1/M2 (diagnostic, seuils=0 actuellement)
+Modes  EncoderFaultPresent → bloque SEMI_AUTO (repli MAINT_N1) — lu 1 scan après Acquisition
+Treuils  ForbidAscent, TopLimitM:=CfgCableLimitAscent_M (≠ CfgTopSensorPos_M — limite exploit. ≠ cible homing)
+Supervision  copie vers IHM
 ```
 
 ---
@@ -207,4 +207,4 @@ PRG_09  copie vers IHM
 | AF06 | E/S physiques codeurs |
 | AF10 | Winch — consommateur position/vitesse, Méca D |
 | AF13 | Simulation codeurs |
-| Code | `CODE/CODEURS/*.st`, `CODE/MAIN/PRG_02_Encoders.st` |
+| Code | `CODE/CODEURS/*.st`, `CODE/MAIN/Acquisition (CFC).st` |
