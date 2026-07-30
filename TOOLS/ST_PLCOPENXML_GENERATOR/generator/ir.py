@@ -117,3 +117,4 @@ class SourceObject:
     enum_values: list[EnumValueDecl] = field(default_factory=list)
 
     global_blocks: list[GlobalVarBlock] = field(default_factory=list)
+    raw_xml_path: str | None = None

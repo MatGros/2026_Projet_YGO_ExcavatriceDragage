@@ -53,7 +53,12 @@ Le cycle est un **séquenceur linéaire (Grafcet)** : chaque étape correspond �
 - **Le cycle auto n'est qu'une surcouche du manuel** : Il enchaîne de manière sécurisée les briques unitaires (`FB_DiveSearch`, `FB_ExtractionSequence`) préalablement qualifiées et validées en mode Maintenance N1.
 - **Guidage IHM Pas-à-Pas** : Chaque étape (`E_CycleStep`) transmet à l'IHM un **message d'instruction clair pour l'opérateur** (indiquant l'état courant et l'action/mouvement attendu de sa part).
 - **Validation Joystick (Homme-mort)** : Même en semi-automatique/automatique, la génération physique des mouvements exige le maintien et l'action du joystick par l'opérateur.
+- 🪨 **Compteur de Prélèvements Extrait (Sauvegardé Hors Tension - RETAIN)** :
+  - **Incrémentation Automatique** : +1 au compteur général à chaque extraction réussie (validation `FB_ExtractionSequence` + remontée complète en position haute `TopPositionSensor` de M1/M2). Valable aussi bien en **Semi-Automatique** qu'en **Maintenance (N1/N2)**.
+  - **Persistance** : Valeur sauvegardée hors tension en zone non volatile (`RETAIN` / `GVL_PERSISTENT.MaterialExtractionCount`).
+  - **Remise à Zéro** : Bouton IHM de réinitialisation (`ResetMaterialExtractionCounter : BOOL`).
 - **Sortie du Mode Auto & Reprise** : En cas d'abandon ou de sortie du mode automatique vers le mode maintenance, **aucune reprise en cours de cycle n'est autorisée**. L'opérateur doit impérativement ramener la machine en **position initiale de départ (au-dessus de la trémie)** pour pouvoir relancer un nouveau cycle automatique.
+
 
 ⚠️ Le passage à une étape **sans mouvement** met **`StartStop := FALSE`** → **rampe de décélération normale** (`Enable` reste actif).
 

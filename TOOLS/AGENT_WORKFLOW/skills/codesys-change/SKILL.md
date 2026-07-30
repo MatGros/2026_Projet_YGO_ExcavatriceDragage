@@ -19,12 +19,15 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
    obligatoire : attendre la validation explicite de l'utilisateur avant toute écriture CODE/DOC.**
 7. Modifier uniquement les fichiers autorisés. Toute nouvelle donnée dérivée est calculée une seule
    fois par l’objet propriétaire et exposée par une interface minimale ; les paramètres safety ne
-   sont pas rendus réglables de l’extérieur sans exigence validée.
-8. **Si au moins un fichier `CODE/**/*.st` a changé : générer obligatoirement `CODE/CODE_Bundle.xml`** via `TOOLS/ST_PLCOPENXML_GENERATOR` avant toute restitution. Ce n'est pas une option et il ne faut jamais proposer un import fichier-par-fichier.
+   sont pas rendus réglables de l’extérieur sans exigence validée. Vérifier avant toute écriture si
+   un POU XML natif/CFC est concerné et préserver la cohérence des noms, interfaces et références
+   avec les sources ST.
+8. **Si au moins un fichier `CODE/**/*.st` a changé : générer obligatoirement `CODE/CODE_Bundle.xml`** via `TOOLS/ST_PLCOPENXML_GENERATOR` avant toute restitution. Ce n'est pas une option et il ne faut jamais proposer un import fichier-par-fichier. Si un POU XML natif/CFC est concerné, le conserver comme source métier et ne jamais éditer le XML final du bundle à la main.
 9. Exécuter obligatoirement `check_bundle_freshness.py <project_root>` après génération ; un bundle absent ou stale bloque la restitution.
 10. Pour C3/C4/safety, exécuter `check_task_test_contract.py <TASK_CONTEXT> --release`. Sans tests `implemented` et preuve d'exécution, le lot est **incomplet**, même si CODESYS compile.
-11. Lancer les autres gates et signaler les limites.
-12. Ne jamais committer sans validation utilisateur.
+11. Si ST2PY est utilisé pour la simulation ou la non-régression, le rapporter comme outil hors-PLC complémentaire ; il ne remplace pas la validation CODESYS ni les essais terrain.
+12. Lancer les autres gates et signaler les limites.
+13. Ne jamais committer sans validation utilisateur.
 
 ## Commande bundle obligatoire
 

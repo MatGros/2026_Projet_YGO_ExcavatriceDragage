@@ -158,3 +158,27 @@ EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLoc
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
 RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
 EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
+
+// ── [PUBLICATION DANS GVL_GLOBAL POUR LECTURE PAR LES AUTRES POU] ─────────────────
+GVL_Global.M1RelayFwd                    := M1RelayFwd;
+GVL_Global.M1RelayRev                    := M1RelayRev;
+GVL_Global.M1SpeedContactor1             := M1SpeedContactor1;
+GVL_Global.M1SpeedContactor2             := M1SpeedContactor2;
+GVL_Global.M1SpeedContactor3             := M1SpeedContactor3;
+GVL_Global.M1SpeedContactor4             := M1SpeedContactor4;
+GVL_Global.M1BrakeCmd                    := M1BrakeCmd;
+GVL_Global.M2RelayFwd                    := M2RelayFwd;
+GVL_Global.M2RelayRev                    := M2RelayRev;
+GVL_Global.M2SpeedContactor1             := M2SpeedContactor1;
+GVL_Global.M2SpeedContactor2             := M2SpeedContactor2;
+GVL_Global.M2SpeedContactor3             := M2SpeedContactor3;
+GVL_Global.M2SpeedContactor4             := M2SpeedContactor4;
+GVL_Global.M2BrakeCmd                    := M2BrakeCmd;
+GVL_Global.TranslationBrakeCmd           := TranslationBrakeCmd;
+GVL_Global.EmergencyArmingPulseActive   := EmergencyArmingPulseActive;
+GVL_Global.EmergencyArmingLockoutActive := EmergencyArmingLockoutActive;
+GVL_Global.ArmingSeqStep                := ArmingSeqStep;
+
+GVL_Global.instWinchOutputInterlockM1_LD     := instWinchOutputInterlockM1_LD;
+GVL_Global.instWinchOutputInterlockM2_LD     := instWinchOutputInterlockM2_LD;
+GVL_Global.instTranslationOutputInterlock_LD := instTranslationOutputInterlock_LD;

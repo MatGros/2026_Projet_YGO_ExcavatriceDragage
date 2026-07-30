@@ -53,6 +53,8 @@ Traduire le **geste opérateur** (2 axes + bouton) en une **consigne normalisée
 - 🕹️ 2 axes analogiques bruts (0..10000 pts) via nœud **CANopen**.
 - 🔘 1 bouton.
 - 📤 Sortie : vitesse **0..100 %** + **sens** (-1 / 0 / +1) par axe.
+- 🎯 **Sorties de neutre rapide** : `IsCentralPositionX : BOOL` et `IsCentralPositionY : BOOL` (TRUE = manche relâché au neutre sur l'axe correspondant ➔ déclenche la décélération rapide/arrêt).
+
 
 ---
 

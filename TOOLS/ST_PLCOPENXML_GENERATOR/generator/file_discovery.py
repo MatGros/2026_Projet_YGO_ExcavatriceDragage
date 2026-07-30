@@ -86,4 +86,23 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
         )
         if obj is not None:
             objects.append(obj)
+
+    # 🧱 Découverte des POU XML natifs (ex. PRG_GLOBAL_CFC.xml)
+    all_xml_files = sorted(code_dir.rglob("*.xml"))
+    for f in all_xml_files:
+        if f.name.startswith("CODE_Bundle"):
+            continue
+        rel = f.relative_to(code_dir).as_posix()
+        rel_parent = f.parent.relative_to(code_dir)
+        folder_str = "" if rel_parent == Path(".") else str(rel_parent).replace('/', '\\')
+        obj = SourceObject(
+            kind="program",
+            name=f.stem,
+            folder=folder_str,
+            file_path=rel,
+            mtime=f.stat().st_mtime,
+            raw_xml_path=str(f)
+        )
+        objects.append(obj)
+
     return objects
