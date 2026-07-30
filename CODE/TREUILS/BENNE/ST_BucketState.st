@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10/AF_Partie-10_FB_Bucket_v1.0.md §4.B
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.B
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_BucketState :

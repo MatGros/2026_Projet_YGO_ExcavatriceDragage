@@ -39,11 +39,11 @@ Contrat standard que **tout FB métier respecte** :
 
 ### 6️⃣ **Fonctions Métier (Partie 8+)**
 - **[Partie 8 (v2.0)](DOC/AF_Partie-08_Fonction_Joystick_v2.0.md)** — Fonction Joystick.
-- **[Partie 9 (v2.0)](DOC/AF_Partie-09/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md)** — Fonction Encoder & Homing.
-- **[Partie 10 (v2.0)](DOC/AF_Partie-10/AF_Partie-10_Fonction_Winch_v2.0.md)** — Fonction Winch (M1/M2, 7 mécanismes safety A-G).
-- **[Partie 11 (v2.0)](DOC/AF_Partie-10/AF_Partie-10_FB_Bucket_v1.0.md)** — Fonction Benne (sous-fonction Treuils M2).
-- **[Partie 12 (v2.0)](DOC/AF_Partie-12/AF_Partie-12_Fonction_Translation_v2.0.md)** — Fonction Translation (M3 variateur AC600).
-- **[Partie 13 (v1.4)](DOC/AF_Partie-13/AF_Partie-13_Fonction_Simulation_v2.0.md)** — Fonction Simulation.
+- **[Partie 9 (v2.0)](DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md)** — Fonction Encoder & Homing.
+- **[Partie 10 (v2.0)](DOC/AF_Partie-10_Fonction_Winch_v2.0.md)** — Fonction Winch (M1/M2, 7 mécanismes safety A-G).
+- **[Partie 11 (v2.0)](DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md)** — Fonction Benne (sous-fonction Treuils M2).
+- **[Partie 12 (v2.0)](DOC/AF_Partie-12_Fonction_Translation_v2.0.md)** — Fonction Translation (M3 variateur AC600).
+- **[Partie 13 (v1.4)](DOC/AF_Partie-13_Fonction_Simulation_v2.0.md)** — Fonction Simulation.
 - **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
 ### 7️⃣ **[PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md)** 🗂️ **Pilotage projet — pas une spec**

@@ -15,8 +15,8 @@
       PRG_AU_Outputs.EmergencyArming_RQ  → pulse réarmement
       PRG_AU_Outputs.Diag            → erreurs/locks
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 PROGRAM PRG_AU_TestBench

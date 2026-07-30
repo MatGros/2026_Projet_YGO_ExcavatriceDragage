@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   📄 Docs : DOC/AF_Partie-10/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-10/AF_Partie-10_FB_Bucket_v1.0.md
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_06_WinchControl

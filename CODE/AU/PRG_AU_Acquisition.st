@@ -11,7 +11,7 @@
       la boucle AU s'ouvre réellement → EmergencyChainClosed repasse
       à FALSE le cycle suivant (1 cycle de retard = acceptable).
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md
 *)
 

@@ -49,7 +49,7 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
   4. BenneOuvertureFermeture (Action Benne par Désynchronisme)
   5. TranslationPontM3 (Translation Variateur AC600)
 - Indexation chronologique par centaines (100, 200, 300, 400, 500) + commentaires explicites des valeurs nominales
-- Création de DOC/AF_Partie-14/AF_Partie-14_Fonction_Troubleshooting_v1.0.md (v1.2)
+- Création de DOC/AF_Partie-14_Fonction_Troubleshooting_v1.0.md (v1.2)
 
 ### `v0.5.1_PlcTestsFrameworkRemoval` — 2026-07-26
 - Retrait du framework de tests automatiques in-PLC (introduit en `v0.4.15`) : `FB_TestSequencer`,
