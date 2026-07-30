@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md §4.A
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v2.0.md §4.A
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_BucketConfig :

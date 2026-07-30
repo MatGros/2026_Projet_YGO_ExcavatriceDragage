@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v2.0.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -33,7 +33,7 @@
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.14.md §4ter pour le contexte
+      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v2.0.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
