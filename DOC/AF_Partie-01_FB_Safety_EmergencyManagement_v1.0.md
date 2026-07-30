@@ -30,21 +30,18 @@
 | `SITE` | Essai terrain / câblage / AU physique. |
 | `AUTO+SITE` | Les deux couches. |
 
-### Catalogue
+### Catalogue (8 tests — regroupés par fonction)
 
-| ID | Attendu | Preuve | Type | Détail |
-|---|---|---|---|---|
-| TC-P01-001 | AU physique coupe puissance moteurs, API vivant | contacteur ouvert, PLC OK | SITE | AF01 §5 |
-| TC-P01-002 | Perte maintien A ou B ouvre la boucle | `PowerKeepAlive_*=FALSE` côté Q | AUTO+SITE | §4 |
-| TC-P01-003 | Armement seulement sur front `ArmRequest` si chain OK et contacteur ouvert | pulse + enchaîne auto-test | AUTO + AUTO_PLC | §3 |
-| TC-P01-004 | `EmergencyArmingFailed` latche ; Reset seul insuffisant si contacteur non engagé | bit/ErrorId | AUTO | §3 |
-| TC-P01-005 | Acquittement défaut métier ≠ réarmement contacteur | 2 actions | AUTO+SITE | AF01 §5.4 |
-| TC-P01-006 | Auto-test redondance A puis B **intégré au réarmement** : un canal ouvert, l'autre maintenu ; chain doit suivre ; échec ⇒ `RedundancyTestFailed` | steps 1–4, 200 ms | **AUTO_PLC** (+ AUTO en sim) | §3.3bis |
-| TC-P01-007 | Échec confirm ⇒ lockout 5 s | `EmergencyArmingLockoutActive` | AUTO | §3 |
-| TC-P01-008 | `PowerCutOffRequest=TRUE` ouvre A et B sans armement | sorties maintien FALSE | AUTO | §3 |
-| TC-P01-009 | `BtnEmergencyCutOff=TRUE` ouvre A et B | sorties maintien FALSE | AUTO | §3 |
-| TC-P01-010 | `Enable=FALSE` force A/B/Arming à FALSE et step 0 | neutralisation | AUTO | §3 |
-| TC-P01-011 | Producteur unique des Q `PowerKeepAlive_*` et `EmergencyArming_RQ` | linkage | AUTO | §5 |
+| ID | Fonction | Attendu | Preuve | Type | Détail |
+|---|---|---|---|---|---|
+| TC-P01-001 | AU physique | Coupe puissance moteurs, API vivant | contacteur ouvert, PLC OK | SITE | §5.1 |
+| TC-P01-002 | Maintien A/B | Perte A ou B ouvre boucle AU | `PowerKeepAlive_*=FALSE` côté Q | AUTO+SITE | §4 |
+| TC-P01-003 | Réarmement | Front `ArmRequest` seul, chain OK, contacteur ouvert | pulse 1s, pas d'auto-réarmement | AUTO + AUTO_PLC | §5.3 |
+| TC-P01-004 | Latch `ArmingFailed` | `EmergencyArmingFailed` latche ; Reset seul insuffisant si contacteur non engagé | bit/ErrorId | AUTO | §5.3 |
+| TC-P01-005 | Acquittement ≠ réarmement | 2 actions distinctes requises | 2 actions | AUTO+SITE | §5.4 |
+| TC-P01-006 | Auto-test A/B intégré | Un canal ouvert, l'autre maintenu ; chain suit ; échec ⇒ `RedundancyTestFailed` | steps 1–4, 200 ms | **AUTO_PLC** (+ AUTO en sim) | §3.3bis |
+| TC-P01-007 | Lockout 5s | Échec confirm ⇒ lockout 5s | `EmergencyArmingLockoutActive` | AUTO | §5.3 |
+| TC-P01-008 | Coupure sécurité | `PowerCutOffRequest=TRUE` ouvre A et B sans armement | sorties maintien FALSE | AUTO | §3 |
 
 ---
 
@@ -91,7 +88,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 | `EmergencyChainClosed` | `PRG_00.EmergencyChainClosed` ← `EmergencyChainClosed_DI` | Boucle AU fermée |
 | `PowerContactorEngaged` | `PRG_00.PowerContactorEngaged` ← `PowerContactorEngaged_DI` | Contacteur engagé |
 | `PowerCutOffRequest` | OR local M1/M2/M3 `.PowerCutOff` dans `PRG_10` | Coupure demandée par safety domaine |
-| `BtnEmergencyCutOff` | `GVL_IHM.Modes.Cmd.BtnEmergencyCutOff` | Coupure IHM maintenue |
+| `BtnEmergencyCutOff` | `GVL_IHM.Modes.Cmd.BtnEmergencyCutOff` | **Coupure IHM maintenue** : bouton IHM (ou supervision) qui force l'ouverture des deux canaux A/B tant que maintenu — **pas** un bouton physique AU (celui-ci est dans la boucle hardware). Ne déclenche **pas** de séquence de réarmement. |
 
 ### Sorties logiques / diag
 
@@ -225,61 +222,74 @@ Filtre acquisition : anti-rebond 20 ms sur les deux DI (`FB_Input` dans `PRG_00`
 
 ---
 
-## 5. Intégration programme (actuel)
+## 5. Intégration programme (architecture cible)
 
-### 5.1 Où sont les FB — carte d'appels MainTask
+> ⚠️ **Architecture en cours de migration** : le code actuel utilise encore des PRG séquentiels
+> (`PRG_00`…`PRG_10`). L'architecture cible (AF02 v3) prévoit des **pages CFC** avec chargeurs :
+> `PRG_ACQUISITION_CFC`, `PRG_MODES_CFC`, `PRG_SAFETY_CFC`, `PRG_OUTPUTS_LD`, etc.
+> Le flux logique reste identique ; seuls les conteneurs changent.
 
-Ordre actuel (codes ~10 ms). Seul le **composite** est une instance programme ;
-Logic/Output sont **privés** dedans (jamais appelés par un PRG).
+### 5.1 Chaîne d'appels (logique, indépendante du conteneur)
 
 ```text
-PRG_00_Inputs
-  │  lit DI → EmergencyChainClosed, PowerContactorEngaged
-  │  SimBench lit PowerKeepAlive_*/EmergencyArming_RQ (Q, scan N-1)
-  ▼
-PRG_01_Diagnostics     joystick, diag bus
-PRG_02_Encoders        codeurs / homing
-PRG_03_Safety          ← FB_Safety_Winch×2, FB_Safety_Translation
-  │                      produisent .PowerCutOff, .SafeStop, …
-  ▼
-PRG_04_Modes
-PRG_05_Cycle
-PRG_06_WinchControl    mouvements M1/M2 (lisent PowerContactorEngaged, SafeStop)
-PRG_07_Translation     mouvement M3
-PRG_09_Supervision     Reset IHM, mapping State (partiel armement)
-  ▼
-PRG_10_Outputs_LD      ← UNIQUE appel :
-                         instSafetyEmergencyManagement (composite)
-                           ├─ Logic   (interne)
-                           └─ Output  (interne)
-                         puis écrit Q :
-                           PowerKeepAlive_A/B_RQ
-                           EmergencyArming_RQ
+Acquisition (DI)
+   │  lit EmergencyChainClosed_DI → EmergencyChainClosed
+   │  lit PowerContactorEngaged_DI → PowerContactorEngaged
+   ▼
+Safety domaines (Winch M1/M2, Translation) → produisent PowerCutOff
+   ▼
+Modes / Cycle
+   ▼
+Agrégation PowerCutOff (OR des 3 safety) → PowerCutOffRequest
+   ▼
+Sorties (Outputs)          ← UNIQUE appel du composite :
+   instSafetyEmergencyManagement (composite)
+     ├─ Logic   (interne)
+     └─ Output  (interne)
+   puis écrit Q :
+     PowerKeepAlive_A/B_RQ
+     EmergencyArming_RQ
 ```
 
-| FB / rôle | Appelé dans | Quand (scan) |
+| FB / rôle | Appelé dans (cible) | Rôle |
 |---|---|---|
-| `FB_Input` chain/contactor | `PRG_00_Inputs` | Début — qualifie DI |
-| `FB_Safety_Winch` M1/M2 | `PRG_03_Safety` | Avant mouvements |
-| `FB_Safety_Translation` | `PRG_03_Safety` | Avant mouvements |
-| `FB_Safety_EmergencyManagement` | **`PRG_10_Outputs_LD` seulement** | Fin — après agrégat OR PowerCutOff |
+| `FB_Input` chain/contactor | Acquisition CFC | Début — qualifie DI |
+| `FB_Safety_Winch` M1/M2 | Safety CFC | Avant mouvements |
+| `FB_Safety_Translation` | Safety CFC | Avant mouvements |
+| `FB_Safety_EmergencyManagement` | **Outputs LD** seulement | Fin — après agrégat OR PowerCutOff |
 | Logic / Output | **Jamais hors composite** | Même scan que le parent |
-| `FB_Sim_Safety` | via `FB_SimBench` dans `PRG_00` | Début (boucle sim) |
+| `FB_Sim_Safety` | via SimBench dans Acquisition | Début (boucle sim) |
 
-### 5.2 Câblage de l'instance (PRG_10)
+### 5.2 Câblage de l'instance (Outputs)
 
 | Élément | Emplacement |
 |---|---|
-| Instance | `PRG_10_Outputs_LD.instSafetyEmergencyManagement` |
-| Agrégation PowerCutOff | Variable locale `PowerCutOffReq` = OR des 3 `.PowerCutOff` de `PRG_03` |
-| Publication Q | Juste après l'appel FB dans le même `PRG_10` |
-| Miroir partiel | `GVL_Global.EmergencyArmingPulseActive/LockoutActive/ArmingSeqStep` |
-| Portail mouvement | `PRG_00.PowerContactorEngaged` (**lu** par le FB, pas produit par lui) |
+| Instance | `PRG_OUTPUTS_LD.instSafetyEmergencyManagement` |
+| Agrégation PowerCutOff | Bus `ST_Safety_PowerCutOffRequest` depuis Safety CFC |
+| Publication Q | Juste après l'appel FB dans Outputs LD |
+| Portail mouvement | `PowerContactorEngaged` (**lu** par le FB, pas produit par lui) |
 
 Conformité AF02 : AU en **chaîne sortie**, pas de page CFC AU orpheline.
 Cible : rester dans `PRG_OUTPUTS_LD`.
 
-### 5.3 Noms : `PowerCutOff` vs `PowerKeepAlive` — cohérent par couche
+### 5.4 Démarrage — autotest au premier boot (Start-up Self-Check)
+
+Au premier cycle après `Enable=TRUE` (démarrage PLC ou téléchargement), le FB exécute
+un **autotest de cohérence** avant d'autoriser toute séquence de réarmement :
+
+| Étape | Vérification | Comportement si échec |
+|---|---|---|
+| 1 | `EmergencyChainClosed = TRUE` (boucle AU fermée) | Bloque toute séquence ; `ErrorId` bit0 si boucle ouverte sans demande |
+| 2 | `PowerContactorEngaged = FALSE` (contacteur au repos) | Bloque ; contacteur déjà engagé = anomalie câblage/retour |
+| 3 | `PowerKeepAlive_A = TRUE` ET `PowerKeepAlive_B = TRUE` (maintien actif) | `RedundancyTestFailed` si l'un FALSE (canal ouvert) |
+| 4 | Pas de séquence en cours (`ArmingSeqStep = 0`) | Bloque si séquence résiduelle |
+
+Ces vérifications sont **synchrones, déterministes, non bloquantes** (1 cycle). Si tout est OK,
+le FB passe en `Ready=TRUE` et attend un front `ArmRequest`.
+
+--- 
+
+## 6. IHM et diagnostics
 
 | Couche | Nom | TRUE signifie |
 |---|---|---|
@@ -302,7 +312,7 @@ Alignement optionnel = lot L5, pas bloquant pour comprendre le flux.
 | Champ | Usage |
 |---|---|
 | `BtnEmergencyArming` | → `ArmRequest` (front) |
-| `BtnEmergencyCutOff` | → `BtnEmergencyCutOff` (niveau) |
+| `BtnEmergencyCutOff` | → `BtnEmergencyCutOff` (niveau) — **commande IHM** (arrêt à distance), **pas** un bouton hardware ; les boutons hardware sont sur la chaîne AU physique (entrées `EmergencyChainClosed_DI`) |
 | `BtnFaultReset` | → chaîne `FaultMachineReset_IHM` → `Reset` (avec autres défauts métier) |
 
 ### États déclarés (`ST_ModesState`) — contrat attendu

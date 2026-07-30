@@ -22,7 +22,7 @@
 
 | ID | Attendu | Type |
 |---|---|---|
-| TC-P10-011 | Interlock sens : neutre→sens immédiat ; inversion directe exige vitesse<0.1 ET 200ms | AUTO |
+| TC-P10-011 | **Interlock sens** : neutre→sens immédiat (200ms) ; **inversion** exige vitesse<0.1 ET 200ms **PLUS temps mort inversion 1s** (paramétrable, > temps mort même sens) ; **redémarrage même sens** : temps mort 1s après arrêt → nouvelle demande | AUTO |
 | TC-P10-017 | Config palier invalide (`FB_SpeedStep`) ⇒ palier 0, sorties sûres | AUTO |
 | TC-P10-018 | `StuckClosed` : contacteurs commandés off, retour non confirmé 500ms ⇒ bit1 | AUTO |
 | TC-P10-019 | Ordre MainTask : Safety avant WinchControl avant Outputs_LD (frontière stricte) | AUTO+SITE |
@@ -71,6 +71,12 @@ Neutre↔un sens = immédiat. Inversion directe Fwd↔Rev exige vitesse<0.1 **et
 `DirectionInterlockDelay`=200ms. `DirectionChangePending` force la cible de rampe à 0.0 de façon
 déterministe pendant l'attente (corrige un bug historique : inversion plus rapide que la
 décélération réelle pouvait bloquer indéfiniment `CommandedDirection`).
+
+**Nouveau : temps mort de redémarrage après arrêt** — distinct de l'inversion de sens :
+- **Redémarrage même sens** : temps mort paramétrable `DeadTimeSameDir` (défaut **1s**) après `MotorRequest=FALSE` → nouvelle demande même sens.
+- **Redémarrage inversion sens** : temps mort paramétrable `DeadTimeOppositeDir` (défaut **1s**, > temps mort même sens) — **en sus** du délai d'inversion 200ms FB_Winch.
+
+Ces temps morts s'appliquent **dans la barrière finale** (FB_WinchOutputInterlock_LD), supérieurs aux délais internes FB_Winch (inversion 200ms + palier 1s250ms).
 
 ---
 

@@ -149,15 +149,15 @@ instSafetyEmergencyManagement(
 );
 
 // Affectation des sorties de réarmement et maintien puissance
-PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.PowerCutOff_A_RQ;
-PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.PowerCutOff_B_RQ;
-EmergencyArming_RQ := instSafetyEmergencyManagement.EmergencyArming_RQ;
+PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.MaintainA_RQ;
+PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.MaintainB_RQ;
+EmergencyArming_RQ := instSafetyEmergencyManagement.ArmPulse_RQ;
 
-EmergencyArmingPulseActive := instSafetyEmergencyManagement.EmergencyArming_RQ;
-EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
-ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
-RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
-EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
+EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Diag.LockoutActive;
+ArmingSeqStep := instSafetyEmergencyManagement.State.Step;
+RedundancyTestFailed := instSafetyEmergencyManagement.Diag.RedundancyTestFailed;
+EmergencyArmingFailed := instSafetyEmergencyManagement.Diag.ArmFailed;
 
 // ── [PUBLICATION DANS GVL_GLOBAL POUR LECTURE PAR LES AUTRES POU] ─────────────────
 GVL_Global.M1RelayFwd                    := M1RelayFwd;
