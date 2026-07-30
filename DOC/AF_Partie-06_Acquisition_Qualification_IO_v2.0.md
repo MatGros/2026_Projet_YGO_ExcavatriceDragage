@@ -62,7 +62,7 @@ Modes / Safety / Cycle / Mouvements / IHM
 | 🔒 Polarite | Normalisee une seule fois a l'acquisition. |
 | ✍️ Producteur unique | L'acquisition est le seul ecrivain des donnees qualifiees d'entree. |
 
-Le detail homing/vitesse codeur reste proprietaire de la Partie 10. AF06 porte seulement leur acquisition et leur publication.
+Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte seulement leur acquisition et leur publication.
 
 ---
 
@@ -132,5 +132,5 @@ Le detail de la chaine AU/rearmement est proprietaire de la Partie 01.
 - Partie 01 : AU, `PowerKeepAlive`, rearmement.
 - Partie 02 : page `PRG_ACQUISITION_CFC` et `PRG_OUTPUTS_LD`.
 - Partie 08 : traitement joystick.
-- Partie 10 : homing et vitesse codeur.
+- Partie 09 : homing et vitesse codeur.
 - Partie 13 : simulation.

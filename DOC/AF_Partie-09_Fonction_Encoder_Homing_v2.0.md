@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle — Partie 10 : Codeurs & Référencement (Homing) (v2.0)
+# Analyse Fonctionnelle — Partie 9 : Codeurs & Référencement (Homing) (v2.0)
 
 > Rôle : mesure position/vitesse câble, référencement (homing), bornage et cohérence.
 > Producteur unique position/vitesse pour tout le programme (Winch, Safety, Cycle, IHM).
@@ -23,18 +23,18 @@
 
 | ID | Attendu | Preuve | Type |
 |---|---|---|---|
-| TC-P10-001 | Preset : `PresetTriggerCmd=2` déclenche, `PresetAck` si écart ≤ tolérance sous timeout | `PresetSeqStep`, `PresetAck/Nak` | AUTO_PLC |
-| TC-P10-002 | `RawPos` gelé si `EncoderAvailable=FALSE` | Forcer alarme bus, `RawPos` figé | AUTO_PLC |
-| TC-P10-003 | Homing nominal rejeté si capteur haut non atteint (hors bypass) | Front `Home` sans capteur → bit4 | AUTO_PLC |
-| TC-P10-004 | Homing rejeté si arrêt non confirmé (contacteurs+frein) | Front `Home` sans arrêt confirmé → bit2 | AUTO_PLC |
-| TC-P10-005 | Unitaire refusé hors MAINT_N2 ou mauvais treuil sélectionné | bit0/bit1 | AUTO |
-| TC-P10-006 | Cible hors [-99;+99] m rejetée sans écriture preset | bit4, `PresetRequest` reste FALSE | AUTO |
-| TC-P10-007 | `HomingRefRaw` conforme à la formule ; `CablePosM` = cible après Done | Calcul vérifié | AUTO_PLC |
-| TC-P10-008 | Incohérence redémarrage (écart > tolérance) ⇒ `HomingSuspect`, `Homed` masqué | Reboot simulé avec écart RawPos | AUTO_PLC |
-| TC-P10-009 | `BtnConfirmCoherence` lève le doute sans réécrire la référence | Front → `HomingSuspect=FALSE`, `HomingRefRaw` inchangé | AUTO_PLC |
-| TC-P10-010 | Bornage : position hors [-99;+99] m ⇒ gel + `EncoderIncoherent` | Forcer position hors plage | AUTO |
-| TC-P10-011 | `EncoderFaultPresent` bloque SEMI_AUTO (repli MAINT_N1) | `SelMode:=SEMI_AUTO` avec défaut actif | AUTO_PLC |
-| TC-P10-012 | Méca D (capteur haut non confirmé arrêté) ⇒ SafeStop+PowerCutOff sous 3 s | SITE — voir AF09 | SITE |
+| TC-P09-001 | Preset : `PresetTriggerCmd=2` déclenche, `PresetAck` si écart ≤ tolérance sous timeout | `PresetSeqStep`, `PresetAck/Nak` | AUTO_PLC |
+| TC-P09-002 | `RawPos` gelé si `EncoderAvailable=FALSE` | Forcer alarme bus, `RawPos` figé | AUTO_PLC |
+| TC-P09-003 | Homing nominal rejeté si capteur haut non atteint (hors bypass) | Front `Home` sans capteur → bit4 | AUTO_PLC |
+| TC-P09-004 | Homing rejeté si arrêt non confirmé (contacteurs+frein) | Front `Home` sans arrêt confirmé → bit2 | AUTO_PLC |
+| TC-P09-005 | Unitaire refusé hors MAINT_N2 ou mauvais treuil sélectionné | bit0/bit1 | AUTO |
+| TC-P09-006 | Cible hors [-99;+99] m rejetée sans écriture preset | bit4, `PresetRequest` reste FALSE | AUTO |
+| TC-P09-007 | `HomingRefRaw` conforme à la formule ; `CablePosM` = cible après Done | Calcul vérifié | AUTO_PLC |
+| TC-P09-008 | Incohérence redémarrage (écart > tolérance) ⇒ `HomingSuspect`, `Homed` masqué | Reboot simulé avec écart RawPos | AUTO_PLC |
+| TC-P09-009 | `BtnConfirmCoherence` lève le doute sans réécrire la référence | Front → `HomingSuspect=FALSE`, `HomingRefRaw` inchangé | AUTO_PLC |
+| TC-P09-010 | Bornage : position hors [-99;+99] m ⇒ gel + `EncoderIncoherent` | Forcer position hors plage | AUTO |
+| TC-P09-011 | `EncoderFaultPresent` bloque SEMI_AUTO (repli MAINT_N1) | `SelMode:=SEMI_AUTO` avec défaut actif | AUTO_PLC |
+| TC-P09-012 | Méca D (capteur haut non confirmé arrêté) ⇒ SafeStop+PowerCutOff sous 3 s | SITE — voir AF10 | SITE |
 
 ---
 
@@ -205,6 +205,6 @@ PRG_09  copie vers IHM
 | AF03 | Contrat FB mouvement (Homing n'en est pas un) |
 | AF05 | Modes — MAINT_N1/N2, blocage SEMI_AUTO |
 | AF06 | E/S physiques codeurs |
-| AF09 | Winch — consommateur position/vitesse, Méca D |
+| AF10 | Winch — consommateur position/vitesse, Méca D |
 | AF13 | Simulation codeurs |
 | Code | `CODE/CODEURS/*.st`, `CODE/MAIN/PRG_02_Encoders.st` |

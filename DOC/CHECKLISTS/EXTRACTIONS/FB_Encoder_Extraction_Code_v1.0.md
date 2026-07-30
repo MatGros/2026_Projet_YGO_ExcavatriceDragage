@@ -1,7 +1,7 @@
-# Extraction Encodeurs/Homing — code vs AF10 (v1.0)
+# Extraction Encodeurs/Homing — code vs AF09 (v1.0)
 
 > Sources : `CODE/CODEURS/*.st`, `CODE/MAIN/PRG_02_Encoders.st`, `CODE/TREUILS/FB_Safety_Winch.st` (consommateur).
-> Statut : fiche de travail avant AF10 v2.0. Renommage `EmergencyStopOk→PowerContactorEngaged` déjà à jour partout ici.
+> Statut : fiche de travail avant AF09 v2.0. Renommage `EmergencyStopOk→PowerContactorEngaged` déjà à jour partout ici.
 
 ## Alertes (devoir d'alerte)
 

@@ -131,5 +131,5 @@ Le format exact des messages est porte par la Partie 07.
 - Partie 02 : architecture et place de `PRG_CYCLE`.
 - Partie 03 : contrats FB et precedence des arrets.
 - Partie 05 : modes et droits.
-- Partie 09/11/12 : treuils, translation, benne.
+- Partie 10/11/12 : treuils, benne, translation.
 - Partie 01 : AU et coupure puissance.

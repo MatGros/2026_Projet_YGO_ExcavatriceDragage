@@ -39,10 +39,10 @@ Contrat standard que **tout FB métier respecte** :
 
 ### 6️⃣ **Fonctions Métier (Partie 8+)**
 - **[Partie 8 (v2.0)](DOC/AF_Partie-08_Fonction_Joystick_v2.0.md)** — Fonction Joystick.
-- **[Partie 9 (v2.0)](DOC/AF_Partie-09_Fonction_Winch_v2.0.md)** — Fonction Winch (M1/M2, 7 mécanismes safety A-G).
-- **[Partie 10 (v2.0)](DOC/AF_Partie-10_Fonction_Encoder_Homing_v2.0.md)** — Fonction Encoder & Homing.
-- **[Partie 11 (v2.0)](DOC/AF_Partie-11_Fonction_Translation_v2.0.md)** — Fonction Translation (M3 variateur AC600).
-- **[Partie 12 (v2.0)](DOC/AF_Partie-12_Fonction_Benne_v2.0.md)** — Fonction Benne (sous-fonction Treuils M2).
+- **[Partie 9 (v2.0)](DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md)** — Fonction Encoder & Homing.
+- **[Partie 10 (v2.0)](DOC/AF_Partie-10_Fonction_Winch_v2.0.md)** — Fonction Winch (M1/M2, 7 mécanismes safety A-G).
+- **[Partie 11 (v2.0)](DOC/AF_Partie-11_Fonction_Benne_v2.0.md)** — Fonction Benne (sous-fonction Treuils M2).
+- **[Partie 12 (v2.0)](DOC/AF_Partie-12_Fonction_Translation_v2.0.md)** — Fonction Translation (M3 variateur AC600).
 - **[Partie 13 (v1.4)](DOC/AF_Partie-13_Fonction_Simulation_v2.0.md)** — Fonction Simulation.
 - **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
@@ -66,10 +66,10 @@ excavatrice-dragage/
 │   ├── AF_Partie-06_IO_Conditioning_v1.6.md
 │   ├── AF_Partie-07_Interface_IHM_v1.7.md
 │   ├── AF_Partie-08_Fonction_Joystick_v2.0.md
-│   ├── AF_Partie-09_Fonction_Winch_v1.12.md
-│   ├── AF_Partie-10_Fonction_Encoder_Homing_v1.10.md
-│   ├── AF_Partie-11_Fonction_Translation_v1.11.md
-│   ├── AF_Partie-12_Fonction_Benne_v2.0.md
+│   ├── AF_Partie-09_Fonction_Encoder_Homing_v2.0.md
+│   ├── AF_Partie-10_Fonction_Winch_v2.0.md
+│   ├── AF_Partie-11_Fonction_Benne_v2.0.md
+│   ├── AF_Partie-12_Fonction_Translation_v2.0.md
 │   ├── AF_Partie-13_Fonction_Simulation_v1.4.md
 │   ├── AUDIT_Coherence_Documentaire_v1.0.md
 │   └── PLAN_TASK_v1.0.md     (pilotage : jalons, tâches, TBD/questions client)

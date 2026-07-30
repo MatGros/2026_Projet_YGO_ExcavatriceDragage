@@ -167,7 +167,7 @@ etats mecaniques deduits, dont certains etats de benne.
 
 Le plan de reference affiche est le toucher eau : `0 m`. Le preset brut des codeurs reste positif
 et est distinct de l'affichage. L'enroulement/remontee est positif ; la descente sous l'eau est
-negative. Le processus de homing est specifie par la Partie 10.
+negative. Le processus de homing est specifie par la Partie 09.
 
 ---
 

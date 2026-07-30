@@ -1,13 +1,13 @@
-# Extraction Treuils M1/M2 — code vs AF09 (v1.0)
+# Extraction Treuils M1/M2 — code vs AF10 (v1.0)
 
 > Sources : `CODE/TREUILS/*.st`, `CODE/COMMUN/FB_Brake.st`, `CODE/MAIN/PRG_06_WinchControl.st`, `PRG_03_Safety.st`.
-> Statut : fiche de travail avant AF09 v2.0. Renommage AU déjà à jour partout ici.
+> Statut : fiche de travail avant AF10 v2.0. Renommage AU déjà à jour partout ici.
 
 ## Alertes (devoir d'alerte)
 
 | # | G | Sujet | Statut |
 |---|---|---|---|
-| A1 | info | "5 mécanismes" annoncé — code+doc legacy en comptent **7 (A-G)** | Corrigé dans AF09 v2.0 |
+| A1 | info | "5 mécanismes" annoncé — code+doc legacy en comptent **7 (A-G)** | Corrigé dans AF10 v2.0 |
 | A2 | P1 | 2 temporisations hausse palier différentes en cascade : `FB_Winch` 1s500ms **puis** `FB_WinchOutputInterlock_LD` 1s250ms (cumul ~2.75s) | Non documenté comme voulu — à clarifier |
 | A3 | P1 | T87/T91 : `DelayMotorDecel` **code mort** — TON armé `IN:=FALSE` dans `FB_Brake`, sans effet réel | Étude terrain non tranchée |
 | A4 | P2 | T93 : rampe %/s peu pertinente pour paliers résistifs discrets | Proposition non faite |

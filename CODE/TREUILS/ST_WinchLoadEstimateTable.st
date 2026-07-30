@@ -7,7 +7,7 @@
    🧭 Index 2 : bande de vitesse câble mesurée (1..5)
    📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v2.0.md
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
 *)
 
 TYPE ST_WinchLoadEstimateTable :
