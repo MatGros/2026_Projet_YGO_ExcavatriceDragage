@@ -28,7 +28,7 @@ dupliqué ici) :
 | [`FB_Winch`](AF_Partie-10_FB_Winch_v1.0.md) | TC-P10-011, 017, 018, 019 |
 | [`FB_Safety_Winch`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | TC-P10-001 à 010 |
 | [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | TC-P10-014, 015, 016 |
-| [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | TC-P10-012, 013, 020 |
+| [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | TC-P10-012, 013, 020, 021, 022 |
 
 ---
 

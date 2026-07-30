@@ -5,7 +5,7 @@
 > Perimetre : automatisme et contrat PLC-IHM ; graphisme et ergonomie IHM hors perimetre.
 > La tracabilite des versions programme/document est portee par `DOC/VERSION_HISTORY.md`.
 
-## 🧭 Sommaire rapide
+## [SOMMAIRE] Sommaire rapide
 
 1. Equipements principaux
 2. Fonctions metier et transverses
@@ -15,7 +15,7 @@
 6. Position et referencement
 7. Responsabilites documentaires
 
-## 🧪 Points de validation
+## [TESTS] Points de validation
 
 Catalogue unique `TC-P01-*` : [`AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md`](AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md).
 Cette partie ne duplique pas le tableau.
@@ -28,48 +28,48 @@ Cette partie ne duplique pas le tableau.
 
 ---
 
-## 🏗️ 1. Equipements principaux
+## [EQUIP] 1. Equipements principaux
 
 | Element | Role machine |
 |---|---|
-| 🪝 Treuil M1 | Levage/retenue, codeur absolu COD1, frein manque-courant. |
-| 🪝 Treuil M2 | Levage/benne, codeur absolu COD2, frein manque-courant. |
-| ↔️ Translation M3 | Deplace le chariot/pont ; variateur AC600 sur EtherCAT et frein manque-courant. |
-| 🪣 Benne | Sans moteur propre : ouverture/fermeture par desynchronisation commandee de M1/M2. |
-| 🕹️ Joystick Hall | Commande operateur CANopen, avec homme-mort. |
-| ⚡ Contacteur puissance | Autorise ou coupe l'energie des moteurs et actionneurs ; il ne coupe pas l'automate. |
+| [TREUIL] Treuil M1 | Levage/retenue, codeur absolu COD1, frein manque-courant. |
+| [TREUIL] Treuil M2 | Levage/benne, codeur absolu COD2, frein manque-courant. |
+| [BIDIR] Translation M3 | Deplace le chariot/pont ; variateur AC600 sur EtherCAT et frein manque-courant. |
+| [BENNE] Benne | Sans moteur propre : ouverture/fermeture par desynchronisation commandee de M1/M2. |
+| [JOY] Joystick Hall | Commande operateur CANopen, avec homme-mort. |
+| [POWER] Contacteur puissance | Autorise ou coupe l'energie des moteurs et actionneurs ; il ne coupe pas l'automate. |
 
 Chaque treuil utilise deux contacteurs de sens et quatre contacteurs de vitesse. Les cinq paliers
 resultent d'une table de masques propre a chaque treuil. Le detail des tables, des mouvements et
 
 ---
 
-## 🧩 2. Fonctions
+## [FONCT] 2. Fonctions
 
-### 🎯 Fonctions metier
+### [TARGET] Fonctions metier
 
 | Fonction | Responsabilite |
 |---|---|
-| 🕹️ Joystick | Produit les demandes de mouvement : marche, direction et vitesse. Les modes et etats autorises determinent l'equipement effectivement commande. |
-| 🪝 Treuils | Executent le mouvement, les paliers, le freinage, les limites et les retours de position. |
-| ↔️ Translation | Execute le mouvement M3 et le positionnement du chariot/pont. |
-| 🪣 Benne | Ordonne la desynchronisation M1/M2 necessaire a son ouverture ou sa fermeture. |
+| [JOY] Joystick | Produit les demandes de mouvement : marche, direction et vitesse. Les modes et etats autorises determinent l'equipement effectivement commande. |
+| [TREUIL] Treuils | Executent le mouvement, les paliers, le freinage, les limites et les retours de position. |
+| [BIDIR] Translation | Execute le mouvement M3 et le positionnement du chariot/pont. |
+| [BENNE] Benne | Ordonne la desynchronisation M1/M2 necessaire a son ouverture ou sa fermeture. |
 | 🎚️ Modes | Arbitre les droits de marche et les sources de commande. |
-| 🔄 Cycle semi-automatique | Orchestre une sequence de production a partir des fonctions disponibles. |
+| [CYCLE] Cycle semi-automatique | Orchestre une sequence de production a partir des fonctions disponibles. |
 
-### 🔧 Fonctions transverses
+### [TOOL] Fonctions transverses
 
 | Fonction | Responsabilite |
 |---|---|
 | 🖥️ Interface PLC-IHM | Expose des structures d'echange typees pour commandes autorisees, reglages, mesures, diagnostics et etats. |
 | 💬 Information operateur | Fournit les etats de la machine et les informations d'action attendue. La presentation, la priorisation et le format des messages sont specifies par la Partie 07. |
-| 🧪 Simulation | Permet les essais hors ligne et sans materiel, avec selection explicite des sources reelles ou simulees par domaine. |
-| 📡 Diagnostic devices | Surveille les devices et bus requis pour une marche sure ; les pertes pertinentes sont transmises aux protections et aux modes. |
+| [TESTS] Simulation | Permet les essais hors ligne et sans materiel, avec selection explicite des sources reelles ou simulees par domaine. |
+| [BUS] Diagnostic devices | Surveille les devices et bus requis pour une marche sure ; les pertes pertinentes sont transmises aux protections et aux modes. |
 | 🛡️ Safety | Surveille les conditions dangereuses de mouvement et demande soit un arret rapide, soit une coupure de puissance selon le risque. |
 
 ---
 
-## 🔄 3. Finalite operationnelle
+## [CYCLE] 3. Finalite operationnelle
 
 La machine descend la benne, realise le prelevement, remonte la charge, la deplace vers une zone
 
@@ -77,14 +77,14 @@ Les modes maintenance permettent les manoeuvres necessaires hors cycle, dans les
 
 ---
 
-## 🛑 4. Modele de commande et d'arret
+## [STOP] 4. Modele de commande et d'arret
 
 | Niveau | Condition | Effet |
 |---|---|---|
-| 🟢 Marche et arret normal | `Enable=TRUE`, pas de `SafeStop` ; `StartStop` pilote la demande | Acceleration ou deceleration normale. |
-| 🟠 Arret rapide logiciel | `SafeStop=TRUE`, `Enable=TRUE` | Deceleration rapide du mouvement ; le FB reste actif jusqu'a l'arret. |
+| [OK] Marche et arret normal | `Enable=TRUE`, pas de `SafeStop` ; `StartStop` pilote la demande | Acceleration ou deceleration normale. |
+| [WARN] Arret rapide logiciel | `SafeStop=TRUE`, `Enable=TRUE` | Deceleration rapide du mouvement ; le FB reste actif jusqu'a l'arret. |
 | ⚪ Neutralisation | `Enable=FALSE` ou contacteur puissance non confirme | Sorties du FB neutralisees. |
-| 🔴 Coupure de puissance | AU physique, perte du maintien PLC ou demande safety majeure | Coupure materielle de l'energie des moteurs et actionneurs. |
+| [KO] Coupure de puissance | AU physique, perte du maintien PLC ou demande safety majeure | Coupure materielle de l'energie des moteurs et actionneurs. |
 
 Precedence obligatoire : `Enable` > `SafeStop` > `StartStop`.
 
@@ -95,12 +95,12 @@ pas, a elle seule, une fonction safety.
 
 ---
 
-## ⚡ 5. Securite electrique et rearmement
+## [POWER] 5. Securite electrique et rearmement
 
 > Detail FB, interfaces, sequence, polarites, IHM, sim et `TC-P01-*` :
 > [`AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md`](AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md).
 
-### 🧱 5.1 Principe
+### [BLOCK] 5.1 Principe
 
 L'automate reste alimente. Une boucle materielle coupe le contacteur general de puissance des
 moteurs et actionneurs. Cette boucle comprend les boutons d'arret d'urgence physiques et deux
@@ -133,7 +133,7 @@ la chaine electrique.
 
 La benne n'a pas de safety dedie : couche 1 Benne (P12), escalade possible via safety M1 (P09).
 
-### 🔁 5.3 Rearmement (regles machine)
+### [LOOP] 5.3 Rearmement (regles machine)
 
 - Jamais automatique.
 - Front commande operateur seulement.
@@ -143,7 +143,7 @@ La benne n'a pas de safety dedie : couche 1 Benne (P12), escalade possible via s
 
 Temporisations, etapes, latches, Reset conditionnel : **spec FB** (pas recopies ici).
 
-### 🧑‍🔧 5.4 Actions operateur
+### 🧑‍[TOOL] 5.4 Actions operateur
 
 | Situation | Action operateur |
 |---|---|
@@ -159,7 +159,7 @@ sorties logiques identiques.
 
 ---
 
-## 📏 6. Position et referencement
+## [DIM] 6. Position et referencement
 
 Les codeurs absolus mesurent position et vitesse des cables. Ils servent a l'information de
 profondeur/altimetrie, aux limites, au synchronisme M1/M2, aux protections de mouvement et aux

@@ -495,6 +495,17 @@ GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.instJoystick.Error
 GVL_IHM.Modes.State.CurrentMode     := PRG_04_Modes.instModes.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 
+// 🆕 Bus State/Diag Emergency → ST_ModesState (AF01 §6)
+GVL_IHM.Modes.State.EmergencyChainOk      := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.ChainOk;
+GVL_IHM.Modes.State.PowerContactorOk      := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.ContactorOk;
+GVL_IHM.Modes.State.EmergencyArmable      := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.Armable;
+GVL_IHM.Modes.State.EmergencyArmingBusy   := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.ArmingBusy;
+GVL_IHM.Modes.State.RedundancyTestFailed  := PRG_10_Outputs_LD.instSafetyEmergencyManagement.Diag.RedundancyTestFailed;
+GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs_LD.instSafetyEmergencyManagement.Diag.ArmFailed;
+GVL_IHM.Modes.State.PowerCutOffActive     := (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                                               OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                                               OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff);
+
 
 // ── 12. MAPPING DIAGNOSTICS BUS → IHM ────────────────────────────────────
 GVL_IHM.Network.BusCanOpen  := PRG_01_Diagnostics.instDiagCanOpen.DeviceCanOpenMaster;
