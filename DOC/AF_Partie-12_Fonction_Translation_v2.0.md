@@ -1,8 +1,8 @@
 # Analyse Fonctionnelle — Partie 12 : Fonction Translation M3 (v2.0)
 
 > Rôle : positionnement chariot/pont (AC600 EtherCAT), sécurité mouvement, barrière finale.
-> Domaine autonome (contrairement à Benne) : PRG propre (`PRG_07`), `FB_Safety_Translation` dédié.
-> Source code : `CODE/TRANSLATION/*.st` · instances dans `PRG_07_TranslationControl`, `PRG_03_Safety`, `PRG_10_Outputs_LD`.
+> Domaine autonome (contrairement à Benne) : PRG propre (`Translation`), `FB_Safety_Translation` dédié.
+> Source code : `CODE/TRANSLATION/*.st` · instances dans `Translation (CFC)`, `Safety (CFC)`, `Outputs (Ladder)`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Translation_Extraction_Code_v1.0.md`.
 > v1.13 archivée : `ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v1.13.md`.
 
@@ -44,7 +44,7 @@
 
 ```text
 FB_Translation_PositionDecoder ──► FB_Safety_Translation ──► FB_Translation ──► FB_TranslationOutputInterlock_LD
-   (5 capteurs → mot, PRG_00)         (safety, PRG_03)         (mouvement, PRG_07)   (barrière finale, PRG_10)
+   (5 capteurs → mot, Acquisition)         (safety, Safety)         (mouvement, Translation)   (barrière finale, Outputs)
 ```
 
 Un seul axe M3 — pas d'instances ×2 comme Winch.
@@ -65,9 +65,9 @@ Un seul axe M3 — pas d'instances ×2 comme Winch.
 | `00001` | Entre P1 et Maintenance |
 | `00000` | Extrême Maintenance |
 
-Tout autre mot ⇒ `Incoherent=TRUE`. `LimitSwitchFwd/Rev` dérivés **seulement** sur mot valide (évite Fdc fantôme).
+Tout autre mot ⇒ `Incoherent=TRUE`. Butées extrêmes (avant/arrière) dérivées **seulement** sur mot valide (évite butée fantôme).
 
-Instance : `PRG_00_Inputs.instPositionDecoder`, position 0, **avant** `PRG_03_Safety`.
+Instance : `Acquisition (CFC).instPositionDecoder`, position 0, **avant** `Safety (CFC)`.
 
 ---
 
@@ -82,7 +82,7 @@ Instance : `PRG_00_Inputs.instPositionDecoder`, position 0, **avant** `PRG_03_Sa
 | 3 | Surchauffe frein | instantané |
 | 4 | **Méca B** — incohérence arrêt persistant | `PostRampTimeout`=3s (constante interne, ⚠️ non paramétrable) |
 | 5 | **Méca A** — mouvement non commandé | 1s (constante interne, câblée en dur) |
-| 6 | Fin de course (Fdc) | instantané |
+| 6 | Butée extrême (avant ou arrière) | instantané |
 | 7 | Mot capteurs incohérent | instantané |
 
 **Détail Méca B** : si `HeartbeatIhmOk=FALSE`, condition élargie (surveillance perte IHM) ; sinon condition standard arrêt commandé sans confirmation.
@@ -111,13 +111,13 @@ _TranslationAutoSpeedCap_Pct=40.0, _TranslationSetFreq_Hz=0.0
 5. Arrêt exact sur capteur : verrouille à 0 tant que cible atteinte dans le même sens.
 6. Interlock sens : délai 200ms si vitesse non nulle avant bascule.
 7. Mot AC600 : `0`=None, `1`=Fwd, `2`=Rev, `7`=Reset. Priorité Reset>Error>mouvement>neutre.
-8. Coupure immédiate si Fdc atteint dans le sens commandé.
+8. Coupure immédiate si butée extrême atteinte dans le sens commandé.
 
 `FB_Translation` **ne décide pas** la frontière finale : SafeStop produit une rampe rapide, Enable maintenu — jamais une coupure sèche transformée ici.
 
 ---
 
-## 5. FB_TranslationOutputInterlock_LD (barrière finale, dans PRG_10)
+## 5. FB_TranslationOutputInterlock_LD (barrière finale, dans Outputs)
 
 Watchdog frein **500ms fixe** (câblé en dur, pas paramétrable).
 
@@ -133,12 +133,12 @@ Watchdog frein **500ms fixe** (câblé en dur, pas paramétrable).
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
-| `ST_TranslationFinalInterlockRequest` | `PRG_07_TranslationControl` | `PRG_10_Outputs_LD` |
-| `ST_TranslationCmd` | IHM | `PRG_07` |
-| `ST_TranslationState` | `PRG_09_Supervision` | IHM |
-| `ST_SafetyTranslation` | `PRG_09_Supervision` | IHM |
-| `ST_BypassTranslation` | IHM RETAIN | `PRG_03`, `PRG_07` |
-| `ST_HwTranslation` | `PRG_00_Inputs` | `PRG_00` (HwIn) |
+| `ST_TranslationFinalInterlockRequest` | `Translation (CFC)` | `Outputs (Ladder)` |
+| `ST_TranslationCmd` | IHM | `Translation` |
+| `ST_TranslationState` | `Supervision` | IHM |
+| `ST_SafetyTranslation` | `Supervision` | IHM |
+| `ST_BypassTranslation` | IHM RETAIN | `Safety`, `Translation` |
+| `ST_HwTranslation` | `Acquisition (CFC)` | `Acquisition` (HwIn) |
 | `E_TranslationFinalInterlockReason` | `FB_TranslationOutputInterlock_LD` | IHM, Troubleshooting |
 
 ---
@@ -146,16 +146,16 @@ Watchdog frein **500ms fixe** (câblé en dur, pas paramétrable).
 ## 7. Intégration programme
 
 ```text
-PRG_00  instPositionDecoder (position 0, AVANT Safety)
-PRG_01  instJoystick (AxisCmdX, DeadmanArmed)
-PRG_03  instSafetyTranslationM3 — Enable inconditionnel, lit M3_Direction_Active de PRG_07 (1 scan de retard)
-PRG_04  MaintenanceM3TargetEnable (Mode=MAINT_N2)
-PRG_05  CmdTranslationM3_Start/Target (SEMI_AUTO)
-PRG_07  instTranslationM3 → publie TranslationFinalInterlockRequest
-PRG_10  instTranslationOutputInterlock_LD (Q finales)
+Acquisition  instPositionDecoder (position 0, AVANT Safety)
+Acquisition  instJoystick (AxisCmdX, DeadmanArmed)
+Safety  instSafetyTranslationM3 — Enable inconditionnel, lit M3_Direction_Active de Translation (1 scan de retard)
+Modes  MaintenanceM3TargetEnable (Mode=MAINT_N2)
+Cycle  CmdTranslationM3_Start/Target (SEMI_AUTO)
+Translation  instTranslationM3 → publie TranslationFinalInterlockRequest
+Outputs  instTranslationOutputInterlock_LD (Q finales)
 ```
 
-**Arbitrage PRG_07** :
+**Arbitrage Translation** :
 - **SEMI_AUTO** : cible/vitesse depuis Cycle, `StartStop` exige `DeadmanArmed AND AxisCmdX.StartStop` (homme-mort actif même en auto).
 - **MAINT_N1/N2** : boutons IHM OU joystick (`TglJoystickMaster`) — `DeadmanArmed` exigé **même pour boutons IHM** (REX 2026-07-19, corrige un écart sécurité).
 - Cible Maintenance (4) refusée hors MAINT_N2.
@@ -171,7 +171,7 @@ PRG_10  instTranslationOutputInterlock_LD (Q finales)
 | 2 | P2 | `PostRampTimeout`(3s)/Méca A(1s) non paramétrables, non documenté avant | Comblé §3 |
 | 3 | P2 | Variante Méca B (perte IHM) non documentée avant | Comblé §3 |
 | 4 | P2 | Doc legacy dit `ApproachSpeedPct` etc. "câblés RETAIN" — **faux**, restent au défaut FB | Corrigé §4 |
-| 5 | info | Dépendance croisée PRG_03↔PRG_07 (1 scan retard) | Clarifié §7 |
+| 5 | info | Dépendance croisée Safety↔Translation (1 scan retard) | Clarifié §7 |
 | 6 | info | `SetFreq_Hz=0` → défaut 30% codé en dur | Vestige mise en service |
 
 ---
@@ -184,4 +184,4 @@ PRG_10  instTranslationOutputInterlock_LD (Q finales)
 | AF03 | Contrat FB mouvement |
 | AF05 | Modes — MAINT_N2 |
 | AF06 | 5 capteurs TOR M3 |
-| Code | `CODE/TRANSLATION/*.st`, `CODE/MAIN/PRG_07_TranslationControl.st` |
+| Code | `CODE/TRANSLATION/*.st`, `CODE/MAIN/Translation (CFC).st` |

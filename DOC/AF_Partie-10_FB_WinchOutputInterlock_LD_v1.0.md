@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §6.
 > Rôle de **ce** document : barrière finale, watchdog frein, machine d'état, anti-redémarrage —
 > et **catalogue unique** des `TC-P10-012`, `013`, `020`.
-> Source code : `CODE/TREUILS/FB_WinchOutputInterlock_LD.st` · instances dans `PRG_10_Outputs_LD`.
+> Source code : `CODE/TREUILS/FB_WinchOutputInterlock_LD.st` · instances dans `Outputs (Ladder)`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
@@ -32,7 +32,7 @@
 
 Profil **barrière finale** (Partie3 §2) : reçoit la demande sortie typée (`ST_WinchFinalInterlockRequest`),
 applique les interlocks ultimes, produit **seule** la commande physique autorisée (Q réelles).
-2 instances : `instWinchOutputInterlockM1_LD`, `instWinchOutputInterlockM2_LD`, dans `PRG_10_Outputs_LD`.
+2 instances : `instWinchOutputInterlockM1_LD`, `instWinchOutputInterlockM2_LD`, dans `Outputs (Ladder)`.
 
 `FB_Winch`/`ST_SpeedStepTable` restent propriétaires du **mapping** palier→contacteurs ; cette
 barrière **autorise ou masque** la demande, ne la reconstruit jamais.

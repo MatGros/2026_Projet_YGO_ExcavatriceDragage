@@ -82,12 +82,12 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 | Port | Producteur actuel | Sémantique |
 |---|---|---|
-| `Enable` | `PRG_10` = TRUE fixe | Active surveillance ; FALSE = neutralisation totale |
-| `Reset` | `PRG_09.FaultMachineReset_IHM` ← `BtnFaultReset` | Front acquittement défauts FB |
+| `Enable` | `Outputs` = TRUE fixe | Active surveillance ; FALSE = neutralisation totale |
+| `Reset` | `Supervision.FaultMachineReset_IHM` ← `BtnFaultReset` | Front acquittement défauts FB |
 | `ArmRequest` | `GVL_IHM.Modes.Cmd.BtnEmergencyArming` | Front demande réarmement |
-| `EmergencyChainClosed` | `PRG_00.EmergencyChainClosed` ← `EmergencyChainClosed_DI` | Boucle AU fermée |
-| `PowerContactorEngaged` | `PRG_00.PowerContactorEngaged` ← `PowerContactorEngaged_DI` | Contacteur engagé |
-| `PowerCutOffRequest` | OR local M1/M2/M3 `.PowerCutOff` dans `PRG_10` | Coupure demandée par safety domaine |
+| `EmergencyChainClosed` | `Acquisition.EmergencyChainClosed` ← `EmergencyChainClosed_DI` | Boucle AU fermée |
+| `PowerContactorEngaged` | `Acquisition.PowerContactorEngaged` ← `PowerContactorEngaged_DI` | Contacteur engagé |
+| `PowerCutOffRequest` | OR local M1/M2/M3 `.PowerCutOff` dans `Outputs` | Coupure demandée par safety domaine |
 | `BtnEmergencyCutOff` | `GVL_IHM.Modes.Cmd.BtnEmergencyCutOff` | **Coupure IHM maintenue** : bouton IHM (ou supervision) qui force l'ouverture des deux canaux A/B tant que maintenu — **pas** un bouton physique AU (celui-ci est dans la boucle hardware). Ne déclenche **pas** de séquence de réarmement. |
 
 ### Sorties logiques / diag
@@ -218,14 +218,14 @@ reste jusqu'au Reset conditionnel.
 Double dénomination FB `PowerCutOff_*_RQ` vs Q `PowerKeepAlive_*_RQ` : **même polarité maintien**.
 Voir écart normalisation §8.
 
-Filtre acquisition : anti-rebond 20 ms sur les deux DI (`FB_Input` dans `PRG_00`).
+Filtre acquisition : anti-rebond 20 ms sur les deux DI (`FB_Input` dans `Acquisition`).
 
 ---
 
 ## 5. Intégration programme (architecture cible)
 
 > ⚠️ **Architecture en cours de migration** : le code actuel utilise encore des PRG séquentiels
-> (`PRG_00`…`PRG_10`). L'architecture cible (AF02 v3) prévoit des **pages CFC** avec chargeurs :
+> (`Acquisition`…`Outputs`). L'architecture cible (AF02 v3) prévoit des **pages CFC** avec chargeurs :
 > `PRG_ACQUISITION_CFC`, `PRG_MODES_CFC`, `PRG_SAFETY_CFC`, `PRG_OUTPUTS_LD`, etc.
 > Le flux logique reste identique ; seuls les conteneurs changent.
 
@@ -319,8 +319,8 @@ Alignement optionnel = lot L5, pas bloquant pour comprendre le flux.
 
 | Champ | Source attendue |
 |---|---|
-| `PowerContactorEngaged` | `PRG_00` (mappé) |
-| `EmergencyChainOk` | `PRG_00.EmergencyChainClosed` |
+| `PowerContactorEngaged` | `Acquisition` (mappé) |
+| `EmergencyChainOk` | `Acquisition.EmergencyChainClosed` |
 | `PowerContactorOk` | miroir contacteur |
 | `PowerCutOffActive` | OR safety domaines (polarité alarme) |
 | `EmergencyArmable` | chain OK ∧ step0 ∧ ¬lockout ∧ ¬RedundancyFail ∧ ¬PowerContactorEngaged |
@@ -328,7 +328,7 @@ Alignement optionnel = lot L5, pas bloquant pour comprendre le flux.
 | `RedundancyTestFailed` | sortie FB |
 | `EmergencyArmingFailed` | sortie FB |
 
-**Écart vérifié** : `PRG_09_Supervision` mappe aujourd'hui `Modes.State.PowerContactorEngaged` ;
+**Écart vérifié** : `Supervision` mappe aujourd'hui `Modes.State.PowerContactorEngaged` ;
 les autres champs armement de `ST_ModesState` ne sont pas encore alimentés depuis le FB.
 À corriger lors de la normalisation (sans changer le DUT IHM s'il est déjà consommé écran).
 
@@ -341,7 +341,7 @@ les autres champs armement de `ST_ModesState` ne sont pas encore alimentés depu
 - `SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop`
 - Latch contacteur sur `EmergencyArming` ; retombée immédiate si chain ouverte
 
-**Correctif L1 appliqué** dans `PRG_00` → `instSimBench` :
+**Correctif L1 appliqué** dans `Acquisition` → `instSimBench` :
 
 | Entrée SimBench | Source |
 |---|---|
@@ -379,7 +379,7 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 | Lot | Contenu | Risque | Prérequis |
 |---|---|---|---|
 | **L0 Doc** | Cette spec + extraction + liens AF01/02/03 | Nul | — |
-| **L1 Sim** | Corriger câblage `FB_SimBench` KeepAlive/Arming | ✅ Fait (`PRG_00`) | — |
+| **L1 Sim** | Corriger câblage `FB_SimBench` KeepAlive/Arming | ✅ Fait (`Acquisition`) | — |
 | **L2 IHM map** | Alimenter tous les champs `ST_ModesState` armement depuis FB | Faible | Validation |
 | **L3 DUT State/Diag** | Introduire bus publics ; retirer dépendance `GVL_Global` armement | Moyen | AF03 fiche contrat |
 | **L4 Agrégat PowerCutOff** | DUT depuis Safety ; OR hors Outputs anonyme | Moyen | CFC Safety |
@@ -425,6 +425,6 @@ Fichiers code de référence :
 - `CODE/AU/FB_Safety_EmergencyManagementLogic.st`
 - `CODE/AU/FB_Safety_EmergencyManagementOutput.st`
 - `CODE/AU/ST_EmergencyManagementCmd.st`
-- `CODE/MAIN/PRG_10_Outputs_LD.st`
-- `CODE/MAIN/PRG_00_Inputs.st`
+- `CODE/MAIN/Outputs (Ladder).st`
+- `CODE/MAIN/Acquisition (CFC).st`
 - `CODE/SIMULATION/FB_Sim_Safety.st`

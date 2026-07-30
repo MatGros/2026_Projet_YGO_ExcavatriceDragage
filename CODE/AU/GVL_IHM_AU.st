@@ -1,19 +1,20 @@
-(* ═══════════════════════════════════════════════════════════════
-   🖥️ GVL_IHM_AU — Structure IHM pour test chaîne AU
-   ───────────────────────────────────────────────────────────────
-   📄 Réplique les champs de ST_ModesCmd/ST_ModesState nécessaires
-      au pilotage de FB_Safety_EmergencyManagement, sans les
-      dépendances aux autres domaines (treuils, translation...).
-   🎯 Pattern identique à GVL_IHM.Modes.Cmd (projet réel).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-07_Interface_IHM_v2.0.md
+(* ==============================================================
+   [IHM] GVL_IHM_AU -- Interface IHM pour le test de la chaine AU
+   --------------------------------------------------------------
+   Role : point d'echange unique entre l'IHM (Watch/visu) et
+          le programme de test de la chaine d'arret d'urgence.
+   Pattern : identique a GVL_IHM.Modes (Cmd + State) dans le
+          projet reel.
+   Usage :
+     GVL_IHM_AU.Cmd.BtnEmergencyArming   -> ecrit par l'IHM
+     GVL_IHM_AU.State.ContactorOk         -> lu par l'IHM
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 
 {attribute 'qualified_only'}
 VAR_GLOBAL
-    // 🎮 Commandes IHM (miroir de ST_ModesCmd)
-    BtnEmergencyArming   : BOOL;   // Front demande réarmement contacteur
-    BtnEmergencyCutOff   : BOOL;   // Niveau coupure IHM maintenue
-    BtnFaultReset        : BOOL;   // Front acquittement défauts
+    Cmd   : ST_EmergencyCmd;    // [IHM] Commandes operateur (Write)
+    State : ST_EmergencyState;  // [IHM] Retours d'etat (Read)
 END_VAR

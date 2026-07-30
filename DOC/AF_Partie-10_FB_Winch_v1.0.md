@@ -4,7 +4,7 @@
 > Rôle de **ce** document : directeur mouvement treuil (rampe, palier, sens, frein) — et
 > **catalogue unique** des `TC-P10-011`, `017`, `018`, `019`.
 > Compose `FB_SpeedStep` (§5), `FB_Brake` (§6), `FB_Ramp` (résumés ici, pas de fiche séparée).
-> Source code : `CODE/TREUILS/FB_Winch.st` · instances `instWinchM1/M2` dans `PRG_06_WinchControl`.
+> Source code : `CODE/TREUILS/FB_Winch.st` · instances `instWinchM1/M2` dans `Treuils (CFC)`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire

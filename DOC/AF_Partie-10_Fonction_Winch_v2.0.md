@@ -3,7 +3,7 @@
 > Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, barrière finale.
 > **Détail technique par FB** : voir les 4 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
-> Source code : `CODE/TREUILS/*.st` · instances dans `PRG_06_WinchControl` (mouvement), `PRG_03_Safety` (safety), `PRG_10_Outputs_LD` (finale).
+> Source code : `CODE/TREUILS/*.st` · instances dans `Treuils (CFC)` (mouvement), `Safety (CFC)` (safety), `Outputs (Ladder)` (finale).
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 > Benne (M2 sous-fonction) : voir AF11, annexée à ce domaine (pas de PRG/actionneur propre).
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
@@ -52,7 +52,7 @@ FB_Winch (mouvement, ×2)
 
 FB_Safety_Winch (×2)              ──► SafeStop / ForbidDescent / ForbidAscent / PowerCutOff
 FB_WinchSync (×1)                 ──► DeltaPosM, SyncWarn (niveau 1, warning)
-FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans PRG_10)
+FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs)
 FB_WinchLoadEstimator (×2)        ──► diagnostic charge, informatif
 ```
 
@@ -72,9 +72,9 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
-| `ST_WinchFinalInterlockRequest` | `PRG_06_WinchControl` | `PRG_10_Outputs_LD` |
+| `ST_WinchFinalInterlockRequest` | `Treuils (CFC)` | `Outputs (Ladder)` |
 | `ST_SpeedStepTable` | config IHM/RETAIN | `FB_Winch`/`FB_SpeedStep` |
-| `ST_SafetyWinch` | `PRG_09_Supervision` (agrège) | IHM |
+| `ST_SafetyWinch` | `Supervision` (agrège) | IHM |
 | `ST_BypassWinch` | IHM RETAIN | `FB_Safety_Winch` |
 | `ST_ContactorCheck` (COMMUN) | `FB_Brake`/`FB_Winch` | `FB_Safety_Winch`, IHM |
 
@@ -83,8 +83,8 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 ## 4. Intégration programme
 
 ```text
-PRG_03_Safety        instSafetyWinchM1/M2, instSpeedMonitorM1/M2, instLoadEstimatorM1/M2
-PRG_06_WinchControl
+Safety (CFC)        instSafetyWinchM1/M2, instSpeedMonitorM1/M2, instLoadEstimatorM1/M2
+Treuils (CFC)
   §1  instBucket (Benne, appelé EN PREMIER — évite fenêtre de commande manuelle parasite)
   §2  Arbitrage M1 (SEMI_AUTO / MAINT / joystick / boutons)
   §3  Arbitrage M2 (Benne prioritaire > SEMI_AUTO > joystick/boutons)
@@ -93,8 +93,8 @@ PRG_06_WinchControl
   instWinchSync (lu 1 scan après arbitrage)
   §5  Limites basses + couplage croisé
   §6/7 Exécution instWinchM1/M2
-  §8  Publication ST_WinchFinalInterlockRequest → PRG_10
-PRG_10_Outputs_LD    instWinchOutputInterlockM1/M2_LD (Q finales)
+  §8  Publication ST_WinchFinalInterlockRequest → Outputs
+Outputs (Ladder)    instWinchOutputInterlockM1/M2_LD (Q finales)
 ```
 
 **Dépendances** : Joystick (`AxisCmdY`, `DeadmanArmed`), Modes (`JoystickWinchSelectArbitrated`,
@@ -186,4 +186,4 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 | AF09 | Codeurs — Homed, position, vitesse |
 | AF11 | Benne — sous-fonction M2 |
 | PLAN_TASK | Lot 4 (T87/T91/T93/T94/T95/T96) — décision non prise, étude terrain requise |
-| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/PRG_06_WinchControl.st` |
+| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/Treuils (CFC).st` |

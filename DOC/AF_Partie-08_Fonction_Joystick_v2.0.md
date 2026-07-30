@@ -2,7 +2,7 @@
 
 > Rôle : acquisition et conditionnement du geste opérateur (Hall CANopen → consignes d'axe).
 > **Pas** un FB de mouvement : pas de `SafeStop` / pas de pilotage Q.
-> Source code : `CODE/JOYSTICK/FB_Joystick.st` · instance `PRG_01_Diagnostics.instJoystick`.
+> Source code : `CODE/JOYSTICK/FB_Joystick.st` · instance `Acquisition (CFC).instJoystick`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Joystick_Extraction_Code_v1.0.md`.
 > v1.3 archivée : `ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v1.3.md`.
 
@@ -30,7 +30,7 @@
 | TC-P08-005 | Changement de mode ou fin benne désarme ; seule Extraction `CLOSING_BUCKET` peut préserver l'armement | câblage + états | AUTO | §4, §6 |
 | TC-P08-006 | Calibration : hors [2000;8000] ⇒ bit0 ; Reset front seulement cause disparue | `ErrorId` | AUTO | §5 |
 | TC-P08-007 | Contrat consigne : `SpeedRef` signé [-100;+100], `StartStop` sur magnitude ; pas d'entrée `SafeStop` | interface `ST_AxisCmd` / FB | AUTO | §1, §2 |
-| TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` en plus de la consigne | linkage PRG_05/06/07 | AUTO | §6 |
+| TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` en plus de la consigne | linkage Cycle/06/07 | AUTO | §6 |
 
 ---
 
@@ -72,7 +72,7 @@ Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► FB_Ramp ─► ST_AxisCmd
 | `SpeedRef` | % **signé** −100..+100 |
 | `Direction` | −1 / 0 / +1 (seuil ±0,1 sur rampe) |
 
-Paramètres d'appel production (`PRG_01`) : deadband / filtre / rates depuis `GVL_PERSISTENT` ;
+Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depuis `GVL_PERSISTENT` ;
 `DeadmanRearmTimeout=T#10s`, `NeutralHoldTime=T#500ms`.
 
 ---
@@ -83,14 +83,14 @@ Paramètres d'appel production (`PRG_01`) : deadband / filtre / rates depuis `GV
 
 | Port | Producteur actuel |
 |---|---|
-| `Enable` | `TRUE` fixe dans PRG_01 |
+| `Enable` | `TRUE` fixe dans Acquisition |
 | `Reset` | `FaultMachineReset_IHM` |
-| `PowerContactorEngaged` | `PRG_00_Inputs.PowerContactorEngaged` |
-| `Mode` | `PRG_04_Modes.instModes.Mode` (scan N−1) |
-| `BenneBusy` | `PRG_06.instBucket.Busy` (scan N−1) |
+| `PowerContactorEngaged` | `Acquisition (CFC).PowerContactorEngaged` |
+| `Mode` | `Modes (CFC).instModes.Mode` (scan N−1) |
+| `BenneBusy` | `Treuils.instBucket.Busy` (scan N−1) |
 | `PreserveArmingAfterBucket` | Extraction Busy **et** état `CLOSING_BUCKET` |
 | `BusCanOpenOP` / `JoystickOP` | `FB_DiagCanOpen` |
-| `RawX/Y`, `RawButton` | `PRG_00.HwIn.Operator` |
+| `RawX/Y`, `RawButton` | `Acquisition.HwIn.Operator` |
 | `BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` |
 | `Invert*`, `Deadband`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |
 | `NeutralXMem/YMem` | `VAR_IN_OUT` persistants |
@@ -168,13 +168,13 @@ lui-même n'a pas été inspecté). À valider avant mise en service.
 ## 6. Intégration programme
 
 ```text
-PRG_00  HwIn.Operator (réel/sim)
-PRG_01  Diag CAN + instJoystick          ← producteur unique consignes joy
-PRG_04  Mode (lu N−1 par joy)
-PRG_05  CycleMotionPermit := DeadmanArmed AND AxisCmdY.StartStop
-PRG_06  Winch : joy + DeadmanArmed + sélecteur treuil
-PRG_07  Translation : AxisCmdX + DeadmanArmed
-PRG_09  Mapping IHM JOY1Joystick.State
+Acquisition  HwIn.Operator (réel/sim)
+Acquisition  Diag CAN + instJoystick          ← producteur unique consignes joy
+Modes  Mode (lu N−1 par joy)
+Cycle  CycleMotionPermit := DeadmanArmed AND AxisCmdY.StartStop
+Treuils  Winch : joy + DeadmanArmed + sélecteur treuil
+Translation  Translation : AxisCmdX + DeadmanArmed
+Supervision  Mapping IHM JOY1Joystick.State
 ```
 
 Consommateurs **doivent** combiner `AxisCmd*.StartStop` **et** `DeadmanArmed`

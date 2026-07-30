@@ -153,5 +153,5 @@
 ## Incoherences constatees dans la source
 
 - `PowerKeepAlive_A_RQ/B_RQ` et `PowerCutOff_A_RQ/B_RQ` sont employes pour le canal fail-safe. La formule et le fichier code cite emploient `PowerCutOff`, tandis que le texte explique une commande de maintien. Aucun renommage ne doit etre fait avant verification materiel/export.
-- L'AF01 cite `PRG_10_Outputs`, alors que le fichier ST actif observe est `CODE/MAIN/PRG_10_Outputs_LD.st`.
+- L'AF01 cite `Outputs_Outputs`, alors que le fichier ST actif observe est `CODE/MAIN/Outputs (Ladder).st`.
 - Les liens vers les Parties 02, 03 et 09 citent des versions anciennes. Cette fiche enregistre le sujet, mais ne corrige pas encore les liens.

@@ -3,7 +3,7 @@
 > Rôle : ouverture/fermeture par désynchronisation contrôlée M1/M2 (M1 immobile, M2 seul bouge).
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni PRG propre. Voir §7 pour justification.
 > Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
-> Instance unique `instBucket` dans `PRG_06_WinchControl` — annexe technique d'AF10.
+> Instance unique `instBucket` dans `Treuils (CFC)` — annexe technique d'AF10.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Bucket_Extraction_Code_v1.0.md`.
 > v1.4 archivée : `ARCHIVES/Doc/AF_Partie-12_Fonction_Benne_v1.4.md`.
 
@@ -27,7 +27,7 @@
 | TC-P11-002 | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | AUTO |
 | TC-P11-003 | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | AUTO |
 | TC-P11-004 | Glissement M1>1.0m pendant BUSY ⇒ bit4 + `M1SlipDetected` + coupe M2 | AUTO |
-| TC-P11-005 | `M1SlipDetected` force SafeStop sur M1 côté PRG_06 (couche 1) | AUTO |
+| TC-P11-005 | `M1SlipDetected` force SafeStop sur M1 côté Treuils (couche 1) | AUTO |
 | TC-P11-006 | Couche 2 (Méca C AF10, bit9) : dérive M1>2.0m ⇒ PowerCutOff | AUTO |
 | TC-P11-007 | Recul (sens inverse) borné à la position de départ, jamais au-delà | AUTO |
 | TC-P11-008 | `ConfirmOpenPosition`/`ClosePosition` : effet seulement MAINT_N1/N2, treuils arrêtés | AUTO |
@@ -74,7 +74,7 @@ Pas de moteur propre — effet de bord de la désynchronisation M1/M2 :
 
 | Couche | Condition | Conséquence |
 |---|---|---|
-| **1** (`FB_Bucket`, bit4) | `State=BUSY` ET `\|CablePosM1-M1RefPosM\| > 1.0m` | Coupe M2 (SevereError interne), `M1SlipDetected` exposé — **consommé** par PRG_06 : force SafeStop M1 |
+| **1** (`FB_Bucket`, bit4) | `State=BUSY` ET `\|CablePosM1-M1RefPosM\| > 1.0m` | Coupe M2 (SevereError interne), `M1SlipDetected` exposé — **consommé** par Treuils : force SafeStop M1 |
 | **2** (`FB_Safety_Winch`, Méca C bit9, AF10) | `BenneHoldStillActive` (M1 seul, câblé sur `instBucket.Busy`) | Dérive M1 > **2.0m** ⇒ **PowerCutOff** |
 
 Défense en profondeur : si couche 1 (SafeStop M2, 1.0m) ne suffit pas à arrêter M1 physiquement (roue libre, contacteur collé), couche 2 coupe la puissance amont à 2.0m.
@@ -100,13 +100,13 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 - `CLOSING_BUCKET` : produit `BucketCloseRequest` → `instBucket.CmdClose_IHM`. Transition vers `CONTROL_ASCENT` dès fermé.
 - `CONTROL_ASCENT` : force palier 1 (`ForceMinSpeedStep`) sur M1/M2, sort après distance parcourue confirmée sur les deux.
 
-**Lien homme-mort** : `PreserveArmingAfterBucket := instExtractionSequence.Busy` (câblé `PRG_01_Diagnostics`) — **seule** cette séquence préserve l'armement joystick en fin de fermeture pour enchaîner immédiatement palier 1, sous ses propres interlocks. `FB_DiveSearch` ne bénéficie pas de cette exception.
+**Lien homme-mort** : `PreserveArmingAfterBucket := instExtractionSequence.Busy` (câblé `Acquisition (CFC)`) — **seule** cette séquence préserve l'armement joystick en fin de fermeture pour enchaîner immédiatement palier 1, sous ses propres interlocks. `FB_DiveSearch` ne bénéficie pas de cette exception.
 
 ---
 
 ## 6. Bus et intégration programme
 
-**Ordre `PRG_06_WinchControl`** (vérifié) :
+**Ordre `Treuils (CFC)`** (vérifié) :
 1. §1 `instBucket` (**appelé en premier**, avant arbitrage M1/M2 — évite fenêtre de commande manuelle parasite)
 2. §2/§3 Arbitrage M1/M2 — **Benne prioritaire absolue sur M2** si `instBucket.Busy`
 3. §3bis Assistance maintenance (DiveSearch/ExtractionSequence, si benne non busy)
@@ -114,7 +114,7 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 5. Synchro suspendue pendant `instBucket.Busy`
 6. Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture
 
-**Consommateurs `instBucket.Busy/Done`** : PRG_06 (arbitrage), PRG_03_Safety (`BenneHoldStillActive`, Méca E), `FB_ExtractionSequence`, `FB_Joystick` (désarmement), PRG_09 (IHM).
+**Consommateurs `instBucket.Busy/Done`** : Treuils (arbitrage), Safety (CFC) (`BenneHoldStillActive`, Méca E), `FB_ExtractionSequence`, `FB_Joystick` (désarmement), Supervision (IHM).
 
 **Homme-mort** : axe Y joystick, même axe que pilotage normal M1/M2 — pas d'axe dédié.
 
@@ -126,7 +126,7 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 |---|---|
 | Aucune I/O propre | Réutilise entièrement les Q de `FB_Winch` M2 |
 | Couplage bidirectionnel fort | `FB_Bucket` a besoin de position/Homed M1+M2 ; `FB_WinchSync`/`FB_Safety_Winch` ont besoin en retour de `Busy`/`ActiveOffsetM`/`M1SlipDetected` |
-| Organisation code déjà ainsi | `TREUILS/BENNE/`, appelé dans `PRG_06_WinchControl` — jamais remis en cause |
+| Organisation code déjà ainsi | `TREUILS/BENNE/`, appelé dans `Treuils (CFC)` — jamais remis en cause |
 | Contenu propre suffisant | Offsets, Méca C couche 1, cinématique inversée, DiveSearch/ExtractionSequence — mérite sa fiche |
 
 **Décision retenue** : AF11 séparée, **explicitement annexée** à AF10 (pas fusionnée — AF10 deviendrait trop volumineuse ; pas indépendante — pas de PRG/Safety propre comme Translation).
