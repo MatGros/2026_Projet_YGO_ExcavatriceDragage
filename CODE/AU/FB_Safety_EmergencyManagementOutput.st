@@ -7,8 +7,8 @@
    🧩 Instance privée du composite FB_Safety_EmergencyManagement
       — jamais appelée hors du composite.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput

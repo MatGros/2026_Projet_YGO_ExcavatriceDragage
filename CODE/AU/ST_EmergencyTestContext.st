@@ -7,8 +7,8 @@
    🎮 Usage : instancié dans PRG_AU_TestBench, piloté depuis
       une table Watch CODESYS ou un visu de test.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 TYPE ST_EmergencyTestContext :

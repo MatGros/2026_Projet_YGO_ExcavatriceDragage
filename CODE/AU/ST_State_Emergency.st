@@ -6,8 +6,8 @@
       et par GVL_Troubleshooting pour diagnostic.
    🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
 *)
 
 TYPE ST_State_Emergency :

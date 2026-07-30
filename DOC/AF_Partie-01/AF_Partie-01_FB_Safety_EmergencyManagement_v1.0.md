@@ -54,7 +54,9 @@ explicite de réarmement** du contacteur général, avec auto-test A/B. Ne gère
 protections mouvement métier (`FB_Safety_Winch` / `FB_Safety_Translation`) : il **consomme**
 leur demande `PowerCutOff` agrégée.
 
-### Composition POO
+### Composition POO et Schéma CFC
+
+🖼️ **Schéma d'architecture et liaisons inter-blocs (CFC)** : [`DOC/DIAGRAMS/DIAG_EmergencyManagement_CFC.png`](../DIAGRAMS/DIAG_EmergencyManagement_CFC.png)
 
 ```text
 FB_Safety_EmergencyManagement          ← façade publique, instance unique
@@ -94,14 +96,24 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 | Port | Sémantique |
 |---|---|
-| `Ready` | Aujourd'hui `= Enable` |
-| `Busy` | Séquence active (`ArmingSeqStep <> 0`) |
-| `Done` | Aujourd'hui `= PowerContactorEngaged` |
-| `Error` / `ErrorId` | bit0 redondance, bit1 arming failed |
+| `Ready` | `= Enable AND NOT StartupFail` |
+| `Busy` | Séquence active ou lockout en cours |
+| `Done` | `= PowerContactorEngaged` |
+| `Error` / `ErrorId` | bit0=Redundancy, bit1=ArmFailed, bit3=StartupFail |
 | `ArmingSeqStep` | 0…6 diagnostic |
 | `RedundancyTestFailed` | Latch auto-test |
 | `EmergencyArmingFailed` | Latch non-confirmation contacteur |
 | `EmergencyArmingLockoutActive` | Fenêtre 5 s anti-réessai |
+
+### Bus d'état et diagnostic (structurés, depuis composite)
+
+| DUT | Champs | Rôle |
+|---|---|---|
+| `ST_State_Emergency` | `ChainOk`, `ContactorOk`, `Step`, `Armable`, `ArmingBusy` | État public chaîne AU — consommé par Supervision, Troubleshooting |
+| `ST_Diag_Emergency` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `LockoutActive` | Diagnostic chaîne AU — consommé par Supervision, IHM State |
+
+**Producteur unique** : `FB_Safety_EmergencyManagement` (sorties `State`/`Diag`).
+Mappés dans `GVL_IHM.Modes.State.*` par Supervision (L2, ✅ fait).
 
 ### Sorties vers actionneurs (via Output)
 
@@ -115,10 +127,13 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 ```text
 ST_EmergencyManagementCmd
-  PowerCutOff_A_Cmd : BOOL   // TRUE = maintien
-  PowerCutOff_B_Cmd : BOOL
-  EmergencyArming_Cmd : BOOL // TRUE = pulse
+  MaintainA_Cmd : BOOL   // TRUE = maintien canal A (ex-PowerCutOff_A_Cmd)
+  MaintainB_Cmd : BOOL   // TRUE = maintien canal B (ex-PowerCutOff_B_Cmd)
+  ArmPulse_Cmd : BOOL   // TRUE = pulse réarmement (ex-EmergencyArming_Cmd)
 ```
+
+🏷️ Renommage 2026-07-30 : `PowerCutOff_*` → `Maintain*` (polarité maintien explicite,
+conforme règle C1 : le nom répond à « que signifie TRUE ? »).
 
 ---
 
@@ -293,15 +308,13 @@ le FB passe en `Ready=TRUE` et attend un front `ArmRequest`.
 
 | Couche | Nom | TRUE signifie |
 |---|---|---|
-| Demande safety métier | `PowerCutOff` / futur bus `ST_Safety_PowerCutOffRequest` | « Je demande la **coupure** » |
+| Demande safety métier | `PowerCutOff` / `ST_Safety_PowerCutOffRequest` (futur bus) | « Je demande la **coupure** » |
 | Entrée composite | `PowerCutOffRequest` | Idem |
-| Sortie logique interne | `PowerCutOff_A/B_Cmd` puis `PowerCutOff_A/B_RQ` | **Maintien** fail-safe (TRUE = OK) — nom historique FB |
+| Sortie logique interne | `MaintainA/B_Cmd` (ex-`PowerCutOff_A/B_Cmd`) | **Maintien** fail-safe (TRUE = maintien sain) |
 | Q physique device | `PowerKeepAlive_A/B_RQ` | **Maintien** (TRUE = relais excité) — nom matériel clair |
 
-Donc : **`ST_Safety_PowerCutOffRequest` + `PowerKeepAlive_*_RQ` = cohérent**  
-(demande de coupure d'un côté, action physique de maintien de l'autre).  
-Ce qui reste ambigu, c'est seulement le port FB `PowerCutOff_*_RQ` (même polarité que KeepAlive).
-Alignement optionnel = lot L5, pas bloquant pour comprendre le flux.
+Cohérence rétablie : `Maintain*` porte la polarité réelle (maintien), `PowerKeepAlive_*_RQ`
+reste le nom matériel historique (identique).
 
 ---
 
@@ -328,9 +341,8 @@ Alignement optionnel = lot L5, pas bloquant pour comprendre le flux.
 | `RedundancyTestFailed` | sortie FB |
 | `EmergencyArmingFailed` | sortie FB |
 
-**Écart vérifié** : `Supervision` mappe aujourd'hui `Modes.State.PowerContactorEngaged` ;
-les autres champs armement de `ST_ModesState` ne sont pas encore alimentés depuis le FB.
-À corriger lors de la normalisation (sans changer le DUT IHM s'il est déjà consommé écran).
+**✅ État 2026-07-30** : les 7 champs manquants de `ST_ModesState` sont désormais alimentés
+depuis `ST_State_Emergency`/`ST_Diag_Emergency` (via `PRG_09_Supervision`). Écart résolu.
 
 ---
 
@@ -374,16 +386,16 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 | `ST_State_Emergency` | Outputs / composite | Step, Busy, Armable, ChainOk, ContactorOk | Supervision, troubleshooting |
 | `ST_Diag_Emergency` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, Lockout | Supervision, IHM State |
 
-### 8.3 Lots d'implémentation proposés (ordre)
+### 8.3 Lots d'implémentation — état courant
 
-| Lot | Contenu | Risque | Prérequis |
+| Lot | Contenu | Risque | État |
 |---|---|---|---|
-| **L0 Doc** | Cette spec + extraction + liens AF01/02/03 | Nul | — |
-| **L1 Sim** | Corriger câblage `FB_SimBench` KeepAlive/Arming | ✅ Fait (`Acquisition`) | — |
-| **L2 IHM map** | Alimenter tous les champs `ST_ModesState` armement depuis FB | Faible | Validation |
-| **L3 DUT State/Diag** | Introduire bus publics ; retirer dépendance `GVL_Global` armement | Moyen | AF03 fiche contrat |
-| **L4 Agrégat PowerCutOff** | DUT depuis Safety ; OR hors Outputs anonyme | Moyen | CFC Safety |
-| **L5 Noms polarité** | Option alignement `PowerKeepAlive` sur ports FB | Élevé (renommage large) | Export device + décision |
+| **L0 Doc** | Cette spec + extraction + liens AF01/02/03 | Nul | ✅ Fait |
+| **L1 Sim** | Corriger câblage `FB_SimBench` KeepAlive/Arming | Faible | ✅ Fait |
+| **L2 IHM map** | Alimenter tous les champs `ST_ModesState` armement depuis FB | Faible | ✅ Fait |
+| **L3 DUT State/Diag** | Introduire `ST_State_Emergency`, `ST_Diag_Emergency` ; retirer dépendance `GVL_Global` armement | Moyen | ✅ Fait (code + bus) |
+| **L4 Agrégat PowerCutOff** | DUT `ST_Safety_PowerCutOffRequest` depuis Safety ; OR hors Outputs anonyme | Moyen | ⬜ Planifié (dépend CFC Safety) |
+| **L5 Noms polarité** | Renommage partiel `PowerCutOff_A/B_Cmd` → `MaintainA/B_Cmd`, `EmergencyArming_Cmd` → `ArmPulse_Cmd` | Moyen | ✅ Fait (ST_EmergencyManagementCmd + code) ; reste `PowerKeepAlive_*_RQ` côté Q (nom matériel conservé) |
 
 ### 8.4 Hors scope de ce FB
 
@@ -424,7 +436,17 @@ Fichiers code de référence :
 - `CODE/AU/FB_Safety_EmergencyManagement.st`
 - `CODE/AU/FB_Safety_EmergencyManagementLogic.st`
 - `CODE/AU/FB_Safety_EmergencyManagementOutput.st`
-- `CODE/AU/ST_EmergencyManagementCmd.st`
-- `CODE/MAIN/Outputs (Ladder).st`
-- `CODE/MAIN/Acquisition (CFC).st`
+- `CODE/AU/ST_EmergencyManagementCmd.st` (interne Logic→Output)
+- `CODE/AU/ST_State_Emergency.st` (bus état public)
+- `CODE/AU/ST_Diag_Emergency.st` (bus diagnostic)
+- `CODE/AU/ST_EmergencyCmd.st` (bus commande IHM, test)
+- `CODE/AU/ST_EmergencyState.st` (bus état IHM, test)
+- `CODE/AU/GVL_PERSISTENT_AU.st` (persistants domaine AU)
+- `CODE/AU/GVL_Simulation_AU.st` (simulation hardware)
+- `CODE/AU/GVL_IHM_AU.st` (interface IHM)
+- `CODE/AU/PRG_AU_Acquisition.st` (acquisition)
+- `CODE/AU/PRG_AU_Outputs.st` (sorties)
+- `CODE/AU/PRG_AU_TestBench.st` (programme principal test)
+- `CODE/MAIN/Outputs (Ladder).st` (cible)
+- `CODE/MAIN/Acquisition (CFC).st` (cible)
 - `CODE/SIMULATION/FB_Sim_Safety.st`

@@ -7,7 +7,7 @@
    ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
       Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Docs : DOC/AF_Partie-10/AF_Partie-10_Fonction_Winch_v2.0.md
 *)
 
 TYPE ST_WinchSpeedConfig :

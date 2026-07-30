@@ -7,8 +7,8 @@
       (treuils, benne, cycle, etc.) pour les bundles de test.
    🔒 RETAIN : survit aux arrêts/redémarrages PLC.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 {attribute 'qualified_only'}

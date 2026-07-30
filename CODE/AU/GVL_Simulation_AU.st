@@ -7,8 +7,8 @@
       domaine SimMachineActive = simulation AU.
       Polarité : TRUE = simulé, FALSE = réel.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-13/AF_Partie-13_Fonction_Simulation_v2.0.md
 *)
 
 {attribute 'qualified_only'}

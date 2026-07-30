@@ -5,8 +5,8 @@
       Consommé par PRG_09_Supervision et GVL_Troubleshooting.
    🎯 Champs lecture seule — producteur unique = FB composite.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
 *)
 
 TYPE ST_Diag_Emergency :
