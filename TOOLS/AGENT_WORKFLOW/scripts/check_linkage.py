@@ -61,7 +61,7 @@ DECL = re.compile(
     re.MULTILINE,
 )
 CALL = re.compile(r"\b(?P<name>[A-Za-z_]\w*)\s*\(")
-CROSS_REF = re.compile(r"\b(?P<pou>PRG_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)\s*\.")
+CROSS_REF = re.compile(r"\b(?P<pou>PRG_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)")
 BUNDLE_BLOCK = re.compile(r'<block\b[^>]*typeName="(?P<type>[^"]+)"[^>]*instanceName="(?P<inst>[^"]+)"')
 BUNDLE_POU = re.compile(r'<pou\s+name="(?P<name>[^"]+)"')
 

@@ -16,6 +16,14 @@ spécifications actives et les tests du projet.
 
 `ARCHIVES/` n'est jamais une source active.
 
+### Sources de vérité et artefacts dérivés
+
+- Les sources de conception sont les fichiers ST et, quand ils existent, les POU XML natifs/CFC (ex. `PRG_GLOBAL_CFC.xml`). Le travail doit préserver la cohérence entre ces sources.
+- Le bundle PLCopenXML (`CODE/CODE_Bundle.xml`) est un artefact dérivé. Il est généré par l'outil dédié et doit être considéré comme résultat de compilation/import, pas comme une source à éditer à la main.
+- Les agents doivent conserver la cohérence des noms de POU, des interfaces, des variables et des références entre le code ST et les objets XML natifs/CFC avant génération.
+- Si un changement impacte un POU XML natif/CFC, l'agent doit le traiter comme une source métier à préserver et l'intégrer par le générateur, pas par une correction manuelle du XML final.
+- L'outil ST2PY est un outil de simulation et de tests hors-PLC ; il aide à valider la logique et la non-régression, mais ne remplace ni la compilation CODESYS ni les essais terrain.
+
 ## 3. Nommage
 
 - PascalCase partout, sans hongrois.

@@ -439,7 +439,22 @@ def build_project_xml(
     for obj in objs:
         guid = object_guid(obj.kind, obj.name)
         folders.setdefault(obj.folder, []).append((obj.name, guid))
-        if obj.kind in ("function_block", "program"):
+        if obj.raw_xml_path:
+            # POU XML natif (ex. CFC) : ré-extraire l'élément <pou> direct
+            raw_tree = ET.parse(obj.raw_xml_path)
+            pou_node = next((n for n in raw_tree.iter() if n.tag.endswith("pou")), None)
+            if pou_node is not None:
+                # Nettoyer les namespaces pour éviter ns0: tout en préservant le namespace xhtml
+                for elem in pou_node.iter():
+                    if "}" in elem.tag:
+                        elem.tag = elem.tag.split("}", 1)[1]
+                    for key in list(elem.attrib.keys()):
+                        if "xmlns" in key or "}" in key:
+                            del elem.attrib[key]
+                    if elem.tag == "xhtml":
+                        elem.attrib["xmlns"] = "http://www.w3.org/1999/xhtml"
+                pous_el.append(pou_node)
+        elif obj.kind in ("function_block", "program"):
             pous_el.append(_build_pou(obj, guid, objects_by_name, diagnostics))
         elif obj.kind == "struct":
             data_types_el.append(_build_struct_datatype(obj, guid, objects_by_name, diagnostics))

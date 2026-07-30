@@ -28,6 +28,13 @@ from agent_workflow.scripts import check_code_style, run_all_gates
 
 ---
 
+## Outils associés au workflow
+
+- [TOOLS/ST_PLCOPENXML_GENERATOR/README.md](../ST_PLCOPENXML_GENERATOR/README.md) : générateur de bundle PLCopenXML à partir des sources ST et des POU XML natifs/CFC. Le workflow l'appelle pour produire `CODE/CODE_Bundle.xml` avant import CODESYS.
+- [TOOLS/OUTILS_ST2PY/README.md](../OUTILS_ST2PY/README.md) : pont ST/XML → Python pour simulation, tests fonctionnels hors-PLC et non-régression. Outil d'aide, pas source de vérité ni substitut à la validation CODESYS/terrain.
+
+---
+
 ## Commandes CLI (entry points)
 
 | Commande | Description |

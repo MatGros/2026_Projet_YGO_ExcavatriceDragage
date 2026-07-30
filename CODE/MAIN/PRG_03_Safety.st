@@ -213,7 +213,7 @@ instSafetyTranslationM3(
     DriveStatusWord     := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback       := PRG_00_Inputs.M3BrakeFeedback,
-    BrakeCmd            := PRG_10_Outputs_LD.instTranslationOutputInterlock_LD.BrakeCmd,
+    BrakeCmd            := GVL_Global.instTranslationOutputInterlock_LD.BrakeCmd,
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
     // 🆕 REX 2026-07-18 : limites extrêmes dérivées du décodage 5 capteurs (mot valide), plus
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.

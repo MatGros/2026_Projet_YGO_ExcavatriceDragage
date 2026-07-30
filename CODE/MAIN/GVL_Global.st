@@ -17,4 +17,30 @@
 {attribute 'qualified_only'}
 VAR_GLOBAL
     BlinkClock                 : BOOL;          // Horloge clignotement système (IHM/diag), rythme réglable GVL_PERSISTENT
+
+    // ── [COMMANDES FINALES ET INTERLOCKS RECOPIÉS DE PRG_10_Outputs_LD] ──────────────────────────
+    // Permet la lecture publique globale par PRG_00_Inputs, PRG_03_Safety, PRG_09_Supervision et PRG_11_Troubleshooting
+    M1RelayFwd                    : BOOL;
+    M1RelayRev                    : BOOL;
+    M1SpeedContactor1             : BOOL;
+    M1SpeedContactor2             : BOOL;
+    M1SpeedContactor3             : BOOL;
+    M1SpeedContactor4             : BOOL;
+    M1BrakeCmd                    : BOOL;
+    M2RelayFwd                    : BOOL;
+    M2RelayRev                    : BOOL;
+    M2SpeedContactor1             : BOOL;
+    M2SpeedContactor2             : BOOL;
+    M2SpeedContactor3             : BOOL;
+    M2SpeedContactor4             : BOOL;
+    M2BrakeCmd                    : BOOL;
+    TranslationBrakeCmd           : BOOL;
+    EmergencyArmingPulseActive   : BOOL;
+    EmergencyArmingLockoutActive: BOOL;
+    ArmingSeqStep                : INT;
+
+    // Diagnostic Interlocks de sortie (recopie de PRG_10_Outputs_LD)
+    instWinchOutputInterlockM1_LD     : FB_WinchOutputInterlock_LD;
+    instWinchOutputInterlockM2_LD     : FB_WinchOutputInterlock_LD;
+    instTranslationOutputInterlock_LD : FB_TranslationOutputInterlock_LD;
 END_VAR

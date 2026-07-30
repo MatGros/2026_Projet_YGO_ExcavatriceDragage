@@ -147,7 +147,9 @@ Pi qualifie et propose, l'humain valide en 1 mot.
 - 🤖 **Aucun lot n'est restitué sans `check_linkage.py --report`.** Bundle généré et tests Python
   verts ne prouvent jamais qu'une fonction est reliée.
 - `TOOLS/` reste séparé de `DOC/` et `CODE/`.
-- `ST_PLCOPENXML_GENERATOR` reste autonome ; le workflow peut l'appeler.
+- `ST_PLCOPENXML_GENERATOR` reste autonome ; le workflow peut l'appeler pour générer le bundle `CODE/CODE_Bundle.xml` à partir des sources ST et des POU XML natifs/CFC présents dans `CODE/`.
+- Les agents ne modifient pas le XML final du bundle à la main ; ils préservent les sources ST/XML natif/CFC et la cohérence des interfaces, noms et références avant génération.
+- `OUTILS_ST2PY` est un outil externe de simulation et de tests hors-PLC ; il sert à valider la logique et la non-régression, mais ne remplace ni la compilation CODESYS ni les essais terrain.
 - Les scripts déterministes vérifient avant l'avis des modèles.
 - Aucun commit automatique — validation humaine obligatoire.
 - Toute modification safety exige une validation humaine.

@@ -41,7 +41,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="codesys-bundle-") as temp:
         temp_root = Path(temp)
         temp_code = temp_root / "CODE"
-        shutil.copytree(code_dir, temp_code, ignore=shutil.ignore_patterns("CODE_Bundle.xml", "*.xml"))
+        shutil.copytree(code_dir, temp_code, ignore=shutil.ignore_patterns("CODE_Bundle.xml"))
         command = [
             sys.executable,
             "-m",
