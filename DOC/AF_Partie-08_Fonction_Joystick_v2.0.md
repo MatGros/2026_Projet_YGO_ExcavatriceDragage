@@ -16,6 +16,7 @@
 6. Intégration programme
 7. IHM
 8. Alertes et écarts
+8bis. TBD — Filtre par défaut et double rampe Joystick↔FB de mouvement
 9. Documents liés
 
 ## 🧪 Points de validation
@@ -212,6 +213,51 @@ une instance, gate fail-safe.
 
 ---
 
+## 8bis. TBD — Filtre par défaut et double rampe Joystick↔FB de mouvement
+
+> ⛔ **Non tranché, pas d'autorisation de coder.** Discussion utilisateur 2026-07-30 sur le
+> risque d'interférence entre la rampe `FB_Joystick` et la rampe/tempo palier de `FB_Winch`/
+> `FB_Translation`. Section de suivi ; décision et code dans un lot dédié, contrat de tâche requis
+> (C3/C4 — accélération/décélération treuil = sécurité machine).
+
+### 8bis.1 Filtre PT1 par défaut
+
+`_JoystickFilterTime := T#100ms` (`GVL_PERSISTENT`) — a peu d'effet en régime établi mais
+introduit un **retard perceptible** au démarrage de chaque mouvement. Demande utilisateur :
+réduire ce défaut pour un ressenti plus réactif. **TBD** : valeur cible à confirmer terrain
+(pas de calcul théorique substituable à un essai réel sur le joystick physique).
+
+### 8bis.2 Double rampe en cascade (constat vérifié)
+
+```text
+FB_Joystick : Scale → Filter PT1 → FB_Ramp (Accel 50%/s, Decel 150%/s, RETAIN _JoystickAccelRate_Pct/_JoystickDecelRate_Pct)
+                                        ↓ SpeedRef déjà rampé
+FB_Winch / FB_Translation : reçoit SpeedRef → sa PROPRE FB_Ramp (paramètres séparés)
+```
+
+Deux rampes indépendantes en série composent une décélération dont le comportement résultant
+est difficile à prédire/régler — constat technique vérifié, pas une hypothèse.
+
+**Proposition en discussion (non tranchée)** :
+
+| Domaine | Aujourd'hui | Piste discutée |
+|---|---|---|
+| Translation (M3) | 2 rampes en cascade | Retirer `FB_Ramp` du Joystick ; garder l'unique rampe déjà présente dans `FB_Translation` (mapping continu %→Hz, une rampe a du sens) |
+| Winch (M1/M2) | 2 rampes + hystérésis palier + tempo 1s500ms | Le joystick sort un **% brut filtré, sans rampe** ; toute la temporisation/lissage vit dans `FB_Winch`/`FB_SpeedStep` (paliers discrets, pas de vitesse continue) — voir AF10 §9bis |
+
+**Effet de bord identifié** : la rampe joystick sert aussi à adoucir le désarmement homme-mort
+(`RampX(Target := SEL(DeadmanArmed, 0.0, ...))`). Si retirée, ce lissage doit être repris par
+la rampe du FB de mouvement aval (déjà présente dans les deux cas) — pas de perte de sécurité
+identifiée, mais **à valider explicitement avant code**.
+
+**TBD à trancher** :
+- Confirmer le retrait de `FB_Ramp` dans `FB_Joystick` (impact : 3 FB, RETAIN orphelins
+  `_JoystickAccelRate_Pct`/`_JoystickDecelRate_Pct` à traiter)
+- Devenir de la rampe %/s dans `FB_Winch` une fois le double-lissage supprimé — lié à AF10 §9bis
+  (T93 : tempo par palier plutôt que rampe continue)
+
+---
+
 ## 9. Documents liés
 
 | Doc | Lien |
@@ -221,6 +267,6 @@ une instance, gate fail-safe.
 | AF05 | Modes, sélecteur treuil, désarmement au change mode |
 | AF06 | Raw Operator / sim |
 | AF07 | `ST_JoystickHMI` |
-| AF09 / AF11 / AF12 | Consommateurs AxisCmd + DeadmanArmed ; exception Extraction |
+| AF10 / AF11 / AF12 | Consommateurs AxisCmd + DeadmanArmed ; exception Extraction |
 | AF13 | `FB_Sim_Joystick` amont |
 | Code | `CODE/JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_AxisCmd.st` |

@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle — Partie 11 : Fonction Translation M3 (v2.0)
+# Analyse Fonctionnelle — Partie 12 : Fonction Translation M3 (v2.0)
 
 > Rôle : positionnement chariot/pont (AC600 EtherCAT), sécurité mouvement, barrière finale.
 > Domaine autonome (contrairement à Benne) : PRG propre (`PRG_07`), `FB_Safety_Translation` dédié.
@@ -22,21 +22,21 @@
 
 | ID | Attendu | Type |
 |---|---|---|
-| TC-P11-001 | 6 mots capteurs valides acceptés (11111→00000) ; tout autre ⇒ `Incoherent` | AUTO |
-| TC-P11-002 | Mot incohérent ⇒ bit7 Safety ⇒ SafeStop+PowerCutOff | AUTO_PLC |
-| TC-P11-003 | `Enable=FALSE` coupe tout indépendamment de SafeStop/StartStop | AUTO_PLC |
-| TC-P11-004 | Ralentissement PV actif **seulement** Direction=1 (vers Trémie) ET SlowdownSensor | AUTO_PLC |
-| TC-P11-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | AUTO_PLC |
-| TC-P11-006 | Watchdog frein 500ms fixe : sans confirmation ⇒ FAULT, RestartInhibit | AUTO_PLC |
-| TC-P11-007 | Réautorisation après timeout : cause disparue + Reset + mot 0 vu + nouvelle demande | AUTO_PLC |
-| TC-P11-008 | Gate final : mot/fréquence nuls tant que `BrakeReleaseRequest AND BrakeCommandOpenConfirmed` non simultanés | AUTO_PLC |
-| TC-P11-009 | Mot 7 (reset AC600) autorisé pendant RestartInhibit, fréquence nulle, ne lève pas l'inhibition | AUTO_PLC |
-| TC-P11-010 | Méca A (bit5) : arrêt commandé mais fréquence>0.5Hz pendant >1.0s ⇒ SafeStop+PowerCutOff | AUTO_PLC |
-| TC-P11-011 | Méca B (bit4) : incohérence arrêt >3.0s ⇒ SafeStop+PowerCutOff ; variante si perte IHM | AUTO_PLC |
-| TC-P11-012 | Cible Maintenance refusée hors MAINT_N2 | AUTO_PLC |
-| TC-P11-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` même sans joystick | AUTO_PLC |
-| TC-P11-014 | `BypassGlobal` force ErrorId=0, coupe les 2 TON, Reset reste fonctionnel | AUTO_PLC |
-| TC-P11-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | SITE |
+| TC-P12-001 | 6 mots capteurs valides acceptés (11111→00000) ; tout autre ⇒ `Incoherent` | AUTO |
+| TC-P12-002 | Mot incohérent ⇒ bit7 Safety ⇒ SafeStop+PowerCutOff | AUTO_PLC |
+| TC-P12-003 | `Enable=FALSE` coupe tout indépendamment de SafeStop/StartStop | AUTO_PLC |
+| TC-P12-004 | Ralentissement PV actif **seulement** Direction=1 (vers Trémie) ET SlowdownSensor | AUTO_PLC |
+| TC-P12-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | AUTO_PLC |
+| TC-P12-006 | Watchdog frein 500ms fixe : sans confirmation ⇒ FAULT, RestartInhibit | AUTO_PLC |
+| TC-P12-007 | Réautorisation après timeout : cause disparue + Reset + mot 0 vu + nouvelle demande | AUTO_PLC |
+| TC-P12-008 | Gate final : mot/fréquence nuls tant que `BrakeReleaseRequest AND BrakeCommandOpenConfirmed` non simultanés | AUTO_PLC |
+| TC-P12-009 | Mot 7 (reset AC600) autorisé pendant RestartInhibit, fréquence nulle, ne lève pas l'inhibition | AUTO_PLC |
+| TC-P12-010 | Méca A (bit5) : arrêt commandé mais fréquence>0.5Hz pendant >1.0s ⇒ SafeStop+PowerCutOff | AUTO_PLC |
+| TC-P12-011 | Méca B (bit4) : incohérence arrêt >3.0s ⇒ SafeStop+PowerCutOff ; variante si perte IHM | AUTO_PLC |
+| TC-P12-012 | Cible Maintenance refusée hors MAINT_N2 | AUTO_PLC |
+| TC-P12-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` même sans joystick | AUTO_PLC |
+| TC-P12-014 | `BypassGlobal` force ErrorId=0, coupe les 2 TON, Reset reste fonctionnel | AUTO_PLC |
+| TC-P12-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | SITE |
 
 ---
 

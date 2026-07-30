@@ -1,4 +1,4 @@
-# Extraction Benne — code vs AF12 (v1.0)
+# Extraction Benne — code vs AF11 (v1.0)
 
 > Sources : `CODE/TREUILS/BENNE/*.st`, `CODE/CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`, `PRG_06_WinchControl.st`.
 
@@ -6,7 +6,7 @@
 
 **Constat code** : `CODE/TREUILS/BENNE/` (déjà niché sous Treuils), appelé par `PRG_06_WinchControl` (même PRG que Winch), instance `instBucket` au même niveau que `instWinchM1/M2`. Aucune I/O physique propre — réutilise entièrement `FB_Winch` M2. Sécurité couche 2 vit dans `FB_Safety_Winch` (pas de FB_Safety_Benne).
 
-**Verdict** : la Benne **n'est pas un domaine autonome** (contrairement à Translation qui a son propre PRG + FB_Safety dédié) — c'est une **sous-fonction du domaine Treuils**. Gardée en **AF12 séparée mais annexée** à AF09 : assez de contenu propre (offsets, Méca C couche 1, cinématique inversée, DiveSearch/ExtractionSequence) pour mériter sa fiche, mais renvoi croisé fort avec AF09.
+**Verdict** : la Benne **n'est pas un domaine autonome** (contrairement à Translation qui a son propre PRG + FB_Safety dédié) — c'est une **sous-fonction du domaine Treuils**. Gardée en **AF11 séparée mais annexée** à AF09 : assez de contenu propre (offsets, Méca C couche 1, cinématique inversée, DiveSearch/ExtractionSequence) pour mériter sa fiche, mais renvoi croisé fort avec AF09.
 
 ## Alertes (devoir d'alerte)
 
