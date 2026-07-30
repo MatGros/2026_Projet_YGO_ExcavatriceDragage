@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎚️ FB_Modes — Arbitrage du mode machine (MVP — diffusion, pas encore overrides complets)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v1.6.md §1/§2
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md §1/§2
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 RÔLE CE LOT : sélectionner/arbitrer `Mode` (source unique diffusée à TOUS les FB
       métier) + garde-fous minimaux :

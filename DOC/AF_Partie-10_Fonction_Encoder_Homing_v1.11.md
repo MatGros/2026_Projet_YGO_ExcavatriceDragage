@@ -147,11 +147,11 @@
 > (`FB_Encoder_Abs`/`FB_Encoder_Scale`/`ST_EncoderCalib`), homing (`FB_Encoder_Homing`) et
 > sélection treuil sont implémentés : homing nominal couplé, ou unitaire M1/M2 en `MAINT_N2`
 > via `GVL_IHM.Modes.JoystickWinchSelect` et une cible libre par treuil bornée à ±99 m.
-> 🔗 Dépend de : [P1 Analyse Fonctionnelle v1.5](AF_Partie-01_Analyse_Fonctionnelle_v1.6.md) §Initialisation,
-> [P2 Architecture v2.12](AF_Partie-02_Architecture_Programme_v2.12.md) (dossier `ENCODER`),
-> [P3 Contrat FB v1.3](AF_Partie-03_Template_FB_Commun_v1.3.md) §1bis (profils FB),
-> [P4 Cycle v1.5](AF_Partie-04_Cycle_Sequenceur_v1.5.md) §Initialisation/§3 Synchro,
-> [P5 Modes v1.2](AF_Partie-05_Modes_Maintenance_v1.6.md) §2 (`MAINT_N1`/`MAINT_N2`),
+> 🔗 Dépend de : [P1 présentation et fonctions v2.0](AF_Partie-01_Analyse_Fonctionnelle_v2.0.md) §6,
+> [P2 Architecture v3.0](AF_Partie-02_Architecture_Programme_v3.0.md) (dossier `ENCODER`),
+> [P3 Contrats v2.0](AF_Partie-03_Contrats_Composants_v2.0.md) §1bis (profils FB),
+> [P4 Mode Semi-Auto v2.0](AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md) §Initialisation/§3 Synchro,
+> [P5 Modes v2.0](AF_Partie-05_Modes_Maintenance_v2.0.md) §2 (`MAINT_N1`/`MAINT_N2`),
 > [P9 Fonction Winch v1.7](AF_Partie-09_Fonction_Winch_v1.13.md) (`FB_Winch` unitaire M1/M2).
 
 ---

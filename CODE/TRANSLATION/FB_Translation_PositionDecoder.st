@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v2.12.md §3bis
+    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.0.md §3
    🧩 Brique réduite (Partie3 §1bis) : pure logique combinatoire, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
       Maintenance) en mot de progression, dérive les 2 limites extrêmes et

@@ -1,0 +1,60 @@
+contract:
+  task_id: AF02_AF03_CFC_ARCHITECTURE_VNEXT
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Definir l'architecture CFC cible et les contrats de composants qui rendent
+    les flux machine lisibles, types et verificables sans modifier le code
+    automate pendant cette phase documentaire.
+  acceptance:
+    - id: AC1
+      statement: "AF02 decrit cinq pages CFC, la sortie Ladder et le programme Cycle ST, avec des frontieres IHM et troubleshooting explicitement marquees TBD."
+      verified_by: "Relecture de DOC/AF_Partie-02_Architecture_Programme_v3.0.md sections 2 et 4."
+    - id: AC2
+      statement: "AF03 distingue les profils de FB, les contrats DUT internes et le contrat IHM Cmd/State/Cfg/Bypass."
+      verified_by: "Relecture de DOC/AF_Partie-03_Contrats_Composants_v2.0.md sections 2 a 5."
+    - id: AC3
+      statement: "Aucun bus global de commande ni logique metier dans les pages CFC n'est autorise par les nouvelles specifications."
+      verified_by: "Relecture des regles de flux AF02 section 3 et AF03 section 5."
+    - id: AC4
+      statement: "Les anciennes AF02 et AF03 sont archivees et les references actives pointent vers les nouvelles versions."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py"
+  scope:
+    allowed:
+      - DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+      - DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+      - DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+      - DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+      - ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md
+      - ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md
+      - DOC/
+      - README.md
+      - AGENTS.md
+      - CODE/
+      - TOOLS/AGENT_WORKFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Logique ST hors commentaires de reference documentaire
+  conservation:
+    must_survive:
+      - "POO par composition, producteur unique, internes prives et frontieres typees."
+      - "Precedence Enable > SafeStop > StartStop pour les mouvements et Reset sur front avec cause disparue."
+      - "AU materiel, PowerCutOff fail-safe et rearmement proprietaires de l'AF01."
+      - "Simulation par frontiere unique et contrat IHM Cmd/State/Cfg/Bypass."
+      - "Barriere finale unique avant toute sortie physique."
+    dropped_on_purpose:
+      - "Le modele PRG_00 a PRG_10 ST autonome comme architecture cible."
+      - "Les propositions de GVL_Global comme bus interne de commande."
+      - "Le CFC prototype PRG_GLOBAL_CFC comme exemple d'architecture cible."
+  evidence_required:
+    - task_contract
+    - check_doc_links
+    - check_linkage
+    - bundle
+    - run_all_gates
+  models_allowed:
+    - "openai/gpt-5.6-terra"
+  alert_duty: >
+    Toute dependance de scan non prouvee, contrat de bus ambigu, source multiple
+    de commande ou conflit entre architecture cible et code actuel est signale
+    avant une migration CFC ou une modification ST.

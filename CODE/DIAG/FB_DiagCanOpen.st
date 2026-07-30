@@ -12,7 +12,7 @@
    But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
    bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
    réel ne l'était pas.
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md
+    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
 
    🐛 REX 2026-07-24 (bis) — BUG CORRIGÉ (mesure terrain mise en service) : l'ancien code comparait
    CANbusStateRaw = 1 pour "actif", valeur JAMAIS vérifiée sur le vrai bus (devinée à l'écriture du

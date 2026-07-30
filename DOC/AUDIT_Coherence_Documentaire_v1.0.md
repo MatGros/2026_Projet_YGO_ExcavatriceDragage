@@ -85,7 +85,7 @@ Légende statut : ✅ **Résolu** (décision prise) · 🛠️ **À corriger** (
 | m2 | `AF_Partie-02` (COMMUN) / `CLAUDE.md` vs `AF_Partie-08` §2 / `CODE` / `README` | `FB_FilterPT1` vs `FB_Filter_PT1` (2 identifiants) | ✅ Nom final confirmé par code/export : `FB_Filter_PT1`. |
 | m3 | `AF_Partie-08` §2/§7 vs `AF_Partie-02` arborescence | `FB_AxisScale`, `FB_Ramp`, `FB_CycleTime` absents de l'architecture | ✅ **D11** (partiel) : préciser dans P2 (sous-composants de `FB_Joystick` / base de temps). |
 | m4 | `.claude/skills/codesys-workflow.md:25` | Référence `AF_Partie-02_..._v2.3.md` (périmé, actif = v2.4) | 🛠️ À corriger (pointe vers version active). |
-| m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
+| m5 | `CODE/PRG_JOY1.st:13` | Lien vers `DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md` (renuméroté **Partie 8**) | 🛠️ Lien mort → Partie 8. |
 | m6 | `README.md` (structure `CODE/`, workflow) | Décrit `CODE/*.xml` + `extract/inject` round-trip, alors que `CODE/` contient un `.st` et la skill impose la **copie manuelle `.st`** | ✅ **D19** : workflow XML **supprimé** ; export manuel `Device.export` + copie ST manuelle. Corriger README (structure `CODE/`, section « Workflow Édition », `extract.bat`/`inject.bat`, `tools/`). |
 | m7 | `AF_Partie-03` (« **tout** FB respecte le contrat ») vs `AF_Partie-06` briques + `FB_Diag*` | Briques E/S & diag n'ont pas l'interface complète (`Enable/Reset/SafetyOk/Mode/State/StateAtError`) | ✅ **D12 + D20** : FB de mouvement = interface standard + `StartStop` ; briques E/S & diag = **types de données propres** (pas de `StartStop`). |
 | m8 | `AF_Partie-02` §9 (ordre) vs §7 (schéma) | `FB_Watchdog()` appelé **après** `FB_Safety()` alors qu'il l'alimente (`ErrorId`) → 1 cycle de retard | ✅ **Sans objet (D21)** : `FB_Watchdog` supprimé (fonction système). Retirer toutes ses références. |
@@ -893,7 +893,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 **Constat** : Commit 26a9f1c (feat benne, 2026-07-08, 15h25) a renommé `OverrideSync`
 → `SyncEnable` dans le code avec inversion de polarité (logique positive désormais), répercuté sur
 5 fichiers `CODE/` (`FB_Modes.st`, `FB_Safety_Winch.st`, `FB_WinchSync.st`, `ST_SyncHMI.st`,
-`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie-05_Modes_Maintenance_v1.6.md`
+`PRG_06_WinchControl.st`). **MAIS** la documentation `DOC/AF_Partie-05_Modes_Maintenance_v2.0.md`
 **n'a pas suivi** — elle parle toujours de `OverrideSync` partout (13 occurrences confirmées au
 2026-07-08 après le commit).
 
@@ -921,7 +921,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 | D100 | **Correction documentaire complète — `OverrideSync` → `SyncEnable` avec inversion de polarité** | Migration effectuée de `AF_Partie-05_Modes_Maintenance_v1.2.md` → **v1.3.md** (13 occurrences corrigées). Toutes les formules et descriptions inversées pour refléter la logique positive (`SyncEnable = TRUE` ⟹ synchro active, au lieu de `OverrideSync = TRUE` ⟹ synchro désactivée). Pseudo-codes de `FB_Modes` mises à jour ; formule SafeStop masques inversés (condition `SyncEnable=FALSE`). Archives : v1.2 déplacée vers `ARCHIVES/Doc/`. Références croisées mises à jour dans `CLAUDE.md` (2 occurrences), `AF_Partie-02_Architecture_Programme_v2.10.md` (2 occurrences ligne 91, 138), `AF_Partie-09_Fonction_Winch_v1.7.md` (7 occurrences + 1 référence Partie5), `AF_Partie-07_Interface_IHM_v1.2.md` (1 occurrence). |
 
 **Fichiers modifiés (documentation)** :
-- ✅ `DOC/AF_Partie-05_Modes_Maintenance_v1.6.md` (NOUVEAU, corrigé avec polarité positive)
+- ✅ `DOC/AF_Partie-05_Modes_Maintenance_v2.0.md` (NOUVEAU, corrigé avec polarité positive)
 - ✅ `ARCHIVES/Doc/AF_Partie-05_Modes_Maintenance_v1.2.md` (archivé, ancien)
 - ✅ `CLAUDE.md` (2 références Partie5 v1.2→v1.3)
 - ✅ `AF_Partie-02_Architecture_Programme_v2.10.md` (2 refs ligne 91, 138)
@@ -961,7 +961,7 @@ synchronisation titre/filename. Ajout de Partie13 (Simulation v1.1) jamais menti
 **Fichiers renommés (13 fichiers, via `git mv`)** :
 - `AF_Partie1_Analyse_Fonctionnelle_v1.5.md` → `AF_Partie-01_Analyse_Fonctionnelle_v1.5.md`
 - `AF_Partie2_Architecture_Programme_v2.10.md` → `AF_Partie-02_Architecture_Programme_v2.10.md`
-- `AF_Partie3_Template_FB_Commun_v1.3.md` → `AF_Partie-03_Template_FB_Commun_v1.3.md`
+- `AF_Partie3_Template_FB_Commun_v1.3.md` → `AF_Partie-03_Contrats_Composants_v2.0.md`
 - `AF_Partie4_Cycle_Sequenceur_v1.2.md` → `AF_Partie-04_Cycle_Sequenceur_v1.2.md`
 - `AF_Partie5_Modes_Maintenance_v1.3.md` → `AF_Partie-05_Modes_Maintenance_v1.3.md`
 - `AF_Partie6_IO_Conditioning_v1.5.md` → `AF_Partie-06_IO_Conditioning_v1.5.md`

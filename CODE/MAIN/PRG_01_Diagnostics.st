@@ -3,14 +3,14 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v2.12.md ; DOC/AF_Partie-08_Fonction_Joystick_v1.3.md
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
 *)
 
 PROGRAM PRG_01_Diagnostics
 VAR
     instDiagCanOpen  : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
     instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
-    FB_Joystick_0    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
+    instJoystick    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
     instIhmHeartbeat : FB_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
 
     // 🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
@@ -71,7 +71,7 @@ instIhmHeartbeat(
 );
 
 // 3. Acquisition Joystick — RawX/RawY/RawButton lus depuis PRG_00_Inputs.HwIn.Operator
-FB_Joystick_0(
+instJoystick(
     Enable              := TRUE,
     EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,

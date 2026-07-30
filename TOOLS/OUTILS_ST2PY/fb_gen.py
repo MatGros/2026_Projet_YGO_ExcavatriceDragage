@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """fb_gen.py
 
 Générateur minimal d'un module Python + test pour un POU/FB donné à partir d'un bundle PLCopen XML.

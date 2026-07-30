@@ -101,11 +101,11 @@ END_VAR
 // 🎯 Source unique : joystick OU boutons IHM. En mode boutons, seule la commande
 // commune Both est compatible avec une assistance qui exige les deux treuils synchronisés.
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    MaintenanceMotionDirection := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-    MaintenanceMotionRequestActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
-                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+    MaintenanceMotionDirection := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
+    MaintenanceMotionRequestActive := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
+                                     AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                      AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3);
-    MaintenanceMotionSpeed_Pct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef);
+    MaintenanceMotionSpeed_Pct := ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
         MaintenanceMotionDirection := 1;
@@ -115,7 +115,7 @@ ELSE
         MaintenanceMotionDirection := 0;
     END_IF;
     MaintenanceMotionRequestActive := (MaintenanceMotionDirection <> 0)
-                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+                                     AND PRG_01_Diagnostics.instJoystick.DeadmanArmed;
     MaintenanceMotionSpeed_Pct := 100.0;
 END_IF;
 
@@ -258,12 +258,12 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
     M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop
-                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
+                            AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                            AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
     M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
-                               ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
+                               ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef));
 ELSE
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01,
     // réouverture documentée T40) : le joystick n'est plus la SEULE source —
@@ -281,14 +281,14 @@ ELSE
     // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (nécessaire pour le gate directionnel ci-dessous).
     IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Source = joystick (comportement historique, inchangé)
-        M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-        M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instBucket.Busy
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+        M1_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
+        M1_StartStop_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop AND NOT instBucket.Busy
+                                AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                 AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
                                      OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
-        M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+        M1_SpeedRef_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
     ELSE
         // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
         // Remplacent l'ancien sélecteur JoystickWinchSelectArbitrated.
@@ -301,7 +301,7 @@ ELSE
             M1_Direction_Active := 0;
         END_IF;
         M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
-                                AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND (PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                      OR GVL_IHM.M1TreuilRetenue.Bypass.Global)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
@@ -322,12 +322,12 @@ ELSE
         // 🛡️ Même garde homme-mort que M1 : le cycle ne poursuit jamais un mouvement
         // après relâchement du joystick.
         M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                                AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
+                                AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                                AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
-                                   ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
+                                   ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef));
     ELSE
         // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01) :
         // idem M1 (voir bandeau branche M1 ci-dessus) — GVL_IHM.Modes.Cmd.TglJoystickMaster bascule la
@@ -343,14 +343,14 @@ ELSE
         // directement car SignedDeltaPosM est déjà dans SON référentiel). Même inversion appliquée
         // à la branche boutons IHM ci-dessous (BtnUp M2 = Direction -1, RATTRAPE si M1 en retard).
         IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-            M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-            M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
-                                    AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+            M2_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
+            M2_StartStop_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
+                                    AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                     AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
                                          OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1))); // 🔧 REX 2026-07-08 (7)
-            M2_SpeedRef_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+            M2_SpeedRef_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
         ELSE
             // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — BtnUp M2 = enroulage/montée (+1),
             // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
@@ -363,7 +363,7 @@ ELSE
                 M2_Direction_Active := 0;
             END_IF;
             M2_StartStop_Active := (M2_Direction_Active <> 0)
-                                    AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                    AND (PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                          OR GVL_IHM.M2TreuilBenne.Bypass.Global)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
@@ -399,7 +399,7 @@ END_IF;
 
 // ── 3ter. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE BENNE ─────
 // 🆕 REX 2026-07-08 : instBucket est appelé en premier (§0), donc son Busy est frais dans CE scan
-// (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de FB_Joystick_0 (PRG_01),
+// (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de instJoystick (PRG_01),
 // calculé AVANT ce scan de PRG_06. Le désarmement homme-mort sur front descendant de Benne.Busy
 // (FB_Joystick §4ter-ter) ne prend donc effet qu'au scan SUIVANT (~10ms de retard structurel). Si
 // l'opérateur tient encore le manche poussé au moment exact où le benne termine, M1 ET M2

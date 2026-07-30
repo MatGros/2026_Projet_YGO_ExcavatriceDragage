@@ -59,7 +59,7 @@ Tous les échanges du CFC reposent sur **8 Structures de Bus Standardisées** :
 - **Contenu** : `JoystickOnline`, `JoystickOperational`, `DriveM3Online`, `DriveM3Operational`, `EncoderM1Online`, `EncoderM2Online`, `NetworkGlobalError`.
 
 ### 3. `ST_CmdJoystickBus` (Bus du Organe de Conduite Manuel)
-- **Émetteur** : `PRG_00_Acquisition_CFC` (`FB_Joystick_0`)
+- **Émetteur** : `PRG_00_Acquisition_CFC` (`instJoystick`)
 - **Contenu** : `DeadmanArmed`, `SpeedRefX_Pct`, `SpeedRefY_Pct`, `RawX`, `RawY`, `JoystickFault`, `IsCentralPositionX`, `IsCentralPositionY`.
 
 ### 4. `ST_CmdModesBus` (Bus de Configuration & Modes Machine)
@@ -112,7 +112,7 @@ Le POU CFC `PRG_00_Acquisition_CFC` est développé pour inclure d'emblée l'ens
  │                                       │      └──────────────────┘ │                                          │   │                │
  │  [ TRAITEMENT JOYSTICK ]              │                           │                                          │   │                │
  │    Channel X / Y / BtnDeadman ────────┴───────────────────────────┼────────►┌───────────────┐                │   │                │
- │                                                                   └────────►│ FB_Joystick_0 ├───────────────┼───┼─►(ST_Cmd_JoyBus)
+ │                                                                   └────────►│ instJoystick ├───────────────┼───┼─►(ST_Cmd_JoyBus)
  │                                                                             └───────────────┘                │   │   │            │
  ├──────────────────────────────────────────────────────────────────────────────────────────────────────────────┼───┼───┼────────────┤
  │  [ PUBLICATION DANS GVL_GLOBAL POUR UTILISATION PAR TOUS LES CABLES CFC SUIVANTS ]                           │   │   │            │
@@ -143,7 +143,7 @@ Afin d'avoir une vision 100% claire et complète de l'architecture finale, voici
 
 ### 1. `PRG_00_Acquisition_CFC` (Niveau 0 - Acquisition & Network)
 - **Rôle** : Reçoit `HwReal` et `HwSim`, applique l'aiguillage réversible vers `HwIn`, surveille les bus CANopen & EtherCAT, et traite le joystick.
-- **Instances internes** : `instInputs` (`FB_Input`), `instDiagCanOpen`, `instDiagEthercat`, `FB_Joystick_0`.
+- **Instances internes** : `instInputs` (`FB_Input`), `instDiagCanOpen`, `instDiagEthercat`, `instJoystick`.
 - **Bus émis** : `ST_HwIn_Bus`, `ST_Diag_NetworkBus`, `ST_Cmd_JoystickBus`.
 
 ### 2. `PRG_02_Encoders_CFC` (Niveau 0bis - Métrologie Codeurs)

@@ -13,8 +13,15 @@
 |---------|-------|---------|
 | `ST_` | Struct de données | `ST_AxisCmd`, `ST_WinchIO` |
 | `E_` | Enum / énumération | `E_Mode`, `E_State`, `E_CycleStep` |
-| `FB_` | Function Block | `FB_Joystick`, `FB_Treuil` |
- 
+| `FB_` | Function Block (type) | `FB_Joystick`, `FB_Winch` |
+| `inst` | Instance d'un FB (variable) | `instJoystick`, `instWinchM1`, `instModes` |
+
+### Instances FB
+- Préfixe **`inst`** + rôle PascalCase : `instJoystick`, `instSafetyWinchM1`.
+- ❌ Pas `FB_Joystick_0`, pas le nom du type seul, pas de suffixe `_0` d'export.
+- Multi-équipement : suffixe métier `M1`/`M2`/`M3` ou rôle (`instDiagCanOpen`).
+- Device IHM peut rester `JOY1…` (nœud) ; l'instance PLC reste `instJoystick`.
+  
 ---
  
 ## Abréviations autorisées

@@ -1,0 +1,133 @@
+# Analyse Fonctionnelle - Partie 2 : Architecture Programme (v3.0)
+
+> Role : architecture cible de l'automate. Elle definit les pages CFC, la sortie Ladder, le programme Cycle ST
+> et les frontieres IHM/troubleshooting a finaliser,
+> les frontieres de flux et les regles de lisibilite maintenance.
+> L'architecture ST historique est archivee. Le code actuel reste une base de migration, pas le
+> modele cible.
+
+## 🧭 Sommaire rapide
+
+1. Principes d'architecture
+2. Pages CFC, sortie Ladder et programme Cycle
+3. Contrats de flux
+4. Ordre d'execution
+5. Regles de maintenance et de migration
+
+## 🧪 Points de validation
+
+| ID | Attendu | Preuve | Type | Détail |
+|---|---|---|---|---|
+| TC-P02-001 | Une donnee a un seul producteur | aucun double ecrivain sur le meme contrat | AUTO | §1 |
+| TC-P02-002 | Page CFC sans logique metier | pas de `IF`/calcul/arbitrage dans le CFC | AUTO | §1 |
+| TC-P02-003 | Sorties physiques seulement via `PRG_OUTPUTS_LD` | aucun autre POU n'ecrit les Q/PDO finaux | AUTO | §2 |
+| TC-P02-004 | Ordre d'execution MainTask conforme a la cible | tache CODESYS + `check_linkage.py` | AUTO | §4 |
+| TC-P02-005 | Troubleshooting lecture seule | aucune ecriture commande/config/interlock | AUTO | §2 |
+
+---
+
+## 🧱 1. Principes d'architecture
+
+| Principe | Exigence |
+|---|---|
+| 👁️ CFC lisible | Une page CFC represente un domaine de responsabilite. Elle montre les instances et contrats, sans logique metier cachee. |
+| 🧩 POO | Les FB encapsulent calculs, machines d'etat et briques techniques par composition. |
+| ✍️ Producteur unique | Toute donnee, commande ou sortie physique a un seul ecrivain identifie. |
+| 🔗 Contrat type | Tout flux inter-domaine passe par une structure DUT publique, documentee et orientee role. |
+| 🛡️ Safety visible | Les sorties safety et leurs consommateurs sont nommes et visibles ; aucun arbitrage safety anonyme n'est admis. |
+| ⚡ Sortie finale | Une barriere finale est l'unique productrice de chaque commande physique. |
+| 🧪 Simulation | Le choix reel/simule est realise une fois a la frontiere acquisition, par domaine. |
+| 🖥️ IHM | Les structures `Cmd/State/Cfg/Bypass` restent le contrat PLC-IHM, distinct des flux internes. |
+
+Une page CFC peut contenir des constantes nommees, des instances et des liaisons. Elle ne contient
+ni `IF`, ni calcul, ni fusion de commandes, ni ecriture de sortie physique hors `PRG_OUTPUTS_LD`.
+
+---
+
+## 🗺️ 2. Organisation cible
+
+| Programme | Langage | Responsabilite |
+|---|---|---|
+| 📥 `PRG_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
+| 🛡️ `PRG_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
+| 🎚️ `PRG_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
+| 🔄 `PRG_CYCLE` | ST | Instance `FB_Cycle` a machine d'etat/Grafcet. Il produit des demandes automatiques ; il ne commande pas les sorties. |
+| 🪝 `PRG_TREUILS_CFC` | CFC | M1/M2, synchronisation, benne, `FB_DiveSearch`, `FB_ExtractionSequence`, arbitrage final treuil et demandes vers barrieres finales. |
+| ↔️ `PRG_TRANSLATION_CFC` | CFC | Positionnement M3, arbitrage final translation et demande vers barriere finale. |
+| ⚡ `PRG_OUTPUTS_LD` | Ladder | Barrieres finales, commandes physiques, gestion de la coupure puissance et du rearmement. |
+| 🖥️ Frontiere IHM | DUT et structures `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Le mapping, la persistance, les agregats et l'eventuel programme ST restent **TBD**. |
+| 🔎 Troubleshooting | Structures lecture seule | Affiche les donnees de debogage dans un ordre utile a la maintenance. Son type, son programme eventuel et son ordonnancement restent **TBD**. |
+
+`PRG_CYCLE` reste en ST : sa machine d'etat est plus lisible, testable et maintenable sous cette
+forme. Les assistants de plongee/extraction restent dans le domaine Treuils car ils sont aussi
+utilises en maintenance.
+
+### Ce qui n'est pas une page CFC autonome
+
+- Les sous-briques techniques restent privees dans leurs FB.
+- Les structures IHM ne sont pas des bus internes et ne justifient pas a elles seules un programme CFC.
+- La gestion d'arret d'urgence est une fonction de la chaine sortie/safety, pas une page parallele
+  non raccordee.
+- `PRG_GLOBAL_CFC` est un prototype historique ; il ne sert pas de reference cible.
+
+---
+
+## 🚌 3. Contrats de flux
+
+Un DUT est un contrat de frontiere. Sa specification indique obligatoirement : proprietaire,
+producteur unique, lecteurs, champs, unites, polarites, validite, comportement d'invalidite et
+strategie de test.
+
+| Frontiere | Produit | Consomme par |
+|---|---|---|
+| 🏗️ Acquisition qualifiee | Mesures conditionnees, polarites normalisees, disponibilite device et source reel/simule. | Safety, Modes, mouvements, Cycle et Supervision selon besoin. |
+| 📡 Diagnostic device | Etat communication et disponibilite de chaque device. | Safety, Modes et Supervision. |
+| 🕹️ Demande conduite | Intention operateur brute, sourcee et homme-mort valide. | Modes/arbitre proprietaire. |
+| 🎚️ Autorisations | Mode arbitre, permissions et limitations. | Cycle et domaines mouvement. |
+| 🛡️ Safety domaine | `SafeStop`, interdictions directionnelles, demande `PowerCutOff` et diagnostics du domaine. | Mouvements, Outputs et Supervision. |
+| ⚙️ Commande arbitree | Une commande unique par mouvement, apres arbitrage des sources et interlocks metier. | FB mouvement concerne. |
+| ⚡ Demande sortie | Demande brute de l'actionneur et confirmations necessaires a la barriere finale. | Outputs uniquement. |
+| 👁️ Etat public | Mesures, etats et diagnostics produits par le domaine. | Supervision et IHM. |
+
+Interdictions : GVL globale de commande, fusion de sources dans une interface de FB, lecture/ecriture
+
+---
+
+## ⏱️ 4. Execution cible
+
+Les cadences terrain restent a confirmer avant migration. Tant qu'aucune decision ne les modifie,
+la base existante est conservee : EtherCAT 4 ms, CANopen 20 ms et `MainTask` 10 ms avec surveillance
+systeme 200 ms.
+
+```text
+MainTask
+  0. PRG_ACQUISITION_CFC
+  1. PRG_MODES_CFC
+  2. PRG_SAFETY_CFC
+  3. PRG_CYCLE                 (ST)
+  4. PRG_TREUILS_CFC
+  5. PRG_TRANSLATION_CFC
+  6. PRG_OUTPUTS_LD
+  7. Frontiere IHM                 (TBD : mapping et persistance)
+  8. Troubleshooting lecture seule (TBD : type et ordonnancement)
+```
+
+Toute dependance lue avant son producteur doit etre supprimee ou documentee comme retard d'un scan,
+
+---
+
+## 🔧 5. Regles de maintenance et migration
+
+- Un technicien doit pouvoir suivre un flux de gauche a droite : acquisition -> decision -> mouvement -> sortie -> etat public.
+- Un domaine peut etre diagnostique depuis sa page CFC sans ouvrir une page machine globale.
+- Le troubleshooting observe les contrats publics et ne peut jamais ecrire une commande, une configuration ou un interlock.
+- Un remplacement se fait avec contrat de conservation, remappage complet des consommateurs et preuve de lien ; jamais par deux producteurs actifs (`_old` et nouveau).
+- Les noms finaux des devices et E/S viennent du materiel/export CODESYS, puis se propagent dans les contrats.
+- La chaine AU, sa polarite fail-safe, son auto-test et son rearmement sont proprietaires de la Partie 01.
+- Les interfaces de FB et DUT sont proprietaires de la Partie 03.
+
+## 📚 Documents lies
+
+- Partie 01 : machine et securite electrique.
+- Partie 03 : contrats composants, DUT et regles CFC.
+- Parties 04 a 14 : exigences de chaque domaine, sans redefinir l'architecture cible.

@@ -74,7 +74,7 @@ Ce programme CFC remplace avantageusement la séquence `PRG_00_Inputs` + `PRG_01
  │   [ 1. FRONT RÉEEL / SIMULATION ]           [ 2. DIAGNOSTIC BUS CAN & ETHERCAT ]           [ 3. QUALIFICATION JOYSTICK & BUS OUTPUT ]      │
  │                                                                                                                                                  │
  │  ┌───────────────────────────────┐           ┌───────────────────────────────────┐           ┌──────────────────────────────────────┐    │
- │  │          instInputs           │           │          instDiagCanOpen          │           │             FB_Joystick_0            │    │
+ │  │          instInputs           │           │          instDiagCanOpen          │           │             instJoystick            │    │
  │  │           (FB_Input)          │           │          (FB_DiagCanOpen)          │           │             (FB_Joystick)            │    │
  │  ├───────────────────────────────┤           ├───────────────────────────────────┤           ├──────────────────────────────────────┤    │
  │  │ HwReal (Bornier Hardware)     │           │ CANbusStateRaw [INT]              │           │ RawX, RawY, BtnDeadman               │    │
@@ -113,7 +113,7 @@ Ce programme CFC remplace avantageusement la séquence `PRG_00_Inputs` + `PRG_01
 | **E2** | **Création des DUTs** | Création des types `ST_HwIn_Bus.st`, `ST_Diag_NetworkBus.st`, `ST_Cmd_JoystickBus.st` dans `CODE/COMMUN/_TYPES/`. | Test de syntaxe ST. |
 | **E3** | **Génération du CFC XML** | Écriture du fichier `PRG_00_Acquisition_CFC.xml` dans `CODE/MAIN/`. | Exécution de `python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .` ➔ Valide le PLCopenXML. |
 | **E4** | **Adaptation des consommateurs**| Mettre à jour `PRG_02_Encoders`, `PRG_03_Safety`, `PRG_06_WinchControl`, `PRG_07_TranslationControl` pour lire leurs entrées sur `GVL_Global.HwInBus` et `GVL_Global.CmdJoystickBus`. | Exécution de `python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py` ➔ Doit sortir **0 erreur de liaison**. |
-| **E5** | **Comparatif Fonctionnel & Non-Régression** | Vérifier la conformité de `PRG_00_Acquisition_CFC` vs `DOC/AF_Partie-06_IO_Conditioning_v1.8.md` et `AF_Partie-08_Fonction_Joystick_v1.3.md`. | Exécution de `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py` (tous les gates au vert). |
+| **E5** | **Comparatif Fonctionnel & Non-Régression** | Vérifier la conformité de `PRG_00_Acquisition_CFC` vs `DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md` et `AF_Partie-08_Fonction_Joystick_v2.0.md`. | Exécution de `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py` (tous les gates au vert). |
 
 ---
 

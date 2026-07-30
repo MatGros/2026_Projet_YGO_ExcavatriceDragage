@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 PRG_Test_KoboldMaintenance — Tests PLC isolés T81/T82
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Cycle_Sequenceur_v1.5.md §3ter
+   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    ⚠️ Programme de qualification MANUELLE : non appelé par MainTask.
       L'opérateur l'appelle temporairement dans une tâche de test, pose TestEnable,
       puis lit Passed/Failed. Aucun accès E/S, aucun ordre machine.

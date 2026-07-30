@@ -11,7 +11,7 @@
 |---|---|
 | Comment on **nomme** | `DOC/NAMING_CONVENTION.md` |
 | Comment on **déclare, encapsule, relie** | **ce document** |
-| Interface obligatoire d'un FB | `DOC/AF_Partie-03_Template_FB_Commun_v1.3.md` |
+| Contrats FB, DUT et CFC | `DOC/AF_Partie-03_Contrats_Composants_v2.0.md` |
 | Ce que fait la machine | `DOC/AF_Partie-01` à `AF_Partie-14` |
 | Comment on exécute une modif | `.claude/skills/codesys-workflow.md` |
 

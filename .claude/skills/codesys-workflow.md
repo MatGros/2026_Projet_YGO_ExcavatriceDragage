@@ -41,8 +41,8 @@ Lire **la version active** (suffixe `_vX.Y` le plus élevé à la racine de `DOC
 - `AGENTS.md` — guardrails et cas d'arrêt
 - `DOC/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
 - `DOC/NAMING_CONVENTION.md` — nommage
-- `DOC/AF_Partie-03_Template_FB_Commun_v1.3.md` — contrat FB
-- `DOC/AF_Partie-02_Architecture_Programme_v2.12.md` — architecture, tâches, flux
+- `DOC/AF_Partie-03_Contrats_Composants_v2.0.md` — contrats FB, DUT et CFC
+- `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` — architecture, tâches et flux
 - la spec métier concernée (`AF_Partie-08` à `-14`)
 
 🚫 `ARCHIVES/Doc/` = versions **périmées**, jamais une source active.

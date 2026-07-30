@@ -39,7 +39,7 @@ spontanée. Continuer en silence sur un doute est la faute ; le signaler ne l'es
 1. `AGENTS.md` — point d'entrée, guardrails et cas d'arrêt
 2. `DOC/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
 3. `DOC/NAMING_CONVENTION.md` — nommage
-4. `DOC/AF_Partie-03_Template_FB_Commun_v1.3.md` — contrat FB (si création/modif de FB)
+4. `DOC/AF_Partie-03_Contrats_Composants_v2.0.md` — contrats FB, DUT et CFC (si création/modif de FB)
 5. La spec métier concernée (`DOC/AF_Partie-08` à `-14`)
 
 `ARCHIVES/` n'est **jamais** une source active.

@@ -1,0 +1,65 @@
+contract:
+  task_id: AF04_AF07_DOCUMENTATION_V2
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Publier des analyses fonctionnelles 04 a 07 concises, alignees sur
+    l'architecture cible et les decisions validees, en marquant explicitement
+    les incertitudes TBD.
+  acceptance:
+    - id: AC1
+      statement: "AF04 decrit le cycle ST, les assistants Diving/Extraction, la synchro sans asservissement continu et le hold apres SafeStop."
+      verified_by: "Relecture DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md"
+    - id: AC2
+      statement: "AF05 distingue modes machine, SyncEnable, selection treuil MAINT_N2 et limite legale hors safety."
+      verified_by: "Relecture DOC/AF_Partie-05_Modes_Maintenance_v2.0.md"
+    - id: AC3
+      statement: "AF06 decrit l'acquisition qualifiee, la simulation, les diagnostics CANopen/EtherCAT et la frontiere sortie Ladder."
+      verified_by: "Relecture DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md"
+    - id: AC4
+      statement: "AF07 se limite au contrat structurel GVL_IHM Cmd/State/Cfg/Bypass et renvoie au code pour les champs."
+      verified_by: "Relecture DOC/AF_Partie-07_Interface_IHM_v2.0.md"
+    - id: AC5
+      statement: "Les anciennes versions 04 a 07 sont archivees et les references actives pointent vers les nouvelles versions."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py"
+  scope:
+    allowed:
+      - DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+      - DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+      - DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md
+      - DOC/AF_Partie-07_Interface_IHM_v2.0.md
+      - DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+      - DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+      - DOC/AF_Partie-06_IO_Conditioning_v1.8.md
+      - DOC/AF_Partie-07_Interface_IHM_v1.7.md
+      - ARCHIVES/Doc/
+      - DOC/CHECKLISTS/
+      - DOC/
+      - README.md
+      - CODE/
+      - TOOLS/AGENT_WORKFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Logique ST hors commentaires de reference documentaire
+  conservation:
+    must_survive:
+      - "Cycle ST producteur de demandes, jamais de sorties physiques."
+      - "Homme-mort requis pour les mouvements semi-auto et assistants."
+      - "Aucun asservissement continu de vitesse M1/M2."
+      - "Selection treuil unitaire uniquement en MAINT_N2, safety active sur l'axe non selectionne."
+      - "Acquisition unique, diagnostics bus et polarites normalisees une seule fois."
+      - "Contrat IHM structurel Cmd/State/Cfg/Bypass."
+    dropped_on_purpose:
+      - "Listes exhaustives de champs IHM dans AF07."
+      - "Regulation continue de synchro en vol."
+      - "Details frein/seuils terrain non qualifies, renvoyes aux parties metier ou marques TBD."
+  evidence_required:
+    - task_contract
+    - check_doc_links
+    - check_linkage
+    - bundle
+  models_allowed:
+    - "openai/gpt-5.6-terra"
+  alert_duty: >
+    Toute affirmation non prouvee par extraction, code ou decision utilisateur
+    est marquee TBD et ne doit pas etre presentee comme exigence active.

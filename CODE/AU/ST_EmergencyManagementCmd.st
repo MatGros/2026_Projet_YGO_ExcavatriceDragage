@@ -4,7 +4,7 @@
    📄 Transporte les ordres logiques entre le bloc de décision
       et le bloc de commande de la boucle d'urgence.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v1.6.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 TYPE ST_EmergencyManagementCmd :
