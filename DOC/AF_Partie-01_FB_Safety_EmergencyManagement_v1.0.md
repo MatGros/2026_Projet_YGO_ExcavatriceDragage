@@ -88,8 +88,8 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 | `Enable` | `PRG_10` = TRUE fixe | Active surveillance ; FALSE = neutralisation totale |
 | `Reset` | `PRG_09.FaultMachineReset_IHM` ← `BtnFaultReset` | Front acquittement défauts FB |
 | `ArmRequest` | `GVL_IHM.Modes.Cmd.BtnEmergencyArming` | Front demande réarmement |
-| `EmergencyChain` | `PRG_00.EmergencyChain` ← `EmergencyChainClosed_DI` | Boucle AU fermée |
-| `EmergencyStopOk` | `PRG_00.EmergencyStopOk` ← `PowerContactorEngaged_DI` | Contacteur engagé |
+| `EmergencyChainClosed` | `PRG_00.EmergencyChainClosed` ← `EmergencyChainClosed_DI` | Boucle AU fermée |
+| `PowerContactorEngaged` | `PRG_00.PowerContactorEngaged` ← `PowerContactorEngaged_DI` | Contacteur engagé |
 | `PowerCutOffRequest` | OR local M1/M2/M3 `.PowerCutOff` dans `PRG_10` | Coupure demandée par safety domaine |
 | `BtnEmergencyCutOff` | `GVL_IHM.Modes.Cmd.BtnEmergencyCutOff` | Coupure IHM maintenue |
 
@@ -99,7 +99,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 |---|---|
 | `Ready` | Aujourd'hui `= Enable` |
 | `Busy` | Séquence active (`ArmingSeqStep <> 0`) |
-| `Done` | Aujourd'hui `= EmergencyStopOk` |
+| `Done` | Aujourd'hui `= PowerContactorEngaged` |
 | `Error` / `ErrorId` | bit0 redondance, bit1 arming failed |
 | `ArmingSeqStep` | 0…6 diagnostic |
 | `RedundancyTestFailed` | Latch auto-test |
@@ -148,9 +148,9 @@ PowerCutOff_B_Cmd = NOT PowerCutOffRequest
 Conditions **toutes** requises sur front `ArmRequest` :
 
 1. `ArmingSeqStep = 0`
-2. `EmergencyChain = TRUE`
+2. `EmergencyChainClosed = TRUE`
 3. `EmergencyArmingLockoutActive = FALSE`
-4. `EmergencyStopOk = FALSE` (contacteur non engagé)
+4. `PowerContactorEngaged = FALSE` (contacteur non engagé)
 
 Pas d'auto-réarmement sur simple retour boucle saine.
 
@@ -163,7 +163,7 @@ Pas d'auto-réarmement sur simple retour boucle saine.
 | 3 | TestB | 200 ms | Ouvre B seul | Idem redondance → 0 |
 | 4 | RestoreB | 200 ms | Rétablit B | Si chain FALSE → 0 ; sinon → 5 |
 | 5 | Pulse | 1 s | `EmergencyArming_Cmd=TRUE` | — |
-| 6 | Confirm | ≤ 2 s | Attend `EmergencyStopOk` | Timeout → `EmergencyArmingFailed` + lockout 5 s |
+| 6 | Confirm | ≤ 2 s | Attend `PowerContactorEngaged` | Timeout → `EmergencyArmingFailed` + lockout 5 s |
 
 Succès étape 6 : retour IDLE, lockout off.
 
@@ -172,7 +172,7 @@ Succès étape 6 : retour IDLE, lockout off.
 À chaque réarmement réussi jusqu'au pulse, le FB **teste les deux sorties de maintien
 sans procédure manuelle séparée** :
 
-| Phase | `PowerKeepAlive_A` | `PowerKeepAlive_B` | Attendu sur `EmergencyChain` |
+| Phase | `PowerKeepAlive_A` | `PowerKeepAlive_B` | Attendu sur `EmergencyChainClosed` |
 |---|---|---|---|
 | TestA (200 ms) | **FALSE** (forcé) | TRUE (maintenu) | doit **ouvrir** (FALSE) |
 | RestoreA | TRUE | TRUE | doit **refermer** (TRUE) |
@@ -192,7 +192,7 @@ sans procédure manuelle séparée** :
 | Défaut | Condition d'effacement |
 |---|---|
 | `RedundancyTestFailed` | Front `Reset` (cause disparue côté process = opérateur / câblage) |
-| `EmergencyArmingFailed` | Front `Reset` **et** `EmergencyStopOk=TRUE` |
+| `EmergencyArmingFailed` | Front `Reset` **et** `PowerContactorEngaged=TRUE` |
 
 **Comportement code retenu** : après expiration du lockout 5 s, un nouvel `ArmRequest` peut
 relancer la séquence même si `EmergencyArmingFailed` est encore latche ; le latch IHM/diag
@@ -213,8 +213,8 @@ reste jusqu'au Reset conditionnel.
 
 | Rôle | Signal acquisition / Q | TRUE signifie |
 |---|---|---|
-| Boucle AU | `EmergencyChainClosed_DI` → `EmergencyChain` | Boucle fermée / saine |
-| Contacteur | `PowerContactorEngaged_DI` → `EmergencyStopOk` | Contacteur engagé |
+| Boucle AU | `EmergencyChainClosed_DI` → `EmergencyChainClosed` | Boucle fermée / saine |
+| Contacteur | `PowerContactorEngaged_DI` → `PowerContactorEngaged` | Contacteur engagé |
 | Maintien A/B | `PowerKeepAlive_A/B_RQ` | Relais maintien excité (fail-safe) |
 | Pulse réarmement | `EmergencyArming_RQ` | Commande mécanique de réarmement active |
 
@@ -234,7 +234,7 @@ Logic/Output sont **privés** dedans (jamais appelés par un PRG).
 
 ```text
 PRG_00_Inputs
-  │  lit DI → EmergencyChain, EmergencyStopOk
+  │  lit DI → EmergencyChainClosed, PowerContactorEngaged
   │  SimBench lit PowerKeepAlive_*/EmergencyArming_RQ (Q, scan N-1)
   ▼
 PRG_01_Diagnostics     joystick, diag bus
@@ -244,7 +244,7 @@ PRG_03_Safety          ← FB_Safety_Winch×2, FB_Safety_Translation
   ▼
 PRG_04_Modes
 PRG_05_Cycle
-PRG_06_WinchControl    mouvements M1/M2 (lisent EmergencyStopOk, SafeStop)
+PRG_06_WinchControl    mouvements M1/M2 (lisent PowerContactorEngaged, SafeStop)
 PRG_07_Translation     mouvement M3
 PRG_09_Supervision     Reset IHM, mapping State (partiel armement)
   ▼
@@ -274,7 +274,7 @@ PRG_10_Outputs_LD      ← UNIQUE appel :
 | Agrégation PowerCutOff | Variable locale `PowerCutOffReq` = OR des 3 `.PowerCutOff` de `PRG_03` |
 | Publication Q | Juste après l'appel FB dans le même `PRG_10` |
 | Miroir partiel | `GVL_Global.EmergencyArmingPulseActive/LockoutActive/ArmingSeqStep` |
-| Portail mouvement | `PRG_00.EmergencyStopOk` (**lu** par le FB, pas produit par lui) |
+| Portail mouvement | `PRG_00.PowerContactorEngaged` (**lu** par le FB, pas produit par lui) |
 
 Conformité AF02 : AU en **chaîne sortie**, pas de page CFC AU orpheline.
 Cible : rester dans `PRG_OUTPUTS_LD`.
@@ -309,16 +309,16 @@ Alignement optionnel = lot L5, pas bloquant pour comprendre le flux.
 
 | Champ | Source attendue |
 |---|---|
-| `EmergencyStopOk` | `PRG_00` (mappé) |
-| `EmergencyChainOk` | `PRG_00.EmergencyChain` |
+| `PowerContactorEngaged` | `PRG_00` (mappé) |
+| `EmergencyChainOk` | `PRG_00.EmergencyChainClosed` |
 | `PowerContactorOk` | miroir contacteur |
 | `PowerCutOffActive` | OR safety domaines (polarité alarme) |
-| `EmergencyArmable` | chain OK ∧ step0 ∧ ¬lockout ∧ ¬RedundancyFail ∧ ¬EmergencyStopOk |
+| `EmergencyArmable` | chain OK ∧ step0 ∧ ¬lockout ∧ ¬RedundancyFail ∧ ¬PowerContactorEngaged |
 | `EmergencyArmingBusy` | Busy ∨ lockout |
 | `RedundancyTestFailed` | sortie FB |
 | `EmergencyArmingFailed` | sortie FB |
 
-**Écart vérifié** : `PRG_09_Supervision` mappe aujourd'hui `Modes.State.EmergencyStopOk` ;
+**Écart vérifié** : `PRG_09_Supervision` mappe aujourd'hui `Modes.State.PowerContactorEngaged` ;
 les autres champs armement de `ST_ModesState` ne sont pas encore alimentés depuis le FB.
 À corriger lors de la normalisation (sans changer le DUT IHM s'il est déjà consommé écran).
 

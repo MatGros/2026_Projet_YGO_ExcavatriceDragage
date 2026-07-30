@@ -12,7 +12,7 @@ FUNCTION_BLOCK PUBLIC FB_Translation
 VAR_INPUT
     Enable                      : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
     Reset                       : BOOL;        // Acquittement défaut (front)
-    EmergencyStopOk             : BOOL;        // Chaîne AU réarmée + conditions globales OK
+    PowerContactorEngaged             : BOOL;        // Chaîne AU réarmée + conditions globales OK
     Mode                        : E_Mode;      // Mode courant
     StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
@@ -81,8 +81,8 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
-// 🛑 1. GATE (Enable / EmergencyStopOk) — neutralisation totale, sorties sûres
-IF NOT Enable OR NOT EmergencyStopOk THEN
+// 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
 
     Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,

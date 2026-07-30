@@ -52,7 +52,7 @@ Tous les échanges du CFC reposent sur **8 Structures de Bus Standardisées** :
 ### 1. `ST_HwInBus` (Bus des Entrées Conditionnées)
 - **Émetteur** : `PRG_00_Acquisition_CFC` (`instInputs`)
 - **Reçoit** : Bornier physique + `ST_CmdModesBus` (pour l'aiguillage réversible Réel ↔ Simulation).
-- **Contenu** : `EmergencyStopOk`, `EmergencyChain`, `TopPositionSensor`, `SlackCableSwitch`, `PhaseRotationOk`, `BrakeThermalFeedback`, `M1FwdRevSpeedFeedbackOff`, `M1ThermalFeedback`, `M1BrakeFeedback`, `M2FwdRevSpeedFeedbackOff`, `M2ThermalFeedback`, `M2BrakeFeedback`, `M3SensorsWord`.
+- **Contenu** : `PowerContactorEngaged`, `EmergencyChainClosed`, `TopPositionSensor`, `SlackCableSwitch`, `PhaseRotationOk`, `BrakeThermalFeedback`, `M1FwdRevSpeedFeedbackOff`, `M1ThermalFeedback`, `M1BrakeFeedback`, `M2FwdRevSpeedFeedbackOff`, `M2ThermalFeedback`, `M2BrakeFeedback`, `M3SensorsWord`.
 
 ### 2. `ST_DiagNetworkBus` (Bus de Santé des Lignes Réseau)
 - **Émetteur** : `PRG_00_Acquisition_CFC` (`instDiagCanOpen`, `instDiagEthercat`)

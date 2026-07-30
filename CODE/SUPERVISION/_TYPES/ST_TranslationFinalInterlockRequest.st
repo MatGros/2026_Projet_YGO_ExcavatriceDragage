@@ -11,7 +11,7 @@ TYPE ST_TranslationFinalInterlockRequest :
 STRUCT
     Enable                       : BOOL;
     Reset                        : BOOL;
-    EmergencyStopOk              : BOOL;
+    PowerContactorEngaged              : BOOL;
     SafeStop                     : BOOL;
     BrakeReleaseRequest          : BOOL;
     BrakeCommandOpenConfirmed    : BOOL; // TRUE = contacteur/bobine desserrage confirmé

@@ -9,7 +9,7 @@ STRUCT
     Idx203_BypassSensorsGlobal    : BOOL;   // 0 = Capteurs Actifs | 1 = AU MOINS 1 CAPTEUR SHUNTÉ ⚠️
 
     Idx301_EmergencyChainClosed   : BOOL;   // 1 = Boucle AU Matérielle Fermée (OK) | 0 = AU APPUYÉ 🔴
-    Idx302_EmergencyStopOk        : BOOL;   // 1 = Puissance Armée | 0 = Puissance Coupée 🔴
+    Idx302_PowerContactorEngaged  : BOOL;   // 1 = Puissance Armée | 0 = Puissance Coupée 🔴
     Idx303_SafeStopActiveAny      : BOOL;   // 0 = Sain | 1 = AU MOINS UN SAFESTOP MÉTIER ACTIF 🔴
     Idx304_PowerCutOffActiveAny   : BOOL;   // 0 = Sain | 1 = COUPURE GENERAL COLLAGE ACTIVEE 🔴
 

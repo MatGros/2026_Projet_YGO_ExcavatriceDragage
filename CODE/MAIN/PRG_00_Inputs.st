@@ -9,7 +9,7 @@
    MAP CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
    [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
    ┌──────────────────────────┬──────────┬─────────────────────────────────┐
-   │ EmergencyStopOk          │ [BLOQUE] │ portail maître — tout le prog.  │
+   │ PowerContactorEngaged          │ [BLOQUE] │ portail maître — tout le prog.  │
    │ TopPositionSensor        │ [BLOQUE] │ ForbidAscent M1+M2 (hors bypass)│
    │ SlackCableSwitch         │ [BLOQUE] │ ForbidDescent M2                │
    │ BrakeThermalFeedback     │ [ESCAL.] │ SafeStop + PowerCutOff (3 axes) │
@@ -35,11 +35,11 @@ VAR_OUTPUT
     // ── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
     // 🔧 REX 2026-07-07 : précision terrain — PowerContactorEngaged_DI (retour contact auxiliaire NO)
     // est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
-    // PAS la boucle AU elle-même (ça, c'est EmergencyChainClosed_DI, ci-dessous). Nom EmergencyStopOk
+    // PAS la boucle AU elle-même (ça, c'est EmergencyChainClosed_DI, ci-dessous). Nom PowerContactorEngaged
     // conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
     // maître du programme, car "puissance réellement présente" est la garantie la plus forte.
-    EmergencyStopOk      : BOOL;   // 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴
-    EmergencyChain       : BOOL;   // 🔗 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) : TRUE=saine ✅ | FALSE=AU appuyé ou PowerCutOff PLC actif 🔴 — précondition à l'armement, PAS le portail maître
+    PowerContactorEngaged      : BOOL;   // 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴
+    EmergencyChainClosed       : BOOL;   // 🔗 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) : TRUE=saine ✅ | FALSE=AU appuyé ou PowerCutOff PLC actif 🔴 — précondition à l'armement, PAS le portail maître
     TopPositionSensor    : BOOL;   // 🔝 Fin de course HAUT (NC) : TRUE=libre ✅ | FALSE=butée atteinte 🔴→ForbidAscent
     SlackCableSwitch     : BOOL;   // 🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent
     KoboldContactFond    : BOOL;   // 🪨 Retour détecteur fond Kobold (NO) : TRUE=contact fond détecté ✅
@@ -91,8 +91,8 @@ VAR_OUTPUT
 END_VAR
 VAR
     // Instances de filtrage
-    instEmergencyStopOk   : FB_Input;
-    instEmergencyChain    : FB_Input; // 🔧 REX 2026-07-07
+    instPowerContactorEngaged   : FB_Input;
+    instEmergencyChainClosed    : FB_Input; // 🔧 REX 2026-07-07
     instSlackCableSwitch  : FB_Input;
     instKoboldContactFond : FB_Input;
     instTopPositionSensor : FB_Input;
@@ -308,18 +308,18 @@ IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
 // ─── §1 HwIn ──► FB_Input ──► VAR_OUTPUT (Conditionnement des entrées) ───────
 
 //  🔌 HwIn.Machine.PowerContactorEngaged_DI ····· câblage réel : 1 = contacteur puissance engagé
-//         └─►[ instEmergencyStopOk 🔩 ]         ← filtre anti-rebond 20 ms
-//                └─► EmergencyStopOk ··········· [BLOQUE] TRUE = puissance présente ✅ (portail maître)
+//         └─►[ instPowerContactorEngaged 🔩 ]         ← filtre anti-rebond 20 ms
+//                └─► PowerContactorEngaged ··········· [BLOQUE] TRUE = puissance présente ✅ (portail maître)
 //                       └─► PRG_01..11 · FB_Safety_* · FB_Cycle · FB_Winch
-instEmergencyStopOk(InputRaw := HwIn.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
-EmergencyStopOk := instEmergencyStopOk.State;
+instPowerContactorEngaged(InputRaw := HwIn.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
+PowerContactorEngaged := instPowerContactorEngaged.State;
 
 //  🔌 HwIn.Machine.EmergencyChainClosed_DI ······ câblage réel : 1 = boucle AU fermée
-//         └─►[ instEmergencyChain 🔩 ]          ← filtre anti-rebond 20 ms
-//                └─► EmergencyChain ············ [BLOQUE] TRUE = boucle AU saine ✅ (précondition armement)
+//         └─►[ instEmergencyChainClosed 🔩 ]          ← filtre anti-rebond 20 ms
+//                └─► EmergencyChainClosed ············ [BLOQUE] TRUE = boucle AU saine ✅ (précondition armement)
 //                       └─► PRG_03_Safety · PRG_06_WinchControl · PRG_11_Troubleshooting
-instEmergencyChain(InputRaw := HwIn.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
-EmergencyChain := instEmergencyChain.State;
+instEmergencyChainClosed(InputRaw := HwIn.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
+EmergencyChainClosed := instEmergencyChainClosed.State;
 
 //  🔌 HwIn.Winch.M2_TensionedCable_DI ··········· câblage réel : 1 = câble tendu (NC)
 //         └─►[ instSlackCableSwitch 🔩 ]        ← filtre anti-rebond 20 ms

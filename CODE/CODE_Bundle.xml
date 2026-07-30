@@ -571,7 +571,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
       - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
         TRUE = rampe accélération, FALSE = rampe décélération normale)
       - Champ `SafetyOk` RETIRÉ : ce n'est pas une commande d'axe, c'est
-        une info de contexte (`EmergencyStopOk`) consommée directement
+        une info de contexte (`PowerContactorEngaged`) consommée directement
         par le FB de mouvement (FB_Winch/FB_Translation), pas portée
         par la consigne d'axe elle-même.
    🧭 4 champs exactement, conforme Partie2 v2.5 §8.
@@ -1616,7 +1616,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle AU Matérielle Fermée (OK) | 0 = AU APPUYÉ 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx302_EmergencyStopOk">
+            <variable name="Idx302_PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -4432,7 +4432,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ Mode de marche actuellement actif</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -4469,7 +4469,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de puissance confirmé engagé (miroir EmergencyStopOk)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de puissance confirmé engagé (miroir PowerContactorEngaged)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmable">
@@ -5366,7 +5366,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -5946,7 +5946,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -6814,7 +6814,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
       et applique une zone morte en %.
    Sortie : OutPct ∈ [-100.0 .. +100.0] (0.0 si dans la deadband)
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
+   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -7185,7 +7185,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défauts (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -7652,7 +7652,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // 🛑 1. GATE DE SÉCURITÉ
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
@@ -8395,7 +8395,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -8968,7 +8968,7 @@ Distance de remontée lente de contrôle</xhtml>
 // === IMPLEMENTATION ===
 
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     CmdWinchM1_StartStop := FALSE;
     CmdWinchM1_Direction := 0;
     CmdWinchM1_SpeedPct  := 0.0;
@@ -9392,7 +9392,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §2
       (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
@@ -10225,7 +10225,7 @@ Done := FALSE;
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -10410,7 +10410,7 @@ Done := FALSE;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
     BottomTouchConfirmed := FALSE;
@@ -10660,7 +10660,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -11071,7 +11071,7 @@ Done := PresetAck;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front) — bits 0/2/3/4/5 (voir §ErrorId)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -11442,7 +11442,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     PresetRequest := FALSE;
     PresetValue := 0;
     State := E_State.DISABLED;
@@ -11598,7 +11598,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front) — bit0 uniquement (bit1 suit HomingSuspect, voir §7bis)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -12202,7 +12202,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement par front</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -12379,7 +12379,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
     Busy := FALSE;
     Done := FALSE;
@@ -12461,7 +12461,7 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -12651,7 +12651,7 @@ END_IF;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
     BottomConfirmationConsumed := FALSE;
@@ -12819,7 +12819,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
       où α = CycleTimeS / (T + CycleTimeS), T = TimeConst en secondes.
    ⚠️ Si TimeConst = 0 ou CycleTimeS = 0, sortie = entrée (pass-through).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
+   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -13166,7 +13166,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -13564,9 +13564,9 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ FB_Joystick — Acquisition + traitement Hall (bouton = homme-mort EN 574/ISO 13850)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md (historique détaillé des
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md (historique détaillé des
       correctifs : AUDIT D34/D35/D49/D51/D53-D59)
-   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §3
+   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §3
       l'interdit (`FB_Joystick` n'est pas un FB de mouvement, Partie3 §1bis). Agissait de
       plus comme un second `Enable` dans le GATE (coupure immédiate), pas comme la rampe
       rapide attendue d'un `SafeStop` — confusion précisément visée par la règle.
@@ -13600,7 +13600,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
-IF NOT Enable OR NOT EmergencyStopOk OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
+IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0;
@@ -13798,7 +13798,7 @@ Done := NOT Error;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front) — bit0</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -14020,7 +14020,7 @@ Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard</xhtml
 
 // 🛑 1. GATE — repli sur le mode de sécurité de veille (DISABLE) si désactivé
 // ou si l'arrêt d'urgence est déclenché.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Mode := E_Mode.DISABLE;
     SyncEnable := TRUE;
     InhibitM1 := FALSE;
@@ -14324,7 +14324,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyChain, EmergencyStopOk, EncoderM1Operational, EncoderM2Operational">
+            <variable name="EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational">
               <type>
                 <BOOL />
               </type>
@@ -14411,7 +14411,7 @@ IF NOT BrakeThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0080; END_
 IF NOT PhaseRotationOk THEN PreflightErrorId := PreflightErrorId OR 16#0100; END_IF;
 IF NOT SlackCableTensioned THEN PreflightErrorId := PreflightErrorId OR 16#0200; END_IF;
 IF M3SensorWordIncoherent THEN PreflightErrorId := PreflightErrorId OR 16#0400; END_IF;
-IF EmergencyStopOk AND NOT EmergencyChain THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
+IF PowerContactorEngaged AND NOT EmergencyChainClosed THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
 IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000; END_IF;
 IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
 IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
@@ -14488,7 +14488,7 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v1.3.md §2 (usage),
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §2 (usage),
                    DOC/AF_Partie-09_Fonction_Winch_v1.14.md (correctif ci-dessous)
    🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
       SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
@@ -14585,7 +14585,7 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyChain">
+            <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
@@ -14593,7 +14593,7 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -14741,8 +14741,8 @@ Logic(
     Enable := Enable,
     Reset := Reset,
     ArmRequest := ArmRequest,
-    EmergencyChain := EmergencyChain,
-    EmergencyStopOk := EmergencyStopOk,
+    EmergencyChainClosed := EmergencyChainClosed,
+    PowerContactorEngaged := PowerContactorEngaged,
     PowerCutOffRequest := PowerCutOffRequest,
     BtnEmergencyCutOff := BtnEmergencyCutOff
 );
@@ -14755,7 +14755,7 @@ Output(
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
 Ready := Enable;
 Busy  := (Logic.ArmingSeqStep &lt;&gt; 0);
-Done  := EmergencyStopOk;
+Done  := PowerContactorEngaged;
 Error := Logic.Error;
 ErrorId := Logic.ErrorId;
 
@@ -14803,7 +14803,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyChain">
+            <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
@@ -14811,7 +14811,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -14993,15 +14993,15 @@ ArmReqEdge(CLK := ArmRequest);
 // 🔍 2. ACQUITTEMENT DES DÉFAUTS
 IF ResetEdge.Q THEN
     RedundancyTestFailed := FALSE;
-    IF EmergencyStopOk THEN
+    IF PowerContactorEngaged THEN
         EmergencyArmingFailed := FALSE;
     END_IF;
 END_IF;
 
 // 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
-IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChain 
+IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
    AND NOT EmergencyArmingLockoutActive 
-   AND NOT EmergencyStopOk THEN
+   AND NOT PowerContactorEngaged THEN
     ArmingSeqStep := 1;
 END_IF;
 
@@ -15011,7 +15011,7 @@ IF ArmingSeqStep = 1 THEN
     ForceTestA := TRUE;
     IF TonTestA.Q THEN
         ForceTestA := FALSE;
-        IF EmergencyChain THEN
+        IF EmergencyChainClosed THEN
             RedundancyTestFailed := TRUE;
             ArmingSeqStep := 0;
         ELSE
@@ -15025,7 +15025,7 @@ END_IF;
 // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
 TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200ms);
 IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
-    IF EmergencyChain THEN
+    IF EmergencyChainClosed THEN
         ArmingSeqStep := 3;
     ELSE
         ArmingSeqStep := 0;
@@ -15038,7 +15038,7 @@ IF ArmingSeqStep = 3 THEN
     ForceTestB := TRUE;
     IF TonTestB.Q THEN
         ForceTestB := FALSE;
-        IF EmergencyChain THEN
+        IF EmergencyChainClosed THEN
             RedundancyTestFailed := TRUE;
             ArmingSeqStep := 0;
         ELSE
@@ -15052,7 +15052,7 @@ END_IF;
 // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
 TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200ms);
 IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
-    IF EmergencyChain THEN
+    IF EmergencyChainClosed THEN
         ArmingSeqStep := 5;
     ELSE
         ArmingSeqStep := 0;
@@ -15069,7 +15069,7 @@ END_IF;
 // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
 TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2s);
 IF ArmingSeqStep = 6 THEN
-    IF EmergencyStopOk THEN
+    IF PowerContactorEngaged THEN
         ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := FALSE;
     ELSIF TonArmingConfirm.Q THEN
@@ -15209,7 +15209,7 @@ EmergencyArming_RQ := Cmd.EmergencyArming_Cmd;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -15794,7 +15794,7 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-SafeStop := Error OR NOT EmergencyStopOk;
+SafeStop := Error OR NOT PowerContactorEngaged;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), dépassement de fin de course (bit6),
@@ -15845,7 +15845,7 @@ State := E_State.READY;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -16688,9 +16688,9 @@ IF LastInReferencingMode AND NOT InReferencingMode THEN
 END_IF;
 LastInReferencingMode := InReferencingMode;
 
-// Si le contacteur de puissance est ouvert (EmergencyStopOk = FALSE), on force les sorties de sécurité
+// Si le contacteur de puissance est ouvert (PowerContactorEngaged = FALSE), on force les sorties de sécurité
 // mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
-IF NOT EmergencyStopOk THEN
+IF NOT PowerContactorEngaged THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
 END_IF;
@@ -16923,7 +16923,7 @@ END_IF;
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
 // (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (🆕 REX 2026-07-08 (4) :
 // Méca E, écart synchro critique) ou si contacteur coupé
-IF NOT EmergencyStopOk THEN
+IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
     SafeStop := (ErrorId AND 16#FF97) &lt;&gt; 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
@@ -16932,7 +16932,7 @@ ELSE
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
-ForbidDescent := (ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT EmergencyStopOk;
+ForbidDescent := (ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged;
 
 // ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (récupération mou câble : montée interdite même en récup)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement,
@@ -17943,7 +17943,7 @@ END_IF;
    📥 EmergencyArming : impulsion de réarmement (EmergencyArming_RQ)
    
    📤 SimChainOk      : simulation de la boucle AU (boutons relâchés et coupures PLC inactives)
-   📤 SimContactorOk  : simulation du contacteur engagé (EmergencyStopOk)
+   📤 SimContactorOk  : simulation du contacteur engagé (PowerContactorEngaged)
    
    ⚙️ Logique physique :
       - La chaîne d'AU (SimChainOk) est saine si les deux relais PLC de coupure sont maintenus fermés (TRUE).
@@ -18698,7 +18698,7 @@ END_CASE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -19132,8 +19132,8 @@ Filtrage capteur de position cible</xhtml>
 
 // === IMPLEMENTATION ===
 
-// 🛑 1. GATE (Enable / EmergencyStopOk) — neutralisation totale, sorties sûres
-IF NOT Enable OR NOT EmergencyStopOk THEN
+// 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
 
     Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
@@ -19340,7 +19340,7 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -19507,7 +19507,7 @@ ResetEdge(CLK := Reset);
 
 // RestartInhibit et ResetRequired sont volontairement conservés : un changement
 // Enable/AU ne doit jamais réautoriser automatiquement le mouvement après timeout.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
     DriveFreqRefHz := 0.0;
@@ -19744,7 +19744,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -20332,7 +20332,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);
@@ -20608,7 +20608,7 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -20776,7 +20776,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
     Busy := FALSE;
     Done := FALSE;
@@ -20896,7 +20896,7 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -21168,7 +21168,7 @@ ResetEdge(CLK := Reset);
 // ErrorId, RestartInhibit et ResetRequired ne sont jamais effacés par une perte
 // Enable/AU : celle-ci coupe uniquement les sorties. Le retour exige toujours un
 // acquittement conscient puis une nouvelle demande opérateur.
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := T#1s250ms);
     RestartDelay(IN := FALSE, PT := T#900ms);
@@ -21508,7 +21508,7 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -21822,7 +21822,7 @@ PreviousQualified := Qualified;
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
 // 🛑 1. GATE
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
     DeltaPosM := 0.0;
@@ -21956,7 +21956,7 @@ Image matérielle brute (acquis §0)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse générique : bascule atomique réel ↔ simulé du domaine Winch</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyStopOk">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
@@ -21964,13 +21964,13 @@ Image matérielle brute (acquis §0)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
 🔧 REX 2026-07-07 : précision terrain — PowerContactorEngaged_DI (retour contact auxiliaire NO)
 est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
-PAS la boucle AU elle-même (ça, c'est EmergencyChainClosed_DI, ci-dessous). Nom EmergencyStopOk
+PAS la boucle AU elle-même (ça, c'est EmergencyChainClosed_DI, ci-dessous). Nom PowerContactorEngaged
 conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
 maître du programme, car "puissance réellement présente" est la garantie la plus forte.
 🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyChain">
+            <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
@@ -22177,7 +22177,7 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
             </variable>
           </outputVars>
           <localVars>
-            <variable name="instEmergencyStopOk">
+            <variable name="instPowerContactorEngaged">
               <type>
                 <derived name="FB_Input" />
               </type>
@@ -22185,7 +22185,7 @@ Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translati
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Instances de filtrage</xhtml>
               </documentation>
             </variable>
-            <variable name="instEmergencyChain">
+            <variable name="instEmergencyChainClosed">
               <type>
                 <derived name="FB_Input" />
               </type>
@@ -22354,7 +22354,7 @@ Modifiable à chaud en vue instance, sans recompiler.</xhtml>
    MAP CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
    [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
    ┌──────────────────────────┬──────────┬─────────────────────────────────┐
-   │ EmergencyStopOk          │ [BLOQUE] │ portail maître — tout le prog.  │
+   │ PowerContactorEngaged          │ [BLOQUE] │ portail maître — tout le prog.  │
    │ TopPositionSensor        │ [BLOQUE] │ ForbidAscent M1+M2 (hors bypass)│
    │ SlackCableSwitch         │ [BLOQUE] │ ForbidDescent M2                │
    │ BrakeThermalFeedback     │ [ESCAL.] │ SafeStop + PowerCutOff (3 axes) │
@@ -22493,9 +22493,11 @@ instSimBench(
     M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
     M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
     M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
-    PowerKeepAlive_A         := GVL_Global.EmergencyArmingPulseActive,
-    PowerKeepAlive_B         := GVL_Global.EmergencyArmingLockoutActive,
-    EmergencyArming_RQ       := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
+    // 🧪 Chaîne AU sim = image des Q physiques (scan N-1, comme le terrain).
+    // ❌ Ne pas brancher Pulse/Lockout/BtnArming : ça court-circuite le FB Emergency.
+    PowerKeepAlive_A         := PowerKeepAlive_A_RQ,
+    PowerKeepAlive_B         := PowerKeepAlive_B_RQ,
+    EmergencyArming_RQ       := EmergencyArming_RQ,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
@@ -22542,18 +22544,18 @@ IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
 // ─── §1 HwIn ──► FB_Input ──► VAR_OUTPUT (Conditionnement des entrées) ───────
 
 //  🔌 HwIn.Machine.PowerContactorEngaged_DI ····· câblage réel : 1 = contacteur puissance engagé
-//         └─►[ instEmergencyStopOk 🔩 ]         ← filtre anti-rebond 20 ms
-//                └─► EmergencyStopOk ··········· [BLOQUE] TRUE = puissance présente ✅ (portail maître)
+//         └─►[ instPowerContactorEngaged 🔩 ]         ← filtre anti-rebond 20 ms
+//                └─► PowerContactorEngaged ··········· [BLOQUE] TRUE = puissance présente ✅ (portail maître)
 //                       └─► PRG_01..11 · FB_Safety_* · FB_Cycle · FB_Winch
-instEmergencyStopOk(InputRaw := HwIn.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
-EmergencyStopOk := instEmergencyStopOk.State;
+instPowerContactorEngaged(InputRaw := HwIn.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
+PowerContactorEngaged := instPowerContactorEngaged.State;
 
 //  🔌 HwIn.Machine.EmergencyChainClosed_DI ······ câblage réel : 1 = boucle AU fermée
-//         └─►[ instEmergencyChain 🔩 ]          ← filtre anti-rebond 20 ms
-//                └─► EmergencyChain ············ [BLOQUE] TRUE = boucle AU saine ✅ (précondition armement)
+//         └─►[ instEmergencyChainClosed 🔩 ]          ← filtre anti-rebond 20 ms
+//                └─► EmergencyChainClosed ············ [BLOQUE] TRUE = boucle AU saine ✅ (précondition armement)
 //                       └─► PRG_03_Safety · PRG_06_WinchControl · PRG_11_Troubleshooting
-instEmergencyChain(InputRaw := HwIn.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
-EmergencyChain := instEmergencyChain.State;
+instEmergencyChainClosed(InputRaw := HwIn.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
+EmergencyChainClosed := instEmergencyChainClosed.State;
 
 //  🔌 HwIn.Winch.M2_TensionedCable_DI ··········· câblage réel : 1 = câble tendu (NC)
 //         └─►[ instSlackCableSwitch 🔩 ]        ← filtre anti-rebond 20 ms
@@ -22723,7 +22725,7 @@ M3_StatusWord_Filtered        := HwIn.Translation.M3_StatusWord;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic EtherCAT (3 devices)</xhtml>
               </documentation>
             </variable>
-            <variable name="FB_Joystick_0">
+            <variable name="instJoystick">
               <type>
                 <derived name="FB_Joystick" />
               </type>
@@ -22789,7 +22791,7 @@ CANbus.GetBusState() brut</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 1.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; DOC/AF_Partie-08_Fonction_Joystick_v1.3.md</xhtml>
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; DOC/AF_Partie-08_Fonction_Joystick_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -22844,9 +22846,9 @@ instIhmHeartbeat(
 );
 
 // 3. Acquisition Joystick — RawX/RawY/RawButton lus depuis PRG_00_Inputs.HwIn.Operator
-FB_Joystick_0(
+instJoystick(
     Enable              := TRUE,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     Mode                := PRG_04_Modes.instModes.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
     BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
@@ -23071,7 +23073,7 @@ M2_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD2_PosValue;
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
     AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD1_Alarms,
@@ -23088,7 +23090,7 @@ instHomingM1(
     Enable               := TRUE,
     Calib                := _CalibM1,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged      := PRG_00_Inputs.PowerContactorEngaged,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
@@ -23121,7 +23123,7 @@ instEncoderScaleM1(
 instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
     AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD2_Alarms,
@@ -23138,7 +23140,7 @@ instHomingM2(
     Enable               := TRUE,
     Calib                := _CalibM2,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk      := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged      := PRG_00_Inputs.PowerContactorEngaged,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
@@ -23171,7 +23173,7 @@ instEncoderScaleM2(
 instEncoderSafetyM1(
     Enable          := TRUE,
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM1.CablePosM,
     HomingSuspect   := instHomingM1.HomingSuspect,
@@ -23184,7 +23186,7 @@ EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 instEncoderSafetyM2(
     Enable          := TRUE,
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM2.CablePosM,
     HomingSuspect   := instHomingM2.HomingSuspect,
@@ -23307,7 +23309,7 @@ instSafetyWinchM1(
     // sur un composant RÉEL protège, un composant SIMULÉ ne fait jamais défaut de lui-même).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
@@ -23334,7 +23336,7 @@ instSafetyWinchM1(
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — le joystick est désormais la SEULE source de
     // mouvement manuel (plus de boutons HMI bruts en parallèle) : le check bouton ajouté en
     // 2026-07-15 (7) pour compenser ce 2ᵉ chemin de commande est devenu sans objet, retiré.
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 0.1),
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef) &lt; 0.1),
     BenneHoldStillActive := PRG_06_WinchControl.instBucket.Busy, // Méca C — M1 doit rester immobile pendant le
                                                                      // benne ; 1 cycle de retard accepté (PRG_03
                                                                      // avant PRG_06 dans l'ordre de tâche), négligeable
@@ -23368,7 +23370,7 @@ instSafetyWinchM2(
     // 🔧 REX 2026-07-15 (2) — même simplification que M1 ci-dessus (voir bandeau instSafetyWinchM1).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
@@ -23394,7 +23396,7 @@ instSafetyWinchM2(
     FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
     BrakeFeedback          := PRG_00_Inputs.M2BrakeFeedback,
     // 🔧 REX 2026-07-19 : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus) — suppression IHM_MANU.
-    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef) &lt; 0.1),
+    JoystickYNeutral       := (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef) &lt; 0.1),
     BenneHoldStillActive := FALSE,
     // 🔧 REX 2026-07-08 (5) : BUG CORRIGÉ — oublié côté M2 lors de l'ajout initial Méca E.
     // ExpectedOtherWinchPosM valait 0.0 par défaut (non câblé) → Méca E comparait CablePosM2
@@ -23426,7 +23428,7 @@ instSafetyWinchM2(
 instSpeedMonitorM1(
     Enable                     := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged            := PRG_00_Inputs.PowerContactorEngaged,
     Mode                       := PRG_04_Modes.instModes.Mode,
     SpeedMps                   := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
@@ -23436,7 +23438,7 @@ instSpeedMonitorM1(
 instSpeedMonitorM2(
     Enable                     := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk            := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged            := PRG_00_Inputs.PowerContactorEngaged,
     Mode                       := PRG_04_Modes.instModes.Mode,
     SpeedMps                   := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
@@ -23448,7 +23450,7 @@ instSpeedMonitorM2(
 instLoadEstimatorM1(
     Enable           := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged  := PRG_00_Inputs.PowerContactorEngaged,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M1MeasuredSpeed_Mps,
@@ -23459,7 +23461,7 @@ instLoadEstimatorM1(
 instLoadEstimatorM2(
     Enable           := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk  := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged  := PRG_00_Inputs.PowerContactorEngaged,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M2MeasuredSpeed_Mps,
@@ -23477,7 +23479,7 @@ instSafetyTranslationM3(
     // InhibitM1/M2) : Enable inconditionnel, comme en Auto.
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
@@ -23590,7 +23592,7 @@ END_IF;
 instModes(
     Enable              := TRUE,
     Reset               := GVL_IHM.Modes.Cmd.BtnModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     SelMode         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
     SelSyncEnable   := GVL_Modes_Stub.SyncEnableRequest_IHM,
     InhibitM1Request    := GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
@@ -23728,8 +23730,8 @@ CmdAbortCycle_IHM := GVL_IHM.Cycle.Cmd.BtnAbort;
 CmdResetCycle_IHM := GVL_IHM.Cycle.Cmd.BtnReset;
 SetDepthM      := GVL_IHM.Cycle.Cfg.SetDepth_M;
 SetOffsetM     := GVL_IHM.Cycle.Cfg.SetOffset_M;
-CycleMotionPermit := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                     AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+CycleMotionPermit := PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                     AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop;
 
 // Appel du séquenceur de cycle principal avec tous ses raccordements
 instCycle(
@@ -23739,7 +23741,7 @@ instCycle(
     CycleMotionPermit   := CycleMotionPermit,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     
     StartCycle          := CmdStartCycle_IHM,
     PauseCycle          := CmdPauseCycle_IHM,
@@ -24136,11 +24138,11 @@ ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).</xhtml>
 // 🎯 Source unique : joystick OU boutons IHM. En mode boutons, seule la commande
 // commune Both est compatible avec une assistance qui exige les deux treuils synchronisés.
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    MaintenanceMotionDirection := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-    MaintenanceMotionRequestActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
-                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+    MaintenanceMotionDirection := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
+    MaintenanceMotionRequestActive := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
+                                     AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                      AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3);
-    MaintenanceMotionSpeed_Pct := ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef);
+    MaintenanceMotionSpeed_Pct := ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
         MaintenanceMotionDirection := 1;
@@ -24150,14 +24152,14 @@ ELSE
         MaintenanceMotionDirection := 0;
     END_IF;
     MaintenanceMotionRequestActive := (MaintenanceMotionDirection &lt;&gt; 0)
-                                     AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+                                     AND PRG_01_Diagnostics.instJoystick.DeadmanArmed;
     MaintenanceMotionSpeed_Pct := 100.0;
 END_IF;
 
 // 🪨 L'attestation manuelle est une preuve temporaire, distincte du Kobold.
 // Elle est consommée à l'entrée extraction et annulée dès qu'un mouvement la rend caduque.
 IF NOT (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
-   OR NOT PRG_00_Inputs.EmergencyStopOk
+   OR NOT PRG_00_Inputs.PowerContactorEngaged
    OR PRG_09_Supervision.FaultMachineReset_IHM
    OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
    OR _BucketState.IsOpen THEN
@@ -24169,7 +24171,7 @@ instDiveSearch(
     Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode := PRG_04_Modes.instModes.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
@@ -24190,7 +24192,7 @@ instExtractionSequence(
     Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode := PRG_04_Modes.instModes.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
@@ -24240,7 +24242,7 @@ instBucket(
                            AND PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable
                            AND PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable, // 🆕 Sécurisé : nécessite les deux codeurs valides et M2 non-inhibé
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
@@ -24293,12 +24295,12 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
     M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop
-                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
+                            AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                            AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
     M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
-                               ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
+                               ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef));
 ELSE
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01,
     // réouverture documentée T40) : le joystick n'est plus la SEULE source —
@@ -24316,14 +24318,14 @@ ELSE
     // 🔧 REX 2026-07-08 (5) : Direction assignée AVANT StartStop (nécessaire pour le gate directionnel ci-dessous).
     IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Source = joystick (comportement historique, inchangé)
-        M1_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-        M1_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop AND NOT instBucket.Busy
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+        M1_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
+        M1_StartStop_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop AND NOT instBucket.Busy
+                                AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                 AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
                                      OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
-        M1_SpeedRef_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+        M1_SpeedRef_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
     ELSE
         // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
         // Remplacent l'ancien sélecteur JoystickWinchSelectArbitrated.
@@ -24336,7 +24338,7 @@ ELSE
             M1_Direction_Active := 0;
         END_IF;
         M1_StartStop_Active := (M1_Direction_Active &lt;&gt; 0) AND NOT instBucket.Busy
-                                AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                AND (PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                      OR GVL_IHM.M1TreuilRetenue.Bypass.Global)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
@@ -24357,12 +24359,12 @@ ELSE
         // 🛡️ Même garde homme-mort que M1 : le cycle ne poursuit jamais un mouvement
         // après relâchement du joystick.
         M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop
-                                AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                                AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
+                                AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                                AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
         M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
-                                   ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef));
+                                   ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef));
     ELSE
         // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01) :
         // idem M1 (voir bandeau branche M1 ci-dessus) — GVL_IHM.Modes.Cmd.TglJoystickMaster bascule la
@@ -24378,14 +24380,14 @@ ELSE
         // directement car SignedDeltaPosM est déjà dans SON référentiel). Même inversion appliquée
         // à la branche boutons IHM ci-dessous (BtnUp M2 = Direction -1, RATTRAPE si M1 en retard).
         IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-            M2_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.Direction;
-            M2_StartStop_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop
-                                    AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+            M2_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
+            M2_StartStop_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
+                                    AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                     AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
                                          OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1))); // 🔧 REX 2026-07-08 (7)
-            M2_SpeedRef_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+            M2_SpeedRef_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
         ELSE
             // 🆕 Source = boutons IHM maintenus (WINCH-BTN-01) — BtnUp M2 = enroulage/montée (+1),
             // 🆕 Source = boutons IHM maintenus — pilotage direct par 6 boutons (M1 Up/Down, M2 Up/Down, Both Up/Down)
@@ -24398,7 +24400,7 @@ ELSE
                 M2_Direction_Active := 0;
             END_IF;
             M2_StartStop_Active := (M2_Direction_Active &lt;&gt; 0)
-                                    AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                                    AND (PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                          OR GVL_IHM.M2TreuilBenne.Bypass.Global)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
@@ -24434,7 +24436,7 @@ END_IF;
 
 // ── 3ter. COUPURE IMMÉDIATE M1/M2 AU SCAN EXACT DE FIN DE CYCLE BENNE ─────
 // 🆕 REX 2026-07-08 : instBucket est appelé en premier (§0), donc son Busy est frais dans CE scan
-// (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de FB_Joystick_0 (PRG_01),
+// (voir §1/§2 ci-dessus) — mais AxisCmdY.StartStop/Direction viennent de instJoystick (PRG_01),
 // calculé AVANT ce scan de PRG_06. Le désarmement homme-mort sur front descendant de Benne.Busy
 // (FB_Joystick §4ter-ter) ne prend donc effet qu'au scan SUIVANT (~10ms de retard structurel). Si
 // l'opérateur tient encore le manche poussé au moment exact où le benne termine, M1 ET M2
@@ -24463,7 +24465,7 @@ instWinchSync(
                         AND NOT (ForbidAscentM1_Active OR ForbidAscentM2_Active
                                  OR ForbidDescentM1_Active OR ForbidDescentM2_Active), // 🆕 REX 2026-07-08 (7)
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM1      := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CablePosM2      := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
@@ -24627,7 +24629,7 @@ instWinchM1(
                                AND (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE)
                                AND NOT PRG_04_Modes.instModes.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M1_StartStop_Active,
     SafeStop                := SafeStopM1_Active,
@@ -24672,7 +24674,7 @@ instWinchM2(
                                AND (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE)
                                AND NOT PRG_04_Modes.instModes.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M2_StartStop_Active,
     SafeStop                := SafeStopM2_Active,
@@ -24714,7 +24716,7 @@ instWinchM2(
 // aucune commande autorisée ne sont produites dans ce programme.
 WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM1FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-WinchM1FinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 WinchM1FinalInterlockRequest.BrakeReleaseRequest := instWinchM1.BrakeCmd;
 WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
@@ -24729,7 +24731,7 @@ WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 
 WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM2FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-WinchM2FinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
 WinchM2FinalInterlockRequest.BrakeReleaseRequest := instWinchM2.BrakeCmd;
 WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
@@ -24844,10 +24846,10 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
     M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
-                            AND PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
-                            AND PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
+                            AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
+                            AND PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop;
     M3_SpeedRef_Active   := MIN(_TranslationAutoSpeedCap_Pct,
-                                ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef));
+                                ABS(PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef));
 
     // Détermination automatique du sens de marche selon la cible :
     // - Trémie (cible 1) = Marche Avant (Direction := 1)
@@ -24879,7 +24881,7 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;  // → Maintenance (-1)
     ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
+        M3_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdX.Direction;
     ELSE
         // Boutons sélectionnés sans BtnFwd/BtnRev : jamais de reprise joystick implicite.
         M3_Direction_Active := 0;
@@ -24889,10 +24891,10 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
     // permettaient un mouvement M3 sans homme-mort (écart relevé par la revue de sécurité).
     // 🌐 Bypass.Global = TRUE → ignore la condition homme-mort (test/simulation)
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
-                           AND (PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed
+                           AND (PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                 OR GVL_IHM.TranslationM3.Bypass.Global)
                            AND (NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
-                                OR PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop);
+                                OR PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop);
 
     // 🎯 Vitesse : conserve GVL_IHM.TranslationM3.Cmd.SetFreq_Hz (consigne Hz réglable opérateur,
     // limitée par PRG_10_Outputs_LD à _TranslationMaxFreq_Hz) comme cible pleine échelle — identique
@@ -24905,14 +24907,14 @@ ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
                   30.0); // défaut 30% si SetFreq_Hz non renseigné
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
                               FreqPct,
-                              (ABS(PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
+                              (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef) / 100.0) * FreqPct);
 ELSE
     // Mode Manuel/Maintenance : Consignes issues du Joystick et sélecteur HMI
     M3_PositioningActive := FALSE;
     SelTarget    := StubTranslationPositionSelect_IHM;
-    M3_StartStop_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.StartStop;
-    M3_Direction_Active  := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.Direction;
-    M3_SpeedRef_Active   := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+    M3_StartStop_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop;
+    M3_Direction_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdX.Direction;
+    M3_SpeedRef_Active   := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
 END_IF;
 
 // 🔄 Inversion de sens IHM (mise en service)
@@ -24946,7 +24948,7 @@ instTranslationM3(
     Enable                  := PRG_06_WinchControl.StubMachineEnableN1
                                AND (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := PRG_03_Safety.instSafetyTranslationM3.SafeStop,
@@ -24972,7 +24974,7 @@ instTranslationM3(
 // FB_Translation (rampe rapide) et n'est jamais une coupure sèche ici.
 TranslationFinalInterlockRequest.Enable := PRG_06_WinchControl.StubMachineEnableN1;
 TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-TranslationFinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
@@ -25483,7 +25485,7 @@ GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_00_Inputs.M3BrakeFeedbac
 GVL_IHM.TranslationM3.State.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
 GVL_IHM.TranslationM3.State.PositionReached      := PRG_07_TranslationControl.M3_PositioningActive
                                                 AND PRG_07_TranslationControl.instTranslationM3.TargetReached;
-GVL_IHM.TranslationM3.State.JoystickDeflection_Pct := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+GVL_IHM.TranslationM3.State.JoystickDeflection_Pct := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
 // 🧭 Position validée IHM : masquée (forcée à FALSE) si le mot capteurs est incohérent (position indéterminée)
 IF PRG_00_Inputs.instPositionDecoder.Incoherent THEN
     GVL_IHM.TranslationM3.State.PositionTremie      := FALSE;
@@ -25579,29 +25581,29 @@ GVL_IHM.Cycle.State.WinchSyncError       := PRG_06_WinchControl.instWinchSync.Er
 GVL_IHM.Cycle.State.WinchSyncDelta_M     := PRG_06_WinchControl.instWinchSync.DeltaPosM;
 GVL_IHM.Cycle.State.M1Position_M         := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M         := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
-GVL_IHM.Cycle.State.DeadmanArmed         := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
-GVL_IHM.Cycle.State.JoystickMotionActive := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.StartStop;
+GVL_IHM.Cycle.State.DeadmanArmed         := PRG_01_Diagnostics.instJoystick.DeadmanArmed;
+GVL_IHM.Cycle.State.JoystickMotionActive := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop;
 GVL_IHM.Cycle.State.MotionPermit         := PRG_05_Cycle.CycleMotionPermit;
 
 
 // ── 10. MAPPING ÉTATS JOYSTICK → IHM ─────────────────────────────────────
-GVL_IHM.JOY1Joystick.State.RawX         := PRG_01_Diagnostics.FB_Joystick_0.RawX;
-GVL_IHM.JOY1Joystick.State.RawY         := PRG_01_Diagnostics.FB_Joystick_0.RawY;
-GVL_IHM.JOY1Joystick.State.RawButton    := PRG_01_Diagnostics.FB_Joystick_0.RawButton;
-GVL_IHM.JOY1Joystick.State.AxisCmdX     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX;
-GVL_IHM.JOY1Joystick.State.AxisCmdY     := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY;
-GVL_IHM.JOY1Joystick.State.NeutralXAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralXAct;
-GVL_IHM.JOY1Joystick.State.NeutralYAct  := PRG_01_Diagnostics.FB_Joystick_0.NeutralYAct;
-GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_01_Diagnostics.FB_Joystick_0.DeadmanArmed;
+GVL_IHM.JOY1Joystick.State.RawX         := PRG_01_Diagnostics.instJoystick.RawX;
+GVL_IHM.JOY1Joystick.State.RawY         := PRG_01_Diagnostics.instJoystick.RawY;
+GVL_IHM.JOY1Joystick.State.RawButton    := PRG_01_Diagnostics.instJoystick.RawButton;
+GVL_IHM.JOY1Joystick.State.AxisCmdX     := PRG_01_Diagnostics.instJoystick.AxisCmdX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY     := PRG_01_Diagnostics.instJoystick.AxisCmdY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct  := PRG_01_Diagnostics.instJoystick.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct  := PRG_01_Diagnostics.instJoystick.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_01_Diagnostics.instJoystick.DeadmanArmed;
 GVL_IHM.JOY1Joystick.State.Online       := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational  := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.State.Error        := PRG_01_Diagnostics.FB_Joystick_0.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.FB_Joystick_0.ErrorId;
+GVL_IHM.JOY1Joystick.State.Error        := PRG_01_Diagnostics.instJoystick.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.instJoystick.ErrorId;
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
 GVL_IHM.Modes.State.CurrentMode     := PRG_04_Modes.instModes.Mode;
-GVL_IHM.Modes.State.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+GVL_IHM.Modes.State.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 
 
 // ── 12. MAPPING DIAGNOSTICS BUS → IHM ────────────────────────────────────
@@ -25832,7 +25834,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                     <connection refLocalId="17" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="EmergencyStopOk">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="19" />
                   </connectionPointIn>
@@ -25923,7 +25925,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_06_WinchControl.WinchM1FinalInterlockRequest.EmergencyStopOk</variable>
+              <variable>PRG_06_WinchControl.WinchM1FinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
             <contact localId="21" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -26043,7 +26045,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                     <connection refLocalId="57" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="EmergencyStopOk">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="59" />
                   </connectionPointIn>
@@ -26134,7 +26136,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_06_WinchControl.WinchM2FinalInterlockRequest.EmergencyStopOk</variable>
+              <variable>PRG_06_WinchControl.WinchM2FinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
             <contact localId="61" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -26254,7 +26256,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                     <connection refLocalId="97" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="EmergencyStopOk">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="99" />
                   </connectionPointIn>
@@ -26315,7 +26317,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_07_TranslationControl.TranslationFinalInterlockRequest.EmergencyStopOk</variable>
+              <variable>PRG_07_TranslationControl.TranslationFinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
             <contact localId="101" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -27410,7 +27412,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                 <connection refLocalId="501" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_00_Inputs.EmergencyStopOk</variable>
+              <variable>PRG_00_Inputs.PowerContactorEngaged</variable>
             </contact>
             <contact localId="505" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -27418,7 +27420,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
                 <connection refLocalId="503" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_00_Inputs.EmergencyChain</variable>
+              <variable>PRG_00_Inputs.EmergencyChainClosed</variable>
             </contact>
             <coil localId="507" negated="false" storage="none">
               <position x="0" y="0" />
@@ -27533,12 +27535,12 @@ Demande de coupure de puissance</xhtml>
                     <connection refLocalId="551" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="EmergencyChain">
+                <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
                     <connection refLocalId="553" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="EmergencyStopOk">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="555" />
                   </connectionPointIn>
@@ -27584,7 +27586,7 @@ Demande de coupure de puissance</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_00_Inputs.EmergencyChain</variable>
+              <variable>PRG_00_Inputs.EmergencyChainClosed</variable>
             </contact>
             <contact localId="555" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -27592,7 +27594,7 @@ Demande de coupure de puissance</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_00_Inputs.EmergencyStopOk</variable>
+              <variable>PRG_00_Inputs.PowerContactorEngaged</variable>
             </contact>
             <contact localId="557" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -28683,7 +28685,7 @@ instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonM
     M1BrakeApplied := PRG_00_Inputs.M1BrakeFeedback, M2BrakeApplied := PRG_00_Inputs.M2BrakeFeedback, M3BrakeApplied := PRG_00_Inputs.M3BrakeFeedback,
     M1ContactorsReleased := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff, M2ContactorsReleased := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff, M1ThermalOk := PRG_00_Inputs.M1ThermalFeedback, M2ThermalOk := PRG_00_Inputs.M2ThermalFeedback,
     BrakeThermalOk := PRG_00_Inputs.BrakeThermalFeedback, PhaseRotationOk := PRG_00_Inputs.PhaseRotationOk, SlackCableTensioned := PRG_00_Inputs.SlackCableSwitch, M3SensorWordIncoherent := PRG_00_Inputs.instPositionDecoder.Incoherent,
-    EmergencyChain := PRG_00_Inputs.EmergencyChain, EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
+    EmergencyChainClosed := PRG_00_Inputs.EmergencyChainClosed, PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1 := PRG_02_Encoders.instHomingM1.Homed, HomedM2 := PRG_02_Encoders.instHomingM2.Homed,
     M1PositionInBounds := (PRG_02_Encoders.instEncoderScaleM1.CablePosM &gt;= -99.0) AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM &lt;= 99.0), M2PositionInBounds := (PRG_02_Encoders.instEncoderScaleM2.CablePosM &gt;= -99.0) AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= 99.0));
 instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
@@ -28695,14 +28697,14 @@ instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
     Config := _WinchSymmetryCfgPersist, Data := _WinchSymmetryDataPersist);
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive             := PRG_04_Modes.instModes.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled      := GVL_Simulation.SimulationModeActive;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.FB_Joystick_0.Ready;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk         := PRG_01_Diagnostics.instJoystick.Ready;
 
 GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected       := (PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.MAINT_N1 AND PRG_04_Modes.instModes.Mode &lt;&gt; E_Mode.MAINT_N2);
 GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal    := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm OR GVL_IHM.M2TreuilBenne.Bypass.OperatorComm OR GVL_IHM.TranslationM3.Bypass.Global;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal    := GVL_IHM.Commun.Bypass.TopPositionSensor OR GVL_IHM.Commun.Bypass.SlackCable OR GVL_IHM.TranslationM3.Bypass.LimitSwitch;
 
-GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx302_EmergencyStopOk        := PRG_00_Inputs.EmergencyStopOk;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChainClosed;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged  := PRG_00_Inputs.PowerContactorEngaged;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny       := PRG_03_Safety.instSafetyWinchM1.SafeStop OR PRG_03_Safety.instSafetyWinchM2.SafeStop OR PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny   := PRG_03_Safety.instSafetyWinchM1.PowerCutOff OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 
@@ -28715,11 +28717,11 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M         := PRG_02
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx102_M2_CablePos_M         := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx103_SyncDelta_M           := PRG_06_WinchControl.instWinchSync.DeltaPosM;
 
-GVL_Troubleshooting.LevageSynchroniseM1M2.Idx201_JoyYRaw_Pct           := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx201_JoyYRaw_Pct           := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM       := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx203_ArbitratedSpeed_Pct   := PRG_06_WinchControl.M1_SpeedRef_Active;
 
-GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx302_SyncFaultActive       := PRG_06_WinchControl.instWinchSync.Error;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx303_M1_ForbidAscent       := PRG_03_Safety.instSafetyWinchM1.ForbidAscent;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx304_M2_ForbidAscent       := PRG_03_Safety.instSafetyWinchM2.ForbidAscent;
@@ -28740,8 +28742,8 @@ GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI  :=
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied           := PRG_00_Inputs.M1BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M1ThermalFeedback;
 
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct:= PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.instJoystick.RawY;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct:= PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp   := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct      := PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct;
@@ -28750,7 +28752,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm   :=
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct  := PRG_06_WinchControl.M1_SpeedRef_Active;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection  := PRG_06_WinchControl.M1_Direction_Active;
 
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive         := PRG_03_Safety.instSafetyWinchM1.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive      := PRG_03_Safety.instSafetyWinchM1.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI   := PRG_00_Inputs.TopPositionSensor;
@@ -28787,8 +28789,8 @@ GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI  :=
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied           := PRG_00_Inputs.M2BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI           := PRG_00_Inputs.M2ThermalFeedback;
 
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.FB_Joystick_0.RawY;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct:= PRG_01_Diagnostics.FB_Joystick_0.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.instJoystick.RawY;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct:= PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp   := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := GVL_IHM.M2TreuilBenne.Cmd.BtnDown;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct      := PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct;
@@ -28797,7 +28799,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm   :=
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct  := PRG_06_WinchControl.M2_SpeedRef_Active;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection  := PRG_06_WinchControl.M2_Direction_Active;
 
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed   := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive         := PRG_03_Safety.instSafetyWinchM2.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive      := PRG_03_Safety.instSafetyWinchM2.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI   := PRG_00_Inputs.TopPositionSensor;
@@ -28836,7 +28838,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen             :=
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose            := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open              := PRG_05_Cycle.instCycle.CmdBucket_Open;
 
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed       := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed       := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive          := PRG_06_WinchControl.instBucket.Error;
 
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy                 := PRG_06_WinchControl.instBucket.Busy;
@@ -28855,8 +28857,8 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := 
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_00_Inputs.M3_StatusWord_Filtered;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_00_Inputs.M3BrakeFeedback;
 
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.FB_Joystick_0.RawX;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.FB_Joystick_0.AxisCmdX.SpeedRef;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.instJoystick.RawX;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd        := GVL_IHM.TranslationM3.Cmd.BtnFwd;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev        := GVL_IHM.TranslationM3.Cmd.BtnRev;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition    := GVL_IHM.TranslationM3.Cmd.SelTarget;
@@ -28865,7 +28867,7 @@ GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive           :
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive  := GVL_IHM.TranslationM3.Bypass.Global;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := PRG_07_TranslationControl.M3_SpeedRef_Active;
 
-GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChain;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed  := PRG_00_Inputs.EmergencyChainClosed;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive        := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx303_PowerCutOffActive     := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := PRG_03_Safety.instSafetyTranslationM3.ErrorLimitSwitch;
@@ -29095,7 +29097,7 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
                 <simpleValue value="TRUE" />
               </initialValue>
             </variable>
-            <variable name="EmergencyStopOkRequest">
+            <variable name="PowerContactorEngagedRequest">
               <type>
                 <BOOL />
               </type>
@@ -29421,7 +29423,7 @@ WinchBusinessTable.P5R1 := TRUE;  WinchBusinessTable.P5R2 := TRUE;
 WinchBusinessTable.P5R3 := TRUE;  WinchBusinessTable.P5R4 := TRUE;
 WinchBusinessTable.StepThreshold_Pct := [10.0, 20.0, 30.0, 40.0, 100.0];
 WinchBusiness(
-    Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     StartStop := TRUE, SafeStop := FALSE, ForbidDescent := FALSE, ForbidAscent := FALSE,
     Direction := 1, SpeedRefPct := 100.0, SpeedStepTable := WinchBusinessTable,
     FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
@@ -29448,7 +29450,7 @@ WinchBusinessTestPassed := (WinchBusiness.StepNumber = 5)
 InterlockM1(
     Enable := EnableRequest,
     Reset := ResetRequest,
-    EmergencyStopOk := EmergencyStopOkRequest,
+    PowerContactorEngaged := PowerContactorEngagedRequest,
     SafeStop := SafeStopRequest,
     BrakeReleaseRequest := (RequestedStepM1 &gt; 0),
     BrakeCommandOpenConfirmed := BrakeConfirmed,
@@ -29464,7 +29466,7 @@ InterlockM1(
 InterlockM2(
     Enable := EnableRequest,
     Reset := ResetRequest,
-    EmergencyStopOk := EmergencyStopOkRequest,
+    PowerContactorEngaged := PowerContactorEngagedRequest,
     SafeStop := SafeStopRequest,
     BrakeReleaseRequest := (RequestedStepM2 &gt; 0),
     BrakeCommandOpenConfirmed := BrakeConfirmed,
@@ -29484,7 +29486,7 @@ InterlockM2(
 InterlockM3(
     Enable := EnableRequest,
     Reset := ResetRequest,
-    EmergencyStopOk := EmergencyStopOkRequest,
+    PowerContactorEngaged := PowerContactorEngagedRequest,
     SafeStop := SafeStopRequest,
     BrakeReleaseRequest := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2),
     BrakeCommandOpenConfirmed := BrakeConfirmed,
@@ -29495,7 +29497,7 @@ InterlockM3(
 
 // Intégration réelle M3 : production par FB_Translation, puis filtre final _LD.
 TranslationIntegration(
-    Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     StartStop := (ScenarioStep &gt;= 110) AND (ScenarioStep &lt; 130),
     SafeStop := TranslationIntegrationSafeStop, Direction := 1, SpeedRefPct := 50.0,
     PositionSensorTarget := FALSE, SlowdownSensor := FALSE,
@@ -29506,7 +29508,7 @@ TranslationIntegration(
     DriveFreqScaleMaxHz := 60.0
 );
 TranslationIntegrationInterlock(
-    Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE,
+    Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
     SafeStop := TranslationIntegrationSafeStop,
     BrakeReleaseRequest := TranslationIntegration.BrakeReleaseRequest,
     BrakeCommandOpenConfirmed := TranslationIntegration.BrakeReleaseRequest,
@@ -29558,15 +29560,15 @@ CASE ScenarioStep OF
         M2EnableLatchHeldOk := InterlockM2.Error AND InterlockM2.RestartInhibit
                                AND NOT InterlockM2.BrakeCmd AND (InterlockM2.AuthorizedStep = 0);
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 12;
 
-    12: // Cas 2 séparé : les deux latch timeout survivent à EmergencyStopOk=FALSE.
+    12: // Cas 2 séparé : les deux latch timeout survivent à PowerContactorEngaged=FALSE.
         M1EmergencyStopLatchHeldOk := InterlockM1.Error AND InterlockM1.RestartInhibit
                                       AND NOT InterlockM1.BrakeCmd AND (InterlockM1.AuthorizedStep = 0);
         M2EmergencyStopLatchHeldOk := InterlockM2.Error AND InterlockM2.RestartInhibit
                                       AND NOT InterlockM2.BrakeCmd AND (InterlockM2.AuthorizedStep = 0);
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         BrakeConfirmed := TRUE; // Cause disparue seulement après les deux gates.
         RequestedStepM1 := 0;
         RequestedStepM2 := 0;
@@ -29624,12 +29626,12 @@ CASE ScenarioStep OF
         StopGateOk := StopGateOk AND NOT InterlockM1.BrakeCmd AND NOT InterlockM2.BrakeCmd
                       AND (InterlockM1.AuthorizedStep = 0) AND (InterlockM2.AuthorizedStep = 0);
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 62;
-    62: // EmergencyStopOk coupe immédiatement puissance/frein.
+    62: // PowerContactorEngaged coupe immédiatement puissance/frein.
         StopGateOk := StopGateOk AND NOT InterlockM1.BrakeCmd AND NOT InterlockM2.BrakeCmd
                       AND (InterlockM1.AuthorizedStep = 0) AND (InterlockM2.AuthorizedStep = 0);
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         SafeStopRequest := TRUE;
         ScenarioStep := 63;
     63: // SafeStop ne coupe pas l'interlock : la rampe rapide reste métier.
@@ -29654,14 +29656,14 @@ CASE ScenarioStep OF
                                AND (InterlockM3.DriveControlWord = 0)
                                AND (InterlockM3.DriveFreqRefHz = 0.0) AND NOT InterlockM3.BrakeCmd;
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 92;
 
-    92: // Timeout M3 persiste pendant EmergencyStopOk=FALSE, sorties sûres.
+    92: // Timeout M3 persiste pendant PowerContactorEngaged=FALSE, sorties sûres.
         M3EmergencyStopLatchHeldOk := InterlockM3.Error AND InterlockM3.RestartInhibit
                                       AND (InterlockM3.DriveControlWord = 0)
                                       AND (InterlockM3.DriveFreqRefHz = 0.0) AND NOT InterlockM3.BrakeCmd;
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         BrakeConfirmed := TRUE; // Cause disparue après les deux gates.
         ScenarioStep := 95;
 
@@ -29692,13 +29694,13 @@ CASE ScenarioStep OF
                            AND (InterlockM3.DriveFreqRefHz = 0.0)
                            AND NOT InterlockM3.BrakeCmd;
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 101;
-    101: // M3 EmergencyStopOk=FALSE : mot, fréquence et frein en position sûre.
+    101: // M3 PowerContactorEngaged=FALSE : mot, fréquence et frein en position sûre.
         M3EmergencyStopGateOk := (InterlockM3.DriveControlWord = 0)
                                   AND (InterlockM3.DriveFreqRefHz = 0.0)
                                   AND NOT InterlockM3.BrakeCmd;
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         ScenarioStep := 110;
 
     110: // FB_Translation réel : attendre une fréquence amont et finale non nulles.
@@ -29935,19 +29937,19 @@ ELSE
 END_IF;
 
 DiveValid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := DiveMotion, MotionDirection := -1, BucketIsOpen := TRUE,
     KoboldImmersed := DiveKobold, M1Position_M := DivePosition_M, M2Position_M := DivePosition_M,
     PositionsValid := TRUE, DiveStartMin_M := 1.0, ImmersionUpper_M := 0.5, ImmersionLower_M := -0.5
 );
 DiveInvalid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := InvalidMotion, MotionDirection := -1, BucketIsOpen := TRUE,
     KoboldImmersed := InvalidKobold, M1Position_M := InvalidPosition_M, M2Position_M := InvalidPosition_M,
     PositionsValid := TRUE, DiveStartMin_M := 1.0, ImmersionUpper_M := 0.5, ImmersionLower_M := -0.5
 );
 ExtractionValid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := ExtractionMotion, MotionDirection := 1, BottomPositionConfirmed := TRUE,
     BucketIsClosed := ExtractionClosed, BucketBusy := ExtractionBusy, BucketError := FALSE,
     WinchSyncError := FALSE, M1Position_M := ExtractionPos_M, M2Position_M := ExtractionPos_M,
@@ -29955,7 +29957,7 @@ ExtractionValid(
     ControlAscentDistance_M := 2.0
 );
 ExtractionInvalid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := FALSE, MotionDirection := 0, BottomPositionConfirmed := FALSE,
     BucketIsClosed := FALSE, BucketBusy := FALSE, BucketError := FALSE, WinchSyncError := FALSE,
     M1Position_M := 0.0, M2Position_M := 0.0, M1MeasuredSpeedValid := TRUE,

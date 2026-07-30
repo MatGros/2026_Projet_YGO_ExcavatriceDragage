@@ -41,10 +41,10 @@ Commentaire header de `ST_EmergencyManagementCmd.st` dit encore `ST_EmergencyCha
 | Signal | Type | Sens vérifié |
 |---|---|---|
 | `Enable` | BOOL | Gate : `FALSE` ⇒ Logic neutralise + Output force sorties `FALSE`. Instance : `TRUE` fixe. |
-| `Reset` | BOOL | Front interne (`R_TRIG`) : acquitte `RedundancyTestFailed` ; acquitte `EmergencyArmingFailed` **seulement si** `EmergencyStopOk=TRUE`. |
+| `Reset` | BOOL | Front interne (`R_TRIG`) : acquitte `RedundancyTestFailed` ; acquitte `EmergencyArmingFailed` **seulement si** `PowerContactorEngaged=TRUE`. |
 | `ArmRequest` | BOOL | Front interne : démarre séquence si preconditions. Source : `GVL_IHM.Modes.Cmd.BtnEmergencyArming`. |
-| `EmergencyChain` | BOOL | Boucle AU saine (précondition armement + critère auto-test). Source : `PRG_00_Inputs.EmergencyChain`. |
-| `EmergencyStopOk` | BOOL | Contacteur engagé (portail maître + confirmation armement). Source : `PRG_00_Inputs.EmergencyStopOk`. |
+| `EmergencyChainClosed` | BOOL | Boucle AU saine (précondition armement + critère auto-test). Source : `PRG_00_Inputs.EmergencyChainClosed`. |
+| `PowerContactorEngaged` | BOOL | Contacteur engagé (portail maître + confirmation armement). Source : `PRG_00_Inputs.PowerContactorEngaged`. |
 | `PowerCutOffRequest` | BOOL | Demande coupure métier agrégée. Source : OR des 3 `FB_Safety_*.PowerCutOff` dans `PRG_10`. |
 | `BtnEmergencyCutOff` | BOOL | Coupure IHM maintenue (ouvre A et B). Source : `GVL_IHM.Modes.Cmd.BtnEmergencyCutOff`. |
 
@@ -54,7 +54,7 @@ Commentaire header de `ST_EmergencyManagementCmd.st` dit encore `ST_EmergencyCha
 |---|---|---|
 | `Ready` | BOOL | `= Enable` (pas de notion Ready métier riche). |
 | `Busy` | BOOL | `ArmingSeqStep <> 0`. |
-| `Done` | BOOL | `= EmergencyStopOk` (contacteur engagé). |
+| `Done` | BOOL | `= PowerContactorEngaged` (contacteur engagé). |
 | `Error` | BOOL | `ErrorId <> 0`. |
 | `ErrorId` | WORD | bit0 `RedundancyTestFailed`, bit1 `EmergencyArmingFailed`. |
 | `PowerCutOff_A_RQ` | BOOL | **Fail-safe maintien** : `TRUE` = voie A maintenue/OK ; `FALSE` = ouverture. |
@@ -83,21 +83,21 @@ Commentaire header de `ST_EmergencyManagementCmd.st` dit encore `ST_EmergencyCha
 | F02 | Maintien fail-safe A/B | VERIFIE | `Cmd.PowerCutOff_* := NOT PowerCutOffRequest AND NOT ForceTest* AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed`. |
 | F03 | Coupure métier `PowerCutOffRequest` | VERIFIE | Ouvre A **et** B tant que TRUE. |
 | F04 | Coupure IHM `BtnEmergencyCutOff` | VERIFIE | Ouvre A **et** B tant que TRUE (niveau, pas front). |
-| F05 | Auto-test redondance A puis B | VERIFIE | Étapes 1–4, 200 ms chacune ; si `EmergencyChain` reste TRUE pendant coupe d'un canal ⇒ `RedundancyTestFailed`. |
+| F05 | Auto-test redondance A puis B | VERIFIE | Étapes 1–4, 200 ms chacune ; si `EmergencyChainClosed` reste TRUE pendant coupe d'un canal ⇒ `RedundancyTestFailed`. |
 | F06 | Impulsion réarmement 1 s | VERIFIE | Étape 5 : `EmergencyArming_Cmd` TRUE pendant `T#1s`. |
-| F07 | Confirmation contacteur 2 s | VERIFIE | Étape 6 : succès si `EmergencyStopOk` ; sinon latch fail + lockout. |
+| F07 | Confirmation contacteur 2 s | VERIFIE | Étape 6 : succès si `PowerContactorEngaged` ; sinon latch fail + lockout. |
 | F08 | Lockout 5 s après fail armement | VERIFIE | `TonArmingLockout` ; bloque nouveau départ séquence. |
-| F09 | Déclenchement armement sur front seulement | VERIFIE | `ArmReqEdge` + step=0 + `EmergencyChain` + NOT lockout + NOT `EmergencyStopOk`. |
+| F09 | Déclenchement armement sur front seulement | VERIFIE | `ArmReqEdge` + step=0 + `EmergencyChainClosed` + NOT lockout + NOT `PowerContactorEngaged`. |
 | F10 | Pas d'auto-réarmement | VERIFIE | Aucun chemin sans front `ArmRequest`. |
 | F11 | Reset `RedundancyTestFailed` sur front | VERIFIE | Sans condition contacteur. |
-| F12 | Reset `EmergencyArmingFailed` conditionnel | VERIFIE | Front Reset **et** `EmergencyStopOk=TRUE`. |
+| F12 | Reset `EmergencyArmingFailed` conditionnel | VERIFIE | Front Reset **et** `PowerContactorEngaged=TRUE`. |
 | F13 | Agrégation demandes PowerCutOff domaines | VERIFIE | `PRG_10` : OR M1/M2/M3 safety — **hors** FB (câblage appelant). |
 | F14 | Publication sorties physiques | VERIFIE | `PowerKeepAlive_A/B_RQ := PowerCutOff_A/B_RQ` ; `EmergencyArming_RQ`. |
 | F15 | Publication GVL_Global états armement | VERIFIE | Pulse, Lockout, ArmingSeqStep (pas Failed/Redundancy). |
 | F16 | Simulation chaîne + contacteur | VERIFIE | `FB_Sim_Safety` : chain = A AND B AND NOT BtnAU ; latch contacteur sur pulse arming. |
-| F17 | Filtrage E/S acquisition | VERIFIE | `PRG_00` : `PowerContactorEngaged_DI` → `EmergencyStopOk` ; `EmergencyChainClosed_DI` → `EmergencyChain` (anti-rebond 20 ms). |
-| F18 | Portail `EmergencyStopOk` vers métiers | VERIFIE | Consommé par Modes, Cycle, Safety domaines, Winch, Translation, Encoders, Joystick, interlocks finaux. |
-| F19 | Mapping IHM States armement complets | ECART | `ST_ModesState` définit `EmergencyArmable/Busy/Failed/…` mais `PRG_09` ne mappe que `EmergencyStopOk` (lu à date). |
+| F17 | Filtrage E/S acquisition | VERIFIE | `PRG_00` : `PowerContactorEngaged_DI` → `PowerContactorEngaged` ; `EmergencyChainClosed_DI` → `EmergencyChainClosed` (anti-rebond 20 ms). |
+| F18 | Portail `PowerContactorEngaged` vers métiers | VERIFIE | Consommé par Modes, Cycle, Safety domaines, Winch, Translation, Encoders, Joystick, interlocks finaux. |
+| F19 | Mapping IHM States armement complets | ECART | `ST_ModesState` définit `EmergencyArmable/Busy/Failed/…` mais `PRG_09` ne mappe que `PowerContactorEngaged` (lu à date). |
 | F20 | Câblage SimBench KeepAlive / Arming | CORRIGE | `PRG_00` : A/B ← `PowerKeepAlive_*_RQ`, Arming ← `EmergencyArming_RQ` (Q FB, scan N-1). |
 
 ---
@@ -106,13 +106,13 @@ Commentaire header de `ST_EmergencyManagementCmd.st` dit encore `ST_EmergencyCha
 
 ```text
 0 IDLE
-  | ArmReq front + EmergencyChain + NOT lockout + NOT EmergencyStopOk
-1 TestA     (ForceTestA, 200 ms) — si EmergencyChain encore TRUE → RedundancyTestFailed → 0
-2 RestoreA  (200 ms) — si EmergencyChain FALSE → 0 ; si TRUE → 3
+  | ArmReq front + EmergencyChainClosed + NOT lockout + NOT PowerContactorEngaged
+1 TestA     (ForceTestA, 200 ms) — si EmergencyChainClosed encore TRUE → RedundancyTestFailed → 0
+2 RestoreA  (200 ms) — si EmergencyChainClosed FALSE → 0 ; si TRUE → 3
 3 TestB     (ForceTestB, 200 ms) — idem fail redondance → 0
 4 RestoreB  (200 ms) — si chain OK → 5 else → 0
 5 Pulse     EmergencyArming_Cmd = TRUE, 1 s → 6
-6 Confirm   si EmergencyStopOk → 0 succès
+6 Confirm   si PowerContactorEngaged → 0 succès
             si timeout 2 s → EmergencyArmingFailed + Lockout 5 s → 0
 ```
 
@@ -128,8 +128,8 @@ Timers nommés : `TonTestA/B`, `TonRestoreA/B`, `TonArmingPulse`, `TonArmingConf
 
 ```text
 [Physique DI]
-  EmergencyChainClosed_DI ──FB_Input──► PRG_00.EmergencyChain ──► FB.EmergencyChain
-  PowerContactorEngaged_DI ──FB_Input──► PRG_00.EmergencyStopOk ──► FB + tous métiers
+  EmergencyChainClosed_DI ──FB_Input──► PRG_00.EmergencyChainClosed ──► FB.EmergencyChainClosed
+  PowerContactorEngaged_DI ──FB_Input──► PRG_00.PowerContactorEngaged ──► FB + tous métiers
 
 [Safety domaines]
   FB_Safety_Winch M1/M2.PowerCutOff ──┐
@@ -168,12 +168,12 @@ Timers nommés : `TonTestA/B`, `TonRestoreA/B`, `TonArmingPulse`, `TonArmingConf
 
 ---
 
-## 7. Consommateurs de `EmergencyStopOk` / `EmergencyChain` (hors FB)
+## 7. Consommateurs de `PowerContactorEngaged` / `EmergencyChainClosed` (hors FB)
 
 | Signal | Producteur | Consommateurs principaux |
 |---|---|---|
-| `EmergencyStopOk` | `PRG_00_Inputs` | Safety M1/M2/M3, Modes, Cycle, Winch×2, Translation, Encoders, Joystick, Dive/Extraction, interlocks finaux, Kobold enable, IHM `Modes.State` |
-| `EmergencyChain` | `PRG_00_Inputs` | FB Emergency, Kobold enable, troubleshooting, preflight |
+| `PowerContactorEngaged` | `PRG_00_Inputs` | Safety M1/M2/M3, Modes, Cycle, Winch×2, Translation, Encoders, Joystick, Dive/Extraction, interlocks finaux, Kobold enable, IHM `Modes.State` |
+| `EmergencyChainClosed` | `PRG_00_Inputs` | FB Emergency, Kobold enable, troubleshooting, preflight |
 | `PowerCutOff` domaine | `FB_Safety_*` | OR → FB Emergency ; IHM safety ; troubleshooting |
 
 ---

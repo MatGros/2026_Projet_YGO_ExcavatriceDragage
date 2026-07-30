@@ -51,7 +51,7 @@ END_VAR
 instWinchOutputInterlockM1_LD(
     Enable := PRG_06_WinchControl.WinchM1FinalInterlockRequest.Enable,
     Reset := PRG_06_WinchControl.WinchM1FinalInterlockRequest.Reset,
-    EmergencyStopOk := PRG_06_WinchControl.WinchM1FinalInterlockRequest.EmergencyStopOk,
+    PowerContactorEngaged := PRG_06_WinchControl.WinchM1FinalInterlockRequest.PowerContactorEngaged,
     SafeStop := PRG_06_WinchControl.WinchM1FinalInterlockRequest.SafeStop,
     BrakeReleaseRequest := PRG_06_WinchControl.WinchM1FinalInterlockRequest.BrakeReleaseRequest,
     BrakeCommandOpenConfirmed := PRG_06_WinchControl.WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed,
@@ -67,7 +67,7 @@ instWinchOutputInterlockM1_LD(
 instWinchOutputInterlockM2_LD(
     Enable := PRG_06_WinchControl.WinchM2FinalInterlockRequest.Enable,
     Reset := PRG_06_WinchControl.WinchM2FinalInterlockRequest.Reset,
-    EmergencyStopOk := PRG_06_WinchControl.WinchM2FinalInterlockRequest.EmergencyStopOk,
+    PowerContactorEngaged := PRG_06_WinchControl.WinchM2FinalInterlockRequest.PowerContactorEngaged,
     SafeStop := PRG_06_WinchControl.WinchM2FinalInterlockRequest.SafeStop,
     BrakeReleaseRequest := PRG_06_WinchControl.WinchM2FinalInterlockRequest.BrakeReleaseRequest,
     BrakeCommandOpenConfirmed := PRG_06_WinchControl.WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed,
@@ -83,7 +83,7 @@ instWinchOutputInterlockM2_LD(
 instTranslationOutputInterlock_LD(
     Enable := PRG_07_TranslationControl.TranslationFinalInterlockRequest.Enable,
     Reset := PRG_07_TranslationControl.TranslationFinalInterlockRequest.Reset,
-    EmergencyStopOk := PRG_07_TranslationControl.TranslationFinalInterlockRequest.EmergencyStopOk,
+    PowerContactorEngaged := PRG_07_TranslationControl.TranslationFinalInterlockRequest.PowerContactorEngaged,
     SafeStop := PRG_07_TranslationControl.TranslationFinalInterlockRequest.SafeStop,
     BrakeReleaseRequest := PRG_07_TranslationControl.TranslationFinalInterlockRequest.BrakeReleaseRequest,
     BrakeCommandOpenConfirmed := PRG_07_TranslationControl.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
@@ -128,8 +128,8 @@ M3_BrakeRelease_RQ := TranslationBrakeCmd;
 M3_CommandWord := instTranslationOutputInterlock_LD.DriveControlWord;
 M3_SetpointFrequencyHz := REAL_TO_UINT(instTranslationOutputInterlock_LD.DriveFreqRefHz * 100.0);
 M1_M2_KoboldMeasureEnable_DQ := PRG_06_WinchControl.KoboldContactorCmdArbitrated
-                                AND PRG_00_Inputs.EmergencyStopOk
-                                AND PRG_00_Inputs.EmergencyChain;
+                                AND PRG_00_Inputs.PowerContactorEngaged
+                                AND PRG_00_Inputs.EmergencyChainClosed;
 
 // === [SÉCURITÉ & COUPURE PUISSANCE AMONT] ===
 // Boucle de sécurité et séquencement d'armement général.
@@ -142,8 +142,8 @@ instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
-    EmergencyChain := PRG_00_Inputs.EmergencyChain,
-    EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk,
+    EmergencyChainClosed := PRG_00_Inputs.EmergencyChainClosed,
+    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
     PowerCutOffRequest := PowerCutOffReq,
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );

@@ -47,7 +47,7 @@ instCycle(
     CycleMotionPermit   := CycleMotionPermit,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
-    EmergencyStopOk     := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
     
     StartCycle          := CmdStartCycle_IHM,
     PauseCycle          := CmdPauseCycle_IHM,

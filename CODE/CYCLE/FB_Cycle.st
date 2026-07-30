@@ -9,7 +9,7 @@ FUNCTION_BLOCK FB_Cycle
 VAR_INPUT
     Enable              : BOOL;         // Activation générale du séquenceur
     Reset               : BOOL;         // Acquittement défaut (front)
-    EmergencyStopOk     : BOOL;         // Chaîne de sécurité OK
+    PowerContactorEngaged     : BOOL;         // Chaîne de sécurité OK
     CycleMotionPermit   : BOOL;         // Homme-mort + joystick actif
     HeartbeatIhmOk      : BOOL;         // 💓 IHM↔PLC valide ; FALSE = repli cycle obligatoire
 
@@ -115,7 +115,7 @@ END_VAR
 // === IMPLEMENTATION ===
 
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     CmdWinchM1_StartStop := FALSE;
     CmdWinchM1_Direction := 0;
     CmdWinchM1_SpeedPct  := 0.0;

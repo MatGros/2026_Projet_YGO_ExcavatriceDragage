@@ -146,7 +146,7 @@ instTranslationM3(
     Enable                  := PRG_06_WinchControl.StubMachineEnableN1
                                AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    EmergencyStopOk         := PRG_00_Inputs.EmergencyStopOk,
+    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := PRG_03_Safety.instSafetyTranslationM3.SafeStop,
@@ -172,7 +172,7 @@ instTranslationM3(
 // FB_Translation (rampe rapide) et n'est jamais une coupure sèche ici.
 TranslationFinalInterlockRequest.Enable := PRG_06_WinchControl.StubMachineEnableN1;
 TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-TranslationFinalInterlockRequest.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;

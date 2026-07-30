@@ -493,7 +493,7 @@ GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.instJoystick.Error
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
 GVL_IHM.Modes.State.CurrentMode     := PRG_04_Modes.instModes.Mode;
-GVL_IHM.Modes.State.EmergencyStopOk := PRG_00_Inputs.EmergencyStopOk;
+GVL_IHM.Modes.State.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
 
 
 // ── 12. MAPPING DIAGNOSTICS BUS → IHM ────────────────────────────────────

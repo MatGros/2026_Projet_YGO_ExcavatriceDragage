@@ -7,7 +7,7 @@
    📥 EmergencyArming : impulsion de réarmement (EmergencyArming_RQ)
    
    📤 SimChainOk      : simulation de la boucle AU (boutons relâchés et coupures PLC inactives)
-   📤 SimContactorOk  : simulation du contacteur engagé (EmergencyStopOk)
+   📤 SimContactorOk  : simulation du contacteur engagé (PowerContactorEngaged)
    
    ⚙️ Logique physique :
       - La chaîne d'AU (SimChainOk) est saine si les deux relais PLC de coupure sont maintenus fermés (TRUE).

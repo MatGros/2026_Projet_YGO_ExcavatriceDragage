@@ -15,7 +15,7 @@ VAR
     ScenarioStep : INT;
     ResetRequest : BOOL;
     EnableRequest : BOOL := TRUE;
-    EmergencyStopOkRequest : BOOL := TRUE;
+    PowerContactorEngagedRequest : BOOL := TRUE;
     SafeStopRequest : BOOL;
     BrakeConfirmed : BOOL;
     ContactorsReleased : BOOL;
@@ -95,7 +95,7 @@ WinchBusinessTable.P5R1 := TRUE;  WinchBusinessTable.P5R2 := TRUE;
 WinchBusinessTable.P5R3 := TRUE;  WinchBusinessTable.P5R4 := TRUE;
 WinchBusinessTable.StepThreshold_Pct := [10.0, 20.0, 30.0, 40.0, 100.0];
 WinchBusiness(
-    Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     StartStop := TRUE, SafeStop := FALSE, ForbidDescent := FALSE, ForbidAscent := FALSE,
     Direction := 1, SpeedRefPct := 100.0, SpeedStepTable := WinchBusinessTable,
     FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
@@ -122,7 +122,7 @@ WinchBusinessTestPassed := (WinchBusiness.StepNumber = 5)
 InterlockM1(
     Enable := EnableRequest,
     Reset := ResetRequest,
-    EmergencyStopOk := EmergencyStopOkRequest,
+    PowerContactorEngaged := PowerContactorEngagedRequest,
     SafeStop := SafeStopRequest,
     BrakeReleaseRequest := (RequestedStepM1 > 0),
     BrakeCommandOpenConfirmed := BrakeConfirmed,
@@ -138,7 +138,7 @@ InterlockM1(
 InterlockM2(
     Enable := EnableRequest,
     Reset := ResetRequest,
-    EmergencyStopOk := EmergencyStopOkRequest,
+    PowerContactorEngaged := PowerContactorEngagedRequest,
     SafeStop := SafeStopRequest,
     BrakeReleaseRequest := (RequestedStepM2 > 0),
     BrakeCommandOpenConfirmed := BrakeConfirmed,
@@ -158,7 +158,7 @@ InterlockM2(
 InterlockM3(
     Enable := EnableRequest,
     Reset := ResetRequest,
-    EmergencyStopOk := EmergencyStopOkRequest,
+    PowerContactorEngaged := PowerContactorEngagedRequest,
     SafeStop := SafeStopRequest,
     BrakeReleaseRequest := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2),
     BrakeCommandOpenConfirmed := BrakeConfirmed,
@@ -169,7 +169,7 @@ InterlockM3(
 
 // Intégration réelle M3 : production par FB_Translation, puis filtre final _LD.
 TranslationIntegration(
-    Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     StartStop := (ScenarioStep >= 110) AND (ScenarioStep < 130),
     SafeStop := TranslationIntegrationSafeStop, Direction := 1, SpeedRefPct := 50.0,
     PositionSensorTarget := FALSE, SlowdownSensor := FALSE,
@@ -180,7 +180,7 @@ TranslationIntegration(
     DriveFreqScaleMaxHz := 60.0
 );
 TranslationIntegrationInterlock(
-    Enable := TRUE, Reset := FALSE, EmergencyStopOk := TRUE,
+    Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
     SafeStop := TranslationIntegrationSafeStop,
     BrakeReleaseRequest := TranslationIntegration.BrakeReleaseRequest,
     BrakeCommandOpenConfirmed := TranslationIntegration.BrakeReleaseRequest,
@@ -232,15 +232,15 @@ CASE ScenarioStep OF
         M2EnableLatchHeldOk := InterlockM2.Error AND InterlockM2.RestartInhibit
                                AND NOT InterlockM2.BrakeCmd AND (InterlockM2.AuthorizedStep = 0);
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 12;
 
-    12: // Cas 2 séparé : les deux latch timeout survivent à EmergencyStopOk=FALSE.
+    12: // Cas 2 séparé : les deux latch timeout survivent à PowerContactorEngaged=FALSE.
         M1EmergencyStopLatchHeldOk := InterlockM1.Error AND InterlockM1.RestartInhibit
                                       AND NOT InterlockM1.BrakeCmd AND (InterlockM1.AuthorizedStep = 0);
         M2EmergencyStopLatchHeldOk := InterlockM2.Error AND InterlockM2.RestartInhibit
                                       AND NOT InterlockM2.BrakeCmd AND (InterlockM2.AuthorizedStep = 0);
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         BrakeConfirmed := TRUE; // Cause disparue seulement après les deux gates.
         RequestedStepM1 := 0;
         RequestedStepM2 := 0;
@@ -298,12 +298,12 @@ CASE ScenarioStep OF
         StopGateOk := StopGateOk AND NOT InterlockM1.BrakeCmd AND NOT InterlockM2.BrakeCmd
                       AND (InterlockM1.AuthorizedStep = 0) AND (InterlockM2.AuthorizedStep = 0);
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 62;
-    62: // EmergencyStopOk coupe immédiatement puissance/frein.
+    62: // PowerContactorEngaged coupe immédiatement puissance/frein.
         StopGateOk := StopGateOk AND NOT InterlockM1.BrakeCmd AND NOT InterlockM2.BrakeCmd
                       AND (InterlockM1.AuthorizedStep = 0) AND (InterlockM2.AuthorizedStep = 0);
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         SafeStopRequest := TRUE;
         ScenarioStep := 63;
     63: // SafeStop ne coupe pas l'interlock : la rampe rapide reste métier.
@@ -328,14 +328,14 @@ CASE ScenarioStep OF
                                AND (InterlockM3.DriveControlWord = 0)
                                AND (InterlockM3.DriveFreqRefHz = 0.0) AND NOT InterlockM3.BrakeCmd;
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 92;
 
-    92: // Timeout M3 persiste pendant EmergencyStopOk=FALSE, sorties sûres.
+    92: // Timeout M3 persiste pendant PowerContactorEngaged=FALSE, sorties sûres.
         M3EmergencyStopLatchHeldOk := InterlockM3.Error AND InterlockM3.RestartInhibit
                                       AND (InterlockM3.DriveControlWord = 0)
                                       AND (InterlockM3.DriveFreqRefHz = 0.0) AND NOT InterlockM3.BrakeCmd;
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         BrakeConfirmed := TRUE; // Cause disparue après les deux gates.
         ScenarioStep := 95;
 
@@ -366,13 +366,13 @@ CASE ScenarioStep OF
                            AND (InterlockM3.DriveFreqRefHz = 0.0)
                            AND NOT InterlockM3.BrakeCmd;
         EnableRequest := TRUE;
-        EmergencyStopOkRequest := FALSE;
+        PowerContactorEngagedRequest := FALSE;
         ScenarioStep := 101;
-    101: // M3 EmergencyStopOk=FALSE : mot, fréquence et frein en position sûre.
+    101: // M3 PowerContactorEngaged=FALSE : mot, fréquence et frein en position sûre.
         M3EmergencyStopGateOk := (InterlockM3.DriveControlWord = 0)
                                   AND (InterlockM3.DriveFreqRefHz = 0.0)
                                   AND NOT InterlockM3.BrakeCmd;
-        EmergencyStopOkRequest := TRUE;
+        PowerContactorEngagedRequest := TRUE;
         ScenarioStep := 110;
 
     110: // FB_Translation réel : attendre une fréquence amont et finale non nulles.

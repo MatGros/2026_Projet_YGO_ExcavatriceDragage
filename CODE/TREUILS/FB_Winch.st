@@ -68,7 +68,7 @@ FUNCTION_BLOCK PUBLIC FB_Winch
 VAR_INPUT
     Enable                  : BOOL;
     Reset                   : BOOL;
-    EmergencyStopOk         : BOOL;
+    PowerContactorEngaged         : BOOL;
     Mode                    : E_Mode;
     StartStop               : BOOL;
     SafeStop                : BOOL;
@@ -150,7 +150,7 @@ VAR
     FirstScanDone       : BOOL;
 END_VAR
 
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     SpeedStep(Enable := FALSE, SpeedRefPct := 0.0, Table := SpeedStepTable, HystMargin := SpeedStepHystMargin);

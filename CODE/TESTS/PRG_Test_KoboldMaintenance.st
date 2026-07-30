@@ -79,19 +79,19 @@ ELSE
 END_IF;
 
 DiveValid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := DiveMotion, MotionDirection := -1, BucketIsOpen := TRUE,
     KoboldImmersed := DiveKobold, M1Position_M := DivePosition_M, M2Position_M := DivePosition_M,
     PositionsValid := TRUE, DiveStartMin_M := 1.0, ImmersionUpper_M := 0.5, ImmersionLower_M := -0.5
 );
 DiveInvalid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := InvalidMotion, MotionDirection := -1, BucketIsOpen := TRUE,
     KoboldImmersed := InvalidKobold, M1Position_M := InvalidPosition_M, M2Position_M := InvalidPosition_M,
     PositionsValid := TRUE, DiveStartMin_M := 1.0, ImmersionUpper_M := 0.5, ImmersionLower_M := -0.5
 );
 ExtractionValid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := ExtractionMotion, MotionDirection := 1, BottomPositionConfirmed := TRUE,
     BucketIsClosed := ExtractionClosed, BucketBusy := ExtractionBusy, BucketError := FALSE,
     WinchSyncError := FALSE, M1Position_M := ExtractionPos_M, M2Position_M := ExtractionPos_M,
@@ -99,7 +99,7 @@ ExtractionValid(
     ControlAscentDistance_M := 2.0
 );
 ExtractionInvalid(
-    Enable := TestEnable, Reset := FALSE, EmergencyStopOk := TRUE, Mode := E_Mode.MAINT_N1,
+    Enable := TestEnable, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.MAINT_N1,
     MotionRequestActive := FALSE, MotionDirection := 0, BottomPositionConfirmed := FALSE,
     BucketIsClosed := FALSE, BucketBusy := FALSE, BucketError := FALSE, WinchSyncError := FALSE,
     M1Position_M := 0.0, M2Position_M := 0.0, M1MeasuredSpeedValid := TRUE,

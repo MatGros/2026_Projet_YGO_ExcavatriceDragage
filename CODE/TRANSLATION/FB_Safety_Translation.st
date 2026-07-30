@@ -11,7 +11,7 @@ FUNCTION_BLOCK PUBLIC FB_Safety_Translation
 VAR_INPUT
     Enable              : BOOL;        // Active la surveillance
     Reset               : BOOL;        // Front acquittement défauts
-    EmergencyStopOk     : BOOL;        // Chaîne AU réarmée + conditions globales OK
+    PowerContactorEngaged     : BOOL;        // Chaîne AU réarmée + conditions globales OK
     Mode                : E_Mode;      // Mode courant
     JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
@@ -213,7 +213,7 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-SafeStop := Error OR NOT EmergencyStopOk;
+SafeStop := Error OR NOT PowerContactorEngaged;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), dépassement de fin de course (bit6),

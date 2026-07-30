@@ -32,7 +32,7 @@ FUNCTION_BLOCK PUBLIC FB_Encoder_Homing
 VAR_INPUT
     Enable               : BOOL;        // Standard
     Reset                : BOOL;        // Acquittement défaut (front) — bits 0/2/3/4/5 (voir §ErrorId)
-    EmergencyStopOk      : BOOL;        // Standard
+    PowerContactorEngaged      : BOOL;        // Standard
     Mode                 : E_Mode;      // MAINT_N1 requis pour le flux nominal
     Home                 : BOOL;        // Demande de référencement (front, bouton IHM UNIQUE)
     UnitaryMode          : BOOL;        // TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)
@@ -90,7 +90,7 @@ END_VAR
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     PresetRequest := FALSE;
     PresetValue := 0;
     State := E_State.DISABLED;

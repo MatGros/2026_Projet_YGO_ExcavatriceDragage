@@ -155,7 +155,7 @@ END_TYPE
 (* Entrées *)
 Enable              : BOOL;        // Standard
 Reset               : BOOL;        // Standard (front)
-EmergencyStopOk     : BOOL;        // Standard
+PowerContactorEngaged     : BOOL;        // Standard
 Mode                : E_Mode;      // Standard
 CmdOpen_IHM         : BOOL;        // Demande ouverture IHM
 CmdClose_IHM        : BOOL;        // Demande fermeture IHM

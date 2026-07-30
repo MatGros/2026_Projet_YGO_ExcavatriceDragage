@@ -42,7 +42,7 @@ FUNCTION_BLOCK PUBLIC FB_Bucket
 VAR_INPUT
     Enable              : BOOL;             // Activation générale
     Reset               : BOOL;             // Acquittement défauts (front)
-    EmergencyStopOk     : BOOL;             // Condition d'arrêt d'urgence
+    PowerContactorEngaged     : BOOL;             // Condition d'arrêt d'urgence
     Mode                : E_Mode;           // Mode de marche machine
     CmdOpen_IHM         : BOOL;             // Demande d'ouverture depuis l'IHM
     CmdClose_IHM        : BOOL;             // Demande de fermeture depuis l'IHM
@@ -103,7 +103,7 @@ VAR
 END_VAR
 
 // 🛑 1. GATE DE SÉCURITÉ
-IF NOT Enable OR NOT EmergencyStopOk THEN
+IF NOT Enable OR NOT PowerContactorEngaged THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
