@@ -9,8 +9,8 @@
    🚦 Produit les bus ST_State_Emergency et ST_Diag_Emergency
       observables en Watch pour vérification de la séquence.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 PROGRAM PRG_AU_Outputs

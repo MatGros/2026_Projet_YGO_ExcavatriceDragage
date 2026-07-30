@@ -1,11 +1,12 @@
-# Analyse Fonctionnelle — Partie 11 : Fonction Benne (v2.0)
+# FB_Bucket — Spec composant (v1.0)
 
-> Rôle : ouverture/fermeture par désynchronisation contrôlée M1/M2 (M1 immobile, M2 seul bouge).
-> **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni PRG propre. Voir §7 pour justification.
+> Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §1.
+> Rôle de **ce** document : ouverture/fermeture benne par désynchronisation M1/M2, protection
+> glissement, assistants maintenance — et **catalogue unique** des `TC-P10-023` à `TC-P10-034`.
+> **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.
 > Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
-> Instance unique `instBucket` dans `Treuils (CFC)` — annexe technique d'AF10.
+> Instance unique `instBucket` dans `Treuils (CFC)` — fiche FB du domaine Treuils.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Bucket_Extraction_Code_v1.0.md`.
-> v1.4 archivée : `ARCHIVES/Doc/AF_Partie-12_Fonction_Benne_v1.4.md`.
 
 ## 🧭 Sommaire
 
@@ -15,26 +16,26 @@
 4. FB_DiveSearch — qualification Kobold
 5. FB_ExtractionSequence — fermeture + remontée
 6. Bus et intégration programme
-7. Pourquoi Benne reste séparée d'AF10
+7. Pourquoi Benne est une fiche FB de AF10 (pas une Partie séparée)
 8. Alertes et écarts
 9. Documents liés
 
-## 🧪 Points de validation
+## 🧪 Points de validation (`TC-P10-023` à `034` — propriétaire unique)
 
 | ID | Attendu | Type |
 |---|---|---|
-| TC-P11-001 | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | AUTO |
-| TC-P11-002 | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | AUTO |
-| TC-P11-003 | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | AUTO |
-| TC-P11-004 | Glissement M1>1.0m pendant BUSY ⇒ bit4 + `M1SlipDetected` + coupe M2 | AUTO |
-| TC-P11-005 | `M1SlipDetected` force SafeStop sur M1 côté Treuils (couche 1) | AUTO |
-| TC-P11-006 | Couche 2 (Méca C AF10, bit9) : dérive M1>2.0m ⇒ PowerCutOff | AUTO |
-| TC-P11-007 | Recul (sens inverse) borné à la position de départ, jamais au-delà | AUTO |
-| TC-P11-008 | `ConfirmOpenPosition`/`ClosePosition` : effet seulement MAINT_N1/N2, treuils arrêtés | AUTO |
-| TC-P11-009 | Codeur(s) non référencé(s) ⇒ bit3 permanent, indépendant de Reset | AUTO |
-| TC-P11-010 | Seule `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne (`PreserveArmingAfterBucket`) ; `FB_DiveSearch` ne le fait pas | AUTO |
-| TC-P11-011 | Butée haute M2 décalée de `OffsetCloseM` uniquement si fermé/en fermeture | AUTO |
-| TC-P11-012 | Terrain : cinématique réelle en charge, amplitude offset validée | SITE |
+| TC-P10-023 | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | AUTO |
+| TC-P10-024 | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | AUTO |
+| TC-P10-025 | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | AUTO |
+| TC-P10-026 | Glissement M1>1.0m pendant BUSY ⇒ bit4 + `M1SlipDetected` + coupe M2 | AUTO |
+| TC-P10-027 | `M1SlipDetected` force SafeStop sur M1 côté Treuils (couche 1) | AUTO |
+| TC-P10-028 | Couche 2 (Méca C AF10, bit9) : dérive M1>2.0m ⇒ PowerCutOff | AUTO |
+| TC-P10-029 | Recul (sens inverse) borné à la position de départ, jamais au-delà | AUTO |
+| TC-P10-030 | `ConfirmOpenPosition`/`ClosePosition` : effet seulement MAINT_N1/N2, treuils arrêtés | AUTO |
+| TC-P10-031 | Codeur(s) non référencé(s) ⇒ bit3 permanent, indépendant de Reset | AUTO |
+| TC-P10-032 | Seule `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne ; `FB_DiveSearch` ne le fait pas | AUTO |
+| TC-P10-033 | Butée haute M2 décalée de `OffsetCloseM` uniquement si fermé/en fermeture | AUTO |
+| TC-P10-034 | Terrain : cinématique réelle en charge, amplitude offset validée | SITE |
 
 ---
 
@@ -120,16 +121,18 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 
 ---
 
-## 7. Pourquoi Benne reste séparée d'AF10
+## 7. Pourquoi Benne est une fiche FB de AF10 (pas une Partie séparée)
 
 | Argument | Constat |
 |---|---|
 | Aucune I/O propre | Réutilise entièrement les Q de `FB_Winch` M2 |
 | Couplage bidirectionnel fort | `FB_Bucket` a besoin de position/Homed M1+M2 ; `FB_WinchSync`/`FB_Safety_Winch` ont besoin en retour de `Busy`/`ActiveOffsetM`/`M1SlipDetected` |
 | Organisation code déjà ainsi | `TREUILS/BENNE/`, appelé dans `Treuils (CFC)` — jamais remis en cause |
-| Contenu propre suffisant | Offsets, Méca C couche 1, cinématique inversée, DiveSearch/ExtractionSequence — mérite sa fiche |
+| Contenu propre suffisant | Offsets, Méca C couche 1, cinématique inversée, DiveSearch/ExtractionSequence — mérite sa fiche FB |
 
-**Décision retenue** : AF11 séparée, **explicitement annexée** à AF10 (pas fusionnée — AF10 deviendrait trop volumineuse ; pas indépendante — pas de PRG/Safety propre comme Translation).
+**Décision retenue** : FB_Bucket est une **fiche FB de la Partie 10** (Treuils), au même titre que
+`FB_WinchSync` — pas une Partie séparée. Contenu suffisant pour sa fiche, mais pas de
+programme/Safety propre (contrairement à Translation qui a son propre CFC + Safety dédié).
 
 ---
 
@@ -148,7 +151,8 @@ Fermeture benne puis remontée contrôlée : `WAIT_BOTTOM_CONFIRMATION → READY
 
 | Doc | Lien |
 |---|---|
-| AF10 | Domaine parent — Treuils M1/M2, Méca C couche 2 |
+| AF10 (chapô) | Rôle machine, intégration programme |
+| AF10 / FB_Safety_Winch | Méca C couche 2 (bit9) |
 | AF09 | Encodeurs — position/Homed consommés |
 | AF04 | Cycle SEMI_AUTO — séquence dragage |
 | AF05 | Modes — MAINT_N1/N2 requis pour assistants |

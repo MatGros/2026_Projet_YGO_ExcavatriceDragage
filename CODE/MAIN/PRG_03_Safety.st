@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 3.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+    📄 Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
 PROGRAM PRG_03_Safety

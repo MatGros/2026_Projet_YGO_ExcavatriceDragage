@@ -1,11 +1,10 @@
 # Analyse Fonctionnelle — Partie 10 : Fonction Winch M1/M2 (v2.0)
 
-> Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, barrière finale.
-> **Détail technique par FB** : voir les 4 fiches dédiées (§1). Ce chapô reste au niveau machine
+> Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
+> **Détail technique par FB** : voir les 5 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code : `CODE/TREUILS/*.st` · instances dans `Treuils (CFC)` (mouvement), `Safety (CFC)` (safety), `Outputs (Ladder)` (finale).
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
-> Benne (M2 sous-fonction) : voir AF11, annexée à ce domaine (pas de PRG/actionneur propre).
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
 
 ## 🧭 Sommaire
@@ -20,7 +19,7 @@
 
 ## 🧪 Points de validation
 
-Catalogue `TC-P10-*` **réparti dans les 4 fiches FB** (propriétaire unique par fiche, pas
+Catalogue `TC-P10-*` **réparti dans les 5 fiches FB** (propriétaire unique par fiche, pas
 dupliqué ici) :
 
 | Fiche | TC couverts |
@@ -29,6 +28,7 @@ dupliqué ici) :
 | [`FB_Safety_Winch`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | TC-P10-001 à 010 |
 | [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | TC-P10-014, 015, 016 |
 | [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | TC-P10-012, 013, 020, 021, 022 |
+| [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | TC-P10-023 à 034 |
 
 ---
 
@@ -40,6 +40,7 @@ dupliqué ici) :
 | [`AF_Partie-10_FB_Safety_Winch_v1.0.md`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
 | [`AF_Partie-10_FB_WinchSync_v1.0.md`](AF_Partie-10_FB_WinchSync_v1.0.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | `FB_WinchOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
+| [`AF_Partie-10_FB_Bucket_v1.0.md`](AF_Partie-10_FB_Bucket_v1.0.md) | `FB_Bucket` (+ `FB_DiveSearch`, `FB_ExtractionSequence`) | Benne, désynchronisation M1/M2, glissement, assistants |
 
 `FB_WinchLoadEstimator` (diagnostic charge informatif, pas de safety) : voir extraction code,
 pas de fiche dédiée (faible enjeu).
@@ -52,11 +53,12 @@ FB_Winch (mouvement, ×2)
 
 FB_Safety_Winch (×2)              ──► SafeStop / ForbidDescent / ForbidAscent / PowerCutOff
 FB_WinchSync (×1)                 ──► DeltaPosM, SyncWarn (niveau 1, warning)
+FB_Bucket (×1)                    ──► Benne (sous-fonction M2, désynchronisation)
 FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs)
 FB_WinchLoadEstimator (×2)        ──► diagnostic charge, informatif
 ```
 
-Benne = sous-fonction M2 (voir AF11) : aucune I/O propre, réutilise `FB_Winch` M2.
+Benne = sous-fonction M2 : aucune I/O propre, réutilise `FB_Winch` M2. Fiche dédiée dans ce dossier.
 
 ---
 
@@ -184,6 +186,5 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 | AF05 | Modes — InhibitM1/M2, SyncEnable |
 | AF06 | E/S physiques treuils |
 | AF09 | Codeurs — Homed, position, vitesse |
-| AF11 | Benne — sous-fonction M2 |
 | PLAN_TASK | Lot 4 (T87/T91/T93/T94/T95/T96) — décision non prise, étude terrain requise |
 | Code | `CODE/TREUILS/*.st`, `CODE/MAIN/Treuils (CFC).st` |

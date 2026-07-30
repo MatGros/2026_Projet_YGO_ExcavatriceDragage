@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie-09/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
       unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
       moteur n'est piloté ici.

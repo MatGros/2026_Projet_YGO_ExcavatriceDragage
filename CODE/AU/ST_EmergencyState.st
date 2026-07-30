@@ -6,7 +6,7 @@
    Pattern : identique a GVL_IHM.Modes.State dans le projet reel.
           Le programme ecrit ces champs, l'IHM les lit.
    ==============================================================
-    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    Docs : DOC/AF_Partie-01/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
            DOC/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 
