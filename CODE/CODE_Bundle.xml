@@ -725,7 +725,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md §4.A
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Benne_v2.0.md §4.A
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -957,7 +957,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md §4.B
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Benne_v2.0.md §4.B
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3286,6 +3286,68 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_Diag_Emergency">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Synthèse : (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3f15b664-1dd2-593a-af9a-957a294bd1db</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ ST_Diag_Emergency — Diagnostic et erreurs de la chaîne AU
+   ───────────────────────────────────────────────────────────────
+   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
+      Consommé par PRG_09_Supervision et GVL_Troubleshooting.
+   🎯 Champs lecture seule — producteur unique = FB composite.
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_DredgingAssistCfg">
         <baseType>
           <struct>
@@ -3538,28 +3600,28 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
       <dataType name="ST_EmergencyManagementCmd">
         <baseType>
           <struct>
-            <variable name="PowerCutOff_A_Cmd">
+            <variable name="MaintainA_Cmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique coupure canal A (TRUE = OK/Maintien, FALSE = Coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOff_B_Cmd">
+            <variable name="MaintainB_Cmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique coupure canal B (TRUE = OK/Maintien, FALSE = Coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyArming_Cmd">
+            <variable name="ArmPulse_Cmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique d'impulsion de réarmement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de réarmement (TRUE = bobine réarmement activée)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3571,12 +3633,16 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_EmergencyChainCmd — Structure de communication interne
+   ⚙️ ST_EmergencyManagementCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
    📄 Transporte les ordres logiques entre le bloc de décision
-      et le bloc de commande de la boucle d'urgence.
+      et le bloc de sortie de la boucle d'urgence.
+   🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien :
+      TRUE = voie maintenue saine, FALSE = coupure demandée — la règle C1
+      interdit un nom portant « coupure » quand le sens est « maintien »).
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderCalib">
@@ -3636,7 +3702,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §9
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §9
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
       modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
@@ -5077,7 +5143,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
    🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
    ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
       packé de la 1ère version) : chaque contacteur de vitesse de
@@ -5089,6 +5155,69 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    L'ordre d'actionnement n'est pas implicite : il est défini ICI,
    dans les données, pas codé en dur dans la logique (FB_SpeedStep).
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_State_Emergency">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Étape séquence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant : chain OK, step=0, pas de lockout, pas de redondance échouée, pas de contacteur déjà engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence armement OU lockout en cours (nouvelle demande ignorée)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>4e2ee04c-1b5f-5e6f-817a-f94c46405f29</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_State_Emergency — État public de la chaîne d'arrêt d'urgence
+   ───────────────────────────────────────────────────────────────
+   📄 Produit par FB_Safety_EmergencyManagement (sortie State).
+      Consommé par PRG_09_Supervision → GVL_IHM.Modes.State pour IHM,
+      et par GVL_Troubleshooting pour diagnostic.
+   🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SyncCfg">
@@ -5468,7 +5597,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
-      doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.13.md
+      doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -6140,7 +6269,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    🧭 Index 2 : bande de vitesse câble mesurée (1..5)
    📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.14.md</xhtml>
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchSpeedConfig">
@@ -6192,7 +6321,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
       Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.14.md</xhtml>
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchState">
@@ -7049,7 +7178,7 @@ Temps de fermeture contacteur de puissance</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md §3
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md §3
                    (règles issues de DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
@@ -7609,12 +7738,12 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪣 FB_Bucket — Commande d'ouverture/fermeture du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Benne_v1.4.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Benne_v2.0.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
       (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
       FERME désormais le benne, DEROULAGE M2 (Direction=-1) l'OUVRE
-      (c'était l'inverse avant). Voir DOC/AF_Partie-12_Fonction_Benne_v1.4.md §REX.
+      (c'était l'inverse avant). Voir DOC/AF_Partie-11_Fonction_Benne_v2.0.md §REX.
    ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
       ne sont fiables que si les codeurs absolus sont référencés (Partie10).
       Sans ça, une position aberrante (codeur non homé) pourrait faire
@@ -7631,7 +7760,7 @@ END_IF;
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md "flux nominal, benne ouvert").
+        voir DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
@@ -10594,7 +10723,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📐 FB_DriftGuard — Détection de dérive de position pendant armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md §4quinquies (Méca A/C)
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md §4quinquies (Méca A/C)
    🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
       Méca C de FB_Safety_Winch (armement + capture position référence + calcul
       dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
@@ -10911,7 +11040,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §3/§6
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
@@ -11407,7 +11536,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
       unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
       moteur n'est piloté ici.
@@ -11738,7 +11867,7 @@ HomingRefRaw := Calib.HomingRefRaw;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §3.6/§3.7
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3.6/§3.7
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
       - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur
@@ -11891,7 +12020,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §2/§3.1
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §2/§3.1
    ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
       `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
       — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
@@ -12079,7 +12208,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📐 FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §3.8
+   📄 Doc : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3.8
    🛡️ Sécurité : mesure propriétaire de la chaîne codeur ; aucune réaction machine
    🧩 Dépendances : position sûre fournie par FB_Encoder_Safety
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -12371,7 +12500,7 @@ END_IF;
    🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
       jusqu'à disparition de la cause et acquittement par front Reset.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -14489,7 +14618,7 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
    📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §2 (usage),
-                   DOC/AF_Partie-09_Fonction_Winch_v1.14.md (correctif ci-dessous)
+                   DOC/AF_Partie-10_Fonction_Winch_v2.0.md (correctif ci-dessous)
    🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
       SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
       jamais concernée par ce bug — voir analyse d'impact ci-dessous).
@@ -14644,26 +14773,27 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed, bit3: StartupFail</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOff_A_RQ">
+            <variable name="MaintainA_RQ">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal A (maintenu à TRUE, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques — renommées (polarité maintien explicite)
+Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOff_B_RQ">
+            <variable name="MaintainB_RQ">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal B (maintenu à TRUE, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal B (TRUE = voie maintenue, FALSE = coupure)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyArming_RQ">
+            <variable name="ArmPulse_RQ">
               <type>
                 <BOOL />
               </type>
@@ -14671,37 +14801,45 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion réarmement physique (1s)</xhtml>
               </documentation>
             </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_State_Emergency" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état public (AF §8.2)
+ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_Diag_Emergency" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Error, ErrorId, Redundancy, ArmFailed, Lockout</xhtml>
+              </documentation>
+            </variable>
             <variable name="ArmingSeqStep">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires (rétrocompatibilité PRG_10/GVL_Global)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B resté collé/shunté détecté à l'auto-test</xhtml>
-              </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de puissance n'a pas confirmé l'armement</xhtml>
-              </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
-              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -14724,10 +14862,16 @@ Current := LIMIT(-100.0, Current, 100.0);
    🛡️ FB_Safety_EmergencyManagement — Bloc Safety Composite (Parent)
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Bloc de sécurité principal de la boucle d'arrêt d'urgence.
-   🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le 
+   🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le
       Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
+   📤 Produit les bus publics ST_State_Emergency et ST_Diag_Emergency
+      en sortie, consommés par Supervision et Troubleshooting.
+   🏷️ Renommé PowerCutOff_A/B_RQ → MaintainA/B_RQ (polarité maintien),
+      EmergencyArming_RQ → ArmPulse_RQ (cohérence nommage).
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md
+              DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -14749,20 +14893,36 @@ Logic(
 
 Output(
     Enable := Enable,
-    Cmd := Logic.Cmd
+    Cmd := Logic.Cmd,
+    ChainOk := EmergencyChainClosed,
+    ContactorOk := PowerContactorEngaged,
+    ArmingStep := Logic.ArmingSeqStep,
+    Armable := Logic.Armable,
+    ArmingBusy := Logic.ArmingBusy,
+    Error := Logic.Error,
+    ErrorId := Logic.ErrorId,
+    RedundancyTestFailed := Logic.RedundancyTestFailed,
+    ArmFailed := Logic.EmergencyArmingFailed,
+    LockoutActive := Logic.EmergencyArmingLockoutActive
 );
 
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
-Ready := Enable;
-Busy  := (Logic.ArmingSeqStep &lt;&gt; 0);
+Ready := Enable AND NOT Logic.StartupFail;
+Busy  := (Logic.ArmingSeqStep &lt;&gt; 0) OR Logic.EmergencyArmingLockoutActive;
 Done  := PowerContactorEngaged;
 Error := Logic.Error;
 ErrorId := Logic.ErrorId;
 
-PowerCutOff_A_RQ   := Output.PowerCutOff_A_RQ;
-PowerCutOff_B_RQ   := Output.PowerCutOff_B_RQ;
-EmergencyArming_RQ := Output.EmergencyArming_RQ;
+// ⚡ Sorties physiques
+MaintainA_RQ   := Output.MaintainA_RQ;
+MaintainB_RQ   := Output.MaintainB_RQ;
+ArmPulse_RQ    := Output.ArmPulse_RQ;
 
+// 🚦 Bus publics
+State := Output.State;
+Diag  := Output.Diag;
+
+// 🩺 Diagnostics scalaires (rétrocompatibilité)
 ArmingSeqStep                := Logic.ArmingSeqStep;
 RedundancyTestFailed         := Logic.RedundancyTestFailed;
 EmergencyArmingFailed        := Logic.EmergencyArmingFailed;
@@ -14890,6 +15050,31 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
               </documentation>
             </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Bus State/Diag internes — repris par le composite pour les DUT publics
+🟢 Réarmement possible maintenant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence ou lockout en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupFail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Autotest démarche échoué</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -14898,6 +15083,11 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
               </type>
             </variable>
             <variable name="ArmReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="EnableRising">
               <type>
                 <derived name="R_TRIG" />
               </type>
@@ -14947,15 +15137,37 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <derived name="TON" />
               </type>
             </variable>
+            <variable name="StartupCheckDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Autotest démarrage
+TRUE = autotest passé, attente réarmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckOK">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résultat autotest (latche le temps du front)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
-      la boucle d'arrêt d'urgence. Produit les consignes logiques.
+      la boucle d'arrêt d'urgence. Produit les consignes logiques
+      et les bus d'état/diagnostic.
+   🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien).
+      Ajout autotest démarrage (§5.4 AF01) + bus State/Diag.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md ; DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md
+              DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -14964,19 +15176,29 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
 
 // === IMPLEMENTATION ===
 
+// 🔄 Fronts
+EnableRising(CLK := Enable);
+ResetEdge(CLK := Reset);
+ArmReqEdge(CLK := ArmRequest);
+
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
     ErrorId := 16#0000;
-    Cmd.PowerCutOff_A_Cmd := FALSE;
-    Cmd.PowerCutOff_B_Cmd := FALSE;
-    Cmd.EmergencyArming_Cmd := FALSE;
+    Cmd.MaintainA_Cmd := FALSE;
+    Cmd.MaintainB_Cmd := FALSE;
+    Cmd.ArmPulse_Cmd := FALSE;
     ArmingSeqStep := 0;
     RedundancyTestFailed := FALSE;
     EmergencyArmingFailed := FALSE;
     EmergencyArmingLockoutActive := FALSE;
     ForceTestA := FALSE;
     ForceTestB := FALSE;
+    Armable := FALSE;
+    ArmingBusy := FALSE;
+    StartupFail := FALSE;
+    StartupCheckDone := FALSE;
+    StartupCheckOK := FALSE;
     TonTestA(IN := FALSE);
     TonRestoreA(IN := FALSE);
     TonTestB(IN := FALSE);
@@ -14987,18 +15209,44 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-ResetEdge(CLK := Reset);
-ArmReqEdge(CLK := ArmRequest);
+// 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
+// Vérifications synchrones 1 cycle au premier passage Enable=TRUE
+IF EnableRising.Q THEN
+    StartupCheckDone := FALSE;
+END_IF;
 
-// 🔍 2. ACQUITTEMENT DES DÉFAUTS
+IF NOT StartupCheckDone THEN
+    // Exécute les 4 contrôles en 1 cycle
+    StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
+                      AND NOT PowerContactorEngaged // 2. Contacteur au repos
+                      AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
+    // Le maintien A/B est vérifié via l'absence de RedundancyTestFailed
+    // (si un canal est ouvert au démarrage, RedundancyTestFailed sera levé
+    //  à la première tentative de réarmement — pas bloquant au boot)
+    StartupCheckDone := TRUE;
+    StartupFail := NOT StartupCheckOK;
+    // Si échec : on reste en attente, ErrorId est positionné
+    IF NOT StartupCheckOK THEN
+        ErrorId := 16#0008; // bit3 = startup autotest fail
+        Error := TRUE;
+    END_IF;
+    RETURN; // 1 cycle pour laisser le temps aux entrées de se stabiliser
+ELSE
+    StartupFail := FALSE;
+END_IF;
+
+// 🔍 3. ACQUITTEMENT DES DÉFAUTS
 IF ResetEdge.Q THEN
     RedundancyTestFailed := FALSE;
+    StartupFail := FALSE;
     IF PowerContactorEngaged THEN
         EmergencyArmingFailed := FALSE;
     END_IF;
+    // Reset efface aussi bit3 d'ErrorId
+    ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
-// 🚦 3. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
+// 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
    AND NOT EmergencyArmingLockoutActive 
    AND NOT PowerContactorEngaged THEN
@@ -15061,7 +15309,7 @@ END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
 TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1s);
-Cmd.EmergencyArming_Cmd := (ArmingSeqStep = 5);
+Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
@@ -15085,11 +15333,24 @@ IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
 
-// 📤 4. GÉNÉRATION DES CONSIGNES LOGIQUES
-Cmd.PowerCutOff_A_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
-Cmd.PowerCutOff_B_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
+// 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES
+Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
+Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
+// ArmPulse_Cmd déjà positionné à l'étape 5 ci-dessus (garder FALSE hors étape 5)
+IF ArmingSeqStep &lt;&gt; 5 THEN
+    Cmd.ArmPulse_Cmd := FALSE;
+END_IF;
 
-// 📤 5. SYNTHÈSE DES ERREURS
+// 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag)
+Armable := EmergencyChainClosed
+           AND (ArmingSeqStep = 0)
+           AND NOT EmergencyArmingLockoutActive
+           AND NOT RedundancyTestFailed
+           AND NOT PowerContactorEngaged;
+
+ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
+
+// 📤 7. SYNTHÈSE DES ERREURS
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
     ErrorId := ErrorId OR 16#0001;
@@ -15097,6 +15358,8 @@ END_IF;
 IF EmergencyArmingFailed THEN
     ErrorId := ErrorId OR 16#0002;
 END_IF;
+// bit3 (16#0008) = StartupFail, positionné au §2 si autotest échoué
+// — ne pas l'effacer ici (reset explicite requis)
 
 Error := (ErrorId &lt;&gt; 16#0000);
 </xhtml>
@@ -15116,7 +15379,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le pilote</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le pilote (FALSE = toutes sorties à FALSE)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -15127,41 +15390,139 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordres logiques reçus du bloc logique</xhtml>
               </documentation>
             </variable>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir EmergencyChainClosed (pour bus State)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir PowerContactorEngaged (pour bus State)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir ArmingSeqStep (pour bus State)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculé par Logic (pour bus State)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculé par Logic (pour bus State)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir Error (pour bus Diag)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir ErrorId (pour bus Diag)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
-            <variable name="PowerCutOff_A_RQ">
+            <variable name="MaintainA_RQ">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers le relais de coupure physique A</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques terminales
+Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOff_B_RQ">
+            <variable name="MaintainB_RQ">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers le relais de coupure physique B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers relais maintien canal B — TRUE = voie maintenue, FALSE = coupure</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyArming_RQ">
+            <variable name="ArmPulse_RQ">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers le contacteur d'impulsion de réarmement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers contacteur impulsion réarmement — TRUE = pulse actif</xhtml>
               </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_State_Emergency" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état public</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_Diag_Emergency" />
+              </type>
             </variable>
           </outputVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📤 FB_Safety_EmergencyOutput — Pilote Physique de Sécurité
+   📤 FB_Safety_EmergencyManagementOutput — Pilote physique + bus état/diag
    ───────────────────────────────────────────────────────────────
-   📄 Rôle : Transmet les ordres de sécurité logiques vers les 
-      sorties physiques de l'automate (relais d'AU A/B/Impulsion).
+   📄 Rôle : Transmet les ordres de sécurité logiques vers les
+      sorties physiques ET produit les bus d'état et diagnostic
+      publics (ST_State_Emergency / ST_Diag_Emergency).
+   🧩 Instance privée du composite FB_Safety_EmergencyManagement
+      — jamais appelée hors du composite.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -15171,16 +15532,42 @@ Error := (ErrorId &lt;&gt; 16#0000);
 // === IMPLEMENTATION ===
 
 IF NOT Enable THEN
-    PowerCutOff_A_RQ   := FALSE;
-    PowerCutOff_B_RQ   := FALSE;
-    EmergencyArming_RQ := FALSE;
+    MaintainA_RQ   := FALSE;
+    MaintainB_RQ   := FALSE;
+    ArmPulse_RQ    := FALSE;
+
+    State.ChainOk        := FALSE;
+    State.ContactorOk    := FALSE;
+    State.Step           := 0;
+    State.Armable        := FALSE;
+    State.ArmingBusy     := FALSE;
+
+    Diag.Error                := FALSE;
+    Diag.ErrorId              := 16#0000;
+    Diag.RedundancyTestFailed := FALSE;
+    Diag.ArmFailed            := FALSE;
+    Diag.LockoutActive        := FALSE;
     RETURN;
 END_IF;
 
-// Écriture directe des signaux logiques sur les sorties physiques (fail-safe)
-PowerCutOff_A_RQ   := Cmd.PowerCutOff_A_Cmd;
-PowerCutOff_B_RQ   := Cmd.PowerCutOff_B_Cmd;
-EmergencyArming_RQ := Cmd.EmergencyArming_Cmd;
+// ⚡ Sorties physiques — écriture directe des ordres logiques
+MaintainA_RQ := Cmd.MaintainA_Cmd;
+MaintainB_RQ := Cmd.MaintainB_Cmd;
+ArmPulse_RQ  := Cmd.ArmPulse_Cmd;
+
+// 🚦 Bus d'état public
+State.ChainOk        := ChainOk;
+State.ContactorOk    := ContactorOk;
+State.Step           := ArmingStep;
+State.Armable        := Armable;
+State.ArmingBusy     := ArmingBusy;
+
+// 🛡️ Bus diagnostic public
+Diag.Error                := Error;
+Diag.ErrorId              := ErrorId;
+Diag.RedundancyTestFailed := RedundancyTestFailed;
+Diag.ArmFailed            := ArmFailed;
+Diag.LockoutActive        := LockoutActive;
 </xhtml>
           </ST>
         </body>
@@ -15644,7 +16031,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.13.md
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -16534,8 +16921,8 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md,
-                   DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md §7
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md,
+                   DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §7
                     (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2/§3)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
@@ -18439,7 +18826,7 @@ Résultat validation table + MaxStepNumber</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md §2, §6
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md §2, §6
    📄 Audit P0.2 : AUDIT_Winch_v1.0 (archivé) §2.2
    📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
    📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
@@ -19118,7 +19505,7 @@ Filtrage capteur de position cible</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.13.md
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -20264,7 +20651,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
@@ -20296,7 +20683,7 @@ LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie-09_Fonction_Winch_v1.14.md §4ter pour le contexte
+      en train de remonter — voir DOC/AF_Partie-10_Fonction_Winch_v2.0.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
@@ -20768,7 +21155,7 @@ END_IF;
    ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
       reste à 0 % et Configured reste FALSE.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.14.md</xhtml>
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -21781,7 +22168,7 @@ PreviousQualified := Qualified;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Winch_v1.14.md §9
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md §9
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
       1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
    🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :
@@ -23056,7 +23443,7 @@ instJoystick(
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -24124,7 +24511,7 @@ ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   📄 Docs : DOC/AF_Partie-09_Fonction_Winch_v1.14.md ; DOC/AF_Partie-12_Fonction_Benne_v1.4.md
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-11_Fonction_Benne_v2.0.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -24827,7 +25214,7 @@ Conversion SetFreqHz (Hz) → % pleine échelle pour SpeedRefPct</xhtml>
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v1.13.md</xhtml>
+   📄 Docs : DOC/AF_Partie-12_Fonction_Translation_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -25604,6 +25991,17 @@ GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.instJoystick.Error
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
 GVL_IHM.Modes.State.CurrentMode     := PRG_04_Modes.instModes.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
+
+// 🆕 Bus State/Diag Emergency → ST_ModesState (AF01 §6)
+GVL_IHM.Modes.State.EmergencyChainOk      := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.ChainOk;
+GVL_IHM.Modes.State.PowerContactorOk      := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.ContactorOk;
+GVL_IHM.Modes.State.EmergencyArmable      := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.Armable;
+GVL_IHM.Modes.State.EmergencyArmingBusy   := PRG_10_Outputs_LD.instSafetyEmergencyManagement.State.ArmingBusy;
+GVL_IHM.Modes.State.RedundancyTestFailed  := PRG_10_Outputs_LD.instSafetyEmergencyManagement.Diag.RedundancyTestFailed;
+GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_10_Outputs_LD.instSafetyEmergencyManagement.Diag.ArmFailed;
+GVL_IHM.Modes.State.PowerCutOffActive     := (PRG_03_Safety.instSafetyWinchM1.PowerCutOff
+                                               OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff
+                                               OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff);
 
 
 // ── 12. MAPPING DIAGNOSTICS BUS → IHM ────────────────────────────────────
@@ -27632,7 +28030,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="563">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.PowerCutOff_A_RQ</expression>
+              <expression>instSafetyEmergencyManagement.MaintainA_RQ</expression>
             </inVariable>
             <outVariable localId="564">
               <position x="0" y="0" />
@@ -27661,7 +28059,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="575">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.PowerCutOff_B_RQ</expression>
+              <expression>instSafetyEmergencyManagement.MaintainB_RQ</expression>
             </inVariable>
             <outVariable localId="576">
               <position x="0" y="0" />
@@ -27690,7 +28088,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="587">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.EmergencyArming_RQ</expression>
+              <expression>instSafetyEmergencyManagement.ArmPulse_RQ</expression>
             </inVariable>
             <outVariable localId="588">
               <position x="0" y="0" />
@@ -27719,7 +28117,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="599">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.EmergencyArming_RQ</expression>
+              <expression>instSafetyEmergencyManagement.ArmPulse_RQ</expression>
             </inVariable>
             <outVariable localId="600">
               <position x="0" y="0" />
@@ -27748,7 +28146,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="611">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.EmergencyArmingLockoutActive</expression>
+              <expression>instSafetyEmergencyManagement.Diag.LockoutActive</expression>
             </inVariable>
             <outVariable localId="612">
               <position x="0" y="0" />
@@ -27777,7 +28175,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="623">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.ArmingSeqStep</expression>
+              <expression>instSafetyEmergencyManagement.State.Step</expression>
             </inVariable>
             <outVariable localId="624">
               <position x="0" y="0" />
@@ -27806,7 +28204,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="635">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.RedundancyTestFailed</expression>
+              <expression>instSafetyEmergencyManagement.Diag.RedundancyTestFailed</expression>
             </inVariable>
             <outVariable localId="636">
               <position x="0" y="0" />
@@ -27835,7 +28233,7 @@ Demande de coupure de puissance</xhtml>
             <inVariable localId="647">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.EmergencyArmingFailed</expression>
+              <expression>instSafetyEmergencyManagement.Diag.ArmFailed</expression>
             </inVariable>
             <outVariable localId="648">
               <position x="0" y="0" />
@@ -28891,6 +29289,274 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>07195219-7877-5f98-aec3-85c8b09adc2c</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="PRG_AU_TestBench" pouType="program">
+        <interface>
+          <inputVars>
+            <variable name="SimEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes testeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimReset">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimArmRequest">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front demandé à l'utilisateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPowerCutOffReq">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety métier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimBtnCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure IHM maintenue</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États observables</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="MaintainA_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MaintainB_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmPulse_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_State_Emergency" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus structurés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_Diag_Emergency" />
+              </type>
+            </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CycleCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Indicateurs de simulation</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instEmergency">
+              <type>
+                <derived name="FB_Safety_EmergencyManagement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instance du composite testé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmReqTrig">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gestion fronts</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetTrig">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 PRG_AU_TestBench — Banc de test minimal pour FB_Safety_EmergencyManagement
+   ───────────────────────────────────────────────────────────────
+   📄 Programme minimal autonome pour simuler et tester la chaîne AU :
+      • Toutes les entrées du composite sont exposées en VAR_INPUT
+      • Toutes les sorties en VAR_OUTPUT pour observation Watch/IHM
+      • Un cycle de simulation basique avec front armement intégré
+   🎯 Objectif : vérifier la séquence d'auto-test A/B, le pulse,
+      la confirmation, le lockout, sans matériel réel.
+   ⚙️ Usage : instancier dans une tâche CODESYS à 50 ms, piloter
+      les inputs depuis une table Watch ou un visu de test.
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🔄 Fronts
+ArmReqTrig(CLK := SimArmRequest);
+ResetTrig(CLK := SimReset);
+
+// 🛡️ Appel du composite
+instEmergency(
+    Enable := SimEnable,
+    Reset := PRG_09_Supervision.FaultMachineReset_IHM,  // ou SimReset si test isolé
+    ArmRequest := SimArmRequest,
+    EmergencyChainClosed := SimChainClosed,
+    PowerContactorEngaged := SimContactorEngaged,
+    PowerCutOffRequest := SimPowerCutOffReq,
+    BtnEmergencyCutOff := SimBtnCutOff
+);
+
+// 📤 Sorties observables
+Ready        := instEmergency.Ready;
+Busy         := instEmergency.Busy;
+Done         := instEmergency.Done;
+Error        := instEmergency.Error;
+ErrorId      := instEmergency.ErrorId;
+MaintainA_RQ := instEmergency.MaintainA_RQ;
+MaintainB_RQ := instEmergency.MaintainB_RQ;
+ArmPulse_RQ  := instEmergency.ArmPulse_RQ;
+State        := instEmergency.State;
+Diag         := instEmergency.Diag;
+ArmingSeqStep       := instEmergency.State.Step;
+RedundancyTestFailed := instEmergency.Diag.RedundancyTestFailed;
+ArmFailed           := instEmergency.Diag.ArmFailed;
+LockoutActive       := instEmergency.Diag.LockoutActive;
+
+// 🔄 Label lisible de l'étape
+CASE instEmergency.State.Step OF
+    0: StateLabel := 'IDLE (attente réarmement)';
+    1: StateLabel := 'TestA (coupe canal A)';
+    2: StateLabel := 'RestoreA (rétablit A)';
+    3: StateLabel := 'TestB (coupe canal B)';
+    4: StateLabel := 'RestoreB (rétablit B)';
+    5: StateLabel := 'Pulse (impulsion 1s)';
+    6: StateLabel := 'Confirm (attente contacteur)';
+ELSE
+    StateLabel := 'INCONNU';
+END_CASE;
+
+// 🔄 Compteur de cycle
+CycleCount := CycleCount + 1;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>02de714f-6617-5e7c-a494-70cf9c90d728</ObjectId>
           </data>
         </addData>
       </pou>
@@ -31307,7 +31973,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Translation_M3_Stub — Entrées de simulation M3 restantes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v1.13.md §7
+   📄 Doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md §7
    🧹 REX 2026-07-18 : ancien mode relais `DEGRADED_IO` retiré. Les sorties relais,
       retours contacteurs, défaut TOR et cible générique sans consommateur sont supprimés.
       Restent uniquement PV (entrée réelle à mapper) et le sélecteur de trajet simulé.
@@ -31471,7 +32137,10 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
           <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
+          <Object Name="PRG_AU_TestBench" ObjectId="02de714f-6617-5e7c-a494-70cf9c90d728" />
+          <Object Name="ST_Diag_Emergency" ObjectId="3f15b664-1dd2-593a-af9a-957a294bd1db" />
           <Object Name="ST_EmergencyManagementCmd" ObjectId="ae2c6921-7efc-58d4-8776-856ce456136e" />
+          <Object Name="ST_State_Emergency" ObjectId="4e2ee04c-1b5f-5e6f-817a-f94c46405f29" />
         </Folder>
         <Folder Name="SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
