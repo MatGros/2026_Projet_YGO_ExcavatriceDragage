@@ -36,6 +36,16 @@
 | Décodeur position — payload cohérent | AUTO | `suites/contracts/test_translation_behavior.py::test_position_decoder_contract_validates_coherent_payloads` | actif |
 | Module généré expose contrat + validateur | AUTO | `suites/contracts/test_translation_behavior.py::test_generated_translation_module_exposes_contract_and_validator` | actif |
 | Rejet module non encapsulé | AUTO | `suites/contracts/test_translation_behavior.py::test_validation_rejects_non_encapsulated_module` | actif |
+| Catalogue M3 — démarrage nominal → cible | AF-TR-01 | `suites/contracts/test_translation_m3_catalog.py::test_translation_m3_catalog` | actif |
+| Catalogue M3 — ralentissement avant cible | AF-TR-02 | `suites/contracts/test_translation_m3_catalog.py::test_translation_m3_catalog` | actif |
+| Catalogue M3 — SafeStop met en défaut | AF-TR-03 | `suites/contracts/test_translation_m3_catalog.py::test_translation_m3_catalog` | actif |
+| Catalogue M3 — Reset acquitte et autorise reprise | AF-TR-04 | `suites/contracts/test_translation_m3_catalog.py::test_translation_m3_catalog` | actif |
+
+> Les 4 lignes ci-dessus sont **pilotées par `suites/catalogs/translation_m3_test_catalog.csv`** :
+> une ligne CSV = un cas pytest paramétré. Ajouter un cas fonctionnel ne demande pas de Python.
+> Historique : ce catalogue était exécuté par `functional_tests/run_translation_m3_catalog.py`,
+> qui écrivait `status='passed'` **en dur** sans comparer au résultat attendu (faux test, hors
+> de tout gate). Supprimé le 2026-08 et remplacé par de vraies assertions.
 
 ## Outillage générateur (`fb_gen.py`) — pas un test métier
 
