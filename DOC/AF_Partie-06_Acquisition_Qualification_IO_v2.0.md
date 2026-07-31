@@ -14,14 +14,14 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type | Détail |
+| ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P06-001 | Aucun FB metier ne lit une E/S brute device | consommateurs = donnees qualifiees seulement | AUTO | §2 |
-| TC-P06-002 | Polarite normalisee une seule fois en acquisition | pas de reinversion dans FB metier | AUTO | §2 |
-| TC-P06-003 | Bascule reel/simulation par domaine a la frontiere unique | `HwIn` source unique | AUTO | §2 |
-| TC-P06-004 | Diag CANopen/EtherCAT publie online/operational | faits dispo pour Modes/Safety/IHM | AUTO | §3 |
-| TC-P06-005 | Noms puissance confirmes device | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI`, `PowerContactorEngaged_DI` | SITE | §4 |
-| TC-P06-006 | Sorties finales seulement via `PRG_OUTPUTS_LD` | barrieres finales uniques productrices | AUTO | §5 |
+| TC-P06-001 | Aucune lecture d'E/S brute dans les FB métier | Consommateurs lisent des faits qualifiés | `💻 AUTO` | §2 |
+| TC-P06-002 | Polarité normalisée une seule fois à l'acquisition | Zéro ré-inversion dans les FB métier | `💻 AUTO` | §2 |
+| TC-P06-003 | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | §2 |
+| TC-P06-004 | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | §3 |
+| TC-P06-005 | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | §4 |
+| TC-P06-006 | Écriture des sorties physiques centralisée | `PRG_OUTPUTS_LD` seul producteur final | `💻 AUTO` | §5 |
 
 ---
 

@@ -25,24 +25,24 @@
 
 | Type | Sens |
 |---|---|
-| `AUTO` | Banc / script / suite hors production (ST de test, Python, sim). |
-| `AUTO_PLC` | **Séquence intégrée à l'automate de production** — se joue toute seule dans le FB (ex. auto-test A/B au réarmement). Pas un essai opérateur manuel. |
-| `SITE` | Essai terrain / câblage / AU physique. |
-| `AUTO+SITE` | Les deux couches. |
+| `💻 AUTO` | Banc / script / suite hors production (Python, sim). |
+| `⚡ AUTO_PLC` | Séquence intégrée à l'automate de production (se joue seule dans le FB). |
+| `🟢 SITE` | Essai terrain / câblage / AU physique. |
+| `⚡ SITE+AUTO` | Couverture mixte (Automate + Terrain). |
 
-### Catalogue (8 tests — regroupés par fonction)
+### Catalogue (9 tests — regroupés par fonction)
 
-| ID | Fonction | Attendu | Preuve | Type | Détail |
+| ID | Intention | Comportement attendu | Preuve | Type | Réf |
 |---|---|---|---|---|---|
-| TC-P01-001 | AU physique | Coupe puissance moteurs, API vivant | contacteur ouvert, PLC OK | SITE | §5.1 |
-| TC-P01-002 | Maintien A/B | Perte A ou B ouvre boucle AU | `PowerKeepAlive_*=FALSE` côté Q | AUTO+SITE | §4 |
-| TC-P01-003 | Réarmement | Front `ArmRequest` seul, chain OK, contacteur ouvert | pulse 1s, pas d'auto-réarmement | AUTO + AUTO_PLC | §5.3 |
-| TC-P01-004 | Fault `ArmingFailed` acquittable sans condition | Reset seul efface l'affichage (front, jamais conditionné par le contacteur) ; interlock securite reste sur la cause brute | bit/ErrorId | AUTO | §5.3, §3.4bis |
-| TC-P01-005 | Acquittement ≠ réarmement | 2 actions distinctes requises ; un nouvel `ArmRequest` relance sans passer par Reset | 2 actions | AUTO+SITE | §5.4 |
-| TC-P01-006 | Auto-test A/B intégré | Un canal ouvert, l'autre maintenu ; chain suit ; échec ⇒ `RedundancyTestFailed` | steps 1–4, 200 ms | **AUTO_PLC** (+ AUTO en sim) | §3.3bis |
-| TC-P01-007 | Lockout 5s | Échec confirm ⇒ lockout 5s | `EmergencyArmingLockoutActive` | AUTO | §5.3 |
-| TC-P01-008 | Coupure sécurité | `PowerCutOffRequest=TRUE` ouvre A et B sans armement | sorties maintien FALSE | AUTO | §3 |
-| TC-P01-009 | Re-latch après acquittement prématuré | Ack sur front Reset alors que cause encore présente → nouvelle occurrence de la cause remet le Fault affiché | `ArmFailedAck` retombe au prochain front Cause | AUTO | §3.4bis |
+| TC-P01-001 | AU physique | Coupe puissance moteurs, API vivant | Contacteur ouvert | `🟢 SITE` | §5.1 |
+| TC-P01-002 | Maintien A/B | Perte canal A ou B ouvre la boucle AU | `MaintainA/B_RQ=FALSE` | `⚡ SITE+AUTO` | §4 |
+| TC-P01-003 | Réarmement | Front `ArmRequest` + boucle OK ➔ pulse 1s | Pulse 1s (step 5) | `⚡ AUTO_PLC` | §5.3 |
+| TC-P01-004 | Ack Cause/Ack | `Reset` efface l'affichage (interlock reste sur Cause) | `Error=FALSE` | `💻 AUTO` | §3.4bis |
+| TC-P01-005 | Séquencement | Acquittement et réarmement 2 actions distinctes | 2 actions requises | `⚡ SITE+AUTO` | §5.4 |
+| TC-P01-006 | Auto-test A/B | Test croisé A/B au réarmement (échec ➔ `RedundancyFail`) | Steps 1–4 (200ms) | `⚡ AUTO_PLC` | §3.3bis |
+| TC-P01-007 | Lockout 5s | Échec confirmation contacteur ➔ verrouillage 5s | `LockoutActive=TRUE` | `💻 AUTO` | §5.3 |
+| TC-P01-008 | Coupure métier | `PowerCutOffRequest=TRUE` coupe A et B sans armer | `MaintainA/B_RQ=FALSE` | `💻 AUTO` | §3 |
+| TC-P01-009 | Re-latch Cause | Cause persistante ➔ ré-alarme au prochain essai | `Ack=FALSE` | `💻 AUTO` | §3.4bis |
 
 ---
 
@@ -468,8 +468,8 @@ Fichiers code de référence :
 - `CODE/AU/ST_EmergencyState.st` (bus état IHM, test)
 - `CODE/AU/GVL_Simulation_AU.st` (simulation hardware)
 - `CODE/AU/GVL_IHM_AU.st` (interface IHM)
-- `CODE/AU/PRG_AU_Acquisition_CFC.xml` (acquisition, CFC natif — cible AF02 §2)
-- `CODE/AU/PRG_AU_Outputs_LD.st` (sorties)
+- `CODE/MAIN/PRG_AU_Acquisition_CFC.xml` (acquisition, CFC natif — cible AF02 §2)
+- `CODE/MAIN/PRG_AU_Outputs_LD.st` (sorties)
 - `CODE/AU/PRG_AU_TestBench.st` (programme principal test)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - `CODE/MAIN/Acquisition (CFC).st` (cible)

@@ -18,18 +18,18 @@
 
 ## 🧪 Points de validation (`TC-P10-001` à `010` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-001 | Méca A (bit7) : dérive>2.0m OU vitesse>0.02m/s, contacteurs+frein confirmés coupés, hors homing ⇒ SafeStop+PowerCutOff | AUTO |
-| TC-P10-002 | Méca B (bit8) : perte CAN/neutre + non-confirmation arrêt sous 3s ⇒ SafeStop+PowerCutOff | AUTO |
-| TC-P10-003 | Méca C (bit9) : dérive M1>2.0m pendant `BenneHoldStillActive` (M1 seul, jamais M2) ⇒ SafeStop+PowerCutOff | AUTO |
-| TC-P10-004 | Méca D (bit11) : capteur haut hors homing + non-confirmation sous 3s ⇒ SafeStop+PowerCutOff ; neutralisé en descente | AUTO |
-| TC-P10-005 | Méca E bit12 : écart>2.0m ⇒ SafeStop seul (pas PowerCutOff) | AUTO |
-| TC-P10-006 | Méca E bit13 : bit12 non confirmé arrêté sous 3s ⇒ escalade PowerCutOff | AUTO |
-| TC-P10-007 | Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ⇒ SafeStop seul | AUTO |
-| TC-P10-008 | Méca G (bit15) : vitesse nulle malgré commande 3s ⇒ SafeStop seul | AUTO |
-| TC-P10-009 | `PowerCutOff` = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84) | AUTO |
-| TC-P10-010 | `SafeStop` exclut bit3 (mou câble) uniquement si `SyncEnable=FALSE` | AUTO |
+| TC-P10-001 | Méca A (bit7) : dérive>2m ou v>0.02m/s arrêt ➔ SafeStop+PowerCutOff | `💻 AUTO` |
+| TC-P10-002 | Méca B (bit8) : non-confirmation arrêt 3s ➔ SafeStop+PowerCutOff | `💻 AUTO` |
+| TC-P10-003 | Méca C (bit9) : dérive M1>2m en maintien M1 ➔ SafeStop+PowerCutOff | `💻 AUTO` |
+| TC-P10-004 | Méca D (bit11) : capteur haut sans arrêt 3s ➔ SafeStop+PowerCutOff | `💻 AUTO` |
+| TC-P10-005 | Méca E bit12 : écart>2m ➔ SafeStop seul (pas PowerCutOff) | `💻 AUTO` |
+| TC-P10-006 | Méca E bit13 : bit12 non confirmé 3s ➔ escalade PowerCutOff | `💻 AUTO` |
+| TC-P10-007 | Méca F (bit14) : sens mesuré opposé au sens commandé 500ms ➔ SafeStop | `💻 AUTO` |
+| TC-P10-008 | Méca G (bit15) : vitesse nulle malgré commande 3s ➔ SafeStop seul | `💻 AUTO` |
+| TC-P10-009 | `PowerCutOff` = exactement bits 2,7,8,9,10,11,13 (masque 16#2F84) | `💻 AUTO` |
+| TC-P10-010 | `SafeStop` exclut bit3 (mou câble) si `SyncEnable=FALSE` | `💻 AUTO` |
 
 ---
 

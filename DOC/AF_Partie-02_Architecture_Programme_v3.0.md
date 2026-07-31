@@ -16,13 +16,13 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type | Détail |
+| ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P02-001 | Une donnee a un seul producteur | aucun double ecrivain sur le meme contrat | AUTO | §1 |
-| TC-P02-002 | Page CFC sans logique metier | pas de `IF`/calcul/arbitrage dans le CFC | AUTO | §1 |
-| TC-P02-003 | Sorties physiques seulement via `PRG_OUTPUTS_LD` | aucun autre POU n'ecrit les Q/PDO finaux | AUTO | §2 |
-| TC-P02-004 | Ordre d'execution MainTask conforme a la cible | tache CODESYS + `check_linkage.py` | AUTO | §4 |
-| TC-P02-005 | Troubleshooting lecture seule | aucune ecriture commande/config/interlock | AUTO | §2 |
+| TC-P02-001 | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat | `💻 AUTO` | §1 |
+| TC-P02-002 | Page CFC sans logique métier | Zéro `IF`/calcul inline dans le CFC | `💻 AUTO` | §1 |
+| TC-P02-003 | Sorties physiques via `PRG_OUTPUTS_LD` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | §2 |
+| TC-P02-004 | Ordre d'exécution MainTask conforme | Tâche CODESYS + `check_linkage.py` PASS | `💻 AUTO` | §4 |
+| TC-P02-005 | Troubleshooting lecture seule | Aucune écriture commande/config/interlock | `💻 AUTO` | §2 |
 
 ---
 

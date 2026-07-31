@@ -18,12 +18,12 @@
 
 ## 🧪 Points de validation (`TC-P12-002` à `011`, `014` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-002 | Mot incohérent ⇒ bit7 ⇒ SafeStop+PowerCutOff | AUTO_PLC |
-| TC-P12-010 | Méca A (bit5) : arrêt commandé mais fréquence>0.5Hz pendant >1.0s ⇒ SafeStop+PowerCutOff | AUTO_PLC |
-| TC-P12-011 | Méca B (bit4) : incohérence arrêt >3.0s ⇒ SafeStop+PowerCutOff ; variante si perte IHM | AUTO_PLC |
-| TC-P12-014 | `BypassGlobal` force ErrorId=0, coupe les 2 TON, Reset reste fonctionnel | AUTO_PLC |
+| TC-P12-002 | Mot incohérent ➔ Bit7 ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P12-010 | Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P12-011 | Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P12-014 | `BypassGlobal` efface `ErrorId`, coupe TONs, Reset fonctionnel | `⚡ AUTO_PLC` |
 
 ---
 

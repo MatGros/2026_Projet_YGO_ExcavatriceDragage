@@ -18,13 +18,13 @@
 
 ## 🧪 Points de validation (`TC-P10-012/013/020/021/022` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-012 | Watchdog frein barrière finale 500ms : sans confirmation ⇒ FAULT, RestartInhibit | AUTO_PLC |
-| TC-P10-013 | Anti-redémarrage : cause disparue + Reset + neutre observé + nouvelle demande distincte | AUTO_PLC |
-| TC-P10-020 | Watchdog frein réel terrain (temps, contacteur/bobine) | SITE |
-| TC-P10-021 | Temps mort redémarrage même sens : 1s après arrêt → nouvelle demande même sens | AUTO |
-| TC-P10-022 | Temps mort inversion sens : 1s après arrêt + inversion sens, > temps mort même sens | AUTO |
+| TC-P10-012 | Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
+| TC-P10-013 | Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation | `⚡ AUTO_PLC` |
+| TC-P10-020 | Watchdog frein réel terrain (temps, contacteur/bobine) | `🟢 SITE` |
+| TC-P10-021 | Temps mort même sens : 1s après arrêt ➔ nouvelle demande | `💻 AUTO` |
+| TC-P10-022 | Temps mort inversion : 1s après arrêt + inversion sens | `💻 AUTO` |
 
 ---
 

@@ -2902,12 +2902,14 @@ TRUE = une safety demande la coupure</xhtml>
           <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
           <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />
           <Object Name="FB_Sim_AU_ChainFeedback" ObjectId="d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda" />
-          <Object Name="PRG_AU_Acquisition_CFC" ObjectId="22eb10df-0a92-5149-8107-a9e4bedbf362" />
-          <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
           <Object Name="PRG_AU_TestBench" ObjectId="02de714f-6617-5e7c-a494-70cf9c90d728" />
         </Folder>
         <Folder Name="COMMUN">
           <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
+        </Folder>
+        <Folder Name="MAIN">
+          <Object Name="PRG_AU_Acquisition_CFC" ObjectId="22eb10df-0a92-5149-8107-a9e4bedbf362" />
+          <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
         </Folder>
       </ProjectStructure>
     </data>

@@ -17,11 +17,11 @@
 
 ## 🧪 Points de validation (`TC-P10-014/015/016` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-014 | Sync bit0 (écart>0.10m, 800ms) ⇒ SyncWarn IHM seul, pas de SafeStop direct (défaut) | AUTO |
-| TC-P10-015 | Sync bit1 (incohérence commande, 500ms) ⇒ SafeStop fast | AUTO |
-| TC-P10-016 | Couplage croisé : si `SyncActive`, arrêt sur un treuil coupe l'autre au même scan | AUTO |
+| TC-P10-014 | Sync bit0 (écart>0.10m, 800ms) ➔ SyncWarn IHM seul | `💻 AUTO` |
+| TC-P10-015 | Sync bit1 (incohérence commande, 500ms) ➔ SafeStop fast | `💻 AUTO` |
+| TC-P10-016 | Couplage croisé : `SyncActive` ➔ arrêt d'un treuil coupe l'autre | `💻 AUTO` |
 
 ---
 

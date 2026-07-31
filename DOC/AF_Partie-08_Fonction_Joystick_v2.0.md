@@ -21,16 +21,16 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type | Détail |
+| ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P08-001 | Perte contacteur puissance, CAN ou joystick non OP ⇒ sorties axes à 0 et `DeadmanArmed=FALSE` | `SpeedRef=0`, `StartStop=FALSE` | AUTO+SITE | §3 |
-| TC-P08-002 | Homme-mort : armement seulement par front bouton au neutre ; sans armement, la rampe cible 0 | `DeadmanArmed` puis `SpeedRef→0` | AUTO+SITE | §4 |
-| TC-P08-003 | Présence : bouton relâché > 10 s en mouvement ⇒ désarmement et décélération normale | `DeadmanArmed=FALSE` | AUTO+SITE | §4 |
-| TC-P08-004 | Neutre : traversée < 500 ms conserve l'armement ; neutre tenu >= 500 ms après geste désarme | `DeadmanArmed` attendu | AUTO | §4 |
-| TC-P08-005 | Changement de mode ou fin benne désarme ; seule Extraction `CLOSING_BUCKET` peut préserver l'armement | câblage + états | AUTO | §4, §6 |
-| TC-P08-006 | Calibration : hors [2000;8000] ⇒ bit0 ; Reset front seulement cause disparue | `ErrorId` | AUTO | §5 |
-| TC-P08-007 | Contrat consigne : `SpeedRef` signé [-100;+100], `StartStop` sur magnitude ; pas d'entrée `SafeStop` | interface `ST_AxisCmd` / FB | AUTO | §1, §2 |
-| TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` en plus de la consigne | linkage Cycle/06/07 | AUTO | §6 |
+| TC-P08-001 | Perte contacteur / CAN ➔ désarmer et annuler axes | `SpeedRef=0`, `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §3 |
+| TC-P08-002 | Armement homme-mort sur front au neutre uniquement | Armement ➔ `SpeedRef` actif | `⚡ SITE+AUTO` | §4 |
+| TC-P08-003 | Bouton relâché > 10 s ➔ désarmement et décélération | `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §4 |
+| TC-P08-004 | Neutre rapide (<500ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | §4 |
+| TC-P08-005 | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | §4, §6 |
+| TC-P08-006 | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | §5 |
+| TC-P08-007 | Consigne `SpeedRef` signée [-100;+100] sur `ST_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | §1, §2 |
+| TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` | Linkage vérifié | `💻 AUTO` | §6 |
 
 ---
 
