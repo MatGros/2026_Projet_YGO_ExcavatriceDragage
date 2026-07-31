@@ -11,6 +11,15 @@ Ce script rend la maintenance inutile :
   D2  lien vers une version plus ancienne que celle presente      -> ERREUR
   D3  plusieurs versions actives du meme document dans `DOC/`     -> AVERTISSEMENT
   D4  lien interne casse vers un autre fichier du depot           -> ERREUR
+  D7  renvoi en PROSE vers un numero d'AF qui n'existe pas        -> ERREUR
+
+Classe de bug D7 (audit 2026-07-31) : le renumerotage des specs metier
+(Translation `11`->`12`, Benne `12`-> fiche du domaine Treuils `10`) a laisse
+`AGENTS.md`, les deux `README.md`, des renvois "Documents lies" et des
+commentaires ST pointer un `AF11` qui n'existe plus. D1-D4 ne voyaient rien :
+ils ne controlent que les CHEMINS de fichiers, pas les mentions en prose
+(`AF11`, `AF_Partie-11`, `Partie 11`, `Translation=P11`). Un agent qui suit
+les guardrails ouvrait donc une spec inexistante.
 
 `--fix` reecrit automatiquement les liens D2 vers la derniere version.
 
@@ -33,11 +42,45 @@ EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git", ".pi-suba
 # de l'entree. Un lien vers un document depuis archive n'y est pas une erreur.
 HISTORICAL_LOGS = {"DOC/VERSION_HISTORY.md", "DOC/AUDIT_Coherence_Documentaire_v1.0.md"}
 
+# D7 — journaux de bord et contrats de tache : ils citent le numero d'AF tel qu'il
+# etait a la date de l'entree. Reecrire un journal falsifierait l'historique.
+NUMBERING_HISTORICAL_PREFIXES = (
+    "DOC/PLAN_TASK",
+    "DOC/CHECKLISTS/TASK_CONTEXT/",
+    "DOC/AUDITS/",
+)
+# Marqueur a poser dans un document qui assume ses renvois a l'ancienne numerotation
+# (il doit alors expliquer l'equivalence actuelle en tete, cf. FB_Bucket_Extraction).
+NUMBERING_OPT_OUT = "doc-links:numerotation-historique"
+
 VERSIONED = re.compile(r"^(?P<stem>.+?)_v(?P<major>\d+)\.(?P<minor>\d+)\.md$")
 LINK = re.compile(r"(?P<path>(?:DOC|CODE|TOOLS)/[A-Za-z0-9_./\-]+\.(?:md|st|py|xml))")
 # `AF_Partie-09_...` : la clef de regroupement est le numero de partie, car le
 # libelle peut changer d'une version a l'autre (`Fonction_Winch` -> `Fonction_Treuil`).
 AF_PARTIE = re.compile(r"^AF_Partie-(?P<num>\d{2})_")
+# Mention d'une AF en PROSE, toutes les formes rencontrees dans le depot :
+#   `AF_Partie-11`  `AF_Partie 11`  `AF11`  `AF-11`  `Partie 11`  `Partie-11`  `Partie11`
+#   plus la forme abregee des guardrails `Translation=P11` (2 chiffres imposes : les
+#   libelles de gravite `P0`/`P1`/`P2` des tableaux d'alerte ne sont PAS des renvois).
+# `(?<![\w-])` interdit de matcher au milieu d'un mot, dans un identifiant `TC-P09-001`,
+# ou apres le prefixe `ex-` reserve aux renvois volontairement historiques
+# (`ex-AF_Partie-11`, cf. CODE/MAIN/PRG_06_WinchControl.st).
+AF_MENTION = re.compile(
+    r"(?<![\w-])(?:"
+    r"(?:AF[_ -]?Partie[- ]?|AF-?|Partie[- ]?)(?P<num>\d{1,2})"
+    r"|P(?P<num2>\d{2})"
+    r")(?![\d\w])"
+)
+
+
+def existing_af_numbers(doc_dir: Path) -> set[str]:
+    """Numeros d'AF reellement publies : fichier `AF_Partie-NN_*` OU dossier `AF_Partie-NN_*`."""
+    numbers: set[str] = set()
+    for entry in doc_dir.glob("AF_Partie-*"):
+        match = re.match(r"AF_Partie-(\d{2})", entry.name)
+        if match:
+            numbers.add(match.group(1))
+    return numbers
 
 
 def is_excluded(path: Path) -> bool:
@@ -98,6 +141,7 @@ def main() -> int:
         return 2
 
     latest = latest_versions(doc_dir)
+    af_numbers = existing_af_numbers(doc_dir)
     # (message, corrige_par_fix) — seuls les liens reellement reecrits disparaissent.
     errors: list[tuple[str, bool]] = []
     warnings: list[str] = []
@@ -145,6 +189,29 @@ def main() -> int:
                     (
                         f"{rel}:1: document sans titre H1 — contenu de tete probablement perdu "
                         f"(commence par : {first.strip()[:60]!r})",
+                        False,
+                    )
+                )
+
+        # D7 — renvoi en prose vers un numero d'AF inexistant (voir en-tete).
+        # `--fix` ne corrige PAS : seul un humain sait si `AF11` voulait dire
+        # Translation (-> AF12) ou Benne (-> fiche du domaine Treuils, AF10).
+        historical = rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text
+        if af_numbers and not historical:
+            reported: set[tuple[int, str]] = set()
+            for match in AF_MENTION.finditer(text):
+                num = (match.group("num") or match.group("num2")).zfill(2)
+                if num in af_numbers:
+                    continue
+                line = text.count("\n", 0, match.start()) + 1
+                if (line, num) in reported:
+                    continue
+                reported.add((line, num))
+                errors.append(
+                    (
+                        f"{rel}:{line}: renvoi `{match.group(0)}` vers une AF inexistante "
+                        f"(numeros publies : {', '.join(sorted(af_numbers))}). Corriger le renvoi, "
+                        f"ou prefixer `ex-` si la mention est volontairement historique",
                         False,
                     )
                 )

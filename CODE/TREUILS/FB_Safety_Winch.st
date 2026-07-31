@@ -2,7 +2,7 @@
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md,
-                   DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §7
+                   DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §7
                     (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2/§3)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).

@@ -3940,7 +3940,7 @@ Boucle AU fermée (comme EmergencyChainClosed_DI)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §9
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §9
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
       modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
@@ -7998,7 +7998,7 @@ END_IF;
         (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
         BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
         M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md "flux nominal, benne ouvert").
+        voir DOC/AF_Partie-09_Fonction_Encoder_v2.0.md "flux nominal, benne ouvert").
         Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
         cible était déjà atteinte) par une action explicite et auditable. Même principe que
         `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
@@ -11278,7 +11278,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3/§6
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §3/§6
    ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
       CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
       instantané par simple offset) + un mode `Teach` auto-calibré —
@@ -11774,7 +11774,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §1/§5/§7bis
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §1/§5/§7bis
    ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
       unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
       moteur n'est piloté ici.
@@ -12105,7 +12105,7 @@ HomingRefRaw := Calib.HomingRefRaw;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3.6/§3.7
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §3.6/§3.7
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
       - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur
@@ -12258,7 +12258,7 @@ Done := FALSE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §2/§3.1
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §2/§3.1
    ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
       `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
       — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
@@ -12446,7 +12446,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📐 FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3.8
+   📄 Doc : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §3.8
    🛡️ Sécurité : mesure propriétaire de la chaîne codeur ; aucune réaction machine
    🧩 Dépendances : position sûre fournie par FB_Encoder_Safety
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -12738,7 +12738,7 @@ END_IF;
    🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
       jusqu'à disparition de la cause et acquittement par front Reset.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -17322,7 +17322,7 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
    🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md,
-                   DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §7
+                   DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §7
                     (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2/§3)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
       un FB métier à part entière (pas une brique réduite).
@@ -18964,7 +18964,7 @@ SimContactorOk := ContactorLatch;
    📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
-      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
+      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie12 §9bis) par
       une simulation par temps de parcours : le translation "arrive" à la cible
       sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
       continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
@@ -23557,7 +23557,7 @@ instPositionDecoder(
 );
 
 //  🔌 HwIn.Translation.M3_BrakeIsOpen_DI ······· câblage réel : 1 = contacteur commandé = DESSERRÉ
-//         └─►[ instM3BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-11 §5
+//         └─►[ instM3BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-12 §5
 //                └─► M3BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
 //                       └─► PRG_03_Safety (instSafetyTranslationM3 Méca B) · PRG_09_Supervision
 instM3BrakeFeedback(InputRaw := HwIn.Translation.M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
@@ -23928,7 +23928,7 @@ instJoystick(
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md</xhtml>
+   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -25178,7 +25178,7 @@ ELSE
     // réouverture documentée T40) : le joystick n'est plus la SEULE source —
     // GVL_IHM.Modes.Cmd.TglJoystickMaster bascule vers les boutons IHM maintenus (BtnUp/BtnDown),
     // homme-mort joystick réel TOUJOURS exigé en parallèle (même leçon que le précédent bug
-    // Translation M3, AF_Partie-11 v1.9 §6bis — jamais implicite). Voir
+    // Translation M3, AF_Partie-12 §6bis (ex-AF_Partie-11 v1.9) — jamais implicite). Voir
     // ARCHIVES/Doc/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
     // 🆕 Sélection treuil (TASK-0001, MAINT_N2 uniquement, voir FB_Modes.JoystickWinchSelectArbitrated) :
     // 1=M1 seul, 2=M2 seul, 3=Couplé — forcé à 3 (Couplé) hors MAINT_N2, IDENTIQUE quelle que

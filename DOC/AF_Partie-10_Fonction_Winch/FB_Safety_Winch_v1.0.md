@@ -87,7 +87,7 @@ mesures surveillées (codeurs, contacteurs restent produits ailleurs).
 | 6 | Limite basse câble | ForbidDescent |
 | 10 | Thermique frein commun | SafeStop+PowerCutOff |
 
-**Défense en profondeur Méca C** (lien Benne, AF11) : couche 1 (`FB_Bucket`, 1.0m) coupe M2 en
+**Défense en profondeur Méca C** (lien Benne, fiche [`FB_Bucket_v1.0.md`](FB_Bucket_v1.0.md)) : couche 1 (`FB_Bucket`, 1.0m) coupe M2 en
 premier ; Méca C (2.0m) coupe la puissance amont si la couche 1 ne suffit pas.
 
 ---
@@ -135,5 +135,5 @@ ForbidAscent  = bit5 OR (capteur haut hors homing) OR (bit3 ET NOT SyncEnable)
 | AF01 | AU/PowerCutOff — chaîne électrique |
 | AF03 | Profil FB safety domaine |
 | AF09 | Encodeurs — position/vitesse/Homed consommés |
-| AF11 | Benne — Méca C couche 2 |
+| AF10 / [FB_Bucket](FB_Bucket_v1.0.md) | Benne — Méca C couche 2 |
 | Code | `CODE/TREUILS/FB_Safety_Winch.st` |

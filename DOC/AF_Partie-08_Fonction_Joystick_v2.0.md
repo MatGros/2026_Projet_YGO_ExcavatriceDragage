@@ -267,6 +267,6 @@ identifiée, mais **à valider explicitement avant code**.
 | AF05 | Modes, sélecteur treuil, désarmement au change mode |
 | AF06 | Raw Operator / sim |
 | AF07 | `ST_JoystickHMI` |
-| AF10 / AF11 / AF12 | Consommateurs AxisCmd + DeadmanArmed ; exception Extraction |
+| AF10 / AF12 | Consommateurs AxisCmd + DeadmanArmed (Treuils Benne incluse · Translation) ; exception Extraction |
 | AF13 | `FB_Sim_Joystick` amont |
 | Code | `CODE/JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_AxisCmd.st` |

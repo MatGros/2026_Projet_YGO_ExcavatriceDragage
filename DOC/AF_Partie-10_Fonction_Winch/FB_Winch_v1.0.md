@@ -148,5 +148,5 @@ leur **égalité** qui signale un contacteur/bobine collé (pas leur différence
 | AF10 / FB_Safety_Winch | `SafeStop`/`ForbidDescent`/`ForbidAscent` consommés |
 | AF10 / FB_WinchOutputInterlock_LD | Consommateur de la demande produite ici |
 | AF09 | Encodeurs — `Homed`, `CablePosM`, vitesse |
-| AF11 | Benne — sous-fonction M2 de ce FB |
+| AF10 / [FB_Bucket](FB_Bucket_v1.0.md) | Benne — sous-fonction M2 de ce FB |
 | Code | `CODE/TREUILS/FB_Winch.st`, `FB_SpeedStep.st`, `CODE/COMMUN/FB_Brake.st` |
