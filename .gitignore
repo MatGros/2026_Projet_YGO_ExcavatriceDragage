@@ -9,9 +9,10 @@ PRJ/*.bak
 # Python
 __pycache__/
 *.pyc
-TOOLS/OUTILS_ST2PY/out/
+# Artefacts generes par l'outil ST2PY : un dossier par domaine machine.
+# Jamais commites : ils sont reproductibles par `fb_gen.py` a partir du bundle.
+TOOLS/OUTILS_ST2PY/RESULTS/
 TOOLS/OUTILS_ST2PY/.st2py_cache.json
-TOOLS/OUTILS_ST2PY/tests_dir_marker
 
 # Claude Code local settings
 .claude/settings.local.json

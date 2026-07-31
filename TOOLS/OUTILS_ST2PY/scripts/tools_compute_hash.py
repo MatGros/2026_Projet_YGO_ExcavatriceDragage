@@ -10,7 +10,7 @@ from datetime import datetime
 use_xsdata = False
 
 ST2PY_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, ST2PY_DIR)
+sys.path.insert(0, os.path.join(ST2PY_DIR, 'core'))
 
 BUNDLE = os.path.abspath(os.path.join(ST2PY_DIR, '..', '..', 'CODE', 'CODE_Bundle.xml'))
 POU_NAME = 'FB_Translation_PositionDecoder'

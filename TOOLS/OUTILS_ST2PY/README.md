@@ -3,7 +3,7 @@
 But et périmètre
 ----------------
 OUTILS_ST2PY est un prototype de pont ST/XML → Python destiné à produire des modules de test hors‑PLC à partir de POUs CODESYS.
-À ce stade, l'implémentation livrée est centrée sur `fb_gen.py` :
+À ce stade, l'implémentation livrée est centrée sur `core/fb_gen.py` :
 - extraire l'interface d'un POU/FB depuis un bundle PLCopen XML,
 - générer un module Python exécutable et un test pytest minimal à partir de ces entrées/sorties,
 - valider avant génération la cohérence du contrat objet (classe encapsulée, méthodes `__init__`/`step`/mappings I/O, initialisation des variables d'interface),
@@ -41,7 +41,7 @@ Principes de traduction
 
 Architecture composants
 -----------------------
-- fb_gen.py
+- core/fb_gen.py
   - implémenté : extrait l'interface d'un POU depuis le bundle PLCopen XML, construit un module Python
     et un test pytest minimal à partir des entrées/sorties, puis applique le cache/hash et la garde‑fou safety.
 - canonicalize.py
@@ -56,22 +56,36 @@ Architecture composants
 Arborescence réelle (REX 2026-08, après réorganisation)
 --------------------------------------------------------
 TOOLS/OUTILS_ST2PY/
-  ├─ fb_gen.py, canonicalize.py, changed_gen.py, data_contracts.py, simulation_bench.py  # coeur outil
-  ├─ visualize_py_module.py    # diagrammes UML/FSM depuis out/modules/*.py (voir plus bas)
-  ├─ test_tracer.py            # traceur d'exécution -> out/chronicles/*.html
-  ├─ TEST_REGISTRY.md          # traçabilité fonction <-> test critique (source unique)
-  ├─ check_test_registry.py    # gate : registre <-> tests reels coherents
-  ├─ scripts/                  # utilitaires non-pytest (st_to_py.py, tools_compute_hash.py,
-  │                            #   position_decoder_demo.py) -- prototypes/demos, pas le coeur
-  ├─ legacy/                   # sous-prototypes separes (st2pone/, CODE_Bundle_test.xml)
+  ├─ core/                     # BIBLIOTHEQUE importable (jamais lancee directement) :
+  │   ├─ fb_gen.py             #   generateur ST/PLCopenXML -> Python
+  │   ├─ canonicalize.py, changed_gen.py, data_contracts.py
+  │   ├─ simulation_bench.py   #   banc de simulation
+  │   ├─ test_tracer.py        #   traceur d'execution -> chronicles/*.html
+  │   └─ results_layout.py     #   POU -> domaine metier, chemins RESULTS/ (source unique)
+  ├─ scripts/                  # OUTILS CLI autonomes (jamais importes) :
+  │   ├─ check_test_registry.py    gate : registre <-> suites reelles
+  │   ├─ visualize_py_module.py    diagrammes UML/FSM des modules generes
+  │   ├─ st_to_py.py, tools_compute_hash.py, position_decoder_demo.py
+  ├─ suites/                   # SUITE PYTEST de l'outil (pas les artefacts generes) :
+  │   ├─ contracts/            #   comportement metier attendu (TC-*)
+  │   ├─ generation/           #   le generateur fait-il son travail
+  │   └─ simulation/           #   bancs de simulation
   ├─ functional_tests/         # catalogue CSV + runner translation M3
-  ├─ tests/                    # suite pytest : contracts/, generation/, simulation/
-  ├─ out/                      # artefacts generes (gitignore) :
-  │   ├─ modules/              #   *.py + *.meta.json generes, tests/ generes a la volee
-  │   ├─ reports/              #   *.safety_report.json, *.validation_report.json
-  │   ├─ chronicles/           #   TC-*_Chronicle_Report.html (traceur d'execution)
-  │   └─ bench/                #   translation_bench.csv/.json
+  ├─ TEST_REGISTRY.md          # tracabilite fonction <-> test critique (source unique)
+  ├─ RESULTS/                  # ARTEFACTS GENERES (gitignore), un dossier par domaine
+  │   ├─ AU/                   #   miroir de CODE/ et de l'analyse fonctionnelle
+  │   │   ├─ modules/          #     *.py + *.meta.json generes
+  │   │   ├─ reports/          #     *.safety_report.json, *.validation_report.json
+  │   │   └─ chronicles/       #     TC-*.html + diagrammes UML/FSM + exports de banc
+  │   ├─ TRANSLATION/          #   idem (modules/ reports/ chronicles/)
+  │   ├─ COMMUN/               #   briques partagees (FB_Brake, FB_Ramp, FB_CycleTime)
+  │   └─ _ARCHIVE/             #   artefacts neutralises, conserves pour historique
   └─ .st2py_cache.json
+
+Trois noms, trois roles distincts, pour lever l'ambiguite historique (REX 2026-08) :
+`suites/` = tests DE l'outil · `RESULTS/` = ce que l'outil PRODUIT · `functional_tests/` =
+catalogue metier. Le mapping POU -> domaine est centralise dans `core/results_layout.py`
+(un seul endroit a mettre a jour quand une fonction machine apparait).
 
 Design détaillé : flux de génération
 -----------------------------------
@@ -92,7 +106,7 @@ Design détaillé : flux de génération
    - produire classe Python minimaliste : inputs, outputs, step(); inclure docstring et mapping bitfields.
    - produire test pytest skeleton (table-driven) couvrant cas standards (valeur baselines) et invariants.
 6. Sortie
-   - écrire artefacts dans `out/modules/` avec métadonnées `out/modules/<POU>.meta.json` (source path, hash, template_version).
+   - écrire artefacts dans `RESULTS/<DOMAINE>/modules/` avec métadonnées `<POU>.meta.json` (source path, hash, template_version).
 
 Cache et idempotence
 --------------------
@@ -126,52 +140,59 @@ Tests et séparation (strategy)
 - Deux familles de tests séparées et distinctes :
   1. `tests/syntax/` : linters, nommage, checks de conformité (existant : `check_code_style.py`).
      - Doit être exécuté sur tout PR touchant `CODE/`.
-  2. `tests/functional/` : pytest pour modules Python générés (out/). Ces tests vérifient
+  2. `tests/functional/` : pytest pour modules Python générés (RESULTS/). Ces tests vérifient
      la logique métier isolée (unit + small integration via main_sim).
 - CI pattern recommandé :
   - Step 1 (always): run tests/syntax; fail early on naming/style violations.
-  - Step 2 (if generation requested in PR or out/ present): run generator for changed POUs,
+  - Step 2 (if generation requested in PR or RESULTS/ present): run generator for changed POUs,
     then run tests/functional; report pass/fail separately from syntax.
-- Golden traces: store under `out/golden/<POU>.json` and compare with tolerance. Use for regression detection.
+- Golden traces: store under `RESULTS/<DOMAINE>/golden/<POU>.json` and compare with tolerance. Use for regression detection.
 
 PR / CI integration
 -------------------
 - Hook proposal : on PR create/update
-  1. run `st_to_py.py changed --ref origin/main --out out/` to generate changed FBs (or report only if safety tokens present),
+  1. run `scripts/st_to_py.py changed --ref origin/main --out RESULTS/<DOMAINE>/modules/` to generate changed FBs (or report only if safety tokens present),
   2. run `ci_runner.py` which executes syntax tests and functional pytest for generated artifacts,
   3. post report in PR with:
      - list of generated modules,
      - hashes and diffs (if any),
      - test results (syntax vs functional),
      - safety warnings needing human signoff.
-- Important : do NOT commit `out/` automatically into main branches; generated artifacts are for reviewer consumption and CI only.
+- Important : do NOT commit `RESULTS/` automatically into main branches; generated artifacts are for reviewer consumption and CI only.
 
-CLI examples (chemins depuis TOOLS/OUTILS_ST2PY/, sortie systematiquement dans out/modules/)
+CLI examples (chemins depuis la racine du depot)
 ------------
-- Lister POUs dans le bundle (requires plcopen):
-  python scripts/st_to_py.py --list --bundle ../../CODE/CODE_Bundle.xml
+La bibliotheque vit dans `core/`, les outils CLI dans `scripts/`, la suite pytest dans
+`suites/`, et les artefacts dans `RESULTS/<DOMAINE>/`.
 
-- Générer un FB unique (POU):
-  python fb_gen.py --bundle C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/CODE_Bundle.xml \
-      --pou FB_Translation_PositionDecoder --out TOOLS/OUTILS_ST2PY/out/modules --allow-safety
+- Lister POUs dans le bundle (requires plcopen):
+  python TOOLS/OUTILS_ST2PY/scripts/st_to_py.py --list --bundle CODE/CODE_Bundle.xml
+
+- Générer un FB unique (POU) — `--out` cible le domaine du POU :
+  python TOOLS/OUTILS_ST2PY/core/fb_gen.py --bundle CODE/CODE_Bundle.xml \
+      --pou FB_Translation_PositionDecoder \
+      --out TOOLS/OUTILS_ST2PY/RESULTS/TRANSLATION/modules --allow-safety
 
 - Tester rapidement le position decoder avec une entrée mask :
   python TOOLS/OUTILS_ST2PY/scripts/position_decoder_demo.py --mask 16
 
 - Générer les FB modifiés depuis main (selective):
-  python fb_gen.py --bundle C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/CODE_Bundle.xml \
-      --out TOOLS/OUTILS_ST2PY/out/modules --changed --ref origin/main
+  python TOOLS/OUTILS_ST2PY/core/fb_gen.py --bundle CODE/CODE_Bundle.xml \
+      --out TOOLS/OUTILS_ST2PY/RESULTS/TRANSLATION/modules --changed --ref origin/main
 
 - Régénérer un POU malgré le cache :
-  python fb_gen.py --bundle C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/CODE_Bundle.xml \
-      --pou FB_Translation --out TOOLS/OUTILS_ST2PY/out/modules --force --allow-safety
+  python TOOLS/OUTILS_ST2PY/core/fb_gen.py --bundle CODE/CODE_Bundle.xml \
+      --pou FB_Translation --out TOOLS/OUTILS_ST2PY/RESULTS/TRANSLATION/modules --force --allow-safety
 
-- Générer les diagrammes UML/FSM pour TOUS les modules de out/modules/ :
-  python TOOLS/OUTILS_ST2PY/visualize_py_module.py
-  python TOOLS/OUTILS_ST2PY/visualize_py_module.py FB_Safety_EmergencyManagement   # un seul module
+- Générer les diagrammes UML/FSM (ranges dans RESULTS/<DOMAINE>/chronicles/) :
+  python TOOLS/OUTILS_ST2PY/scripts/visualize_py_module.py
+  python TOOLS/OUTILS_ST2PY/scripts/visualize_py_module.py FB_Safety_EmergencyManagement
 
 - Vérifier la cohérence du registre de traçabilité tests <-> TEST_REGISTRY.md :
-  python TOOLS/OUTILS_ST2PY/check_test_registry.py --report
+  python TOOLS/OUTILS_ST2PY/scripts/check_test_registry.py --report
+
+- Lancer la suite pytest complete :
+  cd TOOLS/OUTILS_ST2PY && python -m pytest suites
 
 Critères d'acceptation pour une génération (POU)
 ------------------------------------------------
@@ -214,16 +235,16 @@ Historique des actions récentes (extrait, 2026-07-28)
 Comment reproduire localement (exemples rapides)
 ------------------------------------------------
 - Générer un FB unique (forcé, permissif safety) :
-  python TOOLS/OUTILS_ST2PY/fb_gen.py --bundle CODE/CODE_Bundle.xml --pou FB_Translation --out TOOLS/OUTILS_ST2PY/out/modules --force --allow-safety
+  python TOOLS/OUTILS_ST2PY/core/fb_gen.py --bundle CODE/CODE_Bundle.xml --pou FB_Translation --out TOOLS/OUTILS_ST2PY/RESULTS/TRANSLATION/modules --force --allow-safety
 
 - Générer les dépendances identifiées automatiquement :
   (lancer fb_gen pour chaque POU référencé ou utiliser --changed pour détection git)
 
-- Exécuter tous les tests de la suite pytest (contracts/generation/simulation) :
-  cd TOOLS/OUTILS_ST2PY && python -m pytest
+- Exécuter toute la suite pytest de l'outil (contracts/generation/simulation) :
+  cd TOOLS/OUTILS_ST2PY && python -m pytest suites
 
-- Exécuter les tests generes a la volee dans un dossier temporaire (out/modules/tests, ecrase a chaque run) :
-  python -m pytest TOOLS/OUTILS_ST2PY/out/modules/tests
+- Exécuter les tests generes a la volee (RESULTS/<DOMAINE>/modules/tests, ecrase a chaque run) :
+  python -m pytest TOOLS/OUTILS_ST2PY/RESULTS/TRANSLATION/modules/tests
 
 Notes opérationnelles supplémentaires
 ------------------------------------

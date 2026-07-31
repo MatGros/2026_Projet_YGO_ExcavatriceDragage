@@ -5,13 +5,12 @@ import json
 import pathlib
 import sys
 
-TOOLS_DIR = pathlib.Path(__file__).resolve().parent
-OUT_DIR = TOOLS_DIR / 'out' / 'modules'
+from results_layout import results_dir
 
 
 def load_generated_module(pou_name, module_path=None):
     if module_path is None:
-        module_path = OUT_DIR / f'{pou_name}.py'
+        module_path = results_dir(pou_name, 'modules') / f'{pou_name}.py'
     module_path = pathlib.Path(module_path)
     if not module_path.exists():
         raise FileNotFoundError(f'Module not found: {module_path}')

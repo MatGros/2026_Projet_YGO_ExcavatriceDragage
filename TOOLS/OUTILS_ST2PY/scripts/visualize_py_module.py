@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
 AST Parser & Diagram Generator for ST2PY Generated Modules.
-Parses generated Python files (e.g. out/FB_Safety_EmergencyManagement.py) using `ast`,
-extracts Class structure, Inputs, Outputs, FSM States, and generates UML & State Machine diagrams.
+Parses generated Python files (RESULTS/<DOMAINE>/modules/*.py) using `ast`, extracts Class
+structure, Inputs, Outputs, FSM States, and generates UML & State Machine diagrams.
+
+Les diagrammes atterrissent a cote des autres resultats de test du meme domaine
+(RESULTS/<DOMAINE>/chronicles/), pas dans un dossier separe : un rapport de test et
+son diagramme se lisent ensemble (REX 2026-08).
 """
 
 import argparse
@@ -11,9 +15,12 @@ import re
 import sys
 from pathlib import Path
 
-TOOLS_DIR = Path(__file__).resolve().parents[1]
+ST2PY_DIR = Path(__file__).resolve().parents[1]
+TOOLS_DIR = ST2PY_DIR.parent
 sys.path.insert(0, str(TOOLS_DIR))
+sys.path.insert(0, str(ST2PY_DIR / "core"))
 from visualize_workflow import render_puml
+from results_layout import RESULTS_DIR, iter_module_files
 
 
 def parse_module_ast(py_file_path: Path) -> dict:
@@ -175,7 +182,7 @@ FailConfirm --> Step0 : Reset + ContactorEngaged=TRUE
 @enduml"""
 
 
-def process_module(py_path: Path, out_dir: Path) -> bool:
+def process_module(py_path: Path, out_dir: Path) -> bool:  # noqa: D401
     """Génère les diagrammes UML (+ FSM si applicable) pour UN module Python.
     Retourne False si le module n'a pas de classe exploitable (ex. artefact neutralise)."""
     print(f"Analyse AST du module Python: {py_path.name}...")
@@ -205,29 +212,32 @@ def process_module(py_path: Path, out_dir: Path) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Genere les diagrammes UML/FSM pour les modules Python generes dans out/modules/."
+        description="Genere les diagrammes UML/FSM des modules generes, "
+                    "dans RESULTS/<DOMAINE>/chronicles/ (a cote des rapports de test)."
     )
     parser.add_argument(
         "module", nargs="?", default=None,
-        help="Nom du module (ex: FB_Safety_EmergencyManagement). Omis = TOUS les modules de out/modules/."
+        help="Nom du module (ex: FB_Safety_EmergencyManagement). "
+             "Omis = TOUS les modules de RESULTS/*/modules/."
     )
     args = parser.parse_args()
 
-    modules_dir = TOOLS_DIR / "OUTILS_ST2PY" / "out" / "modules"
-    out_dir = TOOLS_DIR.parent / "DOC" / "DIAGRAMS" / "TESTS"
-    out_dir.mkdir(parents=True, exist_ok=True)
-
+    # (domaine, chemin du module) -> le diagramme va dans le chronicles/ du MEME domaine
+    targets = iter_module_files()
     if args.module:
-        targets = [modules_dir / f"{args.module}.py"]
-    else:
-        targets = sorted(modules_dir.glob("*.py"))
+        targets = [t for t in targets if t[1].stem == args.module]
+        if not targets:
+            print(f"Module introuvable dans RESULTS/*/modules/ : {args.module}", file=sys.stderr)
+            return 1
 
     if not targets:
-        print(f"Aucun module Python trouve dans {modules_dir}", file=sys.stderr)
+        print(f"Aucun module Python trouve dans {RESULTS_DIR}", file=sys.stderr)
         return 1
 
     had_error = False
-    for py_path in targets:
+    for domain, py_path in targets:
+        out_dir = RESULTS_DIR / domain / "chronicles"
+        out_dir.mkdir(parents=True, exist_ok=True)
         if not py_path.exists():
             print(f"Fichier introuvable: {py_path}", file=sys.stderr)
             had_error = True
@@ -239,4 +249,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

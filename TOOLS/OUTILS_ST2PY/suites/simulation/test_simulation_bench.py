@@ -4,8 +4,8 @@ import sys
 import tempfile
 
 TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
-if str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
+if str(TOOLS_DIR / 'core') not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR / 'core'))
 
 import fb_gen
 import simulation_bench
