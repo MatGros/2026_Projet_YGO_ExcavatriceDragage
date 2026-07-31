@@ -49,8 +49,6 @@ GVL_Global.BlinkClock := instBlink1Hz.OUT;
 
 
 // ── 1. ACQUISITION DES DEMANDES / BOUTONS DE L'IHM ────────────────────────
-GVL_Modes_Stub.ModeRequest_IHM         := GVL_IHM.Modes.Cmd.SelMode;
-GVL_Modes_Stub.SyncEnableRequest_IHM   := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable; // 🔧 REX 2026-07-08 : renommé, polarité inversée
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
 
 // Signal d'acquittement défauts domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07)
@@ -153,8 +151,8 @@ END_IF;
 // 🔧 REX 2026-07-07 : plus de garde Mode=SEMI_AUTO, cohérent avec PRG_06_WinchControl.st §5
 // (la limite légale s'applique désormais dans tous les modes dès qu'elle est activée).
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
-                                            AND ((NOT PRG_04_Modes.instModes.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M))
-                                                 OR (NOT PRG_04_Modes.instModes.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
+                                            AND ((NOT PRG_MODES_CFC.Auth.InhibitM1 AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M))
+                                                 OR (NOT PRG_MODES_CFC.Auth.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_INPUTS_LD.TopPositionSensor;
 
@@ -230,7 +228,7 @@ GVL_IHM.M1TreuilRetenue.Safety.EncoderFault      := (NOT PRG_02_Encoders.instEnc
                                                   AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global
                                                   AND NOT GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault;
 GVL_IHM.M1TreuilRetenue.Safety.BypassActive      := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault
-                                                     AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
+                                                     AND (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M1TreuilRetenue.Safety.CableLimitDescent := (PRG_03_Safety.instSafetyWinchM1.ErrorId AND 16#0040) <> 16#0000;
 GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent  := PRG_06_WinchControl.CableLimitAscentM1Reached;
 GVL_IHM.M1TreuilRetenue.State.ContactorsCheck          := PRG_06_WinchControl.instWinchM1.ContactorsCheck;
@@ -249,7 +247,7 @@ GVL_IHM.M1TreuilRetenue.Safety.ErrorId           := PRG_03_Safety.instSafetyWinc
 GVL_IHM.M1TreuilRetenue.Safety.MecaADrift_M      := PRG_03_Safety.instSafetyWinchM1.MecaADriftM;
 GVL_IHM.M1TreuilRetenue.Safety.MecaCDrift_M      := PRG_03_Safety.instSafetyWinchM1.MecaCDriftM;
 GVL_IHM.M1TreuilRetenue.Safety.MecaBElapsedTime  := PRG_03_Safety.instSafetyWinchM1.MecaBElapsedTime;
-GVL_IHM.M1TreuilRetenue.State.InhibitActive            := PRG_04_Modes.instModes.InhibitM1; // 🆕 REX 2026-07-08
+GVL_IHM.M1TreuilRetenue.State.InhibitActive            := PRG_MODES_CFC.Auth.InhibitM1; // 🆕 REX 2026-07-08
 
 
 // ── 6. MAPPING ÉTATS TREUIL M2 → IHM ─────────────────────────────────────
@@ -305,7 +303,7 @@ GVL_IHM.M2TreuilBenne.Safety.EncoderFault      := (NOT PRG_02_Encoders.instEncod
                                                   AND NOT GVL_IHM.M2TreuilBenne.Bypass.Global
                                                   AND NOT GVL_IHM.M2TreuilBenne.Bypass.EncoderFault;
 GVL_IHM.M2TreuilBenne.Safety.BypassActive      := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault
-                                                     AND (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2);
+                                                     AND (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2);
 GVL_IHM.M2TreuilBenne.Safety.CableLimitDescent := (PRG_03_Safety.instSafetyWinchM2.ErrorId AND 16#0040) <> 16#0000;
 GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent  := PRG_06_WinchControl.CableLimitAscentM2Reached;
 GVL_IHM.M2TreuilBenne.State.ContactorsCheck          := PRG_06_WinchControl.instWinchM2.ContactorsCheck;
@@ -324,7 +322,7 @@ GVL_IHM.M2TreuilBenne.Safety.ErrorId           := PRG_03_Safety.instSafetyWinchM
 GVL_IHM.M2TreuilBenne.Safety.MecaADrift_M      := PRG_03_Safety.instSafetyWinchM2.MecaADriftM;
 GVL_IHM.M2TreuilBenne.Safety.MecaCDrift_M      := PRG_03_Safety.instSafetyWinchM2.MecaCDriftM;
 GVL_IHM.M2TreuilBenne.Safety.MecaBElapsedTime  := PRG_03_Safety.instSafetyWinchM2.MecaBElapsedTime;
-GVL_IHM.M2TreuilBenne.State.InhibitActive            := PRG_04_Modes.instModes.InhibitM2; // 🆕 REX 2026-07-08
+GVL_IHM.M2TreuilBenne.State.InhibitActive            := PRG_MODES_CFC.Auth.InhibitM2; // 🆕 REX 2026-07-08
 
 
 // ── 7. MAPPING ÉTATS BENNE → IHM ───────────────────────────────────────
@@ -394,7 +392,7 @@ GVL_IHM.TranslationM3.State.SensorsWord         := PRG_ACQUISITION_CFC.instPosDe
 GVL_IHM.TranslationM3.State.SensorWordIncoherent:= PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent;
 GVL_IHM.TranslationM3.State.LimitSwitchFwd     := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd;
 GVL_IHM.TranslationM3.State.LimitSwitchRev     := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev;
-GVL_IHM.TranslationM3.State.MaintenanceTargetEnable := PRG_04_Modes.instModes.MaintenanceM3TargetEnable;
+GVL_IHM.TranslationM3.State.MaintenanceTargetEnable := PRG_MODES_CFC.Auth.MaintenanceM3TargetEnable;
 GVL_IHM.TranslationM3.State.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
 GVL_IHM.TranslationM3.Safety.Error             := PRG_03_Safety.instSafetyTranslationM3.Error;
@@ -492,7 +490,7 @@ GVL_IHM.JOY1Joystick.State.ErrorId      := PRG_01_Diagnostics.instJoystick.Error
 
 
 // ── 11. MAPPING SYSTEM / MODE → IHM ──────────────────────────────────────
-GVL_IHM.Modes.State.CurrentMode     := PRG_04_Modes.instModes.Mode;
+GVL_IHM.Modes.State.CurrentMode     := PRG_MODES_CFC.Auth.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged;
 
 // 🆕 Bus State/Diag Emergency → ST_ModesState (AF01 §6)

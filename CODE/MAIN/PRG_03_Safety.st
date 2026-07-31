@@ -29,11 +29,11 @@ instSafetyWinchM1(
     // SensorSlackCableIsReal — un composant simulé est déjà forcé "sain" en amont (PRG_00_Inputs/
     // PRG_02_Encoders), donc Enable n'a plus besoin de bypasser tout le domaine : un vrai défaut
     // sur un composant RÉEL protège, un composant SIMULÉ ne fait jamais défaut de lui-même).
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
+    Enable              := NOT PRG_MODES_CFC.Auth.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                := PRG_04_Modes.instModes.Mode,
-    SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
+    Mode                := PRG_MODES_CFC.Auth.Mode,
+    SyncEnable          := PRG_MODES_CFC.Auth.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
@@ -67,7 +67,7 @@ instSafetyWinchM1(
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM2.CablePosM - PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 (7)
+    OtherWinchInhibited    := PRG_MODES_CFC.Auth.InhibitM2, // 🆕 REX 2026-07-08 (7)
     MeasuredSpeedMps       := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Encoders.M1MeasuredSpeedSigned_Mps,
     MeasuredSpeedValid     := PRG_02_Encoders.M1SpeedValid,
@@ -90,11 +90,11 @@ instSafetyWinchM1(
 // 2. Sécurité Treuil M2
 instSafetyWinchM2(
     // 🔧 REX 2026-07-15 (2) — même simplification que M1 ci-dessus (voir bandeau instSafetyWinchM1).
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
+    Enable              := NOT PRG_MODES_CFC.Auth.InhibitM2, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                := PRG_04_Modes.instModes.Mode,
-    SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
+    Mode                := PRG_MODES_CFC.Auth.Mode,
+    SyncEnable          := PRG_MODES_CFC.Auth.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
@@ -127,7 +127,7 @@ instSafetyWinchM2(
     ExpectedOtherWinchPosM := PRG_02_Encoders.instEncoderScaleM1.CablePosM + PRG_06_WinchControl.instBucket.ActiveOffsetM,
     BenneBusy            := PRG_06_WinchControl.instBucket.Busy,
     CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
-    OtherWinchInhibited    := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 (7)
+    OtherWinchInhibited    := PRG_MODES_CFC.Auth.InhibitM1, // 🆕 REX 2026-07-08 (7)
     MeasuredSpeedMps       := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Encoders.M2MeasuredSpeedSigned_Mps,
     MeasuredSpeedValid     := PRG_02_Encoders.M2SpeedValid,
@@ -148,20 +148,20 @@ instSafetyWinchM2(
 
 // 2bis. Moniteurs vitesse — diagnostic seul ; seuils désactivés jusqu'à T45.
 instSpeedMonitorM1(
-    Enable                     := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
+    Enable                     := NOT PRG_MODES_CFC.Auth.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged            := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                       := PRG_04_Modes.instModes.Mode,
+    Mode                       := PRG_MODES_CFC.Auth.Mode,
     SpeedMps                   := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
     SpeedVariationTimeout      := T#0ms,
     SpeedStabilityTimeout      := T#0ms
 );
 instSpeedMonitorM2(
-    Enable                     := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
+    Enable                     := NOT PRG_MODES_CFC.Auth.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged            := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                       := PRG_04_Modes.instModes.Mode,
+    Mode                       := PRG_MODES_CFC.Auth.Mode,
     SpeedMps                   := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
     SpeedVariationTimeout      := T#0ms,
@@ -170,10 +170,10 @@ instSpeedMonitorM2(
 
 // 2ter. Estimation charge — information empirique, jamais une fonction safety.
 instLoadEstimatorM1(
-    Enable           := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
+    Enable           := NOT PRG_MODES_CFC.Auth.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode             := PRG_04_Modes.instModes.Mode,
+    Mode             := PRG_MODES_CFC.Auth.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     MeasuredSpeedSignedMps:= PRG_02_Encoders.M1MeasuredSpeedSigned_Mps,
@@ -181,10 +181,10 @@ instLoadEstimatorM1(
     LoadTable        := _WinchLoadEstimateTable
 );
 instLoadEstimatorM2(
-    Enable           := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
+    Enable           := NOT PRG_MODES_CFC.Auth.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode             := PRG_04_Modes.instModes.Mode,
+    Mode             := PRG_MODES_CFC.Auth.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     MeasuredSpeedSignedMps:= PRG_02_Encoders.M2MeasuredSpeedSigned_Mps,
@@ -202,7 +202,7 @@ instSafetyTranslationM3(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                := PRG_04_Modes.instModes.Mode,
+    Mode                := PRG_MODES_CFC.Auth.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
