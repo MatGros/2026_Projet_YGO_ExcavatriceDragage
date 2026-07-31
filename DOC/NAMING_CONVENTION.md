@@ -15,6 +15,21 @@
 | `E_` | Enum / énumération | `E_Mode`, `E_State`, `E_CycleStep` |
 | `FB_` | Function Block (type) | `FB_Joystick`, `FB_Winch` |
 | `inst` | Instance d'un FB (variable) | `instJoystick`, `instWinchM1`, `instModes` |
+| `PRG_` | Programme (POU principal) | `PRG_ACQUISITION_CFC`, `PRG_OUTPUTS_LD` |
+
+### Programmes (POU principaux) — architecture cible
+
+| Suffixe | Langage | Rôle | Exemple |
+|---------|---------|------|---------|
+| `_CFC` | Continuous Function Chart | Orchestration visuelle, câblage FB par bus DUT | `PRG_ACQUISITION_CFC`, `PRG_SAFETY_CFC`, `PRG_TREUILS_CFC`, `PRG_TRANSLATION_CFC` |
+| `_LD` | Ladder Diagram | Barrières finales, sorties physiques | `PRG_OUTPUTS_LD` |
+| (sans suffixe) | Structured Text | Machine d'état / séquenceur | `PRG_CYCLE` |
+
+**Règles :**
+- Un programme `_CFC` ne contient **aucune logique métier** (pas de `IF`, pas de calcul) — uniquement des instances + liaisons par bus DUT.
+- Un programme `_LD` produit **seul** les Q physiques finales (contacteurs, freins, PDO variateur).
+- Un programme ST (`PRG_CYCLE`) porte une machine d'état ; il **produit des demandes**, ne commande pas les sorties.
+- `PRG_GLOBAL_CFC` est un prototype historique — **ne pas reproduire**.
 
 ### Instances FB
 - Préfixe **`inst`** + rôle PascalCase : `instJoystick`, `instSafetyWinchM1`.

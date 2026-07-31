@@ -679,7 +679,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -703,7 +703,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B resté collé/shunté détecté à l'auto-test</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -711,7 +711,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de puissance n'a pas confirmé l'armement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
@@ -794,6 +794,17 @@ Duree auto-test canal A ou B</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree verrouillage anti-reessai apres echec</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_FaultDisplayDebounce">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Anti-clignotement affichage IHM uniquement (§9 STD) — jamais sur l'action</xhtml>
+              </documentation>
+            </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -871,6 +882,77 @@ TRUE = autotest passé, attente réarmement</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Résultat autotest (latche le temps du front)</xhtml>
               </documentation>
             </variable>
+            <variable name="RedundancyTestFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Pattern Cause/Ack (§3.4bis AF01, §9 STD) — Reset jamais conditionné
+Latch brut : canal collé détecté à l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRedundancyDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Latch brut : contacteur non confirmé sous 2s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailedCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingFailedDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -881,9 +963,13 @@ TRUE = autotest passé, attente réarmement</xhtml>
       et les bus d'état/diagnostic.
    🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien).
       Ajout autotest démarrage (§5.4 AF01) + bus State/Diag.
+   🩹 REX 2026-08 : pattern Cause/Ack (RedundancyTestFailed, EmergencyArmingFailed).
+      Reset n'est plus jamais conditionné (ex-bug : Reset+PowerContactorEngaged
+      créait une impasse opérateur). L'interlock sécurité reste sur la Cause brute ;
+      l'affichage IHM (ErrorId) suit la Cause lissée par un debounce court + l'Ack.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
+              DOC/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
               DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
@@ -916,6 +1002,11 @@ IF NOT Enable THEN
     StartupFail := FALSE;
     StartupCheckDone := FALSE;
     StartupCheckOK := FALSE;
+    // 🩹 Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
+    RedundancyTestFailedCause := FALSE;
+    RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedCause := FALSE;
+    EmergencyArmingFailedAck := TRUE;
     TonTestA(IN := FALSE);
     TonRestoreA(IN := FALSE);
     TonTestB(IN := FALSE);
@@ -923,6 +1014,8 @@ IF NOT Enable THEN
     TonArmingPulse(IN := FALSE);
     TonArmingConfirm(IN := FALSE);
     TonArmingLockout(IN := FALSE);
+    TonRedundancyDisplay(IN := FALSE);
+    TonArmingFailedDisplay(IN := FALSE);
     RETURN;
 END_IF;
 
@@ -952,22 +1045,28 @@ ELSE
     StartupFail := FALSE;
 END_IF;
 
-// 🔍 3. ACQUITTEMENT DES DÉFAUTS
+// 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
+// ⚠️ Reset TOUJOURS effectif, jamais conditionné par un état externe (ex-bug REX 2026-08 :
+// "Reset ET PowerContactorEngaged" créait une impasse — le contacteur ne s'engage jamais
+// tant que le défaut est actif, donc le Reset restait bloqué en boucle).
 IF ResetEdge.Q THEN
-    RedundancyTestFailed := FALSE;
+    RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedAck := TRUE;
     StartupFail := FALSE;
-    IF PowerContactorEngaged THEN
-        EmergencyArmingFailed := FALSE;
-    END_IF;
-    // Reset efface aussi bit3 d'ErrorId
+    // Reset efface aussi bit3 d'ErrorId (StartupFail — pas de Cause/Ack séparé, latch simple)
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
+// 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
+// re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
+// TC-P01-009). Ceci prouve par le run reel que la cause a disparu, pas juste un Reset optimiste.
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
    AND NOT EmergencyArmingLockoutActive 
    AND NOT PowerContactorEngaged THEN
     ArmingSeqStep := 1;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
 END_IF;
 
 // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
@@ -977,7 +1076,7 @@ IF ArmingSeqStep = 1 THEN
     IF TonTestA.Q THEN
         ForceTestA := FALSE;
         IF EmergencyChainClosed THEN
-            RedundancyTestFailed := TRUE;
+            RedundancyTestFailedCause := TRUE;
             ArmingSeqStep := 0;
         ELSE
             ArmingSeqStep := 2;
@@ -1004,7 +1103,7 @@ IF ArmingSeqStep = 3 THEN
     IF TonTestB.Q THEN
         ForceTestB := FALSE;
         IF EmergencyChainClosed THEN
-            RedundancyTestFailed := TRUE;
+            RedundancyTestFailedCause := TRUE;
             ArmingSeqStep := 0;
         ELSE
             ArmingSeqStep := 4;
@@ -1038,7 +1137,7 @@ IF ArmingSeqStep = 6 THEN
         ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := FALSE;
     ELSIF TonArmingConfirm.Q THEN
-        EmergencyArmingFailed := TRUE;
+        EmergencyArmingFailedCause := TRUE;
         ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := TRUE;
     END_IF;
@@ -1050,24 +1149,46 @@ IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
 
-// 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES
-Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
-Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
+// 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+// L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
+// jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
+RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
+IF RedundancyCauseEdge.Q THEN
+    RedundancyTestFailedAck := FALSE; // nouvelle occurrence -&gt; ré-alarme, ré-acquittement requis
+END_IF;
+
+ArmingFailedCauseEdge(CLK := EmergencyArmingFailedCause);
+IF ArmingFailedCauseEdge.Q THEN
+    EmergencyArmingFailedAck := FALSE;
+END_IF;
+
+// 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
+Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
+Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 // ArmPulse_Cmd déjà positionné à l'étape 5 ci-dessus (garder FALSE hors étape 5)
 IF ArmingSeqStep &lt;&gt; 5 THEN
     Cmd.ArmPulse_Cmd := FALSE;
 END_IF;
 
-// 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag)
+// 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag) — interlock sur Cause brute
 Armable := EmergencyChainClosed
            AND (ArmingSeqStep = 0)
            AND NOT EmergencyArmingLockoutActive
-           AND NOT RedundancyTestFailed
+           AND NOT RedundancyTestFailedCause
            AND NOT PowerContactorEngaged;
 
 ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
 
-// 📤 7. SYNTHÈSE DES ERREURS
+// 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
+// ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
+// sur la Cause brute, jamais retardée par ce debounce.
+TonRedundancyDisplay(IN := RedundancyTestFailedCause, PT := CST_FaultDisplayDebounce);
+RedundancyTestFailed := TonRedundancyDisplay.Q OR NOT RedundancyTestFailedAck;
+
+TonArmingFailedDisplay(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
+EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAck;
+
+// 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
     ErrorId := ErrorId OR 16#0001;
@@ -1304,7 +1425,7 @@ Diag.LockoutActive        := LockoutActive;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Signaux qualifiés vers le reste du programme
-Boucle AU fermée (qualifié)</xhtml>
+Boucle AU fermée (qualifié FB_Input, 20 ms)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -1312,7 +1433,7 @@ Boucle AU fermée (qualifié)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engagé (qualifié)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engagé (qualifié FB_Input, 20 ms)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -1333,17 +1454,17 @@ Boucle AU fermée (qualifié)</xhtml>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="TonChainFilter">
+            <variable name="instEmergencyChainClosed">
               <type>
-                <derived name="TON" />
+                <derived name="FB_Input" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anti-rebond logiciel (20 ms, comme PRG_00_Inputs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔩 Briques standard de conditionnement (mêmes composants que PRG_00_Inputs)</xhtml>
               </documentation>
             </variable>
-            <variable name="TonContactorFilter">
+            <variable name="instPowerContactorEngaged">
               <type>
-                <derived name="TON" />
+                <derived name="FB_Input" />
               </type>
             </variable>
             <variable name="PrevMaintainA">
@@ -1352,8 +1473,8 @@ Boucle AU fermée (qualifié)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Feedback : sorties physiques du scan PRÉCÉDENT
-(PRG_AU_Acquisition est appelé AVANT PRG_AU_Outputs dans PRG_AU_TestBench,
-donc PRG_AU_Outputs.PowerKeepAlive_A/B_RQ sont les valeurs du cycle N-1)</xhtml>
+(PRG_AU_Acquisition est appelé AVANT PRG_AU_Outputs_LD dans PRG_AU_TestBench,
+donc PRG_AU_Outputs_LD.PowerKeepAlive_A/B_RQ sont les valeurs du cycle N-1)</xhtml>
               </documentation>
             </variable>
             <variable name="PrevMaintainB">
@@ -1361,22 +1482,32 @@ donc PRG_AU_Outputs.PowerKeepAlive_A/B_RQ sont les valeurs du cycle N-1)</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="RawChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Entrée brute simulée de la boucle AU (avant conditionnement FB_Input)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📥 PRG_AU_Acquisition — Acquisition et qualification des entrées AU
    ───────────────────────────────────────────────────────────────
-   📄 Lit les signaux simulés (GVL_Simulation_AU) ou réels (à connecter
-      sur site) et les qualifie avant de les transmettre au composite.
-   🧩 Remplit le rôle de PRG_00_Inputs pour le domaine AU uniquement,
-      avec les mêmes structures ST_HwMachine (partielle).
-   🎯 Pattern : frontière unique HwIn (lot L5 du projet réel).
+   📄 Lit les signaux simulés (GVL_Simulation_AU) et les qualifie via
+      FB_Input (brique standard §1bis, même composant que PRG_00_Inputs)
+      avant de les transmettre au composite.
+   🧩 Structure proche cible PRG_ACQUISITION_CFC (AF02 §2) : conditionnement
+      2 briques FB_Input + agrégation coupure métier — pas de logique
+      métier (règle TC-P02-002, une page CFC ne contient pas d'arbitrage).
    🔄 Feedback simulation : modélise le comportement physique —
       quand le PLC force MaintainA/B_RQ à FALSE (auto-test A/B),
       la boucle AU s'ouvre réellement → EmergencyChainClosed repasse
       à FALSE le cycle suivant (1 cycle de retard = acceptable).
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2
               DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md</xhtml>
           </documentation>
         </interface>
@@ -1386,32 +1517,32 @@ donc PRG_AU_Outputs.PowerKeepAlive_A/B_RQ sont les valeurs du cycle N-1)</xhtml>
 
 // === IMPLEMENTATION ===
 
-// 🔬 Source : simulé ou réel ?
+// 🔬 Source : simulé (banc de test isolé, toujours simulé ici)
 SimActive := GVL_Simulation_AU.SimulationModeActive;
 
-// 🎯 Qualification de la boucle AU (anti-rebond 20 ms)
-// Si la simulation est active ET que le PLC vient de forcer l'ouverture d'un canal
-// (auto-test A/B), la chaîne "physique" s'ouvre → SimChainClosed est ignoré
-// et la boucle repasse à FALSE (1 cycle de retard, fidèle au réel).
+// 🎯 Entrée brute boucle AU : si la simulation vient de forcer l'ouverture d'un
+// canal (auto-test A/B, cycle précédent), la chaîne "physique" retombe → 1 cycle
+// de retard fidèle au comportement réel d'un contacteur/relais.
 IF SimActive AND (NOT PrevMaintainA OR NOT PrevMaintainB) THEN
-    // Au moins un canal forcé à FALSE → la chaîne AU est ouverte
-    TonChainFilter(IN := FALSE, PT := T#20ms);
+    RawChainClosed := FALSE;
 ELSE
-    // Les deux canaux maintenus → la chaîne AU suit SimChainClosed
-    TonChainFilter(IN := GVL_Simulation_AU.SimChainClosed, PT := T#20ms);
+    RawChainClosed := GVL_Simulation_AU.SimChainClosed;
 END_IF;
-EmergencyChainClosed := TonChainFilter.Q;
 
-// 🎯 Qualification retour contacteur (anti-rebond 20 ms)
-TonContactorFilter(IN := GVL_Simulation_AU.SimContactorEngaged, PT := T#20ms);
-PowerContactorEngaged := TonContactorFilter.Q;
+// 🎯 Qualification boucle AU (brique standard, anti-rebond 20 ms)
+instEmergencyChainClosed(InputRaw := RawChainClosed, FilterTime := T#20ms);
+EmergencyChainClosed := instEmergencyChainClosed.State;
+
+// 🎯 Qualification retour contacteur (brique standard, anti-rebond 20 ms)
+instPowerContactorEngaged(InputRaw := GVL_Simulation_AU.SimContactorEngaged, FilterTime := T#20ms);
+PowerContactorEngaged := instPowerContactorEngaged.State;
 
 // 🎯 Agrégation coupure métier (simulée ici, proviendrait de PRG_03_Safety en réel)
 PowerCutOffRequest := GVL_Simulation_AU.SimPowerCutOffReq;
 
 // 📝 Mémorisation pour le prochain cycle (feedback 1 cycle)
-PrevMaintainA := PRG_AU_Outputs.PowerKeepAlive_A_RQ;
-PrevMaintainB := PRG_AU_Outputs.PowerKeepAlive_B_RQ;
+PrevMaintainA := PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ;
+PrevMaintainB := PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ;
 </xhtml>
           </ST>
         </body>
@@ -1421,7 +1552,7 @@ PrevMaintainB := PRG_AU_Outputs.PowerKeepAlive_B_RQ;
           </data>
         </addData>
       </pou>
-      <pou name="PRG_AU_Outputs" pouType="program">
+      <pou name="PRG_AU_Outputs_LD" pouType="program">
         <interface>
           <inputVars />
           <outputVars>
@@ -1465,62 +1596,323 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="instEmergencyManagement">
+            <variable name="instSafetyEmergencyManagement">
               <type>
                 <derived name="FB_Safety_EmergencyManagement" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instance unique du composite AU</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instance unique du composite AU — barrière finale, seul écrivain des Q AU</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📤 PRG_AU_Outputs — Écriture des sorties AU (dernière couche)
+   📤 PRG_AU_Outputs_LD — Écriture des sorties AU (dernière couche, LADDER)
    ───────────────────────────────────────────────────────────────
    📄 Appelle FB_Safety_EmergencyManagement et écrit les variables
       Q physiques (PowerKeepAlive_A/B_RQ, EmergencyArming_RQ).
-   🧩 Remplit le rôle de PRG_10_Outputs_LD pour le domaine AU.
-   🎯 Ordre d'appel obligatoire : PRG_AU_Acquisition → PRG_AU_Outputs
+   🧩 Structure identique à PRG_10_Outputs_LD (projet réel) pour le
+      domaine AU isolé : converti automatiquement en Ladder Diagram
+      (&lt;LD&gt;) dans CODESYS, comme la frontière finale réelle.
+   🎯 Ordre d'appel obligatoire : PRG_AU_Acquisition → PRG_AU_Outputs_LD
       (même cycle, même tâche).
    🚦 Produit les bus ST_State_Emergency et ST_Diag_Emergency
       observables en Watch pour vérification de la séquence.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+              DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2 (PRG_OUTPUTS_LD)</xhtml>
           </documentation>
         </interface>
         <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION ===
-
-// 🛡️ Appel du composite — entrées depuis Acquisition + IHM
-instEmergencyManagement(
-    Enable := TRUE,
-    Reset := GVL_IHM_AU.Cmd.BtnFaultReset,
-    ArmRequest := GVL_IHM_AU.Cmd.BtnEmergencyArming,
-    EmergencyChainClosed := PRG_AU_Acquisition.EmergencyChainClosed,
-    PowerContactorEngaged := PRG_AU_Acquisition.PowerContactorEngaged,
-    PowerCutOffRequest := PRG_AU_Acquisition.PowerCutOffRequest,
-    BtnEmergencyCutOff := GVL_IHM_AU.Cmd.BtnEmergencyCutOff
-);
-
-// ⚡ Sorties physiques
-PowerKeepAlive_A_RQ := instEmergencyManagement.MaintainA_RQ;
-PowerKeepAlive_B_RQ := instEmergencyManagement.MaintainB_RQ;
-EmergencyArming_RQ  := instEmergencyManagement.ArmPulse_RQ;
-
-// 🚦 Observation structurée
-State := instEmergencyManagement.State;
-Diag  := instEmergencyManagement.Diag;
-</xhtml>
-          </ST>
+          <LD>
+            <leftPowerRail localId="0">
+              <position x="0" y="0" />
+              <connectionPointOut formalParameter="none" />
+            </leftPowerRail>
+            <comment localId="1" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === IMPLEMENTATION ===
+// 🛡️ Gestionnaire d'arrêt d'urgence et de réarmement</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="2">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <comment localId="3" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="4">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="5" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Enable">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Reset">
+                  <connectionPointIn>
+                    <connection refLocalId="15" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ArmRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="17" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="EmergencyChainClosed">
+                  <connectionPointIn>
+                    <connection refLocalId="19" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerContactorEngaged">
+                  <connectionPointIn>
+                    <connection refLocalId="21" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerCutOffRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="23" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="BtnEmergencyCutOff">
+                  <connectionPointIn>
+                    <connection refLocalId="25" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType>functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="15" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM_AU.Cmd.BtnFaultReset</variable>
+            </contact>
+            <contact localId="17" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM_AU.Cmd.BtnEmergencyArming</variable>
+            </contact>
+            <contact localId="19" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_AU_Acquisition.EmergencyChainClosed</variable>
+            </contact>
+            <contact localId="21" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_AU_Acquisition.PowerContactorEngaged</variable>
+            </contact>
+            <contact localId="23" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_AU_Acquisition.PowerCutOffRequest</variable>
+            </contact>
+            <contact localId="25" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM_AU.Cmd.BtnEmergencyCutOff</variable>
+            </contact>
+            <comment localId="27" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// ⚡ Affectation des sorties de réarmement et maintien puissance</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="28">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="29">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.MaintainA_RQ</expression>
+            </inVariable>
+            <outVariable localId="30">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="29" />
+              </connectionPointIn>
+              <expression>PowerKeepAlive_A_RQ</expression>
+            </outVariable>
+            <comment localId="39" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="40">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="41">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.MaintainB_RQ</expression>
+            </inVariable>
+            <outVariable localId="42">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="41" />
+              </connectionPointIn>
+              <expression>PowerKeepAlive_B_RQ</expression>
+            </outVariable>
+            <comment localId="51" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="52">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="53">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.ArmPulse_RQ</expression>
+            </inVariable>
+            <outVariable localId="54">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="53" />
+              </connectionPointIn>
+              <expression>EmergencyArming_RQ</expression>
+            </outVariable>
+            <comment localId="63" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🚦 Observation structurée</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="64">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="65">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State</expression>
+            </inVariable>
+            <outVariable localId="66">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="65" />
+              </connectionPointIn>
+              <expression>State</expression>
+            </outVariable>
+            <comment localId="75" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="76">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="77">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag</expression>
+            </inVariable>
+            <outVariable localId="78">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="77" />
+              </connectionPointIn>
+              <expression>Diag</expression>
+            </outVariable>
+            <rightPowerRail localId="2147483646">
+              <position x="0" y="0" />
+              <connectionPointIn />
+            </rightPowerRail>
+          </LD>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e884486e-2439-5706-8613-089f953dc4cf</ObjectId>
+            <ObjectId>b6ff04d2-767d-5228-b8ae-b83c5f61ab01</ObjectId>
           </data>
         </addData>
       </pou>
@@ -1605,10 +1997,10 @@ Diag  := instEmergencyManagement.Diag;
       GVL_Simulation_AU.SimContactorEngaged = TRUE → simule retour contacteur
       GVL_Simulation_AU.SimPowerCutOffReq   = TRUE → simule coupure métier
    👁️ Observation :
-      PRG_AU_Outputs.State.Step      → étape séquence (0..6)
-      PRG_AU_Outputs.PowerKeepAlive_A_RQ → état maintien A
-      PRG_AU_Outputs.EmergencyArming_RQ  → pulse réarmement
-      PRG_AU_Outputs.Diag            → erreurs/locks
+      PRG_AU_Outputs_LD.State.Step      → étape séquence (0..6)
+      PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ → état maintien A
+      PRG_AU_Outputs_LD.EmergencyArming_RQ  → pulse réarmement
+      PRG_AU_Outputs_LD.Diag            → erreurs/locks
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
@@ -1624,33 +2016,33 @@ Diag  := instEmergencyManagement.Diag;
 PRG_AU_Acquisition();
 
 // 📤 2. Traitement et sorties (composite + Q)
-PRG_AU_Outputs();
+PRG_AU_Outputs_LD();
 
 // 🩺 Synthèse Watch — lecture des bus structurés
-MaintainA        := PRG_AU_Outputs.PowerKeepAlive_A_RQ;
-MaintainB        := PRG_AU_Outputs.PowerKeepAlive_B_RQ;
-ArmPulse         := PRG_AU_Outputs.EmergencyArming_RQ;
-Step             := PRG_AU_Outputs.State.Step;
-ErrorId          := PRG_AU_Outputs.Diag.ErrorId;
-RedundancyFailed := PRG_AU_Outputs.Diag.RedundancyTestFailed;
-ArmFailed        := PRG_AU_Outputs.Diag.ArmFailed;
-Lockout          := PRG_AU_Outputs.Diag.LockoutActive;
-ChainOk          := PRG_AU_Outputs.State.ChainOk;
-ContactorOk      := PRG_AU_Outputs.State.ContactorOk;
-Armable          := PRG_AU_Outputs.State.Armable;
+MaintainA        := PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ;
+MaintainB        := PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ;
+ArmPulse         := PRG_AU_Outputs_LD.EmergencyArming_RQ;
+Step             := PRG_AU_Outputs_LD.State.Step;
+ErrorId          := PRG_AU_Outputs_LD.Diag.ErrorId;
+RedundancyFailed := PRG_AU_Outputs_LD.Diag.RedundancyTestFailed;
+ArmFailed        := PRG_AU_Outputs_LD.Diag.ArmFailed;
+Lockout          := PRG_AU_Outputs_LD.Diag.LockoutActive;
+ChainOk          := PRG_AU_Outputs_LD.State.ChainOk;
+ContactorOk      := PRG_AU_Outputs_LD.State.ContactorOk;
+Armable          := PRG_AU_Outputs_LD.State.Armable;
 
 // 📤 Publication IHM — l'opérateur voit ces retours sur son écran
 // [IHM] Publication dans la structure d'etat IHM (lue par la visu operateur)
-GVL_IHM_AU.State.ChainOk              := PRG_AU_Outputs.State.ChainOk;
-GVL_IHM_AU.State.ContactorOk          := PRG_AU_Outputs.State.ContactorOk;
-GVL_IHM_AU.State.Armable              := PRG_AU_Outputs.State.Armable;
-GVL_IHM_AU.State.ArmingBusy           := PRG_AU_Outputs.State.ArmingBusy;
-GVL_IHM_AU.State.RedundancyTestFailed := PRG_AU_Outputs.Diag.RedundancyTestFailed;
-GVL_IHM_AU.State.ArmingFailed         := PRG_AU_Outputs.Diag.ArmFailed;
-GVL_IHM_AU.State.LockoutActive        := PRG_AU_Outputs.Diag.LockoutActive;
-GVL_IHM_AU.State.Step                 := PRG_AU_Outputs.State.Step;
-GVL_IHM_AU.State.Error                := PRG_AU_Outputs.Diag.Error;
-GVL_IHM_AU.State.ErrorId              := PRG_AU_Outputs.Diag.ErrorId;
+GVL_IHM_AU.State.ChainOk              := PRG_AU_Outputs_LD.State.ChainOk;
+GVL_IHM_AU.State.ContactorOk          := PRG_AU_Outputs_LD.State.ContactorOk;
+GVL_IHM_AU.State.Armable              := PRG_AU_Outputs_LD.State.Armable;
+GVL_IHM_AU.State.ArmingBusy           := PRG_AU_Outputs_LD.State.ArmingBusy;
+GVL_IHM_AU.State.RedundancyTestFailed := PRG_AU_Outputs_LD.Diag.RedundancyTestFailed;
+GVL_IHM_AU.State.ArmingFailed         := PRG_AU_Outputs_LD.Diag.ArmFailed;
+GVL_IHM_AU.State.LockoutActive        := PRG_AU_Outputs_LD.Diag.LockoutActive;
+GVL_IHM_AU.State.Step                 := PRG_AU_Outputs_LD.State.Step;
+GVL_IHM_AU.State.Error                := PRG_AU_Outputs_LD.Diag.Error;
+GVL_IHM_AU.State.ErrorId              := PRG_AU_Outputs_LD.Diag.ErrorId;
 GVL_IHM_AU.State.PowerCutOffActive    := GVL_Simulation_AU.SimPowerCutOffReq;
 
 CASE Step OF
@@ -1670,6 +2062,145 @@ END_CASE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>02de714f-6617-5e7c-a494-70cf9c90d728</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Input" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="InputRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal brut carte d'entrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InvertLogic">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = NC (logique inversée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FilterTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tempo anti-rebond (filtrage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChannelOk">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag voie/carte OK (§4) — TRUE par défaut si pas de diag dispo</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="State">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal conditionné, prêt à l'emploi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voie en défaut (ChannelOk faux)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FilterTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="ValueRaw">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📥 FB_Input — Entrée TOR conditionnée (brique réduite)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1
+   🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
+      complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
+      de conditionnement bas niveau, à instancier en tableau (§3) ou
+      composée directement dans un FB métier.
+   🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
+   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
+      d'architecture en attente — composition interne vs FB_IO générique
+      séparé). Ce fichier ne fait QUE créer la brique elle-même.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Input) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Input) ===
+
+// 1. Inversion NO/NC
+ValueRaw := InputRaw XOR InvertLogic;
+
+// 2. Initialisation premier scan &amp; Filtrage anti-rebond
+// Au premier scan post-boot, State prend directement la valeur saine brute sans attendre le délai de 20ms,
+// ce qui évite d'émettre des fausses alarmes transitoires au démarrage de l'automate.
+IF NOT FirstScanDone THEN
+    State := ValueRaw;
+    FirstScanDone := TRUE;
+ELSE
+    FilterTon(IN := (ValueRaw &lt;&gt; State), PT := FilterTime);
+    IF FilterTon.Q THEN
+        State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+    END_IF;
+END_IF;
+
+// 3. Diagnostic voie/carte
+IF NOT ChannelOk THEN
+    ErrorId := ErrorId OR 16#0001;
+    State := FALSE;   // État sûr forcé (Partie6 §1)
+ELSE
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+Error := (ErrorId &lt;&gt; 16#0000);
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8edb8169-fe96-5561-81ca-d3258d6bba57</ObjectId>
           </data>
         </addData>
       </pou>
@@ -1811,8 +2342,11 @@ TRUE = une safety demande la coupure</xhtml>
           <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
           <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />
           <Object Name="PRG_AU_Acquisition" ObjectId="e301096b-b905-5c3d-96fa-3afcf1106a59" />
-          <Object Name="PRG_AU_Outputs" ObjectId="e884486e-2439-5706-8613-089f953dc4cf" />
+          <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
           <Object Name="PRG_AU_TestBench" ObjectId="02de714f-6617-5e7c-a494-70cf9c90d728" />
+        </Folder>
+        <Folder Name="COMMUN">
+          <Object Name="FB_Input" ObjectId="8edb8169-fe96-5561-81ca-d3258d6bba57" />
         </Folder>
       </ProjectStructure>
     </data>

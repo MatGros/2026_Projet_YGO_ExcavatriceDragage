@@ -469,7 +469,7 @@ Fichiers code de référence :
 - `CODE/AU/GVL_Simulation_AU.st` (simulation hardware)
 - `CODE/AU/GVL_IHM_AU.st` (interface IHM)
 - `CODE/AU/PRG_AU_Acquisition.st` (acquisition)
-- `CODE/AU/PRG_AU_Outputs.st` (sorties)
+- `CODE/AU/PRG_AU_Outputs_LD.st` (sorties)
 - `CODE/AU/PRG_AU_TestBench.st` (programme principal test)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - `CODE/MAIN/Acquisition (CFC).st` (cible)
