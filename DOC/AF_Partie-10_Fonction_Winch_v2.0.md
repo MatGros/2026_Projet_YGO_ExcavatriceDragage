@@ -29,7 +29,7 @@ dupliqué ici) :
 | [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | TC-P10-014, 015, 016 |
 | [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | TC-P10-012, 013, 020, 021, 022 |
 | [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | TC-P10-023 à 034 |
-| [`FB_Diag_WinchSymmetry`](AF_Partie-10_Fonction_Winch/FB_Diag_WinchSymmetry_v1.0.md) | Diagnostic MES-008, symétrie |
+| [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | Diagnostic MES-008, symétrie |
 | [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou |
 | [`FB_WinchLoadEstimator`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | Diagnostic charge 2D |
 | [`FB_DriftGuard`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | Dérive position sous frein |
@@ -45,7 +45,7 @@ dupliqué ici) :
 | [`AF_Partie-10_FB_WinchSync_v1.0.md`](AF_Partie-10_FB_WinchSync_v1.0.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | `FB_WinchOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
 | [`AF_Partie-10_FB_Bucket_v1.0.md`](AF_Partie-10_FB_Bucket_v1.0.md) | `FB_Bucket` (+ `FB_DiveSearch`, `FB_ExtractionSequence`) | Benne, désynchronisation M1/M2, glissement, assistants |
-| [`AF_Partie-10_Fonction_Winch/FB_Diag_WinchSymmetry_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Diag_WinchSymmetry_v1.0.md) | `FB_Diag_WinchSymmetry` | Diagnostic passif symétrie & décalages M1/M2 |
+| [`AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | `FB_Winch_Symmetry` | Diagnostic passif symétrie & décalages M1/M2 |
 | [`AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | `FB_SpeedStep` | Décodeur consigne % -> contacteurs & garde-fou |
 | [`AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | `FB_WinchLoadEstimator` | Estimation charge 2D palier x vitesse |
 | [`AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | `FB_DriftGuard` | Capture & surveillance dérive sous frein |
@@ -61,7 +61,7 @@ FB_WinchSync (×1)                 ──► DeltaPosM, SyncWarn (niveau 1, warn
 FB_Bucket (×1)                    ──► Benne (sous-fonction M2, désynchronisation)
 FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs)
 FB_WinchLoadEstimator (×2)        ──► Diagnostic charge, informatif
-FB_Diag_WinchSymmetry (×1)             ──► Diagnostic passif symétrie M1/M2
+FB_Winch_Symmetry (×1)             ──► Diagnostic passif symétrie M1/M2
 ```
 
 Benne = sous-fonction M2 : aucune I/O propre, réutilise `FB_Winch` M2. Fiche dédiée dans ce dossier.
@@ -155,7 +155,7 @@ persistant) : voir la fiche FB concernée (§7 de chaque fiche) et §6 ci-dessou
 
 **Constat** : `SpeedBandMaxMps` est aujourd'hui rempli à la main avec des valeurs théoriques.
 Aucun mécanisme de mesure/calibration automatique n'existe (T95 mentionne "étendre
-`FB_Diag_WinchSymmetry`" sans détailler de mécanisme).
+`FB_Winch_Symmetry`" sans détailler de mécanisme).
 
 **Besoin exprimé** :
 
@@ -175,7 +175,7 @@ Aucun mécanisme de mesure/calibration automatique n'existe (T95 mentionne "éte
 
 Suivi pilotage : `PLAN_TASK.md` T96.
 
-### 6.3bis ⚖️ Surveillance de symétrie M1/M2 (`FB_Diag_WinchSymmetry` — MES-008 & Diagnostic)
+### 6.3bis ⚖️ Surveillance de symétrie M1/M2 (`FB_Winch_Symmetry` — MES-008 & Diagnostic)
 
 **Objectif** : Identifier passivement si un décalage entre les deux treuils (M1 et M2) provient d'un retard d'automatisme/contacteur ou d'un problème mécanique/frein.
 

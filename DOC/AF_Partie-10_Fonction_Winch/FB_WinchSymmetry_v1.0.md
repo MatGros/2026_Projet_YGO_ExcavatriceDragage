@@ -1,8 +1,8 @@
-# FB_Diag_WinchSymmetry — Spec composant (v1.0)
+# FB_Winch_Symmetry — Spec composant (v1.0)
 
 > Rôle machine : [`AF_Partie-10_Fonction_Winch_v2.0.md`](../AF_Partie-10_Fonction_Winch_v2.0.md) §6.3bis.  
 > Rôle de **ce** document : observateur passif de symétrie et de synchronisme M1/M2 (MES-008).  
-> Source code : `CODE/DIAG/FB_Diag_WinchSymmetry.st` · instance unique dans `PRG_11_Troubleshooting`.  
+> Source code : `CODE/TREUILS/FB_Winch_Symmetry.st` · instance unique dans `PRG_11_Troubleshooting`.  
 
 ## 🧭 Sommaire
 
@@ -24,7 +24,7 @@
 
 Brique de **diagnostic passif** (Partie3 §2) : aucun effet direct sur les sorties de commande ni la chaîne de sécurité.
 
-`FB_Diag_WinchSymmetry` compare en continu le comportement des deux treuils principaux (**M1 Retenue** et **M2 Benne**) lorsqu'ils reçoivent des ordres de marche simultanés et dans le même sens.
+`FB_Winch_Symmetry` compare en continu le comportement des deux treuils principaux (**M1 Retenue** et **M2 Benne**) lorsqu'ils reçoivent des ordres de marche simultanés et dans le même sens.
 
 ---
 

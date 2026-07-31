@@ -47,7 +47,7 @@ excavatrice-dragage/
 │   ├── AU/                     # Chaîne arrêt d'urgence / EmergencyManagement
 │   ├── CODEURS/                 # FB_Encoder_Abs/Homing/Scale/Safety/SpeedMeasure/SpeedMonitor (COD1/COD2)
 │   ├── CYCLE/                   # E_CycleStep, FB_Cycle, FB_DiveSearch, FB_ExtractionSequence
-│   ├── DIAG/                    # FB_Diag_CanOpen, FB_Diag_Ethercat, FB_Diag_Preflight, FB_Diag_WinchSymmetry
+│   ├── DIAG/                    # FB_Diag_CanOpen, FB_Diag_Ethercat, FB_Acquisition_Preflight, FB_Winch_Symmetry
 │   ├── JOYSTICK/                 # FB_Joystick et briques associées
 │   ├── MODES/                    # FB_Modes (N1/N2, limite légale)
 │   ├── SIMULATION/               # FB_Sim_*, GVL_Simulation (bit maître + par device)

@@ -22,11 +22,14 @@
 
 | Fiche | FB | Contenu |
 |---|---|---|
-| [`FB_Diag_CanOpen`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_CanOpen_v1.0.md) | `FB_Diag_CanOpen` | Diagnostic bus CANopen + esclave Joystick |
-| [`FB_Diag_Ethercat`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_Ethercat_v1.0.md) | `FB_Diag_Ethercat` | Diagnostic bus EtherCAT (variateur M3 + codeurs M1/M2) |
-| [`FB_Diag_IhmHeartbeat`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.0.md) | `FB_Diag_IhmHeartbeat` | Surveillance bidirectionnelle IHM↔PLC |
-| [`FB_Diag_Preflight`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_Preflight_v1.0.md) | `FB_Diag_Preflight` | Verdict passif machine arrêtée (16 contrôles) |
-| [`FB_Diag_WinchSymmetry`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_WinchSymmetry_v1.0.md) | `FB_Diag_WinchSymmetry` | Mesure passive symétrie M1/M2 (MES-008) |
+| [`FB_Diag_CanOpen`](AF_Partie-12_Fonction_Diagnostic/FB_Diag_CanOpen_v1.0.md) | `FB_Diag_CanOpen` | Diagnostic bus CANopen + esclave Joystick |
+| [`FB_Diag_Ethercat`](AF_Partie-12_Fonction_Diagnostic/FB_Diag_Ethercat_v1.0.md) | `FB_Diag_Ethercat` | Diagnostic bus EtherCAT (variateur M3 + codeurs M1/M2) |
+| [`FB_Diag_IhmHeartbeat`](AF_Partie-12_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.0.md) | `FB_Diag_IhmHeartbeat` | Surveillance bidirectionnelle IHM↔PLC |
+
+> 📌 `FB_Acquisition_Preflight` (qualification E/S machine arrêtée) est documenté dans
+> [`AF_Partie-06`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.0.md).
+> `FB_Winch_Symmetry` (mesure M1/M2) est documenté dans
+> [`AF_Partie-10`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md).
 
 ---
 
@@ -49,8 +52,8 @@
 |---|---|---|---|
 | `ST_Diag_Device` | `Online`, `Operational`, `Error`, `ErrorId`, `State` (E_Diag_State), `StateAtError` | `FB_Diag_CanOpen`, `FB_Diag_Ethercat` | Safety, Modes, IHM, Troubleshooting |
 | `E_Diag_State` | `DISABLED`, `READY`, `INIT`, `MONITORING`, `ERROR`, `SIMULATED` | FB diag | IHM, Modes |
-| `ST_Diag_Winch_SymmetryCfg` | Seuils (`DeltaStartDelay_Ms`, etc.) | GVL_PERSISTENT | `FB_Diag_WinchSymmetry` |
-| `ST_Diag_Winch_SymmetryData` | Mesures (`DeltaStartDelay_Ms`, `MaxSyncDeviation_M`, etc.) | `FB_Diag_WinchSymmetry` | IHM, GVL_PERSISTENT |
+| `ST_Diag_Winch_SymmetryCfg` | Seuils (`DeltaStartDelay_Ms`, etc.) | GVL_PERSISTENT | `FB_Winch_Symmetry` |
+| `ST_Diag_Winch_SymmetryData` | Mesures (`DeltaStartDelay_Ms`, `MaxSyncDeviation_M`, etc.) | `FB_Winch_Symmetry` | IHM, GVL_PERSISTENT |
 
 ---
 
@@ -61,14 +64,17 @@ PRG_01_Diagnostics (acquisition brutes device)
   ├── FB_Diag_CanOpen ──► DeviceJoystick.Online/Operational ──► FB_Safety_Winch/Translation (SafeStop)
   │                    ──► DeviceCanOpenMaster ──► IHM Network
   ├── FB_Diag_Ethercat ──► DeviceVariateur.Online/Operational ──► FB_Safety_Translation (SafeStop)
-  │                    ──► DeviceEncoderM1/M2.Operational ──► FB_Diag_Preflight, IHM
+  │                    ──► DeviceEncoderM1/M2.Operational ──► FB_Acquisition_Preflight, IHM
   ├── FB_Diag_IhmHeartbeat ──► HeartbeatIhmOk ──► FB_Safety_Winch/Translation (SafeStop)
   │                        ──► TglHeartbeatPlc ──► IHM
   └── (sorties diag publiées vers IHM Network + Troubleshooting)
 
 PRG_11_Troubleshooting (observateurs passifs)
-  ├── FB_Diag_Preflight ──► PreflightOk/ErrorId ──► IHM uniquement
-  └── FB_Diag_WinchSymmetry ──► SymmetryOk/Valid ──► IHM uniquement
+  ├── FB_Acquisition_Preflight ──► PreflightOk/ErrorId ──► IHM uniquement
+  └── FB_Winch_Symmetry ──► SymmetryOk/Valid ──► IHM uniquement
+
+> 📌 Preflight et Symmetry sont instanciés dans PRG_11 mais documentés respectivement
+> dans AF_Partie-06 (qualification E/S) et AF_Partie-10 (mesure treuils).
 ```
 
 ---
@@ -78,7 +84,7 @@ PRG_11_Troubleshooting (observateurs passifs)
 | Programme | Instances | Rôle |
 |---|---|---|
 | `PRG_01_Diagnostics` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` | Acquisition brutes + appel FB diag bus/comm |
-| `PRG_11_Troubleshooting` | `instPreflight`, `instWinchSymmetry` | Observateurs passifs (verdict + mesure) |
+| `PRG_11_Troubleshooting` | `instPreflight`, `instWinchSymmetry` | Observateurs passifs (doc : AF06 Preflight, AF10 Symmetry) |
 | `PRG_03_Safety` | (consommateur) | Relaye `JoystickOnline/Operational`, `HeartbeatIhmOk`, `DriveOnline/Operational` vers `FB_Safety_Winch/Translation` |
 | `PRG_09_Supervision` | (consommateur) | Publie diagnostics vers IHM (Network, Preflight, Symmetry) |
 
@@ -101,19 +107,13 @@ PRG_11_Troubleshooting (observateurs passifs)
 
 > ErrorId global synthétise par nibble : `0x00F0` = variateur, `0x0F00` = M1, `0xF000` = M2.
 
-### FB_Diag_Preflight (PreflightErrorId)
-| Bit | Contrôle |
-|---|---|
-| 0-2 | Frein M1/M2/M3 serré |
-| 3-4 | Contacteurs M1/M2 retombés |
-| 5-6 | Thermique M1/M2 OK |
-| 7 | Thermique frein OK |
-| 8 | Rotation phases OK |
-| 9 | Câble M2 tendu |
-| 10 | Capteurs M3 cohérents |
-| 11 | Contacteur sans chaîne AU |
-| 12-13 | Codeur M1/M2 opérationnel |
-| 14-15 | Homé + position bornée M1/M2 |
+### FB_Acquisition_Preflight (PreflightErrorId)
+
+> Documenté dans [`AF_Partie-06`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.0.md) — 16 bits de qualification E/S machine arrêtée.
+
+### FB_Winch_Symmetry
+
+> Documenté dans [`AF_Partie-10`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) — mesures M1/M2 (MES-008).
 
 ---
 
