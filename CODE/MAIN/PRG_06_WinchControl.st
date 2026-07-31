@@ -178,7 +178,7 @@ END_IF;
 
 // Un seul arbitre de fermeture : SEMI_AUTO > assistant extraction > demande IHM manuelle.
 IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    CmdBucketCloseArbitrated := PRG_05_Cycle.instCycle.CmdBucket_Close;
+    CmdBucketCloseArbitrated := PRG_05_Cycle.instCycle.BucketCmd.Close;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
 ELSE
@@ -187,7 +187,7 @@ END_IF;
 
 // Un seul producteur logique de commande Kobold : cycle auto OU assistant maintenance.
 IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    KoboldContactorCmdArbitrated := PRG_05_Cycle.instCycle.KoboldContactorCmd;
+    KoboldContactorCmdArbitrated := PRG_05_Cycle.instCycle.BucketCmd.KoboldContactorCmd;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable;
 END_IF;
@@ -207,7 +207,7 @@ instBucket(
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_MODES_CFC.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.BucketCmd.Open,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
@@ -254,15 +254,15 @@ IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche (bug trouvé en
     // review code), le cycle auto pouvait aggraver un écart mineur sans aucune protection quand
     // SyncSoftStopEnable=TRUE. Ajouté ici, symétrique à la branche manuelle ci-dessous.
-    M1_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM1_Direction;
+    M1_Direction_Active := PRG_05_Cycle.instCycle.WinchM1Cmd.Direction;
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
-    M1_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM1_StartStop
+    M1_StartStop_Active := PRG_05_Cycle.instCycle.WinchM1Cmd.StartStop
                             AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                             AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
-    M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM1_SpeedPct,
+    M1_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.WinchM1Cmd.SpeedPct,
                                ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef));
 ELSE
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01,
@@ -318,15 +318,15 @@ ELSE
     IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche, ajouté
         // symétrique à la branche manuelle ci-dessous (signe M2, voir note ci-dessous).
-        M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
+        M2_Direction_Active := PRG_05_Cycle.instCycle.WinchM2Cmd.Direction;
         // 🛡️ Même garde homme-mort que M1 : le cycle ne poursuit jamais un mouvement
         // après relâchement du joystick.
-        M2_StartStop_Active := PRG_05_Cycle.instCycle.CmdWinchM2_StartStop
+        M2_StartStop_Active := PRG_05_Cycle.instCycle.WinchM2Cmd.StartStop
                                 AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                                 AND PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
-        M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.CmdWinchM2_SpeedPct,
+        M2_SpeedRef_Active  := MIN(PRG_05_Cycle.instCycle.WinchM2Cmd.SpeedPct,
                                    ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef));
     ELSE
         // 🔧 REX 2026-07-19 : suppression IHM_MANU — MAINT_N1/MAINT_N2. 🆕 REX (session WINCH-BTN-01) :
