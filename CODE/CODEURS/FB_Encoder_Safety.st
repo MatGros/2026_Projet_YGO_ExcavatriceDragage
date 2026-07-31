@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md §3.6/§3.7
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md §3.6/§3.7
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
       - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur

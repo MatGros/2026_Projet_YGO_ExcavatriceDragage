@@ -4,7 +4,7 @@
    📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
-      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
+      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie12 §9bis) par
       une simulation par temps de parcours : le translation "arrive" à la cible
       sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
       continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire

@@ -449,7 +449,7 @@ instPositionDecoder(
 );
 
 //  🔌 HwIn.Translation.M3_BrakeIsOpen_DI ······· câblage réel : 1 = contacteur commandé = DESSERRÉ
-//         └─►[ instM3BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-11 §5
+//         └─►[ instM3BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-12 §5
 //                └─► M3BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
 //                       └─► PRG_03_Safety (instSafetyTranslationM3 Méca B) · PRG_09_Supervision
 instM3BrakeFeedback(InputRaw := HwIn.Translation.M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);

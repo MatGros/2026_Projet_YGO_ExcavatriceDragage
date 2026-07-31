@@ -269,7 +269,7 @@ ELSE
     // réouverture documentée T40) : le joystick n'est plus la SEULE source —
     // GVL_IHM.Modes.Cmd.TglJoystickMaster bascule vers les boutons IHM maintenus (BtnUp/BtnDown),
     // homme-mort joystick réel TOUJOURS exigé en parallèle (même leçon que le précédent bug
-    // Translation M3, AF_Partie-11 v1.9 §6bis — jamais implicite). Voir
+    // Translation M3, AF_Partie-12 §6bis (ex-AF_Partie-11 v1.9) — jamais implicite). Voir
     // ARCHIVES/Doc/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
     // 🆕 Sélection treuil (TASK-0001, MAINT_N2 uniquement, voir FB_Modes.JoystickWinchSelectArbitrated) :
     // 1=M1 seul, 2=M2 seul, 3=Couplé — forcé à 3 (Couplé) hors MAINT_N2, IDENTIQUE quelle que

@@ -1,6 +1,15 @@
-# Extraction Benne — code vs AF11 (v1.0)
+# Extraction Benne — code vs spec Benne (v1.0)
 
 > Sources : `CODE/TREUILS/BENNE/*.st`, `CODE/CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`, `PRG_06_WinchControl.st`.
+>
+> 🔄 **Numérotation** : ce document a été rédigé quand Benne=`AF11` et Treuils=`AF09`. État final
+> retenu : la Benne est une **fiche du domaine Treuils** →
+> [`DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](../../AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md).
+> Le numéro 11 n'existe plus. Les mentions d'AF ci-dessous sont conservées telles quelles :
+> elles tracent le raisonnement d'origine, pas l'arborescence actuelle.
+>
+> <!-- doc-links:numerotation-historique -->
+
 
 ## Question tranchée : pourquoi Benne reste séparée d'AF09
 

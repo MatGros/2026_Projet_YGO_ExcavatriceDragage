@@ -40,7 +40,9 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 ## 🔒 GUARDRAILS — avant toute modif `CODE/`, `FB_`, `PRG_` ou « codesys »
 
 1. ✅ Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md)
-2. ✅ Lire les documents 1 à 5 ci-dessus (ajuster la spec métier : Winch=P09, Encoder=P10, Translation=P11, Benne=P12)
+2. ✅ Lire les documents 1 à 5 ci-dessus (ajuster la spec métier : Joystick=P08, Encoder/Homing=P09,
+   Treuils **Benne incluse**=P10, Translation=P12 — ⚠️ **le numéro 11 n'existe pas** : `ex-P11`
+   = ancien numéro de Translation, puis de la Benne)
 3. ✅ Vérifier que la spec est complète → sinon **demander**, ne pas deviner
 4. ✅ Auditer nommage, interface FB, sécurité **avant** d'écrire
 5. ✅ Vérifier mécaniquement la liaison **avant** de restituer (voir ci-dessous)

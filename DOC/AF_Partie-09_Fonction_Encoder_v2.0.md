@@ -2,39 +2,47 @@
 
 > Rôle : mesure position/vitesse câble, référencement (homing), bornage et cohérence.
 > Producteur unique position/vitesse pour tout le programme (Winch, Safety, Cycle, IHM).
+> **Détail technique par FB** : voir les 6 fiches dédiées (§1). Ce chapô reste au niveau machine
+> + intégration programme — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code : `CODE/CODEURS/*.st` · instances dans `Acquisition (CFC)`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
 > v1.11 archivée : `ARCHIVES/Doc/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md`.
 
 ## 🧭 Sommaire
 
-1. Rôle et pipeline
-2. FB_Encoder_Abs — bus et preset
-3. FB_Encoder_Homing — référencement
-4. FB_Encoder_Safety — bornage et cohérence
-5. FB_Encoder_Scale / SpeedMeasure / SpeedMonitor
-6. DUT et bus
-7. Intégration programme
-8. Procédure terrain
-9. Alertes et écarts
-10. Documents liés
+1. Composition — fiches FB dédiées
+2. Pipeline & Rôle machine
+3. DUT et bus
+4. Intégration programme
+5. Procédure terrain
+6. Alertes et écarts
+7. Documents liés
 
 ## 🧪 Points de validation
 
-| ID | Intention | Preuve | Type |
-|---|---|---|---|
-| TC-P09-001 | Preset `PresetTriggerCmd=2` sous tolérance et timeout | `PresetAck` confirmé | `⚡ AUTO_PLC` |
-| TC-P09-002 | `RawPos` gelé si `EncoderAvailable=FALSE` | Position gelée sur perte bus | `⚡ AUTO_PLC` |
-| TC-P09-003 | Homing nominal refusé sans capteur haut (hors bypass) | Front `Home` sans capteur ➔ Bit4 | `⚡ AUTO_PLC` |
-| TC-P09-004 | Homing refusé si arrêt non confirmé (contacteurs+frein) | Front `Home` sans arrêt ➔ Bit2 | `⚡ AUTO_PLC` |
-| TC-P09-005 | Homing unitaire refusé hors MAINT_N2 ou treuil erroné | Refus d'exécution (Bit0/Bit1) | `💻 AUTO` |
-| TC-P09-006 | Cible hors [-99;+99] m rejetée sans écriture preset | `PresetRequest` reste `FALSE` | `💻 AUTO` |
-| TC-P09-007 | `HomingRefRaw` conforme ; `CablePosM` = cible post-Done | Calcul position vérifié | `⚡ AUTO_PLC` |
-| TC-P09-008 | Écart au reboot ➔ `HomingSuspect`, `Homed` masqué | Reboot avec décalage `RawPos` | `⚡ AUTO_PLC` |
-| TC-P09-009 | `BtnConfirmCoherence` lève le doute sans réécrire ref | `HomingSuspect=FALSE` | `⚡ AUTO_PLC` |
-| TC-P09-010 | Bornage [-99;+99] m dépassé ➔ gel + `Incoherent` | Gel position sur hors plage | `💻 AUTO` |
-| TC-P09-011 | `EncoderFaultPresent` interdit la bascule SEMI_AUTO | Repli automatique MAINT_N1 | `⚡ AUTO_PLC` |
-| TC-P09-012 | Méca D : Capteur haut sans arrêt ➔ SafeStop+PowerCutOff 3s | Coupure puissance confirmée | `🟢 SITE` |
+Catalogue `TC-P09-*` **réparti dans les 6 fiches FB** (propriétaire unique par fiche) :
+
+| Fiche | TC couverts |
+|---|---|
+| [`FB_Encoder_Abs`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Abs_v1.0.md) | TC-P09-001, 002 |
+| [`FB_Encoder_Homing`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Homing_v1.0.md) | TC-P09-003 à 009 |
+| [`FB_Encoder_Scale`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Scale_v1.0.md) | TC-P09-013 |
+| [`FB_Encoder_Safety`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Safety_v1.0.md) | TC-P09-010, 011, 012 |
+| [`FB_Encoder_SpeedMeasure`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMeasure_v1.0.md) | TC-P09-014 |
+| [`FB_Encoder_SpeedMonitor`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMonitor_v1.0.md) | TC-P09-015 |
+
+---
+
+## 1. Composition — fiches FB dédiées
+
+| Fiche | FB détaillé | Contenu |
+|---|---|---|
+| [`FB_Encoder_Abs`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Abs_v1.0.md) | `FB_Encoder_Abs` | Acquisition brute bus EtherCAT, statut esclave & preset |
+| [`FB_Encoder_Homing`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Homing_v1.0.md) | `FB_Encoder_Homing` | Référencement nominal/unitaire, RETAIN Calib & doutes boot |
+| [`FB_Encoder_Scale`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Scale_v1.0.md) | `FB_Encoder_Scale` | Conversion linéaire points bruts ➔ mètres câble |
+| [`FB_Encoder_Safety`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Safety_v1.0.md) | `FB_Encoder_Safety` | Bornage [-99;+99] m, incohérence & verrou SEMI_AUTO |
+| [`FB_Encoder_SpeedMeasure`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMeasure_v1.0.md) | `FB_Encoder_SpeedMeasure` | Calcul vitesse m/s sur fenêtre 50 ms sans retard PT1 |
+| [`FB_Encoder_SpeedMonitor`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMonitor_v1.0.md) | `FB_Encoder_SpeedMonitor` | Surveillance & diagnostic des sauts de vitesse brusques |
 
 ---
 
