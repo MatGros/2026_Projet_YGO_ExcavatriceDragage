@@ -47,14 +47,14 @@ excavatrice-dragage/
 │   ├── AU/                     # Chaîne arrêt d'urgence / EmergencyManagement
 │   ├── CODEURS/                 # FB_Encoder_Abs/Homing/Scale/Safety/SpeedMeasure/SpeedMonitor (COD1/COD2)
 │   ├── CYCLE/                   # E_CycleStep, FB_Cycle, FB_DiveSearch, FB_ExtractionSequence
-│   ├── DIAG/                    # FB_Diag_CanOpen, FB_Diag_Ethercat, FB_Acquisition_Preflight, FB_Winch_Symmetry
+│   ├── DIAG/                    # FB_Diag_CanOpen, FB_Diag_Ethercat, FB_Diag_IhmHeartbeat
 │   ├── JOYSTICK/                 # FB_Joystick et briques associées
 │   ├── MODES/                    # FB_Modes (N1/N2, limite légale)
 │   ├── SIMULATION/               # FB_Sim_*, GVL_Simulation (bit maître + par device)
 │   ├── SUPERVISION/               # Structures HMI (GVL_IHM, ST_*HMI)
 │   ├── TRANSLATION/               # FB_Translation, FB_Safety_Translation (M3, AC600)
-│   ├── TREUILS/                   # FB_Winch M1/M2, BENNE/ (FB_Bucket)
-│   ├── COMMUN/ · TESTS/           # Briques réutilisées (FB_Ramp, FB_Brake, FB_CycleTime…) · bancs de test
+│   ├── TREUILS/                   # FB_Winch M1/M2, FB_Winch_Symmetry, BENNE/ (FB_Bucket)
+│   ├── COMMUN/ · TESTS/           # FB_Ramp, FB_Brake, FB_Acquisition_Preflight… · bancs de test
 │   └── CODE_Bundle.xml           # bundle PLCopenXML généré, voir TOOLS/
 │
 ├── TOOLS/                       # 🔧 Outillage
