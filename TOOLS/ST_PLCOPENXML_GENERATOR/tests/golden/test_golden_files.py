@@ -52,7 +52,7 @@ SAMPLE_ROOTS = [
     "ST_WinchHMI",
     "E_CycleStep",
     "FB_Grappin",
-    # E_DiagState.xml (excluded): timestamped 2026-07-04T07:58, ~14h before
+    # E_Diag_State.xml (excluded): timestamped 2026-07-04T07:58, ~14h before
     # E_CycleStep.xml (2026-07-04T21:59) despite both using the same
     # per-value-commented '(...)' enum syntax -- the earlier capture has
     # neither an EnumValueDocumentation nor an Attributes addData block,

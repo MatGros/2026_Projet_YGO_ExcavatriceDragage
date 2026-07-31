@@ -23,7 +23,7 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_DiagState">
+      <dataType name="E_Diag_State">
         <baseType>
           <enum>
             <values>
@@ -51,7 +51,7 @@
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="SYSTEM">
-          <Object Name="E_DiagState" ObjectId="dbed5258-b652-4961-bc40-775659712c76" />
+          <Object Name="E_Diag_State" ObjectId="dbed5258-b652-4961-bc40-775659712c76" />
         </Folder>
       </ProjectStructure>
     </data>

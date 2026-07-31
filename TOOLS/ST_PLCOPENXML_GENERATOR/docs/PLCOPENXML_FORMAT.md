@@ -7,7 +7,7 @@
 > **Statut : schéma quasi entièrement confirmé sur échantillons réels** (`samples_reference_codesys/`,
 > exportés depuis **CODESYS V3.5 SP19 Patch 1**, projet `Programme MGS_v0.3.10_Simulation`) :
 > `FB_Winch.xml` / `FB_Grappin.xml` / `FB_Cycle.xml` (FUNCTION_BLOCK), `PRG_MAIN.xml` (PROGRAM),
-> `E_DiagState.xml` / `E_CycleStep.xml` (ENUM), `ST_WinchHMI.xml` / `ST_SpeedStepTable.xml` (STRUCT),
+> `E_Diag_State.xml` / `E_CycleStep.xml` (ENUM), `ST_WinchHMI.xml` / `ST_SpeedStepTable.xml` (STRUCT),
 > `GVL_IHM.xml` / `GVL_PERSISTENT.xml` / `GVL_DEBUG.xml` (GVL, retain / retain+persistent / non-retain).
 > **Import testé en conditions réelles** (§7) : le POC `test_import_poc/` a été importé (et
 > réimporté) dans le vrai projet CODESYS. Confirmé : sélection d'objets individuelle à l'import
@@ -301,7 +301,7 @@ Placé dans `<types><dataTypes>` (pas `<pous>`, qui reste `<pous />` vide dans c
 
 ## 4. Énumérations (`TYPE ... ENUM ... END_TYPE`)
 
-Confirmé sur `E_DiagState.xml` (5 valeurs) et `E_CycleStep.xml` (13 valeurs, avec commentaire
+Confirmé sur `E_Diag_State.xml` (5 valeurs) et `E_CycleStep.xml` (13 valeurs, avec commentaire
 par valeur) :
 
 ```xml

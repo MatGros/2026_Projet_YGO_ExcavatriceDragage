@@ -28,8 +28,8 @@ VAR_GLOBAL PERSISTENT RETAIN
         SpeedBandHysteresisMps := 0.05
     );
     _WinchLoadEstimateTable : ST_WinchLoadEstimateTable;
-    _WinchSymmetryCfgPersist : ST_WinchSymmetryCfg; // 🩺 D1 : seuils initiaux à confirmer sur site
-    _WinchSymmetryDataPersist : ST_WinchSymmetryData; // 🩺 D1 : dernières/max mesures MES-008
+    _WinchSymmetryCfgPersist : ST_Winch_Symmetry_Cfg; // 🩺 D1 : seuils initiaux à confirmer sur site
+    _WinchSymmetryDataPersist : ST_Winch_Symmetry_Data; // 🩺 D1 : dernières/max mesures MES-008
 
     // 📐 🆕 REX 2026-07-27 — valeurs alignées sur les relevés terrain (REGISTRE_Suivi_MiseEnService) :
     //   • CfgTopSensorPos_M 8.5 → 8.0  (MES-009 : déclenchement physique du capteur haut mesuré à 8,0 m).

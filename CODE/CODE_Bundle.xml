@@ -137,7 +137,7 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="E_DiagState">
+      <dataType name="E_Diag_State">
         <baseType>
           <enum>
             <values>
@@ -162,13 +162,13 @@
               <EnumValue>
                 <Name>READY</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt (opérationnel réel, pas de défaut)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>INIT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation en cours / Recherche de réseau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -180,16 +180,13 @@
               <EnumValue>
                 <Name>ERROR</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Présence anomalie de communication
-🆕 REX 2026-07-24 (demande utilisateur, mise en service) : distingue explicitement "bypassé
-par simulation/bypass réseau IHM" de READY (réellement online) — évite la confusion vue en
-mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypass, pas le bus réel).</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SIMULATED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation (Bus&lt;Device&gt;IsReal=FALSE) ou bypass réseau IHM actif — pas le bus réel</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -201,7 +198,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
             </Attributes>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>39664b51-89a6-5c70-97d4-b9cecb9f2e88</ObjectId>
+            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -3157,7 +3154,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_DiagDevice">
+      <dataType name="ST_Diag_Device">
         <baseType>
           <struct>
             <variable name="Online">
@@ -3194,7 +3191,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
             </variable>
             <variable name="State">
               <type>
-                <derived name="E_DiagState" />
+                <derived name="E_Diag_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diagnostic</xhtml>
@@ -3202,7 +3199,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
             </variable>
             <variable name="StateAtError">
               <type>
-                <derived name="E_DiagState" />
+                <derived name="E_Diag_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Instantané de la phase lors de l'anomalie</xhtml>
@@ -3212,12 +3209,12 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>68ef7967-d114-5e9c-853e-21c8e5a90a1f</ObjectId>
+            <ObjectId>1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_DiagDevice — Structure diagnostic d'un esclave ou bus
+   📡 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4466,7 +4463,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
           <struct>
             <variable name="BusCanOpen">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Diagnostics bus CANopen</xhtml>
@@ -4474,7 +4471,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
             </variable>
             <variable name="Joystick">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostics esclave Joystick</xhtml>
@@ -4498,7 +4495,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
             </variable>
             <variable name="BusEthercat">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Diagnostics bus EtherCAT</xhtml>
@@ -4506,7 +4503,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
             </variable>
             <variable name="EncoderM1">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostics esclave COD1</xhtml>
@@ -4514,7 +4511,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
             </variable>
             <variable name="EncoderM2">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostics esclave COD2</xhtml>
@@ -4522,7 +4519,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
             </variable>
             <variable name="VariateurM3">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Diagnostics esclave AC600</xhtml>
@@ -6962,7 +6959,63 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_WinchSymmetryCfg">
+      <dataType name="ST_WinchSymmetryHMI">
+        <baseType>
+          <struct>
+            <variable name="BtnReset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SymmetryOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SymmetryValid">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaStopDistance_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>53f9b377-a390-54de-9b7c-d1db8711e403</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Winch_Symmetry_Cfg">
         <baseType>
           <struct>
             <variable name="DeltaStartDelay_Ms">
@@ -7025,11 +7078,11 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e4d6e335-c2ee-5eb4-8c0c-853ba5158a6b</ObjectId>
+            <ObjectId>76a5205f-28c9-5708-b53f-fc5a75492e4d</ObjectId>
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_WinchSymmetryData">
+      <dataType name="ST_Winch_Symmetry_Data">
         <baseType>
           <struct>
             <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
@@ -7051,63 +7104,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>013da017-00af-5581-9a6d-612617b82cd3</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="ST_WinchSymmetryHMI">
-        <baseType>
-          <struct>
-            <variable name="BtnReset">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="SymmetryOk">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="SymmetryValid">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DeltaStartDelay_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="DeltaBrakeReleaseTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="DeltaBrakeApplyTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="DeltaStopDistance_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="DeltaStopTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="MaxSyncDeviation_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>53f9b377-a390-54de-9b7c-d1db8711e403</ObjectId>
+            <ObjectId>e42e2778-615a-5ad6-918d-c9d8044e3739</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -9810,9 +9807,7 @@ TimeLast := TimeCurrent;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 : valeurs BRUTES non interprétées — l'appelant (PRG_01) ne fait plus
-qu'acquérir, cette FB décide seule de l'interprétation (voir en-tête).
-Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — PAS 1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute CANbus.GetBusState() (2 = ACTIVE)</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickStateRaw">
@@ -9828,7 +9823,7 @@ Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — 
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active pour ce device (SimulationModeActive AND NOT BusJoystickIsReal), calculé par l'appelant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active pour ce device</xhtml>
               </documentation>
             </variable>
             <variable name="NetworkBypassActive">
@@ -9836,7 +9831,7 @@ Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — 
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM (GVL_IHM.Network.Bypass.Global)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -9883,15 +9878,15 @@ Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — 
             </variable>
             <variable name="State">
               <type>
-                <derived name="E_DiagState" />
+                <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diag — voir en-tête (INIT/SIMULATED/READY/ERROR)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante (INIT/SIMULATED/READY/ERROR)</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
-                <derived name="E_DiagState" />
+                <derived name="E_Diag_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase figée à l'apparition de l'erreur</xhtml>
@@ -9899,7 +9894,7 @@ Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — 
             </variable>
             <variable name="DeviceCanOpenMaster">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics bus CANopen</xhtml>
@@ -9907,7 +9902,7 @@ Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — 
             </variable>
             <variable name="DeviceJoystick">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave Joystick</xhtml>
@@ -9918,9 +9913,7 @@ Valeur brute CANbus.GetBusState() (2 = ACTIVE, confirmé terrain 2026-07-24 — 
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — miroirs bruts (voir VAR_INPUT ci-dessus), lisibles directement sur
-l'instance (Device.Application.PRG_01_Diagnostics.instDiagCanOpen.&lt;Nom&gt;) sans dépendre
-du reste de la logique de bypass/simulation.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroirs bruts lisibles directement sur l'instance</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickStateRawOut">
@@ -9943,8 +9936,7 @@ du reste de la logique de bypass/simulation.</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — interprétation interne (voir en-tête)
-Bus réellement actif, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus réellement actif, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickOnlineReal">
@@ -9968,7 +9960,7 @@ Bus réellement actif, hors tout bypass</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif utilisé pour la logique (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif (réel OU bypass)</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickOnlineEff">
@@ -9976,33 +9968,23 @@ Bus réellement actif, hors tout bypass</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Operational effectif utilisé pour la logique (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Operational effectif (réel OU bypass)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_DiagCanOpen — Diagnostic de communication bus CANopen / Joystick
+   📡 FB_DiagCanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
-   🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE responsabilités —
-   PRG_01_Diagnostics ne transmet plus que les valeurs BRUTES (GetBusState()/GetDeviceState())
-   et les 2 bypass bruts (simulation par device, bypass réseau IHM global) ; c'est CE FB qui
-   décide désormais Online/Operational ET distingue explicitement dans `State` :
-     - INIT       : pas encore online (ni réel, ni bypass) — initialisation normale
-     - SIMULATED  : bypass actif (simulation ou bypass réseau IHM) mais bus réel PAS confirmé online
-     - READY      : bus réellement online (le bypass, actif ou non, ne change rien ici)
-     - ERROR      : défaut détecté
-   But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
-   bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
-   réel ne l'était pas.
-    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
-
-   🐛 REX 2026-07-24 (bis) — BUG CORRIGÉ (mesure terrain mise en service) : l'ancien code comparait
-   CANbusStateRaw = 1 pour "actif", valeur JAMAIS vérifiée sur le vrai bus (devinée à l'écriture du
-   code initial). Mesure réelle : device physique "Bus Active=TRUE, Fault=FALSE" ⇒ CANbusStateRaw
-   = 2. Comparaison corrigée à = 2. ⚠️ Cette valeur reste une CONSTATATION EMPIRIQUE (pas de doc
-   vendeur consultée) — à reconfirmer si possible en simulant une vraie coupure bus (la valeur doit
-   changer et NE PLUS valoir 2).</xhtml>
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+              DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3
+   🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
+      Distinction explicite dans State :
+      - INIT       : pas encore online (ni réel, ni bypass)
+      - SIMULATED  : bypass actif (simulation ou bypass réseau IHM)
+      - READY      : bus réellement online
+      - ERROR      : défaut détecté
+   ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
@@ -10012,30 +9994,26 @@ Bus réellement actif, hors tout bypass</xhtml>
 // 🛑 1. GATE : Désactivation logique si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
-    State := E_DiagState.DISABLED;
-    DeviceJoystick.State := E_DiagState.DISABLED;
+    State := E_Diag_State.DISABLED;
+    DeviceJoystick.State := E_Diag_State.DISABLED;
     DeviceJoystick.Online := FALSE;
     DeviceJoystick.Operational := FALSE;
     DeviceJoystick.Error := FALSE;
     DeviceJoystick.ErrorId := 16#0000;
-    // 🐛 REX 2026-07-24 (ter) — BUG CORRIGÉ : DeviceCanOpenMaster.State n'était JAMAIS assigné
-    // (ni ici, ni dans le corps normal ci-dessous) → restait figé sur sa valeur d'init DISABLED
-    // (E_DiagState := 0 par défaut) quel que soit l'état réel du bus. Constaté en mise en service :
-    // bus réellement ACTIVE mais GVL_IHM.Network.BusCanOpen.State affichait DISABLED en continu.
-    DeviceCanOpenMaster.State := E_DiagState.DISABLED;
+    DeviceCanOpenMaster.State := E_Diag_State.DISABLED;
     DeviceCanOpenMaster.Online := FALSE;
     DeviceCanOpenMaster.Operational := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
-    CANbusStateRawOut := CANbusStateRaw;         // 🆕 miroir toujours à jour, même désactivé
+    CANbusStateRawOut := CANbusStateRaw;
     DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 
-// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES (REX 2026-07-24, rapatrié depuis PRG_01_Diagnostics)
-CANbusOnlineReal         := (CANbusStateRaw = 2); // 🐛 REX 2026-07-24 (bis) : corrigé de 1 → 2 (mesure terrain, voir en-tête)
+// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
+CANbusOnlineReal         := (CANbusStateRaw = 2);
 DeviceJoystickOnlineReal := (DeviceJoystickStateRaw = DEVICE_STATE.RUNNING);
 BypassActive             := SimBypassActive OR NetworkBypassActive;
 CANbusOnlineEff          := CANbusOnlineReal OR BypassActive;
@@ -10046,7 +10024,7 @@ ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
     IF (CANbusOnlineEff AND DeviceJoystickOnlineEff) THEN
         DeviceJoystick.ErrorId := 16#0000;
-        StateAtError := E_DiagState.DISABLED;
+        StateAtError := E_Diag_State.DISABLED;
     END_IF;
 END_IF;
 
@@ -10070,19 +10048,17 @@ ELSE
 END_IF;
 
 // 🚦 5. MACHINE D'ÉTAT JOYSTICK
-// REX 2026-07-08 : correction de la précédence d'affichage IHM des états d'erreur.
-// 🆕 REX 2026-07-24 : distingue SIMULATED (bypass actif, bus réel pas confirmé) de READY (réel).
 IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
-    DeviceJoystick.State := E_DiagState.ERROR;
-    IF StateAtError = E_DiagState.DISABLED THEN
+    DeviceJoystick.State := E_Diag_State.ERROR;
+    IF StateAtError = E_Diag_State.DISABLED THEN
         StateAtError := State;
     END_IF;
 ELSIF NOT (DeviceJoystick.Online AND DeviceJoystick.Operational) THEN
-    DeviceJoystick.State := E_DiagState.INIT;
+    DeviceJoystick.State := E_Diag_State.INIT;
 ELSIF BypassActive AND NOT (CANbusOnlineReal AND DeviceJoystickOnlineReal) THEN
-    DeviceJoystick.State := E_DiagState.SIMULATED;
+    DeviceJoystick.State := E_Diag_State.SIMULATED;
 ELSE
-    DeviceJoystick.State := E_DiagState.READY;
+    DeviceJoystick.State := E_Diag_State.READY;
 END_IF;
 
 State := DeviceJoystick.State;
@@ -10095,17 +10071,15 @@ ErrorId := DeviceJoystick.ErrorId;
 DeviceCanOpenMaster.Operational := CANbusOnlineEff;
 DeviceCanOpenMaster.Online := CANbusOnlineEff;
 
-// 🐛 REX 2026-07-24 (ter) : State du bus maître, jamais assigné avant (voir bug ci-dessus au GATE).
-// Pas d'ErrorId propre au master (les défauts bus sont remontés via DeviceJoystick.ErrorId bit 0).
 IF NOT CANbusOnlineEff THEN
-    DeviceCanOpenMaster.State := E_DiagState.INIT;
+    DeviceCanOpenMaster.State := E_Diag_State.INIT;
 ELSIF BypassActive AND NOT CANbusOnlineReal THEN
-    DeviceCanOpenMaster.State := E_DiagState.SIMULATED;
+    DeviceCanOpenMaster.State := E_Diag_State.SIMULATED;
 ELSE
-    DeviceCanOpenMaster.State := E_DiagState.READY;
+    DeviceCanOpenMaster.State := E_Diag_State.READY;
 END_IF;
 
-// 🆕 REX 2026-07-24 — miroirs bruts (voir en-tête), toujours à jour
+// Miroirs bruts, toujours à jour
 CANbusStateRawOut := CANbusStateRaw;
 DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
 
@@ -10145,9 +10119,7 @@ Done := FALSE;
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 : valeurs BRUTES non interprétées — l'appelant (PRG_01) ne fait plus
-qu'acquérir, cette FB décide seule de l'interprétation (voir en-tête).
-Variateur M3 (AC600_ECAT_Drive)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Variateur M3 (AC600_ECAT_Drive)
 Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
               </documentation>
             </variable>
@@ -10156,7 +10128,7 @@ Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active (SimulationModeActive AND NOT BusVariateurM3IsReal), calculé par l'appelant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1StateRaw">
@@ -10173,7 +10145,7 @@ Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active (SimulationModeActive AND NOT BusEncoderM1IsReal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2StateRaw">
@@ -10190,7 +10162,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active (SimulationModeActive AND NOT BusEncoderM2IsReal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="NetworkBypassActive">
@@ -10198,7 +10170,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM (GVL_IHM.Network.Bypass.Global), commun aux 3 devices</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -10245,7 +10217,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
             </variable>
             <variable name="State">
               <type>
-                <derived name="E_DiagState" />
+                <derived name="E_Diag_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du diagnostic global — voir en-tête</xhtml>
@@ -10253,7 +10225,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
             </variable>
             <variable name="StateAtError">
               <type>
-                <derived name="E_DiagState" />
+                <derived name="E_Diag_State" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase figée à l'apparition de l'erreur</xhtml>
@@ -10261,7 +10233,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
             </variable>
             <variable name="DeviceEthercatMaster">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics bus EtherCAT</xhtml>
@@ -10269,7 +10241,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
             </variable>
             <variable name="DeviceVariateur">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave AC600</xhtml>
@@ -10277,7 +10249,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
             </variable>
             <variable name="DeviceEncoderM1">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD1</xhtml>
@@ -10285,7 +10257,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
             </variable>
             <variable name="DeviceEncoderM2">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD2</xhtml>
@@ -10296,8 +10268,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — miroirs bruts (voir VAR_INPUT ci-dessus), lisibles directement sur
-l'instance (Device.Application.PRG_01_Diagnostics.instDiagEthercat.&lt;Nom&gt;).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroirs bruts lisibles directement sur l'instance</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1StateRawOut">
@@ -10325,8 +10296,7 @@ l'instance (Device.Application.PRG_01_Diagnostics.instDiagEthercat.&lt;Nom&gt;).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-24 — interprétation interne (voir en-tête)
-GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">GetDeviceState() = RUNNING, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1OnlineReal">
@@ -10362,7 +10332,7 @@ GetDeviceState() = RUNNING, hors tout bypass</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif utilisé pour la logique (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif (réel OU bypass)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1OnlineEff">
@@ -10378,20 +10348,13 @@ GetDeviceState() = RUNNING, hors tout bypass</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_DiagEthercat — Diagnostic de communication bus EtherCAT (3 esclaves)
+   📡 FB_DiagEthercat — Diagnostic bus EtherCAT (3 esclaves)
    ───────────────────────────────────────────────────────────────
-   🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE responsabilités —
-   PRG_01_Diagnostics ne transmet plus que les valeurs BRUTES (GetDeviceState()) et les 2 bypass
-   bruts par device (simulation, bypass réseau IHM global) ; c'est CE FB qui décide désormais
-   Online/Operational ET distingue explicitement dans `State` :
-     - INIT       : pas encore online (ni réel, ni bypass) — initialisation normale
-     - SIMULATED  : bypass actif (simulation ou bypass réseau IHM) mais bus réel PAS confirmé online
-     - READY      : bus réellement online (le bypass, actif ou non, ne change rien ici)
-     - ERROR      : défaut détecté
-   But : ne plus jamais confondre en mise en service un bypass masquant (SIMULATED) avec un vrai
-   bus opérationnel (READY) — ambiguïté qui a causé un faux diagnostic "online" alors que le bus
-   réel ne l'était pas.
-    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md</xhtml>
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+              DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3
+   🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
+      Publie ST_Diag_Device par device + state global.
+   ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
@@ -10401,10 +10364,10 @@ GetDeviceState() = RUNNING, hors tout bypass</xhtml>
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
-    State := E_DiagState.DISABLED;
-    DeviceVariateur.State := E_DiagState.DISABLED;
-    DeviceEncoderM1.State := E_DiagState.DISABLED;
-    DeviceEncoderM2.State := E_DiagState.DISABLED;
+    State := E_Diag_State.DISABLED;
+    DeviceVariateur.State := E_Diag_State.DISABLED;
+    DeviceEncoderM1.State := E_Diag_State.DISABLED;
+    DeviceEncoderM2.State := E_Diag_State.DISABLED;
     DeviceVariateur.Online := FALSE;
     DeviceEncoderM1.Online := FALSE;
     DeviceEncoderM2.Online := FALSE;
@@ -10416,14 +10379,9 @@ IF NOT Enable THEN
     DeviceEncoderM2.Error := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
-    // 🐛 REX 2026-07-24 (ter) — BUG CORRIGÉ (même bug que FB_DiagCanOpen, trouvé en mise en
-    // service) : DeviceEthercatMaster.State/.Online/.Operational n'étaient JAMAIS remis à zéro ici
-    // (ni .State assigné nulle part dans le corps normal) → restaient figés sur la dernière valeur
-    // active (ou DISABLED=0 par défaut au tout premier cycle) même après désactivation/rechargement.
-    DeviceEthercatMaster.State := E_DiagState.DISABLED;
+    DeviceEthercatMaster.State := E_Diag_State.DISABLED;
     DeviceEthercatMaster.Online := FALSE;
     DeviceEthercatMaster.Operational := FALSE;
-    // 🆕 miroirs bruts toujours à jour, même désactivé (voir en-tête)
     DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
     DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
     DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
@@ -10432,7 +10390,7 @@ END_IF;
 
 Ready := TRUE;
 
-// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES (REX 2026-07-24, rapatrié depuis PRG_01_Diagnostics)
+// 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
 EncoderM2OnlineReal := (DeviceEncoderM2StateRaw = DEVICE_STATE.RUNNING);
@@ -10478,41 +10436,40 @@ ELSE
     DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
-// 🚦 7. STATE MACHINES DE CHAQUE APPAREIL — 🆕 REX 2026-07-24 : distingue SIMULATED (bypass actif,
-// bus réel pas confirmé) de READY (réel).
+// 🚦 7. STATE MACHINES DE CHAQUE APPAREIL
 IF DeviceVariateur.ErrorId &lt;&gt; 0 THEN
-    DeviceVariateur.State := E_DiagState.ERROR;
+    DeviceVariateur.State := E_Diag_State.ERROR;
 ELSIF NOT VariateurOnlineEff THEN
-    DeviceVariateur.State := E_DiagState.INIT;
+    DeviceVariateur.State := E_Diag_State.INIT;
 ELSIF VariateurBypass AND NOT VariateurOnlineReal THEN
-    DeviceVariateur.State := E_DiagState.SIMULATED;
+    DeviceVariateur.State := E_Diag_State.SIMULATED;
 ELSE
-    DeviceVariateur.State := E_DiagState.READY;
+    DeviceVariateur.State := E_Diag_State.READY;
 END_IF;
 
 IF DeviceEncoderM1.ErrorId &lt;&gt; 0 THEN
-    DeviceEncoderM1.State := E_DiagState.ERROR;
+    DeviceEncoderM1.State := E_Diag_State.ERROR;
 ELSIF NOT EncoderM1OnlineEff THEN
-    DeviceEncoderM1.State := E_DiagState.INIT;
+    DeviceEncoderM1.State := E_Diag_State.INIT;
 ELSIF EncoderM1Bypass AND NOT EncoderM1OnlineReal THEN
-    DeviceEncoderM1.State := E_DiagState.SIMULATED;
+    DeviceEncoderM1.State := E_Diag_State.SIMULATED;
 ELSE
-    DeviceEncoderM1.State := E_DiagState.READY;
+    DeviceEncoderM1.State := E_Diag_State.READY;
 END_IF;
 
 IF DeviceEncoderM2.ErrorId &lt;&gt; 0 THEN
-    DeviceEncoderM2.State := E_DiagState.ERROR;
+    DeviceEncoderM2.State := E_Diag_State.ERROR;
 ELSIF NOT EncoderM2OnlineEff THEN
-    DeviceEncoderM2.State := E_DiagState.INIT;
+    DeviceEncoderM2.State := E_Diag_State.INIT;
 ELSIF EncoderM2Bypass AND NOT EncoderM2OnlineReal THEN
-    DeviceEncoderM2.State := E_DiagState.SIMULATED;
+    DeviceEncoderM2.State := E_Diag_State.SIMULATED;
 ELSE
-    DeviceEncoderM2.State := E_DiagState.READY;
+    DeviceEncoderM2.State := E_Diag_State.READY;
 END_IF;
 
 // Fige la phase du diagnostic global sur le premier défaut
 IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR DeviceEncoderM2.ErrorId &lt;&gt; 0) THEN
-    IF StateAtError = E_DiagState.DISABLED THEN
+    IF StateAtError = E_Diag_State.DISABLED THEN
         StateAtError := State;
     END_IF;
 END_IF;
@@ -10536,20 +10493,19 @@ IF DeviceEncoderM2.Error THEN
 END_IF;
 
 IF Error THEN
-    State := E_DiagState.ERROR;
+    State := E_Diag_State.ERROR;
 ELSIF NOT (VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff) THEN
-    State := E_DiagState.INIT;
+    State := E_Diag_State.INIT;
 ELSIF (VariateurBypass OR EncoderM1Bypass OR EncoderM2Bypass)
       AND NOT (VariateurOnlineReal AND EncoderM1OnlineReal AND EncoderM2OnlineReal) THEN
-    State := E_DiagState.SIMULATED;
+    State := E_Diag_State.SIMULATED;
 ELSE
-    State := E_DiagState.READY;
+    State := E_Diag_State.READY;
 END_IF;
 
 DeviceEthercatMaster.Online := VariateurOnlineEff AND EncoderM1OnlineEff AND EncoderM2OnlineEff;
 DeviceEthercatMaster.Operational := DeviceEthercatMaster.Online;
 
-// 🆕 REX 2026-07-24 — miroirs bruts (voir en-tête), toujours à jour
 DeviceVariateurStateRawOut := DeviceVariateurStateRaw;
 DeviceEncoderM1StateRawOut := DeviceEncoderM1StateRaw;
 DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
@@ -13490,7 +13446,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
             </variable>
             <variable name="BusCanOpenOP">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">État présence nœud CAN</xhtml>
@@ -13498,7 +13454,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
             </variable>
             <variable name="JoystickOP">
               <type>
-                <derived name="ST_DiagDevice" />
+                <derived name="ST_Diag_Device" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode esclave CANopen actif</xhtml>
@@ -22154,7 +22110,7 @@ END_IF;
             </variable>
             <variable name="Config">
               <type>
-                <derived name="ST_WinchSymmetryCfg" />
+                <derived name="ST_Winch_Symmetry_Cfg" />
               </type>
             </variable>
           </inputVars>
@@ -22173,7 +22129,7 @@ END_IF;
           <inOutVars>
             <variable name="Data">
               <type>
-                <derived name="ST_WinchSymmetryData" />
+                <derived name="ST_Winch_Symmetry_Data" />
               </type>
             </variable>
           </inOutVars>
@@ -34081,7 +34037,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
         </variable>
         <variable name="_WinchSymmetryCfgPersist">
           <type>
-            <derived name="ST_WinchSymmetryCfg" />
+            <derived name="ST_Winch_Symmetry_Cfg" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -34093,7 +34049,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
         </variable>
         <variable name="_WinchSymmetryDataPersist">
           <type>
-            <derived name="ST_WinchSymmetryData" />
+            <derived name="ST_Winch_Symmetry_Data" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -34986,13 +34942,13 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_ExtractionSequence" ObjectId="db0a276d-2eae-5fdc-b5fd-93390d06b89e" />
         </Folder>
         <Folder Name="DIAG">
-          <Object Name="E_DiagState" ObjectId="39664b51-89a6-5c70-97d4-b9cecb9f2e88" />
+          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
           <Object Name="FB_DiagCanOpen" ObjectId="94985939-6432-5df4-8717-0ad1efb0fdb4" />
           <Object Name="FB_DiagEthercat" ObjectId="268197d6-ad0a-5ec3-82c7-3a1f88f6bae6" />
           <Object Name="FB_IhmHeartbeat" ObjectId="27ea6b0f-df94-59ee-ac07-585c8e3e993b" />
           <Object Name="FB_Preflight" ObjectId="d31c4cd5-70b8-565a-906d-0e527f36e29d" />
           <Object Name="FB_WinchSymmetry" ObjectId="d3f3c22f-4579-5b7b-a799-7880ca0e8f82" />
-          <Object Name="ST_DiagDevice" ObjectId="68ef7967-d114-5e9c-853e-21c8e5a90a1f" />
+          <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
         </Folder>
         <Folder Name="MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
@@ -35167,9 +35123,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
             <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
             <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
-            <Object Name="ST_WinchSymmetryCfg" ObjectId="e4d6e335-c2ee-5eb4-8c0c-853ba5158a6b" />
-            <Object Name="ST_WinchSymmetryData" ObjectId="013da017-00af-5581-9a6d-612617b82cd3" />
             <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
+            <Object Name="ST_Winch_Symmetry_Cfg" ObjectId="76a5205f-28c9-5708-b53f-fc5a75492e4d" />
+            <Object Name="ST_Winch_Symmetry_Data" ObjectId="e42e2778-615a-5ad6-918d-c9d8044e3739" />
           </Folder>
         </Folder>
         <Folder Name="">
