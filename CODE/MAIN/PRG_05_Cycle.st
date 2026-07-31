@@ -48,11 +48,11 @@ instCycle(
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
-    
+
     StartCycle          := CmdStartCycle_IHM,
     PauseCycle          := CmdPauseCycle_IHM,
     AbortCycle          := CmdAbortCycle_IHM,
-    
+
     SetDepthM        := SetDepthM,
     SetOffsetM       := SetOffsetM,
     SelectedTargetNum_IHM := GVL_IHM.TranslationM3.Cmd.SelTarget,
@@ -95,3 +95,5 @@ GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
 GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
 GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
 GVL_IHM.Cycle.Cmd.BtnReset := FALSE;
+
+END_PROGRAM

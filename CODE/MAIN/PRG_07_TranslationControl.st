@@ -40,10 +40,10 @@ END_VAR
 IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
     M3_PositioningActive  := TRUE;
-    SelTarget    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
+    SelTarget    := PRG_05_Cycle.instCycle.TranslationCmd.Target;
     // 🛡️ SEMI_AUTO reste conditionné par l'homme-mort : relâchement = arrêt,
     // nouvelle sollicitation valide = reprise à l'étape courante.
-    M3_StartStop_Active  := PRG_05_Cycle.instCycle.CmdTranslationM3_Start
+    M3_StartStop_Active  := PRG_05_Cycle.instCycle.TranslationCmd.Start
                             AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
                             AND PRG_01_Diagnostics.instJoystick.AxisCmdX.StartStop;
     M3_SpeedRef_Active   := MIN(_TranslationAutoSpeedCap_Pct,
