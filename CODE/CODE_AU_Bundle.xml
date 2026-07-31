@@ -1030,31 +1030,27 @@ IF NOT StartupCheckDone THEN
     StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
                       AND NOT PowerContactorEngaged // 2. Contacteur au repos
                       AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
-    // Le maintien A/B est vérifié via l'absence de RedundancyTestFailed
-    // (si un canal est ouvert au démarrage, RedundancyTestFailed sera levé
-    //  à la première tentative de réarmement — pas bloquant au boot)
     StartupCheckDone := TRUE;
     StartupFail := NOT StartupCheckOK;
-    // Si échec : on reste en attente, ErrorId est positionné
     IF NOT StartupCheckOK THEN
         ErrorId := 16#0008; // bit3 = startup autotest fail
         Error := TRUE;
     END_IF;
     RETURN; // 1 cycle pour laisser le temps aux entrées de se stabiliser
-ELSE
-    StartupFail := FALSE;
 END_IF;
 
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset TOUJOURS effectif, jamais conditionné par un état externe (ex-bug REX 2026-08 :
-// "Reset ET PowerContactorEngaged" créait une impasse — le contacteur ne s'engage jamais
-// tant que le défaut est actif, donc le Reset restait bloqué en boucle).
+// ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
+// pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
+// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
 IF ResetEdge.Q THEN
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedAck := TRUE;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
-    // Reset efface aussi bit3 d'ErrorId (StartupFail — pas de Cause/Ack séparé, latch simple)
-    ErrorId := ErrorId AND 16#FFF7;
+    ErrorId := 16#0000;
+END_IF;
 END_IF;
 
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
@@ -2764,6 +2760,157 @@ END_CASE;
           </data>
         </addData>
       </pou>
+      <pou name="PRG_ACQUISITION_CFC" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="instJoystick">
+              <type>
+                <derived name="FB_Joystick" />
+              </type>
+            </variable>
+            <variable name="instEncoderAbsM1">
+              <type>
+                <derived name="FB_Encoder_Abs" />
+              </type>
+            </variable>
+            <variable name="instEncoderScaleM1">
+              <type>
+                <derived name="FB_Encoder_Scale" />
+              </type>
+            </variable>
+            <variable name="instHomingM1">
+              <type>
+                <derived name="FB_Encoder_Homing" />
+              </type>
+            </variable>
+            <variable name="instEncoderAbsM2">
+              <type>
+                <derived name="FB_Encoder_Abs" />
+              </type>
+            </variable>
+            <variable name="instEncoderScaleM2">
+              <type>
+                <derived name="FB_Encoder_Scale" />
+              </type>
+            </variable>
+            <variable name="instHomingM2">
+              <type>
+                <derived name="FB_Encoder_Homing" />
+              </type>
+            </variable>
+            <variable name="instPosDecoderM3">
+              <type>
+                <derived name="FB_Translation_PositionDecoder" />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="10" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1</expression>
+                </inVariable>
+                <inVariable localId="2">
+                  <position x="10" y="30" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2</expression>
+                </inVariable>
+                <inVariable localId="3">
+                  <position x="10" y="50" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyBtnRaw</expression>
+                </inVariable>
+                <connector localId="4" name="">
+                  <position x="40" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="5" name="">
+                  <position x="40" y="30" />
+                  <connectionPointIn>
+                    <connection refLocalId="2" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="6" name="">
+                  <position x="40" y="50" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyBtnRaw" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="10" executionOrderId="1" typeName="FB_Joystick" instanceName="instJoystick">
+                  <position x="80" y="10" />
+                  <inputVariables>
+                    <variable formalParameter="RawX">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="4" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="RawY">
+                      <connectionPointIn>
+                        <relPosition x="0" y="20" />
+                        <connection refLocalId="5" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="RawButton">
+                      <connectionPointIn>
+                        <relPosition x="0" y="40" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <outputVariables>
+                    <variable formalParameter="AxisCmdX">
+                      <connectionPointOut>
+                        <relPosition x="40" y="0" />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="AxisCmdY">
+                      <connectionPointOut>
+                        <relPosition x="40" y="20" />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="DeadmanArmed">
+                      <connectionPointOut>
+                        <relPosition x="40" y="40" />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                </block>
+                <outVariable localId="20">
+                  <position x="180" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="AxisCmdX" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdX</expression>
+                </outVariable>
+                <outVariable localId="21">
+                  <position x="180" y="30" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="AxisCmdY" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdY</expression>
+                </outVariable>
+                <outVariable localId="22">
+                  <position x="180" y="50" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="DeadmanArmed" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.DeadmanArmed</expression>
+                </outVariable>
+              </CFC>
+            </data>
+          </addData>
+        </body>
+      </pou>
     </pous>
   </types>
   <instances>
@@ -2910,6 +3057,7 @@ TRUE = une safety demande la coupure</xhtml>
         <Folder Name="MAIN">
           <Object Name="PRG_AU_Acquisition_CFC" ObjectId="22eb10df-0a92-5149-8107-a9e4bedbf362" />
           <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
+          <Object Name="PRG_ACQUISITION_CFC" ObjectId="5ca2a345-56a2-58c8-9723-1de144dc50a4" />
         </Folder>
       </ProjectStructure>
     </data>

@@ -132,31 +132,27 @@ IF NOT StartupCheckDone THEN
     StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
                       AND NOT PowerContactorEngaged // 2. Contacteur au repos
                       AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
-    // Le maintien A/B est vérifié via l'absence de RedundancyTestFailed
-    // (si un canal est ouvert au démarrage, RedundancyTestFailed sera levé
-    //  à la première tentative de réarmement — pas bloquant au boot)
     StartupCheckDone := TRUE;
     StartupFail := NOT StartupCheckOK;
-    // Si échec : on reste en attente, ErrorId est positionné
     IF NOT StartupCheckOK THEN
         ErrorId := 16#0008; // bit3 = startup autotest fail
         Error := TRUE;
     END_IF;
     RETURN; // 1 cycle pour laisser le temps aux entrées de se stabiliser
-ELSE
-    StartupFail := FALSE;
 END_IF;
 
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset TOUJOURS effectif, jamais conditionné par un état externe (ex-bug REX 2026-08 :
-// "Reset ET PowerContactorEngaged" créait une impasse — le contacteur ne s'engage jamais
-// tant que le défaut est actif, donc le Reset restait bloqué en boucle).
+// ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
+// pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
+// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
 IF ResetEdge.Q THEN
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedAck := TRUE;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
-    // Reset efface aussi bit3 d'ErrorId (StartupFail — pas de Cause/Ack séparé, latch simple)
-    ErrorId := ErrorId AND 16#FFF7;
+    ErrorId := 16#0000;
+END_IF;
 END_IF;
 
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ

@@ -117,7 +117,7 @@ def main() -> int:
             var_name = m.group(2)
             key = f"{inst_name}.{var_name}"
             line_start = text.rfind("\n", 0, m.start()) + 1
-            if text[line_start:m.start()].lstrip().startswith("GVL_IHM."):
+            if text[line_start:m.start()].lstrip().startswith(("GVL_IHM.", "GVL_IHM_AU.")):
                 # Bridge Pattern : publication de supervision, pas une écriture dans un FB.
                 continue
             rel_path = path.as_posix()

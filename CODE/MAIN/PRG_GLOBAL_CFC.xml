@@ -50,13 +50,13 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_00_Inputs.EmergencyStopOk</expression>
+                  <expression>PRG_00_Inputs.EmergencyChainClosed</expression>
                 </inVariable>
 
                 <connector localId="2" name="">
-                  <position x="0" y="0" />
+                  <position x="10" y="10" />
                   <connectionPointIn>
-                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.EmergencyStopOk" />
+                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.EmergencyChainClosed" />
                   </connectionPointIn>
                 </connector>
 
@@ -89,7 +89,7 @@
 
                 <!-- Liaison entre DiagCanOpen (Ready) et Modes (Enable) -->
                 <connector localId="11" name="">
-                  <position x="0" y="0" />
+                  <position x="45" y="10" />
                   <connectionPointIn>
                     <connection refLocalId="10" formalParameter="Ready" />
                   </connectionPointIn>
@@ -124,7 +124,7 @@
 
                 <!-- Liaison entre Modes (ActiveMode) et Cycle (ActiveMode) -->
                 <connector localId="21" name="">
-                  <position x="0" y="0" />
+                  <position x="80" y="10" />
                   <connectionPointIn>
                     <connection refLocalId="20" formalParameter="ActiveMode" />
                   </connectionPointIn>
