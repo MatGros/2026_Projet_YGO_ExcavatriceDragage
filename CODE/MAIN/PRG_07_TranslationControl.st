@@ -37,7 +37,7 @@ END_VAR
 // ── 0. DÉCODAGE MOT CAPTEURS (exécuté en position 0 dans PRG_00_Inputs) ──────
 
 // ── 1. ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ──────────────────
-IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Mode Auto/Semi-Auto : Consigne issue du séquenceur de cycle
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_05_Cycle.instCycle.CmdTranslationM3_Target;
@@ -64,8 +64,8 @@ IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
 // FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
-ELSIF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1)
-   OR (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
+ELSIF (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1)
+   OR (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) THEN
     // 🛠️ Maintenance N1/N2 : sous-mode explicite IHM.
     // SelPositioning=FALSE : jog libre, aucun capteur n'arrête hors fins de course.
     // SelPositioning=TRUE : le capteur de SelTarget arrête le mouvement.
@@ -127,7 +127,7 @@ M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
 // 🆕 REX 2026-07-18 : cible Maintenance (4) bloquée hors MAINT_N2 (AF_Partie-02 v2.12 §3bis) —
 // arbitrage centralisé dans FB_Modes (aucun re-test de Mode ici), refuse toute cible si interdite.
-IF (SelTarget = 4) AND NOT PRG_04_Modes.instModes.MaintenanceM3TargetEnable THEN
+IF (SelTarget = 4) AND NOT PRG_MODES_CFC.Auth.MaintenanceM3TargetEnable THEN
     SelTarget := 0;
 END_IF;
 
@@ -144,10 +144,10 @@ END_CASE;
 // ── 2. EXÉCUTION DU PILOTAGE DU TRANSLATION M3 ──────────────────────────────
 instTranslationM3(
     Enable                  := PRG_06_WinchControl.StubMachineEnableN1
-                               AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
+                               AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                    := PRG_04_Modes.instModes.Mode,
+    Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := PRG_03_Safety.instSafetyTranslationM3.SafeStop,
     Direction               := M3_Direction_Active,

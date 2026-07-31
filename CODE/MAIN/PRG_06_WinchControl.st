@@ -104,7 +104,7 @@ IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     MaintenanceMotionDirection := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
     MaintenanceMotionRequestActive := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                                      AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
-                                     AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3);
+                                     AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 3);
     MaintenanceMotionSpeed_Pct := ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -121,7 +121,7 @@ END_IF;
 
 // 🪨 L'attestation manuelle est une preuve temporaire, distincte du Kobold.
 // Elle est consommée à l'entrée extraction et annulée dès qu'un mouvement la rend caduque.
-IF NOT (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+IF NOT (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_INPUTS_LD.PowerContactorEngaged
    OR PRG_09_Supervision.FaultMachineReset_IHM
    OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
@@ -131,11 +131,11 @@ END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
 
 instDiveSearch(
-    Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+    Enable := (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode := PRG_04_Modes.instModes.Mode,
+    Mode := PRG_MODES_CFC.Auth.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
     BucketIsOpen := _BucketState.IsOpen,
@@ -152,11 +152,11 @@ instDiveSearch(
 // Deux preuves HOMOGÈNES et nommées de la même précondition extraction : Kobold ou attestation opérateur.
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed;
 instExtractionSequence(
-    Enable := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
+    Enable := (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode := PRG_04_Modes.instModes.Mode,
+    Mode := PRG_MODES_CFC.Auth.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
@@ -177,7 +177,7 @@ IF instExtractionSequence.BottomConfirmationConsumed THEN
 END_IF;
 
 // Un seul arbitre de fermeture : SEMI_AUTO > assistant extraction > demande IHM manuelle.
-IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     CmdBucketCloseArbitrated := PRG_05_Cycle.instCycle.CmdBucket_Close;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
@@ -186,7 +186,7 @@ ELSE
 END_IF;
 
 // Un seul producteur logique de commande Kobold : cycle auto OU assistant maintenance.
-IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     KoboldContactorCmdArbitrated := PRG_05_Cycle.instCycle.KoboldContactorCmd;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable;
@@ -201,12 +201,12 @@ END_IF;
 // acceptable : ça ne retarde que l'ACCEPTATION d'une nouvelle demande de ~1 scan (10ms), sans
 // aucun impact sécurité (contrairement au cas inverse, qui pouvait faire bouger M1 pendant Busy).
 instBucket(
-    Enable              := NOT PRG_04_Modes.instModes.InhibitM2
+    Enable              := NOT PRG_MODES_CFC.Auth.InhibitM2
                            AND PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable
                            AND PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable, // 🆕 Sécurisé : nécessite les deux codeurs valides et M2 non-inhibé
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                := PRG_04_Modes.instModes.Mode,
+    Mode                := PRG_MODES_CFC.Auth.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.CmdBucket_Open,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
@@ -222,8 +222,8 @@ instBucket(
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
-    InhibitM1           := PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08
-    InhibitM2           := PRG_04_Modes.instModes.InhibitM2,  // 🆕 REX 2026-07-08
+    InhibitM1           := PRG_MODES_CFC.Auth.InhibitM1, // 🆕 REX 2026-07-08
+    InhibitM2           := PRG_MODES_CFC.Auth.InhibitM2,  // 🆕 REX 2026-07-08
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global      // 🌐 Bypass benne (RETAIN)
 );
 
@@ -250,7 +250,7 @@ EffectiveMaxStepAscent   := _CommunCfgPersist.WinchMaxStepAscent;
 EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
 
 // ── 2. ARBITRAGE DES CONSIGNES M1 (Joystick vs Cycle Automatique) ────────
-IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche (bug trouvé en
     // review code), le cycle auto pouvait aggraver un écart mineur sans aucune protection quand
     // SyncSoftStopEnable=TRUE. Ajouté ici, symétrique à la branche manuelle ci-dessous.
@@ -284,8 +284,8 @@ ELSE
         M1_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
         M1_StartStop_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop AND NOT instBucket.Busy
                                 AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
-                                AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1
-                                     OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
+                                AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 1
+                                     OR PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 3)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1))); // 🔧 REX 2026-07-08 (5)
         M1_SpeedRef_Active  := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
@@ -315,7 +315,7 @@ IF instBucket.Busy THEN
     M2_Direction_Active := instBucket.M2_Direction;
     M2_SpeedRef_Active  := 15.0; // Vitesse lente forcée pour fermeture benne
 ELSE
-    IF PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO THEN
+    IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // 🔧 REX 2026-07-08 (7) — review : gate directionnel absent de cette branche, ajouté
         // symétrique à la branche manuelle ci-dessous (signe M2, voir note ci-dessous).
         M2_Direction_Active := PRG_05_Cycle.instCycle.CmdWinchM2_Direction;
@@ -346,8 +346,8 @@ ELSE
             M2_Direction_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.Direction;
             M2_StartStop_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop
                                     AND PRG_01_Diagnostics.instJoystick.DeadmanArmed
-                                    AND (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2
-                                         OR PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 3)
+                                    AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 2
+                                         OR PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 3)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1))); // 🔧 REX 2026-07-08 (7)
             M2_SpeedRef_Active := PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef;
@@ -375,7 +375,7 @@ END_IF;
 // ── 3bis. ASSISTANCE MAINTENANCE : priorité après arbitre manuel, avant les treuils ─
 // DiveSearch garde la main sur toute sa phase active : une pause homme-mort arrête
 // normalement les deux treuils sans laisser le manuel contourner la séquence Kobold.
-IF (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N1 OR PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2) THEN
+IF (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) THEN
     IF instDiveSearch.Busy THEN
         M1_Direction_Active := -1;
         M2_Direction_Active := -1;
@@ -423,18 +423,18 @@ instWinchSync(
     // treuils est en butée (Ascent OU Descent), même principe que la suppression pendant BenneBusy
     // déjà existante. Lu avec 1 scan de retard (ForbidAscent/DescentMx_Active calculés plus bas dans
     // ce fichier) — acceptable, même raisonnement que SyncMinorDeviation ci-dessous.
-    Enable          := PRG_04_Modes.instModes.SyncEnable AND NOT instBucket.Busy
-                        AND NOT PRG_04_Modes.instModes.InhibitM1 AND NOT PRG_04_Modes.instModes.InhibitM2
+    Enable          := PRG_MODES_CFC.Auth.SyncEnable AND NOT instBucket.Busy
+                        AND NOT PRG_MODES_CFC.Auth.InhibitM1 AND NOT PRG_MODES_CFC.Auth.InhibitM2
                         AND NOT (ForbidAscentM1_Active OR ForbidAscentM2_Active
                                  OR ForbidDescentM1_Active OR ForbidDescentM2_Active), // 🆕 REX 2026-07-08 (7)
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode            := PRG_04_Modes.instModes.Mode,
+    Mode            := PRG_MODES_CFC.Auth.Mode,
     CablePosM1      := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CablePosM2      := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     HomedM1         := PRG_02_Encoders.instHomingM1.Homed,
     HomedM2         := PRG_02_Encoders.instHomingM2.Homed,
-    SyncEnable      := PRG_04_Modes.instModes.SyncEnable,
+    SyncEnable      := PRG_MODES_CFC.Auth.SyncEnable,
     CfgSyncToleranceM  := _SyncCfgPersist.CfgSyncTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
     
@@ -550,7 +550,7 @@ ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safet
 CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _WinchM1CfgPersist.CfgCableLimitAscent_M)
-                             AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
+                             AND NOT PRG_MODES_CFC.Auth.HomingApproachEnable;
 
 ForbidAscentM1_Raw  := NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND (
                           PRG_03_Safety.instSafetyWinchM1.ForbidAscent
@@ -569,7 +569,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketC
 CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
                              AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
                              AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift))
-                             AND NOT PRG_04_Modes.instModes.HomingApproachEnable;
+                             AND NOT PRG_MODES_CFC.Auth.HomingApproachEnable;
 
 ForbidAscentM2_Raw  := NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND (
                           PRG_03_Safety.instSafetyWinchM2.ForbidAscent
@@ -589,11 +589,11 @@ ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND F
 // ── 6. EXÉCUTION DU PILOTAGE DU TREUIL M1 ───────────────────────────────
 instWinchM1(
     Enable                  := StubMachineEnableN1
-                               AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE)
-                               AND NOT PRG_04_Modes.instModes.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
+                               AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE)
+                               AND NOT PRG_MODES_CFC.Auth.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                    := PRG_04_Modes.instModes.Mode,
+    Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M1_StartStop_Active,
     SafeStop                := SafeStopM1_Active,
     ForbidDescent           := ForbidDescentM1_Active,
@@ -610,7 +610,7 @@ instWinchM1(
     SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM1.SpeedStable
                                AND NOT PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed
                                AND NOT instWinchSync.Error,
-    HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
+    HomingApproachActive    := PRG_MODES_CFC.Auth.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_INPUTS_LD.M1BrakeFeedback,
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global,
@@ -634,11 +634,11 @@ instWinchM1(
 // ── 7. EXÉCUTION DU PILOTAGE DU TREUIL M2 ───────────────────────────────
 instWinchM2(
     Enable                  := StubMachineEnableN1
-                               AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE)
-                               AND NOT PRG_04_Modes.instModes.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
+                               AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE)
+                               AND NOT PRG_MODES_CFC.Auth.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
-    Mode                    := PRG_04_Modes.instModes.Mode,
+    Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M2_StartStop_Active,
     SafeStop                := SafeStopM2_Active,
     ForbidDescent           := ForbidDescentM2_Active,
@@ -654,7 +654,7 @@ instWinchM2(
     SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM2.SpeedStable
                                AND NOT PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed
                                AND NOT instWinchSync.Error,
-    HomingApproachActive    := PRG_04_Modes.instModes.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
+    HomingApproachActive    := PRG_MODES_CFC.Auth.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_INPUTS_LD.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
     BrakeFeedback           := PRG_INPUTS_LD.M2BrakeFeedback,
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global,

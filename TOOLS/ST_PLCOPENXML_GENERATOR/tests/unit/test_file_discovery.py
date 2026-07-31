@@ -81,9 +81,26 @@ def test_real_code_dir_dynamic_count_relationship():
 
 
 
-def test_real_gvl_modes_stub_object_present_and_named_from_stem():
+def test_real_gvl_modes_removed():
+    """GVL_Modes_Stub a été supprimé (refactoring): les signaux viennent maintenant directement de GVL_IHM."""
     diag = DiagnosticCollector()
     objects = discover_objects(CODE_DIR, diag)
-    stub = next(o for o in objects if o.name == "GVL_Modes_Stub")
-    assert stub.kind == "gvl"
-    assert len(stub.global_blocks) == 1
+    names = {o.name for o in objects}
+    assert "GVL_Modes_Stub" not in names, "GVL_Modes_Stub devrait être supprimé"
+    # Vérifier que les signaux sont désormais dans GVL_IHM
+    gvl_ihm = next((o for o in objects if o.name == "GVL_IHM"), None)
+    assert gvl_ihm is not None, "GVL_IHM doit exister"
+    assert len(gvl_ihm.global_blocks) >= 1, "GVL_IHM doit avoir des blocs globaux"
+
+
+def test_real_prg_modes_cfc_object_present_and_named_from_stem():
+    diag = DiagnosticCollector()
+    objects = discover_objects(CODE_DIR, diag)
+    prg = next(o for o in objects if o.name == "PRG_MODES_CFC")
+    assert prg.kind == "program"
+    # Vérifier que le programme a été parsé correctement
+    # instModes est une variable locale (VAR), Auth est une sortie (VAR_OUTPUT)
+    assert any(v.name == "instModes" for v in prg.local_vars)
+    assert len(prg.output_vars) >= 1  # Auth au minimum
+    assert any(v.name == "Auth" for v in prg.output_vars)
+

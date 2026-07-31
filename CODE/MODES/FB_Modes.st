@@ -1,161 +1,177 @@
 (* ═══════════════════════════════════════════════════════════════
-   🎚️ FB_Modes — Arbitrage du mode machine (MVP — diffusion, pas encore overrides complets)
+   🎚️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md §1/§2
-   🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
-   🎯 RÔLE CE LOT : sélectionner/arbitrer `Mode` (source unique diffusée à TOUS les FB
-      métier) + garde-fous minimaux :
-      - Refuse `SEMI_AUTO` si un défaut codeur est présent (`EncoderFaultPresent`,
-        agrégat `FB_Encoder_Safety` M1/M2) → repli `MAINT_N1`, ErrorId bit0.
-      - Sort `SyncEnable` (🔧 REX 2026-07-08 : logique positive, ex-`OverrideSync` inversé) pour
-        `FB_WinchSync.Enable` (Partie5 §2 : `FB_WinchSync.Enable := SyncEnable`).
-   🔧 REX 2026-07-07 : contrôle `PasswordOk`/bit1 (`MAINT_N2` sans mot de passe) retiré à la
-      demande explicite de l'utilisateur — l'accès à `MAINT_N2` est désormais géré **uniquement**
-      côté IHM (visibilité des actions selon niveau utilisateur), pas de filet de sécurité côté
-      automate. `SelMode = MAINT_N2` est donc accepté sans condition supplémentaire.
-   🔴 HORS PÉRIMÈTRE CE LOT (Partie5 §2/§3, pas encore codé faute de FB_Cycle/FB_Bucket) :
-      `OverrideBucket`, `OverrideLimit`/limite légale de dragage. À ajouter quand
-      `FB_Cycle`/`FB_Bucket` existeront — ne pas inventer un override sans consommateur.
-   🆕 REX 2026-07-08 : `InhibitM1`/`InhibitM2` (mise en service, demande utilisateur) — permet
-      d'inhiber complètement un treuil (commande ET sa propre supervision safety) pour le tester
-      seul, désynchronisation assumée. UNIQUEMENT actionnable en MAINT_N2 (plus restrictif
-      que `SyncEnable`) — arbitrage centralisé ICI, aucun autre fichier ne doit re-tester
-      Mode=MAINT_N2 pour ce besoin.
-   🆕 REX 2026-07-08 (2) : `HomingApproachEnable` — corrige un trou constaté en test : l'arrêt normal à
-      l'approche du capteur haut (`PRG_06_WinchControl.st`, seuil `HomingTargetMx_M -
-      WinchTopStopMarginM`) était bypassé par le simple fait d'être en MAINT_N2, SANS bit dédié —
-      donc désactivé pendant N'IMPORTE QUELLE opération N2, même sans rapport avec un homing.
-      Remplacé par un vrai bit d'autorisation explicite (même pattern que `SyncEnable`), commun
-      aux 2 treuils (référencement nominal déjà sur les 2 ensemble) : l'opérateur doit désormais
-      ACTIVER consciemment cette case en plus d'être en MAINT_N2, pas juste sélectionner le mode.
-   🔧 REX 2026-07-08 (3) : `OverrideSync` renommé `SyncEnable`, polarité inversée (demande
-      utilisateur, IHM plus simple) — TRUE = synchro ACTIVE (au lieu de TRUE = synchro désactivée).
-   ⚠️ Dépendance croisée `EncoderFaultPresent` (FB_Encoder_Safety, appelé APRÈS ce FB dans
-      PRG_MAIN car dépend de CablePosM/Homing) consommée avec 1 CYCLE DE RETARD — même
-      principe déjà assumé pour HomingRefRaw (Partie10 §9bis).
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🔌 FB STANDARD : pas un FB de mouvement, pas de StartStop/SafeStop.
+   🎯 Rôle : Source unique du mode arbitré + bus d'autorisations.
+      - Arbitrage mode (DISABLE/N1/N2/SEMI_AUTO) + garde-fou codeur.
+      - Calcul bus autorisations (SyncEnable, Inhibit, Sélection, Homing, Maintenance).
+   🔒 Authentification : gérée côté IHM. FB_Modes accepte SelMode tel quel.
+   ⚠️ EncoderFaultPresent consommé avec 1 cycle de retard (FB_Encoder_Safety appelé après).
    ═══════════════════════════════════════════════════════════════ *)
 
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Modes) ===
+// === DECLARATION ===
 
 FUNCTION_BLOCK PUBLIC FB_Modes
 VAR_INPUT
-    Enable              : BOOL;        // Standard
-    Reset               : BOOL;        // Acquittement défaut (front) — bit0
-    PowerContactorEngaged     : BOOL;        // Standard
-    SelMode         : E_Mode;      // 🖥️ GVL_Modes_Stub.ModeRequest_IHM — sélecteur forceable
-    SelSyncEnable   : BOOL;        // 🖥️ GVL_Modes_Stub.SyncEnableRequest_IHM — case à cocher, coché = synchro voulue
-    InhibitM1Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M1Winch.BtnInhibit — bouton IHM inhibition M1
-    InhibitM2Request    : BOOL;        // 🆕 REX 2026-07-08 : GVL_IHM.M2Winch.BtnInhibit — bouton IHM inhibition M2
-    SelHomingApproachEnable : BOOL;     // 🆕 REX 2026-07-08 (2) : GVL_IHM.Commun.Cfg.SelHomingApproachEnable — case IHM
-                                        // autorisant à dépasser l'arrêt normal haut (approche capteur pour homing)
-    EncoderFaultPresent : BOOL;        // Agrégat instEncoderSafetyM1/M2.EncoderIncoherent (OR), 1 cycle de retard
-    JoystickWinchSelectRequest : INT;  // 🆕 TASK-0001 : 1=M1, 2=M2, 3=Couplé (brut IHM)
+    Enable              : BOOL;        // Active l'arbitrage
+    Reset               : BOOL;        // Front acquittement défaut (bit0)
+    PowerContactorEngaged : BOOL;      // Chaîne AU OK
+    SelMode             : E_Mode;      // Sélecteur IHM (GVL_IHM.Modes.Cmd.SelMode)
+    SelSyncEnable       : BOOL;        // Case IHM synchro (GVL_IHM.M1M2Sync.Cmd.SelSyncEnable)
+    InhibitM1Request    : BOOL;        // Bouton IHM inhibition M1
+    InhibitM2Request    : BOOL;        // Bouton IHM inhibition M2
+    SelHomingApproachEnable : BOOL;    // Case IHM autorisant dépassement arrêt haut
+    EncoderFaultPresent : BOOL;        // Défaut codeur (agrégat M1/M2, 1 cycle retard)
+    JoystickWinchSelectRequest : INT;  // 1=M1, 2=M2, 3=Couplé (brut IHM)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
     Busy                : BOOL;
     Done                : BOOL;
     Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Mode Semi-Auto refusé (Défaut Codeur)" - SEMI_AUTO refusé (défaut codeur)
+    ErrorId             : WORD;        // bit0: "Mode Semi-Auto refusé (Défaut Codeur)"
     State               : E_State;
     StateAtError        : E_State;
-    Mode                : E_Mode;      // 🎯 Mode ARBITRÉ — diffusé à TOUS les FB métier (remplace E_Mode.MAINT_N1 codé en dur)
-    SyncEnable          : BOOL;        // → FALSE seulement si Mode=MAINT_N1/N2 ET SelSyncEnable décoché (Décision D_OVERRIDESYNC 2026-07-04)
-    InhibitM1           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM1Request
-    InhibitM2           : BOOL;        // 🆕 REX 2026-07-08 : actif SEULEMENT si Mode=MAINT_N2 AND InhibitM2Request
-    HomingApproachEnable     : BOOL;        // 🆕 REX 2026-07-08 (2) : actif SEULEMENT si Mode=MAINT_N2 AND SelHomingApproachEnable
-    JoystickWinchSelectArbitrated : INT; // 🆕 TASK-0001 : arbitré, forcé à 3 (Couplé) hors MAINT_N2
-    MaintenanceM3TargetEnable : BOOL;    // 🆕 REX 2026-07-18 : TRUE seulement si Mode=MAINT_N2 — autorise
-                                          // la cible Translation "Maintenance" (AF_Partie-02 v2.12 §3bis :
-                                          // "Maintenance est accessible uniquement en MAINT_N2")
+    Auth                : ST_Modes_Autorisations;  // Bus d'autorisations typé
 END_VAR
 VAR
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
+    PrevInhibitM1       : BOOL;  // Mémoire état inhibition M1 (exclusion mutuelle)
+    PrevInhibitM2       : BOOL;  // Mémoire état inhibition M2 (exclusion mutuelle)
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Modes) ===
+// === IMPLEMENTATION ===
 
-// 🛑 1. GATE — repli sur le mode de sécurité de veille (DISABLE) si désactivé
-// ou si l'arrêt d'urgence est déclenché.
+// 1. GATE — neutralisation si désactivé ou AU non armé
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Mode := E_Mode.DISABLE;
-    SyncEnable := TRUE;
-    InhibitM1 := FALSE;
-    InhibitM2 := FALSE;
-    HomingApproachEnable := FALSE;
-    JoystickWinchSelectArbitrated := 3; // Par défaut couplé
-    MaintenanceM3TargetEnable := FALSE;
+    Auth.Mode := E_Mode.DISABLE;
+    Auth.SyncEnable := TRUE;
+    Auth.InhibitM1 := FALSE;
+    Auth.InhibitM2 := FALSE;
+    Auth.HomingApproachEnable := FALSE;
+    Auth.JoystickWinchSelectArbitrated := 3;  // Couplé par défaut
+    Auth.MaintenanceM3TargetEnable := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
+    PrevInhibitM1 := FALSE;
+    PrevInhibitM2 := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
 
-// 🔑 2. RESET FRONT
+// 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    Auth.ErrorId := Auth.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+END_IF;
 
-// 🔍 3. GARDE-FOUS
-// bit0 : SEMI_AUTO demandé mais défaut codeur présent → refusé, repli MAINT_N1
+// 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    ErrorId := ErrorId OR 16#0001;
+    Auth.ErrorId := Auth.ErrorId OR 16#0001;  // bit0 : défaut codeur
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Auth.ErrorId := Auth.ErrorId AND 16#FFFE;
 END_IF;
 
-// 📤 4. ARBITRAGE DU MODE
-// 🔧 REX 2026-07-07 : plus de garde-fou mot de passe ici — MAINT_N2 accepté directement,
-// l'accès est filtré en amont côté IHM (visibilité des actions selon niveau utilisateur).
+// 4. ARBITRAGE DU MODE
+// MAINT_N2 accepté directement (authentification côté IHM).
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    Mode := E_Mode.MAINT_N1;
+    Auth.Mode := E_Mode.MAINT_N1;
 ELSE
-    Mode := SelMode;
+    Auth.Mode := SelMode;
 END_IF;
 
-// 📤 5. SYNC ENABLE — actionnable en MAINT_N1 OU MAINT_N2 (Décision D_OVERRIDESYNC 2026-07-04)
-// Anciennement restreint à MAINT_N2 uniquement, mais l'opérateur peut avoir besoin de la
-// procédure de récupération mou câble dès MAINT_N1. 🔧 REX 2026-07-08 : polarité inversée —
+// 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
-SyncEnable := NOT ((Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
+Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
 
-// 📤 5bis. INHIBITION TREUIL — mise en service, demande utilisateur (REX 2026-07-08)
-// UNIQUEMENT actionnable en MAINT_N2 (contrairement à SyncEnable, actionnable aussi N1) —
-// action plus sensible (neutralise complètement un treuil ET sa propre supervision safety),
-// réservée au niveau de droits le plus élevé. Centralisé ICI (comme SyncEnable) : aucun
-// autre fichier ne doit re-tester Mode=MAINT_N2 pour ce besoin.
-InhibitM1 := (Mode = E_Mode.MAINT_N2) AND InhibitM1Request;
-InhibitM2 := (Mode = E_Mode.MAINT_N2) AND InhibitM2Request;
+// 5bis. EXCLUSION MUTUELLE INHIBITIONS + RESET SYNC ENABLE
+// Inhibition M1/M2 mutuellement exclusives (soit l'un, soit l'autre, jamais les deux).
+// Si les deux demandés simultanément : on garde celle déjà active, sinon on rejette les deux.
+// Reset SelSyncEnable si une inhibition devient active (synchro incompatible avec inhibit).
+// Mémorisation états précédents pour détection front montant.
 
-// 📤 5ter. OVERRIDE ARRÊT HAUT — mise en service, demande utilisateur (REX 2026-07-08 (2))
-// UNIQUEMENT actionnable en MAINT_N2 — remplace l'ancien test direct Mode<>MAINT_N2 dans
-// PRG_06_WinchControl.st, qui bypassait l'arrêt normal pour N'IMPORTE QUELLE opération N2.
-// Désormais un choix conscient explicite est requis EN PLUS du mode.
-HomingApproachEnable := (Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
-
-// 📤 5quater. SÉLECTEUR JOYSTICK — TASK-0001 (2026-07-15)
-// M1 seul (=1) ou M2 seul (=2) au joystick est réservé au mode MAINT_N2
-// pour éviter de désynchroniser accidentellement les treuils (câble en travers).
-// Forcé à Couplé (=3) dans tous les autres modes (MAINT_N1, SEMI_AUTO, DISABLE).
-IF Mode = E_Mode.MAINT_N2 THEN
-    JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+// Détection fronts montants inhibitions
+IF InhibitM1Request AND NOT PrevInhibitM1 THEN
+    // Front montant M1
+    IF PrevInhibitM2 THEN
+        // M2 déjà actif → rejette M1
+        Auth.InhibitM1 := FALSE;
+    ELSE
+        // M2 inactif → active M1, désactive M2
+        Auth.InhibitM1 := TRUE;
+        Auth.InhibitM2 := FALSE;
+        // Synchro incompatible avec inhibition → reset case IHM
+        SelSyncEnable := FALSE;
+    END_IF;
+ELSIF InhibitM2Request AND NOT PrevInhibitM2 THEN
+    // Front montant M2
+    IF PrevInhibitM1 THEN
+        // M1 déjà actif → rejette M2
+        Auth.InhibitM2 := FALSE;
+    ELSE
+        // M1 inactif → active M2, désactive M1
+        Auth.InhibitM2 := TRUE;
+        Auth.InhibitM1 := FALSE;
+        SelSyncEnable := FALSE;
+    END_IF;
 ELSE
-    JoystickWinchSelectArbitrated := 3; // Couplé forcé
+    // Pas de front montant → maintenir états actuels
+    // Mais si les deux demandes sont TRUE sans front (cas synchrone sans transition)
+    IF InhibitM1Request AND InhibitM2Request THEN
+        // Les deux demandées simultanément sans transition : repli sécurité
+        Auth.InhibitM1 := FALSE;
+        Auth.InhibitM2 := FALSE;
+    END_IF;
 END_IF;
 
-// 📤 5quinquies. CIBLE TRANSLATION "MAINTENANCE" — mise en service, décision client 2026-07-17
-// (AF_Partie-02 v2.12 §3bis) : bloquée en MAINT_N1 et SEMI_AUTO, autorisée UNIQUEMENT en MAINT_N2.
-// Centralisé ICI (même doctrine que InhibitM1/M2, HomingApproachEnable) : aucun autre fichier ne
-// doit re-tester Mode=MAINT_N2 pour ce besoin — PRG_07_TranslationControl consomme ce bit.
-MaintenanceM3TargetEnable := (Mode = E_Mode.MAINT_N2);
+// Mise à jour mémoires pour prochaine détection front
+PrevInhibitM1 := InhibitM1Request;
+PrevInhibitM2 := InhibitM2Request;
 
-// 📤 6. SORTIES ÉTAT
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+// 5bis-bis. Sortie inhibitions effectives (calculées ci-dessus)
+Auth.InhibitM1 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM1;
+Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
+
+// 5ter. AUTORISATION ARRÊT HAUT (HomingApproach)
+// Uniquement actionnable en MAINT_N2.
+Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
+
+// 5quater. SÉLECTEUR JOYSTICK TREUIL
+// M1 seul ou M2 seul réservé au MAINT_N2. Forcé à Couplé (=3) sinon.
+IF Auth.Mode = E_Mode.MAINT_N2 THEN
+    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSE
+    Auth.JoystickWinchSelectArbitrated := 3;  // Couplé forcé
+END_IF;
+
+// 5quinquies. CIBLE TRANSLATION MAINTENANCE
+// Autorisée uniquement en MAINT_N2. PRG_07_TranslationControl consomme ce bit.
+Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2);
+
+// GATE — désactivation inhibitions/sync si mode change (sortie N2)
+IF Auth.Mode <> E_Mode.MAINT_N2 THEN
+    Auth.InhibitM1 := FALSE;
+    Auth.InhibitM2 := FALSE;
+    Auth.HomingApproachEnable := FALSE;
+    Auth.MaintenanceM3TargetEnable := FALSE;
+    Auth.JoystickWinchSelectArbitrated := 3;
+END_IF;
+
+// 6. SORTIES ÉTAT
+Auth.Error := (Auth.ErrorId <> 16#0000);
+Error := Auth.Error;
+Auth.Error := Auth.Error;  // Redondant mais explicite
+ErrorEdge(CLK := Auth.Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
 Busy := FALSE;
 Done := FALSE;
+
+END_FUNCTION_BLOCK

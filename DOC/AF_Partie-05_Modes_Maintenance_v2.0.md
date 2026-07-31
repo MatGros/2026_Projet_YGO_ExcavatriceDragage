@@ -36,9 +36,7 @@
 
 `FB_Modes` / `PRG_MODES_CFC` arbitre :
 - le mode actif ;
-- les permissions de fonction ;
-- les sources de commande autorisees ;
-- les limitations d'exploitation.
+- le bus d'autorisations `Auth : ST_Modes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
 
 Il ne produit aucune sortie physique.
 
@@ -73,7 +71,29 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 ### Inhibition
 - L'inhibition d'un treuil est une action de maintenance distincte.
 - Elle neutralise le mouvement de l'axe concerne et impose les consequences de synchro.
-- Matrice complete des bypass et authentifications : **TBD**.
+- Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_Modes_Autorisations`).
+- Matrice complete des bypass : **TBD**.
+
+> 📌 **Authentification** : gérée côté IHM (visibilité des actions selon niveau utilisateur).
+> L'automate reçoit uniquement le mode arbitré (`MAINT_N1` / `MAINT_N2` / `SEMI_AUTO`).
+> Aucun garde-fou mot de passe côté PLC — `FB_Modes` accepte `SelMode` tel quel.
+
+---
+
+## 📐 Bus d'autorisations
+
+`FB_Modes` (via `PRG_MODES_CFC`) produit le bus typé `Auth : ST_Modes_Autorisations` :
+
+| Champ | Rôle |
+|---|---|
+| `Mode` | Mode arbitré (DISABLE/N1/N2/SEMI_AUTO) |
+| `SyncEnable` | Synchro M1/M2 (logique positive) |
+| `InhibitM1/2` | Inhibition treuil M1/M2 (MAINT_N2 only) |
+| `JoystickWinchSelectArbitrated` | 1=M1, 2=M2, 3=Couplé (N2 only) |
+| `HomingApproachEnable` | Dépassement butée haut (N2) |
+| `MaintenanceM3TargetEnable` | Cible Translation Maintenance (N2 only) |
+
+Ce bus est consommé par Cycle, Safety, Treuils, Translation, Supervision, Acquisition.
 
 ---
 
@@ -81,12 +101,14 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 La limite legale est une **interdiction d'exploitation**, pas une fonction safety.
 
+> 📌 **Propriétaire** : la limite légale de dragage est implémentée dans le domaine Treuils
+> (`AF_Partie-10`, `FB_Safety_Winch`). `FB_Modes` ne fait que fournir le mode contextuel ;
+> le blocage effectif est arbitré par la safety métier du treuil concerné.
+
 | Contexte | Comportement cible |
 |---|---|
 | SEMI_AUTO | Peut interdire une descente hors cote autorisee. |
 | Maintenance | Signalisation a minima ; blocage eventuel selon regle validee. |
-
-Seuils et regles detaillees par direction : **TBD**, sans duplication hors de ce proprietaire.
 
 ---
 
@@ -105,9 +127,8 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 
 ## ❓ 6. TBD
 
-- Matrice exhaustive des bypass N1/N2, authentification et tracabilite.
+- Matrice exhaustive des bypass N1/N2 et tracabilite.
 - Detail complet des effets de `SyncEnable` par defaut safety.
-- Regle fine de limite legale par mode et direction.
 - Eventuel contrat unique d'intention de conduite entre joystick, boutons et cycle.
 
 ## 📚 Documents lies

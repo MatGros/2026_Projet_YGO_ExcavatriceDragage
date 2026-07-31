@@ -43,7 +43,7 @@ CycleMotionPermit := PRG_01_Diagnostics.instJoystick.DeadmanArmed
 instCycle(
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — Mode=SEMI_AUTO suffit seul (les modes
     // sont mutuellement exclusifs dans FB_Modes, plus besoin d'un flag ManuActive séparé).
-    Enable              := (PRG_04_Modes.instModes.Mode = E_Mode.SEMI_AUTO),
+    Enable              := (PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO),
     CycleMotionPermit   := CycleMotionPermit,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
