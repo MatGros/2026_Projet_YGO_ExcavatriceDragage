@@ -126,6 +126,12 @@ usage mise en service/essais uniquement, jamais un état permanent d'exploitatio
   🔧 **Non encore câblé** : aucune instance actuelle du forçage palier n'est conditionnée par
   `Homed`. Reste du périmètre de migration (lot Winch, cross-ref `AF_Partie-10 §9bis`), pas de
   ce FB directement (`Homed` est ici seulement produit, pas consommé).
+- ⚠️ **Portée confirmée M1/M2 uniquement** (décision utilisateur 2026-07-31) : M3/Translation n'a
+  pas de mécanisme de homing équivalent, ne pas étendre ce principe à M3 sans nouvelle spec.
+- 🟠 **Nommage** : `CfgTopSensorPosM`/`CfgHomingTargetM` sans underscore avant
+  le suffixe d'unité `M` — non conforme `NAMING_CONVENTION.md` §Suffixes d'unité (`CfgTopSensorPos_M`
+  attendu). `ST_WinchCfg.CfgTopSensorPos_M` (IHM) a déjà l'underscore : 2 formes cohabitent pour la
+  même notion. Ne pas renommer au fil de l'eau (voir chapô §6 point 9).
 
 ---
 

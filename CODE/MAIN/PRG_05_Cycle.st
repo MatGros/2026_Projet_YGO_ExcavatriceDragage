@@ -47,7 +47,7 @@ instCycle(
     CycleMotionPermit   := CycleMotionPermit,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
-    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
     
     StartCycle          := CmdStartCycle_IHM,
     PauseCycle          := CmdPauseCycle_IHM,
@@ -58,7 +58,7 @@ instCycle(
     SelectedTargetNum_IHM := GVL_IHM.TranslationM3.Cmd.SelTarget,
 
     // Retour dédié Kobold — distinct du mou de câble.
-    KoboldContactFond   := PRG_00_Inputs.KoboldContactFond,
+    KoboldContactFond   := PRG_01_INPUTS_LD.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM    := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M,
     WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,

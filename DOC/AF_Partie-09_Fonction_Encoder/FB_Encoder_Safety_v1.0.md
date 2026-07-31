@@ -82,6 +82,9 @@ d'incohérence de ce FB (voir §3).
 
 - Le gel de position empêche des dérives catastrophiques dans la machine d'état du cycle en cas de rupture de signal codeur.
 - Voir §3 pour le trou de sécurité perte-bus non couvert par ce FB.
+- 🟠 **Nommage** : `PositionMinM`/`PositionMaxM`/`CablePosM` sans underscore avant le suffixe
+  d'unité `M` — non conforme `NAMING_CONVENTION.md` §Suffixes d'unité. Ne pas renommer au fil de
+  l'eau (voir chapô AF-09 §6 point 9).
 
 ---
 

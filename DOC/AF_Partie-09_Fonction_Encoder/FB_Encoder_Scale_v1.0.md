@@ -67,6 +67,9 @@ exigence de sécurité de calcul, pas un détail d'implémentation.
 - N'effectue aucun filtrage temporel (le filtrage et la surveillance de vitesse sont délégués à `FB_Encoder_SpeedMeasure`).
 - Brique de calcul pure : pas de gel ni de bornage ici (`RawPos` déjà gelé par `FB_Encoder_Abs` ;
   le bornage physique `[-99;+99] m` est la responsabilité de `FB_Encoder_Safety`).
+- 🟠 **Nommage** : `CablePosM` (sortie) sans underscore avant le suffixe d'unité `M` — non
+  conforme `NAMING_CONVENTION.md` §Suffixes d'unité. Ne pas renommer au fil de l'eau (voir chapô
+  AF-09 §6 point 9).
 
 ---
 

@@ -146,7 +146,7 @@ instTranslationM3(
     Enable                  := PRG_06_WinchControl.StubMachineEnableN1
                                AND (PRG_04_Modes.instModes.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged         := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged         := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode                    := PRG_04_Modes.instModes.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := PRG_03_Safety.instSafetyTranslationM3.SafeStop,
@@ -154,15 +154,15 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
-    LimitSwitchFwd          := PRG_00_Inputs.instPositionDecoder.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
-    LimitSwitchRev          := PRG_00_Inputs.instPositionDecoder.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
+    LimitSwitchFwd          := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
+    LimitSwitchRev          := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
     DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_00_Inputs.M3BrakeFeedback, instTranslationM3.BrakeReleaseRequest),
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_01_INPUTS_LD.M3BrakeFeedback, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
@@ -172,7 +172,7 @@ instTranslationM3(
 // FB_Translation (rampe rapide) et n'est jamais une coupure sèche ici.
 TranslationFinalInterlockRequest.Enable := PRG_06_WinchControl.StubMachineEnableN1;
 TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
-TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged;
+TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
