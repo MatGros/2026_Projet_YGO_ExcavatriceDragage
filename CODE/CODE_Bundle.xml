@@ -5911,7 +5911,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
-      doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -16396,7 +16396,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -18929,7 +18929,7 @@ SimContactorOk := ContactorLatch;
    📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
-      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie12 §9bis) par
+      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
       une simulation par temps de parcours : le translation "arrive" à la cible
       sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
       continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
@@ -19955,7 +19955,7 @@ Filtrage capteur de position cible</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -24252,7 +24252,7 @@ ELSE
     // réouverture documentée T40) : le joystick n'est plus la SEULE source —
     // GVL_IHM.Modes.Cmd.TglJoystickMaster bascule vers les boutons IHM maintenus (BtnUp/BtnDown),
     // homme-mort joystick réel TOUJOURS exigé en parallèle (même leçon que le précédent bug
-    // Translation M3, AF_Partie-12 §6bis (ex-AF_Partie-11 v1.9) — jamais implicite). Voir
+    // Translation M3, AF_Partie-11 §6bis (ex-AF_Partie-11 v1.9) — jamais implicite). Voir
     // ARCHIVES/Doc/AUDITS/WinchIhmButtons/REGISTRE_ACTIONS_WinchIhmButtons_v1.0.md.
     // 🆕 Sélection treuil (TASK-0001, MAINT_N2 uniquement, voir FB_Modes.JoystickWinchSelectArbitrated) :
     // 1=M1 seul, 2=M2 seul, 3=Couplé — forcé à 3 (Couplé) hors MAINT_N2, IDENTIQUE quelle que
@@ -24773,7 +24773,7 @@ Conversion SetFreqHz (Hz) → % pleine échelle pour SpeedRefPct</xhtml>
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-12_Fonction_Translation_v2.0.md</xhtml>
+   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -34852,7 +34852,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Translation_M3_Stub — Entrées de simulation M3 restantes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md §7
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md §7
    🧹 REX 2026-07-18 : ancien mode relais `DEGRADED_IO` retiré. Les sorties relais,
       retours contacteurs, défaut TOR et cible générique sans consommateur sont supprimés.
       Restent uniquement PV (entrée réelle à mapper) et le sélecteur de trajet simulé.

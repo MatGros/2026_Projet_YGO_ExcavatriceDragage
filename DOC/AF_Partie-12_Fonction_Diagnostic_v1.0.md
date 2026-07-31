@@ -1,4 +1,4 @@
-# AF Partie 15 — Diagnostic & Supervision Bus (v1.0)
+# AF Partie 12 — Diagnostic & Supervision Bus (v1.0)
 
 > Rôle : diagnostics de communication bus/devices et surveillance opérateur.
 > Les FB diag publient des faits (`Online`, `Operational`, `State`, `ErrorId`).
@@ -22,11 +22,11 @@
 
 | Fiche | FB | Contenu |
 |---|---|---|
-| [`FB_Diag_CanOpen`](AF_Partie-15_Fonction_Diagnostic/FB_Diag_CanOpen_v1.0.md) | `FB_Diag_CanOpen` | Diagnostic bus CANopen + esclave Joystick |
-| [`FB_Diag_Ethercat`](AF_Partie-15_Fonction_Diagnostic/FB_Diag_Ethercat_v1.0.md) | `FB_Diag_Ethercat` | Diagnostic bus EtherCAT (variateur M3 + codeurs M1/M2) |
-| [`FB_Diag_IhmHeartbeat`](AF_Partie-15_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.0.md) | `FB_Diag_IhmHeartbeat` | Surveillance bidirectionnelle IHM↔PLC |
-| [`FB_Diag_Preflight`](AF_Partie-15_Fonction_Diagnostic/FB_Diag_Preflight_v1.0.md) | `FB_Diag_Preflight` | Verdict passif machine arrêtée (16 contrôles) |
-| [`FB_Diag_WinchSymmetry`](AF_Partie-15_Fonction_Diagnostic/FB_Diag_WinchSymmetry_v1.0.md) | `FB_Diag_WinchSymmetry` | Mesure passive symétrie M1/M2 (MES-008) |
+| [`FB_Diag_CanOpen`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_CanOpen_v1.0.md) | `FB_Diag_CanOpen` | Diagnostic bus CANopen + esclave Joystick |
+| [`FB_Diag_Ethercat`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_Ethercat_v1.0.md) | `FB_Diag_Ethercat` | Diagnostic bus EtherCAT (variateur M3 + codeurs M1/M2) |
+| [`FB_Diag_IhmHeartbeat`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_IhmHeartbeat_v1.0.md) | `FB_Diag_IhmHeartbeat` | Surveillance bidirectionnelle IHM↔PLC |
+| [`FB_Diag_Preflight`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_Preflight_v1.0.md) | `FB_Diag_Preflight` | Verdict passif machine arrêtée (16 contrôles) |
+| [`FB_Diag_WinchSymmetry`](AF_Partie-11_Fonction_Diagnostic/FB_Diag_WinchSymmetry_v1.0.md) | `FB_Diag_WinchSymmetry` | Mesure passive symétrie M1/M2 (MES-008) |
 
 ---
 
@@ -125,5 +125,5 @@ PRG_11_Troubleshooting (observateurs passifs)
 | AF03 | Contrats composants — profil non-mouvement |
 | AF06 | Acquisition qualifiée — diagnostics bus §3 |
 | AF07 | Interface IHM — heartbeat, affichage diag |
-| AF10/AF12 | FB_Safety_Winch / FB_Safety_Translation (consommateurs) |
+| AF10/AF11 | FB_Safety_Winch / FB_Safety_Translation (consommateurs) |
 | Code | `CODE/DIAG/*.st` |

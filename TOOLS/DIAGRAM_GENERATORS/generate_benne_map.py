@@ -63,7 +63,7 @@ note bottom of SAFE
   • Si M1 glisse pendant une manœuvre de benne ➔ Verrouillage immédiat et passage en <img:open-iconic/warning> **Error**.
 end note
 
-footer Document source : AF_Partie-12 & FB_Bucket
+footer Document source : AF_Partie-11 & FB_Bucket
 @enduml
 """
 

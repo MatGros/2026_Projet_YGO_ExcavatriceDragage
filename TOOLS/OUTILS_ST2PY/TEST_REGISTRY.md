@@ -26,7 +26,7 @@
 | Coupure sécurité métier | TC-P01-008 | `RESULTS/AU/tests/test_emergency_behavior.py::test_tc_p01_008_safety_power_cutoff_request` | actif |
 | Re-latch après acquittement prématuré | TC-P01-009 | `RESULTS/AU/tests/test_emergency_behavior.py::test_tc_p01_009_relatch_after_premature_ack` | actif |
 
-## TRANSLATION — FB_Translation / FB_Safety_Translation (P12)
+## TRANSLATION — FB_Translation / FB_Safety_Translation (P11)
 
 | Fonction | TC | Test Python | Statut |
 |---|---|---|---|

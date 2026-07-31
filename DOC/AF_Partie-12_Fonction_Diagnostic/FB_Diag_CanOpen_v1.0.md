@@ -55,4 +55,4 @@ Distingue explicitement un bus réellement online (`READY`) d'un bypass masquant
 
 ## 📄 Docs liées
 
-- `AF_Partie-15` §4 (flux) · `AF_Partie-06` §3 (diagnostics bus) · `AF_Partie-03` (profil non-mouvement)
+- `AF_Partie-11` §4 (flux) · `AF_Partie-06` §3 (diagnostics bus) · `AF_Partie-03` (profil non-mouvement)

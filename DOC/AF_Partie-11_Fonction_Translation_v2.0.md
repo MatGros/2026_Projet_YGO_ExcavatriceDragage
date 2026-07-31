@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle — Partie 12 : Fonction Translation M3 (v2.0)
+# Analyse Fonctionnelle — Partie 11 : Fonction Translation M3 (v2.0)
 
 > Rôle : positionnement chariot/pont (AC600 EtherCAT), sécurité mouvement, barrière finale.
 > Domaine autonome : programme propre (`Translation`), `FB_Safety_Translation` dédié.
@@ -19,23 +19,23 @@
 
 ## 🧪 Points de validation
 
-Catalogue `TC-P12-*` **réparti dans les 4 fiches FB** (propriétaire unique par fiche, pas
+Catalogue `TC-P11-*` **réparti dans les 4 fiches FB** (propriétaire unique par fiche, pas
 dupliqué ici) :
 
 | Fiche | TC couverts |
 |---|---|
-| [`FB_Translation_PositionDecoder`](AF_Partie-12_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | TC-P12-001, 002 |
-| [`FB_Safety_Translation`](AF_Partie-12_Fonction_Translation/FB_Safety_Translation_v1.0.md) | TC-P12-002, 010, 011, 014 |
-| [`FB_Translation`](AF_Partie-12_Fonction_Translation/FB_Translation_v1.0.md) | TC-P12-003, 004, 005, 013 |
-| [`FB_TranslationOutputInterlock_LD`](AF_Partie-12_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | TC-P12-006, 007, 008, 009 |
+| [`FB_Translation_PositionDecoder`](AF_Partie-11_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | TC-P11-001, 002 |
+| [`FB_Safety_Translation`](AF_Partie-11_Fonction_Translation/FB_Safety_Translation_v1.0.md) | TC-P11-002, 010, 011, 014 |
+| [`FB_Translation`](AF_Partie-11_Fonction_Translation/FB_Translation_v1.0.md) | TC-P11-003, 004, 005, 013 |
+| [`FB_TranslationOutputInterlock_LD`](AF_Partie-11_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | TC-P11-006, 007, 008, 009 |
 
-TC-P12-012 (Cible Maintenance refusée hors MAINT_N2) et TC-P12-015 (Terrain) restent au niveau
+TC-P11-012 (Cible Maintenance refusée hors MAINT_N2) et TC-P11-015 (Terrain) restent au niveau
 chapô (transverses Modes/terrain).
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-012 | Cible Maintenance refusée hors MAINT_N2 | `⚡ AUTO_PLC` |
-| TC-P12-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | `🟢 SITE` |
+| TC-P11-012 | Cible Maintenance refusée hors MAINT_N2 | `⚡ AUTO_PLC` |
+| TC-P11-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | `🟢 SITE` |
 
 ---
 
@@ -43,10 +43,10 @@ chapô (transverses Modes/terrain).
 
 | Fiche | FB détaillé | Contenu |
 |---|---|---|
-| [`FB_Translation_PositionDecoder_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | `FB_Translation_PositionDecoder` | 5 capteurs → mot, butées extrêmes, incohérence |
-| [`FB_Safety_Translation_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_Safety_Translation_v1.0.md) | `FB_Safety_Translation` | 8 bits ErrorId, Méca A/B, masques, bypass |
-| [`FB_Translation_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_Translation_v1.0.md) | `FB_Translation` (+ `FB_Brake`, `FB_Ramp`) | Mouvement, rampe, mot AC600, ralentissement PV |
-| [`FB_TranslationOutputInterlock_LD_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | `FB_TranslationOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
+| [`FB_Translation_PositionDecoder_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | `FB_Translation_PositionDecoder` | 5 capteurs → mot, butées extrêmes, incohérence |
+| [`FB_Safety_Translation_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_Safety_Translation_v1.0.md) | `FB_Safety_Translation` | 8 bits ErrorId, Méca A/B, masques, bypass |
+| [`FB_Translation_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_Translation_v1.0.md) | `FB_Translation` (+ `FB_Brake`, `FB_Ramp`) | Mouvement, rampe, mot AC600, ralentissement PV |
+| [`FB_TranslationOutputInterlock_LD_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | `FB_TranslationOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
 
 ```text
 FB_Translation_PositionDecoder ──► FB_Safety_Translation ──► FB_Translation ──► FB_TranslationOutputInterlock_LD

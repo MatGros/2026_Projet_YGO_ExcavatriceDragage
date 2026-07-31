@@ -53,7 +53,7 @@
 - 🎯 **Périmètre** : Benne M2, offset ouverture/fermeture (`FB_Bucket.ActiveOffsetM`)
 - 🚦 **Statut** : 🟡 **Appliqué 2026-07-27** (`OffsetCloseM` 10.0 ➔ **15.0 m**), à reconfirmer en charge (`T89`)
 - 🔍 **Constat** : Offset mesuré fermeture benne = **≈ 15 m**.
-- 🛠️ **Décision** : Comparer avec `ActiveOffsetM` (`instBucket`) et `AF_Partie-12` v1.4.
+- 🛠️ **Décision** : Comparer avec `ActiveOffsetM` (`instBucket`) et `AF_Partie-11` v1.4.
 
 ---
 

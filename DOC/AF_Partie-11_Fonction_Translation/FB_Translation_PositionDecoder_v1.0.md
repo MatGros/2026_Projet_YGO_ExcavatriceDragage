@@ -1,8 +1,8 @@
 # FB_Translation_PositionDecoder — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-12_Fonction_Translation_v2.0.md`](../AF_Partie-12_Fonction_Translation_v2.0.md) §2.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.0.md`](../AF_Partie-11_Fonction_Translation_v2.0.md) §2.
 > Rôle de **ce** document : décodage 5 capteurs TOR → mot de progression + butées extrêmes —
-> et **catalogue unique** des `TC-P12-001`, `TC-P12-002`.
+> et **catalogue unique** des `TC-P11-001`, `TC-P11-002`.
 > Source code : `CODE/TRANSLATION/FB_Translation_PositionDecoder.st` · instance `Acquisition.instPositionDecoder`.
 
 ## 🧭 Sommaire
@@ -13,12 +13,12 @@
 4. Alertes et écarts
 5. Documents liés
 
-## 🧪 Points de validation (`TC-P12-001/002` — propriétaire unique)
+## 🧪 Points de validation (`TC-P11-001/002` — propriétaire unique)
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-001 | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` |
-| TC-P12-002 | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P11-001 | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` |
+| TC-P11-002 | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
 
 ---
 
@@ -78,7 +78,7 @@ Aucun écart — comportement conforme, logique combinatoire pure, pas d'état i
 
 | Doc | Lien |
 |---|---|
-| AF12 (chapô) | Rôle machine, intégration programme |
-| AF12 / FB_Safety_Translation | Consommateur `Incoherent`, `LimitSwitchFwd/Rev` |
+| AF11 (chapô) | Rôle machine, intégration programme |
+| AF11 / FB_Safety_Translation | Consommateur `Incoherent`, `LimitSwitchFwd/Rev` |
 | AF06 | 5 capteurs TOR M3 (E/S physiques) |
 | Code | `CODE/TRANSLATION/FB_Translation_PositionDecoder.st` |

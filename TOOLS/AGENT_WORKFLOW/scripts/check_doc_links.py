@@ -199,7 +199,7 @@ def main() -> int:
 
         # D7 — renvoi en prose vers un numero d'AF inexistant (voir en-tete).
         # `--fix` ne corrige PAS : seul un humain sait si `AF11` voulait dire
-        # Translation (-> AF12) ou Benne (-> fiche du domaine Treuils, AF10).
+        # Translation (-> AF11) ou Benne (-> fiche du domaine Treuils, AF10).
         historical = rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text
         # Un nom de fichier archive porte legitimement l'ancien numero
         # (`ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v1.13.md`) : la mention fait

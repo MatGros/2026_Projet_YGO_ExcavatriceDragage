@@ -185,7 +185,7 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - `ST_JoystickHMI`·`PRG_09` : +DeadmanArmed·NeutralX/YAct·AxisCmdX/Y · RawX/Y/Button→FB_Joystick
 - `GVL_PERSISTENT` : params joystick (deadband·filter·accel/decel·invert) + `_BucketState`
 - DOC AF_Partie-11 : `DriveFreqScaleMaxHz` défaut 50→60 Hz + note qualifié
-- DOC AF_Partie-12 : §9 `_BucketState` mémoire longueur câble désynchro
+- DOC AF_Partie-11 : §9 `_BucketState` mémoire longueur câble désynchro
 
 ---
 

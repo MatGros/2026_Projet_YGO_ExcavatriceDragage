@@ -1,4 +1,4 @@
-# Extraction Translation M3 — code vs AF12 (v1.0)
+# Extraction Translation M3 — code vs AF11 (v1.0)
 
 > Sources : `CODE/TRANSLATION/*.st`, `CODE/MAIN/PRG_07_TranslationControl.st`, `PRG_03_Safety.st`.
 

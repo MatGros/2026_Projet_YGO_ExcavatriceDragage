@@ -67,7 +67,7 @@
 | **T25** | **Suite automatisée nominale Encoder/Homing** : gate simulation explicite, watchdog local, rapports TC-E1/TC-E2 corrigés | `SuiteEncoder = 4`, `AF_Partie-10` §10 | `PLAN_TASK` §3 T25 | 🟠 Essais CODESYS + scénarios unitaire/bornage/redémarrage |
 | **T17** | **Checklist Joystick** : exécution terrain + verdict signé — limitations robustesse ajoutées sur `FB_AxisScale`, `FB_Ramp`, consigne finale M3 | `CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md` | `PLAN_TASK` §3 T17 | Terrain |
 | **T26** | **Checklist Translation AC600** : exécution terrain + verdict signé (EtherCAT, commande, fréquence, sens, arrêts, PV, 5 capteurs, Fdc, thermique, diagnostics) | `CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.1.md` | `PLAN_TASK` §3 T26, `AF_Partie-11` §8 | Terrain |
-| **T27** | **Benne : essais mise en service** (cinématique, offsets, Méca C couches 1/2) | `FB_Bucket.st`, `AF_Partie-12` §6 | `PLAN_TASK` §3 T27 | Terrain |
+| **T27** | **Benne : essais mise en service** (cinématique, offsets, Méca C couches 1/2) | `FB_Bucket.st`, `AF_Partie-11` §6 | `PLAN_TASK` §3 T27 | Terrain |
 | **T21** | **Checklist validation Winch v1.7** non réalisée (inhibition, HomingApproachEnable, Méca B/D, diagnostics IHM, simulation) | `AF_Partie-09` §8 | `PLAN_TASK` §3 T21 | Terrain |
 | **T92** | **Qualification bypass ciblés + homing 0 m** (MES-002) : comportement chaque bypass, persistance après redémarrage (RETAIN), homing M1/M2 à 0,0 m, cohérence position, réarmement sûr | `REGISTRE` MES-002, `CHECKLISTS/CHECKLIST_Essais_Persistance_Bypass_Frein` (11 tests) | `PLAN_TASK` §3 T92 | ⚠️ Invalidation RETAIN remet bypass à FALSE → réapparition blocage masqué |
 
@@ -83,7 +83,7 @@
 | **T8** | Rôle de `CodeSeqTriggerCmd` (codeurs) | À vérifier terrain | `AF_Partie-10` | Inconnu — à lever sur site |
 | **T11** | `EmergencyStopOk` : pas de confirmation temporisée post-réarmement, redondance A/B logicielle seulement | Projet | `AUDIT` D93 | Renforcement sécurité possible |
 | **T15** | Validation câblage réel `EmergencyStopOk` (retour contacteur puissance) + comportement post-réarmement | Projet / Terrain | `AF_Partie-01` §Sécurité électrique, `PRG_00_Inputs` | Source logicielle clarifiée, câblage à valider |
-| **T70** | `Modes.SelMode`/`SelJoystickWinch`/`TglJoystickMaster` repartent en valeur restrictive (MAINT_N1) au boot — voulu (sécurité) ou oubli ? | Projet / Client | `AF_Partie-15` §4 | À confirmer avant traitement |
+| **T70** | `Modes.SelMode`/`SelJoystickWinch`/`TglJoystickMaster` repartent en valeur restrictive (MAINT_N1) au boot — voulu (sécurité) ou oubli ? | Projet / Client | `AF_Partie-11` §4 | À confirmer avant traitement |
 | **T22** | Tolérance calibration `TopSensorPositionM` (contrôle visuel) à fixer sur site | Terrain | `AF_Partie-10` §7bis | Réglage mise en service |
 | **T90** | **Hauteurs treuils à contrôler sur site** (MES-009) : capteur haut 8,0 m, arrêt réel ≈ 7,5 m. `CfgTopSensorPos_M=8.0`, `CfgCableLimitAscent_M=7.5`. Erreur sur `CfgTopSensorPos_M` décale TOUTES positions. À inscrire dans doc (`AF_Partie-09` §hauteurs, `AF_Partie-10` homing) : valeurs de base config persistante, pas réglages libres | Terrain / Sécurité | `REGISTRE` MES-009, `GVL_PERSISTENT`, `PLAN_TASK` T90 | ⚠️ Critique mise en service |
 | **T89** | **Offset benne = ÉTAT benne** (MES-010) : `M1=M2` (offset 0) → benne OUVERTE ; `M2` décalé ≈ 15 m → benne FERMÉE. Valeur appliquée 2026-07-27 (`OffsetCloseM` 10.0→15.0). Valider cote premier essai en charge + vérifier ouverture/fermeture ET cycle complet fonctionnels/simulables | Terrain / Projet | `REGISTRE` MES-010, `GVL_PERSISTENT`, `FB_Bucket` | Détermine tout le cycle |
@@ -104,7 +104,7 @@
 
 | Spécification | Section | Problème | Action |
 |---------------|---------|----------|--------|
-| `AF_Partie-04_Cycle_Sequenceur_v1.5.md` | Fichier **manquant** (ENOENT) | Référencée partout (`PLAN_TASK`, `PRG_05_Cycle`, `AF_Partie-09`, `AF_Partie-12`) mais absente de `DOC/` | **Critique** — recréer ou confirmer version archivée |
+| `AF_Partie-04_Cycle_Sequenceur_v1.5.md` | Fichier **manquant** (ENOENT) | Référencée partout (`PLAN_TASK`, `PRG_05_Cycle`, `AF_Partie-09`, `AF_Partie-11`) mais absente de `DOC/` | **Critique** — recréer ou confirmer version archivée |
 | `AF_Partie-09` §4undecies | Montée en charge / temporisation frein | "Investigations futures — validation terrain + réglages différés après essais de charge" | Lever après T91/T93 |
 | `AF_Partie-10` §3.8 / T84-T85 | `FB_Encoder_SpeedMeasure` — fenêtre 50 ms, 6 positions, temps réel écoulé | Spécifié en v1.11 mais **pas de détail algorithme** (médiane ? moyenne ? pondération ?) | Préciser dans doc ou code commentaire |
 | `AF_Partie-11` v1.12 | Mapping registres AC600 (`DriveControlWord`/`StatusWord`) | "Protocole registre AC600 — Constructeur variateur" (T4) | Bloquant finition `FB_Translation` |
@@ -121,7 +121,7 @@
 | `AF_Partie-09` v1.13 §T84/T85/T86 | `FB_Encoder_SpeedMeasure.st`, `PRG_02_Encoders.st`, `FB_Safety_Winch.st`, `PRG_00_Inputs.st` | ✅ Implémenté 2026-07-28 |
 | `AF_Partie-10` v1.11 §3.8 | `FB_Encoder_SpeedMeasure` (fenêtre 50 ms, 6 positions) | ✅ Cohérent |
 | `AF_Partie-11` v1.12 §3bis | `FB_Translation_PositionDecoder` (5 capteurs, mots valides, incohérence) | ✅ Implémenté `PRG_00_Inputs` §2 |
-| `AF_Partie-12` v1.4 §4 point 8 | `FB_Bucket` : offset dynamique `ActiveOffsetM`, butée M2 dynamique, `_BucketState` mémoire | ✅ Implémenté v1.4 |
+| `AF_Partie-11` v1.4 §4 point 8 | `FB_Bucket` : offset dynamique `ActiveOffsetM`, butée M2 dynamique, `_BucketState` mémoire | ✅ Implémenté v1.4 |
 | `AF_Partie-13` v2.0 §2 | Frontière unique `HwReal`/`HwSim`/`HwIn` dans `PRG_00_Inputs` | ✅ Implémenté §0/§0bis/§1 |
 | `PLAN_TASK` T81/T82 | `FB_DiveSearch` (0→1→0), `FB_ExtractionSequence` (fermeture, palier 1 sur 2m, nominal) | 🟠 Code existant, tests PLC à valider |
 | `PLAN_TASK` T47 | `FB_SpeedStep:230-238` garde-fou, `SpeedGuardEnable` défaut FALSE, bandes provisoires | 🟠 Implémenté non activé, raison métier à documenter |

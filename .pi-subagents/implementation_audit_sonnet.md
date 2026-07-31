@@ -37,7 +37,7 @@ Source: `DOC/PLAN_TASK_v1.0.md` (§ Plan orchestré, §2 Tâches/Features, §3 R
 | T21 | Checklist validation Winch v1.7 non réalisée | AF_Partie-09 §8 |
 | T25 | Suite auto Encoder/Homing: essais CODESYS + scénarios restants | AF_Partie-10 §10 |
 | T26 | Checklist Translation AC600: exécution/verdict restants | `CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.1.md` |
-| T27 | Benne: essais mise en service non réalisés (cinématique, offsets, Méca C) | AF_Partie-12 §6 |
+| T27 | Benne: essais mise en service non réalisés (cinématique, offsets, Méca C) | AF_Partie-11 §6 |
 | T39 | Interfaces Homing OK; essais opérateur CODESYS restants | AF_Partie-10 |
 | T43 | Comparaison vitesse M1/M2 raccordée mais seuil/tempo=0 → **contrôle inactif** ; valeurs métier à définir | `FB_Cycle`, AF_Partie-04 §3quater |
 | T48 | Matrice essais V1-V7 (charge, freinage, câble mou...) à rejouer simu/terrain | ex-AF_Partie-14 §7.4.4 archivée |

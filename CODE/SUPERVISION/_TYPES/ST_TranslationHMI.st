@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
-      doc métier : DOC/AF_Partie-12_Fonction_Translation_v2.0.md
+      doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationHMI :
 STRUCT

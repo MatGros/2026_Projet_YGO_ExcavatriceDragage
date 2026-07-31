@@ -131,7 +131,7 @@ la chaine electrique.
 | Demande safety domaine (treuil, translation) | Coupure via canaux PLC ; seuils proprietaires Parties 09/11. |
 | Coupure IHM explicite | Ouverture des canaux PLC (detail FB). |
 
-La benne n'a pas de safety dedie : couche 1 Benne (P12), escalade possible via safety M1 (P09).
+La benne n'a pas de safety dedie : couche 1 Benne (P10), escalade possible via safety M1 (P09).
 
 ### 🔁 5.3 Rearmement (regles machine)
 
