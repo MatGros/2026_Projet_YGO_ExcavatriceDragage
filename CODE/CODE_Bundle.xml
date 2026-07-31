@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T13:13:23.737466" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-30T13:13:23.737466">
+  <contentHeader name="ExcavatriceDragage.project" modificationDateTime="2026-07-30T13:13:23.737466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">ExcavatriceDragage</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -725,7 +725,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Benne_v2.0.md §4.A
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -957,7 +957,7 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Benne_v2.0.md §4.B
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.B
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3597,6 +3597,53 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_EmergencyCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnEmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front demande rearmement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau coupure IHM maintenue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnFaultReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement defauts</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>530ff0c1-144b-5832-bee8-f40edd2d06ee</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
+   [IHM] ST_EmergencyCmd -- Commandes IHM pour la chaine AU
+   --------------------------------------------------------------
+   Role : structure d'echange pour les commandes operateur
+          de la chaine d'arret d'urgence (miroir ST_ModesCmd).
+   Pattern : identique a GVL_IHM.Modes.Cmd dans le projet reel.
+          L'IHM ecrit ces champs, le programme les consomme.
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_EmergencyManagementCmd">
         <baseType>
           <struct>
@@ -3640,6 +3687,197 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien :
       TRUE = voie maintenue saine, FALSE = coupure demandée — la règle C1
       interdit un nom portant « coupure » quand le sens est « maintien »).
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_EmergencyState">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[OK] Etats generaux
+Boucle AU fermee (saine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance demandee par une safety metier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[AU] Sequence de rearmement
+Pret au rearmement (chain OK + pas de lockout + pas de defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[KO] Diagnostics
+Synthese defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0=RedundancyTestFailed, bit1=ArmingFailed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Auto-test A/B a echoue (canal colle/shunte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement echoue (timeout confirmation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage 5s entre tentatives</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>60f821fa-d35a-58c5-ac8a-e1efe1044110</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
+   [IHM] ST_EmergencyState -- Retours d'etat IHM pour chaine AU
+   --------------------------------------------------------------
+   Role : structure d'echange pour les retours d'etat de la
+          chaine d'arret d'urgence (miroir ST_ModesState).
+   Pattern : identique a GVL_IHM.Modes.State dans le projet reel.
+          Le programme ecrit ces champs, l'IHM les lit.
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_EmergencyTestContext">
+        <baseType>
+          <struct>
+            <variable name="CmdArmRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes opérateur simulées (miroir de ST_ModesCmd)
+Front demande réarmement (comme BtnEmergencyArming IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts (comme BtnFaultReset IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure IHM maintenue (comme BtnEmergencyCutOff IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Simulation matériel (remplace les DI physiques)
+Boucle AU fermée (comme EmergencyChainClosed_DI)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur (comme PowerContactorEngaged_DI)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimPowerCutOffReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety métier (OR des 3 domaines)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d1c5daf9-89a1-5ba5-9455-e8cbda05b60f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 ST_EmergencyTestContext — Stimuli de test pour chaîne AU
+   ───────────────────────────────────────────────────────────────
+   📄 Regroupe toutes les commandes de simulation du test bench
+      dans une structure typée, conforme au pattern projet
+      (ST_ModesCmd, ST_WinchCmd, etc.).
+   🎮 Usage : instancié dans PRG_AU_TestBench, piloté depuis
+      une table Watch CODESYS ou un visu de test.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
@@ -7738,12 +7976,12 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪣 FB_Bucket — Commande d'ouverture/fermeture du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Benne_v2.0.md
+   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
       (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
       FERME désormais le benne, DEROULAGE M2 (Direction=-1) l'OUVRE
-      (c'était l'inverse avant). Voir DOC/AF_Partie-11_Fonction_Benne_v2.0.md §REX.
+      (c'était l'inverse avant). Voir DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §REX.
    ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
       ne sont fiables que si les codeurs absolus sont référencés (Partie10).
       Sans ça, une position aberrante (codeur non homé) pourrait faire
@@ -14870,7 +15108,7 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
       EmergencyArming_RQ → ArmPulse_RQ (cohérence nommage).
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
@@ -15007,7 +15245,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -15031,7 +15269,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B resté collé/shunté détecté à l'auto-test</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -15039,7 +15277,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de puissance n'a pas confirmé l'armement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
@@ -15077,6 +15315,62 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
             </variable>
           </outputVars>
           <localVars>
+            <variable name="CST_TestDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[CST] Temporisations normatives de securite AU (fixes, non modifiables RETAIN/IHM)
+Duree auto-test canal A ou B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ArmingPulseDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree impulsion rearmement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ArmingConfirmTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation engagement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ArmingLockout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree verrouillage anti-reessai apres echec</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_FaultDisplayDebounce">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Anti-clignotement affichage IHM uniquement (§9 STD) — jamais sur l'action</xhtml>
+              </documentation>
+            </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -15154,6 +15448,77 @@ TRUE = autotest passé, attente réarmement</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Résultat autotest (latche le temps du front)</xhtml>
               </documentation>
             </variable>
+            <variable name="RedundancyTestFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Pattern Cause/Ack (§3.4bis AF01, §9 STD) — Reset jamais conditionné
+Latch brut : canal collé détecté à l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRedundancyDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Latch brut : contacteur non confirmé sous 2s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailedCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingFailedDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -15164,9 +15529,13 @@ TRUE = autotest passé, attente réarmement</xhtml>
       et les bus d'état/diagnostic.
    🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien).
       Ajout autotest démarrage (§5.4 AF01) + bus State/Diag.
+   🩹 REX 2026-08 : pattern Cause/Ack (RedundancyTestFailed, EmergencyArmingFailed).
+      Reset n'est plus jamais conditionné (ex-bug : Reset+PowerContactorEngaged
+      créait une impasse opérateur). L'interlock sécurité reste sur la Cause brute ;
+      l'affichage IHM (ErrorId) suit la Cause lissée par un debounce court + l'Ack.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
+              DOC/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
               DOC/AF_Partie-03_Contrats_Composants_v2.0.md</xhtml>
           </documentation>
         </interface>
@@ -15199,6 +15568,11 @@ IF NOT Enable THEN
     StartupFail := FALSE;
     StartupCheckDone := FALSE;
     StartupCheckOK := FALSE;
+    // 🩹 Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
+    RedundancyTestFailedCause := FALSE;
+    RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedCause := FALSE;
+    EmergencyArmingFailedAck := TRUE;
     TonTestA(IN := FALSE);
     TonRestoreA(IN := FALSE);
     TonTestB(IN := FALSE);
@@ -15206,6 +15580,8 @@ IF NOT Enable THEN
     TonArmingPulse(IN := FALSE);
     TonArmingConfirm(IN := FALSE);
     TonArmingLockout(IN := FALSE);
+    TonRedundancyDisplay(IN := FALSE);
+    TonArmingFailedDisplay(IN := FALSE);
     RETURN;
 END_IF;
 
@@ -15220,47 +15596,49 @@ IF NOT StartupCheckDone THEN
     StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
                       AND NOT PowerContactorEngaged // 2. Contacteur au repos
                       AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
-    // Le maintien A/B est vérifié via l'absence de RedundancyTestFailed
-    // (si un canal est ouvert au démarrage, RedundancyTestFailed sera levé
-    //  à la première tentative de réarmement — pas bloquant au boot)
     StartupCheckDone := TRUE;
     StartupFail := NOT StartupCheckOK;
-    // Si échec : on reste en attente, ErrorId est positionné
     IF NOT StartupCheckOK THEN
         ErrorId := 16#0008; // bit3 = startup autotest fail
         Error := TRUE;
     END_IF;
     RETURN; // 1 cycle pour laisser le temps aux entrées de se stabiliser
-ELSE
-    StartupFail := FALSE;
 END_IF;
 
-// 🔍 3. ACQUITTEMENT DES DÉFAUTS
+// 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
+// ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
+// pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
+// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
 IF ResetEdge.Q THEN
-    RedundancyTestFailed := FALSE;
+    RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedAck := TRUE;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
-    IF PowerContactorEngaged THEN
-        EmergencyArmingFailed := FALSE;
-    END_IF;
-    // Reset efface aussi bit3 d'ErrorId
-    ErrorId := ErrorId AND 16#FFF7;
+    ErrorId := 16#0000;
+END_IF;
 END_IF;
 
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
+// 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
+// re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
+// TC-P01-009). Ceci prouve par le run reel que la cause a disparu, pas juste un Reset optimiste.
 IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
    AND NOT EmergencyArmingLockoutActive 
    AND NOT PowerContactorEngaged THEN
     ArmingSeqStep := 1;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
 END_IF;
 
 // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
-TonTestA(IN := (ArmingSeqStep = 1), PT := T#200ms);
+TonTestA(IN := (ArmingSeqStep = 1), PT := CST_TestDuration);
 IF ArmingSeqStep = 1 THEN
     ForceTestA := TRUE;
     IF TonTestA.Q THEN
         ForceTestA := FALSE;
         IF EmergencyChainClosed THEN
-            RedundancyTestFailed := TRUE;
+            RedundancyTestFailedCause := TRUE;
             ArmingSeqStep := 0;
         ELSE
             ArmingSeqStep := 2;
@@ -15271,7 +15649,7 @@ ELSE
 END_IF;
 
 // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
-TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200ms);
+TonRestoreA(IN := (ArmingSeqStep = 2), PT := CST_TestDuration);
 IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
     IF EmergencyChainClosed THEN
         ArmingSeqStep := 3;
@@ -15281,13 +15659,13 @@ IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
 END_IF;
 
 // ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
-TonTestB(IN := (ArmingSeqStep = 3), PT := T#200ms);
+TonTestB(IN := (ArmingSeqStep = 3), PT := CST_TestDuration);
 IF ArmingSeqStep = 3 THEN
     ForceTestB := TRUE;
     IF TonTestB.Q THEN
         ForceTestB := FALSE;
         IF EmergencyChainClosed THEN
-            RedundancyTestFailed := TRUE;
+            RedundancyTestFailedCause := TRUE;
             ArmingSeqStep := 0;
         ELSE
             ArmingSeqStep := 4;
@@ -15298,7 +15676,7 @@ ELSE
 END_IF;
 
 // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
-TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200ms);
+TonRestoreB(IN := (ArmingSeqStep = 4), PT := CST_TestDuration);
 IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
     IF EmergencyChainClosed THEN
         ArmingSeqStep := 5;
@@ -15308,49 +15686,71 @@ IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
 END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
-TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1s);
+TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
 Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
 
 // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
-TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2s);
+TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := CST_ArmingConfirmTimeout);
 IF ArmingSeqStep = 6 THEN
     IF PowerContactorEngaged THEN
         ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := FALSE;
     ELSIF TonArmingConfirm.Q THEN
-        EmergencyArmingFailed := TRUE;
+        EmergencyArmingFailedCause := TRUE;
         ArmingSeqStep := 0;
         EmergencyArmingLockoutActive := TRUE;
     END_IF;
 END_IF;
 
 // ⏱️ Séquence de verrouillage temporel (5s)
-TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5s);
+TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := CST_ArmingLockout);
 IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
 
-// 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES
-Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
-Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailed;
+// 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+// L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
+// jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
+RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
+IF RedundancyCauseEdge.Q THEN
+    RedundancyTestFailedAck := FALSE; // nouvelle occurrence -&gt; ré-alarme, ré-acquittement requis
+END_IF;
+
+ArmingFailedCauseEdge(CLK := EmergencyArmingFailedCause);
+IF ArmingFailedCauseEdge.Q THEN
+    EmergencyArmingFailedAck := FALSE;
+END_IF;
+
+// 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
+Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
+Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 // ArmPulse_Cmd déjà positionné à l'étape 5 ci-dessus (garder FALSE hors étape 5)
 IF ArmingSeqStep &lt;&gt; 5 THEN
     Cmd.ArmPulse_Cmd := FALSE;
 END_IF;
 
-// 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag)
+// 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag) — interlock sur Cause brute
 Armable := EmergencyChainClosed
            AND (ArmingSeqStep = 0)
            AND NOT EmergencyArmingLockoutActive
-           AND NOT RedundancyTestFailed
+           AND NOT RedundancyTestFailedCause
            AND NOT PowerContactorEngaged;
 
 ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
 
-// 📤 7. SYNTHÈSE DES ERREURS
+// 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
+// ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
+// sur la Cause brute, jamais retardée par ce debounce.
+TonRedundancyDisplay(IN := RedundancyTestFailedCause, PT := CST_FaultDisplayDebounce);
+RedundancyTestFailed := TonRedundancyDisplay.Q OR NOT RedundancyTestFailedAck;
+
+TonArmingFailedDisplay(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
+EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAck;
+
+// 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
     ErrorId := ErrorId OR 16#0001;
@@ -17955,6 +18355,91 @@ Machine.HydraulicThermalOk_DI      := TRUE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_AU_ChainFeedback" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit maître simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne opérateur banc (Watch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie physique canal A du scan précédent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie physique canal B du scan précédent</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ChainClosedRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrée brute simulée, à qualifier par FB_Input en aval</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_AU_ChainFeedback — Simulation physique boucle AU (banc de test)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+   🎯 Rôle : modélise le comportement physique — quand le PLC force
+      MaintainA/B à FALSE (auto-test A/B), la boucle AU s'ouvre réellement
+      → la sortie ChainClosedRaw repasse à FALSE le cycle suivant (1 cycle
+      de retard = fidèle au comportement réel d'un contacteur/relais).
+   🔴 Sortie brute (non filtrée) : le conditionnement anti-rebond 20 ms
+      est appliqué en aval par FB_Input, pas ici — cette brique ne fait
+      QUE la simulation physique, jamais du conditionnement de signal.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_AU_ChainFeedback) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_AU_ChainFeedback) ===
+
+IF SimulationModeActive AND (NOT MaintainA OR NOT MaintainB) THEN
+    // Au moins un canal forcé à FALSE (auto-test) -&gt; la chaîne AU physique s'ouvre
+    ChainClosedRaw := FALSE;
+ELSE
+    // Les deux canaux maintenus -&gt; la chaîne AU suit la consigne opérateur banc
+    ChainClosedRaw := SimChainClosed;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda</ObjectId>
           </data>
         </addData>
       </pou>
@@ -24511,7 +24996,7 @@ ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
-   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-11_Fonction_Benne_v2.0.md
+   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -26198,7 +26683,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26215,7 +26700,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26297,7 +26782,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               <outputVariables />
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType>functionblock</CallType>
+                  <CallType xmlns="">functionblock</CallType>
                 </data>
               </addData>
             </block>
@@ -26426,7 +26911,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26508,7 +26993,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               <outputVariables />
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType>functionblock</CallType>
+                  <CallType xmlns="">functionblock</CallType>
                 </data>
               </addData>
             </block>
@@ -26637,7 +27122,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26689,7 +27174,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               <outputVariables />
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType>functionblock</CallType>
+                  <CallType xmlns="">functionblock</CallType>
                 </data>
               </addData>
             </block>
@@ -26770,7 +27255,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26787,7 +27272,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26816,7 +27301,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26845,7 +27330,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26874,7 +27359,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26903,7 +27388,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26932,7 +27417,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26961,7 +27446,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -26990,7 +27475,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27023,7 +27508,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27056,7 +27541,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27089,7 +27574,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27122,7 +27607,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27155,7 +27640,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27188,7 +27673,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27221,7 +27706,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27250,7 +27735,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27279,7 +27764,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27308,7 +27793,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27337,7 +27822,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27366,7 +27851,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27395,7 +27880,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27424,7 +27909,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27457,7 +27942,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27490,7 +27975,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27523,7 +28008,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27556,7 +28041,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27589,7 +28074,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27622,7 +28107,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27655,7 +28140,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27672,7 +28157,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27701,7 +28186,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27734,7 +28219,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27763,7 +28248,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27792,7 +28277,7 @@ Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propr
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27843,7 +28328,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27860,7 +28345,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27911,7 +28396,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -27958,7 +28443,7 @@ Demande de coupure de puissance</xhtml>
               <outputVariables />
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType>functionblock</CallType>
+                  <CallType xmlns="">functionblock</CallType>
                 </data>
               </addData>
             </block>
@@ -28023,7 +28508,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28052,7 +28537,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28081,7 +28566,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28110,7 +28595,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28139,7 +28624,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28168,7 +28653,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28197,7 +28682,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28226,7 +28711,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28255,7 +28740,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28288,7 +28773,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28321,7 +28806,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28354,7 +28839,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28387,7 +28872,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28420,7 +28905,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28453,7 +28938,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28486,7 +28971,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28519,7 +29004,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28552,7 +29037,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28585,7 +29070,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28618,7 +29103,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28651,7 +29136,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28684,7 +29169,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28717,7 +29202,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28750,7 +29235,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28783,7 +29268,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28816,7 +29301,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28845,7 +29330,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28874,7 +29359,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -28903,7 +29388,7 @@ Demande de coupure de puissance</xhtml>
               </alternativeText>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType>networktitle</ElementType>
+                  <ElementType xmlns="">networktitle</ElementType>
                 </data>
               </addData>
             </vendorElement>
@@ -29292,101 +29777,554 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
           </data>
         </addData>
       </pou>
-      <pou name="PRG_AU_TestBench" pouType="program">
+      <pou name="PRG_ACQUISITION_CFC" pouType="program">
         <interface>
-          <inputVars>
-            <variable name="SimEnable">
+          <localVars>
+            <variable name="instJoystick">
               <type>
-                <BOOL />
+                <derived name="FB_Joystick" />
               </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commandes testeur</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimReset">
+            <variable name="instEncoderAbsM1">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Abs" />
               </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
             </variable>
-            <variable name="SimArmRequest">
+            <variable name="instEncoderScaleM1">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Scale" />
               </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front demandé à l'utilisateur</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimChainClosed">
+            <variable name="instHomingM1">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Homing" />
               </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermée</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimContactorEngaged">
+            <variable name="instEncoderAbsM2">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Abs" />
               </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimPowerCutOffReq">
+            <variable name="instEncoderScaleM2">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Scale" />
               </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety métier</xhtml>
-              </documentation>
             </variable>
-            <variable name="SimBtnCutOff">
+            <variable name="instHomingM2">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Homing" />
               </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure IHM maintenue</xhtml>
-              </documentation>
             </variable>
-          </inputVars>
+            <variable name="instPosDecoderM3">
+              <type>
+                <derived name="FB_Translation_PositionDecoder" />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="10" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1</expression>
+                </inVariable>
+                <inVariable localId="2">
+                  <position x="10" y="30" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2</expression>
+                </inVariable>
+                <inVariable localId="3">
+                  <position x="10" y="50" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyBtnRaw</expression>
+                </inVariable>
+                <connector localId="4" name="">
+                  <position x="40" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="5" name="">
+                  <position x="40" y="30" />
+                  <connectionPointIn>
+                    <connection refLocalId="2" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="6" name="">
+                  <position x="40" y="50" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyBtnRaw" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="10" executionOrderId="1" typeName="FB_Joystick" instanceName="instJoystick">
+                  <position x="80" y="10" />
+                  <inputVariables>
+                    <variable formalParameter="RawX">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="4" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="RawY">
+                      <connectionPointIn>
+                        <relPosition x="0" y="20" />
+                        <connection refLocalId="5" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="RawButton">
+                      <connectionPointIn>
+                        <relPosition x="0" y="40" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <outputVariables>
+                    <variable formalParameter="AxisCmdX">
+                      <connectionPointOut>
+                        <relPosition x="40" y="0" />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="AxisCmdY">
+                      <connectionPointOut>
+                        <relPosition x="40" y="20" />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="DeadmanArmed">
+                      <connectionPointOut>
+                        <relPosition x="40" y="40" />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                </block>
+                <outVariable localId="20">
+                  <position x="180" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="AxisCmdX" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdX</expression>
+                </outVariable>
+                <outVariable localId="21">
+                  <position x="180" y="30" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="AxisCmdY" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdY</expression>
+                </outVariable>
+                <outVariable localId="22">
+                  <position x="180" y="50" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="DeadmanArmed" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.DeadmanArmed</expression>
+                </outVariable>
+              </CFC>
+            </data>
+          </addData>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5ca2a345-56a2-58c8-9723-1de144dc50a4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="PRG_AU_Acquisition" pouType="program">
+        <interface>
           <outputVars>
-            <variable name="Ready">
+            <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États observables</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (qualifie FB_Input, 20 ms)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engage (qualifie FB_Input, 20 ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety metier (agrege)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instSimChainFeedback">
+              <type>
+                <derived name="FB_Sim_AU_ChainFeedback" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation physique boucle AU (banc de test)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEmergencyChainClosed">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification boucle AU (anti-rebond 20 ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instPowerContactorEngaged">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification retour contacteur (anti-rebond 20 ms)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquisition et qualification des entrees AU (CFC natif, cible AF02 §2).
+Lit les signaux simules (GVL_Simulation_AU) et les qualifie via FB_Input
+(brique standard, meme composant que PRG_00_Inputs) avant transmission
+au composite FB_Safety_EmergencyManagement.
+Aucune logique metier ici (regle TC-P02-002) : le feedback simulation est
+delegue a FB_Sim_AU_ChainFeedback, une page CFC ne fait qu'enchainer des blocs.
+Regle de cablage CFC (obligatoire, DOC/CODE_QUALITY_STANDARDS.md paragraphe CFC) : CHAQUE
+entree source (inVariable/sortie de bloc) passe par un connector dedie avant
+de rejoindre un bloc consommateur -- jamais de connexion directe source vers bloc.
+Chaque connector a une position UNIQUE et non nulle (x,y != 0,0 sauf le tout
+premier), pour eviter les fils de longueur nulle empiles qui rendent le
+cablage illisible/invisible dans l'editeur CODESYS (REX 2026-08).
+Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+       DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2
+       DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="20" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimulationModeActive</expression>
+                </inVariable>
+                <inVariable localId="2">
+                  <position x="10" y="40" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimChainClosed</expression>
+                </inVariable>
+                <inVariable localId="3">
+                  <position x="10" y="60" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ</expression>
+                </inVariable>
+                <inVariable localId="4">
+                  <position x="10" y="80" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ</expression>
+                </inVariable>
+                <connector localId="5" name="">
+                  <position x="40" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="6" name="">
+                  <position x="40" y="40" />
+                  <connectionPointIn>
+                    <connection refLocalId="2" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="7" name="">
+                  <position x="40" y="60" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="8" name="">
+                  <position x="40" y="80" />
+                  <connectionPointIn>
+                    <connection refLocalId="4" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="10" executionOrderId="1" typeName="FB_Sim_AU_ChainFeedback" instanceName="instSimChainFeedback">
+                  <position x="70" y="15" />
+                  <inputVariables>
+                    <variable formalParameter="SimulationModeActive">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="5" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SimChainClosed">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="MaintainA">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="7" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="MaintainB">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="8" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="ChainClosedRaw">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="11" name="">
+                  <position x="105" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="ChainClosedRaw" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="12">
+                  <position x="105" y="35" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>T#20ms</expression>
+                </inVariable>
+                <connector localId="13" name="">
+                  <position x="120" y="35" />
+                  <connectionPointIn>
+                    <connection refLocalId="12" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="20" executionOrderId="2" typeName="FB_Input" instanceName="instEmergencyChainClosed">
+                  <position x="140" y="15" />
+                  <inputVariables>
+                    <variable formalParameter="InputRaw">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="11" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="FilterTime">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="13" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="21" name="">
+                  <position x="175" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="20" formalParameter="State" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="22">
+                  <position x="195" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="21" />
+                  </connectionPointIn>
+                  <expression>EmergencyChainClosed</expression>
+                </outVariable>
+                <inVariable localId="30">
+                  <position x="10" y="120" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimContactorEngaged</expression>
+                </inVariable>
+                <connector localId="32" name="">
+                  <position x="40" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="30" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="31">
+                  <position x="10" y="140" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>T#20ms</expression>
+                </inVariable>
+                <connector localId="33" name="">
+                  <position x="40" y="140" />
+                  <connectionPointIn>
+                    <connection refLocalId="31" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="40" executionOrderId="3" typeName="FB_Input" instanceName="instPowerContactorEngaged">
+                  <position x="70" y="115" />
+                  <inputVariables>
+                    <variable formalParameter="InputRaw">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="32" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="FilterTime">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="33" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="41" name="">
+                  <position x="105" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="40" formalParameter="State" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="42">
+                  <position x="140" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="41" />
+                  </connectionPointIn>
+                  <expression>PowerContactorEngaged</expression>
+                </outVariable>
+                <inVariable localId="50">
+                  <position x="10" y="180" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimPowerCutOffReq</expression>
+                </inVariable>
+                <connector localId="52" name="">
+                  <position x="40" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="50" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="51">
+                  <position x="70" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="52" />
+                  </connectionPointIn>
+                  <expression>PowerCutOffRequest</expression>
+                </outVariable>
+              </CFC>
+            </data>
+          </addData>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e301096b-b905-5c3d-96fa-3afcf1106a59</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="PRG_AU_Outputs_LD" pouType="program">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="PowerKeepAlive_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques terminales (mêmes noms que le projet réel)
+Relais maintien canal A (TRUE = voie maintenue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Relais maintien canal B (TRUE = voie maintenue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion réarmement contacteur (1s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires pour observation Watch (même pattern que PRG_10_Outputs_LD)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="Done">
+            <variable name="Armable">
               <type>
                 <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
               </type>
             </variable>
             <variable name="Error">
@@ -29399,43 +30337,616 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
                 <WORD />
               </type>
             </variable>
-            <variable name="MaintainA_RQ">
+            <variable name="RedundancyTestFailed">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="MaintainB_RQ">
+            <variable name="EmergencyArmingFailed">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="ArmPulse_RQ">
+            <variable name="EmergencyArmingLockoutActive">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="State">
+          </outputVars>
+          <localVars>
+            <variable name="instSafetyEmergencyManagement">
               <type>
-                <derived name="ST_State_Emergency" />
+                <derived name="FB_Safety_EmergencyManagement" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus structurés</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instance unique du composite AU — barrière finale, seul écrivain des Q AU</xhtml>
               </documentation>
             </variable>
-            <variable name="Diag">
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📤 PRG_AU_Outputs_LD — Écriture des sorties AU (dernière couche, LADDER)
+   ───────────────────────────────────────────────────────────────
+   📄 Appelle FB_Safety_EmergencyManagement et écrit les variables
+      Q physiques (PowerKeepAlive_A/B_RQ, EmergencyArming_RQ).
+   🧩 Structure identique à PRG_10_Outputs_LD (projet réel) pour le
+      domaine AU isolé : converti automatiquement en Ladder Diagram
+      (&lt;LD&gt;) dans CODESYS, comme la frontière finale réelle.
+   ⚠️ Pattern LD imposé (REX import) : VAR_OUTPUT strictement scalaires
+      (BOOL/INT/WORD), jamais de structure ST_* en sortie — même règle
+      que PRG_10_Outputs_LD (aucun ST_* dans ses VAR_OUTPUT). Les bus
+      structurés State/Diag restent lisibles via l'instance (Watch),
+      pas via une sortie VAR_OUTPUT du programme.
+   🎯 Ordre d'appel obligatoire : PRG_AU_Acquisition → PRG_AU_Outputs_LD
+      (même cycle, même tâche).
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2 (PRG_OUTPUTS_LD)</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <LD>
+            <leftPowerRail localId="0">
+              <position x="0" y="0" />
+              <connectionPointOut formalParameter="none" />
+            </leftPowerRail>
+            <comment localId="1" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === IMPLEMENTATION ===
+// 🛡️ Gestionnaire d'arrêt d'urgence et de réarmement</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="2">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <comment localId="3" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="4">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="5" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Enable">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Reset">
+                  <connectionPointIn>
+                    <connection refLocalId="15" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ArmRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="17" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="EmergencyChainClosed">
+                  <connectionPointIn>
+                    <connection refLocalId="19" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerContactorEngaged">
+                  <connectionPointIn>
+                    <connection refLocalId="21" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerCutOffRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="23" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="BtnEmergencyCutOff">
+                  <connectionPointIn>
+                    <connection refLocalId="25" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="15" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM_AU.Cmd.BtnFaultReset</variable>
+            </contact>
+            <contact localId="17" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM_AU.Cmd.BtnEmergencyArming</variable>
+            </contact>
+            <contact localId="19" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_AU_Acquisition.EmergencyChainClosed</variable>
+            </contact>
+            <contact localId="21" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_AU_Acquisition.PowerContactorEngaged</variable>
+            </contact>
+            <contact localId="23" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_AU_Acquisition.PowerCutOffRequest</variable>
+            </contact>
+            <contact localId="25" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM_AU.Cmd.BtnEmergencyCutOff</variable>
+            </contact>
+            <comment localId="27" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// ⚡ Affectation des sorties de réarmement et maintien puissance</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="28">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="29">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.MaintainA_RQ</expression>
+            </inVariable>
+            <outVariable localId="30">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="29" />
+              </connectionPointIn>
+              <expression>PowerKeepAlive_A_RQ</expression>
+            </outVariable>
+            <comment localId="39" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="40">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="41">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.MaintainB_RQ</expression>
+            </inVariable>
+            <outVariable localId="42">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="41" />
+              </connectionPointIn>
+              <expression>PowerKeepAlive_B_RQ</expression>
+            </outVariable>
+            <comment localId="51" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="52">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="53">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.ArmPulse_RQ</expression>
+            </inVariable>
+            <outVariable localId="54">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="53" />
+              </connectionPointIn>
+              <expression>EmergencyArming_RQ</expression>
+            </outVariable>
+            <comment localId="63" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🩺 Observation scalaire (dépliage manuel des bus State/Diag)</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="64">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="65">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.ChainOk</expression>
+            </inVariable>
+            <outVariable localId="66">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="65" />
+              </connectionPointIn>
+              <expression>ChainOk</expression>
+            </outVariable>
+            <comment localId="75" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="76">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="77">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.ContactorOk</expression>
+            </inVariable>
+            <outVariable localId="78">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="77" />
+              </connectionPointIn>
+              <expression>ContactorOk</expression>
+            </outVariable>
+            <comment localId="87" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="88">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="89">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.Armable</expression>
+            </inVariable>
+            <outVariable localId="90">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="89" />
+              </connectionPointIn>
+              <expression>Armable</expression>
+            </outVariable>
+            <comment localId="99" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="100">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="101">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.ArmingBusy</expression>
+            </inVariable>
+            <outVariable localId="102">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="101" />
+              </connectionPointIn>
+              <expression>ArmingBusy</expression>
+            </outVariable>
+            <comment localId="111" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="112">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="113">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.Step</expression>
+            </inVariable>
+            <outVariable localId="114">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="113" />
+              </connectionPointIn>
+              <expression>ArmingSeqStep</expression>
+            </outVariable>
+            <comment localId="123" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="124">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="125">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.Error</expression>
+            </inVariable>
+            <outVariable localId="126">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="125" />
+              </connectionPointIn>
+              <expression>Error</expression>
+            </outVariable>
+            <comment localId="135" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="136">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="137">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.ErrorId</expression>
+            </inVariable>
+            <outVariable localId="138">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="137" />
+              </connectionPointIn>
+              <expression>ErrorId</expression>
+            </outVariable>
+            <comment localId="147" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="148">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="149">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.RedundancyTestFailed</expression>
+            </inVariable>
+            <outVariable localId="150">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="149" />
+              </connectionPointIn>
+              <expression>RedundancyTestFailed</expression>
+            </outVariable>
+            <comment localId="159" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="160">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="161">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.ArmFailed</expression>
+            </inVariable>
+            <outVariable localId="162">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="161" />
+              </connectionPointIn>
+              <expression>EmergencyArmingFailed</expression>
+            </outVariable>
+            <comment localId="171" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="172">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="173">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.LockoutActive</expression>
+            </inVariable>
+            <outVariable localId="174">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="173" />
+              </connectionPointIn>
+              <expression>EmergencyArmingLockoutActive</expression>
+            </outVariable>
+            <rightPowerRail localId="2147483646">
+              <position x="0" y="0" />
+              <connectionPointIn />
+            </rightPowerRail>
+          </LD>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6ff04d2-767d-5228-b8ae-b83c5f61ab01</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="PRG_AU_TestBench" pouType="program">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="StepLabel">
               <type>
-                <derived name="ST_Diag_Emergency" />
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Synthèse lisible pour Watch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainA">
+              <type>
+                <BOOL />
               </type>
             </variable>
-            <variable name="ArmingSeqStep">
+            <variable name="MaintainB">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmPulse">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Step">
               <type>
                 <INT />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires</xhtml>
-              </documentation>
             </variable>
-            <variable name="RedundancyTestFailed">
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="RedundancyFailed">
               <type>
                 <BOOL />
               </type>
@@ -29445,58 +30956,47 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
                 <BOOL />
               </type>
             </variable>
-            <variable name="LockoutActive">
+            <variable name="Lockout">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="CycleCount">
+            <variable name="ChainOk">
               <type>
-                <UDINT />
+                <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Indicateurs de simulation</xhtml>
-              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
             </variable>
           </outputVars>
-          <localVars>
-            <variable name="instEmergency">
-              <type>
-                <derived name="FB_Safety_EmergencyManagement" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instance du composite testé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmReqTrig">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gestion fronts</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetTrig">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-          </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 PRG_AU_TestBench — Banc de test minimal pour FB_Safety_EmergencyManagement
+   🧪 PRG_AU_TestBench — Programme principal de test chaîne AU
    ───────────────────────────────────────────────────────────────
-   📄 Programme minimal autonome pour simuler et tester la chaîne AU :
-      • Toutes les entrées du composite sont exposées en VAR_INPUT
-      • Toutes les sorties en VAR_OUTPUT pour observation Watch/IHM
-      • Un cycle de simulation basique avec front armement intégré
-   🎯 Objectif : vérifier la séquence d'auto-test A/B, le pulse,
-      la confirmation, le lockout, sans matériel réel.
-   ⚙️ Usage : instancier dans une tâche CODESYS à 50 ms, piloter
-      les inputs depuis une table Watch ou un visu de test.
+   📄 Ordonnance les étages Acquisition → Outputs dans l'ordre
+      correct (même flux que MainTask réelle).
+   🎮 Pilotage via Watch CODESYS :
+      GVL_IHM_AU.Cmd.BtnEmergencyArming  = TRUE  → lance réarmement
+      GVL_IHM_AU.Cmd.BtnFaultReset       = TRUE  → acquitte défauts
+      GVL_IHM_AU.Cmd.BtnEmergencyCutOff  = TRUE  → coupure IHM
+      GVL_Simulation_AU.SimContactorEngaged = TRUE → simule retour contacteur
+      GVL_Simulation_AU.SimPowerCutOffReq   = TRUE → simule coupure métier
+   👁️ Observation :
+      PRG_AU_Outputs_LD.ArmingSeqStep    → étape séquence (0..6)
+      PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ → état maintien A
+      PRG_AU_Outputs_LD.EmergencyArming_RQ  → pulse réarmement
+      PRG_AU_Outputs_LD.ErrorId          → erreurs/locks
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md</xhtml>
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -29505,52 +31005,50 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
 
 // === IMPLEMENTATION ===
 
-// 🔄 Fronts
-ArmReqTrig(CLK := SimArmRequest);
-ResetTrig(CLK := SimReset);
+// 🔄 1. Acquisition des entrées (simulées)
+PRG_AU_Acquisition();
 
-// 🛡️ Appel du composite
-instEmergency(
-    Enable := SimEnable,
-    Reset := PRG_09_Supervision.FaultMachineReset_IHM,  // ou SimReset si test isolé
-    ArmRequest := SimArmRequest,
-    EmergencyChainClosed := SimChainClosed,
-    PowerContactorEngaged := SimContactorEngaged,
-    PowerCutOffRequest := SimPowerCutOffReq,
-    BtnEmergencyCutOff := SimBtnCutOff
-);
+// 📤 2. Traitement et sorties (composite + Q)
+PRG_AU_Outputs_LD();
 
-// 📤 Sorties observables
-Ready        := instEmergency.Ready;
-Busy         := instEmergency.Busy;
-Done         := instEmergency.Done;
-Error        := instEmergency.Error;
-ErrorId      := instEmergency.ErrorId;
-MaintainA_RQ := instEmergency.MaintainA_RQ;
-MaintainB_RQ := instEmergency.MaintainB_RQ;
-ArmPulse_RQ  := instEmergency.ArmPulse_RQ;
-State        := instEmergency.State;
-Diag         := instEmergency.Diag;
-ArmingSeqStep       := instEmergency.State.Step;
-RedundancyTestFailed := instEmergency.Diag.RedundancyTestFailed;
-ArmFailed           := instEmergency.Diag.ArmFailed;
-LockoutActive       := instEmergency.Diag.LockoutActive;
+// 🩺 Synthèse Watch — lecture des sorties scalaires (pattern PRG_10_Outputs_LD)
+MaintainA        := PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ;
+MaintainB        := PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ;
+ArmPulse         := PRG_AU_Outputs_LD.EmergencyArming_RQ;
+Step             := PRG_AU_Outputs_LD.ArmingSeqStep;
+ErrorId          := PRG_AU_Outputs_LD.ErrorId;
+RedundancyFailed := PRG_AU_Outputs_LD.RedundancyTestFailed;
+ArmFailed        := PRG_AU_Outputs_LD.EmergencyArmingFailed;
+Lockout          := PRG_AU_Outputs_LD.EmergencyArmingLockoutActive;
+ChainOk          := PRG_AU_Outputs_LD.ChainOk;
+ContactorOk      := PRG_AU_Outputs_LD.ContactorOk;
+Armable          := PRG_AU_Outputs_LD.Armable;
 
-// 🔄 Label lisible de l'étape
-CASE instEmergency.State.Step OF
-    0: StateLabel := 'IDLE (attente réarmement)';
-    1: StateLabel := 'TestA (coupe canal A)';
-    2: StateLabel := 'RestoreA (rétablit A)';
-    3: StateLabel := 'TestB (coupe canal B)';
-    4: StateLabel := 'RestoreB (rétablit B)';
-    5: StateLabel := 'Pulse (impulsion 1s)';
-    6: StateLabel := 'Confirm (attente contacteur)';
+// 📤 Publication IHM — l'opérateur voit ces retours sur son écran
+// [IHM] Publication dans la structure d'etat IHM (lue par la visu operateur)
+GVL_IHM_AU.State.ChainOk              := ChainOk;
+GVL_IHM_AU.State.ContactorOk          := ContactorOk;
+GVL_IHM_AU.State.Armable              := Armable;
+GVL_IHM_AU.State.ArmingBusy           := PRG_AU_Outputs_LD.ArmingBusy;
+GVL_IHM_AU.State.RedundancyTestFailed := RedundancyFailed;
+GVL_IHM_AU.State.ArmingFailed         := ArmFailed;
+GVL_IHM_AU.State.LockoutActive        := Lockout;
+GVL_IHM_AU.State.Step                 := Step;
+GVL_IHM_AU.State.Error                := PRG_AU_Outputs_LD.Error;
+GVL_IHM_AU.State.ErrorId              := ErrorId;
+GVL_IHM_AU.State.PowerCutOffActive    := GVL_Simulation_AU.SimPowerCutOffReq;
+
+CASE Step OF
+    0: StepLabel := 'IDLE (attente armement)';
+    1: StepLabel := 'TestA (coupe A)';
+    2: StepLabel := 'RestoreA (rétablit A)';
+    3: StepLabel := 'TestB (coupe B)';
+    4: StepLabel := 'RestoreB (rétablit B)';
+    5: StepLabel := 'Pulse (armement 1s)';
+    6: StepLabel := 'Confirm (attente contacteur)';
 ELSE
-    StateLabel := 'INCONNU';
+    StepLabel := 'ERREUR';
 END_CASE;
-
-// 🔄 Compteur de cycle
-CycleCount := CycleCount + 1;
 </xhtml>
           </ST>
         </body>
@@ -29592,12 +31090,12 @@ CycleCount := CycleCount + 1;
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_00_Inputs.EmergencyStopOk</expression>
+                  <expression>PRG_00_Inputs.EmergencyChainClosed</expression>
                 </inVariable>
                 <connector localId="2" name="">
-                  <position x="0" y="0" />
+                  <position x="10" y="10" />
                   <connectionPointIn>
-                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.EmergencyStopOk" />
+                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.EmergencyChainClosed" />
                   </connectionPointIn>
                 </connector>
                 <block localId="10" executionOrderId="1" typeName="FB_DiagCanOpen" instanceName="instDiagCanOpen">
@@ -29621,12 +31119,12 @@ CycleCount := CycleCount + 1;
                   </outputVariables>
                   <addData>
                     <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
-                      <CallType>functionblock</CallType>
+                      <CallType xmlns="">functionblock</CallType>
                     </data>
                   </addData>
                 </block>
                 <connector localId="11" name="">
-                  <position x="0" y="0" />
+                  <position x="45" y="10" />
                   <connectionPointIn>
                     <connection refLocalId="10" formalParameter="Ready" />
                   </connectionPointIn>
@@ -29652,12 +31150,12 @@ CycleCount := CycleCount + 1;
                   </outputVariables>
                   <addData>
                     <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
-                      <CallType>functionblock</CallType>
+                      <CallType xmlns="">functionblock</CallType>
                     </data>
                   </addData>
                 </block>
                 <connector localId="21" name="">
-                  <position x="0" y="0" />
+                  <position x="80" y="10" />
                   <connectionPointIn>
                     <connection refLocalId="20" formalParameter="ActiveMode" />
                   </connectionPointIn>
@@ -29683,7 +31181,7 @@ CycleCount := CycleCount + 1;
                   </outputVariables>
                   <addData>
                     <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
-                      <CallType>functionblock</CallType>
+                      <CallType xmlns="">functionblock</CallType>
                     </data>
                   </addData>
                 </block>
@@ -31008,6 +32506,51 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_IHM_AU">
+        <variable name="Cmd">
+          <type>
+            <derived name="ST_EmergencyCmd" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">[IHM] Commandes operateur (Write)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="State">
+          <type>
+            <derived name="ST_EmergencyState" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">[IHM] Retours d'etat (Read)</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e10b0c31-1883-5130-8f9d-688cce5b308f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
+   [IHM] GVL_IHM_AU -- Interface IHM pour le test de la chaine AU
+   --------------------------------------------------------------
+   Role : point d'echange unique entre l'IHM (Watch/visu) et
+          le programme de test de la chaine d'arret d'urgence.
+   Pattern : identique a GVL_IHM.Modes (Cmd + State) dans le
+          projet reel.
+   Usage :
+     GVL_IHM_AU.Cmd.BtnEmergencyArming   -&gt; ecrit par l'IHM
+     GVL_IHM_AU.State.ContactorOk         -&gt; lu par l'IHM
+   ==============================================================
+    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Modes_Stub">
         <variable name="ModeRequest_IHM">
           <type>
@@ -31950,6 +33493,79 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Simulation_AU">
+        <variable name="SimulationModeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — rien n'est simulé si FALSE</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimChainClosed">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Simulation du matériel AU
+Simule EmergencyChainClosed_DI fermée</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimContactorEngaged">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule retour contacteur puissance</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimPowerCutOffReq">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Simulation coupure métier (remplace OR des 3 safety domaines)
+TRUE = une safety demande la coupure</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>61eb14ae-eaaa-5b16-b69c-4971b27eec0f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 GVL_Simulation_AU — Simulation hardware pour test chaîne AU
+   ───────────────────────────────────────────────────────────────
+   📄 Remplace les signaux physiques réels (DI/Q) pour le test
+      en isolation de FB_Safety_EmergencyManagement.
+   🎯 Pattern identique à GVL_Simulation (projet réel) :
+      domaine SimMachineActive = simulation AU.
+      Polarité : TRUE = simulé, FALSE = réel.
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-13_Fonction_Simulation_v2.0.md</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Translation_M3_Stub">
         <variable name="StubTranslationPositionSelect_IHM">
           <type>
@@ -32137,9 +33753,15 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
           <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
+          <Object Name="FB_Sim_AU_ChainFeedback" ObjectId="d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda" />
+          <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />
+          <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
           <Object Name="PRG_AU_TestBench" ObjectId="02de714f-6617-5e7c-a494-70cf9c90d728" />
           <Object Name="ST_Diag_Emergency" ObjectId="3f15b664-1dd2-593a-af9a-957a294bd1db" />
+          <Object Name="ST_EmergencyCmd" ObjectId="530ff0c1-144b-5832-bee8-f40edd2d06ee" />
           <Object Name="ST_EmergencyManagementCmd" ObjectId="ae2c6921-7efc-58d4-8776-856ce456136e" />
+          <Object Name="ST_EmergencyState" ObjectId="60f821fa-d35a-58c5-ac8a-e1efe1044110" />
+          <Object Name="ST_EmergencyTestContext" ObjectId="d1c5daf9-89a1-5ba5-9455-e8cbda05b60f" />
           <Object Name="ST_State_Emergency" ObjectId="4e2ee04c-1b5f-5e6f-817a-f94c46405f29" />
         </Folder>
         <Folder Name="SIMULATION">
@@ -32166,6 +33788,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
           <Object Name="PRG_10_Outputs_LD" ObjectId="9e8e885a-aad2-5896-9c2a-81e5c482a0f8" />
           <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
+          <Object Name="PRG_ACQUISITION_CFC" ObjectId="5ca2a345-56a2-58c8-9723-1de144dc50a4" />
+          <Object Name="PRG_AU_Acquisition" ObjectId="e301096b-b905-5c3d-96fa-3afcf1106a59" />
+          <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
           <Object Name="PRG_GLOBAL_CFC" ObjectId="10456701-120c-5ffc-8ee2-6df33f2f2a18" />
           <Object Name="PRG_IP" ObjectId="b6ce8979-9803-5bfc-9c19-fc63a6d2716c" />
         </Folder>
