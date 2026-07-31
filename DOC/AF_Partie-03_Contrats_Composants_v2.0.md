@@ -16,10 +16,12 @@
 | ID | Attendu | Preuve | Type | Détail |
 |---|---|---|---|---|
 | TC-P03-001 | Precedence `Enable > SafeStop > StartStop` | SafeStop impose rampe rapide meme si StartStop=TRUE | AUTO | §3 |
-| TC-P03-002 | Reset sur front seulement si cause disparue | appui maintenu sans front n'efface pas | AUTO | §3 |
+| TC-P03-002 | Reset jamais conditionne par un etat externe | front Reset efface l'acquittement meme cause encore presente | AUTO | §3 |
 | TC-P03-003 | Acquittement ne redemarre pas un mouvement | retour READY, nouvel ordre requis | AUTO | §3 |
 | TC-P03-004 | `StartStop`/`SafeStop` absents des briques non-mouvement | joystick, E/S, diag sans ces entrees | AUTO | §2 |
 | TC-P03-005 | Internes FB inaccessibles aux appelants | echanges uniquement via interfaces/DUT publics | AUTO | §1 |
+| TC-P03-006 | Fault re-latche si cause revient apres acquittement | nouveau front Cause remet `Ack=FALSE` | AUTO | §3, `CODE_QUALITY_STANDARDS.md §9` |
+| TC-P03-007 | Warning distinct de Fault | Warning s'efface seul, aucune action Reset requise | AUTO | §3, `CODE_QUALITY_STANDARDS.md §9` |
 
 ---
 
@@ -60,8 +62,12 @@ StartStop       -> acceleration ou deceleration normale
 
 ### Reset et diagnostic
 
-- `Reset` est traite sur front interne.
-- Un defaut est efface seulement si sa cause a disparu et qu'un nouveau front est recu.
+- `Reset` est traite sur front interne, et n'est **jamais conditionne** par un etat externe
+  (cause corrigee au REX 2026-08 AU, ex-regle erronee "efface seulement si la cause a disparu").
+- Deux categories de defaut a distinguer des la conception d'un composant : **Warning** (auto-efface
+  avec la cause, aucun acquittement) et **Fault** (necessite un acquittement explicite, meme si la
+  cause a disparu ; reapparait si la cause revient apres acquittement). Pattern `Cause`/`Ack` et regle
+  complete : `DOC/CODE_QUALITY_STANDARDS.md §9`.
 - L'acquittement ne redemarre jamais un mouvement : une nouvelle demande explicite est requise.
 - `ErrorId` est un bitfield cumulatif. Chaque bit a une cause, un proprietaire et un texte IHM documentes.
 - `Error := (ErrorId <> 0)`.

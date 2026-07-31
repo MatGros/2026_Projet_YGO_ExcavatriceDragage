@@ -37,11 +37,12 @@
 | TC-P01-001 | AU physique | Coupe puissance moteurs, API vivant | contacteur ouvert, PLC OK | SITE | §5.1 |
 | TC-P01-002 | Maintien A/B | Perte A ou B ouvre boucle AU | `PowerKeepAlive_*=FALSE` côté Q | AUTO+SITE | §4 |
 | TC-P01-003 | Réarmement | Front `ArmRequest` seul, chain OK, contacteur ouvert | pulse 1s, pas d'auto-réarmement | AUTO + AUTO_PLC | §5.3 |
-| TC-P01-004 | Latch `ArmingFailed` | `EmergencyArmingFailed` latche ; Reset seul insuffisant si contacteur non engagé | bit/ErrorId | AUTO | §5.3 |
-| TC-P01-005 | Acquittement ≠ réarmement | 2 actions distinctes requises | 2 actions | AUTO+SITE | §5.4 |
+| TC-P01-004 | Fault `ArmingFailed` acquittable sans condition | Reset seul efface l'affichage (front, jamais conditionné par le contacteur) ; interlock securite reste sur la cause brute | bit/ErrorId | AUTO | §5.3, §3.4bis |
+| TC-P01-005 | Acquittement ≠ réarmement | 2 actions distinctes requises ; un nouvel `ArmRequest` relance sans passer par Reset | 2 actions | AUTO+SITE | §5.4 |
 | TC-P01-006 | Auto-test A/B intégré | Un canal ouvert, l'autre maintenu ; chain suit ; échec ⇒ `RedundancyTestFailed` | steps 1–4, 200 ms | **AUTO_PLC** (+ AUTO en sim) | §3.3bis |
 | TC-P01-007 | Lockout 5s | Échec confirm ⇒ lockout 5s | `EmergencyArmingLockoutActive` | AUTO | §5.3 |
 | TC-P01-008 | Coupure sécurité | `PowerCutOffRequest=TRUE` ouvre A et B sans armement | sorties maintien FALSE | AUTO | §3 |
+| TC-P01-009 | Re-latch après acquittement prématuré | Ack sur front Reset alors que cause encore présente → nouvelle occurrence de la cause remet le Fault affiché | `ArmFailedAck` retombe au prochain front Cause | AUTO | §3.4bis |
 
 ---
 
@@ -201,14 +202,38 @@ sans procédure manuelle séparée** :
 
 ### 3.4 Acquittements
 
-| Défaut | Condition d'effacement |
-|---|---|
-| `RedundancyTestFailed` | Front `Reset` (cause disparue côté process = opérateur / câblage) |
-| `EmergencyArmingFailed` | Front `Reset` **et** `PowerContactorEngaged=TRUE` |
+> ⚠️ **REX 2026-08** : la règle initiale ("Reset **et** `PowerContactorEngaged=TRUE`") créait une
+> impasse opérateur — le contacteur ne peut justement pas s'engager tant que le défaut est actif,
+> donc le Reset restait bloqué en boucle. Corrigée par le pattern `Cause`/`Ack`
+> (`DOC/CODE_QUALITY_STANDARDS.md §9`) : le Reset **acquitte toujours**, sans condition.
+
+| Défaut | Catégorie | Condition d'effacement |
+|---|---|---|
+| `RedundancyTestFailed` | Fault | Front `Reset` (toujours effectif) ; re-latch si un nouvel échec d'auto-test survient |
+| `EmergencyArmingFailed` | Fault | Front `Reset` (toujours effectif, **non conditionné** par `PowerContactorEngaged`) ; re-latch si une nouvelle tentative échoue à nouveau |
+
+**Ce qui débloque reellement une tentative echouee** : ce n'est pas le Reset, c'est un nouveau
+front `ArmRequest` (§3.4bis) — le Reset acquitte seulement l'affichage IHM/diag du defaut passé.
 
 **Comportement code retenu** : après expiration du lockout 5 s, un nouvel `ArmRequest` peut
-relancer la séquence même si `EmergencyArmingFailed` est encore latche ; le latch IHM/diag
-reste jusqu'au Reset conditionnel.
+toujours relancer la séquence, que `EmergencyArmingFailed` ait été acquitté ou non —
+l'acquittement n'est jamais une condition de redémarrage (§3.4bis, `CODE_QUALITY_STANDARDS.md §9`).
+
+### 3.4bis Pattern Cause / Ack appliqué à ce composant
+
+Application concrète du pattern général (`CODE_QUALITY_STANDARDS.md §9`) aux deux Fault de ce FB :
+
+- `EmergencyArmingFailedCause` : latch brut de l'échec de confirmation contacteur (positionné à
+  l'étape 6, jamais effacé par Reset — seulement par une nouvelle tentative reussie).
+- `EmergencyArmingFailedAck` : accusé opérateur, mis à `TRUE` sur front `Reset` (toujours), remis
+  à `FALSE` automatiquement au prochain échec (nouveau front de `EmergencyArmingFailedCause`).
+- Affiché/expose en diagnostic (`ErrorId` bit1) : `Cause OR NOT Ack`.
+- L'interlock de sécurité (blocage nouvel armement pendant le lockout 5s) reste basé sur
+  `EmergencyArmingLockoutActive`, jamais sur `Ack` — l'acquittement n'ouvre aucun interlock.
+- Même construction pour `RedundancyTestFailedCause`/`RedundancyTestFailedAck`.
+- Affichage IHM : lissage anti-clignotement optionnel via `TON` court (`CST_FaultDisplayDebounce`,
+  `T#0ms`…`T#500ms`) sur la sortie affichée uniquement — l'action de sécurité (blocage,
+  `SafeStop`, coupure) reste instantanée sur la `Cause` brute, jamais retardée.
 
 ### 3.5 Temporisations nommées
 

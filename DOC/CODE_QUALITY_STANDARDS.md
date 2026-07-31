@@ -174,7 +174,65 @@ une affectation évidente.
 
 ---
 
-## 9. Checklist de restitution (bloquante)
+## 9. Alarmes et défauts — condition vs acquittement (REX 2026-08 AU)
+
+> 🚩 Pattern absent depuis le début du projet, formalisé après incident `EmergencyArmingFailed`
+> (Reset conditionné → blocage opérateur). Basé sur ISA-18.2 (gestion d'alarmes industrielles).
+
+Deux catégories de défaut, **jamais mélangées dans la même variable** :
+
+| Catégorie | Comportement | Exemple |
+|---|---|---|
+| **Info / Warning** | S'affiche et s'efface **seule** avec la cause. Jamais d'acquittement, aucun `Reset` impliqué. | `BypassOperatorComm actif` |
+| **Fault (à acquitter)** | Nécessite un geste opérateur conscient (`Reset`) pour être effacée, **même si la cause a disparu**. Si la cause **revient après acquittement**, l'alarme réapparaît et redemande un acquittement. | `EmergencyArmingFailed`, `SlackCableDetected` |
+
+### Le Reset n'est jamais conditionné
+
+```pascal
+// ❌ Reset conditionné par un état externe — bloque l'acquittement lui-même
+IF ResetEdge.Q THEN
+    IF PowerContactorEngaged THEN
+        EmergencyArmingFailed := FALSE;
+    END_IF;
+END_IF;
+```
+
+```pascal
+// ✅ Pattern Cause / Ack — Reset TOUJOURS effectif, jamais conditionné
+CauseEdge(CLK := EmergencyArmingFailedCause);   // R_TRIG : nouvelle apparition de la cause
+IF CauseEdge.Q THEN
+    EmergencyArmingFailedAck := FALSE;          // nouvelle occurrence -> ack remis à zéro (ré-alarme)
+END_IF;
+IF ResetEdge.Q THEN
+    EmergencyArmingFailedAck := TRUE;           // toujours effectif, sans condition externe
+END_IF;
+
+EmergencyArmingFailed := EmergencyArmingFailedCause OR NOT EmergencyArmingFailedAck;
+```
+
+- `<Nom>Cause` = condition brute (l'événement ou la mesure qui a déclenché).
+- `<Nom>Ack` = accusé de réception opérateur, remis à `FALSE` automatiquement au prochain front de cause.
+- Un interlock de sécurité (ex : interdiction de redémarrage) se base **toujours sur la cause brute**,
+  jamais sur l'état d'acquittement — l'acquittement n'ouvre jamais un interlock de sécurité par lui-même.
+
+### Temporisation d'affichage IHM (anti-clignotement, pas de délai sur l'action)
+
+L'**action de sécurité** reste instantanée (coupure, interdiction de mouvement...). Seul
+**l'affichage IHM** de la cause peut être retardé par un `TON` court (typiquement `T#0ms` à `T#500ms`,
+valeur en `VAR CONSTANT` documentée) pour éviter qu'un opérateur qui acquitte pendant que la
+cause est encore présente voie l'alarme reclignoter immédiatement — le délai laisse le temps de
+constater visuellement que le problème revient plutôt qu'un affichage figé permanent.
+
+```pascal
+// Action de sécurité : instantanée sur la cause brute, jamais retardée
+SafeStopRequest := EmergencyArmingFailedCause OR ...;
+
+// Affichage IHM uniquement : lissage anti-clignotement
+TonDisplayDebounce(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
+EmergencyArmingFailedDisplayed := TonDisplayDebounce.Q OR NOT EmergencyArmingFailedAck;
+```
+
+## 10. Checklist de restitution (bloquante)
 
 ```text
 [ ] check_linkage.py --report = PASS, bloc collé dans la restitution
@@ -185,6 +243,7 @@ une affectation évidente.
 [ ] Producteur unique par donnée ; aucune GVL de commande cachée
 [ ] Contrat FB respecté (AF_Partie-03)
 [ ] Non-régression : appelants/IHM/diagnostics identifiés et mis à jour
+[ ] Défaut à acquitter : Reset jamais conditionné (§9) ; Warning auto-effaçable distingué du Fault
 [ ] Devoir d'alerte : toute ambiguïté signalée AVANT d'écrire, pas après
 ```
 
