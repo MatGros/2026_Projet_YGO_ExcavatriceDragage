@@ -38,7 +38,7 @@ package "2. COMMANDES OPERATEUR IHM" #F3E5F5 {
   database IHM_CMD #E1BEE7 [
     GVL_IHM_AU.Cmd
     --
-    ST_EmergencyCmd
+    ST_Safety_Emergency_HmiCmd
     * BtnEmergencyArming
     * BtnEmergencyCutOff
     * BtnFaultReset
@@ -70,7 +70,7 @@ package "3. COEURS ET COMPOSITE SAFETY" #FFCDD2 {
 
 package "4. STRUCTURES ET BUS INTER-BLOCS (DUT)" #ECEFF1 {
   rectangle DUT_INT #CFD8DC [
-    ST_EmergencyManagementCmd
+    ST_Safety_Emergency_InternalCmd
     --
     DUT prive Logic -> Output
     * MaintainA_Cmd : BOOL
@@ -78,14 +78,14 @@ package "4. STRUCTURES ET BUS INTER-BLOCS (DUT)" #ECEFF1 {
     * ArmPulse_Cmd : BOOL
   ]
   rectangle DUT_STATE #CFD8DC [
-    ST_State_Emergency
+    ST_Safety_Emergency_State
     --
     Bus Etat public
     * ChainOk / ContactorOk
     * Step (0..6) / Armable / ArmingBusy
   ]
   rectangle DUT_DIAG #CFD8DC [
-    ST_Diag_Emergency
+    ST_Safety_Emergency_Diag
     --
     Bus Diagnostic public
     * Error / ErrorId
@@ -104,7 +104,7 @@ package "5. SORTIES PHYSIQUES ET VISU IHM" #E8F5E9 {
   database IHM_STATE #D1C4E9 [
     GVL_IHM_AU.State
     --
-    ST_EmergencyState
+    ST_Safety_Emergency_HmiState
     * ChainOk / ContactorOk / Armable
     * ArmingBusy / Step / ErrorId
     * RedundancyTestFailed / ArmingFailed
@@ -118,15 +118,15 @@ package "5. SORTIES PHYSIQUES ET VISU IHM" #E8F5E9 {
   ]
 }
 
-IHM_CMD --> COMP : ST_EmergencyCmd
+IHM_CMD --> COMP : ST_Safety_Emergency_HmiCmd
 ACQ --> COMP : DI qualifiees (EmergencyChainClosed, PowerContactorEngaged)
 
 COMP --> LOGIC : Entrees qualifiees
 LOGIC --> DUT_INT : MaintainA_Cmd, MaintainB_Cmd, ArmPulse_Cmd
-DUT_INT --> OUT_FB : ST_EmergencyManagementCmd
+DUT_INT --> OUT_FB : ST_Safety_Emergency_InternalCmd
 
-OUT_FB --> DUT_STATE : State (ST_State_Emergency)
-OUT_FB --> DUT_DIAG : Diag (ST_Diag_Emergency)
+OUT_FB --> DUT_STATE : State (ST_Safety_Emergency_State)
+OUT_FB --> DUT_DIAG : Diag (ST_Safety_Emergency_Diag)
 
 COMP --> OUT_PRG : Maintain_RQ, State, Diag
 
@@ -136,7 +136,7 @@ OUT_PRG --> IHM_STATE : GVL_IHM_AU.State
 legend bottom
   |= Couleur |= Role dans l'architecture CFC |
   |<#E3F2FD>| Acquisition DI physiques ou simulees |
-  |<#F3E5F5>| Commandes operateur IHM (ST_EmergencyCmd) |
+  |<#F3E5F5>| Commandes operateur IHM (ST_Safety_Emergency_HmiCmd) |
   |<#FFCDD2>| Coeur de securite FB (Facade composite parent, Logic avec VAR CONSTANT) |
   |<#ECEFF1>| Structures d'echange et Bus inter-blocs (DUT) |
   |<#E8F5E9>| Sorties physiques terminales (Q) et Retours visu IHM |

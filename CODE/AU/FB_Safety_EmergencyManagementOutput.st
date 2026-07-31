@@ -3,18 +3,18 @@
    ───────────────────────────────────────────────────────────────
    📄 Rôle : Transmet les ordres de sécurité logiques vers les
       sorties physiques ET produit les bus d'état et diagnostic
-      publics (ST_State_Emergency / ST_Diag_Emergency).
+      publics (ST_Safety_Emergency_State / ST_Safety_Emergency_Diag).
    🧩 Instance privée du composite FB_Safety_EmergencyManagement
       — jamais appelée hors du composite.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput
 VAR_INPUT
     Enable              : BOOL;                // Active le pilote (FALSE = toutes sorties à FALSE)
-    Cmd                 : ST_EmergencyManagementCmd; // Ordres logiques reçus du bloc logique
+    Cmd                 : ST_Safety_Emergency_InternalCmd; // Ordres logiques reçus du bloc logique
     ChainOk             : BOOL;                // Miroir EmergencyChainClosed (pour bus State)
     ContactorOk         : BOOL;                // Miroir PowerContactorEngaged (pour bus State)
     ArmingStep          : INT;                 // Miroir ArmingSeqStep (pour bus State)
@@ -33,8 +33,8 @@ VAR_OUTPUT
     ArmPulse_RQ         : BOOL; // Vers contacteur impulsion réarmement — TRUE = pulse actif
 
     // 🚦 Bus d'état public
-    State               : ST_State_Emergency;
-    Diag                : ST_Diag_Emergency;
+    State               : ST_Safety_Emergency_State;
+    Diag                : ST_Safety_Emergency_Diag;
 END_VAR
 
 // === IMPLEMENTATION ===

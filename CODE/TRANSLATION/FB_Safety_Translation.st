@@ -16,7 +16,7 @@ VAR_INPUT
     JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
     JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
     HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
-    PhaseRotationOk     : BOOL;        // PRG_01_INPUTS_LD.PhaseRotationOk (TRUE = OK)
+    PhaseRotationOk     : BOOL;        // PRG_INPUTS_LD.PhaseRotationOk (TRUE = OK)
     BrakeThermalFeedback: BOOL;        // Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)
 
     // 🔌 Spécifique EtherCAT & Capteurs réels

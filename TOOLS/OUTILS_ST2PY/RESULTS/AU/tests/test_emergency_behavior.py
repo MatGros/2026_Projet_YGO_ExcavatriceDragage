@@ -16,7 +16,7 @@ import fb_gen
 from test_tracer import ExecutionTracer
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[5]
-BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_AU_Bundle.xml'
+BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
 
 
 def _load_generated_emergency_module():

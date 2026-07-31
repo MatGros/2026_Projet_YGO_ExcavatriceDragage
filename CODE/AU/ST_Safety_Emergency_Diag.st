@@ -1,15 +1,15 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ ST_Diag_Emergency — Diagnostic et erreurs de la chaîne AU
+   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
    📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
       Consommé par PRG_09_Supervision et GVL_Troubleshooting.
    🎯 Champs lecture seule — producteur unique = FB composite.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+              DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
-TYPE ST_Diag_Emergency :
+TYPE ST_Safety_Emergency_Diag :
 STRUCT
     Error                    : BOOL;   // 🔴 Synthèse : (ErrorId <> 0)
     ErrorId                  : WORD;   // ❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)

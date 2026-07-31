@@ -31,7 +31,7 @@ instSafetyWinchM1(
     // sur un composant RÉEL protège, un composant SIMULÉ ne fait jamais défaut de lui-même).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM1, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
@@ -39,11 +39,11 @@ instSafetyWinchM1(
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable,
     EncoderFaultBypass  := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
-    ThermalFeedback     := NOT PRG_01_INPUTS_LD.M1ThermalFeedback,
-    BrakeThermalFeedback := NOT PRG_01_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
-    SlackCableDetected  := NOT PRG_01_INPUTS_LD.SlackCableSwitch,
-    PhaseRotationOk     := PRG_01_INPUTS_LD.PhaseRotationOk,
-    TopPositionSensor   := PRG_01_INPUTS_LD.TopPositionSensor,
+    ThermalFeedback     := NOT PRG_INPUTS_LD.M1ThermalFeedback,
+    BrakeThermalFeedback := NOT PRG_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
+    SlackCableDetected  := NOT PRG_INPUTS_LD.SlackCableSwitch,
+    PhaseRotationOk     := PRG_INPUTS_LD.PhaseRotationOk,
+    TopPositionSensor   := PRG_INPUTS_LD.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM1.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
@@ -53,8 +53,8 @@ instSafetyWinchM1(
     HomingSuspect       := PRG_02_Encoders.instHomingM1.HomingSuspect,
     TopLimitM           := _WinchM1CfgPersist.CfgTopSensorPos_M,
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir FB_Safety_Winch bandeau en-tête)
-    FwdRevSpeedFeedbackOff := PRG_01_INPUTS_LD.M1FwdRevSpeedFeedbackOff,
-    BrakeFeedback          := PRG_01_INPUTS_LD.M1BrakeFeedback,
+    FwdRevSpeedFeedbackOff := PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff,
+    BrakeFeedback          := PRG_INPUTS_LD.M1BrakeFeedback,
     // 🔧 REX 2026-07-19 : suppression IHM_MANU — le joystick est désormais la SEULE source de
     // mouvement manuel (plus de boutons HMI bruts en parallèle) : le check bouton ajouté en
     // 2026-07-15 (7) pour compenser ce 2ᵉ chemin de commande est devenu sans objet, retiré.
@@ -92,7 +92,7 @@ instSafetyWinchM2(
     // 🔧 REX 2026-07-15 (2) — même simplification que M1 ci-dessus (voir bandeau instSafetyWinchM1).
     Enable              := NOT PRG_04_Modes.instModes.InhibitM2, // 🆕 REX 2026-07-08 : Inhibit (MAINT_N2) uniquement
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     SyncEnable          := PRG_04_Modes.instModes.SyncEnable,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
@@ -100,11 +100,11 @@ instSafetyWinchM2(
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     EncoderAvailable    := PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable,
     EncoderFaultBypass  := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
-    ThermalFeedback     := NOT PRG_01_INPUTS_LD.M2ThermalFeedback,
-    BrakeThermalFeedback := NOT PRG_01_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
-    SlackCableDetected  := NOT PRG_01_INPUTS_LD.SlackCableSwitch,
-    PhaseRotationOk     := PRG_01_INPUTS_LD.PhaseRotationOk,
-    TopPositionSensor   := PRG_01_INPUTS_LD.TopPositionSensor,
+    ThermalFeedback     := NOT PRG_INPUTS_LD.M2ThermalFeedback,
+    BrakeThermalFeedback := NOT PRG_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
+    SlackCableDetected  := NOT PRG_INPUTS_LD.SlackCableSwitch,
+    PhaseRotationOk     := PRG_INPUTS_LD.PhaseRotationOk,
+    TopPositionSensor   := PRG_INPUTS_LD.TopPositionSensor,
     InReferencingMode   := PRG_02_Encoders.instHomingM2.Busy,
     CablePosM           := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
@@ -115,8 +115,8 @@ instSafetyWinchM2(
     TopLimitM           := _WinchM2CfgPersist.CfgTopSensorPos_M,
     // 🔧 REX 2026-07-07 — Méca A/B (voir FB_Safety_Winch bandeau en-tête) — Méca C NON applicable
     // à M2 (c'est M2 qui bouge pendant le benne, BenneHoldStillActive reste FALSE)
-    FwdRevSpeedFeedbackOff := PRG_01_INPUTS_LD.M2FwdRevSpeedFeedbackOff,
-    BrakeFeedback          := PRG_01_INPUTS_LD.M2BrakeFeedback,
+    FwdRevSpeedFeedbackOff := PRG_INPUTS_LD.M2FwdRevSpeedFeedbackOff,
+    BrakeFeedback          := PRG_INPUTS_LD.M2BrakeFeedback,
     // 🔧 REX 2026-07-19 : idem M1 (voir bandeau instSafetyWinchM1 ci-dessus) — suppression IHM_MANU.
     JoystickYNeutral       := (ABS(PRG_01_Diagnostics.instJoystick.AxisCmdY.SpeedRef) < 0.1),
     BenneHoldStillActive := FALSE,
@@ -150,7 +150,7 @@ instSafetyWinchM2(
 instSpeedMonitorM1(
     Enable                     := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged            := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged            := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                       := PRG_04_Modes.instModes.Mode,
     SpeedMps                   := PRG_02_Encoders.M1MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
@@ -160,7 +160,7 @@ instSpeedMonitorM1(
 instSpeedMonitorM2(
     Enable                     := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset                      := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged            := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged            := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                       := PRG_04_Modes.instModes.Mode,
     SpeedMps                   := PRG_02_Encoders.M2MeasuredSpeed_Mps,
     SpeedVariationThresholdMps := 0.0,
@@ -172,7 +172,7 @@ instSpeedMonitorM2(
 instLoadEstimatorM1(
     Enable           := NOT PRG_04_Modes.instModes.InhibitM1 AND PRG_02_Encoders.M1SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged  := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged  := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM1.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M1MeasuredSpeed_Mps,
@@ -183,7 +183,7 @@ instLoadEstimatorM1(
 instLoadEstimatorM2(
     Enable           := NOT PRG_04_Modes.instModes.InhibitM2 AND PRG_02_Encoders.M2SpeedValid,
     Reset            := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged  := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged  := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode             := PRG_04_Modes.instModes.Mode,
     ActiveSpeedStep       := PRG_06_WinchControl.instWinchM2.StepNumber,
     MeasuredSpeedMps      := PRG_02_Encoders.M2MeasuredSpeed_Mps,
@@ -201,25 +201,25 @@ instSafetyTranslationM3(
     // InhibitM1/M2) : Enable inconditionnel, comme en Auto.
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     JoystickOnline      := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
-    PhaseRotationOk     := PRG_01_INPUTS_LD.PhaseRotationOk,
-    BrakeThermalFeedback := NOT PRG_01_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
+    PhaseRotationOk     := PRG_INPUTS_LD.PhaseRotationOk,
+    BrakeThermalFeedback := NOT PRG_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Online,
     DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Operational,
-    DriveStatusWord     := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered,
-    DriveActualFreqHz   := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
-    BrakeFeedback       := PRG_01_INPUTS_LD.M3BrakeFeedback,
+    DriveStatusWord     := PRG_ACQUISITION_CFC.M3_StatusWord_Filtered,
+    DriveActualFreqHz   := UINT_TO_REAL(PRG_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
+    BrakeFeedback       := PRG_INPUTS_LD.M3BrakeFeedback,
     BrakeCmd            := GVL_Global.instTranslationOutputInterlock_LD.BrakeCmd,
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
     // 🆕 REX 2026-07-18 : limites extrêmes dérivées du décodage 5 capteurs (mot valide), plus
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
-    LimitSwitchFwd      := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd,
-    LimitSwitchRev      := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev,
-    SensorWordIncoherent := PRG_00_ACQUISITION_CFC.instPosDecoderM3.Incoherent,
+    LimitSwitchFwd      := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd,
+    LimitSwitchRev      := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev,
+    SensorWordIncoherent := PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent,
     // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass - pilotés IHM)
     BypassGlobal          := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.OperatorComm,

@@ -176,15 +176,15 @@ def test_cfc_extract_missing_file_exits_1(tmp_path):
 
 
 def test_st_to_dut_produces_valid_datatype_struct():
-    st_file = CODE_DIR / "AU" / "ST_EmergencyState.st"
+    st_file = CODE_DIR / "AU" / "ST_Safety_Emergency_HmiState.st"
     if not st_file.exists():
-        pytest.skip("ST_EmergencyState.st not available")
+        pytest.skip("ST_Safety_Emergency_HmiState.st not available")
     diag = DiagnosticCollector()
     data = build_dut_xml(st_file, diag)
     root = _parse_strip_ns(data)
 
     assert root.tag == "dataType"
-    assert root.get("name") == "ST_EmergencyState"
+    assert root.get("name") == "ST_Safety_Emergency_HmiState"
     struct = root.find("baseType/struct")
     assert struct is not None
 
@@ -382,8 +382,8 @@ def test_cfc_extract_multi_file_produces_valid_project():
 
 def test_st_to_dut_multi_file_produces_valid_project():
     """st_to_dut.py with 2 files → <project> with 2 <dataType>."""
-    f1 = CODE_DIR / "AU" / "ST_State_Emergency.st"
-    f2 = CODE_DIR / "AU" / "ST_Diag_Emergency.st"
+    f1 = CODE_DIR / "AU" / "ST_Safety_Emergency_State.st"
+    f2 = CODE_DIR / "AU" / "ST_Safety_Emergency_Diag.st"
     if not f1.exists() or not f2.exists():
         pytest.skip("DUT test files not available")
     diag = DiagnosticCollector()
@@ -392,8 +392,8 @@ def test_st_to_dut_multi_file_produces_valid_project():
     dts = root.findall(".//dataType")
     assert len(dts) == 2
     dt_names = {dt.get("name") for dt in dts}
-    assert "ST_State_Emergency" in dt_names
-    assert "ST_Diag_Emergency" in dt_names
+    assert "ST_Safety_Emergency_State" in dt_names
+    assert "ST_Safety_Emergency_Diag" in dt_names
 
 
 def test_st_to_ld_multi_file_main_exits_0(tmp_path):

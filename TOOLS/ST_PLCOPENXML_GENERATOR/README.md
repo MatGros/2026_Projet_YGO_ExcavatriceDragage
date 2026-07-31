@@ -87,7 +87,7 @@ de `generator/` (pas de réécriture) et produit un artefact PLCopenXML focalis�
 | `scripts/st_to_ld.py` | Convertit un fichier `PRG_*_LD.st` en un `<pou>` en `<LD>` | `python scripts/st_to_ld.py CODE/MAIN/PRG_AU_Outputs_LD.st -o output.xml` |
 | `scripts/st_to_pou.py` | Convertit un fichier `.st` (FB ou PROGRAM) en un `<pou>` en `<ST>` | `python scripts/st_to_pou.py CODE/AU/FB_Safety_EmergencyManagement.st -o output.xml` |
 | `scripts/cfc_extract.py` | Extrait un `<pou>` CFC d'un XML natif (nettoyage namespaces, alignement ObjectIds) | `python scripts/cfc_extract.py CODE/MAIN/PRG_AU_Acquisition_CFC.xml -o output.xml` |
-| `scripts/st_to_dut.py` | Convertit un fichier `.st` (STRUCT ou ENUM) en un `<dataType>` | `python scripts/st_to_dut.py CODE/AU/ST_EmergencyState.st -o output.xml` |
+| `scripts/st_to_dut.py` | Convertit un fichier `.st` (STRUCT ou ENUM) en un `<dataType>` | `python scripts/st_to_dut.py CODE/SUPERVISION/ST_Safety_Emergency_HmiState.st -o output.xml` |
 | `scripts/build_bundle.py` | Orchestre un bundle `<project>` complet depuis fichiers/dossiers | `python scripts/build_bundle.py CODE/AU/ CODE/MAIN/PRG_AU_Outputs_LD.st -o bundle.xml` |
 
 ### Exemples

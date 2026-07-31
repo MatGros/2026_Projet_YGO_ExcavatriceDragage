@@ -9,8 +9,8 @@ all the dataTypes assembled together (with ``<ProjectStructure>``, ObjectIds
 aligned, and inter-object dependencies resolved).
 
 Usage:
-    python scripts/st_to_dut.py CODE/AU/ST_EmergencyState.st -o output.xml
-    python scripts/st_to_dut.py CODE/CYCLE/E_CycleStep.st CODE/AU/ST_EmergencyState.st -o bundle.xml
+    python scripts/st_to_dut.py CODE/AU/ST_Safety_Emergency_HmiState.st -o output.xml
+    python scripts/st_to_dut.py CODE/CYCLE/E_CycleStep.st CODE/AU/ST_Safety_Emergency_HmiState.st -o bundle.xml
 """
 from __future__ import annotations
 

@@ -69,12 +69,13 @@ def test_real_code_dir_dynamic_count_relationship():
     """CODE/ isn't a fixed number we hardcode here: recompute it from disk so
     this stays meaningful as files are added/removed."""
     all_st_files = sorted(CODE_DIR.rglob("*.st"))
+    all_native_xml = [f for f in CODE_DIR.rglob("*.xml") if f.name != "CODE_Bundle.xml"]
     decl_impl_files = [f for f in all_st_files if f.name.endswith("_Decl.st") or f.name.endswith("_Impl.st")]
 
     diag = DiagnosticCollector()
     objects = discover_objects(CODE_DIR, diag)
 
-    assert len(objects) == len(all_st_files) - len(decl_impl_files)
+    assert len(objects) == len(all_st_files) + len(all_native_xml) - len(decl_impl_files)
     assert not diag.has_errors()
 
 

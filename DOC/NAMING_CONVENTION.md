@@ -11,11 +11,31 @@
 ## Préfixes structurels (classification, non typage)
 | Préfixe | Usage | Exemple |
 |---------|-------|---------|
-| `ST_` | Struct de données | `ST_AxisCmd`, `ST_WinchIO` |
+| `ST_` | Struct de données | `ST_Safety_Emergency_State`, `ST_Winch_State` |
 | `E_` | Enum / énumération | `E_Mode`, `E_State`, `E_CycleStep` |
 | `FB_` | Function Block (type) | `FB_Joystick`, `FB_Winch` |
 | `inst` | Instance d'un FB (variable) | `instJoystick`, `instWinchM1`, `instModes` |
 | `PRG_` | Programme (POU principal) | `PRG_ACQUISITION_CFC`, `PRG_OUTPUTS_LD` |
+
+### Structures de données (DUT) — Convention hiérarchique
+
+```text
+ST_<Domaine>_[<SousDomaine>_]<Rôle>
+```
+
+Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fenêtres Watch :
+- **Préfixe** : `ST_` (séparé par `_`)
+- **Domaine** : `Safety`, `Winch`, `Translation`, `Encoder`, `Modes`, `Cycle`, `Commun` (séparé par `_`)
+- **SousDomaine** (optionnel) : `Emergency`, `M1`, `M2`, `M3`, `Bucket` (séparé par `_`)
+- **Rôle** : `Cmd`, `State`, `Diag`, `HmiCmd`, `HmiState`, `InternalCmd`, `TestContext`
+
+**Exemples conformes :**
+- `ST_Safety_Emergency_State` (État public arrêt d'urgence)
+- `ST_Safety_Emergency_Diag` (Diagnostic arrêt d'urgence)
+- `ST_Safety_Emergency_InternalCmd` (Commande interne Logic → Output)
+- `ST_Safety_Emergency_HmiCmd` (Commandes IHM)
+- `ST_Safety_Emergency_HmiState` (Retours état IHM)
+- `ST_Safety_Emergency_TestContext` (Stimuli de test)
 
 ### Programmes (POU principaux) — architecture cible
 

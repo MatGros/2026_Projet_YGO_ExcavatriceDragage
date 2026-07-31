@@ -80,13 +80,13 @@ skinparam classHeaderBackgroundColor #E1BEE7
 title Architecture, Composition & DUT — FB_Safety_EmergencyManagement (Domaine AU)
 
 package "Données Structurées (DUT)" #F5F5F5 {
-    class ST_EmergencyManagementCmd << (S,#1976D2) STRUCT >> {
+    class ST_Safety_Emergency_InternalCmd << (S,#1976D2) STRUCT >> {
         + MaintainA_Cmd : BOOL
         + MaintainB_Cmd : BOOL
         + ArmPulse_Cmd : BOOL
     }
 
-    class ST_State_Emergency << (S,#2E7D32) STRUCT >> {
+    class ST_Safety_Emergency_State << (S,#2E7D32) STRUCT >> {
         + ChainOk : BOOL
         + ContactorOk : BOOL
         + Step : INT
@@ -94,7 +94,7 @@ package "Données Structurées (DUT)" #F5F5F5 {
         + ArmingBusy : BOOL
     }
 
-    class ST_Diag_Emergency << (S,#C62828) STRUCT >> {
+    class ST_Safety_Emergency_Diag << (S,#C62828) STRUCT >> {
         + Error : BOOL
         + ErrorId : WORD
         + RedundancyTestFailed : BOOL
@@ -122,8 +122,8 @@ package "Bloc Composite AU (CODE/AU)" #FAFAFA {
         + MaintainA_RQ : BOOL
         + MaintainB_RQ : BOOL
         + ArmPulse_RQ : BOOL
-        + State : ST_State_Emergency
-        + Diag : ST_Diag_Emergency
+        + State : ST_Safety_Emergency_State
+        + Diag : ST_Safety_Emergency_Diag
     }
 
     class FB_Safety_EmergencyManagementLogic << (C,#D81B60) Décision & FSM >> {
@@ -135,7 +135,7 @@ package "Bloc Composite AU (CODE/AU)" #FAFAFA {
         + PowerCutOffRequest : BOOL
         + BtnEmergencyCutOff : BOOL
         --
-        + Cmd : ST_EmergencyManagementCmd
+        + Cmd : ST_Safety_Emergency_InternalCmd
         + ArmingSeqStep : INT
         + RedundancyTestFailed : BOOL
         + EmergencyArmingFailed : BOOL
@@ -147,7 +147,7 @@ package "Bloc Composite AU (CODE/AU)" #FAFAFA {
 
     class FB_Safety_EmergencyManagementOutput << (C,#00897B) Pilote Physique >> {
         + Enable : BOOL
-        + Cmd : ST_EmergencyManagementCmd
+        + Cmd : ST_Safety_Emergency_InternalCmd
         + ChainOk : BOOL
         + ContactorOk : BOOL
         + ArmingStep : INT
@@ -159,8 +159,8 @@ package "Bloc Composite AU (CODE/AU)" #FAFAFA {
         + MaintainA_RQ : BOOL
         + MaintainB_RQ : BOOL
         + ArmPulse_RQ : BOOL
-        + State : ST_State_Emergency
-        + Diag : ST_Diag_Emergency
+        + State : ST_Safety_Emergency_State
+        + Diag : ST_Safety_Emergency_Diag
     }
 }
 
@@ -174,10 +174,10 @@ package "Écosystème & Interconnexions AU" #F0F4C3 {
 FB_Safety_EmergencyManagement *-- FB_Safety_EmergencyManagementLogic : "Logic (Instance Privée)"
 FB_Safety_EmergencyManagement *-- FB_Safety_EmergencyManagementOutput : "Output (Instance Privée)"
 
-FB_Safety_EmergencyManagementLogic --> ST_EmergencyManagementCmd : "produit Cmd"
-FB_Safety_EmergencyManagementOutput --> ST_EmergencyManagementCmd : "consomme Cmd"
-FB_Safety_EmergencyManagementOutput --> ST_State_Emergency : "produit State"
-FB_Safety_EmergencyManagementOutput --> ST_Diag_Emergency : "produit Diag"
+FB_Safety_EmergencyManagementLogic --> ST_Safety_Emergency_InternalCmd : "produit Cmd"
+FB_Safety_EmergencyManagementOutput --> ST_Safety_Emergency_InternalCmd : "consomme Cmd"
+FB_Safety_EmergencyManagementOutput --> ST_Safety_Emergency_State : "produit State"
+FB_Safety_EmergencyManagementOutput --> ST_Safety_Emergency_Diag : "produit Diag"
 
 PRG_AU_Acquisition_CFC --> FB_Safety_EmergencyManagement : "EmergencyChainClosed, PowerContactorEngaged"
 FB_Safety_EmergencyManagement --> PRG_AU_Outputs_LD : "MaintainA/B_RQ, ArmPulse_RQ, scalaires"
