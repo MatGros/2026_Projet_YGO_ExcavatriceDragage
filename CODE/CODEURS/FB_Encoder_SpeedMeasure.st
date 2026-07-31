@@ -37,7 +37,7 @@ END_VAR
 // ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
 CurrentTimestamp := TIME();
 
-// 🧹 Toute rupture de confiance purge les six positions : aucune ancienne source ne peut contaminer la mesure.
+// Purge des six positions sur rupture de confiance : aucune source antérieure ne peut contaminer la mesure.
 IF NOT Enable OR Reset OR NOT PositionValid THEN
     Speed_Mps := 0.0;
     SignedSpeed_Mps := 0.0;
