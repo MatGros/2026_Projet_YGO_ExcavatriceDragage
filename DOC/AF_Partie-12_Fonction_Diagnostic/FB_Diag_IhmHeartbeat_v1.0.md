@@ -34,4 +34,4 @@ et expose un diagnostic de communication opérateur. Ne produit ni SafeStop ni P
 
 ## 📄 Docs liées
 
-- `AF_Partie-15` §4 (flux) · `AF_Partie-07` (Interface IHM) · `AF_Partie-10/AF_Partie-12` (Safety consommateurs)
+- `AF_Partie-11` §4 (flux) · `AF_Partie-07` (Interface IHM) · `AF_Partie-10/AF_Partie-11` (Safety consommateurs)

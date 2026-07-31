@@ -52,4 +52,4 @@ Aucune écriture de commande, sécurité ou mouvement. Observateur pur.
 
 ## 📄 Docs liées
 
-- `AF_Partie-15` §4 (flux) · `AF_Partie-14` (Troubleshooting) · `AF_Partie-10` (Winch)
+- `AF_Partie-11` §4 (flux) · `AF_Partie-14` (Troubleshooting) · `AF_Partie-10` (Winch)

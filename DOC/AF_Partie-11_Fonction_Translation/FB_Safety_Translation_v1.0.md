@@ -1,8 +1,8 @@
 # FB_Safety_Translation — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-12_Fonction_Translation_v2.0.md`](../AF_Partie-12_Fonction_Translation_v2.0.md) §3.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.0.md`](../AF_Partie-11_Fonction_Translation_v2.0.md) §3.
 > Rôle de **ce** document : safety métier M3 (8 bits ErrorId), Méca A/B, masques —
-> et **catalogue unique** des `TC-P12-002` à `TC-P12-011`, `TC-P12-014`.
+> et **catalogue unique** des `TC-P11-002` à `TC-P11-011`, `TC-P11-014`.
 > Source code : `CODE/TRANSLATION/FB_Safety_Translation.st` · instance `Safety.instSafetyTranslationM3`.
 
 ## 🧭 Sommaire
@@ -16,14 +16,14 @@
 7. Alertes et écarts
 8. Documents liés
 
-## 🧪 Points de validation (`TC-P12-002` à `011`, `014` — propriétaire unique)
+## 🧪 Points de validation (`TC-P11-002` à `011`, `014` — propriétaire unique)
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-002 | Mot incohérent ➔ Bit7 ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
-| TC-P12-010 | Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
-| TC-P12-011 | Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
-| TC-P12-014 | `BypassGlobal` efface `ErrorId`, coupe TONs, Reset fonctionnel | `⚡ AUTO_PLC` |
+| TC-P11-002 | Mot incohérent ➔ Bit7 ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P11-010 | Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P11-011 | Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| TC-P11-014 | `BypassGlobal` efface `ErrorId`, coupe TONs, Reset fonctionnel | `⚡ AUTO_PLC` |
 
 ---
 
@@ -126,8 +126,8 @@ le **capteur amont** pour un test banc.
 
 | Doc | Lien |
 |---|---|
-| AF12 (chapô) | Rôle machine, intégration programme |
+| AF11 (chapô) | Rôle machine, intégration programme |
 | AF01 | AU/PowerCutOff — chaîne électrique |
 | AF03 | Profil FB safety domaine |
-| AF12 / FB_Translation_PositionDecoder | Fournit `Incoherent`, `LimitSwitchFwd/Rev` |
+| AF11 / FB_Translation_PositionDecoder | Fournit `Incoherent`, `LimitSwitchFwd/Rev` |
 | Code | `CODE/TRANSLATION/FB_Safety_Translation.st` |

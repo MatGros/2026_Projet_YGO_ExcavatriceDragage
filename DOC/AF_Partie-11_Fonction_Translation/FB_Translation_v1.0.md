@@ -1,8 +1,8 @@
 # FB_Translation — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-12_Fonction_Translation_v2.0.md`](../AF_Partie-12_Fonction_Translation_v2.0.md) §4.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.0.md`](../AF_Partie-11_Fonction_Translation_v2.0.md) §4.
 > Rôle de **ce** document : mouvement M3 (rampe, arbitrage, mot AC600, ralentissement PV,
-> arrêt sur capteur, frein) — et **catalogue unique** des `TC-P12-003` à `TC-P12-005`, `TC-P12-013`.
+> arrêt sur capteur, frein) — et **catalogue unique** des `TC-P11-003` à `TC-P11-005`, `TC-P11-013`.
 > Compose `FB_Brake` (réutilisé depuis COMMUN) + `FB_Ramp` (continu %/s — contrairement aux treuils à paliers discrets).
 > Source code : `CODE/TRANSLATION/FB_Translation.st` · instance `Translation.instTranslationM3`.
 
@@ -20,14 +20,14 @@
 10. Alertes et écarts
 11. Documents liés
 
-## 🧪 Points de validation (`TC-P12-003/004/005/013` — propriétaire unique)
+## 🧪 Points de validation (`TC-P11-003/004/005/013` — propriétaire unique)
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-003 | `Enable=FALSE` coupe tout indépendamment de `SafeStop`/`StartStop` | `⚡ AUTO_PLC` |
-| TC-P12-004 | Ralentissement PV actif si `Direction=1` (Trémie) ET `SlowdownSensor` | `⚡ AUTO_PLC` |
-| TC-P12-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | `⚡ AUTO_PLC` |
-| TC-P12-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` | `⚡ AUTO_PLC` |
+| TC-P11-003 | `Enable=FALSE` coupe tout indépendamment de `SafeStop`/`StartStop` | `⚡ AUTO_PLC` |
+| TC-P11-004 | Ralentissement PV actif si `Direction=1` (Trémie) ET `SlowdownSensor` | `⚡ AUTO_PLC` |
+| TC-P11-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | `⚡ AUTO_PLC` |
+| TC-P11-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` | `⚡ AUTO_PLC` |
 
 ---
 
@@ -166,9 +166,9 @@ _TranslationSetFreq_Hz=0.0
 
 | Doc | Lien |
 |---|---|
-| AF12 (chapô) | Rôle machine, intégration programme |
-| AF12 / FB_Safety_Translation | `SafeStop` consommé |
-| AF12 / FB_TranslationOutputInterlock_LD | Consommateur de la demande produite ici |
-| AF12 / FB_Translation_PositionDecoder | Fournit butées extrêmes |
+| AF11 (chapô) | Rôle machine, intégration programme |
+| AF11 / FB_Safety_Translation | `SafeStop` consommé |
+| AF11 / FB_TranslationOutputInterlock_LD | Consommateur de la demande produite ici |
+| AF11 / FB_Translation_PositionDecoder | Fournit butées extrêmes |
 | AF03 | Contrat FB mouvement |
 | Code | `CODE/TRANSLATION/FB_Translation.st` |

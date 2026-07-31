@@ -48,13 +48,13 @@ package "3. <img:open-iconic/cogs>\nFONCTIONS MÉTIER ACTIONNEURS" as PKG3 #E8F5
   rectangle "<img:open-iconic/graph>\nAF_Partie-10\nCodeurs EtherCAT\n---\n• FB_Encoder_Abs (4ms)\n• COD1 / COD2" as AF10 #C8E6C9
   rectangle "<img:open-iconic/cog>\nAF_Partie-09\nTreuils M1/M2\n---\n• FB_Winch & Sync\n• Garde-fous A-E" as AF09 #C8E6C9
   rectangle "<img:open-iconic/media-play>\nAF_Partie-11\nTranslation M3\n---\n• FB_Translation\n• AC600 & 5 bits" as AF11 #C8E6C9
-  rectangle "<img:open-iconic/layers>\nAF_Partie-12\nBenne M2\n---\n• FB_Bucket\n• Offset ouv/ferm" as AF12 #C8E6C9
+  rectangle "<img:open-iconic/layers>\nAF_Partie-11\nBenne M2\n---\n• FB_Bucket\n• Offset ouv/ferm" as AF11 #C8E6C9
   rectangle "<img:open-iconic/bug>\nAF_Partie-13\nSimulation\n---\n• FB_Simulation\n• Granularité device" as AF13 #C8E6C9
 
   AF08 --> AF09
   AF10 --> AF09
   AF09 --> AF11
-  AF11 --> AF12
+  AF11 --> AF11
   AF13 --> AF09
 }
 

@@ -174,7 +174,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 ### 📄 Doc à mettre à jour
 - Presque tous les `AF_PartieN` : en-tête "Dépend de Partie 2 vX.Y" obsolète → aligner sur l'architecture courante
 - `AF_Partie-07` (Interface IHM) : réalignée sur `PRG_09_Supervision` et renommée v1.5
-- `AF_Partie-12` : titre et version alignés v1.4 ; chemins Benne/PERSISTENT corrigés
+- `AF_Partie-11` : titre et version alignés v1.4 ; chemins Benne/PERSISTENT corrigés
 - `CLAUDE.md` : arborescence réalignée sur `PRG_00`→`PRG_10`
 
 ---
@@ -208,7 +208,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T24 | ✅ `FB_Encoder_Safety` intégré (instances M1/M2, inhibition `SEMI_AUTO`, diagnostic IHM) | Projet | AF_Partie-10 §9bis |
 | T25 | 🟠 Suite automatisée nominale Encoder/Homing renforcée : gate simulation explicite, watchdog local, rapports TC-E1/TC-E2 corrigés ; essais CODESYS et scénarios unitaire/bornage/redémarrage restant | Projet / Terrain | `SuiteEncoder = 4`, AF_Partie-10 §10 |
 | T26 | 🟠 Checklist Translation AC600 rédigée ; exécution terrain et verdict signé restant à réaliser (EtherCAT, commande, fréquence, sens, arrêts, PV, 5 capteurs, Fdc, thermique, diagnostics) | Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.1.md`, AF_Partie-11 §8 |
-| T27 | Benne : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-12 §6 |
+| T27 | Benne : essais de mise en service non réalisés (cinématique, offsets, Méca C couches 1/2) | Terrain | AF_Partie-11 §6 |
 | T28 | ✅ Plafond palier "essais progressifs" (`WinchMaxStepFwd/Rev`) retiré avec IHM_MANU (2026-07-19) — `PRG_06_WinchControl` applique désormais un plafond fixe (5/`_WinchMaxStepDescent`), identique Auto et Manuel | Projet | Session 2026-07-19 |
 | T29 | ✅ Terminologie active alignée : Translation M3, M1 Retenue, M2 Benne | Projet | CODE + AF métiers |
 | T30 | ✅ Translation configurée sur échelle max 60 Hz ; nominal 30 Hz à 50 % | Projet | `FB_Translation.DriveFreqScaleMaxHz` |
@@ -246,12 +246,12 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T63 | ⏸️ Persistance flags simulation + split `GVL_SimulationBench` reportés : bindings visualisation à maquetter avant import | Projet + IHM | REX session revertée, hors scope WINCH-CORE-01 |
 | T64 | 🟠 Essais treuils du 2026-07-23 : plafond de palier vitesse réglé temporairement à `0`. Confirmer le comportement effectif, tracer les essais, puis définir/restaurer la valeur d'exploitation avant mise en service normale | Projet / Terrain | `REGISTRE_Suivi_MiseEnService_v1.0.md` MES-003 |
 | T65 | ✅ Résolu — Test PLC automatique exécuté réel CODESYS (2026-07-24) : `TESTRUN_PASSED`, TC-CP1..CP5. 1 bug de test trouvé/corrigé au passage (étape 52, garde-fou redondant — PRG_09_Supervision.st non affecté). | Projet | `CONFIG-PERSIST-01`, `PRG_09_Supervision.st` §2/§2bis/§3 |
-| T66 | ✅ Résolu (Lot 2f, commit `b61e540`) : `Cycle.Cfg.SetDepth_M`/`SetOffset_M` protégés par `_CycleCfgPersist`, alarme `ConfigRestoredFromPersistent` incluse. | Projet / Sécurité | AF_Partie-15 §4, `PRG_05_Cycle.st` |
-| T67 | ✅ Résolu (Lot 4) : `TranslationM3.Cmd.SetFreq_Hz` protégé par `_TranslationSetFreq_Hz` + flag `Initialized` dédié (pattern manuel, pas de pont générique — éviterait de persister aussi `BtnFwd`/`BtnRev`). | Projet | AF_Partie-15 §4, `PRG_07_TranslationControl.st:97-100` |
-| T68 | ❌ Non-problème — vérifié 2026-07-24 : `NeutralXMem`/`NeutralYMem` sont des `VAR_IN_OUT` de `FB_Joystick`, `_JoystickNeutralX`/`_JoystickNeutralY` sont passées PAR RÉFÉRENCE depuis `PRG_01_Diagnostics.st` — la calibration écrit déjà directement dans le persistant. Aucune correction nécessaire. | Projet | AF_Partie-15 §4, `FB_Joystick.st` |
-| T69 | ✅ Résolu (Lot 3b, commit `8f90d89`) : `Bucket.Cfg.CfgTimeoutDuration` protégé par `_BucketCfgPersist` (effet de bord du miroir de struct complet). | Projet | AF_Partie-15 §4, `PRG_09_Supervision.st` §2 |
-| T70 | ❓ `Modes.SelMode`/`SelJoystickWinch`/`TglJoystickMaster` repartent en valeur restrictive (MAINT_N1) au boot — à confirmer si voulu (sécurité) ou oubli avant de traiter | Projet / Client | AF_Partie-15 §4 |
-| T71 | ✅ Résolu (Lot 3c, commit `f836c0f`/`9d2d12f`) : `check_config_persistence.py` créé et intégré à `run_all_gates.py` (Gate 3). | Projet | AF_Partie-15 §5 |
+| T66 | ✅ Résolu (Lot 2f, commit `b61e540`) : `Cycle.Cfg.SetDepth_M`/`SetOffset_M` protégés par `_CycleCfgPersist`, alarme `ConfigRestoredFromPersistent` incluse. | Projet / Sécurité | AF_Partie-11 §4, `PRG_05_Cycle.st` |
+| T67 | ✅ Résolu (Lot 4) : `TranslationM3.Cmd.SetFreq_Hz` protégé par `_TranslationSetFreq_Hz` + flag `Initialized` dédié (pattern manuel, pas de pont générique — éviterait de persister aussi `BtnFwd`/`BtnRev`). | Projet | AF_Partie-11 §4, `PRG_07_TranslationControl.st:97-100` |
+| T68 | ❌ Non-problème — vérifié 2026-07-24 : `NeutralXMem`/`NeutralYMem` sont des `VAR_IN_OUT` de `FB_Joystick`, `_JoystickNeutralX`/`_JoystickNeutralY` sont passées PAR RÉFÉRENCE depuis `PRG_01_Diagnostics.st` — la calibration écrit déjà directement dans le persistant. Aucune correction nécessaire. | Projet | AF_Partie-11 §4, `FB_Joystick.st` |
+| T69 | ✅ Résolu (Lot 3b, commit `8f90d89`) : `Bucket.Cfg.CfgTimeoutDuration` protégé par `_BucketCfgPersist` (effet de bord du miroir de struct complet). | Projet | AF_Partie-11 §4, `PRG_09_Supervision.st` §2 |
+| T70 | ❓ `Modes.SelMode`/`SelJoystickWinch`/`TglJoystickMaster` repartent en valeur restrictive (MAINT_N1) au boot — à confirmer si voulu (sécurité) ou oubli avant de traiter | Projet / Client | AF_Partie-11 §4 |
+| T71 | ✅ Résolu (Lot 3c, commit `f836c0f`/`9d2d12f`) : `check_config_persistence.py` créé et intégré à `run_all_gates.py` (Gate 3). | Projet | AF_Partie-11 §5 |
 | T72 | 🟠 Interverrouillage de sécurité commande / frein : conditionner l'activation des contacteurs de sens (`RelayFwd`/`RelayRev`) à l'ordre effectif de desserrage du frein (`BrakeCmd = TRUE`), pour interdire physiquement toute alimentation moteur sous frein serré par l'automate. | Projet / Sécurité | `FB_Winch.st`, `FB_Translation.st`, REX 2026-07-23 |
 | T73 | 🟠 Winch : asymétrie fin de course haute (bit5, a Méca D bit11 = confirmation + escalade PowerCutOff) vs limite basse câble (bit6, Forbid seul, AUCUNE escalade). Ajouter l'équivalent Méca D pour la limite basse — seuils/délais différents selon le sens (montée = tolérance faible, descente = tolérance plus grande) | Projet / Sécurité | FB_Safety_Winch.st bit6, REX 2026-07-23 — logique seulement, pas de bypass |
 | T74 | 🟠 Translation : LimitSwitch (bit6) escalade en PowerCutOff immédiatement (pas de délai de confirmation) — contrairement à Winch/Méca D qui laisse une fenêtre de confirmation avant d'escalader. Harmoniser vers le pattern Méca-style (dépassement transitoire toléré, escalade seulement si mouvement encore anormal après arrêt moteur attendu) | Projet / Sécurité | FB_Safety_Translation.st bit6, REX 2026-07-23 — logique seulement, pas de bypass |
@@ -384,7 +384,7 @@ organisationnel trouvé). Détail fichier par fichier :
 | Partie 9 | `..._v1.9.md` | `..._v1.10.md` | 3 | T9, T20, T21 |
 | Partie 10 | `..._v1.7.md` | `..._v1.9.md` | 8 | T4, T8, T22, T23, T24, T25 |
 | Partie 11 | `..._v1.3.md` | `..._v1.4.md` | 5 | T4, T12, T26 |
-| Partie 12 | `..._v1.2.md` | `..._v1.4.md` | 1 | T27 |
+| Partie 11 | `..._v1.2.md` | `..._v1.4.md` | 1 | T27 |
 | Partie 13 | `..._v1.1.md` | `..._v1.2.md` | 0 (harmonisation titre/fichier uniquement) | — |
 
 📌 Chaque fichier renommé a été archivé tel quel (version pré-nettoyage) dans `ARCHIVES/Doc/`

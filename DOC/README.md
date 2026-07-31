@@ -20,14 +20,11 @@
 | 03 | Template FB commun — contrat d'interface |
 | 04–06 | Mode semi-auto & séquenceur · Modes & maintenance · Acquisition & qualification I/O |
 | 07 | Interface IHM |
-| 08+ | Une fonction métier par domaine : 08 Joystick · 09 Encoder/Homing · 10 Treuils (**Benne incluse**) · 12 Translation · 13 Simulation · 14 Troubleshooting |
+| 08+ | Une fonction métier par domaine : 08 Joystick · 09 Encoder/Homing · 10 Treuils (**Benne incluse**) · 11 Translation · 12 Diagnostic · 13 Simulation · 14 Troubleshooting |
 
-⚠️ **Le numéro 11 n'existe pas** — retiré (ex-Translation, puis ex-Benne). Tout renvoi `ex-AF11`
-est périmé : lire `AF_Partie-12` (Translation) ou la fiche
-[`AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md)
-(Benne) selon le sujet. Contrôlé automatiquement (règle `D7` de `check_doc_links.py`).
+⚠️ **Historique de numérotation** : le numéro 11 a d'abord été celui de la Translation, puis de la Benne, puis a été retiré. Il est désormais réattribué à la Translation (P11). La Benne est une fiche du domaine Treuils : [`AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md). Contrôlé automatiquement (règle `D7` de `check_doc_links.py`).
 
-Les domaines `09`, `10` et `12` sont **éclatés en une fiche par FB** dans un sous-dossier
+Les domaines `09`, `10`, `11` et `12` sont **éclatés en une fiche par FB** dans un sous-dossier
 `AF_Partie-NN_.../` ; le fichier `_vX.Y.md` à la racine reste le **chapô** (rôle machine,
 intégration programme).
 
