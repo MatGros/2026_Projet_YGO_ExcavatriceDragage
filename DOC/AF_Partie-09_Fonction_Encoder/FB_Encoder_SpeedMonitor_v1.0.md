@@ -68,6 +68,10 @@ Brique de **diagnostic passif et de surveillance cinématique** : surveille l'ac
   `SpeedGuardEnableM1/M2 := FALSE` (garde-fou palier non activé). ⚠️ Piège identifié : le jour où
   `SpeedGuardEnable` passe à `TRUE` **sans** régler `SpeedStabilityTimeout` en même temps, la
   machine reste bridée au palier 1 en permanence. Les deux réglages doivent être activés ensemble.
+- 🟠 **Nommage** : `SpeedMps`/`SpeedDeltaMps`/`SpeedVariationThresholdMps` sans underscore avant
+  `Mps` — non conforme `NAMING_CONVENTION.md` §Suffixes d'unité, et **incohérent avec le FB voisin
+  du même domaine** `FB_Encoder_SpeedMeasure` qui utilise déjà `Speed_Mps`/`SignedSpeed_Mps` avec
+  underscore. Ne pas renommer au fil de l'eau (voir chapô AF-09 §6 point 9).
 
 ---
 

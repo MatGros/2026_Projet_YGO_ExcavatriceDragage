@@ -131,8 +131,8 @@ M3_BrakeRelease_RQ := TranslationBrakeCmd;
 M3_CommandWord := instTranslationOutputInterlock_LD.DriveControlWord;
 M3_SetpointFrequencyHz := REAL_TO_UINT(instTranslationOutputInterlock_LD.DriveFreqRefHz * 100.0);
 M1_M2_KoboldMeasureEnable_DQ := PRG_06_WinchControl.KoboldContactorCmdArbitrated
-                                AND PRG_00_Inputs.PowerContactorEngaged
-                                AND PRG_00_Inputs.EmergencyChainClosed;
+                                AND PRG_01_INPUTS_LD.PowerContactorEngaged
+                                AND PRG_01_INPUTS_LD.EmergencyChainClosed;
 
 // === [SÉCURITÉ & COUPURE PUISSANCE AMONT] ===
 // Boucle de sécurité et séquencement d'armement général.
@@ -145,8 +145,8 @@ instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_09_Supervision.FaultMachineReset_IHM,
     ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
-    EmergencyChainClosed := PRG_00_Inputs.EmergencyChainClosed,
-    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
+    EmergencyChainClosed := PRG_01_INPUTS_LD.EmergencyChainClosed,
+    PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged,
     PowerCutOffRequest := PowerCutOffReq,
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );

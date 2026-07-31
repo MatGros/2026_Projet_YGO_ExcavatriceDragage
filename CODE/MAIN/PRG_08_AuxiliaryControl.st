@@ -6,7 +6,7 @@
       programme" §PRG_08) — le PLC ne commande plus casque, grille ni
       centrale hydraulique. Seul le retour thermique centrale hydraulique
       est conservé, remonté en diagnostic IHM.
-   📄 Lot L5 : Lecture depuis PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI
+   📄 Lot L5 : Lecture depuis PRG_00_ACQUISITION_CFC.HwIn.Machine.HydraulicThermalOk_DI
    ═══════════════════════════════════════════════════════════════
    📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
 *)
@@ -18,4 +18,4 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_08_AuxiliaryControl) ===
 
-HydraulicFaultOk := PRG_00_Inputs.HwIn.Machine.HydraulicThermalOk_DI;
+HydraulicFaultOk := PRG_00_ACQUISITION_CFC.HwIn.Machine.HydraulicThermalOk_DI;

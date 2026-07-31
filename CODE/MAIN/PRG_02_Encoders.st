@@ -43,19 +43,19 @@ END_VAR
 
 // === IMPLEMENTATION (corps du PROGRAM PRG_02_Encoders) ===
 
-// 📄 Lot L5 : Les valeurs brutes codeurs sont lues depuis PRG_00_Inputs.HwIn.Winch
-M1_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD1_PosValue;
-M2_RawPosToUse := PRG_00_Inputs.HwIn.Winch.COD2_PosValue;
+// 📄 Lot L5 : Les valeurs brutes codeurs sont lues depuis PRG_00_ACQUISITION_CFC.HwIn.Winch
+M1_RawPosToUse := PRG_00_ACQUISITION_CFC.HwIn.Winch.COD1_PosValue;
+M2_RawPosToUse := PRG_00_ACQUISITION_CFC.HwIn.Winch.COD2_PosValue;
 
 // 2. TREUIL M1 (Abs → Homing → Scale)
 instEncoderAbsM1(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M1_RawPosToUse,
-    AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD1_Alarms,
-    WarningsIn          := PRG_00_Inputs.HwIn.Winch.COD1_Warnings,
+    AlarmsIn            := PRG_00_ACQUISITION_CFC.HwIn.Winch.COD1_Alarms,
+    WarningsIn          := PRG_00_ACQUISITION_CFC.HwIn.Winch.COD1_Warnings,
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational,
     PresetRequest       := instHomingM1.PresetRequest,
     PresetValue         := instHomingM1.PresetValue
@@ -68,7 +68,7 @@ instHomingM1(
     Enable               := TRUE,
     Calib                := _CalibM1,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged      := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
@@ -76,10 +76,10 @@ instHomingM1(
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 1),
     CfgHomingTargetM        := _WinchM1CfgPersist.CfgHomingTarget_M,
     BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
+    TopPositionSensor    := PRG_01_INPUTS_LD.TopPositionSensor,
     CfgTopSensorPosM   := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
-    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M1FwdRevSpeedFeedbackOff,
-    BrakeFeedback        := PRG_00_Inputs.M1BrakeFeedback,
+    FwdRevSpeedFeedbackOff := PRG_01_INPUTS_LD.M1FwdRevSpeedFeedbackOff,
+    BrakeFeedback        := PRG_01_INPUTS_LD.M1BrakeFeedback,
     RawPos               := instEncoderAbsM1.RawPos,
     EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
     PresetAck            := instEncoderAbsM1.PresetAck,
@@ -101,11 +101,11 @@ instEncoderScaleM1(
 instEncoderAbsM2(
     Enable              := TRUE,
     Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_04_Modes.instModes.Mode,
     RawPosIn            := M2_RawPosToUse,
-    AlarmsIn            := PRG_00_Inputs.HwIn.Winch.COD2_Alarms,
-    WarningsIn          := PRG_00_Inputs.HwIn.Winch.COD2_Warnings,
+    AlarmsIn            := PRG_00_ACQUISITION_CFC.HwIn.Winch.COD2_Alarms,
+    WarningsIn          := PRG_00_ACQUISITION_CFC.HwIn.Winch.COD2_Warnings,
     SlaveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     PresetRequest       := instHomingM2.PresetRequest,
     PresetValue         := instHomingM2.PresetValue
@@ -118,7 +118,7 @@ instHomingM2(
     Enable               := TRUE,
     Calib                := _CalibM2,
     Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged      := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode                 := PRG_04_Modes.instModes.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_04_Modes.instModes.Mode = E_Mode.MAINT_N2)
@@ -126,10 +126,10 @@ instHomingM2(
     WinchSelected        := (PRG_04_Modes.instModes.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
     BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    TopPositionSensor    := PRG_00_Inputs.TopPositionSensor,
+    TopPositionSensor    := PRG_01_INPUTS_LD.TopPositionSensor,
     CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
-    FwdRevSpeedFeedbackOff := PRG_00_Inputs.M2FwdRevSpeedFeedbackOff,
-    BrakeFeedback        := PRG_00_Inputs.M2BrakeFeedback,
+    FwdRevSpeedFeedbackOff := PRG_01_INPUTS_LD.M2FwdRevSpeedFeedbackOff,
+    BrakeFeedback        := PRG_01_INPUTS_LD.M2BrakeFeedback,
     RawPos               := instEncoderAbsM2.RawPos,
     EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,
     PresetAck            := instEncoderAbsM2.PresetAck,
@@ -151,7 +151,7 @@ instEncoderScaleM2(
 instEncoderSafetyM1(
     Enable          := TRUE,
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM1.CablePosM,
     HomingSuspect   := instHomingM1.HomingSuspect,
@@ -164,7 +164,7 @@ EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 instEncoderSafetyM2(
     Enable          := TRUE,
     Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged,
     Mode            := PRG_04_Modes.instModes.Mode,
     CablePosM       := instEncoderScaleM2.CablePosM,
     HomingSuspect   := instHomingM2.HomingSuspect,
@@ -185,9 +185,9 @@ M2PositionValid := instEncoderAbsM2.EncoderAvailable
 
 // 🧹 Un homing/preset ou une bascule de source invalide l'historique, même si la position finale est plausible.
 M1SpeedReset := instHomingM1.Busy OR instHomingM1.Done OR instEncoderAbsM1.PresetAck
-                OR NOT M1PositionValid OR PRG_00_Inputs.WinchInputSourceChanged;
+                OR NOT M1PositionValid OR PRG_00_ACQUISITION_CFC.WinchInputSourceChanged;
 M2SpeedReset := instHomingM2.Busy OR instHomingM2.Done OR instEncoderAbsM2.PresetAck
-                OR NOT M2PositionValid OR PRG_00_Inputs.WinchInputSourceChanged;
+                OR NOT M2PositionValid OR PRG_00_ACQUISITION_CFC.WinchInputSourceChanged;
 
 instEncoderSpeedMeasureM1(
     Enable        := TRUE,

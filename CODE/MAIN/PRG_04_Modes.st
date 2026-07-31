@@ -42,7 +42,7 @@ END_IF;
 instModes(
     Enable              := TRUE,
     Reset               := GVL_IHM.Modes.Cmd.BtnModeReset,  // 🔧 REX 2026-07-07 : dédié, jamais mélangé au reset défauts général
-    PowerContactorEngaged     := PRG_00_Inputs.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_01_INPUTS_LD.PowerContactorEngaged,
     SelMode         := GVL_Modes_Stub.ModeRequest_IHM,      // 🖥️ Sélecteur IHM
     SelSyncEnable   := GVL_Modes_Stub.SyncEnableRequest_IHM,
     InhibitM1Request    := GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit, // 🆕 REX 2026-07-08 : IHM réelle, pas GVL_Modes_Stub
