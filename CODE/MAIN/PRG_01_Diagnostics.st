@@ -27,7 +27,7 @@ END_VAR
 
 
 // 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
-// depuis l'image matérielle HwIn transmise par PRG_00_Inputs.
+// depuis l'image matérielle HwIn produite par PRG_00_ACQUISITION_CFC.
 // C'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
 RawCanBusState    := PRG_00_ACQUISITION_CFC.HwIn.Operator.CanBusState;

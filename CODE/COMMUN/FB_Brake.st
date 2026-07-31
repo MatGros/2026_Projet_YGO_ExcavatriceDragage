@@ -14,7 +14,7 @@
       incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
    🆕 REX 2026-07-26 (relevé terrain) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
       (DI = 1 ⟺ frein ouvert). Il est normalisé « TRUE = frein serré » en amont par
-      `PRG_00_Inputs.BrakeFeedbackInvertLogic` (inversion NO/NC de FB_Input). Ce FB reçoit donc un
+      l'inversion NO/NC de FB_Input (PRG_01_INPUTS_LD). Ce FB reçoit donc un
       signal TOUJOURS opposé à `BrakeCmd` en marche saine → le test d'incohérence est `=`, pas `<>`.
       ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
       pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,

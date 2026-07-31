@@ -155,15 +155,15 @@ def build_mapping() -> list[tuple[str, str, str]]:
         ("PRG_00_Inputs.M2BrakeCommandOpenConfirmed", "PRG_01_INPUTS_LD.M2BrakeCommandOpenConfirmed", "exact"),
         ("PRG_00_Inputs.M3BrakeFeedback", "PRG_01_INPUTS_LD.M3BrakeFeedback", "exact"),
         ("PRG_00_Inputs.M3BrakeCommandOpenConfirmed", "PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed", "exact"),
-        # Positions translation (mapping explicite utilisateur)
-        ("PRG_00_Inputs.TranslationPosTremie", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.TranslationPosTremie", "exact"),
-        ("PRG_00_Inputs.TranslationPosPV", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.TranslationPosPV", "exact"),
-        ("PRG_00_Inputs.TranslationPosP2", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.TranslationPosP2", "exact"),
-        ("PRG_00_Inputs.TranslationPosP1", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.TranslationPosP1", "exact"),
-        ("PRG_00_Inputs.TranslationPosMaintenance", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.TranslationPosMaintenance", "exact"),
-        # Variateur M3 filtre (mapping explicite utilisateur a verifier)
-        ("PRG_00_Inputs.M3_StatusWord_Filtered", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.M3_StatusWord_Filtered", "exact"),
-        ("PRG_00_Inputs.M3_ActualFrequencyHz_Filtered", "PRG_00_ACQUISITION_CFC.instPosDecoderM3.M3_ActualFrequencyHz_Filtered", "exact"),
+        # Positions translation (sorties programme PRG_00_ACQUISITION_CFC, migration PRG_00_Inputs)
+        ("PRG_00_Inputs.TranslationPosTremie", "PRG_00_ACQUISITION_CFC.TranslationPosTremie", "exact"),
+        ("PRG_00_Inputs.TranslationPosPV", "PRG_00_ACQUISITION_CFC.TranslationPosPV", "exact"),
+        ("PRG_00_Inputs.TranslationPosP2", "PRG_00_ACQUISITION_CFC.TranslationPosP2", "exact"),
+        ("PRG_00_Inputs.TranslationPosP1", "PRG_00_ACQUISITION_CFC.TranslationPosP1", "exact"),
+        ("PRG_00_Inputs.TranslationPosMaintenance", "PRG_00_ACQUISITION_CFC.TranslationPosMaintenance", "exact"),
+        # Variateur M3 filtre (sorties programme PRG_00_ACQUISITION_CFC)
+        ("PRG_00_Inputs.M3_StatusWord_Filtered", "PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered", "exact"),
+        ("PRG_00_Inputs.M3_ActualFrequencyHz_Filtered", "PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered", "exact"),
     ]
     # Ordre : plus longues sources d'abord pour eviter les collisions partielles.
     mapping.sort(key=lambda x: len(x[0]), reverse=True)

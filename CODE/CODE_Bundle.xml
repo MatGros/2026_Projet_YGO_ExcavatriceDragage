@@ -7429,7 +7429,7 @@ Temps de fermeture contacteur de puissance</xhtml>
       incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
    🆕 REX 2026-07-26 (relevé terrain) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
       (DI = 1 ⟺ frein ouvert). Il est normalisé « TRUE = frein serré » en amont par
-      `PRG_00_Inputs.BrakeFeedbackInvertLogic` (inversion NO/NC de FB_Input). Ce FB reçoit donc un
+      l'inversion NO/NC de FB_Input (PRG_01_INPUTS_LD). Ce FB reçoit donc un
       signal TOUJOURS opposé à `BrakeCmd` en marche saine → le test d'incohérence est `=`, pas `&lt;&gt;`.
       ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
       pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
@@ -16701,7 +16701,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_00_Inputs.M1/M2ThermalFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_01_INPUTS_LD.M1ThermalFeedback / M2ThermalFeedback)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeThermalFeedback">
@@ -18980,7 +18980,7 @@ SimContactorOk := ContactorLatch;
    📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
    📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
       ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
-      réel correspondant (PRG_00_Inputs.st)
+      réel correspondant (PRG_01_INPUTS_LD).
    ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
       Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
    ═══════════════════════════════════════════════════════════════
@@ -20553,6 +20553,47 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)</xhtml>
               </documentation>
             </variable>
+            <variable name="TranslationPosTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Exposition des positions individuelles pour consommation par les programmes aval (migration PRG_00_Inputs)
+TRUE = capteur Trémie actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = capteur PV actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = capteur P2 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = capteur P1 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = capteur Maintenance actif</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -20594,6 +20635,13 @@ END_CASE;
 // 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
 LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
 LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+
+// 🆕 Reprise des capteurs de position pour les consommateurs legacy (passthrough, identique à l'entrée filtrée)
+TranslationPosTremie      := SensorTremie;
+TranslationPosPV          := SensorPV;
+TranslationPosP2          := SensorP2;
+TranslationPosP1          := SensorP1;
+TranslationPosMaintenance := SensorMaintenance;
 </xhtml>
           </ST>
         </body>
@@ -23045,7 +23093,7 @@ CANbus.GetBusState() brut</xhtml>
 
 
 // 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
-// depuis l'image matérielle HwIn transmise par PRG_00_Inputs.
+// depuis l'image matérielle HwIn produite par PRG_00_ACQUISITION_CFC.
 // C'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
 RawCanBusState    := PRG_00_ACQUISITION_CFC.HwIn.Operator.CanBusState;
@@ -23330,6 +23378,31 @@ TRUE = translation en position Trémie</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M3 serré (état sûr) — polarité normalisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [CONFIRMATION DESSERTAGE FREIN M1/M2/M3] ────────────────────────────────────────────
+TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -24471,61 +24544,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="289" typeName="FB_Input" instanceName="instM2FwdRevSpeedFeedbackOff">
+            <inVariable localId="289">
               <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="InputRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="299" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="0" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FilterTime">
-                  <connectionPointIn>
-                    <connection refLocalId="301" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="0" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables />
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <contact localId="299" negated="false" storage="none" edge="none">
+              <connectionPointOut />
+              <expression>NOT M1BrakeFeedback;   (* DI filtré inversé : contacteur desserrage confirmé *) instM2FwdRevSpeedFeedbackOff( InputRaw    := HwIn.Winch.M2_ContactorsReleased_DI, InvertLogic := FALSE, FilterTime  := CST_InputFilterTime, ChannelOk   := TRUE )</expression>
+            </inVariable>
+            <outVariable localId="290">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="0" />
+                <connection refLocalId="289" />
               </connectionPointIn>
-              <connectionPointOut />
-              <variable>HwIn.Winch.M2_ContactorsReleased_DI</variable>
-            </contact>
-            <contact localId="301" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>CST_InputFilterTime</variable>
-            </contact>
-            <comment localId="303" height="0" width="0">
+              <expression>M1BrakeCommandOpenConfirmed</expression>
+            </outVariable>
+            <comment localId="299" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="304">
+            <vendorElement localId="300">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24536,25 +24573,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="305">
+            <inVariable localId="301">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instM2FwdRevSpeedFeedbackOff.State</expression>
             </inVariable>
-            <outVariable localId="306">
+            <outVariable localId="302">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="305" />
+                <connection refLocalId="301" />
               </connectionPointIn>
               <expression>M2FwdRevSpeedFeedbackOff</expression>
             </outVariable>
-            <comment localId="315" height="0" width="0">
+            <comment localId="311" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="316">
+            <vendorElement localId="312">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24565,12 +24602,12 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="317" typeName="FB_Input" instanceName="instM2Thermal">
+            <block localId="313" typeName="FB_Input" instanceName="instM2Thermal">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="327" />
+                    <connection refLocalId="323" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
@@ -24580,7 +24617,7 @@ TRUE = translation en position Trémie</xhtml>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="329" />
+                    <connection refLocalId="325" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -24597,7 +24634,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="327" negated="false" storage="none" edge="none">
+            <contact localId="323" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24605,7 +24642,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M2_ThermalOk_DI</variable>
             </contact>
-            <contact localId="329" negated="false" storage="none" edge="none">
+            <contact localId="325" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24613,13 +24650,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="331" height="0" width="0">
+            <comment localId="327" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="332">
+            <vendorElement localId="328">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24630,25 +24667,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="333">
+            <inVariable localId="329">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instM2Thermal.State</expression>
             </inVariable>
-            <outVariable localId="334">
+            <outVariable localId="330">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="333" />
+                <connection refLocalId="329" />
               </connectionPointIn>
               <expression>M2ThermalFeedback</expression>
             </outVariable>
-            <comment localId="343" height="0" width="0">
+            <comment localId="339" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="344">
+            <vendorElement localId="340">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24659,22 +24696,22 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="345" typeName="FB_Input" instanceName="instM2BrakeFeedback">
+            <block localId="341" typeName="FB_Input" instanceName="instM2BrakeFeedback">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="355" />
+                    <connection refLocalId="351" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="357" />
+                    <connection refLocalId="353" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="359" />
+                    <connection refLocalId="355" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -24691,7 +24728,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="355" negated="false" storage="none" edge="none">
+            <contact localId="351" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24699,7 +24736,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M2_BrakeIsOpen_DI</variable>
             </contact>
-            <contact localId="357" negated="false" storage="none" edge="none">
+            <contact localId="353" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24707,7 +24744,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_BrakeFeedbackInvertLogic</variable>
             </contact>
-            <contact localId="359" negated="false" storage="none" edge="none">
+            <contact localId="355" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24715,13 +24752,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="361" height="0" width="0">
+            <comment localId="357" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="362">
+            <vendorElement localId="358">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24732,25 +24769,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="363">
+            <inVariable localId="359">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instM2BrakeFeedback.State</expression>
             </inVariable>
-            <outVariable localId="364">
+            <outVariable localId="360">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="363" />
+                <connection refLocalId="359" />
               </connectionPointIn>
               <expression>M2BrakeFeedback</expression>
             </outVariable>
-            <comment localId="373" height="0" width="0">
+            <comment localId="369" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [TRANSLATION M3] ===</xhtml>
               </content>
             </comment>
-            <vendorElement localId="374">
+            <vendorElement localId="370">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24761,13 +24798,13 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="375" height="0" width="0">
+            <comment localId="371" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="376">
+            <vendorElement localId="372">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24778,61 +24815,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="377" typeName="FB_Input" instanceName="instTranslationPosTremie">
+            <inVariable localId="373">
               <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="InputRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="387" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="0" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FilterTime">
-                  <connectionPointIn>
-                    <connection refLocalId="389" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="0" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables />
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <contact localId="387" negated="false" storage="none" edge="none">
+              <connectionPointOut />
+              <expression>NOT M2BrakeFeedback;   (* DI filtré inversé : contacteur desserrage confirmé *) instTranslationPosTremie( InputRaw    := HwIn.Translation.M3_PosTremie_DI, InvertLogic := FALSE, FilterTime  := CST_InputFilterTime, ChannelOk   := TRUE )</expression>
+            </inVariable>
+            <outVariable localId="374">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="0" />
+                <connection refLocalId="373" />
               </connectionPointIn>
-              <connectionPointOut />
-              <variable>HwIn.Translation.M3_PosTremie_DI</variable>
-            </contact>
-            <contact localId="389" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>CST_InputFilterTime</variable>
-            </contact>
-            <comment localId="391" height="0" width="0">
+              <expression>M2BrakeCommandOpenConfirmed</expression>
+            </outVariable>
+            <comment localId="383" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="392">
+            <vendorElement localId="384">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24843,25 +24844,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="393">
+            <inVariable localId="385">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instTranslationPosTremie.State</expression>
             </inVariable>
-            <outVariable localId="394">
+            <outVariable localId="386">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="393" />
+                <connection refLocalId="385" />
               </connectionPointIn>
               <expression>TranslationPosTremie</expression>
             </outVariable>
-            <comment localId="403" height="0" width="0">
+            <comment localId="395" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="404">
+            <vendorElement localId="396">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24872,12 +24873,12 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="405" typeName="FB_Input" instanceName="instTranslationPosPV">
+            <block localId="397" typeName="FB_Input" instanceName="instTranslationPosPV">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="415" />
+                    <connection refLocalId="407" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
@@ -24887,7 +24888,7 @@ TRUE = translation en position Trémie</xhtml>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="417" />
+                    <connection refLocalId="409" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -24904,7 +24905,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="415" negated="false" storage="none" edge="none">
+            <contact localId="407" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24912,7 +24913,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosPV_DI</variable>
             </contact>
-            <contact localId="417" negated="false" storage="none" edge="none">
+            <contact localId="409" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -24920,13 +24921,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="419" height="0" width="0">
+            <comment localId="411" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="420">
+            <vendorElement localId="412">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24937,25 +24938,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="421">
+            <inVariable localId="413">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instTranslationPosPV.State</expression>
             </inVariable>
-            <outVariable localId="422">
+            <outVariable localId="414">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="421" />
+                <connection refLocalId="413" />
               </connectionPointIn>
               <expression>TranslationPosPV</expression>
             </outVariable>
-            <comment localId="431" height="0" width="0">
+            <comment localId="423" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="432">
+            <vendorElement localId="424">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -24966,12 +24967,12 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="433" typeName="FB_Input" instanceName="instTranslationPosP2">
+            <block localId="425" typeName="FB_Input" instanceName="instTranslationPosP2">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="443" />
+                    <connection refLocalId="435" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
@@ -24981,7 +24982,7 @@ TRUE = translation en position Trémie</xhtml>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="445" />
+                    <connection refLocalId="437" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -24998,7 +24999,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="443" negated="false" storage="none" edge="none">
+            <contact localId="435" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25006,7 +25007,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosP2_DI</variable>
             </contact>
-            <contact localId="445" negated="false" storage="none" edge="none">
+            <contact localId="437" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25014,13 +25015,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="447" height="0" width="0">
+            <comment localId="439" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="448">
+            <vendorElement localId="440">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25031,25 +25032,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="449">
+            <inVariable localId="441">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instTranslationPosP2.State</expression>
             </inVariable>
-            <outVariable localId="450">
+            <outVariable localId="442">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="449" />
+                <connection refLocalId="441" />
               </connectionPointIn>
               <expression>TranslationPosP2</expression>
             </outVariable>
-            <comment localId="459" height="0" width="0">
+            <comment localId="451" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="460">
+            <vendorElement localId="452">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25060,12 +25061,12 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="461" typeName="FB_Input" instanceName="instTranslationPosP1">
+            <block localId="453" typeName="FB_Input" instanceName="instTranslationPosP1">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="471" />
+                    <connection refLocalId="463" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
@@ -25075,7 +25076,7 @@ TRUE = translation en position Trémie</xhtml>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="473" />
+                    <connection refLocalId="465" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -25092,7 +25093,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="471" negated="false" storage="none" edge="none">
+            <contact localId="463" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25100,7 +25101,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosP1_DI</variable>
             </contact>
-            <contact localId="473" negated="false" storage="none" edge="none">
+            <contact localId="465" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25108,13 +25109,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="475" height="0" width="0">
+            <comment localId="467" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="476">
+            <vendorElement localId="468">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25125,25 +25126,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="477">
+            <inVariable localId="469">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instTranslationPosP1.State</expression>
             </inVariable>
-            <outVariable localId="478">
+            <outVariable localId="470">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="477" />
+                <connection refLocalId="469" />
               </connectionPointIn>
               <expression>TranslationPosP1</expression>
             </outVariable>
-            <comment localId="487" height="0" width="0">
+            <comment localId="479" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="488">
+            <vendorElement localId="480">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25154,12 +25155,12 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="489" typeName="FB_Input" instanceName="instTranslationPosMaintenance">
+            <block localId="481" typeName="FB_Input" instanceName="instTranslationPosMaintenance">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="499" />
+                    <connection refLocalId="491" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
@@ -25169,7 +25170,7 @@ TRUE = translation en position Trémie</xhtml>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="501" />
+                    <connection refLocalId="493" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -25186,7 +25187,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="499" negated="false" storage="none" edge="none">
+            <contact localId="491" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25194,7 +25195,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosMaintenance_DI</variable>
             </contact>
-            <contact localId="501" negated="false" storage="none" edge="none">
+            <contact localId="493" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25202,13 +25203,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="503" height="0" width="0">
+            <comment localId="495" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="504">
+            <vendorElement localId="496">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25219,25 +25220,25 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="505">
+            <inVariable localId="497">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instTranslationPosMaintenance.State</expression>
             </inVariable>
-            <outVariable localId="506">
+            <outVariable localId="498">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="505" />
+                <connection refLocalId="497" />
               </connectionPointIn>
               <expression>TranslationPosMaintenance</expression>
             </outVariable>
-            <comment localId="515" height="0" width="0">
+            <comment localId="507" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="516">
+            <vendorElement localId="508">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25248,22 +25249,22 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <block localId="517" typeName="FB_Input" instanceName="instM3BrakeFeedback">
+            <block localId="509" typeName="FB_Input" instanceName="instM3BrakeFeedback">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="527" />
+                    <connection refLocalId="519" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="529" />
+                    <connection refLocalId="521" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="FilterTime">
                   <connectionPointIn>
-                    <connection refLocalId="531" />
+                    <connection refLocalId="523" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ChannelOk">
@@ -25280,7 +25281,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <contact localId="527" negated="false" storage="none" edge="none">
+            <contact localId="519" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25288,7 +25289,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_BrakeIsOpen_DI</variable>
             </contact>
-            <contact localId="529" negated="false" storage="none" edge="none">
+            <contact localId="521" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25296,7 +25297,7 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_BrakeFeedbackInvertLogic</variable>
             </contact>
-            <contact localId="531" negated="false" storage="none" edge="none">
+            <contact localId="523" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -25304,13 +25305,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>CST_InputFilterTime</variable>
             </contact>
-            <comment localId="533" height="0" width="0">
+            <comment localId="525" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="534">
+            <vendorElement localId="526">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -25321,15 +25322,15 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="535">
+            <inVariable localId="527">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instM3BrakeFeedback.State</expression>
             </inVariable>
-            <outVariable localId="536">
+            <outVariable localId="528">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="535" />
+                <connection refLocalId="527" />
               </connectionPointIn>
               <expression>M3BrakeFeedback</expression>
             </outVariable>
@@ -25952,8 +25953,8 @@ instSafetyTranslationM3(
     BrakeThermalFeedback := NOT PRG_01_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Online,
     DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Operational,
-    DriveStatusWord     := PRG_00_Inputs.M3_StatusWord_Filtered,
-    DriveActualFreqHz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord     := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered,
+    DriveActualFreqHz   := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback       := PRG_01_INPUTS_LD.M3BrakeFeedback,
     BrakeCmd            := GVL_Global.instTranslationOutputInterlock_LD.BrakeCmd,
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
@@ -26230,10 +26231,10 @@ instCycle(
     CableLimitM1AscentM       := _WinchM1CfgPersist.CfgCableLimitAscent_M,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
-    Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,
-    Translation_At_P2       := PRG_00_Inputs.TranslationPosP2,
-    Translation_At_Maintenance := PRG_00_Inputs.TranslationPosMaintenance,
-    Translation_At_Tremie   := PRG_00_Inputs.TranslationPosTremie,
+    Translation_At_P1       := PRG_00_ACQUISITION_CFC.TranslationPosP1,
+    Translation_At_P2       := PRG_00_ACQUISITION_CFC.TranslationPosP2,
+    Translation_At_Maintenance := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance,
+    Translation_At_Tremie   := PRG_00_ACQUISITION_CFC.TranslationPosTremie,
     Translation_Busy        := PRG_07_TranslationControl.instTranslationM3.Busy,
     Translation_Done        := PRG_07_TranslationControl.instTranslationM3.Done,
 
@@ -27183,7 +27184,7 @@ WinchM1FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 WinchM1FinalInterlockRequest.BrakeReleaseRequest := instWinchM1.BrakeCmd;
-WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
+WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M1BrakeCommandOpenConfirmed;
 WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_01_INPUTS_LD.M1FwdRevSpeedFeedbackOff;
 WinchM1FinalInterlockRequest.RequestedRelayFwd := instWinchM1.RelayFwd;
 WinchM1FinalInterlockRequest.RequestedRelayRev := instWinchM1.RelayRev;
@@ -27198,7 +27199,7 @@ WinchM2FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
 WinchM2FinalInterlockRequest.BrakeReleaseRequest := instWinchM2.BrakeCmd;
-WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
+WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M2BrakeCommandOpenConfirmed;
 WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_01_INPUTS_LD.M2FwdRevSpeedFeedbackOff;
 WinchM2FinalInterlockRequest.RequestedRelayFwd := instWinchM2.RelayFwd;
 WinchM2FinalInterlockRequest.RequestedRelayRev := instWinchM2.RelayRev;
@@ -27399,10 +27400,10 @@ END_IF;
 
 // Câblage du capteur de butée de la cible sélectionnée (PV exclu : jamais une cible d'arrêt)
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
-    2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP2;
-    3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP1;
-    4: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosMaintenance;
+    1: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosTremie;
+    2: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosP2;
+    3: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosP1;
+    4: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance;
 ELSE
     M3_PositionSensorTarget := FALSE;   // Aucun capteur visé
 END_CASE;
@@ -27419,11 +27420,11 @@ instTranslationM3(
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
+    SlowdownSensor          := PRG_00_ACQUISITION_CFC.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
     LimitSwitchFwd          := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
     LimitSwitchRev          := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
-    DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord         := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
@@ -27441,7 +27442,7 @@ TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_I
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
-TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 </xhtml>
@@ -27783,7 +27784,7 @@ GVL_IHM.M1TreuilRetenue.State.FinalInterlockReason     := GVL_Global.instWinchOu
 GVL_IHM.M1TreuilRetenue.State.FinalInterlockError      := GVL_Global.instWinchOutputInterlockM1_LD.Error;
 GVL_IHM.M1TreuilRetenue.State.FinalInterlockErrorId    := GVL_Global.instWinchOutputInterlockM1_LD.ErrorId;
 GVL_IHM.M1TreuilRetenue.State.FinalRestartInhibit      := GVL_Global.instWinchOutputInterlockM1_LD.RestartInhibit;
-GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
+GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M1BrakeCommandOpenConfirmed;
 GVL_IHM.M1TreuilRetenue.State.FinalRestartDelayElapsed := PRG_10_Outputs_LD.instWinchOutputInterlockM1_LD.RestartDelayElapsed;
 GVL_IHM.M1TreuilRetenue.State.FinalStepDelayElapsed    := PRG_10_Outputs_LD.instWinchOutputInterlockM1_LD.StepDelayElapsed;
 GVL_IHM.M1TreuilRetenue.State.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
@@ -27856,7 +27857,7 @@ GVL_IHM.M2TreuilBenne.State.FinalInterlockReason     := GVL_Global.instWinchOutp
 GVL_IHM.M2TreuilBenne.State.FinalInterlockError      := GVL_Global.instWinchOutputInterlockM2_LD.Error;
 GVL_IHM.M2TreuilBenne.State.FinalInterlockErrorId    := GVL_Global.instWinchOutputInterlockM2_LD.ErrorId;
 GVL_IHM.M2TreuilBenne.State.FinalRestartInhibit      := GVL_Global.instWinchOutputInterlockM2_LD.RestartInhibit;
-GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
+GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M2BrakeCommandOpenConfirmed;
 GVL_IHM.M2TreuilBenne.State.FinalAuthorizedStep      := GVL_Global.instWinchOutputInterlockM2_LD.AuthorizedStep;
 GVL_IHM.M2TreuilBenne.State.FinalBrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM2_LD.BrakeTimeoutElapsed;
 GVL_IHM.M2TreuilBenne.State.FinalRestartDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.RestartDelayElapsed;
@@ -27943,7 +27944,7 @@ GVL_IHM.TranslationM3.State.FinalInterlockState  := GVL_Global.instTranslationOu
 GVL_IHM.TranslationM3.State.FinalInterlockReason := GVL_Global.instTranslationOutputInterlock_LD.Reason;
 GVL_IHM.TranslationM3.State.FinalInterlockError  := GVL_Global.instTranslationOutputInterlock_LD.Error;
 GVL_IHM.TranslationM3.State.FinalInterlockErrorId := GVL_Global.instTranslationOutputInterlock_LD.ErrorId;
-GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 GVL_IHM.TranslationM3.State.FinalBrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_01_INPUTS_LD.M3BrakeFeedback;
 GVL_IHM.TranslationM3.State.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
@@ -27958,11 +27959,11 @@ IF PRG_00_ACQUISITION_CFC.instPosDecoderM3.Incoherent THEN
     GVL_IHM.TranslationM3.State.PositionP1          := FALSE;
     GVL_IHM.TranslationM3.State.PositionMaintenance := FALSE;
 ELSE
-    GVL_IHM.TranslationM3.State.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
-    GVL_IHM.TranslationM3.State.PositionPV          := PRG_00_Inputs.TranslationPosPV;
-    GVL_IHM.TranslationM3.State.PositionP2          := PRG_00_Inputs.TranslationPosP2;
-    GVL_IHM.TranslationM3.State.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-    GVL_IHM.TranslationM3.State.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+    GVL_IHM.TranslationM3.State.PositionTremie      := PRG_00_ACQUISITION_CFC.TranslationPosTremie;
+    GVL_IHM.TranslationM3.State.PositionPV          := PRG_00_ACQUISITION_CFC.TranslationPosPV;
+    GVL_IHM.TranslationM3.State.PositionP2          := PRG_00_ACQUISITION_CFC.TranslationPosP2;
+    GVL_IHM.TranslationM3.State.PositionP1          := PRG_00_ACQUISITION_CFC.TranslationPosP1;
+    GVL_IHM.TranslationM3.State.PositionMaintenance := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance;
 END_IF;
 GVL_IHM.TranslationM3.State.SensorsWord         := PRG_00_ACQUISITION_CFC.instPosDecoderM3.SensorsWord;
 GVL_IHM.TranslationM3.State.SensorWordIncoherent:= PRG_00_ACQUISITION_CFC.instPosDecoderM3.Incoherent;
@@ -27984,10 +27985,10 @@ GVL_IHM.TranslationM3.Safety.ErrorSensorIncoherent:= PRG_03_Safety.instSafetyTra
 GVL_IHM.TranslationM3.Safety.SafeStop          := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.Safety.PowerCutOff       := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 
-GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7;
-GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0;
+GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered.7;
+GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered.0;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
-GVL_IHM.TranslationM3.State.DriveActualFreq_Hz     := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.TranslationM3.State.DriveActualFreq_Hz     := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.State.DriveFreqRef_Hz        := GVL_Global.instTranslationOutputInterlock_LD.DriveFreqRefHz;
 GVL_IHM.TranslationM3.State.DriveControlWord       := GVL_Global.instTranslationOutputInterlock_LD.DriveControlWord;
 GVL_IHM.TranslationM3.State.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
@@ -31149,9 +31150,9 @@ Demande de coupure de puissance</xhtml>
 // === IMPLEMENTATION (corps du PROGRAM PRG_11_Troubleshooting) ===
 
 // 🛡️ ─── 0. DIAGNOSTIC BARRIÈRES FINALES (lecture seule) ─────────────────
-M1BrakeCommandOpenConfirmedDiag := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
-M2BrakeCommandOpenConfirmedDiag := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
-M3BrakeCommandOpenConfirmedDiag := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+M1BrakeCommandOpenConfirmedDiag := PRG_01_INPUTS_LD.M1BrakeCommandOpenConfirmed;
+M2BrakeCommandOpenConfirmedDiag := PRG_01_INPUTS_LD.M2BrakeCommandOpenConfirmed;
+M3BrakeCommandOpenConfirmedDiag := PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 M1FinalInterlockErrorDiag := GVL_Global.instWinchOutputInterlockM1_LD.Error;
 M2FinalInterlockErrorDiag := GVL_Global.instWinchOutputInterlockM2_LD.Error;
 M3FinalInterlockErrorDiag := GVL_Global.instTranslationOutputInterlock_LD.Error;
@@ -31260,7 +31261,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized:=
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx405_FinalInterlockState := GVL_Global.instWinchOutputInterlockM1_LD.State;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason := GVL_Global.instWinchOutputInterlockM1_LD.Reason;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep := GVL_Global.instWinchOutputInterlockM1_LD.AuthorizedStep;
-GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M1BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM1_LD.BrakeTimeoutElapsed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed := GVL_Global.instWinchOutputInterlockM1_LD.RestartDelayElapsed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := GVL_Global.instWinchOutputInterlockM1_LD.StepDelayElapsed;
@@ -31307,7 +31308,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized:=
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx405_FinalInterlockState := GVL_Global.instWinchOutputInterlockM2_LD.State;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason := GVL_Global.instWinchOutputInterlockM2_LD.Reason;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep := GVL_Global.instWinchOutputInterlockM2_LD.AuthorizedStep;
-GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M2BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM2_LD.BrakeTimeoutElapsed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.RestartDelayElapsed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.StepDelayElapsed;
@@ -31338,13 +31339,13 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ               :=
 
 
 // ↔️ ─── 5. TRANSLATION PONT M3 (VARIATEUR AC600) ─────────────────────────────
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI         := PRG_00_Inputs.TranslationPosTremie;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI             := PRG_00_Inputs.TranslationPosPV;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx103_PosP2_DI             := PRG_00_Inputs.TranslationPosP2;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI             := PRG_00_Inputs.TranslationPosP1;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := PRG_00_Inputs.TranslationPosMaintenance;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_00_Inputs.M3_StatusWord_Filtered;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI         := PRG_00_ACQUISITION_CFC.TranslationPosTremie;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI             := PRG_00_ACQUISITION_CFC.TranslationPosPV;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx103_PosP2_DI             := PRG_00_ACQUISITION_CFC.TranslationPosP2;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI             := PRG_00_ACQUISITION_CFC.TranslationPosP1;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_01_INPUTS_LD.M3BrakeFeedback;
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.instJoystick.RawX;
@@ -31369,7 +31370,7 @@ GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz      :=
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx403_DriveControlWord     := GVL_Global.instTranslationOutputInterlock_LD.DriveControlWord;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx404_FinalInterlockState := GVL_Global.instTranslationOutputInterlock_LD.State;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx405_FinalInterlockReason := GVL_Global.instTranslationOutputInterlock_LD.Reason;
-GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord  := GVL_Global.instTranslationOutputInterlock_LD.DriveControlWord;

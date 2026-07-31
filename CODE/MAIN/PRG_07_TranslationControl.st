@@ -133,10 +133,10 @@ END_IF;
 
 // Câblage du capteur de butée de la cible sélectionnée (PV exclu : jamais une cible d'arrêt)
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosTremie;
-    2: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP2;
-    3: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosP1;
-    4: M3_PositionSensorTarget := PRG_00_Inputs.TranslationPosMaintenance;
+    1: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosTremie;
+    2: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosP2;
+    3: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosP1;
+    4: M3_PositionSensorTarget := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance;
 ELSE
     M3_PositionSensorTarget := FALSE;   // Aucun capteur visé
 END_CASE;
@@ -153,11 +153,11 @@ instTranslationM3(
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensor          := PRG_00_Inputs.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
+    SlowdownSensor          := PRG_00_ACQUISITION_CFC.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
     LimitSwitchFwd          := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
     LimitSwitchRev          := PRG_00_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
-    DriveStatusWord         := PRG_00_Inputs.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord         := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
@@ -175,6 +175,6 @@ TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_I
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_01_INPUTS_LD.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
-TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;

@@ -72,10 +72,10 @@ instCycle(
     CableLimitM1AscentM       := _WinchM1CfgPersist.CfgCableLimitAscent_M,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
-    Translation_At_P1       := PRG_00_Inputs.TranslationPosP1,
-    Translation_At_P2       := PRG_00_Inputs.TranslationPosP2,
-    Translation_At_Maintenance := PRG_00_Inputs.TranslationPosMaintenance,
-    Translation_At_Tremie   := PRG_00_Inputs.TranslationPosTremie,
+    Translation_At_P1       := PRG_00_ACQUISITION_CFC.TranslationPosP1,
+    Translation_At_P2       := PRG_00_ACQUISITION_CFC.TranslationPosP2,
+    Translation_At_Maintenance := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance,
+    Translation_At_Tremie   := PRG_00_ACQUISITION_CFC.TranslationPosTremie,
     Translation_Busy        := PRG_07_TranslationControl.instTranslationM3.Busy,
     Translation_Done        := PRG_07_TranslationControl.instTranslationM3.Done,
 

@@ -210,8 +210,8 @@ instSafetyTranslationM3(
     BrakeThermalFeedback := NOT PRG_01_INPUTS_LD.BrakeThermalFeedback, // 🆕 REX 2026-07-08 — commun M1/M2/M3
     DriveOnline         := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Online,
     DriveOperational    := PRG_01_Diagnostics.instDiagEthercat.DeviceVariateur.Operational,
-    DriveStatusWord     := PRG_00_Inputs.M3_StatusWord_Filtered,
-    DriveActualFreqHz   := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord     := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered,
+    DriveActualFreqHz   := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback       := PRG_01_INPUTS_LD.M3BrakeFeedback,
     BrakeCmd            := GVL_Global.instTranslationOutputInterlock_LD.BrakeCmd,
     Direction           := PRG_07_TranslationControl.M3_Direction_Active,
