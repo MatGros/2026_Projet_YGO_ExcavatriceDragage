@@ -24,8 +24,8 @@ VAR_INPUT
     Mode            : E_Mode;     // Changement de mode désarme le homme-mort
     BenneBusy       : BOOL;       // Fin de cycle benne (front descendant) désarme le homme-mort
     PreserveArmingAfterBucket : BOOL; // TRUE uniquement pendant fermeture ExtractionSequence : enchaînement palier 1 autorisé
-    BusCanOpenOP    : ST_DiagDevice;       // État présence nœud CAN
-    JoystickOP      : ST_DiagDevice;       // Mode esclave CANopen actif
+    BusCanOpenOP    : ST_Diag_Device;       // État présence nœud CAN
+    JoystickOP      : ST_Diag_Device;       // Mode esclave CANopen actif
     RawX            : INT;        // Valeur brute axe X
     RawY            : INT;        // Valeur brute axe Y
     RawButton       : BOOL;       // État brut bouton

@@ -40,9 +40,9 @@ Brique de **diagnostic passif** (Partie3 §2) : aucun effet direct sur les sorti
 | `M1Position_M/M2Position_M` | REAL | Positions mesurées codeurs (m) |
 | `M1Speed_Mps/M2Speed_Mps` | REAL | Vitesses mesurées codeurs (m/s) |
 | `SyncDeviation_M` | REAL | Écart instantané de synchronisme (m) |
-| `Config` | ST_WinchSymmetryCfg | Seuils de tolérance et durées de qualification |
+| `Config` | ST_Winch_Symmetry_Cfg | Seuils de tolérance et durées de qualification |
 
-**Structure de données / InOut** : `Data : ST_WinchSymmetryData` (résultats mesurés).  
+**Structure de données / InOut** : `Data : ST_Winch_Symmetry_Data` (résultats mesurés).  
 **Sorties** : `SymmetryOk` (BOOL, TRUE si tous deltas < seuils), `SymmetryValid` (BOOL, TRUE si mesure qualifiée).
 
 ---

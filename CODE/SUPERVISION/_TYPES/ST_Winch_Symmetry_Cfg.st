@@ -1,4 +1,4 @@
-TYPE ST_WinchSymmetryCfg :
+TYPE ST_Winch_Symmetry_Cfg :
 STRUCT
     DeltaStartDelay_Ms : UDINT := 100;
     DeltaBrakeReleaseTime_Ms : UDINT := 100;

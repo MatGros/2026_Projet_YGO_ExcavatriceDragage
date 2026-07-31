@@ -5,15 +5,15 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_NetworkDiagHMI :
 STRUCT
-    BusCanOpen          : ST_DiagDevice;  (* 📡 Diagnostics bus CANopen *)
-    Joystick            : ST_DiagDevice;  (* 🕹️ Diagnostics esclave Joystick *)
+    BusCanOpen          : ST_Diag_Device;  (* 📡 Diagnostics bus CANopen *)
+    Joystick            : ST_Diag_Device;  (* 🕹️ Diagnostics esclave Joystick *)
     CanError            : BOOL;           (* ⚠️ Anomalie CANopen *)
     CanErrorId          : WORD;           (* ❌ Code anomalie CANopen *)
     
-    BusEthercat         : ST_DiagDevice;  (* 📡 Diagnostics bus EtherCAT *)
-    EncoderM1           : ST_DiagDevice;  (* 🧲 Diagnostics esclave COD1 *)
-    EncoderM2           : ST_DiagDevice;  (* 🧲 Diagnostics esclave COD2 *)
-    VariateurM3         : ST_DiagDevice;  (* ↔️ Diagnostics esclave AC600 *)
+    BusEthercat         : ST_Diag_Device;  (* 📡 Diagnostics bus EtherCAT *)
+    EncoderM1           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD1 *)
+    EncoderM2           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD2 *)
+    VariateurM3         : ST_Diag_Device;  (* ↔️ Diagnostics esclave AC600 *)
     EcatError           : BOOL;           (* ⚠️ Anomalie EtherCAT *)
     EcatErrorId         : WORD;           (* ❌ Code anomalie EtherCAT *)
     

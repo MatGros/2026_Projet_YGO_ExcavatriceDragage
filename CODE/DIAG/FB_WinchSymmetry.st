@@ -12,10 +12,10 @@ VAR_INPUT
     M2Direction : INT;
     M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied : BOOL;
     M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M : REAL;
-    Config : ST_WinchSymmetryCfg;
+    Config : ST_Winch_Symmetry_Cfg;
 END_VAR
 VAR_IN_OUT
-    Data : ST_WinchSymmetryData;
+    Data : ST_Winch_Symmetry_Data;
 END_VAR
 VAR_OUTPUT
     SymmetryOk : BOOL;

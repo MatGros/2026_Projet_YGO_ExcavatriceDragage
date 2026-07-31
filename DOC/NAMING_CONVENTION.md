@@ -72,7 +72,7 @@ complet) : retirées de la liste "autorisée", déplacées en "à éviter" ci-de
 | `Req` | Requête brute, pas encore arbitrée (Niveau 2, préfixe) | `OpenReq`/`CloseReq` (legacy, suffixe) — voir §`Req` vs `Cmd`, pas de préfixe `Req` en usage actuellement |
 | `Ref` | Consigne | `SpeedRef`, `CablePosRef`, `RefPosM` |
 | `Act` | Valeur mesurée/actuelle | `SpeedAct`, `CablePosAct` |
-| `Diag` | Diagnostic | `FB_DiagCanOpen`, `FB_DiagEthercat`, `ST_DiagDevice` |
+| `Diag` | Diagnostic | `FB_DiagCanOpen`, `FB_DiagEthercat`, `ST_Diag_Device` |
 | `Calc` | Calcul / calculateur (nom d'instance) | `CycleTimeCalc` (instance de `FB_CycleTime`) |
 | `Fwd` / `Rev` | Avant / Arrière (forward/reverse) | `RelayFwd`, `LimitSwitchFwd`, `BtnFwd` |
 | `Min` / `Max` | Limite basse / haute | `MaxStepDescente`, `LimitLegalDepthMinAllowed` |
