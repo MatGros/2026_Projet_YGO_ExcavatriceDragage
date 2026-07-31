@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="Dragage" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-01T00:00:00" />
+  <contentHeader name="PRG_AU_Acquisition_CFC.project" modificationDateTime="2026-08-01T00:00:00">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_AU_Acquisition" pouType="program">
+        <interface>
+          <outputVars>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (qualifie FB_Input, 20 ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engage (qualifie FB_Input, 20 ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety metier (agrege)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instSimChainFeedback">
+              <type>
+                <derived name="FB_Sim_AU_ChainFeedback" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation physique boucle AU (banc de test)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEmergencyChainClosed">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification boucle AU (anti-rebond 20 ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instPowerContactorEngaged">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification retour contacteur (anti-rebond 20 ms)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquisition et qualification des entrees AU (CFC natif, cible AF02 §2).
+Lit les signaux simules (GVL_Simulation_AU) et les qualifie via FB_Input
+(brique standard, meme composant que PRG_00_Inputs) avant transmission
+au composite FB_Safety_EmergencyManagement.
+Aucune logique metier ici (regle TC-P02-002) : le feedback simulation est
+delegue a FB_Sim_AU_ChainFeedback, une page CFC ne fait qu'enchainer des blocs.
+Regle de cablage CFC (obligatoire, DOC/CODE_QUALITY_STANDARDS.md paragraphe CFC) : CHAQUE
+entree source (inVariable/sortie de bloc) passe par un connector dedie avant
+de rejoindre un bloc consommateur -- jamais de connexion directe source vers bloc.
+Chaque connector a une position UNIQUE et non nulle (x,y != 0,0 sauf le tout
+premier), pour eviter les fils de longueur nulle empiles qui rendent le
+cablage illisible/invisible dans l'editeur CODESYS (REX 2026-08).
+Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+       DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2
+       DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+
+                <!-- ═══ Colonne 1 : sources (entrees GVL_Simulation_AU + feedback scan precedent) ═══ -->
+                <inVariable localId="1">
+                  <position x="10" y="20" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimulationModeActive</expression>
+                </inVariable>
+                <inVariable localId="2">
+                  <position x="10" y="40" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimChainClosed</expression>
+                </inVariable>
+                <inVariable localId="3">
+                  <position x="10" y="60" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ</expression>
+                </inVariable>
+                <inVariable localId="4">
+                  <position x="10" y="80" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ</expression>
+                </inVariable>
+
+                <!-- Connecteurs dedies (1 par source), positions uniques -->
+                <connector localId="5" name="">
+                  <position x="40" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="6" name="">
+                  <position x="40" y="40" />
+                  <connectionPointIn>
+                    <connection refLocalId="2" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="7" name="">
+                  <position x="40" y="60" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="8" name="">
+                  <position x="40" y="80" />
+                  <connectionPointIn>
+                    <connection refLocalId="4" />
+                  </connectionPointIn>
+                </connector>
+
+                <!-- ═══ Colonne 2 : Bloc 1 - Simulation physique boucle AU (FB_Sim_AU_ChainFeedback) ═══ -->
+                <block localId="10" executionOrderId="1" typeName="FB_Sim_AU_ChainFeedback" instanceName="instSimChainFeedback">
+                  <position x="70" y="15" />
+                  <inputVariables>
+                    <variable formalParameter="SimulationModeActive">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="5" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SimChainClosed">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="MaintainA">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="7" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="MaintainB">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="8" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="ChainClosedRaw">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+
+                <!-- ═══ Colonne 3 : Bloc 2 - Qualification boucle AU (FB_Input) ═══ -->
+                <connector localId="11" name="">
+                  <position x="105" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="ChainClosedRaw" />
+                  </connectionPointIn>
+                </connector>
+
+                <inVariable localId="12">
+                  <position x="105" y="35" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>T#20ms</expression>
+                </inVariable>
+                <connector localId="13" name="">
+                  <position x="120" y="35" />
+                  <connectionPointIn>
+                    <connection refLocalId="12" />
+                  </connectionPointIn>
+                </connector>
+
+                <block localId="20" executionOrderId="2" typeName="FB_Input" instanceName="instEmergencyChainClosed">
+                  <position x="140" y="15" />
+                  <inputVariables>
+                    <variable formalParameter="InputRaw">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="11" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="FilterTime">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="13" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+
+                <!-- ═══ Colonne 4 : sortie EmergencyChainClosed ═══ -->
+                <connector localId="21" name="">
+                  <position x="175" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="20" formalParameter="State" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="22">
+                  <position x="195" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="21" />
+                  </connectionPointIn>
+                  <expression>EmergencyChainClosed</expression>
+                </outVariable>
+
+                <!-- ═══ Ligne 2 : Bloc 3 - Qualification retour contacteur (FB_Input) ═══ -->
+                <inVariable localId="30">
+                  <position x="10" y="120" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimContactorEngaged</expression>
+                </inVariable>
+                <connector localId="32" name="">
+                  <position x="40" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="30" />
+                  </connectionPointIn>
+                </connector>
+
+                <inVariable localId="31">
+                  <position x="10" y="140" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>T#20ms</expression>
+                </inVariable>
+                <connector localId="33" name="">
+                  <position x="40" y="140" />
+                  <connectionPointIn>
+                    <connection refLocalId="31" />
+                  </connectionPointIn>
+                </connector>
+
+                <block localId="40" executionOrderId="3" typeName="FB_Input" instanceName="instPowerContactorEngaged">
+                  <position x="70" y="115" />
+                  <inputVariables>
+                    <variable formalParameter="InputRaw">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="32" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="FilterTime">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="33" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+
+                <connector localId="41" name="">
+                  <position x="105" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="40" formalParameter="State" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="42">
+                  <position x="140" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="41" />
+                  </connectionPointIn>
+                  <expression>PowerContactorEngaged</expression>
+                </outVariable>
+
+                <!-- ═══ Ligne 3 : agregation coupure metier (passthrough direct, pas de FB) ═══ -->
+                <inVariable localId="50">
+                  <position x="10" y="180" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimPowerCutOffReq</expression>
+                </inVariable>
+                <connector localId="52" name="">
+                  <position x="40" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="50" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="51">
+                  <position x="70" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="52" />
+                  </connectionPointIn>
+                  <expression>PowerCutOffRequest</expression>
+                </outVariable>
+
+              </CFC>
+            </data>
+          </addData>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c3f8a1e6-9a2d-4b7e-8f3a-1e6d9c2b5a70</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+</project>

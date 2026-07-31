@@ -7,7 +7,7 @@ import pathlib
 import sys
 
 TOOLS_DIR = pathlib.Path(__file__).resolve().parents[1]
-OUT_DIR = TOOLS_DIR / 'out'
+OUT_DIR = TOOLS_DIR / 'out' / 'modules'
 CATALOG_PATH = pathlib.Path(__file__).with_name('translation_m3_test_catalog.csv')
 
 if str(TOOLS_DIR) not in sys.path:

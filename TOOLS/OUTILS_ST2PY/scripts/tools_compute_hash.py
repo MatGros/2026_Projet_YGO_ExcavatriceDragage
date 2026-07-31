@@ -9,10 +9,13 @@ from datetime import datetime
 # fragile because of namespace differences between generated dataclasses and the actual XML export).
 use_xsdata = False
 
-BUNDLE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'CODE', 'CODE_Bundle.xml'))
+ST2PY_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, ST2PY_DIR)
+
+BUNDLE = os.path.abspath(os.path.join(ST2PY_DIR, '..', '..', 'CODE', 'CODE_Bundle.xml'))
 POU_NAME = 'FB_Translation_PositionDecoder'
-CACHE_PATH = os.path.join(os.path.dirname(__file__), '.st2py_cache.json')
-OUT_META = os.path.join(os.path.dirname(__file__), 'out', f'{POU_NAME}.meta.json')
+CACHE_PATH = os.path.join(ST2PY_DIR, '.st2py_cache.json')
+OUT_META = os.path.join(ST2PY_DIR, 'out', 'modules', f'{POU_NAME}.meta.json')
 
 if len(sys.argv) > 1:
     BUNDLE = sys.argv[1]

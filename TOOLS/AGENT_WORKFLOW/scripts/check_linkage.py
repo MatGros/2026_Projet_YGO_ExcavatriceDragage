@@ -147,6 +147,24 @@ def parse_pou(path: Path) -> Pou | None:
     return pou
 
 
+def load_native_xml_pou_names(root: Path) -> set[str]:
+    """POU definis directement en XML PLCopenXML natif (ex. PRG_GLOBAL_CFC.xml,
+    PRG_AU_Acquisition_CFC.xml). check_linkage.py ne parse que les .st : ces POU
+    sont donc traites comme externes de confiance pour L4 (reference croisee),
+    le generator/xml_builder.py validant deja leur cablage interne a la build.
+    """
+    names: set[str] = set()
+    code = root / "CODE"
+    if not code.is_dir():
+        return names
+    for xml_path in code.rglob("*.xml"):
+        if xml_path.name.startswith("CODE_Bundle") or xml_path.name.startswith("CODE_AU_Bundle"):
+            continue
+        text = xml_path.read_text(encoding="utf-8", errors="replace")
+        names.update(m.group("name") for m in BUNDLE_POU.finditer(text))
+    return names
+
+
 def load_bundle_blocks(root: Path) -> list[tuple[str, str, str]]:
     """Retourne [(pou, instanceName, typeName)] du bundle PLCopenXML."""
     bundle = root / "CODE" / "CODE_Bundle.xml"
@@ -185,6 +203,8 @@ def main() -> int:
         pou = parse_pou(path)
         if pou:
             pous[pou.name] = pou
+
+    native_xml_pous = load_native_xml_pou_names(root)
 
     fb_types = {p.name for p in pous.values() if p.kind == "FUNCTION_BLOCK"} | LIBRARY_FB_TYPES
     function_names = {p.name for p in pous.values() if p.kind == "FUNCTION"}
@@ -252,6 +272,8 @@ def main() -> int:
             if target == pou.name:
                 continue
             line = line_of(pou.body, match.start())
+            if target in native_xml_pous:
+                continue  # POU XML natif (CFC) : cablage deja valide par le generator a la build
             if target not in pous:
                 errors.append(f"[L4] {rel}:{line}: reference vers le POU inexistant `{target}`")
             elif member not in pous[target].declarations:

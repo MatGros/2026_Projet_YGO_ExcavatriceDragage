@@ -7,9 +7,6 @@ TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-OUT_DIR = TOOLS_DIR / 'out'
-OUT_DIR.mkdir(parents=True, exist_ok=True)
-
 import fb_gen
 import simulation_bench
 
@@ -19,7 +16,8 @@ BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
 
 
 def test_safety_translation_bench_reports_fault_then_reset():
-    with tempfile.TemporaryDirectory(dir=str(TOOLS_DIR / 'out')) as tmp_dir:
+    # Dossier temp systeme (jamais dans out/) : cf. REX 2026-08, out/ reserve aux artefacts persistants.
+    with tempfile.TemporaryDirectory(prefix='st2py-test-') as tmp_dir:
         module_path, _, _ = fb_gen.generate_module_and_test('FB_Safety_Translation', tmp_dir, bundle_path=str(BUNDLE_PATH))
         result = simulation_bench.run_safety_translation_bench(
             pou_name='FB_Safety_Translation',
@@ -40,7 +38,7 @@ def test_safety_translation_bench_reports_fault_then_reset():
 
 
 def test_export_bench_writes_semicolon_separated_csv():
-    with tempfile.TemporaryDirectory(dir=str(TOOLS_DIR / 'out')) as tmp_dir:
+    with tempfile.TemporaryDirectory(prefix='st2py-test-') as tmp_dir:
         module_path, _, _ = fb_gen.generate_module_and_test('FB_Safety_Translation', tmp_dir, bundle_path=str(BUNDLE_PATH))
         result = simulation_bench.run_safety_translation_bench(
             pou_name='FB_Safety_Translation',

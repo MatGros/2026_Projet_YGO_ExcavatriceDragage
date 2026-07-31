@@ -6,7 +6,7 @@ import pathlib
 import sys
 
 TOOLS_DIR = pathlib.Path(__file__).resolve().parent
-OUT_DIR = TOOLS_DIR / 'out'
+OUT_DIR = TOOLS_DIR / 'out' / 'modules'
 
 
 def load_generated_module(pou_name, module_path=None):
