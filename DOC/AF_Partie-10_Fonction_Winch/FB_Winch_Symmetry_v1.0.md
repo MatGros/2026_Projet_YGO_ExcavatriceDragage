@@ -1,8 +1,8 @@
-# Fiche FB_Diag_WinchSymmetry v1.0
+# Fiche FB_Winch_Symmetry v1.0
 
 > Mesure passive de symétrie M1/M2 (MES-008).
 > Profil AF03 : brique métier non-mouvement, observateur pur.
-> Source : `CODE/DIAG/FB_Diag_WinchSymmetry.st` · instance : `PRG_11_Troubleshooting.instWinchSymmetry`.
+> Source : `CODE/TREUILS/FB_Winch_Symmetry.st` · instance : `PRG_11_Troubleshooting.instWinchSymmetry`.
 
 ## 🎯 Rôle
 

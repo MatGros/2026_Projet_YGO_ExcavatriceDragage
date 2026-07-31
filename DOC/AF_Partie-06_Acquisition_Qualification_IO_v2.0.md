@@ -13,7 +13,8 @@ qualifiees via `FB_Input`, sans logique metier et sans decision.
 3. Diagnostics bus
 4. Polarites et noms
 5. Sorties physiques
-6. TBD
+6. Preflight (qualification machine arrêtée)
+7. TBD
 
 ## 🧪 Points de validation
 
@@ -139,7 +140,35 @@ Le detail de la chaine AU/rearmement est proprietaire de la Partie 01.
 
 ---
 
-## ❓ 6. TBD
+## 🩺 6. Preflight (qualification machine arrêtée)
+
+| Fiche | FB | Contenu |
+|---|---|---|
+| [`FB_Acquisition_Preflight`](AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_Acquisition_Preflight_v1.0.md) | `FB_Acquisition_Preflight` | Verdict passif : 16 contrôles de cohérence E/S machine arrêtée |
+
+`FB_Acquisition_Preflight` vérifie 16 conditions mécaniques/électriques quand la machine est
+arrêtée. Observateur pur : aucune écriture de commande, sécurité ou mouvement.
+
+Instance : `PRG_11_Troubleshooting.instPreflight`.
+
+### PreflightErrorId (16 bits)
+
+| Bit | Contrôle |
+|---|---|
+| 0-2 | Frein M1/M2/M3 serré |
+| 3-4 | Contacteurs M1/M2 retombés |
+| 5-6 | Thermique M1/M2 OK |
+| 7 | Thermique frein OK |
+| 8 | Rotation phases OK |
+| 9 | Câble M2 tendu |
+| 10 | Capteurs M3 cohérents |
+| 11 | Contacteur sans chaîne AU |
+| 12-13 | Codeur M1/M2 opérationnel |
+| 14-15 | Homé + position bornée M1/M2 |
+
+---
+
+## ❓ 7. TBD
 
 - Durees de filtrage par signal apres qualification terrain.
 - Statut definitif de `FB_Output` non instancie.

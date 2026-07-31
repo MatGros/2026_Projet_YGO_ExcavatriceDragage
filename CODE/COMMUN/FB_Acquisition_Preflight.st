@@ -1,9 +1,9 @@
 (* ═══════════════════════════════════════════════════════════════
-   🩺 FB_Diag_Preflight — Verdict passif machine arrêtée
+   🩺 FB_Acquisition_Preflight — Verdict passif machine arrêtée
    📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
    🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
    ═══════════════════════════════════════════════════════════════ *)
-FUNCTION_BLOCK FB_Diag_Preflight
+FUNCTION_BLOCK FB_Acquisition_Preflight
 VAR_INPUT
     Execute : BOOL;
     MachineIsStill : BOOL;

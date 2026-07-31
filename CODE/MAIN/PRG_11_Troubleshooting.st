@@ -7,8 +7,8 @@
    ═══════════════════════════════════════════════════════════════ *)
 PROGRAM PRG_11_Troubleshooting
 VAR
-    instPreflight : FB_Diag_Preflight;
-    instWinchSymmetry : FB_Diag_WinchSymmetry;
+    instPreflight : FB_Acquisition_Preflight;
+    instWinchSymmetry : FB_Winch_Symmetry;
     TonMachineStill : TON;
     MachineIsStillRaw : BOOL;
     // 🛡️ Lot 3A — lecture seule, visibles Watch / générateur Ladder.

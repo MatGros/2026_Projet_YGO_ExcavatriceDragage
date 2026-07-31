@@ -116,7 +116,7 @@ prédire une valeur réelle.
 
 ℹ️ **Il n'existe volontairement aucun comparateur automatique** (décision D11) : le modèle n'est
 pas une vérité de référence, et un indicateur qui clignote à chaque transitoire finirait ignoré.
-Pour un verdict d'état machine, voir `FB_Diag_Preflight` (plan Ergonomie, à venir).
+Pour un verdict d'état machine, voir `FB_Acquisition_Preflight` (plan Ergonomie, à venir).
 
 ## 5. 🔚 Retour en machine réelle
 

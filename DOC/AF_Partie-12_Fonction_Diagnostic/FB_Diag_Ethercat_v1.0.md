@@ -30,14 +30,14 @@ Distingue `READY` (bus réel online) de `SIMULATED` (bypass actif).
 | `State` / `StateAtError` | E_Diag_State | IHM |
 | `DeviceEthercatMaster` | ST_Diag_Device | IHM Network |
 | `DeviceVariateur` | ST_Diag_Device | FB_Safety_Translation (via PRG_03), IHM |
-| `DeviceEncoderM1` / `DeviceEncoderM2` | ST_Diag_Device | FB_Diag_Preflight, IHM |
+| `DeviceEncoderM1` / `DeviceEncoderM2` | ST_Diag_Device | FB_Acquisition_Preflight, IHM |
 | `*StateRawOut` | miroirs bruts | Troubleshooting |
 
 ## 🔒 Impact machine
 
 - `FB_Safety_Translation` consomme `DeviceVariateur.Online/Operational` :
   - `NOT Online` ou `NOT Operational` → **SafeStop** Translation M3.
-- `FB_Diag_Preflight` consomme `DeviceEncoderM1/M2.Operational` pour son verdict passif.
+- `FB_Acquisition_Preflight` consomme `DeviceEncoderM1/M2.Operational` pour son verdict passif.
 
 ## ❌ ErrorId
 
