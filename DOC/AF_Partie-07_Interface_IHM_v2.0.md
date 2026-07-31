@@ -22,6 +22,7 @@
 | TC-P07-004 | Chaque champ `State` a un seul ecrivain PLC | producteur unique | AUTO | §1 |
 | TC-P07-005 | Troubleshooting lecture seule | aucune commande/config/bypass ecrit | AUTO | §5 |
 | TC-P07-006 | Distinguer message action vs etat | 2 familles separees, alarmes via ErrorId | AUTO+SITE | §4 |
+| TC-P07-007 | Warning auto-efface, Fault attend acquittement | pas de Reset requis pour Warning ; Fault reste affiche jusqu'a Ack | AUTO+SITE | §4, `CODE_QUALITY_STANDARDS.md §9` |
 
 ---
 
@@ -95,6 +96,11 @@ Deux familles a distinguer :
 |---|---|
 | 🎮 Action attendue | L'operateur doit faire quelque chose maintenant. |
 | 🧭 Etat machine | Information d'etat, sans demande d'action. |
+
+Cette distinction recoupe celle des defauts domaine : **Warning** (etat machine, s'efface seul
+avec la cause, pas d'action requise) vs **Fault** (action attendue = acquittement conscient,
+meme cause disparue). Pattern `Cause`/`Ack`, temporisation d'affichage anti-clignotement et regle
+complete : `DOC/CODE_QUALITY_STANDARDS.md §9`. Pas reformule ici.
 
 Format, priorites, concatenation et proprietaire exact : **TBD**.
 

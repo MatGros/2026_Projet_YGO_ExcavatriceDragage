@@ -89,6 +89,10 @@ strategie de test.
 | ⚡ Demande sortie | Demande brute de l'actionneur et confirmations necessaires a la barriere finale. | Outputs uniquement. |
 | 👁️ Etat public | Mesures, etats et diagnostics produits par le domaine. | Supervision et IHM. |
 
+Diagnostics (`Error`/`ErrorId`) portes par la frontiere "Etat public" : distinction Warning
+(auto-efface) / Fault (acquittement explicite, pattern `Cause`/`Ack`) documentee dans
+`DOC/CODE_QUALITY_STANDARDS.md §9`, pas reformulee ici.
+
 Interdictions : GVL globale de commande, fusion de sources dans une interface de FB, lecture/ecriture
 
 ---
