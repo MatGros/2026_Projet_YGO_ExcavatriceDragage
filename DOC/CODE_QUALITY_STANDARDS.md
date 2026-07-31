@@ -232,7 +232,32 @@ TonDisplayDebounce(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebou
 EmergencyArmingFailedDisplayed := TonDisplayDebounce.Q OR NOT EmergencyArmingFailedAck;
 ```
 
-## 10. Checklist de restitution (bloquante)
+## 10. Câblage CFC natif (`.xml`) — REX 2026-08
+
+> 🚩 Un CFC natif (`PRG_*_CFC.xml`, fusionné tel quel dans le bundle, cf. `PRG_GLOBAL_CFC.xml`)
+> importé avec des blocs affichés **sans aucun lien visible** dans CODESYS, alors que le XML
+> était bien formé et le bundle généré sans erreur. Cause : connecteurs empilés en `x=0 y=0`
+> (fils de longueur nulle, invisibles/confus dans l'éditeur graphique).
+
+Règles obligatoires pour tout `<CFC>` écrit ou généré à la main (hors générateur ST→LD) :
+
+1. **Chaque source** (`inVariable`, ou sortie d'un bloc consommée ailleurs) passe par un
+   **`<connector>` dédié** avant de rejoindre un bloc consommateur — jamais de `<connection>`
+   directe d'un bloc vers l'`inVariable` source, même quand PLCopenXML l'autoriserait.
+2. **Chaque `<connector>` a une position unique et non nulle** (`x`, `y` différents de `0,0`,
+   et différents des autres connecteurs de la page). Des connecteurs empilés au même point
+   produisent des fils illisibles ou invisibles dans l'éditeur graphique CODESYS.
+3. **Disposition en colonnes** : sources à gauche, blocs métier au centre (dans l'ordre
+   `executionOrderId`), sorties à droite — cohérent avec la règle §5 AF_Partie-03
+   ("le flux se lit de gauche à droite").
+4. **Aucune logique métier dans le CFC** (rappel §POO/§5 AF03, TC-P02-002) : un `IF`/calcul
+   se délègue à un FB dédié, jamais inline dans une page CFC.
+
+Référence conforme à copier : `CODE/AU/PRG_AU_Acquisition_CFC.xml` (corrigé) ou
+`CODE/MAIN/PRG_GLOBAL_CFC.xml` (prototype historique, câblage correct malgré son statut
+"ne pas reproduire" en architecture — le câblage lui-même reste une référence valide).
+
+## 11. Checklist de restitution (bloquante)
 
 ```text
 [ ] check_linkage.py --report = PASS, bloc collé dans la restitution
@@ -244,6 +269,7 @@ EmergencyArmingFailedDisplayed := TonDisplayDebounce.Q OR NOT EmergencyArmingFai
 [ ] Contrat FB respecté (AF_Partie-03)
 [ ] Non-régression : appelants/IHM/diagnostics identifiés et mis à jour
 [ ] Défaut à acquitter : Reset jamais conditionné (§9) ; Warning auto-effaçable distingué du Fault
+[ ] CFC natif (.xml) : connecteurs dédiés, positions uniques non nulles (§10)
 [ ] Devoir d'alerte : toute ambiguïté signalée AVANT d'écrire, pas après
 ```
 

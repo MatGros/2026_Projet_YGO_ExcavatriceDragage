@@ -468,7 +468,7 @@ Fichiers code de référence :
 - `CODE/AU/ST_EmergencyState.st` (bus état IHM, test)
 - `CODE/AU/GVL_Simulation_AU.st` (simulation hardware)
 - `CODE/AU/GVL_IHM_AU.st` (interface IHM)
-- `CODE/AU/PRG_AU_Acquisition.st` (acquisition)
+- `CODE/AU/PRG_AU_Acquisition_CFC.xml` (acquisition, CFC natif — cible AF02 §2)
 - `CODE/AU/PRG_AU_Outputs_LD.st` (sorties)
 - `CODE/AU/PRG_AU_TestBench.st` (programme principal test)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)

@@ -7,8 +7,8 @@ TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-OUT_DIR = TOOLS_DIR / 'out'
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+MODULES_DIR = TOOLS_DIR / 'out' / 'modules'
+MODULES_DIR.mkdir(parents=True, exist_ok=True)
 
 import fb_gen
 from data_contracts import build_position_decoder_contract, validate_contract
@@ -19,7 +19,9 @@ BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
 
 
 def _load_generated_module(pou_name):
-    tmp_dir = pathlib.Path(tempfile.mkdtemp(prefix='st2py-test-', dir=str(TOOLS_DIR / 'out')))
+    # Dossier temp systeme (jamais dans out/) : out/ reste reserve aux artefacts
+    # persistants (modules generes + rapports), pas aux dossiers de scratch des tests.
+    tmp_dir = pathlib.Path(tempfile.mkdtemp(prefix='st2py-test-'))
     module_path, _, _ = fb_gen.generate_module_and_test(pou_name, str(tmp_dir), bundle_path=str(BUNDLE_PATH))
     spec = importlib.util.spec_from_file_location(pou_name, module_path)
     module = importlib.util.module_from_spec(spec)

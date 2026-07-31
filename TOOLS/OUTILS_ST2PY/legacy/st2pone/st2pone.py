@@ -5,7 +5,9 @@ import argparse
 import pathlib
 import sys
 
-ST2PY_DIR = pathlib.Path(__file__).resolve().parents[1]
+# legacy/st2pone/st2pone.py -> parents[0]=st2pone parents[1]=legacy parents[2]=OUTILS_ST2PY
+ST2PY_DIR = pathlib.Path(__file__).resolve().parents[2]
+LEGACY_DIR = pathlib.Path(__file__).resolve().parents[1]
 if str(ST2PY_DIR) not in sys.path:
     sys.path.insert(0, str(ST2PY_DIR))
 
@@ -14,9 +16,9 @@ import fb_gen
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Generate ST2PY artefacts from a PLCopen XML bundle')
-    parser.add_argument('--bundle', default=str(ST2PY_DIR / 'CODE_Bundle_test.xml'))
+    parser.add_argument('--bundle', default=str(LEGACY_DIR / 'CODE_Bundle_test.xml'))
     parser.add_argument('--pou', default=None)
-    parser.add_argument('--out', default=str(ST2PY_DIR / 'out'))
+    parser.add_argument('--out', default=str(ST2PY_DIR / 'out' / 'modules'))
     parser.add_argument('--changed', action='store_true')
     parser.add_argument('--ref', default='origin/main')
     parser.add_argument('--force', action='store_true')

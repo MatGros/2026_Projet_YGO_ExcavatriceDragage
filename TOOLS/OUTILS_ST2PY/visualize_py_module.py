@@ -5,6 +5,7 @@ Parses generated Python files (e.g. out/FB_Safety_EmergencyManagement.py) using 
 extracts Class structure, Inputs, Outputs, FSM States, and generates UML & State Machine diagrams.
 """
 
+import argparse
 import ast
 import re
 import sys
@@ -174,29 +175,67 @@ FailConfirm --> Step0 : Reset + ContactorEngaged=TRUE
 @enduml"""
 
 
-def main():
-    py_path = TOOLS_DIR / "OUTILS_ST2PY" / "out" / "FB_Safety_EmergencyManagement.py"
-    if not py_path.exists():
-        print(f"Fichier introuvable: {py_path}", file=sys.stderr)
-        return 1
-
+def process_module(py_path: Path, out_dir: Path) -> bool:
+    """Génère les diagrammes UML (+ FSM si applicable) pour UN module Python.
+    Retourne False si le module n'a pas de classe exploitable (ex. artefact neutralise)."""
     print(f"Analyse AST du module Python: {py_path.name}...")
     info = parse_module_ast(py_path)
 
-    out_dir = TOOLS_DIR.parent.parent / "DOC" / "DIAGRAMS"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if not info["class_name"]:
+        print(f"   (aucune classe trouvee dans {py_path.name} -- artefact neutralise/vide, ignore)")
+        return False
 
-    # 1. Diagramme UML Classe
+    # 1. Diagramme UML Classe (toujours généré)
     uml_puml = generate_uml_puml(info)
     uml_png = out_dir / f"DIAG_PY_UML_{info['class_name']}.png"
     render_puml(uml_puml, uml_png, output_format="png")
     print(f"OK : {uml_png}")
 
-    # 2. Diagramme d'États FSM
-    fsm_puml = generate_fsm_puml(info)
-    fsm_png = out_dir / f"DIAG_PY_FSM_{info['class_name']}.png"
-    render_puml(fsm_puml, fsm_png, output_format="png")
-    print(f"OK : {fsm_png}")
+    # 2. Diagramme d'États FSM (seulement si le module a une vraie machine d'état,
+    # détectée via la présence de self._step et de comparaisons self._step == N)
+    if info["fsm_states"]:
+        fsm_puml = generate_fsm_puml(info)
+        fsm_png = out_dir / f"DIAG_PY_FSM_{info['class_name']}.png"
+        render_puml(fsm_puml, fsm_png, output_format="png")
+        print(f"OK : {fsm_png}")
+    else:
+        print(f"   (pas de machine d'état detectee dans {py_path.name}, FSM ignore)")
+    return True
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Genere les diagrammes UML/FSM pour les modules Python generes dans out/modules/."
+    )
+    parser.add_argument(
+        "module", nargs="?", default=None,
+        help="Nom du module (ex: FB_Safety_EmergencyManagement). Omis = TOUS les modules de out/modules/."
+    )
+    args = parser.parse_args()
+
+    modules_dir = TOOLS_DIR / "OUTILS_ST2PY" / "out" / "modules"
+    out_dir = TOOLS_DIR.parent / "DOC" / "DIAGRAMS" / "TESTS"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.module:
+        targets = [modules_dir / f"{args.module}.py"]
+    else:
+        targets = sorted(modules_dir.glob("*.py"))
+
+    if not targets:
+        print(f"Aucun module Python trouve dans {modules_dir}", file=sys.stderr)
+        return 1
+
+    had_error = False
+    for py_path in targets:
+        if not py_path.exists():
+            print(f"Fichier introuvable: {py_path}", file=sys.stderr)
+            had_error = True
+            continue
+        if not process_module(py_path, out_dir):
+            continue
+
+    return 1 if had_error else 0
 
 
 if __name__ == "__main__":

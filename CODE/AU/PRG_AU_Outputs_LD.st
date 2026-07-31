@@ -6,10 +6,13 @@
    🧩 Structure identique à PRG_10_Outputs_LD (projet réel) pour le
       domaine AU isolé : converti automatiquement en Ladder Diagram
       (<LD>) dans CODESYS, comme la frontière finale réelle.
+   ⚠️ Pattern LD imposé (REX import) : VAR_OUTPUT strictement scalaires
+      (BOOL/INT/WORD), jamais de structure ST_* en sortie — même règle
+      que PRG_10_Outputs_LD (aucun ST_* dans ses VAR_OUTPUT). Les bus
+      structurés State/Diag restent lisibles via l'instance (Watch),
+      pas via une sortie VAR_OUTPUT du programme.
    🎯 Ordre d'appel obligatoire : PRG_AU_Acquisition → PRG_AU_Outputs_LD
       (même cycle, même tâche).
-   🚦 Produit les bus ST_State_Emergency et ST_Diag_Emergency
-      observables en Watch pour vérification de la séquence.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2 (PRG_OUTPUTS_LD)
@@ -22,9 +25,17 @@ VAR_OUTPUT
     PowerKeepAlive_B_RQ : BOOL;   // Relais maintien canal B (TRUE = voie maintenue)
     EmergencyArming_RQ  : BOOL;   // Impulsion réarmement contacteur (1s)
 
-    // 🚦 Bus d'état et diagnostic pour observation Watch
-    State               : ST_State_Emergency;
-    Diag                : ST_Diag_Emergency;
+    // 🩺 Diagnostics scalaires pour observation Watch (même pattern que PRG_10_Outputs_LD)
+    ChainOk                      : BOOL;
+    ContactorOk                  : BOOL;
+    Armable                      : BOOL;
+    ArmingBusy                   : BOOL;
+    ArmingSeqStep                : INT;
+    Error                        : BOOL;
+    ErrorId                      : WORD;
+    RedundancyTestFailed         : BOOL;
+    EmergencyArmingFailed        : BOOL;
+    EmergencyArmingLockoutActive : BOOL;
 END_VAR
 VAR
     // Instance unique du composite AU — barrière finale, seul écrivain des Q AU
@@ -49,6 +60,14 @@ PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.MaintainA_RQ;
 PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.MaintainB_RQ;
 EmergencyArming_RQ  := instSafetyEmergencyManagement.ArmPulse_RQ;
 
-// 🚦 Observation structurée
-State := instSafetyEmergencyManagement.State;
-Diag  := instSafetyEmergencyManagement.Diag;
+// 🩺 Observation scalaire (dépliage manuel des bus State/Diag)
+ChainOk                      := instSafetyEmergencyManagement.State.ChainOk;
+ContactorOk                  := instSafetyEmergencyManagement.State.ContactorOk;
+Armable                      := instSafetyEmergencyManagement.State.Armable;
+ArmingBusy                   := instSafetyEmergencyManagement.State.ArmingBusy;
+ArmingSeqStep                := instSafetyEmergencyManagement.State.Step;
+Error                        := instSafetyEmergencyManagement.Diag.Error;
+ErrorId                      := instSafetyEmergencyManagement.Diag.ErrorId;
+RedundancyTestFailed         := instSafetyEmergencyManagement.Diag.RedundancyTestFailed;
+EmergencyArmingFailed        := instSafetyEmergencyManagement.Diag.ArmFailed;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Diag.LockoutActive;

@@ -1415,17 +1415,239 @@ Diag.LockoutActive        := LockoutActive;
           </data>
         </addData>
       </pou>
+      <pou name="FB_Sim_AU_ChainFeedback" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit maître simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne opérateur banc (Watch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie physique canal A du scan précédent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie physique canal B du scan précédent</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ChainClosedRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrée brute simulée, à qualifier par FB_Input en aval</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_AU_ChainFeedback — Simulation physique boucle AU (banc de test)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+   🎯 Rôle : modélise le comportement physique — quand le PLC force
+      MaintainA/B à FALSE (auto-test A/B), la boucle AU s'ouvre réellement
+      → la sortie ChainClosedRaw repasse à FALSE le cycle suivant (1 cycle
+      de retard = fidèle au comportement réel d'un contacteur/relais).
+   🔴 Sortie brute (non filtrée) : le conditionnement anti-rebond 20 ms
+      est appliqué en aval par FB_Input, pas ici — cette brique ne fait
+      QUE la simulation physique, jamais du conditionnement de signal.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_AU_ChainFeedback) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_AU_ChainFeedback) ===
+
+IF SimulationModeActive AND (NOT MaintainA OR NOT MaintainB) THEN
+    // Au moins un canal forcé à FALSE (auto-test) -&gt; la chaîne AU physique s'ouvre
+    ChainClosedRaw := FALSE;
+ELSE
+    // Les deux canaux maintenus -&gt; la chaîne AU suit la consigne opérateur banc
+    ChainClosedRaw := SimChainClosed;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Input" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="InputRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal brut carte d'entrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InvertLogic">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = NC (logique inversée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FilterTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tempo anti-rebond (filtrage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChannelOk">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag voie/carte OK (§4) — TRUE par défaut si pas de diag dispo</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="State">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal conditionné, prêt à l'emploi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voie en défaut (ChannelOk faux)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FilterTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="ValueRaw">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📥 FB_Input — Entrée TOR conditionnée (brique réduite)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1
+   🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
+      complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
+      de conditionnement bas niveau, à instancier en tableau (§3) ou
+      composée directement dans un FB métier.
+   🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
+   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
+      d'architecture en attente — composition interne vs FB_IO générique
+      séparé). Ce fichier ne fait QUE créer la brique elle-même.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Input) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Input) ===
+
+// 1. Inversion NO/NC
+ValueRaw := InputRaw XOR InvertLogic;
+
+// 2. Initialisation premier scan &amp; Filtrage anti-rebond
+// Au premier scan post-boot, State prend directement la valeur saine brute sans attendre le délai de 20ms,
+// ce qui évite d'émettre des fausses alarmes transitoires au démarrage de l'automate.
+IF NOT FirstScanDone THEN
+    State := ValueRaw;
+    FirstScanDone := TRUE;
+ELSE
+    FilterTon(IN := (ValueRaw &lt;&gt; State), PT := FilterTime);
+    IF FilterTon.Q THEN
+        State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+    END_IF;
+END_IF;
+
+// 3. Diagnostic voie/carte
+IF NOT ChannelOk THEN
+    ErrorId := ErrorId OR 16#0001;
+    State := FALSE;   // État sûr forcé (Partie6 §1)
+ELSE
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+Error := (ErrorId &lt;&gt; 16#0000);
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8edb8169-fe96-5561-81ca-d3258d6bba57</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="PRG_AU_Acquisition" pouType="program">
         <interface>
-          <inputVars />
           <outputVars>
             <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Signaux qualifiés vers le reste du programme
-Boucle AU fermée (qualifié FB_Input, 20 ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (qualifie FB_Input, 20 ms)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -1433,7 +1655,7 @@ Boucle AU fermée (qualifié FB_Input, 20 ms)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engagé (qualifié FB_Input, 20 ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engage (qualifie FB_Input, 20 ms)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -1441,114 +1663,316 @@ Boucle AU fermée (qualifié FB_Input, 20 ms)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety métier (agrégé)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 État simulation (pour diagnostic)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande coupure safety metier (agrege)</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="instSimChainFeedback">
+              <type>
+                <derived name="FB_Sim_AU_ChainFeedback" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation physique boucle AU (banc de test)</xhtml>
+              </documentation>
+            </variable>
             <variable name="instEmergencyChainClosed">
               <type>
                 <derived name="FB_Input" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔩 Briques standard de conditionnement (mêmes composants que PRG_00_Inputs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification boucle AU (anti-rebond 20 ms)</xhtml>
               </documentation>
             </variable>
             <variable name="instPowerContactorEngaged">
               <type>
                 <derived name="FB_Input" />
               </type>
-            </variable>
-            <variable name="PrevMaintainA">
-              <type>
-                <BOOL />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Feedback : sorties physiques du scan PRÉCÉDENT
-(PRG_AU_Acquisition est appelé AVANT PRG_AU_Outputs_LD dans PRG_AU_TestBench,
-donc PRG_AU_Outputs_LD.PowerKeepAlive_A/B_RQ sont les valeurs du cycle N-1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PrevMaintainB">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="RawChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Entrée brute simulée de la boucle AU (avant conditionnement FB_Input)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification retour contacteur (anti-rebond 20 ms)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📥 PRG_AU_Acquisition — Acquisition et qualification des entrées AU
-   ───────────────────────────────────────────────────────────────
-   📄 Lit les signaux simulés (GVL_Simulation_AU) et les qualifie via
-      FB_Input (brique standard §1bis, même composant que PRG_00_Inputs)
-      avant de les transmettre au composite.
-   🧩 Structure proche cible PRG_ACQUISITION_CFC (AF02 §2) : conditionnement
-      2 briques FB_Input + agrégation coupure métier — pas de logique
-      métier (règle TC-P02-002, une page CFC ne contient pas d'arbitrage).
-   🔄 Feedback simulation : modélise le comportement physique —
-      quand le PLC force MaintainA/B_RQ à FALSE (auto-test A/B),
-      la boucle AU s'ouvre réellement → EmergencyChainClosed repasse
-      à FALSE le cycle suivant (1 cycle de retard = acceptable).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2
-              DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquisition et qualification des entrees AU (CFC natif, cible AF02 §2).
+Lit les signaux simules (GVL_Simulation_AU) et les qualifie via FB_Input
+(brique standard, meme composant que PRG_00_Inputs) avant transmission
+au composite FB_Safety_EmergencyManagement.
+Aucune logique metier ici (regle TC-P02-002) : le feedback simulation est
+delegue a FB_Sim_AU_ChainFeedback, une page CFC ne fait qu'enchainer des blocs.
+Regle de cablage CFC (obligatoire, DOC/CODE_QUALITY_STANDARDS.md paragraphe CFC) : CHAQUE
+entree source (inVariable/sortie de bloc) passe par un connector dedie avant
+de rejoindre un bloc consommateur -- jamais de connexion directe source vers bloc.
+Chaque connector a une position UNIQUE et non nulle (x,y != 0,0 sauf le tout
+premier), pour eviter les fils de longueur nulle empiles qui rendent le
+cablage illisible/invisible dans l'editeur CODESYS (REX 2026-08).
+Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+       DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2
+       DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION ===
-
-// 🔬 Source : simulé (banc de test isolé, toujours simulé ici)
-SimActive := GVL_Simulation_AU.SimulationModeActive;
-
-// 🎯 Entrée brute boucle AU : si la simulation vient de forcer l'ouverture d'un
-// canal (auto-test A/B, cycle précédent), la chaîne "physique" retombe → 1 cycle
-// de retard fidèle au comportement réel d'un contacteur/relais.
-IF SimActive AND (NOT PrevMaintainA OR NOT PrevMaintainB) THEN
-    RawChainClosed := FALSE;
-ELSE
-    RawChainClosed := GVL_Simulation_AU.SimChainClosed;
-END_IF;
-
-// 🎯 Qualification boucle AU (brique standard, anti-rebond 20 ms)
-instEmergencyChainClosed(InputRaw := RawChainClosed, FilterTime := T#20ms);
-EmergencyChainClosed := instEmergencyChainClosed.State;
-
-// 🎯 Qualification retour contacteur (brique standard, anti-rebond 20 ms)
-instPowerContactorEngaged(InputRaw := GVL_Simulation_AU.SimContactorEngaged, FilterTime := T#20ms);
-PowerContactorEngaged := instPowerContactorEngaged.State;
-
-// 🎯 Agrégation coupure métier (simulée ici, proviendrait de PRG_03_Safety en réel)
-PowerCutOffRequest := GVL_Simulation_AU.SimPowerCutOffReq;
-
-// 📝 Mémorisation pour le prochain cycle (feedback 1 cycle)
-PrevMaintainA := PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ;
-PrevMaintainB := PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ;
-</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
           </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="20" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimulationModeActive</expression>
+                </inVariable>
+                <inVariable localId="2">
+                  <position x="10" y="40" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimChainClosed</expression>
+                </inVariable>
+                <inVariable localId="3">
+                  <position x="10" y="60" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ</expression>
+                </inVariable>
+                <inVariable localId="4">
+                  <position x="10" y="80" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ</expression>
+                </inVariable>
+                <connector localId="5" name="">
+                  <position x="40" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="6" name="">
+                  <position x="40" y="40" />
+                  <connectionPointIn>
+                    <connection refLocalId="2" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="7" name="">
+                  <position x="40" y="60" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="8" name="">
+                  <position x="40" y="80" />
+                  <connectionPointIn>
+                    <connection refLocalId="4" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="10" executionOrderId="1" typeName="FB_Sim_AU_ChainFeedback" instanceName="instSimChainFeedback">
+                  <position x="70" y="15" />
+                  <inputVariables>
+                    <variable formalParameter="SimulationModeActive">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="5" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SimChainClosed">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="MaintainA">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="7" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="MaintainB">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="8" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="ChainClosedRaw">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType>functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="11" name="">
+                  <position x="105" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="ChainClosedRaw" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="12">
+                  <position x="105" y="35" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>T#20ms</expression>
+                </inVariable>
+                <connector localId="13" name="">
+                  <position x="120" y="35" />
+                  <connectionPointIn>
+                    <connection refLocalId="12" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="20" executionOrderId="2" typeName="FB_Input" instanceName="instEmergencyChainClosed">
+                  <position x="140" y="15" />
+                  <inputVariables>
+                    <variable formalParameter="InputRaw">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="11" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="FilterTime">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="13" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType>functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="21" name="">
+                  <position x="175" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="20" formalParameter="State" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="22">
+                  <position x="195" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="21" />
+                  </connectionPointIn>
+                  <expression>EmergencyChainClosed</expression>
+                </outVariable>
+                <inVariable localId="30">
+                  <position x="10" y="120" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimContactorEngaged</expression>
+                </inVariable>
+                <connector localId="32" name="">
+                  <position x="40" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="30" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="31">
+                  <position x="10" y="140" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>T#20ms</expression>
+                </inVariable>
+                <connector localId="33" name="">
+                  <position x="40" y="140" />
+                  <connectionPointIn>
+                    <connection refLocalId="31" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="40" executionOrderId="3" typeName="FB_Input" instanceName="instPowerContactorEngaged">
+                  <position x="70" y="115" />
+                  <inputVariables>
+                    <variable formalParameter="InputRaw">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="32" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="FilterTime">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="33" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType>functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="41" name="">
+                  <position x="105" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="40" formalParameter="State" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="42">
+                  <position x="140" y="120" />
+                  <connectionPointIn>
+                    <connection refLocalId="41" />
+                  </connectionPointIn>
+                  <expression>PowerContactorEngaged</expression>
+                </outVariable>
+                <inVariable localId="50">
+                  <position x="10" y="180" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_Simulation_AU.SimPowerCutOffReq</expression>
+                </inVariable>
+                <connector localId="52" name="">
+                  <position x="40" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="50" />
+                  </connectionPointIn>
+                </connector>
+                <outVariable localId="51">
+                  <position x="70" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="52" />
+                  </connectionPointIn>
+                  <expression>PowerCutOffRequest</expression>
+                </outVariable>
+              </CFC>
+            </data>
+          </addData>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e301096b-b905-5c3d-96fa-3afcf1106a59</ObjectId>
+            <ObjectId>c3f8a1e6-9a2d-4b7e-8f3a-1e6d9c2b5a70</ObjectId>
           </data>
         </addData>
       </pou>
@@ -1581,17 +2005,57 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion réarmement contacteur (1s)</xhtml>
               </documentation>
             </variable>
-            <variable name="State">
+            <variable name="ChainOk">
               <type>
-                <derived name="ST_State_Emergency" />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état et diagnostic pour observation Watch</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires pour observation Watch (même pattern que PRG_10_Outputs_LD)</xhtml>
               </documentation>
             </variable>
-            <variable name="Diag">
+            <variable name="ContactorOk">
               <type>
-                <derived name="ST_Diag_Emergency" />
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArmingLockoutActive">
+              <type>
+                <BOOL />
               </type>
             </variable>
           </outputVars>
@@ -1614,10 +2078,13 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
    🧩 Structure identique à PRG_10_Outputs_LD (projet réel) pour le
       domaine AU isolé : converti automatiquement en Ladder Diagram
       (&lt;LD&gt;) dans CODESYS, comme la frontière finale réelle.
+   ⚠️ Pattern LD imposé (REX import) : VAR_OUTPUT strictement scalaires
+      (BOOL/INT/WORD), jamais de structure ST_* en sortie — même règle
+      que PRG_10_Outputs_LD (aucun ST_* dans ses VAR_OUTPUT). Les bus
+      structurés State/Diag restent lisibles via l'instance (Watch),
+      pas via une sortie VAR_OUTPUT du programme.
    🎯 Ordre d'appel obligatoire : PRG_AU_Acquisition → PRG_AU_Outputs_LD
       (même cycle, même tâche).
-   🚦 Produit les bus ST_State_Emergency et ST_Diag_Emergency
-      observables en Watch pour vérification de la séquence.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2 (PRG_OUTPUTS_LD)</xhtml>
@@ -1849,7 +2316,7 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
             <comment localId="63" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🚦 Observation structurée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🩺 Observation scalaire (dépliage manuel des bus State/Diag)</xhtml>
               </content>
             </comment>
             <vendorElement localId="64">
@@ -1866,14 +2333,14 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
             <inVariable localId="65">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.State</expression>
+              <expression>instSafetyEmergencyManagement.State.ChainOk</expression>
             </inVariable>
             <outVariable localId="66">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="65" />
               </connectionPointIn>
-              <expression>State</expression>
+              <expression>ChainOk</expression>
             </outVariable>
             <comment localId="75" height="0" width="0">
               <position x="0" y="0" />
@@ -1895,14 +2362,246 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
             <inVariable localId="77">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>instSafetyEmergencyManagement.Diag</expression>
+              <expression>instSafetyEmergencyManagement.State.ContactorOk</expression>
             </inVariable>
             <outVariable localId="78">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="77" />
               </connectionPointIn>
-              <expression>Diag</expression>
+              <expression>ContactorOk</expression>
+            </outVariable>
+            <comment localId="87" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="88">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="89">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.Armable</expression>
+            </inVariable>
+            <outVariable localId="90">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="89" />
+              </connectionPointIn>
+              <expression>Armable</expression>
+            </outVariable>
+            <comment localId="99" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="100">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="101">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.ArmingBusy</expression>
+            </inVariable>
+            <outVariable localId="102">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="101" />
+              </connectionPointIn>
+              <expression>ArmingBusy</expression>
+            </outVariable>
+            <comment localId="111" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="112">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="113">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.State.Step</expression>
+            </inVariable>
+            <outVariable localId="114">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="113" />
+              </connectionPointIn>
+              <expression>ArmingSeqStep</expression>
+            </outVariable>
+            <comment localId="123" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="124">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="125">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.Error</expression>
+            </inVariable>
+            <outVariable localId="126">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="125" />
+              </connectionPointIn>
+              <expression>Error</expression>
+            </outVariable>
+            <comment localId="135" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="136">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="137">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.ErrorId</expression>
+            </inVariable>
+            <outVariable localId="138">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="137" />
+              </connectionPointIn>
+              <expression>ErrorId</expression>
+            </outVariable>
+            <comment localId="147" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="148">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="149">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.RedundancyTestFailed</expression>
+            </inVariable>
+            <outVariable localId="150">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="149" />
+              </connectionPointIn>
+              <expression>RedundancyTestFailed</expression>
+            </outVariable>
+            <comment localId="159" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="160">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="161">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.ArmFailed</expression>
+            </inVariable>
+            <outVariable localId="162">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="161" />
+              </connectionPointIn>
+              <expression>EmergencyArmingFailed</expression>
+            </outVariable>
+            <comment localId="171" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="172">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType>networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="173">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSafetyEmergencyManagement.Diag.LockoutActive</expression>
+            </inVariable>
+            <outVariable localId="174">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="173" />
+              </connectionPointIn>
+              <expression>EmergencyArmingLockoutActive</expression>
             </outVariable>
             <rightPowerRail localId="2147483646">
               <position x="0" y="0" />
@@ -1997,10 +2696,10 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
       GVL_Simulation_AU.SimContactorEngaged = TRUE → simule retour contacteur
       GVL_Simulation_AU.SimPowerCutOffReq   = TRUE → simule coupure métier
    👁️ Observation :
-      PRG_AU_Outputs_LD.State.Step      → étape séquence (0..6)
+      PRG_AU_Outputs_LD.ArmingSeqStep    → étape séquence (0..6)
       PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ → état maintien A
       PRG_AU_Outputs_LD.EmergencyArming_RQ  → pulse réarmement
-      PRG_AU_Outputs_LD.Diag            → erreurs/locks
+      PRG_AU_Outputs_LD.ErrorId          → erreurs/locks
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
@@ -2018,31 +2717,31 @@ PRG_AU_Acquisition();
 // 📤 2. Traitement et sorties (composite + Q)
 PRG_AU_Outputs_LD();
 
-// 🩺 Synthèse Watch — lecture des bus structurés
+// 🩺 Synthèse Watch — lecture des sorties scalaires (pattern PRG_10_Outputs_LD)
 MaintainA        := PRG_AU_Outputs_LD.PowerKeepAlive_A_RQ;
 MaintainB        := PRG_AU_Outputs_LD.PowerKeepAlive_B_RQ;
 ArmPulse         := PRG_AU_Outputs_LD.EmergencyArming_RQ;
-Step             := PRG_AU_Outputs_LD.State.Step;
-ErrorId          := PRG_AU_Outputs_LD.Diag.ErrorId;
-RedundancyFailed := PRG_AU_Outputs_LD.Diag.RedundancyTestFailed;
-ArmFailed        := PRG_AU_Outputs_LD.Diag.ArmFailed;
-Lockout          := PRG_AU_Outputs_LD.Diag.LockoutActive;
-ChainOk          := PRG_AU_Outputs_LD.State.ChainOk;
-ContactorOk      := PRG_AU_Outputs_LD.State.ContactorOk;
-Armable          := PRG_AU_Outputs_LD.State.Armable;
+Step             := PRG_AU_Outputs_LD.ArmingSeqStep;
+ErrorId          := PRG_AU_Outputs_LD.ErrorId;
+RedundancyFailed := PRG_AU_Outputs_LD.RedundancyTestFailed;
+ArmFailed        := PRG_AU_Outputs_LD.EmergencyArmingFailed;
+Lockout          := PRG_AU_Outputs_LD.EmergencyArmingLockoutActive;
+ChainOk          := PRG_AU_Outputs_LD.ChainOk;
+ContactorOk      := PRG_AU_Outputs_LD.ContactorOk;
+Armable          := PRG_AU_Outputs_LD.Armable;
 
 // 📤 Publication IHM — l'opérateur voit ces retours sur son écran
 // [IHM] Publication dans la structure d'etat IHM (lue par la visu operateur)
-GVL_IHM_AU.State.ChainOk              := PRG_AU_Outputs_LD.State.ChainOk;
-GVL_IHM_AU.State.ContactorOk          := PRG_AU_Outputs_LD.State.ContactorOk;
-GVL_IHM_AU.State.Armable              := PRG_AU_Outputs_LD.State.Armable;
-GVL_IHM_AU.State.ArmingBusy           := PRG_AU_Outputs_LD.State.ArmingBusy;
-GVL_IHM_AU.State.RedundancyTestFailed := PRG_AU_Outputs_LD.Diag.RedundancyTestFailed;
-GVL_IHM_AU.State.ArmingFailed         := PRG_AU_Outputs_LD.Diag.ArmFailed;
-GVL_IHM_AU.State.LockoutActive        := PRG_AU_Outputs_LD.Diag.LockoutActive;
-GVL_IHM_AU.State.Step                 := PRG_AU_Outputs_LD.State.Step;
-GVL_IHM_AU.State.Error                := PRG_AU_Outputs_LD.Diag.Error;
-GVL_IHM_AU.State.ErrorId              := PRG_AU_Outputs_LD.Diag.ErrorId;
+GVL_IHM_AU.State.ChainOk              := ChainOk;
+GVL_IHM_AU.State.ContactorOk          := ContactorOk;
+GVL_IHM_AU.State.Armable              := Armable;
+GVL_IHM_AU.State.ArmingBusy           := PRG_AU_Outputs_LD.ArmingBusy;
+GVL_IHM_AU.State.RedundancyTestFailed := RedundancyFailed;
+GVL_IHM_AU.State.ArmingFailed         := ArmFailed;
+GVL_IHM_AU.State.LockoutActive        := Lockout;
+GVL_IHM_AU.State.Step                 := Step;
+GVL_IHM_AU.State.Error                := PRG_AU_Outputs_LD.Error;
+GVL_IHM_AU.State.ErrorId              := ErrorId;
 GVL_IHM_AU.State.PowerCutOffActive    := GVL_Simulation_AU.SimPowerCutOffReq;
 
 CASE Step OF
@@ -2062,145 +2761,6 @@ END_CASE;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>02de714f-6617-5e7c-a494-70cf9c90d728</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Input" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="InputRaw">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal brut carte d'entrée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InvertLogic">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = NC (logique inversée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FilterTime">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tempo anti-rebond (filtrage)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ChannelOk">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag voie/carte OK (§4) — TRUE par défaut si pas de diag dispo</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="State">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal conditionné, prêt à l'emploi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voie en défaut (ChannelOk faux)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="FilterTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="ValueRaw">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FirstScanDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📥 FB_Input — Entrée TOR conditionnée (brique réduite)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1
-   🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
-      complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
-      de conditionnement bas niveau, à instancier en tableau (§3) ou
-      composée directement dans un FB métier.
-   🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
-      d'architecture en attente — composition interne vs FB_IO générique
-      séparé). Ce fichier ne fait QUE créer la brique elle-même.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Input) ===</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Input) ===
-
-// 1. Inversion NO/NC
-ValueRaw := InputRaw XOR InvertLogic;
-
-// 2. Initialisation premier scan &amp; Filtrage anti-rebond
-// Au premier scan post-boot, State prend directement la valeur saine brute sans attendre le délai de 20ms,
-// ce qui évite d'émettre des fausses alarmes transitoires au démarrage de l'automate.
-IF NOT FirstScanDone THEN
-    State := ValueRaw;
-    FirstScanDone := TRUE;
-ELSE
-    FilterTon(IN := (ValueRaw &lt;&gt; State), PT := FilterTime);
-    IF FilterTon.Q THEN
-        State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
-    END_IF;
-END_IF;
-
-// 3. Diagnostic voie/carte
-IF NOT ChannelOk THEN
-    ErrorId := ErrorId OR 16#0001;
-    State := FALSE;   // État sûr forcé (Partie6 §1)
-ELSE
-    ErrorId := ErrorId AND 16#FFFE;
-END_IF;
-
-Error := (ErrorId &lt;&gt; 16#0000);
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>8edb8169-fe96-5561-81ca-d3258d6bba57</ObjectId>
           </data>
         </addData>
       </pou>
@@ -2341,7 +2901,8 @@ TRUE = une safety demande la coupure</xhtml>
           <Object Name="ST_EmergencyState" ObjectId="60f821fa-d35a-58c5-ac8a-e1efe1044110" />
           <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
           <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />
-          <Object Name="PRG_AU_Acquisition" ObjectId="e301096b-b905-5c3d-96fa-3afcf1106a59" />
+          <Object Name="FB_Sim_AU_ChainFeedback" ObjectId="d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda" />
+          <Object Name="PRG_AU_Acquisition_CFC" ObjectId="22eb10df-0a92-5149-8107-a9e4bedbf362" />
           <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
           <Object Name="PRG_AU_TestBench" ObjectId="02de714f-6617-5e7c-a494-70cf9c90d728" />
         </Folder>

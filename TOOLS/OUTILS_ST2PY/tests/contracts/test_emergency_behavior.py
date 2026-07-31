@@ -7,8 +7,10 @@ TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-OUT_DIR = TOOLS_DIR / 'out'
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+MODULES_DIR = TOOLS_DIR / 'out' / 'modules'
+MODULES_DIR.mkdir(parents=True, exist_ok=True)
+CHRONICLES_DIR = TOOLS_DIR / 'out' / 'chronicles'
+CHRONICLES_DIR.mkdir(parents=True, exist_ok=True)
 
 import fb_gen
 from test_tracer import ExecutionTracer
@@ -18,9 +20,11 @@ BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_AU_Bundle.xml'
 
 
 def _load_generated_emergency_module():
-    tmp_dir = pathlib.Path(tempfile.mkdtemp(prefix='st2py-test-', dir=str(TOOLS_DIR / 'out')))
+    # Dossier temp systeme (jamais dans out/) : out/ reste reserve aux artefacts
+    # persistants (modules generes + rapports), pas aux dossiers de scratch des tests.
+    tmp_dir = pathlib.Path(tempfile.mkdtemp(prefix='st2py-test-'))
     module_path, _, _ = fb_gen.generate_module_and_test(
-        'FB_Safety_EmergencyManagement',
+        'FB_Safety_EmergencyManagement',  # NOSONAR generation en tmp_dir isole, pas dans out/ (evite pollution)
         str(tmp_dir),
         bundle_path=str(BUNDLE_PATH)
     )
@@ -98,7 +102,7 @@ def test_tc_p01_003_arming_sequence_nominal():
     assert fb.Error is False
 
     # Export HTML report
-    tracer.export_html_report(OUT_DIR / "TC-P01-003_Chronicle_Report.html")
+    tracer.export_html_report(CHRONICLES_DIR / "TC-P01-003_Chronicle_Report.html")
 
 
 def test_tc_p01_006_redundancy_test_failure():
@@ -128,7 +132,7 @@ def test_tc_p01_006_redundancy_test_failure():
     assert (fb.ErrorId & 0x0001) != 0
     assert fb.ArmingSeqStep == 0
 
-    tracer.export_html_report(OUT_DIR / "TC-P01-006_Chronicle_Report.html")
+    tracer.export_html_report(CHRONICLES_DIR / "TC-P01-006_Chronicle_Report.html")
 
 
 def test_tc_p01_007_lockout_after_confirmation_timeout():
@@ -175,7 +179,7 @@ def test_tc_p01_007_lockout_after_confirmation_timeout():
     tracer.log_step(fb, 5010.0, "Fin Lockout 5s")
     assert fb.EmergencyArmingLockoutActive is False
 
-    tracer.export_html_report(OUT_DIR / "TC-P01-007_Chronicle_Report.html")
+    tracer.export_html_report(CHRONICLES_DIR / "TC-P01-007_Chronicle_Report.html")
 
 
 def test_tc_p01_008_safety_power_cutoff_request():
@@ -200,7 +204,7 @@ def test_tc_p01_008_safety_power_cutoff_request():
     assert fb.MaintainA_RQ is False
     assert fb.MaintainB_RQ is False
 
-    tracer.export_html_report(OUT_DIR / "TC-P01-008_Chronicle_Report.html")
+    tracer.export_html_report(CHRONICLES_DIR / "TC-P01-008_Chronicle_Report.html")
 
 
 def test_tc_p01_004_reset_never_conditioned():
@@ -268,7 +272,7 @@ def test_tc_p01_004_reset_never_conditioned():
     assert fb.EmergencyArmingLockoutActive is False
     assert fb.State['Armable'] is True
 
-    tracer.export_html_report(OUT_DIR / "TC-P01-004_Chronicle_Report.html")
+    tracer.export_html_report(CHRONICLES_DIR / "TC-P01-004_Chronicle_Report.html")
 
 
 def test_tc_p01_009_relatch_after_premature_ack():
@@ -313,4 +317,4 @@ def test_tc_p01_009_relatch_after_premature_ack():
 
     assert fb.RedundancyTestFailed is True  # re-latche, PAS besoin d'un nouveau defaut different
 
-    tracer.export_html_report(OUT_DIR / "TC-P01-009_Chronicle_Report.html")
+    tracer.export_html_report(CHRONICLES_DIR / "TC-P01-009_Chronicle_Report.html")

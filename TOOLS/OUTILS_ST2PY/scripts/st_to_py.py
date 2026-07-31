@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Prototype sélectif ST/PLCopen -> Python
 
-Usage:
-  python st_to_py.py --bundle CODE/CODE_Bundle.xml --list
-  python st_to_py.py --bundle CODE/CODE_Bundle.xml --pou PRG_07_TranslationControl --out out/
+Usage (depuis TOOLS/OUTILS_ST2PY/) :
+  python scripts/st_to_py.py --bundle ../../CODE/CODE_Bundle.xml --list
+  python scripts/st_to_py.py --bundle ../../CODE/CODE_Bundle.xml --pou PRG_07_TranslationControl --out out/modules/
 
 Notes:
 - Optional dependency: plcopen (pip install plcopen)
@@ -75,7 +75,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--bundle", type=Path, default=Path("CODE/CODE_Bundle.xml"), help="PLCopen XML bundle")
     parser.add_argument("--list", action="store_true", help="List POU names in bundle")
     parser.add_argument("--pou", type=str, help="POU/FB name to generate")
-    parser.add_argument("--out", type=Path, default=Path("out"), help="Output directory")
+    parser.add_argument("--out", type=Path, default=Path("out/modules"), help="Output directory")
     args = parser.parse_args(argv)
 
     if not args.bundle.is_file():
