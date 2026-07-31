@@ -1,0 +1,50 @@
+   <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Commande contacteur puissance Kobold</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="EmergencyArmingPulseActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArmingLockoutActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instM1RelayFwd">
+              <type>
+                <derived name="FB_Output" />
+              </type>
+            </variable>
+            <variable name="instM1RelayRev">
+              <type>
+                <derived name="FB_Output" />
+              </type>
+            </variable>
+            <variable name="instM1SpeedContactor1">
+              <type>
+                <derived name="FB_Output" />
+              </type>
+      

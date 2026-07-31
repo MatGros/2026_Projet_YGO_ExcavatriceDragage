@@ -1,0 +1,98 @@
+
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
+            </contact>
+            <block localId="99" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Enable">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Reset">
+                  <connectionPointIn>
+                    <connection refLocalId="100" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ArmRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="101" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="EmergencyChain">
+                  <connectionPointIn>
+                    <connection refLocalId="102" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="EmergencyStopOk">
+                  <connectionPointIn>
+                    <connection refLocalId="103" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerCutOffRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="104" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="BtnEmergencyCutOff">
+                  <connectionPointIn>
+                    <connection refLocalId="105" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <comment localId="106" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="107">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="108" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>instSafetyEmergencyManagement.PowerCutOff_A_RQ</variable>
+            </contact>
+            <coil localId="109" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="108" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PowerKeepAlive_A_RQ</variable>
+            </coil>
+            <comment localId="110" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="111">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementty

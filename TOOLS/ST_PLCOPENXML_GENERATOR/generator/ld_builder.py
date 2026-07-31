@@ -48,6 +48,7 @@ def _create_standalone_banner_network(
     d_t.set("name", "http://www.3s-software.com/plcopenxml/fbdelementtype")
     d_t.set("handleUnknown", "implementation")
     el_type_t = ET.SubElement(d_t, "ElementType")
+    el_type_t.set("xmlns", "")
     el_type_t.text = "networktitle"
     cid += 1
 
@@ -92,6 +93,7 @@ def _append_network_header(
     d_t.set("name", "http://www.3s-software.com/plcopenxml/fbdelementtype")
     d_t.set("handleUnknown", "implementation")
     el_type_t = ET.SubElement(d_t, "ElementType")
+    el_type_t.set("xmlns", "")
     el_type_t.text = "networktitle"
     cid += 1
 
@@ -272,6 +274,7 @@ def build_ld_body(
         d_b.set("name", "http://www.3s-software.com/plcopenxml/fbdcalltype")
         d_b.set("handleUnknown", "implementation")
         call_type = ET.SubElement(d_b, "CallType")
+        call_type.set("xmlns", "")
         call_type.text = "functionblock"
 
         # Bobine physique
@@ -352,6 +355,7 @@ def build_ld_body(
             d_b.set("name", "http://www.3s-software.com/plcopenxml/fbdcalltype")
             d_b.set("handleUnknown", "implementation")
             call_type = ET.SubElement(d_b, "CallType")
+            call_type.set("xmlns", "")
             call_type.text = "functionblock"
             continue
 
