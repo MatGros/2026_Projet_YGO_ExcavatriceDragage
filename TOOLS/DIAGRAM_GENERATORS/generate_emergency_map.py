@@ -57,6 +57,7 @@ package "3. COEURS ET COMPOSITE SAFETY" #FFCDD2 {
     --
     Machine d'etat Steps 0..6
     Autotest boot + Redondance A/B
+    VAR CONSTANT : 200ms / 1s / 2s / 5s
     Calcul Armable et ArmingBusy
   ]
   rectangle OUT_FB #E57373 [
@@ -117,22 +118,10 @@ package "5. SORTIES PHYSIQUES ET VISU IHM" #E8F5E9 {
   ]
 }
 
-package "CONFIG ET PERSISTANCE RETAIN" #FFF3E0 {
-  database PERSIST #FFE0B2 [
-    GVL_PERSISTENT_AU
-    --
-    * TonTestDuration : T#200ms
-    * TonArmingPulseDuration : T#1s
-    * TonArmingConfirmTimeout : T#2s
-    * TonArmingLockout : T#5s
-  ]
-}
-
 IHM_CMD --> COMP : ST_EmergencyCmd
 ACQ --> COMP : DI qualifiees (EmergencyChainClosed, PowerContactorEngaged)
 
-PERSIST ..> LOGIC : Configuration RETAIN
-
+COMP --> LOGIC : Entrees qualifiees
 LOGIC --> DUT_INT : MaintainA_Cmd, MaintainB_Cmd, ArmPulse_Cmd
 DUT_INT --> OUT_FB : ST_EmergencyManagementCmd
 
@@ -148,10 +137,9 @@ legend bottom
   |= Couleur |= Role dans l'architecture CFC |
   |<#E3F2FD>| Acquisition DI physiques ou simulees |
   |<#F3E5F5>| Commandes operateur IHM (ST_EmergencyCmd) |
-  |<#FFCDD2>| Coeur de securite FB (Facade composite parent, Logic, Output) |
+  |<#FFCDD2>| Coeur de securite FB (Facade composite parent, Logic avec VAR CONSTANT) |
   |<#ECEFF1>| Structures d'echange et Bus inter-blocs (DUT) |
   |<#E8F5E9>| Sorties physiques terminales (Q) et Retours visu IHM |
-  |<#FFF3E0>| Reglages RETAIN et persistance |
 endlegend
 
 @enduml"""

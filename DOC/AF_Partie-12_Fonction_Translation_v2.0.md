@@ -1,135 +1,71 @@
 # Analyse Fonctionnelle — Partie 12 : Fonction Translation M3 (v2.0)
 
 > Rôle : positionnement chariot/pont (AC600 EtherCAT), sécurité mouvement, barrière finale.
-> Domaine autonome (contrairement à Benne) : PRG propre (`Translation`), `FB_Safety_Translation` dédié.
+> Domaine autonome : programme propre (`Translation`), `FB_Safety_Translation` dédié.
+> **Détail technique par FB** : voir les 4 fiches dédiées (§1). Ce chapô reste au niveau machine
+> + intégration programme — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code : `CODE/TRANSLATION/*.st` · instances dans `Translation (CFC)`, `Safety (CFC)`, `Outputs (Ladder)`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Translation_Extraction_Code_v1.0.md`.
 > v1.13 archivée : `ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v1.13.md`.
 
 ## 🧭 Sommaire
 
-1. Composition et rôle
-2. FB_Translation_PositionDecoder — 5 capteurs
-3. FB_Safety_Translation — safety métier
-4. FB_Translation — mouvement
-5. FB_TranslationOutputInterlock_LD — barrière finale
-6. DUT et bus
-7. Intégration programme
-8. Alertes et écarts
-9. Documents liés
+1. Composition — fiches FB dédiées
+2. Rôle machine
+3. DUT et bus
+4. Intégration programme
+5. Alertes et écarts
+6. Documents liés
 
 ## 🧪 Points de validation
 
+Catalogue `TC-P12-*` **réparti dans les 4 fiches FB** (propriétaire unique par fiche, pas
+dupliqué ici) :
+
+| Fiche | TC couverts |
+|---|---|
+| [`FB_Translation_PositionDecoder`](AF_Partie-12_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | TC-P12-001, 002 |
+| [`FB_Safety_Translation`](AF_Partie-12_Fonction_Translation/FB_Safety_Translation_v1.0.md) | TC-P12-002, 010, 011, 014 |
+| [`FB_Translation`](AF_Partie-12_Fonction_Translation/FB_Translation_v1.0.md) | TC-P12-003, 004, 005, 013 |
+| [`FB_TranslationOutputInterlock_LD`](AF_Partie-12_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | TC-P12-006, 007, 008, 009 |
+
+TC-P12-012 (Cible Maintenance refusée hors MAINT_N2) et TC-P12-015 (Terrain) restent au niveau
+chapô (transverses Modes/terrain).
+
 | ID | Attendu | Type |
 |---|---|---|
-| TC-P12-001 | 6 mots capteurs valides acceptés (11111→00000) ; tout autre ⇒ `Incoherent` | AUTO |
-| TC-P12-002 | Mot incohérent ⇒ bit7 Safety ⇒ SafeStop+PowerCutOff | AUTO_PLC |
-| TC-P12-003 | `Enable=FALSE` coupe tout indépendamment de SafeStop/StartStop | AUTO_PLC |
-| TC-P12-004 | Ralentissement PV actif **seulement** Direction=1 (vers Trémie) ET SlowdownSensor | AUTO_PLC |
-| TC-P12-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | AUTO_PLC |
-| TC-P12-006 | Watchdog frein 500ms fixe : sans confirmation ⇒ FAULT, RestartInhibit | AUTO_PLC |
-| TC-P12-007 | Réautorisation après timeout : cause disparue + Reset + mot 0 vu + nouvelle demande | AUTO_PLC |
-| TC-P12-008 | Gate final : mot/fréquence nuls tant que `BrakeReleaseRequest AND BrakeCommandOpenConfirmed` non simultanés | AUTO_PLC |
-| TC-P12-009 | Mot 7 (reset AC600) autorisé pendant RestartInhibit, fréquence nulle, ne lève pas l'inhibition | AUTO_PLC |
-| TC-P12-010 | Méca A (bit5) : arrêt commandé mais fréquence>0.5Hz pendant >1.0s ⇒ SafeStop+PowerCutOff | AUTO_PLC |
-| TC-P12-011 | Méca B (bit4) : incohérence arrêt >3.0s ⇒ SafeStop+PowerCutOff ; variante si perte IHM | AUTO_PLC |
 | TC-P12-012 | Cible Maintenance refusée hors MAINT_N2 | AUTO_PLC |
-| TC-P12-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` même sans joystick | AUTO_PLC |
-| TC-P12-014 | `BypassGlobal` force ErrorId=0, coupe les 2 TON, Reset reste fonctionnel | AUTO_PLC |
 | TC-P12-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | SITE |
 
 ---
 
-## 1. Composition et rôle
+## 1. Composition — fiches FB dédiées
+
+| Fiche | FB détaillé | Contenu |
+|---|---|---|
+| [`FB_Translation_PositionDecoder_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | `FB_Translation_PositionDecoder` | 5 capteurs → mot, butées extrêmes, incohérence |
+| [`FB_Safety_Translation_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_Safety_Translation_v1.0.md) | `FB_Safety_Translation` | 8 bits ErrorId, Méca A/B, masques, bypass |
+| [`FB_Translation_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_Translation_v1.0.md) | `FB_Translation` (+ `FB_Brake`, `FB_Ramp`) | Mouvement, rampe, mot AC600, ralentissement PV |
+| [`FB_TranslationOutputInterlock_LD_v1.0.md`](AF_Partie-12_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | `FB_TranslationOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
 
 ```text
 FB_Translation_PositionDecoder ──► FB_Safety_Translation ──► FB_Translation ──► FB_TranslationOutputInterlock_LD
-   (5 capteurs → mot, Acquisition)         (safety, Safety)         (mouvement, Translation)   (barrière finale, Outputs)
+   (5 capteurs, Acquisition)          (safety, Safety)         (mouvement, Translation)   (barrière, Outputs)
 ```
 
 Un seul axe M3 — pas d'instances ×2 comme Winch.
 
 ---
 
-## 2. FB_Translation_PositionDecoder (brique réduite, pas de contrat standard)
+## 2. Rôle machine
 
-**Entrées** : 5 BOOL `SensorTremie|PV|P2|P1|Maintenance`. Pas de Enable/Reset/Mode — logique combinatoire pure.
-
-**Table de cohérence (6 mots valides)** :
-| Mot | Zone |
-|---|---|
-| `11111` | Extrême Trémie |
-| `01111` | Entre Trémie et PV |
-| `00111` | P2 |
-| `00011` | P1 |
-| `00001` | Entre P1 et Maintenance |
-| `00000` | Extrême Maintenance |
-
-Tout autre mot ⇒ `Incoherent=TRUE`. Butées extrêmes (avant/arrière) dérivées **seulement** sur mot valide (évite butée fantôme).
-
-Instance : `Acquisition (CFC).instPositionDecoder`, position 0, **avant** `Safety (CFC)`.
+Positionnement du chariot/pont par variateur AC600 sur EtherCAT. 5 positions par capteurs TOR
+(Trémie, PV, P2, P1, Maintenance). Ralentissement automatique avant Trémie (capteur PV).
+Frein à manque de courant. Sécurité par Méca A/B + butées extrêmes + incohérence capteurs.
 
 ---
 
-## 3. FB_Safety_Translation
-
-**ErrorId** :
-| Bit | Cause | Délai |
-|---|---|---|
-| 0 | Perte com opérateur (CAN/heartbeat) | instantané |
-| 1 | Perte com variateur EtherCAT | instantané |
-| 2 | Rotation phase incorrecte | instantané |
-| 3 | Surchauffe frein | instantané |
-| 4 | **Méca B** — incohérence arrêt persistant | `PostRampTimeout`=3s (constante interne, ⚠️ non paramétrable) |
-| 5 | **Méca A** — mouvement non commandé | 1s (constante interne, câblée en dur) |
-| 6 | Butée extrême (avant ou arrière) | instantané |
-| 7 | Mot capteurs incohérent | instantané |
-
-**Détail Méca B** : si `HeartbeatIhmOk=FALSE`, condition élargie (surveillance perte IHM) ; sinon condition standard arrêt commandé sans confirmation.
-
-**Sorties** : `SafeStop = Error OR NOT PowerContactorEngaged` ; `PowerCutOff = (ErrorId AND 16#00F8) <> 0` → bits 3,4,5,6,7 (**pas** bits 0/1/2 : com/rotation ⇒ SafeStop seul, jamais PowerCutOff).
-
-`BypassGlobal` force ErrorId=0 et coupe les 2 TON ; `Reset` reste fonctionnel sous bypass.
-
----
-
-## 4. FB_Translation (mouvement, Partie3 §1bis)
-
-**Réglages RETAIN réellement câblés** (⚠️ liste exhaustive, voir §8 A4) :
-```
-_TranslationMaxFreq_Hz=60.0, _TranslationRampAccelRate_Pct=20.0,
-_TranslationRampDecelNormal_Pct=40.0, _TranslationRampDecelFast_Pct=100.0,
-_TranslationAutoSpeedCap_Pct=40.0, _TranslationSetFreq_Hz=0.0
-```
-`ApproachSpeedPct`(20%), `CaptorDebounce`(100ms), `DirectionInterlockDelay`(200ms) : **restent au défaut du FB**, aucune variable PERSISTENT dédiée.
-
-**Pipeline** :
-1. Gate `Enable/PowerContactorEngaged` → neutralisation totale.
-2. Debounce `PositionSensorTarget` (100ms) → `TargetReached`.
-3. Précédence Enable>SafeStop>StartStop pour la rampe.
-4. **Ralentissement PV** : seulement `Direction=1` (vers Trémie) ET `SlowdownSensor` → plafond `ApproachSpeedPct`. Jamais en sens Maintenance.
-5. Arrêt exact sur capteur : verrouille à 0 tant que cible atteinte dans le même sens.
-6. Interlock sens : délai 200ms si vitesse non nulle avant bascule.
-7. Mot AC600 : `0`=None, `1`=Fwd, `2`=Rev, `7`=Reset. Priorité Reset>Error>mouvement>neutre.
-8. Coupure immédiate si butée extrême atteinte dans le sens commandé.
-
-`FB_Translation` **ne décide pas** la frontière finale : SafeStop produit une rampe rapide, Enable maintenu — jamais une coupure sèche transformée ici.
-
----
-
-## 5. FB_TranslationOutputInterlock_LD (barrière finale, dans Outputs)
-
-Watchdog frein **500ms fixe** (câblé en dur, pas paramétrable).
-
-**Séquence après timeout** : bit0 → `RestartInhibit` → réautorisation exige cause disparue + Reset + **mot 0 vu** puis nouvelle demande mouvement. Mot 7 (reset AC600) reste autorisé pendant l'inhibition, toujours fréquence nulle, **ne lève pas** RestartInhibit.
-
-**Gate final double condition obligatoire** : mot/fréquence autorisés **seulement si** `MovementRequested AND BrakeReleaseRequest AND BrakeCommandOpenConfirmed`.
-
-`Reset` échantillonné **avant** le gate Enable — un Reset maintenu pendant une neutralisation ne devient jamais un acquittement implicite.
-
----
-
-## 6. DUT et bus
+## 3. DUT et bus
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
@@ -143,40 +79,38 @@ Watchdog frein **500ms fixe** (câblé en dur, pas paramétrable).
 
 ---
 
-## 7. Intégration programme
+## 4. Intégration programme
 
 ```text
-Acquisition  instPositionDecoder (position 0, AVANT Safety)
+Acquisition  instPositionDecoder (AVANT Safety)
 Acquisition  instJoystick (AxisCmdX, DeadmanArmed)
-Safety  instSafetyTranslationM3 — Enable inconditionnel, lit M3_Direction_Active de Translation (1 scan de retard)
-Modes  MaintenanceM3TargetEnable (Mode=MAINT_N2)
-Cycle  CmdTranslationM3_Start/Target (SEMI_AUTO)
+Safety       instSafetyTranslationM3 — Enable inconditionnel, lit Direction de Translation (1 scan retard)
+Modes        MaintenanceM3TargetEnable (Mode=MAINT_N2)
+Cycle        CmdTranslationM3_Start/Target (SEMI_AUTO)
 Translation  instTranslationM3 → publie TranslationFinalInterlockRequest
-Outputs  instTranslationOutputInterlock_LD (Q finales)
+Outputs      instTranslationOutputInterlock_LD (Q finales PDO + frein)
 ```
 
 **Arbitrage Translation** :
-- **SEMI_AUTO** : cible/vitesse depuis Cycle, `StartStop` exige `DeadmanArmed AND AxisCmdX.StartStop` (homme-mort actif même en auto).
-- **MAINT_N1/N2** : boutons IHM OU joystick (`TglJoystickMaster`) — `DeadmanArmed` exigé **même pour boutons IHM** (REX 2026-07-19, corrige un écart sécurité).
-- Cible Maintenance (4) refusée hors MAINT_N2.
-- `InvertDirection` inverse le sens après arbitrage, tous modes.
+- **SEMI_AUTO** : cible/vitesse depuis Cycle, `StartStop` exige `DeadmanArmed AND AxisCmdX.StartStop`
+- **MAINT_N1/N2** : boutons IHM OU joystick (`TglJoystickMaster`) — `DeadmanArmed` exigé **même pour boutons IHM**
+- Cible Maintenance (4) refusée hors MAINT_N2
+- `InvertDirection` inverse le sens après arbitrage, tous modes
 
 ---
 
-## 8. Alertes et écarts
+## 5. Alertes et écarts
 
-| # | Gravité | Point | Action |
+| # | Gravité | Point | Détail |
 |---|---|---|---|
-| 1 | info | `PowerCutOff M3 codé en dur FALSE` cité par audits historiques — **faux aujourd'hui**, calcul réel | Ne pas citer ces audits comme référence |
-| 2 | P2 | `PostRampTimeout`(3s)/Méca A(1s) non paramétrables, non documenté avant | Comblé §3 |
-| 3 | P2 | Variante Méca B (perte IHM) non documentée avant | Comblé §3 |
-| 4 | P2 | Doc legacy dit `ApproachSpeedPct` etc. "câblés RETAIN" — **faux**, restent au défaut FB | Corrigé §4 |
-| 5 | info | Dépendance croisée Safety↔Translation (1 scan retard) | Clarifié §7 |
-| 6 | info | `SetFreq_Hz=0` → défaut 30% codé en dur | Vestige mise en service |
+| 1 | info | `PowerCutOff M3 codé FALSE` cité par audits historiques — **faux**, calcul réel | Voir `FB_Safety_Translation` §5 |
+| 2 | P2 | `PostRampTimeout`(3s)/Méca A(1s) non paramétrables | Voir `FB_Safety_Translation` §7 |
+| 3 | P2 | `ApproachSpeedPct` etc. non câblés RETAIN | Voir `FB_Translation` §10 |
+| 4 | info | Dépendance croisée Safety↔Translation (1 scan retard) | Clarifié §4 |
 
 ---
 
-## 9. Documents liés
+## 6. Documents liés
 
 | Doc | Lien |
 |---|---|
@@ -184,4 +118,4 @@ Outputs  instTranslationOutputInterlock_LD (Q finales)
 | AF03 | Contrat FB mouvement |
 | AF05 | Modes — MAINT_N2 |
 | AF06 | 5 capteurs TOR M3 |
-| Code | `CODE/TRANSLATION/*.st`, `CODE/MAIN/Translation (CFC).st` |
+| Code | `CODE/TRANSLATION/*.st` |
