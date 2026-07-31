@@ -30,6 +30,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Object names to generate (default: every object discovered in CODE/)",
     )
     parser.add_argument(
+        "--folder",
+        metavar="NAME",
+        action="append",
+        default=None,
+        help=(
+            "Select every object whose CODE/ subfolder matches NAME (e.g. --folder AU, "
+            "--folder TREUILS). Repeatable to select multiple domains at once. Combines "
+            "with positional object names if both are given."
+        ),
+    )
+    parser.add_argument(
+        "--list-folders",
+        action="store_true",
+        help="Print every discovered CODE/ subfolder (domain) with its object count, then exit",
+    )
+    parser.add_argument(
         "--code-dir", type=Path, default=DEFAULT_CODE_DIR, help="Source CODE/ directory (default: %(default)s)"
     )
     parser.add_argument(
@@ -70,7 +86,31 @@ def main(argv: list[str] | None = None) -> int:
     objects = discover_objects(args.code_dir, diagnostics)
     objects_by_name = {obj.name: obj for obj in objects}
 
-    targets = args.objects if args.objects else sorted(objects_by_name)
+    if args.list_folders:
+        counts: dict[str, int] = {}
+        for obj in objects:
+            counts[obj.folder or "(racine)"] = counts.get(obj.folder or "(racine)", 0) + 1
+        for folder_name in sorted(counts):
+            print(f"{folder_name:20s} {counts[folder_name]} objet(s)")
+        return 0
+
+    targets: list[str] = list(args.objects)
+    if args.folder:
+        requested_folders = {f.upper() for f in args.folder}
+        matched = [
+            obj.name
+            for obj in objects
+            if obj.folder.upper() in requested_folders
+        ]
+        if not matched:
+            diagnostics.error(
+                f"no object found in folder(s): {', '.join(sorted(requested_folders))!r}",
+                "--folder",
+            )
+        targets.extend(name for name in matched if name not in targets)
+
+    if not targets:
+        targets = sorted(objects_by_name)
 
     generated = 0
     if args.bundle:

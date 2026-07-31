@@ -106,6 +106,67 @@ def test_cli_timestamp_override_is_used_verbatim(tmp_path):
     assert root.find("contentHeader").get("modificationDateTime") == "2020-01-01T00:00:00.000000"
 
 
+def test_cli_folder_selector_generates_only_matching_domain(tmp_path, capsys):
+    out_dir = tmp_path / "generated"
+    exit_code = main(
+        ["--folder", "TREUILS", "--bundle", "CODE_TREUILS_Test", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)]
+    )
+    captured = capsys.readouterr()
+    assert exit_code == 0, captured.err
+
+    diag = DiagnosticCollector()
+    objects = discover_objects(CODE_DIR, diag)
+    expected_names = {obj.name for obj in objects if obj.folder.upper() == "TREUILS"}
+    assert len(expected_names) > 0
+
+    root = _parse_unprefixed((out_dir / "CODE_TREUILS_Test.xml").read_text(encoding="utf-8-sig"))
+    pou_names = {p.get("name") for p in root.findall(".//pou")}
+    struct_names = {dt.get("name") for dt in root.findall(".//dataType")}
+    generated_names = pou_names | struct_names
+
+    assert expected_names <= generated_names
+
+
+def test_cli_folder_selector_combines_with_explicit_object_names(tmp_path):
+    out_dir = tmp_path / "generated"
+    exit_code = main(
+        [
+            "E_CycleStep",
+            "--folder",
+            "TREUILS",
+            "--bundle",
+            "CODE_Combo_Test",
+            "--code-dir",
+            str(CODE_DIR),
+            "--out-dir",
+            str(out_dir),
+        ]
+    )
+    assert exit_code == 0
+
+    root = _parse_unprefixed((out_dir / "CODE_Combo_Test.xml").read_text(encoding="utf-8-sig"))
+    data_type_names = {dt.get("name") for dt in root.findall(".//dataType")}
+    assert "E_CycleStep" in data_type_names
+
+
+def test_cli_unknown_folder_reports_error_and_nonzero_exit(tmp_path, capsys):
+    out_dir = tmp_path / "generated"
+    exit_code = main(
+        ["--folder", "NOPE_DOES_NOT_EXIST", "--bundle", "X", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)]
+    )
+    assert exit_code == 1
+    captured = capsys.readouterr()
+    assert "NOPE_DOES_NOT_EXIST" in captured.err
+
+
+def test_cli_list_folders_prints_domains_and_exits_zero(capsys):
+    exit_code = main(["--list-folders", "--code-dir", str(CODE_DIR)])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "TREUILS" in captured.out
+    assert "AU" in captured.out
+
+
 def test_cli_project_name_flag_is_used_in_content_header(tmp_path):
     out_dir = tmp_path / "generated"
     main(
