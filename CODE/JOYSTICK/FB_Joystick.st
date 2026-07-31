@@ -1,31 +1,17 @@
 (* ═══════════════════════════════════════════════════════════════
-   🕹️ FB_Joystick — Acquisition + traitement Hall (bouton = homme-mort EN 574/ISO 13850)
+   🕹️ FB_Joystick — Acquisition & traitement Hall (Homme-mort ISO 13850)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md (historique détaillé des
-      correctifs : AUDIT D34/D35/D49/D51/D53-D59)
-   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §3
-      l'interdit (`FB_Joystick` n'est pas un FB de mouvement, Partie3 §1bis). Agissait de
-      plus comme un second `Enable` dans le GATE (coupure immédiate), pas comme la rampe
-      rapide attendue d'un `SafeStop` — confusion précisément visée par la règle.
-   🔴 Bouton homme-mort — comportement actuel (détail §4ter/§4quater ci-dessous) :
-      - ARMEMENT : appui bouton PENDANT que le manche est AU NEUTRE (ScaleX/Y.OutPct = 0.0).
-      - RECONFIRMATION périodique en mouvement : bouton maintenu OU réappuyé avant
-        `DeadmanRearmTimeout` (10s) — sinon désarmement (rampe forcée à 0, pas d'arrêt brutal).
-      - DÉSARMEMENT sur retour neutre : seulement si le neutre est TENU `NeutralHoldTime`
-        (500ms, ⚠️ hypothèse à valider empiriquement — `ScaleX/Y.OutPct` n'est pas filtré/
-        rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
-        désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
-      Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v2.0.md, migration simulation) : l'ancien bypass
-      `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
-      supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
-      CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/
-      `RawButton` simulés en amont (dans `PRG_01_Diagnostics.st`) : l'opérateur doit
-      toujours réellement "appuyer" (forcer `RawButton` en instance) pour armer.
-   🆕 `SpeedXPct`/`DirectionX`/`SpeedYPct`/`DirectionY` : miroirs directs de `AxisCmdX/Y`
-      (lecture instance CODESYS sans déplier `ST_AxisCmd`). `SpeedRef` est SIGNÉ
-      (-100..+100%, signe = sens) ; `Direction` (-1/0/+1) reste la source de vérité pour
-      `FB_Winch`/`FB_Translation` (`ABS(SpeedRefPct)` à leur frontière d'entrée).
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
+      Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
+      ⚠️ FB_Ramp retiré du Joystick : les rampes d'accélération/décélération
+         sont gérées exclusivement par les FB de mouvement aval (FB_Winch, FB_Translation).
+   🔒 Bouton homme-mort :
+      - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
+      - Reconfirmation périodique en mouvement (délai DeadmanRearmTimeout).
+      - Désarmement sur maintien au neutre (durée NeutralHoldTime).
+   📤 Produit AxisCmdX, AxisCmdY, et signaux de diagnostic/miroir.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Joystick) ===
@@ -34,25 +20,22 @@ FUNCTION_BLOCK FB_Joystick
 VAR_INPUT
     Enable          : BOOL;       // Active la logique
     Reset           : BOOL;       // Acquittement défaut
-    PowerContactorEngaged : BOOL;       // ✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)
-    Mode            : E_Mode;     // 🆕 REX 2026-07-08 — changement de mode désarme le homme-mort (voir §4ter)
-    BenneBusy       : BOOL;       // 🆕 REX 2026-07-08 — fin de cycle benne (front descendant) désarme le homme-mort (voir §4ter)
+    PowerContactorEngaged : BOOL;       // Conditions globales OK (chaîne AU réarmée)
+    Mode            : E_Mode;     // Changement de mode désarme le homme-mort
+    BenneBusy       : BOOL;       // Fin de cycle benne (front descendant) désarme le homme-mort
     PreserveArmingAfterBucket : BOOL; // TRUE uniquement pendant fermeture ExtractionSequence : enchaînement palier 1 autorisé
     BusCanOpenOP    : ST_DiagDevice;       // État présence nœud CAN
     JoystickOP      : ST_DiagDevice;       // Mode esclave CANopen actif
     RawX            : INT;        // Valeur brute axe X
     RawY            : INT;        // Valeur brute axe Y
     RawButton       : BOOL;       // État brut bouton
-    BtnCalibrate       : BOOL;       // Demande de recalage neutre
+    BtnCalibrate    : BOOL;       // Demande de recalage neutre
     InvertX         : BOOL := FALSE;
     InvertY         : BOOL := FALSE;
-    Deadband        : REAL := 10.0;  // 🔧 2026-07-02 (demande utilisateur) : 5.0 → 10.0 %
+    Deadband        : REAL := 10.0;  // Zone morte en %
     FilterTime      : TIME := TIME#100ms;
-    AccelRate       : REAL := 50.0;
-    DecelRate       : REAL := 150.0;
-    DeadmanRearmTimeout : TIME := T#10S; // 🔧 2026-07-03duodecies (était 3s) — délai max entre 2 appuis en mouvement
-    NeutralHoldTime     : TIME := T#500MS; // 🆕 2026-07-03duodecies — temps continu au neutre avant désarmement
-                                            // (filtre les traversées rapides du neutre en inversion de sens)
+    DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement
+    NeutralHoldTime     : TIME := T#500MS; // Temps continu au neutre avant désarmement
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;       // Prêt à commuter
@@ -60,8 +43,8 @@ VAR_OUTPUT
     Done            : BOOL;       // Données valides dispo
     Error           : BOOL;       // Présence anomalie
     ErrorId         : WORD;       // bit0: "Échec calibration Joystick" - Valeurs RawX/Y hors plage lors du recalage
-    AxisCmdX        : ST_AxisCmd; // Sortie normalisée X
-    AxisCmdY        : ST_AxisCmd; // Sortie normalisée Y
+    AxisCmdX        : ST_Joystick_AxisCmd; // Sortie normalisée X
+    AxisCmdY        : ST_Joystick_AxisCmd; // Sortie normalisée Y
     Button          : BOOL;       // Bouton filtré
     NeutralXAct     : INT;        // Point neutre X actuel pour IHM/Test
     NeutralYAct     : INT;        // Point neutre Y actuel pour IHM/Test
@@ -83,16 +66,16 @@ VAR
     ScaleY          : FB_AxisScale;
     FilterX         : FB_Filter_PT1;
     FilterY         : FB_Filter_PT1;
-    RampX           : FB_Ramp;
-    RampY           : FB_Ramp;
+    CmdXVal         : REAL;
+    CmdYVal         : REAL;
     LastCalibrate   : BOOL;
-    ResetEdge       : R_TRIG;   // 🔧 AJOUT (revue de code 2026-07-01) — Reset doit être un front, pas un niveau
-    DeadmanEdge     : R_TRIG;   // 🆕 Front bouton homme-mort (2026-07-03octies)
-    DeadmanTimer    : TON;      // 🆕 2026-07-03decies — délai max entre 2 appuis en mouvement (reconfirmation)
-    NeutralHoldTimer: TON;      // 🆕 2026-07-03duodecies — filtre les traversées rapides du neutre (inversion)
-    LeftNeutralSinceArm : BOOL; // 🔧 2026-07-03terdecies — a réellement quitté le neutre depuis l'armement
-    LastMode        : E_Mode;  // 🆕 REX 2026-07-08 — détecte le changement de mode (voir §4ter)
-    BenneBusyFallEdge : F_TRIG; // 🆕 REX 2026-07-08 — détecte la fin de cycle benne (voir §4ter)
+    ResetEdge       : R_TRIG;
+    DeadmanEdge     : R_TRIG;
+    DeadmanTimer    : TON;
+    NeutralHoldTimer: TON;
+    LeftNeutralSinceArm : BOOL;
+    LastMode        : E_Mode;
+    BenneBusyFallEdge : F_TRIG;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
@@ -218,49 +201,52 @@ ELSE
     FilterX(ValueIn := ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
 END_IF;
 
-// 🔴 Cible rampe forcée à 0 tant que le geste n'est pas armé (homme-mort, voir §4ter)
-RampX(Target := SEL(DeadmanArmed, 0.0, FilterX.ValueOut), AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+CmdXVal := SEL(DeadmanArmed, 0.0, FilterX.ValueOut);
 
 // Mapping Sortie Standardisée Axe X
-// 🔧 2026-07-02 : SpeedRef désormais SIGNÉ (plus de ABS) — le signe porte le sens, cohérent
-// avec Direction ci-dessous (même seuil 0.1, même variable RampX.Current). StartStop reste
-// calculé sur la MAGNITUDE (indépendant du signe) : sinon un mouvement négatif (< -0.1) serait
-// à tort interprété comme "pas de mouvement" (StartStop=FALSE) par le test `> 0.1` direct.
 AxisCmdX.Enable := TRUE;
-AxisCmdX.SpeedRef := RampX.Current;
-AxisCmdX.StartStop := (ABS(RampX.Current) > 0.1);
+AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.StartStop := (ABS(CmdXVal) > 0.1);
 
-IF RampX.Current > 0.1 THEN     AxisCmdX.Direction := 1;
-ELSIF RampX.Current < -0.1 THEN AxisCmdX.Direction := -1;
-ELSE AxisCmdX.Direction := 0;   AxisCmdX.SpeedRef := 0.0;
+IF CmdXVal > 0.1 THEN
+    AxisCmdX.Direction := 1;
+ELSIF CmdXVal < -0.1 THEN
+    AxisCmdX.Direction := -1;
+ELSE
+    AxisCmdX.Direction := 0;
+    AxisCmdX.SpeedRef := 0.0;
 END_IF;
 
-// 🆕 Miroirs maintenance (voir en-tête) — mêmes valeurs, à plat
+// Miroirs maintenance
 SpeedXPct := AxisCmdX.SpeedRef;
 DirectionX := AxisCmdX.Direction;
 
-// 🕹️ 6. PIPELINE TRAITEMENT — AXE Y (ScaleY déjà calculé en §4bis, avant homme-mort)
+// 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
 IF InvertY THEN
     FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
 ELSE
     FilterY(ValueIn := ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
 END_IF;
 
-// 🔴 Cible rampe forcée à 0 tant que le geste n'est pas armé (homme-mort, voir §4ter)
-RampY(Target := SEL(DeadmanArmed, 0.0, FilterY.ValueOut), AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+CmdYVal := SEL(DeadmanArmed, 0.0, FilterY.ValueOut);
 
 // Mapping Sortie Standardisée Axe Y
-// 🔧 2026-07-02 : voir note axe X ci-dessus (même principe, SpeedRef signé + StartStop sur magnitude)
 AxisCmdY.Enable := TRUE;
-AxisCmdY.SpeedRef := RampY.Current;
-AxisCmdY.StartStop := (ABS(RampY.Current) > 0.1);
+AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.StartStop := (ABS(CmdYVal) > 0.1);
 
-IF RampY.Current > 0.1 THEN     AxisCmdY.Direction := 1;
-ELSIF RampY.Current < -0.1 THEN AxisCmdY.Direction := -1;
-ELSE AxisCmdY.Direction := 0;   AxisCmdY.SpeedRef := 0.0;
+IF CmdYVal > 0.1 THEN
+    AxisCmdY.Direction := 1;
+ELSIF CmdYVal < -0.1 THEN
+    AxisCmdY.Direction := -1;
+ELSE
+    AxisCmdY.Direction := 0;
+    AxisCmdY.SpeedRef := 0.0;
 END_IF;
 
-// 🆕 Miroirs maintenance (voir en-tête) — mêmes valeurs, à plat
+// Miroirs maintenance
 SpeedYPct := AxisCmdY.SpeedRef;
 DirectionY := AxisCmdY.Direction;
 

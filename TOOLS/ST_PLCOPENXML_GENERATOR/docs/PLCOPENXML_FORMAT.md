@@ -271,7 +271,7 @@ END_IF;
 Confirmé sur `ST_WinchHMI.xml` (33 membres) :
 
 ```xml
-<dataType name="ST_AxisCmd">
+<dataType name="ST_Joystick_AxisCmd">
   <baseType>
     <struct>
       <variable name="StartStop">

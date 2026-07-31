@@ -33,7 +33,7 @@
       <globalVars name="GVL_PERSISTENT" retain="true" persistent="true">
         <variable name="CalibM1">
           <type>
-            <derived name="ST_EncoderCalib" />
+            <derived name="ST_Encoder_Calib" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -48,7 +48,7 @@
         </variable>
         <variable name="CalibM2">
           <type>
-            <derived name="ST_EncoderCalib" />
+            <derived name="ST_Encoder_Calib" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">

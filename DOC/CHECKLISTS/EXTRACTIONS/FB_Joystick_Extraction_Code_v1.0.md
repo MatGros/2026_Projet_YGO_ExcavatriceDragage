@@ -18,4 +18,4 @@
 
 `FB_Joystick` → ScaleX/Y, FilterX/Y, RampX/Y, CycleTimeCalc  
 Instance unique : `PRG_01_Diagnostics.instJoystick`  
-DUT sortie : `ST_AxisCmd` (Enable, StartStop, SpeedRef signé, Direction)
+DUT sortie : `ST_Joystick_AxisCmd` (Enable, StartStop, SpeedRef signé, Direction)

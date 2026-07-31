@@ -31,7 +31,7 @@ Brique technique de **conversion d'échelle** : transforme la différence entre 
 | Port entrée | Type | Rôle |
 |---|---|---|
 | `RawPos` | UDINT | Position brute — sortie `FB_Encoder_Abs`, déjà gelée sur doute |
-| `HomingRefRaw` | UDINT | Référence brute figée au dernier homing (`ST_EncoderCalib`) |
+| `HomingRefRaw` | UDINT | Référence brute figée au dernier homing (`ST_Encoder_Calib`) |
 | `CableM_PerRev` | REAL := 2.0 | Câble déroulé par tour de tambour (périmètre confirmé terrain, RETAIN site) |
 | `PointsPerRev` | UDINT := 8192 | Résolution codeur |
 

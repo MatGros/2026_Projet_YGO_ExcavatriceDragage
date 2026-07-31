@@ -416,7 +416,7 @@ GVL_IHM . TranslationM3 . BtnFwd
 ## Structures : exemple CODESYS
 ```codesys
 (* Consigne joystick *)
-TYPE ST_AxisCmd :
+TYPE ST_Joystick_AxisCmd :
 STRUCT
     Enable      : BOOL;       (* Autorisation *)
     StartStop   : BOOL;       (* TRUE = rampe accel, FALSE = rampe decel normale *)

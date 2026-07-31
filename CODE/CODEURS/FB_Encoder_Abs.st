@@ -1,41 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
+   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3/§6
-   ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
-      CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
-      instantané par simple offset) + un mode `Teach` auto-calibré —
-      **incompatibles** avec le design Partie10 (preset SDO avec
-      accusé, formule `CableM_PerRev` fixe). Retirés : `HomingTrigger`,
-      `WaterLevelOffset`, `TeachActive/StartRaw/EndRaw/RealDistance`.
-   🧩 1 FB = 1 responsabilité : accès bus EtherCAT + séquence d'écriture
-      preset. N'orchestre PAS le homing lui-même (ça sera le rôle de
-      `FB_Encoder_Homing`, pas codé ce lot) — `PresetRequest`/`PresetValue`
-      sont pilotés en dur (`FALSE`/`0`) dans `PRG_MAIN` pour l'instant.
-   🧊 Principe « geler sur doute » (§6) : `RawPos`/`AngleRaw`/`TurnCount`
-      ne sont PAS mis à jour si `EncoderAvailable = FALSE` — ils
-      conservent leur dernière valeur plausible.
-   ✅ SÉQUENCE PRESET (§5) — CONFIRMÉ TERRAIN 2026-07-02 : `PresetTriggerCmd := 2`
-      (valeur de commande, pas un masque de bits) déclenche le
-      référencement du codeur à `PresetValueOut`. `CodeSeqTriggerCmd`
-      (canal réel `COD1_CodeSeqTrigCmd`) reste `0`, rôle **non identifié**
-      (même par l'utilisateur/terrain) — ne jamais lui donner une valeur
-      arbitraire tant que sa fonction n'est pas confirmée.
-   🔴 PERTE DE FONCTION SIGNALÉE : l'ancienne version composait
-      `FB_Encoder_Safety` en interne (survitesse via `In_SpdValue`).
-      Ce n'est PAS repris ici (Partie10 ne le demande pas, hors
-      périmètre du document) — `FB_Encoder_Safety` (overspeed) devient
-      orphelin tant qu'un lot dédié ne décide pas de son sort (fusion
-      avec le "saut incohérent" Partie10 §3.5, ou reprise telle quelle).
-   🔧 CORRECTIF (2026-07-03, retour terrain) : `InvertDirection` **retiré**.
-      Confirmé terrain : l'objet CoE `6000h` (bit0 : 4→5) inverse le sens
-      de comptage **côté codeur** (F58x8 Kübler), configuré en **Startup
-      Parameter** CODESYS (init automate) — pas un paramètre PLC. L'ancien
-      calcul logiciel (`16#FFFFFFFF - RawPosIn`) était de toute façon
-      **buggé** : il inversait sur toute la plage `UDINT` (32 bits) au
-      lieu de la plage réelle du codeur (25 bits, `PointsPerRev ×
-      MultiTurnRevsMax`), produisant des positions incohérentes après
-      homing. Voir Partie10 §3bis.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Accès bus EtherCAT, statut esclave, extraction positions brutes
+      et séquence de Preset SDO (PresetTriggerCmd := 2).
+   🧊 Principe « geler sur doute » (§6) : RawPos/AngleRaw/TurnCount
+      conservent leur dernière valeur valide si EncoderAvailable = FALSE.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===

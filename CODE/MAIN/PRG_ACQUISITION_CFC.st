@@ -201,8 +201,6 @@ instJoystick(
     InvertY                   := _JoystickInvertY,
     Deadband                  := _JoystickDeadband_Pct,
     FilterTime                := _JoystickFilterTime,
-    AccelRate                 := _JoystickAccelRate_Pct,
-    DecelRate                 := _JoystickDecelRate_Pct,
     DeadmanRearmTimeout       := T#10S,
     NeutralHoldTime           := T#500MS,
     NeutralXMem               := _JoystickNeutralX,

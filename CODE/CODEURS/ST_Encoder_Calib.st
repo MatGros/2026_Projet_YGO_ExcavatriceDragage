@@ -1,15 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
+   🧲 ST_Encoder_Calib — Calibration & référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §9
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
-   ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
-      modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
-      `FB_Encoder_Homing` (qui l'écrit normalement, §5) n'est pas codé —
-      même principe que le stub GVL du lot Winch.
    ═══════════════════════════════════════════════════════════════ *)
 
-TYPE ST_EncoderCalib :
+TYPE ST_Encoder_Calib :
 STRUCT
     HomingRefRaw                  : UDINT;   // Valeur brute figée au dernier homing réussi
     LastKnownRawPos                : UDINT;   // Dernier point brut valide connu (§3.7, continu)

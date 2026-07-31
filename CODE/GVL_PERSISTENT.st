@@ -10,8 +10,8 @@
 VAR_GLOBAL PERSISTENT RETAIN
 
     // 🏗️ TREUILS (M1, M2)
-    _CalibM1 : ST_EncoderCalib; // Calibration treuil M1
-    _CalibM2 : ST_EncoderCalib; // Calibration treuil M2
+    _CalibM1 : ST_Encoder_Calib; // Calibration treuil M1
+    _CalibM2 : ST_Encoder_Calib; // Calibration treuil M2
 
     _WinchSpeedStepTable : ST_SpeedStepTable := (
         P1R1 := FALSE, P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE,
