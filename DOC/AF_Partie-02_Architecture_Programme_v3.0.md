@@ -48,13 +48,14 @@ ni `IF`, ni calcul, ni fusion de commandes, ni ecriture de sortie physique hors 
 
 | Programme | Langage | Responsabilite |
 |---|---|---|
-| 📥 `PRG_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
-| 🛡️ `PRG_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
-| 🎚️ `PRG_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
-| 🔄 `PRG_CYCLE` | ST | Instance `FB_Cycle` a machine d'etat/Grafcet. Il produit des demandes automatiques ; il ne commande pas les sorties. |
-| 🪝 `PRG_TREUILS_CFC` | CFC | M1/M2, synchronisation, benne, `FB_DiveSearch`, `FB_ExtractionSequence`, arbitrage final treuil et demandes vers barrieres finales. |
-| ↔️ `PRG_TRANSLATION_CFC` | CFC | Positionnement M3, arbitrage final translation et demande vers barriere finale. |
-| ⚡ `PRG_OUTPUTS_LD` | Ladder | Barrieres finales, commandes physiques, gestion de la coupure puissance et du rearmement. |
+| 📥 `PRG_00_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
+| 🪜 `PRG_01_INPUTS_LD` | Ladder | Affichage qualifie des 21 E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
+| 🎚️ `PRG_02_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
+| 🛡️ `PRG_03_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
+| 🔄 `PRG_04_CYCLE` | ST | Instance `FB_Cycle` a machine d'etat/Grafcet. Il produit des demandes automatiques ; il ne commande pas les sorties. |
+| 🪝 `PRG_05_TREUILS_CFC` | CFC | M1/M2, synchronisation, benne, `FB_DiveSearch`, `FB_ExtractionSequence`, arbitrage final treuil et demandes vers barrieres finales. |
+| ↔️ `PRG_06_TRANSLATION_CFC` | CFC | Positionnement M3, arbitrage final translation et demande vers barriere finale. |
+| ⚡ `PRG_07_OUTPUTS_LD` | Ladder | Barrieres finales, commandes physiques, gestion de la coupure puissance et du rearmement. |
 | 🖥️ Frontiere IHM | DUT et structures `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Le mapping, la persistance, les agregats et l'eventuel programme ST restent **TBD**. |
 | 🔎 Troubleshooting | Structures lecture seule | Affiche les donnees de debogage dans un ordre utile a la maintenance. Son type, son programme eventuel et son ordonnancement restent **TBD**. |
 
@@ -105,16 +106,24 @@ systeme 200 ms.
 
 ```text
 MainTask
-  0. PRG_ACQUISITION_CFC
-  1. PRG_MODES_CFC
-  2. PRG_SAFETY_CFC
-  3. PRG_CYCLE                 (ST)
-  4. PRG_TREUILS_CFC
-  5. PRG_TRANSLATION_CFC
-  6. PRG_OUTPUTS_LD
-  7. Frontiere IHM                 (TBD : mapping et persistance)
-  8. Troubleshooting lecture seule (TBD : type et ordonnancement)
+  0. PRG_00_ACQUISITION_CFC
+  1. PRG_01_INPUTS_LD
+  2. PRG_02_MODES_CFC
+  3. PRG_03_SAFETY_CFC
+  4. PRG_04_CYCLE                 (ST)
+  5. PRG_05_TREUILS_CFC
+  6. PRG_06_TRANSLATION_CFC
+  7. PRG_07_OUTPUTS_LD
+  8. Frontiere IHM                 (TBD : mapping et persistance)
+  9. Troubleshooting lecture seule (TBD : type et ordonnancement)
 ```
+
+### Regle d'ordonnancement
+
+| Niveau | Regle | Mise en oeuvre |
+|---|---|---|
+| **INTRA-programme** | L'ordre d'execution a l'interieur d'une page CFC est automatique : il suit le flux de donnees entre instances et structures publiques. | CODESYS determine l'ordre topologique des blocs a partir des connexions. |
+| **INTER-programmes** | L'ordre entre programmes est explicite et fige dans la `MainTask` par la numerotation `PRG_XX`. | Aucun programme ne doit lire une donnée produite par un programme execute plus tard dans le meme cycle, sauf retard d'un scan documente. |
 
 Toute dependance lue avant son producteur doit etre supprimee ou documentee comme retard d'un scan,
 
