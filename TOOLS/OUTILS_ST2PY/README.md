@@ -67,10 +67,10 @@ TOOLS/OUTILS_ST2PY/
   │   ├─ visualize_py_module.py    diagrammes UML/FSM des modules generes
   │   ├─ st_to_py.py, tools_compute_hash.py, position_decoder_demo.py
   ├─ suites/                   # SUITE PYTEST de l'outil (pas les artefacts generes) :
-  │   ├─ contracts/            #   comportement metier attendu (TC-*)
+  │   ├─ catalogs/             #   catalogues CSV (1 ligne = 1 cas pytest parametre)
+  │   ├─ contracts/            #   comportement metier attendu (TC-*, AF-*)
   │   ├─ generation/           #   le generateur fait-il son travail
   │   └─ simulation/           #   bancs de simulation
-  ├─ functional_tests/         # catalogue CSV + runner translation M3
   ├─ TEST_REGISTRY.md          # tracabilite fonction <-> test critique (source unique)
   ├─ RESULTS/                  # ARTEFACTS GENERES (gitignore), un dossier par domaine
   │   ├─ AU/                   #   miroir de CODE/ et de l'analyse fonctionnelle
@@ -83,8 +83,7 @@ TOOLS/OUTILS_ST2PY/
   └─ .st2py_cache.json
 
 Trois noms, trois roles distincts, pour lever l'ambiguite historique (REX 2026-08) :
-`suites/` = tests DE l'outil · `RESULTS/` = ce que l'outil PRODUIT · `functional_tests/` =
-catalogue metier. Le mapping POU -> domaine est centralise dans `core/results_layout.py`
+`suites/` = tests DE l'outil · `RESULTS/` = ce que l'outil PRODUIT. Le mapping POU -> domaine est centralise dans `core/results_layout.py`
 (un seul endroit a mettre a jour quand une fonction machine apparait).
 
 Design détaillé : flux de génération
