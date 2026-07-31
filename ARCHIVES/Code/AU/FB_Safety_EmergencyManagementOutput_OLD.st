@@ -10,7 +10,7 @@
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput
 VAR_INPUT
     Enable              : BOOL;        // Active le pilote
-    Cmd                 : ST_EmergencyManagementCmd; // Ordres logiques reçus du bloc logique
+    Cmd                 : ST_Safety_Emergency_InternalCmd; // Ordres logiques reçus du bloc logique
 END_VAR
 VAR_OUTPUT
     PowerCutOff_A_RQ    : BOOL;        // Vers le relais de coupure physique A

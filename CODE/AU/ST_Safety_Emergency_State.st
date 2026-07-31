@@ -1,16 +1,16 @@
 (* ═══════════════════════════════════════════════════════════════
-   🚦 ST_State_Emergency — État public de la chaîne d'arrêt d'urgence
+   🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
    ───────────────────────────────────────────────────────────────
    📄 Produit par FB_Safety_EmergencyManagement (sortie State).
       Consommé par PRG_09_Supervision → GVL_IHM.Modes.State pour IHM,
       et par GVL_Troubleshooting pour diagnostic.
    🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+              DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
-TYPE ST_State_Emergency :
+TYPE ST_Safety_Emergency_State :
 STRUCT
     ChainOk          : BOOL;   // 🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)
     ContactorOk      : BOOL;   // 🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)

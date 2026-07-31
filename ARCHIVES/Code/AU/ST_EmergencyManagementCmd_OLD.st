@@ -7,7 +7,7 @@
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
-TYPE ST_EmergencyManagementCmd :
+TYPE ST_Safety_Emergency_InternalCmd :
 STRUCT
     PowerCutOff_A_Cmd   : BOOL; // Ordre logique coupure canal A (TRUE = OK/Maintien, FALSE = Coupure)
     PowerCutOff_B_Cmd   : BOOL; // Ordre logique coupure canal B (TRUE = OK/Maintien, FALSE = Coupure)

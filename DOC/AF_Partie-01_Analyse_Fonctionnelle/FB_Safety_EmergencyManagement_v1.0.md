@@ -64,7 +64,7 @@ FB_Safety_EmergencyManagement          ← façade publique, instance unique
  ├─ Logic : FB_Safety_EmergencyManagementLogic   ← décision + séquence + latches
  └─ Output : FB_Safety_EmergencyManagementOutput ← projection physique fail-safe
       ▲
-      └── Cmd : ST_EmergencyManagementCmd        ← DUT interne Logic→Output
+      └── Cmd : ST_Safety_Emergency_InternalCmd        ← DUT interne Logic→Output
 ```
 
 | POU | Responsabilité | Interdit |
@@ -72,7 +72,7 @@ FB_Safety_EmergencyManagement          ← façade publique, instance unique
 | Composite | Câblage interne Logic/Output ; exposition ports | Logique métier parallèle |
 | Logic | Machine d'état, fronts Reset/Arm, ErrorId, Cmd | Écriture Q physiques |
 | Output | `Enable` gate + copie Cmd → `*_RQ` | Décision / timers |
-| `ST_EmergencyManagementCmd` | Bus interne 3 BOOL | Usage hors composite |
+| `ST_Safety_Emergency_InternalCmd` | Bus interne 3 BOOL | Usage hors composite |
 
 Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop` ni `SafeStop`.
 `Reset` sur front. Pas de redémarrage auto après défaut.
@@ -110,8 +110,8 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 
 | DUT | Champs | Rôle |
 |---|---|---|
-| `ST_State_Emergency` | `ChainOk`, `ContactorOk`, `Step`, `Armable`, `ArmingBusy` | État public chaîne AU — consommé par Supervision, Troubleshooting |
-| `ST_Diag_Emergency` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `LockoutActive` | Diagnostic chaîne AU — consommé par Supervision, IHM State |
+| `ST_Safety_Emergency_State` | `ChainOk`, `ContactorOk`, `Step`, `Armable`, `ArmingBusy` | État public chaîne AU — consommé par Supervision, Troubleshooting |
+| `ST_Safety_Emergency_Diag` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `LockoutActive` | Diagnostic chaîne AU — consommé par Supervision, IHM State |
 
 **Producteur unique** : `FB_Safety_EmergencyManagement` (sorties `State`/`Diag`).
 Mappés dans `GVL_IHM.Modes.State.*` par Supervision (L2, ✅ fait).
@@ -127,7 +127,7 @@ Mappés dans `GVL_IHM.Modes.State.*` par Supervision (L2, ✅ fait).
 ### DUT interne
 
 ```text
-ST_EmergencyManagementCmd
+ST_Safety_Emergency_InternalCmd
   MaintainA_Cmd : BOOL   // TRUE = maintien canal A (ex-PowerCutOff_A_Cmd)
   MaintainB_Cmd : BOOL   // TRUE = maintien canal B (ex-PowerCutOff_B_Cmd)
   ArmPulse_Cmd : BOOL   // TRUE = pulse réarmement (ex-EmergencyArming_Cmd)
@@ -367,7 +367,7 @@ reste le nom matériel historique (identique).
 | `EmergencyArmingFailed` | sortie FB |
 
 **✅ État 2026-07-30** : les 7 champs manquants de `ST_ModesState` sont désormais alimentés
-depuis `ST_State_Emergency`/`ST_Diag_Emergency` (via `PRG_09_Supervision`). Écart résolu.
+depuis `ST_Safety_Emergency_State`/`ST_Safety_Emergency_Diag` (via `PRG_09_Supervision`). Écart résolu.
 
 ---
 
@@ -400,7 +400,7 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 2. Pas de GVL comme bus de commande interne pour les états armement.
 3. Agrégation `PowerCutOff` nommée et visible (DUT), produite côté Safety.
 4. IHM reste frontière `Cmd/State` ; mapping Supervision lit le bus State/Diag Emergency.
-5. DUT interne Logic→Output conserve `ST_EmergencyManagementCmd` (privé composite).
+5. DUT interne Logic→Output conserve `ST_Safety_Emergency_InternalCmd` (privé composite).
 
 ### 8.2 DUT proposés (noms à figer)
 
@@ -408,8 +408,8 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 |---|---|---|---|
 | `ST_Safety_PowerCutOffRequest` | `PRG_SAFETY_CFC` (agrégateur) | `Request : BOOL`, optionnel masque sources | `PRG_OUTPUTS_LD` → `PowerCutOffRequest` |
 | `ST_HwIn_Machine` (existant / étendu) | Acquisition | DI chain + contactor déjà dans `ST_HwMachine` | FB via Acquisition qualifiée |
-| `ST_State_Emergency` | Outputs / composite | Step, Busy, Armable, ChainOk, ContactorOk | Supervision, troubleshooting |
-| `ST_Diag_Emergency` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, Lockout | Supervision, IHM State |
+| `ST_Safety_Emergency_State` | Outputs / composite | Step, Busy, Armable, ChainOk, ContactorOk | Supervision, troubleshooting |
+| `ST_Safety_Emergency_Diag` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, Lockout | Supervision, IHM State |
 
 ### 8.3 Lots d'implémentation — état courant
 
@@ -418,9 +418,9 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 | **L0 Doc** | Cette spec + extraction + liens AF01/02/03 | Nul | ✅ Fait |
 | **L1 Sim** | Corriger câblage `FB_SimBench` KeepAlive/Arming | Faible | ✅ Fait |
 | **L2 IHM map** | Alimenter tous les champs `ST_ModesState` armement depuis FB | Faible | ✅ Fait |
-| **L3 DUT State/Diag** | Introduire `ST_State_Emergency`, `ST_Diag_Emergency` ; retirer dépendance `GVL_Global` armement | Moyen | ✅ Fait (code + bus) |
+| **L3 DUT State/Diag** | Introduire `ST_Safety_Emergency_State`, `ST_Safety_Emergency_Diag` ; retirer dépendance `GVL_Global` armement | Moyen | ✅ Fait (code + bus) |
 | **L4 Agrégat PowerCutOff** | DUT `ST_Safety_PowerCutOffRequest` depuis Safety ; OR hors Outputs anonyme | Moyen | ⬜ Planifié (dépend CFC Safety) |
-| **L5 Noms polarité** | Renommage partiel `PowerCutOff_A/B_Cmd` → `MaintainA/B_Cmd`, `EmergencyArming_Cmd` → `ArmPulse_Cmd` | Moyen | ✅ Fait (ST_EmergencyManagementCmd + code) ; reste `PowerKeepAlive_*_RQ` côté Q (nom matériel conservé) |
+| **L5 Noms polarité** | Renommage partiel `PowerCutOff_A/B_Cmd` → `MaintainA/B_Cmd`, `EmergencyArming_Cmd` → `ArmPulse_Cmd` | Moyen | ✅ Fait (ST_Safety_Emergency_InternalCmd + code) ; reste `PowerKeepAlive_*_RQ` côté Q (nom matériel conservé) |
 
 ### 8.4 Hors scope de ce FB
 
@@ -461,16 +461,16 @@ Fichiers code de référence :
 - `CODE/AU/FB_Safety_EmergencyManagement.st`
 - `CODE/AU/FB_Safety_EmergencyManagementLogic.st`
 - `CODE/AU/FB_Safety_EmergencyManagementOutput.st`
-- `CODE/AU/ST_EmergencyManagementCmd.st` (interne Logic→Output)
-- `CODE/AU/ST_State_Emergency.st` (bus état public)
-- `CODE/AU/ST_Diag_Emergency.st` (bus diagnostic)
-- `CODE/AU/ST_EmergencyCmd.st` (bus commande IHM, test)
-- `CODE/AU/ST_EmergencyState.st` (bus état IHM, test)
-- `CODE/AU/GVL_Simulation_AU.st` (simulation hardware)
-- `CODE/AU/GVL_IHM_AU.st` (interface IHM)
+- `CODE/AU/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
+- `CODE/AU/ST_Safety_Emergency_State.st` (bus état public)
+- `CODE/AU/ST_Safety_Emergency_Diag.st` (bus diagnostic)
+- `CODE/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test)
+- `CODE/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test)
+- `CODE/SIMULATION/GVL_Simulation_AU.st` (simulation hardware)
+- `CODE/SUPERVISION/GVL_IHM_AU.st` (interface IHM)
 - `CODE/MAIN/PRG_AU_Acquisition_CFC.xml` (acquisition, CFC natif — cible AF02 §2)
 - `CODE/MAIN/PRG_AU_Outputs_LD.st` (sorties)
-- `CODE/AU/PRG_AU_TestBench.st` (programme principal test)
+- `CODE/TESTS/PRG_AU_TestBench.st` (programme principal test)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - `CODE/MAIN/Acquisition (CFC).st` (cible)
 - `CODE/SIMULATION/FB_Sim_Safety.st`

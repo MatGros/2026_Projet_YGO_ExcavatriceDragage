@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 ST_EmergencyTestContext — Stimuli de test pour chaîne AU
+   🧪 ST_Safety_Emergency_TestContext — Stimuli de test pour chaîne AU
    ───────────────────────────────────────────────────────────────
    📄 Regroupe toutes les commandes de simulation du test bench
       dans une structure typée, conforme au pattern projet
@@ -8,10 +8,10 @@
       une table Watch CODESYS ou un visu de test.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+              DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
-TYPE ST_EmergencyTestContext :
+TYPE ST_Safety_Emergency_TestContext :
 STRUCT
     // 🎮 Commandes opérateur simulées (miroir de ST_ModesCmd)
     CmdArmRequest     : BOOL;   // Front demande réarmement (comme BtnEmergencyArming IHM)

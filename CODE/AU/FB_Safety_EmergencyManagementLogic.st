@@ -4,12 +4,9 @@
    📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
       la boucle d'arrêt d'urgence. Produit les consignes logiques
       et les bus d'état/diagnostic.
-   🏷️ Renommé PowerCutOff_X_Cmd → MaintainA/B_Cmd (polarité maintien).
-      Ajout autotest démarrage (§5.4 AF01) + bus State/Diag.
-   🩹 REX 2026-08 : pattern Cause/Ack (RedundancyTestFailed, EmergencyArmingFailed).
-      Reset n'est plus jamais conditionné (ex-bug : Reset+PowerContactorEngaged
-      créait une impasse opérateur). L'interlock sécurité reste sur la Cause brute ;
-      l'affichage IHM (ErrorId) suit la Cause lissée par un debounce court + l'Ack.
+   🔒 Polarité maintien : MaintainA/B_Cmd (TRUE = voie saine).
+   🛡️ Pattern Cause/Ack (§9 STD) : Reset non conditionné, interlock sur Cause brute,
+      affichage IHM (ErrorId) avec debounce court + Ack.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
               DOC/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
@@ -29,7 +26,7 @@ END_VAR
 VAR_OUTPUT
     Error               : BOOL;
     ErrorId             : WORD;        // bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)
-    Cmd                 : ST_EmergencyManagementCmd; // Structure de commande logique produite
+    Cmd                 : ST_Safety_Emergency_InternalCmd; // Structure de commande logique produite
 
     ArmingSeqStep       : INT;         // Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
     RedundancyTestFailed: BOOL;        // 🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag
@@ -152,7 +149,6 @@ IF ResetEdge.Q THEN
     EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
     ErrorId := 16#0000;
-END_IF;
 END_IF;
 
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ

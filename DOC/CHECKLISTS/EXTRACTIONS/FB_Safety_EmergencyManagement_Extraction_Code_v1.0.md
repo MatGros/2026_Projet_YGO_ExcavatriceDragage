@@ -25,12 +25,12 @@
 | `FB_Safety_EmergencyManagement` | `CODE/AU/FB_Safety_EmergencyManagement.st` | Composite parent : appelle Logic puis Output, propage sorties. |
 | `FB_Safety_EmergencyManagementLogic` | `CODE/AU/FB_Safety_EmergencyManagementLogic.st` | Décision, machine d'état armement, latches défaut, consignes logiques. |
 | `FB_Safety_EmergencyManagementOutput` | `CODE/AU/FB_Safety_EmergencyManagementOutput.st` | Pilote physique : copie `Cmd` → sorties `*_RQ` ; fail-safe si `Enable=FALSE`. |
-| `ST_EmergencyManagementCmd` | `CODE/AU/ST_EmergencyManagementCmd.st` | DUT interne Logic → Output (3 BOOL). |
+| `ST_Safety_Emergency_InternalCmd` | `CODE/AU/ST_Safety_Emergency_InternalCmd.st` | DUT interne Logic → Output (3 BOOL). |
 | `FB_Sim_Safety` | `CODE/SIMULATION/FB_Sim_Safety.st` | Sim boucle AU + latch contacteur (consommateur des sorties). |
 
 Instance unique : `PRG_10_Outputs_LD.instSafetyEmergencyManagement`.
 
-Commentaire header de `ST_EmergencyManagementCmd.st` dit encore `ST_EmergencyChainCmd` → **ECART** nom/commentaire.
+Commentaire header de `ST_Safety_Emergency_InternalCmd.st` dit encore `ST_EmergencyChainCmd` → **ECART** nom/commentaire.
 
 ---
 
@@ -65,7 +65,7 @@ Commentaire header de `ST_EmergencyManagementCmd.st` dit encore `ST_EmergencyCha
 | `EmergencyArmingFailed` | BOOL | Latch : pas de confirmation contacteur sous 2 s. |
 | `EmergencyArmingLockoutActive` | BOOL | Verrouillage 5 s après échec armement. |
 
-### DUT interne `ST_EmergencyManagementCmd`
+### DUT interne `ST_Safety_Emergency_InternalCmd`
 
 | Champ | Polarité |
 |---|---|
@@ -157,7 +157,7 @@ Timers nommés : `TonTestA/B`, `TonRestoreA/B`, `TonArmingPulse`, `TonArmingConf
 |---|---|---|---|
 | E1 | Agrégation `PowerCutOff` en OR local `PRG_10`, pas de DUT safety agrégé | CFC illisible ; producteur de l'OR anonyme | DUT `ST_Safety_PowerCutOffRequest` (ou champ dans bus safety machine) produit par `PRG_SAFETY_CFC` |
 | E2 | Double nom `PowerCutOff_*_RQ` (FB) vs `PowerKeepAlive_*_RQ` (E/S) | Confusion polarité | Garder E/S device `PowerKeepAlive_*` ; alias doc clair ; éventuellement renommer sorties FB en `PowerKeepAlive_*` **TBD** |
-| E3 | États armement via `GVL_Global` + VAR_OUTPUT PRG_10 | Contredit « GVL ≠ bus commande interne » | DUT `ST_State_Emergency` / `ST_Diag_Emergency` producteur unique Outputs/Emergency |
+| E3 | États armement via `GVL_Global` + VAR_OUTPUT PRG_10 | Contredit « GVL ≠ bus commande interne » | DUT `ST_Safety_Emergency_State` / `ST_Safety_Emergency_Diag` producteur unique Outputs/Emergency |
 | E4 | IHM : champs `ST_ModesState` non mappés | IHM aveugle sur armable/busy/fail | Mapping Supervision depuis sorties FB (ou bus State) |
 | E5 | SimBench câble mal KeepAlive/Arming | Tests sim non représentatifs de la chaîne | Brancher A/B sur `PowerKeepAlive` réels + pulse sur `EmergencyArming_RQ` FB |
 | E6 | Composite dans Outputs_LD uniquement | Conforme AF02 (« AU dans chaîne sortie ») | **Conserver** instance dans `PRG_OUTPUTS_LD` ; pas de page CFC parallèle |
@@ -208,6 +208,6 @@ Manques tests AUTO suggérés (non encore dans AF01) : F03 PowerCutOffRequest, F
 
 1. Valider comportement F12/E10 (Reset conditionnel + nouvel essai avec latch fail encore actif).
 2. Choisir noms sorties FB : garder `PowerCutOff_*_RQ` ou aligner `PowerKeepAlive_*`.
-3. Valider DUT cibles : `ST_Safety_PowerCutOffAggregate`, `ST_State_Emergency`, `ST_Diag_Emergency` (noms exacts).
+3. Valider DUT cibles : `ST_Safety_PowerCutOffAggregate`, `ST_Safety_Emergency_State`, `ST_Safety_Emergency_Diag` (noms exacts).
 4. Priorité correctifs : E5 SimBench + E4 mapping IHM vs refonte DUT complète.
 5. Confirmer instance unique reste dans `PRG_OUTPUTS_LD`.

@@ -1,5 +1,5 @@
 (* ==============================================================
-   [IHM] ST_EmergencyCmd -- Commandes IHM pour la chaine AU
+   [IHM] ST_Safety_Emergency_HmiCmd -- Commandes IHM pour la chaine AU
    --------------------------------------------------------------
    Role : structure d'echange pour les commandes operateur
           de la chaine d'arret d'urgence (miroir ST_ModesCmd).
@@ -10,7 +10,7 @@
            DOC/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 
-TYPE ST_EmergencyCmd :
+TYPE ST_Safety_Emergency_HmiCmd :
 STRUCT
     BtnEmergencyArming   : BOOL;   // Front demande rearmement contacteur
     BtnEmergencyCutOff   : BOOL;   // Niveau coupure IHM maintenue

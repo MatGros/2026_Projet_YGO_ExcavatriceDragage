@@ -15,16 +15,16 @@ def test_synthetic_program():
     assert not diag.has_errors()
 
 
-def test_real_prg_0_inputs_parses_end_to_end():
-    path = CODE_DIR / "MAIN" / "PRG_00_Inputs.st"
+def test_real_prg_inputs_ld_parses_end_to_end():
+    path = CODE_DIR / "MAIN" / "PRG_INPUTS_LD.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
     obj = parse_file(
-        source, folder="MAIN", stem="PRG_00_Inputs", mtime=1.0, source_label="PRG_00_Inputs.st", diagnostics=diag
+        source, folder="MAIN", stem="PRG_INPUTS_LD", mtime=1.0, source_label="PRG_INPUTS_LD.st", diagnostics=diag
     )
     assert obj is not None
     assert obj.kind == "program"
-    assert obj.name == "PRG_00_Inputs"
+    assert obj.name == "PRG_INPUTS_LD"
     names = [v.name for v in obj.output_vars]
-    assert "EmergencyStopOk" in names
+    assert "EmergencyChainClosed" in names
     assert not diag.has_errors()

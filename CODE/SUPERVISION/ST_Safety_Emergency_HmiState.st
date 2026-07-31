@@ -1,5 +1,5 @@
 (* ==============================================================
-   [IHM] ST_EmergencyState -- Retours d'etat IHM pour chaine AU
+   [IHM] ST_Safety_Emergency_HmiState -- Retours d'etat IHM pour chaine AU
    --------------------------------------------------------------
    Role : structure d'echange pour les retours d'etat de la
           chaine d'arret d'urgence (miroir ST_ModesState).
@@ -10,7 +10,7 @@
            DOC/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 
-TYPE ST_EmergencyState :
+TYPE ST_Safety_Emergency_HmiState :
 STRUCT
     // [OK] Etats generaux
     ChainOk              : BOOL;   // Boucle AU fermee (saine)

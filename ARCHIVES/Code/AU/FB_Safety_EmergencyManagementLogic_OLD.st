@@ -20,7 +20,7 @@ END_VAR
 VAR_OUTPUT
     Error               : BOOL;
     ErrorId             : WORD;        // bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed
-    Cmd                 : ST_EmergencyManagementCmd; // Structure de commande logique produite
+    Cmd                 : ST_Safety_Emergency_InternalCmd; // Structure de commande logique produite
     
     ArmingSeqStep       : INT;         // Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
     RedundancyTestFailed: BOOL;        // Canal A ou B resté collé/shunté détecté à l'auto-test

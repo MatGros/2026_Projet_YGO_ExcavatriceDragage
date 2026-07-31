@@ -4,13 +4,11 @@
    📄 Rôle : Bloc de sécurité principal de la boucle d'arrêt d'urgence.
    🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le
       Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
-   📤 Produit les bus publics ST_State_Emergency et ST_Diag_Emergency
+   📤 Produit les bus publics ST_Safety_Emergency_State et ST_Safety_Emergency_Diag
       en sortie, consommés par Supervision et Troubleshooting.
-   🏷️ Renommé PowerCutOff_A/B_RQ → MaintainA/B_RQ (polarité maintien),
-      EmergencyArming_RQ → ArmPulse_RQ (cohérence nommage).
+   🔒 Sorties physiques MaintainA/B_RQ en polarité maintien (TRUE = voie saine).
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
               DOC/AF_Partie-03_Contrats_Composants_v2.0.md
 *)
 
@@ -31,14 +29,14 @@ VAR_OUTPUT
     Error               : BOOL;
     ErrorId             : WORD;        // bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed, bit3: StartupFail
 
-    // ⚡ Sorties physiques — renommées (polarité maintien explicite)
+    // ⚡ Sorties physiques (polarité maintien explicite)
     MaintainA_RQ        : BOOL;        // Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)
     MaintainB_RQ        : BOOL;        // Sortie de pilotage canal B (TRUE = voie maintenue, FALSE = coupure)
     ArmPulse_RQ         : BOOL;        // Impulsion réarmement physique (1s)
 
     // 🚦 Bus d'état public (AF §8.2)
-    State               : ST_State_Emergency; // ChainOk, ContactorOk, Step, Armable, ArmingBusy
-    Diag                : ST_Diag_Emergency;  // Error, ErrorId, Redundancy, ArmFailed, Lockout
+    State               : ST_Safety_Emergency_State; // ChainOk, ContactorOk, Step, Armable, ArmingBusy
+    Diag                : ST_Safety_Emergency_Diag;  // Error, ErrorId, Redundancy, ArmFailed, Lockout
 
     // 🩺 Diagnostics scalaires (rétrocompatibilité PRG_10/GVL_Global)
     ArmingSeqStep                : INT;

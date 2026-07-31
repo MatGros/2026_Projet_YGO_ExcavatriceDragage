@@ -15,6 +15,6 @@
 
 {attribute 'qualified_only'}
 VAR_GLOBAL
-    Cmd   : ST_EmergencyCmd;    // [IHM] Commandes operateur (Write)
-    State : ST_EmergencyState;  // [IHM] Retours d'etat (Read)
+    Cmd   : ST_Safety_Emergency_HmiCmd;    // [IHM] Commandes operateur (Write)
+    State : ST_Safety_Emergency_HmiState;  // [IHM] Retours d'etat (Read)
 END_VAR
