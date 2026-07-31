@@ -1,6 +1,6 @@
 # FB_Encoder_Scale — Spec composant (v1.0)
 
-> Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.0.md`](../AF_Partie-09_Fonction_Encoder_v2.0.md) §5.  
+> Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §5.  
 > Rôle de **ce** document : conversion cinématique des points bruts codeur en mètres de câble déroulé/enroulé.  
 > Source code : `CODE/CODEURS/FB_Encoder_Scale.st` · instances `instEncoderScaleM1/M2` dans `Acquisition (CFC)`.  
 
@@ -26,34 +26,50 @@ Brique technique de **conversion d'échelle** : transforme la différence entre 
 
 ---
 
-## 2. Interface
+## 2. Interface (vérifiée `CODE/CODEURS/FB_Encoder_Scale.st`)
 
 | Port entrée | Type | Rôle |
 |---|---|---|
-| `RawPos` | UDINT | Position brute qualifiée issue de `FB_Encoder_Abs` |
-| `HomingRefRaw` | UDINT | Référence brute issue de `FB_Encoder_Homing` |
-| `PointsPerRev` | UDINT | Nbre de points par tour (défaut 8192) |
-| `MetersPerRev` | REAL | Nbre de mètres de câble par tour de tambour |
-| `InvertSense` | BOOL | Inversion du sens de comptage (montée/descente) |
+| `RawPos` | UDINT | Position brute — sortie `FB_Encoder_Abs`, déjà gelée sur doute |
+| `HomingRefRaw` | UDINT | Référence brute figée au dernier homing (`ST_EncoderCalib`) |
+| `CableM_PerRev` | REAL := 2.0 | Câble déroulé par tour de tambour (périmètre confirmé terrain, RETAIN site) |
+| `PointsPerRev` | UDINT := 8192 | Résolution codeur |
 
-**Sorties** :
-- `CablePosM : REAL` : Position calculée du câble en mètres.
+**Sortie** :
+- `CablePosM : REAL` : Position câble en mètres, signée (+ enroulé, − sous l'eau).
+
+⚠️ **Pas de port `InvertSense`.** L'inversion de sens de comptage est gérée **côté codeur**
+(objet CoE `6000h`, Startup Parameter CODESYS), pas dans ce FB. Un ancien calcul logiciel
+équivalent (`InvertDirection`, `16#FFFFFFFF - RawPosIn`) a été **retiré le 2026-07-03** : il
+inversait sur toute la plage `UDINT` (32 bits) au lieu de la plage réelle du codeur (25 bits),
+produisant des positions incohérentes après homing. Ne pas réintroduire côté PLC.
 
 ---
 
 ## 3. Calcul cinématique
 
-$$\text{DeltaPts} = \text{RawPos} - \text{HomingRefRaw}$$
-$$\text{CablePosM} = \left( \frac{\text{DeltaPts}}{\text{PointsPerRev}} \right) \times \text{MetersPerRev} \times (\text{si InvertSense THEN } -1.0 \text{ ELSE } 1.0)$$
+```
+RawDiff (DINT)  = UDINT_TO_DINT(RawPos) − UDINT_TO_DINT(HomingRefRaw)   ⚠️ conversion DINT
+                                                                            AVANT soustraction
+CablePosM       = RawDiff × (CableM_PerRev / PointsPerRev)   si PointsPerRev > 0
+                = 0.0                                          sinon (garde division par zéro)
+```
+
+⚠️ **Garde arithmétique obligatoire** : soustraire deux `UDINT` directement reboucle
+silencieusement vers ~2³² en cas de résultat négatif (`RawPos < HomingRefRaw`, cas normal en
+descente sous la référence). La conversion `DINT` **avant** la soustraction est donc une
+exigence de sécurité de calcul, pas un détail d'implémentation.
 
 ---
 
 ## 4. Alertes et écarts
 
 - N'effectue aucun filtrage temporel (le filtrage et la surveillance de vitesse sont délégués à `FB_Encoder_SpeedMeasure`).
+- Brique de calcul pure : pas de gel ni de bornage ici (`RawPos` déjà gelé par `FB_Encoder_Abs` ;
+  le bornage physique `[-99;+99] m` est la responsabilité de `FB_Encoder_Safety`).
 
 ---
 
 ## 5. Documents liés
 
-- [`AF_Partie-09_Fonction_Encoder_v2.0.md`](../AF_Partie-09_Fonction_Encoder_v2.0.md)
+- [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md)

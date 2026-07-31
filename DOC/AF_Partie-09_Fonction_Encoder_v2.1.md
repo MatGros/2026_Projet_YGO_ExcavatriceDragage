@@ -181,7 +181,17 @@ Supervision  copie vers IHM
 | `CfgTopSensorPos_M` | 8.5 m | **8.0 m** |
 | `CfgCableLimitAscent_M` | 8.0 m | **7.5 m** |
 
-**Nominal** : monter M1+M2 au capteur haut → relâcher (arrêt confirmé) → `BtnHome` → `Homed` sur les 2 instances indépendamment. `HomingRefRaw` calculé, `CablePosM≈8.0m`.
+**Nominal** :
+1. **Confirmation visuelle benne ouverte** (opérateur, avant tout mouvement) — tant que M1/M2 ne
+   sont pas référencés, `CablePosM` est potentiellement faux : aucun interlock automatique basé
+   sur la position (y compris l'état benne côté `FB_Bucket`) n'est fiable à ce stade. Seule une
+   vérification visuelle permet de lancer les 2 moteurs ensemble en confiance.
+2. Monter M1+M2 au capteur haut → relâcher (arrêt confirmé) → `BtnHome` → `Homed` sur les 2
+   instances indépendamment. `HomingRefRaw` calculé, `CablePosM≈8.0m`.
+3. **Une fois référencé**, `CablePosM` redevient fiable : presser `ConfirmOpenPosition`
+   (`FB_Bucket`) pour amorcer le suivi automatique `BucketState.IsOpen` — action **distincte** de
+   l'étape 1 (vérification visuelle pré-homing) et **postérieure** à elle, voir
+   `CODE/TREUILS/BENNE/FB_Bucket.st` en-tête REX 2026-07-08.
 
 **Unitaire (MAINT_N2)** : sélectionner treuil → manœuvrer → arrêt confirmé → `CfgHomingTargetM` → `BtnHome`.
 

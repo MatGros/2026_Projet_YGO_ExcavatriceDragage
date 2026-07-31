@@ -65,11 +65,15 @@ AF_PARTIE = re.compile(r"^AF_Partie-(?P<num>\d{2})_")
 # `(?<![\w-])` interdit de matcher au milieu d'un mot, dans un identifiant `TC-P09-001`,
 # ou apres le prefixe `ex-` reserve aux renvois volontairement historiques
 # (`ex-AF_Partie-11`, cf. CODE/MAIN/PRG_06_WinchControl.st).
+# `(?!\d)` (pas `(?![\d\w])`) : un nom de fichier continue souvent par `_Mot`
+# (`AF_Partie-11_Fonction_Benne_v2.0.md`) — seule la continuation par un CHIFFRE doit
+# bloquer le match (evite de lire `110` comme `11`). Rate silencieusement `AF11eme`,
+# suffixe qui n'existe nulle part dans ce depot.
 AF_MENTION = re.compile(
     r"(?<![\w-])(?:"
     r"(?:AF[_ -]?Partie[- ]?|AF-?|Partie[- ]?)(?P<num>\d{1,2})"
     r"|P(?P<num2>\d{2})"
-    r")(?![\d\w])"
+    r")(?!\d)"
 )
 
 
@@ -197,11 +201,18 @@ def main() -> int:
         # `--fix` ne corrige PAS : seul un humain sait si `AF11` voulait dire
         # Translation (-> AF12) ou Benne (-> fiche du domaine Treuils, AF10).
         historical = rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text
+        # Un nom de fichier archive porte legitimement l'ancien numero
+        # (`ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v1.13.md`) : la mention fait
+        # partie du CHEMIN, ce n'est pas un renvoi a corriger. On exclut toute mention
+        # qui tombe dans un token `ARCHIVES/...` de la meme ligne.
+        archive_spans = [m.span() for m in re.finditer(r"ARCHIVES/[A-Za-z0-9_./\-]+", text)]
         if af_numbers and not historical:
             reported: set[tuple[int, str]] = set()
             for match in AF_MENTION.finditer(text):
                 num = (match.group("num") or match.group("num2")).zfill(2)
                 if num in af_numbers:
+                    continue
+                if any(start <= match.start() < end for start, end in archive_spans):
                     continue
                 line = text.count("\n", 0, match.start()) + 1
                 if (line, num) in reported:

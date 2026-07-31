@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<pou name="FB_Input" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="InputRaw">
+        <type>
+          <BOOL />
+        </type>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal brut carte d'entrée</xhtml>
+        </documentation>
+      </variable>
+      <variable name="InvertLogic">
+        <type>
+          <BOOL />
+        </type>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = NC (logique inversée)</xhtml>
+        </documentation>
+      </variable>
+      <variable name="FilterTime">
+        <type>
+          <TIME />
+        </type>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">Tempo anti-rebond (filtrage)</xhtml>
+        </documentation>
+      </variable>
+      <variable name="ChannelOk">
+        <type>
+          <BOOL />
+        </type>
+        <initialValue>
+          <simpleValue value="TRUE" />
+        </initialValue>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag voie/carte OK (§4) — TRUE par défaut si pas de diag dispo</xhtml>
+        </documentation>
+      </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="State">
+        <type>
+          <BOOL />
+        </type>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal conditionné, prêt à l'emploi</xhtml>
+        </documentation>
+      </variable>
+      <variable name="Error">
+        <type>
+          <BOOL />
+        </type>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">Voie en défaut (ChannelOk faux)</xhtml>
+        </documentation>
+      </variable>
+      <variable name="ErrorId">
+        <type>
+          <WORD />
+        </type>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut matériel entrée (Carte HS)" - voie/carte HS</xhtml>
+        </documentation>
+      </variable>
+    </outputVars>
+    <localVars>
+      <variable name="FilterTon">
+        <type>
+          <derived name="TON" />
+        </type>
+      </variable>
+      <variable name="ValueRaw">
+        <type>
+          <BOOL />
+        </type>
+      </variable>
+      <variable name="FirstScanDone">
+        <type>
+          <BOOL />
+        </type>
+      </variable>
+    </localVars>
+    <documentation>
+      <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📥 FB_Input — Entrée TOR conditionnée (brique réduite)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1
+   🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
+      complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
+      de conditionnement bas niveau, à instancier en tableau (§3) ou
+      composée directement dans un FB métier.
+   🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
+   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
+      d'architecture en attente — composition interne vs FB_IO générique
+      séparé). Ce fichier ne fait QUE créer la brique elle-même.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Input) ===</xhtml>
+    </documentation>
+  </interface>
+  <body>
+    <ST>
+      <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Input) ===
+
+// 1. Inversion NO/NC
+ValueRaw := InputRaw XOR InvertLogic;
+
+// 2. Initialisation premier scan &amp; Filtrage anti-rebond
+// Au premier scan post-boot, State prend directement la valeur saine brute sans attendre le délai de 20ms,
+// ce qui évite d'émettre des fausses alarmes transitoires au démarrage de l'automate.
+IF NOT FirstScanDone THEN
+    State := ValueRaw;
+    FirstScanDone := TRUE;
+ELSE
+    FilterTon(IN := (ValueRaw &lt;&gt; State), PT := FilterTime);
+    IF FilterTon.Q THEN
+        State := ValueRaw;   // Une fois à jour, IN redevient FALSE au cycle suivant (ValueRaw=State)
+    END_IF;
+END_IF;
+
+// 3. Diagnostic voie/carte
+IF NOT ChannelOk THEN
+    ErrorId := ErrorId OR 16#0001;
+    State := FALSE;   // État sûr forcé (Partie6 §1)
+ELSE
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+Error := (ErrorId &lt;&gt; 16#0000);
+</xhtml>
+    </ST>
+  </body>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+      <ObjectId>8edb8169-fe96-5561-81ca-d3258d6bba57</ObjectId>
+    </data>
+  </addData>
+</pou>

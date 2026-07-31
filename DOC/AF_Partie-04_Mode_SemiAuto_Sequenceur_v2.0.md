@@ -47,11 +47,18 @@
 
 Ces briques ne sont **pas** des modes machine.
 
-### 🌊 `FB_DiveSearch` — Diving / plongee Kobold
-- Descend avec intention operateur maintenue.
-- Surveille l'immersion et la recherche de fond Kobold.
+### 🌊 `FB_DiveSearch` — Diving / plongée Kobold
+
+- Descend avec intention opérateur maintenue.
+- **Sémantique et Séquence de détection Kobold (`M1_M2_KoboldContactFond_DI`)** :
+  1. **Prêt à plonger (Hors de l'eau, ex. $\ge +1,0$ m)** : Capteur = `0`.
+  2. **Immersion (Contact surface de l'eau, fenêtre $[-0,5\text{ m} ; +0,5\text{ m}]$)** : Front montant $\rightarrow$ Capteur passe à **`1`**.
+  3. **Plongée dans l'eau libre** : Capteur retombe à **`0`**.
+  4. **Toucher Fond (Arrivée au fond)** : Front montant $\rightarrow$ Capteur passe à **`1`** (détection réelle du fond).
+- **Règle de validation du fond** : Le fond est validé si et seulement si l'état `1` (fond) intervient **APRÈS** la confirmation de la séquence complète (départ hors eau `0` $\rightarrow$ immersion `1` $\rightarrow$ eau libre `0`). Un signal `1` direct sans immersion préalable est rejeté comme incohérent.
+- **Activation de la mesure (`M1_M2_KoboldMeasureEnable_DQ`)** : Doit être alimentée pendant toute la séquence. Sans activation ou sans front d'immersion validé autour de $0,0$ m, la descente est bloquée en défaut (T82).
 - Publie une confirmation de fond valide.
-- En anomalie : arret normal demande + diagnostic.
+- En anomalie : arrêt sécurisé demandé + diagnostic.
 
 ### ⛏️ `FB_ExtractionSequence` — Extraction
 - S'active apres confirmation de fond valide, ou attestation manuelle explicite en maintenance.
