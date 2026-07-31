@@ -75,3 +75,36 @@ python -m pytest
 ```
 
 La compilation finale et l'import restent à confirmer dans CODESYS 3.5.
+
+## Scripts CLI modulaires (`scripts/`)
+
+En plus du générateur monolithique (`generator/cli.py`), des scripts indépendants permettent
+de générer de **petits bouts** individuellement. Chaque script réutilise la logique existante
+de `generator/` (pas de réécriture) et produit un artefact PLCopenXML focalisé.
+
+| Script | Rôle | Usage |
+|---|---|---|
+| `scripts/st_to_ld.py` | Convertit un fichier `PRG_*_LD.st` en un `<pou>` en `<LD>` | `python scripts/st_to_ld.py CODE/MAIN/PRG_AU_Outputs_LD.st -o output.xml` |
+| `scripts/st_to_pou.py` | Convertit un fichier `.st` (FB ou PROGRAM) en un `<pou>` en `<ST>` | `python scripts/st_to_pou.py CODE/AU/FB_Safety_EmergencyManagement.st -o output.xml` |
+| `scripts/cfc_extract.py` | Extrait un `<pou>` CFC d'un XML natif (nettoyage namespaces, alignement ObjectIds) | `python scripts/cfc_extract.py CODE/MAIN/PRG_AU_Acquisition_CFC.xml -o output.xml` |
+| `scripts/st_to_dut.py` | Convertit un fichier `.st` (STRUCT ou ENUM) en un `<dataType>` | `python scripts/st_to_dut.py CODE/AU/ST_EmergencyState.st -o output.xml` |
+| `scripts/build_bundle.py` | Orchestre un bundle `<project>` complet depuis fichiers/dossiers | `python scripts/build_bundle.py CODE/AU/ CODE/MAIN/PRG_AU_Outputs_LD.st -o bundle.xml` |
+
+### Exemples
+
+```powershell
+# Générer juste un Ladder depuis un PRG_*_LD
+python scripts/st_to_ld.py CODE/MAIN/PRG_AU_Outputs_LD.st -o /tmp/test_ld.xml
+
+# Générer juste un POU ST
+python scripts/st_to_pou.py CODE/AU/FB_Safety_EmergencyManagement.st -o /tmp/test_pou.xml
+
+# Extraire juste un CFC natif
+python scripts/cfc_extract.py CODE/MAIN/PRG_AU_Acquisition_CFC.xml -o /tmp/test_cfc.xml
+
+# Générer un bundle complet depuis un dossier + un fichier
+python scripts/build_bundle.py CODE/AU/ CODE/MAIN/PRG_AU_Outputs_LD.st -o /tmp/test_bundle.xml
+```
+
+Chaque script dispose de `--help` et gère les erreurs proprement (exit code 1 avec message).
+Le script `st_to_ld.py` rejette les fichiers qui ne sont pas des `PRG_*_LD` avec un message clair.

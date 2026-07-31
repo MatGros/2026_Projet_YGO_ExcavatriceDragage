@@ -19,7 +19,6 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | Dossier / fichier | Périmètre | Statut |
 |---|---|---|
 | `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom des variables d'E/S (convention de polarité) | **Vivant** — sert à retrouver un signal dans les schémas électriques et les REX antérieurs |
-| `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | Revue automatisme / sécurité / IHM (2026-07-26) | **Actif** — C1 corrigé (`1d2e086`), **C2 à C7 non traités** |
 | `IHM_VARIABLES_MIGRATION.md` | Correspondance ancien → nouveau chemin des variables IHM | **Vivant** — à tenir à jour à chaque lot, sert au reparamétrage IHM/SCADA physique |
 
 ## 🎯 À quoi sert chaque document — pour reprendre le travail
@@ -30,7 +29,6 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 
 | Document | Sert à | Tâches |
 |---|---|---|
-| `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | 🔴 **Source des constats C2→C7**, avec raisonnement et lignes de code. Sans lui, les tâches ci-contre sont des titres sans contenu | **T84** (mesure vitesse) · **T86** (`ForbidAscent`) · **T87** (`DelayMotorDecel`) · **T88** (`FB_CycleTime`) |
 | `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom d'E/S. **§3bis porte la sémantique du Kobold à 3 temps** (hors eau `0` → immergé `1` → fond `0`) | **T81** · **T82** · tout retour à un schéma électrique ou un REX antérieur au 2026-07-27 |
 | `IHM_VARIABLES_MIGRATION.md` | Journal ancien → nouveau chemin des variables IHM, pour le reparamétrage de la visu. **À tenir à jour à chaque lot** | **T94** · **T95** · toute publication IHM |
 
@@ -50,6 +48,7 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 
 | Dossier / fichier | Chantier | Clôture |
 |---|---|---|
+| `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | Revue automatisme / sécurité / IHM | 2026-07-31 — archivé. C1/C2/C5 implémentés, C4/C6 suivis dans `PLAN_TASK` et `AF_Partie-10` |
 | `ConfigPersistence/` | Persistance config IHM (Lots 1-6) | `v0.4.26` — implémenté |
 | `RemovePlcTests/` | Retrait du framework de tests in-PLC (plan + audit de vérification) | `v0.5.1` — implémenté, compilé, validé |
 | `TranslationM3/` | Refonte positionnement & sécurités M3 (5 capteurs) | implémenté — `AF_Partie-11 v1.11`, `FB_Translation_PositionDecoder` |
