@@ -26,10 +26,10 @@ if str(_TOOL_ROOT) not in sys.path:
 _REPO_ROOT = _TOOL_ROOT.parent.parent  # project root (CODE/ lives here)
 CODE_DIR = _REPO_ROOT / "CODE"
 
-from scripts.st_to_ld import build_ld_pou_xml
-from scripts.st_to_pou import build_st_pou_xml
-from scripts.st_to_dut import build_dut_xml
-from scripts.cfc_extract import extract_cfc_pou
+from scripts.st_to_ld import build_ld_pou_xml, build_ld_project_xml
+from scripts.st_to_pou import build_st_pou_xml, build_st_project_xml
+from scripts.st_to_dut import build_dut_xml, build_dut_project_xml
+from scripts.cfc_extract import extract_cfc_pou, extract_cfc_project_xml
 from scripts.build_bundle import _collect_objects_from_args
 
 from generator.diagnostics import DiagnosticCollector
@@ -289,3 +289,125 @@ def test_build_bundle_main_exits_1_on_no_objects(tmp_path):
 
     rc = main([str(tmp_path / "nonexistent_dir"), "-o", str(tmp_path / "out.xml")])
     assert rc == 1
+
+
+# ── Multi-file mode tests ─────────────────────────────────────────────────────
+
+
+def _assert_valid_project_bundle(data: bytes, expected_pou_count: int) -> ET.Element:
+    """Shared assertions for multi-file ``<project>`` bundle output."""
+    root = _parse_strip_ns(data)
+    assert root.tag == "project"
+
+    # ProjectStructure must exist
+    ps = root.find(".//ProjectStructure")
+    assert ps is not None, "bundle must contain <ProjectStructure>"
+
+    # ObjectId alignment: 0 mismatch between ProjectStructure and project body
+    ps_ids = {obj.get("ObjectId") for obj in ps.findall(".//Object")}
+    all_object_ids = set()
+    for oid in root.findall(".//ObjectId"):
+        if oid.text:
+            all_object_ids.add(oid.text)
+    mismatch = ps_ids.symmetric_difference(all_object_ids)
+    assert mismatch == set(), f"ObjectId mismatch: {mismatch}"
+
+    # No nested addData inside addData
+    for el in root.iter("addData"):
+        nested = [c for c in el if c.tag == "addData"]
+        assert len(nested) == 0, "nested <addData> found inside <addData>"
+
+    # CallType/ElementType must have xmlns=""
+    raw_text = data.decode("utf-8-sig")
+    if "CallType" in raw_text:
+        assert 'CallType xmlns=""' in raw_text
+    if "ElementType" in raw_text:
+        assert 'ElementType xmlns=""' in raw_text
+
+    # fileHeader / contentHeader / types / instances / addData present
+    assert root.find("fileHeader") is not None
+    assert root.find("contentHeader") is not None
+    assert root.find("types") is not None
+    assert root.find("instances") is not None
+    assert root.find("addData") is not None
+
+    pous = root.findall(".//pou")
+    assert len(pous) == expected_pou_count
+
+    return root
+
+
+def test_st_to_ld_multi_file_produces_valid_project():
+    """st_to_ld.py with 2 files → <project> with 2 <pou> in <LD>."""
+    f1 = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    f2 = CODE_DIR / "MAIN" / "PRG_10_Outputs_LD.st"
+    if not f1.exists() or not f2.exists():
+        pytest.skip("LD test files not available")
+    diag = DiagnosticCollector()
+    data = build_ld_project_xml([f1, f2], diag)
+    root = _assert_valid_project_bundle(data, 2)
+    # Both POUs must have <LD> bodies
+    for pou in root.findall(".//pou"):
+        ld = pou.find(".//LD")
+        assert ld is not None, f"pou {pou.get('name')} must have <LD> body"
+
+
+def test_st_to_pou_multi_file_produces_valid_project():
+    """st_to_pou.py with 2 files → <project> with 2 <pou> in <ST>."""
+    f1 = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    f2 = CODE_DIR / "AU" / "FB_Safety_EmergencyManagementLogic.st"
+    if not f1.exists() or not f2.exists():
+        pytest.skip("POU ST test files not available")
+    diag = DiagnosticCollector()
+    data = build_st_project_xml([f1, f2], diag)
+    root = _assert_valid_project_bundle(data, 2)
+    for pou in root.findall(".//pou"):
+        st = pou.find(".//ST")
+        assert st is not None, f"pou {pou.get('name')} must have <ST> body"
+
+
+def test_cfc_extract_multi_file_produces_valid_project():
+    """cfc_extract.py with 2 files → <project> with 2 CFC <pou>."""
+    f1 = CODE_DIR / "MAIN" / "PRG_AU_Acquisition_CFC.xml"
+    f2 = CODE_DIR / "MAIN" / "PRG_GLOBAL_CFC.xml"
+    if not f1.exists() or not f2.exists():
+        pytest.skip("CFC test files not available")
+    diag = DiagnosticCollector()
+    data = extract_cfc_project_xml([f1, f2], diag)
+    root = _assert_valid_project_bundle(data, 2)
+    pou_names = {p.get("name") for p in root.findall(".//pou")}
+    assert "PRG_AU_Acquisition" in pou_names
+    assert "PRG_GLOBAL_CFC" in pou_names
+
+
+def test_st_to_dut_multi_file_produces_valid_project():
+    """st_to_dut.py with 2 files → <project> with 2 <dataType>."""
+    f1 = CODE_DIR / "AU" / "ST_State_Emergency.st"
+    f2 = CODE_DIR / "AU" / "ST_Diag_Emergency.st"
+    if not f1.exists() or not f2.exists():
+        pytest.skip("DUT test files not available")
+    diag = DiagnosticCollector()
+    data = build_dut_project_xml([f1, f2], diag)
+    root = _assert_valid_project_bundle(data, 0)  # 0 pous, 2 dataTypes
+    dts = root.findall(".//dataType")
+    assert len(dts) == 2
+    dt_names = {dt.get("name") for dt in dts}
+    assert "ST_State_Emergency" in dt_names
+    assert "ST_Diag_Emergency" in dt_names
+
+
+def test_st_to_ld_multi_file_main_exits_0(tmp_path):
+    """CLI main() with 2 LD files exits 0 and writes a <project> file."""
+    from scripts.st_to_ld import main
+
+    f1 = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    f2 = CODE_DIR / "MAIN" / "PRG_10_Outputs_LD.st"
+    if not f1.exists() or not f2.exists():
+        pytest.skip("LD test files not available")
+    out = tmp_path / "bundle.xml"
+    rc = main([str(f1), str(f2), "-o", str(out)])
+    assert rc == 0
+    assert out.is_file()
+    data = out.read_bytes()
+    root = _parse_strip_ns(data)
+    assert root.tag == "project"

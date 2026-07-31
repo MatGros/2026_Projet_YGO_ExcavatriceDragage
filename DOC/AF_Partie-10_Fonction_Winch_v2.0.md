@@ -1,7 +1,7 @@
 # Analyse Fonctionnelle — Partie 10 : Fonction Winch M1/M2 (v2.0)
 
 > Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
-> **Détail technique par FB** : voir les 5 fiches dédiées (§1). Ce chapô reste au niveau machine
+> **Détail technique par FB** : voir les 9 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code : `CODE/TREUILS/*.st` · instances dans `Treuils (CFC)` (mouvement), `Safety (CFC)` (safety), `Outputs (Ladder)` (finale).
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
@@ -19,7 +19,7 @@
 
 ## 🧪 Points de validation
 
-Catalogue `TC-P10-*` **réparti dans les 5 fiches FB** (propriétaire unique par fiche, pas
+Catalogue `TC-P10-*` **réparti dans les fiches FB** (propriétaire unique par fiche, pas
 dupliqué ici) :
 
 | Fiche | TC couverts |
@@ -29,6 +29,10 @@ dupliqué ici) :
 | [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | TC-P10-014, 015, 016 |
 | [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | TC-P10-012, 013, 020, 021, 022 |
 | [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | TC-P10-023 à 034 |
+| [`FB_WinchSymmetry`](AF_Partie-10_Fonction_Winch/FB_WinchSymmetry_v1.0.md) | Diagnostic MES-008, symétrie |
+| [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou |
+| [`FB_WinchLoadEstimator`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | Diagnostic charge 2D |
+| [`FB_DriftGuard`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | Dérive position sous frein |
 
 ---
 
@@ -36,14 +40,15 @@ dupliqué ici) :
 
 | Fiche | FB détaillé | Contenu |
 |---|---|---|
-| [`AF_Partie-10_FB_Winch_v1.0.md`](AF_Partie-10_FB_Winch_v1.0.md) | `FB_Winch` (+ `FB_SpeedStep`, `FB_Brake` résumés) | Mouvement, rampe, palier, sens, frein |
+| [`AF_Partie-10_FB_Winch_v1.0.md`](AF_Partie-10_FB_Winch_v1.0.md) | `FB_Winch` | Mouvement, rampe, palier, sens, frein |
 | [`AF_Partie-10_FB_Safety_Winch_v1.0.md`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
 | [`AF_Partie-10_FB_WinchSync_v1.0.md`](AF_Partie-10_FB_WinchSync_v1.0.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | `FB_WinchOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
 | [`AF_Partie-10_FB_Bucket_v1.0.md`](AF_Partie-10_FB_Bucket_v1.0.md) | `FB_Bucket` (+ `FB_DiveSearch`, `FB_ExtractionSequence`) | Benne, désynchronisation M1/M2, glissement, assistants |
-
-`FB_WinchLoadEstimator` (diagnostic charge informatif, pas de safety) : voir extraction code,
-pas de fiche dédiée (faible enjeu).
+| [`AF_Partie-10_Fonction_Winch/FB_WinchSymmetry_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_WinchSymmetry_v1.0.md) | `FB_WinchSymmetry` | Diagnostic passif symétrie & décalages M1/M2 |
+| [`AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | `FB_SpeedStep` | Décodeur consigne % -> contacteurs & garde-fou |
+| [`AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | `FB_WinchLoadEstimator` | Estimation charge 2D palier x vitesse |
+| [`AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | `FB_DriftGuard` | Capture & surveillance dérive sous frein |
 
 ```text
 FB_Winch (mouvement, ×2)
@@ -51,11 +56,12 @@ FB_Winch (mouvement, ×2)
  ├─ FB_Brake        (séquence frein manque-courant, partagé Translation)
  └─ FB_Ramp         (accel/décel)
 
-FB_Safety_Winch (×2)              ──► SafeStop / ForbidDescent / ForbidAscent / PowerCutOff
+FB_Safety_Winch (×2)              ──► SafeStop / ForbidDescent / ForbidAscent / PowerCutOff (compose FB_DriftGuard)
 FB_WinchSync (×1)                 ──► DeltaPosM, SyncWarn (niveau 1, warning)
 FB_Bucket (×1)                    ──► Benne (sous-fonction M2, désynchronisation)
 FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs)
-FB_WinchLoadEstimator (×2)        ──► diagnostic charge, informatif
+FB_WinchLoadEstimator (×2)        ──► Diagnostic charge, informatif
+FB_WinchSymmetry (×1)             ──► Diagnostic passif symétrie M1/M2
 ```
 
 Benne = sous-fonction M2 : aucune I/O propre, réutilise `FB_Winch` M2. Fiche dédiée dans ce dossier.
