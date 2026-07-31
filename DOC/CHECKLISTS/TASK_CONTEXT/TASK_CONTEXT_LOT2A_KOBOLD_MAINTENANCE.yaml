@@ -10,7 +10,6 @@ scope_code:
   - "CODE/MAIN/PRG_06_WinchControl.st"
   - "CODE/MAIN/PRG_09_Supervision.st"
   - "CODE/JOYSTICK/FB_Joystick.st"
-  - "CODE/TESTS/PRG_Test_KoboldMaintenance.st"
   - "CODE/SUPERVISION/_TYPES"
   - "CODE/GVL_PERSISTENT.st"
 scope_doc:
@@ -26,12 +25,14 @@ acceptance_criteria:
   - "T82 : aucune descente assistée sans séquence Kobold possible."
   - "MAINT_N1/N2 : plongée et extraction sont activables séparément sans mouvement autonome."
   - "Une seule consigne opérateur est exposée à l'IHM, séparée des alarmes."
+# 📌 2026-08-01 : test PLC automatique archivé, plus une obligation C3/C4 (voir PLAN_TASK).
+# Ancien artefact : ARCHIVES/Code/TESTS/PRG_Test_KoboldMaintenance.st (jamais exécuté en
+# CODESYS réel — preuve préparée seulement). Garantie reportée sur human_validation_required.
 tests_required:
-  - "Tests PLC de transitions DiveSearch et ExtractionSequence"
-tests_automated_required: true
-tests_implementation_paths:
-  - "CODE/TESTS/PRG_Test_KoboldMaintenance.st"
-tests_status: implemented
+  - "Vérification manuelle CODESYS (Watch/forçage) des transitions DiveSearch et ExtractionSequence avant chargement"
+tests_automated_required: false
+tests_implementation_paths: []
+tests_status: planned
 test_execution_evidence: []
 review_required: true
 dual_review_required: true

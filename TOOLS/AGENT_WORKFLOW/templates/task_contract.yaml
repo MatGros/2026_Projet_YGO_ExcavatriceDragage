@@ -67,7 +67,7 @@ contract:
     - check_linkage          # bloc "Auto-verification liaison"
     - run_all_gates          # resultat des gates
     - bundle                 # CODE/CODE_Bundle.xml regenere
-    # - task_tests           # obligatoire en C3/C4 safety
+    # - task_tests           # seulement si tests_automated_required: true (option, plus une obligation C3/C4 depuis 2026-08-01)
 
   # ── 6. Modeles autorises ──────────────────────────────────────────────────
   # Voir TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md.

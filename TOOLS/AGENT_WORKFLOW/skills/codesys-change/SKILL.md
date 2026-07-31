@@ -10,7 +10,7 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
 3. Cartographier avant le plan : propriétaire de chaque donnée, producteur unique, interface publique,
    consommateurs et arbitrage des commandes. Refuser tout accès nouveau aux internes d’une instance,
    calcul dupliqué, canal GVL caché ou fusion anarchique de sources par `OR`.
-4. Pour C3/C4, safety, SafeStop ou PowerCutOff : exiger un `TASK_CONTEXT` avec tests PLC automatiques, puis exécuter `check_task_test_contract.py <TASK_CONTEXT>` avant le plan. Une simulation manuelle seule ne ferme jamais l'acceptation.
+4. Pour C3/C4, safety, SafeStop ou PowerCutOff : exiger un `TASK_CONTEXT` avec `human_validation_required: true` et des critères d'acceptation vérifiables. Test PLC automatique optionnel (décision 2026-08-01, plus d'obligation) — si déclaré (`tests_automated_required: true`), exécuter `check_task_test_contract.py <TASK_CONTEXT>` avant le plan pour le tenir à sa parole.
 5. Pour C3 et C4, collecter avant le plan les avis read-only exigés par
    `docs/MODEL_ROUTING.md` via Pi Subagents, puis en synthétiser les accords, divergences et
    risques. Les sous-agents ne modifient ni ne commitent.
@@ -24,7 +24,7 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
    avec les sources ST.
 8. **Si au moins un fichier `CODE/**/*.st` a changé : générer obligatoirement `CODE/CODE_Bundle.xml`** via `TOOLS/ST_PLCOPENXML_GENERATOR` avant toute restitution. Ce n'est pas une option et il ne faut jamais proposer un import fichier-par-fichier. Si un POU XML natif/CFC est concerné, le conserver comme source métier et ne jamais éditer le XML final du bundle à la main.
 9. Exécuter obligatoirement `check_bundle_freshness.py <project_root>` après génération ; un bundle absent ou stale bloque la restitution.
-10. Pour C3/C4/safety, exécuter `check_task_test_contract.py <TASK_CONTEXT> --release`. Sans tests `implemented` et preuve d'exécution, le lot est **incomplet**, même si CODESYS compile.
+10. Pour C3/C4/safety, la validation humaine (Watch/forçage CODESYS avant chargement) est obligatoire, même si CODESYS compile. Si un test PLC automatique a été déclaré (`tests_automated_required: true`), exécuter aussi `check_task_test_contract.py <TASK_CONTEXT> --release` — sans `implemented` + preuve d'exécution, le lot reste **incomplet**.
 11. Si ST2PY est utilisé pour la simulation ou la non-régression, le rapporter comme outil hors-PLC complémentaire ; il ne remplace pas la validation CODESYS ni les essais terrain.
 12. Lancer les autres gates et signaler les limites.
 13. Ne jamais committer sans validation utilisateur.

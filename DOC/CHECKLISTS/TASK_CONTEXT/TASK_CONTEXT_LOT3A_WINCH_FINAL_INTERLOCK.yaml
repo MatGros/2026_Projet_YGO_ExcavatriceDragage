@@ -17,7 +17,6 @@ scope_code:
   - "CODE/MAIN/PRG_09_Supervision.st"
   - "CODE/MAIN/PRG_11_Troubleshooting.st"
   - "CODE/SUPERVISION/_TYPES"
-  - "CODE/TESTS/PRG_Test_FinalBrakePowerInterlock.st"
 scope_doc:
   - "DOC/AF_Partie-09_Fonction_Winch_v1.14.md"
   - "DOC/AF_Partie-11_Fonction_Translation_v1.13.md"
@@ -51,10 +50,12 @@ tests_required:
   - "Perte Enable ou EmergencyStopOk : coupure immédiate de toutes sorties moteur."
   - "SafeStop : l'interlock ne coupe pas le frein ni les commandes tant que la demande métier issue de la rampe rapide n'est pas tombée à zéro."
   - "FB_Winch : test end-to-end de la temporisation métier T#1s500ms, RequestedStep versus StepNumber, sans saut."
-tests_automated_required: true
-tests_implementation_paths:
-  - "CODE/TESTS/PRG_Test_FinalBrakePowerInterlock.st"
-tests_status: implemented
+# 📌 2026-08-01 : test PLC automatique archivé, plus une obligation C3/C4 (voir PLAN_TASK).
+# Ancien artefact : ARCHIVES/Code/TESTS/PRG_Test_FinalBrakePowerInterlock.st (jamais exécuté
+# en CODESYS réel — preuve préparée seulement). Garantie reportée sur human_validation_required.
+tests_automated_required: false
+tests_implementation_paths: []
+tests_status: planned
 test_execution_evidence: []
 review_required: true
 dual_review_required: true

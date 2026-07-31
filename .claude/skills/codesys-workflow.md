@@ -75,15 +75,24 @@ Cartographier avant de toucher : variables concernées, `PRG_*`/`FB_*` impactés
 
 ---
 
-## 🧪 Étape 3bis — Contrat de test (C3/C4 & safety)
+## 🧪 Étape 3bis — Contrat de vérification (C3/C4 & safety)
 
 Sujet `SafeStop`, `PowerCutOff`, AU, frein, contacteur, interlock, limite physique :
 
-1. `TASK_CONTEXT` déclare `tests_automated_required: true`, les fichiers de test et les critères.
-2. `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>` avant de coder.
-3. Test livré **dans le même lot** que la fonction. Un test manuel Watch/forçage complète, ne remplace pas.
-4. Avant restitution : `... check_task_test_contract.py <TASK_CONTEXT> --release`. Sans statut
-   `implemented` + preuve d'exécution → annoncer « lot incomplet ».
+📌 **Décision 2026-08-01** : le test PLC automatique n'est plus obligatoire pour C3/C4 —
+même coût que le framework `PLC_TESTS` abandonné le 2026-07-26 (RAM, resynchronisation),
+pour des preuves jamais réellement exécutées en CODESYS (`CODE/TESTS/` archivé dans
+`ARCHIVES/Code/TESTS/`). La garantie repose sur `human_validation_required` seul.
+
+1. `TASK_CONTEXT` déclare `human_validation_required: true` et des critères d'acceptation
+   vérifiables (§ci-dessous). Test PLC automatique **optionnel** : si la tâche en écrit un
+   quand même, déclarer `tests_automated_required: true` + les fichiers de test.
+2. Si `tests_automated_required: true` : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>` avant de coder, pour tenir la déclaration à sa parole.
+3. Vérification manuelle exhaustive (Watch/forçage CODESYS) **avant tout chargement** — non
+   négociable, que le test automatique existe ou non.
+4. Si un test automatique a été déclaré : avant restitution, `... check_task_test_contract.py
+   <TASK_CONTEXT> --release`. Sans statut `implemented` + preuve d'exécution → annoncer
+   « lot incomplet ».
 
 ---
 

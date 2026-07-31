@@ -35,7 +35,6 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 - `ST_Safety_Emergency_InternalCmd` (Commande interne Logic → Output)
 - `ST_Safety_Emergency_HmiCmd` (Commandes IHM)
 - `ST_Safety_Emergency_HmiState` (Retours état IHM)
-- `ST_Safety_Emergency_TestContext` (Stimuli de test)
 
 ### Programmes (POU principaux) — architecture cible
 

@@ -32,7 +32,9 @@ def test_cli_generates_every_real_object_with_zero_unexpected_errors(tmp_path, c
     assert not diag.has_errors()
 
     generated_files = sorted(out_dir.rglob("*.xml"))
-    assert len(generated_files) >= 170
+    # Floor lowered 2026-08-01 (was 170): CODE/TESTS/ (4 POU) archived to
+    # ARCHIVES/Code/TESTS/, no longer part of the live CODE tree.
+    assert len(generated_files) >= 160
     assert len(objects) >= 60
 
     for path in generated_files:

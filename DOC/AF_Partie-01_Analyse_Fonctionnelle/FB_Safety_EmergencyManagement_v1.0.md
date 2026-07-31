@@ -470,7 +470,7 @@ Fichiers code de référence :
 - `CODE/SUPERVISION/GVL_IHM_AU.st` (interface IHM)
 - `CODE/MAIN/PRG_AU_Acquisition_CFC.xml` (acquisition, CFC natif — cible AF02 §2)
 - `CODE/MAIN/PRG_AU_Outputs_LD.st` (sorties)
-- `CODE/TESTS/PRG_AU_TestBench.st` (programme principal test)
+- `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/PLAN_TASK_v1.0.md`)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - `CODE/MAIN/Acquisition (CFC).st` (cible)
 - `CODE/SIMULATION/FB_Sim_Safety.st`
