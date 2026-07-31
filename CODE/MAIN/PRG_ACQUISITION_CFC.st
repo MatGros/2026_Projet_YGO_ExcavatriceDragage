@@ -1,15 +1,15 @@
 (* ═══════════════════════════════════════════════════════════════
-   📡 PRG_00_ACQUISITION_CFC — Acquisition brute, simulation et aiguillage HwIn
+   📡 PRG_ACQUISITION_CFC — Acquisition brute, simulation et aiguillage HwIn
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2 ;
             DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
    ⚙️ Version ST temporaire pour validation (cible CFC).
    🎯 Rôle unique : produire l'image matérielle HwIn consommée par le reste
       du programme. Aucune décision métier (SafeStop, mode, commande) ici.
-   🔗 Producteur unique de HwIn ; consommateurs = PRG_01_INPUTS_LD et suivants.
+   🔗 Producteur unique de HwIn ; consommateurs = PRG_INPUTS_LD et suivants.
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_00_ACQUISITION_CFC
+PROGRAM PRG_ACQUISITION_CFC
 
 VAR_OUTPUT
     HwReal                   : ST_HardwareImage;  (* Image matérielle brute lue sur le terrain *)

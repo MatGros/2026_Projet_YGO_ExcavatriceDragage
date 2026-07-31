@@ -48,14 +48,14 @@ ni `IF`, ni calcul, ni fusion de commandes, ni ecriture de sortie physique hors 
 
 | Programme | Langage | Responsabilite |
 |---|---|---|
-| 📥 `PRG_00_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
-| 🪜 `PRG_01_INPUTS_LD` | Ladder | Affichage qualifie des 21 E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
-| 🎚️ `PRG_02_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
-| 🛡️ `PRG_03_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
-| 🔄 `PRG_04_CYCLE` | ST | Instance `FB_Cycle` a machine d'etat/Grafcet. Il produit des demandes automatiques ; il ne commande pas les sorties. |
-| 🪝 `PRG_05_TREUILS_CFC` | CFC | M1/M2, synchronisation, benne, `FB_DiveSearch`, `FB_ExtractionSequence`, arbitrage final treuil et demandes vers barrieres finales. |
-| ↔️ `PRG_06_TRANSLATION_CFC` | CFC | Positionnement M3, arbitrage final translation et demande vers barriere finale. |
-| ⚡ `PRG_07_OUTPUTS_LD` | Ladder | Barrieres finales, commandes physiques, gestion de la coupure puissance et du rearmement. |
+| 📥 `PRG_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
+| 🪜 `PRG_INPUTS_LD` | Ladder | Affichage qualifie des 21 E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
+| 🎚️ `PRG_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
+| 🛡️ `PRG_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
+| 🔄 `PRG_CYCLE` | ST | Instance `FB_Cycle` a machine d'etat/Grafcet. Il produit des demandes automatiques ; il ne commande pas les sorties. |
+| 🪝 `PRG_TREUILS_CFC` | CFC | M1/M2, synchronisation, benne, `FB_DiveSearch`, `FB_ExtractionSequence`, arbitrage final treuil et demandes vers barrieres finales. |
+| ↔️ `PRG_TRANSLATION_CFC` | CFC | Positionnement M3, arbitrage final translation et demande vers barriere finale. |
+| ⚡ `PRG_OUTPUTS_LD` | Ladder | Barrieres finales, commandes physiques, gestion de la coupure puissance et du rearmement. |
 | 🖥️ Frontiere IHM | DUT et structures `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Le mapping, la persistance, les agregats et l'eventuel programme ST restent **TBD**. |
 | 🔎 Troubleshooting | Structures lecture seule | Affiche les donnees de debogage dans un ordre utile a la maintenance. Son type, son programme eventuel et son ordonnancement restent **TBD**. |
 
@@ -106,14 +106,14 @@ systeme 200 ms.
 
 ```text
 MainTask
-  0. PRG_00_ACQUISITION_CFC
-  1. PRG_01_INPUTS_LD
-  2. PRG_02_MODES_CFC
-  3. PRG_03_SAFETY_CFC
-  4. PRG_04_CYCLE                 (ST)
-  5. PRG_05_TREUILS_CFC
-  6. PRG_06_TRANSLATION_CFC
-  7. PRG_07_OUTPUTS_LD
+  - PRG_ACQUISITION_CFC
+  - PRG_INPUTS_LD
+  - PRG_MODES_CFC
+  - PRG_SAFETY_CFC
+  - PRG_CYCLE                 (ST)
+  - PRG_TREUILS_CFC
+  - PRG_TRANSLATION_CFC
+  - PRG_OUTPUTS_LD
   8. Frontiere IHM                 (TBD : mapping et persistance)
   9. Troubleshooting lecture seule (TBD : type et ordonnancement)
 ```

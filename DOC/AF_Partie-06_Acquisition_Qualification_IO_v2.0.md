@@ -1,9 +1,9 @@
 # Analyse Fonctionnelle - Partie 6 : Acquisition & Qualification I/O (v2.0)
 
-> Role : definir la frontiere d'acquisition de `PRG_00_ACQUISITION_CFC`.
+> Role : definir la frontiere d'acquisition de `PRG_ACQUISITION_CFC`.
 > Les decisions de mouvement restent hors de ce document.
 
-La page `PRG_01_INPUTS_LD` (Ladder) est associee a cette frontiere : elle affiche les 21 entrees TOR
+La page `PRG_INPUTS_LD` (Ladder) est associee a cette frontiere : elle affiche les 21 entrees TOR
 qualifiees via `FB_Input`, sans logique metier et sans decision.
 
 ## 🧭 Sommaire
@@ -30,7 +30,7 @@ qualifiees via `FB_Input`, sans logique metier et sans decision.
 
 ## 🎯 1. Role
 
-`PRG_00_ACQUISITION_CFC` qualifie les donnees d'entree avant tout usage metier.
+`PRG_ACQUISITION_CFC` qualifie les donnees d'entree avant tout usage metier.
 
 Il publie des **faits qualifies** :
 - E/S TOR et PDO conditionnes via la chaine `HwReal` → `FB_SimBench` → `HwIn` ;
@@ -39,7 +39,7 @@ Il publie des **faits qualifies** :
 - mesures codeurs brutes/qualifiees selon frontiere validee ;
 - joystick, homme-mort et codeurs traites par des FB dedies (`FB_Joystick`, `FB_Encoder_*`, `FB_Translation_PositionDecoder`).
 
-`PRG_01_INPUTS_LD` affiche en Ladder les 21 entrees TOR apres qualification (`FB_Input`) :
+`PRG_INPUTS_LD` affiche en Ladder les 21 entrees TOR apres qualification (`FB_Input`) :
 - polarite normalisee (`TRUE` = etat vrai) ;
 - mots de force/test rejetes en dehors de cette page ;
 - aucune decision `SafeStop`, mode ou commande actionneur n'y est prise.
@@ -69,8 +69,8 @@ Modes / Safety / Cycle / Mouvements / IHM
 | 🧱 Frontiere unique | Aucun FB metier ne lit une E/S brute device. |
 | 🧪 Simulation | La bascule reel/simule se fait une seule fois, par domaine, dans `FB_SimBench`. |
 | 🔒 Polarite | Normalisee une seule fois a l'acquisition (`FB_Input` / DUT de normalisation). |
-| ✍️ Producteur unique | `PRG_00_ACQUISITION_CFC` est le seul ecrivain des donnees qualifiees d'entree. |
-| 🪜 Affichage TOR | `PRG_01_INPUTS_LD` expose les 21 entrees TOR qualifiees via `FB_Input`, en lecture seule. |
+| ✍️ Producteur unique | `PRG_ACQUISITION_CFC` est le seul ecrivain des donnees qualifiees d'entree. |
+| 🪜 Affichage TOR | `PRG_INPUTS_LD` expose les 21 entrees TOR qualifiees via `FB_Input`, en lecture seule. |
 
 Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte seulement leur acquisition et leur publication.
 
@@ -78,10 +78,10 @@ Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte s
 
 | Type de signal | Programme | Langage | Bloc / DUT |
 |---|---|---|---|
-| Devices, simulation, joystick, codeurs, position M3 | `PRG_00_ACQUISITION_CFC` | CFC | Instances `FB_*`, structures `HwReal` / `HwIn` |
-| 21 E/S TOR qualifiees (affichage) | `PRG_01_INPUTS_LD` | Ladder | `FB_Input` : contact → bobine |
+| Devices, simulation, joystick, codeurs, position M3 | `PRG_ACQUISITION_CFC` | CFC | Instances `FB_*`, structures `HwReal` / `HwIn` |
+| 21 E/S TOR qualifiees (affichage) | `PRG_INPUTS_LD` | Ladder | `FB_Input` : contact → bobine |
 
-> 📌 La frontiere acquisition utilise donc **CFC pour le flux device/simulation/FB complexes**, et **Ladder (`PRG_01_INPUTS_LD`) uniquement pour l'affichage des 21 entrees TOR** via `FB_Input`. Aucune logique metier n'est ecrite dans `PRG_01_INPUTS_LD`.
+> 📌 La frontiere acquisition utilise donc **CFC pour le flux device/simulation/FB complexes**, et **Ladder (`PRG_INPUTS_LD`) uniquement pour l'affichage des 21 entrees TOR** via `FB_Input`. Aucune logique metier n'est ecrite dans `PRG_INPUTS_LD`.
 
 ---
 
@@ -148,7 +148,7 @@ Le detail de la chaine AU/rearmement est proprietaire de la Partie 01.
 ## 📚 Documents lies
 
 - Partie 01 : AU, `PowerKeepAlive`, rearmement.
-- Partie 02 : page `PRG_00_ACQUISITION_CFC` et `PRG_07_OUTPUTS_LD`.
+- Partie 02 : page `PRG_ACQUISITION_CFC` et `PRG_OUTPUTS_LD`.
 - Partie 08 : traitement joystick.
 - Partie 09 : homing et vitesse codeur.
 - Partie 13 : simulation.
