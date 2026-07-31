@@ -203,10 +203,10 @@ def _build_pou(
     if obj.header_comment:
         interface.append(_documentation(obj.header_comment))
 
-    # Les programmes _LD gardent ce marqueur de nommage dans la convention projet,
-    # mais leur corps .st est en Structured Text et doit être exporté en <ST>
-    # pour garantir une compilation 100% valide dans CODESYS.
-    if False and obj.kind == "program" and obj.name.startswith("PRG_") and obj.name.endswith("_LD"):
+    # `_LD` identifie la frontière Ladder lisible des PROGRAMMES seulement.
+    # Les FB `_LD` gardent ce marqueur de maintenance, mais restent du ST :
+    # leur logique d'état, TON et R_TRIG ne doit jamais être convertie implicitement.
+    if obj.kind == "program" and obj.name.startswith("PRG_") and obj.name.endswith("_LD"):
         variables = obj.input_vars + obj.output_vars + obj.inout_vars + obj.local_vars + obj.temp_vars
         boolean_identifiers = {
             variable.name
@@ -453,6 +453,12 @@ def build_project_xml(
                             del elem.attrib[key]
                     if elem.tag == "xhtml":
                         elem.attrib["xmlns"] = "http://www.w3.org/1999/xhtml"
+                    # CallType/ElementType sont des extensions vendor CODESYS : elles doivent
+                    # rester hors du namespace PLCopen par défaut (xmlns="" explicite), sinon
+                    # CODESYS ne reconnaît plus le type d'appel/d'élément (échec de compilation
+                    # silencieux constaté sur les patterns non testés).
+                    if elem.tag in ("CallType", "ElementType"):
+                        elem.attrib["xmlns"] = ""
                 # 🎯 Alignement ObjectId : forcer l'ObjectId du POU pour qu'il soit STRICTEMENT égal
                 # à celui inscrit dans ProjectStructure (évite que CODESYS ne rejette l'arborescence
                 # et ne place le POU à la racine du projet).

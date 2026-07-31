@@ -1,0 +1,72 @@
+    <connectionPointIn>
+                <connection refLocalId="79" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_00_Inputs.EmergencyStopOk</variable>
+            </contact>
+            <contact localId="81" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="80" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_00_Inputs.EmergencyChain</variable>
+            </contact>
+            <coil localId="82" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="81" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_M2_KoboldMeasureEnable_DQ</variable>
+            </coil>
+            <comment localId="83" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="84">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="85">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>PRG_07_TranslationControl.instTranslationM3.DriveControlWord</expression>
+            </inVariable>
+            <outVariable localId="86">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="85" />
+              </connectionPointIn>
+              <expression>M3_CommandWord</expression>
+            </outVariable>
+            <comment localId="87" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="88">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="89">
+              <position x="0" y="0" />
+              <connectionPointOut />
+  
