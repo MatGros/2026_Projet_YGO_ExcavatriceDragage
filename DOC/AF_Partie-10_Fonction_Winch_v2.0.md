@@ -169,9 +169,21 @@ Aucun mécanisme de mesure/calibration automatique n'existe (T95 mentionne "éte
 
 Suivi pilotage : `PLAN_TASK.md` T96.
 
+### 6.3bis ⚖️ Surveillance de symétrie M1/M2 (`FB_WinchSymmetry` — MES-008 & Diagnostic)
+
+**Objectif** : Identifier passivement si un décalage entre les deux treuils (M1 et M2) provient d'un retard d'automatisme/contacteur ou d'un problème mécanique/frein.
+
+**Métriques mesurées passivement (exécuté dans `PRG_11_Troubleshooting`)** :
+- `DeltaStartDelay_Ms` : Écart de temps au démarrage des mouvements M1/M2.
+- `DeltaBrakeReleaseTime_Ms` & `DeltaBrakeApplyTime_Ms` : Écart de temps d'ouverture/fermeture effective des freins.
+- `DeltaStopTime_Ms` & `DeltaStopDistance_Mm` : Écart de temps et de distance parcourue lors de la phase d'arrêt.
+- `MaxSyncDeviation_M` : Écart maximal de position synchro pendant la course.
+
+**Consommation IHM / Diagnostic** : Ces données alimentent `ST_WinchSymmetryHMI` et la page Diagnostic de l'IHM pour orienter la maintenance terrain.
+
 ### 6.4 Ne pas faire sans étude terrain (rappel)
 
-- Ne pas trancher `DelayMotorDecel` (supprimer vs implémenter) sans les essais MES-006
+- Ne pas trancher `DelayMotorDecel` (supprimer vs implémenter) sans les essais MES-006 (audit C4)
 - Ne pas activer `SpeedGuardEnable` avant calibration réelle (T94 dépend de T95)
 - Ne pas remplacer la rampe %/s sans valider l'impact sur `FB_Cycle`, IHM, `GVL_PERSISTENT`
 

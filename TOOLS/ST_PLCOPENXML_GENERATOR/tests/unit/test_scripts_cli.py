@@ -1,0 +1,291 @@
+"""Tests for the modular CLI scripts in ``scripts/``.
+
+These tests validate the testable contract:
+  1. st_to_ld.py  → valid XML, 1 <pou> with 1 <body><LD>, CallType/ElementType have xmlns=""
+  2. st_to_pou.py → valid XML, 1 <pou> with 1 <body><ST>
+  3. cfc_extract.py → valid XML, 1 <pou> with CFC body, ObjectIds aligned, xmlns=""
+  4. build_bundle.py → valid <project> with <ProjectStructure>, ObjectId alignment, no nested addData
+  5. st_to_dut.py → valid XML, 1 <dataType>
+  6. Error handling: non-LD file rejected, missing file exits 1
+"""
+from __future__ import annotations
+
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+import pytest
+
+# Ensure the tool root is on sys.path (so ``scripts`` and ``generator`` import).
+import sys
+import os
+
+_TOOL_ROOT = Path(__file__).resolve().parent.parent.parent  # ST_PLCOPENXML_GENERATOR/
+if str(_TOOL_ROOT) not in sys.path:
+    sys.path.insert(0, str(_TOOL_ROOT))
+
+_REPO_ROOT = _TOOL_ROOT.parent.parent  # project root (CODE/ lives here)
+CODE_DIR = _REPO_ROOT / "CODE"
+
+from scripts.st_to_ld import build_ld_pou_xml
+from scripts.st_to_pou import build_st_pou_xml
+from scripts.st_to_dut import build_dut_xml
+from scripts.cfc_extract import extract_cfc_pou
+from scripts.build_bundle import _collect_objects_from_args
+
+from generator.diagnostics import DiagnosticCollector
+from generator.xml_serializer import serialize
+
+PLCOPEN_NS = "http://www.plcopen.org/xml/tc6_0200"
+
+
+def _parse_strip_ns(data: bytes) -> ET.Element:
+    """Parse bytes and strip PLCopen namespace prefixes for plain-tag queries."""
+    root = ET.fromstring(data)
+    for el in root.iter():
+        if "}" in el.tag:
+            el.tag = el.tag.split("}", 1)[1]
+    return root
+
+
+def _has_xmlns_empty(element: ET.Element, tag: str) -> bool:
+    """Check that an element's serialized form carries ``xmlns=""``.
+
+    ET.parse() drops xmlns="" attributes, so we inspect the raw bytes instead.
+    """
+    # Re-serialize this element and check
+    raw = ET.tostring(element).decode("utf-8")
+    return f'<{tag} xmlns="">' in raw or f'<{tag} xmlns=""' in raw
+
+
+# ── st_to_ld.py ──────────────────────────────────────────────────────────────
+
+
+def test_st_to_ld_produces_valid_pou_with_ld_body():
+    st_file = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    if not st_file.exists():
+        pytest.skip("PRG_AU_Outputs_LD.st not available")
+    diag = DiagnosticCollector()
+    data = build_ld_pou_xml(st_file, diag)
+    root = _parse_strip_ns(data)
+
+    assert root.tag == "pou"
+    pous = [root]
+    assert len(pous) == 1
+    pou = pous[0]
+    assert pou.get("name") == "PRG_AU_Outputs_LD"
+
+    bodies = pou.findall("body")
+    assert len(bodies) == 1
+    ld = bodies[0].find("LD")
+    assert ld is not None, "body must contain <LD>"
+
+    # CallType / ElementType must have xmlns="" in the raw output
+    raw_text = data.decode("utf-8-sig")
+    assert 'CallType xmlns=""' in raw_text
+    assert 'ElementType xmlns=""' in raw_text
+
+
+def test_st_to_ld_rejects_non_ld_program():
+    st_file = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    if not st_file.exists():
+        pytest.skip("FB_Safety_EmergencyManagement.st not available")
+    diag = DiagnosticCollector()
+    with pytest.raises(ValueError, match="PRG_\\*_LD"):
+        build_ld_pou_xml(st_file, diag)
+
+
+def test_st_to_ld_missing_file_exits_1(tmp_path):
+    from scripts.st_to_ld import main
+
+    rc = main([str(tmp_path / "nonexistent.st"), "-o", str(tmp_path / "out.xml")])
+    assert rc == 1
+
+
+# ── st_to_pou.py ─────────────────────────────────────────────────────────────
+
+
+def test_st_to_pou_produces_valid_pou_with_st_body():
+    st_file = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    if not st_file.exists():
+        pytest.skip("FB_Safety_EmergencyManagement.st not available")
+    diag = DiagnosticCollector()
+    data = build_st_pou_xml(st_file, diag)
+    root = _parse_strip_ns(data)
+
+    assert root.tag == "pou"
+    assert len([root]) == 1
+    pou = root
+    assert pou.get("name") == "FB_Safety_EmergencyManagement"
+
+    bodies = pou.findall("body")
+    assert len(bodies) == 1
+    st = bodies[0].find("ST")
+    assert st is not None, "body must contain <ST>"
+
+
+def test_st_to_pou_rejects_ld_program():
+    st_file = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    if not st_file.exists():
+        pytest.skip("PRG_AU_Outputs_LD.st not available")
+    diag = DiagnosticCollector()
+    with pytest.raises(ValueError, match="st_to_ld"):
+        build_st_pou_xml(st_file, diag)
+
+
+def test_st_to_pou_missing_file_exits_1(tmp_path):
+    from scripts.st_to_pou import main
+
+    rc = main([str(tmp_path / "nonexistent.st"), "-o", str(tmp_path / "out.xml")])
+    assert rc == 1
+
+
+# ── cfc_extract.py ───────────────────────────────────────────────────────────
+
+
+def test_cfc_extract_produces_valid_pou_with_aligned_objectid():
+    xml_file = CODE_DIR / "MAIN" / "PRG_AU_Acquisition_CFC.xml"
+    if not xml_file.exists():
+        pytest.skip("PRG_AU_Acquisition_CFC.xml not available")
+    data = extract_cfc_pou(xml_file)
+    root = _parse_strip_ns(data)
+
+    assert root.tag == "pou"
+    assert root.get("name") == "PRG_AU_Acquisition"
+
+    # ObjectId present and non-empty
+    object_id = root.find(".//ObjectId")
+    assert object_id is not None
+    assert object_id.text
+
+    # CallType / ElementType must have xmlns=""
+    raw_text = data.decode("utf-8-sig")
+    if "CallType" in raw_text:
+        assert 'CallType xmlns=""' in raw_text
+    if "ElementType" in raw_text:
+        assert 'ElementType xmlns=""' in raw_text
+
+
+def test_cfc_extract_missing_file_exits_1(tmp_path):
+    from scripts.cfc_extract import main
+
+    rc = main([str(tmp_path / "nonexistent.xml"), "-o", str(tmp_path / "out.xml")])
+    assert rc == 1
+
+
+# ── st_to_dut.py ─────────────────────────────────────────────────────────────
+
+
+def test_st_to_dut_produces_valid_datatype_struct():
+    st_file = CODE_DIR / "AU" / "ST_EmergencyState.st"
+    if not st_file.exists():
+        pytest.skip("ST_EmergencyState.st not available")
+    diag = DiagnosticCollector()
+    data = build_dut_xml(st_file, diag)
+    root = _parse_strip_ns(data)
+
+    assert root.tag == "dataType"
+    assert root.get("name") == "ST_EmergencyState"
+    struct = root.find("baseType/struct")
+    assert struct is not None
+
+
+def test_st_to_dut_produces_valid_datatype_enum():
+    st_file = CODE_DIR / "CYCLE" / "E_CycleStep.st"
+    if not st_file.exists():
+        pytest.skip("E_CycleStep.st not available")
+    diag = DiagnosticCollector()
+    data = build_dut_xml(st_file, diag)
+    root = _parse_strip_ns(data)
+
+    assert root.tag == "dataType"
+    assert root.get("name") == "E_CycleStep"
+    enum = root.find("baseType/enum")
+    assert enum is not None
+
+
+def test_st_to_dut_rejects_fb():
+    st_file = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    if not st_file.exists():
+        pytest.skip("FB_Safety_EmergencyManagement.st not available")
+    diag = DiagnosticCollector()
+    with pytest.raises(ValueError, match="STRUCT or ENUM"):
+        build_dut_xml(st_file, diag)
+
+
+def test_st_to_dut_missing_file_exits_1(tmp_path):
+    from scripts.st_to_dut import main
+
+    rc = main([str(tmp_path / "nonexistent.st"), "-o", str(tmp_path / "out.xml")])
+    assert rc == 1
+
+
+# ── build_bundle.py ──────────────────────────────────────────────────────────
+
+
+def test_build_bundle_produces_valid_project_with_project_structure():
+    au_dir = CODE_DIR / "AU"
+    if not au_dir.exists():
+        pytest.skip("CODE/AU/ not available")
+    diag = DiagnosticCollector()
+    objects_by_name = _collect_objects_from_args([au_dir], diag)
+
+    assert len(objects_by_name) > 0
+
+    from generator.xml_builder import build_project_xml
+
+    root_names = sorted(objects_by_name.keys())
+    root = build_project_xml(
+        root_names,
+        objects_by_name,
+        diag,
+        include_deps=True,
+        project_name="TestBundle",
+    )
+    data = serialize(root)
+
+    # Parse and strip namespace
+    parsed = _parse_strip_ns(data)
+    assert parsed.tag == "project"
+
+    # ProjectStructure must exist
+    ps = parsed.find(".//ProjectStructure")
+    assert ps is not None, "bundle must contain <ProjectStructure>"
+
+    # ObjectId alignment: every ObjectId in ProjectStructure must exist in the project body
+    ps_ids = {obj.get("ObjectId") for obj in ps.findall(".//Object")}
+    all_object_ids = set()
+    for oid in parsed.findall(".//ObjectId"):
+        if oid.text:
+            all_object_ids.add(oid.text)
+    mismatch = ps_ids.symmetric_difference(all_object_ids)
+    assert mismatch == set(), f"ObjectId mismatch between ProjectStructure and project body: {mismatch}"
+
+    # No nested addData inside addData
+    for el in parsed.iter("addData"):
+        nested = [c for c in el if c.tag == "addData"]
+        assert len(nested) == 0, f"nested <addData> found inside <addData>"
+
+
+def test_build_bundle_from_multiple_inputs():
+    au_dir = CODE_DIR / "AU"
+    ld_file = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    if not au_dir.exists() or not ld_file.exists():
+        pytest.skip("required inputs not available")
+    diag = DiagnosticCollector()
+    objects_by_name = _collect_objects_from_args([au_dir, ld_file], diag)
+    # PRG_AU_Outputs_LD should be included
+    assert "PRG_AU_Outputs_LD" in objects_by_name
+
+
+def test_build_bundle_missing_path_reports_error(tmp_path):
+    diag = DiagnosticCollector()
+    objects_by_name = _collect_objects_from_args([tmp_path / "nonexistent"], diag)
+    assert len(objects_by_name) == 0
+    assert diag.has_errors()
+
+
+def test_build_bundle_main_exits_1_on_no_objects(tmp_path):
+    from scripts.build_bundle import main
+
+    rc = main([str(tmp_path / "nonexistent_dir"), "-o", str(tmp_path / "out.xml")])
+    assert rc == 1
