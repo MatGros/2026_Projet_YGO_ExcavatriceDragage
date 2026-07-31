@@ -453,6 +453,18 @@ def build_project_xml(
                             del elem.attrib[key]
                     if elem.tag == "xhtml":
                         elem.attrib["xmlns"] = "http://www.w3.org/1999/xhtml"
+                # 🎯 Alignement ObjectId : forcer l'ObjectId du POU pour qu'il soit STRICTEMENT égal
+                # à celui inscrit dans ProjectStructure (évite que CODESYS ne rejette l'arborescence
+                # et ne place le POU à la racine du projet).
+                obj_id_node = next((n for n in pou_node.iter() if n.tag == "ObjectId"), None)
+                if obj_id_node is not None:
+                    obj_id_node.text = guid
+                else:
+                    pou_adddata = pou_node.find("addData")
+                    if pou_adddata is None:
+                        pou_adddata = ET.SubElement(pou_node, "addData")
+                    pou_adddata.append(_objectid_adddata(guid))
+
                 pous_el.append(pou_node)
         elif obj.kind in ("function_block", "program"):
             pous_el.append(_build_pou(obj, guid, objects_by_name, diagnostics))
