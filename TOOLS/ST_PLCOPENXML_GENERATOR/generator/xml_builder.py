@@ -460,10 +460,14 @@ def build_project_xml(
                 if obj_id_node is not None:
                     obj_id_node.text = guid
                 else:
-                    pou_adddata = pou_node.find("addData")
+                    pou_adddata = next((n for n in pou_node.findall("addData")), None)
                     if pou_adddata is None:
                         pou_adddata = ET.SubElement(pou_node, "addData")
-                    pou_adddata.append(_objectid_adddata(guid))
+                    data_el = ET.SubElement(pou_adddata, "data")
+                    data_el.set("name", "http://www.3s-software.com/plcopenxml/objectid")
+                    data_el.set("handleUnknown", "discard")
+                    obj_id_el = ET.SubElement(data_el, "ObjectId")
+                    obj_id_el.text = guid
 
                 pous_el.append(pou_node)
         elif obj.kind in ("function_block", "program"):

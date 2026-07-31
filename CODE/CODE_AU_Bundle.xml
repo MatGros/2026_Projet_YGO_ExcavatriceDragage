@@ -2911,11 +2911,9 @@ END_CASE;
           </addData>
         </body>
         <addData>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-              <ObjectId>5ca2a345-56a2-58c8-9723-1de144dc50a4</ObjectId>
-            </data>
-          </addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5ca2a345-56a2-58c8-9723-1de144dc50a4</ObjectId>
+          </data>
         </addData>
       </pou>
     </pous>
