@@ -1,5 +1,0 @@
-test_id,af_id,pou,title,scenario,preconditions,expect_state,expect_ready,expect_done,expect_error,expect_error_id,notes
-AF-TR-01,AF-TR-01,FB_Translation,Demarrage nominal puis cible atteinte,nominal_start_then_target,Enable=True; EmergencyStopOk=True; StartStop=True; SafeStop=False; SpeedRefPct=80; CaptorDebounce=5,DONE,True,True,False,0,Passe par MOVING avant DONE.
-AF-TR-02,AF-TR-02,FB_Translation,Ralentissement avant la cible,slowdown_then_target,Enable=True; EmergencyStopOk=True; StartStop=True; SafeStop=False; SpeedRefPct=80; CaptorDebounce=5; SlowdownSensor=True,DONE,True,True,False,0,Valide la branche de reduction avant atteinte de cible.
-AF-TR-03,AF-TR-03,FB_Translation,SafeStop met le FB en defaut,safe_stop_fault,Enable=True; EmergencyStopOk=True; StartStop=True; SafeStop=True,FAULT,False,False,True,1,Branche arret rapide.
-AF-TR-04,AF-TR-04,FB_Translation,Reset acquitte le defaut et autorise la reprise,reset_recover,Enable=True; EmergencyStopOk=True; StartStop=True; SafeStop=True,IDLE,True,False,False,0,Reset sur front apres disparition de la cause (SafeStop=False).

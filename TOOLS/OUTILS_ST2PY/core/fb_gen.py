@@ -561,6 +561,11 @@ class {pou_name}:
         self.Error = True
         self.ErrorId = error_id
         self.StateAtError = self.State if self.State not in {{None, ''}} else state_name
+        # _state (etat interne de l'automate) doit suivre State (etat publie), sinon
+        # le FB affiche FAULT tout en restant en MOVING en interne, et repart au cycle
+        # suivant comme si rien ne s'etait passe (REX 2026-08).
+        self._state = state_name
+        self._state_timer_ms = 0.0
         self.State = state_name
         self.Busy = False
         self.Done = False
@@ -582,7 +587,12 @@ class {pou_name}:
         self._prev_safe_stop = bool(self.SafeStop)
         self._prev_start_stop = bool(self.StartStop)
 
-        if reset_edge and self.Error:
+        # Reset = front ET cause disparue (regle projet : jamais de redemarrage
+        # automatique ni de rearmement sous cause presente). Le ST reel utilise
+        # R_TRIG + test de la cause ; le modele generait ici un acquittement au
+        # seul front, ce qui rendait le FB Python plus permissif que l'automate
+        # et masquait la regle en simulation (REX 2026-08).
+        if reset_edge and self.Error and not self.SafeStop:
             self._state = "IDLE"
             self._state_timer_ms = 0.0
             self._set_idle()
@@ -650,6 +660,15 @@ class {pou_name}:
                 self.State = self._state
                 return
             self.State = self._state
+            return
+
+        # Etat FAULT : DEFAUT MEMORISE. Sans cette branche, l'automate de secours
+        # tombait sur le `_set_idle()` final et sortait tout seul du defaut des que
+        # la cause disparaissait -- un redemarrage automatique apres defaut, interdit
+        # par la regle projet. Seul le bloc `reset_edge` ci-dessus (front + cause
+        # disparue) peut quitter FAULT (REX 2026-08).
+        if self._state == "FAULT":
+            self._set_fault(self.ErrorId or 1, "FAULT")
             return
 
         if self._state == "DONE":
