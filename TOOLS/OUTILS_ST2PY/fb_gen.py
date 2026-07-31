@@ -28,7 +28,7 @@ CACHE_NAME = '.st2py_cache.json'
 CURRENT_BUNDLE_PATH = None
 
 from canonicalize import canonicalize_pou_bytes
-from data_contracts import build_position_decoder_contract, build_translation_contract
+from data_contracts import build_contract_from_interface, build_position_decoder_contract, build_translation_contract, FieldSpec
 
 
 def compute_hash(bytes_blob):
@@ -866,6 +866,324 @@ class {pou_name}:
 '''
 
 
+def render_safety_emergency_management_module_code(pou_name, interface):
+    inputs = interface.get('inputs', [])
+    outputs = interface.get('outputs', [])
+    contract = build_contract_from_interface(
+        interface,
+        state_fields=(
+            FieldSpec('_step', 'int', "Étape machine d'état 0..6", 0),
+            FieldSpec('_step_timer_ms', 'float', 'Chronomètre étape', 0.0),
+            FieldSpec('_lockout_active', 'bool', 'Verrouillage 5s actif', False),
+            FieldSpec('_lockout_timer_ms', 'float', 'Chronomètre lockout', 0.0),
+            FieldSpec('_redundancy_failed', 'bool', 'Échec auto-test redondance', False),
+            FieldSpec('_arming_failed', 'bool', 'Échec confirmation réarmement', False),
+            FieldSpec('_startup_fail', 'bool', 'Échec autotest démarrage', False),
+            FieldSpec('_prev_reset', 'bool', 'Front Reset', False),
+            FieldSpec('_prev_arm_req', 'bool', 'Front ArmRequest', False),
+            FieldSpec('_prev_enable', 'bool', 'Front Enable', False),
+            FieldSpec('_first_scan_done', 'bool', 'Premier scan exécuté', False),
+        ),
+    )
+    contract_literal = repr(contract.to_dict())
+
+    output_names = [var['name'] for var in outputs]
+    output_dict_body = []
+    for name in output_names:
+        output_dict_body.append(f"            '{name}': self.{name},")
+    output_dict_body = '\n'.join(output_dict_body) if output_dict_body else "            'status': 'prototype'"
+
+    return f'''# {pou_name}.py
+"""
+Modèle de simulation Python pour {pou_name}.
+Ce modèle reproduit la machine d'état (steps 0..6, autotest boot, redondance A/B,
+timers 200ms/1s/2s/5s) et les bus d'échange State/Diag du POU.
+"""
+
+CONTRACT = {contract_literal}
+
+
+def validate_runtime_contract(payload: dict, scope: str = 'inputs') -> list:
+    if not isinstance(payload, dict):
+        return ['payload must be a mapping']
+    fields = CONTRACT.get(scope, [])
+    errors = []
+    for field in fields:
+        name = field['name']
+        if name not in payload:
+            errors.append(f'missing {{scope}} field {{name}}')
+            continue
+        value = payload[name]
+        expected_type = field['type']
+        if expected_type == 'bool' and not isinstance(value, bool):
+            errors.append(f'{{scope}} field {{name}} should be bool')
+        elif expected_type == 'int' and not isinstance(value, int):
+            errors.append(f'{{scope}} field {{name}} should be int')
+        elif expected_type == 'float' and not isinstance(value, float):
+            errors.append(f'{{scope}} field {{name}} should be float')
+        elif expected_type == 'str' and not isinstance(value, str):
+            errors.append(f'{{scope}} field {{name}} should be str')
+    return errors
+
+
+class {pou_name}:
+    def __init__(self) -> None:
+        # Inputs
+        self.Enable: bool = False
+        self.Reset: bool = False
+        self.ArmRequest: bool = False
+        self.EmergencyChainClosed: bool = False
+        self.PowerContactorEngaged: bool = False
+        self.PowerCutOffRequest: bool = False
+        self.BtnEmergencyCutOff: bool = False
+
+        # Outputs
+        self.Ready: bool = False
+        self.Busy: bool = False
+        self.Done: bool = False
+        self.Error: bool = False
+        self.ErrorId: int = 0
+        self.MaintainA_RQ: bool = False
+        self.MaintainB_RQ: bool = False
+        self.ArmPulse_RQ: bool = False
+        self.State: object = None
+        self.Diag: object = None
+        self.ArmingSeqStep: int = 0
+        self.RedundancyTestFailed: bool = False
+        self.EmergencyArmingFailed: bool = False
+        self.EmergencyArmingLockoutActive: bool = False
+
+        # Internal FSM state
+        self._step: int = 0
+        self._step_timer_ms: float = 0.0
+        self._lockout_active: bool = False
+        self._lockout_timer_ms: float = 0.0
+        self._redundancy_failed: bool = False
+        self._arming_failed: bool = False
+        self._startup_fail: bool = False
+        self._force_test_a: bool = False
+        self._force_test_b: bool = False
+        self._prev_reset: bool = False
+        self._prev_arm_req: bool = False
+        self._prev_enable: bool = False
+        self._first_scan_done: bool = False
+
+        self._update_structs()
+
+    def _clear_outputs(self) -> None:
+        self.Ready = False
+        self.Busy = False
+        self.Done = False
+        self.Error = False
+        self.ErrorId = 0
+        self.MaintainA_RQ = False
+        self.MaintainB_RQ = False
+        self.ArmPulse_RQ = False
+        self._step = 0
+        self._force_test_a = False
+        self._force_test_b = False
+        self._redundancy_failed = False
+        self._arming_failed = False
+        self._lockout_active = False
+        self._startup_fail = False
+        self._first_scan_done = False
+        self._update_structs()
+
+    def _update_structs(self) -> None:
+        armable = (self.Enable and self.EmergencyChainClosed and
+                   self._step == 0 and not self._lockout_active and
+                   not self._redundancy_failed and not self.PowerContactorEngaged and
+                   not self._startup_fail)
+        busy = (self._step != 0) or self._lockout_active
+
+        self.State = {{
+            'ChainOk': bool(self.EmergencyChainClosed),
+            'ContactorOk': bool(self.PowerContactorEngaged),
+            'Step': int(self._step),
+            'Armable': bool(armable),
+            'ArmingBusy': bool(busy),
+        }}
+        self.Diag = {{
+            'Error': bool(self.Error),
+            'ErrorId': int(self.ErrorId),
+            'RedundancyTestFailed': bool(self._redundancy_failed),
+            'ArmFailed': bool(self._arming_failed),
+            'LockoutActive': bool(self._lockout_active),
+        }}
+
+    def step(self, time_ms: float = 10.0) -> None:
+        time_ms = max(float(time_ms), 0.0)
+
+        reset_edge = bool(self.Reset) and not self._prev_reset
+        self._prev_reset = bool(self.Reset)
+
+        arm_edge = bool(self.ArmRequest) and not self._prev_arm_req
+        self._prev_arm_req = bool(self.ArmRequest)
+
+        enable_edge = bool(self.Enable) and not self._prev_enable
+        self._prev_enable = bool(self.Enable)
+
+        if not self.Enable:
+            self._clear_outputs()
+            return
+
+        if enable_edge:
+            self._first_scan_done = False
+
+        if not self._first_scan_done:
+            self._first_scan_done = True
+            startup_ok = self.EmergencyChainClosed and (not self.PowerContactorEngaged) and (self._step == 0)
+            if not startup_ok:
+                self._startup_fail = True
+                self.ErrorId = 0x0008
+                self.Error = True
+                self.Ready = False
+                self._update_structs()
+                return
+
+        if reset_edge:
+            self._redundancy_failed = False
+            self._startup_fail = False
+            if self.PowerContactorEngaged:
+                self._arming_failed = False
+            self.ErrorId &= ~0x0008
+
+        if self._lockout_active:
+            self._lockout_timer_ms += time_ms
+            if self._lockout_timer_ms >= 5000.0:
+                self._lockout_active = False
+                self._lockout_timer_ms = 0.0
+
+        armable = (self.EmergencyChainClosed and
+                   self._step == 0 and
+                   not self._lockout_active and
+                   not self._redundancy_failed and
+                   not self.PowerContactorEngaged and
+                   not self._startup_fail)
+
+        if arm_edge and armable:
+            self._step = 1
+            self._step_timer_ms = 0.0
+
+        self._force_test_a = (self._step == 1)
+        self._force_test_b = (self._step == 3)
+        self.ArmPulse_RQ = (self._step == 5)
+
+        if self._step == 1:
+            if self._step_timer_ms >= 200.0:
+                self._force_test_a = False
+                if self.EmergencyChainClosed:
+                    self._redundancy_failed = True
+                    self._step = 0
+                else:
+                    self._step = 2
+                    self._step_timer_ms = 0.0
+            else:
+                self._step_timer_ms += time_ms
+
+        elif self._step == 2:
+            if self._step_timer_ms >= 200.0:
+                if self.EmergencyChainClosed:
+                    self._step = 3
+                    self._step_timer_ms = 0.0
+                else:
+                    self._step = 0
+            else:
+                self._step_timer_ms += time_ms
+
+        elif self._step == 3:
+            if self._step_timer_ms >= 200.0:
+                self._force_test_b = False
+                if self.EmergencyChainClosed:
+                    self._redundancy_failed = True
+                    self._step = 0
+                else:
+                    self._step = 4
+                    self._step_timer_ms = 0.0
+            else:
+                self._step_timer_ms += time_ms
+
+        elif self._step == 4:
+            if self._step_timer_ms >= 200.0:
+                if self.EmergencyChainClosed:
+                    self._step = 5
+                    self._step_timer_ms = 0.0
+                else:
+                    self._step = 0
+            else:
+                self._step_timer_ms += time_ms
+
+        elif self._step == 5:
+            if self._step_timer_ms >= 1000.0:
+                self._step = 6
+                self._step_timer_ms = 0.0
+            else:
+                self._step_timer_ms += time_ms
+
+        elif self._step == 6:
+            if self.PowerContactorEngaged:
+                self._step = 0
+                self._lockout_active = False
+            elif self._step_timer_ms >= 2000.0:
+                self._arming_failed = True
+                self._step = 0
+                self._lockout_active = True
+                self._lockout_timer_ms = 0.0
+            else:
+                self._step_timer_ms += time_ms
+
+        maintain_a = (not self.PowerCutOffRequest and
+                      not self._force_test_a and
+                      not self.BtnEmergencyCutOff and
+                      not self._redundancy_failed)
+        maintain_b = (not self.PowerCutOffRequest and
+                      not self._force_test_b and
+                      not self.BtnEmergencyCutOff and
+                      not self._redundancy_failed)
+
+        self.MaintainA_RQ = maintain_a
+        self.MaintainB_RQ = maintain_b
+        self.ArmPulse_RQ = (self._step == 5)
+
+        error_id = 0
+        if self._redundancy_failed:
+            error_id |= 0x0001
+        if self._arming_failed:
+            error_id |= 0x0002
+        if self._startup_fail:
+            error_id |= 0x0008
+
+        self.ErrorId = error_id
+        self.Error = (error_id != 0)
+
+        self.ArmingSeqStep = self._step
+        self.RedundancyTestFailed = self._redundancy_failed
+        self.EmergencyArmingFailed = self._arming_failed
+        self.EmergencyArmingLockoutActive = self._lockout_active
+
+        self.Ready = self.Enable and not self._startup_fail
+        self.Busy = (self._step != 0) or self._lockout_active
+        self.Done = self.PowerContactorEngaged
+
+        self._update_structs()
+
+    def set_inputs_from_mapping(self, values: dict) -> None:
+        for name, value in values.items():
+            if hasattr(self, name):
+                setattr(self, name, value)
+
+    def set_outputs_from_mapping(self, values: dict) -> None:
+        for name, value in values.items():
+            if hasattr(self, name):
+                setattr(self, name, value)
+
+    def to_dict(self):
+        return {{
+{output_dict_body}
+        }}
+'''
+
+
 def render_module_code(pou_name, interface):
     if pou_name == 'FB_Translation_PositionDecoder':
         return render_translation_position_decoder_module_code(pou_name)
@@ -873,6 +1191,8 @@ def render_module_code(pou_name, interface):
         return render_translation_module_code(pou_name, interface)
     if pou_name == 'FB_Safety_Translation':
         return render_safety_translation_module_code(pou_name, interface)
+    if pou_name == 'FB_Safety_EmergencyManagement':
+        return render_safety_emergency_management_module_code(pou_name, interface)
 
     inputs = interface.get('inputs', [])
     outputs = interface.get('outputs', [])

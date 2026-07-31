@@ -466,7 +466,6 @@ Fichiers code de référence :
 - `CODE/AU/ST_Diag_Emergency.st` (bus diagnostic)
 - `CODE/AU/ST_EmergencyCmd.st` (bus commande IHM, test)
 - `CODE/AU/ST_EmergencyState.st` (bus état IHM, test)
-- `CODE/AU/GVL_PERSISTENT_AU.st` (persistants domaine AU)
 - `CODE/AU/GVL_Simulation_AU.st` (simulation hardware)
 - `CODE/AU/GVL_IHM_AU.st` (interface IHM)
 - `CODE/AU/PRG_AU_Acquisition.st` (acquisition)

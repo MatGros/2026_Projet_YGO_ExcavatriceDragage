@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T21:00:24.172299" />
-  <contentHeader name="TestBenchEmergency.project" modificationDateTime="2026-07-30T21:00:24.172299">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T22:17:03.880882" />
+  <contentHeader name="TestBenchEmergency.project" modificationDateTime="2026-07-30T22:17:03.880882">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -749,6 +749,51 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
             </variable>
           </outputVars>
           <localVars>
+            <variable name="CST_TestDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[CST] Temporisations normatives de securite AU (fixes, non modifiables RETAIN/IHM)
+Duree auto-test canal A ou B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ArmingPulseDuration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree impulsion rearmement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ArmingConfirmTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation engagement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ArmingLockout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree verrouillage anti-reessai apres echec</xhtml>
+              </documentation>
+            </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -926,7 +971,7 @@ IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed
 END_IF;
 
 // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
-TonTestA(IN := (ArmingSeqStep = 1), PT := T#200ms);
+TonTestA(IN := (ArmingSeqStep = 1), PT := CST_TestDuration);
 IF ArmingSeqStep = 1 THEN
     ForceTestA := TRUE;
     IF TonTestA.Q THEN
@@ -943,7 +988,7 @@ ELSE
 END_IF;
 
 // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
-TonRestoreA(IN := (ArmingSeqStep = 2), PT := T#200ms);
+TonRestoreA(IN := (ArmingSeqStep = 2), PT := CST_TestDuration);
 IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
     IF EmergencyChainClosed THEN
         ArmingSeqStep := 3;
@@ -953,7 +998,7 @@ IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
 END_IF;
 
 // ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
-TonTestB(IN := (ArmingSeqStep = 3), PT := T#200ms);
+TonTestB(IN := (ArmingSeqStep = 3), PT := CST_TestDuration);
 IF ArmingSeqStep = 3 THEN
     ForceTestB := TRUE;
     IF TonTestB.Q THEN
@@ -970,7 +1015,7 @@ ELSE
 END_IF;
 
 // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
-TonRestoreB(IN := (ArmingSeqStep = 4), PT := T#200ms);
+TonRestoreB(IN := (ArmingSeqStep = 4), PT := CST_TestDuration);
 IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
     IF EmergencyChainClosed THEN
         ArmingSeqStep := 5;
@@ -980,14 +1025,14 @@ IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
 END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
-TonArmingPulse(IN := (ArmingSeqStep = 5), PT := T#1s);
+TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
 Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
 
 // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
-TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := T#2s);
+TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := CST_ArmingConfirmTimeout);
 IF ArmingSeqStep = 6 THEN
     IF PowerContactorEngaged THEN
         ArmingSeqStep := 0;
@@ -1000,7 +1045,7 @@ IF ArmingSeqStep = 6 THEN
 END_IF;
 
 // ⏱️ Séquence de verrouillage temporel (5s)
-TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := T#5s);
+TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := CST_ArmingLockout);
 IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
@@ -1442,7 +1487,7 @@ Relais maintien canal A (TRUE = voie maintenue)</xhtml>
       observables en Watch pour vérification de la séquence.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md</xhtml>
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1566,7 +1611,7 @@ Diag  := instEmergencyManagement.Diag;
       PRG_AU_Outputs.Diag            → erreurs/locks
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_FB_Safety_EmergencyManagement_v1.0.md</xhtml>
+              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1634,103 +1679,6 @@ END_CASE;
     <configurations />
   </instances>
   <addData>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_PERSISTENT_AU" retain="true">
-        <variable name="TonTestDuration">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#200ms" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temporisations de la séquence de réarmement (AF §3.5)
-Les valeurs ci-dessous sont les défauts de la spec.
-Ne pas modifier sans comprendre la séquence complète (auto-test A/B).
-Test/Restore A ou B</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TonArmingPulseDuration">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#1s0ms" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion de réarmement</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TonArmingConfirmTimeout">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#2s0ms" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation contacteur</xhtml>
-          </documentation>
-        </variable>
-        <variable name="TonArmingLockout">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#5s0ms" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage anti-réessai</xhtml>
-          </documentation>
-        </variable>
-        <variable name="CfgEmergencyChainNormallyClosed">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="TRUE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Configuration chaîne AU
-TRUE = boucle AU fermée = sain</xhtml>
-          </documentation>
-        </variable>
-        <variable name="CfgContactorNormallyOpen">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="TRUE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur engagé = sain</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>49064159-98e3-5f61-9423-ad9f816b4c1b</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💾 GVL_PERSISTENT_AU — Variables persistantes chaîne AU
-   ───────────────────────────────────────────────────────────────
-   📄 Rôle : Regroupe les réglages persistants RETAIN propres au
-      domaine Arrêt d'Urgence (FB_Safety_EmergencyManagement).
-   🎯 Objectif : dissocier les réglages AU des autres domaines
-      (treuils, benne, cycle, etc.) pour les bundles de test.
-   🔒 RETAIN : survit aux arrêts/redémarrages PLC.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Simulation_AU">
         <variable name="SimulationModeActive">
@@ -1860,7 +1808,6 @@ TRUE = une safety demande la coupure</xhtml>
           <Object Name="ST_Diag_Emergency" ObjectId="3f15b664-1dd2-593a-af9a-957a294bd1db" />
           <Object Name="ST_EmergencyCmd" ObjectId="530ff0c1-144b-5832-bee8-f40edd2d06ee" />
           <Object Name="ST_EmergencyState" ObjectId="60f821fa-d35a-58c5-ac8a-e1efe1044110" />
-          <Object Name="GVL_PERSISTENT_AU" ObjectId="49064159-98e3-5f61-9423-ad9f816b4c1b" />
           <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
           <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />
           <Object Name="PRG_AU_Acquisition" ObjectId="e301096b-b905-5c3d-96fa-3afcf1106a59" />
