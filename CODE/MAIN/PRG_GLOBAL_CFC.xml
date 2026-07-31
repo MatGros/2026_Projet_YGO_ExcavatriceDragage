@@ -22,7 +22,7 @@
           <localVars>
             <variable name="instDiagCanOpen">
               <type>
-                <derived name="FB_DiagCanOpen" />
+                <derived name="FB_Diag_CanOpen" />
               </type>
             </variable>
             <variable name="instModes">
@@ -60,8 +60,8 @@
                   </connectionPointIn>
                 </connector>
 
-                <!-- Bloc 1 : Diagnostic CANOpen (FB_DiagCanOpen) -->
-                <block localId="10" executionOrderId="1" typeName="FB_DiagCanOpen" instanceName="instDiagCanOpen">
+                <!-- Bloc 1 : Diagnostic CANOpen (FB_Diag_CanOpen) -->
+                <block localId="10" executionOrderId="1" typeName="FB_Diag_CanOpen" instanceName="instDiagCanOpen">
                   <position x="15" y="10" />
                   <inputVariables>
                     <variable formalParameter="Enable">

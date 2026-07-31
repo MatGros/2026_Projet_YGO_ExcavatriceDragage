@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   📡 FB_DiagCanOpen — Diagnostic bus CANopen / Joystick
+   📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
               DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3
@@ -10,7 +10,7 @@
       - READY      : bus réellement online
       - ERROR      : défaut détecté
    ═══════════════════════════════════════════════════════════════ *)
-FUNCTION_BLOCK PUBLIC FB_DiagCanOpen
+FUNCTION_BLOCK PUBLIC FB_Diag_CanOpen
 VAR_INPUT
     Enable          : BOOL;        (* Active la surveillance CAN *)
     Reset           : BOOL;        (* Front d'acquittement des défauts *)

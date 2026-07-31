@@ -28,10 +28,10 @@ SAFETY_DIRECTION_IF = re.compile(r"IF\s+Direction\s*[=<>!]")
 # Clé = chemin relatif SANS prefixe CODE/
 # Toute NOUVELLE occurrence non listée ici = ERROR
 KNOWN_VAR_OUTPUT_VIOLATIONS = {
-    "DIAG/FB_DiagCanOpen.st": {
+    "DIAG/FB_Diag_CanOpen.st": {
         "DeviceJoystick.State", "DeviceJoystick.Error", "DeviceJoystick.ErrorId"
     },
-    "DIAG/FB_DiagEthercat.st": {
+    "DIAG/FB_Diag_Ethercat.st": {
         "DeviceVariateur.State", "DeviceEncoderM1.State", "DeviceEncoderM2.State",
         "DeviceVariateur.Error", "DeviceEncoderM1.Error", "DeviceEncoderM2.Error",
         "DeviceVariateur.ErrorId", "DeviceEncoderM1.ErrorId", "DeviceEncoderM2.ErrorId"

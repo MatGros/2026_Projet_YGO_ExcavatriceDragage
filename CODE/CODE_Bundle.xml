@@ -3218,6 +3218,99 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_Diag_Winch_SymmetryCfg">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+            </variable>
+            <variable name="MinimumCommandTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+            </variable>
+            <variable name="MinimumSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>efaade56-0f99-55f7-b383-5f672faf7236</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Diag_Winch_SymmetryData">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaStopDistance_Mm, DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>aab4ef1b-cffe-5d91-9bf0-e6e14ca0e877</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_DredgingAssistCfg">
         <baseType>
           <struct>
@@ -7015,99 +7108,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_Winch_Symmetry_Cfg">
-        <baseType>
-          <struct>
-            <variable name="DeltaStartDelay_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaBrakeReleaseTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaBrakeApplyTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaStopDistance_Mm">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaStopTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="200" />
-              </initialValue>
-            </variable>
-            <variable name="MinimumCommandTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-            </variable>
-            <variable name="MinimumSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.05" />
-              </initialValue>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>76a5205f-28c9-5708-b53f-fc5a75492e4d</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="ST_Winch_Symmetry_Data">
-        <baseType>
-          <struct>
-            <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="DeltaStopDistance_Mm, DeltaStopTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="MaxSyncDeviation_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e42e2778-615a-5ad6-918d-c9d8044e3739</ObjectId>
-          </data>
-        </addData>
-      </dataType>
     </dataTypes>
     <pous>
       <pou name="FB_AxisScale" pouType="functionBlock">
@@ -9783,7 +9783,7 @@ TimeLast := TimeCurrent;
           </data>
         </addData>
       </pou>
-      <pou name="FB_DiagCanOpen" pouType="functionBlock">
+      <pou name="FB_Diag_CanOpen" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -9974,7 +9974,7 @@ TimeLast := TimeCurrent;
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_DiagCanOpen — Diagnostic bus CANopen / Joystick
+   📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
               DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3
@@ -10091,11 +10091,11 @@ Done := FALSE;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>94985939-6432-5df4-8717-0ad1efb0fdb4</ObjectId>
+            <ObjectId>335793a2-469c-5bc1-8663-6c12c4d0dfde</ObjectId>
           </data>
         </addData>
       </pou>
-      <pou name="FB_DiagEthercat" pouType="functionBlock">
+      <pou name="FB_Diag_Ethercat" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -10348,7 +10348,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_DiagEthercat — Diagnostic bus EtherCAT (3 esclaves)
+   📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
               DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3
@@ -10517,7 +10517,454 @@ Done := FALSE;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>268197d6-ad0a-5ec3-82c7-3a1f88f6bae6</ObjectId>
+            <ObjectId>014990de-caff-57d6-8d15-66c7ad1a6908</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Diag_IhmHeartbeat" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance ; FALSE = IHM non valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglHeartbeatIhm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IhmTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence maximale de front IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PlcTogglePeriod">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Période du clignotant PLC</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après front IHM post-boot et avant timeout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmTimeout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucun front IHM depuis IhmTimeout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglHeartbeatPlc">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant PLC à superviser côté IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeSinceIhmEdge">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic : temps depuis le dernier front IHM</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="LastIhmToggle">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="IhmEdgeSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interdit de valider une valeur RETAIN au boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IhmEdgeDetected">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="IhmTimeoutTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="PlcToggleTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   💓 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
+   🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
+      et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
+   🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
+      de leurs réactions métier.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+// 🛑 Sans Enable, aucune valeur mémorisée ne peut déclarer l'IHM valide.
+IF NOT Enable THEN
+    HeartbeatIhmOk := FALSE;
+    HeartbeatIhmTimeout := TRUE;
+    TglHeartbeatPlc := FALSE;
+    TimeSinceIhmEdge := T#0s;
+    LastIhmToggle := TglHeartbeatIhm;
+    IhmEdgeSeen := FALSE;
+    IhmTimeoutTon(IN := FALSE, PT := IhmTimeout);
+    PlcToggleTon(IN := FALSE, PT := PlcTogglePeriod);
+    RETURN;
+END_IF;
+
+// 📥 Front par comparaison : l'IHM écrit un BOOL toggle, pas une impulsion courte.
+IhmEdgeDetected := (TglHeartbeatIhm &lt;&gt; LastIhmToggle);
+LastIhmToggle := TglHeartbeatIhm;
+IF IhmEdgeDetected THEN
+    IhmEdgeSeen := TRUE;
+END_IF;
+
+// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout au bout de IhmTimeout.
+// HeartbeatIhmOk reste TRUE tant que le timeout n'est pas expiré (boot propre sans alarme au scan 1).
+IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
+TimeSinceIhmEdge := IhmTimeoutTon.ET;
+HeartbeatIhmTimeout := IhmTimeoutTon.Q;
+HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
+
+// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
+PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
+IF PlcToggleTon.Q THEN
+    TglHeartbeatPlc := NOT TglHeartbeatPlc;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7e9589ba-412d-5501-80d5-184905e87d23</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Diag_Preflight" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Execute">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MachineIsStill">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1BrakeApplied, M2BrakeApplied, M3BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PreflightOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PreflightErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ExecuteEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="BootPending">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="RequestPending">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 FB_Diag_Preflight — Verdict passif machine arrêtée
+   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
+   🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+ExecuteEdge(CLK := Execute);
+RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
+PreflightBusy := RequestPending AND NOT MachineIsStill;
+IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
+IF NOT RequestPending THEN RETURN; END_IF;
+
+PreflightErrorId := 0;
+(* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
+   bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
+   bit9 câble M2 tendu; bit10 mot M3 cohérent; bit11 contacteur sans chaîne;
+   bit12..13 codeur M1/M2 opérationnel; bit14..15 homé et position bornée M1/M2. *)
+IF NOT M1BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0001; END_IF;
+IF NOT M2BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0002; END_IF;
+IF NOT M3BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0004; END_IF;
+IF NOT M1ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0008; END_IF;
+IF NOT M2ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0010; END_IF;
+IF NOT M1ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0020; END_IF;
+IF NOT M2ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0040; END_IF;
+IF NOT BrakeThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0080; END_IF;
+IF NOT PhaseRotationOk THEN PreflightErrorId := PreflightErrorId OR 16#0100; END_IF;
+IF NOT SlackCableTensioned THEN PreflightErrorId := PreflightErrorId OR 16#0200; END_IF;
+IF M3SensorWordIncoherent THEN PreflightErrorId := PreflightErrorId OR 16#0400; END_IF;
+IF PowerContactorEngaged AND NOT EmergencyChainClosed THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
+IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000; END_IF;
+IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
+IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
+IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
+PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>acb3a4f8-5cb1-5c4d-87ce-70c4d59bb1dd</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Diag_WinchSymmetry" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1CommandActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2CommandActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M2Direction">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_Diag_Winch_SymmetryCfg" />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="SymmetryOk">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SymmetryValid">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Data">
+              <type>
+                <derived name="ST_Diag_Winch_SymmetryData" />
+              </type>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+            </variable>
+            <variable name="CommandTon">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="Comparable, Qualified, PreviousQualified, Stopping, StartCapturedM1, StartCapturedM2, StopCapturedM1, StopCapturedM2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartMsM1, StartMsM2, ReleaseMsM1, ReleaseMsM2, ApplyMsM1, ApplyMsM2, StopMsM1, StopMsM2">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MotionTimer, StopTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="StopStartM1_M, StopStartM2_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚖️ FB_Diag_WinchSymmetry — Mesure passive MES-008 M1/M2
+   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
+   🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+CycleTime(DefaultValueS := 0.010); ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN Data.DeltaStartDelay_Ms:=0; Data.DeltaBrakeReleaseTime_Ms:=0; Data.DeltaBrakeApplyTime_Ms:=0; Data.DeltaStopDistance_Mm:=0; Data.DeltaStopTime_Ms:=0; Data.MaxSyncDeviation_M:=0.0; END_IF;
+Comparable := M1CommandActive AND M2CommandActive AND (M1Direction = M2Direction) AND (M1Direction &lt;&gt; 0);
+CommandTon(IN := Comparable, PT := UDINT_TO_TIME(Config.MinimumCommandTime_Ms));
+Qualified := CommandTon.Q AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps);
+MotionTimer(IN := Comparable, PT := T#1h);
+StopTimer(IN := Stopping, PT := T#1h);
+IF NOT Comparable THEN StartCapturedM1:=FALSE; StartCapturedM2:=FALSE; ReleaseMsM1:=0; ReleaseMsM2:=0; ApplyMsM1:=0; ApplyMsM2:=0; END_IF;
+IF Comparable AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM1 THEN StartMsM1:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM1:=TRUE; END_IF;
+IF Comparable AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM2 THEN StartMsM2:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM2:=TRUE; END_IF;
+IF Qualified THEN
+    IF M1BrakeCmd AND M1BrakeApplied THEN ReleaseMsM1 := ReleaseMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF M2BrakeCmd AND M2BrakeApplied THEN ReleaseMsM2 := ReleaseMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF NOT M1BrakeCmd AND NOT M1BrakeApplied THEN ApplyMsM1 := ApplyMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF NOT M2BrakeCmd AND NOT M2BrakeApplied THEN ApplyMsM2 := ApplyMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
+    IF SyncDeviation_M &gt; Data.MaxSyncDeviation_M THEN Data.MaxSyncDeviation_M := SyncDeviation_M; END_IF;
+END_IF;
+IF PreviousQualified AND NOT Comparable THEN Stopping:=TRUE; StopCapturedM1:=FALSE; StopCapturedM2:=FALSE; StopStartM1_M:=M1Position_M; StopStartM2_M:=M2Position_M; END_IF;
+IF Stopping THEN
+    IF (M1Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM1 THEN StopMsM1:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM1:=TRUE; END_IF;
+    IF (M2Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM2 THEN StopMsM2:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM2:=TRUE; END_IF;
+    IF StopCapturedM1 AND StopCapturedM2 THEN
+        Data.DeltaStartDelay_Ms := ABS(UDINT_TO_DINT(StartMsM1)-UDINT_TO_DINT(StartMsM2));
+        Data.DeltaBrakeReleaseTime_Ms := ABS(UDINT_TO_DINT(ReleaseMsM1)-UDINT_TO_DINT(ReleaseMsM2));
+        Data.DeltaBrakeApplyTime_Ms := ABS(UDINT_TO_DINT(ApplyMsM1)-UDINT_TO_DINT(ApplyMsM2));
+        Data.DeltaStopDistance_Mm := REAL_TO_UDINT(ABS(ABS(M1Position_M-StopStartM1_M)-ABS(M2Position_M-StopStartM2_M))*1000.0);
+        Data.DeltaStopTime_Ms := ABS(UDINT_TO_DINT(StopMsM1)-UDINT_TO_DINT(StopMsM2)); Stopping:=FALSE; SymmetryValid:=TRUE;
+    END_IF;
+END_IF;
+SymmetryOk := SymmetryValid AND (Data.DeltaStartDelay_Ms&lt;=Config.DeltaStartDelay_Ms) AND (Data.DeltaBrakeReleaseTime_Ms&lt;=Config.DeltaBrakeReleaseTime_Ms) AND (Data.DeltaBrakeApplyTime_Ms&lt;=Config.DeltaBrakeApplyTime_Ms) AND (Data.DeltaStopDistance_Mm&lt;=Config.DeltaStopDistance_Mm) AND (Data.DeltaStopTime_Ms&lt;=Config.DeltaStopTime_Ms);
+PreviousQualified := Qualified;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cf3bfbc7-bd03-54e3-bf94-818c79641c27</ObjectId>
           </data>
         </addData>
       </pou>
@@ -11014,7 +11461,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_DiagEthercat — esclave EtherCAT opérationnel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Diag_Ethercat — esclave EtherCAT opérationnel</xhtml>
               </documentation>
             </variable>
             <variable name="PointsPerRev">
@@ -13089,171 +13536,6 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_IhmHeartbeat" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance ; FALSE = IHM non valide</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglHeartbeatIhm">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IhmTimeout">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#2s0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence maximale de front IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PlcTogglePeriod">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Période du clignotant PLC</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="HeartbeatIhmOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après front IHM post-boot et avant timeout</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HeartbeatIhmTimeout">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucun front IHM depuis IhmTimeout</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglHeartbeatPlc">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant PLC à superviser côté IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeSinceIhmEdge">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic : temps depuis le dernier front IHM</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="LastIhmToggle">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="IhmEdgeSeen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interdit de valider une valeur RETAIN au boot</xhtml>
-              </documentation>
-            </variable>
-            <variable name="IhmEdgeDetected">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="IhmTimeoutTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="PlcToggleTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💓 FB_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
-   ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
-   🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
-      et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
-   🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
-      de leurs réactions métier.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION ===
-
-// 🛑 Sans Enable, aucune valeur mémorisée ne peut déclarer l'IHM valide.
-IF NOT Enable THEN
-    HeartbeatIhmOk := FALSE;
-    HeartbeatIhmTimeout := TRUE;
-    TglHeartbeatPlc := FALSE;
-    TimeSinceIhmEdge := T#0s;
-    LastIhmToggle := TglHeartbeatIhm;
-    IhmEdgeSeen := FALSE;
-    IhmTimeoutTon(IN := FALSE, PT := IhmTimeout);
-    PlcToggleTon(IN := FALSE, PT := PlcTogglePeriod);
-    RETURN;
-END_IF;
-
-// 📥 Front par comparaison : l'IHM écrit un BOOL toggle, pas une impulsion courte.
-IhmEdgeDetected := (TglHeartbeatIhm &lt;&gt; LastIhmToggle);
-LastIhmToggle := TglHeartbeatIhm;
-IF IhmEdgeDetected THEN
-    IhmEdgeSeen := TRUE;
-END_IF;
-
-// ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout au bout de IhmTimeout.
-// HeartbeatIhmOk reste TRUE tant que le timeout n'est pas expiré (boot propre sans alarme au scan 1).
-IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
-TimeSinceIhmEdge := IhmTimeoutTon.ET;
-HeartbeatIhmTimeout := IhmTimeoutTon.Q;
-HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
-
-// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
-PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
-IF PlcToggleTon.Q THEN
-    TglHeartbeatPlc := NOT TglHeartbeatPlc;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>27ea6b0f-df94-59ee-ac07-585c8e3e993b</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_Input" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -14479,136 +14761,6 @@ Error := (ErrorId &lt;&gt; 16#0000);
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>b60dd37c-0508-57b7-805e-ba43b1805814</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Preflight" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Execute">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="MachineIsStill">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1BrakeApplied, M2BrakeApplied, M3BrakeApplied">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="PreflightOk">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PreflightDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PreflightBusy">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PreflightErrorId">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="ExecuteEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="BootPending">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-            </variable>
-            <variable name="RequestPending">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🩺 FB_Preflight — Verdict passif machine arrêtée
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-ExecuteEdge(CLK := Execute);
-RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
-PreflightBusy := RequestPending AND NOT MachineIsStill;
-IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
-IF NOT RequestPending THEN RETURN; END_IF;
-
-PreflightErrorId := 0;
-(* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
-   bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
-   bit9 câble M2 tendu; bit10 mot M3 cohérent; bit11 contacteur sans chaîne;
-   bit12..13 codeur M1/M2 opérationnel; bit14..15 homé et position bornée M1/M2. *)
-IF NOT M1BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0001; END_IF;
-IF NOT M2BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0002; END_IF;
-IF NOT M3BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0004; END_IF;
-IF NOT M1ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0008; END_IF;
-IF NOT M2ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0010; END_IF;
-IF NOT M1ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0020; END_IF;
-IF NOT M2ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0040; END_IF;
-IF NOT BrakeThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0080; END_IF;
-IF NOT PhaseRotationOk THEN PreflightErrorId := PreflightErrorId OR 16#0100; END_IF;
-IF NOT SlackCableTensioned THEN PreflightErrorId := PreflightErrorId OR 16#0200; END_IF;
-IF M3SensorWordIncoherent THEN PreflightErrorId := PreflightErrorId OR 16#0400; END_IF;
-IF PowerContactorEngaged AND NOT EmergencyChainClosed THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
-IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000; END_IF;
-IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
-IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
-IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
-PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>d31c4cd5-70b8-565a-906d-0e527f36e29d</ObjectId>
           </data>
         </addData>
       </pou>
@@ -17556,7 +17708,7 @@ ForbidAscent := (ErrorId AND 16#0020) &lt;&gt; 16#0000
 // SafeStop uniquement ; PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
 PowerCutOff := (ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 
-// Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)
+// Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
 Busy := FALSE;
 Done := FALSE;
 </xhtml>
@@ -22070,158 +22222,6 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_WinchSymmetry" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Reset">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1CommandActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2CommandActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1Direction">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="M2Direction">
-              <type>
-                <INT />
-              </type>
-            </variable>
-            <variable name="M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="Config">
-              <type>
-                <derived name="ST_Winch_Symmetry_Cfg" />
-              </type>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="SymmetryOk">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="SymmetryValid">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="Data">
-              <type>
-                <derived name="ST_Winch_Symmetry_Data" />
-              </type>
-            </variable>
-          </inOutVars>
-          <localVars>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="CycleTime">
-              <type>
-                <derived name="FB_CycleTime" />
-              </type>
-            </variable>
-            <variable name="CommandTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="Comparable, Qualified, PreviousQualified, Stopping, StartCapturedM1, StartCapturedM2, StopCapturedM1, StopCapturedM2">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="StartMsM1, StartMsM2, ReleaseMsM1, ReleaseMsM2, ApplyMsM1, ApplyMsM2, StopMsM1, StopMsM2">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="MotionTimer, StopTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="StopStartM1_M, StopStartM2_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚖️ FB_WinchSymmetry — Mesure passive MES-008 M1/M2
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-CycleTime(DefaultValueS := 0.010); ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN Data.DeltaStartDelay_Ms:=0; Data.DeltaBrakeReleaseTime_Ms:=0; Data.DeltaBrakeApplyTime_Ms:=0; Data.DeltaStopDistance_Mm:=0; Data.DeltaStopTime_Ms:=0; Data.MaxSyncDeviation_M:=0.0; END_IF;
-Comparable := M1CommandActive AND M2CommandActive AND (M1Direction = M2Direction) AND (M1Direction &lt;&gt; 0);
-CommandTon(IN := Comparable, PT := UDINT_TO_TIME(Config.MinimumCommandTime_Ms));
-Qualified := CommandTon.Q AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps);
-MotionTimer(IN := Comparable, PT := T#1h);
-StopTimer(IN := Stopping, PT := T#1h);
-IF NOT Comparable THEN StartCapturedM1:=FALSE; StartCapturedM2:=FALSE; ReleaseMsM1:=0; ReleaseMsM2:=0; ApplyMsM1:=0; ApplyMsM2:=0; END_IF;
-IF Comparable AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM1 THEN StartMsM1:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM1:=TRUE; END_IF;
-IF Comparable AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM2 THEN StartMsM2:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM2:=TRUE; END_IF;
-IF Qualified THEN
-    IF M1BrakeCmd AND M1BrakeApplied THEN ReleaseMsM1 := ReleaseMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
-    IF M2BrakeCmd AND M2BrakeApplied THEN ReleaseMsM2 := ReleaseMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
-    IF NOT M1BrakeCmd AND NOT M1BrakeApplied THEN ApplyMsM1 := ApplyMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
-    IF NOT M2BrakeCmd AND NOT M2BrakeApplied THEN ApplyMsM2 := ApplyMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
-    IF SyncDeviation_M &gt; Data.MaxSyncDeviation_M THEN Data.MaxSyncDeviation_M := SyncDeviation_M; END_IF;
-END_IF;
-IF PreviousQualified AND NOT Comparable THEN Stopping:=TRUE; StopCapturedM1:=FALSE; StopCapturedM2:=FALSE; StopStartM1_M:=M1Position_M; StopStartM2_M:=M2Position_M; END_IF;
-IF Stopping THEN
-    IF (M1Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM1 THEN StopMsM1:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM1:=TRUE; END_IF;
-    IF (M2Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM2 THEN StopMsM2:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM2:=TRUE; END_IF;
-    IF StopCapturedM1 AND StopCapturedM2 THEN
-        Data.DeltaStartDelay_Ms := ABS(UDINT_TO_DINT(StartMsM1)-UDINT_TO_DINT(StartMsM2));
-        Data.DeltaBrakeReleaseTime_Ms := ABS(UDINT_TO_DINT(ReleaseMsM1)-UDINT_TO_DINT(ReleaseMsM2));
-        Data.DeltaBrakeApplyTime_Ms := ABS(UDINT_TO_DINT(ApplyMsM1)-UDINT_TO_DINT(ApplyMsM2));
-        Data.DeltaStopDistance_Mm := REAL_TO_UDINT(ABS(ABS(M1Position_M-StopStartM1_M)-ABS(M2Position_M-StopStartM2_M))*1000.0);
-        Data.DeltaStopTime_Ms := ABS(UDINT_TO_DINT(StopMsM1)-UDINT_TO_DINT(StopMsM2)); Stopping:=FALSE; SymmetryValid:=TRUE;
-    END_IF;
-END_IF;
-SymmetryOk := SymmetryValid AND (Data.DeltaStartDelay_Ms&lt;=Config.DeltaStartDelay_Ms) AND (Data.DeltaBrakeReleaseTime_Ms&lt;=Config.DeltaBrakeReleaseTime_Ms) AND (Data.DeltaBrakeApplyTime_Ms&lt;=Config.DeltaBrakeApplyTime_Ms) AND (Data.DeltaStopDistance_Mm&lt;=Config.DeltaStopDistance_Mm) AND (Data.DeltaStopTime_Ms&lt;=Config.DeltaStopTime_Ms);
-PreviousQualified := Qualified;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>d3f3c22f-4579-5b7b-a799-7880ca0e8f82</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_WinchSync" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -22659,7 +22659,7 @@ Done := FALSE;
           <localVars>
             <variable name="instDiagCanOpen">
               <type>
-                <derived name="FB_DiagCanOpen" />
+                <derived name="FB_Diag_CanOpen" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic CAN/Joystick</xhtml>
@@ -22667,7 +22667,7 @@ Done := FALSE;
             </variable>
             <variable name="instDiagEthercat">
               <type>
-                <derived name="FB_DiagEthercat" />
+                <derived name="FB_Diag_Ethercat" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic EtherCAT (3 devices)</xhtml>
@@ -22683,7 +22683,7 @@ Done := FALSE;
             </variable>
             <variable name="instIhmHeartbeat">
               <type>
-                <derived name="FB_IhmHeartbeat" />
+                <derived name="FB_Diag_IhmHeartbeat" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety</xhtml>
@@ -22751,7 +22751,7 @@ CANbus.GetBusState() brut</xhtml>
 
 // 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
 // depuis l'image matérielle HwIn produite par PRG_ACQUISITION_CFC.
-// C'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
+// C'est FB_Diag_CanOpen/FB_Diag_Ethercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
 RawCanBusState    := PRG_ACQUISITION_CFC.HwIn.Operator.CanBusState;
 RawJoystickState  := PRG_ACQUISITION_CFC.HwIn.Operator.JOY1_DeviceState;
@@ -28512,12 +28512,12 @@ Demande de coupure de puissance</xhtml>
           <localVars>
             <variable name="instPreflight">
               <type>
-                <derived name="FB_Preflight" />
+                <derived name="FB_Diag_Preflight" />
               </type>
             </variable>
             <variable name="instWinchSymmetry">
               <type>
-                <derived name="FB_WinchSymmetry" />
+                <derived name="FB_Diag_WinchSymmetry" />
               </type>
             </variable>
             <variable name="TonMachineStill">
@@ -30152,7 +30152,7 @@ END_CASE;
           <localVars>
             <variable name="instDiagCanOpen">
               <type>
-                <derived name="FB_DiagCanOpen" />
+                <derived name="FB_Diag_CanOpen" />
               </type>
             </variable>
             <variable name="instModes">
@@ -30187,7 +30187,7 @@ END_CASE;
                     <connection refLocalId="1" formalParameter="PRG_00_Inputs.EmergencyChainClosed" />
                   </connectionPointIn>
                 </connector>
-                <block localId="10" executionOrderId="1" typeName="FB_DiagCanOpen" instanceName="instDiagCanOpen">
+                <block localId="10" executionOrderId="1" typeName="FB_Diag_CanOpen" instanceName="instDiagCanOpen">
                   <position x="15" y="10" />
                   <inputVariables>
                     <variable formalParameter="Enable">
@@ -34037,7 +34037,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
         </variable>
         <variable name="_WinchSymmetryCfgPersist">
           <type>
-            <derived name="ST_Winch_Symmetry_Cfg" />
+            <derived name="ST_Diag_Winch_SymmetryCfg" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -34049,7 +34049,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
         </variable>
         <variable name="_WinchSymmetryDataPersist">
           <type>
-            <derived name="ST_Winch_Symmetry_Data" />
+            <derived name="ST_Diag_Winch_SymmetryData" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -34943,12 +34943,14 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         </Folder>
         <Folder Name="DIAG">
           <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
-          <Object Name="FB_DiagCanOpen" ObjectId="94985939-6432-5df4-8717-0ad1efb0fdb4" />
-          <Object Name="FB_DiagEthercat" ObjectId="268197d6-ad0a-5ec3-82c7-3a1f88f6bae6" />
-          <Object Name="FB_IhmHeartbeat" ObjectId="27ea6b0f-df94-59ee-ac07-585c8e3e993b" />
-          <Object Name="FB_Preflight" ObjectId="d31c4cd5-70b8-565a-906d-0e527f36e29d" />
-          <Object Name="FB_WinchSymmetry" ObjectId="d3f3c22f-4579-5b7b-a799-7880ca0e8f82" />
+          <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
+          <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
+          <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
+          <Object Name="FB_Diag_Preflight" ObjectId="acb3a4f8-5cb1-5c4d-87ce-70c4d59bb1dd" />
+          <Object Name="FB_Diag_WinchSymmetry" ObjectId="cf3bfbc7-bd03-54e3-bf94-818c79641c27" />
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
+          <Object Name="ST_Diag_Winch_SymmetryCfg" ObjectId="efaade56-0f99-55f7-b383-5f672faf7236" />
+          <Object Name="ST_Diag_Winch_SymmetryData" ObjectId="aab4ef1b-cffe-5d91-9bf0-e6e14ca0e877" />
         </Folder>
         <Folder Name="MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
@@ -35124,8 +35126,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
             <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
             <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
-            <Object Name="ST_Winch_Symmetry_Cfg" ObjectId="76a5205f-28c9-5708-b53f-fc5a75492e4d" />
-            <Object Name="ST_Winch_Symmetry_Data" ObjectId="e42e2778-615a-5ad6-918d-c9d8044e3739" />
           </Folder>
         </Folder>
         <Folder Name="">
