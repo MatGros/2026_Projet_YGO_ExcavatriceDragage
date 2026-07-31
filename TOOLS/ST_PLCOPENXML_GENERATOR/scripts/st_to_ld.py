@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""st_to_ld.py — Convert one ``PRG_*_LD.st`` file to a standalone ``<pou>`` in ``<LD>``.
+"""st_to_ld.py — Convert ``PRG_*_LD.st`` file(s) to PLCopenXML.
 
-Generates a PLCopenXML file containing exactly one ``<pou>`` whose body is a
-``<LD>`` (Ladder Diagram). The file is NOT a full ``<project>`` bundle — it is
-the single POU element only, for inclusion or standalone inspection.
+With a single input file, generates a standalone ``<pou>`` element whose body
+is a ``<LD>`` (Ladder Diagram) — NOT a full ``<project>`` bundle.
+
+With multiple input files, generates a full ``<project>`` bundle containing
+all the POUs assembled together (with ``<ProjectStructure>``, ObjectIds
+aligned, and inter-object dependencies resolved).
 
 Usage:
     python scripts/st_to_ld.py CODE/MAIN/PRG_AU_Outputs_LD.st -o output.xml
+    python scripts/st_to_ld.py CODE/MAIN/PRG_AU_Outputs_LD.st CODE/MAIN/PRG_10_Outputs_LD.st -o bundle.xml
 
 Only ``PRG_*_LD`` programs are eligible — the ``_LD`` suffix is the contract
 that marks the Ladder-readable boundary for PROGRAM objects.
@@ -24,7 +28,7 @@ _TOOL_ROOT = _SCRIPTS_DIR.parent
 if str(_TOOL_ROOT) not in sys.path:
     sys.path.insert(0, str(_TOOL_ROOT))
 
-from scripts._common import parse_single_st_file  # noqa: E402
+from scripts._common import build_multi_file_project, parse_single_st_file  # noqa: E402
 
 from generator.diagnostics import DiagnosticCollector, Severity  # noqa: E402
 from generator.xml_builder import _build_pou  # noqa: E402
@@ -56,25 +60,59 @@ def build_ld_pou_xml(st_path: Path, diagnostics: DiagnosticCollector) -> bytes:
     return serialize(pou)
 
 
+def build_ld_project_xml(
+    st_paths: list[Path], diagnostics: DiagnosticCollector
+) -> bytes:
+    """Assemble a full ``<project>`` bundle from multiple ``PRG_*_LD.st`` files."""
+    objects_by_name: dict[str, object] = {}
+    root_names: list[str] = []
+    for st_path in st_paths:
+        obj = parse_single_st_file(st_path, diagnostics)
+        if obj is None:
+            raise ValueError(f"failed to parse {st_path}")
+        if not _is_ld_program(obj):
+            raise ValueError(
+                f"{st_path.name}: not a PRG_*_LD program — st_to_ld.py only converts "
+                f"PROGRAM objects named PRG_*_LD. Got: {obj.kind} '{obj.name}'."
+            )
+        objects_by_name[obj.name] = obj
+        root_names.append(obj.name)
+    return build_multi_file_project(objects_by_name, root_names, diagnostics)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="st_to_ld.py",
-        description="Convert one PRG_*_LD.st file to a standalone <pou> in <LD> (PLCopenXML).",
+        description=(
+            "Convert PRG_*_LD.st file(s) to PLCopenXML. Single file → standalone "
+            "<pou> in <LD>; multiple files → full <project> bundle."
+        ),
     )
-    parser.add_argument("st_file", type=Path, help="Source .st file (must be PRG_*_LD)")
+    parser.add_argument(
+        "st_files",
+        nargs="+",
+        type=Path,
+        help="One or more source .st files (must be PRG_*_LD)",
+    )
     parser.add_argument("-o", "--output", type=Path, required=True, help="Output .xml file")
     args = parser.parse_args(argv)
 
-    st_path: Path = args.st_file
+    st_paths: list[Path] = args.st_files
     out_path: Path = args.output
 
-    if not st_path.is_file():
-        print(f"error: input file not found: {st_path}", file=sys.stderr)
-        return 1
+    for st_path in st_paths:
+        if not st_path.is_file():
+            print(f"error: input file not found: {st_path}", file=sys.stderr)
+            return 1
 
     diagnostics = DiagnosticCollector()
     try:
-        data = build_ld_pou_xml(st_path, diagnostics)
+        if len(st_paths) == 1:
+            data = build_ld_pou_xml(st_paths[0], diagnostics)
+            label = "LD POU"
+        else:
+            data = build_ld_project_xml(st_paths, diagnostics)
+            label = f"LD project bundle ({len(st_paths)} POUs)"
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -86,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
         stream = sys.stdout if diag.severity is Severity.INFO else sys.stderr
         print(str(diag), file=stream)
 
-    print(f"LD POU written to {out_path}", file=sys.stderr)
+    print(f"{label} written to {out_path}", file=sys.stderr)
     return 1 if diagnostics.has_errors() else 0
 
 

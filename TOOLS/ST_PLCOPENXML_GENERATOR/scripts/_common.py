@@ -20,6 +20,8 @@ if str(_TOOL_ROOT) not in sys.path:
 from generator.diagnostics import DiagnosticCollector  # noqa: E402
 from generator.ir import SourceObject  # noqa: E402
 from generator.st_parser import parse_file  # noqa: E402
+from generator.xml_builder import build_project_xml  # noqa: E402
+from generator.xml_serializer import serialize as _serialize_element  # noqa: E402
 
 _POU_NAME_RE = re.compile(r'<pou\s+name="([^"]+)"')
 
@@ -68,3 +70,26 @@ def make_cfc_source_object(path: Path) -> SourceObject:
         mtime=path.stat().st_mtime,
         raw_xml_path=str(path),
     )
+
+
+def build_multi_file_project(
+    objects_by_name: dict[str, SourceObject],
+    root_names: list[str],
+    diagnostics: DiagnosticCollector,
+    *,
+    project_name: str = "Generated",
+) -> bytes:
+    """Assemble a full PLCopenXML ``<project>`` bundle from multiple objects.
+
+    Wraps :func:`build_project_xml` and serializes the result. Used by the
+    CLI scripts (``st_to_ld.py``, ``st_to_pou.py``, ``cfc_extract.py``,
+    ``st_to_dut.py``) when more than one input file is provided.
+    """
+    root = build_project_xml(
+        root_names,
+        objects_by_name,
+        diagnostics,
+        include_deps=True,
+        project_name=project_name,
+    )
+    return _serialize_element(root)
