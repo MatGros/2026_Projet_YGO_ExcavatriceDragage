@@ -105,7 +105,7 @@
 
 ### MES-005 — 🏗️ Refactoring Architecture Diagnostics (POO vs Externe)
 - 📅 **Date** : 2026-07-24 | 📍 **Lieu** : Terrain / Architecture
-- 🎯 **Périmètre** : `PRG_01_Diagnostics`, `FB_DiagCanOpen`, `FB_DiagEthercat`
+- 🎯 **Périmètre** : `PRG_01_Diagnostics`, `FB_Diag_CanOpen`, `FB_Diag_Ethercat`
 - 🚦 **Statut** : 🟠 **Action ouverte** (`T77`)
 - 🔍 **Constat** : Fausse alarme `CANbusOnline = FALSE` avec joystick fonctionnel. `PRG_01` calculait une logique complexe dans les entrées du FB (`(GetBusState() = 1) OR (SimulationModeActive AND NOT BusIsReal)...`).
 - 💥 **Problèmes POO** :

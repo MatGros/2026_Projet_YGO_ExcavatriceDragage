@@ -29,7 +29,7 @@
           <localVars>
             <variable name="instDiagCanOpen">
               <type>
-                <derived name="FB_DiagCanOpen" />
+                <derived name="FB_Diag_CanOpen" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml"> Diagnostic CAN/Joystick</xhtml>
@@ -37,7 +37,7 @@
             </variable>
             <variable name="instDiagEthercat">
               <type>
-                <derived name="FB_DiagEthercat" />
+                <derived name="FB_Diag_Ethercat" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml"> Diagnostic EtherCAT (3 devices)</xhtml>
@@ -437,7 +437,7 @@ END_IF;
    - EtherCAT : instances esclaves IoDrvEtherCAT (COD1_CODEUR/COD2_CODEUR/
      AC600_ECAT_Drive, arbre devices). Propriété `wState` (ETC_SLAVE_STATE,
      16#8 = OPERATIONAL) + `xError` (TRUE = esclave en erreur → utilisé comme
-     "WcState" au sens FB_DiagEthercat : Online := NOT WcState).
+     "WcState" au sens FB_Diag_Ethercat : Online := NOT WcState).
      ⚠️ VÉRIFIER à la compilation : `wState`/`xError` doivent apparaître dans
      l'assistant de saisie sur `COD1_CODEUR.` — si noms différents dans votre
      version IoDrvEtherCAT, adapter ces 6 lignes UNIQUEMENT (le FB ne change pas).

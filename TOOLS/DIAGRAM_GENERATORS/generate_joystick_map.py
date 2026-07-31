@@ -24,7 +24,7 @@ left to right direction
 title <img:open-iconic/dial> Architecture, Scaling, PT1 & Sécurité Homme-Mort Joystick CAN (FB_Joystick)
 
 package "1. <img:open-iconic/input> ACQUISITION BUS CAN (20ms)" as PKG_CAN #E3F2FD {
-  rectangle "<img:open-iconic/input>\nTRAME CANOPEN (JOYSTICK HALL)\n---\n• RawAxisX / RawAxisY : INT16 (-10000 à +10000)\n• RawButtonDeadman : BOOL (Bouton Homme-Mort)\n• FB_DiagCanOpen (.Online / .Operational)" as CAN #BBDEFB
+  rectangle "<img:open-iconic/input>\nTRAME CANOPEN (JOYSTICK HALL)\n---\n• RawAxisX / RawAxisY : INT16 (-10000 à +10000)\n• RawButtonDeadman : BOOL (Bouton Homme-Mort)\n• FB_Diag_CanOpen (.Online / .Operational)" as CAN #BBDEFB
 }
 
 package "2. <img:open-iconic/dial> TRAITEMENT INTERNE FB_JOYSTICK" as PKG_JOY #E8F5E9 {

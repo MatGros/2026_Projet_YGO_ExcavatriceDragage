@@ -91,7 +91,7 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 | `Mode` | `Modes (CFC).instModes.Mode` (scan N−1) |
 | `BenneBusy` | `Treuils.instBucket.Busy` (scan N−1) |
 | `PreserveArmingAfterBucket` | Extraction Busy **et** état `CLOSING_BUCKET` |
-| `BusCanOpenOP` / `JoystickOP` | `FB_DiagCanOpen` |
+| `BusCanOpenOP` / `JoystickOP` | `FB_Diag_CanOpen` |
 | `RawX/Y`, `RawButton` | `Acquisition.HwIn.Operator` |
 | `BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` |
 | `Invert*`, `Deadband`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |

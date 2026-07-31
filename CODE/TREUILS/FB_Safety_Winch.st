@@ -537,6 +537,6 @@ ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
 // SafeStop uniquement ; PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
 PowerCutOff := (ErrorId AND 16#2F84) <> 16#0000;
 
-// Busy, Done non utilisés mais présents pour conformité (comme FB_DiagCanOpen)
+// Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
 Busy := FALSE;
 Done := FALSE;

@@ -20,7 +20,7 @@ VAR_INPUT
     RawPosIn            : UDINT;       // Brut EtherCAT (ex. COD1_PosValue, %ID)
     AlarmsIn            : UINT;        // Brut EtherCAT (ex. COD1_Alarms)
     WarningsIn          : UINT;        // Brut EtherCAT (ex. COD1_Warnings) — informatif seulement
-    SlaveOperational    : BOOL;        // FB_DiagEthercat — esclave EtherCAT opérationnel
+    SlaveOperational    : BOOL;        // FB_Diag_Ethercat — esclave EtherCAT opérationnel
     PointsPerRev        : UDINT := 8192;  // Résolution codeur confirmée (Partie10 §3.3)
     PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing via PRG_02_Encoders
     PresetValue         : UDINT;       // Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)

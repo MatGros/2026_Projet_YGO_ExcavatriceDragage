@@ -99,7 +99,7 @@ de cycle de vie du FB.
 | ✍️ Producteur unique | Une donnee, un ecrivain ; prouve par fiche contrat + `check_linkage.py`. |
 | ✅ `Valid` | Seulement si le lecteur a un repli documente quand `FALSE` (souvent mesures / safety). |
 | 🚫 Pas d'ID de connexion | Aucun `ProducerId`, signature ou jeton d'appairage dans les DUT internes. Surcharge et fausse securite en CFC local. |
-| 📡 Bus terrain | Identite = adresse device + diag existant (`FB_DiagEthercat`, `FB_DiagCanOpen`, OP/erreur). Pas de second ID applicatif. |
+| 📡 Bus terrain | Identite = adresse device + diag existant (`FB_Diag_Ethercat`, `FB_Diag_CanOpen`, OP/erreur). Pas de second ID applicatif. |
 | ⚡ Fail-safe physique | Chaine AU / maintien A-B : absence de commande saine = coupure ; le logiciel ne remplace pas ce filet. |
 
 ## 👁️ 5. Regles CFC

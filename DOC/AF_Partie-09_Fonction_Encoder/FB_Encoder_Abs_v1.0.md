@@ -37,7 +37,7 @@ Brique de **qualification d'entrée** (Partie3 §2) : lit la position brute Ethe
 | `RawPosIn` | UDINT | Position brute issue du variateur/bus EtherCAT |
 | `AlarmsIn` | UINT | Alarmes matérielles brutes |
 | `WarningsIn` | UINT | Avertissements matériels bruts — informatif seulement |
-| `SlaveOperational` | BOOL | État opérationnel de l'esclave EtherCAT (`FB_DiagEthercat`) |
+| `SlaveOperational` | BOOL | État opérationnel de l'esclave EtherCAT (`FB_Diag_Ethercat`) |
 | `PointsPerRev` | UDINT := 8192 | Résolution codeur |
 | `PresetRequest` | BOOL (front) | Demande d'écriture de preset (issue de `FB_Encoder_Homing`) |
 | `PresetValue` | UDINT | Valeur brute de preset à appliquer |

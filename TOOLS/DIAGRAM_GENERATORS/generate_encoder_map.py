@@ -24,7 +24,7 @@ left to right direction
 title <img:open-iconic/graph> Architecture, Traitement & Recalage Homing Codeurs EtherCAT (FB_Encoder_Abs)
 
 package "1. <img:open-iconic/input> BUS ETHERCAT (4ms)" as PKG_ECAT #E3F2FD {
-  rectangle "<img:open-iconic/input>\nCODEURS ABSOLUS (COD1 / COD2)\n---\n• RawEncoderValue : DWORD (32 bits)\n• StatusWord : WORD\n• FB_DiagEthercat (.Online / .Operational)" as ECAT #BBDEFB
+  rectangle "<img:open-iconic/input>\nCODEURS ABSOLUS (COD1 / COD2)\n---\n• RawEncoderValue : DWORD (32 bits)\n• StatusWord : WORD\n• FB_Diag_Ethercat (.Online / .Operational)" as ECAT #BBDEFB
 }
 
 package "2. <img:open-iconic/graph> TRAITEMENT INTERNE FB_ENCODER_ABS" as PKG_ENC #E8F5E9 {

@@ -8,10 +8,10 @@
 
 PROGRAM PRG_01_Diagnostics
 VAR
-    instDiagCanOpen  : FB_DiagCanOpen;       // Diagnostic CAN/Joystick
-    instDiagEthercat : FB_DiagEthercat;      // Diagnostic EtherCAT (3 devices)
+    instDiagCanOpen  : FB_Diag_CanOpen;       // Diagnostic CAN/Joystick
+    instDiagEthercat : FB_Diag_Ethercat;      // Diagnostic EtherCAT (3 devices)
     instJoystick    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
-    instIhmHeartbeat : FB_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
+    instIhmHeartbeat : FB_Diag_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
 
     // 🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
     // valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device).
@@ -28,7 +28,7 @@ END_VAR
 
 // 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
 // depuis l'image matérielle HwIn produite par PRG_ACQUISITION_CFC.
-// C'est FB_DiagCanOpen/FB_DiagEthercat qui décident désormais seuls Online/Operational/State
+// C'est FB_Diag_CanOpen/FB_Diag_Ethercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
 RawCanBusState    := PRG_ACQUISITION_CFC.HwIn.Operator.CanBusState;
 RawJoystickState  := PRG_ACQUISITION_CFC.HwIn.Operator.JOY1_DeviceState;

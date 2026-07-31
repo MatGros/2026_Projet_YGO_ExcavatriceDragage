@@ -1,9 +1,9 @@
 (* ═══════════════════════════════════════════════════════════════
-   ⚖️ FB_WinchSymmetry — Mesure passive MES-008 M1/M2
+   ⚖️ FB_Diag_WinchSymmetry — Mesure passive MES-008 M1/M2
    📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
    🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
    ═══════════════════════════════════════════════════════════════ *)
-FUNCTION_BLOCK FB_WinchSymmetry
+FUNCTION_BLOCK FB_Diag_WinchSymmetry
 VAR_INPUT
     Reset : BOOL;
     M1CommandActive : BOOL;
@@ -12,10 +12,10 @@ VAR_INPUT
     M2Direction : INT;
     M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied : BOOL;
     M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M : REAL;
-    Config : ST_Winch_Symmetry_Cfg;
+    Config : ST_Diag_Winch_SymmetryCfg;
 END_VAR
 VAR_IN_OUT
-    Data : ST_Winch_Symmetry_Data;
+    Data : ST_Diag_Winch_SymmetryData;
 END_VAR
 VAR_OUTPUT
     SymmetryOk : BOOL;

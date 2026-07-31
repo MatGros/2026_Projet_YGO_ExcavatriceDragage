@@ -1,8 +1,8 @@
-# FB_WinchSymmetry — Spec composant (v1.0)
+# FB_Diag_WinchSymmetry — Spec composant (v1.0)
 
 > Rôle machine : [`AF_Partie-10_Fonction_Winch_v2.0.md`](../AF_Partie-10_Fonction_Winch_v2.0.md) §6.3bis.  
 > Rôle de **ce** document : observateur passif de symétrie et de synchronisme M1/M2 (MES-008).  
-> Source code : `CODE/DIAG/FB_WinchSymmetry.st` · instance unique dans `PRG_11_Troubleshooting`.  
+> Source code : `CODE/DIAG/FB_Diag_WinchSymmetry.st` · instance unique dans `PRG_11_Troubleshooting`.  
 
 ## 🧭 Sommaire
 
@@ -24,7 +24,7 @@
 
 Brique de **diagnostic passif** (Partie3 §2) : aucun effet direct sur les sorties de commande ni la chaîne de sécurité.
 
-`FB_WinchSymmetry` compare en continu le comportement des deux treuils principaux (**M1 Retenue** et **M2 Benne**) lorsqu'ils reçoivent des ordres de marche simultanés et dans le même sens.
+`FB_Diag_WinchSymmetry` compare en continu le comportement des deux treuils principaux (**M1 Retenue** et **M2 Benne**) lorsqu'ils reçoivent des ordres de marche simultanés et dans le même sens.
 
 ---
 
@@ -40,9 +40,9 @@ Brique de **diagnostic passif** (Partie3 §2) : aucun effet direct sur les sorti
 | `M1Position_M/M2Position_M` | REAL | Positions mesurées codeurs (m) |
 | `M1Speed_Mps/M2Speed_Mps` | REAL | Vitesses mesurées codeurs (m/s) |
 | `SyncDeviation_M` | REAL | Écart instantané de synchronisme (m) |
-| `Config` | ST_Winch_Symmetry_Cfg | Seuils de tolérance et durées de qualification |
+| `Config` | ST_Diag_Winch_SymmetryCfg | Seuils de tolérance et durées de qualification |
 
-**Structure de données / InOut** : `Data : ST_Winch_Symmetry_Data` (résultats mesurés).  
+**Structure de données / InOut** : `Data : ST_Diag_Winch_SymmetryData` (résultats mesurés).  
 **Sorties** : `SymmetryOk` (BOOL, TRUE si tous deltas < seuils), `SymmetryValid` (BOOL, TRUE si mesure qualifiée).
 
 ---

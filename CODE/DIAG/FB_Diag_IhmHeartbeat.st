@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   💓 FB_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
+   💓 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
    ───────────────────────────────────────────────────────────────
    📄 Doc : DOC/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
    🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
@@ -8,7 +8,7 @@
       de leurs réactions métier.
    ═══════════════════════════════════════════════════════════════ *)
 
-FUNCTION_BLOCK PUBLIC FB_IhmHeartbeat
+FUNCTION_BLOCK PUBLIC FB_Diag_IhmHeartbeat
 VAR_INPUT
     Enable              : BOOL;              // Active la surveillance ; FALSE = IHM non valide
     TglHeartbeatIhm  : BOOL;              // Toggle IHM, inversion attendue toutes les 500 ms

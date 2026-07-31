@@ -26,7 +26,7 @@ Source: `DOC/PLAN_TASK_v1.0.md` (§ Plan orchestré, §2 Tâches/Features, §3 R
 | **T74** | Translation: LimitSwitch (bit6) escalade sans fenêtre de confirmation — à harmoniser style Méca | 🟠 non fait | `FB_Safety_Translation.st bit6` |
 | **T47** | Garde-fou passage de palier implémenté mais **non activé** (`SpeedGuardEnable=FALSE`) — anti-décrochage moteur/disjonction, pas confort. Raison métier pas encore inscrite dans AF_Partie-09 | 🔴 activation bloquée par calibration (T94/T95) | `FB_SpeedStep:230-238`, `GVL_PERSISTENT._WinchSpeedConfig` |
 | **T94** | Rendre `SpeedGuardEnableM1/M2` PERSISTENT + exposés IHM MAINT_N2 (actuellement VAR locales PRG_06, perdues au download) | 🟠 non fait | `PRG_06_WinchControl:31-32` |
-| **T95** | Outil calibration bandes vitesse (mesure `VitesseMax[1..5]` par palier, à vide/charge) — étendre `FB_WinchSymmetry` | 🟠 non fait | `FB_WinchSymmetry`, T45/T47 |
+| **T95** | Outil calibration bandes vitesse (mesure `VitesseMax[1..5]` par palier, à vide/charge) — étendre `FB_Diag_WinchSymmetry` | 🟠 non fait | `FB_Diag_WinchSymmetry`, T45/T47 |
 | **T83** | `IhmHeartbeat` défaut `TRUE` provisoire (RETAIN) — **repasser à FALSE avant livraison** sinon perte IHM ne déclenche plus SafeStop | 🟠 action livraison | `PRG_01_Diagnostics.st:64-67` |
 
 ## 🟠 Fonctionnel — validation terrain/CODESYS en attente (code déjà écrit)
@@ -53,7 +53,7 @@ Source: `DOC/PLAN_TASK_v1.0.md` (§ Plan orchestré, §2 Tâches/Features, §3 R
 |---|---|---|
 | T75 | `check_code_style.py` exemption obsolète, à corriger précisément | `TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py` |
 | T76 | `FB_Cycle.st:112` `DrainingTime` en dur, jamais câblé IHM/persistant | `FB_Cycle.st:112` |
-| T77 | Refacto architecture diag: transmettre objets bruts au lieu d'expressions pré-calculées | `PRG_01_Diagnostics.st`, `FB_DiagCanOpen.st`, `FB_DiagEthercat.st` |
+| T77 | Refacto architecture diag: transmettre objets bruts au lieu d'expressions pré-calculées | `PRG_01_Diagnostics.st`, `FB_Diag_CanOpen.st`, `FB_Diag_Ethercat.st` |
 | T78 | Rampe accel 50%→10%/s + égalisation dynamique M1/M2 mode couplé — **attend décision T93** | `PRG_06_WinchControl.st`, `FB_Winch.st` |
 | T79 | Config Trace CODESYS diagnostic arrêt différencié M1/M2 (à documenter, pas coder) | CODESYS Trace |
 | T88 | `FB_CycleTime` bouclage `TIME()` ~49.7j non géré, garde-fou proposé | `AUDIT_Revue_Technique_v1.0.md §8` |
