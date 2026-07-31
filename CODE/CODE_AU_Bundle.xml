@@ -1968,7 +1968,7 @@ Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c3f8a1e6-9a2d-4b7e-8f3a-1e6d9c2b5a70</ObjectId>
+            <ObjectId>e301096b-b905-5c3d-96fa-3afcf1106a59</ObjectId>
           </data>
         </addData>
       </pou>
@@ -2910,6 +2910,13 @@ END_CASE;
             </data>
           </addData>
         </body>
+        <addData>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+              <ObjectId>5ca2a345-56a2-58c8-9723-1de144dc50a4</ObjectId>
+            </data>
+          </addData>
+        </addData>
       </pou>
     </pous>
   </types>
