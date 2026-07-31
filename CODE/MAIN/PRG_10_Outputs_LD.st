@@ -25,6 +25,9 @@ VAR_OUTPUT
     M2SpeedContactor4 : BOOL;
     M2BrakeCmd        : BOOL;
     TranslationBrakeCmd : BOOL;
+    PowerKeepAlive_A_RQ : BOOL;
+    PowerKeepAlive_B_RQ : BOOL;
+    EmergencyArming_RQ  : BOOL;
     EmergencyArmingPulseActive   : BOOL;
     EmergencyArmingLockoutActive: BOOL;
     ArmingSeqStep                : INT;

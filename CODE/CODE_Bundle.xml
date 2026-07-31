@@ -22791,788 +22791,159 @@ Done := FALSE;
           </data>
         </addData>
       </pou>
-      <pou name="PRG_00_Inputs" pouType="program">
+      <pou name="PRG_00_ACQUISITION_CFC" pouType="program">
         <interface>
-          <inputVars />
-          <outputVars>
-            <variable name="HwReal">
+          <localVars>
+            <variable name="instJoystick">
               <type>
-                <derived name="ST_HardwareImage" />
+                <derived name="FB_Joystick" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── 🏗️ FRONTIÈRE UNIQUE HW (Image matérielle brute) ────────────────────
-Image matérielle brute (acquis §0)</xhtml>
-              </documentation>
             </variable>
-            <variable name="HwSim">
+            <variable name="instEncoderAbsM1">
               <type>
-                <derived name="ST_HardwareImage" />
+                <derived name="FB_Encoder_Abs" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image produite par le banc (observation uniquement)</xhtml>
-              </documentation>
             </variable>
-            <variable name="HwIn">
+            <variable name="instEncoderScaleM1">
               <type>
-                <derived name="ST_HardwareImage" />
+                <derived name="FB_Encoder_Scale" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image d'entrée consommée par tout le programme (§0bis)</xhtml>
-              </documentation>
             </variable>
-            <variable name="WinchInputSourceChanged">
+            <variable name="instHomingM1">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Homing" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse générique : bascule atomique réel ↔ simulé du domaine Winch</xhtml>
-              </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="instEncoderAbsM2">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Abs" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── 🛑 SÉCURITÉS COMMUNES (NC — repos=TRUE sain, FALSE=défaut/fil coupé) ──────────────
-🔧 REX 2026-07-07 : précision terrain — PowerContactorEngaged_DI (retour contact auxiliaire NO)
-est en fait la confirmation que le CONTACTEUR DE PUISSANCE est réellement engagé (1=actif),
-PAS la boucle AU elle-même (ça, c'est EmergencyChainClosed_DI, ci-dessous). Nom PowerContactorEngaged
-conservé tel quel (contrat FB standard Partie3 §1, utilisé partout) — reste le portail
-maître du programme, car "puissance réellement présente" est la garantie la plus forte.
-🚨 Contacteur de puissance confirmé engagé : TRUE=armé/actif ✅ | FALSE=non armé ou coupure 🔴</xhtml>
-              </documentation>
             </variable>
-            <variable name="EmergencyChainClosed">
+            <variable name="instEncoderScaleM2">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Scale" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 REX 2026-07-07 : boucle AU (coup-de-poing + contact PLC) : TRUE=saine ✅ | FALSE=AU appuyé ou PowerCutOff PLC actif 🔴 — précondition à l'armement, PAS le portail maître</xhtml>
-              </documentation>
             </variable>
-            <variable name="TopPositionSensor">
+            <variable name="instHomingM2">
               <type>
-                <BOOL />
+                <derived name="FB_Encoder_Homing" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔝 Fin de course HAUT (NC) : TRUE=libre ✅ | FALSE=butée atteinte 🔴→ForbidAscent</xhtml>
-              </documentation>
             </variable>
-            <variable name="SlackCableSwitch">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Mou câble sur tambour M2 (NC) : TRUE=câble tendu ✅ | FALSE=mou détecté 🔴→ForbidDescent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactFond">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Retour détecteur fond Kobold (NO) : TRUE=contact fond détecté ✅</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PhaseRotationOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rotation phases élec. (NC) : TRUE=phases OK ✅ | FALSE=inversées/absentes 🔴→SafeStop</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeThermalFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : retour thermique COMMUN aux 3 freins M1/M2/M3 (1 seul fil, impossible
-de savoir lequel des 3 est en cause) — demande utilisateur : la perte de ce retour peut
-signifier un frein qui colle instantanément (frein à manque de courant) → traité comme
-les autres défauts francs du domaine, escalade PowerCutOff côté FB_Safety_Winch/_Translation
-(voir bit10/bit3 respectifs).
-🌡️ Thermique frein M1/M2/M3 commun (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1FwdRevSpeedFeedbackOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── 🪝 TREUIL M1 (frein=NC ; feedback contacteurs=retour unique REX 2026-07-07) ─────
-📡 REX 2026-07-07 : retour unique "tous contacteurs (sens+vitesse)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1ThermalFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">retombés" M1 — remplace M1ContactorFeedbackFwd/Rev (feedback
-individuel par sens supprimé côté matériel, plus jamais câblé).
-TRUE = tous retombés (sain, rien d'engagé)
-🌡️ Thermique moteur M1 (NC) : TRUE=temp OK ✅ | FALSE=surchauffe ou coupure 🔴</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1BrakeFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Retour frein M1 normalisé : TRUE=serré, FALSE=desserré.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1BrakeCommandOpenConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Contacteur/bobine desserrage confirmé, pas une mesure mécanique frein.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2FwdRevSpeedFeedbackOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Le DI physique vaut 1 quand le frein est OUVERT (image du contacteur
-de commande) — inversion faite par BrakeFeedbackInvertLogic, voir VAR.
-── 🪝 TREUIL M2 (même logique que M1) ──────────────────────────────────────────────
-📡 REX 2026-07-07 : idem M1, voir ci-dessus</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ThermalFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Thermique moteur M2 (NC) : TRUE=surchauffe ou coupure 🔴→SafeStop+PowerCutOff</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BrakeFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Retour frein M2 normalisé : TRUE=serré, FALSE=desserré.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BrakeCommandOpenConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Contacteur/bobine desserrage confirmé, pas une mesure mécanique frein.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Même remarque que M1 (DI physique = 1 quand frein ouvert).
-── ↔️ TRANSLATION M3 (capteurs position=NO — position atteinte=TRUE) ────────────────────
-🆕 REX 2026-07-18 : décision client (AF_Partie-02 v2.12 §3bis) — 5 capteurs Trémie|PV|P2|P1|
-Maintenance (ex-Fosse1/Fosse2/Maintenance/Trémie, 4 capteurs). PV=pré-ralentissement avant
-Trémie. Décodage du mot + limites extrêmes + incohérence : voir FB_Translation_PositionDecoder
-(PRG_07_TranslationControl).
-🗑️ Position trémie vidange (NO), extrême gauche : TRUE=en position trémie ✅ | FALSE=absent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Pré-ralentissement (Point de Vitesse) avant Trémie (NO) : TRUE=zone PV atteinte ✅ | FALSE=absent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Position P2 (NO, ex-Fosse2) : TRUE=translation en P2 ✅ | FALSE=absent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Position P1 (NO, ex-Fosse1) : TRUE=translation en P1 ✅ | FALSE=absent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Position maintenance (NO), extrême droite, accès MAINT_N2 uniquement : TRUE=en position service ✅ | FALSE=absent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3BrakeFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Retour frein M3 normalisé : TRUE=serré, FALSE=desserré.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3BrakeCommandOpenConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Contacteur/bobine desserrage confirmé, pas une mesure mécanique frein.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instPositionDecoder">
+            <variable name="instPosDecoderM3">
               <type>
                 <derived name="FB_Translation_PositionDecoder" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Même remarque que M1/M2 (DI physique = 1 quand frein ouvert).
-🆕 REX 2026-07-21 : décodage du mot des 5 capteurs position M3 (position 0, avant PRG_03_Safety)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_StatusWord_Filtered">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-            <variable name="M3_ActualFrequencyHz_Filtered">
-              <type>
-                <UINT />
-              </type>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="instPowerContactorEngaged">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instances de filtrage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instEmergencyChainClosed">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instSlackCableSwitch">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instKoboldContactFond">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTopPositionSensor">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instCtrlPhaseRotation">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instBrakeThermalFeedback">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instM1FwdRevSpeedFeedbackOff">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 : remplace instM1ContactorFwd/Rev</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instM1Thermal">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instM1BrakeFeedback">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instM2FwdRevSpeedFeedbackOff">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 : remplace instM2ContactorFwd/Rev</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instM2Thermal">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instM2BrakeFeedback">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTranslationPosTremie">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTranslationPosPV">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTranslationPosP2">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTranslationPosP1">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instTranslationPosMaintenance">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instM3BrakeFeedback">
-              <type>
-                <derived name="FB_Input" />
-              </type>
-            </variable>
-            <variable name="instSimBench">
-              <type>
-                <derived name="FB_SimBench" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Instance de simulation banc d'essai (Lot L6)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HmiCommandsInitialized">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧹 Purge one-shot des commandes IHM RETAIN, avant leur première consommation.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchInputSourceSimulated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mémoire privée de la source Winch ; aucun détail de simulation ne sort de PRG_00.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PreviousWinchInputSourceSimulated">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="WinchInputSourceInitialized">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BrakeFeedbackInvertLogic">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔩 ═══ POINT DE BASCULE UNIQUE — POLARITÉ DU RETOUR FREIN M1/M2/M3 ═══
-🆕 REX 2026-07-26 (relevé terrain) : le frein est à MANQUE DE COURANT (sortie PLC = 1 →
-frein OUVERT). Le retour câblé est l'état du CONTACTEUR DE COMMANDE : s'il est commandé,
-donc frein ouvert, on reçoit 1. Câblage réel : DI = 1 ⟺ frein OUVERT.
-Or tout le programme aval (FB_Safety_Winch Méca A/B/D/E, FB_Safety_Translation Méca B,
-FB_Brake) raisonne en « TRUE = frein SERRÉ » — l'état sûr. On normalise donc ICI, à la
-frontière, via l'inversion NO/NC de FB_Input (rôle prévu, voir AF_Partie-06 §1).
-👉 SUR SITE : si la mesure montre que le retour est en fait inversé (DI = 1 ⟺ frein serré),
-passer CETTE SEULE VARIABLE à FALSE. Rien d'autre à toucher dans tout le programme.
-Modifiable à chaud en vue instance, sans recompiler.</xhtml>
-              </documentation>
             </variable>
           </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">══════════════════════════════════════════════════════════════════════════
-   📥 PRG_00_Inputs — ACQUISITION &amp; CONDITIONNEMENT       ⚙️ scan position 0
-   ══════════════════════════════════════════════════════════════════════════
-   §0  MATÉRIEL ──► HwReal (Acquisition brute unique)
-   §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine)
-   §1  HwIn     ──► FB_Input ──► VAR_OUTPUT (Filtre 20 ms, polarité NO/NC)
-   §2  Décodage mot capteurs M3
-   ══════════════════════════════════════════════════════════════════════════
-   MAP CARTE DES BLOCAGES — ce qui empêche la machine de bouger si FALSE
-   [BLOQUE] mouvement interdit · [ESCAL.] escalade safety · [DIAG] information seule
-   ┌──────────────────────────┬──────────┬─────────────────────────────────┐
-   │ PowerContactorEngaged          │ [BLOQUE] │ portail maître — tout le prog.  │
-   │ TopPositionSensor        │ [BLOQUE] │ ForbidAscent M1+M2 (hors bypass)│
-   │ SlackCableSwitch         │ [BLOQUE] │ ForbidDescent M2                │
-   │ BrakeThermalFeedback     │ [ESCAL.] │ SafeStop + PowerCutOff (3 axes) │
-   │ PhaseRotationOk          │ [ESCAL.] │ SafeStop (3 axes)               │
-   │ M1/M2ThermalFeedback     │ [ESCAL.] │ SafeStop axe                    │
-   │ M1/M2/M3BrakeFeedback    │ [ESCAL.] │ Méca A/B/D si arrêt non confirmé│
-   │ KoboldContactFond        │ [BLOQUE] │ cycle figé BOTTOM_TOUCH_WAIT    │
-   │ HydraulicThermalOk       │ [DIAG]   │ aucun effet sur le mouvement    │
-   └──────────────────────────┴──────────┴─────────────────────────────────┘
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §5
-   ⚙️ Exécuté par la tâche PLC (Task Manager) en position 0.
-   ✅ Expose ses sorties en VAR_OUTPUT (lecture seule pour le reste du code).
-   ══════════════════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
         </interface>
         <body>
           <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (corps du PROGRAM PRG_00_Inputs) ===
-
-// 🧹 WINCH-CORE-01 — PURGE COMMANDES IHM RETAIN AU BOOT
-// PRG_00 est exécuté avant PRG_01..PRG_10 : aucune commande mémorisée ne peut donc
-// produire un front ou un mouvement pendant le premier scan. Les états sûrs maintenus
-// (`BtnEmergencyCutOff`, inhibitions) ne sont volontairement pas effacés.
-IF NOT HmiCommandsInitialized THEN
-    GVL_IHM.HmiInitDone := FALSE;
-
-    // 🔧 REX 2026-07-24 (demande utilisateur) : Les boutons d'acquittement/reset (BtnFaultReset, etc.)
-    // ne sont plus écrasés en boucle à FALSE par l'automate. Les blocs métier utilisent leur propre R_TRIG (ResetEdge).
-    // Cela permet au technicien terrain de basculer la variable librement à 1 puis 0 dans CODESYS.
-    GVL_IHM.Modes.Cmd.BtnEmergencyArming := FALSE;
-
-    GVL_IHM.M1TreuilRetenue.Cmd.BtnHome := FALSE;
-    GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault := FALSE;
-    GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence := FALSE;
-    GVL_IHM.M2TreuilBenne.Cmd.BtnHome := FALSE;
-    GVL_IHM.M2TreuilBenne.Bypass.EncoderFault := FALSE;
-    GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence := FALSE;
-
-    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen := FALSE;
-    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose := FALSE;
-    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos := FALSE;
-    GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos := FALSE;
-
-    GVL_IHM.Cycle.Cmd.BtnStart := FALSE;
-    GVL_IHM.Cycle.Cmd.BtnPause := FALSE;
-    GVL_IHM.Cycle.Cmd.BtnAbort := FALSE;
-
-    GVL_IHM.TranslationM3.Cmd.SelPositioning := FALSE;
-    GVL_IHM.TranslationM3.Cmd.BtnFwd := FALSE;
-    GVL_IHM.TranslationM3.Cmd.BtnRev := FALSE;
-    GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate := FALSE;
-
-    HmiCommandsInitialized := TRUE;
-    GVL_IHM.HmiInitDone := TRUE;
-END_IF;
-
-
-// ─── §0 MATÉRIEL ──► HwReal (Acquisition brute unique) ──────────────────────
-// Winch M1/M2 &amp; Codeurs
-HwReal.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased_DI;
-HwReal.Winch.M1_ThermalOk_DI          := M1_ThermalOk_DI;
-HwReal.Winch.M1_BrakeIsOpen_DI        := M1_BrakeIsOpen_DI;
-
-HwReal.Winch.M2_ContactorsReleased_DI := M2_ContactorsReleased_DI;
-HwReal.Winch.M2_ThermalOk_DI          := M2_ThermalOk_DI;
-HwReal.Winch.M2_BrakeIsOpen_DI        := M2_BrakeIsOpen_DI;
-
-HwReal.Winch.M1M2_TopPositionFree_DI  := M1M2_TopPositionFree_DI;
-HwReal.Winch.M2_TensionedCable_DI     := M2_TensionedCable_DI;
-
-HwReal.Winch.COD1_PosValue            := COD1_PosValue;
-HwReal.Winch.COD1_Alarms              := COD1_Alarms;
-HwReal.Winch.COD1_Warnings            := COD1_Warnings;
-HwReal.Winch.COD1_DeviceState         := COD1_CODEUR.GetDeviceState();
-
-HwReal.Winch.COD2_PosValue            := COD2_PosValue;
-HwReal.Winch.COD2_Alarms              := COD2_Alarms;
-HwReal.Winch.COD2_Warnings            := COD2_Warnings;
-HwReal.Winch.COD2_DeviceState         := COD2_CODEUR.GetDeviceState();
-
-// Translation M3 &amp; AC600
-HwReal.Translation.M3_PosTremie_DI      := M3_PosTremie_DI;
-HwReal.Translation.M3_PosPV_DI          := M3_PosPV_DI;
-HwReal.Translation.M3_PosP2_DI          := M3_PosP2_DI;
-HwReal.Translation.M3_PosP1_DI          := M3_PosP1_DI;
-HwReal.Translation.M3_PosMaintenance_DI := M3_PosMaintenance_DI;
-HwReal.Translation.M3_BrakeIsOpen_DI    := M3_BrakeIsOpen_DI;
-HwReal.Translation.M3_StatusWord        := M3_StatusWord;
-HwReal.Translation.M3_ActualFrequencyHz := M3_ActualFrequencyHz;
-HwReal.Translation.AC600_DeviceState    := AC600_ECAT_Drive.GetDeviceState();
-
-// Opérateur / Joystick / CANopen
-HwReal.Operator.JoyXRaw_ANA1      := JoyXRaw_ANA1;
-HwReal.Operator.JoyYRaw_ANA2      := JoyYRaw_ANA2;
-HwReal.Operator.JoyBtnRaw         := JoyBtnRaw;
-HwReal.Operator.CanBusState       := CANbus.GetBusState();
-HwReal.Operator.JOY1_DeviceState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState();
-
-// Sécurités / Communs Machine
-HwReal.Machine.PowerContactorEngaged_DI   := PowerContactorEngaged_DI;
-HwReal.Machine.EmergencyChainClosed_DI    := EmergencyChainClosed_DI;
-HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
-HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
-HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
-HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
-
-
-// ─── §0bis HwReal / SimBench ──► HwIn (Aiguillage simulation par domaine) ────
-instSimBench(
-    Enable                   := GVL_Simulation.SimulationModeActive,
-    M1_RelayFwd              := GVL_Global.M1RelayFwd,
-    M1_RelayRev              := GVL_Global.M1RelayRev,
-    M1_SpeedContactor_1      := GVL_Global.M1SpeedContactor1,   // 🔧 REX 2026-07-27 : paliers
-    M1_SpeedContactor_2      := GVL_Global.M1SpeedContactor2,   // inclus dans le retour unique
-    M1_SpeedContactor_3      := GVL_Global.M1SpeedContactor3,   // « tous contacteurs retombés »
-    M1_SpeedContactor_4      := GVL_Global.M1SpeedContactor4,
-    M1_Thermal               := instM1Thermal.State,
-    M1_BrakeIsOpen           := instM1BrakeFeedback.State,
-    M1_SpeedRefPct           := PRG_06_WinchControl.M1_SpeedRef_Active,
-    M1_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd,
-    M1_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut,
-    M1_BrakeCmd              := GVL_Global.M1BrakeCmd,
-    M2_RelayFwd              := GVL_Global.M2RelayFwd,
-    M2_RelayRev              := GVL_Global.M2RelayRev,
-    M2_SpeedContactor_1      := GVL_Global.M2SpeedContactor1,   // 🔧 REX 2026-07-27 : idem M1
-    M2_SpeedContactor_2      := GVL_Global.M2SpeedContactor2,
-    M2_SpeedContactor_3      := GVL_Global.M2SpeedContactor3,
-    M2_SpeedContactor_4      := GVL_Global.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_06_WinchControl.M2_SpeedRef_Active,
-    M2_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd,
-    M2_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut,
-    M2_BrakeCmd              := GVL_Global.M2BrakeCmd,
-    M3_Direction             := PRG_07_TranslationControl.M3_Direction_Active,
-    M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
-    M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
-    M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
-    // 🧪 Chaîne AU sim = image des Q physiques (scan N-1, comme le terrain).
-    // ❌ Ne pas brancher Pulse/Lockout/BtnArming : ça court-circuite le FB Emergency.
-    PowerKeepAlive_A         := PowerKeepAlive_A_RQ,
-    PowerKeepAlive_B         := PowerKeepAlive_B_RQ,
-    EmergencyArming_RQ       := EmergencyArming_RQ,
-    SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
-    SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
-    SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
-    SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
-    SimM3SensorsWordActive   := GVL_Simulation.SimM3SensorsWordActive,
-    SimM3SensorsWord         := GVL_Simulation.SimM3SensorsWord,
-    SimJoystickRawX          := GVL_Simulation.SimJoystickRawX,
-    SimJoystickRawY          := GVL_Simulation.SimJoystickRawY,
-    SimJoystickRawButton     := GVL_Simulation.SimJoystickRawButton,
-    SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
-    BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
-    HwReal                   := HwReal,
-    RawPosM1                 := _SimEncoderRawPosM1,
-    RawPosM2                 := _SimEncoderRawPosM2
-);
-
-// 🧪 Image du banc exposée pour lecture côte à côte ; aucune logique métier ne lit HwSim.
-HwSim.Winch       := instSimBench.Winch;
-HwSim.Translation := instSimBench.Translation;
-HwSim.Operator    := instSimBench.Operator;
-HwSim.Machine     := instSimBench.Machine;
-
-// 🔄 Source Winch atomique + pulse générique. Au boot, la source initiale est mémorisée sans faux pulse.
-WinchInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-IF NOT WinchInputSourceInitialized THEN
-    PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
-    WinchInputSourceInitialized := TRUE;
-    WinchInputSourceChanged := FALSE;
-ELSE
-    WinchInputSourceChanged := (WinchInputSourceSimulated &lt;&gt; PreviousWinchInputSourceSimulated);
-    PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
-END_IF;
-
-IF WinchInputSourceSimulated
-    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
-    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwReal.Translation; END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive
-    THEN HwIn.Operator := instSimBench.Operator;       ELSE HwIn.Operator := HwReal.Operator;       END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
-    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwReal.Machine;         END_IF;
-
-
-// ─── §1 HwIn ──► FB_Input ──► VAR_OUTPUT (Conditionnement des entrées) ───────
-
-//  🔌 HwIn.Machine.PowerContactorEngaged_DI ····· câblage réel : 1 = contacteur puissance engagé
-//         └─►[ instPowerContactorEngaged 🔩 ]         ← filtre anti-rebond 20 ms
-//                └─► PowerContactorEngaged ··········· [BLOQUE] TRUE = puissance présente ✅ (portail maître)
-//                       └─► PRG_01..11 · FB_Safety_* · FB_Cycle · FB_Winch
-instPowerContactorEngaged(InputRaw := HwIn.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
-PowerContactorEngaged := instPowerContactorEngaged.State;
-
-//  🔌 HwIn.Machine.EmergencyChainClosed_DI ······ câblage réel : 1 = boucle AU fermée
-//         └─►[ instEmergencyChainClosed 🔩 ]          ← filtre anti-rebond 20 ms
-//                └─► EmergencyChainClosed ············ [BLOQUE] TRUE = boucle AU saine ✅ (précondition armement)
-//                       └─► PRG_03_Safety · PRG_06_WinchControl · PRG_11_Troubleshooting
-instEmergencyChainClosed(InputRaw := HwIn.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
-EmergencyChainClosed := instEmergencyChainClosed.State;
-
-//  🔌 HwIn.Winch.M2_TensionedCable_DI ··········· câblage réel : 1 = câble tendu (NC)
-//         └─►[ instSlackCableSwitch 🔩 ]        ← filtre anti-rebond 20 ms
-//                └─► SlackCableSwitch ·········· [BLOQUE] TRUE = câble tendu ✅ | FALSE = mou 🔴→ForbidDescent M2
-//                       └─► PRG_03_Safety (instSafetyWinchM1/M2) · PRG_11_Troubleshooting
-instSlackCableSwitch(InputRaw := HwIn.Winch.M2_TensionedCable_DI, FilterTime := T#20MS);
-SlackCableSwitch := instSlackCableSwitch.State;
-
-//  🔌 HwIn.Machine.M1_M2_KoboldContactFond_DI ·· câblage réel : 1 = contact fond détecté (NO)
-//         └─►[ instKoboldContactFond 🔩 ]       ← filtre anti-rebond 20 ms
-//                └─► KoboldContactFond ········· [BLOQUE] TRUE = fond touché ✅ → cycle figé BOTTOM_TOUCH_WAIT
-//                       └─► PRG_05_Cycle (instCycle) · PRG_09_Supervision
-instKoboldContactFond(InputRaw := HwIn.Machine.M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
-KoboldContactFond := instKoboldContactFond.State;
-
-//  🔌 HwIn.Winch.M1M2_TopPositionFree_DI ········ câblage réel : 1 = fin de course libre (NC)
-//         └─►[ instTopPositionSensor 🔩 ]       ← filtre anti-rebond 20 ms
-//                └─► TopPositionSensor ········· [BLOQUE] TRUE = libre ✅ | FALSE = butée haute 🔴→ForbidAscent M1+M2
-//                       └─► PRG_02_Encoders (instHomingM1/M2) · PRG_03_Safety
-instTopPositionSensor(InputRaw := HwIn.Winch.M1M2_TopPositionFree_DI, FilterTime := T#20MS);
-TopPositionSensor := instTopPositionSensor.State;
-
-//  🔌 HwIn.Machine.PhaseRotationOk_DI ··········· câblage réel : 1 = rotation phases correcte (NC)
-//         └─►[ instCtrlPhaseRotation 🔩 ]       ← filtre anti-rebond 20 ms
-//                └─► PhaseRotationOk ··········· [ESCAL.] TRUE = phases OK ✅ | FALSE = inversées 🔴→SafeStop 3 axes
-//                       └─► PRG_03_Safety (instSafetyWinchM1/M2/TranslationM3)
-instCtrlPhaseRotation(InputRaw := HwIn.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
-PhaseRotationOk := instCtrlPhaseRotation.State;
-
-//  🔌 HwIn.Machine.BrakeThermalOk_DI ············ câblage réel : 1 = temp. freins OK (NC, commun M1/M2/M3)
-//         └─►[ instBrakeThermalFeedback 🔩 ]    ← filtre anti-rebond 20 ms
-//                └─► BrakeThermalFeedback ····· [ESCAL.] TRUE = temp OK ✅ | FALSE = surchauffe 🔴→SafeStop+PowerCutOff
-//                       └─► PRG_03_Safety (instSafetyWinchM1/M2/TranslationM3)
-instBrakeThermalFeedback(InputRaw := HwIn.Machine.BrakeThermalOk_DI, FilterTime := T#20MS);
-BrakeThermalFeedback := instBrakeThermalFeedback.State;
-
-// 🪝 TREUIL M1
-//  🔌 HwIn.Winch.M1_ContactorsReleased_DI ······· câblage réel : 1 = tous contacteurs retombés
-//         └─►[ instM1FwdRevSpeedFeedbackOff 🔩 ]← filtre anti-rebond 20 ms
-//                └─► M1FwdRevSpeedFeedbackOff · [ESCAL.] TRUE = retombés ✅ | FALSE = contacteur collé 🔴→Méca A/C
-//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM1)
-instM1FwdRevSpeedFeedbackOff(InputRaw := HwIn.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
-M1FwdRevSpeedFeedbackOff := instM1FwdRevSpeedFeedbackOff.State;
-
-//  🔌 HwIn.Winch.M1_ThermalOk_DI ················ câblage réel : 1 = temp. moteur M1 OK (NC)
-//         └─►[ instM1Thermal 🔩 ]               ← filtre anti-rebond 20 ms
-//                └─► M1ThermalFeedback ········· [ESCAL.] TRUE = temp OK ✅ | FALSE = surchauffe 🔴 (NOTE: PRG_03 inverse en "TRUE=défaut")
-//                       └─► PRG_03_Safety (instSafetyWinchM1) · PRG_09_Supervision
-instM1Thermal(InputRaw := HwIn.Winch.M1_ThermalOk_DI, FilterTime := T#20MS);
-M1ThermalFeedback := instM1Thermal.State;
-
-//  🔌 HwIn.Winch.M1_BrakeIsOpen_DI ·············· câblage réel : 1 = contacteur commandé = DESSERRÉ
-//         └─►[ instM1BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-09 §5bis
-//                └─► M1BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
-//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM1 Méca A/B/D/E)
-instM1BrakeFeedback(InputRaw := HwIn.Winch.M1_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
-M1BrakeFeedback := instM1BrakeFeedback.State;
-M1BrakeCommandOpenConfirmed := NOT M1BrakeFeedback; // DI filtré : contacteur desserrage confirmé uniquement.
-
-// 🪝 TREUIL M2
-//  🔌 HwIn.Winch.M2_ContactorsReleased_DI ······· câblage réel : 1 = tous contacteurs retombés
-//         └─►[ instM2FwdRevSpeedFeedbackOff 🔩 ]← filtre anti-rebond 20 ms
-//                └─► M2FwdRevSpeedFeedbackOff · [ESCAL.] TRUE = retombés ✅ | FALSE = contacteur collé 🔴→Méca A/C
-//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM2)
-instM2FwdRevSpeedFeedbackOff(InputRaw := HwIn.Winch.M2_ContactorsReleased_DI, FilterTime := T#20MS);
-M2FwdRevSpeedFeedbackOff := instM2FwdRevSpeedFeedbackOff.State;
-
-//  🔌 HwIn.Winch.M2_ThermalOk_DI ················ câblage réel : 1 = temp. moteur M2 OK (NC)
-//         └─►[ instM2Thermal 🔩 ]               ← filtre anti-rebond 20 ms
-//                └─► M2ThermalFeedback ········· [ESCAL.] TRUE = temp OK ✅ | FALSE = surchauffe 🔴 (NOTE: PRG_03 inverse en "TRUE=défaut")
-//                       └─► PRG_03_Safety (instSafetyWinchM2) · PRG_09_Supervision
-instM2Thermal(InputRaw := HwIn.Winch.M2_ThermalOk_DI, FilterTime := T#20MS);
-M2ThermalFeedback := instM2Thermal.State;
-
-//  🔌 HwIn.Winch.M2_BrakeIsOpen_DI ·············· câblage réel : 1 = contacteur commandé = DESSERRÉ
-//         └─►[ instM2BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-09 §5bis
-//                └─► M2BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
-//                       └─► PRG_02_Encoders · PRG_03_Safety (instSafetyWinchM2 Méca A/B/D/E)
-instM2BrakeFeedback(InputRaw := HwIn.Winch.M2_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
-M2BrakeFeedback := instM2BrakeFeedback.State;
-M2BrakeCommandOpenConfirmed := NOT M2BrakeFeedback; // DI filtré : contacteur desserrage confirmé uniquement.
-
-// ↔️ TRANSLATION M3
-//  🔌 HwIn.Translation.M3_PosTremie_DI ········· câblage réel : 1 = position trémie atteinte (NO)
-//         └─►[ instTranslationPosTremie 🔩 ]    ← filtre anti-rebond 20 ms
-//                └─► TranslationPosTremie ····· [DIAG] TRUE = en position trémie ✅
-//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
-instTranslationPosTremie(InputRaw := HwIn.Translation.M3_PosTremie_DI, FilterTime := T#20MS);
-TranslationPosTremie := instTranslationPosTremie.State;
-
-//  🔌 HwIn.Translation.M3_PosPV_DI ············· câblage réel : 1 = zone PV atteinte (NO)
-//         └─►[ instTranslationPosPV 🔩 ]        ← filtre anti-rebond 20 ms
-//                └─► TranslationPosPV ········· [DIAG] TRUE = zone PV atteinte ✅ (pré-ralentissement Trémie)
-//                       └─► instPositionDecoder · PRG_09_Supervision
-instTranslationPosPV(InputRaw := HwIn.Translation.M3_PosPV_DI, FilterTime := T#20MS);
-TranslationPosPV := instTranslationPosPV.State;
-
-//  🔌 HwIn.Translation.M3_PosP2_DI ············· câblage réel : 1 = position P2 atteinte (NO)
-//         └─►[ instTranslationPosP2 🔩 ]        ← filtre anti-rebond 20 ms
-//                └─► TranslationPosP2 ········· [DIAG] TRUE = position P2 atteinte ✅
-//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
-instTranslationPosP2(InputRaw := HwIn.Translation.M3_PosP2_DI, FilterTime := T#20MS);
-TranslationPosP2 := instTranslationPosP2.State;
-
-//  🔌 HwIn.Translation.M3_PosP1_DI ············· câblage réel : 1 = position P1 atteinte (NO)
-//         └─►[ instTranslationPosP1 🔩 ]        ← filtre anti-rebond 20 ms
-//                └─► TranslationPosP1 ········· [DIAG] TRUE = position P1 atteinte ✅
-//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
-instTranslationPosP1(InputRaw := HwIn.Translation.M3_PosP1_DI, FilterTime := T#20MS);
-TranslationPosP1 := instTranslationPosP1.State;
-
-//  🔌 HwIn.Translation.M3_PosMaintenance_DI ···· câblage réel : 1 = position service atteinte (NO)
-//         └─►[ instTranslationPosMaintenance 🔩 ]← filtre anti-rebond 20 ms
-//                └─► TranslationPosMaintenance · [DIAG] TRUE = position service atteinte ✅
-//                       └─► instPositionDecoder · PRG_05_Cycle · PRG_09_Supervision
-instTranslationPosMaintenance(InputRaw := HwIn.Translation.M3_PosMaintenance_DI, FilterTime := T#20MS);
-TranslationPosMaintenance := instTranslationPosMaintenance.State;
-
-//  🔌 ─── §2 DÉCODAGE MOT CAPTEURS M3 ──────────────────────────────────────────
-// 🆕 REX 2026-07-21 : Décodage immédiat du mot 5 capteurs position M3 (scan position 0)
-instPositionDecoder(
-    SensorTremie      := TranslationPosTremie,
-    SensorPV          := TranslationPosPV,
-    SensorP2          := TranslationPosP2,
-    SensorP1          := TranslationPosP1,
-    SensorMaintenance := TranslationPosMaintenance
-);
-
-//  🔌 HwIn.Translation.M3_BrakeIsOpen_DI ······· câblage réel : 1 = contacteur commandé = DESSERRÉ
-//         └─►[ instM3BrakeFeedback 🔩 ]         ← bascule unique BrakeFeedbackInvertLogic, 📄 AF_Partie-12 §5
-//                └─► M3BrakeFeedback ··········· [ESCAL.] TRUE = frein SERRÉ (état sûr) ✅ | FALSE = desserré 🔴
-//                       └─► PRG_03_Safety (instSafetyTranslationM3 Méca B) · PRG_09_Supervision
-instM3BrakeFeedback(InputRaw := HwIn.Translation.M3_BrakeIsOpen_DI, InvertLogic := BrakeFeedbackInvertLogic, FilterTime := T#20MS);
-M3BrakeFeedback := instM3BrakeFeedback.State;
-M3BrakeCommandOpenConfirmed := NOT M3BrakeFeedback; // DI filtré : contacteur desserrage confirmé uniquement.
-
-// Retours variateur EtherCAT M3 physiques directs (recopie HwIn)
-M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
-M3_StatusWord_Filtered        := HwIn.Translation.M3_StatusWord;
-</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
           </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="10" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1</expression>
+                </inVariable>
+                <inVariable localId="2">
+                  <position x="10" y="30" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2</expression>
+                </inVariable>
+                <inVariable localId="3">
+                  <position x="10" y="50" />
+                  <connectionPointOut />
+                  <expression>PRG_00_Inputs.HwIn.Operator.JoyBtnRaw</expression>
+                </inVariable>
+                <connector localId="4" name="">
+                  <position x="40" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="5" name="">
+                  <position x="40" y="30" />
+                  <connectionPointIn>
+                    <connection refLocalId="2" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="6" name="">
+                  <position x="40" y="50" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyBtnRaw" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="10" executionOrderId="1" typeName="FB_Joystick" instanceName="instJoystick">
+                  <position x="80" y="10" />
+                  <inputVariables>
+                    <variable formalParameter="RawX">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="4" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="RawY">
+                      <connectionPointIn>
+                        <relPosition x="0" y="20" />
+                        <connection refLocalId="5" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="RawButton">
+                      <connectionPointIn>
+                        <relPosition x="0" y="40" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <outputVariables>
+                    <variable formalParameter="AxisCmdX">
+                      <connectionPointOut>
+                        <relPosition x="40" y="0" />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="AxisCmdY">
+                      <connectionPointOut>
+                        <relPosition x="40" y="20" />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="DeadmanArmed">
+                      <connectionPointOut>
+                        <relPosition x="40" y="40" />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                </block>
+                <outVariable localId="20">
+                  <position x="180" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="AxisCmdX" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdX</expression>
+                </outVariable>
+                <outVariable localId="21">
+                  <position x="180" y="30" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="AxisCmdY" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdY</expression>
+                </outVariable>
+                <outVariable localId="22">
+                  <position x="180" y="50" />
+                  <connectionPointIn>
+                    <connection refLocalId="10" formalParameter="DeadmanArmed" />
+                  </connectionPointIn>
+                  <expression>GVL_IHM.JOY1Joystick.State.DeadmanArmed</expression>
+                </outVariable>
+              </CFC>
+            </data>
+          </addData>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>42d1fbed-f208-5552-bbe3-157a02636904</ObjectId>
+            <ObjectId>e8936004-7544-5cec-a3c0-fe0bb9f742b0</ObjectId>
           </data>
         </addData>
       </pou>
@@ -23750,6 +23121,2227 @@ instJoystick(
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>93b3ebed-bf31-5d7e-bd0b-e466c62e8890</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="PRG_01_INPUTS_LD" pouType="program">
+        <interface>
+          <inputVars>
+            <variable name="HwIn">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image matérielle qualifiée produite par PRG_00_ACQUISITION_CFC</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [PUISSANCE &amp; SÉCURITÉ COMMUNE] ─────────────────────────────────────────────────────
+TRUE = contacteur de puissance engagé / portail maître OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = boucle AU fermée (coup-de-poing + contact PLC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rotation des phases électriques correcte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = thermique freins M1/M2/M3 commun OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [TREUILS M1 / M2] ─────────────────────────────────────────────────────────────────
+TRUE = fin de course haut M1/M2 libre / non atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlackCableSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = câble M2 tendu / capteur mou non déclenché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1FwdRevSpeedFeedbackOff">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = tous contacteurs M1 retombés / aucun collage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ThermalFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M1 serré (état sûr) — polarité normalisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2FwdRevSpeedFeedbackOff">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = tous contacteurs M2 retombés / aucun collage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ThermalFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M2 serré (état sûr) — polarité normalisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactFond">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [KOBOLD FOND] ──────────────────────────────────────────────────────────────────────
+TRUE = détecteur de fond Kobold en contact</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [TRANSLATION M3] ───────────────────────────────────────────────────────────────────
+TRUE = translation en position Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en zone pré-ralentissement PV</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position P2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M3 serré (état sûr) — polarité normalisée</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instPowerContactorEngaged">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [Instances de qualification FB_Input] ───────────────────────────────────────────────</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEmergencyChainClosed">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTopPositionSensor">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instSlackCableSwitch">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instKoboldContactFond">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instCtrlPhaseRotation">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instBrakeThermalFeedback">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM1FwdRevSpeedFeedbackOff">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM1Thermal">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM1BrakeFeedback">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM2FwdRevSpeedFeedbackOff">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM2Thermal">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM2BrakeFeedback">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosTremie">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosPV">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosP2">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosP1">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instTranslationPosMaintenance">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="instM3BrakeFeedback">
+              <type>
+                <derived name="FB_Input" />
+              </type>
+            </variable>
+            <variable name="CST_InputFilterTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#20MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation commune anti-rebond des entrées TOR</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BrakeFeedbackInvertLogic">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M*_BrakeIsOpen_DI inversé : TRUE -&gt; frein serré</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📥 PRG_01_INPUTS_LD — Affichage qualifié des entrées TOR (PROGRAMME LADDER)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2
+   🎨 Rôle : conditionner les 19 E/S TOR retenues du traçage legacy via FB_Input.
+              Aucune décision métier (SafeStop, mode, commande) n'est prise ici.
+   🔗 Dépendances : PRG_00_ACQUISITION_CFC produit HwIn ; consommateurs = Safety/Modes/Cycle/Supervision.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <LD>
+            <leftPowerRail localId="0">
+              <position x="0" y="0" />
+              <connectionPointOut formalParameter="none" />
+            </leftPowerRail>
+            <comment localId="1" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [PUISSANCE &amp; SÉCURITÉ COMMUNE] ===</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="2">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <comment localId="3" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="4">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="5" typeName="FB_Input" instanceName="instPowerContactorEngaged">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="15" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="17" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="15" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Machine.PowerContactorEngaged_DI</variable>
+            </contact>
+            <contact localId="17" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="19" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="20">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="21">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instPowerContactorEngaged.State</expression>
+            </inVariable>
+            <outVariable localId="22">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="21" />
+              </connectionPointIn>
+              <expression>PowerContactorEngaged</expression>
+            </outVariable>
+            <comment localId="31" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="32">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="33" typeName="FB_Input" instanceName="instEmergencyChainClosed">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="43" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="45" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="43" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Machine.EmergencyChainClosed_DI</variable>
+            </contact>
+            <contact localId="45" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="47" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="48">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="49">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instEmergencyChainClosed.State</expression>
+            </inVariable>
+            <outVariable localId="50">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="49" />
+              </connectionPointIn>
+              <expression>EmergencyChainClosed</expression>
+            </outVariable>
+            <comment localId="59" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="60">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="61" typeName="FB_Input" instanceName="instCtrlPhaseRotation">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="71" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="73" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="71" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Machine.PhaseRotationOk_DI</variable>
+            </contact>
+            <contact localId="73" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="75" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="76">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="77">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instCtrlPhaseRotation.State</expression>
+            </inVariable>
+            <outVariable localId="78">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="77" />
+              </connectionPointIn>
+              <expression>PhaseRotationOk</expression>
+            </outVariable>
+            <comment localId="87" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="88">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="89" typeName="FB_Input" instanceName="instBrakeThermalFeedback">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="99" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="101" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="99" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Machine.BrakeThermalOk_DI</variable>
+            </contact>
+            <contact localId="101" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="103" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="104">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="105">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instBrakeThermalFeedback.State</expression>
+            </inVariable>
+            <outVariable localId="106">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="105" />
+              </connectionPointIn>
+              <expression>BrakeThermalFeedback</expression>
+            </outVariable>
+            <comment localId="115" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="116">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="117" typeName="FB_Input" instanceName="instKoboldContactFond">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="127" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="129" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="127" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Machine.M1_M2_KoboldContactFond_DI</variable>
+            </contact>
+            <contact localId="129" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="131" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="132">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="133">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instKoboldContactFond.State</expression>
+            </inVariable>
+            <outVariable localId="134">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="133" />
+              </connectionPointIn>
+              <expression>KoboldContactFond</expression>
+            </outVariable>
+            <comment localId="143" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [TREUILS M1 / M2] ===</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="144">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <comment localId="145" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="146">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="147" typeName="FB_Input" instanceName="instTopPositionSensor">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="157" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="159" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="157" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M1M2_TopPositionFree_DI</variable>
+            </contact>
+            <contact localId="159" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="161" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="162">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="163">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instTopPositionSensor.State</expression>
+            </inVariable>
+            <outVariable localId="164">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="163" />
+              </connectionPointIn>
+              <expression>TopPositionSensor</expression>
+            </outVariable>
+            <comment localId="173" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="174">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="175" typeName="FB_Input" instanceName="instSlackCableSwitch">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="185" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="187" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="185" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M2_TensionedCable_DI</variable>
+            </contact>
+            <contact localId="187" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="189" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="190">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="191">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instSlackCableSwitch.State</expression>
+            </inVariable>
+            <outVariable localId="192">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="191" />
+              </connectionPointIn>
+              <expression>SlackCableSwitch</expression>
+            </outVariable>
+            <comment localId="201" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="202">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="203" typeName="FB_Input" instanceName="instM1FwdRevSpeedFeedbackOff">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="213" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="215" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="213" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M1_ContactorsReleased_DI</variable>
+            </contact>
+            <contact localId="215" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="217" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="218">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="219">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM1FwdRevSpeedFeedbackOff.State</expression>
+            </inVariable>
+            <outVariable localId="220">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="219" />
+              </connectionPointIn>
+              <expression>M1FwdRevSpeedFeedbackOff</expression>
+            </outVariable>
+            <comment localId="229" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="230">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="231" typeName="FB_Input" instanceName="instM1Thermal">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="241" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="243" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="241" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M1_ThermalOk_DI</variable>
+            </contact>
+            <contact localId="243" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="245" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="246">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="247">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM1Thermal.State</expression>
+            </inVariable>
+            <outVariable localId="248">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="247" />
+              </connectionPointIn>
+              <expression>M1ThermalFeedback</expression>
+            </outVariable>
+            <comment localId="257" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="258">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="259" typeName="FB_Input" instanceName="instM1BrakeFeedback">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="269" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="271" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="273" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="269" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M1_BrakeIsOpen_DI</variable>
+            </contact>
+            <contact localId="271" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_BrakeFeedbackInvertLogic</variable>
+            </contact>
+            <contact localId="273" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="275" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="276">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="277">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM1BrakeFeedback.State</expression>
+            </inVariable>
+            <outVariable localId="278">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="277" />
+              </connectionPointIn>
+              <expression>M1BrakeFeedback</expression>
+            </outVariable>
+            <comment localId="287" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="288">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="289" typeName="FB_Input" instanceName="instM2FwdRevSpeedFeedbackOff">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="299" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="301" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="299" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M2_ContactorsReleased_DI</variable>
+            </contact>
+            <contact localId="301" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="303" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="304">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="305">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM2FwdRevSpeedFeedbackOff.State</expression>
+            </inVariable>
+            <outVariable localId="306">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="305" />
+              </connectionPointIn>
+              <expression>M2FwdRevSpeedFeedbackOff</expression>
+            </outVariable>
+            <comment localId="315" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="316">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="317" typeName="FB_Input" instanceName="instM2Thermal">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="327" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="329" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="327" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M2_ThermalOk_DI</variable>
+            </contact>
+            <contact localId="329" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="331" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="332">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="333">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM2Thermal.State</expression>
+            </inVariable>
+            <outVariable localId="334">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="333" />
+              </connectionPointIn>
+              <expression>M2ThermalFeedback</expression>
+            </outVariable>
+            <comment localId="343" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="344">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="345" typeName="FB_Input" instanceName="instM2BrakeFeedback">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="355" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="357" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="359" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="355" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M2_BrakeIsOpen_DI</variable>
+            </contact>
+            <contact localId="357" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_BrakeFeedbackInvertLogic</variable>
+            </contact>
+            <contact localId="359" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="361" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="362">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="363">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM2BrakeFeedback.State</expression>
+            </inVariable>
+            <outVariable localId="364">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="363" />
+              </connectionPointIn>
+              <expression>M2BrakeFeedback</expression>
+            </outVariable>
+            <comment localId="373" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [TRANSLATION M3] ===</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="374">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <comment localId="375" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="376">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="377" typeName="FB_Input" instanceName="instTranslationPosTremie">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="387" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="389" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="387" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Translation.M3_PosTremie_DI</variable>
+            </contact>
+            <contact localId="389" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="391" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="392">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="393">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instTranslationPosTremie.State</expression>
+            </inVariable>
+            <outVariable localId="394">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="393" />
+              </connectionPointIn>
+              <expression>TranslationPosTremie</expression>
+            </outVariable>
+            <comment localId="403" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="404">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="405" typeName="FB_Input" instanceName="instTranslationPosPV">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="415" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="417" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="415" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Translation.M3_PosPV_DI</variable>
+            </contact>
+            <contact localId="417" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="419" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="420">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="421">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instTranslationPosPV.State</expression>
+            </inVariable>
+            <outVariable localId="422">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="421" />
+              </connectionPointIn>
+              <expression>TranslationPosPV</expression>
+            </outVariable>
+            <comment localId="431" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="432">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="433" typeName="FB_Input" instanceName="instTranslationPosP2">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="443" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="445" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="443" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Translation.M3_PosP2_DI</variable>
+            </contact>
+            <contact localId="445" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="447" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="448">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="449">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instTranslationPosP2.State</expression>
+            </inVariable>
+            <outVariable localId="450">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="449" />
+              </connectionPointIn>
+              <expression>TranslationPosP2</expression>
+            </outVariable>
+            <comment localId="459" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="460">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="461" typeName="FB_Input" instanceName="instTranslationPosP1">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="471" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="473" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="471" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Translation.M3_PosP1_DI</variable>
+            </contact>
+            <contact localId="473" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="475" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="476">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="477">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instTranslationPosP1.State</expression>
+            </inVariable>
+            <outVariable localId="478">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="477" />
+              </connectionPointIn>
+              <expression>TranslationPosP1</expression>
+            </outVariable>
+            <comment localId="487" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="488">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="489" typeName="FB_Input" instanceName="instTranslationPosMaintenance">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="499" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="501" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="499" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Translation.M3_PosMaintenance_DI</variable>
+            </contact>
+            <contact localId="501" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="503" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="504">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="505">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instTranslationPosMaintenance.State</expression>
+            </inVariable>
+            <outVariable localId="506">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="505" />
+              </connectionPointIn>
+              <expression>TranslationPosMaintenance</expression>
+            </outVariable>
+            <comment localId="515" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="516">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <block localId="517" typeName="FB_Input" instanceName="instM3BrakeFeedback">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="527" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="529" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="531" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="0" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <contact localId="527" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Translation.M3_BrakeIsOpen_DI</variable>
+            </contact>
+            <contact localId="529" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_BrakeFeedbackInvertLogic</variable>
+            </contact>
+            <contact localId="531" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <comment localId="533" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="534">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="535">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>instM3BrakeFeedback.State</expression>
+            </inVariable>
+            <outVariable localId="536">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="535" />
+              </connectionPointIn>
+              <expression>M3BrakeFeedback</expression>
+            </outVariable>
+            <rightPowerRail localId="2147483646">
+              <position x="0" y="0" />
+              <connectionPointIn />
+            </rightPowerRail>
+          </LD>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3897a163-dba7-5122-970a-7d4962099cac</ObjectId>
           </data>
         </addData>
       </pou>
@@ -26588,6 +28180,21 @@ GVL_IHM.Network.EcatErrorId := PRG_01_Diagnostics.instDiagEthercat.ErrorId;
               </type>
             </variable>
             <variable name="TranslationBrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerKeepAlive_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerKeepAlive_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArming_RQ">
               <type>
                 <BOOL />
               </type>
@@ -29774,162 +31381,6 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ   :=
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>07195219-7877-5f98-aec3-85c8b09adc2c</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="PRG_ACQUISITION_CFC" pouType="program">
-        <interface>
-          <localVars>
-            <variable name="instJoystick">
-              <type>
-                <derived name="FB_Joystick" />
-              </type>
-            </variable>
-            <variable name="instEncoderAbsM1">
-              <type>
-                <derived name="FB_Encoder_Abs" />
-              </type>
-            </variable>
-            <variable name="instEncoderScaleM1">
-              <type>
-                <derived name="FB_Encoder_Scale" />
-              </type>
-            </variable>
-            <variable name="instHomingM1">
-              <type>
-                <derived name="FB_Encoder_Homing" />
-              </type>
-            </variable>
-            <variable name="instEncoderAbsM2">
-              <type>
-                <derived name="FB_Encoder_Abs" />
-              </type>
-            </variable>
-            <variable name="instEncoderScaleM2">
-              <type>
-                <derived name="FB_Encoder_Scale" />
-              </type>
-            </variable>
-            <variable name="instHomingM2">
-              <type>
-                <derived name="FB_Encoder_Homing" />
-              </type>
-            </variable>
-            <variable name="instPosDecoderM3">
-              <type>
-                <derived name="FB_Translation_PositionDecoder" />
-              </type>
-            </variable>
-          </localVars>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-          </ST>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
-              <CFC>
-                <inVariable localId="1">
-                  <position x="10" y="10" />
-                  <connectionPointOut />
-                  <expression>PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1</expression>
-                </inVariable>
-                <inVariable localId="2">
-                  <position x="10" y="30" />
-                  <connectionPointOut />
-                  <expression>PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2</expression>
-                </inVariable>
-                <inVariable localId="3">
-                  <position x="10" y="50" />
-                  <connectionPointOut />
-                  <expression>PRG_00_Inputs.HwIn.Operator.JoyBtnRaw</expression>
-                </inVariable>
-                <connector localId="4" name="">
-                  <position x="40" y="10" />
-                  <connectionPointIn>
-                    <connection refLocalId="1" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyXRaw_ANA1" />
-                  </connectionPointIn>
-                </connector>
-                <connector localId="5" name="">
-                  <position x="40" y="30" />
-                  <connectionPointIn>
-                    <connection refLocalId="2" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyYRaw_ANA2" />
-                  </connectionPointIn>
-                </connector>
-                <connector localId="6" name="">
-                  <position x="40" y="50" />
-                  <connectionPointIn>
-                    <connection refLocalId="3" formalParameter="PRG_00_Inputs.HwIn.Operator.JoyBtnRaw" />
-                  </connectionPointIn>
-                </connector>
-                <block localId="10" executionOrderId="1" typeName="FB_Joystick" instanceName="instJoystick">
-                  <position x="80" y="10" />
-                  <inputVariables>
-                    <variable formalParameter="RawX">
-                      <connectionPointIn>
-                        <relPosition x="0" y="0" />
-                        <connection refLocalId="4" />
-                      </connectionPointIn>
-                    </variable>
-                    <variable formalParameter="RawY">
-                      <connectionPointIn>
-                        <relPosition x="0" y="20" />
-                        <connection refLocalId="5" />
-                      </connectionPointIn>
-                    </variable>
-                    <variable formalParameter="RawButton">
-                      <connectionPointIn>
-                        <relPosition x="0" y="40" />
-                        <connection refLocalId="6" />
-                      </connectionPointIn>
-                    </variable>
-                  </inputVariables>
-                  <outputVariables>
-                    <variable formalParameter="AxisCmdX">
-                      <connectionPointOut>
-                        <relPosition x="40" y="0" />
-                      </connectionPointOut>
-                    </variable>
-                    <variable formalParameter="AxisCmdY">
-                      <connectionPointOut>
-                        <relPosition x="40" y="20" />
-                      </connectionPointOut>
-                    </variable>
-                    <variable formalParameter="DeadmanArmed">
-                      <connectionPointOut>
-                        <relPosition x="40" y="40" />
-                      </connectionPointOut>
-                    </variable>
-                  </outputVariables>
-                </block>
-                <outVariable localId="20">
-                  <position x="180" y="10" />
-                  <connectionPointIn>
-                    <connection refLocalId="10" formalParameter="AxisCmdX" />
-                  </connectionPointIn>
-                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdX</expression>
-                </outVariable>
-                <outVariable localId="21">
-                  <position x="180" y="30" />
-                  <connectionPointIn>
-                    <connection refLocalId="10" formalParameter="AxisCmdY" />
-                  </connectionPointIn>
-                  <expression>GVL_IHM.JOY1Joystick.State.AxisCmdY</expression>
-                </outVariable>
-                <outVariable localId="22">
-                  <position x="180" y="50" />
-                  <connectionPointIn>
-                    <connection refLocalId="10" formalParameter="DeadmanArmed" />
-                  </connectionPointIn>
-                  <expression>GVL_IHM.JOY1Joystick.State.DeadmanArmed</expression>
-                </outVariable>
-              </CFC>
-            </data>
-          </addData>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>5ca2a345-56a2-58c8-9723-1de144dc50a4</ObjectId>
           </data>
         </addData>
       </pou>
@@ -33776,8 +35227,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
           <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
-          <Object Name="PRG_00_Inputs" ObjectId="42d1fbed-f208-5552-bbe3-157a02636904" />
+          <Object Name="PRG_00_ACQUISITION_CFC" ObjectId="e8936004-7544-5cec-a3c0-fe0bb9f742b0" />
           <Object Name="PRG_01_Diagnostics" ObjectId="93b3ebed-bf31-5d7e-bd0b-e466c62e8890" />
+          <Object Name="PRG_01_INPUTS_LD" ObjectId="3897a163-dba7-5122-970a-7d4962099cac" />
           <Object Name="PRG_02_Encoders" ObjectId="b971c8dd-35c9-56f9-a5f0-9f678de64af4" />
           <Object Name="PRG_03_Safety" ObjectId="0d6cb680-2b1a-5c6b-97ff-45020fa827aa" />
           <Object Name="PRG_04_Modes" ObjectId="878272a8-cc45-5ab5-8eee-ef58917243dd" />
@@ -33788,7 +35240,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="PRG_09_Supervision" ObjectId="84946444-e1ef-5f61-a3fc-7b8b648f3d87" />
           <Object Name="PRG_10_Outputs_LD" ObjectId="9e8e885a-aad2-5896-9c2a-81e5c482a0f8" />
           <Object Name="PRG_11_Troubleshooting" ObjectId="07195219-7877-5f98-aec3-85c8b09adc2c" />
-          <Object Name="PRG_ACQUISITION_CFC" ObjectId="5ca2a345-56a2-58c8-9723-1de144dc50a4" />
           <Object Name="PRG_AU_Acquisition" ObjectId="e301096b-b905-5c3d-96fa-3afcf1106a59" />
           <Object Name="PRG_AU_Outputs_LD" ObjectId="b6ff04d2-767d-5228-b8ae-b83c5f61ab01" />
           <Object Name="PRG_GLOBAL_CFC" ObjectId="10456701-120c-5ffc-8ee2-6df33f2f2a18" />

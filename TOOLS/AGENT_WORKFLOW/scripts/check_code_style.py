@@ -39,7 +39,7 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
 }
 
 SIMULATION_ALLOWED_PATHS = {
-    "CODE/MAIN/PRG_00_Inputs.st",
+    "CODE/MAIN/PRG_00_ACQUISITION_CFC.st",
     "CODE/MAIN/PRG_09_Supervision.st",
     "CODE/MAIN/PRG_11_Troubleshooting.st",
 }
