@@ -20,12 +20,12 @@
 
 ## 🧪 Points de validation (`TC-P10-011/017/018/019` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-011 | **Interlock sens** : neutre→sens immédiat (200ms) ; **inversion** exige vitesse<0.1 ET 200ms **PLUS temps mort inversion 1s** (paramétrable, > temps mort même sens) ; **redémarrage même sens** : temps mort 1s après arrêt → nouvelle demande | AUTO |
-| TC-P10-017 | Config palier invalide (`FB_SpeedStep`) ⇒ palier 0, sorties sûres | AUTO |
-| TC-P10-018 | `StuckClosed` : contacteurs commandés off, retour non confirmé 500ms ⇒ bit1 | AUTO |
-| TC-P10-019 | Ordre MainTask : Safety avant WinchControl avant Outputs_LD (frontière stricte) | AUTO+SITE |
+| TC-P10-011 | Interlock sens & temporisations d'inversion / redémarrage 1s | `💻 AUTO` |
+| TC-P10-017 | Config palier invalide (`FB_SpeedStep`) ➔ palier 0, sorties sûres | `💻 AUTO` |
+| TC-P10-018 | `StuckClosed` : contacteurs off non confirmés 500ms ➔ bit1 | `💻 AUTO` |
+| TC-P10-019 | Ordre MainTask : Safety ➔ WinchControl ➔ Outputs_LD | `⚡ SITE+AUTO` |
 
 ---
 

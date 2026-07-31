@@ -21,20 +21,20 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type |
+| ID | Intention | Preuve | Type |
 |---|---|---|---|
-| TC-P09-001 | Preset : `PresetTriggerCmd=2` déclenche, `PresetAck` si écart ≤ tolérance sous timeout | `PresetSeqStep`, `PresetAck/Nak` | AUTO_PLC |
-| TC-P09-002 | `RawPos` gelé si `EncoderAvailable=FALSE` | Forcer alarme bus, `RawPos` figé | AUTO_PLC |
-| TC-P09-003 | Homing nominal rejeté si capteur haut non atteint (hors bypass) | Front `Home` sans capteur → bit4 | AUTO_PLC |
-| TC-P09-004 | Homing rejeté si arrêt non confirmé (contacteurs+frein) | Front `Home` sans arrêt confirmé → bit2 | AUTO_PLC |
-| TC-P09-005 | Unitaire refusé hors MAINT_N2 ou mauvais treuil sélectionné | bit0/bit1 | AUTO |
-| TC-P09-006 | Cible hors [-99;+99] m rejetée sans écriture preset | bit4, `PresetRequest` reste FALSE | AUTO |
-| TC-P09-007 | `HomingRefRaw` conforme à la formule ; `CablePosM` = cible après Done | Calcul vérifié | AUTO_PLC |
-| TC-P09-008 | Incohérence redémarrage (écart > tolérance) ⇒ `HomingSuspect`, `Homed` masqué | Reboot simulé avec écart RawPos | AUTO_PLC |
-| TC-P09-009 | `BtnConfirmCoherence` lève le doute sans réécrire la référence | Front → `HomingSuspect=FALSE`, `HomingRefRaw` inchangé | AUTO_PLC |
-| TC-P09-010 | Bornage : position hors [-99;+99] m ⇒ gel + `EncoderIncoherent` | Forcer position hors plage | AUTO |
-| TC-P09-011 | `EncoderFaultPresent` bloque SEMI_AUTO (repli MAINT_N1) | `SelMode:=SEMI_AUTO` avec défaut actif | AUTO_PLC |
-| TC-P09-012 | Méca D (capteur haut non confirmé arrêté) ⇒ SafeStop+PowerCutOff sous 3 s | SITE — voir AF10 | SITE |
+| TC-P09-001 | Preset `PresetTriggerCmd=2` sous tolérance et timeout | `PresetAck` confirmé | `⚡ AUTO_PLC` |
+| TC-P09-002 | `RawPos` gelé si `EncoderAvailable=FALSE` | Position gelée sur perte bus | `⚡ AUTO_PLC` |
+| TC-P09-003 | Homing nominal refusé sans capteur haut (hors bypass) | Front `Home` sans capteur ➔ Bit4 | `⚡ AUTO_PLC` |
+| TC-P09-004 | Homing refusé si arrêt non confirmé (contacteurs+frein) | Front `Home` sans arrêt ➔ Bit2 | `⚡ AUTO_PLC` |
+| TC-P09-005 | Homing unitaire refusé hors MAINT_N2 ou treuil erroné | Refus d'exécution (Bit0/Bit1) | `💻 AUTO` |
+| TC-P09-006 | Cible hors [-99;+99] m rejetée sans écriture preset | `PresetRequest` reste `FALSE` | `💻 AUTO` |
+| TC-P09-007 | `HomingRefRaw` conforme ; `CablePosM` = cible post-Done | Calcul position vérifié | `⚡ AUTO_PLC` |
+| TC-P09-008 | Écart au reboot ➔ `HomingSuspect`, `Homed` masqué | Reboot avec décalage `RawPos` | `⚡ AUTO_PLC` |
+| TC-P09-009 | `BtnConfirmCoherence` lève le doute sans réécrire ref | `HomingSuspect=FALSE` | `⚡ AUTO_PLC` |
+| TC-P09-010 | Bornage [-99;+99] m dépassé ➔ gel + `Incoherent` | Gel position sur hors plage | `💻 AUTO` |
+| TC-P09-011 | `EncoderFaultPresent` interdit la bascule SEMI_AUTO | Repli automatique MAINT_N1 | `⚡ AUTO_PLC` |
+| TC-P09-012 | Méca D : Capteur haut sans arrêt ➔ SafeStop+PowerCutOff 3s | Coupure puissance confirmée | `🟢 SITE` |
 
 ---
 

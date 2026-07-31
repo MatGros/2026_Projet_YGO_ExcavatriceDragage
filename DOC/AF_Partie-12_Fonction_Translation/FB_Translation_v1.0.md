@@ -22,12 +22,12 @@
 
 ## 🧪 Points de validation (`TC-P12-003/004/005/013` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-003 | `Enable=FALSE` coupe tout indépendamment de SafeStop/StartStop | AUTO_PLC |
-| TC-P12-004 | Ralentissement PV actif **seulement** Direction=1 (vers Trémie) ET SlowdownSensor | AUTO_PLC |
-| TC-P12-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | AUTO_PLC |
-| TC-P12-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` même sans joystick | AUTO_PLC |
+| TC-P12-003 | `Enable=FALSE` coupe tout indépendamment de `SafeStop`/`StartStop` | `⚡ AUTO_PLC` |
+| TC-P12-004 | Ralentissement PV actif si `Direction=1` (Trémie) ET `SlowdownSensor` | `⚡ AUTO_PLC` |
+| TC-P12-005 | Interlock sens : bascule directe si vitesse=0, sinon délai 200ms | `⚡ AUTO_PLC` |
+| TC-P12-013 | Boutons IHM en MAINT exigent `DeadmanArmed=TRUE` | `⚡ AUTO_PLC` |
 
 ---
 

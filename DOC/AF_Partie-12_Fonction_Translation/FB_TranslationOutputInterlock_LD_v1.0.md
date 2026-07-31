@@ -18,12 +18,12 @@
 
 ## 🧪 Points de validation (`TC-P12-006` à `009` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-006 | Watchdog frein 500ms fixe : sans confirmation ⇒ FAULT, RestartInhibit | AUTO_PLC |
-| TC-P12-007 | Réautorisation après timeout : cause disparue + Reset + mot 0 vu + nouvelle demande | AUTO_PLC |
-| TC-P12-008 | Gate final : mot/fréquence nuls tant que `BrakeReleaseRequest AND BrakeCommandOpenConfirmed` non simultanés | AUTO_PLC |
-| TC-P12-009 | Mot 7 (reset AC600) autorisé pendant RestartInhibit, fréquence nulle, ne lève pas l'inhibition | AUTO_PLC |
+| TC-P12-006 | Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
+| TC-P12-007 | Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle demande | `⚡ AUTO_PLC` |
+| TC-P12-008 | Gate final : Mot/fréquence nuls sans confirmation frein simultanée | `⚡ AUTO_PLC` |
+| TC-P12-009 | Mot 7 (reset AC600) autorisé pendant `RestartInhibit` (sans levée inhibition) | `⚡ AUTO_PLC` |
 
 ---
 

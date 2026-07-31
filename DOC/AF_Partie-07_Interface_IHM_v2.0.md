@@ -14,15 +14,15 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type | Détail |
+| ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P07-001 | IHM et PLC partagent les memes DUT | pas de miroir parallele de champs | AUTO | §1 |
-| TC-P07-002 | Structures `Cmd/State/Cfg` par domaine | convention respectee dans `GVL_IHM` | AUTO | §3 |
-| TC-P07-003 | IHM n'accede pas aux internes FB | lecture/ecriture seulement via `GVL_IHM` | AUTO | §1 |
-| TC-P07-004 | Chaque champ `State` a un seul ecrivain PLC | producteur unique | AUTO | §1 |
-| TC-P07-005 | Troubleshooting lecture seule | aucune commande/config/bypass ecrit | AUTO | §5 |
-| TC-P07-006 | Distinguer message action vs etat | 2 familles separees, alarmes via ErrorId | AUTO+SITE | §4 |
-| TC-P07-007 | Warning auto-efface, Fault attend acquittement | pas de Reset requis pour Warning ; Fault reste affiche jusqu'a Ack | AUTO+SITE | §4, `CODE_QUALITY_STANDARDS.md §9` |
+| TC-P07-001 | IHM et PLC partagent les mêmes DUTs | Aucun miroir parallèle de variables | `💻 AUTO` | §1 |
+| TC-P07-002 | Structures `Cmd/State/Cfg` par domaine | Convention respectée dans `GVL_IHM` | `💻 AUTO` | §3 |
+| TC-P07-003 | IHM limitée aux variables de `GVL_IHM` | Zéro accès direct aux internes des FB | `💻 AUTO` | §1 |
+| TC-P07-004 | Producteur unique par champ `State` | Un seul écrivain PLC par variable d'état | `💻 AUTO` | §1 |
+| TC-P07-005 | Page Troubleshooting en lecture seule | Zéro écriture de commande/config/bypass | `💻 AUTO` | §5 |
+| TC-P07-006 | Séparation messages action vs état | 2 familles distinctes, alarmes sur `ErrorId` | `⚡ SITE+AUTO` | §4 |
+| TC-P07-007 | Warning auto-effaçable vs Fault sur Reset | Warning s'efface seul, Fault exige `Ack` | `⚡ SITE+AUTO` | §4 |
 
 ---
 

@@ -253,7 +253,7 @@ Règles obligatoires pour tout `<CFC>` écrit ou généré à la main (hors gén
 4. **Aucune logique métier dans le CFC** (rappel §POO/§5 AF03, TC-P02-002) : un `IF`/calcul
    se délègue à un FB dédié, jamais inline dans une page CFC.
 
-Référence conforme à copier : `CODE/AU/PRG_AU_Acquisition_CFC.xml` (corrigé) ou
+Référence conforme à copier : `CODE/MAIN/PRG_AU_Acquisition_CFC.xml` (corrigé) ou
 `CODE/MAIN/PRG_GLOBAL_CFC.xml` (prototype historique, câblage correct malgré son statut
 "ne pas reproduire" en architecture — le câblage lui-même reste une référence valide).
 

@@ -14,14 +14,14 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type | Détail |
+| ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P05-001 | Modes machine limites a Manuel / N1 / N2 / SEMI_AUTO | `SyncEnable`, Diving, Extraction hors `E_Mode` | AUTO | §1-2 |
-| TC-P05-002 | Nominal : joystick pilote M1+M2 ensemble | les 2 treuils recoivent la meme intention | AUTO | §3 |
-| TC-P05-003 | MAINT_N2 M1 seul : M2 non commande, frein serre, safety active | pas d'`Inhibit` safety sur M2 | AUTO | §3 |
-| TC-P05-004 | SEMI_AUTO refuse si codeurs invalides | bascule/refus mode, message visible | AUTO | §5 |
-| TC-P05-005 | Limite legale = interdiction exploitation, pas safety | pas de `PowerCutOff` du seul fait limite legale | AUTO | §4 |
-| TC-P05-006 | Apres defaut : pas de redemarrage automatique | Reset + nouvel ordre requis | AUTO | §5 |
+| TC-P05-001 | Modes machine restreints (Manuel, N1, N2, SEMI_AUTO) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | §1-2 |
+| TC-P05-002 | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | §3 |
+| TC-P05-003 | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | §3 |
+| TC-P05-004 | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | §5 |
+| TC-P05-005 | Limite légale = blocage exploitation, pas safety | Pas de `PowerCutOff` sur simple limite légale | `💻 AUTO` | §4 |
+| TC-P05-006 | Pas de redémarrage automatique après défaut | `Reset` + nouvel ordre explicite requis | `💻 AUTO` | §5 |
 
 ---
 

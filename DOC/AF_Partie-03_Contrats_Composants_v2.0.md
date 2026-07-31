@@ -13,15 +13,15 @@
 
 ## 🧪 Points de validation
 
-| ID | Attendu | Preuve | Type | Détail |
+| ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P03-001 | Precedence `Enable > SafeStop > StartStop` | SafeStop impose rampe rapide meme si StartStop=TRUE | AUTO | §3 |
-| TC-P03-002 | Reset jamais conditionne par un etat externe | front Reset efface l'acquittement meme cause encore presente | AUTO | §3 |
-| TC-P03-003 | Acquittement ne redemarre pas un mouvement | retour READY, nouvel ordre requis | AUTO | §3 |
-| TC-P03-004 | `StartStop`/`SafeStop` absents des briques non-mouvement | joystick, E/S, diag sans ces entrees | AUTO | §2 |
-| TC-P03-005 | Internes FB inaccessibles aux appelants | echanges uniquement via interfaces/DUT publics | AUTO | §1 |
-| TC-P03-006 | Fault re-latche si cause revient apres acquittement | nouveau front Cause remet `Ack=FALSE` | AUTO | §3, `CODE_QUALITY_STANDARDS.md §9` |
-| TC-P03-007 | Warning distinct de Fault | Warning s'efface seul, aucune action Reset requise | AUTO | §3, `CODE_QUALITY_STANDARDS.md §9` |
+| TC-P03-001 | Priorité `Enable > SafeStop > StartStop` | `SafeStop` impose la rampe rapide même si `StartStop=TRUE` | `💻 AUTO` | §3 |
+| TC-P03-002 | Reset inconditionnel (Cause/Ack) | Front `Reset` efface l'affichage (interlock reste sur Cause) | `💻 AUTO` | §3 |
+| TC-P03-003 | Pas de redémarrage auto après Ack | Retour READY, nouvel ordre explicite requis | `💻 AUTO` | §3 |
+| TC-P03-004 | Pas de `SafeStop`/`StartStop` hors mouvement | Absents des briques E/S, joystick et diag | `💻 AUTO` | §2 |
+| TC-P03-005 | Encapsulation stricte | Échanges via interfaces/DUTs publics uniquement | `💻 AUTO` | §1 |
+| TC-P03-006 | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | §3 |
+| TC-P03-007 | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | §3 |
 
 ---
 

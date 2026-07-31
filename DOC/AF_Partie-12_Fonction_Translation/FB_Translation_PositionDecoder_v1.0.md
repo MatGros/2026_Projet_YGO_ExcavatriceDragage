@@ -15,10 +15,10 @@
 
 ## 🧪 Points de validation (`TC-P12-001/002` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-001 | 6 mots capteurs valides acceptés (11111→00000) ; tout autre ⇒ `Incoherent` | AUTO |
-| TC-P12-002 | Mot incohérent ⇒ `Incoherent=TRUE` → bit7 Safety ⇒ SafeStop+PowerCutOff | AUTO_PLC |
+| TC-P12-001 | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` |
+| TC-P12-002 | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
 
 ---
 

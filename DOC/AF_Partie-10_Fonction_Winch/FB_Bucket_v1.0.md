@@ -22,20 +22,20 @@
 
 ## 🧪 Points de validation (`TC-P10-023` à `034` — propriétaire unique)
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-023 | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | AUTO |
-| TC-P10-024 | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | AUTO |
-| TC-P10-025 | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | AUTO |
-| TC-P10-026 | Glissement M1>1.0m pendant BUSY ⇒ bit4 + `M1SlipDetected` + coupe M2 | AUTO |
-| TC-P10-027 | `M1SlipDetected` force SafeStop sur M1 côté Treuils (couche 1) | AUTO |
-| TC-P10-028 | Couche 2 (Méca C AF10, bit9) : dérive M1>2.0m ⇒ PowerCutOff | AUTO |
-| TC-P10-029 | Recul (sens inverse) borné à la position de départ, jamais au-delà | AUTO |
-| TC-P10-030 | `ConfirmOpenPosition`/`ClosePosition` : effet seulement MAINT_N1/N2, treuils arrêtés | AUTO |
-| TC-P10-031 | Codeur(s) non référencé(s) ⇒ bit3 permanent, indépendant de Reset | AUTO |
-| TC-P10-032 | Seule `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne ; `FB_DiveSearch` ne le fait pas | AUTO |
-| TC-P10-033 | Butée haute M2 décalée de `OffsetCloseM` uniquement si fermé/en fermeture | AUTO |
-| TC-P10-034 | Terrain : cinématique réelle en charge, amplitude offset validée | SITE |
+| TC-P10-023 | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | `💻 AUTO` |
+| TC-P10-024 | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | `💻 AUTO` |
+| TC-P10-025 | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | `💻 AUTO` |
+| TC-P10-026 | Glissement M1>1.0m pendant BUSY ➔ bit4 + `M1SlipDetected` + coupe M2 | `💻 AUTO` |
+| TC-P10-027 | `M1SlipDetected` force `SafeStop` sur M1 côté Treuils | `💻 AUTO` |
+| TC-P10-028 | Couche 2 (Méca C) : dérive M1>2.0m ➔ `PowerCutOff` | `💻 AUTO` |
+| TC-P10-029 | Recul (sens inverse) borné à la position de départ, jamais au-delà | `💻 AUTO` |
+| TC-P10-030 | `ConfirmOpen/ClosePosition` : effet seulement MAINT_N1/N2 arrêtés | `💻 AUTO` |
+| TC-P10-031 | Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de `Reset` | `💻 AUTO` |
+| TC-P10-032 | `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne | `💻 AUTO` |
+| TC-P10-033 | Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture | `💻 AUTO` |
+| TC-P10-034 | Terrain : cinématique réelle en charge, amplitude offset validée | `🟢 SITE` |
 
 ---
 

@@ -32,10 +32,10 @@ dupliqué ici) :
 TC-P12-012 (Cible Maintenance refusée hors MAINT_N2) et TC-P12-015 (Terrain) restent au niveau
 chapô (transverses Modes/terrain).
 
-| ID | Attendu | Type |
+| ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P12-012 | Cible Maintenance refusée hors MAINT_N2 | AUTO_PLC |
-| TC-P12-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | SITE |
+| TC-P12-012 | Cible Maintenance refusée hors MAINT_N2 | `⚡ AUTO_PLC` |
+| TC-P12-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | `🟢 SITE` |
 
 ---
 
