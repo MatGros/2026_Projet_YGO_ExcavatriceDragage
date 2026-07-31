@@ -48,7 +48,7 @@ ni `IF`, ni calcul, ni fusion de commandes, ni ecriture de sortie physique hors 
 
 | Programme | Langage | Responsabilite |
 |---|---|---|
-| 📥 `PRG_02_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
+| 📥 `PRG_00_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
 | 🪜 `PRG_01_INPUTS_LD` | Ladder | Affichage qualifie des 21 E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
 | 🎚️ `PRG_02_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
 | 🛡️ `PRG_03_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
@@ -106,7 +106,7 @@ systeme 200 ms.
 
 ```text
 MainTask
-  0. PRG_02_ACQUISITION_CFC
+  0. PRG_00_ACQUISITION_CFC
   1. PRG_01_INPUTS_LD
   2. PRG_02_MODES_CFC
   3. PRG_03_SAFETY_CFC

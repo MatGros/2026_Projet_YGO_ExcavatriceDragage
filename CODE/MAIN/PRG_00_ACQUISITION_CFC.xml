@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="Dragage" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-01T00:00:00" />
-  <contentHeader name="PRG_02_ACQUISITION_CFC.project" modificationDateTime="2026-08-01T00:00:00">
+  <contentHeader name="PRG_00_ACQUISITION_CFC.project" modificationDateTime="2026-08-01T00:00:00">
     <coordinateInfo>
       <fbd><scaling x="1" y="1" /></fbd>
       <ld><scaling x="1" y="1" /></ld>
@@ -11,7 +11,7 @@
   <types>
     <dataTypes />
     <pous>
-      <pou name="PRG_02_ACQUISITION_CFC" pouType="program">
+      <pou name="PRG_00_ACQUISITION_CFC" pouType="program">
         <interface>
           <localVars>
             <variable name="instJoystick"><type><derived name="FB_Joystick" /></type></variable>

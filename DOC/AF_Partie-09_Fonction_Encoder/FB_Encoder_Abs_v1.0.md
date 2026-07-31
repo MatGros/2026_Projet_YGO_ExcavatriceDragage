@@ -1,6 +1,6 @@
 # FB_Encoder_Abs — Spec composant (v1.0)
 
-> Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.0.md`](../AF_Partie-09_Fonction_Encoder_v2.0.md) §2.  
+> Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §2.  
 > Rôle de **ce** document : acquisition brute bus EtherCAT, gestion de la disponibilité et des requêtes de preset.  
 > Source code : `CODE/CODEURS/FB_Encoder_Abs.st` · instances `instEncoderAbsM1/M2` dans `Acquisition (CFC)`.  
 
@@ -32,16 +32,26 @@ Brique de **qualification d'entrée** (Partie3 §2) : lit la position brute Ethe
 | Port entrée | Type | Rôle |
 |---|---|---|
 | `Enable/Reset` | BOOL | Standard |
+| `PowerContactorEngaged` | BOOL | Standard |
+| `Mode` | E_Mode | Standard (contexte, pas encore exploité ce lot) |
 | `RawPosIn` | UDINT | Position brute issue du variateur/bus EtherCAT |
 | `AlarmsIn` | UINT | Alarmes matérielles brutes |
+| `WarningsIn` | UINT | Avertissements matériels bruts — informatif seulement |
 | `SlaveOperational` | BOOL | État opérationnel de l'esclave EtherCAT (`FB_DiagEthercat`) |
-| `PresetRequest` | BOOL | Demande d'écriture de preset (issue de `FB_Encoder_Homing`) |
+| `PointsPerRev` | UDINT := 8192 | Résolution codeur |
+| `PresetRequest` | BOOL (front) | Demande d'écriture de preset (issue de `FB_Encoder_Homing`) |
 | `PresetValue` | UDINT | Valeur brute de preset à appliquer |
+| `PresetTimeout` | TIME := T#2s | Délai max de convergence post-preset |
+| `PresetTolerancePts` | UDINT := 10 | Tolérance relecture post-preset |
 
 **Sorties** :
 - `RawPos : UDINT` : Position brute qualifiée (gelée sur sa dernière valeur si `EncoderAvailable = FALSE`).
 - `EncoderAvailable : BOOL` : `TRUE` si l'esclave est opérationnel et qu'aucun défaut n'est actif (`(ErrorId AND 1) = 0`).
+- `AngleRaw`/`TurnCount` : informatif maintenance (`RawPos MOD/DIV PointsPerRev`).
 - `PresetAck / PresetNak : BOOL` : Impulsions de confirmation (Ack) ou de rejet/timeout (Nak).
+- `PresetTriggerCmd`/`CodeSeqTriggerCmd`/`PresetValueOut` : à câbler sur les RxPDO codeur.
+
+**`ErrorId`** : bit0 = "Défaut communication codeur" (alarme/bus) ; bit1 = "Erreur référencement (timeout)" (preset refusé/timeout).
 
 ---
 
@@ -61,4 +71,4 @@ Brique de **qualification d'entrée** (Partie3 §2) : lit la position brute Ethe
 
 ## 5. Documents liés
 
-- [`AF_Partie-09_Fonction_Encoder_v2.0.md`](../AF_Partie-09_Fonction_Encoder_v2.0.md)
+- [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md)

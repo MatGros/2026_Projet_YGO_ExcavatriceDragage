@@ -1,6 +1,6 @@
 # Extraction code — FB_Safety_EmergencyManagement (v1.0)
 
-> Source : `CODE/AU/*`, `CODE/MAIN/PRG_00_Inputs.st`, `PRG_10_Outputs_LD.st`, `PRG_09_Supervision.st`,
+> Source : `CODE/AU/*`, `CODE/MAIN/PRG_00_Inputs`, `PRG_10_Outputs_LD.st`, `PRG_09_Supervision.st`,
 > `CODE/SIMULATION/FB_Sim_Safety.st`, DUT IHM `ST_ModesCmd` / `ST_ModesState`.
 > Statut : fiche de travail **code → doc**. Ne remplace pas AF01 ni la spec FB.
 > Objectif : inventorier fonctionnalités, interfaces, liaisons et écarts avant normalisation bus/DUT.

@@ -1,6 +1,6 @@
 # FB_Encoder_SpeedMeasure — Spec composant (v1.0)
 
-> Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.0.md`](../AF_Partie-09_Fonction_Encoder_v2.0.md) §5.  
+> Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §5.  
 > Rôle de **ce** document : calcul de la vitesse linéaire réelle du câble (m/s) par glissement d'échantillons horodatés.  
 > Source code : `CODE/CODEURS/FB_Encoder_SpeedMeasure.st` · instances `instEncoderSpeedMeasureM1/M2` dans `Acquisition (CFC)`.  
 
@@ -26,18 +26,19 @@ Brique technique de **mesure de vitesse linéaire** : calcule la vitesse du câb
 
 ---
 
-## 2. Interface
+## 2. Interface (vérifiée `CODE/CODEURS/FB_Encoder_SpeedMeasure.st`)
 
 | Port entrée | Type | Rôle |
 |---|---|---|
-| `Enable/Reset` | BOOL | Standard |
-| `CablePosM` | REAL | Position courante sécurisée (m) |
-| `EncoderAvailable` | BOOL | Disponibilité du signal codeur |
+| `Enable` | BOOL | Autorise l'acquisition |
+| `Reset` | BOOL | Purge immédiate de l'historique (6 positions) |
+| `Position_M` | REAL | Position câble **sûre** — sortie `FB_Encoder_Safety.CablePosMSafe`, pas `FB_Encoder_Scale` directement |
+| `PositionValid` | BOOL | `TRUE` si la chaîne codeur garantit la position |
 
 **Sorties** :
-- `MeasuredSpeed_Mps : REAL` : Vitesse linéaire absolue en m/s ($\ge 0.0$).
-- `MeasuredSpeedSigned_Mps : REAL` : Vitesse signée (positive en montée, négative en descente).
-- `SpeedValid : BOOL` : `TRUE` si la fenêtre d'échantillonnage est remplie et que l'encodeur est disponible.
+- `Speed_Mps : REAL` : Vitesse absolue sur la fenêtre horodatée.
+- `SignedSpeed_Mps : REAL` : Vitesse signée (positive montée, négative descente).
+- `Valid : BOOL` : `TRUE` après 6 positions couvrant au moins 50 ms.
 
 ---
 
@@ -56,4 +57,4 @@ Brique technique de **mesure de vitesse linéaire** : calcule la vitesse du câb
 
 ## 5. Documents liés
 
-- [`AF_Partie-09_Fonction_Encoder_v2.0.md`](../AF_Partie-09_Fonction_Encoder_v2.0.md)
+- [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md)

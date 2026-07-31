@@ -1,9 +1,9 @@
 # Extraction de specifications - AF Partie 02 Architecture (v1.0)
 
 > Sources analysees : `ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md`,
-> `DOC/AUDITS/SYNTHESE_Architecture_CFC_Bus_DUT_v1.0.md`,
-> `DOC/AUDITS/MATRICE_Architecture_CFC_Bus_DUT_v1.0.md` et
-> `DOC/AUDITS/PLAN_MIGRATION_Lot1_CFC_Acquisition_v1.0.md`.
+> `ARCHIVES/Doc/AUDITS/SYNTHESE_Architecture_CFC_Bus_DUT_v1.0.md`,
+> `ARCHIVES/Doc/AUDITS/MATRICE_Architecture_CFC_Bus_DUT_v1.0.md` et
+> `ARCHIVES/Doc/AUDITS/PLAN_MIGRATION_Lot1_CFC_Acquisition_v1.0.md`.
 > Statut : fiche de conservation et de cadrage. Elle ne remplace pas l'AF02.
 
 ## Statut des sources

@@ -143,7 +143,7 @@ complète sur ce projet (voir incident ci-dessous).
 
 📖 **Deux incidents réels** ont fondé ces règles (SafeStop forcé manuellement · `SlackCableSwitch`
 câblé sans inversion · `PhaseRotationOk` non initialisé) : récits complets dans
-[`DOC/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md).
+[`ARCHIVES/Doc/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md).
 
 🚫 **Règle** : ne JAMAIS forcer manuellement une sortie de COMMANDE (`SafeStop`, `ForbidDescent`,
 `PowerCutOff`) — elle est TOUJOURS calculée par son bloc Safety. Pour un test banc, forcer
@@ -209,7 +209,7 @@ Exemple de pipeline (illustratif — pas le pipeline réel actuel, voir note ⚠
 📖 **Statut réel** : `Req` n'est appliqué **nulle part** dans le code actuel ; `CmdX` existe en
 préfixe, `BrakeCmd`/`OpenReq` en suffixe (legacy assumé). Le chantier de généralisation et la
 migration `ST_TranslationHMI` non retenue sont documentés dans
-[`DOC/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md) — **ne pas s'en servir comme
+[`ARCHIVES/Doc/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md) — **ne pas s'en servir comme
 référence d'un état existant**.
 
 ### Paramètre → Mesure → État atteint → État actif (fin de course logiciel, seuils)
@@ -307,7 +307,7 @@ Les structures d'échange IHM (`ST_WinchHMI`, `ST_BucketHMI`, `ST_TranslationHMI
 
 ⚠️ `GVL_Simulation` mélange aujourd'hui 3 familles (`_IsReal`, `_Simulated`, `Sim...`).
 La convention cible (`Bus`/`Sensor`/`Sim`/`Tst`/`Link`) est **planifiée, pas appliquée** :
-voir [`DOC/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md).
+voir [`ARCHIVES/Doc/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md).
 **Ne pas migrer au fil de l'eau** — chantier à part.
 
 ### Règle — Repère juste après le préfixe (GVL plates uniquement)

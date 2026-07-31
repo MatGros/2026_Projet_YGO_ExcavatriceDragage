@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 2.
    ✅ Expose ses défauts en VAR_OUTPUT (1 cycle de retard assumé pour instModes).
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_v2.0.md
+   📄 Docs : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
 *)
 
 PROGRAM PRG_02_Encoders

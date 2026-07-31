@@ -18,7 +18,6 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 
 | Dossier / fichier | Périmètre | Statut |
 |---|---|---|
-| `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom des variables d'E/S (convention de polarité) | **Vivant** — sert à retrouver un signal dans les schémas électriques et les REX antérieurs |
 | `IHM_VARIABLES_MIGRATION.md` | Correspondance ancien → nouveau chemin des variables IHM | **Vivant** — à tenir à jour à chaque lot, sert au reparamétrage IHM/SCADA physique |
 
 ## 🎯 À quoi sert chaque document — pour reprendre le travail
@@ -29,7 +28,6 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 
 | Document | Sert à | Tâches |
 |---|---|---|
-| `TABLE_Renommage_IO_v1.0.md` | Correspondance ancien → nouveau nom d'E/S. **§3bis porte la sémantique du Kobold à 3 temps** (hors eau `0` → immergé `1` → fond `0`) | **T81** · **T82** · tout retour à un schéma électrique ou un REX antérieur au 2026-07-27 |
 | `IHM_VARIABLES_MIGRATION.md` | Journal ancien → nouveau chemin des variables IHM, pour le reparamétrage de la visu. **À tenir à jour à chaque lot** | **T94** · **T95** · toute publication IHM |
 
 ### 📚 Hors de ce dossier, mais indispensables
@@ -48,6 +46,11 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 
 | Dossier / fichier | Chantier | Clôture |
 |---|---|---|
+| `TABLE_Renommage_IO_v1.0.md` | Table de renommage E/S & sémantique Kobold | 2026-07-31 — archivé. Sémantique Kobold intégrée dans `AF_Partie-04 §2` (T81/T82). Mapping réel géré par CODESYS `Device.export` |
+| `SYNTHESE_Architecture_CFC_Bus_DUT_v1.0.md` | Cadrage architecture CFC & Bus DUT | 2026-07-31 — archivé. Principes intégrés dans `AF_Partie-02` et `AF_Partie-03` |
+| `MATRICE_Architecture_CFC_Bus_DUT_v1.0.md` | Matrice détaillée des 5 Bus DUT | 2026-07-31 — archivé. Structures réelles dans `CODE/` (`ST_*.st`) |
+| `PLAN_MIGRATION_Lot1_CFC_Acquisition_v1.0.md` | Plan de migration Lot 1 CFC | 2026-07-31 — archivé |
+| `REX_Nommage_v1.0.md` | REX historique de nommage & pièges | 2026-07-31 — archivé. Référencé par `NAMING_CONVENTION.md` |
 | `RevueTechnique/AUDIT_Revue_Technique_v1.0.md` | Revue automatisme / sécurité / IHM | 2026-07-31 — archivé. C1/C2/C5 implémentés, C4/C6 suivis dans `PLAN_TASK` et `AF_Partie-10` |
 | `ConfigPersistence/` | Persistance config IHM (Lots 1-6) | `v0.4.26` — implémenté |
 | `RemovePlcTests/` | Retrait du framework de tests in-PLC (plan + audit de vérification) | `v0.5.1` — implémenté, compilé, validé |
