@@ -8,7 +8,7 @@ non-regression lors d'une evolution.
 
 Controles :
   R1  chaque test reference dans TEST_REGISTRY.md existe reellement (fichier::fonction)
-  R2  chaque `def test_*` present dans suites/ est reference dans le registre
+  R2  chaque `def test_*` present dans RESULTS/*/tests/ est reference dans le registre
   R3  aucun dossier de scratch `st2py-test-*` residuel sous RESULTS/
       (les tests doivent utiliser le temp systeme, jamais l'arborescence de resultats)
 
@@ -24,13 +24,13 @@ import re
 import sys
 from pathlib import Path
 
-#: Le registre reference les tests sous la forme `suites/<groupe>/<fichier>.py::<test>`.
-REGISTRY_LINE = re.compile(r"`suites/(?P<relpath>[\w/]+\.py)::(?P<funcname>test_\w+)`")
+#: Le registre reference les tests sous la forme `RESULTS/<DOMAINE>/tests/<fichier>.py::<test>`.
+REGISTRY_LINE = re.compile(r"`RESULTS/(?P<relpath>[\w/]+\.py)::(?P<funcname>test_\w+)`")
 TEST_DEF = re.compile(r"^def (test_\w+)\s*\(", re.MULTILINE)
 
-#: Groupes de suites tracables. contracts = comportement metier (TC-*),
-#: generation/simulation = outillage (AUTO), mais tous doivent etre traces.
-SUITE_GROUPS = ("contracts", "generation", "simulation")
+#: Domaines tracables (miroir de core/results_layout.py). AU/TRANSLATION = comportement
+#: metier (TC-*), _OUTIL = tests unitaires du generateur lui-meme (AUTO), mais tous tracés.
+DOMAIN_GROUPS = ("AU", "TRANSLATION", "_OUTIL")
 
 
 def load_registry_references(registry_path: Path) -> set[tuple[str, str]]:
@@ -38,14 +38,14 @@ def load_registry_references(registry_path: Path) -> set[tuple[str, str]]:
     return {(m.group("relpath"), m.group("funcname")) for m in REGISTRY_LINE.finditer(text)}
 
 
-def load_actual_tests(suites_dir: Path, group: str) -> set[tuple[str, str]]:
+def load_actual_tests(results_dir: Path, domain: str) -> set[tuple[str, str]]:
     found: set[tuple[str, str]] = set()
-    folder = suites_dir / group
+    folder = results_dir / domain / "tests"
     if not folder.is_dir():
         return found
     for path in sorted(folder.glob("test_*.py")):
         text = path.read_text(encoding="utf-8")
-        rel = f"{group}/{path.name}"
+        rel = f"{domain}/tests/{path.name}"
         for match in TEST_DEF.finditer(text):
             found.add((rel, match.group(1)))
     return found
@@ -65,7 +65,6 @@ def main() -> int:
 
     root = args.root.resolve()
     registry_path = root / "TEST_REGISTRY.md"
-    suites_dir = root / "suites"
     results_dir = root / "RESULTS"
 
     if not registry_path.is_file():
@@ -73,7 +72,7 @@ def main() -> int:
         return 2
 
     registry_refs = load_registry_references(registry_path)
-    by_group = {g: load_actual_tests(suites_dir, g) for g in SUITE_GROUPS}
+    by_group = {g: load_actual_tests(results_dir, g) for g in DOMAIN_GROUPS}
     actual_all: set[tuple[str, str]] = set()
     for tests in by_group.values():
         actual_all |= tests
@@ -82,10 +81,10 @@ def main() -> int:
     warnings: list[str] = []
 
     for relpath, funcname in sorted(registry_refs - actual_all):
-        errors.append(f"[R1] TEST_REGISTRY.md reference `{relpath}::{funcname}` introuvable dans suites/")
+        errors.append(f"[R1] TEST_REGISTRY.md reference `{relpath}::{funcname}` introuvable dans RESULTS/")
 
     for relpath, funcname in sorted(actual_all - registry_refs):
-        errors.append(f"[R2] suites/{relpath}::{funcname} existe mais absent de TEST_REGISTRY.md")
+        errors.append(f"[R2] RESULTS/{relpath}::{funcname} existe mais absent de TEST_REGISTRY.md")
 
     for stale in find_stale_scratch_dirs(results_dir):
         warnings.append(

@@ -6,7 +6,7 @@ import pathlib
 import sys
 import pytest
 
-TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
+TOOLS_DIR = pathlib.Path(__file__).resolve().parents[3]
 if str(TOOLS_DIR / 'core') not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR / 'core'))
 

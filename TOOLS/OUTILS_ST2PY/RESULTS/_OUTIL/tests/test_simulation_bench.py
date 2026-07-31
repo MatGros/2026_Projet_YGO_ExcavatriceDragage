@@ -3,7 +3,7 @@ import pathlib
 import sys
 import tempfile
 
-TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
+TOOLS_DIR = pathlib.Path(__file__).resolve().parents[3]
 if str(TOOLS_DIR / 'core') not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR / 'core'))
 
@@ -11,7 +11,7 @@ import fb_gen
 import simulation_bench
 
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[4]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[5]
 BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
 
 
