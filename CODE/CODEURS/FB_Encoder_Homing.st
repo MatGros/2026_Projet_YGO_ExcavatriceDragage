@@ -29,8 +29,7 @@ VAR_INPUT
                                          // IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
                                          // voir PRG_MAIN.st
     CfgTopSensorPosM   : REAL := 8.5;   // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
-    FwdRevSpeedFeedbackOff : BOOL;      // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
-                                         // retombés" CE TREUIL — arrêt confirmé (remplace ContactorFeedbackFwd/Rev)
+    FwdRevSpeedFeedbackOff : BOOL;      // Retour unique "tous contacteurs sens+vitesse retombés" CE TREUIL — arrêt confirmé
     BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)
     RawPos               : UDINT;       // Sortie FB_Encoder_Abs (déjà gelée sur doute)
     EncoderAvailable     : BOOL;        // Sortie FB_Encoder_Abs
@@ -116,9 +115,8 @@ IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
 END_IF;
 
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
-// 🛡️ Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
-// 🔧 REX 2026-07-07 : FwdRevSpeedFeedbackOff remplace (NOT ContactorFeedbackFwd) AND (NOT ContactorFeedbackRev)
-// 🌐 BypassGlobal = TRUE → on saute la vérification d'arrêt (mise en service)
+// Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
+// BypassGlobal = TRUE → saute la vérification d'arrêt (mise en service)
 ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
@@ -173,7 +171,7 @@ IF State = E_State.BUSY THEN
         Calib.LastKnownRawPos := PresetValueCalc;
         Done := TRUE;
         State := E_State.READY;
-        // 🔧 REX 2026-07-24 : Un homing réussi efface l'intégralité de ErrorId (y compris les anciens rejets 0..5 et le bit9)
+        // Un homing réussi efface l'intégralité de ErrorId
         ErrorId := 16#0000;
     ELSIF PresetNak THEN
         ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)

@@ -5,8 +5,8 @@
                    DOC/AF_Partie-03_Contrats_Composants_v2.0.md
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
       Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
-      ⚠️ FB_Ramp retiré du Joystick : les rampes d'accélération/décélération
-         sont gérées exclusivement par les FB de mouvement aval (FB_Winch, FB_Translation).
+      Les rampes d'accélération/décélération sont gérées exclusivement par les
+      FB de mouvement aval (FB_Winch, FB_Translation), hors de ce bloc.
    🔒 Bouton homme-mort :
       - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
       - Reconfirmation périodique en mouvement (délai DeadmanRearmTimeout).
@@ -100,11 +100,7 @@ END_IF;
 
 Ready := TRUE; Busy := TRUE;
 
-// 🔑 2. RESET DÉFAUT (front uniquement + cause disparue, Partie3 §5)
-// ⚠️ CORRECTIF (revue de code 2026-07-01) : l'ancienne version effaçait le défaut sur simple
-// niveau `Reset AND Error`, sans front ET sans vérifier que la cause (calib hors plage) avait
-// disparu — un Reset maintenu (bouton IHM bloqué) effaçait le défaut en boucle même si RawX/Y
-// restaient hors plage. Non conforme au guardrail Reset (CLAUDE.md, Partie3 §5).
+// 🔑 2. RESET DÉFAUT (front + cause disparue, Partie3 §5)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q AND (RawX >= 2000 AND RawX <= 8000 AND RawY >= 2000 AND RawY <= 8000) THEN
     ErrorId := ErrorId AND 16#FFFE;
@@ -120,8 +116,7 @@ IF BtnCalibrate AND NOT LastCalibrate THEN
         NeutralXMem := RawX;
         NeutralYMem := RawY;
     ELSE
-        // 🔧 CORRECTIF N7 (revue de code) : un seul bit pour une seule cause (Partie3 §3),
-        // l'ancienne valeur 16#0003 levait à tort les bits 0 ET 1 pour un même défaut.
+        // Un seul bit pour une seule cause (Partie3 §3)
         ErrorId := ErrorId OR 16#0001;
     END_IF;
 END_IF;
@@ -132,56 +127,49 @@ LastCalibrate := BtnCalibrate;
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, Deadband := Deadband);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
 
-// 🆕 4ter-bis. CHANGEMENT DE MODE (REX 2026-07-08, demande utilisateur) : désarme le homme-mort
-// dès que Mode change (MAINT_N1/N2/SEMI_AUTO/AUTO) — évite qu'une commande en cours (manche non
-// centré) ne "traverse" le changement de mode et ne soit réinterprétée soudainement dans le
-// nouveau contexte de mode (risque de mouvement soudain). Repassage par le neutre + nouvel appui
-// bouton exigé, comme n'importe quel désarmement (§4ter ci-dessous).
+// 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
+// (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
+// de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
 IF Mode <> LastMode THEN
     DeadmanArmed := FALSE;
     LeftNeutralSinceArm := FALSE;
 END_IF;
 LastMode := Mode;
 
-// 🆕 4ter-ter. FIN DE CYCLE BENNE : le désarmement reste la règle générale afin qu'une
-// fermeture manuelle ne démarre jamais M1/M2 par surprise. Seule exception documentée :
-// ExtractionSequence garde l'armement pendant sa fermeture, car elle enchaîne immédiatement
-// vers le contrôle au palier 1 sous ses propres interlocks synchro/position. La sortie de cette
-// brique retombe dès défaut, reset, AU ou abandon ; elle ne contourne pas le neutre autrement.
+// 4ter-ter. FIN DE CYCLE BENNE : désarmement général pour qu'une fermeture manuelle
+// ne démarre jamais M1/M2 par surprise. Exception : ExtractionSequence garde l'armement
+// pendant sa fermeture (enchaînement palier 1 sous ses propres interlocks synchro/position).
 BenneBusyFallEdge(CLK := BenneBusy);
 IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmed := FALSE;
     LeftNeutralSinceArm := FALSE;
 END_IF;
 
-// 🔴 4ter. BOUTON HOMME-MORT (2026-07-03octies + renforcé decies/duodecies/terdecies — voir en-tête)
+// 4ter. BOUTON HOMME-MORT
 DeadmanEdge(CLK := RawButton);
 
-// 🔧 2026-07-03terdecies (CORRECTIF review) : `LeftNeutralSinceArm` distingue "vient d'armer,
-// n'a pas encore bougé" (NE DOIT PAS désarmer, même après NeutralHoldTime — l'opérateur a le
-// temps qu'il veut pour démarrer son geste après l'appui) de "a bougé, PUIS est revenu au
-// neutre" (là, `NeutralHoldTime` s'applique normalement, voir plus bas). Sans ce garde-fou, un
-// opérateur qui arme puis hésite plus de NeutralHoldTime avant de bouger se faisait désarmer
-// silencieusement (fail-safe, mais contredisait l'intention D57).
+// LeftNeutralSinceArm distingue "vient d'armer, n'a pas encore bougé" (ne désarme pas,
+// l'opérateur a le temps qu'il veut pour démarrer) de "a bougé, puis est revenu au neutre"
+// (NeutralHoldTime s'applique).
 IF NOT DeadmanArmed THEN
     LeftNeutralSinceArm := FALSE;   // Repos/désarmé : prêt pour le prochain armement
 ELSIF NOT ((ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0)) THEN
     LeftNeutralSinceArm := TRUE;    // Armé et a quitté le neutre au moins une fois : geste réellement démarré
 END_IF;
 
-// Le neutre doit être TENU `NeutralHoldTime` avant de désarmer (pas juste traversé) — sinon une
-// inversion de sens rapide (Fwd→Rev) désarmerait à tort au passage par le neutre. Ne s'applique
-// QU'APRÈS un geste réellement démarré (`LeftNeutralSinceArm`), jamais juste après l'armement.
+// Neutre tenu NeutralHoldTime avant désarmement (pas juste traversé). Filtre les inversions
+// rapides (Fwd→Rev). Ne s'applique qu'après un geste réellement démarré.
 NeutralHoldTimer(IN := DeadmanArmed AND LeftNeutralSinceArm AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0),
                  PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN
-    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps APRÈS un geste démarré = fin réelle
+    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps après geste = fin réelle
 END_IF;
 IF DeadmanEdge.Q AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0) THEN
-    DeadmanArmed := TRUE;       // Appui bouton AU NEUTRE = armement
+    DeadmanArmed := TRUE;       // Appui bouton au neutre = armement
 END_IF;
 
-// 🆕 4quater. RECONFIRMATION PÉRIODIQUE (2026-07-03decies, CORRIGÉ undecies suite review) — tant
+// 4quater. RECONFIRMATION PÉRIODIQUE — tant qu'armé ET en mouvement, le bouton doit être
+// maintenu ou ré-appuyé avant DeadmanRearmTimeout. Seul un relâchement prolongé désarme.
 // qu'armé ET en mouvement (hors neutre), le bouton doit être soit MAINTENU, soit ré-appuyé, avant
 // DeadmanRearmTimeout. ⚠️ CORRECTIF : le 1er jet ne détectait qu'un FRONT (`DeadmanEdge.Q`) — un
 // opérateur qui MAINTIENT le bouton enfoncé en continu (réflexe naturel homme-mort) ne générait
