@@ -4,11 +4,12 @@ import sys
 import tempfile
 
 TOOLS_DIR = pathlib.Path(__file__).resolve().parents[2]
-if str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
+if str(TOOLS_DIR / 'core') not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR / 'core'))
 
-MODULES_DIR = TOOLS_DIR / 'out' / 'modules'
-MODULES_DIR.mkdir(parents=True, exist_ok=True)
+from results_layout import results_dir
+
+MODULES_DIR = results_dir('FB_Translation', 'modules')
 
 import fb_gen
 from data_contracts import build_position_decoder_contract, validate_contract

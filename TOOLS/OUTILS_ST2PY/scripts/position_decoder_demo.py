@@ -6,7 +6,9 @@ import sys
 from pathlib import Path
 
 TOOLS_DIR = Path(__file__).resolve().parents[1]
-OUT_DIR = TOOLS_DIR / 'out' / 'modules'
+sys.path.insert(0, str(TOOLS_DIR / 'core'))
+from results_layout import results_dir
+OUT_DIR = results_dir('FB_Translation_PositionDecoder', 'modules')
 if str(OUT_DIR) not in sys.path:
     sys.path.insert(0, str(OUT_DIR))
 

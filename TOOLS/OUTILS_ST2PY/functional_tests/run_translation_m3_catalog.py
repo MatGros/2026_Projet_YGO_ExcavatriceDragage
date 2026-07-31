@@ -7,17 +7,18 @@ import pathlib
 import sys
 
 TOOLS_DIR = pathlib.Path(__file__).resolve().parents[1]
-OUT_DIR = TOOLS_DIR / 'out' / 'modules'
+CORE_DIR = TOOLS_DIR / 'core'
 CATALOG_PATH = pathlib.Path(__file__).with_name('translation_m3_test_catalog.csv')
 
-if str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
+if str(CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(CORE_DIR))
 
 import fb_gen
 
 
 def _load_generated_module(pou_name):
-    module_path = OUT_DIR / f'{pou_name}.py'
+    from results_layout import results_dir
+    module_path = results_dir(pou_name, 'modules') / f'{pou_name}.py'
     spec = importlib.util.spec_from_file_location(pou_name, module_path)
     if spec is None or spec.loader is None:
         raise FileNotFoundError(f'Generated module not found: {module_path}')
