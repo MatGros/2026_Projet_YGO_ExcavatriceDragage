@@ -63,3 +63,9 @@ node_modules/
 
 # Artefacts de sous-agents Pi (transcripts regenerables, ~26 Mo)
 .pi-subagents/artifacts/
+
+# Scratchs d'agent a la racine (fichiers de travail temporaires, jamais du livrable).
+# Ajoute apres deux fuites accidentelles dans des commits (2026-08).
+/_*.py
+/_*.txt
+/_*.log
