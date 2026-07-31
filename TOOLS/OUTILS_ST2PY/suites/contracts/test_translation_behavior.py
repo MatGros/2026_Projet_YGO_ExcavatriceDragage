@@ -63,6 +63,78 @@ def test_translation_safe_stop_sets_fault():
     assert fb.State == 'FAULT'
 
 
+def test_translation_passes_through_slowdown_before_target():
+    """AF-TR-02 : la branche de reduction de vitesse est traversee avant la cible.
+
+    Arriver a DONE ne prouve pas que le ralentissement a eu lieu : l'etat SLOWDOWN
+    est donc verifie explicitement AVANT l'atteinte de cible.
+    """
+    module = _load_generated_module('FB_Translation')
+    fb = module.FB_Translation()
+    fb.Enable = True
+    fb.EmergencyStopOk = True
+    fb.StartStop = True
+    fb.SpeedRefPct = 80.0
+    fb.CaptorDebounce = 5.0
+
+    fb.step(10.0)
+    assert fb.State == 'MOVING'
+
+    fb.SlowdownSensor = True
+    fb.step(10.0)
+    assert fb.State == 'SLOWDOWN'
+
+    fb.PositionSensorTarget = True
+    fb.step(10.0)
+    assert fb.State == 'DONE'
+    assert fb.Done is True
+    assert fb.Error is False
+
+
+def test_translation_reset_requires_cause_to_disappear_first():
+    """AF-TR-04 : Reset n'acquitte que si la cause a disparu (regle projet).
+
+    Deux phases distinctes, sinon le test ne prouve rien : un Reset appuye alors que
+    SafeStop est toujours actif NE DOIT PAS reamorcer (jamais de redemarrage sous
+    cause presente) ; une fois la cause levee, un nouvel appui ramene en IDLE.
+    """
+    module = _load_generated_module('FB_Translation')
+    fb = module.FB_Translation()
+    fb.Enable = True
+    fb.EmergencyStopOk = True
+    fb.StartStop = True
+    fb.SafeStop = True
+
+    fb.step(10.0)
+    assert fb.State == 'FAULT'
+
+    # Phase 1 : Reset alors que la cause est TOUJOURS presente -> reste en defaut.
+    fb.Reset = True
+    fb.step(10.0)
+    assert fb.State == 'FAULT', "Reset ne doit pas acquitter tant que SafeStop est actif"
+
+    # Phase 2 : la cause disparait, mais l'ordre de marche est TOUJOURS enclenche.
+    # Le FB doit rester en defaut : disparition de la cause != acquittement.
+    fb.Reset = False
+    fb.SafeStop = False
+    fb.step(10.0)
+    assert fb.State == 'FAULT', "la disparition de la cause ne doit pas acquitter seule"
+
+    # Phase 3 : ordre de marche relache (l'operateur reprend la main), puis appui
+    # conscient sur Reset -> retour en IDLE, sans repartir tout seul.
+    fb.StartStop = False
+    fb.Reset = True
+    fb.step(10.0)
+    assert fb.State == 'IDLE'
+    assert fb.Error is False
+    assert fb.Ready is True
+
+    # Et surtout : pas de redemarrage automatique au cycle suivant.
+    fb.Reset = False
+    fb.step(10.0)
+    assert fb.State == 'IDLE', "aucun redemarrage automatique apres acquittement"
+
+
 def test_validation_accepts_generated_translation_module():
     module = _load_generated_module('FB_Translation')
     module_source = pathlib.Path(module.__file__).read_text(encoding='utf-8')
