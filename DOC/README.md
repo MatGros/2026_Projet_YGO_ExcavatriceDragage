@@ -31,7 +31,7 @@ automatiquement par `python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py --fi
 |---|---|
 | Pilotage / reliquats / TBD | [PLAN_TASK_v1.0.md](PLAN_TASK_v1.0.md) |
 | Historique CODE ↔ DOC | [VERSION_HISTORY.md](VERSION_HISTORY.md) |
-| Décisions de conception | [AUDIT_Coherence_Documentaire_v1.0.md](AUDIT_Coherence_Documentaire_v1.0.md) |
+| Décisions de conception | [ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md](../ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) (archive) |
 | Mise en service | [REGISTRE_Suivi_MiseEnService_20260724_v1.0.md](REGISTRE_Suivi_MiseEnService_20260724_v1.0.md) |
 | Post-mise en service | [REGISTRE Post-MES](REGISTRE_Suivi_PostMiseEnService_Livraison10Aout_20260728_v1.0.md) |
 | Fiches d'essais | `CHECKLISTS/` · Audits ouverts : `AUDITS/` · Schémas : `DIAGRAMS/` |

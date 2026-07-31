@@ -44,7 +44,7 @@ Contrat standard que **tout FB métier respecte** :
 - **[Partie 11 (v2.0)](DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md)** — Fonction Benne (sous-fonction Treuils M2).
 - **[Partie 12 (v2.0)](DOC/AF_Partie-12_Fonction_Translation_v2.0.md)** — Fonction Translation (M3 variateur AC600).
 - **[Partie 13 (v1.4)](DOC/AF_Partie-13_Fonction_Simulation_v2.0.md)** — Fonction Simulation.
-- **[Audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
+- **[Audit de cohérence (v1.0)](ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md)** — Historique des décisions de conception.
 
 ### 7️⃣ **[PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md)** 🗂️ **Pilotage projet — pas une spec**
 Seul document de suivi planning : jalons connus de l'affaire, état des tâches/features (fait/priorisé/partiel/différé/manquant), et récap des reliquats/TBD/questions client. Les `AF_PartieN` restent de la spec fonctionnelle pure — tout TBD organisationnel y renvoie ici (`📌 Suivi : PLAN_TASK.md §3`) plutôt que d'y être détaillé.
@@ -164,7 +164,7 @@ Sortie → `CODE/CODE_Bundle.xml`
 3. Étudier [AF_Partie-02 (v2.12)](ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v2.12.md) pour l'architecture **[RÉFÉRENCE]**
 4. Comprendre [AF_Partie-03 (v1.3)](ARCHIVES/Doc/AF_Partie-03_Template_FB_Commun_v1.3.md) avant de coder un FB
 5. Approfondir [Partie 4 (v1.4)](ARCHIVES/Doc/AF_Partie-04_Cycle_Sequenceur_v1.5.md) / [5 (v1.6)](ARCHIVES/Doc/AF_Partie-05_Modes_Maintenance_v1.6.md) / [6 (v1.6)](ARCHIVES/Doc/AF_Partie-06_IO_Conditioning_v1.8.md)
-6. Consulter [l'audit de cohérence (v1.0)](DOC/AUDIT_Coherence_Documentaire_v1.0.md) pour l'historique des décisions de conception
+6. Consulter [l'audit de cohérence (v1.0)](ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) pour l'historique des décisions de conception
 7. Consulter [VERSION_HISTORY.md](DOC/VERSION_HISTORY.md) pour les versions CODESYS testées
 8. Consulter [PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md) pour savoir ce qu'il reste à faire, trancher ou demander au client
 

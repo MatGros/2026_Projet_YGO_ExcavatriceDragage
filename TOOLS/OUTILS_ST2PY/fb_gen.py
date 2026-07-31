@@ -876,12 +876,19 @@ def render_safety_emergency_management_module_code(pou_name, interface):
             FieldSpec('_step_timer_ms', 'float', 'Chronomètre étape', 0.0),
             FieldSpec('_lockout_active', 'bool', 'Verrouillage 5s actif', False),
             FieldSpec('_lockout_timer_ms', 'float', 'Chronomètre lockout', 0.0),
-            FieldSpec('_redundancy_failed', 'bool', 'Échec auto-test redondance', False),
-            FieldSpec('_arming_failed', 'bool', 'Échec confirmation réarmement', False),
+            # Pattern Cause/Ack (REX 2026-08, AF01 §3.4bis, CODE_QUALITY_STANDARDS §9)
+            FieldSpec('_redundancy_failed_cause', 'bool', 'Latch brut auto-test redondance', False),
+            FieldSpec('_redundancy_failed_ack', 'bool', 'Accusé opérateur redondance', True),
+            FieldSpec('_redundancy_display_timer_ms', 'float', 'Debounce affichage redondance', 0.0),
+            FieldSpec('_arming_failed_cause', 'bool', 'Latch brut non-confirmation contacteur', False),
+            FieldSpec('_arming_failed_ack', 'bool', 'Accusé opérateur armement', True),
+            FieldSpec('_arming_display_timer_ms', 'float', 'Debounce affichage armement', 0.0),
             FieldSpec('_startup_fail', 'bool', 'Échec autotest démarrage', False),
             FieldSpec('_prev_reset', 'bool', 'Front Reset', False),
             FieldSpec('_prev_arm_req', 'bool', 'Front ArmRequest', False),
             FieldSpec('_prev_enable', 'bool', 'Front Enable', False),
+            FieldSpec('_prev_redundancy_cause', 'bool', 'Front Cause redondance (ré-alarme)', False),
+            FieldSpec('_prev_arming_cause', 'bool', 'Front Cause armement (ré-alarme)', False),
             FieldSpec('_first_scan_done', 'bool', 'Premier scan exécuté', False),
         ),
     )
@@ -958,14 +965,23 @@ class {pou_name}:
         self._step_timer_ms: float = 0.0
         self._lockout_active: bool = False
         self._lockout_timer_ms: float = 0.0
-        self._redundancy_failed: bool = False
-        self._arming_failed: bool = False
+        # Pattern Cause/Ack (REX 2026-08) : Cause = latch brut interlock securite,
+        # Ack = accuse operateur (Reset toujours effectif, jamais conditionne).
+        # Affiche = debounce(Cause) OR NOT Ack.
+        self._redundancy_failed_cause: bool = False
+        self._redundancy_failed_ack: bool = True
+        self._redundancy_display_timer_ms: float = 0.0
+        self._arming_failed_cause: bool = False
+        self._arming_failed_ack: bool = True
+        self._arming_display_timer_ms: float = 0.0
         self._startup_fail: bool = False
         self._force_test_a: bool = False
         self._force_test_b: bool = False
         self._prev_reset: bool = False
         self._prev_arm_req: bool = False
         self._prev_enable: bool = False
+        self._prev_redundancy_cause: bool = False
+        self._prev_arming_cause: bool = False
         self._first_scan_done: bool = False
 
         self._update_structs()
@@ -982,8 +998,11 @@ class {pou_name}:
         self._step = 0
         self._force_test_a = False
         self._force_test_b = False
-        self._redundancy_failed = False
-        self._arming_failed = False
+        # Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
+        self._redundancy_failed_cause = False
+        self._redundancy_failed_ack = True
+        self._arming_failed_cause = False
+        self._arming_failed_ack = True
         self._lockout_active = False
         self._startup_fail = False
         self._first_scan_done = False
@@ -992,7 +1011,7 @@ class {pou_name}:
     def _update_structs(self) -> None:
         armable = (self.Enable and self.EmergencyChainClosed and
                    self._step == 0 and not self._lockout_active and
-                   not self._redundancy_failed and not self.PowerContactorEngaged and
+                   not self._redundancy_failed_cause and not self.PowerContactorEngaged and
                    not self._startup_fail)
         busy = (self._step != 0) or self._lockout_active
 
@@ -1006,8 +1025,8 @@ class {pou_name}:
         self.Diag = {{
             'Error': bool(self.Error),
             'ErrorId': int(self.ErrorId),
-            'RedundancyTestFailed': bool(self._redundancy_failed),
-            'ArmFailed': bool(self._arming_failed),
+            'RedundancyTestFailed': bool(self.RedundancyTestFailed),
+            'ArmFailed': bool(self.EmergencyArmingFailed),
             'LockoutActive': bool(self._lockout_active),
         }}
 
@@ -1041,11 +1060,12 @@ class {pou_name}:
                 self._update_structs()
                 return
 
+        # Pattern Cause/Ack (REX 2026-08) : Reset TOUJOURS effectif, jamais conditionne
+        # par un etat externe (ex-bug : "Reset ET PowerContactorEngaged" creait une impasse).
         if reset_edge:
-            self._redundancy_failed = False
+            self._redundancy_failed_ack = True
+            self._arming_failed_ack = True
             self._startup_fail = False
-            if self.PowerContactorEngaged:
-                self._arming_failed = False
             self.ErrorId &= ~0x0008
 
         if self._lockout_active:
@@ -1057,13 +1077,17 @@ class {pou_name}:
         armable = (self.EmergencyChainClosed and
                    self._step == 0 and
                    not self._lockout_active and
-                   not self._redundancy_failed and
+                   not self._redundancy_failed_cause and
                    not self.PowerContactorEngaged and
                    not self._startup_fail)
 
         if arm_edge and armable:
             self._step = 1
             self._step_timer_ms = 0.0
+            # Nouvelle tentative repart d'une Cause propre (TC-P01-009) : si le probleme
+            # persiste, il sera re-latche des le prochain echec (re-alarme + re-acquittement).
+            self._redundancy_failed_cause = False
+            self._arming_failed_cause = False
 
         self._force_test_a = (self._step == 1)
         self._force_test_b = (self._step == 3)
@@ -1073,7 +1097,7 @@ class {pou_name}:
             if self._step_timer_ms >= 200.0:
                 self._force_test_a = False
                 if self.EmergencyChainClosed:
-                    self._redundancy_failed = True
+                    self._redundancy_failed_cause = True
                     self._step = 0
                 else:
                     self._step = 2
@@ -1095,7 +1119,7 @@ class {pou_name}:
             if self._step_timer_ms >= 200.0:
                 self._force_test_b = False
                 if self.EmergencyChainClosed:
-                    self._redundancy_failed = True
+                    self._redundancy_failed_cause = True
                     self._step = 0
                 else:
                     self._step = 4
@@ -1125,30 +1149,60 @@ class {pou_name}:
                 self._step = 0
                 self._lockout_active = False
             elif self._step_timer_ms >= 2000.0:
-                self._arming_failed = True
+                self._arming_failed_cause = True
                 self._step = 0
                 self._lockout_active = True
                 self._lockout_timer_ms = 0.0
             else:
                 self._step_timer_ms += time_ms
 
+        # Pattern Cause/Ack : detection re-apparition (TC-P01-009). L'interlock securite
+        # (MaintainA/B_RQ, Armable) utilise TOUJOURS la Cause brute, jamais l'Ack.
+        redundancy_cause_edge = self._redundancy_failed_cause and not self._prev_redundancy_cause
+        self._prev_redundancy_cause = self._redundancy_failed_cause
+        if redundancy_cause_edge:
+            self._redundancy_failed_ack = False
+
+        arming_cause_edge = self._arming_failed_cause and not self._prev_arming_cause
+        self._prev_arming_cause = self._arming_failed_cause
+        if arming_cause_edge:
+            self._arming_failed_ack = False
+
         maintain_a = (not self.PowerCutOffRequest and
                       not self._force_test_a and
                       not self.BtnEmergencyCutOff and
-                      not self._redundancy_failed)
+                      not self._redundancy_failed_cause)
         maintain_b = (not self.PowerCutOffRequest and
                       not self._force_test_b and
                       not self.BtnEmergencyCutOff and
-                      not self._redundancy_failed)
+                      not self._redundancy_failed_cause)
 
         self.MaintainA_RQ = maintain_a
         self.MaintainB_RQ = maintain_b
         self.ArmPulse_RQ = (self._step == 5)
 
+        # Affichage IHM : debounce anti-clignotement (Cause lissee) OR NOT Ack (STD §9).
+        # Uniquement pour l'affichage : l'action de securite ci-dessus reste instantanee
+        # sur la Cause brute, jamais retardee par ce debounce.
+        fault_display_debounce_ms = 200.0
+        if self._redundancy_failed_cause:
+            self._redundancy_display_timer_ms = min(
+                self._redundancy_display_timer_ms + time_ms, fault_display_debounce_ms)
+        else:
+            self._redundancy_display_timer_ms = 0.0
+        redundancy_displayed = (self._redundancy_display_timer_ms >= fault_display_debounce_ms) or not self._redundancy_failed_ack
+
+        if self._arming_failed_cause:
+            self._arming_display_timer_ms = min(
+                self._arming_display_timer_ms + time_ms, fault_display_debounce_ms)
+        else:
+            self._arming_display_timer_ms = 0.0
+        arming_displayed = (self._arming_display_timer_ms >= fault_display_debounce_ms) or not self._arming_failed_ack
+
         error_id = 0
-        if self._redundancy_failed:
+        if redundancy_displayed:
             error_id |= 0x0001
-        if self._arming_failed:
+        if arming_displayed:
             error_id |= 0x0002
         if self._startup_fail:
             error_id |= 0x0008
@@ -1157,8 +1211,8 @@ class {pou_name}:
         self.Error = (error_id != 0)
 
         self.ArmingSeqStep = self._step
-        self.RedundancyTestFailed = self._redundancy_failed
-        self.EmergencyArmingFailed = self._arming_failed
+        self.RedundancyTestFailed = redundancy_displayed
+        self.EmergencyArmingFailed = arming_displayed
         self.EmergencyArmingLockoutActive = self._lockout_active
 
         self.Ready = self.Enable and not self._startup_fail

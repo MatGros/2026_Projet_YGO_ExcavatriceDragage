@@ -12,7 +12,7 @@
 | Comment on **nomme** | `DOC/NAMING_CONVENTION.md` |
 | Comment on **déclare, encapsule, relie** | **ce document** |
 | Contrats FB, DUT et CFC | `DOC/AF_Partie-03_Contrats_Composants_v2.0.md` |
-| Ce que fait la machine | `DOC/AF_Partie-01` à `AF_Partie-14` |
+| Ce que fait la machine | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | Comment on exécute une modif | `.claude/skills/codesys-workflow.md` |
 
 ---
@@ -53,7 +53,7 @@ Détail complet (préfixes, suffixes d'unité, polarité booléenne, constructio
 
 > ⛔ **Un bundle généré, des tests Python verts ou un XML bien formé ne prouvent JAMAIS
 > qu'une fonction est reliée au reste du programme.** Ce sont des preuves de forme.
-> Le bug `PRG_10_Outputs_LD` a franchi tous ces contrôles.
+> Le bug de la barrière finale Outputs a franchi tous ces contrôles.
 
 Quatre faits doivent être **prouvés par recherche**, jamais déduits :
 
@@ -115,8 +115,8 @@ Il ne doit jamais masquer un arbitrage de commandes ni une priorité safety.
 
 - **Structure (`ST_*`) seulement si les données forment un contrat cohérent** (commande, mesure,
   état, diagnostic). Ni fourre-tout, ni structure pour deux scalaires sans bénéfice.
-- **Un `PRG_XX` orchestre**, il ne réimplémente pas la responsabilité d'un FB. Les données
-  destinées à d'autres programmes passent par ses `VAR_OUTPUT`, pas par `PRG_XX.Instance.Sortie`.
+- **Un programme orchestre**, il ne réimplémente pas la responsabilité d'un FB. Les données
+  destinées à d'autres programmes passent par ses `VAR_OUTPUT`, pas par accès direct à une instance interne.
 
 ---
 

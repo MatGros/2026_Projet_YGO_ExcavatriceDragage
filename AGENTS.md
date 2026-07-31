@@ -128,7 +128,7 @@ Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document :
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
 - [PLAN_TASK](DOC/PLAN_TASK_v1.0.md) — 🗂️ **pilotage, pas une spec** : état des tâches, reliquats, TBD
-- [AUDIT_Coherence_Documentaire](DOC/AUDIT_Coherence_Documentaire_v1.0.md) — historique des décisions de conception
+- [AUDIT_Coherence_Documentaire](ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) — historique des décisions de conception
 
 **Plan de numérotation** : 1–3 fondations · 4–6 specs transverses (Cycle/Modes/E-S) · 8+ fonctions
 métier, une par FB.
