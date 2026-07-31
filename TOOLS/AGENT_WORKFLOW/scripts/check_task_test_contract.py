@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Gate the test contract declared in a CODESYS task-context YAML file.
 
-C3/C4 and safety tasks must declare automatic PLC-test artifacts. In --release
-mode, those artifacts must be marked implemented and have execution evidence.
+Automatic PLC-test artifacts are optional (decision 2026-08-01: the in-PLC test
+overhead — RAM, resync cost — outweighs the benefit for most lots; C3/C4 safety
+relies on human_validation_required + manual CODESYS verification before load).
+If a task still declares tests_automated_required: true, this gate holds it to
+its word: artifact paths must be named, and in --release mode the artifact must
+be marked implemented with execution evidence.
 This intentionally reads only the small flat YAML contract used by this project.
 """
 
@@ -33,21 +37,17 @@ def main() -> int:
     args = parser.parse_args()
 
     text = args.task_context.read_text(encoding="utf-8")
-    criticality = value(text, "criticality")
-    required = criticality in {"C3", "C4"} or value(text, "pony_tail") == "forbidden"
     automated = value(text, "tests_automated_required").lower() == "true"
     paths = listed(text, "tests_implementation_paths")
     status = value(text, "tests_status")
     evidence = listed(text, "test_execution_evidence")
 
     errors: list[str] = []
-    if required and not automated:
-        errors.append("tests_automated_required: true is mandatory for C3/C4 or safety.")
-    if required and not paths:
-        errors.append("tests_implementation_paths must name the PLC test artifact(s).")
-    if args.release and required and status != "implemented":
+    if automated and not paths:
+        errors.append("tests_automated_required: true requires tests_implementation_paths to name the PLC test artifact(s).")
+    if args.release and automated and status != "implemented":
         errors.append("tests_status must be implemented before release.")
-    if args.release and required and not evidence:
+    if args.release and automated and not evidence:
         errors.append("test_execution_evidence must record the simulation/CODESYS result before release.")
 
     if errors:

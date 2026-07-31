@@ -33,6 +33,7 @@
 
 | Date | Jalon |
 |---|---|
+| 2026-08-01 | 🗑️ `CODE/TESTS/` archivé (4 fichiers → `ARCHIVES/Code/TESTS/`) + retrait de l'obligation de test PLC automatique en C3/C4 — détail §2 « Extension 2026-08-01 » |
 | 2026-07-28 | 🚀 `v0.5.3_PreCommissioningPrep` — Initialisation nouvelle session de travail, cadrage registre post-MES (`PMS-XXX`), pense-bête client YGO (isolation simu, visu pas-à-pas, dédouanement PLC/Matériel, MAINT_N1 ➔ Auto) |
 | 2026-07-27 | 🏁 **Chantier pré-livraison — simulation & diagnostic TERMINÉ** (commits `72a3bbc`→`HEAD`). Détail §1bis. Documents de conduite archivés dans `ARCHIVES/Doc/AUDITS/PreLivraison/` : ce plan redevient l'unique source du pilotage |
 | 2026-07-24 | 🎯 **Priorité Demain** — 1) Chargement API + vérification Visualisation IHM (remapping). 2) Qualification purge Bypass Global (M1, M2, M3). 3) Essai du fonctionnement **Capteur Kobold** (contact fond) & IHM. 4) Essai du **Positionneur Translation M3** ("Aller à la position" Trémie/Maintenance/Zone travail). |
@@ -132,6 +133,22 @@ pour des rapports jamais relus, + resynchronisation des 7 suites à chaque évol
 `GVL_PLC_Tests` survit, réduite à ses 20 `Override*` = points d'injection de pannes en **forçage
 manuel**. Non-régression (ex-TC-01/02/03, matrice V1–V7) → simulation CODESYS manuelle + FAT/SAT.
 Spec archivée : `ARCHIVES/Doc/AF_Partie-14_PLC_Tests_Validation_v1.2.md`.
+
+### ❌ Extension 2026-08-01 — `CODE/TESTS/` archivé, gate C3/C4 test-auto retiré
+Même motif que ci-dessus, étendu aux bancs de test C4 restants : `PRG_AU_TestBench.st`,
+`PRG_Test_FinalBrakePowerInterlock.st` (LOT3A), `PRG_Test_KoboldMaintenance.st` (LOT2A/T81-T82),
+`ST_Safety_Emergency_TestContext.st` **retirés** → `ARCHIVES/Code/TESTS/`. Aucun n'avait jamais
+été exécuté en CODESYS réel (en-têtes explicites : « preuves préparées, pas une exécution
+CODESYS déclarée »).
+📌 **Décision projet** : le test PLC automatique n'est plus une obligation C3/C4 —
+`check_task_test_contract.py`, les skills `codesys-workflow`/`codesys-change`/`release-check`
+et `docs/TASK_CONTEXT.md` mis à jour en conséquence. La garantie C3/C4 repose désormais
+sur `human_validation_required` seul : **vérification manuelle exhaustive (Watch/forçage
+CODESYS) avant tout chargement**, y compris pour ce qui ne peut pas être testé autrement.
+`TASK_CONTEXT_LOT2A_KOBOLD_MAINTENANCE.yaml` et `TASK_CONTEXT_LOT3A_WINCH_FINAL_INTERLOCK.yaml`
+repassés `tests_automated_required: false` / `tests_status: planned` — **T81/T82 (Kobold) et
+le lot Interlocks finaux (2A) restent à valider manuellement en CODESYS avant mise en service**,
+sans artefact de test embarqué.
 
 ### 🗑️ Nettoyage dû
 `GVL_BUS`/`GVL_Machine_Stub` ✅ supprimés (2026-07-15, orphelins confirmés) · `ST_IHM_MANU` ✅ supprimé (2026-07-19) ·

@@ -47,7 +47,6 @@ SPEC_MAP: dict[str, list[int]] = {
     "CODE/MODES/": [5],
     "CODE/SIMULATION/": [13],
     "CODE/SUPERVISION/": [7],
-    "CODE/TESTS/": [3],
     "CODE/TRANSLATION/": [11, 3],
     "CODE/TREUILS/": [9, 3, 12],
 }

@@ -9,7 +9,8 @@ scope_doc: []
 out_of_scope: []
 acceptance_criteria: []
 tests_required: []
-# Obligatoire C3/C4 et tout sujet safety : test PLC automatique traçable.
+# Optionnel, tout niveau (décision 2026-08-01 : plus d'obligation C3/C4 — voir
+# note ci-dessous). true seulement si la tâche choisit d'écrire un test PLC.
 tests_automated_required: false
 tests_implementation_paths: [] # fichiers ST du test/extension de suite
 tests_status: planned|implemented|executed
@@ -34,16 +35,22 @@ freins, contacteurs, limites physiques, interlocks, homing safety et FAT/SAT.
 
 | Champ | C0-C1 | C2-C3 | C4 |
 |---|---|---|---|
-| `tests_automated_required` | false | false / true | **true** |
+| `tests_automated_required` | false | false | false (option libre) |
 | `dual_review_required` | false | false | **true** |
 | `pony_tail` | allowed | allowed / forbidden | **forbidden** |
 | `human_validation_required` | true | true | **true** |
 
-## Gate tests C3/C4
+## Gate tests (optionnel)
 
-Avant code : `python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>`.
-Avant restitution/release : même commande avec `--release`.
+📌 **Décision 2026-08-01** : le test PLC automatique embarqué n'est plus obligatoire pour
+C3/C4, quel que soit le sujet safety. Motif : même coût que le framework `PLC_TESTS`
+abandonné le 2026-07-26 (RAM, resynchronisation à chaque évolution métier) pour des
+artefacts jamais réellement exécutés en CODESYS (`CODE/TESTS/` archivé dans
+`ARCHIVES/Code/TESTS/`). La garantie C3/C4 repose désormais sur `human_validation_required`
+seul : vérification manuelle exhaustive (Watch/forçage CODESYS) **avant tout chargement**,
+sans artefact structuré obligatoire.
 
-Pour C3/C4 ou safety, une simulation manuelle seule ne suffit pas : le scope doit contenir
-un artefact PLC de test, et le lot reste bloqué tant que `tests_status` n'est pas
-`implemented` avec une preuve d'exécution.
+Si une tâche choisit quand même d'écrire un test PLC (`tests_automated_required: true`) :
+`python TOOLS/AGENT_WORKFLOW/scripts/check_task_test_contract.py <TASK_CONTEXT>` avant code,
+même commande `--release` avant restitution — le gate vérifie alors que l'artefact déclaré
+existe et, en release, qu'il est `implemented` avec preuve d'exécution.
