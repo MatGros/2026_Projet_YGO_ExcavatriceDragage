@@ -40,6 +40,11 @@ VAR_OUTPUT
     TranslationPosP1           : BOOL;       (* TRUE = translation en position P1 *)
     TranslationPosMaintenance  : BOOL;       (* TRUE = translation en position Maintenance *)
     M3BrakeFeedback            : BOOL := TRUE;   (* TRUE = frein M3 serré (état sûr) — polarité normalisée *)
+
+    // ── [CONFIRMATION DESSERTAGE FREIN M1/M2/M3] ────────────────────────────────────────────
+    M1BrakeCommandOpenConfirmed : BOOL;      (* TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback) *)
+    M2BrakeCommandOpenConfirmed : BOOL;      (* TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback) *)
+    M3BrakeCommandOpenConfirmed : BOOL;      (* TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback) *)
 END_VAR
 
 VAR
@@ -153,6 +158,7 @@ instM1BrakeFeedback(
     ChannelOk   := TRUE
 );
 M1BrakeFeedback := instM1BrakeFeedback.State;
+M1BrakeCommandOpenConfirmed := NOT M1BrakeFeedback;   (* DI filtré inversé : contacteur desserrage confirmé *)
 
 instM2FwdRevSpeedFeedbackOff(
     InputRaw    := HwIn.Winch.M2_ContactorsReleased_DI,
@@ -177,6 +183,7 @@ instM2BrakeFeedback(
     ChannelOk   := TRUE
 );
 M2BrakeFeedback := instM2BrakeFeedback.State;
+M2BrakeCommandOpenConfirmed := NOT M2BrakeFeedback;   (* DI filtré inversé : contacteur desserrage confirmé *)
 
 // === [TRANSLATION M3] ===
 instTranslationPosTremie(
@@ -226,3 +233,4 @@ instM3BrakeFeedback(
     ChannelOk   := TRUE
 );
 M3BrakeFeedback := instM3BrakeFeedback.State;
+M3BrakeCommandOpenConfirmed := NOT M3BrakeFeedback;   (* DI filtré inversé : contacteur desserrage confirmé *)

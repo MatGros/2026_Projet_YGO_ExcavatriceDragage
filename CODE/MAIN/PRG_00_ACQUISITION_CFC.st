@@ -16,6 +16,17 @@ VAR_OUTPUT
     HwSim                    : ST_HardwareImage;  (* Image produite par le banc de simulation *)
     HwIn                     : ST_HardwareImage;  (* Image aiguillée réel/simulé *)
     WinchInputSourceChanged  : BOOL;              (* Pulse 1 cycle sur bascule réel/simulé domaine Winch *)
+
+    // 🆕 Migration PRG_00_Inputs : positions Translation M3 exposées en sortie de programme
+    TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie *)
+    TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV *)
+    TranslationPosP2          : BOOL;   (* TRUE = translation en position P2 *)
+    TranslationPosP1          : BOOL;   (* TRUE = translation en position P1 *)
+    TranslationPosMaintenance : BOOL;   (* TRUE = translation en position Maintenance *)
+
+    // 🆕 Migration PRG_00_Inputs : retours variateur M3 filtrés (PT1 T#0MS = recopie legacy)
+    M3_StatusWord_Filtered        : UINT;
+    M3_ActualFrequencyHz_Filtered : UINT;
 END_VAR
 
 VAR
@@ -29,6 +40,11 @@ VAR
     instEncoderScaleM2       : FB_Encoder_Scale;
     instHomingM2             : FB_Encoder_Homing;
     instPosDecoderM3         : FB_Translation_PositionDecoder;
+
+    (* ── Filtrage des retours variateur M3 (migration PRG_00_Inputs) ── *)
+    instCycleTimeAcq            : FB_CycleTime;
+    instFilterM3StatusWord      : FB_Filter_PT1;
+    instFilterM3ActualFreqHz      : FB_Filter_PT1;
 
     (* ── Mémoire de la source Winch (front bascule réel/simulé) ── *)
     WinchInputSourceSimulated            : BOOL;
@@ -295,3 +311,27 @@ instPosDecoderM3(
     SensorP1          := HwIn.Translation.M3_PosP1_DI,
     SensorMaintenance := HwIn.Translation.M3_PosMaintenance_DI
 );
+
+// 🆕 Exposition des positions Translation M3 pour les consommateurs legacy
+TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
+TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
+TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
+TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
+TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
+
+// 🆕 Filtrage PT1 (T#0MS = pass-through) des retours variateur M3 — cohérent avec le legacy
+instCycleTimeAcq(DefaultValueS := 0.010);
+
+instFilterM3StatusWord(
+    ValueIn    := UINT_TO_REAL(WORD_TO_UINT(HwIn.Translation.M3_StatusWord)),
+    TimeConst  := T#0MS,
+    CycleTimeS := instCycleTimeAcq.CycleTimeS
+);
+M3_StatusWord_Filtered := REAL_TO_UINT(instFilterM3StatusWord.ValueOut);
+
+instFilterM3ActualFreqHz(
+    ValueIn    := UINT_TO_REAL(HwIn.Translation.M3_ActualFrequencyHz),
+    TimeConst  := T#0MS,
+    CycleTimeS := instCycleTimeAcq.CycleTimeS
+);
+M3_ActualFrequencyHz_Filtered := REAL_TO_UINT(instFilterM3ActualFreqHz.ValueOut);

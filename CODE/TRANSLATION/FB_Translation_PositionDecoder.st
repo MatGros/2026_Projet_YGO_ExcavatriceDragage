@@ -24,6 +24,13 @@ VAR_OUTPUT
     LimitSwitchRev    : BOOL;   // Extrême Maintenance confirmé (mot = 00000)
     Incoherent        : BOOL;   // Mot hors des 6 combinaisons valides -> défaut sécurité (SafeStop+PowerCutOff, voir FB_Safety_Translation)
     SensorsWord       : BYTE;   // Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)
+
+    // 🆕 Exposition des positions individuelles pour consommation par les programmes aval (migration PRG_00_Inputs)
+    TranslationPosTremie      : BOOL;   // TRUE = capteur Trémie actif
+    TranslationPosPV          : BOOL;   // TRUE = capteur PV actif
+    TranslationPosP2          : BOOL;   // TRUE = capteur P2 actif
+    TranslationPosP1          : BOOL;   // TRUE = capteur P1 actif
+    TranslationPosMaintenance : BOOL;   // TRUE = capteur Maintenance actif
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -47,3 +54,10 @@ END_CASE;
 // 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
 LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
 LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+
+// 🆕 Reprise des capteurs de position pour les consommateurs legacy (passthrough, identique à l'entrée filtrée)
+TranslationPosTremie      := SensorTremie;
+TranslationPosPV          := SensorPV;
+TranslationPosP2          := SensorP2;
+TranslationPosP1          := SensorP1;
+TranslationPosMaintenance := SensorMaintenance;

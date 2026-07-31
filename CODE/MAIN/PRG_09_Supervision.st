@@ -209,7 +209,7 @@ GVL_IHM.M1TreuilRetenue.State.FinalInterlockReason     := GVL_Global.instWinchOu
 GVL_IHM.M1TreuilRetenue.State.FinalInterlockError      := GVL_Global.instWinchOutputInterlockM1_LD.Error;
 GVL_IHM.M1TreuilRetenue.State.FinalInterlockErrorId    := GVL_Global.instWinchOutputInterlockM1_LD.ErrorId;
 GVL_IHM.M1TreuilRetenue.State.FinalRestartInhibit      := GVL_Global.instWinchOutputInterlockM1_LD.RestartInhibit;
-GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed := PRG_00_Inputs.M1BrakeCommandOpenConfirmed;
+GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M1BrakeCommandOpenConfirmed;
 GVL_IHM.M1TreuilRetenue.State.FinalRestartDelayElapsed := PRG_10_Outputs_LD.instWinchOutputInterlockM1_LD.RestartDelayElapsed;
 GVL_IHM.M1TreuilRetenue.State.FinalStepDelayElapsed    := PRG_10_Outputs_LD.instWinchOutputInterlockM1_LD.StepDelayElapsed;
 GVL_IHM.M1TreuilRetenue.State.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
@@ -282,7 +282,7 @@ GVL_IHM.M2TreuilBenne.State.FinalInterlockReason     := GVL_Global.instWinchOutp
 GVL_IHM.M2TreuilBenne.State.FinalInterlockError      := GVL_Global.instWinchOutputInterlockM2_LD.Error;
 GVL_IHM.M2TreuilBenne.State.FinalInterlockErrorId    := GVL_Global.instWinchOutputInterlockM2_LD.ErrorId;
 GVL_IHM.M2TreuilBenne.State.FinalRestartInhibit      := GVL_Global.instWinchOutputInterlockM2_LD.RestartInhibit;
-GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed := PRG_00_Inputs.M2BrakeCommandOpenConfirmed;
+GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M2BrakeCommandOpenConfirmed;
 GVL_IHM.M2TreuilBenne.State.FinalAuthorizedStep      := GVL_Global.instWinchOutputInterlockM2_LD.AuthorizedStep;
 GVL_IHM.M2TreuilBenne.State.FinalBrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM2_LD.BrakeTimeoutElapsed;
 GVL_IHM.M2TreuilBenne.State.FinalRestartDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.RestartDelayElapsed;
@@ -369,7 +369,7 @@ GVL_IHM.TranslationM3.State.FinalInterlockState  := GVL_Global.instTranslationOu
 GVL_IHM.TranslationM3.State.FinalInterlockReason := GVL_Global.instTranslationOutputInterlock_LD.Reason;
 GVL_IHM.TranslationM3.State.FinalInterlockError  := GVL_Global.instTranslationOutputInterlock_LD.Error;
 GVL_IHM.TranslationM3.State.FinalInterlockErrorId := GVL_Global.instTranslationOutputInterlock_LD.ErrorId;
-GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_00_Inputs.M3BrakeCommandOpenConfirmed;
+GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_01_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 GVL_IHM.TranslationM3.State.FinalBrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_01_INPUTS_LD.M3BrakeFeedback;
 GVL_IHM.TranslationM3.State.PositionSensorTarget := PRG_07_TranslationControl.M3_PositionSensorTarget;
@@ -384,11 +384,11 @@ IF PRG_00_ACQUISITION_CFC.instPosDecoderM3.Incoherent THEN
     GVL_IHM.TranslationM3.State.PositionP1          := FALSE;
     GVL_IHM.TranslationM3.State.PositionMaintenance := FALSE;
 ELSE
-    GVL_IHM.TranslationM3.State.PositionTremie      := PRG_00_Inputs.TranslationPosTremie;
-    GVL_IHM.TranslationM3.State.PositionPV          := PRG_00_Inputs.TranslationPosPV;
-    GVL_IHM.TranslationM3.State.PositionP2          := PRG_00_Inputs.TranslationPosP2;
-    GVL_IHM.TranslationM3.State.PositionP1          := PRG_00_Inputs.TranslationPosP1;
-    GVL_IHM.TranslationM3.State.PositionMaintenance := PRG_00_Inputs.TranslationPosMaintenance;
+    GVL_IHM.TranslationM3.State.PositionTremie      := PRG_00_ACQUISITION_CFC.TranslationPosTremie;
+    GVL_IHM.TranslationM3.State.PositionPV          := PRG_00_ACQUISITION_CFC.TranslationPosPV;
+    GVL_IHM.TranslationM3.State.PositionP2          := PRG_00_ACQUISITION_CFC.TranslationPosP2;
+    GVL_IHM.TranslationM3.State.PositionP1          := PRG_00_ACQUISITION_CFC.TranslationPosP1;
+    GVL_IHM.TranslationM3.State.PositionMaintenance := PRG_00_ACQUISITION_CFC.TranslationPosMaintenance;
 END_IF;
 GVL_IHM.TranslationM3.State.SensorsWord         := PRG_00_ACQUISITION_CFC.instPosDecoderM3.SensorsWord;
 GVL_IHM.TranslationM3.State.SensorWordIncoherent:= PRG_00_ACQUISITION_CFC.instPosDecoderM3.Incoherent;
@@ -410,10 +410,10 @@ GVL_IHM.TranslationM3.Safety.ErrorSensorIncoherent:= PRG_03_Safety.instSafetyTra
 GVL_IHM.TranslationM3.Safety.SafeStop          := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
 GVL_IHM.TranslationM3.Safety.PowerCutOff       := PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
 
-GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_Inputs.M3_StatusWord_Filtered.7;
-GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_Inputs.M3_StatusWord_Filtered.0;
+GVL_IHM.TranslationM3.State.DriveCommReady       := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered.7;
+GVL_IHM.TranslationM3.State.DrivePowerReady      := PRG_00_ACQUISITION_CFC.M3_StatusWord_Filtered.0;
 // 🔧 Source unique (PRG_00_Inputs), valable Auto ET Manu — remplace l'ex-doublon IHM_MANU.M3_FreqActual
-GVL_IHM.TranslationM3.State.DriveActualFreq_Hz     := UINT_TO_REAL(PRG_00_Inputs.M3_ActualFrequencyHz_Filtered) / 100.0;
+GVL_IHM.TranslationM3.State.DriveActualFreq_Hz     := UINT_TO_REAL(PRG_00_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_IHM.TranslationM3.State.DriveFreqRef_Hz        := GVL_Global.instTranslationOutputInterlock_LD.DriveFreqRefHz;
 GVL_IHM.TranslationM3.State.DriveControlWord       := GVL_Global.instTranslationOutputInterlock_LD.DriveControlWord;
 GVL_IHM.TranslationM3.State.ActiveDirection      := PRG_07_TranslationControl.M3_Direction_Active;
