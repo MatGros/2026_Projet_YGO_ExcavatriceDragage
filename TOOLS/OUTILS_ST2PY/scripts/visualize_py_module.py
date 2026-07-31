@@ -4,8 +4,8 @@ AST Parser & Diagram Generator for ST2PY Generated Modules.
 Parses generated Python files (RESULTS/<DOMAINE>/modules/*.py) using `ast`, extracts Class
 structure, Inputs, Outputs, FSM States, and generates UML & State Machine diagrams.
 
-Les diagrammes atterrissent a cote des autres resultats de test du meme domaine
-(RESULTS/<DOMAINE>/chronicles/), pas dans un dossier separe : un rapport de test et
+Les diagrammes atterrissent à côté des autres résultats de test du même domaine
+(RESULTS/<DOMAINE>/chronicles/), pas dans un dossier séparé : un rapport de test et
 son diagramme se lisent ensemble (REX 2026-08).
 """
 
@@ -41,7 +41,6 @@ def parse_module_ast(py_file_path: Path) -> dict:
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
             info["class_name"] = node.name
-            # Look at __init__ assignments
             for stmt in node.body:
                 if isinstance(stmt, ast.FunctionDef) and stmt.name == "__init__":
                     for item in stmt.body:
@@ -57,7 +56,6 @@ def parse_module_ast(py_file_path: Path) -> dict:
                             else:
                                 info["outputs"].append((attr_name, type_name))
 
-    # Extract FSM step comments or comparisons like `self._step == X` from code using regex
     steps_found = sorted(set(re.findall(r"self\._step\s*==\s*(\d+)", code)))
     info["fsm_states"] = [int(s) for s in steps_found]
 
@@ -65,8 +63,210 @@ def parse_module_ast(py_file_path: Path) -> dict:
 
 
 def generate_uml_puml(info: dict) -> str:
-    """Generate PlantUML Class Diagram for the parsed module."""
+    """Generate PlantUML Class & Composition Diagram for the parsed module, including DUTs & Sub-FBs."""
     class_name = info["class_name"]
+
+    # Traitement spécial pour FB_Safety_EmergencyManagement (diagramme d'architecture composite complet)
+    if class_name == "FB_Safety_EmergencyManagement":
+        return """@startuml
+scale max 3800x3800
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam fontname "Segoe UI, Arial, sans-serif"
+skinparam fontsize 12
+skinparam classHeaderBackgroundColor #E1BEE7
+
+title Architecture, Composition & DUT — FB_Safety_EmergencyManagement (Domaine AU)
+
+package "Données Structurées (DUT)" #F5F5F5 {
+    class ST_EmergencyManagementCmd << (S,#1976D2) STRUCT >> {
+        + MaintainA_Cmd : BOOL
+        + MaintainB_Cmd : BOOL
+        + ArmPulse_Cmd : BOOL
+    }
+
+    class ST_State_Emergency << (S,#2E7D32) STRUCT >> {
+        + ChainOk : BOOL
+        + ContactorOk : BOOL
+        + Step : INT
+        + Armable : BOOL
+        + ArmingBusy : BOOL
+    }
+
+    class ST_Diag_Emergency << (S,#C62828) STRUCT >> {
+        + Error : BOOL
+        + ErrorId : WORD
+        + RedundancyTestFailed : BOOL
+        + ArmFailed : BOOL
+        + LockoutActive : BOOL
+    }
+}
+
+package "Bloc Composite AU (CODE/AU)" #FAFAFA {
+    class FB_Safety_EmergencyManagement << (C,#7B1FA2) Composite Parent >> {
+        .. Entrées (VAR_INPUT) ..
+        + Enable : BOOL
+        + Reset : BOOL
+        + ArmRequest : BOOL
+        + EmergencyChainClosed : BOOL
+        + PowerContactorEngaged : BOOL
+        + PowerCutOffRequest : BOOL
+        + BtnEmergencyCutOff : BOOL
+        .. Sorties (VAR_OUTPUT) ..
+        + Ready : BOOL
+        + Busy : BOOL
+        + Done : BOOL
+        + Error : BOOL
+        + ErrorId : WORD
+        + MaintainA_RQ : BOOL
+        + MaintainB_RQ : BOOL
+        + ArmPulse_RQ : BOOL
+        + State : ST_State_Emergency
+        + Diag : ST_Diag_Emergency
+    }
+
+    class FB_Safety_EmergencyManagementLogic << (C,#D81B60) Décision & FSM >> {
+        + Enable : BOOL
+        + Reset : BOOL
+        + ArmRequest : BOOL
+        + EmergencyChainClosed : BOOL
+        + PowerContactorEngaged : BOOL
+        + PowerCutOffRequest : BOOL
+        + BtnEmergencyCutOff : BOOL
+        --
+        + Cmd : ST_EmergencyManagementCmd
+        + ArmingSeqStep : INT
+        + RedundancyTestFailed : BOOL
+        + EmergencyArmingFailed : BOOL
+        + EmergencyArmingLockoutActive : BOOL
+        + Armable : BOOL
+        + ArmingBusy : BOOL
+        + StartupFail : BOOL
+    }
+
+    class FB_Safety_EmergencyManagementOutput << (C,#00897B) Pilote Physique >> {
+        + Enable : BOOL
+        + Cmd : ST_EmergencyManagementCmd
+        + ChainOk : BOOL
+        + ContactorOk : BOOL
+        + ArmingStep : INT
+        + Armable : BOOL
+        + ArmingBusy : BOOL
+        + Error : BOOL
+        + ErrorId : WORD
+        --
+        + MaintainA_RQ : BOOL
+        + MaintainB_RQ : BOOL
+        + ArmPulse_RQ : BOOL
+        + State : ST_State_Emergency
+        + Diag : ST_Diag_Emergency
+    }
+}
+
+package "Écosystème & Interconnexions AU" #F0F4C3 {
+    class PRG_AU_Acquisition_CFC << (P,#78909C) CFC Acquisition >>
+    class FB_Sim_AU_ChainFeedback << (C,#FB8C00) Simulation Feedback >>
+    class PRG_AU_Outputs_LD << (P,#78909C) LD Sorties Scalaires >>
+    class PRG_09_Supervision << (P,#5C6BC0) Supervision IHM >>
+}
+
+FB_Safety_EmergencyManagement *-- FB_Safety_EmergencyManagementLogic : "Logic (Instance Privée)"
+FB_Safety_EmergencyManagement *-- FB_Safety_EmergencyManagementOutput : "Output (Instance Privée)"
+
+FB_Safety_EmergencyManagementLogic --> ST_EmergencyManagementCmd : "produit Cmd"
+FB_Safety_EmergencyManagementOutput --> ST_EmergencyManagementCmd : "consomme Cmd"
+FB_Safety_EmergencyManagementOutput --> ST_State_Emergency : "produit State"
+FB_Safety_EmergencyManagementOutput --> ST_Diag_Emergency : "produit Diag"
+
+PRG_AU_Acquisition_CFC --> FB_Safety_EmergencyManagement : "EmergencyChainClosed, PowerContactorEngaged"
+FB_Safety_EmergencyManagement --> PRG_AU_Outputs_LD : "MaintainA/B_RQ, ArmPulse_RQ, scalaires"
+FB_Safety_EmergencyManagement --> PRG_09_Supervision : "State, Diag"
+FB_Sim_AU_ChainFeedback <--> FB_Safety_EmergencyManagement : "Boucle simulation A/B"
+
+legend bottom
+  |= Objet |= Rôle dans le domaine AU |
+  | `FB_Safety_EmergencyManagement` | Composite parent encapsulant Logic & Output |
+  | `FB_Safety_EmergencyManagementLogic` | Machine d'état (steps 0..6, autotest, Cause/Ack) |
+  | `FB_Safety_EmergencyManagementOutput` | Pilote physique & génération des bus d'état/diag |
+  | `ST_*` | Structures DUT véhiculant les consignes & états publics |
+endlegend
+
+@enduml"""
+
+    # Traitement spécial pour FB_Safety_Translation / FB_Translation
+    if class_name in ["FB_Translation", "FB_Safety_Translation"]:
+        return """@startuml
+scale max 3800x3800
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam fontname "Segoe UI, Arial, sans-serif"
+skinparam fontsize 12
+skinparam classHeaderBackgroundColor #B2EBF2
+
+title Architecture & Interconnexions — Domaine Translation (CODE/TRANSLATION)
+
+package "Données Structurées & DÉCODEUR" #F5F5F5 {
+    class FB_Translation_PositionDecoder << (C,#00ACC1) Décodeur Capteurs >> {
+        + SensorsMask : WORD
+        --
+        + RawPosition : INT
+        + IncoherentMask : BOOL
+        + ForwardAllowed : BOOL
+        + ReverseAllowed : BOOL
+    }
+
+    class ST_TranslationHMI << (S,#1976D2) STRUCT >> {
+        + SpeedRefPct : REAL
+        + Direction : INT
+        + ManualCmd : BOOL
+    }
+}
+
+package "Sécurité & Pilotage Translation" #FAFAFA {
+    class FB_Safety_Translation << (C,#D32F2F) Sécurité Translation >> {
+        + Enable : BOOL
+        + SafeStop : BOOL
+        + Reset : BOOL
+        --
+        + Error : BOOL
+        + ErrorId : WORD
+        + DriveControlWord : WORD
+    }
+
+    class FB_Translation << (C,#0288D1) Commande Translation >> {
+        + Enable : BOOL
+        + StartStop : BOOL
+        + SpeedRefPct : REAL
+        + Direction : INT
+        --
+        + Active : BOOL
+        + SpeedOutPct : REAL
+        + Done : BOOL
+    }
+
+    class FB_Brake << (C,#7CB342) Frein >> {
+        + Release : BOOL
+        --
+        + Engaged : BOOL
+    }
+
+    class FB_Ramp << (C,#7CB342) Rampe Accél/Décél >> {
+        + Target : REAL
+        --
+        + Current : REAL
+    }
+}
+
+FB_Translation --> FB_Translation_PositionDecoder : "consomme détection position"
+FB_Safety_Translation --> FB_Translation : "verrouille en cas de SafeStop/Erreur"
+FB_Translation *-- FB_Brake : "pilote Frein"
+FB_Translation *-- FB_Ramp : "applique Rampe Vitesse"
+FB_Translation --> ST_TranslationHMI : "échange consigne IHM"
+
+@enduml"""
+
     inputs_str = "\n".join([f"  + {name} : {tp}" for name, tp in info["inputs"]])
     outputs_str = "\n".join([f"  + {name} : {tp}" for name, tp in info["outputs"]])
     state_str = "\n".join([f"  - {name} : {tp}" for name, tp in info["state_vars"]])
@@ -80,7 +280,7 @@ skinparam fontname "Segoe UI, Arial, sans-serif"
 skinparam fontsize 12
 skinparam classHeaderBackgroundColor #E1BEE7
 
-title Diagramme de Classe UML — {class_name} (Module Python Genere)
+title Diagramme de Classe UML — {class_name} (Module Python Généré)
 
 class {class_name} << (C,#7B1FA2) POU Python >> {{
   .. Entrées (VAR_INPUT) ..
@@ -101,7 +301,7 @@ class {class_name} << (C,#7B1FA2) POU Python >> {{
 
 legend bottom
   |= Emplacement |= Rôle |
-  | `out/{class_name}.py` | Modèle Python autonome généré depuis le bundle XML |
+  | `RESULTS/<DOMAINE>/modules/{class_name}.py` | Modèle Python autonome généré depuis le bundle XML |
   | `CONTRACT` | Dictionnaire de contrat runtime (inputs/outputs/state) |
 endlegend
 
@@ -120,43 +320,43 @@ skinparam roundcorner 8
 skinparam fontname "Segoe UI, Arial, sans-serif"
 skinparam fontsize 12
 
-title Diagramme d'Etats FSM - {class_name} [Steps 0 a 6]
+title Diagramme d'Etats FSM — {class_name} [Steps 0 a 6]
 
 [*] --> Step0 : Boot / Enable=TRUE
 
 state Step0 #E8F5E9
-Step0 : Step 0 IDLE - Attente ArmRequest
+Step0 : Step 0 IDLE — Attente ArmRequest
 Step0 : MaintainA_RQ=TRUE, MaintainB_RQ=TRUE
 
 state Step1 #FFF3E0
-Step1 : Step 1 TestA - MaintainA_RQ=FALSE [200ms]
+Step1 : Step 1 TestA — MaintainA_RQ=FALSE [200ms]
 Step1 : Test ouverture canal A
 
 state Step2 #E3F2FD
-Step2 : Step 2 RestoreA - MaintainA_RQ=TRUE [200ms]
+Step2 : Step 2 RestoreA — MaintainA_RQ=TRUE [200ms]
 Step2 : Attente refermeture boucle
 
 state Step3 #FFF3E0
-Step3 : Step 3 TestB - MaintainB_RQ=FALSE [200ms]
+Step3 : Step 3 TestB — MaintainB_RQ=FALSE [200ms]
 Step3 : Test ouverture canal B
 
 state Step4 #E3F2FD
-Step4 : Step 4 RestoreB - MaintainB_RQ=TRUE [200ms]
+Step4 : Step 4 RestoreB — MaintainB_RQ=TRUE [200ms]
 Step4 : Attente refermeture boucle
 
 state Step5 #FFE0B2
-Step5 : Step 5 Pulse - ArmPulse_RQ=TRUE [1000ms]
-Step5 : Impulsion rearmement contacteur
+Step5 : Step 5 Pulse — ArmPulse_RQ=TRUE [1000ms]
+Step5 : Impulsion réarmement contacteur
 
 state Step6 #FFF9C4
-Step6 : Step 6 Confirm - Attente PowerContactorEngaged [2000ms max]
+Step6 : Step 6 Confirm — Attente PowerContactorEngaged [2000ms max]
 
 state FailRedundancy #FFCDD2
-FailRedundancy : ECHEC REDONDANCE - RedundancyTestFailed=TRUE
-FailRedundancy : Canal A ou B reste colle
+FailRedundancy : ÉCHEC REDONDANCE — RedundancyTestFailed=TRUE
+FailRedundancy : Canal A ou B resté collé
 
 state FailConfirm #FFCDD2
-FailConfirm : ECHEC CONFIRMATION - ArmingFailed=TRUE
+FailConfirm : ÉCHEC CONFIRMATION — EmergencyArmingFailed=TRUE
 FailConfirm : LockoutActive=TRUE [5s]
 
 Step0 --> Step1 : ArmRequest + Armable
@@ -177,43 +377,41 @@ Step6 --> Step0 : PowerContactorEngaged=TRUE
 Step6 --> FailConfirm : Timeout 2000ms
 
 FailRedundancy --> Step0 : Reset (Cause disparue)
-FailConfirm --> Step0 : Reset + ContactorEngaged=TRUE
+FailConfirm --> Step0 : Reset + ArmRequest
 
 @enduml"""
 
 
-def process_module(py_path: Path, out_dir: Path) -> bool:  # noqa: D401
-    """Génère les diagrammes UML (+ FSM si applicable) pour UN module Python.
-    Retourne False si le module n'a pas de classe exploitable (ex. artefact neutralise)."""
+def process_module(py_path: Path, out_dir: Path) -> bool:
+    """Génère les diagrammes UML (+ FSM si applicable) pour UN module Python."""
     print(f"Analyse AST du module Python: {py_path.name}...")
     info = parse_module_ast(py_path)
 
     if not info["class_name"]:
-        print(f"   (aucune classe trouvee dans {py_path.name} -- artefact neutralise/vide, ignore)")
+        print(f"   (aucune classe trouvée dans {py_path.name} — artefact neutralisé/vide, ignoré)")
         return False
 
-    # 1. Diagramme UML Classe (toujours généré)
+    # 1. Diagramme UML Classe + Composition + DUT + Interconnexions
     uml_puml = generate_uml_puml(info)
     uml_png = out_dir / f"DIAG_PY_UML_{info['class_name']}.png"
     render_puml(uml_puml, uml_png, output_format="png")
     print(f"OK : {uml_png}")
 
-    # 2. Diagramme d'États FSM (seulement si le module a une vraie machine d'état,
-    # détectée via la présence de self._step et de comparaisons self._step == N)
+    # 2. Diagramme d'États FSM
     if info["fsm_states"]:
         fsm_puml = generate_fsm_puml(info)
         fsm_png = out_dir / f"DIAG_PY_FSM_{info['class_name']}.png"
         render_puml(fsm_puml, fsm_png, output_format="png")
         print(f"OK : {fsm_png}")
     else:
-        print(f"   (pas de machine d'état detectee dans {py_path.name}, FSM ignore)")
+        print(f"   (pas de machine d'état détectée dans {py_path.name}, FSM ignoré)")
     return True
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Genere les diagrammes UML/FSM des modules generes, "
-                    "dans RESULTS/<DOMAINE>/chronicles/ (a cote des rapports de test)."
+        description="Génère les diagrammes UML/FSM des modules générés, "
+                    "dans RESULTS/<DOMAINE>/chronicles/ (à côté des rapports de test)."
     )
     parser.add_argument(
         "module", nargs="?", default=None,
@@ -222,7 +420,6 @@ def main():
     )
     args = parser.parse_args()
 
-    # (domaine, chemin du module) -> le diagramme va dans le chronicles/ du MEME domaine
     targets = iter_module_files()
     if args.module:
         targets = [t for t in targets if t[1].stem == args.module]
@@ -231,7 +428,7 @@ def main():
             return 1
 
     if not targets:
-        print(f"Aucun module Python trouve dans {RESULTS_DIR}", file=sys.stderr)
+        print(f"Aucun module Python trouvé dans {RESULTS_DIR}", file=sys.stderr)
         return 1
 
     had_error = False
