@@ -17,6 +17,6 @@
 
 ## Composition code
 
-`FB_Encoder_Abs` (bus EtherCAT) → `FB_Encoder_Homing` (orchestration + RETAIN `ST_EncoderCalib`) → `FB_Encoder_Scale` (pts→m) → `FB_Encoder_Safety` (bornage+cohérence) → `FB_Encoder_SpeedMeasure` (vitesse 50ms/6 éch.)
+`FB_Encoder_Abs` (bus EtherCAT) → `FB_Encoder_Homing` (orchestration + RETAIN `ST_Encoder_Calib`) → `FB_Encoder_Scale` (pts→m) → `FB_Encoder_Safety` (bornage+cohérence) → `FB_Encoder_SpeedMeasure` (vitesse 50ms/6 éch.)
 Instances ×2 (M1/M2), toutes dans `PRG_02_Encoders` — producteur unique position/vitesse.
 `FB_Encoder_SpeedMonitor` : diagnostic seul, instances dans `PRG_03_Safety`.

@@ -520,71 +520,6 @@ mise en service (PLC affichait Operational=1 sans indiquer que c'était un bypas
           </data>
         </addData>
       </dataType>
-      <dataType name="ST_AxisCmd">
-        <baseType>
-          <struct>
-            <variable name="Enable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartStop">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedRef">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Direction">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>0e745763-905d-50f6-aa26-5f4cd95f438a</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕹️ ST_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
-   ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.0.md §3
-   ⚠️ MISE EN CONFORMITÉ (remplace la version actuelle du projet) :
-      - Champ `Start` renommé `StartStop` (convention Partie3 §1bis :
-        TRUE = rampe accélération, FALSE = rampe décélération normale)
-      - Champ `SafetyOk` RETIRÉ : ce n'est pas une commande d'axe, c'est
-        une info de contexte (`PowerContactorEngaged`) consommée directement
-        par le FB de mouvement (FB_Winch/FB_Translation), pas portée
-        par la consigne d'axe elle-même.
-   🧭 4 champs exactement, conforme Partie2 v2.5 §8.
-   🔧 2026-07-02 (demande utilisateur) : `SpeedRef` devient SIGNÉ (-100..+100 %,
-      le signe porte le sens) au lieu de toujours positif — affichage simplifié
-      IHM/maintenance. `Direction` reste inchangé (conservé, redondant mais
-      explicite). Émis par `FB_Joystick` (CODE/JOYSTICK/FB_Joystick.st) ; `FB_Winch`/
-      `FB_Translation` extraient la magnitude via `ABS(SpeedRefPct)` à leur
-      frontière d'entrée et continuent d'utiliser `Direction` comme source
-      d'autorité du sens (interlock inchangé).
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_BucketCfg">
         <baseType>
           <struct>
@@ -3535,72 +3470,6 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_EncoderCalib">
-        <baseType>
-          <struct>
-            <variable name="HomingRefRaw">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute figée au dernier homing réussi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LastKnownRawPos">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (§3.7, continu)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RestartCoherenceTolerancePts">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance redémarrage (~12% PointsPerRev 8192)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Homed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE dès qu'un référencement a réussi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incohérence détectée au redémarrage (§3.7)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c0305d2f-05be-5f51-a956-8f8be933913d</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧲 ST_EncoderCalib — Calibration/référence codeur (1 par treuil, RETAIN)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §9
-   🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
-   ⚠️ Ce lot (acquisition + mise à l'échelle) : `HomingRefRaw` reste
-      modifiable MANUELLEMENT (RETAIN, valeur de test) tant que
-      `FB_Encoder_Homing` (qui l'écrit normalement, §5) n'est pas codé —
-      même principe que le stub GVL du lot Winch.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_EncoderHMI">
         <baseType>
           <struct>
@@ -3680,6 +3549,69 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    🧲 ST_EncoderHMI — Données d'échange IHM pour les codeurs absolus
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des informations et diagnostics des codeurs.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Encoder_Calib">
+        <baseType>
+          <struct>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute figée au dernier homing réussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastKnownRawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (§3.7, continu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartCoherenceTolerancePts">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance redémarrage (~12% PointsPerRev 8192)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE dès qu'un référencement a réussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incohérence détectée au redémarrage (§3.7)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>808932ee-dfa9-530c-b6b0-60a6dd0eb372</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧲 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4181,7 +4113,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
             </variable>
             <variable name="AxisCmdX">
               <type>
-                <derived name="ST_AxisCmd" />
+                <derived name="ST_Joystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe X normalisée (sortie FB_Joystick)</xhtml>
@@ -4189,7 +4121,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
             </variable>
             <variable name="AxisCmdY">
               <type>
-                <derived name="ST_AxisCmd" />
+                <derived name="ST_Joystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe Y normalisée (sortie FB_Joystick)</xhtml>
@@ -4261,6 +4193,62 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_JoystickState — États et diagnostics IHM du Joystick
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Joystick_AxisCmd">
+        <baseType>
+          <struct>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedRef">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 4 champs exactement :
+      - Enable    : Autorisation globale du pipeline
+      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
+      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
+      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -11274,43 +11262,14 @@ END_IF;
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus, 1 responsabilité)
+   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3/§6
-   ⚠️ RÉÉCRITURE COMPLÈTE (remplace la version legacy du projet, dossier
-      CODEUR) : l'ancienne version utilisait `HomingTrigger` (recalage
-      instantané par simple offset) + un mode `Teach` auto-calibré —
-      **incompatibles** avec le design Partie10 (preset SDO avec
-      accusé, formule `CableM_PerRev` fixe). Retirés : `HomingTrigger`,
-      `WaterLevelOffset`, `TeachActive/StartRaw/EndRaw/RealDistance`.
-   🧩 1 FB = 1 responsabilité : accès bus EtherCAT + séquence d'écriture
-      preset. N'orchestre PAS le homing lui-même (ça sera le rôle de
-      `FB_Encoder_Homing`, pas codé ce lot) — `PresetRequest`/`PresetValue`
-      sont pilotés en dur (`FALSE`/`0`) dans `PRG_MAIN` pour l'instant.
-   🧊 Principe « geler sur doute » (§6) : `RawPos`/`AngleRaw`/`TurnCount`
-      ne sont PAS mis à jour si `EncoderAvailable = FALSE` — ils
-      conservent leur dernière valeur plausible.
-   ✅ SÉQUENCE PRESET (§5) — CONFIRMÉ TERRAIN 2026-07-02 : `PresetTriggerCmd := 2`
-      (valeur de commande, pas un masque de bits) déclenche le
-      référencement du codeur à `PresetValueOut`. `CodeSeqTriggerCmd`
-      (canal réel `COD1_CodeSeqTrigCmd`) reste `0`, rôle **non identifié**
-      (même par l'utilisateur/terrain) — ne jamais lui donner une valeur
-      arbitraire tant que sa fonction n'est pas confirmée.
-   🔴 PERTE DE FONCTION SIGNALÉE : l'ancienne version composait
-      `FB_Encoder_Safety` en interne (survitesse via `In_SpdValue`).
-      Ce n'est PAS repris ici (Partie10 ne le demande pas, hors
-      périmètre du document) — `FB_Encoder_Safety` (overspeed) devient
-      orphelin tant qu'un lot dédié ne décide pas de son sort (fusion
-      avec le "saut incohérent" Partie10 §3.5, ou reprise telle quelle).
-   🔧 CORRECTIF (2026-07-03, retour terrain) : `InvertDirection` **retiré**.
-      Confirmé terrain : l'objet CoE `6000h` (bit0 : 4→5) inverse le sens
-      de comptage **côté codeur** (F58x8 Kübler), configuré en **Startup
-      Parameter** CODESYS (init automate) — pas un paramètre PLC. L'ancien
-      calcul logiciel (`16#FFFFFFFF - RawPosIn`) était de toute façon
-      **buggé** : il inversait sur toute la plage `UDINT` (32 bits) au
-      lieu de la plage réelle du codeur (25 bits, `PointsPerRev ×
-      MultiTurnRevsMax`), produisant des positions incohérentes après
-      homing. Voir Partie10 §3bis.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Accès bus EtherCAT, statut esclave, extraction positions brutes
+      et séquence de Preset SDO (PresetTriggerCmd := 2).
+   🧊 Principe « geler sur doute » (§6) : RawPos/AngleRaw/TurnCount
+      conservent leur dernière valeur valide si EncoderAvailable = FALSE.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===</xhtml>
           </documentation>
@@ -11694,7 +11653,7 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
           <inOutVars>
             <variable name="Calib">
               <type>
-                <derived name="ST_EncoderCalib" />
+                <derived name="ST_Encoder_Calib" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Référence vers l'état persistant global (survit aux téléchargements)</xhtml>
@@ -11773,28 +11732,13 @@ Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §1/§5/§7bis
-   ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
-      unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
-      moteur n'est piloté ici.
-   🔌 PAS un FB de mouvement (Partie3 §1bis) : il n'écrit qu'une valeur
-      de calibration, le treuil étant déjà à l'arrêt confirmé. Pas de
-      `StartStop`/`SafeStop`.
-   🧮 Calcul (généralise le cas historique cible=0.00, Partie10 §3.2/§3.3) :
-      - `PresetValue` = `HomingRefTargetNominal` = (PointsPerRev × MultiTurnRevsMax) / 2
-        (constante, TOUJOURS la même — centre exact de la plage, marge anti-débordement)
-      - `HomingRefRaw` = `PresetValue` − round(`CfgTopSensorPosM` × PointsPerRev / CableM_PerRev)
-        (ainsi `CablePosM` = `CfgTopSensorPosM` exactement au moment du homing)
-      ⚠️ ÉVOLUTION vs interface §5 d'origine : `HomingRefRaw` est ajouté en sortie explicite
-      (le document original supposait implicitement `HomingRefRaw := PresetValue`, valable
-      uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈8.50 m).
-   🧊 `ST_EncoderCalib` géré en interne (`VAR RETAIN`) — expose `Homed`/`HomingSuspect`/
-      `HomingRefRaw` en sortie pour les consommateurs (`FB_Encoder_Scale`).
-   🔴 SIMPLIFICATIONS assumées pour ce lot (à documenter/lever plus tard si besoin) :
-      - Les 2 instances (M1/M2) sont autonomes : le même bouton IHM pilote les deux `Home`
-        simultanément (câblage PRG_MAIN), mais chacune valide/rejette SES PROPRES conditions
-        indépendamment (pas d'attente mutuelle ni de synchro de déclenchement).
-      - `BtnConfirmCoherence`/§3.7 (incohérence redémarrage) : implémenté a minima (bit9), mais
-        non testé en conditions réelles de coupure secteur — à revalider.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Rôle : Gestion du flux de homing nominal (capteur haut + cible paramétrable)
+      ou unitaire (MAINT_N2, treuil sélectionné).
+   🧮 Calcul du point de calage :
+      - PresetValue = centre de la plage multi-tour (marge anti-débordement)
+      - HomingRefRaw = PresetValue - round(CfgTopSensorPosM × PointsPerRev / CableM_PerRev)
+   🧊 Expose ST_Encoder_Calib en VAR_IN_OUT (RETAIN).
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===</xhtml>
           </documentation>
@@ -12101,22 +12045,14 @@ HomingRefRaw := Calib.HomingRefRaw;
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
+   🛡️ FB_Encoder_Safety — Bornage physique &amp; relais incohérence redémarrage
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
-   🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
-   🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
-      - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur
-        jugée IMPOSSIBLE, sortie `CablePosMSafe` GELÉE sur dernière valeur plausible
-        (principe « geler sur doute », §6), ErrorId bit0.
-      - §3.7 Relais de `HomingSuspect` (déjà détecté par `FB_Encoder_Homing`, jamais
-        consommé nulle part avant ce lot) : ErrorId bit1.
-      - `EncoderIncoherent` (= Error) → consommé par `FB_Modes` pour REFUSER
-        `SEMI_AUTO` (reste possible de travailler en MAINT_N1/N2 pour re-référencer,
-        voir échange utilisateur — PAS de SafeStop ici, ne bloque jamais le mouvement).
-   🔴 HORS PÉRIMÈTRE CE LOT (Partie10 §3.5, reporté) : détection de saut EN COURS
-      D'EXPLOITATION (plausibilité vitesse codeur, calcul sur cycles EtherCAT 4ms) —
-      lot dédié à part entière, pas fait ici.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Rôle :
+      - Bornage absolu [-99.00 ; +99.00] m (CablePosMSafe gelée sur dernière valeur plausible).
+      - Relais de HomingSuspect (ErrorId bit1).
+      - Expose EncoderIncoherent (= Error) consommé par FB_Modes.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Safety) ===</xhtml>
           </documentation>
@@ -12206,7 +12142,7 @@ Done := FALSE;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référence brute figée au dernier homing (ST_EncoderCalib)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référence brute figée au dernier homing (ST_Encoder_Calib)</xhtml>
               </documentation>
             </variable>
             <variable name="CableM_PerRev">
@@ -12257,18 +12193,9 @@ Done := FALSE;
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §2/§3.1
-   ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
-      `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
-      — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
-      `EndTeachPos`/`RealDistMeters`) : `CableM_PerRev` est un paramètre
-      RETAIN fixe (site), pas recalculé dynamiquement (Partie10 §2).
-   🧮 Arithmétique signée sûre (§3.1) : conversion en DINT AVANT la
-      soustraction (jamais soustraire deux UDINT directement — un
-      résultat négatif reboucle silencieusement vers ~2³²).
-   🧩 Brique de calcul pure — pas de gel/bornage ici : `RawPos` en
-      entrée est déjà gelé par `FB_Encoder_Abs` (§6) ; le bornage
-      physique absolu [-99;+99] m est la responsabilité de
-      `FB_Encoder_Safety` (§3.6, pas dans ce lot), pas de celle-ci.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Formule : CablePosM = (RawPos - HomingRefRaw) × (CableM_PerRev / PointsPerRev)
+   🧮 Arithmétique signée sûre : conversion en DINT avant la soustraction.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===</xhtml>
           </documentation>
@@ -13536,7 +13463,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Renommé (était SafetyOk) — conditions globales OK (chaîne AU réarmée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conditions globales OK (chaîne AU réarmée)</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -13544,7 +13471,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 — changement de mode désarme le homme-mort (voir §4ter)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Changement de mode désarme le homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="BenneBusy">
@@ -13552,7 +13479,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 — fin de cycle benne (front descendant) désarme le homme-mort (voir §4ter)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle benne (front descendant) désarme le homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="PreserveArmingAfterBucket">
@@ -13635,7 +13562,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-07-02 (demande utilisateur) : 5.0 → 10.0 %</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en %</xhtml>
               </documentation>
             </variable>
             <variable name="FilterTime">
@@ -13646,22 +13573,6 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <simpleValue value="TIME#100ms" />
               </initialValue>
             </variable>
-            <variable name="AccelRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="50" />
-              </initialValue>
-            </variable>
-            <variable name="DecelRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="150" />
-              </initialValue>
-            </variable>
             <variable name="DeadmanRearmTimeout">
               <type>
                 <TIME />
@@ -13670,7 +13581,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <simpleValue value="TIME#10S" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-07-03duodecies (était 3s) — délai max entre 2 appuis en mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai max entre 2 appuis en mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralHoldTime">
@@ -13681,7 +13592,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <simpleValue value="TIME#500MS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-07-03duodecies — temps continu au neutre avant désarmement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps continu au neutre avant désarmement</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -13728,7 +13639,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
             </variable>
             <variable name="AxisCmdX">
               <type>
-                <derived name="ST_AxisCmd" />
+                <derived name="ST_Joystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie normalisée X</xhtml>
@@ -13736,7 +13647,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
             </variable>
             <variable name="AxisCmdY">
               <type>
-                <derived name="ST_AxisCmd" />
+                <derived name="ST_Joystick_AxisCmd" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie normalisée Y</xhtml>
@@ -13853,14 +13764,14 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <derived name="FB_Filter_PT1" />
               </type>
             </variable>
-            <variable name="RampX">
+            <variable name="CmdXVal">
               <type>
-                <derived name="FB_Ramp" />
+                <REAL />
               </type>
             </variable>
-            <variable name="RampY">
+            <variable name="CmdYVal">
               <type>
-                <derived name="FB_Ramp" />
+                <REAL />
               </type>
             </variable>
             <variable name="LastCalibrate">
@@ -13872,88 +13783,53 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
               <type>
                 <derived name="R_TRIG" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 AJOUT (revue de code 2026-07-01) — Reset doit être un front, pas un niveau</xhtml>
-              </documentation>
             </variable>
             <variable name="DeadmanEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Front bouton homme-mort (2026-07-03octies)</xhtml>
-              </documentation>
             </variable>
             <variable name="DeadmanTimer">
               <type>
                 <derived name="TON" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-07-03decies — délai max entre 2 appuis en mouvement (reconfirmation)</xhtml>
-              </documentation>
             </variable>
             <variable name="NeutralHoldTimer">
               <type>
                 <derived name="TON" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-07-03duodecies — filtre les traversées rapides du neutre (inversion)</xhtml>
-              </documentation>
             </variable>
             <variable name="LeftNeutralSinceArm">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-07-03terdecies — a réellement quitté le neutre depuis l'armement</xhtml>
-              </documentation>
             </variable>
             <variable name="LastMode">
               <type>
                 <derived name="E_Mode" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 — détecte le changement de mode (voir §4ter)</xhtml>
-              </documentation>
             </variable>
             <variable name="BenneBusyFallEdge">
               <type>
                 <derived name="F_TRIG" />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 — détecte la fin de cycle benne (voir §4ter)</xhtml>
-              </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕹️ FB_Joystick — Acquisition + traitement Hall (bouton = homme-mort EN 574/ISO 13850)
+   🕹️ FB_Joystick — Acquisition &amp; traitement Hall (Homme-mort ISO 13850)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md (historique détaillé des
-      correctifs : AUDIT D34/D35/D49/D51/D53-D59)
-   🔧 CORRECTIF (2026-07-03septdecies, AUDIT D69) : `SafeStop` RETIRÉ — DOC/AF_Partie-08_Fonction_Joystick_v2.0.md §3
-      l'interdit (`FB_Joystick` n'est pas un FB de mouvement, Partie3 §1bis). Agissait de
-      plus comme un second `Enable` dans le GATE (coupure immédiate), pas comme la rampe
-      rapide attendue d'un `SafeStop` — confusion précisément visée par la règle.
-   🔴 Bouton homme-mort — comportement actuel (détail §4ter/§4quater ci-dessous) :
-      - ARMEMENT : appui bouton PENDANT que le manche est AU NEUTRE (ScaleX/Y.OutPct = 0.0).
-      - RECONFIRMATION périodique en mouvement : bouton maintenu OU réappuyé avant
-        `DeadmanRearmTimeout` (10s) — sinon désarmement (rampe forcée à 0, pas d'arrêt brutal).
-      - DÉSARMEMENT sur retour neutre : seulement si le neutre est TENU `NeutralHoldTime`
-        (500ms, ⚠️ hypothèse à valider empiriquement — `ScaleX/Y.OutPct` n'est pas filtré/
-        rampé), pas sur simple traversée (inversion de sens). `LeftNeutralSinceArm` évite un
-        désarmement prématuré si l'opérateur hésite après l'armement sans avoir bougé.
-      Défend contre un calage AVANT et APRÈS armement (présence continue exigée).
-   🔧 RETRAIT BYPASS (DOC/AF_Partie-13_Fonction_Simulation_v2.0.md, migration simulation) : l'ancien bypass
-      `GVL_DEBUG.DBG_DeadmanBypass_TEST` (forçait `DeadmanArmed` en permanence) est
-      supprimé — le homme-mort réel n'est plus jamais contourné. Sur banc sans joystick
-      CAN câblé, c'est `FB_Sim_Joystick` (CODE/SIMULATION/) qui fournit des `RawX`/`RawY`/
-      `RawButton` simulés en amont (dans `PRG_01_Diagnostics.st`) : l'opérateur doit
-      toujours réellement "appuyer" (forcer `RawButton` en instance) pour armer.
-   🆕 `SpeedXPct`/`DirectionX`/`SpeedYPct`/`DirectionY` : miroirs directs de `AxisCmdX/Y`
-      (lecture instance CODESYS sans déplier `ST_AxisCmd`). `SpeedRef` est SIGNÉ
-      (-100..+100%, signe = sens) ; `Direction` (-1/0/+1) reste la source de vérité pour
-      `FB_Winch`/`FB_Translation` (`ABS(SpeedRefPct)` à leur frontière d'entrée).
+   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
+      Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
+      ⚠️ FB_Ramp retiré du Joystick : les rampes d'accélération/décélération
+         sont gérées exclusivement par les FB de mouvement aval (FB_Winch, FB_Translation).
+   🔒 Bouton homme-mort :
+      - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
+      - Reconfirmation périodique en mouvement (délai DeadmanRearmTimeout).
+      - Désarmement sur maintien au neutre (durée NeutralHoldTime).
+   📤 Produit AxisCmdX, AxisCmdY, et signaux de diagnostic/miroir.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Joystick) ===</xhtml>
           </documentation>
@@ -14085,49 +13961,52 @@ ELSE
     FilterX(ValueIn := ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
 END_IF;
 
-// 🔴 Cible rampe forcée à 0 tant que le geste n'est pas armé (homme-mort, voir §4ter)
-RampX(Target := SEL(DeadmanArmed, 0.0, FilterX.ValueOut), AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+CmdXVal := SEL(DeadmanArmed, 0.0, FilterX.ValueOut);
 
 // Mapping Sortie Standardisée Axe X
-// 🔧 2026-07-02 : SpeedRef désormais SIGNÉ (plus de ABS) — le signe porte le sens, cohérent
-// avec Direction ci-dessous (même seuil 0.1, même variable RampX.Current). StartStop reste
-// calculé sur la MAGNITUDE (indépendant du signe) : sinon un mouvement négatif (&lt; -0.1) serait
-// à tort interprété comme "pas de mouvement" (StartStop=FALSE) par le test `&gt; 0.1` direct.
 AxisCmdX.Enable := TRUE;
-AxisCmdX.SpeedRef := RampX.Current;
-AxisCmdX.StartStop := (ABS(RampX.Current) &gt; 0.1);
+AxisCmdX.SpeedRef := CmdXVal;
+AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
-IF RampX.Current &gt; 0.1 THEN     AxisCmdX.Direction := 1;
-ELSIF RampX.Current &lt; -0.1 THEN AxisCmdX.Direction := -1;
-ELSE AxisCmdX.Direction := 0;   AxisCmdX.SpeedRef := 0.0;
+IF CmdXVal &gt; 0.1 THEN
+    AxisCmdX.Direction := 1;
+ELSIF CmdXVal &lt; -0.1 THEN
+    AxisCmdX.Direction := -1;
+ELSE
+    AxisCmdX.Direction := 0;
+    AxisCmdX.SpeedRef := 0.0;
 END_IF;
 
-// 🆕 Miroirs maintenance (voir en-tête) — mêmes valeurs, à plat
+// Miroirs maintenance
 SpeedXPct := AxisCmdX.SpeedRef;
 DirectionX := AxisCmdX.Direction;
 
-// 🕹️ 6. PIPELINE TRAITEMENT — AXE Y (ScaleY déjà calculé en §4bis, avant homme-mort)
+// 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
 IF InvertY THEN
     FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
 ELSE
     FilterY(ValueIn := ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
 END_IF;
 
-// 🔴 Cible rampe forcée à 0 tant que le geste n'est pas armé (homme-mort, voir §4ter)
-RampY(Target := SEL(DeadmanArmed, 0.0, FilterY.ValueOut), AccelRate := AccelRate, DecelRate := DecelRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+CmdYVal := SEL(DeadmanArmed, 0.0, FilterY.ValueOut);
 
 // Mapping Sortie Standardisée Axe Y
-// 🔧 2026-07-02 : voir note axe X ci-dessus (même principe, SpeedRef signé + StartStop sur magnitude)
 AxisCmdY.Enable := TRUE;
-AxisCmdY.SpeedRef := RampY.Current;
-AxisCmdY.StartStop := (ABS(RampY.Current) &gt; 0.1);
+AxisCmdY.SpeedRef := CmdYVal;
+AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
-IF RampY.Current &gt; 0.1 THEN     AxisCmdY.Direction := 1;
-ELSIF RampY.Current &lt; -0.1 THEN AxisCmdY.Direction := -1;
-ELSE AxisCmdY.Direction := 0;   AxisCmdY.SpeedRef := 0.0;
+IF CmdYVal &gt; 0.1 THEN
+    AxisCmdY.Direction := 1;
+ELSIF CmdYVal &lt; -0.1 THEN
+    AxisCmdY.Direction := -1;
+ELSE
+    AxisCmdY.Direction := 0;
+    AxisCmdY.SpeedRef := 0.0;
 END_IF;
 
-// 🆕 Miroirs maintenance (voir en-tête) — mêmes valeurs, à plat
+// Miroirs maintenance
 SpeedYPct := AxisCmdY.SpeedRef;
 DirectionY := AxisCmdY.Direction;
 
@@ -22989,12 +22868,10 @@ instJoystick(
     RawY                := PRG_ACQUISITION_CFC.HwIn.Operator.JoyYRaw_ANA2,
     RawButton           := PRG_ACQUISITION_CFC.HwIn.Operator.JoyBtnRaw,
     BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
-    InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
-    InvertY             := _JoystickInvertY,       // 🔧 idem
-    Deadband            := _JoystickDeadband_Pct,  // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
-    FilterTime          := _JoystickFilterTime,    // 🔧 idem
-    AccelRate           := _JoystickAccelRate_Pct, // 🔧 idem
-    DecelRate           := _JoystickDecelRate_Pct, // 🔧 idem
+    InvertX             := _JoystickInvertX,       // depuis GVL_PERSISTENT
+    InvertY             := _JoystickInvertY,       // idem
+    Deadband            := _JoystickDeadband_Pct,  // depuis GVL_PERSISTENT
+    FilterTime          := _JoystickFilterTime,    // idem
     // 🛡️ Délais de sécurité Homme-Mort : réordonnés aux valeurs réelles de production (10s / 500ms)
     DeadmanRearmTimeout := T#10S,
     NeutralHoldTime     := T#500MS
@@ -34046,7 +33923,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
       <globalVars name="GVL_PERSISTENT" retain="true" persistent="true">
         <variable name="_CalibM1">
           <type>
-            <derived name="ST_EncoderCalib" />
+            <derived name="ST_Encoder_Calib" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -34058,7 +33935,7 @@ Effectif uniquement en MAINT_N1/N2 (arbitré par FB_Modes.SyncEnable, voir Parti
         </variable>
         <variable name="_CalibM2">
           <type>
-            <derived name="ST_EncoderCalib" />
+            <derived name="ST_Encoder_Calib" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -35182,7 +35059,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
           <Object Name="FB_Filter_PT1" ObjectId="564cb076-094f-527b-93bc-caad3ea68d7f" />
           <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
-          <Object Name="ST_AxisCmd" ObjectId="0e745763-905d-50f6-aa26-5f4cd95f438a" />
+          <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
         </Folder>
         <Folder Name="CODEURS">
           <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
@@ -35191,7 +35068,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
           <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
-          <Object Name="ST_EncoderCalib" ObjectId="c0305d2f-05be-5f51-a956-8f8be933913d" />
+          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>
         <Folder Name="AU">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />

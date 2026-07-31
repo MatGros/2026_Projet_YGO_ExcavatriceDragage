@@ -87,12 +87,10 @@ instJoystick(
     RawY                := PRG_ACQUISITION_CFC.HwIn.Operator.JoyYRaw_ANA2,
     RawButton           := PRG_ACQUISITION_CFC.HwIn.Operator.JoyBtnRaw,
     BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
-    InvertX             := _JoystickInvertX,       // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
-    InvertY             := _JoystickInvertY,       // 🔧 idem
-    Deadband            := _JoystickDeadband_Pct,  // 🔧 REX 2026-07-21 : depuis GVL_PERSISTENT
-    FilterTime          := _JoystickFilterTime,    // 🔧 idem
-    AccelRate           := _JoystickAccelRate_Pct, // 🔧 idem
-    DecelRate           := _JoystickDecelRate_Pct, // 🔧 idem
+    InvertX             := _JoystickInvertX,       // depuis GVL_PERSISTENT
+    InvertY             := _JoystickInvertY,       // idem
+    Deadband            := _JoystickDeadband_Pct,  // depuis GVL_PERSISTENT
+    FilterTime          := _JoystickFilterTime,    // idem
     // 🛡️ Délais de sécurité Homme-Mort : réordonnés aux valeurs réelles de production (10s / 500ms)
     DeadmanRearmTimeout := T#10S,
     NeutralHoldTime     := T#500MS

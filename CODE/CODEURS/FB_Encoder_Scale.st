@@ -2,18 +2,9 @@
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §2/§3.1
-   ⚠️ RÉÉCRITURE (remplace la version legacy) : formule FIXE
-      `CablePosM = (RawPos − HomingRefRaw) × (CableM_PerRev/PointsPerRev)`
-      — retire le mode `Teach` auto-calibré (`EnableTeach`/`StartTeachPos`/
-      `EndTeachPos`/`RealDistMeters`) : `CableM_PerRev` est un paramètre
-      RETAIN fixe (site), pas recalculé dynamiquement (Partie10 §2).
-   🧮 Arithmétique signée sûre (§3.1) : conversion en DINT AVANT la
-      soustraction (jamais soustraire deux UDINT directement — un
-      résultat négatif reboucle silencieusement vers ~2³²).
-   🧩 Brique de calcul pure — pas de gel/bornage ici : `RawPos` en
-      entrée est déjà gelé par `FB_Encoder_Abs` (§6) ; le bornage
-      physique absolu [-99;+99] m est la responsabilité de
-      `FB_Encoder_Safety` (§3.6, pas dans ce lot), pas de celle-ci.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Formule : CablePosM = (RawPos - HomingRefRaw) × (CableM_PerRev / PointsPerRev)
+   🧮 Arithmétique signée sûre : conversion en DINT avant la soustraction.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===
@@ -21,7 +12,7 @@
 FUNCTION_BLOCK PUBLIC FB_Encoder_Scale
 VAR_INPUT
     RawPos          : UDINT;       // Position brute (sortie FB_Encoder_Abs, déjà gelée sur doute)
-    HomingRefRaw    : UDINT;       // Référence brute figée au dernier homing (ST_EncoderCalib)
+    HomingRefRaw    : UDINT;       // Référence brute figée au dernier homing (ST_Encoder_Calib)
     CableM_PerRev   : REAL := 2.0; // Câble déroulé par tour (périmètre tambour confirmé 2026-07-02, réglable site)
     PointsPerRev    : UDINT := 8192; // Résolution codeur confirmée (Partie10 §3.3)
 END_VAR

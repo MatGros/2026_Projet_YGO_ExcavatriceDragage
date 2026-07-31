@@ -2,28 +2,13 @@
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §1/§5/§7bis
-   ⚠️ PÉRIMÈTRE : flux nominal (capteur haut + cible paramétrable) ou
-      unitaire MAINT_N2 (treuil sélectionné + cible libre). Aucun mouvement
-      moteur n'est piloté ici.
-   🔌 PAS un FB de mouvement (Partie3 §1bis) : il n'écrit qu'une valeur
-      de calibration, le treuil étant déjà à l'arrêt confirmé. Pas de
-      `StartStop`/`SafeStop`.
-   🧮 Calcul (généralise le cas historique cible=0.00, Partie10 §3.2/§3.3) :
-      - `PresetValue` = `HomingRefTargetNominal` = (PointsPerRev × MultiTurnRevsMax) / 2
-        (constante, TOUJOURS la même — centre exact de la plage, marge anti-débordement)
-      - `HomingRefRaw` = `PresetValue` − round(`CfgTopSensorPosM` × PointsPerRev / CableM_PerRev)
-        (ainsi `CablePosM` = `CfgTopSensorPosM` exactement au moment du homing)
-      ⚠️ ÉVOLUTION vs interface §5 d'origine : `HomingRefRaw` est ajouté en sortie explicite
-      (le document original supposait implicitement `HomingRefRaw := PresetValue`, valable
-      uniquement pour une cible à 0.00 — ne fonctionne plus avec une cible non nulle ≈8.50 m).
-   🧊 `ST_EncoderCalib` géré en interne (`VAR RETAIN`) — expose `Homed`/`HomingSuspect`/
-      `HomingRefRaw` en sortie pour les consommateurs (`FB_Encoder_Scale`).
-   🔴 SIMPLIFICATIONS assumées pour ce lot (à documenter/lever plus tard si besoin) :
-      - Les 2 instances (M1/M2) sont autonomes : le même bouton IHM pilote les deux `Home`
-        simultanément (câblage PRG_MAIN), mais chacune valide/rejette SES PROPRES conditions
-        indépendamment (pas d'attente mutuelle ni de synchro de déclenchement).
-      - `BtnConfirmCoherence`/§3.7 (incohérence redémarrage) : implémenté a minima (bit9), mais
-        non testé en conditions réelles de coupure secteur — à revalider.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Rôle : Gestion du flux de homing nominal (capteur haut + cible paramétrable)
+      ou unitaire (MAINT_N2, treuil sélectionné).
+   🧮 Calcul du point de calage :
+      - PresetValue = centre de la plage multi-tour (marge anti-débordement)
+      - HomingRefRaw = PresetValue - round(CfgTopSensorPosM × PointsPerRev / CableM_PerRev)
+   🧊 Expose ST_Encoder_Calib en VAR_IN_OUT (RETAIN).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===
@@ -71,7 +56,7 @@ VAR_OUTPUT
     HomingRefRaw         : UDINT;       // RETAIN interne, miroir Calib.HomingRefRaw → FB_Encoder_Scale
 END_VAR
 VAR_IN_OUT
-    Calib                : ST_EncoderCalib;   // Référence vers l'état persistant global (survit aux téléchargements)
+    Calib                : ST_Encoder_Calib;   // Référence vers l'état persistant global (survit aux téléchargements)
 END_VAR
 VAR
     ResetEdge            : R_TRIG;

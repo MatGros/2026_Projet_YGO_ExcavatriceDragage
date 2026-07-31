@@ -58,7 +58,7 @@ Brique de **référencement et calibration** : calcule la position de référenc
 | `CableM_PerRev` | REAL := 2.0 | Câble déroulé par tour |
 | `BypassGlobal` | BOOL := FALSE | 🌐 Ignore arrêt confirmé **et** capteur haut (mise en service) — voir §3bis |
 
-**InOut** : `Calib : ST_EncoderCalib` (RETAIN — `HomingRefRaw`, `Homed`, `HomingSuspect`,
+**InOut** : `Calib : ST_Encoder_Calib` (RETAIN — `HomingRefRaw`, `Homed`, `HomingSuspect`,
 `LastKnownRawPos`, `RestartCoherenceTolerancePts`).
 **Sorties** : `Ready/Busy/Done/Error/ErrorId`, `PresetRequest/PresetValue`, `Homed`, `HomingSuspect`,
 `HomingRefRaw`.

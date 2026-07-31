@@ -29,7 +29,7 @@
 | TC-P08-004 | Neutre rapide (<500ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | §4 |
 | TC-P08-005 | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | §4, §6 |
 | TC-P08-006 | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | §5 |
-| TC-P08-007 | Consigne `SpeedRef` signée [-100;+100] sur `ST_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | §1, §2 |
+| TC-P08-007 | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | §1, §2 |
 | TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` | Linkage vérifié | `💻 AUTO` | §6 |
 
 ---
@@ -39,7 +39,7 @@
 | Fait | Détail |
 |---|---|
 | Entrée | 2 axes bruts 0..10000 + 1 bouton, nœud CANopen (ou sim amont) |
-| Sortie | `ST_AxisCmd` X/Y + `DeadmanArmed` + miroirs maintenance |
+| Sortie | `ST_Joystick_AxisCmd` X/Y + `DeadmanArmed` + miroirs maintenance |
 | Fait | Producteur d'**intention** de conduite, pas d'actionneur |
 | Ne fait pas | Arbitrage mode, limites machine, frein, PowerCutOff, Q physiques |
 
@@ -50,20 +50,22 @@ Profil AF03 : brique métier non-mouvement. Gate : `Enable`, `PowerContactorEnga
 ## 2. Pipeline et composition
 
 ```text
-Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► FB_Ramp ─► ST_AxisCmd
-         deadband %        τ filtre         accel/decel
-                    ▲
-              homme-mort force Target rampe = 0 si non armé
+Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► Homme-Mort (0 si non armé) ─► ST_Joystick_AxisCmd
+         deadband %        τ filtre
 ```
 
 | Brique | Rôle |
 |---|---|
 | `FB_AxisScale` | Neutre + deadband → % signé, borné ±100 |
-| `FB_Filter_PT1` | Lissage ; `CycleTimeS` via `FB_CycleTime` interne |
-| `FB_Ramp` | Accel / décel (décel plus rapide par défaut) |
-| Homme-mort | Sélectionne cible rampe : 0 ou sortie filtre |
+| `FB_Filter_PT1` | Lissage haute fréquence ; `CycleTimeS` via `FB_CycleTime` interne |
+| Homme-mort | Force la consigne à 0.0 si non armé (`DeadmanArmed = FALSE`) |
 
-`ST_AxisCmd` :
+> 📌 **Architecture des rampes** : `FB_Ramp` n'est pas instancié dans `FB_Joystick`.
+> La gestion des rampes d'accélération et de décélération est confiée exclusivement aux FB
+> de mouvement aval (`FB_Winch`, `FB_Translation`) pour éviter le double-lissage et préserver
+> la maîtrise directe du gradient de décélération lors des arrêts de sécurité (`SafeStop`).
+
+`ST_Joystick_AxisCmd` :
 
 | Champ | Sens |
 |---|---|
@@ -269,4 +271,4 @@ identifiée, mais **à valider explicitement avant code**.
 | AF07 | `ST_JoystickHMI` |
 | AF10 / AF12 | Consommateurs AxisCmd + DeadmanArmed (Treuils Benne incluse · Translation) ; exception Extraction |
 | AF13 | `FB_Sim_Joystick` amont |
-| Code | `CODE/JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_AxisCmd.st` |
+| Code | `CODE/JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_Joystick_AxisCmd.st` |

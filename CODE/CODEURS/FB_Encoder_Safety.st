@@ -1,20 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ FB_Encoder_Safety — Bornage physique + relais incohérence redémarrage (1 par treuil)
+   🛡️ FB_Encoder_Safety — Bornage physique & relais incohérence redémarrage
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
-   🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop.
-   🎯 PÉRIMÈTRE CE LOT (répond à l'incident CablePosM≈4096m après reset RETAIN) :
-      - §3.6 Bornage absolu [-99.00 ; +99.00] m : `CablePosM` hors plage → valeur
-        jugée IMPOSSIBLE, sortie `CablePosMSafe` GELÉE sur dernière valeur plausible
-        (principe « geler sur doute », §6), ErrorId bit0.
-      - §3.7 Relais de `HomingSuspect` (déjà détecté par `FB_Encoder_Homing`, jamais
-        consommé nulle part avant ce lot) : ErrorId bit1.
-      - `EncoderIncoherent` (= Error) → consommé par `FB_Modes` pour REFUSER
-        `SEMI_AUTO` (reste possible de travailler en MAINT_N1/N2 pour re-référencer,
-        voir échange utilisateur — PAS de SafeStop ici, ne bloque jamais le mouvement).
-   🔴 HORS PÉRIMÈTRE CE LOT (Partie10 §3.5, reporté) : détection de saut EN COURS
-      D'EXPLOITATION (plausibilité vitesse codeur, calcul sur cycles EtherCAT 4ms) —
-      lot dédié à part entière, pas fait ici.
+                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+   🎯 Rôle :
+      - Bornage absolu [-99.00 ; +99.00] m (CablePosMSafe gelée sur dernière valeur plausible).
+      - Relais de HomingSuspect (ErrorId bit1).
+      - Expose EncoderIncoherent (= Error) consommé par FB_Modes.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Safety) ===
