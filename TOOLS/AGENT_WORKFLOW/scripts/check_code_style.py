@@ -39,9 +39,9 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
 }
 
 SIMULATION_ALLOWED_PATHS = {
-    "CODE/MAIN/PRG_00_ACQUISITION_CFC.st",
-    "CODE/MAIN/PRG_09_Supervision.st",
-    "CODE/MAIN/PRG_11_Troubleshooting.st",
+    "CODE/MAIN/PRG_ACQUISITION_CFC.st",
+    "CODE/MAIN/PRG_SUPERVISION_CFC.st",
+    "CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st",
 }
 
 
@@ -143,7 +143,7 @@ def main() -> int:
         for m in HOMME_MORT_MISSING.finditer(text):
             # Vérifier que DeadmanArmed n'est PAS dans un rayon de 100 chars
             context = text[max(0, m.start()-100):m.end()+100]
-            if "DeadmanArmed" not in context and "PRG_07_TranslationControl" in text:
+            if "DeadmanArmed" not in context and "PRG_TRANSLATION_CFC" in text:
                 line = text[:m.start()].count('\n') + 1
                 print(f"[WARN] {path}:{line}: StartStop/Direction assigned without DeadmanArmed check (homme-mort)", file=sys.stderr)
                 warnings += 1
