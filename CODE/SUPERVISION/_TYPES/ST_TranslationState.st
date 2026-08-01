@@ -43,6 +43,7 @@ STRUCT
     SensorWordIncoherent    : BOOL;
     LimitSwitchFwd          : BOOL;
     LimitSwitchRev          : BOOL;
+    DriveThermalOk          : BOOL;    (* 🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même *)
     MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
     SimulationModeActive    : BOOL;
 END_STRUCT

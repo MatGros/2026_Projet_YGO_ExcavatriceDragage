@@ -2059,6 +2059,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ normalisé (PRG_00 après BrakeFeedbackInvertLogic)</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx109_DriveThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -6250,6 +6258,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               <type>
                 <BOOL />
               </type>
+            </variable>
+            <variable name="DriveThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+              </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
               <type>
@@ -18183,6 +18199,9 @@ END_IF;
 // Polarité frein M3 (1 = OUVERT)
 Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
 
+// 🆕 T96 : thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
+Translation.M3_ThermalFeedback_DI := TRUE;
+
 // Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -&gt; 16#0081
 IF (M3_Direction &lt;&gt; 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
@@ -29900,6 +29919,7 @@ GVL_IHM.TranslationM3.State.FinalInterlockErrorId := GVL_Global.instTranslationO
 GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 GVL_IHM.TranslationM3.State.FinalBrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_INPUTS_LD.M3BrakeFeedback;
+GVL_IHM.TranslationM3.State.DriveThermalOk       := PRG_ACQUISITION_CFC.HwIn.Translation.M3_ThermalFeedback_DI; // 🆕 T96 — diagnostic seul
 GVL_IHM.TranslationM3.State.PositionSensorTarget := PRG_TRANSLATION_CFC.M3_PositionSensorTarget;
 GVL_IHM.TranslationM3.State.PositionReached      := PRG_TRANSLATION_CFC.M3_PositioningActive
                                                 AND PRG_TRANSLATION_CFC.instTranslationM3.TargetReached;
@@ -31570,6 +31590,7 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := 
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_ACQUISITION_CFC.M3_StatusWord_Filtered;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_INPUTS_LD.M3BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk       := PRG_ACQUISITION_CFC.HwIn.Translation.M3_ThermalFeedback_DI; // 🆕 T96
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.instJoystick.RawX;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
