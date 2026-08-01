@@ -11,6 +11,9 @@ PRJ/*.bak
 *.~d
 
 # Python
+venv/
+env/
+.venv/
 __pycache__/
 *.pyc
 # Artefacts generes par l'outil ST2PY : un dossier par domaine machine.
