@@ -18,7 +18,7 @@ STRUCT
     LimitLegalReached         : BOOL; (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
     Cfg                       : ST_CommunCfg; (* 🔧 Configuration des paramètres communs machine *)
     HydraulicThermalFault     : BOOL; (* 🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique
-                                          (PRG_08_AuxiliaryControl, diagnostic seul — aucune commande PLC) *)
+                                          (PRG_AUXILIARY_CFC, diagnostic seul — aucune commande PLC) *)
 
     (* 🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)) *)
     Bypass : ST_BypassCommun;    (* SlackCable, TopPositionSensor — capteur physique unique M1/M2, jamais duplique par axe *)
@@ -36,7 +36,7 @@ STRUCT
 
     // 🐛 FIX 2026-07-23 : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
     // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
-    // (doctrine reset=front, PRG_09_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
+    // (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
     ConfigRestoredFromPersistent : BOOL; (* ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier *)
     BtnAckConfigRestored         : BOOL; (* 🔘 IHM→PLC : acquittement opérateur (front) *)
 

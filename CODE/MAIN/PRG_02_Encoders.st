@@ -50,7 +50,7 @@ M2_RawPosToUse := PRG_ACQUISITION_CFC.HwIn.Winch.COD2_PosValue;
 // 2. TREUIL M1 (Abs → Homing → Scale)
 instEncoderAbsM1(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_MODES_CFC.Auth.Mode,
     RawPosIn            := M1_RawPosToUse,
@@ -67,7 +67,7 @@ COD1_PresetValue    := instEncoderAbsM1.PresetValueOut;
 instHomingM1(
     Enable               := TRUE,
     Calib                := _CalibM1,
-    Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                 := PRG_MODES_CFC.Auth.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
@@ -100,7 +100,7 @@ instEncoderScaleM1(
 // 3. TREUIL M2 (Abs → Homing → Scale)
 instEncoderAbsM2(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_MODES_CFC.Auth.Mode,
     RawPosIn            := M2_RawPosToUse,
@@ -117,7 +117,7 @@ COD2_PresetValue    := instEncoderAbsM2.PresetValueOut;
 instHomingM2(
     Enable               := TRUE,
     Calib                := _CalibM2,
-    Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                 := PRG_MODES_CFC.Auth.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
@@ -150,7 +150,7 @@ instEncoderScaleM2(
 // 4. SÉCURITÉ DE BORNAGE ET INCOHÉRENCE
 instEncoderSafetyM1(
     Enable          := TRUE,
-    Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset           := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode            := PRG_MODES_CFC.Auth.Mode,
     CablePosM       := instEncoderScaleM1.CablePosM,
@@ -163,7 +163,7 @@ EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent;
 
 instEncoderSafetyM2(
     Enable          := TRUE,
-    Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset           := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode            := PRG_MODES_CFC.Auth.Mode,
     CablePosM       := instEncoderScaleM2.CablePosM,

@@ -11,7 +11,7 @@ VAR
     instDiagCanOpen  : FB_Diag_CanOpen;       // Diagnostic CAN/Joystick
     instDiagEthercat : FB_Diag_Ethercat;      // Diagnostic EtherCAT (3 devices)
     instJoystick    : FB_Joystick;          // Traitement joystick (calib/filtre/rampe)
-    instIhmHeartbeat : FB_Diag_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_03_Safety
+    instIhmHeartbeat : FB_Diag_IhmHeartbeat;      // 💓 Surveillance IHM↔PLC, consommée par PRG_SAFETY_CFC
 
     // 🆕 REX 2026-07-24 (demande utilisateur, mise en service) : capture UNIQUE par cycle des
     // valeurs brutes bus (évite d'appeler GetBusState()/GetDeviceState() deux fois par device).
@@ -40,7 +40,7 @@ RawEncoderM2State := PRG_ACQUISITION_CFC.HwIn.Winch.COD2_DeviceState;
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
 instDiagCanOpen(
     Enable := TRUE,
-    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     CANbusStateRaw := RawCanBusState,
     DeviceJoystickStateRaw := RawJoystickState,
     SimBypassActive := FALSE,
@@ -50,7 +50,7 @@ instDiagCanOpen(
 // 2. Diagnostics EtherCAT (variateur + 2 codeurs)
 instDiagEthercat(
     Enable := TRUE,
-    Reset := PRG_09_Supervision.FaultMachineReset_IHM,          // 🔑 Bouton général machine
+    Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,          // 🔑 Bouton général machine
     DeviceVariateurStateRaw := RawVariateurState,
     DeviceVariateurSimBypass := FALSE,
     DeviceEncoderM1StateRaw := RawEncoderM1State,
@@ -74,11 +74,11 @@ instIhmHeartbeat(
 instJoystick(
     Enable              := TRUE,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     Mode                := PRG_MODES_CFC.Auth.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
-    BenneBusy         := PRG_06_WinchControl.instBucket.Busy,
-    PreserveArmingAfterBucket := PRG_06_WinchControl.instExtractionSequence.Busy
-                                  AND (PRG_06_WinchControl.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
+    BenneBusy         := PRG_TREUILS_CFC.instBucket.Busy,
+    PreserveArmingAfterBucket := PRG_TREUILS_CFC.instExtractionSequence.Busy
+                                  AND (PRG_TREUILS_CFC.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
     NeutralXMem         := _JoystickNeutralX,
     NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,

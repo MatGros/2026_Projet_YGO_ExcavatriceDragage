@@ -17,7 +17,7 @@ STRUCT
     CfgCableLimitAscent_M   : REAL := 8.0;      (* 📐 Limite haute d'exploitation NORMALE (m) *)
 
     (* 🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
-       métier dont le défaut peut valoir n'importe quoi) — PRG_09_Supervision.st §2/§3 *)
+       métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3 *)
     Initialized              : BOOL := FALSE;    (* 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot *)
 END_STRUCT
 END_TYPE

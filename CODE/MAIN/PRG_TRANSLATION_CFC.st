@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   ↔️ PRG_07_TranslationControl — Pilotage de la Translation Translation M3
+   ↔️ PRG_TRANSLATION_CFC — Pilotage de la Translation Translation M3
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
@@ -7,7 +7,7 @@
    📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
 *)
 
-PROGRAM PRG_07_TranslationControl
+PROGRAM PRG_TRANSLATION_CFC
 VAR_OUTPUT
     // 🛡️ Demande brute explicite, consommée par PRG_10_Outputs_LD.
     // PRG_07 ne produit jamais un PDO/frein M3 autorisé.
@@ -32,7 +32,7 @@ VAR
     FreqPct                 : REAL; // Conversion SetFreqHz (Hz) → % pleine échelle pour SpeedRefPct
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_07_TranslationControl) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_TRANSLATION_CFC) ===
 
 // ── 0. DÉCODAGE MOT CAPTEURS (exécuté en position 0 dans PRG_00_Inputs) ──────
 
@@ -57,13 +57,13 @@ IF PRG_MODES_CFC.Auth.Mode = E_Mode.SEMI_AUTO THEN
     ELSE
         M3_Direction_Active := -1;
     END_IF;
-// ── 1bis. MAINT_N1/N2 — 2ᵉ source d'arbitrage (mirroir PRG_06_WinchControl §1/§2) ──
+// ── 1bis. MAINT_N1/N2 — 2ᵉ source d'arbitrage (mirroir PRG_TREUILS_CFC §1/§2) ──
 // 🔧 REX 2026-07-19 : ex-libellé "IHM_MANU" (bypass supprimé) — cette branche est désormais
 // gatée par Mode (MAINT_N1/N2), pas par un flag ManuActive séparé.
 // 🆕 REX 2026-07-16 : remplace l'ex-bypass direct M3_CommandWord dans PRG_10_Outputs_LD — M3 est
 // désormais piloté par la MÊME instance instTranslationM3 (FB_Translation) qu'en Auto, avec la
 // rampe accel/décel et l'interlock changement de sens natifs, sous surveillance réelle de
-// FB_Safety_Translation (voir PRG_03_Safety, Enable désormais inconditionnel).
+// FB_Safety_Translation (voir PRG_SAFETY_CFC, Enable désormais inconditionnel).
 ELSIF (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1)
    OR (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) THEN
     // 🛠️ Maintenance N1/N2 : sous-mode explicite IHM.
@@ -143,13 +143,13 @@ END_CASE;
 
 // ── 2. EXÉCUTION DU PILOTAGE DU TRANSLATION M3 ──────────────────────────────
 instTranslationM3(
-    Enable                  := PRG_06_WinchControl.StubMachineEnableN1
+    Enable                  := PRG_TREUILS_CFC.StubMachineEnableN1
                                AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
-    Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                   := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M3_StartStop_Active,
-    SafeStop                := PRG_03_Safety.instSafetyTranslationM3.SafeStop,
+    SafeStop                := PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
@@ -170,10 +170,10 @@ instTranslationM3(
 // 🛡️ Publication demande brute M3 vers PRG_10_Outputs_LD.
 // Ordre MainTask requis : PRG_07 avant PRG_10. SafeStop reste traité par
 // FB_Translation (rampe rapide) et n'est jamais une coupure sèche ici.
-TranslationFinalInterlockRequest.Enable := PRG_06_WinchControl.StubMachineEnableN1;
-TranslationFinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
+TranslationFinalInterlockRequest.Enable := PRG_TREUILS_CFC.StubMachineEnableN1;
+TranslationFinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM;
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged;
-TranslationFinalInterlockRequest.SafeStop := PRG_03_Safety.instSafetyTranslationM3.SafeStop;
+TranslationFinalInterlockRequest.SafeStop := PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;

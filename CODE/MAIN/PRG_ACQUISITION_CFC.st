@@ -85,6 +85,7 @@ HwReal.Translation.M3_PosP2_DI          := M3_PosP2_DI;
 HwReal.Translation.M3_PosP1_DI          := M3_PosP1_DI;
 HwReal.Translation.M3_PosMaintenance_DI := M3_PosMaintenance_DI;
 HwReal.Translation.M3_BrakeIsOpen_DI    := M3_BrakeIsOpen_DI;
+HwReal.Translation.M3_ThermalFeedback_DI:= M3_ThermalFeedback_DI; // 🆕 T96 — diagnostic seul (voie déjà mappée CODESYS, jamais lue jusqu'ici)
 HwReal.Translation.M3_StatusWord        := M3_StatusWord;
 HwReal.Translation.M3_ActualFrequencyHz := M3_ActualFrequencyHz;
 HwReal.Translation.AC600_DeviceState    := AC600_ECAT_Drive.GetDeviceState();
@@ -115,7 +116,7 @@ instSimBench(
     M1_SpeedContactor_2      := GVL_Global.M1SpeedContactor2,
     M1_SpeedContactor_3      := GVL_Global.M1SpeedContactor3,
     M1_SpeedContactor_4      := GVL_Global.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_06_WinchControl.M1_SpeedRef_Active,
+    M1_SpeedRefPct           := PRG_TREUILS_CFC.M1_SpeedRef_Active,
     M1_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM1.PresetValueOut,
     M1_BrakeCmd              := GVL_Global.M1BrakeCmd,
@@ -125,12 +126,12 @@ instSimBench(
     M2_SpeedContactor_2      := GVL_Global.M2SpeedContactor2,
     M2_SpeedContactor_3      := GVL_Global.M2SpeedContactor3,
     M2_SpeedContactor_4      := GVL_Global.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_06_WinchControl.M2_SpeedRef_Active,
+    M2_SpeedRefPct           := PRG_TREUILS_CFC.M2_SpeedRef_Active,
     M2_PresetTriggerCmd      := PRG_02_Encoders.instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := PRG_02_Encoders.instEncoderAbsM2.PresetValueOut,
     M2_BrakeCmd              := GVL_Global.M2BrakeCmd,
-    M3_Direction             := PRG_07_TranslationControl.M3_Direction_Active,
-    M3_SpeedRefPct           := PRG_07_TranslationControl.M3_SpeedRef_Active,
+    M3_Direction             := PRG_TRANSLATION_CFC.M3_Direction_Active,
+    M3_SpeedRefPct           := PRG_TRANSLATION_CFC.M3_SpeedRef_Active,
     M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
     M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
     PowerKeepAlive_A         := PRG_10_Outputs_LD.PowerKeepAlive_A_RQ,
@@ -185,12 +186,12 @@ IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
 // 🕹️ Joystick : acquisition + homme-mort + mise à l'échelle
 instJoystick(
     Enable                    := TRUE,
-    Reset                     := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                     := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                      := PRG_MODES_CFC.Auth.Mode,
-    BenneBusy                 := PRG_06_WinchControl.instBucket.Busy,
-    PreserveArmingAfterBucket := PRG_06_WinchControl.instExtractionSequence.Busy
-                                 AND (PRG_06_WinchControl.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
+    BenneBusy                 := PRG_TREUILS_CFC.instBucket.Busy,
+    PreserveArmingAfterBucket := PRG_TREUILS_CFC.instExtractionSequence.Busy
+                                 AND (PRG_TREUILS_CFC.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
     BusCanOpenOP              := PRG_01_Diagnostics.instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := PRG_01_Diagnostics.instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -210,7 +211,7 @@ instJoystick(
 // 🧲 Codeurs M1 : Abs → Homing → Scale
 instEncoderAbsM1(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_MODES_CFC.Auth.Mode,
     RawPosIn            := HwIn.Winch.COD1_PosValue,
@@ -223,7 +224,7 @@ instEncoderAbsM1(
 
 instHomingM1(
     Enable               := TRUE,
-    Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                 := PRG_MODES_CFC.Auth.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
@@ -257,7 +258,7 @@ instEncoderScaleM1(
 // 🧲 Codeurs M2 : Abs → Homing → Scale
 instEncoderAbsM2(
     Enable              := TRUE,
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_MODES_CFC.Auth.Mode,
     RawPosIn            := HwIn.Winch.COD2_PosValue,
@@ -270,7 +271,7 @@ instEncoderAbsM2(
 
 instHomingM2(
     Enable               := TRUE,
-    Reset                := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                 := PRG_MODES_CFC.Auth.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,

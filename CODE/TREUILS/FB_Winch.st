@@ -79,7 +79,7 @@ VAR_INPUT
     SpeedStepTable          : ST_SpeedStepTable;
     CfgMaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
     MaxStepAscent           : INT := 5;    // 🆕 REX 2026-07-15 (9) : Plafond palier en montée (CommandedDirection=1) — 5 = pas de restriction
-                                             // (valeur fixe Auto ET Manuel, voir PRG_06_WinchControl).
+                                             // (valeur fixe Auto ET Manuel, voir PRG_TREUILS_CFC).
     HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
     FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)

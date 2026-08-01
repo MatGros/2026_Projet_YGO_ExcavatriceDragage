@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ ST_TranslationFinalInterlockRequest — Demande brute vers PDO M3
    ───────────────────────────────────────────────────────────────
-   📤 Producteur unique : PRG_07_TranslationControl (VAR_OUTPUT).
+   📤 Producteur unique : PRG_TRANSLATION_CFC (VAR_OUTPUT).
    📥 Consommateur unique : PRG_10_Outputs_LD, avant
       FB_TranslationOutputInterlock_LD.
    🔒 Ne contient jamais une commande PDO autorisée.

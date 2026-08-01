@@ -2,7 +2,7 @@
    🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
    📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
-      Consommé par PRG_09_Supervision et GVL_Troubleshooting.
+      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
    🎯 Champs lecture seule — producteur unique = FB composite.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2

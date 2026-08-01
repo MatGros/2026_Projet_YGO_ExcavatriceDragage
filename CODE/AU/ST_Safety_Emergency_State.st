@@ -2,7 +2,7 @@
    🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
    ───────────────────────────────────────────────────────────────
    📄 Produit par FB_Safety_EmergencyManagement (sortie State).
-      Consommé par PRG_09_Supervision → GVL_IHM.Modes.State pour IHM,
+      Consommé par PRG_SUPERVISION_CFC → GVL_IHM.Modes.State pour IHM,
       et par GVL_Troubleshooting pour diagnostic.
    🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
    ═══════════════════════════════════════════════════════════════

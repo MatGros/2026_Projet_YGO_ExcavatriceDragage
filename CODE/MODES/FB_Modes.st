@@ -150,7 +150,7 @@ ELSE
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// Autorisée uniquement en MAINT_N2. PRG_07_TranslationControl consomme ce bit.
+// Autorisée uniquement en MAINT_N2. PRG_TRANSLATION_CFC consomme ce bit.
 Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2);
 
 // GATE — désactivation inhibitions/sync si mode change (sortie N2)

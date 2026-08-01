@@ -1,6 +1,6 @@
 # Extraction Translation M3 — code vs AF11 (v1.0)
 
-> Sources : `CODE/TRANSLATION/*.st`, `CODE/MAIN/PRG_07_TranslationControl.st`, `PRG_03_Safety.st`.
+> Sources : `CODE/TRANSLATION/*.st`, `CODE/MAIN/PRG_TRANSLATION_CFC.st`, `PRG_03_Safety.st`.
 
 ## Alertes (devoir d'alerte)
 
