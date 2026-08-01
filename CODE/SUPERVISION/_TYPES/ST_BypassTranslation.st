@@ -26,7 +26,7 @@ STRUCT
     Process           : BOOL; (* ⚙️ Bypass groupé : tous les bits qui provoquent un SafeStop *)
     Global            : BOOL; (* 🌐 Bypass Global : ignore toutes les sécurités de cet axe *)
     // 🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-    // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_09_Supervision.st
+    // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
     Initialized       : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT
 END_TYPE

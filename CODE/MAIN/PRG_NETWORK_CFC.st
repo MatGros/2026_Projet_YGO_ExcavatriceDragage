@@ -1,12 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   💻 PRG_IP — Configuration / Diagnostic Ethernet / IP
+   💻 PRG_NETWORK_CFC — Configuration / Diagnostic Ethernet / IP
    ───────────────────────────────────────────────────────────────
    Note : Programme exécuté en tâche de fond ou asynchrone.
    Le bloc de configuration de l'IP est actuellement stubbé / commenté.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
 *)
-PROGRAM PRG_IP
+PROGRAM PRG_NETWORK_CFC
 VAR
     // SetNetworkConfig_0 : SetNetworkConfig; (* Configuration IP commentée par défaut *)
 END_VAR

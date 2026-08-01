@@ -2,7 +2,7 @@
    🔧 ST_CommunCfg — Configuration des paramètres communs machine
    📄 2026-07-24 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
    WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
-   ad-hoc dans PRG_09_Supervision.st, une seule instance ici l'élimine).
+   ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CommunCfg :
 STRUCT

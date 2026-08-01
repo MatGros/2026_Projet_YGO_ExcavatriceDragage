@@ -1,6 +1,6 @@
 # Extraction Treuils M1/M2 — code vs AF10 (v1.0)
 
-> Sources : `CODE/TREUILS/*.st`, `CODE/COMMUN/FB_Brake.st`, `CODE/MAIN/PRG_06_WinchControl.st`, `PRG_03_Safety.st`.
+> Sources : `CODE/TREUILS/*.st`, `CODE/COMMUN/FB_Brake.st`, `CODE/MAIN/PRG_TREUILS_CFC.st`, `PRG_03_Safety.st`.
 > Statut : fiche de travail avant AF10 v2.0. Renommage AU déjà à jour partout ici.
 
 ## Alertes (devoir d'alerte)

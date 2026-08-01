@@ -52,46 +52,46 @@ END_VAR
 // Les trois instances sont les uniques producteurs des commandes autorisées.
 // Aucun mapping C1..C4 n'est reconstruit : FB_Winch / SpeedStepTable demeure propriétaire.
 instWinchOutputInterlockM1_LD(
-    Enable := PRG_06_WinchControl.WinchM1FinalInterlockRequest.Enable,
-    Reset := PRG_06_WinchControl.WinchM1FinalInterlockRequest.Reset,
-    PowerContactorEngaged := PRG_06_WinchControl.WinchM1FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop := PRG_06_WinchControl.WinchM1FinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest := PRG_06_WinchControl.WinchM1FinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed := PRG_06_WinchControl.WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed,
-    FwdRevSpeedFeedbackOff := PRG_06_WinchControl.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1 := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2 := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3 := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4 := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep := PRG_06_WinchControl.WinchM1FinalInterlockRequest.RequestedStep
+    Enable := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.Enable,
+    Reset := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.Reset,
+    PowerContactorEngaged := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.SafeStop,
+    BrakeReleaseRequest := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.BrakeReleaseRequest,
+    BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed,
+    FwdRevSpeedFeedbackOff := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1 := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2 := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3 := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4 := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedContactor4,
+    RequestedStep := PRG_TREUILS_CFC.WinchM1FinalInterlockRequest.RequestedStep
 );
 instWinchOutputInterlockM2_LD(
-    Enable := PRG_06_WinchControl.WinchM2FinalInterlockRequest.Enable,
-    Reset := PRG_06_WinchControl.WinchM2FinalInterlockRequest.Reset,
-    PowerContactorEngaged := PRG_06_WinchControl.WinchM2FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop := PRG_06_WinchControl.WinchM2FinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest := PRG_06_WinchControl.WinchM2FinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed := PRG_06_WinchControl.WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed,
-    FwdRevSpeedFeedbackOff := PRG_06_WinchControl.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1 := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2 := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3 := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4 := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep := PRG_06_WinchControl.WinchM2FinalInterlockRequest.RequestedStep
+    Enable := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.Enable,
+    Reset := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.Reset,
+    PowerContactorEngaged := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.SafeStop,
+    BrakeReleaseRequest := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.BrakeReleaseRequest,
+    BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed,
+    FwdRevSpeedFeedbackOff := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1 := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2 := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3 := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4 := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedContactor4,
+    RequestedStep := PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.RequestedStep
 );
 instTranslationOutputInterlock_LD(
-    Enable := PRG_07_TranslationControl.TranslationFinalInterlockRequest.Enable,
-    Reset := PRG_07_TranslationControl.TranslationFinalInterlockRequest.Reset,
-    PowerContactorEngaged := PRG_07_TranslationControl.TranslationFinalInterlockRequest.PowerContactorEngaged,
-    SafeStop := PRG_07_TranslationControl.TranslationFinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest := PRG_07_TranslationControl.TranslationFinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed := PRG_07_TranslationControl.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord := PRG_07_TranslationControl.TranslationFinalInterlockRequest.RequestedDriveControlWord,
-    RequestedDriveFreqHz := PRG_07_TranslationControl.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+    Enable := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.Enable,
+    Reset := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.Reset,
+    PowerContactorEngaged := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.PowerContactorEngaged,
+    SafeStop := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.SafeStop,
+    BrakeReleaseRequest := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    BrakeCommandOpenConfirmed := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
+    RequestedDriveControlWord := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+    RequestedDriveFreqHz := PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.RequestedDriveFreqHz
 );
 
 // === [Q M1 / M2] ===
@@ -130,7 +130,7 @@ TranslationBrakeCmd := instTranslationOutputInterlock_LD.BrakeCmd;
 M3_BrakeRelease_RQ := TranslationBrakeCmd;
 M3_CommandWord := instTranslationOutputInterlock_LD.DriveControlWord;
 M3_SetpointFrequencyHz := REAL_TO_UINT(instTranslationOutputInterlock_LD.DriveFreqRefHz * 100.0);
-M1_M2_KoboldMeasureEnable_DQ := PRG_06_WinchControl.KoboldContactorCmdArbitrated
+M1_M2_KoboldMeasureEnable_DQ := PRG_TREUILS_CFC.KoboldContactorCmdArbitrated
                                 AND PRG_INPUTS_LD.PowerContactorEngaged
                                 AND PRG_INPUTS_LD.EmergencyChainClosed;
 
@@ -138,12 +138,12 @@ M1_M2_KoboldMeasureEnable_DQ := PRG_06_WinchControl.KoboldContactorCmdArbitrated
 // Boucle de sécurité et séquencement d'armement général.
 
 // Demande de coupure de puissance
-PowerCutOffReq := PRG_03_Safety.instSafetyWinchM1.PowerCutOff OR PRG_03_Safety.instSafetyWinchM2.PowerCutOff OR PRG_03_Safety.instSafetyTranslationM3.PowerCutOff;
+PowerCutOffReq := PRG_SAFETY_CFC.instSafetyWinchM1.PowerCutOff OR PRG_SAFETY_CFC.instSafetyWinchM2.PowerCutOff OR PRG_SAFETY_CFC.instSafetyTranslationM3.PowerCutOff;
 
 // Gestionnaire d'arrêt d'urgence et de réarmement
 instSafetyEmergencyManagement(
     Enable := TRUE,
-    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
     EmergencyChainClosed := PRG_INPUTS_LD.EmergencyChainClosed,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,

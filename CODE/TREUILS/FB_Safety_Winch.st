@@ -91,7 +91,7 @@
    🆕 REX 2026-07-08 (3) — MÉCA D (bit11), demande utilisateur (retour terrain test banc) :
       modèle à 3 couches en fonctionnement NORMAL (hors référencement) à l'approche du capteur
       haut : (1) ~arrêt rampé normal à `HomingTargetMx_M - WinchTopStopMarginM` (voir
-       `PRG_06_WinchControl.st`, gardé par `HomingApproachEnable` désormais — REX 2026-07-08 (2)) ;
+       `PRG_TREUILS_CFC.st`, gardé par `HomingApproachEnable` désormais — REX 2026-07-08 (2)) ;
       (2) coupure immédiate `ForbidAscent` si le capteur physique est réellement atteint (bit5,
       déjà existant) ; (3) **Méca D** : si malgré la coupure (2), les contacteurs ET le frein ne
       confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
@@ -99,7 +99,7 @@
       différente (capteur haut atteint hors référencement, au lieu de perte commande opérateur).
    🆕 REX 2026-07-08 (4) — MÉCA E (bits 12/13), écart synchro M1/M2 CRITIQUE, demande utilisateur
       (analyse redondance synchro) : `FB_WinchSync` (écart mineur, `WinchSyncTolerance_M`) reste
-      le 1er niveau (arrêt rampe normale, `PRG_06_WinchControl.st`). Méca E est une couche
+      le 1er niveau (arrêt rampe normale, `PRG_TREUILS_CFC.st`). Méca E est une couche
       SUPPLÉMENTAIRE et INDÉPENDANTE dans `FB_Safety_Winch` pour un écart VRAIMENT important
       (`CriticalSyncToleranceM`, théorique 2.0m) — défense en profondeur si le 1er niveau n'a pas
       suffi (ex. treuil qui continue malgré l'arrêt demandé). Nouvelles entrées `OtherWinchPosM`
@@ -154,7 +154,7 @@ VAR_INPUT
 
     // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13), écart synchro M1/M2 critique
     ExpectedOtherWinchPosM  : REAL;         // Position ATTENDUE de l'AUTRE treuil, DÉJÀ corrigée de
-                                             // l'offset benne actif par l'appelant (PRG_03_Safety) —
+                                             // l'offset benne actif par l'appelant (PRG_SAFETY_CFC) —
                                              // ce FB ne fait qu'un ABS(CablePosM - ExpectedOtherWinchPosM)
     BenneBusy             : BOOL;         // instBucket.Busy (les 2 instances) — suppression pendant
                                              // le trajet actif (écart transitoire normal, pas un défaut)
@@ -200,7 +200,7 @@ VAR_OUTPUT
     PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
 
     // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
-    // par l'IHM pour la mise en service (voir PRG_09_Supervision, GVL_IHM.M1Winch/M2Winch)
+    // par l'IHM pour la mise en service (voir PRG_SUPERVISION_CFC, GVL_IHM.M1Winch/M2Winch)
     MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
     MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM
     MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout

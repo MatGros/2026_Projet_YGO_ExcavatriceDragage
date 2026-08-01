@@ -14,7 +14,7 @@
    🔧 REX 2026-07-07 (3) : Méca C couche 1 (bit4) — M1 DOIT rester immobile pendant
       que M2 bouge seul. Si M1 glisse de plus de M1SlipToleranceM (1.0 m) pendant
       BUSY → SevereError (coupe M2 via le mécanisme existant) + sortie dédiée
-      M1SlipDetected (à consommer côté PRG_06_WinchControl pour forcer SafeStop
+      M1SlipDetected (à consommer côté PRG_TREUILS_CFC pour forcer SafeStop
       sur M1 spécifiquement — FB_Bucket ne pilote pas M1). Couche de secours si
       cette couche ne suffit pas : voir FB_Safety_Winch bit9 (tolérance 2.0 m,
       escalade PowerCutOff).
@@ -69,7 +69,7 @@ VAR_OUTPUT
     Done                : BOOL;             // Mouvement terminé avec succès
     Error               : BOOL;             // Présence d'un défaut
     ErrorId             : WORD;             // bit0: "Timeout mouvement benne" - Timeout mouvement, bit1: "Incohérence position benne" - Incohérence boot, bit2: "Limites placement benne dépassées" - Limites dépassées, bit3: "Codeur(s) benne non référencé(s)" - Codeur(s) M1/M2 non référencé(s), bit4: "Glissement M1 détecté" - Glissement M1 pendant Busy
-    M1SlipDetected      : BOOL;             // 🔧 REX 2026-07-07 : à consommer côté PRG_06_WinchControl (force SafeStop M1)
+    M1SlipDetected      : BOOL;             // 🔧 REX 2026-07-07 : à consommer côté PRG_TREUILS_CFC (force SafeStop M1)
     CloseReq            : BOOL;             // 🆕 REX 2026-07-08 : demande de fermeture mémorisée — image IHM (FALSE = pas de demande active
                                              // ou objectif atteint/retour position départ ; TRUE = demande armée ou mouvement en cours)
     OpenReq             : BOOL;             // 🆕 REX 2026-07-08 : demande d'ouverture mémorisée — même principe
@@ -449,7 +449,7 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
-// (M2PositionCorrected, côté PRG_09_Supervision).
+// (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
 // 🔧 REX 2026-07-08 : ajout de CloseReq/OpenReq (pas seulement IsClosed/IsOpen, qui sont FALSE
 // pendant TOUT le trajet depuis le REX du 2026-07-08 sur l'état transitoire) — sinon
 // ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant le trajet entier d'une fermeture,

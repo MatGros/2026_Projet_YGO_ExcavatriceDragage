@@ -61,8 +61,8 @@ instCycle(
     KoboldContactFond   := PRG_INPUTS_LD.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM    := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M,
-    WinchSyncError      := PRG_06_WinchControl.instWinchSync.Error,
-    WinchSyncDeltaM     := PRG_06_WinchControl.instWinchSync.DeltaPosM,
+    WinchSyncError      := PRG_TREUILS_CFC.instWinchSync.Error,
+    WinchSyncDeltaM     := PRG_TREUILS_CFC.instWinchSync.DeltaPosM,
     M1_CablePosM        := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
     M2_CablePosM        := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     M1_MeasuredSpeedMps := PRG_02_Encoders.M1MeasuredSpeed_Mps,
@@ -76,12 +76,12 @@ instCycle(
     Translation_At_P2       := PRG_ACQUISITION_CFC.TranslationPosP2,
     Translation_At_Maintenance := PRG_ACQUISITION_CFC.TranslationPosMaintenance,
     Translation_At_Tremie   := PRG_ACQUISITION_CFC.TranslationPosTremie,
-    Translation_Busy        := PRG_07_TranslationControl.instTranslationM3.Busy,
-    Translation_Done        := PRG_07_TranslationControl.instTranslationM3.Done,
+    Translation_Busy        := PRG_TRANSLATION_CFC.instTranslationM3.Busy,
+    Translation_Done        := PRG_TRANSLATION_CFC.instTranslationM3.Done,
 
     // Mouvements mâchoires benne (gérés par instBucket)
-    Benne_Busy        := PRG_06_WinchControl.instBucket.Busy,
-    Benne_Done        := PRG_06_WinchControl.instBucket.Done,
+    Benne_Busy        := PRG_TREUILS_CFC.instBucket.Busy,
+    Benne_Done        := PRG_TREUILS_CFC.instBucket.Done,
     Benne_IsOpen      := _BucketState.IsOpen,
     Benne_IsClosed    := _BucketState.IsClosed
 );

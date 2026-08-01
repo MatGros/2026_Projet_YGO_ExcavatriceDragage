@@ -1,12 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   🪝 PRG_06_WinchControl — Commande des Treuils M1 (moteur de retenue) / M2 (moteur Benne), Synchro et Benne
+   🪝 PRG_TREUILS_CFC — Commande des Treuils M1 (moteur de retenue) / M2 (moteur Benne), Synchro et Benne
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 6.
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_05_Cycle).
    📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_06_WinchControl
+PROGRAM PRG_TREUILS_CFC
 VAR_OUTPUT
     // 🛡️ Demandes brutes explicites : consommées par PRG_10_Outputs_LD.
     // PRG_06 ne produit jamais les Q ni les commandes finales autorisées.
@@ -95,7 +95,7 @@ VAR
     EffectiveMaxStepDescente  : INT;
 END_VAR
 
-// === IMPLEMENTATION (corps du PROGRAM PRG_06_WinchControl) ===
+// === IMPLEMENTATION (corps du PROGRAM PRG_TREUILS_CFC) ===
 
 // ── 0. INTENTION MAINTENANCE + ASSISTANTS PRÉLÈVEMENT ──────────────────
 // 🎯 Source unique : joystick OU boutons IHM. En mode boutons, seule la commande
@@ -123,7 +123,7 @@ END_IF;
 // Elle est consommée à l'entrée extraction et annulée dès qu'un mouvement la rend caduque.
 IF NOT (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_INPUTS_LD.PowerContactorEngaged
-   OR PRG_09_Supervision.FaultMachineReset_IHM
+   OR PRG_SUPERVISION_CFC.FaultMachineReset_IHM
    OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
    OR _BucketState.IsOpen THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
@@ -133,7 +133,7 @@ ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomCon
 instDiveSearch(
     Enable := (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
-    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode := PRG_MODES_CFC.Auth.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
@@ -154,7 +154,7 @@ BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPo
 instExtractionSequence(
     Enable := (PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N1 OR PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
-    Reset := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode := PRG_MODES_CFC.Auth.Mode,
     MotionRequestActive := MaintenanceMotionRequestActive,
@@ -204,7 +204,7 @@ instBucket(
     Enable              := NOT PRG_MODES_CFC.Auth.InhibitM2
                            AND PRG_02_Encoders.instEncoderAbsM1.EncoderAvailable
                            AND PRG_02_Encoders.instEncoderAbsM2.EncoderAvailable, // 🆕 Sécurisé : nécessite les deux codeurs valides et M2 non-inhibé
-    Reset               := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                := PRG_MODES_CFC.Auth.Mode,
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR PRG_05_Cycle.instCycle.BucketCmd.Open,
@@ -427,7 +427,7 @@ instWinchSync(
                         AND NOT PRG_MODES_CFC.Auth.InhibitM1 AND NOT PRG_MODES_CFC.Auth.InhibitM2
                         AND NOT (ForbidAscentM1_Active OR ForbidAscentM2_Active
                                  OR ForbidDescentM1_Active OR ForbidDescentM2_Active), // 🆕 REX 2026-07-08 (7)
-    Reset           := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset           := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode            := PRG_MODES_CFC.Auth.Mode,
     CablePosM1      := PRG_02_Encoders.instEncoderScaleM1.CablePosM,
@@ -514,18 +514,18 @@ END_IF;
 // 🆕 REX 2026-07-08 (6) : _SyncSoftStopEnable=FALSE (défaut) → comportement D'AVANT,
 // bit0 réintégré ici en SafeStop fast classique comme n'importe quel autre défaut winch. TRUE →
 // bit0 exclu d'ici, géré exclusivement par le gate directionnel StartStop (§1/§2).
-SafeStopM1_Raw      := PRG_03_Safety.instSafetyWinchM1.SafeStop
+SafeStopM1_Raw      := PRG_SAFETY_CFC.instSafetyWinchM1.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
                        OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000))
                        OR instBucket.M1SlipDetected;
-SafeStopM2_Raw      := PRG_03_Safety.instSafetyWinchM2.SafeStop
+SafeStopM2_Raw      := PRG_SAFETY_CFC.instSafetyWinchM2.SafeStop
                        OR ((instWinchSync.ErrorId AND 16#0002) <> 16#0000)
                        OR (NOT _SyncSoftStopEnable AND ((instWinchSync.ErrorId AND 16#0001) <> 16#0000));
 
-ForbidDescentM1_Raw := (NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND PRG_03_Safety.instSafetyWinchM1.ForbidDescent)
+ForbidDescentM1_Raw := (NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND PRG_SAFETY_CFC.instSafetyWinchM1.ForbidDescent)
                        OR (_CommunCfgPersist.LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
-ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safety.instSafetyWinchM2.ForbidDescent)
+ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_SAFETY_CFC.instSafetyWinchM2.ForbidDescent)
                        OR (_CommunCfgPersist.LimitLegalEnabled
                            AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 
@@ -546,14 +546,14 @@ ForbidDescentM2_Raw := (NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND PRG_03_Safet
 // nécessite MAINT_N2 ET une case IHM activée consciemment pour dépasser CableLimitAscentMx_M
 // et aller chercher le capteur physique en petite vitesse (Homing).
 // 🆕 REX 2026-07-15 (8) : flag dédié — miroir IHM (GVL_IHM.M1TreuilRetenue.CableLimitAscentReached, voir
-// PRG_09_Supervision), symétrique à CableLimitDescentReached. Réutilisé ci-dessous dans ForbidAscentM1_Raw.
+// PRG_SUPERVISION_CFC), symétrique à CableLimitDescentReached. Réutilisé ci-dessous dans ForbidAscentM1_Raw.
 CableLimitAscentM1Reached := PRG_02_Encoders.instHomingM1.Homed
                              AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
                              AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _WinchM1CfgPersist.CfgCableLimitAscent_M)
                              AND NOT PRG_MODES_CFC.Auth.HomingApproachEnable;
 
 ForbidAscentM1_Raw  := NOT GVL_IHM.M1TreuilRetenue.Bypass.Global AND (
-                          PRG_03_Safety.instSafetyWinchM1.ForbidAscent
+                          PRG_SAFETY_CFC.instSafetyWinchM1.ForbidAscent
                           OR (PRG_02_Encoders.instHomingM1.Homed
                               AND NOT PRG_02_Encoders.instHomingM1.HomingSuspect
                               AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= _WinchM1CfgPersist.CfgTopSensorPos_M))
@@ -572,7 +572,7 @@ CableLimitAscentM2Reached := PRG_02_Encoders.instHomingM2.Homed
                              AND NOT PRG_MODES_CFC.Auth.HomingApproachEnable;
 
 ForbidAscentM2_Raw  := NOT GVL_IHM.M2TreuilBenne.Bypass.Global AND (
-                          PRG_03_Safety.instSafetyWinchM2.ForbidAscent
+                          PRG_SAFETY_CFC.instSafetyWinchM2.ForbidAscent
                           OR (PRG_02_Encoders.instHomingM2.Homed
                               AND NOT PRG_02_Encoders.instHomingM2.HomingSuspect
                               AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= (_WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift)))
@@ -591,7 +591,7 @@ instWinchM1(
     Enable                  := StubMachineEnableN1
                                AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE)
                                AND NOT PRG_MODES_CFC.Auth.InhibitM1, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M1
-    Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                   := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M1_StartStop_Active,
@@ -605,10 +605,10 @@ instWinchM1(
     // WinchMaxStepDescente/5 inchangés, Manu applique en plus WinchMaxStepFwd/Rev (essais progressifs).
     CfgMaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep, EffectiveMaxStepAscent, 1),
-    MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM1.SpeedBand,
+    MeasuredSpeedBand       := PRG_SAFETY_CFC.instLoadEstimatorM1.SpeedBand,
     SpeedGuardEnable        := SpeedGuardEnableM1,
-    SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM1.SpeedStable
-                               AND NOT PRG_03_Safety.instSpeedMonitorM1.SpeedVariationConfirmed
+    SpeedGuardReady         := PRG_SAFETY_CFC.instSpeedMonitorM1.SpeedStable
+                               AND NOT PRG_SAFETY_CFC.instSpeedMonitorM1.SpeedVariationConfirmed
                                AND NOT instWinchSync.Error,
     HomingApproachActive    := PRG_MODES_CFC.Auth.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
@@ -636,7 +636,7 @@ instWinchM2(
     Enable                  := StubMachineEnableN1
                                AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE)
                                AND NOT PRG_MODES_CFC.Auth.InhibitM2, // 🔧 WINCH-CORE-01 : DISABLE neutralise réellement M2
-    Reset                   := PRG_09_Supervision.FaultMachineReset_IHM,
+    Reset                   := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
     Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M2_StartStop_Active,
@@ -649,10 +649,10 @@ instWinchM2(
     // 🔧 REX 2026-07-15 (9) : idem M1 (voir §6 ci-dessus).
     CfgMaxStepDescente         := EffectiveMaxStepDescente,
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep, EffectiveMaxStepAscent, 1),
-    MeasuredSpeedBand       := PRG_03_Safety.instLoadEstimatorM2.SpeedBand,
+    MeasuredSpeedBand       := PRG_SAFETY_CFC.instLoadEstimatorM2.SpeedBand,
     SpeedGuardEnable        := SpeedGuardEnableM2,
-    SpeedGuardReady         := PRG_03_Safety.instSpeedMonitorM2.SpeedStable
-                               AND NOT PRG_03_Safety.instSpeedMonitorM2.SpeedVariationConfirmed
+    SpeedGuardReady         := PRG_SAFETY_CFC.instSpeedMonitorM2.SpeedStable
+                               AND NOT PRG_SAFETY_CFC.instSpeedMonitorM2.SpeedVariationConfirmed
                                AND NOT instWinchSync.Error,
     HomingApproachActive    := PRG_MODES_CFC.Auth.HomingApproachEnable, // 🆕 REX 2026-07-08 : vitesse lente en approche
     FwdRevSpeedFeedbackOff  := PRG_INPUTS_LD.M2FwdRevSpeedFeedbackOff, // 🔧 REX 2026-07-07
@@ -678,7 +678,7 @@ instWinchM2(
 // VAR_OUTPUT sont la frontière explicite producteur/consommateur ; aucune Q et
 // aucune commande autorisée ne sont produites dans ce programme.
 WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
-WinchM1FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
+WinchM1FinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 WinchM1FinalInterlockRequest.BrakeReleaseRequest := instWinchM1.BrakeCmd;
@@ -693,7 +693,7 @@ WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 
 WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
-WinchM2FinalInterlockRequest.Reset := PRG_09_Supervision.FaultMachineReset_IHM;
+WinchM2FinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
 WinchM2FinalInterlockRequest.BrakeReleaseRequest := instWinchM2.BrakeCmd;
