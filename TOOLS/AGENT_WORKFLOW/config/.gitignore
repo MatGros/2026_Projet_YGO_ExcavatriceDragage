@@ -1,0 +1,25 @@
+# CODESYS exports (bruts, non lisibles)
+*.osym
+Symbols.osym
+
+# À committer:
+# ✅ io_mapping.md (référence Markdown)
+# ✅ io_mapping.yaml (gates L8-L12)
+# ✅ io_mapping_simple.csv (export Excel)
+# ✅ Device_IO_*.csv (historique complets horodatés)
+
+# À ignorer:
+# Fichiers temporaires CODESYS
+*.bak
+*.tmp
+*~
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.DS_Store
+Thumbs.db

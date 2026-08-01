@@ -25,26 +25,39 @@ TOOLS/
 └── visualize_workflow.py    # Compatibilité et moteur commun Mermaid
 ```
 
-## Utilisation rapide
+## 🚀 Utilisation rapide
 
-### Générer le bundle PLCopenXML
+### 1️⃣ Valider le code (avant de terminer une tâche)
+
+```powershell
+# 📋 Tous les gates : liaison + structure + style
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+
+# 🔗 BLOQUANT : Vérifier que TOUT est câblé (REX 2026-07-29)
+python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+```
+
+👉 **Pas de commit sans gates verts ET validation utilisateur** — les deux sont obligatoires.
+
+### 2️⃣ Générer le bundle PLCopenXML
 
 ```powershell
 # Depuis la racine du projet
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
+# Sortie : CODE/CODE_Bundle.xml → copier/coller dans CODESYS 3.5
+```
+
+**Alternative manuelle** (rarement) :
+```powershell
 cd TOOLS/ST_PLCOPENXML_GENERATOR
 python -m pytest                          # 306 tests
 python -m generator.cli --bundle CODE_Bundle --project-name "MGS_v0.4.18" --timestamp "2026-07-18T00:05:50"
 ```
 
-Sortie : `CODE/CODE_Bundle.xml` → importer dans CODESYS.
-
-### Lancer tous les gates (workflow)
+### 3️⃣ Validation compilation CODESYS (après build manuel)
 
 ```powershell
-# Gates Python uniquement
-python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys
-
-# Gates + validation compilation CODESYS (après build manuel)
+# 💾 Après un build dans CODESYS, exporter le log :
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --codesys-log build.log --strict
 ```
 
@@ -82,6 +95,52 @@ pip install -e TOOLS/AGENT_WORKFLOW
 ```
 
 Skills disponibles : `codesys-change`, `codesys-review`, `herdr-review`, `doc-sync`, `release-check`, `requirement-intake`.
+
+---
+
+## 🧰 Ce que font les outils (dossier par dossier)
+
+### `AGENT_WORKFLOW/scripts/` — Gates & Validation
+
+📌 **Gates** = filtres automatiques qui **bloquent le code cassé avant qu'il ne rentre en CODESYS** :
+
+| Gate | 🎯 Rôle | Bloque si... |
+|---|---|---|
+| **`check_linkage.py`** | 🔗 Câblage réel : chaque variable appelle une autre variable, chaque FB sort dans `PRG_*_Outputs` | Une variable n'est nulle part connectée · un module orphelin · un appel de FB manquant |
+| **`check_structure.py`** | 📦 Structure ST valide : pas de doublons FB, bonnes déclarations, interface FB conforme | Code ST mal formé · noms non-PascalCase · FB sans contrat (AF_Partie-03) |
+| **`check_style.py`** | 🎨 Respect des conventions : noms, indentation, zones de code (INPUT/VAR/METHOD) | Majuscules mal placées · underscore → PascalCase · mauvaise section |
+| **`check_compile.py`** | ⚙️ Compilation CODESYS OK (optionnel, si log disponible) | Erreurs build · warnings non tolérants |
+| **`generate_codesys_bundle.py`** | 📦 Génère PLCopenXML → ready-to-import dans CODESYS | Invalid ST → PLCopenXML échoue |
+
+👉 **Toujours lancer `run_all_gates.py` avant de terminer une tâche** — c'est le "test de consentement". Pas de commit sans gates verts **ET validation utilisateur** — les deux sont obligatoires.
+
+### `AGENT_WORKFLOW/skills/` — Extensions Pi Coding Agent
+
+🤖 Compétences qu'on donne aux agents IA pour naviguer le projet :
+
+- **`codesys-workflow`** 📝 : Lire les specs, vérifier nommage, auditer FB avant de coder
+- **`codesys-review`** 🔍 : Review du code ST (sécurité machine, non-régression, contrats)
+- **`herdr-review`** 👥 : Orchestration multi-agents (délégation, parallélisation)
+
+### `AGENT_WORKFLOW/docs/` — Policies & Architecture
+
+📚 Directives machine-lisibles pour les agents :
+
+- **`SAFETY.md`** ⚠️ : Règles immuables (Enable/SafeStop/StartStop, Reset sur front, pas d'auto-redémarrage)
+- **`WORKFLOW.md`** 🔄 : Cycle d'édition (règles → archi → code → vérif → REX)
+- **`DOC_WRITING.md`** ✍️ : Style documentation (précision = robustesse)
+
+### `ST_PLCOPENXML_GENERATOR/` — Compilateur maison
+
+🏭 **Convertisseur autonome** : ST (notre dialecte) → PLCopenXML (format CODESYS universal) :
+
+- 306 tests unitaires + intégration (pas de régression)
+- Appelé par `generate_codesys_bundle.py`
+- **Jamais** copier du code du générateur dans `AGENT_WORKFLOW` — c'est une CLI externa
+
+### `PROJECT_WORKSPACE/` — Orchestration IDE
+
+🖥️ Config para VS Code : lance Pi, Gates, Graph, Herdr dans 4 terminaux parallèles (1 raccourci)
 
 ---
 

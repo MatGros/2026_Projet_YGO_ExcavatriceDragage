@@ -103,7 +103,15 @@
       "Bash(grep -v \":0$\")",
       "Bash(xargs -n1 basename)",
       "Bash(grep -n \"^#\\\\{1,3\\\\} \" RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md)",
-      "Bash(echo \"EXIT=$?\")"
+      "Bash(echo \"EXIT=$?\")",
+      "PowerShell(node \"C:/Users/ZEDVICTUS/.claude/plugins/cache/idun-antigravity/antigravity/0.1.0/scripts/antigravity.mjs\" setup --json | ConvertFrom-Json | ConvertTo-Json -Depth 10)",
+      "PowerShell(node \"C:/Users/ZEDVICTUS/.claude/plugins/cache/idun-antigravity/antigravity/0.1.0/scripts/antigravity.mjs\" setup)",
+      "PowerShell(node \"C:/Users/ZEDVICTUS/.claude/plugins/cache/idun-antigravity/antigravity/0.1.0/scripts/antigravity.mjs\" status agy-msadr4rs-icwtn5)",
+      "PowerShell(node \"C:/Users/ZEDVICTUS/.claude/plugins/cache/idun-antigravity/antigravity/0.1.0/scripts/antigravity.mjs\" result agy-msadr4rs-icwtn5)",
+      "Bash(node *)",
+      "Skill(antigravity:cancel)",
+      "PowerShell(node \"C:/Users/ZEDVICTUS/.claude/plugins/cache/idun-antigravity/antigravity/0.1.0/scripts/antigravity.mjs\" cancel agy-msaeaewc-rgjqpk)",
+      "Bash(cygpath -w /tmp/orphan_grep_summary.txt)"
     ],
     "ask": [
       "Bash(git reset *)",
