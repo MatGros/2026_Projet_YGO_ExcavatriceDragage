@@ -3,7 +3,7 @@
 > Rôle : diagnostics de communication bus/devices et surveillance opérateur.
 > Les FB diag publient des faits (`Online`, `Operational`, `State`, `ErrorId`).
 > Les FB Safety aval **décident** d'agir (SafeStop) — aucun FB diag ne coupe directement.
-> Source code : `CODE/DIAG/*.st` · instances dans `PRG_01_Diagnostics` et `PRG_11_Troubleshooting`.
+> Source code : `CODE/DIAG/*.st` · instances dans `PRG_01_Diagnostics` et `PRG_TROUBLESHOOTING_CFC`.
 > Détail par FB : voir les fiches dédiées (§1).
 
 ## 🧭 Sommaire
@@ -69,11 +69,11 @@ PRG_01_Diagnostics (acquisition brutes device)
   │                        ──► TglHeartbeatPlc ──► IHM
   └── (sorties diag publiées vers IHM Network + Troubleshooting)
 
-PRG_11_Troubleshooting (observateurs passifs)
+PRG_TROUBLESHOOTING_CFC (observateurs passifs)
   ├── FB_Acquisition_Preflight ──► PreflightOk/ErrorId ──► IHM uniquement
   └── FB_Winch_Symmetry ──► SymmetryOk/Valid ──► IHM uniquement
 
-> 📌 Preflight et Symmetry sont instanciés dans PRG_11 mais documentés respectivement
+> 📌 Preflight et Symmetry sont instanciés dans PRG_TROUBLESHOOTING_CFC mais documentés respectivement
 > dans AF_Partie-06 (qualification E/S) et AF_Partie-10 (mesure treuils).
 ```
 
@@ -84,9 +84,9 @@ PRG_11_Troubleshooting (observateurs passifs)
 | Programme | Instances | Rôle |
 |---|---|---|
 | `PRG_01_Diagnostics` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` | Acquisition brutes + appel FB diag bus/comm |
-| `PRG_11_Troubleshooting` | `instPreflight`, `instWinchSymmetry` | Observateurs passifs (doc : AF06 Preflight, AF10 Symmetry) |
-| `PRG_03_Safety` | (consommateur) | Relaye `JoystickOnline/Operational`, `HeartbeatIhmOk`, `DriveOnline/Operational` vers `FB_Safety_Winch/Translation` |
-| `PRG_09_Supervision` | (consommateur) | Publie diagnostics vers IHM (Network, Preflight, Symmetry) |
+| `PRG_TROUBLESHOOTING_CFC` | `instPreflight`, `instWinchSymmetry` | Observateurs passifs (doc : AF06 Preflight, AF10 Symmetry) |
+| `PRG_SAFETY_CFC` | (consommateur) | Relaye `JoystickOnline/Operational`, `HeartbeatIhmOk`, `DriveOnline/Operational` vers `FB_Safety_Winch/Translation` |
+| `PRG_SUPERVISION_CFC` | (consommateur) | Publie diagnostics vers IHM (Network, Preflight, Symmetry) |
 
 ---
 

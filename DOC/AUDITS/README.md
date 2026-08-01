@@ -58,8 +58,8 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | `PreLivraison/` | Chantier pré-livraison : rationalisation simulation (T80, L2→L8) + diagnostic (D1) — 5 plans, 8 fiches de tâche, 4 rapports | 2026-07-27 — **implémenté et validé**. Pilotage repris dans `PLAN_TASK` §1bis |
 | `Bypass/` | Homogénéisation des bypass globaux | 2026-07-23 — appliqué et validé (MES-004) |
 | `WinchIhmButtons/` | Commandes IHM treuils | décisions actées, fonctions déjà couvertes |
-| `CARTOGRAPHIE_Flux_IHM_Actionneurs_v1.0.md` | Chemin bouton → sécurité → sortie | 2026-07-24 — **périmée** : antérieure à `HwIn`, aux renommages E/S et à `PRG_11_Troubleshooting`, qui la remplace |
-| `NAVBOARDS/` · `CHECKLIST_MiseEnService_JoystickTranslation` | Tables de repérage variables + cahier d'essais joystick/translation | 2026-07-27 — périmés (noms `GVL_IHM` obsolètes) ; repris par `PRG_11` et `PLAN_TASK` §4 |
+| `CARTOGRAPHIE_Flux_IHM_Actionneurs_v1.0.md` | Chemin bouton → sécurité → sortie | 2026-07-24 — **périmée** : antérieure à `HwIn`, aux renommages E/S et à `PRG_TROUBLESHOOTING_CFC`, qui la remplace |
+| `NAVBOARDS/` · `CHECKLIST_MiseEnService_JoystickTranslation` | Tables de repérage variables + cahier d'essais joystick/translation | 2026-07-27 — périmés (noms `GVL_IHM` obsolètes) ; repris par `PRG_TROUBLESHOOTING_CFC` et `PLAN_TASK` §4 |
 | `RAPPORT_Audit_Persistance_Bypass_Frein_v1.0.md` | Persistance, RETAIN, bypass & freins | 2026-07-27 — correctifs TEST-05/06 livrés. Cahier d'essais extrait vers `../CHECKLISTS/CHECKLIST_Essais_Persistance_Bypass_Frein_v1.0.md` ; reste à faire suivi en T72/T92 |
 | `Winch/` | Audit Winch v1.0 | historique — actions reprises dans `PLAN_TASK` |
 | `WinchCore/` | — | historique |
