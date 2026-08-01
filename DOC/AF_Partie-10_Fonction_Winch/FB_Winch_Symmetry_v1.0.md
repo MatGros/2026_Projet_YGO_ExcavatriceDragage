@@ -2,7 +2,7 @@
 
 > Mesure passive de symétrie M1/M2 (MES-008).
 > Profil AF03 : brique métier non-mouvement, observateur pur.
-> Source : `CODE/TREUILS/FB_Winch_Symmetry.st` · instance : `PRG_11_Troubleshooting.instWinchSymmetry`.
+> Source : `CODE/TREUILS/FB_Winch_Symmetry.st` · instance : `PRG_TROUBLESHOOTING_CFC.instWinchSymmetry`.
 
 ## 🎯 Rôle
 
@@ -15,18 +15,18 @@ Aucune écriture de commande, sécurité ou mouvement. Observateur pur.
 | Port | Type | Producteur |
 |---|---|---|
 | `Reset` | BOOL | `GVL_IHM.Commun.WinchSymmetry.BtnReset` |
-| `M1/M2CommandActive` | BOOL | `PRG_06_WinchControl` |
-| `M1/M2Direction` | INT | `PRG_06_WinchControl` |
-| `M1/M2BrakeCmd` / `M1/M2BrakeApplied` | BOOL | `PRG_06` / `PRG_INPUTS_LD` |
+| `M1/M2CommandActive` | BOOL | `PRG_TREUILS_CFC` |
+| `M1/M2Direction` | INT | `PRG_TREUILS_CFC` |
+| `M1/M2BrakeCmd` / `M1/M2BrakeApplied` | BOOL | `PRG_TREUILS_CFC` / `PRG_INPUTS_LD` |
 | `M1/M2Position_M` / `M1/M2Speed_Mps` | REAL | `FB_Encoder_Scale` / `FB_Encoder_SpeedMeasure` |
 | `SyncDeviation_M` | REAL | `FB_WinchSync` |
-| `Config` | ST_Diag_Winch_SymmetryCfg | `_WinchSymmetryCfgPersist` (RETAIN) |
+| `Config` | ST_Winch_SymmetryCfg | `_WinchSymmetryCfgPersist` (RETAIN) |
 
 ## 📥 VAR_IN_OUT
 
 | Port | Type | Rôle |
 |---|---|---|
-| `Data` | ST_Diag_Winch_SymmetryData | Mesures persistées (RETAIN via GVL_PERSISTENT) |
+| `Data` | ST_Winch_SymmetryData | Mesures persistées (RETAIN via GVL_PERSISTENT) |
 
 ## 📤 Sorties
 
@@ -39,7 +39,7 @@ Aucune écriture de commande, sécurité ou mouvement. Observateur pur.
 
 - **Aucun**. Mesure passive : informe l'opérateur, ne coupe rien.
 
-## 📊 Mesures (ST_Diag_Winch_SymmetryData)
+## 📊 Mesures (ST_Winch_SymmetryData)
 
 | Champ | Unité | Rôle |
 |---|---|---|
