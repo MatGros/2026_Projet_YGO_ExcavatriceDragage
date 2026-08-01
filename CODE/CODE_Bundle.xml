@@ -3269,99 +3269,6 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_Diag_Winch_SymmetryCfg">
-        <baseType>
-          <struct>
-            <variable name="DeltaStartDelay_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaBrakeReleaseTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaBrakeApplyTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaStopDistance_Mm">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-            </variable>
-            <variable name="DeltaStopTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="200" />
-              </initialValue>
-            </variable>
-            <variable name="MinimumCommandTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="1000" />
-              </initialValue>
-            </variable>
-            <variable name="MinimumSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.05" />
-              </initialValue>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>efaade56-0f99-55f7-b383-5f672faf7236</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="ST_Diag_Winch_SymmetryData">
-        <baseType>
-          <struct>
-            <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="DeltaStopDistance_Mm, DeltaStopTime_Ms">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="MaxSyncDeviation_M">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>aab4ef1b-cffe-5d91-9bf0-e6e14ca0e877</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_DredgingAssistCfg">
         <baseType>
           <struct>
@@ -7253,6 +7160,99 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>53f9b377-a390-54de-9b7c-d1db8711e403</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Winch_SymmetryCfg">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaBrakeReleaseTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+            </variable>
+            <variable name="MinimumCommandTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+            </variable>
+            <variable name="MinimumSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.05" />
+              </initialValue>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cafdebf4-b7e5-5000-bdd0-033e76a6b7c7</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Winch_SymmetryData">
+        <baseType>
+          <struct>
+            <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="DeltaStopDistance_Mm, DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="MaxSyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f7635572-022c-5fdd-93e8-106b5d2eea3e</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -22639,7 +22639,7 @@ Done := FALSE;
             </variable>
             <variable name="Config">
               <type>
-                <derived name="ST_Diag_Winch_SymmetryCfg" />
+                <derived name="ST_Winch_SymmetryCfg" />
               </type>
             </variable>
           </inputVars>
@@ -22658,7 +22658,7 @@ Done := FALSE;
           <inOutVars>
             <variable name="Data">
               <type>
-                <derived name="ST_Diag_Winch_SymmetryData" />
+                <derived name="ST_Winch_SymmetryData" />
               </type>
             </variable>
           </inOutVars>
@@ -32206,7 +32206,7 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
         </variable>
         <variable name="_WinchSymmetryCfgPersist">
           <type>
-            <derived name="ST_Diag_Winch_SymmetryCfg" />
+            <derived name="ST_Winch_SymmetryCfg" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -32218,7 +32218,7 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
         </variable>
         <variable name="_WinchSymmetryDataPersist">
           <type>
-            <derived name="ST_Diag_Winch_SymmetryData" />
+            <derived name="ST_Winch_SymmetryData" />
           </type>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -33116,8 +33116,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
           <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
-          <Object Name="ST_Diag_Winch_SymmetryCfg" ObjectId="efaade56-0f99-55f7-b383-5f672faf7236" />
-          <Object Name="ST_Diag_Winch_SymmetryData" ObjectId="aab4ef1b-cffe-5d91-9bf0-e6e14ca0e877" />
         </Folder>
         <Folder Name="MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
@@ -33163,6 +33161,8 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="ST_WinchCmdDemand" ObjectId="e1cb8f0c-a5a5-5b87-b439-8e0b245904de" />
           <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
           <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
+          <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
+          <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
           <Folder Name="BENNE">
             <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
             <Object Name="ST_BucketCmdDemand" ObjectId="e0ba9d9d-5f49-57f9-aa65-51128070b971" />
