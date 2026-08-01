@@ -111,7 +111,15 @@
       "Bash(node *)",
       "Skill(antigravity:cancel)",
       "PowerShell(node \"C:/Users/ZEDVICTUS/.claude/plugins/cache/idun-antigravity/antigravity/0.1.0/scripts/antigravity.mjs\" cancel agy-msaeaewc-rgjqpk)",
-      "Bash(cygpath -w /tmp/orphan_grep_summary.txt)"
+      "Bash(cygpath -w /tmp/orphan_grep_summary.txt)",
+      "Bash(awk '/^=== /{name=$2} /NO_OTHER_ST_FILE_HIT/{print name}' /tmp/orphan_grep_summary2.txt)",
+      "Read(//c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/tests/**)",
+      "Read(//c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS/AGENT_WORKFLOW/**)",
+      "Bash(grep -c \"ERROR\" /tmp_report.txt)",
+      "Bash(grep -n \"ERROR\" /tmp_report.txt)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\ZEDVICTUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage\\\\3b121974-6c26-4832-b143-729d9c757e1c\\\\scratchpad\")",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report)",
+      "Read(//c/Users/ZEDVICTUS/AppData/Local/Temp/claude/C---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage/3b121974-6c26-4832-b143-729d9c757e1c/scratchpad/**)"
     ],
     "ask": [
       "Bash(git reset *)",

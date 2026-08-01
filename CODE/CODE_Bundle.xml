@@ -18270,91 +18270,6 @@ Machine.HydraulicThermalOk_DI      := TRUE;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Sim_AU_ChainFeedback" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="SimulationModeActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit maître simulation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SimChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne opérateur banc (Watch)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintainA">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie physique canal A du scan précédent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintainB">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie physique canal B du scan précédent</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="ChainClosedRaw">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrée brute simulée, à qualifier par FB_Input en aval</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_AU_ChainFeedback — Simulation physique boucle AU (banc de test)
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
-   🎯 Rôle : modélise le comportement physique — quand le PLC force
-      MaintainA/B à FALSE (auto-test A/B), la boucle AU s'ouvre réellement
-      → la sortie ChainClosedRaw repasse à FALSE le cycle suivant (1 cycle
-      de retard = fidèle au comportement réel d'un contacteur/relais).
-   🔴 Sortie brute (non filtrée) : le conditionnement anti-rebond 20 ms
-      est appliqué en aval par FB_Input, pas ici — cette brique ne fait
-      QUE la simulation physique, jamais du conditionnement de signal.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_AU_ChainFeedback) ===</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_AU_ChainFeedback) ===
-
-IF SimulationModeActive AND (NOT MaintainA OR NOT MaintainB) THEN
-    // Au moins un canal forcé à FALSE (auto-test) -&gt; la chaîne AU physique s'ouvre
-    ChainClosedRaw := FALSE;
-ELSE
-    // Les deux canaux maintenus -&gt; la chaîne AU suit la consigne opérateur banc
-    ChainClosedRaw := SimChainClosed;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_Sim_Encoder" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -29164,34 +29079,6 @@ END_PROGRAM</xhtml>
           </data>
         </addData>
       </pou>
-      <pou name="PRG_NETWORK_CFC" pouType="program">
-        <interface>
-          <inputVars />
-          <outputVars />
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💻 PRG_NETWORK_CFC — Configuration / Diagnostic Ethernet / IP
-   ───────────────────────────────────────────────────────────────
-   Note : Programme exécuté en tâche de fond ou asynchrone.
-   Le bloc de configuration de l'IP est actuellement stubbé / commenté.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// Pas d'implémentation active (toutes les configurations sont figées ou gérées par l'OS automate).
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c638a6dd-dbff-5527-8003-af16d71440c3</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="PRG_SAFETY_CFC" pouType="program">
         <interface>
           <inputVars />
@@ -29704,6 +29591,10 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
                                                  OR (NOT PRG_MODES_CFC.Auth.InhibitM2 AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)));
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_INPUTS_LD.TopPositionSensor;
+
+// 🆕 REX 2026-08-01 (LOT_B) : câblage du défaut thermique centrale hydraulique vers l'IHM
+// (diagnostic seul, aucune commande PLC — voir PRG_AUXILIARY_CFC.HydraulicFaultOk).
+GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_AUXILIARY_CFC.HydraulicFaultOk;
 
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v2.0.md) ──────
@@ -32925,79 +32816,6 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_Simulation_AU">
-        <variable name="SimulationModeActive">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="TRUE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — rien n'est simulé si FALSE</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimChainClosed">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="TRUE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Simulation du matériel AU
-Simule EmergencyChainClosed_DI fermée</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimContactorEngaged">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Simule retour contacteur puissance</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimPowerCutOffReq">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Simulation coupure métier (remplace OR des 3 safety domaines)
-TRUE = une safety demande la coupure</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>61eb14ae-eaaa-5b16-b69c-4971b27eec0f</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 GVL_Simulation_AU — Simulation hardware pour test chaîne AU
-   ───────────────────────────────────────────────────────────────
-   📄 Remplace les signaux physiques réels (DI/Q) pour le test
-      en isolation de FB_Safety_EmergencyManagement.
-   🎯 Pattern identique à GVL_Simulation (projet réel) :
-      domaine SimMachineActive = simulation AU.
-      Polarité : TRUE = simulé, FALSE = réel.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-13_Fonction_Simulation_v2.0.md</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Translation_M3_Stub">
         <variable name="StubTranslationPositionSelect_IHM">
           <type>
@@ -33195,13 +33013,11 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
         </Folder>
         <Folder Name="SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
-          <Object Name="FB_Sim_AU_ChainFeedback" ObjectId="d9bcfb99-d0ce-5a96-8e7a-0c5e15c80dda" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
           <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
-          <Object Name="GVL_Simulation_AU" ObjectId="61eb14ae-eaaa-5b16-b69c-4971b27eec0f" />
         </Folder>
         <Folder Name="MAIN">
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
@@ -33215,7 +33031,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="PRG_AUXILIARY_CFC" ObjectId="59ba66f3-c87a-5e2b-bbbf-7f77065e1e05" />
           <Object Name="PRG_INPUTS_LD" ObjectId="d745ee5b-adec-5ca4-8f66-9e6ac56d1c15" />
           <Object Name="PRG_MODES_CFC" ObjectId="d79231ad-e5a4-5d25-8958-28eb3d240c26" />
-          <Object Name="PRG_NETWORK_CFC" ObjectId="c638a6dd-dbff-5527-8003-af16d71440c3" />
           <Object Name="PRG_SAFETY_CFC" ObjectId="9cdc0970-72da-5a3a-b91b-3d8da6f1a8e4" />
           <Object Name="PRG_SUPERVISION_CFC" ObjectId="40f01768-c039-5fcb-a57a-9ca47082ec01" />
           <Object Name="PRG_TRANSLATION_CFC" ObjectId="9ca929a6-926f-524b-97c0-a55c4bce81a5" />

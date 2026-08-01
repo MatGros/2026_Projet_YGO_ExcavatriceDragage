@@ -156,6 +156,10 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
 
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_INPUTS_LD.TopPositionSensor;
 
+// 🆕 REX 2026-08-01 (LOT_B) : câblage du défaut thermique centrale hydraulique vers l'IHM
+// (diagnostic seul, aucune commande PLC — voir PRG_AUXILIARY_CFC.HydraulicFaultOk).
+GVL_IHM.Commun.HydraulicThermalFault := NOT PRG_AUXILIARY_CFC.HydraulicFaultOk;
+
 
 // ── 4. BYPASS DE SIMULATION POUR L'IHM (état effectif par device, voir DOC/AF_Partie-13_Fonction_Simulation_v2.0.md) ──────
 // 📄 Lot L6 : Ré-alimentation des miroirs IHM depuis l'état effectif de simulation (SimulationModeActive AND Sim<Domaine>Active)
