@@ -179,7 +179,7 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 
 **Objectif** : Identifier passivement si un décalage entre les deux treuils (M1 et M2) provient d'un retard d'automatisme/contacteur ou d'un problème mécanique/frein.
 
-**Métriques mesurées passivement (exécuté dans `PRG_11_Troubleshooting`)** :
+**Métriques mesurées passivement (exécuté dans `PRG_TROUBLESHOOTING_CFC`)** :
 - `DeltaStartDelay_Ms` : Écart de temps au démarrage des mouvements M1/M2.
 - `DeltaBrakeReleaseTime_Ms` & `DeltaBrakeApplyTime_Ms` : Écart de temps d'ouverture/fermeture effective des freins.
 - `DeltaStopTime_Ms` & `DeltaStopDistance_Mm` : Écart de temps et de distance parcourue lors de la phase d'arrêt.

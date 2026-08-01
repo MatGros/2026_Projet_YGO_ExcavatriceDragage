@@ -367,7 +367,7 @@ reste le nom matériel historique (identique).
 | `EmergencyArmingFailed` | sortie FB |
 
 **✅ État 2026-07-30** : les 7 champs manquants de `ST_ModesState` sont désormais alimentés
-depuis `ST_Safety_Emergency_State`/`ST_Safety_Emergency_Diag` (via `PRG_09_Supervision`). Écart résolu.
+depuis `ST_Safety_Emergency_State`/`ST_Safety_Emergency_Diag` (via `PRG_SUPERVISION_CFC`). Écart résolu.
 
 ---
 

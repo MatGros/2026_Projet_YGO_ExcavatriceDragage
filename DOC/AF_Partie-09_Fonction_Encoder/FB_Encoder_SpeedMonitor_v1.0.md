@@ -59,11 +59,11 @@ Brique de **diagnostic passif et de surveillance cinématique** : surveille l'ac
 ## 4. Alertes et écarts
 
 - **Seuils inertes** : `SpeedVariationThresholdMps`/`SpeedVariationTimeout` câblés à `0`/`T#0ms`
-  dans `PRG_03_Safety.st` — `ErrorId` bit0 **ne peut jamais se déclencher** actuellement (volontaire,
+  dans `PRG_SAFETY_CFC.st` — `ErrorId` bit0 **ne peut jamais se déclencher** actuellement (volontaire,
   en attente calibrage terrain T45).
 - 🔴 **`SpeedStable` n'est pas qu'un diagnostic** : elle conditionne `SpeedGuardReady` dans
   `FB_SpeedStep`, qui bride le palier de vitesse Winch à 1 tant qu'elle n'est pas confirmée
-  (`PRG_06_WinchControl.st`, `FB_SpeedStep.st`). Avec `SpeedStabilityTimeout = T#0ms`,
+  (`PRG_TREUILS_CFC.st`, `FB_SpeedStep.st`). Avec `SpeedStabilityTimeout = T#0ms`,
   `SpeedStable` reste `FALSE` en permanence — **sans effet aujourd'hui** car
   `SpeedGuardEnableM1/M2 := FALSE` (garde-fou palier non activé). ⚠️ Piège identifié : le jour où
   `SpeedGuardEnable` passe à `TRUE` **sans** régler `SpeedStabilityTimeout` en même temps, la

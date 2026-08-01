@@ -122,7 +122,7 @@ usage mise en service/essais uniquement, jamais un état permanent d'exploitatio
   exposé à l'IHM via `ST_WinchState` (pas un défaut acquittable, une information) ; **(2)** le
   treuil doit rester manœuvrable en `MAINT_N1` à **vitesse forcée palier 1** pour exécuter le
   cycle de référencement lui-même — même mécanisme que `ForceMinSpeedStep` déjà utilisé par
-  `FB_ExtractionSequence` (`PRG_06_WinchControl.st`, `SEL(Force..., EffectiveMaxStepAscent, 1)`).
+  `FB_ExtractionSequence` (`PRG_TREUILS_CFC.st`, `SEL(Force..., EffectiveMaxStepAscent, 1)`).
   🔧 **Non encore câblé** : aucune instance actuelle du forçage palier n'est conditionnée par
   `Homed`. Reste du périmètre de migration (lot Winch, cross-ref `AF_Partie-10 §9bis`), pas de
   ce FB directement (`Homed` est ici seulement produit, pas consommé).

@@ -149,7 +149,7 @@ Le detail de la chaine AU/rearmement est proprietaire de la Partie 01.
 `FB_Acquisition_Preflight` vérifie 16 conditions mécaniques/électriques quand la machine est
 arrêtée. Observateur pur : aucune écriture de commande, sécurité ou mouvement.
 
-Instance : `PRG_11_Troubleshooting.instPreflight`.
+Instance : `PRG_TROUBLESHOOTING_CFC.instPreflight`.
 
 ### PreflightErrorId (16 bits)
 

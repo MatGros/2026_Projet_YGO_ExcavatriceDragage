@@ -27,4 +27,4 @@ Checklists de mise en service et de validation terrain.
 `CHECKLIST_MiseEnService_JoystickTranslation_v1.2.md` → `ARCHIVES/Doc/CHECKLISTS/`
 Jamais exécutée (T17/T26) et antérieure au renommage des E/S. Le protocole de recette
 fait foi dans `PLAN_TASK` §4 ; le diagnostic terrain passe désormais par
-`PRG_11_Troubleshooting` (`AF_Partie-14`).
+`PRG_TROUBLESHOOTING_CFC` (`AF_Partie-14`).
