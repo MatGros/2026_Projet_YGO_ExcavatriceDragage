@@ -4,6 +4,12 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `LOT_A_SUPPRESSION_CODE_MORT` — 2026-08-01
+- Suppression de 3 objets jamais câblés (confirmé grep exhaustif) : `FB_Sim_AU_ChainFeedback`, `GVL_Simulation_AU`, `PRG_NETWORK_CFC`
+- Zéro changement de comportement machine — code mort uniquement, mécanisme `GVL_Simulation` réel inchangé
+- Nouveau garde-fou `check_linkage.py` L13 : détecte FB jamais instancié / GVL jamais référencée / PROGRAM stub vide
+- Alerte : `GVL_IHM_AU` détectée orpheline (même origine, hors périmètre — décision de suppression à valider par l'utilisateur) ; `FB_Output` déjà connu sans instance depuis LOT3A — les deux tracés en exemption `KNOWN_ORPHANS_PENDING_DECISION`
+
 ### `LOT3A_FinalBrakePowerInterlock` — 2026-07-28
 - M1/M2 : `FB_WinchOutputInterlock_LD`, watchdog 500 ms, paliers adjacents et redémarrage 900 ms ; mapping C1..C4 conservé exclusivement depuis `FB_Winch` / `SpeedStepTable`
 - M3 : `FB_TranslationOutputInterlock_LD` après `FB_Brake`, 1/2+fréquence bloqués sans demande de desserrage **et** confirmation contacteur/bobine

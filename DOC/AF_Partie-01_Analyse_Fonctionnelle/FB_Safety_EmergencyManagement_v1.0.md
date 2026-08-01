@@ -466,7 +466,6 @@ Fichiers code de référence :
 - `CODE/AU/ST_Safety_Emergency_Diag.st` (bus diagnostic)
 - `CODE/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test)
 - `CODE/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test)
-- `CODE/SIMULATION/GVL_Simulation_AU.st` (simulation hardware)
 - `CODE/SUPERVISION/GVL_IHM_AU.st` (interface IHM)
 - `CODE/MAIN/PRG_ACQUISITION_CFC.st` (acquisition, CFC natif — cible AF02 §2)
 - `CODE/MAIN/PRG_OUTPUTS_LD.st` (sorties)

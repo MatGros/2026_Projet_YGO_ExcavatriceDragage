@@ -1,0 +1,110 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# LOT 5 — VERIFICATION FINALE ET REX
+# ═══════════════════════════════════════════════════════════════════════════
+# Ce lot ferme la campagne ouverte par l'audit 2026-08 sur les 5 incoherences
+# de structure de CODE/MAIN.
+#
+# Il est confie a un agent EN LECTURE SEULE sur CODE/ : il verifie, il ne
+# corrige pas. Toute correction restante repart en LOT 4A ou 4B avec son propre
+# contrat. Un verificateur autorise a corriger finit toujours par valider son
+# propre travail, ce qui est precisement le defaut de revue constate.
+# ═══════════════════════════════════════════════════════════════════════════
+
+task_id: "LOT5-VERIFICATION-FINALE"
+request: >
+  Verifier que les 5 incoherences de l'audit 2026-08 sont fermees, que les gates
+  qui devaient les detecter les detectent effectivement, et consigner le retour
+  d'experience dans les documents de pilotage.
+criticality: C3
+strategy: patch
+
+scope_code: []
+scope_doc:
+  - "DOC/VERSION_HISTORY.md"
+  - "DOC/PLAN_TASK_v1.0.md"
+out_of_scope:
+  - "CODE/** : lecture seule, aucune correction dans ce lot"
+  - "TOOLS/AGENT_WORKFLOW/scripts/** : lecture seule"
+  - "Toute correction restante, qui repart en LOT 4A ou 4B"
+
+contract:
+  task_id: LOT5-VERIFICATION-FINALE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Etablir la preuve que la classe de defaut ouverte par l'audit est fermee a la
+    fois dans le code et dans les controles automatiques, et laisser une trace
+    exploitable par le prochain intervenant.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le gate de structure de code passe au vert sur l'etat final du depot,
+        alors qu'il sortait en erreur a la fin du LOT 1.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py ; code retour nul"
+    - id: AC2
+      statement: >
+        Le gate de cablage CFC passe au vert sur les pages converties.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_cfc_wiring.py --report ; code retour nul"
+    - id: AC3
+      statement: >
+        Le controle de liaison passe au vert et son bloc Auto-verification
+        liaison figure dans la restitution.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report ; bloc colle dans la reponse finale"
+    - id: AC4
+      statement: >
+        L'ensemble des gates du runner passe au vert, gate CFC inclus.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py ; RESUME sans aucune ligne FAIL"
+    - id: AC5
+      statement: >
+        Une modification de test qui reintroduit volontairement un desalignement
+        nom de fichier / nom de POU fait echouer le gate de structure.
+      verified_by: "essai en copie de travail jetable, non commite : le gate sort en erreur, puis retour a l'etat initial verifie par git status propre"
+    - id: AC6
+      statement: >
+        VERSION_HISTORY porte une entree datee decrivant la campagne, les cinq
+        incoherences fermees et les gates ajoutes.
+      verified_by: "grep -n '2026-08' DOC/VERSION_HISTORY.md ; l'entree cite le gate de structure et le rebranchement du gate CFC"
+    - id: AC7
+      statement: >
+        PLAN_TASK reflete l'etat de chaque lot de la campagne et ne laisse aucun
+        lot ouvert sans reliquat identifie.
+      verified_by: "lecture de DOC/PLAN_TASK_v1.0.md ; les cinq lots y figurent avec leur etat"
+    - id: AC8
+      statement: >
+        Le depot ne contient plus aucun programme dont le suffixe de langage
+        contredit le langage emis dans le bundle.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py ; zero anomalie d'axe langage"
+
+  scope:
+    allowed:
+      - DOC/VERSION_HISTORY.md
+      - DOC/PLAN_TASK_v1.0.md
+    forbidden:
+      - CODE/
+      - TOOLS/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/CHECKLISTS/TASK_CONTEXT/
+
+  conservation:
+    must_survive:
+      - "L'historique existant de VERSION_HISTORY reste intact, la campagne s'ajoute en nouvelle entree."
+      - "Les reliquats et TBD deja listes dans PLAN_TASK et etrangers a cette campagne restent presents."
+    dropped_on_purpose:
+      - "Les entrees de PLAN_TASK decrivant les cinq incoherences comme ouvertes, une fois leur fermeture prouvee."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Ce lot est en lecture seule sur CODE/. Si une incoherence subsiste, elle est
+    remontee a l'orchestrateur et repart en LOT 4A ou 4B avec son propre contrat.
+    Corriger ici reviendrait a valider son propre travail, ce qui est exactement
+    le defaut de revue a l'origine de cette campagne.

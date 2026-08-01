@@ -13,6 +13,10 @@ Controles :
   L4  reference croisee POU.Membre.Champ vers un POU/membre inexistant
   L5  typeName du bundle PLCopenXML != type reellement declare
   L7  meme nom d'instance declare dans plusieurs PROGRAM (ambiguite)
+  L13 orphelins : FUNCTION_BLOCK jamais instancie / GVL jamais reference /
+      PROGRAM stub sans aucune instruction executable (REX 2026-08-01 :
+      FB_Sim_AU_ChainFeedback, GVL_Simulation_AU, PRG_NETWORK_CFC — ecrits
+      puis jamais raccordes, jamais detectes avant suppression manuelle)
 
 Aucun controle ne lit `Device.export` : cet export est mis a jour au bon vouloir
 humain, il ne peut donc pas servir de reference. Debogage ponctuel uniquement.
@@ -65,6 +69,24 @@ except ImportError:
 # Ajouter ici uniquement apres verification, jamais pour faire taire une erreur.
 LIBRARY_FB_TYPES: set[str] = set()
 
+# L13 — orphelins connus, exemptes du niveau ERROR mais toujours affiches en WARN.
+# Ajouter ici UNIQUEMENT apres verification manuelle + justification tracee,
+# jamais pour faire taire un vrai bug. Retirer la ligne des qu'elle n'est plus
+# vraie (POU instancie/reference, ou supprime).
+KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
+    "FB_Output": (
+        "brique candidate 'reduite' : integration Winch/Translation pas encore "
+        "decidee (cf. header CODE/COMMUN/FB_Output.st) — retirer de cette liste "
+        "des qu'elle est instanciee ou supprimee"
+    ),
+    "GVL_IHM_AU": (
+        "orpheline constatee 2026-08-01 (LOT_A_SUPPRESSION_CODE_MORT) : meme "
+        "origine que FB_Sim_AU_ChainFeedback/GVL_Simulation_AU (banc de test AU "
+        "jamais raccorde), mais HORS perimetre de ce lot — suppression a valider "
+        "explicitement par l'utilisateur avant tout retrait"
+    ),
+}
+
 # Sections de declaration dont le contenu est une interface, pas une instance
 # possedee : on n'exige pas d'appel pour celles-ci.
 INTERFACE_SECTIONS = {"VAR_INPUT", "VAR_OUTPUT", "VAR_IN_OUT", "VAR_EXTERNAL"}
@@ -94,6 +116,8 @@ CALL = re.compile(r"\b(?P<name>[A-Za-z_]\w*)\s*\(")
 CROSS_REF = re.compile(r"\b(?P<pou>PRG_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)")
 BUNDLE_BLOCK = re.compile(r'<block\b[^>]*typeName="(?P<type>[^"]+)"[^>]*instanceName="(?P<inst>[^"]+)"')
 BUNDLE_POU = re.compile(r'<pou\s+name="(?P<name>[^"]+)"')
+# `GVL_Foo.Champ` : reference a un champ de GVL (nom libre, pas seulement PRG_).
+GVL_FIELD_REF = re.compile(r"\b(?P<gvl>GVL_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)")
 
 
 def strip_comments(text: str) -> str:
@@ -214,6 +238,138 @@ def load_bundle_blocks(root: Path) -> list[tuple[str, str, str]]:
     return out
 
 
+def load_gvl_files(code: Path) -> dict[str, Path]:
+    """GVL sans header POU (VAR_GLOBAL nu) : nom de fichier -> chemin.
+
+    parse_pou() ne les voit pas : POU_HEADER ne matche que PROGRAM/
+    FUNCTION_BLOCK/FUNCTION/INTERFACE, et un fichier GVL_*.st est un simple
+    bloc VAR_GLOBAL sans aucun de ces mots-cles. On les retrouve par
+    convention de nommage (obligatoire, cf. NAMING_CONVENTION.md).
+    """
+    out: dict[str, Path] = {}
+    for path in sorted(code.rglob("GVL_*.st")):
+        raw = path.read_text(encoding="utf-8", errors="replace")
+        if re.search(r"^\s*VAR_GLOBAL\b", strip_comments(raw), re.MULTILINE):
+            out[path.stem] = path
+    return out
+
+
+def parse_gvl_fields(path: Path) -> tuple[set[str], bool]:
+    """Champs top-level d'un fichier GVL + indicateur `qualified_only`.
+
+    Sans `{attribute 'qualified_only'}`, CODESYS autorise l'acces AUX CHAMPS
+    par leur nom nu (sans prefixe `NomGvl.`) : c'est le cas de GVL_PERSISTENT,
+    GVL_BypassRetain et GVL_Translation_M3_Stub sur ce projet. Un detecteur
+    qui n'exigerait que la forme qualifiee produirait des faux positifs
+    massifs sur ces GVL pourtant activement utilisees.
+    """
+    raw = path.read_text(encoding="utf-8", errors="replace")
+    clean = strip_comments(raw)
+    qualified_only = "qualified_only" in clean
+    fields: set[str] = set()
+    for block in VAR_BLOCK.finditer(clean):
+        if block.group(1) != "VAR_GLOBAL":
+            continue
+        for decl in DECL.finditer(block.group("body")):
+            if decl.group("ref"):
+                continue
+            name = decl.group("name")
+            if name.upper() in {"END_VAR", "STRUCT"}:
+                continue
+            fields.add(name)
+    return fields, qualified_only
+
+
+def find_l13_orphans(pous: dict[str, Pou], gvl_files: dict[str, Path], root: Path) -> list[str]:
+    """L13 — POU/GVL declare dans CODE/ mais jamais reellement cable.
+
+    REX 2026-08-01 (LOT_A_SUPPRESSION_CODE_MORT) : `FB_Sim_AU_ChainFeedback`,
+    `GVL_Simulation_AU` et `PRG_NETWORK_CFC` ont ete ecrits, bundles, testes
+    au niveau forme... et jamais raccordes au reste du programme. Aucun des
+    controles L1-L12 ne les voit, car ils portent sur le cablage INTERNE
+    d'un POU deja identifie comme utilise, pas sur la question "ce POU
+    sert-il a quelque chose ?". Trois signatures distinctes, aucune ne lit
+    Device.export (decision 2026-07-29) :
+
+      - FUNCTION_BLOCK jamais instancie : aucune declaration `nom : CeType`
+        nulle part ailleurs dans CODE/ (le type ne sert a rien s'il n'est
+        le type d'aucune variable).
+      - GVL jamais reference : aucun `NomGvl.Champ` hors de son propre
+        fichier (une GVL existe pour etre lue/ecrite par d'autres POU).
+      - PROGRAM stub vide : aucune instruction executable dans le corps
+        (uniquement declarations/commentaires) — un PROGRAM reellement
+        cable dans une tache a toujours au moins une affectation ou un
+        appel ; un stub jamais complete est indiscernable d'un stub jamais
+        raccorde, donc traite comme orphelin.
+
+    Deliberement PAS base sur une liste "officielle" de programmes (ex.
+    section Execution cible de AF_Partie-02) : cette liste peut devenir
+    perimee independamment du code (elle l'etait déjà pour plusieurs
+    PROGRAM legitimes lors de la conception de ce gate), ce qui produirait
+    des faux positifs sur du code actif. Le stub vide est un fait purement
+    structurel, jamais perime.
+    """
+    errors: list[str] = []
+
+    # --- FUNCTION_BLOCK jamais instancie ------------------------------------
+    type_usage: dict[str, set[str]] = {}
+    for pou in pous.values():
+        for typ, _section, _line in pou.declarations.values():
+            type_usage.setdefault(typ, set()).add(pou.name)
+
+    for pou in sorted(pous.values(), key=lambda p: p.name):
+        if pou.kind != "FUNCTION_BLOCK":
+            continue
+        if not type_usage.get(pou.name):
+            rel = pou.path.relative_to(root).as_posix()
+            _report(errors, pou.name, f"[L13-FB] {rel}: FUNCTION_BLOCK `{pou.name}` declare mais jamais "
+                    f"instancie (aucun `: {pou.name}` ailleurs dans CODE/) — orphelin")
+
+    # --- GVL jamais referencee -----------------------------------------------
+    code = root / "CODE"
+    raw_by_path: dict[Path, str] = {
+        p: strip_comments(p.read_text(encoding="utf-8", errors="replace"))
+        for p in code.rglob("*.st")
+    }
+    for gvl_name, gvl_path in sorted(gvl_files.items()):
+        fields, qualified_only = parse_gvl_fields(gvl_path)
+        others = {path: text for path, text in raw_by_path.items() if path != gvl_path}
+
+        qualified_hit = any(
+            any(m.group("gvl") == gvl_name for m in GVL_FIELD_REF.finditer(text))
+            for text in others.values()
+        )
+        bare_hit = False
+        if not qualified_only and fields:
+            word_re = re.compile(r"\b(?:" + "|".join(re.escape(f) for f in fields) + r")\b")
+            bare_hit = any(word_re.search(text) for text in others.values())
+
+        if not (qualified_hit or bare_hit):
+            rel = gvl_path.relative_to(root).as_posix()
+            _report(errors, gvl_name, f"[L13-GVL] {rel}: `{gvl_name}` declare mais aucun de ses champs "
+                    f"n'est jamais lu/ecrit hors de ce fichier (qualifie ou nu) — orphelin")
+
+    # --- PROGRAM stub sans instruction executable -----------------------------
+    for pou in sorted(pous.values(), key=lambda p: p.name):
+        if pou.kind != "PROGRAM":
+            continue
+        if not pou.body.strip():
+            rel = pou.path.relative_to(root).as_posix()
+            _report(errors, pou.name, f"[L13-PRG] {rel}: PROGRAM `{pou.name}` sans aucune instruction "
+                    f"executable (stub vide) — orphelin, jamais cable")
+
+    return errors
+
+
+def _report(errors: list[str], name: str, message: str) -> None:
+    """Ajoute un finding L13, sauf si `name` est une exemption tracee (WARN quand meme)."""
+    waiver = KNOWN_ORPHANS_PENDING_DECISION.get(name)
+    if waiver:
+        print(f"[WARN] {message} — EXEMPTE : {waiver}")
+    else:
+        errors.append(message)
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # L8-L12 CHECKERS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -310,36 +466,47 @@ class L9Finding:
 
 class L9Checker:
     """Vérifie que VAR_OUTPUT physiques sont addressées.
-    
+
     Limitation : Device.export XML CODESYS est très propriétaire.
     Alternative : chercher utilisation de l'adresse dans le code ST.
     """
-    
+
+    # `load_io_mapping()` ne construit des clés que pour ces deux POU (seuls
+    # points de contact réels entre le code et les canaux physiques bruts du
+    # CSV — cf. son propre code : IEC address %Q → PRG_OUTPUTS_LD, sinon
+    # PRG_INPUTS_LD). Vérifier un VAR_OUTPUT de n'importe quel autre PROGRAM
+    # contre cette table est un faux positif garanti par construction : la
+    # clé ne peut structurellement jamais y figurer (REX 2026-08-01, T100).
+    PHYSICAL_IO_POUS = frozenset({"PRG_OUTPUTS_LD", "PRG_INPUTS_LD"})
+
     def __init__(self, pou: Pou, device_io_map: dict):
         self.pou = pou
         self.device_io_map = device_io_map
-    
+
     def check(self) -> list[L9Finding]:
         """Analyse les VAR_OUTPUT.
-        
+
         Remarque : Device.export XML n'expose pas directement les adresses I/O.
         L9 seulement vérifie si device_io_map est disponible et peuplée.
         """
         if self.pou.kind != "PROGRAM":
             return []
-        
+
+        if self.pou.name not in self.PHYSICAL_IO_POUS:
+            return []
+
         findings = []
-        
+
         # Si device_io_map vide ou None, ignorer L9 (Device.export parsing a échoué)
         if not self.device_io_map:
             return findings
-        
+
         for var_name, (typ, section, line) in self.pou.declarations.items():
             if section != "VAR_OUTPUT":
                 continue
-            
+
             full_name = f"{self.pou.name}.{var_name}"
-            
+
             if full_name in self.device_io_map:
                 addr = self.device_io_map[full_name].get("address", "?")
                 findings.append(L9Finding(
@@ -349,12 +516,22 @@ class L9Checker:
                     message=f"Mapped to {addr}",
                 ))
             else:
+                # Non prouvé faux : le CSV nomme les canaux avec leur libellé
+                # matériel brut (ex. `M1_RelayFwd_Up_DQ`) alors que le code
+                # utilise le nom métier retraité (ex. `M1RelayFwd`) — aucune
+                # correspondance automatique fiable sans risquer d'inventer
+                # une adresse. WARN, pas KO : à rapprocher manuellement par
+                # l'utilisateur, jamais par une heuristique de nommage.
                 findings.append(L9Finding(
-                    level="HIGH",
+                    level="MEDIUM",
                     var_name=var_name,
-                    message="Not found in I/O map",
+                    message=(
+                        "Not found in I/O map by exact name — verifier "
+                        "manuellement contre le nom de canal brut du CSV "
+                        "(convention de nommage differente)"
+                    ),
                 ))
-        
+
         return findings
     
     def _has_address_annotation(self, var_name: str) -> bool:
@@ -687,6 +864,10 @@ def main() -> int:
                 f"alors que la declaration dit `{declared[0]}`"
             )
 
+    # L13 — orphelins (FB jamais instancie / GVL jamais reference / PROGRAM stub vide)
+    gvl_files = load_gvl_files(code)
+    l13_errors = find_l13_orphans(pous, gvl_files, root)
+
     # L6 RETIRE (decision 2026-07-29). Il lisait `Device.export` pour verifier
     # qu'un PROGRAM figurait dans la configuration de tache. Or `Device.export`
     # est mis a jour au bon vouloir humain : ce n'est PAS une reference de
@@ -703,6 +884,7 @@ def main() -> int:
     l8_verified: list[str] = []
     
     l9_errors: list[str] = []
+    l9_warnings: list[str] = []
     l9_verified: list[str] = []
     
     l10_warnings: list[str] = []
@@ -749,6 +931,8 @@ def main() -> int:
             for finding in l9_checker.check():
                 if finding.level == "HIGH":
                     l9_errors.append(f"[L9] {rel}: {finding.var_name} — {finding.message}")
+                elif finding.level == "MEDIUM":
+                    l9_warnings.append(f"[L9] {rel}: {finding.var_name} — {finding.message}")
                 elif finding.level == "OK":
                     l9_verified.append(f"{finding.var_name} → {finding.address}")
         
@@ -785,10 +969,10 @@ def main() -> int:
                 l10_verified.append(f"{finding.var_name} — {finding.message}")
     
     # Collecte globale
-    all_errors = errors + l8_errors + l9_errors + l12_errors
-    all_warnings = warnings + l8_warnings + l11_warnings + l12_warnings + l10_warnings
+    all_errors = errors + l8_errors + l9_errors + l12_errors + l13_errors
+    all_warnings = warnings + l8_warnings + l9_warnings + l11_warnings + l12_warnings + l10_warnings
     all_verified = verified + l8_verified + l9_verified + l10_verified + l11_verified + l12_verified
-    
+
     # Affichage
     for warning in all_warnings:
         print(f"[WARN] {warning}")
@@ -801,11 +985,13 @@ def main() -> int:
         print(f"Auto-verification liaison (check_linkage.py) — {'FAIL' if all_errors else 'PASS'}")
         print(f"  Linkage (L1-L7):    {len(verified)} OK, {len(errors)} KO")
         print(f"  L8 (Output assign): {len(l8_verified)} OK, {len(l8_errors)} KO, {len(l8_warnings)} WARN")
-        print(f"  L9 (I/O mapping):   {len(l9_verified)} OK, {len(l9_errors)} KO")
+        print(f"  L9 (I/O mapping):   {len(l9_verified)} OK, {len(l9_errors)} KO, {len(l9_warnings)} WARN")
         print(f"  L10 (Single prod):  {len(l10_verified)} OK, {len(l10_warnings)} WARN")
         print(f"  L11 (Polarity):     {len(l11_verified)} OK, {len(l11_warnings)} WARN")
         print(f"  L12 (Timing):       {len(l12_verified)} OK, {len(l12_errors)} KO, {len(l12_warnings)} WARN")
-        
+        l13_total = sum(1 for p in pous.values() if p.kind in ("FUNCTION_BLOCK", "PROGRAM")) + len(gvl_files)
+        print(f"  L13 (Orphelins):    {l13_total - len(l13_errors)} OK, {len(l13_errors)} KO")
+
         selected = args.files or []
         shown = [v for v in verified + l8_verified + l9_verified + l10_verified + l11_verified + l12_verified 
                  if not selected or any(s in v for s in selected)]
@@ -815,9 +1001,9 @@ def main() -> int:
         if len(shown) > limit:
             print(f"  ... {len(shown) - limit} autres verifiees")
         
-        for error in (errors + l8_errors + l9_errors + l12_errors)[:8]:
+        for error in (errors + l8_errors + l9_errors + l12_errors + l13_errors)[:8]:
             print(f"  KO  {error}")
-        for warning in (warnings + l8_warnings + l11_warnings + l12_warnings + l10_warnings)[:5]:
+        for warning in (warnings + l8_warnings + l9_warnings + l11_warnings + l12_warnings + l10_warnings)[:5]:
             print(f"  !   {warning}")
         print("```")
 

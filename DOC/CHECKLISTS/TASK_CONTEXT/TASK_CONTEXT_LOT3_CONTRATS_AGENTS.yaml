@@ -1,0 +1,119 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# LOT 3 — CONTRATS AGENTS : FERMER LA CLASSE DE DEFAUT
+# ═══════════════════════════════════════════════════════════════════════════
+# Constat de l'orchestrateur (2026-08) :
+#   « l'agent a mal question de travail et les agents qui ont fait la revue
+#     pareil, donc les contrats avec les agents sont pas correctement bien
+#     specifies. »
+#
+# Fait mesure : PRG_OUTPUTS_LD.st declare PROGRAM PRG_10_Outputs_LD. Ce
+# desalignement a ete produit par un agent, valide par une revue d'agent, et
+# n'a ete arrete par aucun des 8 gates. Aucun contrat de tache existant ne
+# demandait de verifier que le nom de fichier corresponde au nom du POU.
+#
+# Ce lot rend l'objectif structurel obligatoire dans le contrat lui-meme, pour
+# que la question soit posee a l'agent AVANT qu'il ecrive, et pas decouverte
+# apres coup par un audit humain.
+# ═══════════════════════════════════════════════════════════════════════════
+
+task_id: "LOT3-CONTRATS-AGENTS"
+request: >
+  Rendre obligatoires, dans le gabarit de contrat et dans le preambule des
+  sous-agents, les objectifs structurels nom de fichier egale nom de POU et
+  suffixe de langage egale langage genere, et faire refuser par le gate de
+  contrat toute tache touchant CODE/MAIN qui ne les porte pas.
+criticality: C3
+strategy: patch
+
+scope_code:
+  - "TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml"
+  - "TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md"
+  - "TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py"
+  - "TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py"
+scope_doc:
+  - "TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md"
+  - "TOOLS/AGENT_WORKFLOW/docs/CODE_WRITING_POLICY.md"
+out_of_scope:
+  - "CODE/** : aucun fichier automate n'est modifie dans ce lot"
+  - "Les contrats de lot deja rediges dans DOC/CHECKLISTS/TASK_CONTEXT/"
+  - "La liste noire GENERIC_PATTERNS existante, qui reste en vigueur"
+
+contract:
+  task_id: LOT3-CONTRATS-AGENTS
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Faire qu'un agent charge d'ecrire ou de renommer un programme dans CODE/MAIN
+    recoive, dans son contrat, l'obligation explicite d'aligner nom de fichier,
+    nom de POU et langage genere, au lieu de decouvrir la regle apres la revue.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Le gabarit de contrat porte une rubrique d'objectifs structurels citant
+        l'alignement nom de fichier / nom de POU et l'alignement suffixe /
+        langage genere dans le bundle.
+      verified_by: "grep -n 'nom de POU' TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml ; au moins une occurrence dans une rubrique d'objectifs structurels"
+    - id: AC2
+      statement: >
+        check_task_contract.py refuse un contrat dont le scope contient un
+        fichier de CODE/MAIN et dont aucun critere d'acceptation ne porte sur la
+        structure du POU.
+      verified_by: "C:/Python313/python.exe -m pytest TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py -q -k structurel ; le test de refus passe"
+    - id: AC3
+      statement: >
+        check_task_contract.py accepte les cinq contrats de lot deja rediges pour
+        cette campagne, qui portent tous des criteres structurels.
+      verified_by: "for f in DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT*_*.yaml ; do python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py $f ; done ; chaque appel retourne PASS"
+    - id: AC4
+      statement: >
+        Le preambule des sous-agents interdit de creer un POU dont le nom differe
+        du nom de fichier, et interdit d'apposer un suffixe de langage que le
+        generateur ne produit pas.
+      verified_by: "grep -n 'suffixe' TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md ; l'interdiction est enoncee dans le preambule"
+    - id: AC5
+      statement: >
+        Le preambule des sous-agents indique que l'ajout d'une exemption dans un
+        script de gate est une decision d'orchestrateur, pas une decision d'agent.
+      verified_by: "grep -n 'exemption' TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md ; la regle d'escalade est enoncee"
+    - id: AC6
+      statement: >
+        Le controle structurel ajoute au gate de contrat ne se declenche pas sur
+        une tache purement documentaire, dont le scope ne touche pas CODE/MAIN.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT2_DOC_CFC_NUMEROTATION.yaml ; sortie PASS"
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
+      - TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md
+      - TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py
+      - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+      - TOOLS/AGENT_WORKFLOW/docs/CODE_WRITING_POLICY.md
+    forbidden:
+      - CODE/
+      - DOC/CHECKLISTS/TASK_CONTEXT/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Les 7 controles T1 a T7 de check_task_contract.py restent actifs et gardent leur identifiant."
+      - "La liste GENERIC_PATTERNS continue de refuser les criteres generiques observes sur les 53 taches du REX 2026-07-29."
+      - "Le contrat reste facultatif en C0 et C1, obligatoire a partir de C2."
+    dropped_on_purpose:
+      - "L'acceptation silencieuse d'un contrat touchant CODE/MAIN sans aucun critere structurel."
+
+  evidence_required:
+    - run_all_gates
+    - task_tests
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si le nouveau controle structurel rend rouge un contrat de tache historique
+    considere comme valide, ne pas assouplir la regle pour le faire passer :
+    remonter le cas a l'orchestrateur. Un gate calibre sur l'existant ne detecte
+    plus rien, ce qui est exactement l'etat constate avant ce lot.
