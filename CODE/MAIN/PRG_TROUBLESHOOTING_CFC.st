@@ -230,6 +230,7 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := 
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_ACQUISITION_CFC.M3_StatusWord_Filtered;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_INPUTS_LD.M3BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk       := PRG_ACQUISITION_CFC.HwIn.Translation.M3_ThermalFeedback_DI; // 🆕 T96
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.instJoystick.RawX;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct       := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;

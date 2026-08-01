@@ -370,6 +370,7 @@ GVL_IHM.TranslationM3.State.FinalInterlockErrorId := GVL_Global.instTranslationO
 GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_INPUTS_LD.M3BrakeCommandOpenConfirmed;
 GVL_IHM.TranslationM3.State.FinalBrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_INPUTS_LD.M3BrakeFeedback;
+GVL_IHM.TranslationM3.State.DriveThermalOk       := PRG_ACQUISITION_CFC.HwIn.Translation.M3_ThermalFeedback_DI; // 🆕 T96 — diagnostic seul
 GVL_IHM.TranslationM3.State.PositionSensorTarget := PRG_TRANSLATION_CFC.M3_PositionSensorTarget;
 GVL_IHM.TranslationM3.State.PositionReached      := PRG_TRANSLATION_CFC.M3_PositioningActive
                                                 AND PRG_TRANSLATION_CFC.instTranslationM3.TargetReached;

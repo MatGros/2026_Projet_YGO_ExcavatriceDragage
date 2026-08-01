@@ -222,6 +222,9 @@ END_IF;
 // Polarité frein M3 (1 = OUVERT)
 Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
 
+// 🆕 T96 : thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
+Translation.M3_ThermalFeedback_DI := TRUE;
+
 // Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -> 16#0081
 IF (M3_Direction <> 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
