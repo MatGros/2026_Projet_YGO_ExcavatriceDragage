@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §4.
 > Rôle de **ce** document : synchro niveau 1 (warning), couplage croisé — et **catalogue unique**
 > des `TC-P10-014`, `015`, `016`.
-> Source code : `CODE/TREUILS/FB_WinchSync.st` · instance unique dans `Treuils (CFC)`.
+> Source code : `CODE/TREUILS/FB_WinchSync.st` · instance unique dans `PRG_TREUILS_CFC.st` (ST actuel). Cible de migration : `PRG_04_Treuils_Benne_CFC.xml` CFC natif, absent de `CODE/MAIN`.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
@@ -66,7 +66,7 @@ Manuel/SemiAuto=TRUE par défaut.
 ## 4. Couplage croisé Treuils
 
 Si `SyncActive`, tout arrêt (SafeStop/Forbid) sur **un** treuil coupe l'**autre au même scan**
-(pas d'attente du filtre 500/800ms interne) — câblé dans `Treuils (CFC)`, pas dans ce FB.
+(pas d'attente du filtre 500/800ms interne) — câblé dans le programme Treuils ST actuel ; sa représentation future est la page CFC native cible `PRG_04_Treuils_Benne_CFC.xml`, pas ce FB.
 
 Suspendu pendant `BenneBusy` (écart transitoire volontaire) et en butée normale
 (`ForbidAscent/DescentMx_Active`).
@@ -90,4 +90,4 @@ Aucun écart majeur identifié — comportement conforme à la doc legacy sur ce
 | AF10 (chapô) | Rôle machine, intégration programme |
 | AF10 / FB_Safety_Winch | Méca E — défense en profondeur niveau 2 |
 | AF05 | Modes — `SyncEnable` |
-| Code | `CODE/TREUILS/FB_WinchSync.st`, `CODE/MAIN/Treuils (CFC).st` |
+| Code | `CODE/TREUILS/FB_WinchSync.st`, `CODE/MAIN/PRG_TREUILS_CFC.st` (ST actuel) ; cible `PRG_04_Treuils_Benne_CFC.xml` absente |

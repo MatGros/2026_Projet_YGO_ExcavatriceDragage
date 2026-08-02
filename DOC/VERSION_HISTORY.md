@@ -4,6 +4,21 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `M0BIS_ALIGNEMENT_DOC_7POU` — 2026-08 (documentation seule)
+- Architecture actée : **7 POU par ensemble mécanique**, chaque procédé portant sa safety dans sa page
+- `PRG_01_Inputs_LD` · `PRG_02_Acquisition_CFC` · `PRG_03_Modes_Cycle_CFC` · `PRG_04_Treuils_Benne_CFC` · `PRG_05_Translation_CFC` · `PRG_06_Outputs_LD` · `PRG_07_Supervision_CFC`
+- Abandonné comme **cible** : `PRG_SAFETY_CFC` global, `PRG_01_Diagnostics`, `PRG_02_Encoders`, `PRG_AUXILIARY_CFC`, `PRG_TROUBLESHOOTING_CFC`/`PRG_11_Troubleshooting`, table 13 POU
+- AF06/AF09/AF10/AF11/AF12/AF13/AF14 : sections « intégration programme » alignées · cibles `.xml` corrigées
+- Dossiers C4 fondés sur la safety séparée archivés dans `ARCHIVES/Doc/AUDITS/Architecture/` (10 fichiers)
+- ⚠️ **Aucune sémantique safety, seuil, polarité ou `ErrorId` modifié** : seule l'affectation POU change
+- 🚨 Arbitrage ouvert T103 : le homing lit le mode de marche — bloque le lot M1 (`AF_Partie-09` §4bis)
+- Aucun `CODE/` modifié
+
+### `RU-4_ARCHITECTURE_MAINTASK` — 2026-08-01 — ⚠️ **PÉRIMÉE** (remplacée par l'entrée ci-dessus)
+- Dossier C4 créé : cycles inter-POU, doubles producteurs joystick/codeurs et options de migration documentés
+- Aucun `CODE/` modifié : table 13 rangs, renommage et CFC natif bloqués jusqu'aux décisions RU-4.1 à RU-4.4
+- Invariants : `PRG_10_Outputs_LD` unique barrière physique ; `PRG_11_Troubleshooting` ST lecture seule après Outputs
+
 ### `LOT_A_SUPPRESSION_CODE_MORT` — 2026-08-01
 - Suppression de 3 objets jamais câblés (confirmé grep exhaustif) : `FB_Sim_AU_ChainFeedback`, `GVL_Simulation_AU`, `PRG_NETWORK_CFC`
 - Zéro changement de comportement machine — code mort uniquement, mécanisme `GVL_Simulation` réel inchangé

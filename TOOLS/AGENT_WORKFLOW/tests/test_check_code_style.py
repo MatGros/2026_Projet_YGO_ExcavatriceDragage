@@ -1,0 +1,40 @@
+"""Tests de non-regression du gate de style CODE."""
+
+from __future__ import annotations
+
+import importlib.util
+import sys
+from pathlib import Path
+
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_code_style.py"
+SPEC = importlib.util.spec_from_file_location("check_code_style", SCRIPT)
+assert SPEC is not None and SPEC.loader is not None
+check_code_style = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = check_code_style
+SPEC.loader.exec_module(check_code_style)
+
+
+def test_simulation_allowlist_limitee_aux_trois_frontieres_justifiees() -> None:
+    expected_paths = {
+        "CODE/MAIN/PRG_ACQUISITION_CFC.st",
+        "CODE/MAIN/PRG_SUPERVISION_CFC.st",
+        "CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st",
+    }
+
+    assert set(check_code_style.SIMULATION_ALLOWED_PATHS) == expected_paths
+    for path in expected_paths:
+        allowance = check_code_style.SIMULATION_ALLOWED_PATHS[path]
+        assert allowance.executable_usage
+        assert allowance.decision == "Decision humaine 2026-08 : frontiere " + (
+            "acquisition validee."
+            if "ACQUISITION" in path
+            else "supervision validee."
+            if "SUPERVISION" in path
+            else "troubleshooting validee."
+        )
+        assert "migration CFC/numerotation" in allowance.removal_condition
+        assert check_code_style.simulation_reference_allowed(Path(path))
+
+    assert not check_code_style.simulation_reference_allowed(
+        Path("CODE/MAIN/PRG_SAFETY_CFC.st")
+    )

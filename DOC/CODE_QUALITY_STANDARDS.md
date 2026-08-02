@@ -234,9 +234,9 @@ EmergencyArmingFailedDisplayed := TonDisplayDebounce.Q OR NOT EmergencyArmingFai
 
 ## 10. Câblage CFC natif (`.xml`) — REX 2026-08
 
-> 🚩 Un CFC natif (`PRG_*_CFC.xml`, fusionné tel quel dans le bundle, cf. `PRG_GLOBAL_CFC.xml`)
+> 🚩 Un CFC natif (`PRG_*_CFC.xml`, fusionné tel quel dans le bundle) peut etre
 > importé avec des blocs affichés **sans aucun lien visible** dans CODESYS, alors que le XML
-> était bien formé et le bundle généré sans erreur. Cause : connecteurs empilés en `x=0 y=0`
+> est bien formé et le bundle généré sans erreur. Cause : connecteurs empilés en `x=0 y=0`
 > (fils de longueur nulle, invisibles/confus dans l'éditeur graphique).
 
 Règles obligatoires pour tout `<CFC>` écrit ou généré à la main (hors générateur ST→LD) :
@@ -253,9 +253,12 @@ Règles obligatoires pour tout `<CFC>` écrit ou généré à la main (hors gén
 4. **Aucune logique métier dans le CFC** (rappel §POO/§5 AF03, TC-P02-002) : un `IF`/calcul
    se délègue à un FB dédié, jamais inline dans une page CFC.
 
-Référence conforme à copier : `CODE/MAIN/PRG_ACQUISITION_CFC.st` (corrigé) ou
-`CODE/MAIN/PRG_MODES_CFC.st` (prototype historique, câblage correct malgré son statut
-"ne pas reproduire" en architecture — le câblage lui-même reste une référence valide).
+Reference de structure XML :
+`TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml`.
+La procedure de production, de fusion et de validation est normative dans
+`DOC/AF_Partie-03_Contrats_Composants_v2.0.md §5`. Attention : le sample porte
+historiquement des connecteurs en `(0,0)` ; il ne constitue jamais une reference
+pour les coordonnees.
 
 ## 11. Checklist de restitution (bloquante)
 

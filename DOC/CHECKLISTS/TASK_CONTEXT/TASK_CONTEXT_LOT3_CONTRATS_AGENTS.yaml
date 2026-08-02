@@ -63,9 +63,9 @@ contract:
       verified_by: "C:/Python313/python.exe -m pytest TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py -q -k structurel ; le test de refus passe"
     - id: AC3
       statement: >
-        check_task_contract.py accepte les cinq contrats de lot deja rediges pour
-        cette campagne, qui portent tous des criteres structurels.
-      verified_by: "for f in DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT*_*.yaml ; do python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py $f ; done ; chaque appel retourne PASS"
+        check_task_contract.py accepte les six contrats de la campagne structure
+        CODE 2026-08, chacun portant les criteres adaptes a son perimetre.
+      verified_by: "for f in TASK_CONTEXT_LOT1_GATES_STRUCTURE_CODE.yaml TASK_CONTEXT_LOT2_DOC_CFC_NUMEROTATION.yaml TASK_CONTEXT_LOT3_CONTRATS_AGENTS.yaml TASK_CONTEXT_LOT4A_RENOMMAGE_PROGRAMMES.yaml TASK_CONTEXT_LOT4B_CONVERSION_CFC_NATIF.yaml TASK_CONTEXT_LOT5_VERIFICATION_FINALE.yaml ; do python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/CHECKLISTS/TASK_CONTEXT/$f || exit 1; done"
     - id: AC4
       statement: >
         Le preambule des sous-agents interdit de creer un POU dont le nom differe
@@ -91,9 +91,14 @@ contract:
       - TOOLS/AGENT_WORKFLOW/tests/test_check_task_contract.py
       - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
       - TOOLS/AGENT_WORKFLOW/docs/CODE_WRITING_POLICY.md
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT1_GATES_STRUCTURE_CODE.yaml
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT2_DOC_CFC_NUMEROTATION.yaml
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT3_CONTRATS_AGENTS.yaml
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT4A_RENOMMAGE_PROGRAMMES.yaml
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT4B_CONVERSION_CFC_NATIF.yaml
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT5_VERIFICATION_FINALE.yaml
     forbidden:
       - CODE/
-      - DOC/CHECKLISTS/TASK_CONTEXT/
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
   conservation:

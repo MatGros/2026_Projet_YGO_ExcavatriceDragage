@@ -31,6 +31,10 @@ spécifications actives et les tests du projet.
 - Commentaires en français.
 - `FB_` : Function Block ; `ST_` : structure ; `E_` : enum.
 - `PRG_XX_` : programme autonome numéroté.
+- Avant toute écriture dans `CODE/MAIN/`, le contrat de tâche porte les deux objectifs
+  structurels vérifiables : nom de fichier = nom de POU, et suffixe = langage généré
+  dans le bundle. `check_task_contract.py` les refuse sinon ;
+  `check_code_structure.py` les vérifie ensuite sur les sources et le bundle.
 - Unités explicites : `_M`, `_Pct`, `_Ms`, `_Hz`.
 - Entrées de commande : `Enable`, `Reset`, `StartStop` selon le profil.
 - Sorties d'état : `Ready`, `Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError`.

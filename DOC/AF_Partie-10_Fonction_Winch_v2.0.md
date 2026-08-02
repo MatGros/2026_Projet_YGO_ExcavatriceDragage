@@ -3,7 +3,8 @@
 > Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
 > **Détail technique par FB** : voir les 9 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
-> Source code : `CODE/TREUILS/*.st` · instances dans `Treuils (CFC)` (mouvement), `Safety (CFC)` (safety), `Outputs (Ladder)` (finale).
+> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_TREUILS_CFC.st` et `PRG_SAFETY_CFC.st` (tous deux ST actuels), `PRG_OUTPUTS_LD.st` (Ladder généré). Cible de migration CFC native : **une seule page** `PRG_04_Treuils_Benne_CFC.xml` — elle absorbe la partie M1/M2/benne de `PRG_SAFETY_CFC` (safety câblée en parallèle visible sur la même page). Aucune page safety séparée n'est une cible.
+> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
 
@@ -80,7 +81,7 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
-| `ST_WinchFinalInterlockRequest` | `Treuils (CFC)` | `Outputs (Ladder)` |
+| `ST_WinchFinalInterlockRequest` | `PRG_TREUILS_CFC.st` actuel ; cible `PRG_04_Treuils_Benne_CFC.xml` absente | `PRG_OUTPUTS_LD.st` actuel ; cible `PRG_06_Outputs_LD` |
 | `ST_SpeedStepTable` | config IHM/RETAIN | `FB_Winch`/`FB_SpeedStep` |
 | `ST_SafetyWinch` | `Supervision` (agrège) | IHM |
 | `ST_BypassWinch` | IHM RETAIN | `FB_Safety_Winch` |
@@ -90,9 +91,11 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 ## 4. Intégration programme
 
+### 4.1 État actuel du code (ST, avant migration)
+
 ```text
-Safety (CFC)        instSafetyWinchM1/M2, instSpeedMonitorM1/M2, instLoadEstimatorM1/M2
-Treuils (CFC)
+Safety ST actuel (`PRG_SAFETY_CFC.st`)        instSafetyWinchM1/M2, instSpeedMonitorM1/M2, instLoadEstimatorM1/M2
+Treuils ST actuel (`PRG_TREUILS_CFC.st`)
   §1  instBucket (Benne, appelé EN PREMIER — évite fenêtre de commande manuelle parasite)
   §2  Arbitrage M1 (SEMI_AUTO / MAINT / joystick / boutons)
   §3  Arbitrage M2 (Benne prioritaire > SEMI_AUTO > joystick/boutons)
@@ -102,11 +105,33 @@ Treuils (CFC)
   §5  Limites basses + couplage croisé
   §6/7 Exécution instWinchM1/M2
   §8  Publication ST_WinchFinalInterlockRequest → Outputs
-Outputs (Ladder)    instWinchOutputInterlockM1/M2_LD (Q finales)
+Outputs Ladder (`PRG_OUTPUTS_LD.st`)      instWinchOutputInterlockM1/M2_LD (Q finales)
 ```
 
 **Dépendances** : Joystick (`AxisCmdY`, `DeadmanArmed`), Modes (`JoystickWinchSelectArbitrated`,
 `InhibitM1/M2`, `SyncEnable`), Encodeurs (`CablePosM`, `Homed`, vitesse), Cycle (SEMI_AUTO).
+
+### 4.2 Cible — `PRG_04_Treuils_Benne_CFC` (rang 04 de la `MainTask`)
+
+Découpage **par ensemble mécanique**. M1 (retenue) et M2 (benne) sont indissociables : la benne
+est suspendue entre les deux, et l'ouverture, la fermeture, la synchro et le câble mou dépendent
+de leur **combinaison**. Une seule page les porte, avec leur safety.
+
+| Ce qui migre dans `PRG_04_Treuils_Benne_CFC` | Provenance actuelle |
+|---|---|
+| Arbitrages M1/M2, benne, synchro, assistants plongée/extraction | `PRG_TREUILS_CFC` |
+| `instSafetyWinchM1/M2`, `instSpeedMonitorM1/M2`, `instLoadEstimatorM1/M2` | partie M1/M2/benne de `PRG_SAFETY_CFC` |
+
+⚠️ **Aucune sémantique safety ne change** : les mécanismes Méca A→E, les bits `ErrorId` 14/15,
+`ForbidAscent`/`ForbidDescent`, les seuils et les polarités restent ceux décrits dans les fiches FB.
+Seule **l'affectation POU** change : la safety devient visible en parallèle des blocs métier sur
+la même page, ce qui supprime par construction le cycle prouvé `Safety ↔ Treuils`.
+
+`PowerCutOff` : cette page publie **sa demande** M1/M2. L'agrégation et la coupure restent la
+responsabilité exclusive de la barrière finale `PRG_06_Outputs_LD` (AF02 §2). Aucun POU « safety
+machine globale » n'existe dans la cible.
+
+📌 Lot de migration : **M3** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
 
 ---
 
@@ -179,7 +204,7 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 
 **Objectif** : Identifier passivement si un décalage entre les deux treuils (M1 et M2) provient d'un retard d'automatisme/contacteur ou d'un problème mécanique/frein.
 
-**Métriques mesurées passivement (exécuté dans `PRG_TROUBLESHOOTING_CFC`)** :
+**Métriques mesurées passivement (exécuté dans le ST actuel `PRG_TROUBLESHOOTING_CFC.st`, cible `PRG_07_Supervision_CFC` qui absorbe le troubleshooting en lecture seule stricte)** :
 - `DeltaStartDelay_Ms` : Écart de temps au démarrage des mouvements M1/M2.
 - `DeltaBrakeReleaseTime_Ms` & `DeltaBrakeApplyTime_Ms` : Écart de temps d'ouverture/fermeture effective des freins.
 - `DeltaStopTime_Ms` & `DeltaStopDistance_Mm` : Écart de temps et de distance parcourue lors de la phase d'arrêt.
@@ -205,4 +230,4 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 | AF06 | E/S physiques treuils |
 | AF09 | Codeurs — Homed, position, vitesse |
 | PLAN_TASK | Lot 4 (T87/T91/T93/T94/T95/T96) — décision non prise, étude terrain requise |
-| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/Treuils (CFC).st` |
+| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/PRG_TREUILS_CFC.st` (ST actuel) ; cible `PRG_04_Treuils_Benne_CFC.xml` absente |

@@ -90,6 +90,13 @@ contract:
         Le renommage n'introduit aucune modification de logique : le diff ne
         contient que des changements de nom de programme et de nom de fichier.
       verified_by: "git diff --stat puis relecture du diff ; aucune ligne modifiee hors identifiant de programme"
+    - id: AC9
+      statement: >
+        Le suffixe de chaque programme correspond au langage emis dans le bundle
+        a l'etape de migration : chaque _LD source .st est emis en <LD> ; chaque
+        _CFC encore source .st est explicitement trace comme etat transitoire
+        interdit apres LOT4B, sans pretendre etre deja un CFC natif.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py ; les seules erreurs S2 restantes citent exclusivement les _CFC attendus au LOT4B, aucune erreur S2 ne cite un _LD"
 
   scope:
     allowed:

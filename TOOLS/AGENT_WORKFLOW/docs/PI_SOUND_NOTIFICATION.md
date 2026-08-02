@@ -15,7 +15,7 @@ C:\Users\ZEDVICTUS\.pi\agent\extensions\sound-notifier.ts
 
 - **Event** : `agent_settled` (déclenchement quand l'agent a complètement terminé)
 - **Son** : `notify.wav` (notification système Windows standard)
-- **Librairie** : Native PowerShell `System.Media.SoundPlayer`
+- **Librairie** : Native PowerShell `System.Media.SoundPlayer` (joué en asynchrone avec `.Play()` et `child.unref()` pour ne pas bloquer la boucle d'événements Node/Pi Coding)
 
 ### 🎯 Utilisation
 

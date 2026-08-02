@@ -7,6 +7,7 @@ le gate refuse bien ce type de critere.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -39,9 +40,15 @@ contract:
 """
 
 
-def run(path: Path, *args: str) -> subprocess.CompletedProcess[str]:
+def run(path: Path, *args: str, disable_pyyaml: bool = False) -> subprocess.CompletedProcess[str]:
+    env = os.environ.copy()
+    if disable_pyyaml:
+        env["CHECK_TASK_CONTRACT_DISABLE_PYYAML"] = "1"
     return subprocess.run(
-        [sys.executable, str(SCRIPT), str(path), *args], capture_output=True, text=True
+        [sys.executable, str(SCRIPT), str(path), *args],
+        capture_output=True,
+        text=True,
+        env=env,
     )
 
 
@@ -123,3 +130,175 @@ def test_gabarit_non_rempli_refuse(tmp_path: Path) -> None:
     result = run(template)
     assert result.returncode == 1
     assert "gabarit" in result.stderr
+
+
+MAIN_PROGRAM_SCOPE = """\
+contract:
+  task_id: LOT_08_PROGRAMME
+  criticality: C3
+  strategy: patch
+  objective: "Rendre la page programme lisible dans CODESYS."
+  acceptance:
+    - id: AC1
+      statement: "Le nom de fichier est identique au nom de POU declare."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC2
+      statement: "Le suffixe de langage correspond au langage genere dans le bundle."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_08_Modes_CFC.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - check_linkage
+"""
+
+
+def test_t8_programme_main_sans_criteres_structurels_refuse(tmp_path: Path) -> None:
+    bad = MAIN_PROGRAM_SCOPE.replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "Le CFC contient les trois instances attendues."',
+    ).replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "Les trois instances sont appelees une fois par scan."',
+    )
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 1
+    assert "T8" in result.stderr
+    assert "nom de fichier = nom de POU" in result.stderr
+    assert "suffixe = langage genere dans le bundle" in result.stderr
+
+
+def test_t8_programme_main_sans_critere_suffixe_refuse(tmp_path: Path) -> None:
+    bad = MAIN_PROGRAM_SCOPE.replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "Les sorties physiques restent dans la barriere Ladder."',
+    )
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 1
+    assert "T8" in result.stderr
+    assert "suffixe = langage genere dans le bundle" in result.stderr
+
+
+def test_t8_accepte_la_formulation_fichier_pou_equivalente(tmp_path: Path) -> None:
+    equivalent = MAIN_PROGRAM_SCOPE.replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "Chaque fichier declare un POU dont le nom est identique au nom du fichier."',
+    )
+    result = run(write(tmp_path, equivalent))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_t8_programme_main_avec_deux_criteres_structurels_passe(tmp_path: Path) -> None:
+    result = run(write(tmp_path, MAIN_PROGRAM_SCOPE))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_t8_ne_s_applique_pas_a_une_tache_documentaire(tmp_path: Path) -> None:
+    documentation = MAIN_PROGRAM_SCOPE.replace(
+        "CODE/MAIN/PRG_08_Modes_CFC.xml",
+        "DOC/AF_Partie-02_Architecture_Programme_v3.0.md",
+    ).replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "La documentation reference le sample CFC reel."',
+    ).replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "La table de nommage indique le format source."',
+    )
+    result = run(write(tmp_path, documentation))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_t8_raw_forbidden_code_main_ne_declenche_pas_le_controle(tmp_path: Path) -> None:
+    documentation = MAIN_PROGRAM_SCOPE.replace(
+        "CODE/MAIN/PRG_08_Modes_CFC.xml",
+        "DOC/AF_Partie-02_Architecture_Programme_v3.0.md",
+    ).replace(
+        "      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export",
+        "      - CODE/MAIN/PRG_08_Modes_CFC.xml",
+    ).replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "La documentation reference le sample CFC reel."',
+    ).replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "La table de nommage indique le format source."',
+    )
+    result = run(write(tmp_path, documentation), disable_pyyaml=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_t8_raw_code_main_sans_relations_structurelles_refuse(tmp_path: Path) -> None:
+    bad = MAIN_PROGRAM_SCOPE.replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "La page contient les blocs requis."',
+    ).replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "Les connexions sont visibles dans CODESYS."',
+    )
+    result = run(write(tmp_path, bad), disable_pyyaml=True)
+    assert result.returncode == 1
+    assert "T8" in result.stderr
+
+
+def test_t8_decorative_terms_sans_relation_sont_refuses(tmp_path: Path) -> None:
+    bad = MAIN_PROGRAM_SCOPE.replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "Le fichier, le nom et le POU sont documentes dans la revue."',
+    ).replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "Le suffixe, le langage et le bundle sont documentes dans la revue."',
+    )
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 1
+    assert "T8" in result.stderr
+
+
+def test_t8_relation_decorative_scattered_refusee(tmp_path: Path) -> None:
+    """Une relation hors des termes structures ne satisfait jamais T8."""
+    bad = MAIN_PROGRAM_SCOPE.replace(
+        'statement: "Le nom de fichier est identique au nom de POU declare."',
+        'statement: "Le fichier est identique dans la revue ; le POU est documente."',
+    ).replace(
+        'statement: "Le suffixe de langage correspond au langage genere dans le bundle."',
+        'statement: "Le suffixe est identique dans la revue ; le langage et le bundle sont documentes."',
+    )
+    result = run(write(tmp_path, bad))
+    assert result.returncode == 1
+    assert "T8" in result.stderr
+
+
+def test_t8_raw_relations_structurelles_explicites_acceptes(tmp_path: Path) -> None:
+    result = run(write(tmp_path, MAIN_PROGRAM_SCOPE), disable_pyyaml=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_raw_scope_allowed_empty_refuse(tmp_path: Path) -> None:
+    """Le repli doit appliquer T5 comme le parseur PyYAML."""
+    bad = VALID.replace("    allowed:\n      - CODE/TREUILS/FB_Winch.st\n", "    allowed: []\n")
+    result = run(write(tmp_path, bad), disable_pyyaml=True)
+    assert result.returncode == 1
+    assert "T5" in result.stderr
+
+
+def test_campaign_raw_fallback(tmp_path: Path) -> None:
+    """Les six contrats de campagne restent valides sans PyYAML.
+
+    Ils emploient des champs YAML replies (``statement: >`` / ``verified_by:``)
+    et protegeaient donc le defaut de decalage statements/preuves du repli.
+    """
+    root = Path(__file__).resolve().parents[3]
+    names = (
+        "TASK_CONTEXT_LOT1_GATES_STRUCTURE_CODE.yaml",
+        "TASK_CONTEXT_LOT2_DOC_CFC_NUMEROTATION.yaml",
+        "TASK_CONTEXT_LOT3_CONTRATS_AGENTS.yaml",
+        "TASK_CONTEXT_LOT4A_RENOMMAGE_PROGRAMMES.yaml",
+        "TASK_CONTEXT_LOT4B_CONVERSION_CFC_NATIF.yaml",
+        "TASK_CONTEXT_LOT5_VERIFICATION_FINALE.yaml",
+    )
+    for name in names:
+        result = run(
+            root / "DOC" / "CHECKLISTS" / "TASK_CONTEXT" / name,
+            disable_pyyaml=True,
+        )
+        assert result.returncode == 0, f"{name}: {result.stdout}{result.stderr}"

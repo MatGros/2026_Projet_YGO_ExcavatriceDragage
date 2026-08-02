@@ -32,10 +32,16 @@ scope_code: []
 scope_doc:
   - "DOC/AF_Partie-03_Contrats_Composants_v2.0.md"
   - "DOC/AF_Partie-02_Architecture_Programme_v3.0.md"
+  - "DOC/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.0.md"
+  - "DOC/AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.0.md"
+  - "DOC/AF_Partie-10_Fonction_Winch_v2.0.md"
+  - "DOC/AF_Partie-13_Fonction_Simulation_v2.0.md"
+  - "DOC/CHECKLISTS/EXTRACTIONS/AF_Partie-02_Extraction_Architecture_v1.0.md"
   - "DOC/CODE_QUALITY_STANDARDS.md"
   - "DOC/NAMING_CONVENTION.md"
   - "DOC/README.md"
   - "DOC/VERSION_HISTORY.md"
+  - "AGENTS.md"
 out_of_scope:
   - "CODE/** : aucun fichier automate n'est modifie dans ce lot"
   - "Creation des .xml CFC eux-memes (LOT 4)"
@@ -65,20 +71,21 @@ contract:
       verified_by: "grep -rn 'samples_reference_codesys' DOC/ ; au moins une occurrence citant PRG_CFC_3FB.xml"
     - id: AC3
       statement: >
-        CODE_QUALITY_STANDARDS section 10 ne renvoie plus vers un fichier .st ni
-        vers un .xml absent du depot comme reference de cablage CFC.
-      verified_by: "grep -n 'PRG_ACQUISITION_CFC.st\\|PRG_GLOBAL_CFC.xml\\|PRG_AU_Acquisition_CFC.xml' DOC/CODE_QUALITY_STANDARDS.md ; zero occurrence presentee comme reference a copier"
+        Aucun document actif ne presente PRG_ACQUISITION_CFC.st ni un .xml absent
+        du depot comme reference de cablage CFC conforme.
+      verified_by: "grep -rn 'PRG_ACQUISITION_CFC.st\\|PRG_GLOBAL_CFC.xml\\|PRG_AU_Acquisition_CFC.xml' DOC/ ; zero occurrence presentee comme reference a copier"
     - id: AC4
       statement: >
-        AF_Partie-02 section 4 enonce la numerotation PRG_XX et sa liste d'ordre
-        MainTask emploie les memes noms numerotes, sans divergence entre la regle
-        et la liste qui l'illustre.
-      verified_by: "lecture de DOC/AF_Partie-02_Architecture_Programme_v3.0.md section 4 ; chaque programme du bloc MainTask porte un prefixe PRG_XX"
+        AF_Partie-02 section 4 distingue les rangs MainTask deja decides des
+        rangs geles, et interdit explicitement d'attribuer un PRG_XX aux quatre
+        POU cycliques avant arbitrage de leurs retards d'un scan ou proprietaires.
+      verified_by: "grep -n 'gele\\|retard d.un scan\\|PRG_01_Diagnostics' DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; la section 4 cite les quatre POU et l'interdiction d'inventer leur rang"
     - id: AC5
       statement: >
-        AF_Partie-02 section 2 attribue au troubleshooting un type et un rang
-        d'execution arretes, en remplacement de la mention TBD.
-      verified_by: "grep -n 'Troubleshooting' DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; la ligne cite PRG_11_Troubleshooting et ne contient plus TBD"
+        AF_Partie-02 attribue au troubleshooting le type ST et le rang
+        explicitement valides PRG_11_Troubleshooting, et ne le qualifie plus de
+        TBD dans aucune section active.
+      verified_by: "grep -n 'Troubleshooting' DOC/AF_Partie-02_Architecture_Programme_v3.0.md ; toutes les occurrences actives citent PRG_11_Troubleshooting sans TBD"
     - id: AC6
       statement: >
         NAMING_CONVENTION porte une table associant chaque suffixe de programme a
@@ -87,10 +94,18 @@ contract:
       verified_by: "grep -n '_CFC' DOC/NAMING_CONVENTION.md ; une table associe explicitement _CFC a l'extension .xml"
     - id: AC7
       statement: >
-        La table de nommage des programmes liste les 13 programmes avec leur nom
-        cible numerote, utilisable comme table de correspondance par le LOT 4.
-      verified_by: "grep -c 'PRG_' DOC/NAMING_CONVENTION.md ; la table cible contient 13 lignes de programmes"
+        NAMING_CONVENTION fournit une table de correspondance uniquement pour les
+        rangs deja arbitres et marque explicitement les quatre POU cycliques comme
+        non renommables tant que leur ordre MainTask n'est pas decide.
+      verified_by: "grep -n 'PRG_01_Diagnostics\\|PRG_02_Encoders\\|PRG_AUXILIARY_CFC\\|PRG_SUPERVISION_CFC' DOC/NAMING_CONVENTION.md ; les quatre sont marques geles ou non decides"
     - id: AC8
+      statement: >
+        AGENTS.md et AF_Partie-03 affichent la meme sequence canonique : generation
+        du bundle, verification de liaison sur ce bundle, puis execution de tous
+        les gates ; AF_Partie-02 qualifie PRG_01_Diagnostics et PRG_02_Encoders
+        de noms historiques non interpretable comme rang MainTask.
+      verified_by: "grep -n -A3 'generate_codesys_bundle.py' AGENTS.md DOC/AF_Partie-03_Contrats_Composants_v2.0.md ; les deux fichiers donnent bundle puis check_linkage puis run_all_gates"
+    - id: AC9
       statement: >
         Aucun lien documentaire mort ni version perimee n'est introduit par les
         modifications de ce lot.
@@ -100,10 +115,16 @@ contract:
     allowed:
       - DOC/AF_Partie-03_Contrats_Composants_v2.0.md
       - DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+      - DOC/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.0.md
+      - DOC/AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.0.md
+      - DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+      - DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+      - DOC/CHECKLISTS/EXTRACTIONS/AF_Partie-02_Extraction_Architecture_v1.0.md
       - DOC/CODE_QUALITY_STANDARDS.md
       - DOC/NAMING_CONVENTION.md
       - DOC/README.md
       - DOC/VERSION_HISTORY.md
+      - AGENTS.md
     forbidden:
       - CODE/
       - TOOLS/AGENT_WORKFLOW/scripts/
@@ -114,9 +135,11 @@ contract:
       - "Les 4 regles de cablage CFC de CODE_QUALITY_STANDARDS section 10 (connecteur dedie, position non nulle, disposition en colonnes, aucune logique metier) restent enoncees et opposables."
       - "La regle d'ordonnancement inter-programmes reste enoncee dans AF_Partie-02 section 4."
       - "Les 7 points de validation TC-P02 et TC-P03 restent presents et numerotes a l'identique."
+      - "AGENTS.md conserve les trois controles obligatoires, dans l'ordre canonique bundle puis liaison puis gates."
     dropped_on_purpose:
       - "La mention TBD du troubleshooting dans AF_Partie-02 section 2, arbitree en PRG_11_Troubleshooting."
-      - "Le renvoi de CODE_QUALITY_STANDARDS section 10 vers des fichiers inexistants ou non CFC."
+      - "Le renvoi de tout document actif vers des fichiers inexistants ou non CFC comme references de cablage CFC."
+      - "Toute table complete de rangs PRG_XX : les quatre POU cycliques restent geles jusqu'a arbitrage d'architecture."
 
   evidence_required:
     - check_doc_links

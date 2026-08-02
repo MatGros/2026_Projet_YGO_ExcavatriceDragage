@@ -54,8 +54,10 @@ def main() -> int:
     S = "TOOLS/AGENT_WORKFLOW/scripts"
     plan: list[tuple[str, list[str]]] = [
         ("GATE 1: Structure",                          [sys.executable, f"{S}/check_structure.py"]),
+        ("GATE 1bis: Structure CODE (POU, suffixe, ordre)", [sys.executable, f"{S}/check_code_structure.py"]),
         ("GATE 2: Code style (VAR_OUTPUT, simulation)", [sys.executable, f"{S}/check_code_style.py", "CODE"]),
         ("GATE 2bis: LIAISON (instances, refs, bundle)", [sys.executable, f"{S}/check_linkage.py"]),
+        ("GATE 2bis-bis: Cablage CFC natif",           [sys.executable, f"{S}/check_cfc_wiring.py"]),
         ("GATE 2ter: Routage modele",                  [sys.executable, f"{S}/check_model_routing.py"]),
         ("GATE 2quater: Liens documentaires",          [sys.executable, f"{S}/check_doc_links.py"]),
         ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),

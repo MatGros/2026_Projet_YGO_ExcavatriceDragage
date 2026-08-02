@@ -82,8 +82,8 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 > ces contrôles (REX 2026-07-29). Seul `check_linkage.py` prouve le câblage réel.
 
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report    # liaison (BLOQUANT)
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . # bundle PLCopenXML
+python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report    # liaison sur le bundle (BLOQUANT)
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py             # tous les gates
 ```
 

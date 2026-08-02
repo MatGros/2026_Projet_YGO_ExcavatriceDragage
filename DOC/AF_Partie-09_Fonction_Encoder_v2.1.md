@@ -5,7 +5,10 @@
 > **Détail technique par FB** : voir les 6 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme — il ne recopie **pas** les interfaces/`ErrorId`/`TC-` des fiches.
 > Source code : `CODE/CODEURS/*.st` (déjà réécrit nouvelle génération, cf. en-têtes `.st` —
-> ce n'est pas du code legacy à migrer) · instances dans `Acquisition (CFC)`.
+> ce n'est pas du code legacy à migrer) · instances dans `PRG_02_Encoders.st` (POU ST actuel).
+> Cible : la chaîne codéurs complète rejoint `PRG_02_Acquisition_CFC` (rang 02) — voir §4.2.
+> ⚠️ **Point d'arbitrage ouvert pour le lot M1** : le homing lit le mode de marche — voir §4bis.
+> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
 > v2.0 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md`.
 > v1.11 archivée : `ARCHIVES/Doc/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md`.
@@ -25,6 +28,7 @@ non abouti, **M1/M2 uniquement** (fiche `FB_Encoder_Homing` §4, cross-ref `AF_P
 2. Rôle et pipeline
 3. DUT et bus
 4. Intégration programme
+4bis. ⚖️ Point d'arbitrage OUVERT — le homing lit le mode de marche
 5. Procédure terrain
 6. Alertes et écarts
 7. Documents liés
@@ -91,6 +95,8 @@ réalité par le passé (v1.0), elle est volontairement retirée.
 
 ## 4. Intégration programme
 
+### 4.1 État actuel du code (ST, avant migration)
+
 ```text
 Acquisition  DI/simulation → HwIn.Winch.COD1/2_*
 Acquisition  diag EtherCAT device
@@ -106,6 +112,86 @@ Modes  EncoderFaultPresent → bloque SEMI_AUTO (repli MAINT_N1) — lu 1 scan a
 Treuils  ForbidAscent, TopLimitM:=CfgCableLimitAscent_M (≠ CfgTopSensorPos_M — limite exploit. ≠ cible homing)
 Supervision  copie vers IHM
 ```
+
+### 4.2 Cible — chaîne codéurs dans `PRG_02_Acquisition_CFC`
+
+Acquérir une mesure physique, la mettre à l'échelle, en déduire une vitesse et juger sa validité
+est **une seule responsabilité**. Les cinq étages `instEncoderAbs` → `instHoming` → `instEncoderScale`
+→ `instEncoderSafety` → `instEncoderSpeedMeasure` (M1/M2/M3) rejoignent donc la page acquisition.
+
+✅ Effet attendu : les instances aujourd'hui dupliquées entre `PRG_ACQUISITION_CFC` et
+`PRG_02_Encoders` (`instEncoderAbsM1/M2`, `instEncoderScaleM1/M2`, `instHomingM1/M2`) sont
+unifiées, avec un producteur unique. Le cycle prouvé `Acquisition ↔ Encoders` disparaît.
+
+⚠️ **Aucune sémantique codéur ne change** : les `ErrorId`, les seuils (`PositionMinM/MaxM` = ±99.0 m),
+les polarités, `HomingSuspect`, `EncoderIncoherent` et la procédure terrain §5 restent identiques.
+Seule **l'affectation POU** change.
+
+⚠️ **Cette fusion n'est pas réalisable en l'état** : le homing lit une donnée produite par un POU
+aval. Ce point est ouvert — §4bis.
+
+📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+
+---
+
+## ⚖️ 4bis. Point d'arbitrage OUVERT — le homing lit le mode de marche
+
+> 🚨 **Statut : ARBITRAGE REQUIS, non tranché.** À instruire au lancement du lot **M1**.
+> Cette section **constate un fait de code**. Elle ne décide rien, ne propose aucune option
+> préférée, et ne modifie aucune sémantique safety.
+
+### Dépendance prouvée (`CODE/MAIN/PRG_02_Encoders.st`)
+
+`FB_Encoder_Homing` M1 et M2 reçoivent trois entrées dérivées de `PRG_MODES_CFC` :
+
+| Ligne | Port alimenté | Expression exacte lue dans le code |
+|---|---|---|
+| `:72` | `Mode` (M1) | `PRG_MODES_CFC.Auth.Mode` |
+| `:74-75` | `UnitaryMode` (M1) | `(PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated <> 3)` |
+| `:76` | `WinchSelected` (M1) | `(PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 1)` |
+| `:122` | `Mode` (M2) | `PRG_MODES_CFC.Auth.Mode` |
+| `:124-125` | `UnitaryMode` (M2) | `(PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated <> 3)` |
+| `:126` | `WinchSelected` (M2) | `(PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 2)` |
+
+La même lecture existe sur les étages voisins de la chaîne : `instEncoderAbsM1/M2` (`:55`, `:105`)
+et `instEncoderSafetyM1/M2` (`:155`, `:168`) reçoivent également `PRG_MODES_CFC.Auth.Mode`.
+
+### Pourquoi c'est bloquant pour M1
+
+`FB_Encoder_Homing` utilise ces entrées pour autoriser ses deux flux : `MAINT_N1` pour le flux
+nominal, `MAINT_N2` + `WinchSelected` pour le flux unitaire (fiche `FB_Encoder_Homing` §3, bits
+`ErrorId` 0 « Mode non autorisé » et 1 « Mauvais treuil sélectionné »).
+
+Or dans l'architecture cible, l'acquisition est au **rang 02** et les modes au **rang 03** :
+
+```text
+02 PRG_02_Acquisition_CFC   ← devrait contenir instHomingM1/M2
+03 PRG_03_Modes_Cycle_CFC   ← produit Auth.Mode et Auth.JoystickWinchSelectArbitrated
+```
+
+Le consommateur s'exécuterait donc **avant** son producteur. La règle d'ordonnancement
+(`AF_Partie-02` §4) l'interdit sauf retard d'un scan explicitement documenté, et l'invariant
+projet interdit tout retard d'un scan sur `Reset`, `SafeStop`, `PowerCutOff`, une commande ou une
+sortie.
+
+### Ce qui doit être tranché — et par qui
+
+🚨 **La question porte sur une autorisation de mouvement de référencement. Elle relève d'un
+arbitrage utilisateur/sécurité, pas d'un choix d'agent.** Aucune réponse ne doit être déduite,
+inventée ou reformulée depuis la présente documentation.
+
+Questions ouvertes à instruire, avec preuve de code à l'appui :
+
+1. `Mode`, `UnitaryMode` et `WinchSelected` sont-ils des **autorisations** (donc légitimement
+   produites par les Modes au rang 03), ou des **faits d'entrée** reconstructibles au rang 02 ?
+2. Si la dépendance est irréductible, où le homing doit-il vivre pour respecter la règle
+   producteur-avant-consommateur, sans découper la chaîne codéur en deux propriétaires ?
+3. Quel serait l'effet exact d'un retard d'un scan sur `Mode` côté homing — et cet effet
+   touche-t-il une commande, un interlock ou une autorisation de mouvement ?
+
+⛔ **Tant que ce point n'est pas tranché par l'utilisateur, le lot M1 ne peut pas déplacer
+`instHomingM1/M2`.** Référence pilotage : `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`
+§4, lot M1, point dur n°2.
 
 ---
 
@@ -149,6 +235,7 @@ Supervision  copie vers IHM
 | 6 | info | `BtnHomingAtZero` — combiné avec `BtnHome` en amont dans `PRG_02_Encoders`, pas un port `FB_Encoder_Homing` séparé | Clarifié fiche Homing §2 |
 | 7 | info | Numérotation `ErrorId` différente par FB (pas de table unifiée) | Assumé — chaque fiche documente sa propre table |
 | 8 | 🔴 **P0 hors doc** | Perte de bus codeur (`EncoderAvailable=FALSE`) ⇒ `RawPos` gelé ⇒ position reste dans la plage ⇒ `SEMI_AUTO` reste autorisé sur une position figée | Trou de sécurité réel, indépendant de cette doc — à instruire en lot dédié C3/C4, cross-ref fiche `FB_Encoder_Safety` §3 |
+| 10 | 🚨 **Arbitrage requis** | `instHomingM1/M2` lit `PRG_MODES_CFC.Auth.*` (`PRG_02_Encoders.st:72,74-76,122,124-126`) : dans la cible, l'acquisition (rang 02) précède les modes (rang 03) | **Non tranché** — arbitrage utilisateur/sécurité au lancement du lot M1. Faits et questions ouvertes : §4bis. Aucune décision ne doit être déduite par un agent |
 | 9 | 🟠 **Nommage** | Suffixe d'unité `_M`/`_Mps` incohérent au sein du domaine CODEURS : `CfgTopSensorPosM`, `CfgHomingTargetM`, `PositionMinM`/`PositionMaxM`, `CablePosM` (sans underscore) **vs** `Speed_Mps`/`SignedSpeed_Mps` de `FB_Encoder_SpeedMeasure` (avec underscore, conforme). `FB_Encoder_SpeedMonitor` aggrave : `SpeedMps`/`SpeedDeltaMps`/`SpeedVariationThresholdMps` sans underscore, à côté de `Speed_Mps` du FB voisin. Règle : `NAMING_CONVENTION.md` §Suffixes d'unité, « toujours précédés d'un underscore ». Egalement : `ST_WinchCfg.CfgTopSensorPos_M` (IHM, avec underscore) **et** le port FB `CfgTopSensorPosM` (sans) désignent la même notion sous 2 formes. **Ne pas renommer au fil de l'eau** (casse IHM/bundle, `NAMING_CONVENTION.md` §Variables IHM) — lot de renommage dédié à trancher séparément. |
 
 ---

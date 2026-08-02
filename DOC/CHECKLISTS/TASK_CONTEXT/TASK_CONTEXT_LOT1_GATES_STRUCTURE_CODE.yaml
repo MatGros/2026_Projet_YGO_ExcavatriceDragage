@@ -72,9 +72,11 @@ contract:
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py ; le RESUME contient une ligne citant check_cfc_wiring"
     - id: AC6
       statement: >
-        check_code_style.py n'exempte plus PRG_ACQUISITION_CFC.st,
-        PRG_SUPERVISION_CFC.st et PRG_TROUBLESHOOTING_CFC.st de ses controles.
-      verified_by: "grep -n 'PRG_ACQUISITION_CFC\\|PRG_SUPERVISION_CFC\\|PRG_TROUBLESHOOTING_CFC' TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py ; zero occurrence en liste d'exemption"
+        L'allowlist GVL_Simulation est limitee a PRG_ACQUISITION_CFC.st,
+        PRG_SUPERVISION_CFC.st et PRG_TROUBLESHOOTING_CFC.st ; chaque entree
+        porte son usage executable, la decision 2026-08 et sa condition de
+        retrait lors de la migration CFC/numerotation.
+      verified_by: "C:/Python313/python.exe -m pytest TOOLS/AGENT_WORKFLOW/tests/test_check_code_style.py -q -k simulation_allowlist ; le test prouve que les trois chemins justifies passent et qu'un quatrieme chemin est refuse"
     - id: AC7
       statement: >
         Chaque regle du nouveau gate possede un test unitaire qui echoue si la
@@ -92,6 +94,7 @@ contract:
       - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
       - TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py
       - TOOLS/AGENT_WORKFLOW/tests/test_check_code_structure.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_check_code_style.py
       - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
     forbidden:
       - CODE/
@@ -104,7 +107,7 @@ contract:
       - "Les 8 gates deja presents dans run_all_gates.py continuent d'etre executes dans le meme ordre."
       - "run_all_gates.py continue d'executer tous les gates puis d'afficher un RESUME, au lieu de s'arreter au premier echec (REX 2026-07-29)."
     dropped_on_purpose:
-      - "Les 3 exemptions de check_code_style.py, qui masquaient les fichiers a corriger."
+      - "Les exemptions GVL_Simulation non justifiees ou sans condition de retrait ; les trois frontieres executees explicitement valides sont conservees jusqu'a leur migration."
 
   evidence_required:
     - check_linkage

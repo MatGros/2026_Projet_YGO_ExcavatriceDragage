@@ -46,22 +46,30 @@ ni `IF`, ni calcul, ni fusion de commandes, ni ecriture de sortie physique hors 
 
 ## 🗺️ 2. Organisation cible
 
-| Programme | Langage | Responsabilite |
-|---|---|---|
-| 📥 `PRG_ACQUISITION_CFC` | CFC | Frontiere E/S, selection reel/simule, diagnostics devices, joystick, codeurs COD1/COD2, mise a l'echelle, vitesse et homing. |
-| 🪜 `PRG_INPUTS_LD` | Ladder | Affichage qualifie des 21 E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
-| 🎚️ `PRG_MODES_CFC` | CFC | Modes, droits, autorisations, selections et arbitrages de sources autorises. |
-| 🛡️ `PRG_SAFETY_CFC` | CFC | Safety M1, M2 et M3 ; interdictions, `SafeStop`, demandes de coupure puissance et diagnostics safety. |
-| 🔄 `PRG_CYCLE` | ST | Instance `FB_Cycle` a machine d'etat/Grafcet. Il produit des demandes automatiques ; il ne commande pas les sorties. |
-| 🪝 `PRG_TREUILS_CFC` | CFC | M1/M2, synchronisation, benne, `FB_DiveSearch`, `FB_ExtractionSequence`, arbitrage final treuil et demandes vers barrieres finales. |
-| ↔️ `PRG_TRANSLATION_CFC` | CFC | Positionnement M3, arbitrage final translation et demande vers barriere finale. |
-| ⚡ `PRG_OUTPUTS_LD` | Ladder | Barrieres finales, commandes physiques, gestion de la coupure puissance et du rearmement. |
-| 🖥️ Frontiere IHM | DUT et structures `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Le mapping, la persistance, les agregats et l'eventuel programme ST restent **TBD**. |
-| 🔎 Troubleshooting | Structures lecture seule | Affiche les donnees de debogage dans un ordre utile a la maintenance. Son type, son programme eventuel et son ordonnancement restent **TBD**. |
+**Regle de decoupage : par ensemble mecanique, pas par couche transverse.**
+Chaque procede physique porte sa propre safety dans sa page CFC : le lien entre la surveillance
+safety et le bloc metier commande doit etre visible sur le meme schema, sans ouvrir une autre page.
 
-`PRG_CYCLE` reste en ST : sa machine d'etat est plus lisible, testable et maintenable sous cette
-forme. Les assistants de plongee/extraction restent dans le domaine Treuils car ils sont aussi
-utilises en maintenance.
+| N° | Programme | Langage | Responsabilite |
+|---|---|---|---|
+| 01 | 🪜 `PRG_01_Inputs_LD` | Ladder | Image qualifiee des E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
+| 02 | 📥 `PRG_02_Acquisition_CFC` | CFC | Frontiere E/S, selection reel/simule, **chaine complete codeurs M1/M2/M3** (absolu, echelle, vitesse, validite), joystick, **diagnostics devices/bus** et retours auxiliaires qualifies. |
+| 03 | 🎚️ `PRG_03_Modes_Cycle_CFC` | CFC | Modes, droits, autorisations, selections de sources et **sequenceur de cycle** (`FB_Cycle`). Produit des demandes ; ne commande aucune sortie. |
+| 04 | 🪝 `PRG_04_Treuils_Benne_CFC` | CFC | **Ensemble levage indissociable** : M1 (retenue) + M2 (benne) + synchronisation + benne + `FB_DiveSearch`/`FB_ExtractionSequence`, **avec la safety M1/M2 cablee en parallele visible** sur la meme page. |
+| 05 | ↔️ `PRG_05_Translation_CFC` | CFC | Positionnement M3 et arbitrage final translation, **avec la safety M3 cablee en parallele visible** sur la meme page. |
+| 06 | ⚡ `PRG_06_Outputs_LD` | Ladder | Barrieres finales, commandes physiques, **agregation finale des demandes `PowerCutOff`** et rearmement. |
+| 07 | 🔎 `PRG_07_Supervision_CFC` | CFC | Agregation IHM, troubleshooting et bypass. Lecture seule stricte : il n'ecrit ni commande, ni configuration, ni interlock. |
+
+| Element transverse | Rattachement | Regle |
+|---|---|---|
+| 🖥️ Frontiere IHM | DUT `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Mapping et persistance restent **TBD**. |
+| 🛑 Chaine AU physique | `PRG_02_Acquisition_CFC` | L'etat AU est un **fait d'entree qualifie** acquis avec les autres entrees : visible des l'acquisition pour la maintenance. Le FB agit ensuite sur les sorties via la barriere finale. La chaine materielle reste independante et proprietaire de la Partie 01. |
+| ⚡ `PowerCutOff` | `PRG_06_Outputs_LD` | Chaque procede publie **sa demande** ; la barriere finale, seule au plus pres des sorties, realise l'agregation et coupe. |
+| 🔀 Securites croisees | Procede qui **subit** l'interdiction | Une interdiction est portee par le domaine qui la subit (ex. interdire M3 selon un etat benne = dans `PRG_05_Translation_CFC`). Les Modes distribuent des **autorisations**, ils ne portent pas la responsabilite de l'interdiction metier. |
+
+`FB_Cycle` reste une machine d'etat ST encapsulee : sa logique est plus lisible et testable sous cette
+forme, mais elle est instanciee dans la page CFC Modes/Cycle. Les assistants de plongee/extraction
+restent dans le domaine Treuils car ils sont aussi utilises en maintenance.
 
 ### Ce qui n'est pas une page CFC autonome
 
@@ -105,18 +113,48 @@ la base existante est conservee : EtherCAT 4 ms, CANopen 20 ms et `MainTask` 10 
 systeme 200 ms.
 
 ```text
-MainTask
-  - PRG_ACQUISITION_CFC
-  - PRG_INPUTS_LD
-  - PRG_MODES_CFC
-  - PRG_SAFETY_CFC
-  - PRG_CYCLE                 (ST)
-  - PRG_TREUILS_CFC
-  - PRG_TRANSLATION_CFC
-  - PRG_OUTPUTS_LD
-  8. Frontiere IHM                 (TBD : mapping et persistance)
-  9. Troubleshooting lecture seule (TBD : type et ordonnancement)
+MainTask 10 ms — ordre d'appel cible (decoupage par ensemble mecanique)
+  01. PRG_01_Inputs_LD             (source .st convertie en Ladder)
+  02. PRG_02_Acquisition_CFC       (CFC natif .xml cible)
+  03. PRG_03_Modes_Cycle_CFC       (CFC natif .xml cible)
+  04. PRG_04_Treuils_Benne_CFC     (CFC natif .xml cible — safety M1/M2 integree)
+  05. PRG_05_Translation_CFC       (CFC natif .xml cible — safety M3 integree)
+  06. PRG_06_Outputs_LD            (source .st convertie en Ladder)
+  07. PRG_07_Supervision_CFC       (CFC natif .xml cible — lecture seule)
 ```
+
+Ce flux est lineaire et sans retour arriere : entrees -> acquisition/diagnostic -> autorisations ->
+procedes avec leur safety -> barriere finale -> observation. La safety n'est plus une couche separee
+lue par les mouvements puis relue par elle-meme : chaque procede contient sa surveillance, ce qui
+supprime par construction les cycles inter-programmes Safety <-> Treuils et Safety <-> Translation.
+
+Frontiere IHM : DUT et structures `Cmd/State/Cfg/Bypass` ; mapping et persistance restent TBD, sans
+programme MainTask dedie.
+
+### Migration depuis le decoupage historique
+
+Le decoupage transverse historique (safety globale separee des mouvements) est **abandonne** : il
+creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance de migration :
+
+| POU actuel | Devient | Motif |
+|---|---|---|
+| `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` | Inchange, renumerote. |
+| `PRG_ACQUISITION_CFC` + `PRG_01_Diagnostics` + `PRG_02_Encoders` + `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition_CFC` | Acquerir une mesure, sa vitesse et sa sante est **une seule responsabilite**. Supprime les instances codeurs dupliquees et le POU auxiliaire d'une ligne. |
+| `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle_CFC` | Autorisations et sequences de conduite au meme endroit. |
+| `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne_CFC` | M1 et M2 sont mecaniquement indissociables (benne suspendue) ; leur safety devient visible en parallele des blocs metier. |
+| `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation_CFC` | Idem pour la translation. |
+| `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` | Devient aussi l'agregateur `PowerCutOff`. |
+| `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision_CFC` | Observation et diagnostic, lecture seule stricte. |
+
+📌 Dossier de decision : `DOC/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
+**Aucun renommage ni fusion ne demarre sans lot dedie** : chaque etape exige remappage complet des
+consommateurs, producteur unique et preuve de liaison.
+
+📌 Dossiers de revue et audits d'architecture :
+- `ARCHIVES/Doc/AUDITS/Architecture/TABLE_POU_ACTIFS_VS_LEGACY_v1.0.md` : Cartographie POU actifs vs legacy et procédure de nettoyage CODESYS.
+- `ARCHIVES/Doc/AUDITS/Architecture/PLAN_Migration_MainTask_CFC_v1.0.md` : Preuves des cycles supprimés par le découpage par procédé.
+Tant que les décisions de migration ne sont pas appliquées, cette section ne constitue pas une
+autorisation de renommer prématurément les POU dans le code sans lot dédié.
 
 ### Regle d'ordonnancement
 

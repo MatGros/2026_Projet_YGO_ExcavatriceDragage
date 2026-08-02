@@ -2,7 +2,7 @@
 
 > Verdict passif machine arrêtée (16 contrôles de cohérence).
 > Profil AF03 : brique métier non-mouvement, observateur pur.
-> Source : `CODE/COMMUN/FB_Acquisition_Preflight.st` · instance : `PRG_TROUBLESHOOTING_CFC.instPreflight`.
+> Source : `CODE/COMMUN/FB_Acquisition_Preflight.st` · instance : `PRG_TROUBLESHOOTING_CFC.instPreflight` (ST actuel) ; cible `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seule stricte.
 
 ## 🎯 Rôle
 

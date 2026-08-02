@@ -2,7 +2,7 @@
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5  
 > **Statut** : référence active · 2026-07-27  
-> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/Acquisition (CFC).st`,
+> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_ACQUISITION_CFC.st` (ST actuel ; cible CFC native `PRG_02_Acquisition_CFC.xml` absente, rang 02 de la `MainTask` — voir `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2),
 > `AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`,
 > `CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md`.
 
@@ -29,7 +29,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 [FB_SimBench]     ──► HwSim  ─┘
 ```
 
-`Acquisition (CFC)` est l'unique frontière :
+`PRG_ACQUISITION_CFC.st` est la frontière ST actuelle ; `PRG_02_Acquisition_CFC.xml` est sa cible CFC native, absente de `CODE/MAIN`. ⚠️ Dans la cible, cette page absorbe aussi les codeurs, les diagnostics devices/bus et les retours auxiliaires : la frontière réel/simulé ci-dessous **reste unique et inchangée** et couvre alors l'ensemble de ces entrées :
 
 1. §0 acquiert chaque E/S brute dans `HwReal : ST_HardwareImage`.
 2. `instSimBench` construit les quatre sous-images simulées.
@@ -42,7 +42,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 ## 3. 🎛️ Commande de simulation
 
-`GVL_Simulation` est lu uniquement par `Acquisition (CFC)`, le banc et les publications/diagnostics
+`GVL_Simulation` est lu uniquement par l'acquisition ST actuelle, le banc et les publications/diagnostics
 autorisés. Polarité positive : `TRUE = simulation active`; tous les flags sont `FALSE` au démarrage.
 
 | Signal | Domaine simulé |
@@ -80,7 +80,7 @@ normalisée une seule fois par le conditionnement.
 
 ## 5. 🔍 Observation et diagnostic
 
-En vue instance de `Acquisition (CFC)`, lire côte à côte les trois `ST_HardwareImage` homologues :
+En vue instance de l'acquisition ST actuelle, lire côte à côte les trois `ST_HardwareImage` homologues :
 
 | Image | Signification |
 |---|---|
@@ -100,7 +100,7 @@ forcer un capteur sain et masquer une polarité erronée (REX C1).
 
 Les gates Python interdisent désormais :
 
-- toute dépendance exécutable à `GVL_Simulation` hors `SIMULATION`, `Acquisition (CFC)`,
+- toute dépendance exécutable à `GVL_Simulation` hors `SIMULATION`, acquisition ST actuelle,
   `Supervision` et `Troubleshooting` ;
 - toute forme `OR (GVL_Simulation.<flag> AND ...)`, sans exception.
 
@@ -108,7 +108,7 @@ Les gates Python interdisent désormais :
 
 1. Importer le bundle unique `CODE/CODE_Bundle.xml` dans `Application` via
    **Project → Import PLCopenXML**.
-2. En vue instance, ouvrir `Acquisition (CFC)` et comparer `HwReal`, `HwSim`, `HwIn`.
+2. En vue instance, ouvrir `PRG_ACQUISITION_CFC` (ST actuel) et comparer `HwReal`, `HwSim`, `HwIn`.
 3. Machine arrêtée : activer le bit maître puis un seul domaine; contrôler que `HwIn` bascule
    entièrement sur l'image attendue.
 4. Avant retour réel : désactiver les quatre domaines, puis `SimulationModeActive`; vérifier les
