@@ -135,7 +135,7 @@ Le format exact des messages est porte par la Partie 07.
 
 ## 📚 Documents lies
 
-- Partie 02 : architecture et place de `PRG_CYCLE`.
+- Partie 02 : architecture et place du sequenceur — `FB_Cycle` est instancie dans `PRG_03_Modes_Cycle_CFC` (rang 03), qui reunit modes, autorisations et sequences. Il produit des demandes ; il ne commande aucune sortie.
 - Partie 03 : contrats FB et precedence des arrets.
 - Partie 05 : modes et droits.
 - Partie 10/11/12 : treuils, benne, translation.

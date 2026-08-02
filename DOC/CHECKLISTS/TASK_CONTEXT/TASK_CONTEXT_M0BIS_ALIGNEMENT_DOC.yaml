@@ -1,0 +1,76 @@
+contract:
+  task_id: M0BIS_ALIGNEMENT_DOC_7POU
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Aligner toute la documentation active sur l'architecture 7 POU par procede
+    mecanique, afin qu'aucun agent de migration ne lise une cible abandonnee.
+
+  acceptance:
+    - id: AC1
+      statement: "Aucun document actif de DOC/ ne propose une table MainTask concurrente de celle de AF_Partie-02 (7 POU PRG_01 a PRG_07)."
+      verified_by: "grep -rn 'PRG_0[0-9]_\\|PRG_1[0-2]_' DOC/ hors ARCHIVES : chaque occurrence correspond aux 7 POU cibles ou est marquee historique"
+    - id: AC2
+      statement: "Les dossiers d'audit C4 fondes sur la safety separee sont deplaces sous ARCHIVES/ et ne sont plus references par un document actif."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py"
+    - id: AC3
+      statement: "Aucune spec metier ne designe une cible PRG_04_Safety_CFC.xml, PRG_06_Treuils_CFC.xml, PRG_01_Acquisition_CFC.xml ou PRG_11_Troubleshooting."
+      verified_by: "grep -rn 'PRG_04_Safety\\|PRG_06_Treuils\\|PRG_01_Acquisition\\|PRG_11_Troubleshooting' DOC/ hors ARCHIVES : aucun resultat"
+    - id: AC4
+      statement: "AF06, AF09, AF12 et AF14 decrivent l'integration programme reelle de la cible : acquisition unifiee, safety dans son procede, supervision unifiee."
+      verified_by: "lecture des sections Integration programme de AF06, AF09, AF12, AF14"
+    - id: AC5
+      statement: "La dependance du homing vers le mode de marche est documentee comme point d'arbitrage explicite, sans decision safety inventee."
+      verified_by: "section dediee dans AF_Partie-09 citant les lignes de code prouvant la dependance"
+    - id: AC6
+      statement: "Les liens documentaires et l'index DOC/README restent valides."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py"
+
+  scope:
+    allowed:
+      - DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md
+      - DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
+      - DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+      - DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+      - DOC/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+      - DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+      - DOC/AF_Partie-14_Fonction_Troubleshooting_v1.0.md
+      - DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+      - DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+      - DOC/AUDITS/
+      - DOC/README.md
+      - DOC/PLAN_TASK_v1.0.md
+      - DOC/VERSION_HISTORY.md
+      - ARCHIVES/
+    forbidden:
+      - CODE/
+      - TOOLS/
+      - DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+      - DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+      - DOC/NAMING_CONVENTION.md
+      - DOC/CODE_QUALITY_STANDARDS.md
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Toute exigence metier, seuil, polarite, ErrorId et regle safety decrite dans les specs : seule l'affectation POU change."
+      - "La tracabilite historique : les dossiers obsoletes sont archives, jamais supprimes."
+      - "AF_Partie-02 reste la source unique de l'architecture cible."
+    dropped_on_purpose:
+      - "Les tables MainTask 13 POU et les cibles CFC fondees sur une safety separee des mouvements."
+
+  evidence_required:
+    - check_doc_links
+    - changed-files
+    - residual-risks
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Aucune decision safety, seuil, polarite ou semantique metier ne peut etre
+    creee, deduite ou reformulee par cette tache. Si un document ne peut pas
+    etre aligne sans trancher une question metier, laisser le texte en place,
+    marquer le point comme arbitrage requis et le remonter immediatement.

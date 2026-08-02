@@ -34,11 +34,16 @@
 | 🛠️ MAINT_N2 | Maintenance etendue, degradations conscientes et visibles. |
 | 🔄 SEMI_AUTO | Cycle sequencer ; mouvements toujours conditionnes par l'operateur. |
 
-`FB_Modes` / `PRG_MODES_CFC` arbitre :
+`FB_Modes` / `PRG_MODES_CFC` (POU ST actuel ; cible `PRG_03_Modes_Cycle_CFC`, rang 03) arbitre :
 - le mode actif ;
 - le bus d'autorisations `Auth : ST_Modes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
 
 Il ne produit aucune sortie physique.
+
+⚠️ **Les Modes distribuent des autorisations, ils ne portent pas les interdictions metier.** Une
+interdiction est portee par le procede qui la **subit** : interdire M3 selon un etat benne est une
+regle de `PRG_05_Translation_CFC`, pas des Modes. Chaque commande metier recoit l'autorisation ou
+non, et decide localement. Voir `AF_Partie-02` §2.
 
 ---
 
@@ -82,7 +87,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 ## 📐 Bus d'autorisations
 
-`FB_Modes` (via `PRG_MODES_CFC`) produit le bus typé `Auth : ST_Modes_Autorisations` :
+`FB_Modes` (via `PRG_MODES_CFC` actuel, `PRG_03_Modes_Cycle_CFC` en cible) produit le bus typé `Auth : ST_Modes_Autorisations` :
 
 | Champ | Rôle |
 |---|---|
@@ -134,7 +139,7 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 ## 📚 Documents lies
 
 - Partie 01 : AU et rearmement.
-- Partie 02 : page `PRG_MODES_CFC`.
+- Partie 02 : architecture cible — page `PRG_03_Modes_Cycle_CFC` (modes, autorisations et sequenceur `FB_Cycle` reunis).
 - Partie 03 : contrats et precedence.
 - Partie 04 : cycle et assistants.
 - Partie 07 : interface IHM modes.

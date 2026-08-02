@@ -68,6 +68,13 @@ Il porte : objectif métier · **critères testables** (chacun avec son `verifie
 autorisé/interdit · contrat de conservation si rebuild · preuves attendues · modèles autorisés ·
 devoir d'alerte.
 
+🧱 Si `contract.scope.allowed` touche `CODE/MAIN/`, deux critères sont obligatoires :
+1. nom de fichier = nom du POU ;
+2. suffixe de langage = langage généré dans le bundle.
+
+`check_task_contract.py` contrôle ces critères **dans le contrat** (T8), avant toute
+écriture. `check_code_structure.py` contrôle ensuite leur réalité dans le code et le bundle.
+
 🔁 **Il traverse les trois runtimes** — c'est son intérêt principal : les hooks ne couvrent que
 l'orchestrateur Claude Code, le contrat s'applique aussi aux sous-agents Pi (ses critères
 remplacent le boilerplate de l'*acceptance contract*) et aux agents externes.
@@ -172,6 +179,8 @@ Toute erreur détectée — **à n'importe quelle étape** (édition, gate, comp
 | Origine erreur | Garde-fou ajouté |
 |---|---|
 | **Instance déclarée jamais appelée (`PRG_10_Outputs_LD`, 2026-07-29)** | **`check_linkage.py` — gate 2bis + hook PostToolUse** |
+| **Nom de fichier/POU ou suffixe/langage incohérent (audit 2026-08)** | **`check_code_structure.py` — gate 1bis + tests unitaires** |
+| **CFC natif aux fils invisibles (connecteurs empilés/à 0,0)** | **`check_cfc_wiring.py` — gate 2bis-bis** |
 | **Consignes pointant des specs supprimées** | **`check_doc_links.py` (+ `--fix` automatique)** |
 | **Document amputé de sa tête sans être vu (`NAMING_CONVENTION`)** | **`check_doc_links.py` D6 — titre H1 obligatoire** |
 | **Sous-agent démarrant sans les règles projet** | **`prompts/subagent_preamble.md` obligatoire en tête de tâche** |

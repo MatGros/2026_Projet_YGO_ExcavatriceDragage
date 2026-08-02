@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 FORBIDDEN = ("CoupeEnable", "FB_Watchdog")
@@ -38,10 +39,34 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
     },
 }
 
-SIMULATION_ALLOWED_PATHS = {
-    "CODE/MAIN/PRG_ACQUISITION_CFC.st",
-    "CODE/MAIN/PRG_SUPERVISION_CFC.st",
-    "CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st",
+@dataclass(frozen=True)
+class SimulationAllowance:
+    """Justification d'une frontiere executable lisant GVL_Simulation."""
+
+    executable_usage: str
+    decision: str
+    removal_condition: str
+
+
+# Decision humaine 2026-08 : GVL_Simulation est interdit hors implementation
+# CODE/SIMULATION et ces trois frontieres MAIN. Chaque exception est nommee,
+# justifiee et temporaire ; ne jamais ajouter un chemin pour faire taire un gate.
+SIMULATION_ALLOWED_PATHS: dict[str, SimulationAllowance] = {
+    "CODE/MAIN/PRG_ACQUISITION_CFC.st": SimulationAllowance(
+        executable_usage="Produit HwReal/HwSim/HwIn et aiguille reel/simule.",
+        decision="Decision humaine 2026-08 : frontiere acquisition validee.",
+        removal_condition="Retirer lors de la migration CFC/numerotation si la frontiere est remplacee.",
+    ),
+    "CODE/MAIN/PRG_SUPERVISION_CFC.st": SimulationAllowance(
+        executable_usage="Publie les bypass et l'etat SimulationModeActive vers l'IHM.",
+        decision="Decision humaine 2026-08 : frontiere supervision validee.",
+        removal_condition="Retirer lors de la migration CFC/numerotation si le mapping IHM est remplace.",
+    ),
+    "CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st": SimulationAllowance(
+        executable_usage="Publie le diagnostic lecture seule SimulationEnabled dans GVL_Troubleshooting.",
+        decision="Decision humaine 2026-08 : frontiere troubleshooting validee.",
+        removal_condition="Retirer lors de la migration CFC/numerotation vers PRG_11_Troubleshooting.",
+    ),
 }
 
 

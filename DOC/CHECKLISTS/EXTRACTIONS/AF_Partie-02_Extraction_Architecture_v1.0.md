@@ -12,7 +12,7 @@
 |---|---|
 | AF02 v2.12 | Description de l'architecture ST actuellement documentee ; elle sera refondue. |
 | Audits CFC/BUS/DUT | Propositions d'architecture, non decision d'architecture validee. Elles servent d'inspiration critique. |
-| `PRG_GLOBAL_CFC.xml` | Prototype CFC present dans le code ; ses interfaces ne correspondent pas au code actuel et son rattachement de tache n'est pas prouve par cette analyse. |
+| `PRG_GLOBAL_CFC.xml` | Prototype cite par les archives, absent de `CODE/MAIN` ; ses interfaces ne correspondent pas au code actuel et il ne constitue ni une page active ni une reference de cablage. |
 
 ## A conserver pour la future architecture
 
@@ -30,7 +30,7 @@
 
 ## Etat observe utile au design cible
 
-- `Acquisition (CFC)` porte deja une frontiere structuree `HwReal` / `HwSim` / `HwIn` de type `ST_HardwareImage`.
+- L'acquisition ST actuelle `PRG_ACQUISITION_CFC.st` porte deja une frontiere structuree `HwReal` / `HwSim` / `HwIn` de type `ST_HardwareImage` ; le CFC natif `PRG_01_Acquisition_CFC.xml` reste une cible de migration absente.
 - Les contrats IHM sont deja structures par domaine dans `GVL_IHM`.
 - Des structures de chaine existent (`ST_ChainWinch`, `ST_ChainTranslation` et sous-structures Inputs, Demandes, Control, Safety, Outputs), mais leur usage reel dans les programmes CFC reste a cartographier avant de les normaliser.
 - Les barrieres finales `FB_WinchOutputInterlock_LD` et `FB_TranslationOutputInterlock_LD` materialisent une frontiere sortie pertinente pour la lisibilite et la surete.
@@ -62,7 +62,7 @@
 
 ## Alertes a resoudre avant AF02 v3
 
-1. **CFC prototype non conforme** : `PRG_GLOBAL_CFC.xml` cite `ActiveMode` et `CycleActive`, absents des interfaces lues. Il ne peut pas servir d'exemple executable.
+1. **Prototype archive non conforme** : `PRG_GLOBAL_CFC.xml`, absent du depot actif, cite `ActiveMode` et `CycleActive`, absents des interfaces lues. Il ne peut pas servir d'exemple executable ni de reference CFC.
 2. **Etat actuel vs cible** : les audits appellent leurs propositions « definitives » alors qu'aucune preuve de migration CFC complete n'est presente. AF02 v3 devra distinguer cible validee, etat transitoire et existant a retirer.
 3. **GVL de flux** : la proposition de publication de tous les bus dans `GVL_Global` contredit les regles de producteur unique et les frontieres typees directes.
 4. **Couverture fonctionnelle incomplete** : l'arborescence CFC proposee ne porte pas explicitement Modes, Cycle, Supervision, sorties physiques et gestion AU.

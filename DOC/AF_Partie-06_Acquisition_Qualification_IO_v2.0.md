@@ -1,7 +1,9 @@
 # Analyse Fonctionnelle - Partie 6 : Acquisition & Qualification I/O (v2.0)
 
-> Role : definir la frontiere d'acquisition de `PRG_ACQUISITION_CFC`.
+> Role : definir la frontiere d'acquisition de `PRG_ACQUISITION_CFC` (ST actuel).
+> Cible : `PRG_02_Acquisition_CFC`, rang 02 de la `MainTask` — voir §2bis.
 > Les decisions de mouvement restent hors de ce document.
+> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
 
 La page `PRG_INPUTS_LD` (Ladder) est associee a cette frontiere : elle affiche les 21 entrees TOR
 qualifiees via `FB_Input`, sans logique metier et sans decision.
@@ -62,7 +64,7 @@ HwIn (faits qualifies)
    ↓
 FB complexes d'acquisition (Joystick, Codeurs, PositionDecoder M3)
    ↓
-Modes / Safety / Cycle / Mouvements / IHM
+Modes/Cycle → procedes (Treuils/Benne, Translation) avec leur safety → Outputs → Supervision
 ```
 
 | Regle | Exigence |
@@ -70,7 +72,7 @@ Modes / Safety / Cycle / Mouvements / IHM
 | 🧱 Frontiere unique | Aucun FB metier ne lit une E/S brute device. |
 | 🧪 Simulation | La bascule reel/simule se fait une seule fois, par domaine, dans `FB_SimBench`. |
 | 🔒 Polarite | Normalisee une seule fois a l'acquisition (`FB_Input` / DUT de normalisation). |
-| ✍️ Producteur unique | `PRG_ACQUISITION_CFC` est le seul ecrivain des donnees qualifiees d'entree. |
+| ✍️ Producteur unique | L'acquisition est le seul ecrivain des donnees qualifiees d'entree (`PRG_ACQUISITION_CFC` actuel, `PRG_02_Acquisition_CFC` cible). |
 | 🪜 Affichage TOR | `PRG_INPUTS_LD` expose les 21 entrees TOR qualifiees via `FB_Input`, en lecture seule. |
 
 Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte seulement leur acquisition et leur publication.
@@ -83,6 +85,43 @@ Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte s
 | 21 E/S TOR qualifiees (affichage) | `PRG_INPUTS_LD` | Ladder | `FB_Input` : contact → bobine |
 
 > 📌 La frontiere acquisition utilise donc **CFC pour le flux device/simulation/FB complexes**, et **Ladder (`PRG_INPUTS_LD`) uniquement pour l'affichage des 21 entrees TOR** via `FB_Input`. Aucune logique metier n'est ecrite dans `PRG_INPUTS_LD`.
+
+---
+
+## 🧩 2bis. Integration programme — cible `PRG_02_Acquisition_CFC`
+
+**Principe :** acquerir une mesure physique, la mettre a l'echelle, en deduire une vitesse et juger
+sa validite est **une seule responsabilite**. La cible reunit donc dans une page unique ce que le
+code actuel eclate en quatre POU — ce qui supprime les instances codeurs et joystick dupliquees.
+
+| Ce qui est absorbe par `PRG_02_Acquisition_CFC` | POU actuel | Contenu concerne |
+|---|---|---|
+| Frontiere E/S, selection reel/simule, joystick | `PRG_ACQUISITION_CFC` | `HwReal` / `FB_SimBench` / `HwIn`, `instJoystick` |
+| Chaine codeurs complete M1/M2/M3 | `PRG_02_Encoders` | absolu, echelle, vitesse, validite, homing (⚠️ arbitrage — voir AF09) |
+| Diagnostics devices et bus | `PRG_01_Diagnostics` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` |
+| Retours auxiliaires qualifies | `PRG_AUXILIARY_CFC` | retour thermique centrale hydraulique |
+| **Etat AU qualifie** | chaine AU | ⚠️ **acquisition de l'etat seulement** |
+
+### 🛑 Etat AU : acquis ici, agissant en sortie
+
+L'etat de la chaine d'arret d'urgence est un **fait d'entree qualifie**, acquis avec les autres
+entrees pour etre visible des l'acquisition par la maintenance.
+
+⚠️ **Cela ne change rien a son action.** Le FB de gestion AU agit sur les sorties via la barriere
+finale `PRG_06_Outputs_LD`. **Acquisition de l'etat ≠ lieu d'action.** La chaine materielle AU, sa
+polarite fail-safe, son auto-test et son rearmement restent proprietaires de la **Partie 01** : le
+PLC ne remplace jamais cette chaine.
+
+### ⚠️ Ce que l'acquisition n'absorbe pas
+
+- Aucune decision `SafeStop`, mode, interdiction ou commande actionneur. La safety de chaque
+  procede vit **dans la page de son procede** (`PRG_04_Treuils_Benne_CFC`, `PRG_05_Translation_CFC`),
+  pas ici et pas dans un POU safety global — qui n'existe pas dans la cible.
+- Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs_LD`.
+
+📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+⚠️ Ce lot porte un point d'arbitrage ouvert : le homing lit aujourd'hui le mode de marche, donc une
+donnee produite par un POU aval. Faits et options : `DOC/AF_Partie-09_Fonction_Encoder_v2.1.md` §4bis.
 
 ---
 
@@ -102,9 +141,13 @@ Faits publies :
 - synthese de disponibilite si utile.
 
 Les consommateurs decident ensuite :
-- Safety : interlock ou `SafeStop` ;
+- la safety de chaque procede, **dans la page de son procede** : interlock ou `SafeStop` ;
 - Modes : refus de semi-auto ou permission ;
 - IHM : affichage diagnostic.
+
+📌 Dans la cible, ces diagnostics sont produits **ici** et non plus dans un POU `PRG_01_Diagnostics`
+separee : c'est ce qui supprime le cycle prouve `Acquisition ↔ Diagnostics` et la duplication de
+`instJoystick`. Les FB et leurs seuils sont inchanges (Partie 12).
 
 ---
 
@@ -127,7 +170,7 @@ Le nom d'une E/S dit ce que signifie `TRUE`.
 
 ## ⚡ 5. Sorties physiques
 
-Les sorties finales restent dans `PRG_OUTPUTS_LD` en Ladder.
+Les sorties finales restent dans `PRG_OUTPUTS_LD` en Ladder (cible `PRG_06_Outputs_LD`).
 
 | Regle | Exigence |
 |---|---|
@@ -149,7 +192,8 @@ Le detail de la chaine AU/rearmement est proprietaire de la Partie 01.
 `FB_Acquisition_Preflight` vérifie 16 conditions mécaniques/électriques quand la machine est
 arrêtée. Observateur pur : aucune écriture de commande, sécurité ou mouvement.
 
-Instance : `PRG_TROUBLESHOOTING_CFC.instPreflight`.
+Instance : `PRG_TROUBLESHOOTING_CFC.instPreflight` (ST actuel).
+Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seule stricte.
 
 ### PreflightErrorId (16 bits)
 
@@ -177,7 +221,7 @@ Instance : `PRG_TROUBLESHOOTING_CFC.instPreflight`.
 ## 📚 Documents lies
 
 - Partie 01 : AU, `PowerKeepAlive`, rearmement.
-- Partie 02 : page `PRG_ACQUISITION_CFC` et `PRG_OUTPUTS_LD`.
+- Partie 02 : architecture cible 7 POU — `PRG_02_Acquisition_CFC` et `PRG_06_Outputs_LD`.
 - Partie 08 : traitement joystick.
 - Partie 09 : homing et vitesse codeur.
 - Partie 13 : simulation.

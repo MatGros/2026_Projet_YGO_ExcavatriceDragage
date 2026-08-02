@@ -38,17 +38,61 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 
 ### Programmes (POU principaux) — architecture cible
 
-| Suffixe | Langage | Rôle | Exemple |
-|---------|---------|------|---------|
-| `_CFC` | Continuous Function Chart | Orchestration visuelle, câblage FB par bus DUT | `PRG_ACQUISITION_CFC`, `PRG_SAFETY_CFC`, `PRG_TREUILS_CFC`, `PRG_TRANSLATION_CFC` |
-| `_LD` | Ladder Diagram | Barrières finales, sorties physiques | `PRG_OUTPUTS_LD` |
-| (sans suffixe) | Structured Text | Machine d'état / séquenceur | `PRG_CYCLE` |
+| Suffixe | Langage bundle | Source versionnee | Rôle | Exemple |
+|---------|----------------|-------------------|------|---------|
+| `_CFC` | Continuous Function Chart (`<CFC>`) | `.xml` PLCopenXML natif | Orchestration visuelle, câblage FB par bus DUT | `PRG_XX_ACQUISITION_CFC.xml` |
+| `_LD` | Ladder Diagram (`<LD>`) | `.st`, converti automatiquement en Ladder dans le bundle | Barrières finales, sorties physiques | `PRG_XX_OUTPUTS_LD.st` |
+| (sans suffixe) | Structured Text (`<ST>`) | `.st` | Machine d'état / séquenceur ou agrégation lecture seule | `PRG_XX_CYCLE.st` |
 
 **Règles :**
-- Un programme `_CFC` ne contient **aucune logique métier** (pas de `IF`, pas de calcul) — uniquement des instances + liaisons par bus DUT.
-- Un programme `_LD` produit **seul** les Q physiques finales (contacteurs, freins, PDO variateur).
-- Un programme ST (`PRG_CYCLE`) porte une machine d'état ; il **produit des demandes**, ne commande pas les sorties.
+- Tout programme est prefixe `PRG_XX_` : la numerotation est la preuve documentaire de l'ordre MainTask ; le rang est decide dans `AF_Partie-02` avant tout renommage.
+- Un programme `_CFC` est un `.xml` PLCopenXML natif et ne contient **aucune logique métier** (pas de `IF`, pas de calcul) — uniquement des instances + liaisons par bus DUT.
+- Un programme `_LD.st` est converti automatiquement en `<LD>` dans le bundle ; il produit **seul** les Q physiques finales (contacteurs, freins, PDO variateur).
+- Un programme ST (`PRG_XX_CYCLE.st`) porte une machine d'état ; il **produit des demandes**, ne commande pas les sorties.
 - `PRG_GLOBAL_CFC` est un prototype historique — **ne pas reproduire**.
+
+### Noms cibles des programmes — aucun renommage sans lot dedie
+
+> 🗺️ **Cette table ne decide rien : elle recopie la cible de `AF_Partie-02` §2 et §4**, seule
+> source de l'architecture. Elle sert uniquement a fixer l'orthographe des noms.
+> Le decoupage est fait **par ensemble mecanique**, pas par couche transverse : chaque procede
+> porte sa safety dans sa propre page. Decision : `DOC/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
+
+| Rang | Nom cible | Langage / source |
+|---|---|---|
+| 01 | `PRG_01_Inputs_LD` | `.st` converti en `<LD>` |
+| 02 | `PRG_02_Acquisition_CFC` | CFC natif `.xml` cible |
+| 03 | `PRG_03_Modes_Cycle_CFC` | CFC natif `.xml` cible |
+| 04 | `PRG_04_Treuils_Benne_CFC` | CFC natif `.xml` cible |
+| 05 | `PRG_05_Translation_CFC` | CFC natif `.xml` cible |
+| 06 | `PRG_06_Outputs_LD` | `.st` converti en `<LD>` |
+| 07 | `PRG_07_Supervision_CFC` | CFC natif `.xml` cible |
+
+🚫 **Noms abandonnes comme cibles** — ne pas les reintroduire dans une table de nommage :
+`PRG_01_Acquisition_CFC`, `PRG_02_Inputs_LD`, `PRG_03_Modes_CFC`, `PRG_04_Safety_CFC` (ou toute
+page safety separee des mouvements), `PRG_05_Cycle`, `PRG_06_Treuils_CFC`, `PRG_07_Translation_CFC`,
+`PRG_10_Outputs_LD`, `PRG_11_Troubleshooting`.
+
+### POU actuels — correspondance vers la cible
+
+Les POU ci-dessous existent dans `CODE/MAIN` et gardent leur nom **jusqu'a leur lot de migration**.
+Aucun n'est un nom cible : ils sont absorbes par la page du procede correspondant.
+
+| POU actuel | Absorbe par |
+|---|---|
+| `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` |
+| `PRG_ACQUISITION_CFC`, `PRG_01_Diagnostics`, `PRG_02_Encoders`, `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition_CFC` |
+| `PRG_MODES_CFC`, `PRG_05_Cycle` | `PRG_03_Modes_Cycle_CFC` |
+| `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne_CFC` |
+| `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation_CFC` |
+| `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` |
+| `PRG_SUPERVISION_CFC`, `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision_CFC` |
+
+⛔ **Aucun renommage, fusion ou conversion CFC natif ne demarre sans lot dedie** : chaque etape
+exige le remappage complet des consommateurs avant suppression de l'ancien producteur, un
+producteur unique a tout instant, et une preuve de liaison. Ordonnancement des lots M0→M8, avec
+M7 (renumerotation) verrouille tant qu'un cycle inter-programme subsiste :
+`DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`.
 
 ### Instances FB
 - Préfixe **`inst`** + rôle PascalCase : `instJoystick`, `instSafetyWinchM1`.

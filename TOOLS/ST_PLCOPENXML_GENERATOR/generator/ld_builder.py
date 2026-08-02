@@ -104,6 +104,7 @@ def build_ld_body(
     body_text: str,
     boolean_identifiers: set[str] | None = None,
     instance_types: dict[str, str] | None = None,
+    instance_input_types: dict[str, dict[str, str]] | None = None,
 ) -> ET.Element:
     """Convertit un PROGRAM ``PRG_*_LD`` en Ladder.
 
@@ -116,6 +117,7 @@ def build_ld_body(
     """
     boolean_identifiers = boolean_identifiers or set()
     instance_types = instance_types or {}
+    instance_input_types = instance_input_types or {}
     body = ET.Element("body")
     ld = ET.SubElement(body, "LD")
 
@@ -165,6 +167,13 @@ def build_ld_body(
             continue
 
         if line_s.startswith("(*"):
+            continue
+
+        # Les commentaires ST de fin de ligne ne font pas partie de
+        # l'instruction. Sans ce retrait, le `;` n'est plus terminal et la
+        # ligne suivante est fusionnée, supprimant un appel FB du LD généré.
+        line_s = re.sub(r"\(\*.*?\*\)", "", line_s).strip()
+        if not line_s:
             continue
 
         # Dès qu'on touche une vraie ligne de code, la description de la bannière est terminée
@@ -325,9 +334,25 @@ def build_ld_body(
                 var_in.set("formalParameter", p_name)
                 c_in_p = ET.SubElement(var_in, "connectionPointIn")
 
-                if p_val in ("TRUE", "FALSE") or p_val.isdigit():
-                    c_ref_p = ET.SubElement(c_in_p, "connection")
-                    c_ref_p.set("refLocalId", "0")
+                # A ladder contact is a BOOL-only element.  Feeding a TIME,
+                # INT, WORD or REAL argument through one creates an invalid
+                # diagram despite well-formed XML (observed on the two LD
+                # programs during CODESYS import).  The formal parameter type
+                # comes from the declared interface of the called FB; values
+                # of every non-BOOL (or unresolved) formal are data sources.
+                formal_type = instance_input_types.get(inst_name, {}).get(p_name)
+                if formal_type != "BOOL":
+                    source_id = local_id_counter
+                    local_id_counter += 2
+                    input_var = ET.SubElement(ld, "inVariable")
+                    input_var.set("localId", str(source_id))
+                    ET.SubElement(input_var, "position", x="0", y="0")
+                    ET.SubElement(input_var, "connectionPointOut")
+                    expression = ET.SubElement(input_var, "expression")
+                    expression.text = p_val
+                    ET.SubElement(c_in_p, "connection", refLocalId=str(source_id))
+                elif p_val == "TRUE":
+                    ET.SubElement(c_in_p, "connection", refLocalId="0")
                 else:
                     cnt_id = local_id_counter
                     local_id_counter += 2

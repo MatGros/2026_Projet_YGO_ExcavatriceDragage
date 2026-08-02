@@ -30,6 +30,13 @@ tout critère générique d'acceptation. Ta restitution se juge **contre eux**, 
 
 - Un critère sans moyen de vérification n'est pas un critère → **le signaler, ne pas deviner**.
 - Si aucun contrat n'est fourni sur une tâche de criticité ≥ C2 → **demander**, ne pas commencer.
+- Si le scope touche `CODE/MAIN/`, le contrat doit prouver explicitement : **nom de fichier = nom de POU** et **suffixe de langage = langage généré dans le bundle**. Sans ces deux critères, demander une correction du contrat avant d'écrire.
+
+## 🧱 Structure des programmes — non négociable
+
+- Ne jamais créer ou renommer un POU dont le nom diffère du nom de son fichier source.
+- Ne jamais apposer `_CFC`, `_LD` ou un autre suffixe de langage si le générateur ne produit pas le langage correspondant dans le bundle PLCopenXML.
+- Une exemption de gate ou une allowlist n'est jamais une décision d'agent : remonter le fait, son usage réel et sa condition de retrait à l'orchestrateur. Seul l'orchestrateur peut la valider et la tracer.
 
 ## 🚨 Devoir d'alerte — non négociable
 

@@ -111,6 +111,82 @@ de cycle de vie du FB.
 - Le numero d'ordre graphique ne prouve pas l'ordre scan. La configuration de tache CODESYS et `check_linkage.py` sont les preuves requises.
 - Une GVL ne sert pas de bus de commande interne. `GVL_IHM`, persistance et simulation restent des frontieres justifiees.
 
+### Production obligatoire d'une page CFC native
+
+Un programme suffixe `_CFC` est une **source PLCopenXML native** :
+`CODE/MAIN/PRG_XX_<Domaine>_CFC.xml`. Il n'est pas ecrit en ST et le generateur
+ne le convertit pas depuis un `.st`. Le bundle decouvre et fusionne ce fichier
+XML natif tel quel dans la sequence canonique de l'etape 6 ci-dessous.
+
+**Reference de syntaxe reelle :**
+`TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml`
+(export CODESYS V3.5 SP19 Patch 1, trois FB). Ce sample est une reference de
+**structure XML**, pas de geometrie : ses connecteurs en `(0,0)` ne doivent pas
+etre recopies (regle de visibilite ci-dessous).
+
+| Element PLCopenXML observe dans le sample | Role dans la page |
+|---|---|
+| `<interface><localVars>` | Declaration des instances de FB de la page. |
+| `<body><ST><xhtml .../></ST><addData>...<CFC>` | Conteneur CODESYS du dessin CFC natif ; le ST reste vide. |
+| `<inVariable localId>` + `<expression>` | Source nommee (variable ou champ DUT) placee a gauche. |
+| `<connector localId>` | Relais graphique unique entre une source/sortie et son consommateur. |
+| `<block localId executionOrderId typeName instanceName>` | Instance de FB ; `executionOrderId` materialise l'ordre graphique des blocs. |
+| `<connection refLocalId>` | Liaison vers le `localId` de la source ou du connecteur. |
+| Sortie de FB | Dans le sample, chaque `<variable>` de `<outputVariables>` porte un `<connectionPointOut>` et un `<relPosition>` ; aucun élément top-level `<outVariable>` n'est observe. |
+
+Squelette minimal — balises et imbrication relevees dans le sample (les noms,
+`localId`, `executionOrderId` et positions sont a definir pour la page reelle) :
+
+```xml
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <types><pous>
+    <pou name="PRG_XX_Domaine_CFC" pouType="program">
+      <interface><localVars>
+        <variable name="instDomaine"><type><derived name="FB_Domaine" /></type></variable>
+      </localVars></interface>
+      <body>
+        <ST><xhtml xmlns="http://www.w3.org/1999/xhtml" /></ST>
+        <addData><data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation"><CFC>
+          <inVariable localId="1"><position x="10" y="10" /><connectionPointOut><expression /></connectionPointOut><expression>Source</expression></inVariable>
+          <connector localId="2" name=""><position x="20" y="10" /><connectionPointIn><connection refLocalId="1" /></connectionPointIn></connector>
+          <block localId="3" executionOrderId="1" typeName="FB_Domaine" instanceName="instDomaine"><position x="40" y="10" /></block>
+        </CFC></data></addData>
+      </body>
+    </pou>
+  </pous></types>
+</project>
+```
+
+Procedure par page :
+
+1. Partir du sample et conserver son enveloppe `<project>`, `<pou>`, interface,
+   `<body>` et extension CODESYS `<CFC>` ; ne pas inventer une balise alternative.
+2. Declarer les instances dans `localVars`, puis creer les `inVariable`,
+   `connector` et `block` avec des `localId` uniques.
+3. Mettre les sources a gauche, les blocs au centre dans l'ordre
+   `executionOrderId`, les sorties a droite. Une source ou sortie consommee
+   passe par son propre `connector` avant le bloc consommateur.
+4. Donner a chaque `connector`, `inVariable` et `block` une position non nulle ;
+   les positions de connecteurs sont toutes distinctes. Pour une sortie de FB,
+   conserver le pattern observe `<connectionPointOut><relPosition .../></connectionPointOut>`
+   dans sa `variable` de `<outputVariables>` ; ne pas declarer de position
+   top-level `<outVariable>`, absente du sample. Les coordonnees `(0,0)` du
+   sample sont interdites par le REX CFC.
+5. Conserver toute logique (`IF`, calcul, arbitrage, ecriture sortie) dans un FB
+   proprietaire : la page ne fait que declarer et relier les contrats publics.
+6. Generer le bundle, prouver sa liaison, puis executer tous les gates. Le
+   runner inclut le controle `check_cfc_wiring.py` des pages CFC natives :
+
+```powershell
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
+python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+```
+
+7. Importer le PLCopenXML dans CODESYS 3.5 et confirmer humainement que les fils
+   sont visibles avant de convertir la page suivante. Un XML bien forme ou un
+   bundle vert ne remplace pas cette observation.
+
 ## 📚 Documents lies
 
 - Partie 01 : AU, coupure puissance et rearmement.

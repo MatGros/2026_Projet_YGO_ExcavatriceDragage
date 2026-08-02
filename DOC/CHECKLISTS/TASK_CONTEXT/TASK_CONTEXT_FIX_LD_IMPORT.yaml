@@ -1,0 +1,34 @@
+contract:
+  task_id: FIX-LD-IMPORT
+  criticality: C3
+  strategy: patch
+  objective: "Rendre PRG_INPUTS_LD et PRG_10_Outputs_LD importables dans CODESYS via CODE_Bundle.xml sans modifier leur logique ST ni le comportement machine."
+  acceptance:
+    - id: AC1
+      statement: "Les deux POU LD sont générés avec une structure PLCopen LD acceptée par le format de référence et sans index/référence XML invalide."
+      verified_by: "comparaison structurelle avec samples_reference_codesys et validation XML"
+    - id: AC2
+      statement: "Le ST source des deux POU et les autres POU du bundle restent inchangés fonctionnellement."
+      verified_by: "git diff -- CODE/MAIN/PRG_INPUTS_LD.st CODE/MAIN/PRG_10_Outputs_LD.st ; diff bundle ciblé"
+    - id: AC3
+      statement: "Le bundle et le contrôle de liaison passent après correction."
+      verified_by: "generate_codesys_bundle.py . ; check_linkage.py --report"
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py
+      - CODE_Bundle.xml
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_FIX_LD_IMPORT.yaml
+    forbidden:
+      - CODE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Logique ST et comportement de PRG_INPUTS_LD/PRG_10_Outputs_LD inchangés."
+      - "Outputs LD reste producteur physique unique."
+  evidence_required:
+    - validation XML
+    - bundle
+    - check_linkage
+    - tests-added
+  alert_duty: "Stopper et remonter toute incompatibilité PLCopen non prouvée; ne pas remplacer le LD par du ST."

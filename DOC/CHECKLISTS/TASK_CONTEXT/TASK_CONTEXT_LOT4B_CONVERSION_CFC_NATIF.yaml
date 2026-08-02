@@ -107,6 +107,12 @@ contract:
         Le generateur de bundle integre le .xml natif de la page sans le
         reconstruire depuis du ST.
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . ; la page apparait dans le bundle et aucun .st homonyme ne subsiste dans CODE/MAIN"
+    - id: AC10
+      statement: >
+        Le nom du fichier source CFC est identique au nom du POU qu'il declare,
+        avec l'extension .xml, et son suffixe _CFC correspond au langage CFC,
+        emis en balise <CFC> dans le bundle final.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py ; aucune erreur S1 ou S2 ne cite la page CFC convertie"
 
   scope:
     allowed:

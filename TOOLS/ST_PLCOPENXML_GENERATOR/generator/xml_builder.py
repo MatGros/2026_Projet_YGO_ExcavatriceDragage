@@ -221,7 +221,22 @@ def _build_pou(
             for variable in variables
             if isinstance(variable.type, DerivedType)
         }
-        pou.append(build_ld_body(obj.body_text or "", boolean_identifiers, instance_types))
+        # The LD renderer must not infer an argument's type from its spelling:
+        # PLCopen `<contact>` is valid for BOOL only.  Supply each called FB's
+        # declared input types so TIME/INT/WORD/REAL use `<inVariable>`.
+        instance_input_types: dict[str, dict[str, str]] = {}
+        for variable in variables:
+            if not isinstance(variable.type, DerivedType):
+                continue
+            called_fb = objects_by_name.get(variable.type.name)
+            if called_fb is None:
+                continue
+            instance_input_types[variable.name] = {
+                input_var.name: input_var.type.name
+                for input_var in called_fb.input_vars
+                if isinstance(input_var.type, BaseType)
+            }
+        pou.append(build_ld_body(obj.body_text or "", boolean_identifiers, instance_types, instance_input_types))
     else:
         body = ET.SubElement(pou, "body")
         st_el = ET.SubElement(body, "ST")

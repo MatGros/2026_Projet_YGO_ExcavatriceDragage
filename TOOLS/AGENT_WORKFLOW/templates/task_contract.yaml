@@ -43,6 +43,13 @@ contract:
       statement: "..."
       verified_by: "..."
 
+  # ── Objectifs structurels obligatoires si scope.allowed touche CODE/MAIN/ ─
+  # Le gate T8 refuse le contrat si les DEUX criteres suivants sont absents :
+  # - nom de fichier = nom de POU declare ;
+  # - suffixe de langage = langage genere dans le bundle PLCopenXML.
+  # Chaque critere doit avoir son propre verified_by (normalement
+  # check_code_structure.py). Le gate verifie le contrat, il ne parse pas CODE/.
+
   # ── 3. Perimetre ──────────────────────────────────────────────────────────
   scope:
     allowed:                 # fichiers que la tache PEUT modifier
