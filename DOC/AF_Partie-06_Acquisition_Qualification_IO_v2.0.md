@@ -125,6 +125,151 @@ d'arrêt) et publie sa calibration/requête de preset vers la chaîne EtherCAT.
 
 ---
 
+## 🧾 2ter. Contrats DUT — image d'acquisition
+
+> 📌 Règles de fiche : `AF_Partie-03 §4`. **Producteur unique** : chaque champ a exactement un
+> écrivain. Trois images du même type `ST_HardwareImage` (brute / simulée / sélectionnée) + un DUT
+> TOR qualifiées. Aucun FB métier ne lit une E/S brute device : tout passe par `HwIn`.
+
+### 🧱 `ST_HardwareImage` — image brute / simulée / sélectionnée (3 instances)
+
+| | Instance | Contenu | Producteur | Lecteurs |
+|---|---|---|---|---|
+| Brute | `HwReal` | Image **device brute** (polarité physique, valeurs non mises à l'échelle) | `PRG_02_Acquisition_CFC` (lectures E/S/PDO, `GetDeviceState`) | `FB_SimBench`, observation maintenance |
+| Simulée | `HwSim` | Image **simulée** (polarité normalisée au modèle) | `FB_SimBench` | `PRG_02` (sélecteur) uniquement |
+| Sélectionnée | `HwIn` | Image **résultante par domaine** (réel qualifié OU simulé) | `PRG_02_Acquisition_CFC` (sélecteur `SEL` par domaine) | **Tout le programme métier** (Modes, Treuils/Benne, Translation, Outputs, Supervision) |
+
+**Structure** (4 sous-domaines, identiques entre les 3 instances) :
+
+| Champ | Type | Contenu | Unités | Polarité |
+|---|---|---|---|---|
+| `Winch` | `ST_HwWinch` | TOR réelles treuils M1/M2 + codeurs COD1/COD2 | — | `_DI` : `TRUE` = état vrai (normalisé) |
+| `Translation` | `ST_HwTranslation` | TOR réelles M3 + status word/fréquence AC600 | `Hz` (x100), `WORD` | idem |
+| `Operator` | `ST_HwOperator` | Joystick analogique `INT` + état bus CAN | — | — |
+| `Machine` | `ST_HwMachine` | Sécurités/commun machine (AU, phases, thermiques, Kobold) | — | `TRUE` = état sûr/OK |
+
+**Sélection par domaine** (une seule bascule, visible dans le CFC Acquisition) :
+
+```text
+HwIn.<Domaine> := SEL(SimActive.<Domaine>, HwSim.<Domaine>, <réel du domaine>)
+```
+
+- Domaine réel → source = TOR qualifiées (`ST_InputsQualified`) pour les `_DI`, mesures réelles sinon.
+- Domaine simulé → source = `HwSim` **sans filtrage** (valeurs simulées normalisées, AF13 §4).
+- 🧪 Tous les domaines ont la même logique visible : pas de bascule cachée dans un Ladder.
+
+**Invalidité** : un sous-domaine simulé n'a pas de notion d'erreur physique propre ; les faits de
+disponibilité (device, communication) restent évalués sur la source réelle par `PRG_02` (voir §3).
+
+**Cadence** : tâche `T01_Acquisition` (cycle rapide), lecture seule, aucun effet de bord.
+
+**Tests de contrat** :
+- Sans simulation : `HwIn.Winch.<champ> == ST_InputsQualified.<champ>` (domaine réel).
+- Simulation active sur un domaine : `HwIn.<Domaine> == HwSim.<Domaine>` quel que soit le réel.
+- Aucun `_DI` de `HwIn` n'a une polarité physique : tout `TRUE` = état logique normalisé.
+
+### 🔢 `ST_InputsQualified` — TOR réelles qualifiées (à créer)
+
+| Attr. | Valeur |
+|---|---|
+| Propriétaire / producteur | `PRG_01_Inputs_LD` (Ladder, `FB_Input`) |
+| Écrivain unique | `PRG_01_Inputs_LD` |
+| Lecteurs | `PRG_02_Acquisition_CFC` (seul — alimente le « réel » des domaines TOR) |
+| Contenu | une entrée `BOOL` par TOR réelle qualifiée : `M1/M2/M3_*_DI`, `M1M2_*`, `Machine_*`, joystick homme-mort — exhaustif selon `ST_Hw*` |
+| Polarité | `TRUE` = état logique normalisé (déjà inversé/filtré par `FB_Input`) |
+| Filtre | appliqué **avant** la sélection, sur le réel uniquement (décision Q1=A validée) |
+| Invalidité | pas de champ d'erreur propre : un `_DI` qualifié vaut l'état TOR après `FB_Input` ; une panne de canal remonte via les diagnostics device (§3) |
+| Cadence | tâche `T01_Acquisition`, cycle rapide |
+
+**Tests de contrat** :
+- Reflète la polarité normalisée : `FB_Input` seul modifie `TRUE/FALSE` du device, pas `PRG_02`.
+- Le sim n'apparaît **jamais** dans `ST_InputsQualified` (réel pur) — la bascule vit dans `PRG_02`.
+- Aucune décision `SafeStop`, mode ou commande actionneur lue depuis ce DUT en dehors d'`Acquisition`.
+
+> ✅ Décisions actées : filtre `FB_Input` sur le réel uniquement (le sim passe sans filtre) ;
+> sélecteur TOR réel/sim visible dans le CFC Acquisition, `PRG_01_Inputs_LD` ne porte que le réel
+> qualifié. — Cette frontière invalide l'ordre « filtre après sélection » d'AF13 : alignement AF13
+> prévu à l'étape 6.
+
+### 📏 `ST_EncoderMeasurements` — mesures codeur M1/M2 (à créer)
+
+Facts de la chaîne de mesure pure (Abs → Scale → Safety → SpeedMeasure), un sous-DUT par treuil.
+
+| Attr. | Valeur |
+|---|---|
+| Propriétaire / producteur | `PRG_02_Acquisition_CFC` (chaîne de mesure pure, rang 02) |
+| Écrivain unique | `PRG_02_Acquisition_CFC` |
+| Lecteurs | `PRG_04_Treuils_Benne_CFC` (conduite + `FB_Safety_Winch`), `PRG_03_Modes_Cycle_CFC` (`EncoderIncoherent` → blocage SEMI_AUTO), Supervision/IHM |
+| Cadence | tâche `T01_Acquisition`, cycle rapide |
+
+**Structure** (1 sous-DUT par treuil, M1 et M2) :
+
+```text
+ST_EncoderMeasurements
+├── M1 : ST_EncoderMeasurement
+└── M2 : ST_EncoderMeasurement
+```
+
+| Champ | Type | Source FB | Unités | Invalidité |
+|---|---|---|---|---|
+| `RawPos` | UDINT | `FB_Encoder_Abs.RawPos` | points bruts | **gelée** sur dernière valeur valide si `EncoderAvailable=FALSE` |
+| `EncoderAvailable` | BOOL | `FB_Encoder_Abs.EncoderAvailable` | — | `FALSE` = perte bus/esclave → warning IHM + vue Modes |
+| `CablePosM` | REAL | `FB_Encoder_Scale.CablePosM` | m (signée, + enroulé) | gelée via `CablePosMSafe` |
+| `CablePosMSafe` | REAL | `FB_Encoder_Safety.CablePosMSafe` | m | gelée sur dernière valeur **plausible** si hors plage ±99 m |
+| `EncoderIncoherent` | BOOL | `FB_Encoder_Safety.EncoderIncoherent` | — | `TRUE` = incohérence redémarrage → **refuse SEMI_AUTO** (Modes) |
+| `Speed_Mps` | REAL | `FB_Encoder_SpeedMeasure.Speed_Mps` | m/s | 0.0 si `Valid=FALSE` |
+| `SignedSpeed_Mps` | REAL | `FB_Encoder_SpeedMeasure.SignedSpeed_Mps` | m/s (signée, + montée) | 0.0 si `Valid=FALSE` |
+| `SpeedValid` | BOOL | `FB_Encoder_SpeedMeasure.Valid` | — | `FALSE` < 6 éch. couvrant 50 ms |
+
+**Polarité** : tout `BOOL` = `TRUE` état normalisé. Aucun champ brut EtherCAT (alarmes/warnings,
+`DEVICE_STATE`) dans ce DUT : ils restent exposés via `ST_EncoderHMI` (Supervision) pour l'IHM.
+
+**Tests de contrat** :
+- Perte bus (simuler `AlarmsIn≠0` ou esclave non opérationnel) : `EncoderAvailable=FALSE`,
+  `RawPos` inchangé (gelé), `SpeedValid=FALSE`, `Speed_Mps=0.0`.
+- Redémarrage incohérent (`HomingSuspect`) : `EncoderIncoherent=TRUE` → Modes refuse `SEMI_AUTO`.
+- Sans simulation : M1 reflète COD1, M2 reflète COD2 — jamais croisés.
+
+> ✅ **Point de vigilance ordonnancement — TRANCHÉ (décision 2026-08-03)** : `FB_Encoder_Scale`
+> (rang 02) consomme `HomingRefRaw` produit par `FB_Encoder_Homing` (**rang 04**, Treuils).
+> **Retard d'un scan bénin assumé** : `HomingRefRaw` est RETAIN quasi-statique, ne change que sur
+> référencement abouti (procédure terrain AF09 §5) suivi d'une confirmation visuelle — jamais de
+> conséquence sur une commande, un interlock ou une sortie. Pas de relais dédié, pas de déplacement
+> du homing (réintroduirait la violation grave Homing→Modes). Documenté AF09 §4.2 « Note A-01 bis ».
+
+### 🔥 Flux perte codeur → Modes / Safety / Supervision / IHM (trou P0 AF09 §6 alert. 8)
+
+> ✅ **Corrigé par conception** — la chaîne `ST_EncoderMeasurements` propage la **disponibilité**
+> (`EncoderAvailable`), pas seulement la **cohérence** (`EncoderIncoherent`). L'ancien agrégat
+> `EncoderFaultPresent := EncoderIncoherent M1 OR M2` laissait une position figée autoriser
+> `SEMI_AUTO` (perte bus ⇒ `RawPos` gelé ⇒ position dans la plage ⇒ incohérence fausse).
+
+**Un seul fait par treuil définit le défaut codeur consommé partout** (formule déjà portée par
+`Supervision` côté IHM) :
+
+```text
+EncoderFault.<Treuil> := NOT EncoderAvailable OR EncoderIncoherent
+```
+
+| Consommateur | Action sur `EncoderFault` | Bypass |
+|---|---|---|
+| `PRG_03_Modes_Cycle_CFC` (`FB_Modes`) | Refuse `SEMI_AUTO` (repli `MAINT_N1`, `Auth.ErrorId` bit0) — **agrégat M1 OR M2** | aucun (SEMI_AUTO ne tolère aucun codeur faux) |
+| `PRG_04_Treuils_Benne_CFC` (`FB_Safety_Winch`) | `SafeStop` du treuil concerné (bit2 `ErrorId`) | individuel `EncoderFaultBypass`, **MAINT_N2 uniquement** |
+| `PRG_03_Modes_Cycle_CFC` (`Auth.SyncEnable` / `Sync`) | Synchro refusée si l'un des 2 codeurs faux | — |
+| `PRG_06_Outputs_LD` / `PRG_04` (commande) | Interdit toute commande reposant sur la position tant que `EncoderFault` | via Modes/Safety uniquement |
+| `PRG_07_Supervision_CFC` (IHM) | `EncoderFault` par treuil → alarme/animation | — |
+
+**Producteur unique de l'agrégat** : `PRG_02_Acquisition_CFC` produit `ST_EncoderMeasurements`
+(avec `EncoderAvailable` par treuil) ; l'agrégat `EncoderFaultPresent` (M1 OR M2, incluant la
+disponibilité) est **calculé par `FB_Modes`** à partir de ce DUT — pas de POU d'agrégation
+intermédiaire (supprime le cycle `PRG_02_Encoders` legacy).
+
+**Test de contrat (non-régression)** : perte bus COD1 simulée ⇒ `M1.EncoderAvailable=FALSE`,
+`M1.EncoderFault=TRUE` ⇒ Modes refuse `SEMI_AUTO`, `FB_Safety_Winch` M1 passe `SafeStop`, M2
+inchangé, IHM affiche l'alarme M1 — **alors même que `CablePosMSafe` reste gelée dans la plage**.
+
+---
+
 ## 📡 3. Diagnostics bus
 
 Les diagnostics font partie de l'acquisition qualifiee.

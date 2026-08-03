@@ -61,20 +61,24 @@ d'incohérence de ce FB (voir §3).
   dernière valeur valide et `EncoderIncoherent` est activé.
 - `ErrorId` (numérotation **locale**, différente de `FB_Encoder_Homing`) : bit0 = "Position câble
   hors plage" (hors plage physique) ; bit1 = "Incohérence position boot" (miroir `HomingSuspect`).
-- 🔴 **`EncoderFaultPresent` n'est PAS une sortie de ce FB** : c'est `CODE/MAIN/PRG_02_Encoders.st`
-  qui l'agrège (`EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent`, idem M2, puis
-  `EncoderFaultPresent := M1 OR M2`), consommé par `FB_Modes` (1 cycle de retard) pour refuser
-  `SEMI_AUTO`. Producteur : `PRG_02_Encoders`, pas ce FB — ne pas le documenter comme sortie FB
-  dans une future implémentation sans en faire un choix d'architecture explicite.
+- 🔴 **`EncoderFaultPresent` n'est PAS une sortie de ce FB** : dans le legacy, le POU ST
+  `PRG_02_Encoders` (supprimé au lot M1) l'agrégeait (`EncoderFaultPresentM1 := instEncoderSafetyM1.EncoderIncoherent`,
+  idem M2, puis `EncoderFaultPresent := M1 OR M2`), consommé par `FB_Modes` (1 cycle de retard)
+  pour refuser `SEMI_AUTO`. **Dans la cible (décision 2026-08-03)**, l'agrégat est calculé par
+  `FB_Modes` à partir de `ST_EncoderMeasurements`, avec la **disponibilité** incluse :
+  `EncoderFault := NOT EncoderAvailable OR EncoderIncoherent` (M1 OR M2). Ne pas le documenter
+  comme sortie FB sans en faire un choix d'architecture explicite. Voir AF06 §2ter « Flux perte codeur ».
 - ⚠️ **Comportement réel** : `EncoderFaultPresent` vient de `EncoderIncoherent`
   (bornage + `HomingSuspect` relayé), **pas** de `Homed = FALSE` directement. Un treuil jamais
   référencé (mais jamais mis en doute) ne bloque donc pas `SEMI_AUTO` par ce mécanisme —
   comportement voulu, voir fiche Homing §4 pour le traitement cible de ce cas (signalement +
   vitesse forcée palier 1).
-- 🔴 **Trou de sécurité à instruire (hors périmètre doc)** : perte de bus codeur ⇒ `RawPos` gelé
-  par `FB_Encoder_Abs` ⇒ position reste dans la plage ⇒ `EncoderIncoherent = FALSE` ⇒ `SEMI_AUTO`
-  reste autorisé sur une position figée, sans alerte dédiée à la perte de bus elle-même dans ce
-  FB. À traiter dans un lot dédié (cross-ref `EncoderAvailable`, `FB_Encoder_Abs`).
+- 🟢 **Trou de sécurité résolu par conception (décision 2026-08-03)** : perte de bus codeur ⇒
+  `RawPos` gelé par `FB_Encoder_Abs` ⇒ position reste dans la plage ⇒ `EncoderIncoherent = FALSE`.
+  Ce FB ne remonte que la cohérence ; c'est la **disponibilité** (`EncoderAvailable`) qui couvre la
+  perte bus : `EncoderFault := NOT EncoderAvailable OR EncoderIncoherent`, consommé par Modes
+  (refus `SEMI_AUTO`), `FB_Safety_Winch` (`SafeStop` bit2) et IHM. Flux et contrat :
+  `AF_Partie-06 §2ter « Flux perte codeur »` + `ST_EncoderMeasurements`.
 
 ---
 

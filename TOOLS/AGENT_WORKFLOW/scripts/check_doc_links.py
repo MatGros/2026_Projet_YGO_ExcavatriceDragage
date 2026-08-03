@@ -40,7 +40,16 @@ SCAN_GLOBS = ("*.md", ".claude/skills/*.md", "DOC/**/*.md", "TOOLS/**/*.md", "CO
 EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git", ".pi-subagents"}
 # Journaux historiques : ils citent des documents tels qu'ils existaient a la date
 # de l'entree. Un lien vers un document depuis archive n'y est pas une erreur.
-HISTORICAL_LOGS = {"DOC/VERSION_HISTORY.md", "DOC/AUDIT_Coherence_Documentaire_v1.0.md"}
+HISTORICAL_LOGS = {
+    "DOC/VERSION_HISTORY.md",
+    "DOC/AUDIT_Coherence_Documentaire_v1.0.md",
+    # Inventaire gel avant migration 7 POU : reference volontairement les POU
+    # supprimes par les lots M1/M8 (photo de l'etat initial, lecture seule).
+    "DOC/AUDITS/Architecture/AUDIT_M0_GEL_ETAT_INITIAL.md",
+    "DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md",
+    # Fiche de travail pre-AF09 v2.0 : source legacy ciblee, POU supprime.
+    "DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
+}
 
 # D7 — journaux de bord et contrats de tache : ils citent le numero d'AF tel qu'il
 # etait a la date de l'entree. Reecrire un journal falsifierait l'historique.

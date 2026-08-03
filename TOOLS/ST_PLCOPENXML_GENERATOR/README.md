@@ -86,7 +86,7 @@ de `generator/` (pas de réécriture) et produit un artefact PLCopenXML focalis�
 |---|---|---|
 | `scripts/st_to_ld.py` | Convertit un fichier `PRG_*_LD.st` en un `<pou>` en `<LD>` | `python scripts/st_to_ld.py CODE/MAIN/PRG_OUTPUTS_LD.st -o output.xml` |
 | `scripts/st_to_pou.py` | Convertit un fichier `.st` (FB ou PROGRAM) en un `<pou>` en `<ST>` | `python scripts/st_to_pou.py CODE/AU/FB_Safety_EmergencyManagement.st -o output.xml` |
-| `scripts/cfc_extract.py` | Extrait un `<pou>` CFC d'un XML natif (nettoyage namespaces, alignement ObjectIds) | `python scripts/cfc_extract.py CODE/MAIN/PRG_ACQUISITION_CFC.xml -o output.xml` |
+| `scripts/cfc_extract.py` | Extrait un `<pou>` CFC d'un XML natif (nettoyage namespaces, alignement ObjectIds) | `python scripts/cfc_extract.py CODE/MAIN/PRG_02_Acquisition_CFC.xml -o output.xml` |
 | `scripts/st_to_dut.py` | Convertit un fichier `.st` (STRUCT ou ENUM) en un `<dataType>` | `python scripts/st_to_dut.py CODE/SUPERVISION/ST_Safety_Emergency_HmiState.st -o output.xml` |
 | `scripts/build_bundle.py` | Orchestre un bundle `<project>` complet depuis fichiers/dossiers | `python scripts/build_bundle.py CODE/AU/ CODE/MAIN/PRG_OUTPUTS_LD.st -o bundle.xml` |
 
@@ -100,7 +100,7 @@ python scripts/st_to_ld.py CODE/MAIN/PRG_OUTPUTS_LD.st -o /tmp/test_ld.xml
 python scripts/st_to_pou.py CODE/AU/FB_Safety_EmergencyManagement.st -o /tmp/test_pou.xml
 
 # Extraire juste un CFC natif
-python scripts/cfc_extract.py CODE/MAIN/PRG_ACQUISITION_CFC.xml -o /tmp/test_cfc.xml
+python scripts/cfc_extract.py CODE/MAIN/PRG_02_Acquisition_CFC.xml -o /tmp/test_cfc.xml
 
 # Générer un bundle complet depuis un dossier + un fichier
 python scripts/build_bundle.py CODE/AU/ CODE/MAIN/PRG_OUTPUTS_LD.st -o /tmp/test_bundle.xml
