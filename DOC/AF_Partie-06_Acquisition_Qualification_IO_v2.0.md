@@ -5,7 +5,7 @@
 > Les decisions de mouvement restent hors de ce document.
 > 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
 
-La page `PRG_01_Inputs_LD` (Ladder) est associee a cette frontiere : elle affiche les 21 entrees TOR
+La page `PRG_01_Inputs_LD` (Ladder) est associee a cette frontiere : elle affiche les 22 entrees TOR
 qualifiees via `FB_Input`, sans logique metier et sans decision.
 
 ## 🧭 Sommaire
@@ -42,7 +42,7 @@ L'acquisition publie des **faits qualifies** :
 - mesures codeurs brutes/qualifiees selon frontiere validee ;
 - joystick, homme-mort et codeurs traites par des FB dedies (`FB_Joystick`, `FB_Encoder_*`, `FB_Translation_PositionDecoder`).
 
-`PRG_01_Inputs_LD` affiche en Ladder les 21 entrees TOR apres qualification (`FB_Input`) :
+`PRG_01_Inputs_LD` affiche en Ladder les 22 entrees TOR apres qualification (`FB_Input`) :
 - polarite normalisee (`TRUE` = etat vrai) ;
 - mots de force/test rejetes en dehors de cette page ;
 - aucune decision `SafeStop`, mode ou commande actionneur n'y est prise.
@@ -161,7 +161,7 @@ HwIn.<Domaine> := SEL(SimActive.<Domaine>, HwSim.<Domaine>, <réel du domaine>)
 **Invalidité** : un sous-domaine simulé n'a pas de notion d'erreur physique propre ; les faits de
 disponibilité (device, communication) restent évalués sur la source réelle par `PRG_02` (voir §3).
 
-**Cadence** : tâche `T01_Acquisition` (cycle rapide), lecture seule, aucun effet de bord.
+**Cadence** : tâche `MainTask` (cycle rapide, AF02 §4), lecture seule, aucun effet de bord.
 
 **Tests de contrat** :
 - Sans simulation : `HwIn.Winch.<champ> == ST_InputsQualified.<champ>` (domaine réel).
@@ -179,7 +179,7 @@ disponibilité (device, communication) restent évalués sur la source réelle p
 | Polarité | `TRUE` = état logique normalisé (déjà inversé/filtré par `FB_Input`) |
 | Filtre | appliqué **avant** la sélection, sur le réel uniquement (décision Q1=A validée) |
 | Invalidité | pas de champ d'erreur propre : un `_DI` qualifié vaut l'état TOR après `FB_Input` ; une panne de canal remonte via les diagnostics device (§3) |
-| Cadence | tâche `T01_Acquisition`, cycle rapide |
+| Cadence | tâche `MainTask`, cycle rapide |
 
 **Tests de contrat** :
 - Reflète la polarité normalisée : `FB_Input` seul modifie `TRUE/FALSE` du device, pas `PRG_02`.
@@ -220,6 +220,7 @@ ST_EncoderMeasurements
 | `Speed_Mps` | REAL | `FB_Encoder_SpeedMeasure.Speed_Mps` | m/s | 0.0 si `Valid=FALSE` |
 | `SignedSpeed_Mps` | REAL | `FB_Encoder_SpeedMeasure.SignedSpeed_Mps` | m/s (signée, + montée) | 0.0 si `Valid=FALSE` |
 | `SpeedValid` | BOOL | `FB_Encoder_SpeedMeasure.Valid` | — | `FALSE` < 6 éch. couvrant 50 ms |
+| Cadence | tâche `MainTask`, cycle rapide |
 
 **Polarité** : tout `BOOL` = `TRUE` état normalisé. Aucun champ brut EtherCAT (alarmes/warnings,
 `DEVICE_STATE`) dans ce DUT : ils restent exposés via `ST_EncoderHMI` (Supervision) pour l'IHM.
@@ -296,20 +297,58 @@ separee : c'est ce qui supprime le cycle prouve `Acquisition ↔ Diagnostics` et
 
 ---
 
-## 🔌 4. Polarites et noms
+## 🔌 4. TOR d'entrée — liste exhaustive (squelette de `ST_InputsQualified`)
 
-Le nom d'une E/S dit ce que signifie `TRUE`.
+> 📌 **Source de vérité matérielle** : `TOOLS/AGENT_WORKFLOW/config/Device_IO_20260729.csv`
+> (export CODESYS → CSV, référence T100) + `PRG_00_Inputs_Trace_Migration_v1.0.md` (polarités legacy).
+> **22 TOR d'entrée réelles** — ce compte remplace les anciens « 19 » (fiche FB_Input) et « 21 »
+> (versions antérieures de ce §1). Toute TOR listée ici a **une** entrée `BOOL` dans
+> `ST_InputsQualified` et **une** instance `FB_Input` dans `PRG_01_Inputs_LD`.
 
-| Famille | Exemples confirmes |
+Le nom d'une E/S dit ce que signifie `TRUE` (`<Domaine>_<ÉtatQuandTRUE>_DI`). `InvertLogic` dans
+`FB_Input` corrige l'écart **physique ↔ logique** (contact NC → `InvertLogic := TRUE`) — exactement
+une fois, ici.
+
+| # | TOR (`_DI`) | Device · Bit | Domaine (`HwIn`) | Polarité | `TRUE` = |
+|---|---|---|---|---|---|
+| 1 | `PowerContactorEngaged_DI` | VH_0800END · 6 | Machine | NO | Contacteur de puissance engagé / portail maître OK |
+| 2 | `EmergencyChainClosed_DI` | VH_0800END · 7 | Machine | NC | Boucle AU fermée (coup-de-poing + contact PLC) |
+| 3 | `PhaseRotationOk_DI` | VH_0800END · 4 | Machine | NC | Rotation des phases électriques correcte |
+| 4 | `BrakeThermalOk_DI` | VH_0800END · 3 | Machine | NC | Thermique freins M1/M2/M3 commun OK |
+| 5 | `M1_BrakeIsOpen_DI` | VH_0800END · 0 | Winch | inversée* | Frein M1 **ouvert** (desserré) — normalisée TRUE=serré |
+| 6 | `M2_BrakeIsOpen_DI` | VH_0800END · 1 | Winch | inversée* | Frein M2 **ouvert** — normalisée TRUE=serré |
+| 7 | `M3_BrakeIsOpen_DI` | VH_0800END · 2 | Translation | inversée* | Frein M3 **ouvert** — normalisée TRUE=serré |
+| 8 | `M1_ContactorsReleased_DI` | Local_Digital_IO · 0 | Winch | NO | Contacteurs sens M1 relâchés |
+| 9 | `M1_ThermalOk_DI` | Local_Digital_IO · 1 | Winch | NC | Thermique M1 OK |
+| 10 | `M2_ContactorsReleased_DI` | Local_Digital_IO · 2 | Winch | NO | Contacteurs sens M2 relâchés |
+| 11 | `M2_ThermalOk_DI` | Local_Digital_IO · 3 | Winch | NC | Thermique M2 OK |
+| 12 | `M2_TensionedCable_DI` | Local_Digital_IO · 4 | Winch | NC | Câble M2 tendu (capteur mou non déclenché) |
+| 13 | `M1_M2_KoboldContactFond_DI` | Local_Digital_IO · 5 | Machine | NO | Kobold fond détecté (info=0 et benne immergée) |
+| 14 | `M3_ThermalFeedback_DI` | Local_Digital_IO · 6 | Winch | NC | Thermique M3 OK *(nouveau vs legacy 19)* |
+| 15 | `M1M2_TopPositionFree_DI` | Local_Digital_IO · 7 | Winch | NC | Position extrême haut libre — référencement, déclenche AU |
+| 16 | `M3_PosTremie_DI` | VH_0808ETP · 0 | Translation | NO | Chariot position Trémie |
+| 17 | `M3_PosPV_DI` | VH_0808ETP · 1 | Translation | NO | Chariot position PV (ralentissement Trémie) |
+| 18 | `M3_PosP2_DI` | VH_0808ETP · 2 | Translation | NO | Chariot position P2 |
+| 19 | `M3_PosP1_DI` | VH_0808ETP · 3 | Translation | NO | Chariot position P1 |
+| 20 | `M3_PosMaintenance_DI` | VH_0808ETP · 4 | Translation | NO | Chariot position Maintenance |
+| 21 | `HydraulicThermalOk_DI` | VH_0808ETP · 6 | Machine | NC | Thermique moteur hydraulique OK *(nouveau vs legacy 19)* |
+| 22 | `ConveyorInfeedReady_DI` | VH_0808ETP · 7 | Machine | NO | Autorisation démarrage crible (dépose gravats) *(nouveau vs legacy 19)* |
+
+\* Freins : `M*_BrakeIsOpen_DI` porte **TRUE = ouvert** (nom physique). `FB_Input` normalise vers
+`M*BrakeFeedback` **TRUE = serré** (consommateurs safety) — `InvertLogic := TRUE` (A-09, trace
+migration lignes 10/13/19).
+
+### Sorties de maintien / réarmement (familles liées, Q/RQ)
+
+| Q/RQ | Rôle |
 |---|---|
-| ⚡ Puissance | `PowerContactorEngaged_DI`, `EmergencyChainClosed_DI` |
-| 🔁 Maintien / rearmement | `PowerKeepAlive_A_RQ`, `PowerKeepAlive_B_RQ`, `EmergencyArming_RQ` |
-| 🛑 Freins | `M*_BrakeIsOpen_DI`, `M*_BrakeRelease_RQ` |
-| 🪨 Kobold | `M1_M2_KoboldContactFond_DI`, `M1_M2_KoboldMeasureEnable_DQ` |
+| `PowerKeepAlive_A_RQ`, `PowerKeepAlive_B_RQ` | `TRUE` = maintien de la puissance voie A/B (NC, fail-safe) — sa retombée ouvre la chaîne |
+| `EmergencyArming_RQ` | `TRUE` = impulsion de réarmement (1 s / 5 s) |
+| `M*_BrakeRelease_RQ` | `TRUE` = desserrage de frein commandé |
+| `M1_M2_KoboldMeasureEnable_DQ` | `TRUE` = mesure Kobold activée |
 
-`PowerContactorEngaged_DI` confirme le contacteur de puissance et alimente le portail `PowerContactorEngaged`.  
-`EmergencyChainClosed_DI` confirme la boucle AU.  
-`PowerKeepAlive_*=TRUE` maintient la puissance ; sa retombee ouvre la chaine.
+`PowerContactorEngaged_DI` alimente le portail `PowerContactorEngaged`. `EmergencyChainClosed_DI`
+confirme la boucle AU (Partie 01).
 
 ---
 
