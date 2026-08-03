@@ -512,12 +512,11 @@ def build_ld_body(
 
             ET.SubElement(block, "inOutVariables")
             out_vars = ET.SubElement(block, "outputVariables")
-            for out_p in instance_output_types.get(inst_name, []):
+            if instance_type == "FB_Output":
                 var_out = ET.SubElement(out_vars, "variable")
-                var_out.set("formalParameter", out_p)
-                c_out = ET.SubElement(var_out, "connectionPointOut")
-                if out_p != "State":
-                    ET.SubElement(c_out, "expression")
+                var_out.set("formalParameter", "State")
+                ET.SubElement(var_out, "connectionPointOut")
+
 
             b_adddata = ET.SubElement(block, "addData")
             d_b = ET.SubElement(b_adddata, "data")
