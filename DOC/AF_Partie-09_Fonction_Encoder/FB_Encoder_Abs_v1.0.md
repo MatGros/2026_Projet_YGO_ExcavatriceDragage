@@ -55,9 +55,12 @@ Brique de **qualification d'entrée** (Partie3 §2) : lit la position brute Ethe
 
 ---
 
-## 3. Séquence Preset
+## 3. Séquence Preset EtherCAT
 
-- **Constantes** : `PointsPerRev = 8192`, `PresetTimeout = T#2s`, `PresetTolerancePts = 10`.
+- **Constantes** : `PointsPerRev = 8192`, `MultiTurnRevsMax = 4096`, `PresetTimeout = T#2s`, `PresetTolerancePts = 10`.
+- **Cible nominale** : `HomingRefTarget = (PointsPerRev × MultiTurnRevsMax) / 2`
+  `= (8192 × 4096) / 2 = 16 777 216 points UL`. Cette valeur est le centre de la plage
+  multitour totale de `33 554 432 points UL`, pas la moitié d'un seul tour (`4096 points`).
 - **Mécanisme** : Lors d'un front montant de `PresetRequest`, le bloc envoie la commande `PresetTriggerCmd := 2` (valeur confirmée terrain) et attend que `|RawPos - PresetValueOut| <= 10 pts` dans la fenêtre de 2 secondes.
 - Si le délai expire sans convergence, `PresetNak` est émis et le bit1 d'ErrorId est positionné.
 

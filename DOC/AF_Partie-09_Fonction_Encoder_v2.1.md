@@ -72,8 +72,12 @@ FB_Encoder_Abs ──► FB_Encoder_Homing ──► FB_Encoder_Scale ──► 
     RawPos/preset)     RETAIN Calib)                              cohérence boot)        50ms/6 éch.)
 ```
 
-2 instances (M1/M2), toutes dans `Acquisition (CFC)` — **producteur unique** position/vitesse.
-`FB_Encoder_SpeedMonitor` (diagnostic, `Safety (CFC)`) : détecte variation brusque, **pas** de SafeStop direct.
+Les instances de mesure M1/M2 sont dans `PRG_02_Acquisition_CFC` — **producteur unique**
+position/vitesse/disponibilite. `FB_Encoder_SpeedMonitor` reste un observateur diagnostique : il
+détecte une variation brusque, mais ne déclenche pas directement de `SafeStop`.
+
+`FB_Encoder_Homing` est séparé de cette chaîne de mesure et rejoint `PRG_04_Treuils_Benne_CFC`.
+Le CFC métier rend ainsi l'état du référencement immédiatement lisible en maintenance.
 
 Interfaces, `ErrorId` et logique détaillée : **fiches dédiées** (§1). Ce chapô ne documente que
 le rôle machine du pipeline et son intégration — toute redite d'interface ici a dérivé de la
@@ -85,7 +89,7 @@ réalité par le passé (v1.0), elle est volontairement retirée.
 
 | DUT | Champs clés | Producteur | Consommateur |
 |---|---|---|---|
-| `ST_Encoder_Calib` | `HomingRefRaw`, `LastKnownRawPos`, `RestartCoherenceTolerancePts`(1000), `Homed`, `HomingSuspect` | `FB_Encoder_Homing` (VAR_IN_OUT) | lui-même, `FB_Encoder_Scale` |
+| `ST_Encoder_Calib` | `HomingRefRaw`, `LastKnownRawPos`, `RestartCoherenceTolerancePts`(1000), `Homed`, `HomingSuspect` | `FB_Encoder_Homing` dans Treuils/Benne (`VAR_IN_OUT`) | Homing ; `FB_Encoder_Scale` |
 | `ST_EncoderHMI` | `RawPos/Alarms/SlaveOperational/Error/ErrorId` | `Supervision` | IHM |
 | `ST_WinchCfg` | `CfgTopSensorPos_M`, `CfgCableLimitAscent_M` | GVL_PERSISTENT (IHM) | `Acquisition/03/06` |
 | `ST_WinchState` | `Homed/HomingBusy/.../HomingRefRaw/Encoder` | `Supervision` | IHM |
@@ -102,10 +106,10 @@ Acquisition  DI/simulation → HwIn.Winch.COD1/2_*
 Acquisition  diag EtherCAT device
 Acquisition  ← PRODUCTEUR UNIQUE position/vitesse
   1. instEncoderAbsM1/M2      (RawPos, EncoderAvailable)
-  2. instHomingM1/M2          (Homed, HomingSuspect, HomingRefRaw) → écrit Calib RETAIN
-  3. instEncoderScaleM1/M2    (CablePosM)
-  4. instEncoderSafetyM1/M2   (CablePosMSafe, EncoderIncoherent)
-  5. instEncoderSpeedMeasureM1/M2 (Speed_Mps, SignedSpeed_Mps, Valid)
+  2. instEncoderScaleM1/M2    (CablePosM)
+  3. instEncoderSafetyM1/M2   (CablePosMSafe, EncoderIncoherent)
+  4. instEncoderSpeedMeasureM1/M2 (Speed_Mps, SignedSpeed_Mps, Valid)
+  5. instHomingM1/M2           (Homed, HomingSuspect, HomingRefRaw) → Treuils/Benne
 Safety  instSpeedMonitorM1/M2 (diagnostic, seuils=0 actuellement)
 PRG_02_Encoders  agrège EncoderFaultPresentM1/M2 := EncoderIncoherent → EncoderFaultPresent
 Modes  EncoderFaultPresent → bloque SEMI_AUTO (repli MAINT_N1) — lu 1 scan après Acquisition
@@ -113,11 +117,11 @@ Treuils  ForbidAscent, TopLimitM:=CfgCableLimitAscent_M (≠ CfgTopSensorPos_M �
 Supervision  copie vers IHM
 ```
 
-### 4.2 Cible — chaîne codéurs dans `PRG_02_Acquisition_CFC`
+### 4.2 Cible — chaîne codeurs dans `PRG_02_Acquisition_CFC` (mesure pure, sans homing)
 
 Acquérir une mesure physique, la mettre à l'échelle, en déduire une vitesse et juger sa validité
-est **une seule responsabilité**. Les cinq étages `instEncoderAbs` → `instHoming` → `instEncoderScale`
-→ `instEncoderSafety` → `instEncoderSpeedMeasure` (M1/M2/M3) rejoignent donc la page acquisition.
+est **une seule responsabilité**. Les cinq étages `instEncoderAbs, instEncoderScale`
+→ `instEncoderSafety` → `instEncoderSpeedMeasure` (M1/M2) rejoignent donc la page acquisition.
 
 ✅ Effet attendu : les instances aujourd'hui dupliquées entre `PRG_ACQUISITION_CFC` et
 `PRG_02_Encoders` (`instEncoderAbsM1/M2`, `instEncoderScaleM1/M2`, `instHomingM1/M2`) sont
@@ -127,8 +131,12 @@ unifiées, avec un producteur unique. Le cycle prouvé `Acquisition ↔ Encoders
 les polarités, `HomingSuspect`, `EncoderIncoherent` et la procédure terrain §5 restent identiques.
 Seule **l'affectation POU** change.
 
-⚠️ **Cette fusion n'est pas réalisable en l'état** : le homing lit une donnée produite par un POU
-aval. Ce point est ouvert — §4bis.
+⚠️ **Le homing ne migre pas avec l'acquisition** : `instHomingM1/M2` rejoint
+`PRG_04_Treuils_Benne_CFC`. L'acquisition conserve la chaîne de mesure pure
+(Abs→Scale→Safety→SpeedMeasure). Le homing demande le preset EtherCAT et publie
+`HomingRefRaw` ; l'acquisition réutilise cette référence pour produire la position.
+
+> **Note sur A-01** : le homing lit `Mode`/`UnitaryMode`/`WinchSelected` qui sont produits par `PRG_03_Modes_Cycle_CFC` (rang 03). Dans la cible, l'acquisition est au rang 02 et les modes au rang 03. Le homing dans Treuils (rang 04) lit bien Modes (rang 03) — pas de violation d'ordonnancement.
 
 📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
 
@@ -136,7 +144,7 @@ aval. Ce point est ouvert — §4bis.
 
 ## ⚖️ 4bis. Point d'arbitrage OUVERT — le homing lit le mode de marche
 
-> 🚨 **Statut : ARBITRAGE REQUIS, non tranché.** À instruire au lancement du lot **M1**.
+> ✅ **Statut : DÉCIDÉ.** Le homing migre vers `PRG_04_Treuils_Benne_CFC` (M3) — décision A-01 confirmée par l'utilisateur. Voir §4.2 ci-dessus.
 > Cette section **constate un fait de code**. Elle ne décide rien, ne propose aucune option
 > préférée, et ne modifie aucune sémantique safety.
 
@@ -235,7 +243,7 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
 | 6 | info | `BtnHomingAtZero` — combiné avec `BtnHome` en amont dans `PRG_02_Encoders`, pas un port `FB_Encoder_Homing` séparé | Clarifié fiche Homing §2 |
 | 7 | info | Numérotation `ErrorId` différente par FB (pas de table unifiée) | Assumé — chaque fiche documente sa propre table |
 | 8 | 🔴 **P0 hors doc** | Perte de bus codeur (`EncoderAvailable=FALSE`) ⇒ `RawPos` gelé ⇒ position reste dans la plage ⇒ `SEMI_AUTO` reste autorisé sur une position figée | Trou de sécurité réel, indépendant de cette doc — à instruire en lot dédié C3/C4, cross-ref fiche `FB_Encoder_Safety` §3 |
-| 10 | 🚨 **Arbitrage requis** | `instHomingM1/M2` lit `PRG_MODES_CFC.Auth.*` (`PRG_02_Encoders.st:72,74-76,122,124-126`) : dans la cible, l'acquisition (rang 02) précède les modes (rang 03) | **Non tranché** — arbitrage utilisateur/sécurité au lancement du lot M1. Faits et questions ouvertes : §4bis. Aucune décision ne doit être déduite par un agent |
+| 10 | 🟡 **DÉCIDÉ** | `instHomingM1/M2` migre vers `PRG_04_Treuils_Benne_CFC` (M3) — décision A-01 confirmée. Le homing est une conduite de treuil, pas une acquisition brute. L'acquisition conserve la chaîne de mesure pure (Abs→Scale→Safety→SpeedMeasure). Le homing dans Treuils (rang 04) lit bien Modes (rang 03) — pas de violation d'ordonnancement. | **Tranché** — A-01 confirmé |
 | 9 | 🟠 **Nommage** | Suffixe d'unité `_M`/`_Mps` incohérent au sein du domaine CODEURS : `CfgTopSensorPosM`, `CfgHomingTargetM`, `PositionMinM`/`PositionMaxM`, `CablePosM` (sans underscore) **vs** `Speed_Mps`/`SignedSpeed_Mps` de `FB_Encoder_SpeedMeasure` (avec underscore, conforme). `FB_Encoder_SpeedMonitor` aggrave : `SpeedMps`/`SpeedDeltaMps`/`SpeedVariationThresholdMps` sans underscore, à côté de `Speed_Mps` du FB voisin. Règle : `NAMING_CONVENTION.md` §Suffixes d'unité, « toujours précédés d'un underscore ». Egalement : `ST_WinchCfg.CfgTopSensorPos_M` (IHM, avec underscore) **et** le port FB `CfgTopSensorPosM` (sans) désignent la même notion sous 2 formes. **Ne pas renommer au fil de l'eau** (casse IHM/bundle, `NAMING_CONVENTION.md` §Variables IHM) — lot de renommage dédié à trancher séparément. |
 
 ---

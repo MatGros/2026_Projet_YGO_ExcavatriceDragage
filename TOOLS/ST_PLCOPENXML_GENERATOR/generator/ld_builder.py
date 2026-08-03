@@ -210,21 +210,29 @@ def build_ld_body(
         # FB_Output : instXxx(Command := var)  →  suivi de var := instXxx.State
         m_cmd = re.match(r"^(\w+)\s*\(\s*Command\s*:=\s*([\w\.]+)\s*\)$", stmt_clean)
         if m_cmd:
-            fb_commands[m_cmd.group(1)] = (b_title, b_desc, stmt_comm, m_cmd.group(2))
+            fb_commands[m_cmd.group(1)] = (b_title, b_desc, stmt_comm, m_cmd.group(2), {})
             continue
 
-        # FB_Input : instXxx(InputRaw := var, ...)  →  suivi de var := instXxx.State
-        m_input = re.match(r"^(\w+)\s*\(\s*InputRaw\s*:=\s*([\w\.]+)\s*,\s*.*\)$", stmt_clean, flags=re.DOTALL)
-        if m_input:
-            fb_commands[m_input.group(1)] = (b_title, b_desc, stmt_comm, m_input.group(2))
-            continue
+        # FB_Input / FB_Output : instXxx(Param := val, Param2 := val2, ...)
+        # Capture TOUS les paramètres pour le câblage LD multi-params.
+        m_input = re.match(r"^(\w+)\s*\((.+)\)$", stmt_clean, flags=re.DOTALL)
+        if m_input and ' := ' in m_input.group(2):
+            inst = m_input.group(1)
+            params_str = m_input.group(2)
+            params = {}
+            for pm in re.finditer(r'(\w+)\s*:=\s*([^,]+)', params_str):
+                params[pm.group(1)] = pm.group(2).strip()
+            if 'InputRaw' in params or 'Command' in params:
+                main_var = params.get('InputRaw') or params.get('Command') or ''
+                fb_commands[inst] = (b_title, b_desc, stmt_comm, main_var, params)
+                continue
 
         m_state = re.match(r"^([\w\.]+)\s*:=\s*(\w+)\.State$", stmt_clean)
         if m_state:
             coil_var, inst_name = m_state.groups()
             if inst_name in fb_commands:
-                bt, bd, sc, cmd_v = fb_commands.pop(inst_name)
-                coil_mappings.append((bt or b_title, bd or b_desc, sc or stmt_comm, inst_name, cmd_v, coil_var))
+                bt, bd, sc, cmd_v, all_params = fb_commands.pop(inst_name)
+                coil_mappings.append((bt or b_title, bd or b_desc, sc or stmt_comm, inst_name, cmd_v, coil_var, all_params))
                 continue
 
         other_statements.append((b_title, b_desc, stmt_comm, stmt_clean))
@@ -232,7 +240,7 @@ def build_ld_body(
     last_emitted_title = ""
 
     # ── 1. Réseaux unifiés FB_Output / FB_Input ──
-    for b_title, b_desc, stmt_comm, inst_name, cmd_var, coil_var in coil_mappings:
+    for b_title, b_desc, stmt_comm, inst_name, cmd_var, coil_var, all_params in coil_mappings:
 
         # Si un nouveau grand titre // === apparaît, on crée le RÉSEAU SÉPARÉ DE BANNIÈRE
         if b_title and b_title != last_emitted_title:
@@ -267,6 +275,29 @@ def build_ld_body(
         var_el = ET.SubElement(contact, "variable")
         var_el.text = cmd_var
 
+        # Contacts pour les paramètres supplémentaires (InvertLogic, FilterTime, ChannelOk, etc.)
+        # Structure identique au sample CODESYS PRG_10_LD_Commentaires.xml :
+        # un contact par paramètre, placé AVANT le bloc, connecté au leftPowerRail (refLocalId=0).
+        extra_param_contacts = {}  # param_name -> localId
+        for p_name, p_value in all_params.items():
+            if p_name == main_input_param:
+                continue
+            p_contact_id = local_id_counter
+            local_id_counter += 1
+            extra_param_contacts[p_name] = p_contact_id
+            p_contact = ET.SubElement(ld, "contact")
+            p_contact.set("localId", str(p_contact_id))
+            p_contact.set("negated", "false")
+            p_contact.set("storage", "none")
+            p_contact.set("edge", "none")
+            ET.SubElement(p_contact, "position", x="0", y="0")
+            p_c_in = ET.SubElement(p_contact, "connectionPointIn")
+            p_c_ref = ET.SubElement(p_c_in, "connection")
+            p_c_ref.set("refLocalId", "0")
+            ET.SubElement(p_contact, "connectionPointOut")
+            p_var_el = ET.SubElement(p_contact, "variable")
+            p_var_el.text = p_value
+
         # Le type du bloc doit correspondre à sa déclaration VAR réelle.
         instance_type = instance_types.get(inst_name)
         if instance_type is None:
@@ -277,25 +308,35 @@ def build_ld_body(
         block.set("instanceName", inst_name)
         ET.SubElement(block, "position", x="0", y="0")
 
+        # Émettre TOUS les paramètres d'entrée dans le bloc.
+        # Ordre : paramètre principal d'abord, puis les autres.
         in_vars = ET.SubElement(block, "inputVariables")
         var_in = ET.SubElement(in_vars, "variable")
         var_in.set("formalParameter", main_input_param)
         c_in_b = ET.SubElement(var_in, "connectionPointIn")
         c_ref_b = ET.SubElement(c_in_b, "connection")
         c_ref_b.set("refLocalId", str(contact_id))
-
-        # Paramètres supplémentaires FB_Input (InvertLogic, FilterTime, ChannelOk)
-        # ne sont pas représentables en Ladder classique (TIME/BOOL constants).
-        # Ils sont omis du diagramme LD ; CODESYS les initialise à leur valeur
-        # par défaut ou via l'appel ST sous-jacent. Seul InputRaw est câblé.
-        # (Le sample CODESYS PRG_10_LD ne câble que Command pour FB_Output.)
+        for p_name in all_params:
+            if p_name == main_input_param:
+                continue
+            var_p = ET.SubElement(in_vars, "variable")
+            var_p.set("formalParameter", p_name)
+            c_in_p = ET.SubElement(var_p, "connectionPointIn")
+            c_ref_p = ET.SubElement(c_in_p, "connection")
+            c_ref_p.set("refLocalId", str(extra_param_contacts.get(p_name, 0)))
 
         ET.SubElement(block, "inOutVariables")
 
+        # Émettre TOUS les outputs (State, Error, ErrorId pour FB_Input)
         out_vars = ET.SubElement(block, "outputVariables")
         var_out = ET.SubElement(out_vars, "variable")
         var_out.set("formalParameter", "State")
         ET.SubElement(var_out, "connectionPointOut")
+        # Error et ErrorId (FB_Input) — exposés pour les consommateurs/IHM
+        for out_p in ("Error", "ErrorId"):
+            var_err = ET.SubElement(out_vars, "variable")
+            var_err.set("formalParameter", out_p)
+            ET.SubElement(var_err, "connectionPointOut")
 
         b_adddata = ET.SubElement(block, "addData")
         d_b = ET.SubElement(b_adddata, "data")
@@ -340,27 +381,14 @@ def build_ld_body(
             instance_type = instance_types.get(inst_name)
             if instance_type is None:
                 raise ValueError(f"LD block instance without declared type: {inst_name}")
-            block = ET.SubElement(ld, "block")
-            block.set("localId", str(block_id))
-            block.set("typeName", instance_type)
-            block.set("instanceName", inst_name)
-            ET.SubElement(block, "position", x="0", y="0")
 
-            in_vars = ET.SubElement(block, "inputVariables")
-
+            # ── Phase 1 : créer les sources (contacts/inVariables) AVANT le bloc.
+            # CODESYS exige que les éléments source précèdent le bloc dans le LD.
+            param_source_ids = {}  # param_name -> localId du contact/inVariable (ou 0 pour TRUE)
             for p_name, p_val in arg_matches:
-                var_in = ET.SubElement(in_vars, "variable")
-                var_in.set("formalParameter", p_name)
-                c_in_p = ET.SubElement(var_in, "connectionPointIn")
-
-                # A ladder contact is a BOOL-only element.  Feeding a TIME,
-                # INT, WORD or REAL argument through one creates an invalid
-                # diagram despite well-formed XML (observed on the two LD
-                # programs during CODESYS import).  The formal parameter type
-                # comes from the declared interface of the called FB; values
-                # of every non-BOOL (or unresolved) formal are data sources.
                 formal_type = instance_input_types.get(inst_name, {}).get(p_name)
                 if formal_type != "BOOL":
+                    # Non-BOOL (TIME/INT/WORD/REAL) : inVariable, pas contact.
                     source_id = local_id_counter
                     local_id_counter += 2
                     input_var = ET.SubElement(ld, "inVariable")
@@ -369,10 +397,12 @@ def build_ld_body(
                     ET.SubElement(input_var, "connectionPointOut")
                     expression = ET.SubElement(input_var, "expression")
                     expression.text = p_val
-                    ET.SubElement(c_in_p, "connection", refLocalId=str(source_id))
+                    param_source_ids[p_name] = source_id
                 elif p_val == "TRUE":
-                    ET.SubElement(c_in_p, "connection", refLocalId="0")
+                    # BOOL TRUE : connecté directement au leftPowerRail (0).
+                    param_source_ids[p_name] = 0
                 else:
+                    # BOOL variable : contact.
                     cnt_id = local_id_counter
                     local_id_counter += 2
                     contact = ET.SubElement(ld, "contact")
@@ -387,9 +417,22 @@ def build_ld_body(
                     ET.SubElement(contact, "connectionPointOut")
                     var_el = ET.SubElement(contact, "variable")
                     var_el.text = p_val
+                    param_source_ids[p_name] = cnt_id
 
-                    c_ref_p = ET.SubElement(c_in_p, "connection")
-                    c_ref_p.set("refLocalId", str(cnt_id))
+            # ── Phase 2 : créer le bloc APRÈS ses sources.
+            block = ET.SubElement(ld, "block")
+            block.set("localId", str(block_id))
+            block.set("typeName", instance_type)
+            block.set("instanceName", inst_name)
+            ET.SubElement(block, "position", x="0", y="0")
+
+            in_vars = ET.SubElement(block, "inputVariables")
+            for p_name, _ in arg_matches:
+                var_in = ET.SubElement(in_vars, "variable")
+                var_in.set("formalParameter", p_name)
+                c_in_p = ET.SubElement(var_in, "connectionPointIn")
+                c_ref_p = ET.SubElement(c_in_p, "connection")
+                c_ref_p.set("refLocalId", str(param_source_ids.get(p_name, 0)))
 
             ET.SubElement(block, "inOutVariables")
             ET.SubElement(block, "outputVariables")

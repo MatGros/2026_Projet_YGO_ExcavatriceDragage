@@ -522,7 +522,7 @@ premier import CFC testable et devra être remplacée par des contrats explicite
 |---|---|---|
 | M0-bis alignement doc | ✅ terminé, commit `f32dcd6` | — |
 | M0 audit de gel | ✅ terminé — `AUDIT_M0_GEL_ETAT_INITIAL.md` | A-09, A-10, A-11, A-12 |
-| M1 acquisition unifiée | à lancer | A-01, A-02, A-03, A-09, A-10, A-12 |
+| M1 acquisition unifiée | à lancer | A-02, A-03, A-09, A-10, A-12 (A-01 tranché : homing dans Treuils M3) |
 | M2 modes + cycle | ✅ staging XML créé, hors MainTask | A-14 |
 | M3 treuils + safety | à lancer | A-01 |
 | M4 translation + safety | à lancer | — |
