@@ -2,7 +2,7 @@
 
 > Brique de qualification d'entrée TOR (inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte).
 > Profil AF03 §1bis : brique réduite, pas de contrat FB standard (pas d'Enable/StartStop/Mode/State/StateAtError).
-> Source : `CODE/COMMUN/FB_Input.st` · instances : 19 dans `PRG_01_Inputs_LD` (toutes les entrées TOR).
+> Source : `CODE/COMMUN/FB_Input.st` · instances : 22 dans `PRG_01_Inputs_LD` (toutes les entrées TOR — liste exhaustive `AF_Partie-06 §4`).
 
 ## 🎯 Rôle
 
