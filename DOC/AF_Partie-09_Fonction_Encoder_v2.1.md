@@ -138,6 +138,15 @@ Seule **l'affectation POU** change.
 
 > **Note sur A-01** : le homing lit `Mode`/`UnitaryMode`/`WinchSelected` qui sont produits par `PRG_03_Modes_Cycle_CFC` (rang 03). Dans la cible, l'acquisition est au rang 02 et les modes au rang 03. Le homing dans Treuils (rang 04) lit bien Modes (rang 03) — pas de violation d'ordonnancement.
 
+> **Note sur A-01 bis (décision 2026-08-03)** : le sens inverse `FB_Encoder_Scale` (rang 02, Acquisition)
+> → `HomingRefRaw` (produit par `FB_Encoder_Homing`, rang 04, Treuils) crée un retard d'un scan
+> formellement contraire à `AF_Partie-02 §4`. **Retard bénin assumé** : `HomingRefRaw` est RETAIN
+> quasi-statique, ne change que sur référencement abouti (procédure terrain §5 : manœuvre → arrêt
+> confirmé → `BtnHome`) suivi d'une confirmation visuelle — jamais de conséquence sur une commande,
+> un interlock ou une sortie. Pas de relais dédié, pas de déplacement du homing vers l'acquisition
+> (qui réintroduirait la violation grave Homing→Modes). Le gel de sortie (`CablePosMSafe`) reste le
+> comportement naturel de la chaîne (option 3 validée).
+
 📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
 
 ---
@@ -148,7 +157,10 @@ Seule **l'affectation POU** change.
 > Cette section **constate un fait de code**. Elle ne décide rien, ne propose aucune option
 > préférée, et ne modifie aucune sémantique safety.
 
-### Dépendance prouvée (`CODE/MAIN/PRG_02_Encoders.st`)
+### Dépendance prouvée (legacy `PRG_02_Encoders.st`, supprimé au lot M1 — preuve conservée en §4.2)
+
+> 📌 Le POU ST legacy `PRG_02_Encoders.st` a été supprimé du dépôt (commit migration M1). La preuve
+> ci-dessous reste l'historique de la décision A-01. Pour la cible, voir §4.2.
 
 `FB_Encoder_Homing` M1 et M2 reçoivent trois entrées dérivées de `PRG_MODES_CFC` :
 
@@ -242,9 +254,10 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
 | 5 | P2 | `SpeedMonitor` seuils inertes (`0`/`T#0ms`) | Volontaire jusqu'à T45 — ⚠️ voir fiche `FB_Encoder_SpeedMonitor` §4 : activer `SpeedGuardEnable` sans régler `SpeedStabilityTimeout` bride la machine au palier 1 en permanence |
 | 6 | info | `BtnHomingAtZero` — combiné avec `BtnHome` en amont dans `PRG_02_Encoders`, pas un port `FB_Encoder_Homing` séparé | Clarifié fiche Homing §2 |
 | 7 | info | Numérotation `ErrorId` différente par FB (pas de table unifiée) | Assumé — chaque fiche documente sa propre table |
-| 8 | 🔴 **P0 hors doc** | Perte de bus codeur (`EncoderAvailable=FALSE`) ⇒ `RawPos` gelé ⇒ position reste dans la plage ⇒ `SEMI_AUTO` reste autorisé sur une position figée | Trou de sécurité réel, indépendant de cette doc — à instruire en lot dédié C3/C4, cross-ref fiche `FB_Encoder_Safety` §3 |
+| 8 | 🟢 **Tranché** | Perte de bus codeur (`EncoderAvailable=FALSE`) ⇒ `RawPos` gelé ⇒ position reste dans la plage ⇒ `SEMI_AUTO` reste autorisé sur une position figée | **Corrigé par conception (décision 2026-08-03)** : `EncoderFault := NOT EncoderAvailable OR EncoderIncoherent` propagé par `ST_EncoderMeasurements` → Modes refuse `SEMI_AUTO`, `FB_Safety_Winch` `SafeStop` (bit2), IHM alarme. Détail : AF06 §2ter « Flux perte codeur » |
 | 10 | 🟡 **DÉCIDÉ** | `instHomingM1/M2` migre vers `PRG_04_Treuils_Benne_CFC` (M3) — décision A-01 confirmée. Le homing est une conduite de treuil, pas une acquisition brute. L'acquisition conserve la chaîne de mesure pure (Abs→Scale→Safety→SpeedMeasure). Le homing dans Treuils (rang 04) lit bien Modes (rang 03) — pas de violation d'ordonnancement. | **Tranché** — A-01 confirmé |
 | 9 | 🟠 **Nommage** | Suffixe d'unité `_M`/`_Mps` incohérent au sein du domaine CODEURS : `CfgTopSensorPosM`, `CfgHomingTargetM`, `PositionMinM`/`PositionMaxM`, `CablePosM` (sans underscore) **vs** `Speed_Mps`/`SignedSpeed_Mps` de `FB_Encoder_SpeedMeasure` (avec underscore, conforme). `FB_Encoder_SpeedMonitor` aggrave : `SpeedMps`/`SpeedDeltaMps`/`SpeedVariationThresholdMps` sans underscore, à côté de `Speed_Mps` du FB voisin. Règle : `NAMING_CONVENTION.md` §Suffixes d'unité, « toujours précédés d'un underscore ». Egalement : `ST_WinchCfg.CfgTopSensorPos_M` (IHM, avec underscore) **et** le port FB `CfgTopSensorPosM` (sans) désignent la même notion sous 2 formes. **Ne pas renommer au fil de l'eau** (casse IHM/bundle, `NAMING_CONVENTION.md` §Variables IHM) — lot de renommage dédié à trancher séparément. |
+| 11 | 🟢 **Tranché** | Retard d'un scan `Scale (rang 02) → HomingRefRaw (Homing, rang 04)` — **bénin assumé** (RETAIN quasi-statique, changement uniquement sur référencement abouti, confirmation visuelle après). Pas de relais, pas de déplacement du homing (réintroduirait la violation grave Homing→Modes). Gel de sortie conservé. | **Décision 2026-08-03, option 1** — documenté §4.2 « Note sur A-01 bis » |
 
 ---
 
@@ -258,4 +271,4 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
 | AF06 | E/S physiques codeurs |
 | AF10 | Winch — consommateur position/vitesse, Méca D, vitesse forcée palier 1 (M1/M2) |
 | AF13 | Simulation codeurs |
-| Code | `CODE/CODEURS/*.st`, `CODE/MAIN/PRG_02_Encoders.st` |
+| Code | `CODE/CODEURS/*.st` · legacy supprimé : `PRG_02_Encoders.st` (M1) |

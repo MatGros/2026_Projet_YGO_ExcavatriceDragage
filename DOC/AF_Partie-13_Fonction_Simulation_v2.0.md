@@ -2,7 +2,7 @@
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5  
 > **Statut** : référence active · 2026-07-27  
-> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_ACQUISITION_CFC.xml` (CFC natif ; son pont temporaire de conservation est `CODE/ACQUISITION/FB_AcquisitionLegacyBridge.st`),
+> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_02_Acquisition_CFC.xml` (CFC natif cible), `CODE/MAIN/PRG_01_Inputs_LD` (Ladder TOR),
 > `AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`,
 > `CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md`.
 
@@ -24,18 +24,24 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 ## 2. 🏗️ Frontière unique
 
 ```text
-[%IX / PDO réels] ──► HwReal ─┐
-                              ├──► HwIn ──► conditionnement + logique métier
-[FB_SimBench]     ──► HwSim  ─┘
+[%IX / PDO réels] ──► HwReal ──► FB_Input (qualification TOR réelles, PRG_01_Inputs_LD)
+                                        │  ST_InputsQualified (réel qualifié)
+                                        │
+[FB_SimBench]     ──► HwSim  ───────────┼──► SEL par domaine (PRG_02_Acquisition_CFC) ──► HwIn ──► logique métier
 ```
 
-`PRG_ACQUISITION_CFC.st` est la frontière ST actuelle ; `PRG_02_Acquisition_CFC.xml` est sa cible CFC native, absente de `CODE/MAIN`. ⚠️ Dans la cible, cette page absorbe aussi les codeurs, les diagnostics devices/bus et les retours auxiliaires : la frontière réel/simulé ci-dessous **reste unique et inchangée** et couvre alors l'ensemble de ces entrées :
+`PRG_02_Acquisition_CFC` est la frontière CFC cible. ⚠️ Dans la cible, cette page absorbe aussi les
+codeurs, les diagnostics devices/bus et les retours auxiliaires : la frontière réel/simulé ci-dessous
+**reste unique et inchangée** et couvre alors l'ensemble de ces entrées :
 
 1. §0 acquiert chaque E/S brute dans `HwReal : ST_HardwareImage`.
-2. `instSimBench` construit les quatre sous-images simulées.
-3. `HwSim : ST_HardwareImage` les expose pour observation, sans alimenter la logique métier.
-4. Les quatre `IF` de §0bis sélectionnent une structure complète dans `HwIn`.
-5. §1 conditionne uniquement `HwIn` via `FB_Input`.
+2. `PRG_01_Inputs_LD` qualifie les TOR **réelles** via `FB_Input` (polarité + filtre) →
+   `ST_InputsQualified` — le réel seul, **avant** toute sélection (décision Q1=A, AF06 §2ter).
+3. `instSimBench` construit les quatre sous-images simulées.
+4. `HwSim : ST_HardwareImage` les expose pour observation, sans alimenter la logique métier.
+5. Les quatre `IF` de §0bis sélectionnent une structure complète dans `HwIn` : réel qualifié
+   (`ST_InputsQualified`) **ou** simulé (`HwSim`), **sans filtrage du simulé** (valeurs normalisées).
+6. `HwIn` alimente la logique métier — aucun `FB_Input` n'est ré-appliqué après la sélection.
 
 `HwIn` est la seule image consommée par le programme métier. Aucun FB métier ne lit
 `GVL_Simulation` ni `HwSim`.
@@ -76,11 +82,12 @@ précédent, les stimuli et `HwReal`; il ne lit aucune GVL. Il compose :
 
 Le REX C1 : un retour de frein simulé inversé, ajouté à une logique aval elle-même erronée,
 compensait les deux erreurs et masquait le défaut réel. La polarité est donc définie au modèle et
-normalisée une seule fois par le conditionnement.
+normalisée une seule fois sur le **réel** dans `PRG_01_Inputs_LD` (`FB_Input`) — le simulé est
+normalisé au modèle (les valeurs simulées traversent la sélection sans filtrage, AF06 §2ter).
 
 ## 5. 🔍 Observation et diagnostic
 
-En vue instance de l'acquisition ST actuelle, lire côte à côte les trois `ST_HardwareImage` homologues :
+En vue instance de l'acquisition cible `PRG_02_Acquisition_CFC`, lire côte à côte les trois `ST_HardwareImage` homologues :
 
 | Image | Signification |
 |---|---|
@@ -108,7 +115,7 @@ Les gates Python interdisent désormais :
 
 1. Importer le bundle unique `CODE/CODE_Bundle.xml` dans `Application` via
    **Project → Import PLCopenXML**.
-2. En vue instance, ouvrir `PRG_ACQUISITION_CFC` (ST actuel) et comparer `HwReal`, `HwSim`, `HwIn`.
+2. En vue instance, ouvrir `PRG_02_Acquisition_CFC` et comparer `HwReal`, `HwSim`, `HwIn`.
 3. Machine arrêtée : activer le bit maître puis un seul domaine; contrôler que `HwIn` bascule
    entièrement sur l'image attendue.
 4. Avant retour réel : désactiver les quatre domaines, puis `SimulationModeActive`; vérifier les
