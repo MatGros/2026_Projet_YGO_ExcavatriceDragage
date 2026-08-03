@@ -8,6 +8,17 @@
 
 PROGRAM PRG_06_Outputs_LD
 
+VAR_OUTPUT
+    PowerKeepAlive_A_RQ          : BOOL;
+    PowerKeepAlive_B_RQ          : BOOL;
+    EmergencyArming_RQ           : BOOL;
+    EmergencyArmingPulseActive   : BOOL;
+    EmergencyArmingLockoutActive : BOOL;
+    ArmingSeqStep                : INT;
+    RedundancyTestFailed         : BOOL;
+    EmergencyArmingFailed        : BOOL;
+END_VAR
+
 VAR
     M1RelayFwd          : BOOL;
     M1RelayRev          : BOOL;
@@ -25,6 +36,7 @@ VAR
     M2BrakeCmd          : BOOL;
     TranslationBrakeCmd : BOOL;
     KoboldContactorCmd  : BOOL;
+    PowerCutOffReq      : BOOL;
 
     instM1RelayFwd          : FB_Output;
     instM1RelayRev          : FB_Output;
@@ -41,6 +53,7 @@ VAR
     instM2SpeedContactor4   : FB_Output;
     instM2BrakeCmd          : FB_Output;
     instTranslationBrakeCmd : FB_Output;
+    instSafetyEmergencyManagement : FB_Safety_EmergencyManagement;
 END_VAR
 
 // === ⚡ ÉCRITURE SORTIES PHYSIQUES Q (M1 / M2 / M3 via FB_Output) ===
@@ -89,5 +102,29 @@ M2_BrakeRelease_RQ := instM2BrakeCmd.State;
 
 instTranslationBrakeCmd(Command := TranslationBrakeCmd);
 M3_BrakeRelease_RQ := instTranslationBrakeCmd.State;
+
+// === 🛡️ §2 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
+
+PowerCutOffReq := FALSE;
+
+instSafetyEmergencyManagement(
+    Enable := TRUE,
+    Reset := PRG_07_Supervision.FaultMachineReset_IHM,
+    ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
+    EmergencyChainClosed := PRG_01_Inputs_LD.EmergencyChainClosed,
+    PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged,
+    PowerCutOffRequest := PowerCutOffReq,
+    BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
+);
+
+PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.MaintainA_RQ;
+PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.MaintainB_RQ;
+EmergencyArming_RQ := instSafetyEmergencyManagement.ArmPulse_RQ;
+
+EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Diag.LockoutActive;
+ArmingSeqStep := instSafetyEmergencyManagement.State.Step;
+RedundancyTestFailed := instSafetyEmergencyManagement.Diag.RedundancyTestFailed;
+EmergencyArmingFailed := instSafetyEmergencyManagement.Diag.ArmFailed;
 
 END_PROGRAM
