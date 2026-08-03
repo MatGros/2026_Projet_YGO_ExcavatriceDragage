@@ -435,16 +435,12 @@ def build_ld_body(
             for p_name in declared_inputs:
                 p_val = arg_map.get(p_name)
                 formal_type = instance_input_types.get(inst_name, {}).get(p_name)
-                if p_val == "TRUE":
-                    # BOOL TRUE : connecté directement au leftPowerRail (0).
-                    param_source_ids[p_name] = 0
-                    continue
                 direct_identifier = p_val is not None and re.fullmatch(
                     r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_val
                 )
-                if p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
-                    # Non-BOOL (TIME/INT/WORD/REAL), expression ou non câblé :
-                    # inVariable, pas contact. FALSE est sérialisé "0" (oracle).
+                if p_val == "TRUE" or p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
+                    # Non-BOOL (TIME/INT/WORD/REAL), constantes (TRUE/FALSE), expression ou non câblé :
+                    # inVariable, pas contact. FALSE est sérialisé "0", TRUE est "TRUE" ou "1".
                     source_id = local_id_counter
                     local_id_counter += 2
                     input_var = ET.SubElement(ld, "inVariable")
@@ -454,6 +450,8 @@ def build_ld_body(
                     expression = ET.SubElement(input_var, "expression")
                     if p_val == "FALSE":
                         expression.text = "0"
+                    elif p_val == "TRUE":
+                        expression.text = "TRUE"
                     elif p_val is not None:
                         expression.text = p_val
                     param_source_ids[p_name] = source_id
