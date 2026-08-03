@@ -90,4 +90,4 @@ Aucun écart majeur identifié — comportement conforme à la doc legacy sur ce
 | AF10 (chapô) | Rôle machine, intégration programme |
 | AF10 / FB_Safety_Winch | Méca E — défense en profondeur niveau 2 |
 | AF05 | Modes — `SyncEnable` |
-| Code | `CODE/TREUILS/FB_WinchSync.st`, `CODE/MAIN/PRG_TREUILS_CFC.st` (ST actuel) ; cible `PRG_04_Treuils_Benne_CFC.xml` absente |
+| Code | `CODE/TREUILS/FB_WinchSync.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (ST actuel) ; cible `PRG_04_Treuils_Benne_CFC.xml` absente |

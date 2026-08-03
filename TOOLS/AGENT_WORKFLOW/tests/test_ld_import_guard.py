@@ -373,11 +373,19 @@ def test_every_block_has_coil_wired_to_state_output() -> None:
 def test_bundle_prg06_outputs_ld_valid_invariables_and_block_refs() -> None:
     """PRG_06_Outputs_LD dans le bundle ne doit avoir ni refLocalId=0 sur des inputs FB,
     ni littéraux 'TRUE'/'FALSE' non convertis dans les inVariable (doivent être '1'/'0').
+    Le programme ne doit pas non plus déclarer de VAR_INPUT (inputVars doit être vide).
     """
     import xml.etree.ElementTree as ET
     bundle = Path(__file__).resolve().parents[2].parent / "CODE" / "CODE_Bundle.xml"
     assert bundle.exists()
     root = ET.parse(bundle).getroot()
+
+    # Vérifier que GVL_PERSISTENT est exclu du bundle XML
+    gvl_persist = [
+        p for p in root.findall(".//{http://www.plcopen.org/xml/tc6_0200}globalVars")
+        if p.attrib.get("name") == "GVL_PERSISTENT"
+    ]
+    assert len(gvl_persist) == 0, "GVL_PERSISTENT doit être exclu du bundle XML (géré manuellement par copié-collé)"
 
     pous = [
         p for p in root.findall(".//{http://www.plcopen.org/xml/tc6_0200}pou")
@@ -385,6 +393,10 @@ def test_bundle_prg06_outputs_ld_valid_invariables_and_block_refs() -> None:
     ]
     assert len(pous) == 1, "PRG_06_Outputs_LD absent ou dupliqué dans le bundle"
     pou = pous[0]
+
+    # Vérifier que inputVars est vide sur le PROGRAM PRG_06_Outputs_LD
+    input_vars = pou.findall("{http://www.plcopen.org/xml/tc6_0200}interface/{http://www.plcopen.org/xml/tc6_0200}inputVars/{http://www.plcopen.org/xml/tc6_0200}variable")
+    assert len(input_vars) == 0, f"PRG_06_Outputs_LD ne doit pas déclarer de VAR_INPUT dans un PROGRAM: {len(input_vars)} trouvés"
 
     # 1. Vérifier qu'aucun inputVariable de block n'a refLocalId="0"
     for block in pou.findall(".//{http://www.plcopen.org/xml/tc6_0200}block"):

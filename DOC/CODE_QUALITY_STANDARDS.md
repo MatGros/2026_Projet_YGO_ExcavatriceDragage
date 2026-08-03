@@ -313,7 +313,7 @@ pure sans inVariable/outVariable, coil reliée à .State pour chaque block.
 [ ] Contrat FB respecté (AF_Partie-03)
 [ ] Non-régression : appelants/IHM/diagnostics identifiés et mis à jour
 [ ] Défaut à acquitter : Reset jamais conditionné (§9) ; Warning auto-effaçable distingué du Fault
-[ ] CFC natif (.xml) : connecteurs dédiés, positions uniques non nulles (§10)
+[ ] Orchestration ST pur (.st) : découpage par sections commentées avec emojis, zéro logique métier inline, contrats DUT raccordés (§10)
 [ ] Devoir d'alerte : toute ambiguïté signalée AVANT d'écrire, pas après
 ```
 
