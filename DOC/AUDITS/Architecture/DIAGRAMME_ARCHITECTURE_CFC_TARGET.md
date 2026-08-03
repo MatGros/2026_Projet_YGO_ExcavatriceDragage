@@ -62,7 +62,7 @@ flowchart LR
     subgraph A2["📥 PRG_02_Acquisition_CFC"]
         HR["HwReal : ST_HardwareImage<br/>(image brute device)"]
         SMB["FB_SimBench<br/>HwSim : ST_HardwareImage<br/>(image simulée)"]
-        SEL["Sélection par domaine<br/>Winch · Translation ·<br/>Operator · Machine"]
+        SEL["SEL × 4 (fonctions CODESYS)<br/>Winch · Translation ·<br/>Operator · Machine<br/>responsable : PRG_02"]
         HI["HwIn : ST_HardwareImage<br/>(image sélectionnée)"]
         JST["FB_Joystick"]
         COD["Chaîne codeurs M1/M2<br/>FB_Encoder_Abs · Scale ·<br/>Safety · SpeedMeasure"]
@@ -74,9 +74,9 @@ flowchart LR
         IQ["ST_InputsQualified"]
         EM["ST_EncoderMeasurements (M1·M2)"]
         HW["HwIn / faits qualifiés"]
-        JAX["ST_Joystick_AxisCmd<br/>X/Y + DeadmanArmed"]
-        DDEV["ST_Diag_Device<br/>(Online/Operational/ErrorId)"]
-        AUF["État AU qualifié<br/>(fait d'entrée)"]
+        JAX["ST_Joystick_AxisCmd<br/>(X/Y, PAS DeadmanArmed)"]
+        DDEV["ST_Diag_Device<br/>+ E_Diag_State<br/>(par device)"]
+        AUF["ST_HwMachine<br/>(état AU brut qualifié)"]
     end
 
     TOR --> FBIN
@@ -93,9 +93,9 @@ flowchart LR
     COD -->|ST_EncoderMeasurements<br/>AF06 §2ter| EM
     SEL -.->|ST_InputsQualified =<br/>réel des domaines TOR| IQ
     HI --> HW
-    JST -->|ST_Joystick_AxisCmd + DeadmanArmed<br/>AF08 §6| JAX
-    DIA -->|faits diag<br/>AF12| DDEV
-    AU --> AUF
+    JST -->|"ST_Joystick_AxisCmd (X/Y)<br/>+ DeadmanArmed (BOOL séparé)"| JAX
+    DIA -->|ST_Diag_Device<br/>AF12| DDEV
+    AU -->|ST_HwMachine<br/>fait brut| AUF
 ```
 
 > **Lecture** : la frontière est **unique**. Tout ce qui entre dans les FB de `PRG_02` (joystick,
@@ -120,15 +120,16 @@ flowchart LR
 
 ## 3. Zoom A — Joystick (AF08 §6, AF06 §1)
 
-**Producteur** : `PRG_02_Acquisition_CFC.instJoystick`. **Sortie** : `ST_Joystick_AxisCmd` + `DeadmanArmed`.
+**Producteur** : `PRG_02_Acquisition_CFC.instJoystick`. **Sorties** : `ST_Joystick_AxisCmd` (X/Y)
+**et** `DeadmanArmed` (BOOL séparé — **pas** dans le DUT).
 
 ```mermaid
 flowchart LR
     subgraph ACQ["📥 PRG_02_Acquisition_CFC"]
         JOY["FB_Joystick<br/>Raw→AxisScale→Filter_PT1→Homme-mort<br/>AF08 §2"]
     end
-    JOY -->|"ST_Joystick_AxisCmd<br/>AxisCmdX · AxisCmdY"| AX["ST_Joystick_AxisCmd<br/>(publication)"]
-    JOY -->|DeadmanArmed| DA["DeadmanArmed<br/>(fait)"]
+    JOY -->|"ST_Joystick_AxisCmd<br/>AxisCmdX · AxisCmdY"| AX["ST_Joystick_AxisCmd<br/>(Enable·StartStop·SpeedRef·<br/>Direction·PowerContactorEngaged)"]
+    JOY -->|DeadmanArmed| DA["DeadmanArmed<br/>(BOOL séparé)"]
     AX --> M3["PRG_03 · FB_Cycle<br/>CycleMotionPermit :=<br/>DeadmanArmed AND AxisCmdY.StartStop<br/>AF08 §6"]
     AX --> TR["PRG_04 · FB_Winch<br/>consigne + sélecteur treuil"]
     AX --> TL["PRG_05 · FB_Translation<br/>AxisCmdX + DeadmanArmed"]
@@ -140,13 +141,14 @@ flowchart LR
 
 > **Contrat consommateur** : `AxisCmd*.StartStop` **et** `DeadmanArmed` combinés (TC-P08-013).
 > Rampes laissées aux FB de mouvement aval (`FB_Winch`, `FB_Translation`) — AF08 §2.
+> `DeadmanArmed` apparaît aussi dans `ST_JoystickState` (IHM) **pour affichage uniquement**.
 
 ---
 
-## 4. Zoom B — Diagnostics devices / bus (AF12, AF06 §3)
+## 4. Zoom B — Diagnostics devices / bus (AF12 §1, AF06 §3)
 
 **Producteur** : `PRG_02_Acquisition_CFC` (`instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat`).
-**Sortie** : `ST_Diag_Device` (`Online`, `Operational`, `Error`, `ErrorId`, `State`).
+**DUT de sortie** : `ST_Diag_Device` (une instance par device) + `E_Diag_State`.
 
 ```mermaid
 flowchart LR
@@ -155,7 +157,7 @@ flowchart LR
         ETH["instDiagEthercat"]
         HBT["instIhmHeartbeat"]
     end
-    CAN -->|"DeviceCanOpenMaster<br/>DeviceJoystick"| DD["ST_Diag_Device<br/>(faits)"]
+    CAN -->|"DeviceCanOpenMaster<br/>DeviceJoystick"| DD["ST_Diag_Device<br/>(Online·Operational·Error·<br/>ErrorId·State·StateAtError)"]
     ETH -->|"DeviceEthercatMaster<br/>DeviceVariateur<br/>DeviceEncoderM1/M2"| DD
     HBT -->|"heartbeat IHM<br/>(fait)"| HB["IhmHeartbeat"]
     DD --> SAF["FB_Safety_Winch /<br/>FB_Safety_Translation<br/>(via PRG_04/05)"]
@@ -171,19 +173,29 @@ flowchart LR
 
 ## 5. Zoom C — État AU & PositionDecoder M3 (AF06 §2bis, AF01, AF11 §4.2)
 
-### 5.1 État AU — acquis ici, agit en sortie
+### 5.1 État AU — acquis ici (fait brut), qualifié/agissant en sortie
 
 ```mermaid
 flowchart LR
     subgraph ACQ["📥 PRG_02_Acquisition_CFC"]
-        AU["État AU<br/>(fait d'entrée qualifié)"]
+        AU["ST_HwMachine<br/>EmergencyChainClosed_DI<br/>PowerContactorEngaged_DI<br/>(faits bruts qualifiés)"]
     end
-    AU -->|fait qualifié| OUT["PRG_06_Outputs_LD<br/>barrière finale"]
-    OUT -->|action AU| PWR["coupure puissance /<br/>rearmement (Partie 01)"]
+    subgraph OUT["⚡ PRG_06_Outputs_LD"]
+        FBEM["FB_Safety_EmergencyManagement"]
+        ST["ST_Safety_Emergency_State<br/>ChainOk·ContactorOk·Step·Armable·ArmingBusy"]
+        DG["ST_Safety_Emergency_Diag<br/>Error·ErrorId·RedundancyFail·Lockout"]
+    end
+    AU -->|"EmergencyChainClosed<br/>PowerContactorEngaged<br/>(via PRG_02 qualifié)"| FBEM
+    FBEM -->|fait| ST
+    FBEM -->|fait| DG
+    ST --> SUP["PRG_07 · Supervision / Troubleshooting"]
+    DG --> SUP
 ```
 
-> ⚠️ **Acquisition de l'état ≠ lieu d'action** : `PRG_02` ne fait qu'acquis le fait ; la chaîne
-> matérielle AU reste indépendante et prioritaire (Partie 01), le FB agit via la barrière finale.
+> ⚠️ **Acquisition de l'état ≠ lieu d'action** : `PRG_02` acquiert `ST_HwMachine` (faits bruts
+> qualifiés) ; le FB agit via `PRG_06_Outputs_LD` (barrière finale). La chaîne matérielle AU reste
+> indépendante et prioritaire (Partie 01). DUT publics : `ST_Safety_Emergency_State` /
+> `ST_Safety_Emergency_Diag` (AF01 fiche §8).
 
 ### 5.2 PositionDecoder M3 — décodage à la frontière, consommation en Translation
 
@@ -222,7 +234,21 @@ flowchart LR
 
 ---
 
-## 7. Correspondance code legacy → cible (AF02 §4, AF06 §2bis)
+## 7. Sommaire des structures publiées par `PRG_02` (et leur DUT)
+
+| Sortie | DUT / type | Contenu | Réf. spec |
+|---|---|---|---|
+| TOR réelles qualifiées | `ST_InputsQualified` | 1 BOOL par TOR (`M1/M2/M3_*_DI`, `Machine_*`) | AF06 §2ter |
+| Image sélectionnée | `ST_HardwareImage` (`HwIn`) | 4 sous-domaines `Winch`/`Translation`/`Operator`/`Machine` | AF06 §2ter |
+| Mesures codeurs | `ST_EncoderMeasurements` | `M1`/`M2` : `RawPos`, `EncoderAvailable`, `CablePosM`, `CablePosMSafe`, `EncoderIncoherent`, `Speed_Mps`, `SignedSpeed_Mps`, `SpeedValid` | AF06 §2ter |
+| Consigne joystick | `ST_Joystick_AxisCmd` | `Enable`, `StartStop`, `SpeedRef`, `Direction`, `PowerContactorEngaged` — **`DeadmanArmed` est hors DUT** (BOOL séparé) | AF08 §6, NAMING §Structures |
+| Diagnostics devices | `ST_Diag_Device` (+ `E_Diag_State`) | par device : `Online`, `Operational`, `Error`, `ErrorId`, `State`, `StateAtError` | AF12 §1 |
+| État AU brut qualifié | `ST_HwMachine` (sous-image) | `EmergencyChainClosed_DI`, `PowerContactorEngaged_DI`, … | AF06 §2ter, AF01 |
+| État AU public / diag | `ST_Safety_Emergency_State` / `_Diag` | produit par `FB_Safety_EmergencyManagement` (en `PRG_06`), **pas** par `PRG_02` | AF01 fiche §8 |
+
+---
+
+## 8. Correspondance code legacy → cible (AF02 §4, AF06 §2bis)
 
 | Legacy | Cible | Lot |
 |---|---|---|
