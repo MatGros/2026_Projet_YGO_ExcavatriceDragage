@@ -1455,7 +1455,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed</expression>
+                  <expression>PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed</expression>
                 </inVariable>
                 <connector localId="119" name="">
                   <position x="100" y="830" />

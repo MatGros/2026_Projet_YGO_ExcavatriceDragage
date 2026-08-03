@@ -29,7 +29,7 @@ VAR_INPUT
 
     BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
     BypassLimitSwitch            : BOOL;       // 🚧 TRUE = ignore les fins de course extrêmes
-    BrakeFeedback                : BOOL;       // Retour normalisé : TRUE = frein serré
+    BrakeFeedback                : BOOL;       // Retour physique direct : TRUE = frein OUVERT (desserré)
 
     // Réglages rampe (RETAIN)
     CfgRampAccelRate                : REAL := 20.0;    // %/s — accélération
@@ -60,6 +60,7 @@ VAR_OUTPUT
     RequestedDriveControlWord : WORD; // Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD
     RequestedDriveFreqHz      : REAL; // Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD
     BrakeReleaseRequest       : BOOL; // Demande métier desserrage, issue de FB_Brake
+    BrakeCommandOpenConfirmed : BOOL; // TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
     BrakeContactorCheck  : ST_ContactorCheck; // Diag contacteur frein
 END_VAR
 VAR
@@ -89,6 +90,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
     BrakeReleaseRequest := Brake.BrakeCmd;
+    BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
     BrakeContactorCheck := Brake.ContactorCheck;
 
     CommandedDirection := 0;
@@ -211,6 +213,7 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
       BypassContactorCheck := BypassContactorCheck);
 BrakeReleaseRequest := Brake.BrakeCmd;
+BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
 // 🛡️ FB_Translation ne décide plus la frontière finale : il expose uniquement

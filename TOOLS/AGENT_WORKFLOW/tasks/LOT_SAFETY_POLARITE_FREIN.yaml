@@ -1,0 +1,128 @@
+contract:
+  task_id: LOT_SAFETY_POLARITE_FREIN
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Revoquer la decision du 2026-07-26 (TRUE = frein serre dans l'aval via
+    InvertLogic) et adopter la logique physique reelle du frein a manque de
+    courant : TRUE = frein OUVERT (desserre) dans toute la chaine, comme le DI
+    physique M1_BrakeIsOpen_DI. Plus aucune inversion a la frontiere. Tous les
+    consommateurs safety sont ajustes pour garantir le MEME comportement de
+    protection (Meca A/B/D/E, DriftGuard, FB_Brake, homing) avec la nouvelle
+    polarite.
+
+  acceptance:
+    - id: AC1
+      statement: "PRG_01_Inputs_LD.st : CST_BrakeFeedbackInvertLogic vaut FALSE (ou est supprimee). Les instances instM1/M2/M3BrakeFeedback recoivent InvertLogic := FALSE. M1BrakeFeedback = M1_BrakeIsOpen_DI (TRUE = frein ouvert)."
+      verified_by: "grep -n InvertLogic CODE/MAIN/PRG_01_Inputs_LD.st"
+    - id: AC2
+      statement: "PRG_01_Inputs_LD.st : les commentaires de M1/M2/M3BrakeFeedback indiquent TRUE = frein ouvert. M1BrakeCommandOpenConfirmed := NOT M1BrakeFeedback reste correct (TRUE = frein serre confirme, inverse du retour)."
+      verified_by: "grep -n BrakeFeedback CODE/MAIN/PRG_01_Inputs_LD.st"
+    - id: AC3
+      statement: "FB_Safety_Winch.st : ligne 369 Arm := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode (au lieu de AND BrakeFeedback). Ligne 375 : FwdRevSpeedFeedbackOff AND NOT BrakeFeedback. Lignes 389/436/460 MecaB/D/E : NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback). Commentaire ligne 147 : TRUE = frein ouvert. Comportement Meca A/B/D/E inchange."
+      verified_by: "grep -n BrakeFeedback CODE/TREUILS/FB_Safety_Winch.st"
+    - id: AC4
+      statement: "FB_Safety_Translation.st : ligne 158 UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback (au lieu de NOT BrakeFeedback). Ligne 160 idem. Commentaire ligne 27 : TRUE = frein ouvert. Comportement Meca B inchange."
+      verified_by: "grep -n BrakeFeedback CODE/TRANSLATION/FB_Safety_Translation.st"
+    - id: AC5
+      statement: "FB_Encoder_Homing.st : ligne 120 ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback) (au lieu de AND BrakeFeedback). Commentaire ligne 33 : TRUE = frein ouvert (coherent avec le reste, plus de contradiction TRUE=relache)."
+      verified_by: "grep -n BrakeFeedback CODE/CODEURS/FB_Encoder_Homing.st"
+    - id: AC6
+      statement: "FB_Brake.st : TonFeedback(IN := (BrakeCmd <> ContactorFeedback)) (au lieu de =) — en marche saine BrakeCmd (TRUE=relache) et ContactorFeedback (TRUE=ouvert) sont maintenant EGAUX en sain, leur DIFFERENCE trahit un defaut. StuckClosed/StuckOpen reajustes. Commentaires mis a jour."
+      verified_by: "grep -n TonFeedback CODE/COMMUN/FB_Brake.st"
+    - id: AC7
+      statement: "FB_Translation.st et FB_Winch.st : ContactorFeedback := BrakeFeedback passe TRUE=ouvert. Commentaire FB_Translation ligne 32 mis a jour."
+      verified_by: "grep -n BrakeFeedback CODE/TRANSLATION/FB_Translation.st"
+    - id: AC8
+      statement: "PRG_TROUBLESHOOTING_CFC.st : M1BrakeApplied := NOT PRG_01_Inputs_LD.M1BrakeFeedback (au lieu de := direct) pour garder TRUE = frein serre dans l'IHM (le nom BrakeApplied dit serre). Idem M2/M3. Idx104/108 inchanges (TRUE=serre) avec NOT a l'affectation."
+      verified_by: "grep -n BrakeApplied CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st"
+    - id: AC9
+      statement: "PRG_SUPERVISION_CFC.st : GVL_IHM.TranslationM3.State.BrakeFeedback := PRG_01_Inputs_LD.M3BrakeFeedback — commenter TRUE=ouvert. Verifier si l'IHM attend TRUE=serre (auquel cas ajouter NOT)."
+      verified_by: "grep -n BrakeFeedback CODE/MAIN/PRG_SUPERVISION_CFC.st"
+    - id: AC10
+      statement: "ST_Chain_Winch_Inputs.st et ST_Chain_Translation_Inputs.st : commentaires Idx104/108_BrakeApplied mis a jour pour refléter la nouvelle polarite (cohérent avec AC8)."
+      verified_by: "grep -n BrakeApplied CODE/SUPERVISION/_TYPES/ST_Chain_Winch_Inputs.st"
+    - id: AC11
+      statement: "FB_AcquisitionLegacyBridge.st : BrakeFeedback := HwIn.Winch.M1_BrakeIsOpen_DI — deja en logique directe (TRUE=ouvert). Aucune inversion a ajouter. Verifier coherence."
+      verified_by: "grep -n BrakeFeedback CODE/ACQUISITION/FB_AcquisitionLegacyBridge.st"
+    - id: AC12
+      statement: "Docs mis a jour : PLAN_TASK section 1bis ligne 77 (decision revoquee + nouvelle decision TRUE = frein ouvert), AF_Partie-09 FB_Encoder_Homing (polarite corrigee), AF_Partie-11 FB_Translation (TRUE=ouvert), AF_Partie-10 FB_Safety_Winch/FB_Winch, REGISTRE MES (procedure InvertLogic supprimee)."
+      verified_by: "grep -rn TRUE-frein-serré DOC/PLAN_TASK_v1.0.md"
+    - id: AC13
+      statement: "Bundle regenere et check_bundle_st_syntax.py PASS."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_bundle_st_syntax.py ."
+    - id: AC14
+      statement: "check_linkage.py --report PASS (0 erreur)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report"
+    - id: AC15
+      statement: "Aucun comportement safety modifie : Meca A/B/D/E, DriftGuard, homing, FB_Brake — tous declenchent dans les MEMES conditions qu'avant, seule la polarite du signal change."
+      verified_by: "revue du diff par l'orchestrateur + reviewer independant"
+    - id: AC16
+      statement: "Ce lot ne renomme aucun POU : le nom de fichier de chaque POU reste egal au nom de POU declare. PRG_01_Inputs_LD.st declare toujours PROGRAM PRG_01_Inputs_LD. Le nom de fichier correspond au nom de POU."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC17
+      statement: "Le suffixe de langage de chaque fichier reste egal au langage genere dans le bundle : _LD pour PRG_01_Inputs_LD, _CFC pour les XML natifs. Aucun suffixe change. Le suffixe correspond au langage du bundle."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_01_Inputs_LD.st
+      - CODE/TREUILS/FB_Safety_Winch.st
+      - CODE/TRANSLATION/FB_Safety_Translation.st
+      - CODE/CODEURS/FB_Encoder_Homing.st
+      - CODE/TREUILS/FB_DriftGuard.st
+      - CODE/COMMUN/FB_Brake.st
+      - CODE/TREUILS/FB_Winch.st
+      - CODE/TRANSLATION/FB_Translation.st
+      - CODE/ACQUISITION/FB_AcquisitionLegacyBridge.st
+      - CODE/MAIN/PRG_SAFETY_CFC.st
+      - CODE/MAIN/PRG_TREUILS_CFC.st
+      - CODE/MAIN/PRG_TRANSLATION_CFC.st
+      - CODE/MAIN/PRG_SUPERVISION_CFC.st
+      - CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st
+      - CODE/MAIN/PRG_02_Encoders.st
+      - CODE/SUPERVISION/_TYPES/ST_Chain_Winch_Inputs.st
+      - CODE/SUPERVISION/_TYPES/ST_Chain_Translation_Inputs.st
+      - CODE/SUPERVISION/_TYPES/ST_TranslationState.st
+      - DOC/PLAN_TASK_v1.0.md
+      - DOC/AF_Partie-09_Fonction_Encoder/FB_Encoder_Homing_v1.0.md
+      - DOC/AF_Partie-11_Fonction_Translation/FB_Translation_v1.0.md
+      - DOC/AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md
+      - DOC/AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md
+      - DOC/AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md
+      - DOC/REGISTRE_Suivi_MiseEnService_20260724_v1.0.md
+    forbidden:
+      - CODE/CODE_Bundle.xml
+      - PRJ_CODESYS/**
+      - ARCHIVES/**
+      - TOOLS/**
+
+  conservation:
+    must_survive:
+      - "Meca A (FB_Safety_Winch bit7, derive codeur) : declenche quand le treuil bouge ALORS QUE le frein est serre. Condition actuelle : MeasuredSpeedMps > seuil AND FwdRevSpeedFeedbackOff AND BrakeFeedback (TRUE=serre). Apres : AND NOT BrakeFeedback (TRUE=ouvert donc NOT = serre). MEME declenchement."
+      - "Meca B (bit8, arret non confirme) : TON si contacteurs retombes ET frein serre pendant PostRampTimeout. Condition actuelle : NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback). Apres : NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback). MEME declenchement."
+      - "Meca D/E : meme logique que Meca B."
+      - "DriftGuard Arm : s'arme quand contacteurs retombes ET frein serre. Apres : AND NOT BrakeFeedback au lieu de AND BrakeFeedback."
+      - "FB_Brake StuckClosed/StuckOpen : en marche saine BrakeCmd (TRUE=relache) et ContactorFeedback (TRUE=ouvert apres fix) sont EGAUX. Le test repasse en <> (difference = defaut). StuckClosed = relache commandee (BrakeCmd=TRUE) mais frein reste serre (ContactorFeedback=FALSE). StuckOpen = serrage commande (BrakeCmd=FALSE) mais frein reste ouvert (ContactorFeedback=TRUE)."
+      - "FB_Encoder_Homing ArretConfirme : TRUE quand contacteurs retombes ET frein serre. Apres : AND NOT BrakeFeedback."
+      - "IHM troubleshooting M1BrakeApplied : TRUE = frein serre (le nom le dit). Apres : := NOT M1BrakeFeedback pour garder ce sens."
+    dropped_on_purpose:
+      - "Decision PLAN_TASK section 1bis TRUE = frein serre dans l'aval — REVOQUEE."
+      - "CST_BrakeFeedbackInvertLogic := TRUE — supprimee ou mise a FALSE."
+      - "Procedure terrain REGISTRE MES 'Si 1 -> cablage inverse -> passer InvertLogic := FALSE' — supprimee (plus d'InvertLogic)."
+
+  evidence_required:
+    - check_linkage
+    - check_bundle_st_syntax
+    - bundle
+    - diff_review
+
+  models_allowed:
+    - "nvidia/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+
+  alert_duty: >
+    Toute condition safety qui ne se retrouve pas a l'identique apres inversion
+    doit etre remontee IMMEDIATEMENT via contact_supervisor (reason: need_decision).
+    Ne jamais inverser aveuglement — verifier que chaque NOT preserve le
+    comportement. Si un doute existe sur le sens d'une condition, PAUSE et demande.

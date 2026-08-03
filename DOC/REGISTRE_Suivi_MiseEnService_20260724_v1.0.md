@@ -39,10 +39,12 @@
   - **Méca A désarmé** ➔ Perte détection roue libre / frein qui patine.
   - `FB_Brake` en incohérence ➔ Serrage frein sous couple + coupure relais (cause incident `v0.4.27`).
 - 🛠️ **Fix appliqué** : Normalisation frontière NO/NC via `FB_Input` : `PRG_00_Inputs.BrakeFeedbackInvertLogic : BOOL := TRUE`. Modèle simulé fixé (`:= BrakeCmd`). `FB_Brake` incohérence `<>` ➔ `=`. `FB_Safety_*` intacts.
-- 🔩 **Action Terrain (Machine à l'arrêt, frein serré)** :
-  1. Lire `M1_BrakeFeedback_DI`.
-  2. Si `0` ➔ Conforme (`BrakeFeedbackInvertLogic = TRUE`).
-  3. Si `1` ➔ Câblage inversé ➔ passer `BrakeFeedbackInvertLogic := FALSE` à chaud + figer init.
+  > ⚠️ **RÉVOQUÉ 2026-08-03** : `BrakeFeedbackInvertLogic := FALSE` (plus d'inversion). `M1BrakeFeedback = M1_BrakeIsOpen_DI` (TRUE = frein ouvert). `FB_Brake` test repasse en `<>`. `FB_Safety_*` conditions inversées (`NOT BrakeFeedback`) pour garder le même comportement. Voir `LOT_SAFETY_POLARITE_FREIN`.
+- ~~🔩 **Action Terrain (Machine à l'arrêt, frein serré)** :~~
+  ~~1. Lire `M1_BrakeFeedback_DI`.~~
+  ~~2. Si `0` ➔ Conforme (`BrakeFeedbackInvertLogic = TRUE`).~~
+  ~~3. Si `1` ➔ Câblage inversé ➔ passer `BrakeFeedbackInvertLogic := FALSE` à chaud + figer init.~~
+  > Procédure supprimée : plus de `BrakeFeedbackInvertLogic` à ajuster (constant à FALSE, logique directe).
 - 🛑 **Limite connue** : Retour = contacteur, PAS le frein physique. Seul **Méca A** (dérive codeur, `FB_Safety_Winch` bit7) détecte la patinage (`0,02 m/s` direct).
 - 🚀 **Activation** : Passer `SensorM1/M2/M3ContactorFeedbackIsReal := TRUE` **axe par axe**.
 
