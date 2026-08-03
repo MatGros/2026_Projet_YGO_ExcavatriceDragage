@@ -58,7 +58,7 @@ TonMachineStill(IN := MachineIsStillRaw, PT := T#2s);
 instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonMachineStill.Q,
     M1BrakeApplied := PRG_INPUTS_LD.M1BrakeFeedback, M2BrakeApplied := PRG_INPUTS_LD.M2BrakeFeedback, M3BrakeApplied := PRG_INPUTS_LD.M3BrakeFeedback,
     M1ContactorsReleased := PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff, M2ContactorsReleased := PRG_INPUTS_LD.M2FwdRevSpeedFeedbackOff, M1ThermalOk := PRG_INPUTS_LD.M1ThermalFeedback, M2ThermalOk := PRG_INPUTS_LD.M2ThermalFeedback,
-    BrakeThermalOk := PRG_INPUTS_LD.BrakeThermalFeedback, PhaseRotationOk := PRG_INPUTS_LD.PhaseRotationOk, SlackCableTensioned := PRG_INPUTS_LD.SlackCableSwitch, M3SensorWordIncoherent := PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent,
+    BrakeThermalOk := PRG_INPUTS_LD.BrakeThermalFeedback, PhaseRotationOk := PRG_INPUTS_LD.PhaseRotationOk, SlackCableTensioned := PRG_INPUTS_LD.SlackCableSwitch, M3SensorWordIncoherent := PRG_ACQUISITION_CFC.M3_SensorWordIncoherent,
     EmergencyChainClosed := PRG_INPUTS_LD.EmergencyChainClosed, PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1 := PRG_02_Encoders.instHomingM1.Homed, HomedM2 := PRG_02_Encoders.instHomingM2.Homed,
     M1PositionInBounds := (PRG_02_Encoders.instEncoderScaleM1.CablePosM >= -99.0) AND (PRG_02_Encoders.instEncoderScaleM1.CablePosM <= 99.0), M2PositionInBounds := (PRG_02_Encoders.instEncoderScaleM2.CablePosM >= -99.0) AND (PRG_02_Encoders.instEncoderScaleM2.CablePosM <= 99.0));

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-02T00:00:00" />
+  <contentHeader name="CFC_PREVIEW_Supervision.project" modificationDateTime="2026-08-02T00:00:00" />
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="CFC_PREVIEW_Supervision" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="instSupervisionProjection">
+              <type>
+                <derived name="FB_SupervisionProjection" />
+              </type>
+            </variable>
+          </localVars>
+        <outputVars><variable name="Ready"><type><BOOL /></type></variable></outputVars></interface>
+        <body>
+          <ST>
+            <html:xhtml />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="20" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>TRUE</expression>
+                </inVariable>
+                <connector localId="2" name="">
+                  <position x="40" y="20" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="3" executionOrderId="1" typeName="FB_SupervisionProjection" instanceName="instSupervisionProjection">
+                  <position x="80" y="20" />
+                  <inputVariables>
+                    <variable formalParameter="Enable">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="2" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="Ready">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                </block>
+              <connector localId="4" name="ReadyPublisher"><position x="1100" y="102" /><connectionPointIn><connection refLocalId="3" formalParameter="Ready" /></connectionPointIn></connector><outVariable localId="5"><position x="1240" y="120" /><connectionPointIn><connection refLocalId="4" /></connectionPointIn><expression>Ready</expression></outVariable></CFC>
+            </data>
+          </addData>
+        </body>
+      </pou>
+    </pous>
+  </types>
+</project>

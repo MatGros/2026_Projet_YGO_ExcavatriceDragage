@@ -33,5 +33,3 @@ instModes(
 Auth := instModes.Auth;
 
 END_PROGRAM
-
-END_PROGRAM

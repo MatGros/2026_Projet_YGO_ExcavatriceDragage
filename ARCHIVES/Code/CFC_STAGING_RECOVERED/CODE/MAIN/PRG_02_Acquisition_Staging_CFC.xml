@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-02T00:00:00" />
+  <contentHeader name="AcquisitionStaging.project" modificationDateTime="2026-08-02T00:00:00" />
+  <types><dataTypes /><pous>
+    <pou name="PRG_02_Acquisition_Staging_CFC" pouType="program">
+      <interface><localVars>
+        <variable name="instResetAggregation"><type><derived name="FB_ResetAggregation" /></type></variable>
+        <variable name="instAcquisitionRouter"><type><derived name="FB_AcquisitionRouter" /></type></variable>
+      </localVars><outputVars><variable name="CmdReset"><type><derived name="ST_ResetCommand" /></type></variable><variable name="HwIn"><type><derived name="ST_HardwareImage" /></type></variable><variable name="WinchInputSourceChanged"><type><BOOL /></type></variable></outputVars></interface>
+      <body>
+        <ST><html:xhtml /></ST>
+        <addData><data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation"><CFC>
+          <inVariable localId="1"><position x="10" y="10" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.Modes.Cmd.BtnFaultReset</expression></inVariable>
+          <connector localId="2" name=""><position x="30" y="10" /><connectionPointIn><connection refLocalId="1" /></connectionPointIn></connector>
+          <inVariable localId="3"><position x="10" y="25" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.M1TreuilRetenue.Cmd.BtnReset</expression></inVariable>
+          <connector localId="4" name=""><position x="30" y="25" /><connectionPointIn><connection refLocalId="3" /></connectionPointIn></connector>
+          <inVariable localId="5"><position x="10" y="40" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.M2TreuilBenne.Cmd.BtnReset</expression></inVariable>
+          <connector localId="6" name=""><position x="30" y="40" /><connectionPointIn><connection refLocalId="5" /></connectionPointIn></connector>
+          <inVariable localId="7"><position x="10" y="55" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset</expression></inVariable>
+          <connector localId="8" name=""><position x="30" y="55" /><connectionPointIn><connection refLocalId="7" /></connectionPointIn></connector>
+          <block localId="9" executionOrderId="1" typeName="FB_ResetAggregation" instanceName="instResetAggregation">
+            <position x="60" y="20" />
+            <inputVariables>
+              <variable formalParameter="BtnFaultReset"><connectionPointIn><relPosition x="0" y="0" /><connection refLocalId="2" /></connectionPointIn></variable>
+              <variable formalParameter="BtnResetM1"><connectionPointIn><relPosition x="0" y="1" /><connection refLocalId="4" /></connectionPointIn></variable>
+              <variable formalParameter="BtnResetM2"><connectionPointIn><relPosition x="0" y="2" /><connection refLocalId="6" /></connectionPointIn></variable>
+              <variable formalParameter="BtnResetBucket"><connectionPointIn><relPosition x="0" y="3" /><connection refLocalId="8" /></connectionPointIn></variable>
+            </inputVariables><inOutVariables /><outputVariables><variable formalParameter="Cmd"><connectionPointOut><relPosition x="0" y="0" /><expression /></connectionPointOut></variable></outputVariables>
+            <addData><data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation"><CallType>functionblock</CallType></data></addData>
+          </block>
+          <inVariable localId="10"><position x="10" y="100" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_ACQUISITION_CFC.HwReal</expression></inVariable>
+          <connector localId="11" name=""><position x="30" y="100" /><connectionPointIn><connection refLocalId="10" /></connectionPointIn></connector>
+          <inVariable localId="12"><position x="10" y="115" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_ACQUISITION_CFC.HwSim</expression></inVariable>
+          <connector localId="13" name=""><position x="30" y="115" /><connectionPointIn><connection refLocalId="12" /></connectionPointIn></connector>
+          <inVariable localId="14"><position x="10" y="130" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_Simulation.SimulationModeActive</expression></inVariable>
+          <connector localId="15" name=""><position x="30" y="130" /><connectionPointIn><connection refLocalId="14" /></connectionPointIn></connector>
+          <inVariable localId="16"><position x="10" y="145" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_Simulation.SimWinchActive</expression></inVariable>
+          <connector localId="17" name=""><position x="30" y="145" /><connectionPointIn><connection refLocalId="16" /></connectionPointIn></connector>
+          <inVariable localId="18"><position x="10" y="160" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_Simulation.SimTranslationActive</expression></inVariable>
+          <connector localId="19" name=""><position x="30" y="160" /><connectionPointIn><connection refLocalId="18" /></connectionPointIn></connector>
+          <inVariable localId="20"><position x="10" y="175" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_Simulation.SimOperatorActive</expression></inVariable>
+          <connector localId="21" name=""><position x="30" y="175" /><connectionPointIn><connection refLocalId="20" /></connectionPointIn></connector>
+          <inVariable localId="22"><position x="10" y="190" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_Simulation.SimMachineActive</expression></inVariable>
+          <connector localId="23" name=""><position x="30" y="190" /><connectionPointIn><connection refLocalId="22" /></connectionPointIn></connector>
+          <block localId="24" executionOrderId="2" typeName="FB_AcquisitionRouter" instanceName="instAcquisitionRouter">
+            <position x="60" y="120" />
+            <inputVariables>
+              <variable formalParameter="HwReal"><connectionPointIn><relPosition x="0" y="0" /><connection refLocalId="11" /></connectionPointIn></variable>
+              <variable formalParameter="HwSim"><connectionPointIn><relPosition x="0" y="1" /><connection refLocalId="13" /></connectionPointIn></variable>
+              <variable formalParameter="SimulationModeActive"><connectionPointIn><relPosition x="0" y="2" /><connection refLocalId="15" /></connectionPointIn></variable>
+              <variable formalParameter="SimWinchActive"><connectionPointIn><relPosition x="0" y="3" /><connection refLocalId="17" /></connectionPointIn></variable>
+              <variable formalParameter="SimTranslationActive"><connectionPointIn><relPosition x="0" y="4" /><connection refLocalId="19" /></connectionPointIn></variable>
+              <variable formalParameter="SimOperatorActive"><connectionPointIn><relPosition x="0" y="5" /><connection refLocalId="21" /></connectionPointIn></variable>
+              <variable formalParameter="SimMachineActive"><connectionPointIn><relPosition x="0" y="6" /><connection refLocalId="23" /></connectionPointIn></variable>
+            </inputVariables><inOutVariables /><outputVariables>
+              <variable formalParameter="HwIn"><connectionPointOut><relPosition x="0" y="0" /><expression /></connectionPointOut></variable>
+              <variable formalParameter="WinchInputSourceChanged"><connectionPointOut><relPosition x="0" y="1" /><expression /></connectionPointOut></variable>
+            </outputVariables>
+            <addData><data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation"><CallType>functionblock</CallType></data></addData>
+          </block>
+        <connector localId="25" name="CmdResetPublisher"><position x="1100" y="120" /><connectionPointIn><connection refLocalId="9" formalParameter="Cmd" /></connectionPointIn></connector><outVariable localId="26"><position x="1240" y="138" /><connectionPointIn><connection refLocalId="25" /></connectionPointIn><expression>CmdReset</expression></outVariable><connector localId="27" name="HwInPublisher"><position x="1100" y="156" /><connectionPointIn><connection refLocalId="24" formalParameter="HwIn" /></connectionPointIn></connector><outVariable localId="28"><position x="1240" y="174" /><connectionPointIn><connection refLocalId="27" /></connectionPointIn><expression>HwIn</expression></outVariable><connector localId="29" name="WinchInputSourceChangedPublisher"><position x="1100" y="192" /><connectionPointIn><connection refLocalId="24" formalParameter="WinchInputSourceChanged" /></connectionPointIn></connector><outVariable localId="30"><position x="1240" y="210" /><connectionPointIn><connection refLocalId="29" /></connectionPointIn><expression>WinchInputSourceChanged</expression></outVariable></CFC></data></addData>
+      </body>
+    </pou>
+  </pous></types>
+</project>

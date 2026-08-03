@@ -219,6 +219,27 @@ def load_native_xml_pou_names(root: Path) -> set[str]:
     return names
 
 
+def load_native_xml_block_types(root: Path) -> set[str]:
+    """Types de FB réellement instanciés dans les pages CFC XML natives.
+
+    L13 contrôlait historiquement uniquement les déclarations ST ``instX : FB_X``.
+    Une page CFC native déclare ses instances dans XML (``typeName=``) : l'ignorer
+    créait le faux positif « FB orphelin » dès qu'un FB était câblé uniquement dans
+    une page XML. Les bundles ne sont pas utilisés ici : la source XML est la
+    preuve, donc le contrôle reste valable avant génération du bundle.
+    """
+    types: set[str] = set()
+    code = root / "CODE"
+    if not code.is_dir():
+        return types
+    for xml_path in code.rglob("*.xml"):
+        if xml_path.name.startswith("CODE_Bundle") or xml_path.name.startswith("CODE_AU_Bundle"):
+            continue
+        text = xml_path.read_text(encoding="utf-8", errors="replace")
+        types.update(match.group("type") for match in BUNDLE_BLOCK.finditer(text))
+    return types
+
+
 def load_bundle_blocks(root: Path) -> list[tuple[str, str, str]]:
     """Retourne [(pou, instanceName, typeName)] du bundle PLCopenXML."""
     bundle = root / "CODE" / "CODE_Bundle.xml"
@@ -316,6 +337,11 @@ def find_l13_orphans(pous: dict[str, Pou], gvl_files: dict[str, Path], root: Pat
     for pou in pous.values():
         for typ, _section, _line in pou.declarations.values():
             type_usage.setdefault(typ, set()).add(pou.name)
+
+    # Les instances CFC XML n'apparaissent pas dans les declarations ST.
+    # Marquage distinct afin que L13 reste explicable dans les rapports.
+    for typ in load_native_xml_block_types(root):
+        type_usage.setdefault(typ, set()).add("<CFC_XML_NATIVE>")
 
     for pou in sorted(pous.values(), key=lambda p: p.name):
         if pou.kind != "FUNCTION_BLOCK":

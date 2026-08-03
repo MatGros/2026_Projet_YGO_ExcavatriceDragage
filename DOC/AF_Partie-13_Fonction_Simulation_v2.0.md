@@ -2,7 +2,7 @@
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5  
 > **Statut** : référence active · 2026-07-27  
-> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_ACQUISITION_CFC.st` (ST actuel ; cible CFC native `PRG_02_Acquisition_CFC.xml` absente, rang 02 de la `MainTask` — voir `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2),
+> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_ACQUISITION_CFC.xml` (CFC natif ; son pont temporaire de conservation est `CODE/ACQUISITION/FB_AcquisitionLegacyBridge.st`),
 > `AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`,
 > `CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md`.
 

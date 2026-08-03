@@ -1,0 +1,42 @@
+contract:
+  task_id: FIX_BUNDLE_MAIN_COVERAGE
+  criticality: C2
+  strategy: patch
+  objective: >
+    Prouver automatiquement que chaque POU source de CODE/MAIN est généré une
+    fois et une seule dans CODE/CODE_Bundle.xml avec le langage attendu.
+  acceptance:
+    - id: AC1
+      statement: "PRG_INPUTS_LD, PRG_ACQUISITION_CFC, PRG_01_Diagnostics, PRG_02_Encoders, PRG_05_Cycle, PRG_AUXILIARY_CFC, PRG_MODES_CFC, PRG_SAFETY_CFC, PRG_TREUILS_CFC, PRG_TRANSLATION_CFC, PRG_10_Outputs_LD, PRG_TROUBLESHOOTING_CFC et PRG_SUPERVISION_CFC sont chacun présents exactement une fois dans CODE_Bundle.xml."
+      verified_by: "nouveau test pytest de couverture MAIN"
+    - id: AC2
+      statement: "Une source _LD.st est émise en <LD>; une source _CFC.xml est émise avec extension <CFC>; une source ST non-LD est émise en <ST>."
+      verified_by: "nouveau test pytest de langage généré"
+    - id: AC3
+      statement: "Un POU source absent du bundle, dupliqué, ou émis dans le mauvais langage fait échouer le test avec le nom du POU."
+      verified_by: "tests négatifs avec bundle temporaire mutilé/dupliqué"
+    - id: AC4
+      statement: "Le garde-fou refuse tout fichier CODE/MAIN dont le nom de POU déclaré ou le nom de bundle diffère du basename fichier; un POU final doit commencer par PRG_XX_."
+      verified_by: "tests négatifs de mismatch fichier/POU/bundle"
+    - id: AC5
+      statement: "Le bundle réel courant produit un rapport explicite des POU historiques non conformes, sans les confondre avec une couverture bundle valide."
+      verified_by: "check_bundle_main_coverage.py --report"
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - CODE/CODE_Bundle.xml
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_FIX_BUNDLE_MAIN_COVERAGE.yaml
+    forbidden:
+      - CODE/MAIN/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Aucune logique automate ni source CODE/MAIN n'est modifiée."
+  evidence_required:
+    - tests-added
+    - bundle
+    - commands-run
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: "Tout cas source ambigu doit être échoué explicitement, jamais ignoré."

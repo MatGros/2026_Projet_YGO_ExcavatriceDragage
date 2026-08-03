@@ -144,6 +144,19 @@ l'identificateur non défini commun — jamais corriger erreur par erreur avant 
 3. Choisir `CODE/CODE_Bundle.xml`
 4. Valider les objets proposés
 
+### 📐 Note `_LD.st` → `<LD>` (REX 2026-08)
+
+Les sources `_LD.st` sont converties en `<LD>` Ladder par le générateur.
+Règles bloquantes (détail : `DOC/CODE_QUALITY_STANDARDS.md §11`, `DOC/AF_Partie-03 §6`) :
+
+- **Rung complet obligatoire** : `contact → block(FB) → coil → rightPowerRail`.
+  Le générateur rejette les rungs incomplets (sans coil).
+- `FB_Input` câble `InputRaw` comme contact principal ; `FB_Output` câble `Command`.
+- Chaque block FB doit avoir une **coil reliée à `.State`**.
+- `NOT var` produit un contact `negated="true"`, jamais un `inVariable`.
+- Une page LD BOOL pure ne contient aucun `inVariable`/`outVariable`.
+- Tests : `python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v`
+
 ---
 
 ## 🔁 Étape 5 — REX (si validé fonctionnel)

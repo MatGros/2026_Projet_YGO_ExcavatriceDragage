@@ -10,7 +10,11 @@ SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_code_structure
 
 
 def program(name: str) -> str:
-    return f"PROGRAM {name}\nVAR\n    Value : BOOL;\nEND_VAR\nValue := TRUE;\n"
+    return f"PROGRAM {name}\nVAR\n    Value : BOOL;\nEND_VAR\nValue := TRUE;\nEND_PROGRAM\n"
+
+
+def function_block(name: str) -> str:
+    return f"FUNCTION_BLOCK {name}\nVAR_INPUT\n    Enable : BOOL;\nEND_VAR\nQ := Enable;\nEND_FUNCTION_BLOCK\n"
 
 
 def bundle(pous: dict[str, str]) -> str:
@@ -138,3 +142,162 @@ def test_bundle_absent_est_refuse(tmp_path: Path) -> None:
     assert result.returncode == 1
     assert "[S0]" in result.stderr
     assert "bundle introuvable" in result.stderr
+
+
+# ---------------------------------------------------------------------------
+# S4 — Epilogue END_PROGRAM / END_FUNCTION_BLOCK
+# ---------------------------------------------------------------------------
+
+def test_s4_program_un_end_program_accepte(tmp_path: Path) -> None:
+    """Un PROGRAM avec exactement un END_PROGRAM est valide."""
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": program("PRG_01_Cycle")},
+        {"PRG_01_Cycle": "ST"},
+    )
+
+    result = run(root)
+
+    assert result.returncode == 0, result.stderr
+    assert "PASS" in result.stdout
+
+
+def test_s4_double_end_program_refuse(tmp_path: Path) -> None:
+    """Deux END_PROGRAM dans un meme fichier — bug historique PRG_MODES_CFC.st."""
+    source = (
+        "PROGRAM PRG_01_Cycle\n"
+        "VAR\n    V : BOOL;\nEND_VAR\n"
+        "V := TRUE;\n"
+        "END_PROGRAM\n"
+        "END_PROGRAM\n"
+    )
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": source},
+        {"PRG_01_Cycle": "ST"},
+    )
+
+    result = run(root)
+
+    assert result.returncode == 1
+    assert "[S4]" in result.stderr
+    assert "2 END_PROGRAM" in result.stderr
+
+
+def test_s4_program_zero_end_program_ignorer(tmp_path: Path) -> None:
+    """PROGRAM sans END_PROGRAM — fragment incomplet, ignore par S4."""
+    source = "PROGRAM PRG_01_Cycle\nVAR\n    V : BOOL;\nEND_VAR\nV := TRUE;\n"
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": source},
+        {"PRG_01_Cycle": "ST"},
+    )
+
+    result = run(root)
+
+    # S4 ne signale pas les fragments sans epilogue. S3 peut signaler le
+    # prefixe manquant mais ce test n'utilise pas de prefixe — on verifie juste
+    # qu'aucune erreur S4 n'est remontee.
+    assert "[S4]" not in result.stderr
+
+
+def test_s4_program_avec_end_fb_refuse(tmp_path: Path) -> None:
+    """PROGRAM avec END_FUNCTION_BLOCK au lieu de END_PROGRAM."""
+    source = (
+        "PROGRAM PRG_01_Cycle\n"
+        "VAR\n    V : BOOL;\nEND_VAR\n"
+        "V := TRUE;\n"
+        "END_FUNCTION_BLOCK\n"
+    )
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": source},
+        {"PRG_01_Cycle": "ST"},
+    )
+
+    result = run(root)
+
+    assert result.returncode == 1
+    assert "[S4]" in result.stderr
+    assert "END_FUNCTION_BLOCK" in result.stderr
+
+
+def test_s4_fb_un_end_fb_accepte(tmp_path: Path) -> None:
+    """Un FUNCTION_BLOCK avec exactement un END_FUNCTION_BLOCK est valide."""
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": program("PRG_01_Cycle"),
+         "FB_Foo.st": function_block("FB_Foo")},
+        {"PRG_01_Cycle": "ST"},
+    )
+    # Place FB outside MAIN to match real project layout
+    fb_path = root / "CODE" / "COMMUN" / "FB_Foo.st"
+    fb_path.parent.mkdir(parents=True, exist_ok=True)
+    fb_path.write_text(function_block("FB_Foo"), encoding="utf-8")
+    (root / "CODE" / "MAIN" / "FB_Foo.st").unlink()
+
+    result = run(root)
+
+    assert result.returncode == 0, result.stderr
+    assert "PASS" in result.stdout
+
+
+def test_s4_fb_double_end_fb_refuse(tmp_path: Path) -> None:
+    """Deux END_FUNCTION_BLOCK dans un meme fichier."""
+    source = function_block("FB_Foo") + "END_FUNCTION_BLOCK\n"
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": program("PRG_01_Cycle")},
+        {"PRG_01_Cycle": "ST"},
+    )
+    fb_path = root / "CODE" / "COMMUN" / "FB_Foo.st"
+    fb_path.parent.mkdir(parents=True, exist_ok=True)
+    fb_path.write_text(source, encoding="utf-8")
+
+    result = run(root)
+
+    assert result.returncode == 1
+    assert "[S4]" in result.stderr
+    assert "2 END_FUNCTION_BLOCK" in result.stderr
+
+
+def test_s4_fb_avec_end_program_refuse(tmp_path: Path) -> None:
+    """FUNCTION_BLOCK avec END_PROGRAM au lieu de END_FUNCTION_BLOCK."""
+    source = (
+        "FUNCTION_BLOCK FB_Foo\n"
+        "VAR_INPUT\n    Enable : BOOL;\nEND_VAR\n"
+        "Q := Enable;\n"
+        "END_PROGRAM\n"
+    )
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": program("PRG_01_Cycle")},
+        {"PRG_01_Cycle": "ST"},
+    )
+    fb_path = root / "CODE" / "COMMUN" / "FB_Foo.st"
+    fb_path.parent.mkdir(parents=True, exist_ok=True)
+    fb_path.write_text(source, encoding="utf-8")
+
+    result = run(root)
+
+    assert result.returncode == 1
+    assert "[S4]" in result.stderr
+    assert "END_PROGRAM" in result.stderr
+
+
+def test_s4_fichier_non_pou_ignore(tmp_path: Path) -> None:
+    """Un .st qui n'est ni PROGRAM ni FUNCTION_BLOCK (TYPE, GVL) est ignore."""
+    source = "TYPE ST_Foo :\nSTRUCT\n    Val : BOOL;\nEND_STRUCT\nEND_TYPE\n"
+    root = make_project(
+        tmp_path,
+        {"PRG_01_Cycle.st": program("PRG_01_Cycle")},
+        {"PRG_01_Cycle": "ST"},
+    )
+    type_path = root / "CODE" / "COMMUN" / "ST_Foo.st"
+    type_path.parent.mkdir(parents=True, exist_ok=True)
+    type_path.write_text(source, encoding="utf-8")
+
+    result = run(root)
+
+    assert result.returncode == 0, result.stderr
+    assert "PASS" in result.stdout

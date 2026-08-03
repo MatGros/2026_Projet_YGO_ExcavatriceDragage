@@ -187,6 +187,52 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
    sont visibles avant de convertir la page suivante. Un XML bien forme ou un
    bundle vert ne remplace pas cette observation.
 
+## 📐 6. Règles de génération Ladder (`_LD.st` → `<LD>`)
+
+> 🚩 REX 2026-08 : trois bugs d'import CODESYS sur `PRG_INPUTS_LD` ont nécessité
+> la formalisation des règles de génération LD. Référentiel complet :
+> `DOC/CODE_QUALITY_STANDARDS.md §11`.
+
+Un programme suffixe `_LD` est une **source ST** convertie en `<LD>` dans le
+bundle PLCopenXML par `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
+
+### Rung complet obligatoire
+
+Chaque rung doit contenir la chaîne complète :
+
+```text
+leftPowerRail → contact → block(FB) → coil → rightPowerRail
+```
+
+CODESYS rejette les rungs incomplets (sans coil ou sans rightPowerRail).
+
+### Câblage FB_Input vs FB_Output
+
+| FB | Contact principal | Sortie → coil |
+|---|---|---|
+| `FB_Input` | `InputRaw` | `.State` |
+| `FB_Output` | `Command` | `.State` |
+
+- Le contact principal est relié au `leftPowerRail` puis au `formalParameter` du block.
+- La coil est **toujours** reliée à la sortie `State` du block.
+- Les paramètres non-BOOL (`FilterTime`, etc.) ne sont pas représentés en LD.
+
+### Expressions BOOL — pas d'inVariable/outVariable
+
+- `NOT var` → contact `negated="true"` (jamais d'`inVariable`).
+- `var1 AND var2` → série de contacts.
+- `var1 OR var2` → parallèle de contacts.
+- Une page `_LD` BOOL pure ne contient **aucun** `inVariable`/`outVariable` —
+  uniquement `contact`, `coil`, `block` et `comment`.
+- Les `inVariable`/`outVariable` sont réservés aux expressions typées non-BOOL
+  (TIME, INT, WORD, REAL) dans la section multi-paramètres du générateur.
+
+### Tests de régression
+
+```powershell
+python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
+```
+
 ## 📚 Documents lies
 
 - Partie 01 : AU, coupure puissance et rearmement.

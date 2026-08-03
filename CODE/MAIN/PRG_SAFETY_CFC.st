@@ -217,9 +217,9 @@ instSafetyTranslationM3(
     Direction           := PRG_TRANSLATION_CFC.M3_Direction_Active,
     // 🆕 REX 2026-07-18 : limites extrêmes dérivées du décodage 5 capteurs (mot valide), plus
     // câblées directement sur un capteur brut — voir FB_Translation_PositionDecoder.
-    LimitSwitchFwd      := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd,
-    LimitSwitchRev      := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev,
-    SensorWordIncoherent := PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent,
+    LimitSwitchFwd      := PRG_ACQUISITION_CFC.M3_LimitSwitchFwd,
+    LimitSwitchRev      := PRG_ACQUISITION_CFC.M3_LimitSwitchRev,
+    SensorWordIncoherent := PRG_ACQUISITION_CFC.M3_SensorWordIncoherent,
     // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass - pilotés IHM)
     BypassGlobal          := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.OperatorComm,

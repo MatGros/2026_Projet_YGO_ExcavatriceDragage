@@ -380,7 +380,7 @@ GVL_IHM.TranslationM3.State.PositionReached      := PRG_TRANSLATION_CFC.M3_Posit
                                                 AND PRG_TRANSLATION_CFC.instTranslationM3.TargetReached;
 GVL_IHM.TranslationM3.State.JoystickDeflection_Pct := PRG_01_Diagnostics.instJoystick.AxisCmdX.SpeedRef;
 // 🧭 Position validée IHM : masquée (forcée à FALSE) si le mot capteurs est incohérent (position indéterminée)
-IF PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent THEN
+IF PRG_ACQUISITION_CFC.M3_SensorWordIncoherent THEN
     GVL_IHM.TranslationM3.State.PositionTremie      := FALSE;
     GVL_IHM.TranslationM3.State.PositionPV          := FALSE;
     GVL_IHM.TranslationM3.State.PositionP2          := FALSE;
@@ -393,10 +393,10 @@ ELSE
     GVL_IHM.TranslationM3.State.PositionP1          := PRG_ACQUISITION_CFC.TranslationPosP1;
     GVL_IHM.TranslationM3.State.PositionMaintenance := PRG_ACQUISITION_CFC.TranslationPosMaintenance;
 END_IF;
-GVL_IHM.TranslationM3.State.SensorsWord         := PRG_ACQUISITION_CFC.instPosDecoderM3.SensorsWord;
-GVL_IHM.TranslationM3.State.SensorWordIncoherent:= PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent;
-GVL_IHM.TranslationM3.State.LimitSwitchFwd     := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd;
-GVL_IHM.TranslationM3.State.LimitSwitchRev     := PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev;
+GVL_IHM.TranslationM3.State.SensorsWord         := PRG_ACQUISITION_CFC.M3_SensorsWord;
+GVL_IHM.TranslationM3.State.SensorWordIncoherent:= PRG_ACQUISITION_CFC.M3_SensorWordIncoherent;
+GVL_IHM.TranslationM3.State.LimitSwitchFwd     := PRG_ACQUISITION_CFC.M3_LimitSwitchFwd;
+GVL_IHM.TranslationM3.State.LimitSwitchRev     := PRG_ACQUISITION_CFC.M3_LimitSwitchRev;
 GVL_IHM.TranslationM3.State.MaintenanceTargetEnable := PRG_MODES_CFC.Auth.MaintenanceM3TargetEnable;
 GVL_IHM.TranslationM3.State.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 

@@ -23,6 +23,7 @@ Usage :
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -53,6 +54,15 @@ def check_page(pou_name: str, cfc: ET.Element, rel: str) -> tuple[list[str], lis
     connector_ids: dict[str, tuple[str, str]] = {}  # localId -> (x, y)
     all_local_ids: set[str] = set()
     referenced_ids: set[str] = set()
+    # Les pages de staging sont nos pages de migration les plus exposées aux
+    # squelettes XML : un bloc sans entrée ou une sortie publique non raccordée
+    # semble valide en XML mais ne représente aucun flux CFC réel dans CODESYS.
+    is_staging_page = "_Staging_CFC" in pou_name or pou_name in {
+        "PRG_03_Modes_Cycle_CFC",
+        "PRG_04_Treuils_Benne_CFC",
+        "PRG_05_Translation_CFC",
+        "PRG_07_Supervision_CFC",
+    }
 
     for child in cfc:
         tag = child.tag.replace(NS, "")
@@ -74,6 +84,33 @@ def check_page(pou_name: str, cfc: ET.Element, rel: str) -> tuple[list[str], lis
                     )
                 if x is not None and y is not None:
                     connector_ids[local_id] = (x, y)
+
+        if is_staging_page and tag == "block":
+            inputs = child.find(f"{NS}inputVariables")
+            if inputs is None:
+                inputs = child.find("inputVariables")
+            if inputs is None or not list(inputs):
+                errors.append(
+                    f"[W5] {rel} pou={pou_name}: block `{child.get('instanceName', '?')}` "
+                    "sans entrée — squelette CFC interdit"
+                )
+
+        if is_staging_page and tag == "inVariable":
+            expression = child.findtext(f"{NS}expression") or child.findtext("expression") or ""
+            if re.search(r"\b(?:NOT|OR|AND)\b|\bABS\s*\(", expression, re.IGNORECASE):
+                errors.append(
+                    f"[W6] {rel} pou={pou_name}: expression inline interdite `{expression}`; "
+                    "extraire un FB ST"
+                )
+
+        if is_staging_page and tag == "outVariable":
+            expression = child.findtext(f"{NS}expression") or child.findtext("expression") or ""
+            has_input = child.find(f"{NS}connectionPointIn/{NS}connection") is not None or child.find("connectionPointIn/connection") is not None
+            if not expression or not has_input:
+                errors.append(
+                    f"[W7] {rel} pou={pou_name}: outVariable localId={local_id} "
+                    "sans publication raccordée"
+                )
 
         # Collecte toutes les references <connection refLocalId="...">
         for conn in child.iter():

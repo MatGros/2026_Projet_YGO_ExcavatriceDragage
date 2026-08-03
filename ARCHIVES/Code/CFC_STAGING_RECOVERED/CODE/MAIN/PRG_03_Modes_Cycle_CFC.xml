@@ -1,0 +1,1153 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-02T00:00:00" />
+  <contentHeader name="ModesCycleStaging.project" modificationDateTime="2026-08-02T00:00:00" />
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_03_Modes_Cycle_CFC" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="instModes">
+              <type>
+                <derived name="FB_Modes" />
+              </type>
+            </variable>
+            <variable name="instCycleIhmBridge">
+              <type>
+                <derived name="FB_CycleIhmBridge" />
+              </type>
+            </variable>
+            <variable name="instCycle">
+              <type>
+                <derived name="FB_Cycle" />
+              </type>
+            </variable>
+          </localVars>
+        <outputVars><variable name="Auth"><type><derived name="ST_Modes_Autorisations" /></type></variable><variable name="WinchM1Cmd"><type><derived name="ST_WinchCmdDemand" /></type></variable><variable name="WinchM2Cmd"><type><derived name="ST_WinchCmdDemand" /></type></variable><variable name="TranslationCmd"><type><derived name="ST_TranslationCmdDemand" /></type></variable><variable name="BucketCmd"><type><derived name="ST_BucketCmdDemand" /></type></variable></outputVars></interface>
+        <body>
+          <ST>
+            <html:xhtml />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <inVariable localId="1">
+                  <position x="10" y="10" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>TRUE</expression>
+                </inVariable>
+                <connector localId="2" name="">
+                  <position x="35" y="10" />
+                  <connectionPointIn>
+                    <connection refLocalId="1" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="3">
+                  <position x="10" y="23" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Modes.Cmd.BtnModeReset</expression>
+                </inVariable>
+                <connector localId="4" name="">
+                  <position x="35" y="23" />
+                  <connectionPointIn>
+                    <connection refLocalId="3" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="5">
+                  <position x="10" y="36" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_INPUTS_LD.PowerContactorEngaged</expression>
+                </inVariable>
+                <connector localId="6" name="">
+                  <position x="35" y="36" />
+                  <connectionPointIn>
+                    <connection refLocalId="5" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="7">
+                  <position x="10" y="49" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Modes.Cmd.SelMode</expression>
+                </inVariable>
+                <connector localId="8" name="">
+                  <position x="35" y="49" />
+                  <connectionPointIn>
+                    <connection refLocalId="7" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="9">
+                  <position x="10" y="62" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.M1M2Sync.Cmd.SelSyncEnable</expression>
+                </inVariable>
+                <connector localId="10" name="">
+                  <position x="35" y="62" />
+                  <connectionPointIn>
+                    <connection refLocalId="9" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="11">
+                  <position x="10" y="75" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit</expression>
+                </inVariable>
+                <connector localId="12" name="">
+                  <position x="35" y="75" />
+                  <connectionPointIn>
+                    <connection refLocalId="11" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="13">
+                  <position x="10" y="88" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit</expression>
+                </inVariable>
+                <connector localId="14" name="">
+                  <position x="35" y="88" />
+                  <connectionPointIn>
+                    <connection refLocalId="13" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="15">
+                  <position x="10" y="101" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Commun.Cfg.SelHomingApproachEnable</expression>
+                </inVariable>
+                <connector localId="16" name="">
+                  <position x="35" y="101" />
+                  <connectionPointIn>
+                    <connection refLocalId="15" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="17">
+                  <position x="10" y="114" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_02_Encoders.EncoderFaultPresent</expression>
+                </inVariable>
+                <connector localId="18" name="">
+                  <position x="35" y="114" />
+                  <connectionPointIn>
+                    <connection refLocalId="17" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="19">
+                  <position x="10" y="127" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Modes.Cmd.SelJoystickWinch</expression>
+                </inVariable>
+                <connector localId="20" name="">
+                  <position x="35" y="127" />
+                  <connectionPointIn>
+                    <connection refLocalId="19" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="21" executionOrderId="1" typeName="FB_Modes" instanceName="instModes">
+                  <position x="70" y="25" />
+                  <inputVariables>
+                    <variable formalParameter="Enable">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="2" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Reset">
+                      <connectionPointIn>
+                        <relPosition x="0" y="1" />
+                        <connection refLocalId="4" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="PowerContactorEngaged">
+                      <connectionPointIn>
+                        <relPosition x="0" y="2" />
+                        <connection refLocalId="6" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SelMode">
+                      <connectionPointIn>
+                        <relPosition x="0" y="3" />
+                        <connection refLocalId="8" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SelSyncEnable">
+                      <connectionPointIn>
+                        <relPosition x="0" y="4" />
+                        <connection refLocalId="10" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="InhibitM1Request">
+                      <connectionPointIn>
+                        <relPosition x="0" y="5" />
+                        <connection refLocalId="12" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="InhibitM2Request">
+                      <connectionPointIn>
+                        <relPosition x="0" y="6" />
+                        <connection refLocalId="14" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SelHomingApproachEnable">
+                      <connectionPointIn>
+                        <relPosition x="0" y="7" />
+                        <connection refLocalId="16" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="EncoderFaultPresent">
+                      <connectionPointIn>
+                        <relPosition x="0" y="8" />
+                        <connection refLocalId="18" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="JoystickWinchSelectRequest">
+                      <connectionPointIn>
+                        <relPosition x="0" y="9" />
+                        <connection refLocalId="20" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="Ready">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Busy">
+                      <connectionPointOut>
+                        <relPosition x="0" y="1" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Done">
+                      <connectionPointOut>
+                        <relPosition x="0" y="2" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Error">
+                      <connectionPointOut>
+                        <relPosition x="0" y="3" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="ErrorId">
+                      <connectionPointOut>
+                        <relPosition x="0" y="4" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="State">
+                      <connectionPointOut>
+                        <relPosition x="0" y="5" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="StateAtError">
+                      <connectionPointOut>
+                        <relPosition x="0" y="6" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Auth">
+                      <connectionPointOut>
+                        <relPosition x="0" y="7" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType>functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <inVariable localId="22">
+                  <position x="10" y="155" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>instModes.Auth.Mode</expression>
+                </inVariable>
+                <connector localId="99" name="">
+                  <position x="35" y="155" />
+                  <connectionPointIn>
+                    <connection refLocalId="22" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="23">
+                  <position x="10" y="180" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_01_Diagnostics.instJoystick.DeadmanArmed</expression>
+                </inVariable>
+                <connector localId="24" name="">
+                  <position x="35" y="180" />
+                  <connectionPointIn>
+                    <connection refLocalId="23" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="25">
+                  <position x="10" y="193" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop</expression>
+                </inVariable>
+                <connector localId="26" name="">
+                  <position x="35" y="193" />
+                  <connectionPointIn>
+                    <connection refLocalId="25" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="27">
+                  <position x="10" y="206" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Cycle.Cfg.SetDepth_M</expression>
+                </inVariable>
+                <connector localId="28" name="">
+                  <position x="35" y="206" />
+                  <connectionPointIn>
+                    <connection refLocalId="27" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="29">
+                  <position x="10" y="219" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Cycle.Cfg.SetOffset_M</expression>
+                </inVariable>
+                <connector localId="30" name="">
+                  <position x="35" y="219" />
+                  <connectionPointIn>
+                    <connection refLocalId="29" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="31">
+                  <position x="10" y="232" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.TranslationM3.Cmd.SelTarget</expression>
+                </inVariable>
+                <connector localId="32" name="">
+                  <position x="35" y="232" />
+                  <connectionPointIn>
+                    <connection refLocalId="31" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="33">
+                  <position x="10" y="250" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Cycle.Cmd</expression>
+                </inVariable>
+                <connector localId="34" name="">
+                  <position x="35" y="250" />
+                  <connectionPointIn>
+                    <connection refLocalId="33" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="35" executionOrderId="2" typeName="FB_CycleIhmBridge" instanceName="instCycleIhmBridge">
+                  <position x="150" y="175" />
+                  <inputVariables>
+                    <variable formalParameter="Mode">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="99" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="DeadmanArmed">
+                      <connectionPointIn>
+                        <relPosition x="0" y="1" />
+                        <connection refLocalId="24" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="AxisCmdYStartStop">
+                      <connectionPointIn>
+                        <relPosition x="0" y="2" />
+                        <connection refLocalId="26" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SetDepthM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="3" />
+                        <connection refLocalId="28" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SetOffsetM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="4" />
+                        <connection refLocalId="30" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SelectedTargetNum">
+                      <connectionPointIn>
+                        <relPosition x="0" y="5" />
+                        <connection refLocalId="32" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables>
+                    <variable formalParameter="CycleCmd">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="34" />
+                      </connectionPointIn>
+                    </variable>
+                  </inOutVariables>
+                  <outputVariables>
+                    <variable formalParameter="CycleEnable">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="CycleMotionPermit">
+                      <connectionPointOut>
+                        <relPosition x="0" y="1" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="StartCycle">
+                      <connectionPointOut>
+                        <relPosition x="0" y="2" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="PauseCycle">
+                      <connectionPointOut>
+                        <relPosition x="0" y="3" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="AbortCycle">
+                      <connectionPointOut>
+                        <relPosition x="0" y="4" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="ResetCycle">
+                      <connectionPointOut>
+                        <relPosition x="0" y="5" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SetDepthMOut">
+                      <connectionPointOut>
+                        <relPosition x="0" y="6" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SetOffsetMOut">
+                      <connectionPointOut>
+                        <relPosition x="0" y="7" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SelectedTargetNumOut">
+                      <connectionPointOut>
+                        <relPosition x="0" y="8" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchThresholdMps">
+                      <connectionPointOut>
+                        <relPosition x="0" y="9" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchTimeout">
+                      <connectionPointOut>
+                        <relPosition x="0" y="10" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType>functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <connector localId="36" name="">
+                  <position x="35" y="300" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="CycleEnable" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="37" name="">
+                  <position x="35" y="313" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="CycleMotionPermit" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="38" name="">
+                  <position x="35" y="326" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="StartCycle" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="39" name="">
+                  <position x="35" y="339" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="PauseCycle" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="40" name="">
+                  <position x="35" y="352" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="AbortCycle" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="41" name="">
+                  <position x="35" y="365" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="ResetCycle" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="42" name="">
+                  <position x="35" y="378" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="SetDepthMOut" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="43" name="">
+                  <position x="35" y="391" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="SetOffsetMOut" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="44" name="">
+                  <position x="35" y="404" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="SelectedTargetNumOut" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="45" name="">
+                  <position x="35" y="417" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="SpeedMismatchThresholdMps" />
+                  </connectionPointIn>
+                </connector>
+                <connector localId="46" name="">
+                  <position x="35" y="430" />
+                  <connectionPointIn>
+                    <connection refLocalId="35" formalParameter="SpeedMismatchTimeout" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="47">
+                  <position x="10" y="484" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk</expression>
+                </inVariable>
+                <connector localId="48" name="">
+                  <position x="35" y="484" />
+                  <connectionPointIn>
+                    <connection refLocalId="47" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="49">
+                  <position x="10" y="496" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_INPUTS_LD.PowerContactorEngaged</expression>
+                </inVariable>
+                <connector localId="50" name="">
+                  <position x="35" y="496" />
+                  <connectionPointIn>
+                    <connection refLocalId="49" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="51">
+                  <position x="10" y="508" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_INPUTS_LD.KoboldContactFond</expression>
+                </inVariable>
+                <connector localId="52" name="">
+                  <position x="35" y="508" />
+                  <connectionPointIn>
+                    <connection refLocalId="51" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="53">
+                  <position x="10" y="520" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Commun.LimitLegalReached</expression>
+                </inVariable>
+                <connector localId="54" name="">
+                  <position x="35" y="520" />
+                  <connectionPointIn>
+                    <connection refLocalId="53" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="55">
+                  <position x="10" y="532" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M</expression>
+                </inVariable>
+                <connector localId="56" name="">
+                  <position x="35" y="532" />
+                  <connectionPointIn>
+                    <connection refLocalId="55" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="57">
+                  <position x="10" y="544" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_TREUILS_CFC.instWinchSync.Error</expression>
+                </inVariable>
+                <connector localId="58" name="">
+                  <position x="35" y="544" />
+                  <connectionPointIn>
+                    <connection refLocalId="57" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="59">
+                  <position x="10" y="556" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_TREUILS_CFC.instWinchSync.DeltaPosM</expression>
+                </inVariable>
+                <connector localId="60" name="">
+                  <position x="35" y="556" />
+                  <connectionPointIn>
+                    <connection refLocalId="59" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="61">
+                  <position x="10" y="568" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_02_Encoders.instEncoderScaleM1.CablePosM</expression>
+                </inVariable>
+                <connector localId="62" name="">
+                  <position x="35" y="568" />
+                  <connectionPointIn>
+                    <connection refLocalId="61" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="63">
+                  <position x="10" y="580" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_02_Encoders.instEncoderScaleM2.CablePosM</expression>
+                </inVariable>
+                <connector localId="64" name="">
+                  <position x="35" y="580" />
+                  <connectionPointIn>
+                    <connection refLocalId="63" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="65">
+                  <position x="10" y="592" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_02_Encoders.M1MeasuredSpeed_Mps</expression>
+                </inVariable>
+                <connector localId="66" name="">
+                  <position x="35" y="592" />
+                  <connectionPointIn>
+                    <connection refLocalId="65" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="67">
+                  <position x="10" y="604" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_02_Encoders.M2MeasuredSpeed_Mps</expression>
+                </inVariable>
+                <connector localId="68" name="">
+                  <position x="35" y="604" />
+                  <connectionPointIn>
+                    <connection refLocalId="67" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="69">
+                  <position x="10" y="616" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>_WinchM1CfgPersist.CfgCableLimitAscent_M</expression>
+                </inVariable>
+                <connector localId="70" name="">
+                  <position x="35" y="616" />
+                  <connectionPointIn>
+                    <connection refLocalId="69" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="71">
+                  <position x="10" y="628" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_ACQUISITION_CFC.TranslationPosP1</expression>
+                </inVariable>
+                <connector localId="72" name="">
+                  <position x="35" y="628" />
+                  <connectionPointIn>
+                    <connection refLocalId="71" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="73">
+                  <position x="10" y="640" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_ACQUISITION_CFC.TranslationPosP2</expression>
+                </inVariable>
+                <connector localId="74" name="">
+                  <position x="35" y="640" />
+                  <connectionPointIn>
+                    <connection refLocalId="73" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="75">
+                  <position x="10" y="652" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_ACQUISITION_CFC.TranslationPosMaintenance</expression>
+                </inVariable>
+                <connector localId="76" name="">
+                  <position x="35" y="652" />
+                  <connectionPointIn>
+                    <connection refLocalId="75" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="77">
+                  <position x="10" y="664" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_ACQUISITION_CFC.TranslationPosTremie</expression>
+                </inVariable>
+                <connector localId="78" name="">
+                  <position x="35" y="664" />
+                  <connectionPointIn>
+                    <connection refLocalId="77" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="79">
+                  <position x="10" y="676" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_TRANSLATION_CFC.instTranslationM3.Busy</expression>
+                </inVariable>
+                <connector localId="80" name="">
+                  <position x="35" y="676" />
+                  <connectionPointIn>
+                    <connection refLocalId="79" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="81">
+                  <position x="10" y="688" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_TRANSLATION_CFC.instTranslationM3.Done</expression>
+                </inVariable>
+                <connector localId="82" name="">
+                  <position x="35" y="688" />
+                  <connectionPointIn>
+                    <connection refLocalId="81" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="83">
+                  <position x="10" y="700" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_TREUILS_CFC.instBucket.Busy</expression>
+                </inVariable>
+                <connector localId="84" name="">
+                  <position x="35" y="700" />
+                  <connectionPointIn>
+                    <connection refLocalId="83" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="85">
+                  <position x="10" y="712" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>PRG_TREUILS_CFC.instBucket.Done</expression>
+                </inVariable>
+                <connector localId="86" name="">
+                  <position x="35" y="712" />
+                  <connectionPointIn>
+                    <connection refLocalId="85" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="87">
+                  <position x="10" y="724" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>_BucketState.IsOpen</expression>
+                </inVariable>
+                <connector localId="88" name="">
+                  <position x="35" y="724" />
+                  <connectionPointIn>
+                    <connection refLocalId="87" />
+                  </connectionPointIn>
+                </connector>
+                <inVariable localId="89">
+                  <position x="10" y="736" />
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                  <expression>_BucketState.IsClosed</expression>
+                </inVariable>
+                <connector localId="90" name="">
+                  <position x="35" y="736" />
+                  <connectionPointIn>
+                    <connection refLocalId="89" />
+                  </connectionPointIn>
+                </connector>
+                <block localId="91" executionOrderId="3" typeName="FB_Cycle" instanceName="instCycle">
+                  <position x="270" y="300" />
+                  <inputVariables>
+                    <variable formalParameter="Enable">
+                      <connectionPointIn>
+                        <relPosition x="0" y="0" />
+                        <connection refLocalId="36" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="CycleMotionPermit">
+                      <connectionPointIn>
+                        <relPosition x="0" y="1" />
+                        <connection refLocalId="37" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="HeartbeatIhmOk">
+                      <connectionPointIn>
+                        <relPosition x="0" y="2" />
+                        <connection refLocalId="48" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="PowerContactorEngaged">
+                      <connectionPointIn>
+                        <relPosition x="0" y="3" />
+                        <connection refLocalId="50" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="KoboldContactFond">
+                      <connectionPointIn>
+                        <relPosition x="0" y="4" />
+                        <connection refLocalId="52" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="LimitLegalReached">
+                      <connectionPointIn>
+                        <relPosition x="0" y="5" />
+                        <connection refLocalId="54" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="LimitLegalDepthM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="6" />
+                        <connection refLocalId="56" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="WinchSyncError">
+                      <connectionPointIn>
+                        <relPosition x="0" y="7" />
+                        <connection refLocalId="58" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="WinchSyncDeltaM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="8" />
+                        <connection refLocalId="60" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="M1_CablePosM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="9" />
+                        <connection refLocalId="62" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="M2_CablePosM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="10" />
+                        <connection refLocalId="64" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="M1_MeasuredSpeedMps">
+                      <connectionPointIn>
+                        <relPosition x="0" y="11" />
+                        <connection refLocalId="66" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="M2_MeasuredSpeedMps">
+                      <connectionPointIn>
+                        <relPosition x="0" y="12" />
+                        <connection refLocalId="68" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="CableLimitM1AscentM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="13" />
+                        <connection refLocalId="70" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Translation_At_P1">
+                      <connectionPointIn>
+                        <relPosition x="0" y="14" />
+                        <connection refLocalId="72" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Translation_At_P2">
+                      <connectionPointIn>
+                        <relPosition x="0" y="15" />
+                        <connection refLocalId="74" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Translation_At_Maintenance">
+                      <connectionPointIn>
+                        <relPosition x="0" y="16" />
+                        <connection refLocalId="76" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Translation_At_Tremie">
+                      <connectionPointIn>
+                        <relPosition x="0" y="17" />
+                        <connection refLocalId="78" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Translation_Busy">
+                      <connectionPointIn>
+                        <relPosition x="0" y="18" />
+                        <connection refLocalId="80" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Translation_Done">
+                      <connectionPointIn>
+                        <relPosition x="0" y="19" />
+                        <connection refLocalId="82" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Benne_Busy">
+                      <connectionPointIn>
+                        <relPosition x="0" y="20" />
+                        <connection refLocalId="84" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Benne_Done">
+                      <connectionPointIn>
+                        <relPosition x="0" y="21" />
+                        <connection refLocalId="86" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Benne_IsOpen">
+                      <connectionPointIn>
+                        <relPosition x="0" y="22" />
+                        <connection refLocalId="88" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Benne_IsClosed">
+                      <connectionPointIn>
+                        <relPosition x="0" y="23" />
+                        <connection refLocalId="90" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="Reset">
+                      <connectionPointIn>
+                        <relPosition x="0" y="24" />
+                        <connection refLocalId="41" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="StartCycle">
+                      <connectionPointIn>
+                        <relPosition x="0" y="25" />
+                        <connection refLocalId="38" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="PauseCycle">
+                      <connectionPointIn>
+                        <relPosition x="0" y="26" />
+                        <connection refLocalId="39" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="AbortCycle">
+                      <connectionPointIn>
+                        <relPosition x="0" y="27" />
+                        <connection refLocalId="40" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SetDepthM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="28" />
+                        <connection refLocalId="42" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SetOffsetM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="29" />
+                        <connection refLocalId="43" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SelectedTargetNum_IHM">
+                      <connectionPointIn>
+                        <relPosition x="0" y="30" />
+                        <connection refLocalId="44" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchThresholdMps">
+                      <connectionPointIn>
+                        <relPosition x="0" y="31" />
+                        <connection refLocalId="45" />
+                      </connectionPointIn>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchTimeout">
+                      <connectionPointIn>
+                        <relPosition x="0" y="32" />
+                        <connection refLocalId="46" />
+                      </connectionPointIn>
+                    </variable>
+                  </inputVariables>
+                  <inOutVariables />
+                  <outputVariables>
+                    <variable formalParameter="Ready">
+                      <connectionPointOut>
+                        <relPosition x="0" y="0" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Busy">
+                      <connectionPointOut>
+                        <relPosition x="0" y="1" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Done">
+                      <connectionPointOut>
+                        <relPosition x="0" y="2" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="Error">
+                      <connectionPointOut>
+                        <relPosition x="0" y="3" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="ErrorId">
+                      <connectionPointOut>
+                        <relPosition x="0" y="4" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchMps">
+                      <connectionPointOut>
+                        <relPosition x="0" y="5" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchActive">
+                      <connectionPointOut>
+                        <relPosition x="0" y="6" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="SpeedMismatchConfirmed">
+                      <connectionPointOut>
+                        <relPosition x="0" y="7" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="WinchM1Cmd">
+                      <connectionPointOut>
+                        <relPosition x="0" y="8" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="WinchM2Cmd">
+                      <connectionPointOut>
+                        <relPosition x="0" y="9" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="TranslationCmd">
+                      <connectionPointOut>
+                        <relPosition x="0" y="10" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="BucketCmd">
+                      <connectionPointOut>
+                        <relPosition x="0" y="11" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="CycleStep">
+                      <connectionPointOut>
+                        <relPosition x="0" y="12" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                    <variable formalParameter="CycleStateStr">
+                      <connectionPointOut>
+                        <relPosition x="0" y="13" />
+                        <expression />
+                      </connectionPointOut>
+                    </variable>
+                  </outputVariables>
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType>functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+              <connector localId="100" name="AuthPublisher"><position x="1100" y="30" /><connectionPointIn><connection refLocalId="21" formalParameter="Auth" /></connectionPointIn></connector><outVariable localId="101"><position x="1240" y="48" /><connectionPointIn><connection refLocalId="100" /></connectionPointIn><expression>Auth</expression></outVariable><connector localId="102" name="WinchM1CmdPublisher"><position x="1100" y="66" /><connectionPointIn><connection refLocalId="91" formalParameter="WinchM1Cmd" /></connectionPointIn></connector><outVariable localId="103"><position x="1240" y="84" /><connectionPointIn><connection refLocalId="102" /></connectionPointIn><expression>WinchM1Cmd</expression></outVariable><connector localId="104" name="WinchM2CmdPublisher"><position x="1100" y="102" /><connectionPointIn><connection refLocalId="91" formalParameter="WinchM2Cmd" /></connectionPointIn></connector><outVariable localId="105"><position x="1240" y="120" /><connectionPointIn><connection refLocalId="104" /></connectionPointIn><expression>WinchM2Cmd</expression></outVariable><connector localId="106" name="TranslationCmdPublisher"><position x="1100" y="138" /><connectionPointIn><connection refLocalId="91" formalParameter="TranslationCmd" /></connectionPointIn></connector><outVariable localId="107"><position x="1240" y="156" /><connectionPointIn><connection refLocalId="106" /></connectionPointIn><expression>TranslationCmd</expression></outVariable><connector localId="108" name="BucketCmdPublisher"><position x="1100" y="174" /><connectionPointIn><connection refLocalId="91" formalParameter="BucketCmd" /></connectionPointIn></connector><outVariable localId="109"><position x="1240" y="192" /><connectionPointIn><connection refLocalId="108" /></connectionPointIn><expression>BucketCmd</expression></outVariable></CFC>
+            </data>
+          </addData>
+        </body>
+      </pou>
+    </pous>
+  </types>
+</project>
