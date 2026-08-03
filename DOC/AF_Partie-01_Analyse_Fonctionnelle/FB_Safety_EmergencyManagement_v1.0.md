@@ -467,7 +467,7 @@ Fichiers code de référence :
 - `CODE/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test)
 - `CODE/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test)
 - `CODE/SUPERVISION/GVL_IHM_AU.st` (interface IHM)
-- `CODE/MAIN/PRG_ACQUISITION_CFC.st` (acquisition ST actuelle ; cible de migration `PRG_01_Acquisition_CFC.xml` CFC natif, absent de `CODE/MAIN`)
+- `CODE/MAIN/PRG_ACQUISITION_CFC.xml` (CFC natif ; pont temporaire de conservation : `CODE/ACQUISITION/FB_AcquisitionLegacyBridge.st`)
 - `CODE/MAIN/PRG_OUTPUTS_LD.st` (sorties)
 - `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/PLAN_TASK_v1.0.md`)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)

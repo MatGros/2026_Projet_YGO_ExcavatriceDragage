@@ -10,6 +10,10 @@ Controles :
   S1  nom du fichier source == nom du PROGRAM declare
   S2  suffixe _CFC / _LD == langage correspondant dans CODE_Bundle.xml
   S3  chaque PROGRAM porte le prefixe d'ordre PRG_XX_
+  S4  un fichier .st ne contient pas plus d'un END_PROGRAM ou END_FUNCTION_BLOCK,
+      et l'epilogue correspond au type de POU declare (REX 2026-08 : double
+      END_PROGRAM dans PRG_MODES_CFC.st -> 10 erreurs de compilation CODESYS).
+      Les fragments sans epilogue sont ignores.
 
 Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
@@ -26,6 +30,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 PROGRAM_HEADER = re.compile(r"^\s*PROGRAM\s+(?P<name>[A-Za-z_]\w*)\b", re.MULTILINE)
+FUNCTION_BLOCK_HEADER = re.compile(r"^\s*FUNCTION_BLOCK\b", re.MULTILINE)
+END_PROGRAM_RE = re.compile(r"^\s*END_PROGRAM\b", re.MULTILINE)
+END_FUNCTION_BLOCK_RE = re.compile(r"^\s*END_FUNCTION_BLOCK\b", re.MULTILINE)
 ORDERED_PROGRAM = re.compile(r"^PRG_\d{2}_")
 LANGUAGE_SUFFIXES = {"_CFC": "CFC", "_LD": "LD"}
 BUNDLE_NAMES = {"CODE_Bundle.xml", "CODE_AU_Bundle.xml"}
@@ -126,6 +133,62 @@ def check(root: Path) -> list[str]:
         if not ORDERED_PROGRAM.match(source.name):
             errors.append(
                 f"[S3] {rel}: {source.name} sans prefixe d'ordre PRG_XX_"
+            )
+
+    errors.extend(check_st_end_keywords(root, code))
+
+    return errors
+
+
+def check_st_end_keywords(root: Path, code: Path) -> list[str]:
+    """S4 : pas plus d'un END_PROGRAM/END_FUNCTION_BLOCK par .st, pas de croisement.
+
+    Un fichier .st qui declare PROGRAM ou FUNCTION_BLOCK est verifie uniquement
+    s'il contient au moins un mot-cle d'epilogue (END_PROGRAM ou
+    END_FUNCTION_BLOCK). Les fichiers .st du projet sont souvent des fragments
+    incomplets (implementation seule, sans epilogue) — ils restent valides.
+
+    Les cas refles :
+      - Plus d'un END_PROGRAM ou END_FUNCTION_BLOCK dans un meme fichier.
+      - END_PROGRAM dans un fichier FUNCTION_BLOCK (ou inverse).
+    """
+    errors: list[str] = []
+    for path in sorted(code.rglob("*.st")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        is_program = PROGRAM_HEADER.search(text) is not None
+        is_fb = FUNCTION_BLOCK_HEADER.search(text) is not None
+        if not is_program and not is_fb:
+            continue
+
+        rel = path.relative_to(root).as_posix()
+        ep_count = len(END_PROGRAM_RE.findall(text))
+        efb_count = len(END_FUNCTION_BLOCK_RE.findall(text))
+
+        # Pas d'epilogue du tout = fragment incomplet, on ignore.
+        if ep_count == 0 and efb_count == 0:
+            continue
+
+        # Plus d'un epilogue d'un meme type.
+        if ep_count > 1:
+            errors.append(
+                f"[S4] {rel}: {ep_count} END_PROGRAM detectes (maximum : 1)"
+            )
+        if efb_count > 1:
+            errors.append(
+                f"[S4] {rel}: {efb_count} END_FUNCTION_BLOCK detectes "
+                f"(maximum : 1)"
+            )
+
+        # Croisement : END_PROGRAM dans un FUNCTION_BLOCK ou inverse.
+        if is_fb and ep_count > 0:
+            errors.append(
+                f"[S4] {rel}: FUNCTION_BLOCK declare mais contient "
+                f"END_PROGRAM ({ep_count})"
+            )
+        if is_program and efb_count > 0:
+            errors.append(
+                f"[S4] {rel}: PROGRAM declare mais contient "
+                f"END_FUNCTION_BLOCK ({efb_count})"
             )
 
     return errors

@@ -260,7 +260,65 @@ La procedure de production, de fusion et de validation est normative dans
 historiquement des connecteurs en `(0,0)` ; il ne constitue jamais une reference
 pour les coordonnees.
 
-## 11. Checklist de restitution (bloquante)
+## 11. Règles de génération Ladder (`_LD.st` → `<LD>`) — REX 2026-08
+
+> 🚩 Trois bugs d'import CODESYS sur `PRG_INPUTS_LD` ont révélé que le générateur
+> ST→LD (`TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`) produisait du
+> PLCopenXML invalide. Les règles ci-dessous sont **obligatoires** pour toute
+> source `_LD.st` et sont vérifiées par `test_ld_import_guard.py`.
+
+### Structure d'un rung LD complet
+
+Un programme suffixe `_LD` est converti en `<LD>` dans le bundle PLCopenXML.
+Chaque rung doit contenir la **chaîne complète** :
+
+```text
+leftPowerRail → contact → block(FB) → coil → rightPowerRail
+```
+
+CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
+
+### Règles de câblage FB
+
+| FB | Contact principal | Sortie → coil |
+|---|---|---|
+| `FB_Input` | `InputRaw` (contact) | `.State` → coil |
+| `FB_Output` | `Command` (contact) | `.State` → coil |
+
+- Le **contact principal** (`InputRaw` ou `Command`) est relié au
+  `leftPowerRail` puis au `formalParameter` du block.
+- La **coil** est reliée à la sortie `State` du block (`formalParameter="State"`).
+- Les paramètres supplémentaires (`FilterTime`, `InvertLogic`, `ChannelOk`)
+  ne sont **pas** représentés en LD — seuls les paramètres BOOL sont câblés
+  comme contacts ; les paramètres typés (TIME, INT…) restent des `inVariable`
+  dans la section multi-paramètres du générateur.
+
+### Expressions BOOL
+
+| Expression | Rendu LD |
+|---|---|
+| `var` (BOOL connu) | contact `negated="false"` |
+| `NOT var` (BOOL connu) | contact `negated="true"` |
+| `var1 AND var2` | série de contacts |
+| `var1 OR var2` | parallèle de contacts |
+| Expression typée non-BOOL | `inVariable` → `outVariable` (hors page BOOL pure) |
+
+- **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
+  BOOL. Un `inVariable` en page LD BOOL pure est un bug d'import.
+- Une page `_LD` de type BOOL pur (ex. `PRG_INPUTS_LD`) ne doit contenir
+  **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
+  `block` et `comment`.
+
+### Tests de régression
+
+```powershell
+python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
+```
+
+Les 6 tests couvrent : rung FB_Input complet, contact inversé NOT, page BOOL
+pure sans inVariable/outVariable, coil reliée à .State pour chaque block.
+
+## 12. Checklist de restitution (bloquante)
 
 ```text
 [ ] check_linkage.py --report = PASS, bloc collé dans la restitution

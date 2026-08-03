@@ -1,0 +1,80 @@
+contract:
+  task_id: M5_OUTPUTS_POWERCUTOFF
+  criticality: C4
+  strategy: patch
+  human_validation_required: true
+
+  objective: >
+    Établir PRG_06_Outputs_LD comme barrière finale unique des actionneurs et
+    agréger par OU les trois demandes publiques PowerCutOff sans qu'un procédé puisse en masquer un autre.
+
+  acceptance:
+    - id: AC1
+      statement: "PRG_06_Outputs_LD agrège les demandes PowerCutOff M1, M2, M3 et la chaîne AU par OU logique; toute demande vraie coupe indépendamment de la disponibilité des autres procédés."
+      verified_by: "test PLC table de vérité des quatre sources + revue de PRG_06_Outputs_LD.st"
+    - id: AC2
+      statement: "PRG_06_Outputs_LD reste l'unique producteur des 21 commandes physiques d'actionneur, avec FB_WinchOutputInterlock_LD, FB_TranslationOutputInterlock_LD et FB_Safety_EmergencyManagement conservés."
+      verified_by: "check_linkage.py --report + audit des affectations Q/PDO + essai CODESYS humain sorties"
+    - id: AC3
+      statement: "Les trois demandes PowerCutOff viennent de contrats publics des procédés et aucune lecture PRG_SAFETY_CFC.inst*.PowerCutOff ne subsiste."
+      verified_by: "grep des références PRG_SAFETY_CFC.inst et des contrats PowerCutOff + check_linkage.py --report"
+    - id: AC4
+      statement: "L'accès Safety historique à GVL_Global.instTranslationOutputInterlock_LD.BrakeCmd reste inchangé et documenté comme dette A-07; aucune copie d'instance GVL n'est supprimée si elle est encore consommée."
+      verified_by: "grep BrakeCmd et GVL_Global.instTranslationOutputInterlock_LD + validation humaine safety"
+    - id: AC5
+      statement: "L'AU physique demeure indépendant et prioritaire; PowerCutOff logiciel ne prétend jamais remplacer sa chaîne matérielle."
+      verified_by: "essai CODESYS humain avec procédure machine approuvée + revue câblage logique"
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU: PRG_06_Outputs_LD.st / PRG_06_Outputs_LD."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC7
+      statement: "Le suffixe correspond au langage Ladder généré dans le bundle: .st pour PRG_06_Outputs_LD."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py + inspection CODE/CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_OUTPUTS_LD.st
+      - CODE/MAIN/PRG_06_Outputs_LD.st
+      - CODE/MAIN/GVL_Global.st
+      - CODE/COMMUN/ST_OutputBarrierState.st
+      - DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - CODE/MAIN/PRG_04_Treuils_Benne_CFC.xml
+      - CODE/MAIN/PRG_05_Translation_CFC.xml
+      - CODE/MAIN/PRG_SUPERVISION_CFC.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - .git/
+
+  conservation:
+    must_survive:
+      - "Les 21 sorties actionneur, leurs interlocks finals, temporisations, polarités et priorités AU."
+      - "Agrégation PowerCutOff par OU strict, jamais ET."
+      - "Une demande procédure ne peut être masquée par l'indisponibilité d'un autre procédé."
+      - "Les six presets codeur restent hors des commandes actionneur centralisées, conformément à A-12."
+      - "BrakeCmd A-07 conserve sa sémantique et son retard jusqu'à arbitrage safety explicite."
+    dropped_on_purpose:
+      - "Nom historique PRG_10_Outputs_LD et fichier PRG_OUTPUTS_LD.st, remplacés après remappage par PRG_06_Outputs_LD.st."
+      - "Lectures directes de PowerCutOff à l'intérieur de PRG_SAFETY_CFC, remplacées par demandes publiques."
+
+  decision_references:
+    - "A-04: agrégation PowerCutOff par Outputs avec OU logique."
+    - "A-06: action AU en barrière finale, chaîne matérielle indépendante."
+    - "A-07: dette BrakeCmd interne Outputs conservée, M5 limité à PowerCutOff."
+    - "A-12: presets codeur documentés comme exception aux sorties actionneur Outputs."
+
+  evidence_required:
+    - check_code_structure
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - task_tests
+    - human_validation_notes
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Ne pas modifier la sémantique BrakeCmd ni l'architecture de la chaîne AU;
+    toute correction qui l'exige dépasse M5 et doit être arbitrée safety.

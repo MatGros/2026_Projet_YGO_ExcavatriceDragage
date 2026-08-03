@@ -207,9 +207,16 @@ def build_ld_body(
         if not stmt_clean:
             continue
 
+        # FB_Output : instXxx(Command := var)  →  suivi de var := instXxx.State
         m_cmd = re.match(r"^(\w+)\s*\(\s*Command\s*:=\s*([\w\.]+)\s*\)$", stmt_clean)
         if m_cmd:
             fb_commands[m_cmd.group(1)] = (b_title, b_desc, stmt_comm, m_cmd.group(2))
+            continue
+
+        # FB_Input : instXxx(InputRaw := var, ...)  →  suivi de var := instXxx.State
+        m_input = re.match(r"^(\w+)\s*\(\s*InputRaw\s*:=\s*([\w\.]+)\s*,\s*.*\)$", stmt_clean, flags=re.DOTALL)
+        if m_input:
+            fb_commands[m_input.group(1)] = (b_title, b_desc, stmt_comm, m_input.group(2))
             continue
 
         m_state = re.match(r"^([\w\.]+)\s*:=\s*(\w+)\.State$", stmt_clean)
@@ -224,7 +231,7 @@ def build_ld_body(
 
     last_emitted_title = ""
 
-    # ── 1. Réseaux unifiés FB_Output ──
+    # ── 1. Réseaux unifiés FB_Output / FB_Input ──
     for b_title, b_desc, stmt_comm, inst_name, cmd_var, coil_var in coil_mappings:
 
         # Si un nouveau grand titre // === apparaît, on crée le RÉSEAU SÉPARÉ DE BANNIÈRE
@@ -240,7 +247,13 @@ def build_ld_body(
         coil_id = local_id_counter + 2
         local_id_counter += 10
 
-        # Contact de commande
+        # Contact de commande / entrée principale
+        # FB_Output utilise Command, FB_Input utilise InputRaw.
+        main_input_param = "Command"
+        inst_type_name = instance_types.get(inst_name, "")
+        if inst_type_name == "FB_Input" or "InputRaw" in (instance_input_types.get(inst_name, {})):
+            main_input_param = "InputRaw"
+
         contact = ET.SubElement(ld, "contact")
         contact.set("localId", str(contact_id))
         contact.set("negated", "false")
@@ -266,10 +279,16 @@ def build_ld_body(
 
         in_vars = ET.SubElement(block, "inputVariables")
         var_in = ET.SubElement(in_vars, "variable")
-        var_in.set("formalParameter", "Command")
+        var_in.set("formalParameter", main_input_param)
         c_in_b = ET.SubElement(var_in, "connectionPointIn")
         c_ref_b = ET.SubElement(c_in_b, "connection")
         c_ref_b.set("refLocalId", str(contact_id))
+
+        # Paramètres supplémentaires FB_Input (InvertLogic, FilterTime, ChannelOk)
+        # ne sont pas représentables en Ladder classique (TIME/BOOL constants).
+        # Ils sont omis du diagramme LD ; CODESYS les initialise à leur valeur
+        # par défaut ou via l'appel ST sous-jacent. Seul InputRaw est câblé.
+        # (Le sample CODESYS PRG_10_LD ne câble que Command pour FB_Output.)
 
         ET.SubElement(block, "inOutVariables")
 
@@ -489,6 +508,37 @@ def build_ld_body(
                 ET.SubElement(contact, "connectionPointOut")
                 contact_variable = ET.SubElement(contact, "variable")
                 contact_variable.text = source_expression
+
+                coil = ET.SubElement(ld, "coil")
+                coil.set("localId", str(coil_id))
+                coil.set("negated", "false")
+                coil.set("storage", "none")
+                ET.SubElement(coil, "position", x="0", y="0")
+                coil_in = ET.SubElement(coil, "connectionPointIn")
+                ET.SubElement(coil_in, "connection", refLocalId=str(contact_id))
+                ET.SubElement(coil, "connectionPointOut")
+                coil_variable = ET.SubElement(coil, "variable")
+                coil_variable.text = target_var
+                continue
+
+            # Contact inversé : NOT variable → contact negated=true → coil
+            not_match = re.fullmatch(r"NOT\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)", source_expression)
+            if not_match and not_match.group(1) in boolean_identifiers:
+                contact_id = local_id_counter
+                coil_id = local_id_counter + 1
+                local_id_counter += 10
+
+                contact = ET.SubElement(ld, "contact")
+                contact.set("localId", str(contact_id))
+                contact.set("negated", "true")
+                contact.set("storage", "none")
+                contact.set("edge", "none")
+                ET.SubElement(contact, "position", x="0", y="0")
+                contact_in = ET.SubElement(contact, "connectionPointIn")
+                ET.SubElement(contact_in, "connection", refLocalId="0")
+                ET.SubElement(contact, "connectionPointOut")
+                contact_variable = ET.SubElement(contact, "variable")
+                contact_variable.text = not_match.group(1)
 
                 coil = ET.SubElement(ld, "coil")
                 coil.set("localId", str(coil_id))

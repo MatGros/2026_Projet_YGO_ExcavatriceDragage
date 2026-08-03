@@ -1,0 +1,84 @@
+contract:
+  task_id: M4_TRANSLATION_SAFETY
+  criticality: C4
+  strategy: rebuild
+  human_validation_required: true
+
+  objective: >
+    Réunir Translation et safety M3 au rang 05 pour supprimer leur cycle,
+    conserver les protections de déplacement et publier une demande finale sûre vers Outputs.
+
+  acceptance:
+    - id: AC1
+      statement: "PRG_05_Translation_CFC câble localement FB_Safety_Translation, FB_Translation, FB_TranslationArbiter et FB_TranslationRequestPublisher, avec une unique ST_TranslationFinalInterlockRequest et une demande PowerCutOff M3."
+      verified_by: "check_cfc_wiring.py --report + check_linkage.py --report"
+    - id: AC2
+      statement: "Méca A/B M3, bit 6 butées extrêmes, bit 7 incohérence mot capteurs, ralentissement PV, homme-mort auto/maintenance, inversion de sens et refus cible Maintenance hors MAINT_N2 sont conservés."
+      verified_by: "tests PLC safety M3 + essai CODESYS humain pour chaque capteur, sens et cible"
+    - id: AC3
+      statement: "Chaque capteur M3 consommé provient de ST_AcquisitionQualified et non d'une E/S brute, avec polarité, filtrage et valeur dégradée conservés."
+      verified_by: "revue des contrats et du câblage XML + watch CODESYS humain des signaux M3"
+    - id: AC4
+      statement: "Aucun cycle inter-programme Safety↔Translation ni producteur safety M3 historique ne subsiste; SafeStop et PowerCutOff ne prennent aucun scan de retard supplémentaire."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report + test PLC de coupure M3"
+    - id: AC5
+      statement: "La lecture historique BrakeCmd de la barrière Outputs est conservée strictement telle quelle, avec sa dette et son retard documentés; le lot est BLOCK si sa sémantique doit changer."
+      verified_by: "diff de la liaison BrakeCmd + REGISTRE_ARBITRAGES_MIGRATION.md A-07 + validation humaine safety"
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU: PRG_05_Translation_CFC.xml / PRG_05_Translation_CFC."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC7
+      statement: "Le suffixe correspond au langage CFC généré dans le bundle: .xml pour PRG_05_Translation_CFC."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py + inspection CODE/CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_TRANSLATION_CFC.st
+      - CODE/MAIN/PRG_SAFETY_CFC.st
+      - CODE/MAIN/PRG_05_Translation_CFC.xml
+      - CODE/TRANSLATION/ST_TranslationSafetyState.st
+      - CODE/TRANSLATION/ST_TranslationProcessState.st
+      - CODE/TRANSLATION/FB_TranslationArbiter.st
+      - CODE/TRANSLATION/FB_TranslationRequestPublisher.st
+      - CODE/COMMUN/ST_AcquisitionQualified.st
+      - DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - CODE/MAIN/PRG_TREUILS_CFC.st
+      - CODE/MAIN/PRG_OUTPUTS_LD.st
+      - CODE/MAIN/PRG_SUPERVISION_CFC.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - .git/
+
+  conservation:
+    must_survive:
+      - "Les huit champs de ST_TranslationFinalInterlockRequest."
+      - "Méca A/B, bits 6/7, frein, limites, temporisations, ErrorId et polarités M3."
+      - "L'action physique reste exclusivement dans Outputs; Translation ne publie que demandes et interlock."
+      - "Reset est détecté sur front et un défaut ne redémarre jamais Translation automatiquement."
+      - "La dette BrakeCmd A-07 reste explicitement conservée, sans substitution par retour mécanique."
+    dropped_on_purpose:
+      - "PRG_TRANSLATION_CFC et la partie M3 restante de PRG_SAFETY_CFC après remappage total."
+      - "Lectures croisées Safety↔Translation remplacées par câblage local et contrats publics."
+
+  decision_references:
+    - "A-05: Translation porte les interdictions qu'elle subit."
+    - "A-07: BrakeCmd interne Outputs est une dette bloquante, conservée sans arbitrage safety."
+    - "A-11: safety transverse sans VAR_OUTPUT supprimée au profit d'une safety locale."
+
+  evidence_required:
+    - check_code_structure
+    - check_linkage
+    - check_cfc_wiring
+    - bundle
+    - run_all_gates
+    - task_tests
+    - human_validation_notes
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Toute nécessité de choisir entre BrakeCmd calculé et retour physique frein
+    est une décision safety non autorisée: arrêter le lot et remonter A-07.

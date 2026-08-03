@@ -33,9 +33,9 @@ qualifiees via `FB_Input`, sans logique metier et sans decision.
 
 ## 🎯 1. Role
 
-`PRG_ACQUISITION_CFC` qualifie les donnees d'entree avant tout usage metier.
+`PRG_01_Inputs_LD` acquiert les entrees TOR **reelles**, normalise leur polarite et applique leur filtrage avant tout usage metier. `PRG_02_Acquisition_CFC` selectionne ensuite, par domaine, l'image reelle qualifiee ou l'image simulee.
 
-Il publie des **faits qualifies** :
+L'acquisition publie des **faits qualifies** :
 - E/S TOR et PDO conditionnes via la chaine `HwReal` → `FB_SimBench` → `HwIn` ;
 - disponibilite des devices (diagnostics CANopen/EtherCAT) ;
 - image reelle ou simulee selectionnee par domaine ;
@@ -54,16 +54,14 @@ L'acquisition ne decide ni `SafeStop`, ni mode, ni commande actionneur.
 ## 🏗️ 2. Chaine d'acquisition
 
 ```text
-Materiel / PDO
-   ↓
-HwReal (image brute device)
-   ↓
-FB_SimBench (selection reel / simule par domaine)
-   ↓
-HwIn (faits qualifies)
-   ↓
-FB complexes d'acquisition (Joystick, Codeurs, PositionDecoder M3)
-   ↓
+E/S TOR reelles ──► PRG_01_Inputs_LD ──► ST_InputsQualified (reel qualifie)
+PDO / mesures reelles ────────────────────────────────────────────┐
+FB_SimBench ──────────────────────────────────────────────────────┤
+                                                                    ↓
+                              PRG_02_Acquisition_CFC : selection reel/simule par domaine
+                                                                    ↓
+              HwIn + Joystick + Codeurs + PositionDecoder M3 + diagnostics devices
+                                                                    ↓
 Modes/Cycle → procedes (Treuils/Benne, Translation) avec leur safety → Outputs → Supervision
 ```
 
@@ -71,9 +69,9 @@ Modes/Cycle → procedes (Treuils/Benne, Translation) avec leur safety → Outpu
 |---|---|
 | 🧱 Frontiere unique | Aucun FB metier ne lit une E/S brute device. |
 | 🧪 Simulation | La bascule reel/simule se fait une seule fois, par domaine, dans `FB_SimBench`. |
-| 🔒 Polarite | Normalisee une seule fois a l'acquisition (`FB_Input` / DUT de normalisation). |
-| ✍️ Producteur unique | L'acquisition est le seul ecrivain des donnees qualifiees d'entree (`PRG_ACQUISITION_CFC` actuel, `PRG_02_Acquisition_CFC` cible). |
-| 🪜 Affichage TOR | `PRG_INPUTS_LD` expose les 21 entrees TOR qualifiees via `FB_Input`, en lecture seule. |
+| 🔒 Polarite | Normalisee une seule fois dans `PRG_01_Inputs_LD` (`FB_Input` / DUT de normalisation). |
+| ✍️ Producteur unique | `PRG_01_Inputs_LD` produit les TOR reels qualifies; `PRG_02_Acquisition_CFC` produit l'image selectionnee reel/simule et les mesures acquises. |
+| 🪜 Inputs LD | `PRG_01_Inputs_LD` acquiert et expose les E/S TOR reelles via `FB_Input`, sans decision metier. |
 
 Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte seulement leur acquisition et leur publication.
 
@@ -81,10 +79,10 @@ Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte s
 
 | Type de signal | Programme | Langage | Bloc / DUT |
 |---|---|---|---|
-| Devices, simulation, joystick, codeurs, position M3 | `PRG_ACQUISITION_CFC` | CFC | Instances `FB_*`, structures `HwReal` / `HwIn` |
-| 21 E/S TOR qualifiees (affichage) | `PRG_INPUTS_LD` | Ladder | `FB_Input` : contact → bobine |
+| E/S TOR reelles qualifiees | `PRG_01_Inputs_LD` | Ladder | `FB_Input` : acquisition, polarite, filtre, `ST_InputsQualified` |
+| PDO/mesures, simulation, joystick, codeurs, position M3, diagnostics | `PRG_02_Acquisition_CFC` | CFC | Instances `FB_*`, selection reel/simule, `ST_AcquisitionQualified` |
 
-> 📌 La frontiere acquisition utilise donc **CFC pour le flux device/simulation/FB complexes**, et **Ladder (`PRG_INPUTS_LD`) uniquement pour l'affichage des 21 entrees TOR** via `FB_Input`. Aucune logique metier n'est ecrite dans `PRG_INPUTS_LD`.
+> 📌 La frontiere est donc explicite : **Ladder acquiert et qualifie les TOR reelles**, puis le **CFC selectionne reel/simule et traite les FB complexes**. Aucune logique metier n'est ecrite dans `PRG_01_Inputs_LD`.
 
 ---
 

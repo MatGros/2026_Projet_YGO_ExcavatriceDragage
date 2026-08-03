@@ -1,0 +1,89 @@
+contract:
+  task_id: M8_XML_NATIFS_DIRECTS_7POU
+  criticality: C4
+  strategy: rebuild
+  human_validation_required: true
+
+  objective: >
+    Remplacer les pages programme CFC ST historiques par des pages PLCopenXML
+    CFC natives directement importables dans CODESYS, sans fichier PRG_*_CFC.st
+    pour les sept POU de l'architecture cible.
+
+  acceptance:
+    - id: AC1
+      statement: "Chaque programme cible CFC est une source CODE/MAIN/PRG_XX_Nom_CFC.xml native avec <body><ST/> vide et extension <CFC>, et aucun PRG_*_CFC.st cible ne subsiste."
+      verified_by: "python validation XML + check_code_structure.py + grep des fichiers CODE/MAIN/*_CFC.st"
+    - id: AC2
+      statement: "Chaque page XML suit la structure PLCopenXML des exemples samples_reference_codesys, avec localId uniques, positions distinctes, executionOrderId cohérents, blocs FB déclarés et liaisons explicites."
+      verified_by: "check_cfc_wiring.py + comparaison structurelle aux samples_reference_codesys"
+    - id: AC3
+      statement: "Les comportements conservés sont portés par des FB/DUT ST dédiés et appelés par les pages XML; aucune logique IF/CASE/calcul inline n'est introduite dans un CFC."
+      verified_by: "grep des pages XML et revue du diff des FB/DUT associés"
+    - id: AC4
+      statement: "Les noms POU, noms de fichier et rangs cibles sont cohérents avec AF02: PRG_01_Inputs_LD, PRG_02_Acquisition_CFC, PRG_03_Modes_Cycle_CFC, PRG_04_Treuils_Benne_CFC, PRG_05_Translation_CFC, PRG_06_Outputs_LD, PRG_07_Supervision_CFC."
+      verified_by: "check_code_structure.py + grep des anciennes cibles PRG_SAFETY_CFC/PRG_TREUILS_CFC/PRG_TRANSLATION_CFC/PRG_SUPERVISION_CFC"
+    - id: AC5
+      statement: "Aucun ancien et nouveau producteur ne coexistent pour une même donnée; Outputs LD reste l'unique producteur des commandes physiques, hors presets codeur explicitement tracés."
+      verified_by: "check_linkage.py --report et audit des producteurs"
+    - id: AC6
+      statement: "Le bundle PLCopenXML régénéré contient une seule définition de chaque POU cible et aucun PRG_*_CFC.st concurrent."
+      verified_by: "generate_codesys_bundle.py . + inspection XML des noms POU"
+    - id: AC7
+      statement: "Les écarts impossibles à exprimer en fils CFC sont extraits dans des FB ST dédiés sans modification silencieuse de leur sémantique; tout écart est inscrit dans REGISTRE_ARBITRAGES_MIGRATION.md."
+      verified_by: "diff des FB/DUT + registre des arbitrages + revue indépendante"
+    - id: AC8
+      statement: "Pour chaque POU cible, le nom de fichier est identique au nom de POU et le suffixe de langage correspond au langage généré dans le bundle."
+      verified_by: "check_code_structure.py"
+
+  scope:
+    allowed:
+      - CODE/MAIN/*.xml
+      - CODE/MAIN/*.st
+      - CODE/*/*.st
+      - CODE/*/*.xml
+      - DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+      - DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+      - DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+      - DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md
+      - DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
+      - DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+      - DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+      - DOC/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+      - DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+      - DOC/AF_Partie-14_Fonction_Troubleshooting_v1.0.md
+      - DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - .git/
+
+  conservation:
+    must_survive:
+      - "Reset sur front et aucun redémarrage automatique après défaut."
+      - "SafeStop, PowerCutOff, commandes et sorties sans retard supplémentaire introduit."
+      - "AU physique indépendant; le PLC ne remplace pas la chaîne matérielle."
+      - "Outputs LD unique producteur physique des actionneurs."
+      - "Toute règle métier, polarité, seuil et ErrorId existants, sauf écart explicitement inscrit et validé."
+    dropped_on_purpose:
+      - "Les programmes CFC ST historiques PRG_*_CFC.st comme sources de pages : remplacés par XML natif."
+      - "Les accès inter-POU directs aux instances internes, remplacés par contrats ou câblage local."
+
+  evidence_required:
+    - check_code_structure
+    - check_cfc_wiring
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - human_validation_notes
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Ne jamais traduire automatiquement une logique ST arbitraire en XML CFC.
+    Si une logique ne se réduit pas à des instances et liaisons, l'extraire
+    dans un FB ST dédié ou inscrire immédiatement le point dans le registre;
+    aucune approximation safety n'est admise.

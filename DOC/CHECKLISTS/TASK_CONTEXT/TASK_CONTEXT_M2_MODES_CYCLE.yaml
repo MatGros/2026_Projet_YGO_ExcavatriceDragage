@@ -1,0 +1,76 @@
+contract:
+  task_id: M2_MODES_CYCLE
+  criticality: C3
+  strategy: patch
+  human_validation_required: true
+
+  objective: >
+    Réunir au rang 03 les autorisations de modes et le séquenceur Cycle afin de
+    publier des demandes de procédé fraîches, sans produire de sortie physique.
+
+  acceptance:
+    - id: AC1
+      statement: "PRG_03_Modes_Cycle_CFC instancie FB_Modes, FB_Cycle et FB_CycleIhmBridge, publie Auth et demandes Cycle publiques, et aucun autre POU ne conserve les producteurs PRG_MODES_CFC ou PRG_05_Cycle."
+      verified_by: "check_linkage.py --report + grep des PROGRAM et producteurs Auth/demandes Cycle"
+    - id: AC2
+      statement: "Le relâchement homme-mort force StartStop=FALSE sans perdre l'étape Cycle, et les resets Modes, Cycle et défaut machine restent distincts et sur front chez leurs consommateurs."
+      verified_by: "essai CODESYS humain: cycle actif puis relâchement/ré-appui homme-mort et trois scénarios Reset + revue FB_CycleIhmBridge"
+    - id: AC3
+      statement: "FB_Cycle ne produit ni Q, ni PDO, ni commande finale; il émet seulement des demandes consommées par Treuils et Translation."
+      verified_by: "grep des affectations de sorties physiques/PDO dans PRG_03_Modes_Cycle_CFC.xml et FB_CycleIhmBridge.st + check_linkage.py --report"
+    - id: AC4
+      statement: "PRG_03_Modes_Cycle_CFC lit EncoderUnsafe et CmdReset produits au rang 02 sans lecture d'un producteur aval ni retard ajouté."
+      verified_by: "check_linkage.py --report + watch CODESYS humain de la transition SEMI_AUTO"
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU: PRG_03_Modes_Cycle_CFC.xml / PRG_03_Modes_Cycle_CFC."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC6
+      statement: "Le suffixe correspond au langage CFC généré dans le bundle: .xml pour PRG_03_Modes_Cycle_CFC."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py + inspection CODE/CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_MODES_CFC.st
+      - CODE/MAIN/PRG_05_Cycle.st
+      - CODE/MAIN/PRG_03_Modes_Cycle_CFC.xml
+      - CODE/CYCLE/FB_CycleIhmBridge.st
+      - CODE/COMMUN/ST_ResetCommand.st
+      - DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - CODE/MAIN/PRG_02_Acquisition_CFC.xml
+      - CODE/MAIN/PRG_TREUILS_CFC.st
+      - CODE/MAIN/PRG_TRANSLATION_CFC.st
+      - CODE/MAIN/PRG_OUTPUTS_LD.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - .git/
+
+  conservation:
+    must_survive:
+      - "Les sept champs d'autorisation Auth, notamment InhibitM1, InhibitM2, SyncEnable et MaintenanceM3TargetEnable."
+      - "Les commandes Cycle, états, détection SpeedMismatch et consommation impulsionnelle IHM existantes."
+      - "Le séquenceur reste une machine d'état encapsulée et ne commande aucun actionneur."
+      - "Aucune autorisation n'est élargie lorsque EncoderUnsafe est vrai."
+    dropped_on_purpose:
+      - "PRG_MODES_CFC et PRG_05_Cycle après remappage intégral dans PRG_03_Modes_Cycle_CFC."
+
+  decision_references:
+    - "A-02: EncoderUnsafe acquisition conditionne SEMI_AUTO; HomingSuspect reste hors prédicat."
+    - "A-03: CmdReset est produit en acquisition et ses fronts restent locaux."
+    - "A-05: Modes distribue les autorisations; le domaine qui subit porte l'interdiction."
+
+  evidence_required:
+    - check_code_structure
+    - check_linkage
+    - check_cfc_wiring
+    - bundle
+    - run_all_gates
+    - human_validation_notes
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Toute ambiguïté entre arrêt homme-mort, pause Cycle et Reset est bloquante;
+    ne jamais fusionner leurs sémantiques pour simplifier le CFC.
