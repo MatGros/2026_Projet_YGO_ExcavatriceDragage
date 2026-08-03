@@ -67,14 +67,14 @@ State := E_State.READY;
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    Auth.ErrorId := Auth.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+    ErrorId := ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
 END_IF;
 
 // 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    Auth.ErrorId := Auth.ErrorId OR 16#0001;  // bit0 : défaut codeur
+    ErrorId := ErrorId OR 16#0001;  // bit0 : défaut codeur
 ELSIF ResetEdge.Q THEN
-    Auth.ErrorId := Auth.ErrorId AND 16#FFFE;
+    ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
 // 4. ARBITRAGE DU MODE
@@ -163,10 +163,8 @@ IF Auth.Mode <> E_Mode.MAINT_N2 THEN
 END_IF;
 
 // 6. SORTIES ÉTAT
-Auth.Error := (Auth.ErrorId <> 16#0000);
-Error := Auth.Error;
-Auth.Error := Auth.Error;  // Redondant mais explicite
-ErrorEdge(CLK := Auth.Error);
+Error := (ErrorId <> 16#0000);
+ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
