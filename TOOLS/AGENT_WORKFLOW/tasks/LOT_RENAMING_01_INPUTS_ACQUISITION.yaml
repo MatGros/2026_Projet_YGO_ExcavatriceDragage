@@ -1,0 +1,97 @@
+contract:
+  task_id: LOT_RENAMING_01_INPUTS_ACQUISITION
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Renommer les 2 premiers POU cibles de la MainTask (AF_Partie-02 §4) pour
+    rendre l'ordre d'execution lisible dans CODESYS : PRG_INPUTS_LD ->
+    PRG_01_Inputs_LD et PRG_ACQUISITION_CFC -> PRG_02_Acquisition_CFC.
+    Propager le renommage a toutes les references cross-POU (.st + .xml hors
+    bundle) pour que check_linkage reste vert.
+
+  acceptance:
+    - id: AC1
+      statement: "Le fichier CODE/MAIN/PRG_INPUTS_LD.st n'existe plus ; le fichier CODE/MAIN/PRG_01_Inputs_LD.st existe et contient la declaration 'PROGRAM PRG_01_Inputs_LD'."
+      verified_by: "ls CODE/MAIN/PRG_01_Inputs_LD.st && grep -n 'PROGRAM PRG_01_Inputs_LD' CODE/MAIN/PRG_01_Inputs_LD.st"
+    - id: AC2
+      statement: "Le fichier CODE/MAIN/PRG_ACQUISITION_CFC.xml n'existe plus ; le fichier CODE/MAIN/PRG_02_Acquisition_CFC.xml existe et contient l'attribut <pou name=\"PRG_02_Acquisition_CFC\">."
+      verified_by: "ls CODE/MAIN/PRG_02_Acquisition_CFC.xml && grep -o 'pou name=\"PRG_02_Acquisition_CFC\"' CODE/MAIN/PRG_02_Acquisition_CFC.xml"
+    - id: AC3
+      statement: "Aucune reference a 'PRG_INPUTS_LD' (comme identifiant ST, pas comme prose historique) ne subsiste dans les fichiers .st et .xml hors bundle ; toutes sont renommees en PRG_01_Inputs_LD."
+      verified_by: "grep -rn 'PRG_INPUTS_LD' CODE/ --include='*.st' --include='*.xml' | grep -v CODE_Bundle.xml | grep -v 'PRG_01_Inputs_LD' ; retour vide attendu (hors commentaires de prose toleres mais signales)"
+    - id: AC4
+      statement: "Aucune reference a 'PRG_ACQUISITION_CFC' (comme identifiant ST) ne subsiste dans les fichiers .st et .xml hors bundle ; toutes sont renommees en PRG_02_Acquisition_CFC."
+      verified_by: "grep -rn 'PRG_ACQUISITION_CFC' CODE/ --include='*.st' --include='*.xml' | grep -v CODE_Bundle.xml | grep -v 'PRG_02_Acquisition_CFC' ; retour vide attendu (hors commentaires de prose toleres mais signales)"
+    - id: AC5
+      statement: "Le bundle CODE/CODE_Bundle.xml regenere contient les POU 'PRG_01_Inputs_LD' et 'PRG_02_Acquisition_CFC' et aucun POU 'PRG_INPUTS_LD' ni 'PRG_ACQUISITION_CFC'."
+      verified_by: "python -c \"import xml.etree.ElementTree as ET; t=ET.parse('CODE/CODE_Bundle.xml'); NS='{http://www.plcopen.org/xml/tc6_0200}'; names=[p.get('name') for p in t.iter() if p.tag==NS+'pou']; assert 'PRG_01_Inputs_LD' in names and 'PRG_02_Acquisition_CFC' in names; assert 'PRG_INPUTS_LD' not in names and 'PRG_ACQUISITION_CFC' not in names; print('OK')\""
+    - id: AC6
+      statement: "Le gate check_linkage.py --report passe (bloc Auto-verification liaison vert, aucun POU orphelin ni reference rompue causee par le renommage)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report"
+    - id: AC7
+      statement: "Le gate check_bundle_st_syntax.py passe (aucun body ST ne contient END_PROGRAM/END_FUNCTION_BLOCK) — valide le fix generateur en passant."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_bundle_st_syntax.py ."
+    - id: AC8
+      statement: "Le gate check_code_structure.py passe (nom de fichier = nom de POU declare, suffixe de langage coherents)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC9
+      statement: "Aucun autre POU que les 2 cibles n'a ete modifie dans sa declaration ou son nom de fichier."
+      verified_by: "git diff --name-only doit contenir uniquement : PRG_INPUTS_LD.st (supprime), PRG_01_Inputs_LD.st (ajoute), PRG_ACQUISITION_CFC.xml (supprime), PRG_02_Acquisition_CFC.xml (ajoute), et les .st/.xml ou des references ont ete propagees. Aucun FB_* renomme."
+    - id: AC10
+      statement: "Pour chaque POU cible, le nom de fichier est egal au nom de POU declare : PRG_01_Inputs_LD.st declare PROGRAM PRG_01_Inputs_LD ; PRG_02_Acquisition_CFC.xml declare pou name=\"PRG_02_Acquisition_CFC\". Le nom de fichier correspond au nom de POU."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC11
+      statement: "Le suffixe de langage du fichier est egal au langage genere dans le bundle : _LD -> body LD/ST, _CFC -> body CFC natif. Le suffixe correspond au langage du bundle."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_INPUTS_LD.st
+      - CODE/MAIN/PRG_01_Inputs_LD.st
+      - CODE/MAIN/PRG_ACQUISITION_CFC.xml
+      - CODE/MAIN/PRG_02_Acquisition_CFC.xml
+      - CODE/MAIN/*.st (references cross-POU a propager)
+      - CODE/CFC_PREVIEW/*.xml (references cross-POU a propager)
+      - CODE/*/FB_*.st (uniquement les lignes de commentaire/prose mentionnant les anciens noms, pour coherence)
+    forbidden:
+      - CODE/CODE_Bundle.xml (regenere, jamais edite a la main)
+      - PRJ_CODESYS/**
+      - DOC/**
+      - TOOLS/AGENT_WORKFLOW/scripts/check_bundle_st_syntax.py (deja cree par l'orchestrateur)
+      - TOOLS/ST_PLCOPENXML_GENERATOR/generator/st_sections.py (deja fixe par l'orchestrateur)
+      - ARCHIVES/**
+      - Tout POU autre que les 2 cibles (pas de renommage de FB, pas de renommage d'autres PRG)
+
+  conservation:
+    must_survive:
+      - "Toutes les variables VAR/VAR_INPUT/VAR_OUTPUT de PRG_INPUTS_LD et PRG_ACQUISITION_CFC restent identiques (meme nom, meme type, meme ordre)."
+      - "Toutes les connexions CFC dans PRG_ACQUISITION_CFC.xml restent identiques (meme localId, meme refLocalId, meme expression hors renommage du POU lui-meme)."
+      - "Le body ST de PRG_INPUTS_LD.st reste byte-pour-byte identique hors la ligne de declaration PROGRAM et le header comment si mention."
+    dropped_on_purpose:
+      - "Aucun comportement supprime : renommage pur."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/nvidia/nemotron-nano-9b"
+
+  alert_duty: >
+    Tout probleme constate (reference rompue inattendue, POU dependant non
+    reference dans le mapping, gate rouge inexplique) est remonte IMMEDIATEMENT
+    a l'orchestrateur, pas a la fin. Signaler n'est pas elargir le scope.
+
+# Contexte technique pour le sous-agent :
+# - Le generateur de bundle (TOOLS/ST_PLCOPENXML_GENERATOR) utilise le NOM DECLARE
+#   dans le .st (PROGRAM XXX) comme nom de POU, pas le nom de fichier. Pour les
+#   .xml natifs, le nom vient de <pou name="...">. Donc renommer un fichier
+#   necessite aussi de renommer la declaration/attribut interne.
+# - check_linkage.py parse les .st et matche les references cross-POU contre le
+#   nom declare. Une reference 'PRG_INPUTS_LD.X' sans POU 'PRG_INPUTS_LD' = rouge.
+# - Le bundle CODE_Bundle.xml ne s'edite pas : il se regenere via
+#   'python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .'
+# - Ne JAMAIS committer. L'orchestrateur valide le diff avant tout commit.
+# - Prefixe de commit eventuel : aucun (pas de commit dans cette tache).

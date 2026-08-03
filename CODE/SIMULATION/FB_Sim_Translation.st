@@ -20,7 +20,7 @@
    📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
    📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
       ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
-      réel correspondant (PRG_INPUTS_LD).
+      réel correspondant (PRG_01_Inputs_LD).
    ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
       Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
    ═══════════════════════════════════════════════════════════════ *)

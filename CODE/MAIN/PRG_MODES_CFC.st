@@ -19,7 +19,7 @@ END_VAR
 instModes(
     Enable                  := TRUE,
     Reset                   := GVL_IHM.Modes.Cmd.BtnModeReset,
-    PowerContactorEngaged   := PRG_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged   := PRG_01_Inputs_LD.PowerContactorEngaged,
     SelMode                 := GVL_IHM.Modes.Cmd.SelMode,
     SelSyncEnable           := GVL_IHM.M1M2Sync.Cmd.SelSyncEnable,
     InhibitM1Request        := GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit,

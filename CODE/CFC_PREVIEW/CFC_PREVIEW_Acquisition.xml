@@ -29,9 +29,9 @@
             </inputVariables><inOutVariables /><outputVariables><variable formalParameter="Cmd"><connectionPointOut><relPosition x="0" y="0" /><expression /></connectionPointOut></variable></outputVariables>
             <addData><data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation"><CallType>functionblock</CallType></data></addData>
           </block>
-          <inVariable localId="10"><position x="10" y="100" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_ACQUISITION_CFC.HwReal</expression></inVariable>
+          <inVariable localId="10"><position x="10" y="100" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_02_Acquisition_CFC.HwReal</expression></inVariable>
           <connector localId="11" name=""><position x="30" y="100" /><connectionPointIn><connection refLocalId="10" /></connectionPointIn></connector>
-          <inVariable localId="12"><position x="10" y="115" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_ACQUISITION_CFC.HwSim</expression></inVariable>
+          <inVariable localId="12"><position x="10" y="115" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_02_Acquisition_CFC.HwSim</expression></inVariable>
           <connector localId="13" name=""><position x="30" y="115" /><connectionPointIn><connection refLocalId="12" /></connectionPointIn></connector>
           <inVariable localId="14"><position x="10" y="130" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_Simulation.SimulationModeActive</expression></inVariable>
           <connector localId="15" name=""><position x="30" y="130" /><connectionPointIn><connection refLocalId="14" /></connectionPointIn></connector>

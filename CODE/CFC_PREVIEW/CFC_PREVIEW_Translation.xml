@@ -246,7 +246,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosTremie</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosTremie</expression>
                 </inVariable>
                 <connector localId="30" name="">
                   <position x="100" y="230" />
@@ -259,7 +259,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosP2</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosP2</expression>
                 </inVariable>
                 <connector localId="32" name="">
                   <position x="100" y="245" />
@@ -272,7 +272,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosP1</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosP1</expression>
                 </inVariable>
                 <connector localId="34" name="">
                   <position x="100" y="260" />
@@ -285,7 +285,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosMaintenance</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosMaintenance</expression>
                 </inVariable>
                 <connector localId="36" name="">
                   <position x="100" y="275" />
@@ -507,7 +507,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.PowerContactorEngaged</expression>
+                  <expression>PRG_01_Inputs_LD.PowerContactorEngaged</expression>
                 </inVariable>
                 <connector localId="46" name="">
                   <position x="100" y="350" />
@@ -559,7 +559,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.PhaseRotationOk</expression>
+                  <expression>PRG_01_Inputs_LD.PhaseRotationOk</expression>
                 </inVariable>
                 <connector localId="54" name="">
                   <position x="100" y="410" />
@@ -611,7 +611,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.M3_StatusWord_Filtered</expression>
+                  <expression>PRG_02_Acquisition_CFC.M3_StatusWord_Filtered</expression>
                 </inVariable>
                 <connector localId="62" name="">
                   <position x="100" y="470" />
@@ -624,7 +624,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered</expression>
+                  <expression>PRG_02_Acquisition_CFC.M3_ActualFrequencyHz_Filtered</expression>
                 </inVariable>
                 <connector localId="64" name="">
                   <position x="100" y="485" />
@@ -637,7 +637,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.M3BrakeFeedback</expression>
+                  <expression>PRG_01_Inputs_LD.M3BrakeFeedback</expression>
                 </inVariable>
                 <connector localId="66" name="">
                   <position x="100" y="500" />
@@ -663,7 +663,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd</expression>
+                  <expression>PRG_02_Acquisition_CFC.instPosDecoderM3.LimitSwitchFwd</expression>
                 </inVariable>
                 <connector localId="70" name="">
                   <position x="100" y="530" />
@@ -676,7 +676,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchRev</expression>
+                  <expression>PRG_02_Acquisition_CFC.instPosDecoderM3.LimitSwitchRev</expression>
                 </inVariable>
                 <connector localId="72" name="">
                   <position x="100" y="545" />
@@ -689,7 +689,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.instPosDecoderM3.Incoherent</expression>
+                  <expression>PRG_02_Acquisition_CFC.instPosDecoderM3.Incoherent</expression>
                 </inVariable>
                 <connector localId="74" name="">
                   <position x="100" y="560" />
@@ -1190,7 +1190,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosPV</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosPV</expression>
                 </inVariable>
                 <connector localId="107" name="">
                   <position x="100" y="755" />
@@ -1455,7 +1455,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.M3BrakeCommandOpenConfirmed</expression>
+                  <expression>PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed</expression>
                 </inVariable>
                 <connector localId="119" name="">
                   <position x="100" y="830" />
@@ -1542,7 +1542,7 @@
                     </data>
                   </addData>
                 </block>
-              <connector localId="124" name="M3SafeStopPublisher"><position x="1100" y="102" /><connectionPointIn><connection refLocalId="101" formalParameter="SafeStop" /></connectionPointIn></connector><outVariable localId="125"><position x="1240" y="120" /><connectionPointIn><connection refLocalId="124" /></connectionPointIn><expression>M3SafeStop</expression></outVariable><connector localId="126" name="M3PowerCutOffPublisher"><position x="1100" y="138" /><connectionPointIn><connection refLocalId="101" formalParameter="PowerCutOff" /></connectionPointIn></connector><outVariable localId="127"><position x="1240" y="156" /><connectionPointIn><connection refLocalId="126" /></connectionPointIn><expression>M3PowerCutOff</expression></outVariable><connector localId="128" name="TranslationRequestPublisher"><position x="1100" y="174" /><connectionPointIn><connection refLocalId="105" formalParameter="Request" /></connectionPointIn></connector><outVariable localId="129"><position x="1240" y="192" /><connectionPointIn><connection refLocalId="128" /></connectionPointIn><expression>TranslationRequest</expression></outVariable><inVariable localId="130"><position x="20" y="1520" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_INPUTS_LD.BrakeThermalFeedback</expression></inVariable><connector localId="131" name="BrakeThermalFeedbackSource"><position x="130" y="1520" /><connectionPointIn><connection refLocalId="130" /></connectionPointIn></connector><inVariable localId="132"><position x="20" y="1545" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.TranslationM3.Bypass.ContactorFeedback</expression></inVariable><connector localId="133" name="BypassContactorFeedbackSource"><position x="130" y="1545" /><connectionPointIn><connection refLocalId="132" /></connectionPointIn></connector><inVariable localId="134"><position x="20" y="1570" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.TranslationM3.Bypass.Global</expression></inVariable><connector localId="135" name="BypassGlobalSource"><position x="130" y="1570" /><connectionPointIn><connection refLocalId="134" /></connectionPointIn></connector><inVariable localId="136"><position x="20" y="1595" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.TranslationM3.Bypass.LimitSwitch</expression></inVariable><connector localId="137" name="BypassLimitSwitchSource"><position x="130" y="1595" /><connectionPointIn><connection refLocalId="136" /></connectionPointIn></connector><block localId="138" executionOrderId="6" typeName="FB_TranslationCfcExpressions" instanceName="instTranslationCfcExpressions"><position x="260" y="1550" /><inputVariables><variable formalParameter="BrakeThermalFeedback"><connectionPointIn><relPosition x="0" y="0" /><connection refLocalId="131" /></connectionPointIn></variable><variable formalParameter="BypassContactorFeedback"><connectionPointIn><relPosition x="0" y="1" /><connection refLocalId="133" /></connectionPointIn></variable><variable formalParameter="BypassGlobal"><connectionPointIn><relPosition x="0" y="2" /><connection refLocalId="135" /></connectionPointIn></variable><variable formalParameter="BypassLimitSwitch"><connectionPointIn><relPosition x="0" y="3" /><connection refLocalId="137" /></connectionPointIn></variable></inputVariables><inOutVariables /><outputVariables><variable formalParameter="BrakeThermalOk"><connectionPointOut><relPosition x="0" y="0" /><expression /></connectionPointOut></variable><variable formalParameter="BypassContactorFeedbackEffective"><connectionPointOut><relPosition x="0" y="1" /><expression /></connectionPointOut></variable><variable formalParameter="BypassLimitSwitchEffective"><connectionPointOut><relPosition x="0" y="2" /><expression /></connectionPointOut></variable></outputVariables></block></CFC>
+              <connector localId="124" name="M3SafeStopPublisher"><position x="1100" y="102" /><connectionPointIn><connection refLocalId="101" formalParameter="SafeStop" /></connectionPointIn></connector><outVariable localId="125"><position x="1240" y="120" /><connectionPointIn><connection refLocalId="124" /></connectionPointIn><expression>M3SafeStop</expression></outVariable><connector localId="126" name="M3PowerCutOffPublisher"><position x="1100" y="138" /><connectionPointIn><connection refLocalId="101" formalParameter="PowerCutOff" /></connectionPointIn></connector><outVariable localId="127"><position x="1240" y="156" /><connectionPointIn><connection refLocalId="126" /></connectionPointIn><expression>M3PowerCutOff</expression></outVariable><connector localId="128" name="TranslationRequestPublisher"><position x="1100" y="174" /><connectionPointIn><connection refLocalId="105" formalParameter="Request" /></connectionPointIn></connector><outVariable localId="129"><position x="1240" y="192" /><connectionPointIn><connection refLocalId="128" /></connectionPointIn><expression>TranslationRequest</expression></outVariable><inVariable localId="130"><position x="20" y="1520" /><connectionPointOut><expression /></connectionPointOut><expression>PRG_01_Inputs_LD.BrakeThermalFeedback</expression></inVariable><connector localId="131" name="BrakeThermalFeedbackSource"><position x="130" y="1520" /><connectionPointIn><connection refLocalId="130" /></connectionPointIn></connector><inVariable localId="132"><position x="20" y="1545" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.TranslationM3.Bypass.ContactorFeedback</expression></inVariable><connector localId="133" name="BypassContactorFeedbackSource"><position x="130" y="1545" /><connectionPointIn><connection refLocalId="132" /></connectionPointIn></connector><inVariable localId="134"><position x="20" y="1570" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.TranslationM3.Bypass.Global</expression></inVariable><connector localId="135" name="BypassGlobalSource"><position x="130" y="1570" /><connectionPointIn><connection refLocalId="134" /></connectionPointIn></connector><inVariable localId="136"><position x="20" y="1595" /><connectionPointOut><expression /></connectionPointOut><expression>GVL_IHM.TranslationM3.Bypass.LimitSwitch</expression></inVariable><connector localId="137" name="BypassLimitSwitchSource"><position x="130" y="1595" /><connectionPointIn><connection refLocalId="136" /></connectionPointIn></connector><block localId="138" executionOrderId="6" typeName="FB_TranslationCfcExpressions" instanceName="instTranslationCfcExpressions"><position x="260" y="1550" /><inputVariables><variable formalParameter="BrakeThermalFeedback"><connectionPointIn><relPosition x="0" y="0" /><connection refLocalId="131" /></connectionPointIn></variable><variable formalParameter="BypassContactorFeedback"><connectionPointIn><relPosition x="0" y="1" /><connection refLocalId="133" /></connectionPointIn></variable><variable formalParameter="BypassGlobal"><connectionPointIn><relPosition x="0" y="2" /><connection refLocalId="135" /></connectionPointIn></variable><variable formalParameter="BypassLimitSwitch"><connectionPointIn><relPosition x="0" y="3" /><connection refLocalId="137" /></connectionPointIn></variable></inputVariables><inOutVariables /><outputVariables><variable formalParameter="BrakeThermalOk"><connectionPointOut><relPosition x="0" y="0" /><expression /></connectionPointOut></variable><variable formalParameter="BypassContactorFeedbackEffective"><connectionPointOut><relPosition x="0" y="1" /><expression /></connectionPointOut></variable><variable formalParameter="BypassLimitSwitchEffective"><connectionPointOut><relPosition x="0" y="2" /><expression /></connectionPointOut></variable></outputVariables></block></CFC>
             </data>
           </addData>
         </body>

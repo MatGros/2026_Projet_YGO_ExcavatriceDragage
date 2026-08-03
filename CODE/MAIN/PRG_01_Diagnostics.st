@@ -27,14 +27,14 @@ END_VAR
 
 
 // 🔧 REX 2026-07-24 (demande utilisateur, mise en service) : REFONTE — PRG_01 lit les valeurs brutes bus
-// depuis l'image matérielle HwIn produite par PRG_ACQUISITION_CFC.
+// depuis l'image matérielle HwIn produite par PRG_02_Acquisition_CFC.
 // C'est FB_Diag_CanOpen/FB_Diag_Ethercat qui décident désormais seuls Online/Operational/State
 // (distinction INIT normal / SIMULATED bypass / READY réel / ERROR — voir en-tête de ces FB).
-RawCanBusState    := PRG_ACQUISITION_CFC.HwIn.Operator.CanBusState;
-RawJoystickState  := PRG_ACQUISITION_CFC.HwIn.Operator.JOY1_DeviceState;
-RawVariateurState := PRG_ACQUISITION_CFC.HwIn.Translation.AC600_DeviceState;
-RawEncoderM1State := PRG_ACQUISITION_CFC.HwIn.Winch.COD1_DeviceState;
-RawEncoderM2State := PRG_ACQUISITION_CFC.HwIn.Winch.COD2_DeviceState;
+RawCanBusState    := PRG_02_Acquisition_CFC.HwIn.Operator.CanBusState;
+RawJoystickState  := PRG_02_Acquisition_CFC.HwIn.Operator.JOY1_DeviceState;
+RawVariateurState := PRG_02_Acquisition_CFC.HwIn.Translation.AC600_DeviceState;
+RawEncoderM1State := PRG_02_Acquisition_CFC.HwIn.Winch.COD1_DeviceState;
+RawEncoderM2State := PRG_02_Acquisition_CFC.HwIn.Winch.COD2_DeviceState;
 
 // 1. Diagnostics CANopen — 🆕 REX 2026-07-08 : gardé par BusJoystickIsReal UNIQUEMENT (bus/nœud),
 // indépendant de BusJoystickSignalIsReal (signal brut ci-dessus) — granularité séparée.
@@ -70,10 +70,10 @@ instIhmHeartbeat(
     PlcTogglePeriod := T#500ms
 );
 
-// 3. Acquisition Joystick — RawX/RawY/RawButton lus depuis PRG_ACQUISITION_CFC.HwIn.Operator
+// 3. Acquisition Joystick — RawX/RawY/RawButton lus depuis PRG_02_Acquisition_CFC.HwIn.Operator
 instJoystick(
     Enable              := TRUE,
-    PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_01_Inputs_LD.PowerContactorEngaged,
     Reset               := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
     Mode                := PRG_MODES_CFC.Auth.Mode,  // 🆕 REX 2026-07-08 : désarme le homme-mort au changement de mode
     BenneBusy         := PRG_TREUILS_CFC.instBucket.Busy,
@@ -83,9 +83,9 @@ instJoystick(
     NeutralYMem         := _JoystickNeutralY,
     BusCanOpenOP        := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP          := instDiagCanOpen.DeviceJoystick,
-    RawX                := PRG_ACQUISITION_CFC.HwIn.Operator.JoyXRaw_ANA1,
-    RawY                := PRG_ACQUISITION_CFC.HwIn.Operator.JoyYRaw_ANA2,
-    RawButton           := PRG_ACQUISITION_CFC.HwIn.Operator.JoyBtnRaw,
+    RawX                := PRG_02_Acquisition_CFC.HwIn.Operator.JoyXRaw_ANA1,
+    RawY                := PRG_02_Acquisition_CFC.HwIn.Operator.JoyYRaw_ANA2,
+    RawButton           := PRG_02_Acquisition_CFC.HwIn.Operator.JoyBtnRaw,
     BtnCalibrate           := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX             := _JoystickInvertX,       // depuis GVL_PERSISTENT
     InvertY             := _JoystickInvertY,       // idem

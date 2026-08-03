@@ -4,13 +4,13 @@
    📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2
    🎨 Rôle : conditionner les 19 E/S TOR retenues du traçage legacy via FB_Input.
               Aucune décision métier (SafeStop, mode, commande) n'est prise ici.
-   🔗 Dépendances : PRG_ACQUISITION_CFC produit HwIn ; consommateurs = Safety/Modes/Cycle/Supervision.
+   🔗 Dépendances : PRG_02_Acquisition_CFC produit HwIn ; consommateurs = Safety/Modes/Cycle/Supervision.
    ═══════════════════════════════════════════════════════════════ *)
 
-PROGRAM PRG_INPUTS_LD
+PROGRAM PRG_01_Inputs_LD
 
 VAR_INPUT
-    HwIn : ST_HardwareImage;    (* Image matérielle qualifiée produite par PRG_ACQUISITION_CFC *)
+    HwIn : ST_HardwareImage;    (* Image matérielle qualifiée produite par PRG_02_Acquisition_CFC *)
 END_VAR
 
 VAR_OUTPUT
