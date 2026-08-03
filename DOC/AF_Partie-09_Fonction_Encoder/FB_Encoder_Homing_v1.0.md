@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §3.  
 > Rôle de **ce** document : gestion du référencement (homing nominal et unitaire), mémorisation RETAIN et qualification du doute.  
-> Source code : `CODE/CODEURS/FB_Encoder_Homing.st` · instances `instHomingM1/M2` dans `Acquisition (CFC)`.  
+> Source code : `CODE/CODEURS/FB_Encoder_Homing.st` · instances cibles `instHomingM1/M2` dans `PRG_04_Treuils_Benne_CFC`.  
 
 ## 🧭 Sommaire
 
@@ -28,7 +28,30 @@
 
 ## 1. Rôle et profil
 
-Brique de **référencement et calibration** : calcule la position de référence brute (`HomingRefRaw`) à appliquer au codeur pour qu'une hauteur cible donnée (`CfgHomingTargetM`) corresponde exactement à la cote physique.
+Brique de **référencement et calibration** : orchestre le preset EtherCAT et calcule la référence
+brute (`HomingRefRaw`) pour qu'une hauteur cible donnée (`CfgHomingTargetM`) corresponde exactement
+à la cote physique. La mesure position/vitesse reste produite par `PRG_02_Acquisition_CFC` ; ce FB
+est placé dans le CFC Treuils/Benne pour rendre l'état de maintenance immédiatement lisible.
+
+### Référence de preset EtherCAT
+
+Le codeur est référencé par son télégramme de preset EtherCAT. La valeur envoyée est le centre de
+la plage multitour totale, afin d'empêcher un rebouclage brutal du compteur vers zéro en utilisation :
+
+```text
+PointsPerRev       = 8 192 points/tour
+MultiTurnRevsMax   = 4 096 tours
+MaxRawValue        = 8 192 × 4 096 = 33 554 432 points UL
+HomingRefTarget    = MaxRawValue / 2 = 16 777 216 points UL
+```
+
+`16 777 216 points UL` est donc la moitié de la **plage multitour totale**, et non la moitié de la
+résolution d'un seul tour (`8 192 / 2 = 4 096 points`). Cette marge symétrique évite qu'une position
+valide franchisse la limite brute et réapparaisse soudainement près de zéro.
+
+Séquence : `FB_Encoder_Homing` produit `PresetRequest` et `PresetValue`, `FB_Encoder_Abs` les
+transmet au télégramme EtherCAT, puis renvoie `PresetAck` ou `PresetNak`. Après acquittement,
+`HomingRefRaw` est mémorisé dans `ST_Encoder_Calib` et consommé par `FB_Encoder_Scale`.
 
 ---
 

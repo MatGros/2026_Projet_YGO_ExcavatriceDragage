@@ -95,7 +95,7 @@ code actuel eclate en quatre POU — ce qui supprime les instances codeurs et jo
 | Ce qui est absorbe par `PRG_02_Acquisition_CFC` | POU actuel | Contenu concerne |
 |---|---|---|
 | Frontiere E/S, selection reel/simule, joystick | `PRG_ACQUISITION_CFC` | `HwReal` / `FB_SimBench` / `HwIn`, `instJoystick` |
-| Chaine codeurs complete M1/M2/M3 | `PRG_02_Encoders` | absolu, echelle, vitesse, validite, homing (⚠️ arbitrage — voir AF09) |
+| Chaine de mesure codeurs M1/M2/M3 | `PRG_02_Encoders` | acquisition brute, echelle, position, vitesse, validite et disponibilite |
 | Diagnostics devices et bus | `PRG_01_Diagnostics` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` |
 | Retours auxiliaires qualifies | `PRG_AUXILIARY_CFC` | retour thermique centrale hydraulique |
 | **Etat AU qualifie** | chaine AU | ⚠️ **acquisition de l'etat seulement** |
@@ -118,8 +118,10 @@ PLC ne remplace jamais cette chaine.
 - Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs_LD`.
 
 📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
-⚠️ Ce lot porte un point d'arbitrage ouvert : le homing lit aujourd'hui le mode de marche, donc une
-donnee produite par un POU aval. Faits et options : `DOC/AF_Partie-09_Fonction_Encoder_v2.1.md` §4bis.
+Le référencement (`FB_Encoder_Homing`) n'appartient pas à cette frontière de mesure : il rejoint
+`PRG_04_Treuils_Benne_CFC`, où les autorisations de maintenance et la visibilité opérateur sont
+disponibles. Il consomme les faits publiés par l'acquisition (`RawPos`, `EncoderAvailable`, retours
+d'arrêt) et publie sa calibration/requête de preset vers la chaîne EtherCAT.
 
 ---
 

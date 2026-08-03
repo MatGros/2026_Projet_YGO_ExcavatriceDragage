@@ -27646,6 +27646,30 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
+            <contact localId="15" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="16" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="17" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
             <block localId="5" typeName="FB_Input" instanceName="instPowerContactorEngaged">
               <position x="0" y="0" />
               <inputVariables>
@@ -27654,10 +27678,31 @@ TRUE = translation en position Trémie</xhtml>
                     <connection refLocalId="6" />
                   </connectionPointIn>
                 </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="15" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="16" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="17" />
+                  </connectionPointIn>
+                </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -27675,13 +27720,13 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>PowerContactorEngaged</variable>
             </coil>
-            <comment localId="15" height="0" width="0">
+            <comment localId="18" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="16">
+            <vendorElement localId="19">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27692,7 +27737,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="18" negated="false" storage="none" edge="none">
+            <contact localId="21" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27700,18 +27745,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
-            <block localId="17" typeName="FB_Input" instanceName="instEmergencyChainClosed">
+            <contact localId="30" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="31" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="32" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="20" typeName="FB_Input" instanceName="instEmergencyChainClosed">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="18" />
+                    <connection refLocalId="21" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="30" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="31" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="32" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -27721,21 +27811,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="19" negated="false" storage="none">
+            <coil localId="22" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="17" formalParameter="State" />
+                <connection refLocalId="20" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>EmergencyChainClosed</variable>
             </coil>
-            <comment localId="27" height="0" width="0">
+            <comment localId="33" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="28">
+            <vendorElement localId="34">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27746,7 +27836,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="30" negated="false" storage="none" edge="none">
+            <contact localId="36" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27754,18 +27844,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Machine.PhaseRotationOk_DI</variable>
             </contact>
-            <block localId="29" typeName="FB_Input" instanceName="instCtrlPhaseRotation">
+            <contact localId="45" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="46" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="47" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="35" typeName="FB_Input" instanceName="instCtrlPhaseRotation">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="30" />
+                    <connection refLocalId="36" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="45" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="46" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="47" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -27775,21 +27910,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="31" negated="false" storage="none">
+            <coil localId="37" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="29" formalParameter="State" />
+                <connection refLocalId="35" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>PhaseRotationOk</variable>
             </coil>
-            <comment localId="39" height="0" width="0">
+            <comment localId="48" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="40">
+            <vendorElement localId="49">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27800,7 +27935,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="42" negated="false" storage="none" edge="none">
+            <contact localId="51" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27808,72 +27943,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Machine.BrakeThermalOk_DI</variable>
             </contact>
-            <block localId="41" typeName="FB_Input" instanceName="instBrakeThermalFeedback">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="InputRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="42" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="43" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="41" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>BrakeThermalFeedback</variable>
-            </coil>
-            <comment localId="51" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="52">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="54" negated="false" storage="none" edge="none">
+            <contact localId="60" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>HwIn.Machine.M1_M2_KoboldContactFond_DI</variable>
+              <variable>FALSE</variable>
             </contact>
-            <block localId="53" typeName="FB_Input" instanceName="instKoboldContactFond">
+            <contact localId="61" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="62" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="50" typeName="FB_Input" instanceName="instBrakeThermalFeedback">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="54" />
+                    <connection refLocalId="51" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="60" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="61" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="62" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -27883,18 +28009,18 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="55" negated="false" storage="none">
+            <coil localId="52" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="53" formalParameter="State" />
+                <connection refLocalId="50" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>KoboldContactFond</variable>
+              <variable>BrakeThermalFeedback</variable>
             </coil>
             <comment localId="63" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [TREUILS M1 / M2] ===</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
             <vendorElement localId="64">
@@ -27908,13 +28034,95 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="65" height="0" width="0">
+            <contact localId="66" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Machine.M1_M2_KoboldContactFond_DI</variable>
+            </contact>
+            <contact localId="75" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="76" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="77" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="65" typeName="FB_Input" instanceName="instKoboldContactFond">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="66" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="75" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="76" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="77" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="67" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="65" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>KoboldContactFond</variable>
+            </coil>
+            <comment localId="78" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [TREUILS M1 / M2] ===</xhtml>
               </content>
             </comment>
-            <vendorElement localId="66">
+            <vendorElement localId="79">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27925,7 +28133,24 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="68" negated="false" storage="none" edge="none">
+            <comment localId="80" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="81">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="83" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27933,18 +28158,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M1M2_TopPositionFree_DI</variable>
             </contact>
-            <block localId="67" typeName="FB_Input" instanceName="instTopPositionSensor">
+            <contact localId="92" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="93" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="94" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="82" typeName="FB_Input" instanceName="instTopPositionSensor">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="68" />
+                    <connection refLocalId="83" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="92" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="93" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="94" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -27954,21 +28224,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="69" negated="false" storage="none">
+            <coil localId="84" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="67" formalParameter="State" />
+                <connection refLocalId="82" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TopPositionSensor</variable>
             </coil>
-            <comment localId="77" height="0" width="0">
+            <comment localId="95" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="78">
+            <vendorElement localId="96">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27979,7 +28249,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="80" negated="false" storage="none" edge="none">
+            <contact localId="98" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27987,18 +28257,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M2_TensionedCable_DI</variable>
             </contact>
-            <block localId="79" typeName="FB_Input" instanceName="instSlackCableSwitch">
+            <contact localId="107" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="108" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="109" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="97" typeName="FB_Input" instanceName="instSlackCableSwitch">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="80" />
+                    <connection refLocalId="98" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="107" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="108" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="109" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28008,21 +28323,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="81" negated="false" storage="none">
+            <coil localId="99" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="79" formalParameter="State" />
+                <connection refLocalId="97" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>SlackCableSwitch</variable>
             </coil>
-            <comment localId="89" height="0" width="0">
+            <comment localId="110" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="90">
+            <vendorElement localId="111">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28033,7 +28348,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="92" negated="false" storage="none" edge="none">
+            <contact localId="113" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28041,18 +28356,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M1_ContactorsReleased_DI</variable>
             </contact>
-            <block localId="91" typeName="FB_Input" instanceName="instM1FwdRevSpeedFeedbackOff">
+            <contact localId="122" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="123" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="124" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="112" typeName="FB_Input" instanceName="instM1FwdRevSpeedFeedbackOff">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="92" />
+                    <connection refLocalId="113" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="122" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="123" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="124" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28062,121 +28422,13 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="93" negated="false" storage="none">
+            <coil localId="114" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="91" formalParameter="State" />
+                <connection refLocalId="112" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1FwdRevSpeedFeedbackOff</variable>
-            </coil>
-            <comment localId="101" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="102">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="104" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>HwIn.Winch.M1_ThermalOk_DI</variable>
-            </contact>
-            <block localId="103" typeName="FB_Input" instanceName="instM1Thermal">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="InputRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="104" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="105" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="103" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1ThermalFeedback</variable>
-            </coil>
-            <comment localId="113" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="114">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="116" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>HwIn.Winch.M1_BrakeIsOpen_DI</variable>
-            </contact>
-            <block localId="115" typeName="FB_Input" instanceName="instM1BrakeFeedback">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="InputRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="116" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="117" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="115" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1BrakeFeedback</variable>
             </coil>
             <comment localId="125" height="0" width="0">
               <position x="0" y="0" />
@@ -28201,9 +28453,33 @@ TRUE = translation en position Trémie</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>HwIn.Winch.M2_ContactorsReleased_DI</variable>
+              <variable>HwIn.Winch.M1_ThermalOk_DI</variable>
             </contact>
-            <block localId="127" typeName="FB_Input" instanceName="instM2FwdRevSpeedFeedbackOff">
+            <contact localId="137" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="138" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="139" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="127" typeName="FB_Input" instanceName="instM1Thermal">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
@@ -28211,10 +28487,31 @@ TRUE = translation en position Trémie</xhtml>
                     <connection refLocalId="128" />
                   </connectionPointIn>
                 </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="137" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="138" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="139" />
+                  </connectionPointIn>
+                </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28230,15 +28527,15 @@ TRUE = translation en position Trémie</xhtml>
                 <connection refLocalId="127" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2FwdRevSpeedFeedbackOff</variable>
+              <variable>M1ThermalFeedback</variable>
             </coil>
-            <comment localId="137" height="0" width="0">
+            <comment localId="140" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="138">
+            <vendorElement localId="141">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28249,7 +28546,205 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="140" negated="false" storage="none" edge="none">
+            <contact localId="143" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M1_BrakeIsOpen_DI</variable>
+            </contact>
+            <contact localId="152" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>TRUE</variable>
+            </contact>
+            <contact localId="153" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="154" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="142" typeName="FB_Input" instanceName="instM1BrakeFeedback">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="143" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="152" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="153" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="154" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="144" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="142" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1BrakeFeedback</variable>
+            </coil>
+            <comment localId="155" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="156">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="158" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>HwIn.Winch.M2_ContactorsReleased_DI</variable>
+            </contact>
+            <contact localId="167" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="168" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="169" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="157" typeName="FB_Input" instanceName="instM2FwdRevSpeedFeedbackOff">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="InputRaw">
+                  <connectionPointIn>
+                    <connection refLocalId="158" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="167" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="168" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="169" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="159" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="157" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2FwdRevSpeedFeedbackOff</variable>
+            </coil>
+            <comment localId="170" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="171">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="173" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28257,18 +28752,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M2_ThermalOk_DI</variable>
             </contact>
-            <block localId="139" typeName="FB_Input" instanceName="instM2Thermal">
+            <contact localId="182" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="183" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="184" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="172" typeName="FB_Input" instanceName="instM2Thermal">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="140" />
+                    <connection refLocalId="173" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="182" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="183" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="184" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28278,21 +28818,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="141" negated="false" storage="none">
+            <coil localId="174" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="139" formalParameter="State" />
+                <connection refLocalId="172" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M2ThermalFeedback</variable>
             </coil>
-            <comment localId="149" height="0" width="0">
+            <comment localId="185" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="150">
+            <vendorElement localId="186">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28303,7 +28843,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="152" negated="false" storage="none" edge="none">
+            <contact localId="188" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28311,18 +28851,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Winch.M2_BrakeIsOpen_DI</variable>
             </contact>
-            <block localId="151" typeName="FB_Input" instanceName="instM2BrakeFeedback">
+            <contact localId="197" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>TRUE</variable>
+            </contact>
+            <contact localId="198" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="199" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="187" typeName="FB_Input" instanceName="instM2BrakeFeedback">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="152" />
+                    <connection refLocalId="188" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="197" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="198" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="199" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28332,21 +28917,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="153" negated="false" storage="none">
+            <coil localId="189" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="151" formalParameter="State" />
+                <connection refLocalId="187" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M2BrakeFeedback</variable>
             </coil>
-            <comment localId="161" height="0" width="0">
+            <comment localId="200" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [TRANSLATION M3] ===</xhtml>
               </content>
             </comment>
-            <vendorElement localId="162">
+            <vendorElement localId="201">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28357,13 +28942,13 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="163" height="0" width="0">
+            <comment localId="202" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="164">
+            <vendorElement localId="203">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28374,7 +28959,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="166" negated="false" storage="none" edge="none">
+            <contact localId="205" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28382,18 +28967,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosTremie_DI</variable>
             </contact>
-            <block localId="165" typeName="FB_Input" instanceName="instTranslationPosTremie">
+            <contact localId="214" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="215" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="216" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="204" typeName="FB_Input" instanceName="instTranslationPosTremie">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="166" />
+                    <connection refLocalId="205" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="214" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="215" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="216" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28403,21 +29033,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="167" negated="false" storage="none">
+            <coil localId="206" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="165" formalParameter="State" />
+                <connection refLocalId="204" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TranslationPosTremie</variable>
             </coil>
-            <comment localId="175" height="0" width="0">
+            <comment localId="217" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="176">
+            <vendorElement localId="218">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28428,7 +29058,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="178" negated="false" storage="none" edge="none">
+            <contact localId="220" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28436,18 +29066,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosPV_DI</variable>
             </contact>
-            <block localId="177" typeName="FB_Input" instanceName="instTranslationPosPV">
+            <contact localId="229" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="230" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="231" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="219" typeName="FB_Input" instanceName="instTranslationPosPV">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="178" />
+                    <connection refLocalId="220" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="229" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="230" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="231" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28457,21 +29132,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="179" negated="false" storage="none">
+            <coil localId="221" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="177" formalParameter="State" />
+                <connection refLocalId="219" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TranslationPosPV</variable>
             </coil>
-            <comment localId="187" height="0" width="0">
+            <comment localId="232" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="188">
+            <vendorElement localId="233">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28482,7 +29157,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="190" negated="false" storage="none" edge="none">
+            <contact localId="235" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28490,18 +29165,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosP2_DI</variable>
             </contact>
-            <block localId="189" typeName="FB_Input" instanceName="instTranslationPosP2">
+            <contact localId="244" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="245" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="246" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="234" typeName="FB_Input" instanceName="instTranslationPosP2">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="190" />
+                    <connection refLocalId="235" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="244" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="245" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="246" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28511,21 +29231,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="191" negated="false" storage="none">
+            <coil localId="236" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="189" formalParameter="State" />
+                <connection refLocalId="234" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TranslationPosP2</variable>
             </coil>
-            <comment localId="199" height="0" width="0">
+            <comment localId="247" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="200">
+            <vendorElement localId="248">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28536,7 +29256,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="202" negated="false" storage="none" edge="none">
+            <contact localId="250" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28544,18 +29264,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosP1_DI</variable>
             </contact>
-            <block localId="201" typeName="FB_Input" instanceName="instTranslationPosP1">
+            <contact localId="259" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="260" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="261" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="249" typeName="FB_Input" instanceName="instTranslationPosP1">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="202" />
+                    <connection refLocalId="250" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="259" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="260" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="261" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28565,21 +29330,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="203" negated="false" storage="none">
+            <coil localId="251" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="201" formalParameter="State" />
+                <connection refLocalId="249" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TranslationPosP1</variable>
             </coil>
-            <comment localId="211" height="0" width="0">
+            <comment localId="262" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="212">
+            <vendorElement localId="263">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28590,7 +29355,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="214" negated="false" storage="none" edge="none">
+            <contact localId="265" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28598,18 +29363,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_PosMaintenance_DI</variable>
             </contact>
-            <block localId="213" typeName="FB_Input" instanceName="instTranslationPosMaintenance">
+            <contact localId="274" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>FALSE</variable>
+            </contact>
+            <contact localId="275" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="276" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="264" typeName="FB_Input" instanceName="instTranslationPosMaintenance">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="214" />
+                    <connection refLocalId="265" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="274" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="275" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="276" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28619,21 +29429,21 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="215" negated="false" storage="none">
+            <coil localId="266" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="213" formalParameter="State" />
+                <connection refLocalId="264" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TranslationPosMaintenance</variable>
             </coil>
-            <comment localId="223" height="0" width="0">
+            <comment localId="277" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="224">
+            <vendorElement localId="278">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28644,7 +29454,7 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="226" negated="false" storage="none" edge="none">
+            <contact localId="280" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28652,18 +29462,63 @@ TRUE = translation en position Trémie</xhtml>
               <connectionPointOut />
               <variable>HwIn.Translation.M3_BrakeIsOpen_DI</variable>
             </contact>
-            <block localId="225" typeName="FB_Input" instanceName="instM3BrakeFeedback">
+            <contact localId="289" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>TRUE</variable>
+            </contact>
+            <contact localId="290" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>CST_InputFilterTime</variable>
+            </contact>
+            <contact localId="291" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>(Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING)</variable>
+            </contact>
+            <block localId="279" typeName="FB_Input" instanceName="instM3BrakeFeedback">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="InputRaw">
                   <connectionPointIn>
-                    <connection refLocalId="226" />
+                    <connection refLocalId="280" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="289" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="FilterTime">
+                  <connectionPointIn>
+                    <connection refLocalId="290" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ChannelOk">
+                  <connectionPointIn>
+                    <connection refLocalId="291" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="ErrorId">
                   <connectionPointOut />
                 </variable>
               </outputVariables>
@@ -28673,10 +29528,10 @@ TRUE = translation en position Trémie</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="227" negated="false" storage="none">
+            <coil localId="281" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="225" formalParameter="State" />
+                <connection refLocalId="279" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M3BrakeFeedback</variable>

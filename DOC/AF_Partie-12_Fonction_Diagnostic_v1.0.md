@@ -85,7 +85,7 @@ PRG_TROUBLESHOOTING_CFC (observateurs passifs)
 
 ## 5. Intégration programme
 
-### 5.1 État actuel du code (ST, avant migration)
+### 5.1 État actuel du code (ST legacy, avant migration)
 
 | Programme | Instances | Rôle |
 |---|---|---|
