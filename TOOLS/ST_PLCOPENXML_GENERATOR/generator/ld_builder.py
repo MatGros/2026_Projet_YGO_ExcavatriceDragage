@@ -297,14 +297,11 @@ def build_ld_body(
             if p_name == main_input_param:
                 continue
             p_value = all_params.get(p_name)
-            if p_value == "TRUE":
-                extra_param_sources[p_name] = 0
-                continue
             formal_type = instance_input_types.get(inst_name, {}).get(p_name)
             direct_identifier = p_value is not None and re.fullmatch(
                 r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_value
             )
-            if p_value == "FALSE" or formal_type != "BOOL" or not direct_identifier:
+            if p_value == "TRUE" or p_value == "FALSE" or formal_type != "BOOL" or not direct_identifier:
                 src_id = local_id_counter
                 local_id_counter += 2
                 input_var = ET.SubElement(ld, "inVariable")
@@ -314,6 +311,8 @@ def build_ld_body(
                 expression = ET.SubElement(input_var, "expression")
                 if p_value == "FALSE":
                     expression.text = "0"
+                elif p_value == "TRUE":
+                    expression.text = "1"
                 elif p_value is not None:
                     expression.text = p_value
                 extra_param_sources[p_name] = src_id
@@ -440,7 +439,7 @@ def build_ld_body(
                 )
                 if p_val == "TRUE" or p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
                     # Non-BOOL (TIME/INT/WORD/REAL), constantes (TRUE/FALSE), expression ou non câblé :
-                    # inVariable, pas contact. FALSE est sérialisé "0", TRUE est "TRUE" ou "1".
+                    # inVariable, pas contact. FALSE est sérialisé "0", TRUE est "1" (oracle CODESYS).
                     source_id = local_id_counter
                     local_id_counter += 2
                     input_var = ET.SubElement(ld, "inVariable")
@@ -451,7 +450,7 @@ def build_ld_body(
                     if p_val == "FALSE":
                         expression.text = "0"
                     elif p_val == "TRUE":
-                        expression.text = "TRUE"
+                        expression.text = "1"
                     elif p_val is not None:
                         expression.text = p_val
                     param_source_ids[p_name] = source_id
@@ -666,7 +665,12 @@ def build_ld_body(
             ET.SubElement(input_var, "position", x="0", y="0")
             ET.SubElement(input_var, "connectionPointOut")
             expression = ET.SubElement(input_var, "expression")
-            expression.text = source_expression
+            if source_expression == "FALSE":
+                expression.text = "0"
+            elif source_expression == "TRUE":
+                expression.text = "1"
+            else:
+                expression.text = source_expression
 
             output_var = ET.SubElement(ld, "outVariable")
             output_var.set("localId", str(output_id))

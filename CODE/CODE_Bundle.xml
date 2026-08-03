@@ -29421,7 +29421,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
             <inVariable localId="521">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>FALSE</expression>
+              <expression>0</expression>
             </inVariable>
             <outVariable localId="522">
               <position x="0" y="0" />
@@ -29450,7 +29450,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
             <inVariable localId="543">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>TRUE</expression>
+              <expression>1</expression>
             </inVariable>
             <contact localId="545" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
