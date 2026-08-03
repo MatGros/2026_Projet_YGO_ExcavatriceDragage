@@ -232,33 +232,16 @@ TonDisplayDebounce(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebou
 EmergencyArmingFailedDisplayed := TonDisplayDebounce.Q OR NOT EmergencyArmingFailedAck;
 ```
 
-## 10. Câblage CFC natif (`.xml`) — REX 2026-08
+## 10. Orchestration ST pur (`.st`) — REX 2026-08 (Remplace CFC XML)
 
-> 🚩 Un CFC natif (`PRG_*_CFC.xml`, fusionné tel quel dans le bundle) peut etre
-> importé avec des blocs affichés **sans aucun lien visible** dans CODESYS, alors que le XML
-> est bien formé et le bundle généré sans erreur. Cause : connecteurs empilés en `x=0 y=0`
-> (fils de longueur nulle, invisibles/confus dans l'éditeur graphique).
+> 📌 **Décision d'architecture (Urgence Projet)** : L'orchestration par diagrammes graphiques CFC (`.xml`) est remplacée par du **Texte Structuré ST pur (`.st`)** pour tous les programmes d'orchestration (`PRG_02_Acquisition`, `PRG_03_Modes_Cycle`, `PRG_04_Treuils_Benne`, `PRG_05_Translation`, `PRG_07_Supervision`).
 
-Règles obligatoires pour tout `<CFC>` écrit ou généré à la main (hors générateur ST→LD) :
+Règles obligatoires pour tout programme d'orchestration ST :
 
-1. **Chaque source** (`inVariable`, ou sortie d'un bloc consommée ailleurs) passe par un
-   **`<connector>` dédié** avant de rejoindre un bloc consommateur — jamais de `<connection>`
-   directe d'un bloc vers l'`inVariable` source, même quand PLCopenXML l'autoriserait.
-2. **Chaque `<connector>` a une position unique et non nulle** (`x`, `y` différents de `0,0`,
-   et différents des autres connecteurs de la page). Des connecteurs empilés au même point
-   produisent des fils illisibles ou invisibles dans l'éditeur graphique CODESYS.
-3. **Disposition en colonnes** : sources à gauche, blocs métier au centre (dans l'ordre
-   `executionOrderId`), sorties à droite — cohérent avec la règle §5 AF_Partie-03
-   ("le flux se lit de gauche à droite").
-4. **Aucune logique métier dans le CFC** (rappel §POO/§5 AF03, TC-P02-002) : un `IF`/calcul
-   se délègue à un FB dédié, jamais inline dans une page CFC.
-
-Reference de structure XML :
-`TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml`.
-La procedure de production, de fusion et de validation est normative dans
-`DOC/AF_Partie-03_Contrats_Composants_v2.0.md §5`. Attention : le sample porte
-historiquement des connecteurs en `(0,0)` ; il ne constitue jamais une reference
-pour les coordonnees.
+1. **Sections structurées avec emojis** : Chaque programme ST d'orchestration doit obligatoirement découper son flux de haut en bas avec des bannières commentées explicites (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`).
+2. **Aucune logique métier inline** : Le POU ST ne contient aucun `IF` complexe ni calcul métier — uniquement des instanciations et des appels de FB avec liaison par structures DUT publiques (`ST_*`).
+3. **Producteur unique par bus DUT** : Les échanges inter-programmes passent par des structures typées dédiées (`Auth`, `Qualified`, `Measurements`).
+4. **Conservation du Ladder Diagram (`_LD.st`)** : Les barrières d'E/S physiques TOR (`PRG_01_Inputs_LD.st` et `PRG_06_Outputs_LD.st`) restent exclusivement en Ladder Diagram (`<LD>`).
 
 ## 11. Règles de génération Ladder (`_LD.st` → `<LD>`) — REX 2026-08
 

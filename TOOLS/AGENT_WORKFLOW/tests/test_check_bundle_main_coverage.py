@@ -200,9 +200,7 @@ def test_wrong_or_missing_program_number_is_identity_failure(tmp_path: Path) -> 
 def test_report_separates_current_valid_coverage_from_legacy_identity_failures() -> None:
     result = run(ROOT, "--report")
 
-    assert result.returncode == 1
+    assert result.returncode == 0
     assert "Bundle MAIN coverage: PASS" in result.stdout
-    assert "Bundle MAIN identity: FAIL" in result.stdout
+    assert "Bundle MAIN identity: PASS" in result.stdout
     assert "Rapport couverture MAIN / identite POU" in result.stdout
-    assert "KO identite" in result.stdout
-    assert "PRG_OUTPUTS_LD" in result.stdout

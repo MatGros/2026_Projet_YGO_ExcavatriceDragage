@@ -6,7 +6,7 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 
 ### `M0BIS_ALIGNEMENT_DOC_7POU` — 2026-08 (documentation seule)
 - Architecture actée : **7 POU par ensemble mécanique**, chaque procédé portant sa safety dans sa page
-- `PRG_01_Inputs_LD` · `PRG_02_Acquisition_CFC` · `PRG_03_Modes_Cycle_CFC` · `PRG_04_Treuils_Benne_CFC` · `PRG_05_Translation_CFC` · `PRG_06_Outputs_LD` · `PRG_07_Supervision_CFC`
+- `PRG_01_Inputs_LD` · `PRG_02_Acquisition` · `PRG_03_Modes_Cycle` · `PRG_04_Treuils_Benne` · `PRG_05_Translation` · `PRG_06_Outputs_LD` · `PRG_07_Supervision`
 - Abandonné comme **cible** : `PRG_SAFETY_CFC` global, `PRG_01_Diagnostics`, `PRG_02_Encoders`, `PRG_AUXILIARY_CFC`, `PRG_TROUBLESHOOTING_CFC`/`PRG_11_Troubleshooting`, table 13 POU
 - AF06/AF09/AF10/AF11/AF12/AF13/AF14 : sections « intégration programme » alignées · cibles `.xml` corrigées
 - Dossiers C4 fondés sur la safety séparée archivés dans `ARCHIVES/Doc/AUDITS/Architecture/` (10 fichiers)

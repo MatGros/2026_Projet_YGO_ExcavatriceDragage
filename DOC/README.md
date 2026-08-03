@@ -43,12 +43,12 @@ dans sa propre page, visible à côté des blocs métier.
 | Rang | POU cible |
 |---|---|
 | 01 | `PRG_01_Inputs_LD` |
-| 02 | `PRG_02_Acquisition_CFC` — absorbe codéurs, diagnostics, auxiliaires, état AU |
-| 03 | `PRG_03_Modes_Cycle_CFC` |
-| 04 | `PRG_04_Treuils_Benne_CFC` — safety M1/M2 intégrée |
-| 05 | `PRG_05_Translation_CFC` — safety M3 intégrée |
+| 02 | `PRG_02_Acquisition` — absorbe codéurs, diagnostics, auxiliaires, état AU (ST pur) |
+| 03 | `PRG_03_Modes_Cycle` — (ST pur) |
+| 04 | `PRG_04_Treuils_Benne` — safety M1/M2 intégrée (ST pur) |
+| 05 | `PRG_05_Translation` — safety M3 intégrée (ST pur) |
 | 06 | `PRG_06_Outputs_LD` — agrège `PowerCutOff` |
-| 07 | `PRG_07_Supervision_CFC` — absorbe le troubleshooting, lecture seule stricte |
+| 07 | `PRG_07_Supervision` — absorbe le troubleshooting, lecture seule stricte (ST pur) |
 
 🚫 **Vocabulaire abandonné** — ces POU n'existent pas dans la cible et ne doivent pas être
 reconstruits : `PRG_SAFETY_CFC` (ou toute page safety séparée), `PRG_01_Diagnostics`,
