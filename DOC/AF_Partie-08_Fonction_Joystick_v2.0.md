@@ -25,7 +25,7 @@
 |---|---|---|---|---|
 | TC-P08-001 | Perte contacteur / CAN ➔ désarmer et annuler axes | `SpeedRef=0`, `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §3 |
 | TC-P08-002 | Armement homme-mort sur front au neutre uniquement | Armement ➔ `SpeedRef` actif | `⚡ SITE+AUTO` | §4 |
-| TC-P08-003 | Bouton relâché > 10 s ➔ désarmement et décélération | `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §4 |
+| TC-P08-003 | Bouton relâché en mouvement : **sans** reconfirmation (`DeadmanReconfEnable=FALSE`, défaut) armement conservé ; **avec** reconfirmation (TRUE) relâchement > 10 s ➔ désarmement | `DeadmanArmed` conservé / `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §4 |
 | TC-P08-004 | Neutre rapide (<500ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | §4 |
 | TC-P08-005 | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | §4, §6 |
 | TC-P08-006 | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | §5 |
@@ -75,7 +75,7 @@ Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► Homme-Mort (0 si non armé) 
 | `Direction` | −1 / 0 / +1 (seuil ±0,1 sur rampe) |
 
 Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depuis `GVL_PERSISTENT` ;
-`DeadmanRearmTimeout=T#10s`, `NeutralHoldTime=T#500ms`.
+`DeadmanRearmTimeout=T#10s`, `NeutralHoldTime=T#500ms`, `DeadmanReconfEnable=FALSE` (figé, défaut cible).
 
 ---
 
@@ -96,6 +96,9 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 | `BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` |
 | `Invert*`, `Deadband`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |
 | `NeutralXMem/YMem` | `VAR_IN_OUT` persistants |
+| `DeadmanRearmTimeout` | `T#10s` — reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
+| `NeutralHoldTime` | `T#500ms` — neutre tenu avant désarmement |
+| `DeadmanReconfEnable` | `FALSE` figé (Acquisition) — consentement au démarrage / reconfirmation |
 
 ### Sorties
 
@@ -115,6 +118,20 @@ sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 
 ## 4. Homme-mort
 
+> 🆕 **2026-08-03 — Décision utilisateur** : le bouton devient un **consentement au démarrage**.
+> Défaut (`DeadmanReconfEnable := FALSE`, figé dans le câblage) : armement au neutre → mouvement
+> libre **sans surveillance du bouton** → retour au neutre 500 ms désarme → rappuyer pour un nouveau
+> mouvement. La reconfirmation périodique reste disponible en paramètre (`DeadmanReconfEnable := TRUE`,
+> réactivation par recompilation uniquement).
+
+### Paramètres
+
+| Paramètre | Défaut | Rôle |
+|---|---|---|
+| `DeadmanReconfEnable` | `FALSE` | `FALSE` = consentement au démarrage (mouvement libre) ; `TRUE` = reconfirmation périodique en mouvement |
+| `DeadmanRearmTimeout` | `T#10S` | Délai de reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
+| `NeutralHoldTime` | `T#500MS` | Neutre tenu avant désarmement |
+
 ### Armement
 Front bouton **et** `ScaleX.OutPct=0` **et** `ScaleY.OutPct=0` (après deadband, **avant** filtre/rampe).
 
@@ -123,11 +140,12 @@ Front bouton **et** `ScaleX.OutPct=0` **et** `ScaleY.OutPct=0` (après deadband,
 |---|---|
 | Gate | Enable / AU / CAN / device |
 | Neutre tenu | Après avoir quitté le neutre une fois (`LeftNeutralSinceArm`), neutre ≥ 500 ms |
-| Timeout présence | Armé + hors neutre + bouton **relâché** ≥ 10 s |
+| Timeout présence | Uniquement si `DeadmanReconfEnable=TRUE` : armé + hors neutre + bouton **relâché** ≥ 10 s |
 | Changement mode | `Mode <> LastMode` |
 | Fin benne | Front descendant `BenneBusy` **si** `NOT PreserveArmingAfterBucket` |
 
-Maintenir le bouton **ou** le réappuyer en mouvement remet le timer 10 s (niveau, pas seulement front).
+Avec reconfirmation (`TRUE`) : maintenir le bouton **ou** le réappuyer en mouvement remet le timer
+10 s (niveau, pas seulement front). Sans (`FALSE`, défaut) : aucun désarmement lié au bouton en mouvement.
 
 ### Exception Extraction (documentée)
 `PreserveArmingAfterBucket` évite le désarmement en fin de fermeture auto pour enchaîner palier 1

@@ -7,10 +7,12 @@
       Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
       Les rampes d'accélération/décélération sont gérées exclusivement par les
       FB de mouvement aval (FB_Winch, FB_Translation), hors de ce bloc.
-   🔒 Bouton homme-mort :
-      - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
-      - Reconfirmation périodique en mouvement (délai DeadmanRearmTimeout).
-      - Désarmement sur maintien au neutre (durée NeutralHoldTime).
+    🔒 Bouton homme-mort :
+       - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
+       - Consentement au démarrage : mouvement libre SANS surveillance du bouton
+         (défaut, DeadmanReconfEnable := FALSE). Optionnel : reconfirmation périodique
+         en mouvement (délai DeadmanRearmTimeout) si DeadmanReconfEnable := TRUE.
+       - Désarmement sur maintien au neutre (durée NeutralHoldTime) + gate/mode/fin benne.
    📤 Produit AxisCmdX, AxisCmdY, et signaux de diagnostic/miroir.
    ═══════════════════════════════════════════════════════════════ *)
 
@@ -34,8 +36,9 @@ VAR_INPUT
     InvertY         : BOOL := FALSE;
     Deadband        : REAL := 10.0;  // Zone morte en %
     FilterTime      : TIME := TIME#100ms;
-    DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement
+    DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement (si reconfirmation activée)
     NeutralHoldTime     : TIME := T#500MS; // Temps continu au neutre avant désarmement
+    DeadmanReconfEnable : BOOL := FALSE; // 🆕 2026-08-03 : FALSE = bouton = consentement au démarrage (mouvement libre, défaut cible) ; TRUE = reconfirmation périodique en mouvement (comportement historique)
 END_VAR
 VAR_OUTPUT
     Ready           : BOOL;       // Prêt à commuter
@@ -168,15 +171,16 @@ IF DeadmanEdge.Q AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0) THEN
     DeadmanArmed := TRUE;       // Appui bouton au neutre = armement
 END_IF;
 
-// 4quater. RECONFIRMATION PÉRIODIQUE — tant qu'armé ET en mouvement, le bouton doit être
-// maintenu ou ré-appuyé avant DeadmanRearmTimeout. Seul un relâchement prolongé désarme.
-// qu'armé ET en mouvement (hors neutre), le bouton doit être soit MAINTENU, soit ré-appuyé, avant
-// DeadmanRearmTimeout. ⚠️ CORRECTIF : le 1er jet ne détectait qu'un FRONT (`DeadmanEdge.Q`) — un
+// 4quater. RECONFIRMATION PÉRIODIQUE (optionnelle) — activée uniquement si DeadmanReconfEnable := TRUE.
+// 🆕 2026-08-03 : par défaut FALSE → bouton = CONSENTEMENT AU DÉMARRAGE : une fois armé, le mouvement
+// est libre SANS surveillance du bouton ; seuls gate/mode/fin benne/neutre 500ms désarment.
+// ⚠️ CORRECTIF (garde-fou si réactivé) : le 1er jet ne détectait qu'un FRONT (`DeadmanEdge.Q`) — un
 // opérateur qui MAINTIENT le bouton enfoncé en continu (réflexe naturel homme-mort) ne générait
 // plus jamais de front après le 1er appui → désarmement surprise au bout de 3s MALGRÉ la présence
 // continue. Corrigé : `NOT RawButton` (niveau, pas front) — maintenir OU réappuyer dans le délai
 // remettent tous les deux `IN` à FALSE (TON.ET repart de 0), seul un RELÂCHEMENT PROLONGÉ désarme.
-DeadmanTimer(IN := DeadmanArmed AND NOT ((ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0)) AND NOT RawButton,
+DeadmanTimer(IN := DeadmanReconfEnable AND DeadmanArmed
+                   AND NOT ((ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0)) AND NOT RawButton,
              PT := DeadmanRearmTimeout);
 IF DeadmanTimer.Q THEN
     DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)
