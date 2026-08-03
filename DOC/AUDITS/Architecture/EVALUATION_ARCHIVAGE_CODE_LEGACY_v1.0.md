@@ -90,7 +90,7 @@ Tous `ST_*` (`SUPERVISION/_TYPES` + domaines) · `GVL_IHM` · `GVL_PERSISTENT`.
 | Fichier | Cible | Lot |
 |---|---|---|
 | `ARCHIVES/Code/ACQUISITION/FB_AcquisitionLegacyBridge.st` | implémentation cible `PRG_02` (SEL inline + gate + chaîne codeurs) | M1 |
-| `CODE/MAIN/PRG_02_Acquisition_CFC.xml` | nouveau `PRG_02_Acquisition_CFC` | M1 |
+| `CODE/MAIN/PRG_02_Acquisition.st` | nouveau `PRG_02_Acquisition_CFC` | M1 |
 | `CODE/SUPERVISION/GVL_IHM_AU.st` | supprimé (décision T99) | lot dédié |
 
 🔴 **Références pendantes à résoudre au M1** (POU absents du dépôt) :

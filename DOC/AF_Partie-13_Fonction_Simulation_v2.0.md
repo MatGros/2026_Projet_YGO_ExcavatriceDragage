@@ -2,7 +2,7 @@
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5  
 > **Statut** : référence active · 2026-07-27  
-> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_02_Acquisition_CFC.xml` (CFC natif cible), `CODE/MAIN/PRG_01_Inputs_LD` (Ladder TOR),
+> **Sources** : `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_02_Acquisition.st` (CFC natif cible), `CODE/MAIN/PRG_01_Inputs_LD` (Ladder TOR),
 > `AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`,
 > `CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md`.
 
