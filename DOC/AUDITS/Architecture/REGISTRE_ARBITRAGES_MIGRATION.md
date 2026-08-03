@@ -25,7 +25,7 @@
 
 ## A-01 — Homing lit le mode de marche *(lot M1)*
 
-**Statut : 🟡 TRANCHÉ PROVISOIRE**
+**Statut : 🟢 TRANCHÉ (option C validée utilisateur 2026-08-03)**
 
 ### Faits prouvés
 
@@ -43,7 +43,7 @@ homing dans l'acquisition ferait lire un producteur aval. Consommateur avant pro
 | B — Homing déplacé dans l'acquisition avec retard d'un scan | ⛔ Refusée : une autorisation de référencement n'est pas une mesure lecture seule |
 | C — Homing déplacé dans le procédé Treuils | Le recalage suit le mouvement qu'il recale ; cohérent avec le découpage par procédé |
 
-### Décision retenue : **C**
+### Décision retenue : **C** *(validée utilisateur 2026-08-03 — « ce n'est pas un problème »)*
 
 Le homing est une fonction de **conduite du treuil**, pas d'acquisition brute : il commande un
 preset de position pendant un mouvement de référencement. Le placer dans
