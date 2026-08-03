@@ -65,7 +65,9 @@ def test_gvl_name_derived_from_filename(tmp_path):
     assert objects[0].folder == ""
 
 
-def test_standalone_ld_export_is_excluded_from_discovery(tmp_path):
+def test_standalone_ld_export_is_a_blocking_error(tmp_path):
+    """Un *_LD.xml posé à côté de son .st est interdit (REX 2026-08) : la
+    livraison Ladder passe exclusivement par le bundle CODE_Bundle.xml."""
     _write(tmp_path / "PRG_01_Inputs_LD.st", "PROGRAM PRG_01_Inputs_LD\nEND_PROGRAM\n")
     _write(
         tmp_path / "PRG_01_Inputs_LD.xml",
@@ -76,23 +78,25 @@ def test_standalone_ld_export_is_excluded_from_discovery(tmp_path):
     objects = discover_objects(tmp_path, diag)
 
     assert [object_.name for object_ in objects] == ["PRG_01_Inputs_LD"]
-    assert any("standalone LD export" in str(info) for info in diag.of(Severity.INFO))
+    errors = [str(e) for e in diag.of(Severity.ERROR)]
+    assert any("standalone LD export" in e for e in errors)
 
 
 def test_real_code_dir_dynamic_count_relationship():
     """CODE/ isn't a fixed number we hardcode here: recompute it from disk so
-    this stays meaningful as files are added/removed."""
+    this stays meaningful as files are added/removed.
+
+    La livraison Ladder passe par le bundle : aucun *_LD.xml ne doit exister
+    à côté de son .st (REX 2026-08) — un tel artefact serait une ERREUR, pas
+    un POU à compter."""
     all_st_files = sorted(CODE_DIR.rglob("*.st"))
     all_native_xml = [f for f in CODE_DIR.rglob("*.xml") if f.name != "CODE_Bundle.xml"]
-    standalone_ld_exports = [
-        file for file in all_native_xml if file.stem.endswith("_LD") and file.with_suffix(".st").is_file()
-    ]
     decl_impl_files = [file for file in all_st_files if file.name.endswith("_Decl.st") or file.name.endswith("_Impl.st")]
 
     diag = DiagnosticCollector()
     objects = discover_objects(CODE_DIR, diag)
 
-    assert len(objects) == len(all_st_files) + len(all_native_xml) - len(standalone_ld_exports) - len(decl_impl_files)
+    assert len(objects) == len(all_st_files) + len(all_native_xml) - len(decl_impl_files)
     assert not diag.has_errors()
 
 

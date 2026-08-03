@@ -105,6 +105,7 @@ def build_ld_body(
     boolean_identifiers: set[str] | None = None,
     instance_types: dict[str, str] | None = None,
     instance_input_types: dict[str, dict[str, str]] | None = None,
+    instance_output_types: dict[str, list[str]] | None = None,
 ) -> ET.Element:
     """Convertit un PROGRAM ``PRG_*_LD`` en Ladder.
 
@@ -118,6 +119,7 @@ def build_ld_body(
     boolean_identifiers = boolean_identifiers or set()
     instance_types = instance_types or {}
     instance_input_types = instance_input_types or {}
+    instance_output_types = instance_output_types or {}
     body = ET.Element("body")
     ld = ET.SubElement(body, "LD")
 
@@ -275,16 +277,50 @@ def build_ld_body(
         var_el = ET.SubElement(contact, "variable")
         var_el.text = cmd_var
 
-        # Contacts pour les paramètres supplémentaires (InvertLogic, FilterTime, ChannelOk, etc.)
-        # Structure identique au sample CODESYS PRG_10_LD_Commentaires.xml :
-        # un contact par paramètre, placé AVANT le bloc, connecté au leftPowerRail (refLocalId=0).
-        extra_param_contacts = {}  # param_name -> localId
-        for p_name, p_value in all_params.items():
+        # Sources pour TOUS les inputs déclarés du FB, câblés ou non.
+        # Oracle CODESYS (samples_reference_codesys/PRG_input_LD.xml, REX 2026-08) :
+        #   - chaque input formel du FB apparaît dans inputVariables, même non câblé ;
+        #   - input non câblé        → inVariable à expression VIDE ;
+        #   - BOOL littéral TRUE     → leftPowerRail (0) ;
+        #   - BOOL littéral FALSE    → inVariable expression "0" (sérialisation CODESYS) ;
+        #   - non-BOOL ou expression → inVariable (expression) ;
+        #   - BOOL variable          → contact.
+        # Un contact Ladder ne porte jamais de littéral TIME ni d'expression : c'est
+        # un bug d'import CODESYS (REX 2026-08).
+        declared_inputs = list(instance_input_types.get(inst_name, {}).keys())
+        for p_name in all_params:
+            if p_name not in declared_inputs:
+                declared_inputs.append(p_name)
+
+        extra_param_sources = {}  # param_name -> localId (0 = leftPowerRail)
+        for p_name in declared_inputs:
             if p_name == main_input_param:
                 continue
+            p_value = all_params.get(p_name)
+            if p_value == "TRUE":
+                extra_param_sources[p_name] = 0
+                continue
+            formal_type = instance_input_types.get(inst_name, {}).get(p_name)
+            direct_identifier = p_value is not None and re.fullmatch(
+                r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_value
+            )
+            if p_value == "FALSE" or formal_type != "BOOL" or not direct_identifier:
+                src_id = local_id_counter
+                local_id_counter += 2
+                input_var = ET.SubElement(ld, "inVariable")
+                input_var.set("localId", str(src_id))
+                ET.SubElement(input_var, "position", x="0", y="0")
+                ET.SubElement(input_var, "connectionPointOut")
+                expression = ET.SubElement(input_var, "expression")
+                if p_value == "FALSE":
+                    expression.text = "0"
+                elif p_value is not None:
+                    expression.text = p_value
+                extra_param_sources[p_name] = src_id
+                continue
             p_contact_id = local_id_counter
-            local_id_counter += 1
-            extra_param_contacts[p_name] = p_contact_id
+            local_id_counter += 2
+            extra_param_sources[p_name] = p_contact_id
             p_contact = ET.SubElement(ld, "contact")
             p_contact.set("localId", str(p_contact_id))
             p_contact.set("negated", "false")
@@ -316,27 +352,30 @@ def build_ld_body(
         c_in_b = ET.SubElement(var_in, "connectionPointIn")
         c_ref_b = ET.SubElement(c_in_b, "connection")
         c_ref_b.set("refLocalId", str(contact_id))
-        for p_name in all_params:
+        for p_name in declared_inputs:
             if p_name == main_input_param:
                 continue
             var_p = ET.SubElement(in_vars, "variable")
             var_p.set("formalParameter", p_name)
             c_in_p = ET.SubElement(var_p, "connectionPointIn")
             c_ref_p = ET.SubElement(c_in_p, "connection")
-            c_ref_p.set("refLocalId", str(extra_param_contacts.get(p_name, 0)))
+            c_ref_p.set("refLocalId", str(extra_param_sources.get(p_name, 0)))
 
         ET.SubElement(block, "inOutVariables")
 
-        # Émettre TOUS les outputs (State, Error, ErrorId pour FB_Input)
+        # Émettre TOUS les outputs déclarés du FB (State, Error, ErrorId pour FB_Input).
+        # Structure oracle CODESYS : State → <connectionPointOut/> ;
+        # Error/ErrorId → <connectionPointOut><expression/></connectionPointOut>.
+        declared_outputs = instance_output_types.get(inst_name, [])
+        if not declared_outputs:
+            declared_outputs = ["State"]
         out_vars = ET.SubElement(block, "outputVariables")
-        var_out = ET.SubElement(out_vars, "variable")
-        var_out.set("formalParameter", "State")
-        ET.SubElement(var_out, "connectionPointOut")
-        # Error et ErrorId (FB_Input) — exposés pour les consommateurs/IHM
-        for out_p in ("Error", "ErrorId"):
-            var_err = ET.SubElement(out_vars, "variable")
-            var_err.set("formalParameter", out_p)
-            ET.SubElement(var_err, "connectionPointOut")
+        for out_p in declared_outputs:
+            var_out = ET.SubElement(out_vars, "variable")
+            var_out.set("formalParameter", out_p)
+            c_out = ET.SubElement(var_out, "connectionPointOut")
+            if out_p != "State":
+                ET.SubElement(c_out, "expression")
 
         b_adddata = ET.SubElement(block, "addData")
         d_b = ET.SubElement(b_adddata, "data")
@@ -384,11 +423,28 @@ def build_ld_body(
 
             # ── Phase 1 : créer les sources (contacts/inVariables) AVANT le bloc.
             # CODESYS exige que les éléments source précèdent le bloc dans le LD.
+            # Chaque input formel du FB apparaît (câblé ou non, expression vide
+            # sinon) — oracle PRG_input_LD.xml (REX 2026-08).
+            declared_inputs = list(instance_input_types.get(inst_name, {}).keys())
+            arg_map = dict(arg_matches)
+            for p_name in arg_map:
+                if p_name not in declared_inputs:
+                    declared_inputs.append(p_name)
+
             param_source_ids = {}  # param_name -> localId du contact/inVariable (ou 0 pour TRUE)
-            for p_name, p_val in arg_matches:
+            for p_name in declared_inputs:
+                p_val = arg_map.get(p_name)
                 formal_type = instance_input_types.get(inst_name, {}).get(p_name)
-                if formal_type != "BOOL":
-                    # Non-BOOL (TIME/INT/WORD/REAL) : inVariable, pas contact.
+                if p_val == "TRUE":
+                    # BOOL TRUE : connecté directement au leftPowerRail (0).
+                    param_source_ids[p_name] = 0
+                    continue
+                direct_identifier = p_val is not None and re.fullmatch(
+                    r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_val
+                )
+                if p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
+                    # Non-BOOL (TIME/INT/WORD/REAL), expression ou non câblé :
+                    # inVariable, pas contact. FALSE est sérialisé "0" (oracle).
                     source_id = local_id_counter
                     local_id_counter += 2
                     input_var = ET.SubElement(ld, "inVariable")
@@ -396,28 +452,28 @@ def build_ld_body(
                     ET.SubElement(input_var, "position", x="0", y="0")
                     ET.SubElement(input_var, "connectionPointOut")
                     expression = ET.SubElement(input_var, "expression")
-                    expression.text = p_val
+                    if p_val == "FALSE":
+                        expression.text = "0"
+                    elif p_val is not None:
+                        expression.text = p_val
                     param_source_ids[p_name] = source_id
-                elif p_val == "TRUE":
-                    # BOOL TRUE : connecté directement au leftPowerRail (0).
-                    param_source_ids[p_name] = 0
-                else:
-                    # BOOL variable : contact.
-                    cnt_id = local_id_counter
-                    local_id_counter += 2
-                    contact = ET.SubElement(ld, "contact")
-                    contact.set("localId", str(cnt_id))
-                    contact.set("negated", "false")
-                    contact.set("storage", "none")
-                    contact.set("edge", "none")
-                    ET.SubElement(contact, "position", x="0", y="0")
-                    c_in_c = ET.SubElement(contact, "connectionPointIn")
-                    c_ref_c = ET.SubElement(c_in_c, "connection")
-                    c_ref_c.set("refLocalId", "0")
-                    ET.SubElement(contact, "connectionPointOut")
-                    var_el = ET.SubElement(contact, "variable")
-                    var_el.text = p_val
-                    param_source_ids[p_name] = cnt_id
+                    continue
+                # BOOL variable : contact.
+                cnt_id = local_id_counter
+                local_id_counter += 2
+                contact = ET.SubElement(ld, "contact")
+                contact.set("localId", str(cnt_id))
+                contact.set("negated", "false")
+                contact.set("storage", "none")
+                contact.set("edge", "none")
+                ET.SubElement(contact, "position", x="0", y="0")
+                c_in_c = ET.SubElement(contact, "connectionPointIn")
+                c_ref_c = ET.SubElement(c_in_c, "connection")
+                c_ref_c.set("refLocalId", "0")
+                ET.SubElement(contact, "connectionPointOut")
+                var_el = ET.SubElement(contact, "variable")
+                var_el.text = p_val
+                param_source_ids[p_name] = cnt_id
 
             # ── Phase 2 : créer le bloc APRÈS ses sources.
             block = ET.SubElement(ld, "block")
@@ -427,7 +483,7 @@ def build_ld_body(
             ET.SubElement(block, "position", x="0", y="0")
 
             in_vars = ET.SubElement(block, "inputVariables")
-            for p_name, _ in arg_matches:
+            for p_name in declared_inputs:
                 var_in = ET.SubElement(in_vars, "variable")
                 var_in.set("formalParameter", p_name)
                 c_in_p = ET.SubElement(var_in, "connectionPointIn")
@@ -435,7 +491,13 @@ def build_ld_body(
                 c_ref_p.set("refLocalId", str(param_source_ids.get(p_name, 0)))
 
             ET.SubElement(block, "inOutVariables")
-            ET.SubElement(block, "outputVariables")
+            out_vars = ET.SubElement(block, "outputVariables")
+            for out_p in instance_output_types.get(inst_name, []):
+                var_out = ET.SubElement(out_vars, "variable")
+                var_out.set("formalParameter", out_p)
+                c_out = ET.SubElement(var_out, "connectionPointOut")
+                if out_p != "State":
+                    ET.SubElement(c_out, "expression")
 
             b_adddata = ET.SubElement(block, "addData")
             d_b = ET.SubElement(b_adddata, "data")

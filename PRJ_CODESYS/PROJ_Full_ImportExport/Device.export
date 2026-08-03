@@ -48380,7 +48380,7 @@
     <Single Type="{6198ad31-4b98-445c-927f-3258a0e82fe3}" Method="IArchivable">
       <Single Name="IsRoot" Type="bool">False</Single>
       <Single Name="MetaObject" Type="{81297157-7ec9-45ce-845e-84cab2b88ade}" Method="IArchivable">
-        <Single Name="Guid" Type="System.Guid">d5a0a244-8ba5-40b8-a35d-9725e9ff8126</Single>
+        <Single Name="Guid" Type="System.Guid">b404450e-105f-5aa6-8c01-cbf582c5f3ce</Single>
         <Single Name="ParentGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
         <Single Name="Name" Type="string">GVL_PERSISTENT</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties">
@@ -48405,7 +48405,7 @@
         <Array Name="EmbeddedTypeGuids" Type="System.Guid">
           <Single Type="System.Guid">a9ed5b7e-75c5-4651-af16-d2c27e98cb94</Single>
         </Array>
-        <Single Name="Timestamp" Type="long">639211094018644877</Single>
+        <Single Name="Timestamp" Type="long">639213700640110739</Single>
       </Single>
       <Single Name="Object" Type="{261bd6e6-249c-4232-bb6f-84c2fbeef430}" Method="IArchivable">
         <Null Name="persvarlist" />
@@ -48413,9 +48413,9 @@
           <Single Name="TextDocument" Type="{f3878285-8e4f-490b-bb1b-9acbb7eb04db}" Method="IArchivable">
             <Single Name="TextBlobForSerialisation" Type="string">VAR_GLOBAL RETAIN PERSISTENT
 	{attribute 'order_in_persistent_editor' := '0'}
-	_CalibM1: ST_EncoderCalib;
+	_CalibM1: ST_Encoder_Calib;
 	{attribute 'order_in_persistent_editor' := '1'}
-	_CalibM2: ST_EncoderCalib;
+	_CalibM2: ST_Encoder_Calib;
 	{attribute 'order_in_persistent_editor' := '2'}
 	_WinchSpeedStepTable: ST_SpeedStepTable := (P1R1 := FALSE, P1R2 := FALSE, P1R3 := FALSE, P1R4 := FALSE, P2R1 := TRUE, P2R2 := FALSE, P2R3 := FALSE, P2R4 := FALSE, P3R1 := TRUE, P3R2 := TRUE, P3R3 := FALSE, P3R4 := FALSE, P4R1 := TRUE, P4R2 := TRUE, P4R3 := TRUE, P4R4 := FALSE, P5R1 := TRUE, P5R2 := TRUE, P5R3 := TRUE, P5R4 := TRUE, StepThreshold_Pct := [20, 40, 60, 80, 100]);
 	{attribute 'order_in_persistent_editor' := '3'}
@@ -48423,9 +48423,9 @@
 	{attribute 'order_in_persistent_editor' := '4'}
 	_WinchLoadEstimateTable: ST_WinchLoadEstimateTable;
 	{attribute 'order_in_persistent_editor' := '5'}
-	_WinchSymmetryCfgPersist: ST_WinchSymmetryCfg;
+	_WinchSymmetryCfgPersist: ST_Winch_SymmetryCfg;
 	{attribute 'order_in_persistent_editor' := '6'}
-	_WinchSymmetryDataPersist: ST_WinchSymmetryData;
+	_WinchSymmetryDataPersist: ST_Winch_SymmetryData;
 	{attribute 'order_in_persistent_editor' := '7'}
 	_WinchM1CfgPersist: ST_WinchCfg := (CfgTopSensorPos_M := 8, CfgHomingTarget_M := 0, CfgRampAccelRate := 10, CfgRampDecelNormalRate := 150, CfgRampDecelFastRate := 400, CfgCableLimitDescent_M := -20, CfgCableLimitAscent_M := 7.5);
 	{attribute 'order_in_persistent_editor' := '8'}
@@ -48483,12 +48483,12 @@
 	{attribute 'order_in_persistent_editor' := '34'}
 	_SimEncoderRawPosM2: UDINT := 1000000;
 END_VAR</Single>
-            <Single Name="LineInfoPersistence" Type="string">d5a0a244-8ba5-40b8-a35d-9725e9ff8126_Decl_LineIds</Single>
+            <Single Name="LineInfoPersistence" Type="string">b404450e-105f-5aa6-8c01-cbf582c5f3ce_Decl_LineIds</Single>
           </Single>
         </Single>
         <Null Name="NetVarProperties" />
-        <Single Name="guidinit" Type="System.Guid">9e4efe90-b694-4c7a-b53c-517a8247dc35</Single>
-        <Single Name="guidcyclic" Type="System.Guid">d5919958-941c-4b26-9165-4e1277702620</Single>
+        <Single Name="guidinit" Type="System.Guid">6ba65525-177a-4e9e-acee-be25f9e02dd8</Single>
+        <Single Name="guidcyclic" Type="System.Guid">30f1abc7-17fc-43b8-9562-fce0da54498e</Single>
         <Single Name="dymmattributecount" Type="int">0</Single>
       </Single>
       <Single Name="ParentSVNodeGuid" Type="System.Guid">103fbab6-1b12-4ccb-9cc6-6c66cad0e1cb</Single>
@@ -120887,7 +120887,7 @@ END_VAR</Single>
         <Dictionary Type="{2c41fa04-1834-41c1-816e-303c7aa2c05b}" Name="Properties" />
         <Single Name="TypeGuid" Type="System.Guid">98a2708a-9b18-4f31-82ed-a1465b24fa2d</Single>
         <Null Name="EmbeddedTypeGuids" />
-        <Single Name="Timestamp" Type="long">639211080451007200</Single>
+        <Single Name="Timestamp" Type="long">639213622358174248</Single>
       </Single>
       <Single Name="Object" Type="{98a2708a-9b18-4f31-82ed-a1465b24fa2d}" Method="IArchivable">
         <Single Name="AllowEmpty" Type="bool">False</Single>
@@ -120916,11 +120916,7 @@ END_VAR</Single>
         <Single Name="EventPOUGuid" Type="System.Guid">d362cd94-8c10-4897-a0e5-e6430f2a5c82</Single>
         <List Name="PouList" Type="{33f568bb-4a2c-48cb-a762-34cca3066d03}">
           <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
-            <Single Name="Name" Type="string">PRG_00_Inputs</Single>
-            <Single Name="Comment" Type="string"></Single>
-          </Single>
-          <Single Type="{f194d1ef-7376-42ce-a729-4a5485a97a46}" Method="IArchivable">
-            <Single Name="Name" Type="string">PRG_AU_Acquisition</Single>
+            <Single Name="Name" Type="string">PRG_01_Inputs_LD</Single>
             <Single Name="Comment" Type="string"></Single>
           </Single>
         </List>

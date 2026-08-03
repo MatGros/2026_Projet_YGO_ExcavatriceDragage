@@ -69,7 +69,9 @@ def test_all_main_source_languages_are_accepted(tmp_path: Path) -> None:
     assert "Bundle MAIN identity: PASS" in result.stdout
 
 
-def test_standalone_ld_export_is_not_a_second_bundle_source(tmp_path: Path) -> None:
+def test_standalone_ld_export_is_rejected_as_blocking_error(tmp_path: Path) -> None:
+    """Un *_LD.xml posé à côté de son .st est un artefact de livraison interdit
+    (REX 2026-08) : le Ladder n'est livré QUE par CODE_Bundle.xml."""
     root = make_project(
         tmp_path,
         {
@@ -84,9 +86,8 @@ def test_standalone_ld_export_is_not_a_second_bundle_source(tmp_path: Path) -> N
 
     result = run(root)
 
-    assert result.returncode == 0, result.stderr
-    assert "Bundle MAIN coverage: PASS" in result.stdout
-    assert "Bundle MAIN identity: PASS" in result.stdout
+    assert result.returncode == 1
+    assert "standalone LD export interdit" in result.stderr
 
 
 def test_missing_main_pou_is_rejected_with_its_name(tmp_path: Path) -> None:
