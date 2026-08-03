@@ -30,7 +30,7 @@ VAR_INPUT
                                          // voir PRG_MAIN.st
     CfgTopSensorPosM   : REAL := 8.5;   // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
     FwdRevSpeedFeedbackOff : BOOL;      // Retour unique "tous contacteurs sens+vitesse retombés" CE TREUIL — arrêt confirmé
-    BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)
+    BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = ouvert/desserré — révocation 2026-08-03)
     RawPos               : UDINT;       // Sortie FB_Encoder_Abs (déjà gelée sur doute)
     EncoderAvailable     : BOOL;        // Sortie FB_Encoder_Abs
     PresetAck            : BOOL;        // Pulse — sortie FB_Encoder_Abs (écriture confirmée)
@@ -117,7 +117,7 @@ END_IF;
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
 // Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // BypassGlobal = TRUE → saute la vérification d'arrêt (mise en service)
-ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND BrakeFeedback);
+ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN

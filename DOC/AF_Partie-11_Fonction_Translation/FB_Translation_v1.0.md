@@ -57,7 +57,7 @@ contrairement aux treuils à contacteurs discrets).
 | `DriveStatusWord` | WORD | Mot état AC600 (EtherCAT) |
 | `DriveActualFreqHz` | REAL | Fréquence réelle mesurée (Hz) |
 | `BypassContactorCheck`/`BypassLimitSwitch` | BOOL | Bypass simulation/mise en service |
-| `BrakeFeedback` | BOOL | Retour normalisé (TRUE=serré) |
+| `BrakeFeedback` | BOOL | Retour physique direct (TRUE=ouvert/desserré) |
 
 **Sorties** : `Ready/Busy/Done/Error/ErrorId/State/StateAtError`, `TargetReached`,
 `RequestedDriveControlWord` (WORD), `RequestedDriveFreqHz` (REAL), `BrakeReleaseRequest`,

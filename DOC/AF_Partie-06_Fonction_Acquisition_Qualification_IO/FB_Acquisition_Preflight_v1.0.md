@@ -15,12 +15,12 @@ Aucune écriture de commande, sécurité ou mouvement. Observateur pur.
 |---|---|---|
 | `Execute` | BOOL | `GVL_IHM.Commun.Preflight.BtnRun` (front IHM) |
 | `MachineIsStill` | BOOL | `TonMachineStill.Q` (timer immobilitité) |
-| `M1/M2/M3BrakeApplied` | BOOL | `PRG_INPUTS_LD` |
-| `M1/M2ContactorsReleased` | BOOL | `PRG_INPUTS_LD` |
-| `M1/M2ThermalOk` | BOOL | `PRG_INPUTS_LD` |
-| `BrakeThermalOk` / `PhaseRotationOk` | BOOL | `PRG_INPUTS_LD` |
-| `SlackCableTensioned` / `M3SensorWordIncoherent` | BOOL | `PRG_INPUTS_LD` |
-| `EmergencyChainClosed` / `PowerContactorEngaged` | BOOL | `PRG_INPUTS_LD` |
+| `M1/M2/M3BrakeApplied` | BOOL | `PRG_01_Inputs_LD` |
+| `M1/M2ContactorsReleased` | BOOL | `PRG_01_Inputs_LD` |
+| `M1/M2ThermalOk` | BOOL | `PRG_01_Inputs_LD` |
+| `BrakeThermalOk` / `PhaseRotationOk` | BOOL | `PRG_01_Inputs_LD` |
+| `SlackCableTensioned` / `M3SensorWordIncoherent` | BOOL | `PRG_01_Inputs_LD` |
+| `EmergencyChainClosed` / `PowerContactorEngaged` | BOOL | `PRG_01_Inputs_LD` |
 | `EncoderM1/M2Operational` | BOOL | `FB_Diag_Ethercat` (via PRG_01) |
 | `HomedM1/M2` / `M1/M2PositionInBounds` | BOOL | `FB_Encoder_Homing` / `FB_Encoder_Safety` |
 

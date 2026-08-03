@@ -197,7 +197,7 @@ Les six instances codeurs dupliquées **ne lisent pas les mêmes signaux** :
 
 | Jeu | Source lue | Nature |
 |---|---|---|
-| `PRG_02_Encoders` | `PRG_INPUTS_LD.M1BrakeFeedback`, `.PowerContactorEngaged`, `.TopPositionSensor` (`PRG_02_Encoders.st:54,71,79,81-82,104`) | Signaux **qualifiés** : `FB_Input`, polarité normalisée, filtre 20 ms |
+| `PRG_02_Encoders` | `PRG_01_Inputs_LD.M1BrakeFeedback`, `.PowerContactorEngaged`, `.TopPositionSensor` (`PRG_02_Encoders.st:54,71,79,81-82,104`) | Signaux **qualifiés** : `FB_Input`, polarité normalisée, filtre 20 ms |
 | `PRG_ACQUISITION_CFC` | `HwIn.Winch.M1_BrakeIsOpen_DI` (`PRG_ACQUISITION_CFC.st:62,66,175,217-218`) | Signaux **bruts**, polarité d'origine |
 
 `M1BrakeFeedback` vaut `NOT M1_BrakeIsOpen_DI` : les deux jeux voient une **polarité inverse**.
@@ -209,7 +209,7 @@ une polarité et un filtrage. C'est un arbitrage de qualification d'entrée, pas
 
 ### Décision retenue : conserver le jeu **qualifié**
 
-Le jeu lu par `PRG_02_Encoders` (via `PRG_INPUTS_LD`, donc `FB_Input`) est retenu :
+Le jeu lu par `PRG_02_Encoders` (via `PRG_01_Inputs_LD`, donc `FB_Input`) est retenu :
 
 1. Il applique la polarité normalisée documentée et un filtre anti-rebond de 20 ms.
 2. C'est le jeu qui alimente aujourd'hui `FB_Encoder_Safety`, donc les décisions de sûreté.
@@ -225,18 +225,18 @@ l'existant pour chaque entrée reprise. Toute différence non justifiée = BLOCK
 
 ---
 
-## A-10 — `PRG_INPUTS_LD.HwIn` n'a aucun producteur prouvable
+## A-10 — `PRG_01_Inputs_LD.HwIn` n'a aucun producteur prouvable
 
 **Statut : 🔴 BLOQUANT — à traiter dans M1**
 
 ### Fait
 
-`PRG_INPUTS_LD` déclare `HwIn : ST_HardwareImage` en `VAR_INPUT` (`PRG_INPUTS_LD.st:13`), commenté
+`PRG_01_Inputs_LD` déclare `HwIn : ST_HardwareImage` en `VAR_INPUT` (`PRG_01_Inputs_LD.st:13`), commenté
 « produite par PRG_ACQUISITION_CFC ». Or :
 
 ```text
-grep "PRG_INPUTS_LD.HwIn :="  → aucun résultat
-grep "PRG_INPUTS_LD("          → aucun résultat
+grep "PRG_01_Inputs_LD.HwIn :="  → aucun résultat
+grep "PRG_01_Inputs_LD("          → aucun résultat
 ```
 
 Aucun site d'affectation, aucun appel paramétré dans `CODE/`. Le POU qui produit 22 signaux
@@ -258,7 +258,7 @@ La fusion Acquisition ↔ Inputs prévue en M1 est **suspendue** sur ce point. `
 reste un POU distinct alimenté explicitement, et le lot M1 doit rendre ce raccordement **visible
 et prouvé dans le code** — c'est précisément ce que la migration doit corriger.
 
-⚠️ À vérifier par l'utilisateur dans CODESYS : `PRG_INPUTS_LD.HwIn` est-il câblé ?
+⚠️ À vérifier par l'utilisateur dans CODESYS : `PRG_01_Inputs_LD.HwIn` est-il câblé ?
 
 ---
 

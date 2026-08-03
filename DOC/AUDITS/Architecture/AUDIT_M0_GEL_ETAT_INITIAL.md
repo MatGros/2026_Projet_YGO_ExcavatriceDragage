@@ -29,7 +29,7 @@ sont signalées explicitement (`PRG_AUXILIARY_CFC.st:9`, `PRG_ACQUISITION_CFC.st
 | # ordre déclaré | Fichier | Nom `PROGRAM` | Ligne `PROGRAM` | Lignes | Position tâche déclarée en bandeau |
 |---|---|---|---|---|---|
 | — | `PRG_ACQUISITION_CFC.st` | `PRG_ACQUISITION_CFC` | :12 | 336 | non prouvé (aucune position en bandeau) |
-| — | `PRG_INPUTS_LD.st` | `PRG_INPUTS_LD` | :10 | 236 | non prouvé (aucune position en bandeau) |
+| — | `PRG_01_Inputs_LD.st` | `PRG_01_Inputs_LD` | :10 | 236 | non prouvé (aucune position en bandeau) |
 | 1 | `PRG_01_Diagnostics.st` | `PRG_01_Diagnostics` | :9 | 97 | `PRG_01_Diagnostics.st:4` — position 1 |
 | 2 | `PRG_02_Encoders.st` | `PRG_02_Encoders` | :10 | 212 | `PRG_02_Encoders.st:4` — position 2 |
 | 8 | `PRG_AUXILIARY_CFC.st` | `PRG_AUXILIARY_CFC` | :14 | 21 | `PRG_AUXILIARY_CFC.st:4` — position 8 |
@@ -155,13 +155,13 @@ Les 11 autres instances (`instSimBench`, `instJoystick`, `instEncoderAbs/Scale/H
 
 ---
 
-## A2. `PRG_INPUTS_LD` — `CODE/MAIN/PRG_INPUTS_LD.st` (236 lignes)
+## A2. `PRG_01_Inputs_LD` — `CODE/MAIN/PRG_01_Inputs_LD.st` (236 lignes)
 
 ### ① Instances FB déclarées — 19 (toutes `FB_Input`)
 
 | Instance | Type | Déclaration |
 |---|---|---|
-| `instPowerContactorEngaged` | `FB_Input` | `PRG_INPUTS_LD.st:52` |
+| `instPowerContactorEngaged` | `FB_Input` | `PRG_01_Inputs_LD.st:52` |
 | `instEmergencyChainClosed` | `FB_Input` | `:53` |
 | `instTopPositionSensor` | `FB_Input` | `:54` |
 | `instSlackCableSwitch` | `FB_Input` | `:55` |
@@ -218,19 +218,19 @@ Détail consommateurs `PowerContactorEngaged` : `PRG_01_Diagnostics`(76) ·
 `PRG_TRANSLATION_CFC`(149,175) · `PRG_TREUILS_CFC`(125,137,158,208,431,595,640,682,697) ·
 `PRG_TROUBLESHOOTING_CFC`(62,81).
 
-📌 **Fait #4 — 5 sorties `PRG_INPUTS_LD` sans aucun consommateur** :
-`TranslationPosTremie/PV/P2/P1/Maintenance` (`PRG_INPUTS_LD.st:37`–`:41`). Les consommateurs lisent
+📌 **Fait #4 — 5 sorties `PRG_01_Inputs_LD` sans aucun consommateur** :
+`TranslationPosTremie/PV/P2/P1/Maintenance` (`PRG_01_Inputs_LD.st:37`–`:41`). Les consommateurs lisent
 les homologues de `PRG_ACQUISITION_CFC` (`:21`–`:25`). Les deux chaînes coexistent :
-`PRG_INPUTS_LD` passe par `FB_Input` (filtre 20 ms, `:189`–`:227`), `PRG_ACQUISITION_CFC` par
+`PRG_01_Inputs_LD` passe par `FB_Input` (filtre 20 ms, `:189`–`:227`), `PRG_ACQUISITION_CFC` par
 `instPosDecoderM3` (`:306`–`:319`).
 
 ### ③ Variables lues chez d'autres POU — **0**
 
-`PRG_INPUTS_LD.st` ne contient **aucune** référence `PRG_<autre>.…`. Sa seule entrée externe est
+`PRG_01_Inputs_LD.st` ne contient **aucune** référence `PRG_<autre>.…`. Sa seule entrée externe est
 `VAR_INPUT HwIn` (`:13`), lue en `:82, :90, :98, :106, :114, :123, :131, :139, :147, :155, :164, :172, :180, :190, :198, :206, :214, :222, :230`.
 
-📌 **Fait #5 — `PRG_INPUTS_LD.HwIn` n'a aucun site d'affectation dans `CODE/`.** Recherche
-`PRG_INPUTS_LD.HwIn` : 0 occurrence ; recherche d'un appel `PRG_INPUTS_LD(...)` : 0 occurrence.
+📌 **Fait #5 — `PRG_01_Inputs_LD.HwIn` n'a aucun site d'affectation dans `CODE/`.** Recherche
+`PRG_01_Inputs_LD.HwIn` : 0 occurrence ; recherche d'un appel `PRG_01_Inputs_LD(...)` : 0 occurrence.
 Le raccordement de ce `VAR_INPUT` est **non prouvé depuis `CODE/`** (mécanisme CFC de la page
 CODESYS, non observable ici).
 
@@ -271,7 +271,7 @@ Il n'écrit aucun champ `GVL_*` (0 affectation `GVL_…:=`).
 | `PRG_ACQUISITION_CFC.HwIn.Operator.JoyXRaw_ANA1` | `PRG_ACQUISITION_CFC` | 86 |
 | `PRG_ACQUISITION_CFC.HwIn.Operator.JoyYRaw_ANA2` | `PRG_ACQUISITION_CFC` | 87 |
 | `PRG_ACQUISITION_CFC.HwIn.Operator.JoyBtnRaw` | `PRG_ACQUISITION_CFC` | 88 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 76 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 76 |
 | `PRG_MODES_CFC.Auth.Mode` | `PRG_MODES_CFC` | 78 |
 | `PRG_SUPERVISION_CFC.FaultMachineReset_IHM` | `PRG_SUPERVISION_CFC` | 43, 53, 77 |
 | `PRG_TREUILS_CFC.instBucket.Busy` | `PRG_TREUILS_CFC` | 79 |
@@ -358,12 +358,12 @@ de sorties matérielles hors `PRG_10_Outputs_LD` dans `CODE/`. Voir T3.
 | `PRG_ACQUISITION_CFC.HwIn.Winch.COD2_Alarms` | `PRG_ACQUISITION_CFC` | 107 |
 | `PRG_ACQUISITION_CFC.HwIn.Winch.COD2_Warnings` | `PRG_ACQUISITION_CFC` | 108 |
 | `PRG_ACQUISITION_CFC.WinchInputSourceChanged` | `PRG_ACQUISITION_CFC` | 188, 190 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 54, 71, 104, 121, 154, 167 |
-| `PRG_INPUTS_LD.TopPositionSensor` | `PRG_INPUTS_LD` | 79, 129 |
-| `PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff` | `PRG_INPUTS_LD` | 81 |
-| `PRG_INPUTS_LD.M1BrakeFeedback` | `PRG_INPUTS_LD` | 82 |
-| `PRG_INPUTS_LD.M2FwdRevSpeedFeedbackOff` | `PRG_INPUTS_LD` | 131 |
-| `PRG_INPUTS_LD.M2BrakeFeedback` | `PRG_INPUTS_LD` | 132 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 54, 71, 104, 121, 154, 167 |
+| `PRG_01_Inputs_LD.TopPositionSensor` | `PRG_01_Inputs_LD` | 79, 129 |
+| `PRG_01_Inputs_LD.M1FwdRevSpeedFeedbackOff` | `PRG_01_Inputs_LD` | 81 |
+| `PRG_01_Inputs_LD.M1BrakeFeedback` | `PRG_01_Inputs_LD` | 82 |
+| `PRG_01_Inputs_LD.M2FwdRevSpeedFeedbackOff` | `PRG_01_Inputs_LD` | 131 |
+| `PRG_01_Inputs_LD.M2BrakeFeedback` | `PRG_01_Inputs_LD` | 132 |
 | `PRG_MODES_CFC.Auth.Mode` | `PRG_MODES_CFC` | 55, 72, 74, 105, 122, 124, 155, 168 |
 | `PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated` | `PRG_MODES_CFC` | 75, 76, 125, 126 |
 | `PRG_SUPERVISION_CFC.FaultMachineReset_IHM` | `PRG_SUPERVISION_CFC` | 53, 70, 103, 120, 153, 166 |
@@ -417,7 +417,7 @@ de sorties matérielles hors `PRG_10_Outputs_LD` dans `CODE/`. Voir T3.
 
 | Variable | Type | Décl. | Écriture | Consommateurs |
 |---|---|---|---|---|
-| `Auth` | `ST_Modes_Autorisations` | `:14` | `:33` | 9 POU (tous sauf `PRG_INPUTS_LD` et lui-même) |
+| `Auth` | `ST_Modes_Autorisations` | `:14` | `:33` | 9 POU (tous sauf `PRG_01_Inputs_LD` et lui-même) |
 
 Champs de `Auth` effectivement lus : `Mode`, `InhibitM1`, `InhibitM2`, `SyncEnable`,
 `HomingApproachEnable`, `JoystickWinchSelectArbitrated`, `MaintenanceM3TargetEnable`.
@@ -426,7 +426,7 @@ Champs de `Auth` effectivement lus : `Mode`, `InhibitM1`, `InhibitM2`, `SyncEnab
 
 | Symbole lu | POU producteur | Ligne |
 |---|---|---|
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 22 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 22 |
 | `PRG_02_Encoders.EncoderFaultPresent` | `PRG_02_Encoders` | 28 |
 
 ### ④ Consommateurs de `Auth` — 9 POU / 95 lignes-occurrences
@@ -498,14 +498,14 @@ de ses 7 instances internes** depuis 4 POU (T2-11/12/13, T2-49→55, T2-68, T2-7
 | `PRG_ACQUISITION_CFC.M3_StatusWord_Filtered` | `PRG_ACQUISITION_CFC` | 213 |
 | `PRG_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered` | `PRG_ACQUISITION_CFC` | 214 |
 | `PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd` / `.LimitSwitchRev` / `.Incoherent` | `PRG_ACQUISITION_CFC` | 220 / 221 / 222 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 34, 95, 153, 163, 175, 186, 204 |
-| `PRG_INPUTS_LD.BrakeThermalFeedback` | `PRG_INPUTS_LD` | 43, 104, 210 |
-| `PRG_INPUTS_LD.PhaseRotationOk` | `PRG_INPUTS_LD` | 45, 106, 209 |
-| `PRG_INPUTS_LD.SlackCableSwitch` | `PRG_INPUTS_LD` | 44, 105 |
-| `PRG_INPUTS_LD.TopPositionSensor` | `PRG_INPUTS_LD` | 46, 107 |
-| `PRG_INPUTS_LD.M1ThermalFeedback` / `.M1FwdRevSpeedFeedbackOff` / `.M1BrakeFeedback` | `PRG_INPUTS_LD` | 42 / 56 / 57 |
-| `PRG_INPUTS_LD.M2ThermalFeedback` / `.M2FwdRevSpeedFeedbackOff` / `.M2BrakeFeedback` | `PRG_INPUTS_LD` | 103 / 118 / 119 |
-| `PRG_INPUTS_LD.M3BrakeFeedback` | `PRG_INPUTS_LD` | 215 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 34, 95, 153, 163, 175, 186, 204 |
+| `PRG_01_Inputs_LD.BrakeThermalFeedback` | `PRG_01_Inputs_LD` | 43, 104, 210 |
+| `PRG_01_Inputs_LD.PhaseRotationOk` | `PRG_01_Inputs_LD` | 45, 106, 209 |
+| `PRG_01_Inputs_LD.SlackCableSwitch` | `PRG_01_Inputs_LD` | 44, 105 |
+| `PRG_01_Inputs_LD.TopPositionSensor` | `PRG_01_Inputs_LD` | 46, 107 |
+| `PRG_01_Inputs_LD.M1ThermalFeedback` / `.M1FwdRevSpeedFeedbackOff` / `.M1BrakeFeedback` | `PRG_01_Inputs_LD` | 42 / 56 / 57 |
+| `PRG_01_Inputs_LD.M2ThermalFeedback` / `.M2FwdRevSpeedFeedbackOff` / `.M2BrakeFeedback` | `PRG_01_Inputs_LD` | 103 / 118 / 119 |
+| `PRG_01_Inputs_LD.M3BrakeFeedback` | `PRG_01_Inputs_LD` | 215 |
 | `PRG_MODES_CFC.Auth.Mode` | `PRG_MODES_CFC` | 35, 96, 154, 164, 176, 187, 205 |
 | `PRG_MODES_CFC.Auth.InhibitM1` | `PRG_MODES_CFC` | 32, 130, 151, 173 |
 | `PRG_MODES_CFC.Auth.InhibitM2` | `PRG_MODES_CFC` | 70, 93, 161, 184 |
@@ -564,8 +564,8 @@ Variables internes : `CmdStartCycle_IHM`(`:16`), `CmdPauseCycle_IHM`(`:17`), `Cm
 | `PRG_01_Diagnostics.instJoystick.AxisCmdY.StartStop` | `PRG_01_Diagnostics` | 40 |
 | `PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk` | `PRG_01_Diagnostics` | 48 |
 | `PRG_MODES_CFC.Auth.Mode` | `PRG_MODES_CFC` | 46 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 50 |
-| `PRG_INPUTS_LD.KoboldContactFond` | `PRG_INPUTS_LD` | 61 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 50 |
+| `PRG_01_Inputs_LD.KoboldContactFond` | `PRG_01_Inputs_LD` | 61 |
 | `PRG_TREUILS_CFC.instWinchSync.Error` | `PRG_TREUILS_CFC` | 64 |
 | `PRG_TREUILS_CFC.instWinchSync.DeltaPosM` | `PRG_TREUILS_CFC` | 65 |
 | `PRG_02_Encoders.instEncoderScaleM1.CablePosM` | `PRG_02_Encoders` | 66 |
@@ -640,10 +640,10 @@ Variables internes : `CmdStartCycle_IHM`(`:16`), `CmdPauseCycle_IHM`(`:17`), `Cm
 | `PRG_05_Cycle.instCycle.BucketCmd.Close` / `.KoboldContactorCmd` / `.Open` | `PRG_05_Cycle` | 181 / 190 / 210 |
 | `PRG_05_Cycle.instCycle.WinchM1Cmd.Direction` / `.StartStop` / `.SpeedPct` | `PRG_05_Cycle` | 257 / 260 / 265 |
 | `PRG_05_Cycle.instCycle.WinchM2Cmd.Direction` / `.StartStop` / `.SpeedPct` | `PRG_05_Cycle` | 321 / 324 / 329 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 125, 137, 158, 208, 431, 595, 640, 682, 697 |
-| `PRG_INPUTS_LD.KoboldContactFond` | `PRG_INPUTS_LD` | 142 |
-| `PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff` / `.M1BrakeFeedback` / `.M1BrakeCommandOpenConfirmed` | `PRG_INPUTS_LD` | 614, 686 / 615 / 685 |
-| `PRG_INPUTS_LD.M2FwdRevSpeedFeedbackOff` / `.M2BrakeFeedback` / `.M2BrakeCommandOpenConfirmed` | `PRG_INPUTS_LD` | 658, 701 / 659 / 700 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 125, 137, 158, 208, 431, 595, 640, 682, 697 |
+| `PRG_01_Inputs_LD.KoboldContactFond` | `PRG_01_Inputs_LD` | 142 |
+| `PRG_01_Inputs_LD.M1FwdRevSpeedFeedbackOff` / `.M1BrakeFeedback` / `.M1BrakeCommandOpenConfirmed` | `PRG_01_Inputs_LD` | 614, 686 / 615 / 685 |
+| `PRG_01_Inputs_LD.M2FwdRevSpeedFeedbackOff` / `.M2BrakeFeedback` / `.M2BrakeCommandOpenConfirmed` | `PRG_01_Inputs_LD` | 658, 701 / 659 / 700 |
 | `PRG_MODES_CFC.Auth.Mode` | `PRG_MODES_CFC` | 124, 134, 138, 155, 159, 180, 189, 209, 253, 318, 378, 432, 592, 596, 637, 641 |
 | `PRG_MODES_CFC.Auth.InhibitM1` / `.InhibitM2` | `PRG_MODES_CFC` | 225, 427, 593 / 204, 226, 427, 638 |
 | `PRG_MODES_CFC.Auth.SyncEnable` | `PRG_MODES_CFC` | 426, 437 |
@@ -701,8 +701,8 @@ Variables internes : `CmdStartCycle_IHM`(`:16`), `CmdPauseCycle_IHM`(`:17`), `Cm
 | `PRG_ACQUISITION_CFC.TranslationPosTremie` / `P2` / `P1` / `Maintenance` / `PV` | `PRG_ACQUISITION_CFC` | 136 / 137 / 138 / 139 / 156 |
 | `PRG_ACQUISITION_CFC.instPosDecoderM3.LimitSwitchFwd` / `.LimitSwitchRev` | `PRG_ACQUISITION_CFC` | 157 / 158 |
 | `PRG_ACQUISITION_CFC.M3_StatusWord_Filtered` / `.M3_ActualFrequencyHz_Filtered` | `PRG_ACQUISITION_CFC` | 159 / 160 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 149, 175 |
-| `PRG_INPUTS_LD.M3BrakeFeedback` / `.M3BrakeCommandOpenConfirmed` | `PRG_INPUTS_LD` | 165 / 178 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 149, 175 |
+| `PRG_01_Inputs_LD.M3BrakeFeedback` / `.M3BrakeCommandOpenConfirmed` | `PRG_01_Inputs_LD` | 165 / 178 |
 | `PRG_MODES_CFC.Auth.Mode` | `PRG_MODES_CFC` | 40, 67, 68, 147, 150 |
 | `PRG_MODES_CFC.Auth.MaintenanceM3TargetEnable` | `PRG_MODES_CFC` | 130 |
 | `PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop` | `PRG_SAFETY_CFC` | 152, 176 |
@@ -784,8 +784,8 @@ Les valeurs équivalentes sont relues ailleurs directement sur l'instance :
 | `PRG_TREUILS_CFC.WinchM2FinalInterlockRequest.*` (14 champs) | `PRG_TREUILS_CFC` | 71–84 |
 | `PRG_TRANSLATION_CFC.TranslationFinalInterlockRequest.*` (8 champs) | `PRG_TRANSLATION_CFC` | 87–94 |
 | `PRG_TREUILS_CFC.KoboldContactorCmdArbitrated` | `PRG_TREUILS_CFC` | 133 |
-| `PRG_INPUTS_LD.PowerContactorEngaged` | `PRG_INPUTS_LD` | 134, 149 |
-| `PRG_INPUTS_LD.EmergencyChainClosed` | `PRG_INPUTS_LD` | 135, 148 |
+| `PRG_01_Inputs_LD.PowerContactorEngaged` | `PRG_01_Inputs_LD` | 134, 149 |
+| `PRG_01_Inputs_LD.EmergencyChainClosed` | `PRG_01_Inputs_LD` | 135, 148 |
 | `PRG_SAFETY_CFC.instSafetyWinchM1.PowerCutOff` | `PRG_SAFETY_CFC` | 141 |
 | `PRG_SAFETY_CFC.instSafetyWinchM2.PowerCutOff` | `PRG_SAFETY_CFC` | 141 |
 | `PRG_SAFETY_CFC.instSafetyTranslationM3.PowerCutOff` | `PRG_SAFETY_CFC` | 141 |
@@ -849,7 +849,7 @@ dans les sections A des POU producteurs) :
 | `PRG_01_Diagnostics` | 24 | 25 |
 | `PRG_ACQUISITION_CFC` | 13 | 14 |
 | `PRG_TRANSLATION_CFC` | 11 | 11 |
-| `PRG_INPUTS_LD` | 10 | 11 |
+| `PRG_01_Inputs_LD` | 10 | 11 |
 | `PRG_05_Cycle` | 9 | 9 |
 | `PRG_10_Outputs_LD` | 8 | 8 |
 | `PRG_TROUBLESHOOTING_CFC` | 5 | 5 |
@@ -908,7 +908,7 @@ Aucune écriture `GVL_IHM`, `GVL_Global`, ni sortie physique.
 
 | POU producteur | Symboles distincts | Lignes-occurrences |
 |---|---|---|
-| `PRG_INPUTS_LD` | 16 | 38 |
+| `PRG_01_Inputs_LD` | 16 | 38 |
 | `PRG_TREUILS_CFC` | 14 | 24 |
 | `PRG_SAFETY_CFC` | 14 | 22 |
 | `PRG_02_Encoders` | 8 | 14 |
@@ -966,19 +966,19 @@ Faits observés, sans interprétation :
 
 | Instance | Entrée | `PRG_01_Diagnostics` / `PRG_02_Encoders` | `PRG_ACQUISITION_CFC` |
 |---|---|---|---|
-| `instJoystick` | `PowerContactorEngaged` | `PRG_INPUTS_LD.PowerContactorEngaged` (`PRG_01_Diagnostics.st:76`) | `HwIn.Machine.PowerContactorEngaged_DI` (`PRG_ACQUISITION_CFC.st:190`) |
+| `instJoystick` | `PowerContactorEngaged` | `PRG_01_Inputs_LD.PowerContactorEngaged` (`PRG_01_Diagnostics.st:76`) | `HwIn.Machine.PowerContactorEngaged_DI` (`PRG_ACQUISITION_CFC.st:190`) |
 | `instJoystick` | `RawX` | `PRG_ACQUISITION_CFC.HwIn.Operator.JoyXRaw_ANA1` (`:86`) | `HwIn.Operator.JoyXRaw_ANA1` (`:197`) |
 | `instEncoderAbsM1` | `RawPosIn` | `M1_RawPosToUse` ← `HwIn.Winch.COD1_PosValue` (`PRG_02_Encoders.st:47`, `:56`) | `HwIn.Winch.COD1_PosValue` (`PRG_ACQUISITION_CFC.st:217`) |
-| `instHomingM1` | `TopPositionSensor` | `PRG_INPUTS_LD.TopPositionSensor` (`PRG_02_Encoders.st:79`) | `HwIn.Winch.M1M2_TopPositionFree_DI` (`PRG_ACQUISITION_CFC.st:236`) |
-| `instHomingM1` | `FwdRevSpeedFeedbackOff` | `PRG_INPUTS_LD.M1FwdRevSpeedFeedbackOff` (`PRG_02_Encoders.st:81`) | `HwIn.Winch.M1_ContactorsReleased_DI` (`PRG_ACQUISITION_CFC.st:238`) |
-| `instHomingM1` | `BrakeFeedback` | `PRG_INPUTS_LD.M1BrakeFeedback` (`PRG_02_Encoders.st:82`) | `HwIn.Winch.M1_BrakeIsOpen_DI` (`PRG_ACQUISITION_CFC.st:239`) |
+| `instHomingM1` | `TopPositionSensor` | `PRG_01_Inputs_LD.TopPositionSensor` (`PRG_02_Encoders.st:79`) | `HwIn.Winch.M1M2_TopPositionFree_DI` (`PRG_ACQUISITION_CFC.st:236`) |
+| `instHomingM1` | `FwdRevSpeedFeedbackOff` | `PRG_01_Inputs_LD.M1FwdRevSpeedFeedbackOff` (`PRG_02_Encoders.st:81`) | `HwIn.Winch.M1_ContactorsReleased_DI` (`PRG_ACQUISITION_CFC.st:238`) |
+| `instHomingM1` | `BrakeFeedback` | `PRG_01_Inputs_LD.M1BrakeFeedback` (`PRG_02_Encoders.st:82`) | `HwIn.Winch.M1_BrakeIsOpen_DI` (`PRG_ACQUISITION_CFC.st:239`) |
 | `instHomingM1` | `Calib` | `_CalibM1` (`PRG_02_Encoders.st:69`) | `_CalibM1` (`PRG_ACQUISITION_CFC.st:248`) |
 
 📌 **Fait #16 — les deux jeux d'instances ne sont pas câblés à l'identique.** Le jeu
-`PRG_02_Encoders` / `PRG_01_Diagnostics` consomme les signaux **qualifiés** de `PRG_INPUTS_LD`
+`PRG_02_Encoders` / `PRG_01_Diagnostics` consomme les signaux **qualifiés** de `PRG_01_Inputs_LD`
 (passés par `FB_Input`, polarité inversée + filtre 20 ms), le jeu `PRG_ACQUISITION_CFC` consomme
 les signaux **bruts** de `HwIn` (polarité non inversée). Ex. `M1BrakeFeedback` est
-`NOT M1_BrakeIsOpen_DI` (`PRG_INPUTS_LD.st:156`, `:75`, `:160`) alors que
+`NOT M1_BrakeIsOpen_DI` (`PRG_01_Inputs_LD.st:156`, `:75`, `:160`) alors que
 `PRG_ACQUISITION_CFC.st:239` passe `HwIn.Winch.M1_BrakeIsOpen_DI` directement.
 
 ---
@@ -1178,7 +1178,7 @@ uniquement comme preuve de l'existence d'un mapping matériel, jamais comme preu
 | T3-15 | `M3_BrakeRelease_RQ` | `:130` | `instTranslationOutputInterlock_LD.BrakeCmd` (`:129`) | 1 occ. |
 | T3-16 | `M3_CommandWord` | `:131` | `instTranslationOutputInterlock_LD.DriveControlWord` | 1 occ. (`:20834`) |
 | T3-17 | `M3_SetpointFrequencyHz` | `:132` | `REAL_TO_UINT(instTranslationOutputInterlock_LD.DriveFreqRefHz * 100.0)` | 1 occ. |
-| T3-18 | `M1_M2_KoboldMeasureEnable_DQ` | `:133` | `PRG_TREUILS_CFC.KoboldContactorCmdArbitrated AND PRG_INPUTS_LD.PowerContactorEngaged AND PRG_INPUTS_LD.EmergencyChainClosed` | 1 occ. (`:42890`) |
+| T3-18 | `M1_M2_KoboldMeasureEnable_DQ` | `:133` | `PRG_TREUILS_CFC.KoboldContactorCmdArbitrated AND PRG_01_Inputs_LD.PowerContactorEngaged AND PRG_01_Inputs_LD.EmergencyChainClosed` | 1 occ. (`:42890`) |
 | T3-19 | `PowerKeepAlive_A_RQ` | `:155` | `instSafetyEmergencyManagement.MaintainA_RQ` | 1 occ. (`:42988`) |
 | T3-20 | `PowerKeepAlive_B_RQ` | `:156` | `instSafetyEmergencyManagement.MaintainB_RQ` | 1 occ. |
 | T3-21 | `EmergencyArming_RQ` | `:157` | `instSafetyEmergencyManagement.ArmPulse_RQ` | 1 occ. |
@@ -1227,7 +1227,7 @@ chaque écart.
 
 | POU | Instances |
 |---|---|
-| `PRG_INPUTS_LD` | 19 |
+| `PRG_01_Inputs_LD` | 19 |
 | `PRG_ACQUISITION_CFC` | 12 |
 | `PRG_02_Encoders` | 10 |
 | `PRG_SUPERVISION_CFC` | 9 |
@@ -1246,11 +1246,11 @@ chaque écart.
 
 ## C2 — `VAR_OUTPUT` par POU (total 72)
 
-`PRG_INPUTS_LD` a en plus **1 `VAR_INPUT`** (`HwIn`, `:13`), non compté ici.
+`PRG_01_Inputs_LD` a en plus **1 `VAR_INPUT`** (`HwIn`, `:13`), non compté ici.
 
 | POU | `VAR_OUTPUT` | Dont sans consommateur inter-POU |
 |---|---|---|
-| `PRG_INPUTS_LD` | 22 | 5 (`TranslationPos*`) |
+| `PRG_01_Inputs_LD` | 22 | 5 (`TranslationPos*`) |
 | `PRG_10_Outputs_LD` | 23 | 20 |
 | `PRG_ACQUISITION_CFC` | 11 | 2 (`HwReal`, `HwSim`) |
 | `PRG_02_Encoders` | 9 | 2 (`EncoderFaultPresentM1/M2`) |
@@ -1279,7 +1279,7 @@ producteur compte 2 ; une ligne lisant 2 fois le même symbole compte 1).
 | Lecteur ↓ / Producteur → | ACQ | INP | D01 | E02 | AUX | MOD | SAF | CYC | TRE | TRA | OUT | SUP | TRB | **TOT** |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `PRG_ACQUISITION_CFC` | — | 0 | 4 | 4 | 0 | 11 | 0 | 0 | 5 | 2 | 3 | 5 | 0 | **34** |
-| `PRG_INPUTS_LD` | 0 | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
+| `PRG_01_Inputs_LD` | 0 | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |
 | `PRG_01_Diagnostics` | 8 | 1 | — | 0 | 0 | 1 | 0 | 0 | 3 | 0 | 0 | 3 | 0 | **16** |
 | `PRG_02_Encoders` | 8 | 12 | 2 | — | 0 | 12 | 0 | 0 | 0 | 0 | 0 | 6 | 0 | **40** |
 | `PRG_AUXILIARY_CFC` | 2 | 0 | 0 | 0 | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **2** |
@@ -1294,7 +1294,7 @@ producteur compte 2 ; une ligne lisant 2 fois le même symbole compte 1).
 | **TOT produit** | **59** | **115** | **89** | **142** | **1** | **95** | **84** | **24** | **160** | **25** | **11** | **33** | **5** | **843** |
 
 📌 **Fait #20 — le POU le plus lu est `PRG_TREUILS_CFC` (160), le plus lecteur est
-`PRG_SUPERVISION_CFC` (264).** `PRG_INPUTS_LD` est le seul POU qui ne lit **rien** (ligne à 0).
+`PRG_SUPERVISION_CFC` (264).** `PRG_01_Inputs_LD` est le seul POU qui ne lit **rien** (ligne à 0).
 
 ## C4 — Cycles inter-POU prouvés (lecture mutuelle A→B et B→A)
 
@@ -1336,8 +1336,8 @@ producteur compte 2 ; une ligne lisant 2 fois le même symbole compte 1).
 
 | # | Constat | Preuve | Statut |
 |---|---|---|---|
-| D1 | 5 `VAR_OUTPUT` de `PRG_INPUTS_LD` (`TranslationPos*`) n'ont aucun consommateur | `PRG_INPUTS_LD.st:37`–`:41` ; 0 occurrence `PRG_INPUTS_LD.TranslationPos*` | fait |
-| D2 | `PRG_INPUTS_LD.HwIn` (`:13`) n'a aucun site d'affectation dans `CODE/` | 0 occurrence `PRG_INPUTS_LD.HwIn`, 0 appel `PRG_INPUTS_LD(` | **non prouvé** hors `CODE/` |
+| D1 | 5 `VAR_OUTPUT` de `PRG_01_Inputs_LD` (`TranslationPos*`) n'ont aucun consommateur | `PRG_01_Inputs_LD.st:37`–`:41` ; 0 occurrence `PRG_01_Inputs_LD.TranslationPos*` | fait |
+| D2 | `PRG_01_Inputs_LD.HwIn` (`:13`) n'a aucun site d'affectation dans `CODE/` | 0 occurrence `PRG_01_Inputs_LD.HwIn`, 0 appel `PRG_01_Inputs_LD(` | **non prouvé** hors `CODE/` |
 | D3 | `HwReal` et `HwSim` (`PRG_ACQUISITION_CFC.st:15`, `:16`) n'ont aucun consommateur inter-POU | 0 occurrence | fait |
 | D4 | `EncoderFaultPresentM1/M2` (`PRG_02_Encoders.st:13`, `:14`) sans consommateur | 0 occurrence | fait |
 | D5 | `RedundancyTestFailed`, `EmergencyArmingFailed` (`PRG_OUTPUTS_LD.st:34`, `:35`) sans consommateur ni recopie GVL | 0 occurrence ; équivalents relus sur l'instance `PRG_SUPERVISION_CFC.st:506`, `:507` | fait |

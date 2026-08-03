@@ -49,7 +49,7 @@ Brique de **référencement et calibration** : calcule la position de référenc
 | `TopPositionSensor` | BOOL | Capteur haut **unique, commun M1/M2** — voir polarité §3 |
 | `CfgTopSensorPosM` | REAL := 8.5 | Cible homing nominal (RETAIN site — valeur réelle 8.0 m, voir §4) |
 | `FwdRevSpeedFeedbackOff` | BOOL | Retour "tous contacteurs sens+vitesse retombés" CE treuil |
-| `BrakeFeedback` | BOOL | Retour contacteur frein CE treuil (`TRUE` = relâché) |
+| `BrakeFeedback` | BOOL | Retour contacteur frein CE treuil (`TRUE` = ouvert/desserré) |
 | `RawPos` | UDINT | Sortie `FB_Encoder_Abs` (déjà gelée sur doute) |
 | `EncoderAvailable` | BOOL | Sortie `FB_Encoder_Abs` |
 | `PresetAck`/`PresetNak` | BOOL (pulse) | Sortie `FB_Encoder_Abs` |

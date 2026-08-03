@@ -2056,7 +2056,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ normalisé (PRG_00 après BrakeFeedbackInvertLogic)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ (NOT BrakeFeedback — IHM garde le sens serré)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx109_DriveThermalOk">
@@ -2391,7 +2391,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ normalisé (PRG_00 après BrakeFeedbackInvertLogic)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ (NOT BrakeFeedback — IHM garde le sens serré)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx105_ThermalOk_DI">
@@ -5983,7 +5983,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique de l'état du frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique direct : TRUE = frein OUVERT (desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionSensorTarget">
@@ -10389,7 +10389,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed</expression>
+                  <expression>PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed</expression>
                 </inVariable>
                 <connector localId="119" name="">
                   <position x="100" y="830" />
@@ -11914,7 +11914,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein NORMALISÉ (PRG_00_Inputs) : TRUE = frein SERRÉ</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein (PRG_01_Inputs_LD) : TRUE = frein OUVERT (desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="DelayContactClose">
@@ -11925,9 +11925,9 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <simpleValue value="TIME#100ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-26 : polarité opposée à BrakeCmd (TRUE = relâché)
-→ en marche normale les deux DIFFÈRENT toujours ; c'est leur
-ÉGALITÉ qui trahit un contacteur collé (voir §4).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-08-03 : même sens que BrakeCmd (TRUE = relâché)
+→ en marche normale les deux sont ÉGAUX ; c'est leur
+DIFFÉRENCE qui trahit un contacteur collé (voir §4).
 Temps de fermeture contacteur de puissance</xhtml>
               </documentation>
             </variable>
@@ -12020,6 +12020,14 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande sortie bobine frein : TRUE = relâché</xhtml>
               </documentation>
             </variable>
+            <variable name="BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (même sens que ContactorFeedback)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ContactorCheck">
               <type>
                 <derived name="ST_ContactorCheck" />
@@ -12088,10 +12096,9 @@ Temps de fermeture contacteur de puissance</xhtml>
       de coller (sinon usure/casse mécanique en plein mouvement).
    🔍 Double vérification retour contacteur bobine (ST_ContactorCheck) :
       incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
-   🆕 REX 2026-07-26 (relevé terrain) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
-      (DI = 1 ⟺ frein ouvert). Il est normalisé « TRUE = frein serré » en amont par
-      l'inversion NO/NC de FB_Input (PRG_01_Inputs_LD). Ce FB reçoit donc un
-      signal TOUJOURS opposé à `BrakeCmd` en marche saine → le test d'incohérence est `=`, pas `&lt;&gt;`.
+   🆕 REX 2026-08-03 (révocation 2026-07-26) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
+      (DI = 1 ⟺ frein ouvert). Plus d'inversion à la frontière : ce FB reçoit maintenant un
+      signal dans le MÊME sens que `BrakeCmd` en marche saine (TRUE = relâché = ouvert) → le test d'incohérence est `&lt;&gt;`, pas `=`.
       ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
       pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
       FB_Safety_Winch bit7) — pas par ce bloc.
@@ -12147,16 +12154,15 @@ Done := (State = E_State.DONE);
 ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
-// 🆕 REX 2026-07-26 (relevé terrain) : `ContactorFeedback` est NORMALISÉ « TRUE = frein serré »
-// (PRG_00_Inputs, inversion FB_Input) alors que `BrakeCmd` vaut TRUE = relâché. Les deux sont donc
-// TOUJOURS opposés en marche saine → c'est leur ÉGALITÉ qui signale l'incohérence.
-// ⚠️ Le test était `&lt;&gt;` : il partait de l'hypothèse inverse (retour TRUE = relâché) et aurait levé
-// un défaut permanent dès le câblage du retour réel. Corrigé en `=`.
-TonFeedback(IN := (BrakeCmd = ContactorFeedback), PT := FeedbackTimeout);
+// 🆕 REX 2026-08-03 (révocation 2026-07-26) : `ContactorFeedback` est maintenant dans le MÊME sens
+// que `BrakeCmd` (TRUE = relâché = frein ouvert). En marche saine les deux sont ÉGAUX → c'est leur
+// DIFFÉRENCE qui signale l'incohérence (contacteur collé).
+// ⚠️ Le test repasse en `&lt;&gt;` (retour à la logique d'origine pré-2026-07-26).
+TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
-        ContactorCheck.StuckClosed := (BrakeCmd AND ContactorFeedback);            // relâche commandée, retour toujours "serré"
-        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND NOT ContactorFeedback);    // serrage commandé, retour toujours "relâché"
+        ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
+        ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
         ErrorId := ErrorId OR 16#0001;
     ELSIF ResetEdge.Q THEN
         ContactorCheck.StuckClosed := FALSE;
@@ -12179,12 +12185,13 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-// 🛡️ 6. SORTIE SÛRE SUR DÉFAUT (Partie3 §9 étape 7 — ajout revue de code 2026-07-01)
-// Incohérence commande/retour détectée : on ne peut plus se fier à la séquence temporisée
-// normale (le contacteur suspect biaiserait la logique) → position sûre par défaut (collé).
+// 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
 IF Error THEN
     BrakeCmd := FALSE;
 END_IF;
+
+// 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback)
+BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
 </xhtml>
           </ST>
         </body>
@@ -16243,7 +16250,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur frein CE TREUIL (TRUE = relâché, FALSE = collé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur frein CE TREUIL (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
               </documentation>
             </variable>
             <variable name="RawPos">
@@ -16550,7 +16557,7 @@ END_IF;
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
 // Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // BypassGlobal = TRUE → saute la vérification d'arrêt (mise en service)
-ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND BrakeFeedback);
+ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State &lt;&gt; E_State.BUSY) THEN
@@ -18014,7 +18021,8 @@ END_IF;
 // 3. Diagnostic voie/carte
 IF NOT ChannelOk THEN
     ErrorId := ErrorId OR 16#0001;
-    State := FALSE;   // État sûr forcé (Partie6 §1)
+    // State conserve sa dernière valeur (hold) — le consommateur décide l'état sûr via Error.
+    // FB_Input ne force pas State : il ne connaît pas l'état sûr du signal.
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
@@ -20397,7 +20405,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état bobine frein (NC conditionné)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état bobine frein (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
@@ -20830,9 +20838,9 @@ IF NOT BypassGlobal THEN
     // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
     IF NOT (BypassSafety OR BypassMecaB) THEN
         IF NOT HeartbeatIhmOk THEN
-            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
+            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
         ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-            UncommandedActiveB := DriveStatusWord.0 OR NOT BrakeFeedback;
+            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
         END_IF;
@@ -21121,7 +21129,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein CE treuil (TRUE = serré/collé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein CE treuil (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickYNeutral">
@@ -21879,13 +21887,13 @@ END_IF;
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
 // 🔧 T84/T85 : la chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
 DriftGuardA(
-    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
+    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode,
     PositionM  := CablePosM,
     ToleranceM := UncommandedDriftToleranceM
 );
 MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
     ErrorId := ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
@@ -21899,7 +21907,7 @@ END_IF;
 // (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
                        OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
-TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
+TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
 MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
 IF TonMecaB.Q THEN
     ErrorId := ErrorId OR 16#0100;
@@ -21946,7 +21954,7 @@ TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
             OR (Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM + 0.10))))
            AND (Direction &gt;= 0)) // 🆕 Neutralise la butée haute en descente (Direction = -1)
-          AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)), 
+          AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)), 
     PT := PostRampTimeout
 );
 IF TonMecaD.Q THEN
@@ -21970,7 +21978,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#EFFF;
 END_IF;
 
-TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((ErrorId AND 16#1000) &lt;&gt; 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)),
+TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((ErrorId AND 16#1000) &lt;&gt; 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
          PT := PostRampTimeout);
 IF TonMecaE.Q THEN
     ErrorId := ErrorId OR 16#2000;
@@ -23913,7 +23921,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour normalisé : TRUE = frein serré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique direct : TRUE = frein OUVERT (desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
@@ -24112,6 +24120,14 @@ Filtrage capteur de position cible</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier desserrage, issue de FB_Brake</xhtml>
               </documentation>
             </variable>
+            <variable name="BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeContactorCheck">
               <type>
                 <derived name="ST_ContactorCheck" />
@@ -24237,6 +24253,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
     BrakeReleaseRequest := Brake.BrakeCmd;
+    BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
     BrakeContactorCheck := Brake.ContactorCheck;
 
     CommandedDirection := 0;
@@ -24359,6 +24376,7 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
       BypassContactorCheck := BypassContactorCheck);
 BrakeReleaseRequest := Brake.BrakeCmd;
+BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
 // 🛡️ FB_Translation ne décide plus la frontière finale : il expose uniquement
@@ -25286,6 +25304,14 @@ TranslationPosMaintenance := SensorMaintenance;
                 <BOOL />
               </type>
             </variable>
+            <variable name="BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ContactorsCheck">
               <type>
                 <derived name="ST_ContactorCheck" />
@@ -25489,6 +25515,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
     BrakeCmd := Brake.BrakeCmd;
+    BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
     BrakeContactorCheck := Brake.ContactorCheck;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
@@ -25654,6 +25681,7 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev
       DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
       BypassContactorCheck := BypassContactorCheck);
 BrakeCmd := Brake.BrakeCmd;
+BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
 // 🔧 REX 2026-07-07 : vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens —
@@ -27350,7 +27378,7 @@ TRUE = fin de course haut M1/M2 libre / non atteinte</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M1 serré (état sûr) — polarité normalisée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M1 OUVERT (desserré) — polarité physique directe</xhtml>
               </documentation>
             </variable>
             <variable name="M2FwdRevSpeedFeedbackOff">
@@ -27383,7 +27411,7 @@ TRUE = fin de course haut M1/M2 libre / non atteinte</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M2 serré (état sûr) — polarité normalisée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M2 OUVERT (desserré) — polarité physique directe</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactFond">
@@ -27444,32 +27472,7 @@ TRUE = translation en position Trémie</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M3 serré (état sûr) — polarité normalisée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1BrakeCommandOpenConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── [CONFIRMATION DESSERTAGE FREIN M1/M2/M3] ────────────────────────────────────────────
-TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BrakeCommandOpenConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3BrakeCommandOpenConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein M3 OUVERT (desserré) — polarité physique directe</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -27581,17 +27584,6 @@ TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation commune anti-rebond des entrées TOR</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_BrakeFeedbackInvertLogic">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">M*_BrakeIsOpen_DI inversé : TRUE -&gt; frein serré</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -28688,105 +28680,6 @@ TRUE = contacteur/bobine de desserrage confirmé (NOT BrakeFeedback)</xhtml>
               </connectionPointIn>
               <connectionPointOut />
               <variable>M3BrakeFeedback</variable>
-            </coil>
-            <comment localId="235" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="236">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="237" negated="true" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1BrakeFeedback</variable>
-            </contact>
-            <coil localId="238" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="237" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1BrakeCommandOpenConfirmed</variable>
-            </coil>
-            <comment localId="247" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="248">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="249" negated="true" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2BrakeFeedback</variable>
-            </contact>
-            <coil localId="250" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="249" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2BrakeCommandOpenConfirmed</variable>
-            </coil>
-            <comment localId="259" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="260">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="261" negated="true" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M3BrakeFeedback</variable>
-            </contact>
-            <coil localId="262" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="261" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M3BrakeCommandOpenConfirmed</variable>
             </coil>
             <rightPowerRail localId="2147483646">
               <position x="0" y="0" />
@@ -33332,7 +33225,7 @@ GVL_IHM.M1TreuilRetenue.State.FinalInterlockReason     := GVL_Global.instWinchOu
 GVL_IHM.M1TreuilRetenue.State.FinalInterlockError      := GVL_Global.instWinchOutputInterlockM1_LD.Error;
 GVL_IHM.M1TreuilRetenue.State.FinalInterlockErrorId    := GVL_Global.instWinchOutputInterlockM1_LD.ErrorId;
 GVL_IHM.M1TreuilRetenue.State.FinalRestartInhibit      := GVL_Global.instWinchOutputInterlockM1_LD.RestartInhibit;
-GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M1BrakeCommandOpenConfirmed;
+GVL_IHM.M1TreuilRetenue.State.BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.instWinchM1.BrakeCommandOpenConfirmed;
 GVL_IHM.M1TreuilRetenue.State.FinalRestartDelayElapsed := PRG_10_Outputs_LD.instWinchOutputInterlockM1_LD.RestartDelayElapsed;
 GVL_IHM.M1TreuilRetenue.State.FinalStepDelayElapsed    := PRG_10_Outputs_LD.instWinchOutputInterlockM1_LD.StepDelayElapsed;
 GVL_IHM.M1TreuilRetenue.State.Homed                    := PRG_02_Encoders.instHomingM1.Homed;
@@ -33405,7 +33298,7 @@ GVL_IHM.M2TreuilBenne.State.FinalInterlockReason     := GVL_Global.instWinchOutp
 GVL_IHM.M2TreuilBenne.State.FinalInterlockError      := GVL_Global.instWinchOutputInterlockM2_LD.Error;
 GVL_IHM.M2TreuilBenne.State.FinalInterlockErrorId    := GVL_Global.instWinchOutputInterlockM2_LD.ErrorId;
 GVL_IHM.M2TreuilBenne.State.FinalRestartInhibit      := GVL_Global.instWinchOutputInterlockM2_LD.RestartInhibit;
-GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M2BrakeCommandOpenConfirmed;
+GVL_IHM.M2TreuilBenne.State.BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.instWinchM2.BrakeCommandOpenConfirmed;
 GVL_IHM.M2TreuilBenne.State.FinalAuthorizedStep      := GVL_Global.instWinchOutputInterlockM2_LD.AuthorizedStep;
 GVL_IHM.M2TreuilBenne.State.FinalBrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM2_LD.BrakeTimeoutElapsed;
 GVL_IHM.M2TreuilBenne.State.FinalRestartDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.RestartDelayElapsed;
@@ -33492,7 +33385,7 @@ GVL_IHM.TranslationM3.State.FinalInterlockState  := GVL_Global.instTranslationOu
 GVL_IHM.TranslationM3.State.FinalInterlockReason := GVL_Global.instTranslationOutputInterlock_LD.Reason;
 GVL_IHM.TranslationM3.State.FinalInterlockError  := GVL_Global.instTranslationOutputInterlock_LD.Error;
 GVL_IHM.TranslationM3.State.FinalInterlockErrorId := GVL_Global.instTranslationOutputInterlock_LD.ErrorId;
-GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed;
+GVL_IHM.TranslationM3.State.BrakeCommandOpenConfirmed := PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed;
 GVL_IHM.TranslationM3.State.FinalBrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 GVL_IHM.TranslationM3.State.BrakeFeedback        := PRG_01_Inputs_LD.M3BrakeFeedback;
 GVL_IHM.TranslationM3.State.DriveThermalOk       := PRG_02_Acquisition_CFC.HwIn.Translation.M3_ThermalFeedback_DI; // 🆕 T96 — diagnostic seul
@@ -33877,7 +33770,7 @@ TranslationFinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
-TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed;
+TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 </xhtml>
@@ -34810,7 +34703,7 @@ WinchM1FinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 WinchM1FinalInterlockRequest.BrakeReleaseRequest := instWinchM1.BrakeCmd;
-WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M1BrakeCommandOpenConfirmed;
+WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.instWinchM1.BrakeCommandOpenConfirmed;
 WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_01_Inputs_LD.M1FwdRevSpeedFeedbackOff;
 WinchM1FinalInterlockRequest.RequestedRelayFwd := instWinchM1.RelayFwd;
 WinchM1FinalInterlockRequest.RequestedRelayRev := instWinchM1.RelayRev;
@@ -34825,7 +34718,7 @@ WinchM2FinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
 WinchM2FinalInterlockRequest.BrakeReleaseRequest := instWinchM2.BrakeCmd;
-WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M2BrakeCommandOpenConfirmed;
+WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.instWinchM2.BrakeCommandOpenConfirmed;
 WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_01_Inputs_LD.M2FwdRevSpeedFeedbackOff;
 WinchM2FinalInterlockRequest.RequestedRelayFwd := instWinchM2.RelayFwd;
 WinchM2FinalInterlockRequest.RequestedRelayRev := instWinchM2.RelayRev;
@@ -34969,9 +34862,9 @@ WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 // === IMPLEMENTATION (corps du PROGRAM PRG_TROUBLESHOOTING_CFC) ===
 
 // 🛡️ ─── 0. DIAGNOSTIC BARRIÈRES FINALES (lecture seule) ─────────────────
-M1BrakeCommandOpenConfirmedDiag := PRG_01_Inputs_LD.M1BrakeCommandOpenConfirmed;
-M2BrakeCommandOpenConfirmedDiag := PRG_01_Inputs_LD.M2BrakeCommandOpenConfirmed;
-M3BrakeCommandOpenConfirmedDiag := PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed;
+M1BrakeCommandOpenConfirmedDiag := PRG_TREUILS_CFC.instWinchM1.BrakeCommandOpenConfirmed;
+M2BrakeCommandOpenConfirmedDiag := PRG_TREUILS_CFC.instWinchM2.BrakeCommandOpenConfirmed;
+M3BrakeCommandOpenConfirmedDiag := PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed;
 M1FinalInterlockErrorDiag := GVL_Global.instWinchOutputInterlockM1_LD.Error;
 M2FinalInterlockErrorDiag := GVL_Global.instWinchOutputInterlockM2_LD.Error;
 M3FinalInterlockErrorDiag := GVL_Global.instTranslationOutputInterlock_LD.Error;
@@ -34992,7 +34885,7 @@ MachineIsStillRaw := NOT (GVL_Global.M1RelayFwd OR GVL_Global.M1RelayRev OR GVL_
                  AND (M3_CommandWord = 0) AND NOT GVL_Global.M1BrakeCmd AND NOT GVL_Global.M2BrakeCmd AND NOT GVL_Global.TranslationBrakeCmd;
 TonMachineStill(IN := MachineIsStillRaw, PT := T#2s);
 instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonMachineStill.Q,
-    M1BrakeApplied := PRG_01_Inputs_LD.M1BrakeFeedback, M2BrakeApplied := PRG_01_Inputs_LD.M2BrakeFeedback, M3BrakeApplied := PRG_01_Inputs_LD.M3BrakeFeedback,
+    M1BrakeApplied := NOT PRG_01_Inputs_LD.M1BrakeFeedback, M2BrakeApplied := NOT PRG_01_Inputs_LD.M2BrakeFeedback, M3BrakeApplied := NOT PRG_01_Inputs_LD.M3BrakeFeedback,
     M1ContactorsReleased := PRG_01_Inputs_LD.M1FwdRevSpeedFeedbackOff, M2ContactorsReleased := PRG_01_Inputs_LD.M2FwdRevSpeedFeedbackOff, M1ThermalOk := PRG_01_Inputs_LD.M1ThermalFeedback, M2ThermalOk := PRG_01_Inputs_LD.M2ThermalFeedback,
     BrakeThermalOk := PRG_01_Inputs_LD.BrakeThermalFeedback, PhaseRotationOk := PRG_01_Inputs_LD.PhaseRotationOk, SlackCableTensioned := PRG_01_Inputs_LD.SlackCableSwitch, M3SensorWordIncoherent := PRG_02_Acquisition_CFC.M3_SensorWordIncoherent,
     EmergencyChainClosed := PRG_01_Inputs_LD.EmergencyChainClosed, PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged, EncoderM1Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM1.Operational, EncoderM2Operational := PRG_01_Diagnostics.instDiagEthercat.DeviceEncoderM2.Operational,
@@ -35001,7 +34894,7 @@ instPreflight(Execute := GVL_IHM.Commun.Preflight.BtnRun, MachineIsStill := TonM
 instWinchSymmetry(Reset := GVL_IHM.Commun.WinchSymmetry.BtnReset,
     M1CommandActive := GVL_Global.M1RelayFwd OR GVL_Global.M1RelayRev, M2CommandActive := GVL_Global.M2RelayFwd OR GVL_Global.M2RelayRev,
     M1Direction := PRG_TREUILS_CFC.M1_Direction_Active, M2Direction := PRG_TREUILS_CFC.M2_Direction_Active,
-    M1BrakeCmd := GVL_Global.M1BrakeCmd, M2BrakeCmd := GVL_Global.M2BrakeCmd, M1BrakeApplied := PRG_01_Inputs_LD.M1BrakeFeedback, M2BrakeApplied := PRG_01_Inputs_LD.M2BrakeFeedback,
+    M1BrakeCmd := GVL_Global.M1BrakeCmd, M2BrakeCmd := GVL_Global.M2BrakeCmd, M1BrakeApplied := NOT PRG_01_Inputs_LD.M1BrakeFeedback, M2BrakeApplied := NOT PRG_01_Inputs_LD.M2BrakeFeedback,
     M1Position_M := PRG_02_Encoders.instEncoderScaleM1.CablePosM, M2Position_M := PRG_02_Encoders.instEncoderScaleM2.CablePosM,
     M1Speed_Mps := PRG_02_Encoders.M1MeasuredSpeed_Mps, M2Speed_Mps := PRG_02_Encoders.M2MeasuredSpeed_Mps, SyncDeviation_M := PRG_TREUILS_CFC.instWinchSync.DeltaPosM,
     Config := _WinchSymmetryCfgPersist, Data := _WinchSymmetryDataPersist);
@@ -35049,7 +34942,7 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ     := GVL_Gl
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM1.RawPos);
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM1.CablePosM;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_01_Inputs_LD.M1FwdRevSpeedFeedbackOff;
-GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied           := PRG_01_Inputs_LD.M1BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied           := NOT PRG_01_Inputs_LD.M1BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI           := PRG_01_Inputs_LD.M1ThermalFeedback;
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.instJoystick.RawY;
@@ -35080,7 +34973,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized:=
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx405_FinalInterlockState := GVL_Global.instWinchOutputInterlockM1_LD.State;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason := GVL_Global.instWinchOutputInterlockM1_LD.Reason;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep := GVL_Global.instWinchOutputInterlockM1_LD.AuthorizedStep;
-GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M1BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.instWinchM1.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM1_LD.BrakeTimeoutElapsed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed := GVL_Global.instWinchOutputInterlockM1_LD.RestartDelayElapsed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := GVL_Global.instWinchOutputInterlockM1_LD.StepDelayElapsed;
@@ -35096,7 +34989,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ   := 
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos          := TO_DINT(PRG_02_Encoders.instEncoderAbsM2.RawPos);
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx102_CablePos_M             := PRG_02_Encoders.instEncoderScaleM2.CablePosM;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI  := PRG_01_Inputs_LD.M2FwdRevSpeedFeedbackOff;
-GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied           := PRG_01_Inputs_LD.M2BrakeFeedback;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied           := NOT PRG_01_Inputs_LD.M2BrakeFeedback;
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI           := PRG_01_Inputs_LD.M2ThermalFeedback;
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA   := PRG_01_Diagnostics.instJoystick.RawY;
@@ -35127,7 +35020,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized:=
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx405_FinalInterlockState := GVL_Global.instWinchOutputInterlockM2_LD.State;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason := GVL_Global.instWinchOutputInterlockM2_LD.Reason;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep := GVL_Global.instWinchOutputInterlockM2_LD.AuthorizedStep;
-GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M2BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := PRG_TREUILS_CFC.instWinchM2.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed := GVL_Global.instWinchOutputInterlockM2_LD.BrakeTimeoutElapsed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.RestartDelayElapsed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := GVL_Global.instWinchOutputInterlockM2_LD.StepDelayElapsed;
@@ -35165,7 +35058,7 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI             := 
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI    := PRG_02_Acquisition_CFC.TranslationPosMaintenance;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz   := UINT_TO_REAL(PRG_02_Acquisition_CFC.M3_ActualFrequencyHz_Filtered) / 100.0;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord      := PRG_02_Acquisition_CFC.M3_StatusWord_Filtered;
-GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := PRG_01_Inputs_LD.M3BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied         := NOT PRG_01_Inputs_LD.M3BrakeFeedback;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk       := PRG_02_Acquisition_CFC.HwIn.Translation.M3_ThermalFeedback_DI; // 🆕 T96
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA          := PRG_01_Diagnostics.instJoystick.RawX;
@@ -35190,7 +35083,7 @@ GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz      :=
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx403_DriveControlWord     := GVL_Global.instTranslationOutputInterlock_LD.DriveControlWord;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx404_FinalInterlockState := GVL_Global.instTranslationOutputInterlock_LD.State;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx405_FinalInterlockReason := GVL_Global.instTranslationOutputInterlock_LD.Reason;
-GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := GVL_Global.instTranslationOutputInterlock_LD.BrakeTimeoutElapsed;
 
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord  := GVL_Global.instTranslationOutputInterlock_LD.DriveControlWord;

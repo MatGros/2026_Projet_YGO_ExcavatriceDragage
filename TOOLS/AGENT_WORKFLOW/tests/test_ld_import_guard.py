@@ -1,7 +1,7 @@
 """Regression guards for CODESYS LD import — type-safe FB wiring and rung completeness.
 
 These tests protect against three classes of CODESYS import failures observed
-on PRG_INPUTS_LD (REX 2026-08):
+on PRG_01_Inputs_LD (REX 2026-08):
   1. FB_Input(InputRaw :=) was not recognised by the LD builder — only
      FB_Output(Command :=) was.
   2. FB_Input rungs had no coil — CODESYS rejects incomplete rungs.
@@ -212,7 +212,7 @@ def test_not_var_produces_negated_contact_not_invariable() -> None:
 # ---------------------------------------------------------------------------
 
 def test_pure_bool_ld_page_has_zero_invariable_outvariable() -> None:
-    """Une page LD de type PRG_INPUTS_LD (BOOL pur) ne doit contenir aucun
+    """Une page LD de type PRG_01_Inputs_LD (BOOL pur) ne doit contenir aucun
     inVariable ni outVariable.
 
     Les signaux BOOL doivent être représentés exclusivement par des contacts

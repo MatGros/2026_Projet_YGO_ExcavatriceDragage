@@ -175,6 +175,6 @@ TranslationFinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
-TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed;
+TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_TRANSLATION_CFC.instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;

@@ -262,7 +262,7 @@ pour les coordonnees.
 
 ## 11. Règles de génération Ladder (`_LD.st` → `<LD>`) — REX 2026-08
 
-> 🚩 Trois bugs d'import CODESYS sur `PRG_INPUTS_LD` ont révélé que le générateur
+> 🚩 Trois bugs d'import CODESYS sur `PRG_01_Inputs_LD` ont révélé que le générateur
 > ST→LD (`TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`) produisait du
 > PLCopenXML invalide. Les règles ci-dessous sont **obligatoires** pour toute
 > source `_LD.st` et sont vérifiées par `test_ld_import_guard.py`.
@@ -305,7 +305,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 
 - **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
   BOOL. Un `inVariable` en page LD BOOL pure est un bug d'import.
-- Une page `_LD` de type BOOL pur (ex. `PRG_INPUTS_LD`) ne doit contenir
+- Une page `_LD` de type BOOL pur (ex. `PRG_01_Inputs_LD`) ne doit contenir
   **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
   `block` et `comment`.
 

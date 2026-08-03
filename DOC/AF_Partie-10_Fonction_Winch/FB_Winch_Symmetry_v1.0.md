@@ -17,7 +17,7 @@ Aucune écriture de commande, sécurité ou mouvement. Observateur pur.
 | `Reset` | BOOL | `GVL_IHM.Commun.WinchSymmetry.BtnReset` |
 | `M1/M2CommandActive` | BOOL | `PRG_TREUILS_CFC` |
 | `M1/M2Direction` | INT | `PRG_TREUILS_CFC` |
-| `M1/M2BrakeCmd` / `M1/M2BrakeApplied` | BOOL | `PRG_TREUILS_CFC` / `PRG_INPUTS_LD` |
+| `M1/M2BrakeCmd` / `M1/M2BrakeApplied` | BOOL | `PRG_TREUILS_CFC` / `PRG_01_Inputs_LD` |
 | `M1/M2Position_M` / `M1/M2Speed_Mps` | REAL | `FB_Encoder_Scale` / `FB_Encoder_SpeedMeasure` |
 | `SyncDeviation_M` | REAL | `FB_WinchSync` |
 | `Config` | ST_Winch_SymmetryCfg | `_WinchSymmetryCfgPersist` (RETAIN) |

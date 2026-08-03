@@ -189,7 +189,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 
 ## 📐 6. Règles de génération Ladder (`_LD.st` → `<LD>`)
 
-> 🚩 REX 2026-08 : trois bugs d'import CODESYS sur `PRG_INPUTS_LD` ont nécessité
+> 🚩 REX 2026-08 : trois bugs d'import CODESYS sur `PRG_01_Inputs_LD` ont nécessité
 > la formalisation des règles de génération LD. Référentiel complet :
 > `DOC/CODE_QUALITY_STANDARDS.md §11`.
 

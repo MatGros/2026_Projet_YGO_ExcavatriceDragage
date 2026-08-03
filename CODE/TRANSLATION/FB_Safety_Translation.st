@@ -24,7 +24,7 @@ VAR_INPUT
     DriveOperational    : BOOL;        // Status diagnostic communication EtherCAT (Operational)
     DriveStatusWord     : WORD;        // Mot d'état variateur AC600
     DriveActualFreqHz   : REAL;        // Vitesse réelle variateur (Hz)
-    BrakeFeedback       : BOOL;        // Retour d'état bobine frein (NC conditionné)
+    BrakeFeedback       : BOOL;        // Retour d'état bobine frein (TRUE = ouvert/desserré — révocation 2026-08-03)
     BrakeCmd            : BOOL;        // Commande frein
     Direction           : INT;         // Direction commandée
     LimitSwitchFwd      : BOOL;        // Fin de course extrême avant
@@ -155,9 +155,9 @@ IF NOT BypassGlobal THEN
     // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
     IF NOT (BypassSafety OR BypassMecaB) THEN
         IF NOT HeartbeatIhmOk THEN
-            UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR NOT BrakeFeedback;
+            UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
         ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-            UncommandedActiveB := DriveStatusWord.0 OR NOT BrakeFeedback;
+            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
         END_IF;

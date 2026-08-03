@@ -13,7 +13,7 @@ STRUCT
     Error                   : BOOL;    (* 🔴 Translation en défaut *)
     ErrorId                 : WORD;    (* ❌ Code du défaut actif *)
     BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein (lecture seule, TRUE = desserré) *)
-    BrakeFeedback           : BOOL;    (* 🔌 Retour physique de l'état du frein *)
+    BrakeFeedback           : BOOL;    (* 🔌 Retour physique direct : TRUE = frein OUVERT (desserré) *)
     PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
     PositionReached         : BOOL;    (* ✅ Positionneur : cible sélectionnée atteinte (non mémorisé) *)
     JoystickDeflection_Pct  : REAL;    (* 🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3 *)

@@ -144,7 +144,7 @@ VAR_INPUT
 
     // 🔧 REX 2026-07-07 — Méca A/B/C (voir bandeau en-tête)
     FwdRevSpeedFeedbackOff  : BOOL;         // Retour unique "tous contacteurs sens+vitesse retombés" CE treuil
-    BrakeFeedback           : BOOL;         // Retour frein CE treuil (TRUE = serré/collé)
+    BrakeFeedback           : BOOL;         // Retour frein CE treuil (TRUE = ouvert/desserré — révocation 2026-08-03)
     JoystickYNeutral        : BOOL;         // TRUE = joystick axe Y au neutre (magnitude ~0), précalculé en amont
     BenneHoldStillActive  : BOOL;         // TRUE seulement pour l'instance M1 pendant que le benne bouge M2 seul (instBucket.Busy) — toujours FALSE côté M2
     UncommandedSpeedThresholdMps : REAL := 0.02; // 🔧 Méca A — théorique, à ajuster sur site
@@ -366,13 +366,13 @@ END_IF;
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
 // 🔧 T84/T85 : la chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
 DriftGuardA(
-    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode,
+    Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode,
     PositionM  := CablePosM,
     ToleranceM := UncommandedDriftToleranceM
 );
 MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
     ErrorId := ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
@@ -386,7 +386,7 @@ END_IF;
 // (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
                        OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
-TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback), PT := PostRampTimeout);
+TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
 MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
 IF TonMecaB.Q THEN
     ErrorId := ErrorId OR 16#0100;
@@ -433,7 +433,7 @@ TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
             OR (Homed AND NOT HomingSuspect AND (CablePosM >= (TopLimitM + 0.10))))
            AND (Direction >= 0)) // 🆕 Neutralise la butée haute en descente (Direction = -1)
-          AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)), 
+          AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)), 
     PT := PostRampTimeout
 );
 IF TonMecaD.Q THEN
@@ -457,7 +457,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#EFFF;
 END_IF;
 
-TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((ErrorId AND 16#1000) <> 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND BrakeFeedback)),
+TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((ErrorId AND 16#1000) <> 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
          PT := PostRampTimeout);
 IF TonMecaE.Q THEN
     ErrorId := ErrorId OR 16#2000;

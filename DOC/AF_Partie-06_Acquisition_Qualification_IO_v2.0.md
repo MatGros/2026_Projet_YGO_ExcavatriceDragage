@@ -5,7 +5,7 @@
 > Les decisions de mouvement restent hors de ce document.
 > 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
 
-La page `PRG_INPUTS_LD` (Ladder) est associee a cette frontiere : elle affiche les 21 entrees TOR
+La page `PRG_01_Inputs_LD` (Ladder) est associee a cette frontiere : elle affiche les 21 entrees TOR
 qualifiees via `FB_Input`, sans logique metier et sans decision.
 
 ## 🧭 Sommaire
@@ -42,7 +42,7 @@ L'acquisition publie des **faits qualifies** :
 - mesures codeurs brutes/qualifiees selon frontiere validee ;
 - joystick, homme-mort et codeurs traites par des FB dedies (`FB_Joystick`, `FB_Encoder_*`, `FB_Translation_PositionDecoder`).
 
-`PRG_INPUTS_LD` affiche en Ladder les 21 entrees TOR apres qualification (`FB_Input`) :
+`PRG_01_Inputs_LD` affiche en Ladder les 21 entrees TOR apres qualification (`FB_Input`) :
 - polarite normalisee (`TRUE` = etat vrai) ;
 - mots de force/test rejetes en dehors de cette page ;
 - aucune decision `SafeStop`, mode ou commande actionneur n'y est prise.

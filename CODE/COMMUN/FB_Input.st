@@ -53,7 +53,8 @@ END_IF;
 // 3. Diagnostic voie/carte
 IF NOT ChannelOk THEN
     ErrorId := ErrorId OR 16#0001;
-    State := FALSE;   // État sûr forcé (Partie6 §1)
+    // State conserve sa dernière valeur (hold) — le consommateur décide l'état sûr via Error.
+    // FB_Input ne force pas State : il ne connaît pas l'état sûr du signal.
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;

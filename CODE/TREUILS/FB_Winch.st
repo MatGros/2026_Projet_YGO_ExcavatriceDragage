@@ -127,6 +127,7 @@ VAR_OUTPUT
     BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier fixe T#1s500ms
     SpeedGuardLimited   : BOOL;
     BrakeCmd            : BOOL;
+    BrakeCommandOpenConfirmed : BOOL;  // TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
     ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
     BrakeContactorCheck : ST_ContactorCheck;
 END_VAR
@@ -162,6 +163,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
           DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
           DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
     BrakeCmd := Brake.BrakeCmd;
+    BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
     BrakeContactorCheck := Brake.ContactorCheck;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
@@ -327,6 +329,7 @@ Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev
       DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
       BypassContactorCheck := BypassContactorCheck);
 BrakeCmd := Brake.BrakeCmd;
+BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
 // 🔧 REX 2026-07-07 : vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens —

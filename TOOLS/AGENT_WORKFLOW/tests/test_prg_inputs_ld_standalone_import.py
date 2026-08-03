@@ -1,4 +1,4 @@
-"""Regression guard for the standalone PRG_INPUTS_LD PLCopenXML import."""
+"""Regression guard for the standalone PRG_01_Inputs_LD PLCopenXML import."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from generator.file_discovery import discover_objects
 from generator.xml_builder import build_project_xml
 from generator.xml_serializer import serialize
 
-POU_NAME = "PRG_INPUTS_LD"
+POU_NAME = "PRG_01_Inputs_LD"
 STANDALONE = ROOT / "CODE" / "MAIN" / f"{POU_NAME}.xml"
 BUNDLE = ROOT / "CODE" / "CODE_Bundle.xml"
 
