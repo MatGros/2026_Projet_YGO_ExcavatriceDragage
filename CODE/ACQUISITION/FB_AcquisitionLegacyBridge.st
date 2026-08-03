@@ -211,6 +211,7 @@ instJoystick(
     FilterTime                := _JoystickFilterTime,
     DeadmanRearmTimeout       := T#10S,
     NeutralHoldTime           := T#500MS,
+    DeadmanReconfEnable       := FALSE,   // 🆕 2026-08-03 : consentement au démarrage (pas de surveillance du bouton en mouvement). Réactivable par recompilation uniquement.
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );
