@@ -292,11 +292,27 @@ def build_ld_body(
             if p_name not in declared_inputs:
                 declared_inputs.append(p_name)
 
+        instance_type = instance_types.get(inst_name)
+        if instance_type is None:
+            raise ValueError(f"LD block instance without declared type: {inst_name}")
+
         extra_param_sources = {}  # param_name -> localId (0 = leftPowerRail)
         for p_name in declared_inputs:
             if p_name == main_input_param:
                 continue
             p_value = all_params.get(p_name)
+            if p_value is None:
+                if instance_type == "FB_Input":
+                    src_id = local_id_counter
+                    local_id_counter += 2
+                    input_var = ET.SubElement(ld, "inVariable")
+                    input_var.set("localId", str(src_id))
+                    ET.SubElement(input_var, "position", x="0", y="0")
+                    ET.SubElement(input_var, "connectionPointOut")
+                    expression = ET.SubElement(input_var, "expression")
+                    expression.text = ""
+                    extra_param_sources[p_name] = src_id
+                continue
             formal_type = instance_input_types.get(inst_name, {}).get(p_name)
             direct_identifier = (
                 p_value is not None
@@ -336,9 +352,6 @@ def build_ld_body(
             p_var_el.text = p_value
 
         # Le type du bloc doit correspondre à sa déclaration VAR réelle.
-        instance_type = instance_types.get(inst_name)
-        if instance_type is None:
-            raise ValueError(f"LD block instance without declared type: {inst_name}")
         block = ET.SubElement(ld, "block")
         block.set("localId", str(block_id))
         block.set("typeName", instance_type)
@@ -356,11 +369,13 @@ def build_ld_body(
         for p_name in declared_inputs:
             if p_name == main_input_param:
                 continue
+            if p_name not in extra_param_sources:
+                continue
             var_p = ET.SubElement(in_vars, "variable")
             var_p.set("formalParameter", p_name)
             c_in_p = ET.SubElement(var_p, "connectionPointIn")
             c_ref_p = ET.SubElement(c_in_p, "connection")
-            c_ref_p.set("refLocalId", str(extra_param_sources.get(p_name, 0)))
+            c_ref_p.set("refLocalId", str(extra_param_sources[p_name]))
 
         ET.SubElement(block, "inOutVariables")
 
@@ -435,6 +450,8 @@ def build_ld_body(
             param_source_ids = {}  # param_name -> localId du contact/inVariable (ou 0 pour TRUE)
             for p_name in declared_inputs:
                 p_val = arg_map.get(p_name)
+                if p_val is None:
+                    continue
                 formal_type = instance_input_types.get(inst_name, {}).get(p_name)
                 direct_identifier = (
                     p_val is not None
@@ -442,7 +459,7 @@ def build_ld_body(
                     and re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_val)
                 )
                 if p_val == "TRUE" or p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
-                    # Non-BOOL (TIME/INT/WORD/REAL), constantes (TRUE/FALSE), expression ou non câblé :
+                    # Non-BOOL (TIME/INT/WORD/REAL), constantes (TRUE/FALSE), expression :
                     # inVariable, pas contact. FALSE est sérialisé "0", TRUE est "1" (oracle CODESYS).
                     source_id = local_id_counter
                     local_id_counter += 2
@@ -485,11 +502,13 @@ def build_ld_body(
 
             in_vars = ET.SubElement(block, "inputVariables")
             for p_name in declared_inputs:
+                if p_name not in param_source_ids:
+                    continue
                 var_in = ET.SubElement(in_vars, "variable")
                 var_in.set("formalParameter", p_name)
                 c_in_p = ET.SubElement(var_in, "connectionPointIn")
                 c_ref_p = ET.SubElement(c_in_p, "connection")
-                c_ref_p.set("refLocalId", str(param_source_ids.get(p_name, 0)))
+                c_ref_p.set("refLocalId", str(param_source_ids[p_name]))
 
             ET.SubElement(block, "inOutVariables")
             out_vars = ET.SubElement(block, "outputVariables")
