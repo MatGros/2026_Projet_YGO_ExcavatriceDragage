@@ -56,6 +56,7 @@ def main() -> int:
         ("GATE 1: Structure",                          [sys.executable, f"{S}/check_structure.py"]),
         ("GATE 1bis: Structure CODE (POU, suffixe, ordre)", [sys.executable, f"{S}/check_code_structure.py"]),
         ("GATE 1ter: Couverture MAIN du bundle", [sys.executable, f"{S}/check_bundle_main_coverage.py"]),
+        ("GATE 1quater: Securite des types et membres STRUCT", [sys.executable, f"{S}/check_type_safety.py"]),
         ("GATE 2: Code style (VAR_OUTPUT, simulation)", [sys.executable, f"{S}/check_code_style.py", "CODE"]),
         ("GATE 2bis: LIAISON (instances, refs, bundle)", [sys.executable, f"{S}/check_linkage.py"]),
         ("GATE 2bis-bis: Cablage CFC natif",           [sys.executable, f"{S}/check_cfc_wiring.py"]),

@@ -151,8 +151,8 @@ GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.W
 GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue;
 GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
 
-GVL_IHM.Modes.State.ActiveMode := PRG_03_Modes_Cycle.Auth.Mode;
-GVL_IHM.Modes.State.SyncEnabled := PRG_03_Modes_Cycle.Auth.SyncEnable;
+GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
+GVL_IHM.M1M2Sync.State.SyncActive := PRG_03_Modes_Cycle.Auth.SyncEnable;
 
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;

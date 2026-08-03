@@ -26526,7 +26526,7 @@ instModes(
     InhibitM1Request        := GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit,
     InhibitM2Request        := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit,
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
-    EncoderFaultPresent     := NOT PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState,
+    EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; 8) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; 8),
     JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch
 );
 
@@ -28791,68 +28791,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </variable>
               </inputVariables>
               <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="Ready">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Busy">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Done">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="MaintainA_RQ">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="MaintainB_RQ">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ArmPulse_RQ">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ArmingSeqStep">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="RedundancyTestFailed">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="EmergencyArmingFailed">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="EmergencyArmingLockoutActive">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-              </outputVariables>
+              <outputVariables />
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
                   <CallType xmlns="">functionblock</CallType>
@@ -29309,8 +29248,8 @@ GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.W
 GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue;
 GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
 
-GVL_IHM.Modes.State.ActiveMode := PRG_03_Modes_Cycle.Auth.Mode;
-GVL_IHM.Modes.State.SyncEnabled := PRG_03_Modes_Cycle.Auth.SyncEnable;
+GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
+GVL_IHM.M1M2Sync.State.SyncActive := PRG_03_Modes_Cycle.Auth.SyncEnable;
 
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;
