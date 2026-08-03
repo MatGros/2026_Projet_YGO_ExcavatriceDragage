@@ -47,7 +47,7 @@ instCycle(
     CycleMotionPermit   := CycleMotionPermit,
     HeartbeatIhmOk      := PRG_01_Diagnostics.instIhmHeartbeat.HeartbeatIhmOk,
     Reset               := CmdResetCycle_IHM,
-    PowerContactorEngaged     := PRG_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged     := PRG_01_Inputs_LD.PowerContactorEngaged,
 
     StartCycle          := CmdStartCycle_IHM,
     PauseCycle          := CmdPauseCycle_IHM,
@@ -58,7 +58,7 @@ instCycle(
     SelectedTargetNum_IHM := GVL_IHM.TranslationM3.Cmd.SelTarget,
 
     // Retour dédié Kobold — distinct du mou de câble.
-    KoboldContactFond   := PRG_INPUTS_LD.KoboldContactFond,
+    KoboldContactFond   := PRG_01_Inputs_LD.KoboldContactFond,
     LimitLegalReached   := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM    := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M,
     WinchSyncError      := PRG_TREUILS_CFC.instWinchSync.Error,
@@ -72,10 +72,10 @@ instCycle(
     CableLimitM1AscentM       := _WinchM1CfgPersist.CfgCableLimitAscent_M,
 
     // Position translation — 🆕 REX 2026-07-18 : Fosse1/Fosse2 renommés P1/P2 (AF_Partie-02 v2.12 §3bis)
-    Translation_At_P1       := PRG_ACQUISITION_CFC.TranslationPosP1,
-    Translation_At_P2       := PRG_ACQUISITION_CFC.TranslationPosP2,
-    Translation_At_Maintenance := PRG_ACQUISITION_CFC.TranslationPosMaintenance,
-    Translation_At_Tremie   := PRG_ACQUISITION_CFC.TranslationPosTremie,
+    Translation_At_P1       := PRG_02_Acquisition_CFC.TranslationPosP1,
+    Translation_At_P2       := PRG_02_Acquisition_CFC.TranslationPosP2,
+    Translation_At_Maintenance := PRG_02_Acquisition_CFC.TranslationPosMaintenance,
+    Translation_At_Tremie   := PRG_02_Acquisition_CFC.TranslationPosTremie,
     Translation_Busy        := PRG_TRANSLATION_CFC.instTranslationM3.Busy,
     Translation_Done        := PRG_TRANSLATION_CFC.instTranslationM3.Done,
 

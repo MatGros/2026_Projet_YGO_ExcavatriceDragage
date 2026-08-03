@@ -128,10 +128,10 @@ VAR_INPUT
     HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     EncoderFaultBypass  : BOOL;        // 🔧 Autorisation maintenance sans codeur ; effective uniquement en MAINT_N2
-    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_INPUTS_LD.M1ThermalFeedback / M2ThermalFeedback)
-    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_INPUTS_LD.BrakeThermalFeedback)
+    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_01_Inputs_LD.M1ThermalFeedback / M2ThermalFeedback)
+    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_01_Inputs_LD.BrakeThermalFeedback)
     SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si NOT SyncEnable
-    PhaseRotationOk     : BOOL;        // PRG_INPUTS_LD.PhaseRotationOk (commun) — TRUE = rotation phases correcte
+    PhaseRotationOk     : BOOL;        // PRG_01_Inputs_LD.PhaseRotationOk (commun) — TRUE = rotation phases correcte
     TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)

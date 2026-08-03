@@ -63,7 +63,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.PowerContactorEngaged</expression>
+                  <expression>PRG_01_Inputs_LD.PowerContactorEngaged</expression>
                 </inVariable>
                 <connector localId="6" name="">
                   <position x="35" y="36" />
@@ -580,7 +580,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.PowerContactorEngaged</expression>
+                  <expression>PRG_01_Inputs_LD.PowerContactorEngaged</expression>
                 </inVariable>
                 <connector localId="50" name="">
                   <position x="35" y="496" />
@@ -593,7 +593,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_INPUTS_LD.KoboldContactFond</expression>
+                  <expression>PRG_01_Inputs_LD.KoboldContactFond</expression>
                 </inVariable>
                 <connector localId="52" name="">
                   <position x="35" y="508" />
@@ -723,7 +723,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosP1</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosP1</expression>
                 </inVariable>
                 <connector localId="72" name="">
                   <position x="35" y="628" />
@@ -736,7 +736,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosP2</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosP2</expression>
                 </inVariable>
                 <connector localId="74" name="">
                   <position x="35" y="640" />
@@ -749,7 +749,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosMaintenance</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosMaintenance</expression>
                 </inVariable>
                 <connector localId="76" name="">
                   <position x="35" y="652" />
@@ -762,7 +762,7 @@
                   <connectionPointOut>
                     <expression />
                   </connectionPointOut>
-                  <expression>PRG_ACQUISITION_CFC.TranslationPosTremie</expression>
+                  <expression>PRG_02_Acquisition_CFC.TranslationPosTremie</expression>
                 </inVariable>
                 <connector localId="78" name="">
                   <position x="35" y="664" />

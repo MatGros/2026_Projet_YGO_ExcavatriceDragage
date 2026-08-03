@@ -63,6 +63,7 @@ def main() -> int:
         ("GATE 2quater: Liens documentaires",          [sys.executable, f"{S}/check_doc_links.py"]),
         ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),
         ("GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/check_bundle_freshness.py", "."]),
+        ("GATE 4bis: Syntaxe ST du bundle (no terminator)", [sys.executable, f"{S}/check_bundle_st_syntax.py", "."]),
         ("GATE 5: PyTest",                             [str(py313), "-m", "pytest",
                                                         "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
                                                         "TOOLS/AGENT_WORKFLOW/tests", "-q"]),

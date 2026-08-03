@@ -3,10 +3,10 @@
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2 ;
             DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
-   ⚙️ Pont ST temporaire appelé exclusivement par PRG_ACQUISITION_CFC.xml.
+   ⚙️ Pont ST temporaire appelé exclusivement par PRG_02_Acquisition_CFC.xml.
    🎯 Rôle unique : produire l'image matérielle HwIn consommée par le reste
       du programme. Aucune décision métier (SafeStop, mode, commande) ici.
-   🔗 Producteur unique de HwIn ; consommateurs = PRG_INPUTS_LD et suivants.
+   🔗 Producteur unique de HwIn ; consommateurs = PRG_01_Inputs_LD et suivants.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK FB_AcquisitionLegacyBridge

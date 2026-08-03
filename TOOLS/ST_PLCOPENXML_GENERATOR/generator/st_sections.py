@@ -123,6 +123,24 @@ def _parse_var_blocks(source: str, masked: str, cursor: int) -> tuple[list[VarBl
     return blocks, end_of_last_block
 
 
+def _strip_pou_terminator(source: str, masked: str, body_start: int, terminator: str) -> str:
+    """Return implementation body without the trailing POU terminator token.
+
+    Some .st sources end with END_PROGRAM/END_FUNCTION_BLOCK. CODESYS adds its
+    own terminator on import, so the generator MUST NOT emit this token inside
+    the <ST><xhtml> body — a duplicate causes C0009 "Jeton inattendu" at the
+    exact line of the embedded token. Strip it (and trailing whitespace) here.
+    """
+    body = source[body_start:]
+    masked_body = masked[body_start:]
+    idx = masked_body.rfind(terminator)
+    if idx == -1:
+        return body
+    # Cut at the terminator; keep trailing comment/whitespace only if present
+    # before the token. The terminator itself and anything after is dropped.
+    return body[:idx].rstrip() + "\n"
+
+
 def split_file(source: str) -> SectionizedFile:
     header_comment, cursor = _consume_header_comment(source)
     masked = mask(tokenize(source))
@@ -138,7 +156,7 @@ def split_file(source: str) -> SectionizedFile:
             header_comment=header_comment,
             attribute_pragmas=attribute_pragmas,
             var_blocks=var_blocks,
-            body_text=source[body_start:],
+            body_text=_strip_pou_terminator(source, masked, body_start, "END_FUNCTION_BLOCK"),
         )
 
     program_match = _PROGRAM_RE.match(masked, cursor)
@@ -151,7 +169,7 @@ def split_file(source: str) -> SectionizedFile:
             header_comment=header_comment,
             attribute_pragmas=attribute_pragmas,
             var_blocks=var_blocks,
-            body_text=source[body_start:],
+            body_text=_strip_pou_terminator(source, masked, body_start, "END_PROGRAM"),
         )
 
     type_match = _TYPE_RE.match(masked, cursor)

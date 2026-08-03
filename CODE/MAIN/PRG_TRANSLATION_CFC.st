@@ -133,10 +133,10 @@ END_IF;
 
 // Câblage du capteur de butée de la cible sélectionnée (PV exclu : jamais une cible d'arrêt)
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_ACQUISITION_CFC.TranslationPosTremie;
-    2: M3_PositionSensorTarget := PRG_ACQUISITION_CFC.TranslationPosP2;
-    3: M3_PositionSensorTarget := PRG_ACQUISITION_CFC.TranslationPosP1;
-    4: M3_PositionSensorTarget := PRG_ACQUISITION_CFC.TranslationPosMaintenance;
+    1: M3_PositionSensorTarget := PRG_02_Acquisition_CFC.TranslationPosTremie;
+    2: M3_PositionSensorTarget := PRG_02_Acquisition_CFC.TranslationPosP2;
+    3: M3_PositionSensorTarget := PRG_02_Acquisition_CFC.TranslationPosP1;
+    4: M3_PositionSensorTarget := PRG_02_Acquisition_CFC.TranslationPosMaintenance;
 ELSE
     M3_PositionSensorTarget := FALSE;   // Aucun capteur visé
 END_CASE;
@@ -146,23 +146,23 @@ instTranslationM3(
     Enable                  := PRG_TREUILS_CFC.StubMachineEnableN1
                                AND (PRG_MODES_CFC.Auth.Mode <> E_Mode.DISABLE), // 🔧 WINCH-CORE-01 : DISABLE neutralise M3
     Reset                   := PRG_SUPERVISION_CFC.FaultMachineReset_IHM,
-    PowerContactorEngaged         := PRG_INPUTS_LD.PowerContactorEngaged,
+    PowerContactorEngaged         := PRG_01_Inputs_LD.PowerContactorEngaged,
     Mode                    := PRG_MODES_CFC.Auth.Mode,
     StartStop               := M3_StartStop_Active,
     SafeStop                := PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensor          := PRG_ACQUISITION_CFC.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
-    LimitSwitchFwd          := PRG_ACQUISITION_CFC.M3_LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
-    LimitSwitchRev          := PRG_ACQUISITION_CFC.M3_LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
-    DriveStatusWord         := PRG_ACQUISITION_CFC.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_ACQUISITION_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
+    SlowdownSensor          := PRG_02_Acquisition_CFC.TranslationPosPV, // 🆕 remplace ApproachTime (timer) — ralentissement avant Trémie uniquement
+    LimitSwitchFwd          := PRG_02_Acquisition_CFC.M3_LimitSwitchFwd, // 🆕 dérivé du mot capteurs (extrême Trémie, mot=11111)
+    LimitSwitchRev          := PRG_02_Acquisition_CFC.M3_LimitSwitchRev, // 🆕 dérivé du mot capteurs (extrême Maintenance, mot=00000)
+    DriveStatusWord         := PRG_02_Acquisition_CFC.M3_StatusWord_Filtered,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition_CFC.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate           := _TranslationRampAccelRate_Pct,      // 🔧 PERSISTENT depuis GVL_PERSISTENT
     CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct,    // 🔧 idem
     CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct,      // 🔧 idem
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,             // 🔧 source unique depuis PERSISTENT
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_INPUTS_LD.M3BrakeFeedback, instTranslationM3.BrakeReleaseRequest),
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_01_Inputs_LD.M3BrakeFeedback, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
@@ -172,9 +172,9 @@ instTranslationM3(
 // FB_Translation (rampe rapide) et n'est jamais une coupure sèche ici.
 TranslationFinalInterlockRequest.Enable := PRG_TREUILS_CFC.StubMachineEnableN1;
 TranslationFinalInterlockRequest.Reset := PRG_SUPERVISION_CFC.FaultMachineReset_IHM;
-TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_INPUTS_LD.PowerContactorEngaged;
+TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged;
 TranslationFinalInterlockRequest.SafeStop := PRG_SAFETY_CFC.instSafetyTranslationM3.SafeStop;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
-TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_INPUTS_LD.M3BrakeCommandOpenConfirmed;
+TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := PRG_01_Inputs_LD.M3BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
