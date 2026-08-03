@@ -48,7 +48,7 @@ flowchart LR
 
 ---
 
-## 2. Zoom `PRG_02_Acquisition_CFC` — frontière interne (AF06 §1/§2)
+## 2. Zoom `PRG_02_Acquisition_CFC` — frontière interne (AF06 §1/§2) — vue générale
 
 ```mermaid
 flowchart LR
@@ -74,6 +74,9 @@ flowchart LR
         IQ["ST_InputsQualified"]
         EM["ST_EncoderMeasurements (M1·M2)"]
         HW["HwIn / faits qualifiés"]
+        JAX["ST_Joystick_AxisCmd<br/>X/Y + DeadmanArmed"]
+        DDEV["ST_Diag_Device<br/>(Online/Operational/ErrorId)"]
+        AUF["État AU qualifié<br/>(fait d'entrée)"]
     end
 
     TOR --> FBIN
@@ -90,7 +93,15 @@ flowchart LR
     COD -->|ST_EncoderMeasurements<br/>AF06 §2ter| EM
     SEL -.->|ST_InputsQualified =<br/>réel des domaines TOR| IQ
     HI --> HW
+    JST -->|ST_Joystick_AxisCmd + DeadmanArmed<br/>AF08 §6| JAX
+    DIA -->|faits diag<br/>AF12| DDEV
+    AU --> AUF
 ```
+
+> **Lecture** : la frontière est **unique**. Tout ce qui entre dans les FB de `PRG_02` (joystick,
+> codeurs, décodeur M3, diag, AU) passe par **`HwIn`** (ou `ST_InputsQualified` pour les TOR réelles).
+> Rien ne lit un device brut hors de cette page. Les sorties de `PRG_02` sont des **faits typés**
+> (structures DUT) consommés par les pages aval — détaillés dans les zooms ci-dessous.
 
 ### Règles du câblage (extraits AF06 §2, §2ter)
 
@@ -107,7 +118,93 @@ flowchart LR
 
 ---
 
-## 3. Flux perte codeur (P0) — un seul fait par treuil (AF06 §2ter)
+## 3. Zoom A — Joystick (AF08 §6, AF06 §1)
+
+**Producteur** : `PRG_02_Acquisition_CFC.instJoystick`. **Sortie** : `ST_Joystick_AxisCmd` + `DeadmanArmed`.
+
+```mermaid
+flowchart LR
+    subgraph ACQ["📥 PRG_02_Acquisition_CFC"]
+        JOY["FB_Joystick<br/>Raw→AxisScale→Filter_PT1→Homme-mort<br/>AF08 §2"]
+    end
+    JOY -->|"ST_Joystick_AxisCmd<br/>AxisCmdX · AxisCmdY"| AX["ST_Joystick_AxisCmd<br/>(publication)"]
+    JOY -->|DeadmanArmed| DA["DeadmanArmed<br/>(fait)"]
+    AX --> M3["PRG_03 · FB_Cycle<br/>CycleMotionPermit :=<br/>DeadmanArmed AND AxisCmdY.StartStop<br/>AF08 §6"]
+    AX --> TR["PRG_04 · FB_Winch<br/>consigne + sélecteur treuil"]
+    AX --> TL["PRG_05 · FB_Translation<br/>AxisCmdX + DeadmanArmed"]
+    DA --> M3
+    DA --> TR
+    DA --> TL
+    AX --> SUP["PRG_07 · Supervision<br/>mapping IHM JOY1Joystick.State"]
+```
+
+> **Contrat consommateur** : `AxisCmd*.StartStop` **et** `DeadmanArmed` combinés (TC-P08-013).
+> Rampes laissées aux FB de mouvement aval (`FB_Winch`, `FB_Translation`) — AF08 §2.
+
+---
+
+## 4. Zoom B — Diagnostics devices / bus (AF12, AF06 §3)
+
+**Producteur** : `PRG_02_Acquisition_CFC` (`instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat`).
+**Sortie** : `ST_Diag_Device` (`Online`, `Operational`, `Error`, `ErrorId`, `State`).
+
+```mermaid
+flowchart LR
+    subgraph ACQ["📥 PRG_02_Acquisition_CFC"]
+        CAN["instDiagCanOpen"]
+        ETH["instDiagEthercat"]
+        HBT["instIhmHeartbeat"]
+    end
+    CAN -->|"DeviceCanOpenMaster<br/>DeviceJoystick"| DD["ST_Diag_Device<br/>(faits)"]
+    ETH -->|"DeviceEthercatMaster<br/>DeviceVariateur<br/>DeviceEncoderM1/M2"| DD
+    HBT -->|"heartbeat IHM<br/>(fait)"| HB["IhmHeartbeat"]
+    DD --> SAF["FB_Safety_Winch /<br/>FB_Safety_Translation<br/>(via PRG_04/05)"]
+    DD --> MOD["PRG_03 · Modes<br/>(dispo device)"]
+    DD --> IHM["PRG_07 · IHM Network<br/>+ Troubleshooting"]
+    HB --> MOD
+```
+
+> **Règle AF12 §2** : un FB diag **ne pilote jamais** `SafeStop`/`PowerCutOff` — il publie des faits ;
+> les `FB_Safety_<Domaine>` consomment et décident seuls.
+
+---
+
+## 5. Zoom C — État AU & PositionDecoder M3 (AF06 §2bis, AF01, AF11 §4.2)
+
+### 5.1 État AU — acquis ici, agit en sortie
+
+```mermaid
+flowchart LR
+    subgraph ACQ["📥 PRG_02_Acquisition_CFC"]
+        AU["État AU<br/>(fait d'entrée qualifié)"]
+    end
+    AU -->|fait qualifié| OUT["PRG_06_Outputs_LD<br/>barrière finale"]
+    OUT -->|action AU| PWR["coupure puissance /<br/>rearmement (Partie 01)"]
+```
+
+> ⚠️ **Acquisition de l'état ≠ lieu d'action** : `PRG_02` ne fait qu'acquis le fait ; la chaîne
+> matérielle AU reste indépendante et prioritaire (Partie 01), le FB agit via la barrière finale.
+
+### 5.2 PositionDecoder M3 — décodage à la frontière, consommation en Translation
+
+```mermaid
+flowchart LR
+    subgraph ACQ["📥 PRG_02_Acquisition_CFC"]
+        DEC["FB_Translation_PositionDecoder<br/>5 capteurs → mot + butées + incohérence<br/>AF11 fiche §2"]
+    end
+    DEC -->|LimitSwitchFwd<br/>LimitSwitchRev| SAF["PRG_05 · FB_Safety_Translation<br/>butées extrêmes"]
+    DEC -->|Incoherent| SAF
+    DEC -->|mot de progression| TR["PRG_05 · FB_Translation<br/>position"]
+```
+
+> **Pourquoi ici et pas en Translation** : décoder le mot brut 5 capteurs produit des **faits
+> qualifiés** (qualification d'entrée, comme les codeurs). Il est exécuté **avant** Safety
+> (`Acquisition.instPositionDecoder`), et ses sorties sont consommées par `FB_Safety_Translation`
+> (bit7 → `SafeStop`+`PowerCutOff`, TC-P11-002). Cible : AF11 §4.2 ligne 103.
+
+---
+
+## 6. Flux perte codeur (P0) — un seul fait par treuil (AF06 §2ter)
 
 ```mermaid
 flowchart LR
@@ -125,12 +222,13 @@ flowchart LR
 
 ---
 
-## 4. Correspondance code legacy → cible (AF02 §4, AF06 §2bis)
+## 7. Correspondance code legacy → cible (AF02 §4, AF06 §2bis)
 
 | Legacy | Cible | Lot |
 |---|---|---|
 | `PRG_00_Inputs` / `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` | M1 |
 | `PRG_ACQUISITION_CFC` + `PRG_02_Encoders` + `PRG_01_Diagnostics` + `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition_CFC` | M1 |
+| `instPositionDecoder` (acquisition) | `PRG_02_Acquisition_CFC` — sorties lues par `PRG_05` | M1 |
 | `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle_CFC` | M2 |
 | `PRG_TREUILS_CFC` + safety M1/M2 (`PRG_SAFETY_CFC`) | `PRG_04_Treuils_Benne_CFC` | M3 |
 | `PRG_TRANSLATION_CFC` + safety M3 | `PRG_05_Translation_CFC` | M4 |
