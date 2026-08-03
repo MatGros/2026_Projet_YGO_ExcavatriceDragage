@@ -407,7 +407,7 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 | DUT | Producteur | Contenu minimal | Lecteurs |
 |---|---|---|---|
 | `ST_Safety_PowerCutOffRequest` | `PRG_SAFETY_CFC` (agrégateur) | `Request : BOOL`, optionnel masque sources | `PRG_OUTPUTS_LD` → `PowerCutOffRequest` |
-| `ST_HwIn_Machine` (existant / étendu) | Acquisition | DI chain + contactor déjà dans `ST_HwMachine` | FB via Acquisition qualifiée |
+| `ST_HwMachine` (sous-image de `ST_HardwareImage`) | Acquisition | DI chain + contactor déjà dans `ST_HwMachine` | FB via Acquisition qualifiée |
 | `ST_Safety_Emergency_State` | Outputs / composite | Step, Busy, Armable, ChainOk, ContactorOk | Supervision, troubleshooting |
 | `ST_Safety_Emergency_Diag` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, Lockout | Supervision, IHM State |
 
