@@ -298,8 +298,10 @@ def build_ld_body(
                 continue
             p_value = all_params.get(p_name)
             formal_type = instance_input_types.get(inst_name, {}).get(p_name)
-            direct_identifier = p_value is not None and re.fullmatch(
-                r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_value
+            direct_identifier = (
+                p_value is not None
+                and not p_value.startswith("PRG_")
+                and re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_value)
             )
             if p_value == "TRUE" or p_value == "FALSE" or formal_type != "BOOL" or not direct_identifier:
                 src_id = local_id_counter
@@ -434,8 +436,10 @@ def build_ld_body(
             for p_name in declared_inputs:
                 p_val = arg_map.get(p_name)
                 formal_type = instance_input_types.get(inst_name, {}).get(p_name)
-                direct_identifier = p_val is not None and re.fullmatch(
-                    r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_val
+                direct_identifier = (
+                    p_val is not None
+                    and not p_val.startswith("PRG_")
+                    and re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_val)
                 )
                 if p_val == "TRUE" or p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
                     # Non-BOOL (TIME/INT/WORD/REAL), constantes (TRUE/FALSE), expression ou non câblé :
@@ -511,39 +515,40 @@ def build_ld_body(
             out_var_name = parts[0].strip()
             conds = [c.strip() for c in parts[1].split("AND")]
 
-            prev_id = 0
-            for cond in conds:
-                cnt_id = local_id_counter
-                local_id_counter += 2
+            if all(re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", c) and not c.startswith("PRG_") for c in conds):
+                prev_id = 0
+                for cond in conds:
+                    cnt_id = local_id_counter
+                    local_id_counter += 2
 
-                contact = ET.SubElement(ld, "contact")
-                contact.set("localId", str(cnt_id))
-                contact.set("negated", "false")
-                contact.set("storage", "none")
-                contact.set("edge", "none")
-                ET.SubElement(contact, "position", x="0", y="0")
-                c_in = ET.SubElement(contact, "connectionPointIn")
-                c_ref = ET.SubElement(c_in, "connection")
-                c_ref.set("refLocalId", str(prev_id))
-                ET.SubElement(contact, "connectionPointOut")
-                var_el = ET.SubElement(contact, "variable")
-                var_el.text = cond
-                prev_id = cnt_id
+                    contact = ET.SubElement(ld, "contact")
+                    contact.set("localId", str(cnt_id))
+                    contact.set("negated", "false")
+                    contact.set("storage", "none")
+                    contact.set("edge", "none")
+                    ET.SubElement(contact, "position", x="0", y="0")
+                    c_in = ET.SubElement(contact, "connectionPointIn")
+                    c_ref = ET.SubElement(c_in, "connection")
+                    c_ref.set("refLocalId", str(prev_id))
+                    ET.SubElement(contact, "connectionPointOut")
+                    var_el = ET.SubElement(contact, "variable")
+                    var_el.text = cond
+                    prev_id = cnt_id
 
-            coil_id = local_id_counter
-            local_id_counter += 10
-            coil = ET.SubElement(ld, "coil")
-            coil.set("localId", str(coil_id))
-            coil.set("negated", "false")
-            coil.set("storage", "none")
-            ET.SubElement(coil, "position", x="0", y="0")
-            c_in_c = ET.SubElement(coil, "connectionPointIn")
-            c_ref_c = ET.SubElement(c_in_c, "connection")
-            c_ref_c.set("refLocalId", str(prev_id))
-            ET.SubElement(coil, "connectionPointOut")
-            var_el = ET.SubElement(coil, "variable")
-            var_el.text = out_var_name
-            continue
+                coil_id = local_id_counter
+                local_id_counter += 10
+                coil = ET.SubElement(ld, "coil")
+                coil.set("localId", str(coil_id))
+                coil.set("negated", "false")
+                coil.set("storage", "none")
+                ET.SubElement(coil, "position", x="0", y="0")
+                c_in_c = ET.SubElement(coil, "connectionPointIn")
+                c_ref_c = ET.SubElement(c_in_c, "connection")
+                c_ref_c.set("refLocalId", str(prev_id))
+                ET.SubElement(coil, "connectionPointOut")
+                var_el = ET.SubElement(coil, "variable")
+                var_el.text = out_var_name
+                continue
 
         # Expression OR
         if ":=" in stmt_clean and " OR " in stmt_clean:
@@ -551,32 +556,33 @@ def build_ld_body(
             out_var_name = parts[0].strip()
             conds = [c.strip() for c in parts[1].split("OR")]
 
-            branch_ids = []
-            for cond in conds:
-                cnt_id = local_id_counter
-                local_id_counter += 2
-                branch_ids.append(cnt_id)
+            if all(re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", c) and not c.startswith("PRG_") for c in conds):
+                branch_ids = []
+                for cond in conds:
+                    cnt_id = local_id_counter
+                    local_id_counter += 2
+                    branch_ids.append(cnt_id)
 
-                contact = ET.SubElement(ld, "contact")
-                contact.set("localId", str(cnt_id))
-                contact.set("negated", "false")
-                contact.set("storage", "none")
-                contact.set("edge", "none")
-                ET.SubElement(contact, "position", x="0", y="0")
-                c_in = ET.SubElement(contact, "connectionPointIn")
-                c_ref = ET.SubElement(c_in, "connection")
-                c_ref.set("refLocalId", "0")
-                ET.SubElement(contact, "connectionPointOut")
-                var_el = ET.SubElement(contact, "variable")
-                var_el.text = cond
+                    contact = ET.SubElement(ld, "contact")
+                    contact.set("localId", str(cnt_id))
+                    contact.set("negated", "false")
+                    contact.set("storage", "none")
+                    contact.set("edge", "none")
+                    ET.SubElement(contact, "position", x="0", y="0")
+                    c_in = ET.SubElement(contact, "connectionPointIn")
+                    c_ref = ET.SubElement(c_in, "connection")
+                    c_ref.set("refLocalId", "0")
+                    ET.SubElement(contact, "connectionPointOut")
+                    var_el = ET.SubElement(contact, "variable")
+                    var_el.text = cond
 
-            coil_id = local_id_counter
-            local_id_counter += 10
-            coil = ET.SubElement(ld, "coil")
-            coil.set("localId", str(coil_id))
-            coil.set("negated", "false")
-            coil.set("storage", "none")
-            ET.SubElement(coil, "position", x="0", y="0")
+                coil_id = local_id_counter
+                local_id_counter += 10
+                coil = ET.SubElement(ld, "coil")
+                coil.set("localId", str(coil_id))
+                coil.set("negated", "false")
+                coil.set("storage", "none")
+                ET.SubElement(coil, "position", x="0", y="0")
             c_in_c = ET.SubElement(coil, "connectionPointIn")
             for b_id in branch_ids:
                 c_ref_c = ET.SubElement(c_in_c, "connection")
@@ -594,7 +600,7 @@ def build_ld_body(
             source_expression = parts[1].strip()
             direct_identifier = re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", source_expression)
 
-            if direct_identifier and source_expression in boolean_identifiers:
+            if direct_identifier and not source_expression.startswith("PRG_") and source_expression in boolean_identifiers:
                 contact_id = local_id_counter
                 coil_id = local_id_counter + 1
                 local_id_counter += 10
@@ -625,7 +631,7 @@ def build_ld_body(
 
             # Contact inversé : NOT variable → contact negated=true → coil
             not_match = re.fullmatch(r"NOT\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)", source_expression)
-            if not_match and not_match.group(1) in boolean_identifiers:
+            if not_match and not not_match.group(1).startswith("PRG_") and not_match.group(1) in boolean_identifiers:
                 contact_id = local_id_counter
                 coil_id = local_id_counter + 1
                 local_id_counter += 10

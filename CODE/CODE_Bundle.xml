@@ -27564,110 +27564,71 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="15" negated="false" storage="none" edge="none">
+            <inVariable localId="15">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable</variable>
-            </contact>
-            <contact localId="17" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable</expression>
+            </inVariable>
+            <inVariable localId="17">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Reset</variable>
-            </contact>
-            <contact localId="19" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Reset</expression>
+            </inVariable>
+            <inVariable localId="19">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged</variable>
-            </contact>
-            <contact localId="21" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged</expression>
+            </inVariable>
+            <inVariable localId="21">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop</variable>
-            </contact>
-            <contact localId="23" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop</expression>
+            </inVariable>
+            <inVariable localId="23">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeReleaseRequest</variable>
-            </contact>
-            <contact localId="25" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeReleaseRequest</expression>
+            </inVariable>
+            <inVariable localId="25">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed</variable>
-            </contact>
-            <contact localId="27" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed</expression>
+            </inVariable>
+            <inVariable localId="27">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff</variable>
-            </contact>
-            <contact localId="29" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff</expression>
+            </inVariable>
+            <inVariable localId="29">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd</variable>
-            </contact>
-            <contact localId="31" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd</expression>
+            </inVariable>
+            <inVariable localId="31">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev</variable>
-            </contact>
-            <contact localId="33" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev</expression>
+            </inVariable>
+            <inVariable localId="33">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1</variable>
-            </contact>
-            <contact localId="35" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1</expression>
+            </inVariable>
+            <inVariable localId="35">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2</variable>
-            </contact>
-            <contact localId="37" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2</expression>
+            </inVariable>
+            <inVariable localId="37">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3</variable>
-            </contact>
-            <contact localId="39" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3</expression>
+            </inVariable>
+            <inVariable localId="39">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4</variable>
-            </contact>
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4</expression>
+            </inVariable>
             <inVariable localId="41">
               <position x="0" y="0" />
               <connectionPointOut />
@@ -27858,110 +27819,71 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="55" negated="false" storage="none" edge="none">
+            <inVariable localId="55">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable</variable>
-            </contact>
-            <contact localId="57" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable</expression>
+            </inVariable>
+            <inVariable localId="57">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Reset</variable>
-            </contact>
-            <contact localId="59" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Reset</expression>
+            </inVariable>
+            <inVariable localId="59">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged</variable>
-            </contact>
-            <contact localId="61" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged</expression>
+            </inVariable>
+            <inVariable localId="61">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop</variable>
-            </contact>
-            <contact localId="63" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop</expression>
+            </inVariable>
+            <inVariable localId="63">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeReleaseRequest</variable>
-            </contact>
-            <contact localId="65" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeReleaseRequest</expression>
+            </inVariable>
+            <inVariable localId="65">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed</variable>
-            </contact>
-            <contact localId="67" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed</expression>
+            </inVariable>
+            <inVariable localId="67">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff</variable>
-            </contact>
-            <contact localId="69" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff</expression>
+            </inVariable>
+            <inVariable localId="69">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd</variable>
-            </contact>
-            <contact localId="71" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd</expression>
+            </inVariable>
+            <inVariable localId="71">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev</variable>
-            </contact>
-            <contact localId="73" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev</expression>
+            </inVariable>
+            <inVariable localId="73">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1</variable>
-            </contact>
-            <contact localId="75" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1</expression>
+            </inVariable>
+            <inVariable localId="75">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2</variable>
-            </contact>
-            <contact localId="77" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2</expression>
+            </inVariable>
+            <inVariable localId="77">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3</variable>
-            </contact>
-            <contact localId="79" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3</expression>
+            </inVariable>
+            <inVariable localId="79">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4</variable>
-            </contact>
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4</expression>
+            </inVariable>
             <inVariable localId="81">
               <position x="0" y="0" />
               <connectionPointOut />
@@ -28152,54 +28074,36 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="95" negated="false" storage="none" edge="none">
+            <inVariable localId="95">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.Enable</variable>
-            </contact>
-            <contact localId="97" negated="false" storage="none" edge="none">
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.Enable</expression>
+            </inVariable>
+            <inVariable localId="97">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.Reset</variable>
-            </contact>
-            <contact localId="99" negated="false" storage="none" edge="none">
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.Reset</expression>
+            </inVariable>
+            <inVariable localId="99">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged</variable>
-            </contact>
-            <contact localId="101" negated="false" storage="none" edge="none">
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged</expression>
+            </inVariable>
+            <inVariable localId="101">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop</variable>
-            </contact>
-            <contact localId="103" negated="false" storage="none" edge="none">
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop</expression>
+            </inVariable>
+            <inVariable localId="103">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest</variable>
-            </contact>
-            <contact localId="105" negated="false" storage="none" edge="none">
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest</expression>
+            </inVariable>
+            <inVariable localId="105">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed</variable>
-            </contact>
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed</expression>
+            </inVariable>
             <inVariable localId="107">
               <position x="0" y="0" />
               <connectionPointOut />
@@ -29352,45 +29256,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="501" negated="false" storage="none" edge="none">
+            <inVariable localId="501">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated</variable>
-            </contact>
-            <contact localId="503" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated AND PRG_01_Inputs_LD.PowerContactorEngaged AND PRG_01_Inputs_LD.EmergencyChainClosed</expression>
+            </inVariable>
+            <outVariable localId="502">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="501" />
               </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_01_Inputs_LD.PowerContactorEngaged</variable>
-            </contact>
-            <contact localId="505" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="503" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_01_Inputs_LD.EmergencyChainClosed</variable>
-            </contact>
-            <coil localId="507" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="505" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1_M2_KoboldMeasureEnable_DQ</variable>
-            </coil>
-            <comment localId="517" height="0" width="0">
+              <expression>M1_M2_KoboldMeasureEnable_DQ</expression>
+            </outVariable>
+            <comment localId="511" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === [SÉCURITÉ &amp; COUPURE PUISSANCE AMONT] ===</xhtml>
               </content>
             </comment>
-            <vendorElement localId="518">
+            <vendorElement localId="512">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29401,13 +29285,13 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="519" height="0" width="0">
+            <comment localId="513" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="520">
+            <vendorElement localId="514">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29418,25 +29302,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="521">
+            <inVariable localId="515">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>0</expression>
             </inVariable>
-            <outVariable localId="522">
+            <outVariable localId="516">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="521" />
+                <connection refLocalId="515" />
               </connectionPointIn>
               <expression>PowerCutOffReq</expression>
             </outVariable>
-            <comment localId="531" height="0" width="0">
+            <comment localId="525" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="532">
+            <vendorElement localId="526">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29447,20 +29331,17 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="543">
+            <inVariable localId="537">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>1</expression>
             </inVariable>
-            <contact localId="545" negated="false" storage="none" edge="none">
+            <inVariable localId="539">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
-            </contact>
-            <contact localId="547" negated="false" storage="none" edge="none">
+              <expression>PRG_07_Supervision.FaultMachineReset_IHM</expression>
+            </inVariable>
+            <contact localId="541" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29468,23 +29349,17 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
             </contact>
-            <contact localId="549" negated="false" storage="none" edge="none">
+            <inVariable localId="543">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_01_Inputs_LD.EmergencyChainClosed</variable>
-            </contact>
-            <contact localId="551" negated="false" storage="none" edge="none">
+              <expression>PRG_01_Inputs_LD.EmergencyChainClosed</expression>
+            </inVariable>
+            <inVariable localId="545">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_01_Inputs_LD.PowerContactorEngaged</variable>
-            </contact>
-            <contact localId="553" negated="false" storage="none" edge="none">
+              <expression>PRG_01_Inputs_LD.PowerContactorEngaged</expression>
+            </inVariable>
+            <contact localId="547" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29492,7 +29367,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="555" negated="false" storage="none" edge="none">
+            <contact localId="549" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29500,42 +29375,42 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="533" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="527" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="543" />
+                    <connection refLocalId="537" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="545" />
+                    <connection refLocalId="539" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="547" />
+                    <connection refLocalId="541" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="549" />
+                    <connection refLocalId="543" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="551" />
+                    <connection refLocalId="545" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="553" />
+                    <connection refLocalId="547" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="555" />
+                    <connection refLocalId="549" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -29608,13 +29483,13 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <comment localId="557" height="0" width="0">
+            <comment localId="551" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="558">
+            <vendorElement localId="552">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29625,25 +29500,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="559">
+            <inVariable localId="553">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.MaintainA_RQ</expression>
             </inVariable>
-            <outVariable localId="560">
+            <outVariable localId="554">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="559" />
+                <connection refLocalId="553" />
               </connectionPointIn>
               <expression>PowerKeepAlive_A_RQ</expression>
             </outVariable>
-            <comment localId="569" height="0" width="0">
+            <comment localId="563" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="570">
+            <vendorElement localId="564">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29654,25 +29529,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="571">
+            <inVariable localId="565">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.MaintainB_RQ</expression>
             </inVariable>
-            <outVariable localId="572">
+            <outVariable localId="566">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="571" />
+                <connection refLocalId="565" />
               </connectionPointIn>
               <expression>PowerKeepAlive_B_RQ</expression>
             </outVariable>
-            <comment localId="581" height="0" width="0">
+            <comment localId="575" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="582">
+            <vendorElement localId="576">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29683,25 +29558,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="583">
+            <inVariable localId="577">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.ArmPulse_RQ</expression>
             </inVariable>
-            <outVariable localId="584">
+            <outVariable localId="578">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="583" />
+                <connection refLocalId="577" />
               </connectionPointIn>
               <expression>EmergencyArming_RQ</expression>
             </outVariable>
-            <comment localId="593" height="0" width="0">
+            <comment localId="587" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="594">
+            <vendorElement localId="588">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29712,25 +29587,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="595">
+            <inVariable localId="589">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.ArmPulse_RQ</expression>
             </inVariable>
-            <outVariable localId="596">
+            <outVariable localId="590">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="595" />
+                <connection refLocalId="589" />
               </connectionPointIn>
               <expression>EmergencyArmingPulseActive</expression>
             </outVariable>
-            <comment localId="605" height="0" width="0">
+            <comment localId="599" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="606">
+            <vendorElement localId="600">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29741,25 +29616,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="607">
+            <inVariable localId="601">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.Diag.LockoutActive</expression>
             </inVariable>
-            <outVariable localId="608">
+            <outVariable localId="602">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="607" />
+                <connection refLocalId="601" />
               </connectionPointIn>
               <expression>EmergencyArmingLockoutActive</expression>
             </outVariable>
-            <comment localId="617" height="0" width="0">
+            <comment localId="611" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="618">
+            <vendorElement localId="612">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29770,25 +29645,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="619">
+            <inVariable localId="613">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.State.Step</expression>
             </inVariable>
-            <outVariable localId="620">
+            <outVariable localId="614">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="619" />
+                <connection refLocalId="613" />
               </connectionPointIn>
               <expression>ArmingSeqStep</expression>
             </outVariable>
-            <comment localId="629" height="0" width="0">
+            <comment localId="623" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="630">
+            <vendorElement localId="624">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29799,25 +29674,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="631">
+            <inVariable localId="625">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.Diag.RedundancyTestFailed</expression>
             </inVariable>
-            <outVariable localId="632">
+            <outVariable localId="626">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="631" />
+                <connection refLocalId="625" />
               </connectionPointIn>
               <expression>RedundancyTestFailed</expression>
             </outVariable>
-            <comment localId="641" height="0" width="0">
+            <comment localId="635" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="642">
+            <vendorElement localId="636">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29828,25 +29703,25 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="643">
+            <inVariable localId="637">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>instSafetyEmergencyManagement.Diag.ArmFailed</expression>
             </inVariable>
-            <outVariable localId="644">
+            <outVariable localId="638">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="643" />
+                <connection refLocalId="637" />
               </connectionPointIn>
               <expression>EmergencyArmingFailed</expression>
             </outVariable>
-            <comment localId="653" height="0" width="0">
+            <comment localId="647" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="654">
+            <vendorElement localId="648">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29857,7 +29732,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="655" negated="false" storage="none" edge="none">
+            <contact localId="649" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29865,21 +29740,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1RelayFwd</variable>
             </contact>
-            <coil localId="656" negated="false" storage="none">
+            <coil localId="650" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="655" />
+                <connection refLocalId="649" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1RelayFwd</variable>
             </coil>
-            <comment localId="665" height="0" width="0">
+            <comment localId="659" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="666">
+            <vendorElement localId="660">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29890,7 +29765,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="667" negated="false" storage="none" edge="none">
+            <contact localId="661" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29898,21 +29773,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1RelayRev</variable>
             </contact>
-            <coil localId="668" negated="false" storage="none">
+            <coil localId="662" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="667" />
+                <connection refLocalId="661" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1RelayRev</variable>
             </coil>
-            <comment localId="677" height="0" width="0">
+            <comment localId="671" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="678">
+            <vendorElement localId="672">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29923,7 +29798,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="679" negated="false" storage="none" edge="none">
+            <contact localId="673" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29931,21 +29806,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor1</variable>
             </contact>
-            <coil localId="680" negated="false" storage="none">
+            <coil localId="674" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="679" />
+                <connection refLocalId="673" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1SpeedContactor1</variable>
             </coil>
-            <comment localId="689" height="0" width="0">
+            <comment localId="683" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="690">
+            <vendorElement localId="684">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29956,7 +29831,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="691" negated="false" storage="none" edge="none">
+            <contact localId="685" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29964,21 +29839,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor2</variable>
             </contact>
-            <coil localId="692" negated="false" storage="none">
+            <coil localId="686" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="691" />
+                <connection refLocalId="685" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1SpeedContactor2</variable>
             </coil>
-            <comment localId="701" height="0" width="0">
+            <comment localId="695" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="702">
+            <vendorElement localId="696">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29989,7 +29864,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="703" negated="false" storage="none" edge="none">
+            <contact localId="697" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29997,21 +29872,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor3</variable>
             </contact>
-            <coil localId="704" negated="false" storage="none">
+            <coil localId="698" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="703" />
+                <connection refLocalId="697" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1SpeedContactor3</variable>
             </coil>
-            <comment localId="713" height="0" width="0">
+            <comment localId="707" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="714">
+            <vendorElement localId="708">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30022,7 +29897,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="715" negated="false" storage="none" edge="none">
+            <contact localId="709" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30030,21 +29905,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor4</variable>
             </contact>
-            <coil localId="716" negated="false" storage="none">
+            <coil localId="710" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="715" />
+                <connection refLocalId="709" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1SpeedContactor4</variable>
             </coil>
-            <comment localId="725" height="0" width="0">
+            <comment localId="719" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="726">
+            <vendorElement localId="720">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30055,7 +29930,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="727" negated="false" storage="none" edge="none">
+            <contact localId="721" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30063,21 +29938,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1BrakeCmd</variable>
             </contact>
-            <coil localId="728" negated="false" storage="none">
+            <coil localId="722" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="727" />
+                <connection refLocalId="721" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1BrakeCmd</variable>
             </coil>
-            <comment localId="737" height="0" width="0">
+            <comment localId="731" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="738">
+            <vendorElement localId="732">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30088,7 +29963,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="739" negated="false" storage="none" edge="none">
+            <contact localId="733" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30096,21 +29971,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2RelayFwd</variable>
             </contact>
-            <coil localId="740" negated="false" storage="none">
+            <coil localId="734" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="739" />
+                <connection refLocalId="733" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2RelayFwd</variable>
             </coil>
-            <comment localId="749" height="0" width="0">
+            <comment localId="743" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="750">
+            <vendorElement localId="744">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30121,7 +29996,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="751" negated="false" storage="none" edge="none">
+            <contact localId="745" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30129,21 +30004,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2RelayRev</variable>
             </contact>
-            <coil localId="752" negated="false" storage="none">
+            <coil localId="746" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="751" />
+                <connection refLocalId="745" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2RelayRev</variable>
             </coil>
-            <comment localId="761" height="0" width="0">
+            <comment localId="755" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="762">
+            <vendorElement localId="756">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30154,7 +30029,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="763" negated="false" storage="none" edge="none">
+            <contact localId="757" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30162,21 +30037,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2SpeedContactor1</variable>
             </contact>
-            <coil localId="764" negated="false" storage="none">
+            <coil localId="758" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="763" />
+                <connection refLocalId="757" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2SpeedContactor1</variable>
             </coil>
-            <comment localId="773" height="0" width="0">
+            <comment localId="767" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="774">
+            <vendorElement localId="768">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30187,7 +30062,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="775" negated="false" storage="none" edge="none">
+            <contact localId="769" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30195,21 +30070,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2SpeedContactor2</variable>
             </contact>
-            <coil localId="776" negated="false" storage="none">
+            <coil localId="770" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="775" />
+                <connection refLocalId="769" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2SpeedContactor2</variable>
             </coil>
-            <comment localId="785" height="0" width="0">
+            <comment localId="779" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="786">
+            <vendorElement localId="780">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30220,7 +30095,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="787" negated="false" storage="none" edge="none">
+            <contact localId="781" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30228,21 +30103,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2SpeedContactor3</variable>
             </contact>
-            <coil localId="788" negated="false" storage="none">
+            <coil localId="782" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="787" />
+                <connection refLocalId="781" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2SpeedContactor3</variable>
             </coil>
-            <comment localId="797" height="0" width="0">
+            <comment localId="791" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="798">
+            <vendorElement localId="792">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30253,7 +30128,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="799" negated="false" storage="none" edge="none">
+            <contact localId="793" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30261,21 +30136,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2SpeedContactor4</variable>
             </contact>
-            <coil localId="800" negated="false" storage="none">
+            <coil localId="794" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="799" />
+                <connection refLocalId="793" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2SpeedContactor4</variable>
             </coil>
-            <comment localId="809" height="0" width="0">
+            <comment localId="803" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="810">
+            <vendorElement localId="804">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30286,7 +30161,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="811" negated="false" storage="none" edge="none">
+            <contact localId="805" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30294,21 +30169,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2BrakeCmd</variable>
             </contact>
-            <coil localId="812" negated="false" storage="none">
+            <coil localId="806" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="811" />
+                <connection refLocalId="805" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2BrakeCmd</variable>
             </coil>
-            <comment localId="821" height="0" width="0">
+            <comment localId="815" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="822">
+            <vendorElement localId="816">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -30319,7 +30194,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="823" negated="false" storage="none" edge="none">
+            <contact localId="817" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -30327,10 +30202,10 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>TranslationBrakeCmd</variable>
             </contact>
-            <coil localId="824" negated="false" storage="none">
+            <coil localId="818" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="823" />
+                <connection refLocalId="817" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.TranslationBrakeCmd</variable>
@@ -30972,735 +30847,6 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
     Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
            DOC/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
         </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_PERSISTENT" retain="true" persistent="true">
-        <variable name="_CalibM1">
-          <type>
-            <derived name="ST_Encoder_Calib" />
-          </type>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="0" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_CalibM2">
-          <type>
-            <derived name="ST_Encoder_Calib" />
-          </type>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="1" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchSpeedStepTable">
-          <type>
-            <derived name="ST_SpeedStepTable" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="P1R1">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P1R2">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P1R3">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P1R4">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P2R1">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P2R2">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P2R3">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P2R4">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P3R1">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P3R2">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P3R3">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P3R4">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P4R1">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P4R2">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P4R3">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P4R4">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="P5R1">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P5R2">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P5R3">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="P5R4">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="StepThreshold_Pct">
-                <arrayValue>
-                  <value>
-                    <simpleValue value="20" />
-                  </value>
-                  <value>
-                    <simpleValue value="40" />
-                  </value>
-                  <value>
-                    <simpleValue value="60" />
-                  </value>
-                  <value>
-                    <simpleValue value="80" />
-                  </value>
-                  <value>
-                    <simpleValue value="100" />
-                  </value>
-                </arrayValue>
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="2" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchSpeedConfig">
-          <type>
-            <derived name="ST_WinchSpeedConfig" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="MaxMeasuredSpeedMps">
-                <simpleValue value="2" />
-              </value>
-              <value member="SpeedBandMaxMps">
-                <arrayValue>
-                  <value>
-                    <simpleValue value="0.4" />
-                  </value>
-                  <value>
-                    <simpleValue value="0.8" />
-                  </value>
-                  <value>
-                    <simpleValue value="1.2" />
-                  </value>
-                  <value>
-                    <simpleValue value="1.6" />
-                  </value>
-                  <value>
-                    <simpleValue value="2" />
-                  </value>
-                </arrayValue>
-              </value>
-              <value member="SpeedBandHysteresisMps">
-                <simpleValue value="0.05" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="3" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchLoadEstimateTable">
-          <type>
-            <derived name="ST_WinchLoadEstimateTable" />
-          </type>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="4" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchSymmetryCfgPersist">
-          <type>
-            <derived name="ST_Winch_SymmetryCfg" />
-          </type>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="5" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchSymmetryDataPersist">
-          <type>
-            <derived name="ST_Winch_SymmetryData" />
-          </type>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="6" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchM1CfgPersist">
-          <type>
-            <derived name="ST_WinchCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="CfgTopSensorPos_M">
-                <simpleValue value="8" />
-              </value>
-              <value member="CfgHomingTarget_M">
-                <simpleValue value="0" />
-              </value>
-              <value member="CfgRampAccelRate">
-                <simpleValue value="10" />
-              </value>
-              <value member="CfgRampDecelNormalRate">
-                <simpleValue value="150" />
-              </value>
-              <value member="CfgRampDecelFastRate">
-                <simpleValue value="400" />
-              </value>
-              <value member="CfgCableLimitDescent_M">
-                <simpleValue value="-20" />
-              </value>
-              <value member="CfgCableLimitAscent_M">
-                <simpleValue value="7.5" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="7" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchM2CfgPersist">
-          <type>
-            <derived name="ST_WinchCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="CfgTopSensorPos_M">
-                <simpleValue value="8" />
-              </value>
-              <value member="CfgHomingTarget_M">
-                <simpleValue value="0" />
-              </value>
-              <value member="CfgRampAccelRate">
-                <simpleValue value="10" />
-              </value>
-              <value member="CfgRampDecelNormalRate">
-                <simpleValue value="150" />
-              </value>
-              <value member="CfgRampDecelFastRate">
-                <simpleValue value="400" />
-              </value>
-              <value member="CfgCableLimitDescent_M">
-                <simpleValue value="-20" />
-              </value>
-              <value member="CfgCableLimitAscent_M">
-                <simpleValue value="7.5" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="8" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_SyncCfgPersist">
-          <type>
-            <derived name="ST_SyncCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="CfgSyncTolerance_M">
-                <simpleValue value="0.25" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="9" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_WinchCriticalSyncTolerance_M">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="2" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="10" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_SyncSoftStopEnable">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="11" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_BucketCfgPersist">
-          <type>
-            <derived name="ST_BucketCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="Config">
-                <structValue>
-                  <value member="OffsetOpenM">
-                    <simpleValue value="0" />
-                  </value>
-                  <value member="OffsetCloseM">
-                    <simpleValue value="15" />
-                  </value>
-                  <value member="CoherenceLimitM">
-                    <simpleValue value="0.05" />
-                  </value>
-                </structValue>
-              </value>
-              <value member="CfgTimeoutDuration">
-                <simpleValue value="TIME#30s0ms" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="12" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_BucketState">
-          <type>
-            <derived name="ST_BucketState" />
-          </type>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="13" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_TranslationMaxFreq_Hz">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="60" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="14" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_TranslationRampAccelRate_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="20" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="15" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_TranslationRampDecelNormal_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="40" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="16" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_TranslationRampDecelFast_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="100" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="17" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_TranslationAutoSpeedCap_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="40" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="18" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_TranslationSetFreq_Hz">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="0" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="19" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickNeutralX">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="5000" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="20" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickNeutralY">
-          <type>
-            <INT />
-          </type>
-          <initialValue>
-            <simpleValue value="5000" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="21" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickDeadband_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="10" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="22" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickFilterTime">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#100ms" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="23" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickAccelRate_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="50" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="24" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickDecelRate_Pct">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="150" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="25" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickInvertX">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="26" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_JoystickInvertY">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="27" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_CycleCfgPersist">
-          <type>
-            <derived name="ST_CycleCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="SetDepth_M">
-                <simpleValue value="-12.5" />
-              </value>
-              <value member="SetOffset_M">
-                <simpleValue value="1.5" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="28" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_DredgingAssistCfgPersist">
-          <type>
-            <derived name="ST_DredgingAssistCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="DiveStartMin_M">
-                <simpleValue value="1" />
-              </value>
-              <value member="ImmersionUpper_M">
-                <simpleValue value="0.5" />
-              </value>
-              <value member="ImmersionLower_M">
-                <simpleValue value="-0.5" />
-              </value>
-              <value member="ExtractionControlDistance_M">
-                <simpleValue value="2" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="29" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_CommunCfgPersist">
-          <type>
-            <derived name="ST_CommunCfg" />
-          </type>
-          <initialValue>
-            <structValue>
-              <value member="LimitLegalDepthMinAllowed_M">
-                <simpleValue value="-15" />
-              </value>
-              <value member="LimitLegalEnabled">
-                <simpleValue value="TRUE" />
-              </value>
-              <value member="SelHomingApproachEnable">
-                <simpleValue value="FALSE" />
-              </value>
-              <value member="WinchMaxStepDescente">
-                <simpleValue value="3" />
-              </value>
-              <value member="WinchMaxStepAscent">
-                <simpleValue value="5" />
-              </value>
-              <value member="WinchSlowdownDistance_M">
-                <simpleValue value="1" />
-              </value>
-              <value member="WinchSlowSpeed_Pct">
-                <simpleValue value="15" />
-              </value>
-            </structValue>
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="30" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_BlinkTimeOn">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#1s0ms" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="31" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_BlinkTimeOff">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#800ms" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="32" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_SimEncoderRawPosM1">
-          <type>
-            <UDINT />
-          </type>
-          <initialValue>
-            <simpleValue value="1000000" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="33" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <variable name="_SimEncoderRawPosM2">
-          <type>
-            <UDINT />
-          </type>
-          <initialValue>
-            <simpleValue value="1000000" />
-          </initialValue>
-          <addData>
-            <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-              <Attributes>
-                <Attribute Name="order_in_persistent_editor" Value="34" />
-              </Attributes>
-            </data>
-          </addData>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b404450e-105f-5aa6-8c01-cbf582c5f3ce</ObjectId>
-          </data>
-        </addData>
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">

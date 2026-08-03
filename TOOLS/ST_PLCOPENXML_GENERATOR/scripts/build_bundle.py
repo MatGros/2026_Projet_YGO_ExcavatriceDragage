@@ -109,7 +109,7 @@ def main(argv: list[str] | None = None) -> int:
         include_deps=not args.no_deps,
         project_name=args.project_name,
         timestamp_override=args.timestamp,
-        exclude_gvl_persistent=False,
+        exclude_gvl_persistent=True,
     )
 
     write_file(root, args.output)
