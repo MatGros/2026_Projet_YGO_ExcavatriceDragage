@@ -156,16 +156,29 @@ flowchart LR
         CAN["instDiagCanOpen"]
         ETH["instDiagEthercat"]
         HBT["instIhmHeartbeat"]
+        DD["ST_Diag_Device<br/>(Online·Operational·Error·<br/>ErrorId·State·StateAtError)<br/>+ E_Diag_State"]
+        JOY["FB_Joystick<br/>Gate : BusCanOpenOP<br/>AND JoystickOP"]
+        COD["Chaîne codeurs M1/M2<br/>SlaveOperational<br/>(BOOL aplati)"]
     end
-    CAN -->|"DeviceCanOpenMaster<br/>DeviceJoystick"| DD["ST_Diag_Device<br/>(Online·Operational·Error·<br/>ErrorId·State·StateAtError)"]
+    CAN -->|"DeviceCanOpenMaster<br/>DeviceJoystick"| DD
     ETH -->|"DeviceEthercatMaster<br/>DeviceVariateur<br/>DeviceEncoderM1/M2"| DD
     HBT -->|"heartbeat IHM<br/>(fait)"| HB["IhmHeartbeat"]
+    DD -->|"BusCanOpenOP<br/>JoystickOP<br/>(struct entière)"| JOY
+    DD -->|"DeviceEncoderM1/M2<br/>.Operational"| COD
     DD --> SAF["FB_Safety_Winch /<br/>FB_Safety_Translation<br/>(via PRG_04/05)"]
     DD --> MOD["PRG_03 · Modes<br/>(dispo device)"]
     DD --> IHM["PRG_07 · IHM Network<br/>+ Troubleshooting"]
     HB --> MOD
+    HB -->|"HeartbeatIhmOk<br/>défaut si absent"| SAF
 ```
 
+> **La gestion des états bus est consommée à 2 niveaux** :
+> 1. **À la frontière (dans `PRG_02`)** : gate du joystick (`FB_Joystick.st:84` — toute commande
+>    coupée si CAN non opérationnel) et chaîne codeurs (`FB_Encoder_Abs.st:79` — erreur si esclave
+>    EtherCAT absent).
+> 2. **En aval** : `FB_Safety_*` (JoystickOnline/Operational, DriveOperational, `HeartbeatIhmOk`),
+>    Modes, IHM.
+>
 > **Règle AF12 §2** : un FB diag **ne pilote jamais** `SafeStop`/`PowerCutOff` — il publie des faits ;
 > les `FB_Safety_<Domaine>` consomment et décident seuls.
 
