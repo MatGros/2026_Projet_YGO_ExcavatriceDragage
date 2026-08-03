@@ -361,7 +361,7 @@ Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seul
 
 - Durees de filtrage par signal apres qualification terrain.
 - Statut definitif de `FB_Output` non instancie.
-- Contrat exact des structures de publication internes vers les pages CFC.
+- ~~Contrat exact des structures de publication internes vers les pages CFC.~~ ✅ **Résolu** — §2ter : `ST_HardwareImage` (HwReal/HwSim/HwIn), `ST_InputsQualified` (producteur `PRG_01_Inputs_LD`, lecteur `PRG_02_Acquisition_CFC` seul), `ST_EncoderMeasurements` (M1/M2, lecteurs Treuils/Modes/Supervision).
 
 ## 📚 Documents lies
 
