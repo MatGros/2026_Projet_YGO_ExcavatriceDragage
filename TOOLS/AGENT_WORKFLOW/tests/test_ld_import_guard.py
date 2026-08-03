@@ -221,21 +221,21 @@ def test_pure_bool_ld_page_has_zero_invariable_outvariable() -> None:
     """
     ld_body = build_ld_body(
         """
-        instInput1(InputRaw := RawSignal1, FilterTime := CST_FilterTime, ChannelOk := TRUE);
+        instInput1(InputRaw := RawSignal1, InvertLogic := Invert1);
         Signal1 := instInput1.State;
-        instInput2(InputRaw := RawSignal2, FilterTime := CST_FilterTime, ChannelOk := TRUE);
+        instInput2(InputRaw := RawSignal2, InvertLogic := Invert2);
         Signal2 := instInput2.State;
         MotorReady := Signal1 AND Signal2;
         EmergencyActive := NOT EmergencyButton;
         """,
         boolean_identifiers={
-            "RawSignal1", "RawSignal2", "Signal1", "Signal2",
+            "RawSignal1", "RawSignal2", "Signal1", "Signal2", "Invert1", "Invert2",
             "MotorReady", "EmergencyActive", "EmergencyButton",
         },
         instance_types={"instInput1": "FB_Input", "instInput2": "FB_Input"},
         instance_input_types={
-            "instInput1": {"InputRaw": "BOOL", "FilterTime": "TIME", "ChannelOk": "BOOL"},
-            "instInput2": {"InputRaw": "BOOL", "FilterTime": "TIME", "ChannelOk": "BOOL"},
+            "instInput1": {"InputRaw": "BOOL", "InvertLogic": "BOOL"},
+            "instInput2": {"InputRaw": "BOOL", "InvertLogic": "BOOL"},
         },
     )
     ld = ld_body.find("LD")
@@ -250,6 +250,70 @@ def test_pure_bool_ld_page_has_zero_invariable_outvariable() -> None:
     # Vérifier qu'on a bien des contacts et coils
     assert len(ld.findall("contact")) >= 4, "Contacts manquants"
     assert len(ld.findall("coil")) >= 4, "Coils manquantes"
+
+
+# ---------------------------------------------------------------------------
+# Règle 3bis — Paramètre typé non-BOOL (FilterTime) → inVariable, jamais contact
+# ---------------------------------------------------------------------------
+
+def test_time_filter_param_is_invariable_not_contact() -> None:
+    """Un paramètre FB non-BOOL (FilterTime: TIME) doit être un inVariable.
+
+    Un contact Ladder ne peut porter que des variables BOOL. Un contact
+    câblé sur un littéral TIME (FilterTime := T#20MS) ou sur une constante
+    TIME est rejeté par CODESYS à l'import PLCopenXML (REX 2026-08,
+    régénération PRG_01_Inputs_LD : contacts créés pour FilterTime et
+    ChannelOk). Règles de câblage section 1 (§11) :
+      - type != BOOL            → inVariable (expression)
+      - valeur "TRUE"           → leftPowerRail (0)
+      - BOOL variable           → contact
+      - expression non-identif. → inVariable (ex. GetDeviceState() = RUNNING)
+    """
+    ld_body = build_ld_body(
+        """
+        instInput(InputRaw := RawSignal, FilterTime := T#20MS, ChannelOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING));
+        Signal := instInput.State;
+        """,
+        instance_types={"instInput": "FB_Input"},
+        instance_input_types={
+            "instInput": {
+                "InputRaw": "BOOL",
+                "FilterTime": "TIME",
+                "ChannelOk": "BOOL",
+            }
+        },
+    )
+    ld = ld_body.find("LD")
+    assert ld is not None
+
+    # Aucun contact pour FilterTime : un contact ne porte que du BOOL
+    contact_vars = [c.findtext("variable") for c in ld.findall("contact")]
+    assert "T#20MS" not in contact_vars, "Littéral TIME rendu comme contact Ladder"
+    assert "CST_FilterTime" not in contact_vars, "Constante TIME rendue comme contact Ladder"
+
+    # FilterTime doit être un inVariable avec l'expression T#20MS
+    invars = {v.findtext("expression"): v for v in ld.findall("inVariable")}
+    assert "T#20MS" in invars, f"FilterTime T#20MS absent des inVariable: {list(invars)}"
+
+    # ChannelOk (expression) → inVariable aussi, pas un contact
+    exprs = [v.findtext("expression") for v in ld.findall("inVariable")]
+    assert any("GetDeviceState" in e for e in exprs), \
+        f"Expression ChannelOk absente des inVariable: {exprs}"
+
+    # Le block doit référencer FilterTime depuis l'inVariable
+    block = ld.find("block")
+    params = {v.get("formalParameter"): v for v in block.findall("inputVariables/variable")}
+    filter_conn = params["FilterTime"].find("connectionPointIn/connection")
+    filter_id = filter_conn.get("refLocalId")
+    invar_ids = {v.get("localId") for v in ld.findall("inVariable")}
+    assert filter_id in invar_ids, "FilterTime non relié à un inVariable"
+
+    # Tous les refLocalId référencés doivent exister
+    local_ids = {e.get("localId") for e in ld.iter() if e.get("localId")}
+    referenced = {
+        c.get("refLocalId") for c in ld.findall(".//connection") if c.get("refLocalId") != "0"
+    }
+    assert referenced <= local_ids
 
 
 # ---------------------------------------------------------------------------

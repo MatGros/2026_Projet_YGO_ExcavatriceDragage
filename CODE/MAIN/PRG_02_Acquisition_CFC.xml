@@ -1,28 +1,428 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- PRG_ACQUISITION_CFC : page CFC native. Toute logique est encapsulee dans FB_AcquisitionLegacyBridge. -->
+<!-- 📡 PRG_02_Acquisition_CFC : Page CFC native d'acquisition et qualification I/O
+     📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2/§2bis/§2ter
+     ⚙️ Exécuté par MainTask en position 2 (après PRG_01_Inputs_LD).
+     🎯 Rôle unique : Produire l'image matérielle HwIn, acquérir et traiter les 
+        mesures codeurs (M1/M2), décoder M3, traiter le joystick et publier les retours. -->
 <project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-03T00:00:00" />
-  <contentHeader name="PRG_ACQUISITION_CFC.project" modificationDateTime="2026-08-03T00:00:00" />
-  <types><dataTypes /><pous><pou name="PRG_02_Acquisition_CFC" pouType="program">
-    <interface><localVars><variable name="instAcquisition"><type><derived name="FB_AcquisitionLegacyBridge" /></type></variable></localVars><outputVars><variable name="HwReal"><type><derived name="ST_HardwareImage" /></type></variable><variable name="HwSim"><type><derived name="ST_HardwareImage" /></type></variable><variable name="HwIn"><type><derived name="ST_HardwareImage" /></type></variable><variable name="WinchInputSourceChanged"><type><BOOL /></type></variable><variable name="TranslationPosTremie"><type><BOOL /></type></variable><variable name="TranslationPosPV"><type><BOOL /></type></variable><variable name="TranslationPosP2"><type><BOOL /></type></variable><variable name="TranslationPosP1"><type><BOOL /></type></variable><variable name="TranslationPosMaintenance"><type><BOOL /></type></variable><variable name="M3_StatusWord_Filtered"><type><UINT /></type></variable><variable name="M3_ActualFrequencyHz_Filtered"><type><UINT /></type></variable><variable name="M3_LimitSwitchFwd"><type><BOOL /></type></variable><variable name="M3_LimitSwitchRev"><type><BOOL /></type></variable><variable name="M3_SensorWordIncoherent"><type><BOOL /></type></variable><variable name="M3_SensorsWord"><type><BYTE /></type></variable></outputVars></interface>
-    <body><ST><html:xhtml /></ST><addData><data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation"><CFC>
-      <block localId="1" executionOrderId="1" typeName="FB_AcquisitionLegacyBridge" instanceName="instAcquisition"><position x="100" y="20" /><inputVariables /><inOutVariables /><outputVariables><variable formalParameter="HwReal"><connectionPointOut><relPosition x="0" y="0" /><expression /></connectionPointOut></variable><variable formalParameter="HwSim"><connectionPointOut><relPosition x="0" y="1" /><expression /></connectionPointOut></variable><variable formalParameter="HwIn"><connectionPointOut><relPosition x="0" y="2" /><expression /></connectionPointOut></variable><variable formalParameter="WinchInputSourceChanged"><connectionPointOut><relPosition x="0" y="3" /><expression /></connectionPointOut></variable><variable formalParameter="TranslationPosTremie"><connectionPointOut><relPosition x="0" y="4" /><expression /></connectionPointOut></variable><variable formalParameter="TranslationPosPV"><connectionPointOut><relPosition x="0" y="5" /><expression /></connectionPointOut></variable><variable formalParameter="TranslationPosP2"><connectionPointOut><relPosition x="0" y="6" /><expression /></connectionPointOut></variable><variable formalParameter="TranslationPosP1"><connectionPointOut><relPosition x="0" y="7" /><expression /></connectionPointOut></variable><variable formalParameter="TranslationPosMaintenance"><connectionPointOut><relPosition x="0" y="8" /><expression /></connectionPointOut></variable><variable formalParameter="M3_StatusWord_Filtered"><connectionPointOut><relPosition x="0" y="9" /><expression /></connectionPointOut></variable><variable formalParameter="M3_ActualFrequencyHz_Filtered"><connectionPointOut><relPosition x="0" y="10" /><expression /></connectionPointOut></variable><variable formalParameter="M3_LimitSwitchFwd"><connectionPointOut><relPosition x="0" y="11" /><expression /></connectionPointOut></variable><variable formalParameter="M3_LimitSwitchRev"><connectionPointOut><relPosition x="0" y="12" /><expression /></connectionPointOut></variable><variable formalParameter="M3_SensorWordIncoherent"><connectionPointOut><relPosition x="0" y="13" /><expression /></connectionPointOut></variable><variable formalParameter="M3_SensorsWord"><connectionPointOut><relPosition x="0" y="14" /><expression /></connectionPointOut></variable></outputVariables><addData><data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation"><CallType>functionblock</CallType></data></addData></block>
-      <connector localId="2" name="HwRealPublisher"><position x="280" y="15" /><connectionPointIn><connection refLocalId="1" formalParameter="HwReal" /></connectionPointIn></connector>
-          <outVariable localId="3"><position x="420" y="15" /><connectionPointIn><connection refLocalId="2" /></connectionPointIn><expression>HwReal</expression></outVariable><connector localId="4" name="HwSimPublisher"><position x="280" y="29" /><connectionPointIn><connection refLocalId="1" formalParameter="HwSim" /></connectionPointIn></connector>
-          <outVariable localId="5"><position x="420" y="29" /><connectionPointIn><connection refLocalId="4" /></connectionPointIn><expression>HwSim</expression></outVariable><connector localId="6" name="HwInPublisher"><position x="280" y="43" /><connectionPointIn><connection refLocalId="1" formalParameter="HwIn" /></connectionPointIn></connector>
-          <outVariable localId="7"><position x="420" y="43" /><connectionPointIn><connection refLocalId="6" /></connectionPointIn><expression>HwIn</expression></outVariable><connector localId="8" name="WinchInputSourceChangedPublisher"><position x="280" y="57" /><connectionPointIn><connection refLocalId="1" formalParameter="WinchInputSourceChanged" /></connectionPointIn></connector>
-          <outVariable localId="9"><position x="420" y="57" /><connectionPointIn><connection refLocalId="8" /></connectionPointIn><expression>WinchInputSourceChanged</expression></outVariable><connector localId="10" name="TranslationPosTremiePublisher"><position x="280" y="71" /><connectionPointIn><connection refLocalId="1" formalParameter="TranslationPosTremie" /></connectionPointIn></connector>
-          <outVariable localId="11"><position x="420" y="71" /><connectionPointIn><connection refLocalId="10" /></connectionPointIn><expression>TranslationPosTremie</expression></outVariable><connector localId="12" name="TranslationPosPVPublisher"><position x="280" y="85" /><connectionPointIn><connection refLocalId="1" formalParameter="TranslationPosPV" /></connectionPointIn></connector>
-          <outVariable localId="13"><position x="420" y="85" /><connectionPointIn><connection refLocalId="12" /></connectionPointIn><expression>TranslationPosPV</expression></outVariable><connector localId="14" name="TranslationPosP2Publisher"><position x="280" y="99" /><connectionPointIn><connection refLocalId="1" formalParameter="TranslationPosP2" /></connectionPointIn></connector>
-          <outVariable localId="15"><position x="420" y="99" /><connectionPointIn><connection refLocalId="14" /></connectionPointIn><expression>TranslationPosP2</expression></outVariable><connector localId="16" name="TranslationPosP1Publisher"><position x="280" y="113" /><connectionPointIn><connection refLocalId="1" formalParameter="TranslationPosP1" /></connectionPointIn></connector>
-          <outVariable localId="17"><position x="420" y="113" /><connectionPointIn><connection refLocalId="16" /></connectionPointIn><expression>TranslationPosP1</expression></outVariable><connector localId="18" name="TranslationPosMaintenancePublisher"><position x="280" y="127" /><connectionPointIn><connection refLocalId="1" formalParameter="TranslationPosMaintenance" /></connectionPointIn></connector>
-          <outVariable localId="19"><position x="420" y="127" /><connectionPointIn><connection refLocalId="18" /></connectionPointIn><expression>TranslationPosMaintenance</expression></outVariable><connector localId="20" name="M3_StatusWord_FilteredPublisher"><position x="280" y="141" /><connectionPointIn><connection refLocalId="1" formalParameter="M3_StatusWord_Filtered" /></connectionPointIn></connector>
-          <outVariable localId="21"><position x="420" y="141" /><connectionPointIn><connection refLocalId="20" /></connectionPointIn><expression>M3_StatusWord_Filtered</expression></outVariable><connector localId="22" name="M3_ActualFrequencyHz_FilteredPublisher"><position x="280" y="155" /><connectionPointIn><connection refLocalId="1" formalParameter="M3_ActualFrequencyHz_Filtered" /></connectionPointIn></connector>
-          <outVariable localId="23"><position x="420" y="155" /><connectionPointIn><connection refLocalId="22" /></connectionPointIn><expression>M3_ActualFrequencyHz_Filtered</expression></outVariable><connector localId="24" name="M3_LimitSwitchFwdPublisher"><position x="280" y="169" /><connectionPointIn><connection refLocalId="1" formalParameter="M3_LimitSwitchFwd" /></connectionPointIn></connector>
-          <outVariable localId="25"><position x="420" y="169" /><connectionPointIn><connection refLocalId="24" /></connectionPointIn><expression>M3_LimitSwitchFwd</expression></outVariable><connector localId="26" name="M3_LimitSwitchRevPublisher"><position x="280" y="183" /><connectionPointIn><connection refLocalId="1" formalParameter="M3_LimitSwitchRev" /></connectionPointIn></connector>
-          <outVariable localId="27"><position x="420" y="183" /><connectionPointIn><connection refLocalId="26" /></connectionPointIn><expression>M3_LimitSwitchRev</expression></outVariable><connector localId="28" name="M3_SensorWordIncoherentPublisher"><position x="280" y="197" /><connectionPointIn><connection refLocalId="1" formalParameter="M3_SensorWordIncoherent" /></connectionPointIn></connector>
-          <outVariable localId="29"><position x="420" y="197" /><connectionPointIn><connection refLocalId="28" /></connectionPointIn><expression>M3_SensorWordIncoherent</expression></outVariable><connector localId="30" name="M3_SensorsWordPublisher"><position x="280" y="211" /><connectionPointIn><connection refLocalId="1" formalParameter="M3_SensorsWord" /></connectionPointIn></connector>
-          <outVariable localId="31"><position x="420" y="211" /><connectionPointIn><connection refLocalId="30" /></connectionPointIn><expression>M3_SensorsWord</expression></outVariable>
-    </CFC></data></addData></body>
-  </pou></pous></types>
+  <contentHeader name="PRG_02_Acquisition_CFC.project" modificationDateTime="2026-08-03T00:00:00" />
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_02_Acquisition_CFC" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="instSimBench"><type><derived name="FB_SimBench" /></type></variable>
+            <variable name="instJoystick"><type><derived name="FB_Joystick" /></type></variable>
+            <variable name="instEncoderAbsM1"><type><derived name="FB_Encoder_Abs" /></type></variable>
+            <variable name="instHomingM1"><type><derived name="FB_Encoder_Homing" /></type></variable>
+            <variable name="instEncoderScaleM1"><type><derived name="FB_Encoder_Scale" /></type></variable>
+            <variable name="instEncoderAbsM2"><type><derived name="FB_Encoder_Abs" /></type></variable>
+            <variable name="instHomingM2"><type><derived name="FB_Encoder_Homing" /></type></variable>
+            <variable name="instEncoderScaleM2"><type><derived name="FB_Encoder_Scale" /></type></variable>
+            <variable name="instPosDecoderM3"><type><derived name="FB_Translation_PositionDecoder" /></type></variable>
+            <variable name="instCycleTimeAcq"><type><derived name="FB_CycleTime" /></type></variable>
+            <variable name="instFilterM3StatusWord"><type><derived name="FB_Filter_PT1" /></type></variable>
+            <variable name="instFilterM3ActualFreqHz"><type><derived name="FB_Filter_PT1" /></type></variable>
+            <variable name="WinchInputSourceSimulated"><type><BOOL /></type></variable>
+            <variable name="PreviousWinchInputSourceSimulated"><type><BOOL /></type></variable>
+            <variable name="WinchInputSourceInitialized"><type><BOOL /></type></variable>
+          </localVars>
+          <outputVars>
+            <variable name="HwReal"><type><derived name="ST_HardwareImage" /></type></variable>
+            <variable name="HwSim"><type><derived name="ST_HardwareImage" /></type></variable>
+            <variable name="HwIn"><type><derived name="ST_HardwareImage" /></type></variable>
+            <variable name="WinchInputSourceChanged"><type><BOOL /></type></variable>
+            <variable name="TranslationPosTremie"><type><BOOL /></type></variable>
+            <variable name="TranslationPosPV"><type><BOOL /></type></variable>
+            <variable name="TranslationPosP2"><type><BOOL /></type></variable>
+            <variable name="TranslationPosP1"><type><BOOL /></type></variable>
+            <variable name="TranslationPosMaintenance"><type><BOOL /></type></variable>
+            <variable name="M3_StatusWord_Filtered"><type><UINT /></type></variable>
+            <variable name="M3_ActualFrequencyHz_Filtered"><type><UINT /></type></variable>
+            <variable name="M3_LimitSwitchFwd"><type><BOOL /></type></variable>
+            <variable name="M3_LimitSwitchRev"><type><BOOL /></type></variable>
+            <variable name="M3_SensorWordIncoherent"><type><BOOL /></type></variable>
+            <variable name="M3_SensorsWord"><type><BYTE /></type></variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <html:xhtml />
+          </ST>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/cfc" handleUnknown="implementation">
+              <CFC>
+                <!-- Entrées / Blocs complexes -->
+                <block localId="1" executionOrderId="1" typeName="FB_SimBench" instanceName="instSimBench">
+                  <position x="100" y="20" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="2" executionOrderId="2" typeName="FB_Joystick" instanceName="instJoystick">
+                  <position x="100" y="80" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="3" executionOrderId="3" typeName="FB_Encoder_Abs" instanceName="instEncoderAbsM1">
+                  <position x="100" y="140" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="4" executionOrderId="4" typeName="FB_Encoder_Homing" instanceName="instHomingM1">
+                  <position x="100" y="200" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="5" executionOrderId="5" typeName="FB_Encoder_Scale" instanceName="instEncoderScaleM1">
+                  <position x="100" y="260" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="6" executionOrderId="6" typeName="FB_Encoder_Abs" instanceName="instEncoderAbsM2">
+                  <position x="100" y="320" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="7" executionOrderId="7" typeName="FB_Encoder_Homing" instanceName="instHomingM2">
+                  <position x="100" y="380" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="8" executionOrderId="8" typeName="FB_Encoder_Scale" instanceName="instEncoderScaleM2">
+                  <position x="100" y="440" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="9" executionOrderId="9" typeName="FB_Translation_PositionDecoder" instanceName="instPosDecoderM3">
+                  <position x="100" y="500" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="10" executionOrderId="10" typeName="FB_Filter_PT1" instanceName="instFilterM3StatusWord">
+                  <position x="100" y="560" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="11" executionOrderId="11" typeName="FB_Filter_PT1" instanceName="instFilterM3ActualFreqHz">
+                  <position x="100" y="620" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+                <block localId="12" executionOrderId="12" typeName="FB_CycleTime" instanceName="instCycleTimeAcq">
+                  <position x="100" y="680" />
+                  <inputVariables />
+                  <inOutVariables />
+                  <outputVariables />
+                  <addData>
+                    <data name="http://www.3s-software.com/plcopenxml/cfccalltype" handleUnknown="implementation">
+                      <CallType xmlns="">functionblock</CallType>
+                    </data>
+                  </addData>
+                </block>
+
+                <!-- Connecteurs et Variables de Sortie Publiques (15 sorties) -->
+                <inVariable localId="101">
+                  <position x="250" y="20" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>HwReal</expression>
+                </inVariable>
+                <connector localId="102" name="HwRealConn">
+                  <position x="380" y="20" />
+                  <connectionPointIn><connection refLocalId="101" /></connectionPointIn>
+                </connector>
+                <outVariable localId="103">
+                  <position x="450" y="20" />
+                  <connectionPointIn><connection refLocalId="102" /></connectionPointIn>
+                  <expression>HwReal</expression>
+                </outVariable>
+
+                <inVariable localId="104">
+                  <position x="250" y="40" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>HwSim</expression>
+                </inVariable>
+                <connector localId="105" name="HwSimConn">
+                  <position x="380" y="40" />
+                  <connectionPointIn><connection refLocalId="104" /></connectionPointIn>
+                </connector>
+                <outVariable localId="106">
+                  <position x="450" y="40" />
+                  <connectionPointIn><connection refLocalId="105" /></connectionPointIn>
+                  <expression>HwSim</expression>
+                </outVariable>
+
+                <inVariable localId="107">
+                  <position x="250" y="60" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>HwIn</expression>
+                </inVariable>
+                <connector localId="108" name="HwInConn">
+                  <position x="380" y="60" />
+                  <connectionPointIn><connection refLocalId="107" /></connectionPointIn>
+                </connector>
+                <outVariable localId="109">
+                  <position x="450" y="60" />
+                  <connectionPointIn><connection refLocalId="108" /></connectionPointIn>
+                  <expression>HwIn</expression>
+                </outVariable>
+
+                <inVariable localId="110">
+                  <position x="250" y="80" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>WinchInputSourceChanged</expression>
+                </inVariable>
+                <connector localId="111" name="WinchSrcConn">
+                  <position x="380" y="80" />
+                  <connectionPointIn><connection refLocalId="110" /></connectionPointIn>
+                </connector>
+                <outVariable localId="112">
+                  <position x="450" y="80" />
+                  <connectionPointIn><connection refLocalId="111" /></connectionPointIn>
+                  <expression>WinchInputSourceChanged</expression>
+                </outVariable>
+
+                <inVariable localId="113">
+                  <position x="250" y="100" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.TranslationPosTremie</expression>
+                </inVariable>
+                <connector localId="114" name="PosTremieConn">
+                  <position x="380" y="100" />
+                  <connectionPointIn><connection refLocalId="113" /></connectionPointIn>
+                </connector>
+                <outVariable localId="115">
+                  <position x="450" y="100" />
+                  <connectionPointIn><connection refLocalId="114" /></connectionPointIn>
+                  <expression>TranslationPosTremie</expression>
+                </outVariable>
+
+                <inVariable localId="116">
+                  <position x="250" y="120" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.TranslationPosPV</expression>
+                </inVariable>
+                <connector localId="117" name="PosPVConn">
+                  <position x="380" y="120" />
+                  <connectionPointIn><connection refLocalId="116" /></connectionPointIn>
+                </connector>
+                <outVariable localId="118">
+                  <position x="450" y="120" />
+                  <connectionPointIn><connection refLocalId="117" /></connectionPointIn>
+                  <expression>TranslationPosPV</expression>
+                </outVariable>
+
+                <inVariable localId="119">
+                  <position x="250" y="140" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.TranslationPosP2</expression>
+                </inVariable>
+                <connector localId="120" name="PosP2Conn">
+                  <position x="380" y="140" />
+                  <connectionPointIn><connection refLocalId="119" /></connectionPointIn>
+                </connector>
+                <outVariable localId="121">
+                  <position x="450" y="140" />
+                  <connectionPointIn><connection refLocalId="120" /></connectionPointIn>
+                  <expression>TranslationPosP2</expression>
+                </outVariable>
+
+                <inVariable localId="122">
+                  <position x="250" y="160" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.TranslationPosP1</expression>
+                </inVariable>
+                <connector localId="123" name="PosP1Conn">
+                  <position x="380" y="160" />
+                  <connectionPointIn><connection refLocalId="122" /></connectionPointIn>
+                </connector>
+                <outVariable localId="124">
+                  <position x="450" y="160" />
+                  <connectionPointIn><connection refLocalId="123" /></connectionPointIn>
+                  <expression>TranslationPosP1</expression>
+                </outVariable>
+
+                <inVariable localId="125">
+                  <position x="250" y="180" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.TranslationPosMaintenance</expression>
+                </inVariable>
+                <connector localId="126" name="PosMaintConn">
+                  <position x="380" y="180" />
+                  <connectionPointIn><connection refLocalId="125" /></connectionPointIn>
+                </connector>
+                <outVariable localId="127">
+                  <position x="450" y="180" />
+                  <connectionPointIn><connection refLocalId="126" /></connectionPointIn>
+                  <expression>TranslationPosMaintenance</expression>
+                </outVariable>
+
+                <inVariable localId="128">
+                  <position x="250" y="200" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>M3_StatusWord_Filtered</expression>
+                </inVariable>
+                <connector localId="129" name="M3StatusConn">
+                  <position x="380" y="200" />
+                  <connectionPointIn><connection refLocalId="128" /></connectionPointIn>
+                </connector>
+                <outVariable localId="130">
+                  <position x="450" y="200" />
+                  <connectionPointIn><connection refLocalId="129" /></connectionPointIn>
+                  <expression>M3_StatusWord_Filtered</expression>
+                </outVariable>
+
+                <inVariable localId="131">
+                  <position x="250" y="220" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>M3_ActualFrequencyHz_Filtered</expression>
+                </inVariable>
+                <connector localId="132" name="M3FreqConn">
+                  <position x="380" y="220" />
+                  <connectionPointIn><connection refLocalId="131" /></connectionPointIn>
+                </connector>
+                <outVariable localId="133">
+                  <position x="450" y="220" />
+                  <connectionPointIn><connection refLocalId="132" /></connectionPointIn>
+                  <expression>M3_ActualFrequencyHz_Filtered</expression>
+                </outVariable>
+
+                <inVariable localId="134">
+                  <position x="250" y="240" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.LimitSwitchFwd</expression>
+                </inVariable>
+                <connector localId="135" name="LimitFwdConn">
+                  <position x="380" y="240" />
+                  <connectionPointIn><connection refLocalId="134" /></connectionPointIn>
+                </connector>
+                <outVariable localId="136">
+                  <position x="450" y="240" />
+                  <connectionPointIn><connection refLocalId="135" /></connectionPointIn>
+                  <expression>M3_LimitSwitchFwd</expression>
+                </outVariable>
+
+                <inVariable localId="137">
+                  <position x="250" y="260" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.LimitSwitchRev</expression>
+                </inVariable>
+                <connector localId="138" name="LimitRevConn">
+                  <position x="380" y="260" />
+                  <connectionPointIn><connection refLocalId="137" /></connectionPointIn>
+                </connector>
+                <outVariable localId="139">
+                  <position x="450" y="260" />
+                  <connectionPointIn><connection refLocalId="138" /></connectionPointIn>
+                  <expression>M3_LimitSwitchRev</expression>
+                </outVariable>
+
+                <inVariable localId="140">
+                  <position x="250" y="280" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.Incoherent</expression>
+                </inVariable>
+                <connector localId="141" name="SensorIncoherentConn">
+                  <position x="380" y="280" />
+                  <connectionPointIn><connection refLocalId="140" /></connectionPointIn>
+                </connector>
+                <outVariable localId="142">
+                  <position x="450" y="280" />
+                  <connectionPointIn><connection refLocalId="141" /></connectionPointIn>
+                  <expression>M3_SensorWordIncoherent</expression>
+                </outVariable>
+
+                <inVariable localId="143">
+                  <position x="250" y="300" />
+                  <connectionPointOut><expression /></connectionPointOut>
+                  <expression>instPosDecoderM3.SensorsWord</expression>
+                </inVariable>
+                <connector localId="144" name="SensorsWordConn">
+                  <position x="380" y="300" />
+                  <connectionPointIn><connection refLocalId="143" /></connectionPointIn>
+                </connector>
+                <outVariable localId="145">
+                  <position x="450" y="300" />
+                  <connectionPointIn><connection refLocalId="144" /></connectionPointIn>
+                  <expression>M3_SensorsWord</expression>
+                </outVariable>
+              </CFC>
+            </data>
+          </addData>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3067f082-1262-4217-a068-80fbca8b6883</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
 </project>

@@ -225,6 +225,7 @@ def _build_pou(
         # PLCopen `<contact>` is valid for BOOL only.  Supply each called FB's
         # declared input types so TIME/INT/WORD/REAL use `<inVariable>`.
         instance_input_types: dict[str, dict[str, str]] = {}
+        instance_output_types: dict[str, list[str]] = {}
         for variable in variables:
             if not isinstance(variable.type, DerivedType):
                 continue
@@ -236,7 +237,20 @@ def _build_pou(
                 for input_var in called_fb.input_vars
                 if isinstance(input_var.type, BaseType)
             }
-        pou.append(build_ld_body(obj.body_text or "", boolean_identifiers, instance_types, instance_input_types))
+            instance_output_types[variable.name] = [
+                output_var.name
+                for output_var in called_fb.output_vars
+                if isinstance(output_var.type, BaseType)
+            ]
+        pou.append(
+            build_ld_body(
+                obj.body_text or "",
+                boolean_identifiers,
+                instance_types,
+                instance_input_types,
+                instance_output_types,
+            )
+        )
     else:
         body = ET.SubElement(pou, "body")
         st_el = ET.SubElement(body, "ST")

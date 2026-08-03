@@ -114,6 +114,12 @@ def discover_main_program_sources(main: Path) -> tuple[list[MainProgramSource], 
                 coverage_errors.append(f"[BMC0] {path}: source PRG XML sans pou/@name")
             continue
         if is_standalone_ld_export(path, programs):
+            # Un *_LD.xml à côté de son .st est un artefact de livraison interdit :
+            # le Ladder n'est livré QUE par le bundle (REX 2026-08, import CODESYS).
+            coverage_errors.append(
+                f"[BMC0] {path}: standalone LD export interdit — la livraison "
+                f"Ladder est CODE_Bundle.xml uniquement (REX 2026-08)"
+            )
             continue
         if not path.stem.endswith("_CFC"):
             coverage_errors.append(f"[BMC0] {path}: source PROGRAM XML doit etre nomme *_CFC.xml")
