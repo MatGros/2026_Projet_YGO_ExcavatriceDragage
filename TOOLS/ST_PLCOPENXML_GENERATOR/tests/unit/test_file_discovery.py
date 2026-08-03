@@ -115,7 +115,7 @@ def test_real_gvl_modes_removed():
 def test_real_prg_modes_cfc_object_present_and_named_from_stem():
     diag = DiagnosticCollector()
     objects = discover_objects(CODE_DIR, diag)
-    prg = next(o for o in objects if o.name == "PRG_MODES_CFC")
+    prg = next(o for o in objects if o.name == "PRG_03_Modes_Cycle")
     assert prg.kind == "program"
     # Vérifier que le programme a été parsé correctement
     # instModes est une variable locale (VAR), Auth est une sortie (VAR_OUTPUT)

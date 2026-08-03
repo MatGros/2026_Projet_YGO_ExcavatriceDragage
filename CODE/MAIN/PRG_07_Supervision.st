@@ -1,0 +1,166 @@
+(* ═══════════════════════════════════════════════════════════════
+   🖥️ PRG_07_Supervision — Échanges IHM, Diagnostics et Initialisation Boot
+   ───────────────────────────────────────────────────────────────
+   ⚙️ Exécuté par la tâche PLC en position 7.
+   ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
+   ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
+   📄 Docs : DOC/AF_Partie-07_Interface_IHM_v2.0.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+PROGRAM PRG_07_Supervision
+
+VAR_OUTPUT
+    FaultMachineReset_IHM : BOOL;
+END_VAR
+
+VAR
+    instBlink1Hz : BLINK;
+    instAckConfigRestored : R_TRIG;
+    instCfgPersistBridgeSync : FB_CfgPersistBridge_SyncCfg;
+    instCfgPersistBridgeCycle : FB_CfgPersistBridge_CycleCfg;
+    instCfgPersistBridgeDredgingAssist : FB_CfgPersistBridge_DredgingAssistCfg;
+    instCfgPersistBridgeCommun : FB_CfgPersistBridge_CommunCfg;
+    instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg;
+    instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg;
+    instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
+    instDiagCanOpen : FB_Diag_CanOpen;
+    instDiagEthercat : FB_Diag_Ethercat;
+END_VAR
+
+// === 🧩 §1 HORLOGE & RESET MACHINE ===
+
+instBlink1Hz(
+    ENABLE   := TRUE,
+    TIMEHIGH := _BlinkTimeOn,
+    TIMELOW  := _BlinkTimeOff
+);
+GVL_Global.BlinkClock := instBlink1Hz.OUT;
+
+instDiagCanOpen(
+    Enable := TRUE,
+    Reset  := GVL_IHM.Modes.Cmd.BtnFaultReset
+);
+
+instDiagEthercat(
+    Enable := TRUE,
+    Reset  := GVL_IHM.Modes.Cmd.BtnFaultReset
+);
+
+StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
+
+FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
+                    OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
+                    OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
+                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
+
+
+// === 🌉 §2 PERSISTANCE & RESTAURATION CONFIG ===
+
+instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
+IF instCfgPersistBridgeWinchM1.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeWinchM2(Hmi := GVL_IHM.M2TreuilBenne.Cfg, Persist := _WinchM2CfgPersist);
+IF instCfgPersistBridgeWinchM2.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
+IF instCfgPersistBridgeSync.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeBucket(Hmi := GVL_IHM.M2TreuilBenne.Bucket.Cfg, Persist := _BucketCfgPersist);
+IF instCfgPersistBridgeBucket.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeCommun(Hmi := GVL_IHM.Commun.Cfg, Persist := _CommunCfgPersist);
+IF instCfgPersistBridgeCommun.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeCycle(Hmi := GVL_IHM.Cycle.Cfg, Persist := _CycleCfgPersist);
+IF instCfgPersistBridgeCycle.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeDredgingAssist(Hmi := GVL_IHM.DredgingAssist.Cfg, Persist := _DredgingAssistCfgPersist);
+IF instCfgPersistBridgeDredgingAssist.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
+    GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := _TranslationSetFreq_Hz;
+    GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instAckConfigRestored(CLK := GVL_IHM.Commun.BtnAckConfigRestored);
+IF instAckConfigRestored.Q THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
+END_IF;
+
+IF NOT GVL_IHM.TranslationM3.Bypass.Initialized THEN
+    IF BypassTranslationGlobal THEN
+        GVL_IHM.TranslationM3.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.TranslationM3.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.M1TreuilRetenue.Bypass.Initialized THEN
+    IF BypassWinchM1Global THEN
+        GVL_IHM.M1TreuilRetenue.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M1TreuilRetenue.Bypass.Initialized := TRUE;
+END_IF;
+
+IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
+    IF BypassWinchM2Global THEN
+        GVL_IHM.M2TreuilBenne.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
+END_IF;
+
+IF GVL_IHM.TranslationM3.Bypass.Global <> BypassTranslationGlobal THEN
+    BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
+END_IF;
+IF GVL_IHM.M1TreuilRetenue.Bypass.Global <> BypassWinchM1Global THEN
+    BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+END_IF;
+IF GVL_IHM.M2TreuilBenne.Bypass.Global <> BypassWinchM2Global THEN
+    BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
+END_IF;
+
+
+// === 📊 §3 PROJECTIONS IHM ET MAPPING ===
+
+GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled;
+GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_01_Inputs_LD.TopPositionSensor;
+GVL_IHM.Commun.HydraulicThermalFault     := FALSE;
+
+GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+
+GVL_IHM.M1TreuilRetenue.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue;
+GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable;
+GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue;
+GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
+
+GVL_IHM.Modes.State.ActiveMode := PRG_03_Modes_Cycle.Auth.Mode;
+GVL_IHM.Modes.State.SyncEnabled := PRG_03_Modes_Cycle.Auth.SyncEnable;
+
+GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
+GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;
+GVL_IHM.Network.BusEthercat := instDiagEthercat.DeviceEthercatMaster;
+GVL_IHM.Network.EncoderM1   := instDiagEthercat.DeviceEncoderM1;
+GVL_IHM.Network.EncoderM2   := instDiagEthercat.DeviceEncoderM2;
+GVL_IHM.Network.VariateurM3 := instDiagEthercat.DeviceVariateur;
+GVL_IHM.Network.EcatError   := instDiagEthercat.Error;
+GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
+
+END_PROGRAM

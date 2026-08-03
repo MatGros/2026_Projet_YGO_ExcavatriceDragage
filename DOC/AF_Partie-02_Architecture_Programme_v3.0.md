@@ -30,17 +30,16 @@
 
 | Principe | Exigence |
 |---|---|
-| 👁️ CFC lisible | Une page CFC represente un domaine de responsabilite. Elle montre les instances et contrats, sans logique metier cachee. |
-| 🧩 POO | Les FB encapsulent calculs, machines d'etat et briques techniques par composition. |
-| ✍️ Producteur unique | Toute donnee, commande ou sortie physique a un seul ecrivain identifie. |
-| 🔗 Contrat type | Tout flux inter-domaine passe par une structure DUT publique, documentee et orientee role. |
-| 🛡️ Safety visible | Les sorties safety et leurs consommateurs sont nommes et visibles ; aucun arbitrage safety anonyme n'est admis. |
-| ⚡ Sortie finale | Une barriere finale est l'unique productrice de chaque commande physique. |
-| 🧪 Simulation | Le choix reel/simule est realise une fois a la frontiere acquisition, par domaine. |
+| 📑 ST lisible & structuré | Les programmes d'orchestration sont rédigés en **Structured Text (ST)**. Ils sont découpés en sections claires commentées avec des emojis (ex: `// === 📥 §1 ACQUISITION ===`), sans logique métier inline. |
+| 🧩 POO | Les FB encapsulent calculs, machines d'état et briques techniques par composition. |
+| ✍️ Producteur unique | Toute donnée, commande ou sortie physique a un seul écrivain identifié. |
+| 🔗 Contrat par bus DUT | Tout flux inter-domaine passe par une structure DUT publique (`ST_*`), documentée et orientée rôle (`Auth`, `Qualified`, `Measurements`). |
+| 🛡️ Safety visible | Les sorties safety et leurs consommateurs sont nommés et explicites ; aucun arbitrage safety anonyme n'est admis. |
+| ⚡ Sortie finale | Une barrière finale (`PRG_06_Outputs_LD`) est l'unique productrice de chaque commande physique. |
+| 🧪 Simulation | Le choix réel/simulé est réalisé une fois à la frontière acquisition, par domaine. |
 | 🖥️ IHM | Les structures `Cmd/State/Cfg/Bypass` restent le contrat PLC-IHM, distinct des flux internes. |
 
-Une page CFC peut contenir des constantes nommees, des instances et des liaisons. Elle ne contient
-ni `IF`, ni calcul, ni fusion de commandes, ni ecriture de sortie physique hors `PRG_OUTPUTS_LD`.
+Un programme d'orchestration ST contient des déclarations d'instances, des constantes nommées et le câblage des entrées/sorties de FB par structures DUT. Il ne contient ni `IF` complexe, ni calcul, ni fusion de commandes, ni écriture de sortie physique hors `PRG_06_Outputs_LD`.
 
 ---
 
@@ -52,20 +51,20 @@ safety et le bloc metier commande doit etre visible sur le meme schema, sans ouv
 
 | N° | Programme | Langage | Responsabilite |
 |---|---|---|---|
-| 01 | 🪜 `PRG_01_Inputs_LD` | Ladder | Image qualifiee des E/S TOR via `FB_Input` ; lecture seule, aucune decision metier. |
-| 02 | 📥 `PRG_02_Acquisition_CFC` | CFC | Frontiere E/S, selection reel/simule, **chaine complete codeurs M1/M2/M3** (absolu, echelle, vitesse, validite), joystick, **diagnostics devices/bus** et retours auxiliaires qualifies. |
-| 03 | 🎚️ `PRG_03_Modes_Cycle_CFC` | CFC | Modes, droits, autorisations, selections de sources et **sequenceur de cycle** (`FB_Cycle`). Produit des demandes ; ne commande aucune sortie. |
-| 04 | 🪝 `PRG_04_Treuils_Benne_CFC` | CFC | **Ensemble levage indissociable** : M1 (retenue) + M2 (benne) + synchronisation + benne + `FB_DiveSearch`/`FB_ExtractionSequence`, **avec la safety M1/M2 cablee en parallele visible** sur la meme page. |
-| 05 | ↔️ `PRG_05_Translation_CFC` | CFC | Positionnement M3 et arbitrage final translation, **avec la safety M3 cablee en parallele visible** sur la meme page. |
-| 06 | ⚡ `PRG_06_Outputs_LD` | Ladder | Barrieres finales, commandes physiques, **agregation finale des demandes `PowerCutOff`** et rearmement. |
-| 07 | 🔎 `PRG_07_Supervision_CFC` | CFC | Agregation IHM, troubleshooting et bypass. Lecture seule stricte : il n'ecrit ni commande, ni configuration, ni interlock. |
+| 01 | 🪜 `PRG_01_Inputs_LD` | Ladder | Image qualifiée des E/S TOR via `FB_Input` ; lecture seule, aucune décision métier. |
+| 02 | 📥 `PRG_02_Acquisition` | ST pur (`.st`) | Frontière E/S, sélection réel/simulé, **chaîne complète codeurs M1/M2/M3**, joystick, **diagnostics devices/bus** et retours auxiliaires qualifiés. |
+| 03 | 🎚️ `PRG_03_Modes_Cycle` | ST pur (`.st`) | Modes, droits, autorisations, sélections de sources et **séquenceur de cycle** (`FB_Cycle`). Produit des demandes ; ne commande aucune sortie. |
+| 04 | 🪝 `PRG_04_Treuils_Benne` | ST pur (`.st`) | **Ensemble levage indissociable** : M1 (retenue) + M2 (benne) + synchronisation + benne + `FB_DiveSearch`/`FB_ExtractionSequence`, avec la safety M1/M2 appelée de manière explicite. |
+| 05 | ↔️ `PRG_05_Translation` | ST pur (`.st`) | Positionnement M3 et arbitrage final translation, avec la safety M3 appelée de manière explicite. |
+| 06 | ⚡ `PRG_06_Outputs_LD` | Ladder | Barrières finales, commandes physiques, **agrégation finale des demandes `PowerCutOff`** et réarmement. |
+| 07 | 🔎 `PRG_07_Supervision` | ST pur (`.st`) | Agrégation IHM, troubleshooting et bypass. Lecture seule stricte : n'écrit ni commande, ni configuration, ni interlock. |
 
 | Element transverse | Rattachement | Regle |
 |---|---|---|
 | 🖥️ Frontiere IHM | DUT `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Mapping et persistance restent **TBD**. |
-| 🛑 Chaine AU physique | `PRG_02_Acquisition_CFC` | L'etat AU est un **fait d'entree qualifie** acquis avec les autres entrees : visible des l'acquisition pour la maintenance. Le FB agit ensuite sur les sorties via la barriere finale. La chaine materielle reste independante et proprietaire de la Partie 01. |
+| 🛑 Chaine AU physique | `PRG_02_Acquisition` | L'etat AU est un **fait d'entree qualifie** acquis avec les autres entrees : visible des l'acquisition pour la maintenance. Le FB agit ensuite sur les sorties via la barriere finale. La chaine materielle reste independante et proprietaire de la Partie 01. |
 | ⚡ `PowerCutOff` | `PRG_06_Outputs_LD` | Chaque procede publie **sa demande** ; la barriere finale, seule au plus pres des sorties, realise l'agregation et coupe. |
-| 🔀 Securites croisees | Procede qui **subit** l'interdiction | Une interdiction est portee par le domaine qui la subit (ex. interdire M3 selon un etat benne = dans `PRG_05_Translation_CFC`). Les Modes distribuent des **autorisations**, ils ne portent pas la responsabilite de l'interdiction metier. |
+| 🔀 Securites croisees | Procede qui **subit** l'interdiction | Une interdiction est portee par le domaine qui la subit (ex. interdire M3 selon un etat benne = dans `PRG_05_Translation`). Les Modes distribuent des **autorisations**, ils ne portent pas la responsabilite de l'interdiction metier. |
 
 `FB_Cycle` reste une machine d'etat ST encapsulee : sa logique est plus lisible et testable sous cette
 forme, mais elle est instanciee dans la page CFC Modes/Cycle. Les assistants de plongee/extraction
@@ -113,14 +112,14 @@ la base existante est conservee : EtherCAT 4 ms, CANopen 20 ms et `MainTask` 10 
 systeme 200 ms.
 
 ```text
-MainTask 10 ms — ordre d'appel cible (decoupage par ensemble mecanique)
+MainTask 10 ms — ordre d'appel cible (découpage par ensemble mécanique)
   01. PRG_01_Inputs_LD             (source .st convertie en Ladder)
-  02. PRG_02_Acquisition_CFC       (CFC natif .xml cible)
-  03. PRG_03_Modes_Cycle_CFC       (CFC natif .xml cible)
-  04. PRG_04_Treuils_Benne_CFC     (CFC natif .xml cible — safety M1/M2 integree)
-  05. PRG_05_Translation_CFC       (CFC natif .xml cible — safety M3 integree)
+  02. PRG_02_Acquisition           (source .st en ST pur d'orchestration)
+  03. PRG_03_Modes_Cycle           (source .st en ST pur d'orchestration)
+  04. PRG_04_Treuils_Benne         (source .st en ST pur — safety M1/M2 intégrée)
+  05. PRG_05_Translation           (source .st en ST pur — safety M3 intégrée)
   06. PRG_06_Outputs_LD            (source .st convertie en Ladder)
-  07. PRG_07_Supervision_CFC       (CFC natif .xml cible — lecture seule)
+  07. PRG_07_Supervision           (source .st en ST pur — lecture seule)
 ```
 
 Ce flux est lineaire et sans retour arriere : entrees -> acquisition/diagnostic -> autorisations ->
@@ -138,13 +137,13 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 
 | POU actuel | Devient | Motif |
 |---|---|---|
-| `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` | Inchange, renumerote. |
-| `PRG_ACQUISITION_CFC` + `PRG_01_Diagnostics` + `PRG_02_Encoders` + `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition_CFC` | Acquerir une mesure, sa vitesse et sa sante est **une seule responsabilite**. Supprime les instances codeurs dupliquees et le POU auxiliaire d'une ligne. |
-| `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle_CFC` | Autorisations et sequences de conduite au meme endroit. |
-| `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne_CFC` | M1 et M2 sont mecaniquement indissociables (benne suspendue) ; leur safety devient visible en parallele des blocs metier. |
-| `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation_CFC` | Idem pour la translation. |
-| `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` | Devient aussi l'agregateur `PowerCutOff`. |
-| `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision_CFC` | Observation et diagnostic, lecture seule stricte. |
+| `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` | Inchangé, renuméroté (Ladder). |
+| `PRG_ACQUISITION_CFC` + `PRG_01_Diagnostics` + `PRG_02_Encoders` + `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition` | Acquérir une mesure, sa vitesse et sa santé est **une seule responsabilité** (ST pur). |
+| `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle` | Autorisations et séquences de conduite au même endroit (ST pur). |
+| `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne` | M1 et M2 sont mécaniquement indissociables (benne suspendue) ; leur safety est appelée au même endroit (ST pur). |
+| `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation` | Idem pour la translation (ST pur). |
+| `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` | Devient aussi l'agrégateur `PowerCutOff` (Ladder). |
+| `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` | Observation et diagnostic, lecture seule stricte (ST pur). |
 
 📌 Dossier de decision : `DOC/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
 **Aucun renommage ni fusion ne demarre sans lot dedie** : chaque etape exige remappage complet des

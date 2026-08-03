@@ -40,16 +40,15 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 
 | Suffixe | Langage bundle | Source versionnee | Rôle | Exemple |
 |---------|----------------|-------------------|------|---------|
-| `_CFC` | Continuous Function Chart (`<CFC>`) | `.xml` PLCopenXML natif | Orchestration visuelle, câblage FB par bus DUT | `PRG_XX_ACQUISITION_CFC.xml` |
-| `_LD` | Ladder Diagram (`<LD>`) | `.st`, converti automatiquement en Ladder dans le bundle | Barrières finales, sorties physiques | `PRG_XX_OUTPUTS_LD.st` |
-| (sans suffixe) | Structured Text (`<ST>`) | `.st` | Machine d'état / séquenceur ou agrégation lecture seule | `PRG_XX_CYCLE.st` |
+| (sans suffixe) | Structured Text (`<ST>`) | `.st` | Orchestration ST par procédé, câblage d'instances FB par bus DUT | `PRG_02_Acquisition.st`, `PRG_04_Treuils_Benne.st` |
+| `_LD` | Ladder Diagram (`<LD>`) | `.st`, converti automatiquement en Ladder dans le bundle | Barrières finales, E/S physiques TOR qualifiées | `PRG_01_Inputs_LD.st`, `PRG_06_Outputs_LD.st` |
 
 **Règles :**
-- Tout programme est prefixe `PRG_XX_` : la numerotation est la preuve documentaire de l'ordre MainTask ; le rang est decide dans `AF_Partie-02` avant tout renommage.
-- Un programme `_CFC` est un `.xml` PLCopenXML natif et ne contient **aucune logique métier** (pas de `IF`, pas de calcul) — uniquement des instances + liaisons par bus DUT.
-- Un programme `_LD.st` est converti automatiquement en `<LD>` dans le bundle ; il produit **seul** les Q physiques finales (contacteurs, freins, PDO variateur).
-- Un programme ST (`PRG_XX_CYCLE.st`) porte une machine d'état ; il **produit des demandes**, ne commande pas les sorties.
-- `PRG_GLOBAL_CFC` est un prototype historique — **ne pas reproduire**.
+- Tout programme est préfixé `PRG_XX_` : la numérotation fixe l'ordre exact d'exécution dans la `MainTask` (décidé dans `AF_Partie-02`).
+- Les programmes d'orchestration procédés sont rédigés en **Texte Structuré ST (`.st`)** pour maximiser la vitesse d'implémentation et la lisibilité textuelle.
+- **Organisation en sections commentées avec emojis dans le ST** : Chaque programme ST d'orchestration doit structurer son flux de manière limpide de haut en bas (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`).
+- **Aucune logique métier inline** dans les POU `PRG_` ST : l'orchestration ne contient ni `IF` complexe ni calcul métier — uniquement des instanciations de FB et des câblages par bus DUT (`ST_*`).
+- Les programmes `_LD.st` restent convertis automatiquement en `<LD>` dans le bundle pour les barrières d'E/S physiques TOR (`PRG_01_Inputs_LD.st` et `PRG_06_Outputs_LD.st`).
 
 ### Noms cibles des programmes — aucun renommage sans lot dedie
 
@@ -60,13 +59,13 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 
 | Rang | Nom cible | Langage / source |
 |---|---|---|
-| 01 | `PRG_01_Inputs_LD` | `.st` converti en `<LD>` |
-| 02 | `PRG_02_Acquisition_CFC` | CFC natif `.xml` cible |
-| 03 | `PRG_03_Modes_Cycle_CFC` | CFC natif `.xml` cible |
-| 04 | `PRG_04_Treuils_Benne_CFC` | CFC natif `.xml` cible |
-| 05 | `PRG_05_Translation_CFC` | CFC natif `.xml` cible |
-| 06 | `PRG_06_Outputs_LD` | `.st` converti en `<LD>` |
-| 07 | `PRG_07_Supervision_CFC` | CFC natif `.xml` cible |
+| 01 | `PRG_01_Inputs_LD` | `.st` converti en `<LD>` (Ladder TOR) |
+| 02 | `PRG_02_Acquisition` | `.st` ST pur (Orchestration Acquisition) |
+| 03 | `PRG_03_Modes_Cycle` | `.st` ST pur (Orchestration Modes & Cycle) |
+| 04 | `PRG_04_Treuils_Benne` | `.st` ST pur (Orchestration Levage/Treuils) |
+| 05 | `PRG_05_Translation` | `.st` ST pur (Orchestration Translation) |
+| 06 | `PRG_06_Outputs_LD` | `.st` converti en `<LD>` (Ladder Sorties) |
+| 07 | `PRG_07_Supervision` | `.st` ST pur (Supervision / Lecture seule) |
 
 🚫 **Noms abandonnes comme cibles** — ne pas les reintroduire dans une table de nommage :
 `PRG_01_Acquisition_CFC`, `PRG_02_Inputs_LD`, `PRG_03_Modes_CFC`, `PRG_04_Safety_CFC` (ou toute
@@ -81,12 +80,12 @@ Aucun n'est un nom cible : ils sont absorbes par la page du procede correspondan
 | POU actuel | Absorbe par |
 |---|---|
 | `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` |
-| `PRG_ACQUISITION_CFC`, `PRG_01_Diagnostics`, `PRG_02_Encoders`, `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition_CFC` |
-| `PRG_MODES_CFC`, `PRG_05_Cycle` | `PRG_03_Modes_Cycle_CFC` |
-| `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne_CFC` |
-| `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation_CFC` |
+| `PRG_ACQUISITION_CFC`, `PRG_01_Diagnostics`, `PRG_02_Encoders`, `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition` |
+| `PRG_MODES_CFC`, `PRG_05_Cycle` | `PRG_03_Modes_Cycle` |
+| `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne` |
+| `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation` |
 | `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` |
-| `PRG_SUPERVISION_CFC`, `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision_CFC` |
+| `PRG_SUPERVISION_CFC`, `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` |
 
 ⛔ **Aucun renommage, fusion ou conversion CFC natif ne demarre sans lot dedie** : chaque etape
 exige le remappage complet des consommateurs avant suppression de l'ancien producteur, un
