@@ -516,13 +516,47 @@ premier import CFC testable et devra être remplacée par des contrats explicite
 
 ---
 
+## A-16 — DUT orphelins / fantômes / doublons de l'audit acquisition *(lot M1)*
+
+**Statut : 🟡 TRANCHÉ PROVISOIRE — réaffectation documentaire, code inchangé**
+
+### Faits (audit DUT acquisition, 2026-08-03)
+
+| DUT | Verdict | Constat |
+|---|---|---|
+| `ST_Diag_Device`, `E_Diag_State` | orphelins | FB diag non instanciés depuis la suppression de `PRG_01_Diagnostics` ; redeviennent vivants quand `instDiagCanOpen/Ethercat/IhmHeartbeat` rejoignent `PRG_02_Acquisition_CFC` (cible) |
+| `ST_JoystickState`, `ST_EncoderHMI`, `ST_NetworkDiagHMI` | IHM-only, producteur cassé | producteur legacy supprimé ; à réaffecter en lot M6 (supervision/IHM) |
+| `ST_HwIn_Machine` | fantôme | n'existe pas ; le champ réel est `ST_HwMachine` (sous-image de `ST_HardwareImage`) — **corrigé** dans la fiche `FB_Safety_EmergencyManagement` §8.2 (commit `6eeb6cb`) |
+| `ST_DeviceDiagnostics` | doublon potentiel | à rapprocher de `ST_Diag_Device` en lot M6 |
+| `ST_EncoderMeasurements` | à créer | contrat rédigé — AF06 §2ter |
+
+### Options
+
+| Option | Effet |
+|---|---|
+| A — Supprimer les DUT orphelins maintenant | 🔴 Non : casse la cible (diag redeviendront vivants en `PRG_02`) et l'IHM |
+| B — Réaffectation documentaire seule (cible) | Conserve le code, aligne la doc sur les propriétaires cibles ; nettoyage réel au moment du cutover |
+| C — Ignorer | Risque de re-créer des doublons au cutover |
+
+### Décision retenue : **B**
+
+Le code ne change pas (DOC-only). La doc cible (AF06/AF12) pointe déjà les bons propriétaires.
+Le nettoyage physique (`ST_DeviceDiagnostics` vs `ST_Diag_Device`, réaffectation des DUT IHM-only)
+se fera pendant les lots M1/M6, avec ce registre pour référence.
+
+### Risque résiduel
+
+Doublons temporaires si un lot ré-écrit un DUT sans consulter cet audit. À vérifier en revue M1/M6.
+
+---
+
 ## Journal des lots
 
 | Lot | Statut | Arbitrages engagés |
 |---|---|---|
 | M0-bis alignement doc | ✅ terminé, commit `f32dcd6` | — |
 | M0 audit de gel | ✅ terminé — `AUDIT_M0_GEL_ETAT_INITIAL.md` | A-09, A-10, A-11, A-12 |
-| M1 acquisition unifiée | à lancer | A-02, A-03, A-09, A-10, A-12 (A-01 tranché : homing dans Treuils M3) |
+| M1 acquisition unifiée | à lancer | A-02, A-03, A-09, A-10, A-12, A-16 (A-01 tranché : homing dans Treuils M3) |
 | M2 modes + cycle | ✅ staging XML créé, hors MainTask | A-14 |
 | M3 treuils + safety | à lancer | A-01 |
 | M4 translation + safety | à lancer | — |
