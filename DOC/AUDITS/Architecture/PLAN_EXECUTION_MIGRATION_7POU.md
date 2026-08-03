@@ -108,11 +108,15 @@ Aucune écriture dans `CODE/`.
 
 Points durs :
 1. Six instances dupliquées à unifier (`instEncoderAbsM1/M2`, `instEncoderScaleM1/M2`, `instHomingM1/M2`) et `instJoystick`.
-2. Le homing lit aujourd'hui le mode de marche → dépendance vers un POU aval.
+2. ~~Le homing lit aujourd'hui le mode de marche → dépendance vers un POU aval.~~ **TRANCHÉ (A-01)** : le
+   homing migre en M3 avec les treuils (option C) — il ne reste donc pas ici, la dépendance vers
+   Modes (rang 03) est lue depuis Treuils (rang 04). La mesure reste en Acquisition, le recalage
+   part avec le mouvement qu'il recale. Preuve : REGISTRE_ARBITRAGES_MIGRATION §A-01.
 3. L'état AU devient un fait d'entrée qualifié ici (RU §3.3), l'action reste en `Outputs`.
 
-⚠️ Le point 2 est le seul vrai blocage restant : si le homing a besoin des Modes, il ne peut pas
-être calculé avant eux. Options à trancher au lancement de M1, avec preuve à l'appui.
+⚠️ Point 2 résolu par conception (A-01). Au lancement de M1, appliquer aussi A-16 (DUT orphelins/
+doublons : `ST_Diag_Device`, `ST_DeviceDiagnostics`, DUT IHM-only) et le contrat DUT
+`ST_EncoderMeasurements` (AF06 §2ter) comme squelette d'échange inter-blocs.
 
 ### M2 — Modes + Cycle *(C3, patch)*
 
